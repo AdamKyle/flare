@@ -43,6 +43,9 @@ class MapControllerApiTest extends TestCase
             'game_map_id' => $this->character->getCharacter(false)->map->game_map_id,
         ]);
 
+        $this->createGameMap(['name' => 'Purgatory']);
+        $this->createGameMap(['name' => 'Hell']);
+
         resolve(BuildMonsterCacheService::class)->buildCache();
     }
 

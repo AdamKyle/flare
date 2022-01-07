@@ -15,6 +15,7 @@ use League\Fractal\Manager;
 use Tests\TestCase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Traits\CreateCelestials;
+use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateMonster;
 use Tests\Traits\CreateNpc;
 
@@ -22,7 +23,7 @@ class ConjureServiceTest extends TestCase
 {
     use RefreshDatabase;
 
-    use RefreshDatabase, CreateMonster, CreateNpc, CreateCelestials;
+    use RefreshDatabase, CreateMonster, CreateNpc, CreateCelestials, CreateGameMap;
 
     private $character = null;
 
@@ -33,6 +34,9 @@ class ConjureServiceTest extends TestCase
             'gold' => 999999999,
             'gold_dust' => 999999999,
         ]);
+
+        $this->createGameMap(['name' => 'Hell']);
+        $this->createGameMap(['name' => 'Purgatory']);
     }
 
     public function testCanConjurePrivateCelestial() {

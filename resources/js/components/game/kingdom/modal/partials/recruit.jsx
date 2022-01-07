@@ -1,5 +1,6 @@
 import React, {Fragment} from 'react';
 import {Popover, OverlayTrigger} from 'react-bootstrap';
+import AlertInfo from "../../../components/base/alert-info";
 
 export default class Recruit extends React.Component {
 
@@ -7,7 +8,7 @@ export default class Recruit extends React.Component {
     super(props);
 
     this.state = {
-      max: this.props.currentPopulation,
+      max: parseInt(this.props.unit.kd_max.replace(/,/g, '')) || 0,
       value: "",
       canRecruit: true,
       loading: false,
@@ -19,16 +20,16 @@ export default class Recruit extends React.Component {
   componentDidUpdate(prevProps, prevState) {
     if (prevState.max !== this.state.max) {
       this.setState({
-        max: this.props.currentPopulation,
+        max: parseInt(this.props.unit.kd_max.replace(/,/g, '')) || 0,
         value: 0,
       });
     }
   }
 
   amountChange(event) {
-    let value = parseInt(event.target.value) || '';
+    let value = parseInt(event.target.value) || 0;
 
-    if (value !== '') {
+    if (value !== 0) {
       if (value > this.state.max) {
         value = this.state.max;
       }
@@ -43,9 +44,9 @@ export default class Recruit extends React.Component {
   }
 
   amountChangeWithGold(event) {
-    let value = parseInt(event.target.value) || '';
+    let value = parseInt(event.target.value) || 0;
 
-    if (value !== '') {
+    if (value !== 0) {
       if (value > this.state.max) {
         value = this.state.max;
       }
@@ -281,12 +282,17 @@ export default class Recruit extends React.Component {
             {
               this.state.recruitmentType === 'recruit-with-gold' ?
                 <Fragment>
-                  <div className="alert alert-info">
+                  <AlertInfo icon={'fas fa-question-circle'} title="Info">
                     <p>You can pay gold instead of resources to recruit units.</p>
                     <p>You cannot buy more units then your population allows. You also cannot buy
                     more units then you have gold. Each unit has a cost per unit.</p>
                     <p>Recruitment time still counts. The more you recruit the more time it takes.</p>
-                  </div>
+                    <p>When recruiting with gold, you do not need to worry about the resource cost section, this is just an idea of how many resources it would take
+                    to recruit the units you wanted, if you were using resources.</p>
+                    <p>Do not use gold to purchase large amounts on units, until you have trained your Kingmanship <a href="/information/skill-information" target="_blank">Skill</a>&nbsp;
+                      to a significant portion. For example - with Kingmanship at level 1, recruiting 1 billion spearmen would take: <strong>94 years in real time</strong>,
+                      with the skill maxed out, it takes 34.72 days to recruit that many units, which is <em>much</em> better.</p>
+                  </AlertInfo>
                   <dl className="mt-3 mb-3">
                     <dt>Cost per unit:</dt>
                     <dd>{this.props.unit.cost_per_unit}</dd>

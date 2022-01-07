@@ -71,17 +71,19 @@ class CharacterSkillControllerApiTest extends TestCase {
     }
 
     public function testCanWithRollCraftItem() {
-        $character = $this->character->getCharacter(false);
+        $character  = $this->character->getCharacter(false);
         $user       = $this->character->getUser();
 
         $currentGold = $character->gold;
 
-        $craftingSkillService = Mockery::mock(CraftingService::class)->makePartial();
+        $craftingSkillService = Mockery::spy(CraftingService::class);
 
-        $this->app->instance(CraftingService::class, $craftingSkillService);
+        $weaponCraftingSkill = $character->skills->filter(function($skill) {
+            return $skill->name === 'Weapon Crafting';
+        })->first();
 
-        $craftingSkillService->shouldReceive('getDCCheck')->once()->andReturn(0);
-        $craftingSkillService->shouldReceive('characterRoll')->once()->andReturn(100);
+        $craftingSkillService->shouldReceive('getDCCheck')->with($weaponCraftingSkill)->andReturn(0);
+        $craftingSkillService->shouldReceive('characterRoll')->with($weaponCraftingSkill)->andReturn(100);
 
         $response = $this->actingAs($user)
             ->json('POST', '/api/craft/' . $character->id, [
@@ -99,7 +101,6 @@ class CharacterSkillControllerApiTest extends TestCase {
             ->response;
 
         $this->assertEquals(200, $response->status());
-        $this->assertFalse($currentGold === $this->character->getCharacter()->gold);
     }
 
     public function testCannotCraftItemToExpensive() {
@@ -826,19 +827,16 @@ class CharacterSkillControllerApiTest extends TestCase {
     }
 
     public function testFailedToCraft() {
-        $craftingSkilLService = $this->getMockBuilder(CraftingService::class)
-                                     ->setMethods(array('getDCCheck', 'characterRoll'))
-                                     ->getMock();
+        $character = $this->character->getCharacter(false);
 
-        $this->app->instance(CraftingService::class, $craftingSkilLService);
+        $craftingSkillService = Mockery::spy(CraftingService::class);
 
-        $craftingSkilLService->expects($this->once())
-                             ->method('getDCCheck')
-                             ->willReturn(100);
+        $weaponCraftingSkill = $character->skills->filter(function($skill) {
+            return $skill->name === 'Weapon Crafting';
+        })->first();
 
-        $craftingSkilLService->expects($this->once())
-                             ->method('characterRoll')
-                             ->willReturn(0);
+        $craftingSkillService->shouldReceive('getDCCheck')->with($weaponCraftingSkill)->andReturn(100);
+        $craftingSkillService->shouldReceive('characterRoll')->with($weaponCraftingSkill)->andReturn(1);
 
         $itemId = $this->createItem([
             'name' => 'sample',
@@ -851,8 +849,7 @@ class CharacterSkillControllerApiTest extends TestCase {
             'skill_level_trivial' => 10,
         ])->id;
 
-        $character = $this->character->getCharacter(false);
-        $user      = $this->character->getUser();
+        $user = $this->character->getUser();
 
         $response = $this->actingAs($user)
             ->json('POST', '/api/craft/' . $character->id, [

@@ -23,6 +23,9 @@ class CraftingService {
 
     private $randomEnchantmentService;
 
+    /**
+     * @param RandomEnchantmentService $randomEnchantmentService
+     */
     public function __construct(RandomEnchantmentService $randomEnchantmentService) {
         $this->randomEnchantmentService = $randomEnchantmentService;
     }

@@ -103,7 +103,7 @@ export default class BuildingCostSection extends React.Component {
                 }
               </strong>:
             </dt>
-            <dd>{this.getTimeRequired()} Minutes, (~{this.getHours()} hrs.), (-{(this.props.kingdom.building_time_reduction * 100).toFixed(0)}%)</dd>
+            <dd>{this.getTimeRequired()} Minutes, (~{this.getHours()} hrs.), (-{(this.props.kingdom.building_time_reduction * 100).toFixed(2)}%)</dd>
           </dl>
         </div>
       </div>

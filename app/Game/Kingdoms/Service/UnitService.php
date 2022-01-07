@@ -185,7 +185,9 @@ class UnitService {
             return $skill->baseSkill->type === SkillTypeValue::EFFECTS_KINGDOM;
         })->first();
 
-        return floor($time - $time * $skillBonus->unit_time_reduction);
+        $timeNeeded = floor($time - $time * $skillBonus->unit_time_reduction);
+
+        return $timeNeeded >= 1 ? $timeNeeded : 1;
     }
 
     protected function calculateElapsedTimePercent(UnitInQueue $queue): int {

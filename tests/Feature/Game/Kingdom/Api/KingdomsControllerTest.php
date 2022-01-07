@@ -23,6 +23,7 @@ use App\Game\Kingdoms\Service\KingdomBuildingService;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 use Tests\TestCase;
 use Tests\Setup\Character\CharacterFactory;
+use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateKingdomBuilding;
 use Tests\Traits\CreateGameBuilding;
 use Tests\Traits\CreateGameUnit;
@@ -36,7 +37,8 @@ class KingdomsControllerTest extends TestCase
         CreateGameBuilding,
         CreateKingdomBuilding,
         CreateLocation,
-        CreateGameUnit;
+        CreateGameUnit,
+        CreateGameMap;
 
     private $character;
 
@@ -44,6 +46,9 @@ class KingdomsControllerTest extends TestCase
         parent::setUp();
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
+
+        $this->createGameMap(['name' => 'Purgatory']);
+        $this->createGameMap(['name' => 'Hell']);
     }
 
     public function tearDown(): void {
