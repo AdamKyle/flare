@@ -123,7 +123,7 @@ export default class Game extends React.Component {
     this.setState({position: position});
   }
 
-  updateTeleportLoations(locations, currentX, currentY) {
+  updateTeleportLocations(locations, currentX, currentY) {
     this.setState({
       teleportLocations: locations,
       current_x: currentX,
@@ -430,7 +430,7 @@ export default class Game extends React.Component {
               openAdventureDetails={this.openAdventureDetails.bind(this)}
               openTraverserDetails={this.openTraverseDetails.bind(this)}
               updateAdventure={this.updateAdventure.bind(this)}
-              updateTeleportLoations={this.updateTeleportLoations.bind(this)}
+              updateTeleportLocations={this.updateTeleportLocations.bind(this)}
               openTeleportDetails={this.openTeleportDetails.bind(this)}
               openQuestDetails={this.openQuestDetails.bind(this)}
               openTimeOutModal={this.openTimeOutModal.bind(this)}

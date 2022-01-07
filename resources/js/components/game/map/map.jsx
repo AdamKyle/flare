@@ -109,7 +109,7 @@ export default class Map extends React.Component {
 
         this.props.updateAdventure(this.state.adventures, this.state.adventureLogs, this.state.canAdventureAgainAt, result.data.inventory_sets);
 
-        this.props.updateTeleportLoations(this.state.teleportLocations, this.state.characterPosition.x, this.state.characterPosition.y);
+        this.props.updateTeleportLocations(this.state.teleportLocations, this.state.characterPosition.x, this.state.characterPosition.y);
 
         this.props.updateKingdoms({
           my_kingdoms: this.state.kingdoms,
@@ -228,7 +228,7 @@ export default class Map extends React.Component {
       }, () => {
         this.props.updateAdventure(event.adventureDetails, [], null);
 
-        this.props.updateTeleportLoations(this.state.teleportLocations, event.map.character_position_x, event.map.character_position_y);
+        this.props.updateTeleportLocations(this.state.teleportLocations, event.map.character_position_x, event.map.character_position_y);
 
         this.props.updatePort({
           currentPort: event.portDetails.hasOwnProperty('current_port') ? event.portDetails.current_port : null,
@@ -318,7 +318,7 @@ export default class Map extends React.Component {
 
         this.props.updateAdventure(this.state.adventures, this.state.adventureLogs, this.state.canAdventureAgainAt);
 
-        this.props.updateTeleportLoations(
+        this.props.updateTeleportLocations(
           this.state.teleportLocations,
           event.mapDetails.character_map.character_position_x,
           event.mapDetails.character_map.character_position_y
@@ -490,7 +490,7 @@ export default class Map extends React.Component {
           can_mass_embezzle: result.data.can_mass_embezzle,
         });
 
-        this.props.updateTeleportLoations(this.state.teleportLocations, this.state.characterPosition.x, this.state.characterPosition.y);
+        this.props.updateTeleportLocations(this.state.teleportLocations, this.state.characterPosition.x, this.state.characterPosition.y);
 
         this.props.updateAdventure(this.state.adventures, [], null);
 

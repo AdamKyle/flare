@@ -11,20 +11,39 @@
 > YOU MUST PLAY AND EARN IT! There are no shortcuts in Tlessa!**
 > 
 > *And there never will be!*
+> 
+> Tlessa does have a lot of systems, and while this tips section is a giant wall of text, we cannot go over all them here.
+> This is designed to get you started and from there you can branch out into other help docs or reach out via discord or in game 
+> chat if there are people online.
+> 
+> I, The Creator, always check discord, multiple times per day to make sure no one is having issues and every one is having fun.
+
+*Ahem... Let's get on with this shall we child? Are you ready? The road ahead is long, the night is full of creatures that haunt your waking nightmarish existence.*
 
 I could list out things you should focus on, things you should and should not do. That's fun and all, but instead let me
 walk you through the couple of hours of the game for you. I'll provide screenshots so you can follow along.
 
-Tlessa has a lot of systems and sub systems and ways of managing your character, from skills, enchantments, alchemical items, 
-special items found at special locations, quest items and so on. Looking at the game, one might think Tlessa is a mess of systems, but they are all interconnected
+Tlessa has a lot of systems and sub systems and ways of managing your character, from [skills](/information/skill-information), [enchantments](/information/encahnting), [alchemical items](/information/usable-items), 
+special items found at [special locations](/information/special-locations), [quest](/information/quests) items and so on. 
+
+Looking at the game, one might think Tlessa is a mess of systems, but they are all interconnected
 together and play off each other such that they all come together in the end to give you a sense of accomplishment and feel like, after a long road, that you 
-"did this". you, the player invested time and energy and created a god killing character who rules the lands. The best part is, you didn't have to spend any money to do it.
+"did this". you, the player invested time and energy and created a god killing character who rules the lands. 
+
+The best part is, you didn't have to spend any money to do it. How exciting!
+
+Now lets start with making our character shall we?
+
+### Character Creation and The Game
 
 What I pick for race and class will be different from you. But that's ok. 
 You can still follow along and adjust accordingly for your own class.
 
 First, let's check our [race and class](/information/races-and-classes) and pick one we want to play as. You can't change this, 
 but you can delete your account and create a new one, should you want something else.
+
+You are also allowed to make 10 accounts per IP, so you can try out other combinations. All accounts are bound by IP, so if your roommates want to play, save some slots
+for them as they would share the same IP.
 
 Got a race and class picked out? Great, so now that you have registered, you will be greeted wth this:
 
@@ -34,8 +53,17 @@ Got a race and class picked out? Great, so now that you have registered, you wil
     </a>
 </div>
 
-*This is ... Intense.* Don't worry, I am about to make it slightly worse. Do me a favour and right click, open in a new tab the 
-character sheet from the menu:
+you have information at the top such as your currencies and character stats. Player have two types of stats:
+
+- Modded (what you see at the top of the first image, effected by things like equipment, enchantments, level, skill levels and so on)
+- Raw (You can see these on the character sheet under Base stats) These are your stats with nothing equipped.
+
+You can also see you have a [map](/information/map) that you can move around on, see [movement](/information/movement).
+
+Below your stats and beside the map you have an actions tab, this is broken into two sections: [Auto Attack](/information/automation) and your regular
+actions section.
+
+Do me a favour and right click, open in a new tab, the character sheet from the menu (hover on the menu to open the sub menu):
 
 <div class="mb-4">
     <a href="/storage/info/tips/images/character-sheet-menu.png" class="glightbox">
@@ -43,21 +71,33 @@ character sheet from the menu:
     </a>
 </div>
 
-*Oh christ! that got even more terrifying*. Relax. Don't try and digest it all, we don't care about the info on the character sheet section yet.
+*Oh christ! that got even more terrifying*. 
+
+<div class="mb-4">
+    <a href="/storage/info/tips/images/character-sheet.png" class="glightbox">
+        <img src="/storage/info/tips/images/character-sheet.png" class="img-fluid" />
+    </a>
+</div>
 
 It is more beneficial to play with these two tabs open, this way you can refresh the character sheet and not loose focus of chat. Where's chat?
 In the first image it's the black box at the bottom. That's where things like server messages (that only you can see), other player messages, global messages, admin messages
 and npc messages will appear. It's imperative you pay attention to the information in the chat section. Drops, new levels, gold rushes, quest messages, celestial spawn messages - so much happens in chat.
 
-If you look at the first image, you have information at the top such as your currencies and character stats. Player have two types of stats:
+This second tab I had you open is what's known as your character sheet. [Equipping](/information/equipment) armour and weapons, moving items to [sets](/information/equipment-sets),
+training [skills](/information/skill-information), [passive kingdom skills](/information/kingdom-passive-skills), manage your [factions](/information/factions), your [usable items](/information/usable-items)
+and boons.
 
-- Modded (what you see on the character sheet, effected by things like equipment, enchantments, level, skill levels and so on)
-- Raw (You can see these on the character sheet under Base stats) These are your stats with nothing equipped.
+This page also has information your stats, various attack types and their breakdowns on damage you do so you can better plan which 
+attack type will best suite your play style and your class based on equipment. Speaking of which, your equipment effects **everything**. Your stats, damage, everything.
 
-You can also see you have a [map](/information/map) that you can move around on, see [movement](/information/movement).
+Players often ask me: Why should I craft if I can buy it all from the shop?
 
-Below your stats and beside the map you have an actions tab, this is broken into two sections: [Auto Attack](/information/automation) and your regular
-actions section.
+Check [Crafting](/information/crafting), there is a list of craftable items, sort it by cost for me will ya. That's pretty high, so go to the shop and do the same, the shop does not .... oh .... the shop will only take me so far.
+
+There ya go... You also cannot buy enchanted items from the shop, you can from the [market](/information/market-board) and you can get some low level uniques in a moment,
+but you will need to craft your own gear at a certain point, specifically if you plan to go far.
+
+### Shopping, Attacking, Factions and Automation
 
 So what now? Head back to the game tab, and first select Sewer Rat from the dropdown list in the Action Section, like so:
 
@@ -87,6 +127,8 @@ You may see death. You may have died. You may see this, you may have killed it a
 
 Either way this is no good, and we need better gear. Right now, it doesn't matter what your class is, you have 1000 Gold. You can see this in the top section of the game window
 where it states your name, class and gold.
+
+Your whole goal in life in this game is to **Kill the enemy in one shot**. Faster kills, faster turn around time.
 
 So lets go shopping. Let's open the shop window - which will open in a new tab, here's where to find in the menu:
 
@@ -130,17 +172,16 @@ Here you can see the **Stat to focus on for max damage** and the **To focus on f
 
 There are a verity of ways you can increase these stats and skill. One way is to level the [skill](/information/skills) and another is to equip enchanted gear.
 
-Base gear, from the shop, will only get you so far. The shop ends at gear costing 2 billion gold, but you can craft beyond what the shop carries as well as upgrade
-that crafted gear. however later, we will learn about [enchantments](/information/enchanting) and [random enchants (uniques)](/information/random-enchants) that turn your items green!
+Base gear, from the shop, will only get you so far. The shop ends at gear costing 2 billion gold, but you can craft beyond what the shop carries. 
+However, later we will learn about [enchantments](/information/enchanting) and [random enchants (uniques)](/information/random-enchants) that turn your items green!
 
-These can further raise the states, even specialize in specific stats, skills, damage types and so on. Later when you are not weak and pathetic and
-can hold your own, you can invest in these items. We will even do some later on! How fun!
+These can further raise the states, even specialize in specific stats, skills, damage types and so on. We will investigate these a bit later.
 
-Come now child, back to the task at hand ...
+*Come now child, back to the task at hand ...*
 
 You still have that character sheet open in one of those tabs right? If so, close any tab other than Game tab and the character sheet. Great!
 
-Now, on the character sheet at the very top, look for a tab called [Factions](/information/factions). Click it.
+Now, on the character sheet at the very top, look for a tab called [Factions](/information/factions). Click it. You can read the aforementioned link to see images and other bits of information.
 
 You should see a table of map names, and factions. We're going to do the first one together, Surface. When we are done you will be the Mercenary of Surface
 and have a very powerful unique item, that will grow with you as you level. But more on that later.
@@ -191,7 +232,7 @@ you train Accuracy. This way you can buy a healing spell, equip it and use eithe
 
 Healing spells can never miss and healing spells have a chance to resurrect you and heal you again! Prophets can attack with Damage spells but
 are weaker than Heretics as they don't get an Intelligence boost. Damage spells also increase the Intelligence and Focus of a Heretic, while Healing spells
-will increase your Charisma (chr) ad Focus.
+will increase your Charisma (chr). Both will also raise your focus. Which for casters is their **To Hit** stat.
 
 Don't focus on the other [skills](/information/skill-information) right now, we shall detail some of those a bit later
 
@@ -227,6 +268,8 @@ Now that we have this automation set up. Click begin:
 Enjoy my friend. Sit back, go get a coffee, relax. Don't close the tab, don't log out, just enjoy the fruits of your labour. Your character sheet will update in  real time.
 
 Come back in  an hour. We will begin phase two!
+
+### Time to upgrade our gear
 
 You may not have gotten all the points needed for the Surface faction, on the faction tab of the character sheet, so - I would like you to head to the shop
 now and purchase some better gear. If you are a caster, focus on Damage spells for intelligence and focus (for Heretics) and healing spells for 
@@ -286,19 +329,22 @@ These are the only forms of auto attack that allows you to log out while it proc
 
 All XP and skill XP from adventures will do what's called overflow, allowing you to gain multiple levels and skill levels in one session.
 
-Locations that are special, will contain monsters that are the same you fight in the dropdown list but are much harder. These places can drop special 
-items called Gems (more on that later) and any item (of any value) with any enchantment from any enemy 10 levels or higher than you.
+Locations that are special, will contain monsters that are the same you fight in the dropdown list but are much harder. These places drop some [quest](/information/quests) items
+that you need for later quests in the game. You can see a full list of all [quest items here](/information/quest-items).
 
-There is a special location for each [plane](/information/planes). Shadow Plane is the only plane that has the same drops as Special locations and stronger monsters.
+There is a special location for each [plane](/information/planes) (except Purgatory).
 
-Shadow plane will not drop gems, but it's special location will. For now lets focus on what we were doing, getting a faction title!
-
-*Wait what are gems?* Child. Wait, we shall get to that. I promise.
+For now lets focus on what we were doing, getting a faction title!
 
 Once you have decided what to do with your gear, lets go back to auto battling, you may be able to fight harder critters, so do the list trick again, pick up from where you last left off
 and continue down the monster list - remember, you want to one shot kill the enemy. Once you have it, continue auto battling with that new monster selected.
 
-## Got the Faction title now? Excellent!
+Make sure to upgrade your gear every so often, you cannot move very far down the list wit the gear you bought at the beginning of this guide, the further down the list, the more XP, gold and drops.
+Some [monsters](/information/monsters/list) also drop quest items. If you find your self being blocked a lot, you need to do better damage, this can mean better gear in some shape or form.
+
+A body piece could go a long way (they give the highest stat boost), or a better spell or a new ring even.
+
+### Got the Faction title now? Excellent!
 
 <div class="mb-4">
     <a href="/storage/info/tips/images/unique-enchantment.png" class="glightbox">
@@ -326,10 +372,12 @@ will stack to a maximum of 99% but other classes, we take the best life stealing
 But all this stacking means nothing, if your core stats are really low. So this unique, could be 115% on everything and be super awesome, and it is, don't get me wrong, equip it and watch you become a 
 mini god. But there is more, you have to continue to level, the higher the level the more damage the item (or in this case the enchantment) can do.
 
-Take a moment and read through [enchanting](/information/enchanting) as it lists all the various types of enchantments you can craft in game. These enchantments, the green uniqueue ones,
-will not show up in any of those lists because you cannot craft these. You get them from Faction Farming and the [Queen of Hearts](/information/npcs) in Hell.
+Take a moment and read through [enchanting](/information/enchanting) as it lists all the various types of enchantments you can craft in game. These enchantments, the green unique ones,
+will not show up in any of those lists because you cannot craft these. You get them from Faction Farming and the [Queen of Hearts](/information/npcs) in Hell (read the [Uniques docs to understand how to use her](/information/random-enchants)).
 
-Save these green items, because there is a [NPC](/information/npcs) that can re-roll them, even transfer them to other items for a price.
+You can save these, if you want, in  set by clicking the action dropdown in your inventory, clicking move to set and moving it to a set.
+
+Sets may only contain one unique if you want to [equip the set](/information/equipment-sets), but you can also treat the tab like a stash tab.
 
 These items are late game and from faction farming you can get 25 of them. when you get to late game, you will be rewarded with the opportunity to push
 your character even further by being able to re-roll aspects of these enchants and transfer them to, essentially, god tier items that you can craft and then upgrade. 
@@ -357,12 +405,11 @@ There are [Quests](/information/quests) that you can do. I would search through
 the [planes](/information/planes) as they have all the locations and npc's that offer quests which as simple as speaking to them with the currency or item or both.
 
 While you auto battle, you can also craft - which will let you train a new type of skill: [crafting](/information/crafting). You can craft all the items you 
-see in the shop and even ones you do not - known as craft only items. Once you reach the crating cap, can you can then upgrade the top end gear
-for even better gear - much later in the game.
+see in the shop and even ones you do not - known as craft only items.
 
-this gear will be useless without [enchantments](/information/enchantments) and there are a lot to pick from.
+This gear will be useless without [enchantments](/information/enchantments) and there are a lot to pick from.
 
-Here's your next task child:
+**Here's your next task child**:
 
 I want you to aim for killing a Labyrinth Fiend on the surface. You may need to train looting while auto battling or manually battling. 
 
@@ -385,8 +432,7 @@ someone buys them, thus you can start making some coin.
 ## You won't get far ...
 
 So you might be enjoying the auto battling and buying shop gear and look, ooo shiny green items are falling from the sky. But without the right enchantments for your class,
-for example - Life stealing for vampires with a damage relic - or intelligence based enchantments for Heretics. There is a whole world of customization for your character,
-from passive skills that effect and unlock things such as passive buffs, blueprints for new buildings and so on, for your kingdoms.
+for example - Life stealing for vampires with a damage relic - or intelligence based enchantments for Heretics. There is a whole world of customization for your character.
 
 Your character, as they grow, will only get as powerful as the amount of time you are willing to invest. Sure you can kill a Satanic Cult Leader, but are you utilizing the power
 of your character? Can they kill the same critter in a [special location]()? Are you getting every last bit of power out of your character?
@@ -402,13 +448,15 @@ to be able to do the mass amounts of damage required for special locations, Shad
 For example a Level 234 Fighter, decked out in enchanted gear (that they made or bought) will be stronger than a character in nothing but shop gear and a couple
 of the faction uniques at the same level/class.
 
+Why? Because they took the time to research the best enchantments for the gear to gear themselves towards their ultimate end gaol.
+
 ## The end of the walk through ...
 
-Phew child! We made it!
+Phew, child! We made it!
 
 We haven't even scratched the surface! We haven't talked about [Kingdoms](/information/kingdoms) or even [Alchemy](/information/alchemy) a skill locked behind a quest!
 
 We haven't even touched [Passive skills](/information/kingdom-passive-skills) or half the other information. But alas this is where I leave you to explore on your own.
 
-There is a ton of infromation here in the help docs to answer questions, and should you have more - come to [discord](https://discord.gg/hcwdqJUerh) where I shall answer them all!
+There is a ton of information here in the help docs to answer questions, and should you have more - come to [discord](https://discord.gg/hcwdqJUerh) where I shall answer them all!
 
