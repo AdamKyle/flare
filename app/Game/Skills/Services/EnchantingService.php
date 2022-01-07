@@ -3,6 +3,8 @@
 namespace App\Game\Skills\Services;
 
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
+use App\Game\Core\Events\UpdateQueenOfHeartsPanel;
+use App\Game\Core\Services\RandomEnchantmentService;
 use App\Game\Skills\Events\UpdateCharacterEnchantingList;
 use App\Game\Skills\Values\SkillTypeValue;
 use Exception;
@@ -37,6 +39,11 @@ class EnchantingService {
     private $enchantItemService;
 
     /**
+     * @var RandomEnchantmentService
+     */
+    private $randomEnchantmentService;
+
+    /**
      * @var bool $sentToEasyMessage
      */
     private $sentToEasyMessage = false;
@@ -55,9 +62,14 @@ class EnchantingService {
      * @param EnchantItemService $enchantItemService
      * @return void
      */
-    public function __construct(CharacterInformationBuilder $characterInformationBuilder, EnchantItemService $enchantItemService) {
+    public function __construct(CharacterInformationBuilder $characterInformationBuilder,
+                                EnchantItemService $enchantItemService,
+                                RandomEnchantmentService $randomEnchantmentService)
+    {
+
         $this->characterInformationBuilder = $characterInformationBuilder;
         $this->enchantItemService          = $enchantItemService;
+        $this->randomEnchantmentService    = $randomEnchantmentService;
     }
 
     /**
@@ -240,6 +252,8 @@ class EnchantingService {
         $message = 'Applied enchantment: '.$affix->name.' to: ' . $slot->item->refresh()->affix_name;
 
         event(new ServerMessageEvent($character->user, 'enchanted', $message));
+
+        event(new UpdateQueenOfHeartsPanel($character->user, $this->randomEnchantmentService->fetchDataForApi($character)));
 
         if (!$tooEasy) {
             event(new UpdateSkillEvent($enchantingSkill));

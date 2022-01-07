@@ -27,10 +27,28 @@ export default class RandomAffixSection extends React.Component {
       hasGold: true,
       hasInventorySpace: true,
     }
+
+    this.updateQueenOfHearts = Echo.private('update-queen-of-hearts-panel-' + this.props.userId);
   }
 
   componentDidMount() {
     this.fetchUniqueData();
+
+    this.updateQueenOfHearts.listen('Game.Core.Events.UpdateQueenOfHeartsPanel', (event) => {
+      console.log(event);
+      this.setState({
+        uniquesOnHand: event.panelData.slots,
+        nonUniques: event.panelData.non_unique_slots,
+        uniquesToBuy: event.panelData.valuations,
+        hasGold: event.panelData.has_gold,
+        hasInventorySpace: event.panelData.has_inventory_room,
+        characterCurrencies: {
+          gold: event.panelData.character_gold,
+          gold_dust: event.panelData.character_gold_dust,
+          shards: event.panelData.character_shards,
+        },
+      });
+    });
   }
 
   updateCurrencies(goldDust, shards, gold) {

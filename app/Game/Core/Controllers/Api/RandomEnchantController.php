@@ -6,6 +6,7 @@ use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Values\RandomAffixDetails;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
+use App\Game\Core\Events\UpdateQueenOfHeartsPanel;
 use App\Game\Core\Requests\MoveRandomEnchantment;
 use App\Game\Core\Requests\PurchaseRandomEnchantment;
 use App\Game\Core\Requests\ReRollRandomEnchantment;
@@ -33,35 +34,7 @@ class RandomEnchantController extends Controller {
     }
 
     public function uniquesOnly(Character $character) {
-        $uniqueSlots    = $this->randomEnchantmentService->fetchUniquesFromCharactersInventory($character);
-        $nonUniqueSlots = $this->randomEnchantmentService->fetchNonUniqueItems($character);
-
-        return response()->json([
-            'slots' => $uniqueSlots,
-            'non_unique_slots' => $nonUniqueSlots,
-            'valuations' => [
-                '10,000,000,000' => [
-                    'damage_range'     => (new RandomAffixDetails(RandomAffixDetails::BASIC))->getDamageRange(),
-                    'percentage_range' => (new RandomAffixDetails(RandomAffixDetails::BASIC))->getPercentageRange(),
-                    'type'             => 'basic',
-                ],
-                '50,000,000,000' => [
-                    'damage_range'     => (new RandomAffixDetails(RandomAffixDetails::MEDIUM))->getDamageRange(),
-                    'percentage_range' => (new RandomAffixDetails(RandomAffixDetails::MEDIUM))->getPercentageRange(),
-                    'type'             => 'medium',
-                ],
-                '100,000,000,000' => [
-                    'damage_range'     => (new RandomAffixDetails(RandomAffixDetails::LEGENDARY))->getDamageRange(),
-                    'percentage_range' => (new RandomAffixDetails(RandomAffixDetails::LEGENDARY))->getPercentageRange(),
-                    'type'             => 'legendary',
-                ],
-            ],
-            'has_gold'            => $character->gold >= RandomAffixDetails::BASIC,
-            'has_inventory_room'  => !$character->isInventoryFull(),
-            'character_gold'      => $character->gold,
-            'character_gold_dust' => $character->gold_dust,
-            'character_shards'    => $character->shards,
-        ]);
+        return response()->json($this->randomEnchantmentService->fetchDataForApi($character));
     }
 
     public function purchase(PurchaseRandomEnchantment $request, Character $character) {
@@ -94,6 +67,8 @@ class RandomEnchantController extends Controller {
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
         event(new UpdateTopBarEvent($character));
+
+        event(new UpdateQueenOfHeartsPanel($character->user, $this->randomEnchantmentService->fetchDataForApi($character)));
 
         broadcast(new ServerMessageEvent($character->user, 'The Queen of Hearts blushes, smiles and bats her eye lashes at you as she hands you, from out of no where, a new shiny object: ' . $item->affix_name, true));
 

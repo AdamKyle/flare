@@ -5,6 +5,8 @@ namespace App\Game\Skills\Services;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateSkillEvent;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
+use App\Game\Core\Events\UpdateQueenOfHeartsPanel;
+use App\Game\Core\Services\RandomEnchantmentService;
 use App\Game\Skills\Events\UpdateCharacterCraftingList;
 use Illuminate\Database\Eloquent\Collection;
 use App\Flare\Models\Character;
@@ -18,6 +20,12 @@ use App\Game\Messages\Events\ServerMessageEvent as GameServerMessageEvent;
 class CraftingService {
 
     use ResponseBuilder, SkillCheck, UpdateCharacterGold;
+
+    private $randomEnchantmentService;
+
+    public function __construct(RandomEnchantmentService $randomEnchantmentService) {
+        $this->randomEnchantmentService = $randomEnchantmentService;
+    }
 
     /**
      * Fetch all craftable items for a character.
@@ -136,6 +144,8 @@ class CraftingService {
             ]);
 
             event(new ServerMessageEvent($character->user, 'crafted', $item->name));
+
+            event(new UpdateQueenOfHeartsPanel($character->user, $this->randomEnchantmentService->fetchDataForApi($character)));
 
             return true;
         }

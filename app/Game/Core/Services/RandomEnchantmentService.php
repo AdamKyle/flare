@@ -62,6 +62,38 @@ class RandomEnchantmentService {
         })->values();
     }
 
+    public function fetchDataForApi(Character $character): array {
+        $uniqueSlots    = $this->fetchUniquesFromCharactersInventory($character);
+        $nonUniqueSlots = $this->fetchNonUniqueItems($character);
+
+        return [
+            'slots' => $uniqueSlots,
+            'non_unique_slots' => $nonUniqueSlots,
+            'valuations' => [
+                '10,000,000,000' => [
+                    'damage_range'     => (new RandomAffixDetails(RandomAffixDetails::BASIC))->getDamageRange(),
+                    'percentage_range' => (new RandomAffixDetails(RandomAffixDetails::BASIC))->getPercentageRange(),
+                    'type'             => 'basic',
+                ],
+                '50,000,000,000' => [
+                    'damage_range'     => (new RandomAffixDetails(RandomAffixDetails::MEDIUM))->getDamageRange(),
+                    'percentage_range' => (new RandomAffixDetails(RandomAffixDetails::MEDIUM))->getPercentageRange(),
+                    'type'             => 'medium',
+                ],
+                '100,000,000,000' => [
+                    'damage_range'     => (new RandomAffixDetails(RandomAffixDetails::LEGENDARY))->getDamageRange(),
+                    'percentage_range' => (new RandomAffixDetails(RandomAffixDetails::LEGENDARY))->getPercentageRange(),
+                    'type'             => 'legendary',
+                ],
+            ],
+            'has_gold'            => $character->gold >= RandomAffixDetails::BASIC,
+            'has_inventory_room'  => !$character->isInventoryFull(),
+            'character_gold'      => $character->gold,
+            'character_gold_dust' => $character->gold_dust,
+            'character_shards'    => $character->shards,
+        ];
+    }
+
     public function fetchNonUniqueItems(Character $character): Collection {
         return $character->inventory->slots->filter(function($slot) {
             if (!$slot->equipped && $slot->item->type !== 'quest' && $slot->item->type !== 'alchemy') {
@@ -105,6 +137,10 @@ class RandomEnchantmentService {
                 'item_suffix_id' => $randomAffix->generateAffix('suffix')->id
             ]);
         }
+
+        $duplicateItem->update([
+            'market_sellable' => true,
+        ]);
 
         return $duplicateItem;
     }

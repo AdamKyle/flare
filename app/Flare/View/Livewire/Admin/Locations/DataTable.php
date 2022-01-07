@@ -17,6 +17,7 @@ class DataTable extends Component
     public $sortField   = 'name';
     public $perPage     = 10;
     public $gameMapId   = null;
+    public $only        = null;
 
     protected $paginationTheme = 'bootstrap';
 
@@ -58,7 +59,11 @@ class DataTable extends Component
         }
 
         if (!is_null($this->gameMapId)) {
-            $locations = $location->where('game_map_id', $this->gameMapId);
+            $location = $location->where('game_map_id', $this->gameMapId);
+        }
+
+        if ($this->only === 'special_locations') {
+            $location = $location->whereNotNull('enemy_strength_type');
         }
 
         $locations = $location->orderBy($column, $this->sortBy)

@@ -1,8 +1,12 @@
 import React from 'react';
 import {Modal, Button} from 'react-bootstrap';
+import {debounce} from "lodash";
 import ItemDetails from "../item-details";
 import MarketHistory from "../market-history";
 import UsableItemDetails from "../usable-item-details";
+import ItemName from "../components/item-name";
+import AlertInfo from "../../game/components/base/alert-info";
+import AlertError from "../../game/components/base/alert-error";
 
 export default class SellItemModal extends React.Component {
 
@@ -10,18 +14,36 @@ export default class SellItemModal extends React.Component {
     super(props);
 
     this.state = {
-      list_for: 0,
-      error: false,
+      list_for: '',
       posting: false,
       error_message: null,
       loading: false,
     }
+
   }
 
+  debouncedEvent = debounce((price) => {
+    const minCost = parseInt(this.props.modalData.min_cost) || 0;
+
+    if (minCost !== 0) {
+      if (price < minCost) {
+        return this.setState({
+          error_message: 'No. The minimum price allowed is: ' + minCost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+          list_for: price,
+        });
+      }
+    }
+  }, 1000)
+
   salePrice(event) {
+    const value = parseInt(event.target.value) || 0
+
     this.setState({
-      list_for: event.target.value,
+      error_message: null,
+      list_for: value
     });
+
+    this.debouncedEvent(value);
   }
 
 
@@ -75,7 +97,20 @@ export default class SellItemModal extends React.Component {
     });
   }
 
+  buildListForLabel() {
+    let label = 'List for ';
+
+    if (this.props.modalData.unique) {
+      label += '(Minimum selling price allowed: '+this.props.modalData.min_cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")+' Gold)';
+    } else {
+      label += '(Suggested selling price: '+this.props.modalData.cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")+' Gold)';
+    }
+
+    return label
+  }
+
   render() {
+
     const suggestedPrice = this.props.modalData.cost;
 
     return (
@@ -88,22 +123,39 @@ export default class SellItemModal extends React.Component {
         size="lg"
       >
         <Modal.Header closeButton>
-          <Modal.Title>{this.props.modalData.name}</Modal.Title>
+          <Modal.Title>
+            <ItemName item={this.props.modalData} />
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          { this.state.error ?
-            <div className="alert alert-danger mb-2 mt-2">
-              {this.state.error_message}
-            </div> : null
+          { this.state.error_message !== null ?
+              <AlertError icon={"fas fa-exclamation"} title={'Oops!'}>
+                <p>{this.state.error_message}</p>
+              </AlertError>
+            : null
           }
-          <div className="alert alert-info">
-            Chart shows the sale history of this item (with exact affixes attached) over time so you can gauge the average buying price. The number input for you, is a place holder
-            only, of the cost of the item plus cost of attached affixes. Use this as a guide only.
-          </div>
+          <AlertInfo icon={"fas fa-question-circle"} title={"Help"}>
+            <p>
+              Chart shows the sale history of this item (with exact affixes attached) over time so you can gauge the average buying price. The number input for you, is a place holder
+              only, of the cost of the item plus cost of attached affixes. Use this as a guide only.
+            </p>
+            <p>
+              If the value in the input is supplied for you, the item cannot fall below tht minimum price. This will apply to special items like
+              <a href="/information/random-enchantments">uniques</a>. If there is no value (or 0) then you are free to enter any price you see fit.
+            </p>
+          </AlertInfo>
           <div className="form-group">
-            <label htmlFor="listPirce">List For (suggested price: {suggestedPrice > 0 ? suggestedPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + ' Gold' : 'anything'})</label>
-            <input type="number" min={0} className="form-control" id="listPirce" onChange={this.salePrice.bind(this)} />
-            <small id="emailHelp" className="form-text text-muted">There is a 5% sales tax for listing items.</small>
+            <label htmlFor="listPrice">
+              {this.buildListForLabel()}
+            </label>
+            <input type="number"
+                   min={this.props.modalData.min_cost}
+                   className="form-control"
+                   id="listPrice"
+                   onChange={this.salePrice.bind(this)}
+                   value={this.state.list_for}
+            />
+            <small id="listPriceHelp" className="form-text text-muted">There is a 5% sales tax for listing items.</small>
           </div>
           <MarketHistory type={this.props.modalData.type}/>
           {
@@ -128,6 +180,7 @@ export default class SellItemModal extends React.Component {
           <Button
             variant="primary"
             onClick={this.list.bind(this)}
+            disabled={this.state.error_message !== null}
           >
             List
           </Button>

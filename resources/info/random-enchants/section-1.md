@@ -305,4 +305,13 @@ Speaking of the last point, moving affixes can delete the item they were attache
 As we can see the Queen of Hearts is more an end game NPC that you would access to help build one good unique for taking on Purgatory creatures. These are balanced around you
 having at least one Affix and being closer to Max level to be able to take on some creatures down in Purgatory which can level a character faster than the speed of light.
 
+## Regarding the Market Board
 
+Uniques will not allow you to list them for less than half their cost. For example a single item with a single unique enchantment at a valuation of 10 Billion Gold cannot be sold
+for less than 5 Billion gold.
+
+This is to prevent High level players, from making toons (AKA: Additional character) and listing expensive, hard to get (and perfect) uniques for nothing.
+
+## Regarding Disenchant and Destroy
+
+Players may disenchant and destroy these uniques.

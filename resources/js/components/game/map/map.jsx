@@ -519,13 +519,13 @@ export default class Map extends React.Component {
         if (response.status === 429) {
           return this.props.openTimeOutModal();
         }
+
+        return getServerMessage('cannot_walk_on_water', response.data.message);
       }
 
       this.setState({
         characterPosition: {x: this.state.characterPosition.x, y: this.state.characterPosition.y},
       });
-
-      return getServerMessage('cannot_walk_on_water');
     });
   }
 

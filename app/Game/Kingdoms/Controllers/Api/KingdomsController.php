@@ -71,6 +71,13 @@ class KingdomsController extends Controller {
     }
 
     public function settle(KingdomsSettleRequest $request, Character $character, KingdomService $kingdomService) {
+
+        if ($character->map->gameMap->mapType()->isPurgatory()) {
+            return response()->json([
+                'message' => 'Child, this is not place to be a King or Queen, The Creator would destroy anything you build down here. You\'re not even suppose to be here.'
+            ], 200);
+        }
+
         $kingdom = Kingdom::where('name', $request->name)->where('game_map_id', $character->map->game_map_id)->first();
 
         if (!is_null($kingdom)) {

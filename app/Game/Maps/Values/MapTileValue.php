@@ -66,6 +66,10 @@ class MapTileValue {
         return in_array($color, [164027]);
     }
 
+    public function isPurgatoryWater(int $color): bool {
+        return in_array($color, [255255255]);
+    }
+
     /**
      * Can the character walk on death water?
      *

@@ -22,7 +22,16 @@ return [
     'automation'        => [],
     'factions'          => [],
     'random-enchants'   => [],
-    'special-locations' => [],
+    'special-locations' => [
+        [
+            'livewire'            => true,
+            'view'                => 'admin.locations.data-table',
+            'only'                => 'special_locations',
+            'insert_before_table' => null,
+            'type'                => null,
+            'craft_only'          => false,
+        ],
+    ],
     'kingdom-passive-skills' => [
         [
             'livewire'            => true,

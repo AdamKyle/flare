@@ -166,6 +166,10 @@ class MovementService {
             }
         }
 
+        if ($this->mapTile->isPurgatoryWater((int) $mapTileColor)) {
+            return $this->errorResult('You would slip away into the void if you tried to go that way child!');
+        }
+
         return $this->moveCharacter($character, $params);
     }
 
@@ -362,11 +366,15 @@ class MovementService {
             return $this->errorResult('Cannot teleport to Death Water locations without a ' . $item->name);
         }
 
-         if (!$canTeleportToMagma && $this->mapTile->isMagma($this->mapTile->getTileColor($character, $x, $y))) {
-             $item = Item::where('effect', ItemEffectsValue::WALK_ON_MAGMA)->first();
+        if (!$canTeleportToMagma && $this->mapTile->isMagma($this->mapTile->getTileColor($character, $x, $y))) {
+            $item = Item::where('effect', ItemEffectsValue::WALK_ON_MAGMA)->first();
 
-             return $this->errorResult('Cannot teleport to magma locations without a ' . $item->name);
-         }
+            return $this->errorResult('Cannot teleport to magma locations without a ' . $item->name);
+        }
+
+        if ($this->mapTile->isPurgatoryWater($this->mapTile->getTileColor($character, $x, $y))) {
+            return $this->errorResult('You would slip away into the void if you tried to go that way child!');
+        }
 
         if ($character->gold < $cost) {
             return $this->errorResult('Not enough gold.');

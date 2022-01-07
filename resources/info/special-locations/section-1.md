@@ -15,7 +15,13 @@ which, even if leveled to 100%, is capped at 45% in these special locations.
 
 Players do not need special quest items to enter these locations, but are cautioned against doing so when just starting out.
 
-[Image of location details]
+<div class="mb-4">
+    <a href="/storage/info/special-locations/images/special-location.png" class="glightbox">
+        <img src="/storage/info/special-locations/images/special-location.png" class="img-fluid" />
+    </a>
+</div>
+
+**Note**: the image above may be different than in game experience, that is the location may be a different name, and different coordinates.
 
 Above you can see the details of one of these locations. You can see the monsters core stats are raised by a specific amount and all the % base attributes,
 such as accuracy, dodge, spell evasion, [voidance and devoidance](/information/voidance) is also raised by a specific % amount.

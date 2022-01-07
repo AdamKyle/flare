@@ -3,11 +3,14 @@
 namespace App\Flare\Transformers;
 
 use App\Flare\Models\GameSkill;
+use App\Flare\Traits\IsItemUnique;
 use Facades\App\Flare\Calculators\SellItemCalculator;
 use League\Fractal\TransformerAbstract;
 use App\Flare\Models\Item;
 
 class ItemTransfromer extends TransformerAbstract {
+    
+    use IsItemUnique;
 
     /**
      * Gets the response data for the character sheet
@@ -62,6 +65,8 @@ class ItemTransfromer extends TransformerAbstract {
             'artifact_annulment'               => $item->artifact_annulment,
             'increase_skill_bonus_by'          => $item->increase_skill_bonus_by,
             'increase_skill_training_bonus_by' => $item->increase_skill_training_bonus_by,
+            'unique'                           => $this->isUnique($item),
+            'min_cost'                         => SellItemCalculator::fetchMinimumSalePriceOfUnique($item),
         ];
     }
 }

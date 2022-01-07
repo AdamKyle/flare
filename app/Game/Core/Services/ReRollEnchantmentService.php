@@ -10,6 +10,7 @@ use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
 use App\Flare\Values\RandomAffixDetails;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
+use App\Game\Core\Events\UpdateQueenOfHeartsPanel;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 
@@ -57,6 +58,10 @@ class ReRollEnchantmentService {
             $this->changeAffix($character, $dupliateItem, $affix, $reRollType);
         }
 
+        $duplicateItem->update([
+            'market_sellable' => true,
+        ]);
+
         $slot->update([
             'item_id' => $dupliateItem->id,
         ]);
@@ -66,6 +71,8 @@ class ReRollEnchantmentService {
         event(new UpdateTopBarEvent($character));
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        event(new UpdateQueenOfHeartsPanel($character->user, $this->fetchDataForApi($character)));
 
         event(new ServerMessageEvent($character->user, 'Ooooh hoo hoo hoo! I have done it child! I have made the modifications and I think you\'ll be happy! Oh child I am so happy! ooh hoo hoo hoo!', true));
     }
@@ -78,6 +85,10 @@ class ReRollEnchantmentService {
 
         $duplicateSecondaryItem = $secondarySlot->item->duplicate();
         $duplicateUnique        = $slot->item->duplicate();
+
+        $duplicateUnique->update([
+            'market_sellable' => true,
+        ]);
 
         $deletedAll = false;
         $deletedSome = false;
@@ -162,6 +173,8 @@ class ReRollEnchantmentService {
         event(new UpdateTopBarEvent($character));
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        event(new UpdateQueenOfHeartsPanel($character->user, $this->fetchDataForApi($character)));
 
         event(new ServerMessageEvent($character->user, 'Ooooh hoo hoo hoo! I have done as thou have requested, my lovely, beautiful gorgeous child! Oh look at how powerful you are!', true));
 

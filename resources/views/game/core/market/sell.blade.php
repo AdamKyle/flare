@@ -18,6 +18,8 @@
                     If you are seeing no items show up in the table, chances are you have no enchanted gear
                     or alchemical items to sell.
                 </p>
+                <p>Unique (<a href="/information/random-enchants">Random Enchantment Items (AKA Green Items)</a>) already have a defined minimum price. Failure to list it for the minimum price
+                will not allow you to sell the item. Uniques are easy for new players to earn and more expensive ones take time and effort to get, you can't just give these away.</p>
             </x-core.alerts.info-alert>
 
             <div id="sell-items-on-market">

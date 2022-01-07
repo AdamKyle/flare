@@ -394,6 +394,7 @@ export default class Game extends React.Component {
             {
               this.state.npcComponentName !== null ?
                 <NpcComponentWrapper
+                  userId={this.props.userId}
                   npcComponentName={this.state.npcComponentName}
                   close={this.closeNpcComponent.bind(this)}
                   openTimeOutModal={this.openTimeOutModal.bind(this)}

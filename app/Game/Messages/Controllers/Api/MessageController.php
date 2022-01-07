@@ -165,7 +165,11 @@ class MessageController extends Controller {
             $handler->forUser(auth()->user())->increaseThrottleCount()->silence();
         }
 
-        broadcast(new ServerMessageEvent(auth()->user(), $this->serverMessage->build($request->type)));
+        if ($request->has('custom_message')) {
+            broadcast(new ServerMessageEvent(auth()->user(), $request->custom_message));
+        } else {
+            broadcast(new ServerMessageEvent(auth()->user(), $this->serverMessage->build($request->type)));
+        }
 
         return response()->json([], 200);
     }
