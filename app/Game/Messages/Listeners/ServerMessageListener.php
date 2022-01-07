@@ -89,6 +89,10 @@ class ServerMessageListener
                 $message = 'Disenchanted the item and got: ' . $event->forMessage . ' Gold Dust.';
 
                 return broadcast(new ServerMessage($event->user, $message));
+            case 'disenchanted-adventure':
+                $message = 'Disenchanted the item (from your previous adventure) and got: ' . $event->forMessage . ' Gold Dust.';
+
+                return broadcast(new ServerMessage($event->user, $message));
             case 'lotto_max':
                 $message = 'You won the daily Gold Dust Lottery! Congratz! You won: ' . $event->forMessage . ' Gold Dust';
 

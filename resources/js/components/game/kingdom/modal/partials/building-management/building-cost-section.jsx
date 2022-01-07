@@ -49,7 +49,9 @@ export default class BuildingCostSection extends React.Component {
       timeNeeded = building.time_increase;
     }
 
-    return Math.floor(timeNeeded - timeNeeded * this.props.kingdom.building_time_reduction);
+    timeNeeded = timeNeeded - (timeNeeded * this.props.kingdom.building_time_reduction);
+
+    return timeNeeded
   }
 
   getHours() {

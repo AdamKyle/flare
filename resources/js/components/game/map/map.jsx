@@ -107,7 +107,7 @@ export default class Map extends React.Component {
           canMove: this.state.canMove,
         });
 
-        this.props.updateAdventure(this.state.adventures, this.state.adventureLogs, this.state.canAdventureAgainAt);
+        this.props.updateAdventure(this.state.adventures, this.state.adventureLogs, this.state.canAdventureAgainAt, result.data.inventory_sets);
 
         this.props.updateTeleportLoations(this.state.teleportLocations, this.state.characterPosition.x, this.state.characterPosition.y);
 

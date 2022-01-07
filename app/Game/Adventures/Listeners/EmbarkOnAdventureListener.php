@@ -35,11 +35,9 @@ class EmbarkOnAdventureListener
 
         $character = $event->character->refresh();
 
-        for($i = 1; $i <= $event->adventure->levels; $i++) {
-            $delay            = $i === 1 ? $event->adventure->time_per_level : $i * $event->adventure->time_per_level;
-            $timeTillFinished = now()->addMinutes($delay);
+        $delay            = $event->adventure->time_per_level;
+        $timeTillFinished = now()->addMinutes($delay);
 
-            AdventureJob::dispatch($character, $event->adventure, $event->attackType, $jobName, $i)->delay($timeTillFinished);
-        }
+        AdventureJob::dispatch($character, $event->adventure, $event->attackType, $jobName)->delay($timeTillFinished);
     }
 }

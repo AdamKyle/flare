@@ -263,6 +263,12 @@ export default class BuildingManagementModal extends React.Component {
 
       newTime = newTime + newTime * this.props.building.raw_time_increase;
 
+      newTime = newTime - (newTime * this.props.kingdom.building_time_reduction)
+
+      if (newTime < 1) {
+        newTime = 1;
+      }
+
       time = time + newTime;
     }
 

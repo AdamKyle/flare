@@ -10,6 +10,7 @@ use App\Flare\Transformers\Serializers\CoreSerializer;
 use App\Game\Core\Services\InventorySetService;
 use App\Game\Core\Services\RandomEnchantmentService;
 use App\Game\Core\Services\UseItemService;
+use App\Game\Skills\Services\DisenchantService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
 use App\Game\Core\Comparison\ItemComparison;
@@ -60,6 +61,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CharacterXPService::class),
                 $app->make(InventorySetService::class),
                 $app->make(RandomAffixGenerator::class),
+                $app->make(DisenchantService::class),
             );
         });
 

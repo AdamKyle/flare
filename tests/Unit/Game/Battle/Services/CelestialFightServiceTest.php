@@ -3,9 +3,11 @@
 namespace Tests\Unit\Game\Battle\Services;
 
 use App\Game\Battle\Services\CelestialFightService;
+use App\Game\Messages\Events\GlobalMessageEvent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Game\Battle\Values\CelestialConjureType;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Traits\CreateCelestials;
@@ -115,6 +117,8 @@ class CelestialFightServiceTest extends TestCase
     }
 
     public function testFightCelestialCharacterDies() {
+        Event::fake();
+
         $monster = $this->createMonster([
             'is_celestial_entity' => true,
             'gold_cost'           => 1000,
@@ -154,6 +158,7 @@ class CelestialFightServiceTest extends TestCase
 
         $response = $celestialFightService->fight($character, $celestialFight, $characterInCelestialFight, 'attack');
 
+        Event::assertDispatched(GlobalMessageEvent::class);
 
         $this->assertEquals(200, $response['status']);
         $this->assertNotEmpty($response['fight']);

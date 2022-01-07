@@ -52,6 +52,7 @@ export default class Game extends React.Component {
       current_x: null,
       current_y: null,
       characterGold: 0,
+      inventorySets: [],
       kingdomData: {
         my_kingdoms: [],
         can_attack: false,
@@ -109,11 +110,12 @@ export default class Game extends React.Component {
     });
   }
 
-  updateAdventure(adventureDetails, adventureLogs, adventureAgainAt) {
+  updateAdventure(adventureDetails, adventureLogs, adventureAgainAt, inventorySets) {
     this.setState({
       adventureDetails: adventureDetails,
       adventureLogs: adventureLogs,
       canAdventureAgainAt: adventureAgainAt,
+      inventorySets: inventorySets,
     });
   }
 
@@ -366,6 +368,7 @@ export default class Game extends React.Component {
                   openAdventureDetails={this.openAdventureDetails.bind(this)}
                   adventureAgainAt={this.state.canAdventureAgainAt}
                   adventureLogs={this.state.adventureLogs}
+                  inventorySets={this.state.inventorySets}
                   openTimeOutModal={this.openTimeOutModal.bind(this)}
                 />
                 : null

@@ -102,6 +102,7 @@ class LocationService {
             'adventure_details'      => $this->adventureDetails,
             'adventure_logs'         => $character->adventureLogs,
             'adventure_completed_at' => $character->can_adventure_again_at,
+            'inventory_sets'         => $this->getSets($character),
             'is_dead'                => $character->is_dead,
             'teleport'               => $this->coordinatesCache->getFromCache(),
             'celestials'             => $this->getCelestialEntity($character),
@@ -115,6 +116,33 @@ class LocationService {
             'characters_on_map'      => $this->getActiveUsersCountForMap($character),
             'can_mass_embezzle'      => $this->canMassEmbezzle($character, $this->canManage),
         ];
+    }
+
+    protected function getSets(Character $character): array {
+        $sets = [];
+
+        foreach ($character->inventorySets as $set) {
+
+            if ($set->slots->isEmpty()) {
+                if (is_null($set->name)) {
+                    $index     = $character->inventorySets->search(function($inventorySet) use ($set) {
+                        return $inventorySet->id === $set->id;
+                    }) + 1;
+
+                    $sets[] = [
+                        'name' => 'Set ' . $index,
+                        'id'   => $set->id,
+                    ];
+                } else {
+                    $sets[] = [
+                        'name' => 'Set ' . $index,
+                        'id'   => $set->id,
+                    ];
+                }
+            }
+        }
+
+        return $sets;
     }
 
     protected function fetchLocationData(Character $character): Collection {

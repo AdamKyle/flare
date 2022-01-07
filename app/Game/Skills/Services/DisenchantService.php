@@ -3,6 +3,7 @@
 namespace App\Game\Skills\Services;
 
 use App\Flare\Events\ServerMessageEvent;
+use App\Flare\Models\Item;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Messages\Events\ServerMessageEvent as MessageEvent;
 use App\Flare\Events\UpdateSkillEvent;
@@ -66,6 +67,29 @@ class DisenchantService {
             $affixData['affixes'],
             $affixData['character_inventory'],
         ));
+    }
+
+    public function disenchantItemWithSkill(Character $character) {
+        $disenchantSkill = $character->skills->filter(function($skill) {
+            return $skill->type()->isDisenchanting();
+        })->first();
+
+        if (!is_null($disenchantSkill)) {
+            $characterRoll = $this->characterRoll($disenchantSkill);
+            $dcCheck       = $this->getDCCheck($disenchantSkill, 0);
+
+            if ($characterRoll > $dcCheck) {
+                $goldDust = $this->updateGoldDust($character, false, $disenchantSkill);
+
+                event(new ServerMessageEvent($character->user, 'disenchanted-adventure', $goldDust));
+                event(new UpdateSkillEvent($disenchantSkill));
+
+            } else {
+                $this->updateGoldDust($character, true);
+
+                event(new ServerMessageEvent($character->user, 'failed-to-disenchant'));
+            }
+        }
     }
 
     /**

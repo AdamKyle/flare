@@ -21,6 +21,7 @@ class Adventure extends Model
         'name',
         'description',
         'reward_item_id',
+        'over_flow_set_id',
         'levels',
         'time_per_level',
         'gold_rush_chance',
@@ -56,6 +57,10 @@ class Adventure extends Model
 
     public function itemReward() {
         return $this->hasOne(Item::class, 'id', 'reward_item_id');
+    }
+
+    public function overflowSet() {
+        return $this->hasOne(InventorySet::class, 'id', 'over_flow_set_id');
     }
 
     public function floorDescriptions() {

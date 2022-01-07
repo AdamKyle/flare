@@ -108,7 +108,7 @@ class ConjureService {
         }
 
         $healthRange          = explode('-', $monster->health_range);
-        $currentMonsterHealth = rand($healthRange[0], $healthRange[1]) + 10;
+        $currentMonsterHealth = rand($healthRange[0], $healthRange[1]);
 
         $celestialFight = CelestialFight::create([
             'monster_id'      => $monster->id,

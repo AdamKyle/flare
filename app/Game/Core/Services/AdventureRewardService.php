@@ -7,11 +7,13 @@ use App\Flare\Models\Adventure;
 use App\Flare\Models\Faction;
 use App\Flare\Models\Item as ItemModel;
 use App\Flare\Models\Skill;
+use App\Flare\Models\User;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Services\CharacterXPService;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\RandomAffixDetails;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
+use App\Game\Core\Jobs\AdventureItemDisenchantJob;
 use App\Game\Core\Traits\CanHaveQuestItem;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
@@ -19,6 +21,7 @@ use App\Game\Core\Values\FactionLevel;
 use App\Game\Core\Values\FactionType;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Skills\Services\DisenchantService;
 
 class AdventureRewardService {
 
@@ -34,6 +37,8 @@ class AdventureRewardService {
     private $characterXPService;
 
     private $randomAffixGenerator;
+
+    private $disenchantService;
 
     /**
      * @var array $messages
@@ -53,7 +58,8 @@ class AdventureRewardService {
                                 BuildCharacterAttackTypes $buildCharacterAttackTypes,
                                 CharacterXPService $characterXPService,
                                 InventorySetService $inventorySetService,
-                                RandomAffixGenerator $randomAffixGenerator
+                                RandomAffixGenerator $randomAffixGenerator,
+                                DisenchantService $disenchantService,
     ) {
 
         $this->characterService          = $characterService;
@@ -61,6 +67,7 @@ class AdventureRewardService {
         $this->characterXPService        = $characterXPService;
         $this->inventorySetService       = $inventorySetService;
         $this->randomAffixGenerator      = $randomAffixGenerator;
+        $this->disenchantService         = $disenchantService;
     }
 
     /**
@@ -278,6 +285,9 @@ class AdventureRewardService {
     protected function handleItems(array $items, Character $character): void {
         $character         = $character->refresh();
         $newItemList       = $items;
+        $user              = $character->user;
+
+
         $characterEmptySet = $character->inventorySets->filter(function($set) {
             return $set->slots->isEmpty();
         })->first();
@@ -286,7 +296,15 @@ class AdventureRewardService {
             foreach ($items as $index => $item) {
                 $item = Item::find($item['id']);
 
+
                 if (!is_null($item)) {
+
+                    if ($item->type !== 'quest' && !is_null($user->auto_disenchant_amount)) {
+                       if ($this->autoDisenchant($character, $item)) {
+                           continue;
+                       }
+                    }
+
                     if ($character->isInventoryFull() && !is_null($characterEmptySet) && $item->type !== 'quest') {
                         $this->inventorySetService->putItemIntoSet($characterEmptySet, $item);
 
@@ -330,6 +348,32 @@ class AdventureRewardService {
                 $character = $character->refresh();
             }
         }
+    }
+
+    protected function autoDisenchant(Character $character, Item $item) {
+        $user = $character->user;
+
+        if ($user->auto_disenchant_amount === 'all') {
+            AdventureItemDisenchantJob::dispatch($character, $item)->delay(now()->addSeconds(30));
+
+            $this->messages[] = 'Item: '.$item->affix_name.' has been set to be disenchanted. (Item may have already been disenchanted if you see no message in chat)';
+
+            return true;
+        }
+
+        if ($user->auto_disenchant_amount === '1-billion') {
+            $cost = SellItemCalculator::fetchSalePriceWithAffixes($this->item);
+
+            if ($cost < 1000000000) {
+                AdventureItemDisenchantJob::dispatch($character, $item);
+
+                $this->messages[] = 'Item: '.$item->affix_name.' has been set to be disenchanted. (Item may have already been disenchanted if you see no message in chat)';
+
+                return true;
+            }
+        }
+
+        return false;
     }
 
     protected function factionReward(Character $character, Faction $faction, string $mapName, ?string $title = null) {

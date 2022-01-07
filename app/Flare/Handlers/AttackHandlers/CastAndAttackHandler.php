@@ -125,6 +125,8 @@ class CastAndAttackHandler {
             $message          = 'You missed with your weapon(s)!';
             $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
         }
+
+        $this->entrancingChanceHandler->resetLogs();
     }
 
     public function castSpells($attacker, $defender, CharacterInformationBuilder $characterInfo, int $totalSpellDamage, int $totalHealing, bool $voided) {

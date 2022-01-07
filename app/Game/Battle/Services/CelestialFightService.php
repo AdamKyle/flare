@@ -2,6 +2,7 @@
 
 namespace App\Game\Battle\Services;
 
+use Facades\App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\CelestialFight;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterInCelestialFight;
@@ -88,6 +89,8 @@ class CelestialFightService {
                 'message' => 'You have died during the fight! Death has come for you!',
                 'class'   => 'enemy-action-fired',
             ];
+
+            $this->moveCelestial($character, $celestialFight);
 
             return $this->successResult([
                 'fight' => [
@@ -187,5 +190,19 @@ class CelestialFightService {
         ]);
 
         return $characterInCelestialFight->refresh();
+    }
+
+    protected function moveCelestial(Character $character, CelestialFight $celestialFight) {
+        $monster              = $celestialFight->monster;
+        $healthRange          = explode('-', $monster->health_range);
+        $currentMonsterHealth = rand($healthRange[0], $healthRange[1]);
+
+        $celestialFight->update([
+            'x_position'      => CoordinatesCache::getFromCache()['x'][rand(CoordinatesCache::getFromCache()['x'][0], (count(CoordinatesCache::getFromCache()['x']) - 1))],
+            'y_position'      => CoordinatesCache::getFromCache()['y'][rand(CoordinatesCache::getFromCache()['y'][0], (count(CoordinatesCache::getFromCache()['y']) - 1))],
+            'current_health'  => $currentMonsterHealth,
+        ]);
+
+        event(new GlobalMessageEvent($character->name . ' Has caused: ' . $monster->name . ' to flee to the far ends of Tlessa (use /pct or /pc to find the new coordinates).'));
     }
 }

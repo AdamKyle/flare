@@ -4,6 +4,7 @@ namespace Tests\Feature\Game\Battle;
 
 use App\Flare\Builders\CharacterAttackInformation;
 use App\Flare\Builders\CharacterInformationBuilder;
+use Illuminate\Support\Facades\Event;
 use Mockery;
 use App\Flare\Models\CelestialFight;
 use App\Flare\Services\BuildMonsterCacheService;
@@ -505,6 +506,7 @@ class CelestialBattleControllerApiTest extends TestCase {
     }
 
     public function testReviveInCelestialFight() {
+
         $this->createNpc([
             'type' => NpcTypes::SUMMONER
         ]);

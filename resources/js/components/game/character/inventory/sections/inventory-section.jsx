@@ -135,21 +135,33 @@ export default class InventorySection extends React.Component {
   }
 
   manageDestroyAllModal(successMessage) {
+    if (typeof successMessage === 'object') {
+      return this.setState({
+        showDisenchantModal: !this.state.showDisenchantModal,
+      });
+    }
+
     this.setState({
       showDestroyAllModal: !this.state.showDestroyAllModal,
     }, () => {
       this.setState({
-        successMessage: typeof successMessage !== 'object' ? successMessage : null,
+        successMessage: typeof successMessage !== 'undefined' ? successMessage : null,
       })
     });
   }
 
   manageDisenchantModal(successMessage) {
+    if (typeof successMessage === 'object') {
+      return this.setState({
+        showDisenchantModal: !this.state.showDisenchantModal,
+      });
+    }
+
     this.setState({
       showDisenchantModal: !this.state.showDisenchantModal,
     }, () => {
       this.setState({
-        successMessage: typeof successMessage !== 'object' ? successMessage : null,
+        successMessage: typeof successMessage !== 'undefined' ? successMessage : null,
       })
     });
   }

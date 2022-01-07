@@ -265,7 +265,7 @@ class KingdomBuildingService {
         })->first()->skill_bonus;
 
         if ($time > 0) {
-            return floor($time - $time * $skillBonus);
+            return $time;
         }
 
         return floor($building->time_increase - $building->time_increase * $skillBonus);

@@ -24,7 +24,8 @@ class AdventureEmbarkRequest extends FormRequest
     public function rules()
     {
         return [
-            'attack_type' => 'string|required'
+            'attack_type'   => 'string|required',
+            'over_flow_set' => 'nullable|integer|exists:inventory_sets,id',
         ];
     }
 

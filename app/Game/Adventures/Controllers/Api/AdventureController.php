@@ -31,9 +31,10 @@ class AdventureController extends Controller {
         ]);
 
         $adventureLog = $character->adventureLogs()->create([
-            'character_id' => $character->id,
-            'adventure_id' => $adventure->id,
-            'in_progress'  => true,
+            'character_id'     => $character->id,
+            'adventure_id'     => $adventure->id,
+            'in_progress'      => true,
+            'over_flow_set_id' => $request->has('over_flow_set') ? $request->over_flow_set : null,
         ]);
 
         $character->update([
