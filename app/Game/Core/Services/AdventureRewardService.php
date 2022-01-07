@@ -292,6 +292,7 @@ class AdventureRewardService {
             return $set->slots->isEmpty();
         })->first();
 
+
         if (!empty($items)) {
             foreach ($items as $index => $item) {
                 $item = Item::find($item['id']);

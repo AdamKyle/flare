@@ -826,47 +826,6 @@ class CharacterSkillControllerApiTest extends TestCase {
         })->isNotEmpty());
     }
 
-    public function testFailedToCraft() {
-        $character = $this->character->getCharacter(false);
-
-        $craftingSkillService = Mockery::spy(CraftingService::class);
-
-        $weaponCraftingSkill = $character->skills->filter(function($skill) {
-            return $skill->name === 'Weapon Crafting';
-        })->first();
-
-        $craftingSkillService->shouldReceive('getDCCheck')->with($weaponCraftingSkill)->andReturn(100);
-        $craftingSkillService->shouldReceive('characterRoll')->with($weaponCraftingSkill)->andReturn(1);
-
-        $itemId = $this->createItem([
-            'name' => 'sample',
-            'type' => 'weapon',
-            'cost' => 1,
-            'can_craft' => true,
-            'skill_level_required' => 1,
-            'skill_level_trivial' => 10,
-            'crafting_type' => 'weapon',
-            'skill_level_trivial' => 10,
-        ])->id;
-
-        $user = $this->character->getUser();
-
-        $response = $this->actingAs($user)
-            ->json('POST', '/api/craft/' . $character->id, [
-                'item_to_craft' => $itemId,
-                'type' => 'weapon',
-            ])
-            ->response;
-
-        $character = $this->character->getCharacter(false);
-
-        $this->assertEquals(200, $response->status());
-        $this->assertTrue($character->inventory->slots->count() === 0);
-        $this->assertFalse($character->inventory->slots->filter(function($slot) {
-            return $slot->item->name === 'sample';
-        })->isNotEmpty());
-    }
-
     public function testFailedToCraftBecauseDead() {
 
         $character = $this->character->updateCharacter(['is_dead' => true])->getCharacter(false);
