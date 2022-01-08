@@ -23,6 +23,7 @@ class AdventureLog extends Model
         'in_progress',
         'took_to_long',
         'last_completed_level',
+        'over_flow_set_id',
         'logs',
         'rewards',
         'created_at',
@@ -57,6 +58,10 @@ class AdventureLog extends Model
 
     public function adventure() {
         return $this->hasOne(Adventure::class, 'id', 'adventure_id');
+    }
+
+    public function overFlowSet() {
+        return $this->hasOne(SetSlot::class, 'id', 'over_flow_set_id');
     }
 
     protected static function newFactory() {

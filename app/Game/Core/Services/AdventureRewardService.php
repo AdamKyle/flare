@@ -4,7 +4,9 @@ namespace App\Game\Core\Services;
 
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Models\Adventure;
+use App\Flare\Models\AdventureLog;
 use App\Flare\Models\Faction;
+use App\Flare\Models\InventorySet;
 use App\Flare\Models\Item as ItemModel;
 use App\Flare\Models\Skill;
 use App\Flare\Models\User;
@@ -77,7 +79,9 @@ class AdventureRewardService {
      * @param Character $character
      * @return AdventureRewardService
      */
-    public function distributeRewards(array $rewards, Character $character, Adventure $adventure): AdventureRewardService {
+    public function distributeRewards(array $rewards, Character $character, AdventureLog $adventureLog): AdventureRewardService {
+        $adventure = $adventureLog->adventure;
+
         if ($character->gold !== MaxCurrenciesValue::MAX_GOLD) {
             $maxCurrencies = new MaxCurrenciesValue($character->gold + $rewards['gold'], MaxCurrenciesValue::GOLD);
 
@@ -103,7 +107,7 @@ class AdventureRewardService {
         $this->handleFactionPoints($character, $adventure, $rewards['faction_points']);
 
         if (!empty($rewards['items'])) {
-            $this->handleItems($rewards['items'], $character);
+            $this->handleItems($rewards['items'], $character, $adventureLog->overFlowSet);
         }
 
         return $this;
@@ -282,16 +286,19 @@ class AdventureRewardService {
         }
     }
 
-    protected function handleItems(array $items, Character $character): void {
+    protected function handleItems(array $items, Character $character, InventorySet $set = null): void {
         $character         = $character->refresh();
         $newItemList       = $items;
         $user              = $character->user;
 
 
-        $characterEmptySet = $character->inventorySets->filter(function($set) {
-            return $set->slots->isEmpty();
-        })->first();
-
+        if (!is_null($set)) {
+            $characterSet = $character->innventorySets()->find($setId);
+        } else {
+            $characterSet = $character->inventorySets->filter(function($set) {
+                return $set->slots->isEmpty();
+            })->first();
+        }
 
         if (!empty($items)) {
             foreach ($items as $index => $item) {
@@ -309,11 +316,17 @@ class AdventureRewardService {
                     if ($character->isInventoryFull() && !is_null($characterEmptySet) && $item->type !== 'quest') {
                         $this->inventorySetService->putItemIntoSet($characterEmptySet, $item);
 
-                        $index     = $character->inventorySets->search(function($set) use ($characterEmptySet) {
-                            return $set->id === $characterEmptySet->id;
-                        });
+                        if (!is_null($characterSet->name)) {
+                            $this->messages[] = 'Item: '.$item->affix_name.' has been stored in Set: '.$characterSet->name.' as your inventory is full';
+                        } else {
+                            $index     = $character->inventorySets->search(function($set) use ($characterSet) {
+                                return $set->id === $characterSet->id;
+                            });
 
-                        $this->messages[] = 'Item: '.$item->affix_name.' has been stored in Set: '.($index + 1).' as your inventory is full';
+                            $this->messages[] = 'Item: '.$item->affix_name.' has been stored in Set: '.($index + 1).' as your inventory is full';
+                        }
+
+
                     } else if ($item->type !== 'quest' && $character->isInventoryFull()) {
                         $this->messages[] = 'You failed to get the item: '.$item->affix_name.' as your inventory is full and you have no empty set.';
                     }

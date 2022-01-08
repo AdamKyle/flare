@@ -13,7 +13,7 @@ class AddOverFlowSetIdToAdventures extends Migration
      */
     public function up()
     {
-        Schema::table('adventures', function (Blueprint $table) {
+        Schema::table('adventure_logs', function (Blueprint $table) {
             $table->unsignedBigInteger('over_flow_set_id')->nullable();
             $table->foreign('over_flow_set_id')
                   ->references('id')->on('inventory_sets');
@@ -27,7 +27,7 @@ class AddOverFlowSetIdToAdventures extends Migration
      */
     public function down()
     {
-        Schema::table('adventures', function (Blueprint $table) {
+        Schema::table('adventure_logs', function (Blueprint $table) {
             $table->dropForeign(['over_flow_set_id']);
             $table->dropColumn('over_flow_set_id');
         });

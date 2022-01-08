@@ -105,6 +105,7 @@ class RandomEnchantController extends Controller {
         $character = $character->refresh();
 
         return response()->json([
+            'gold'      => $character->gold,
             'gold_dust' => $character->gold_dust,
             'shards'    => $character->shards,
             'message'   => 'The Queen has re rolled: ' . $slot->item->affix_name . ' Check your inventory to see the new stats.',
@@ -138,6 +139,7 @@ class RandomEnchantController extends Controller {
         );
 
         return response()->json([
+            'gold'      => $character->gold,
             'gold_dust' => $character->gold_dust,
             'shards'    => $character->shards,
             'message'   => 'The Queen has moved the stats from one item to the other. Check your inventory for the new unique.',

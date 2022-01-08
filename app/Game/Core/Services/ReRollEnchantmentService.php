@@ -18,6 +18,8 @@ class ReRollEnchantmentService {
 
     private AffixAttributeBuilder $affixAttributeBuilder;
 
+    private RandomEnchantmentService $randomEnchantmentService;
+
     private $functionMap = [
         'base'       => [
             'setCoreModifiers',
@@ -42,8 +44,9 @@ class ReRollEnchantmentService {
         ],
     ];
 
-    public function __construct(AffixAttributeBuilder $affixAttributeBuilder) {
-        $this->affixAttributeBuilder = $affixAttributeBuilder;
+    public function __construct(AffixAttributeBuilder $affixAttributeBuilder, RandomEnchantmentService $randomEnchantmentService) {
+        $this->affixAttributeBuilder    = $affixAttributeBuilder;
+        $this->randomEnchantmentService = $randomEnchantmentService;
     }
 
     public function reRoll(Character $character, InventorySlot $slot, string $affixType, string $reRollType, int $goldDustCost, int $shardCost) {
@@ -58,7 +61,7 @@ class ReRollEnchantmentService {
             $this->changeAffix($character, $dupliateItem, $affix, $reRollType);
         }
 
-        $duplicateItem->update([
+        $dupliateItem->update([
             'market_sellable' => true,
         ]);
 
@@ -72,7 +75,7 @@ class ReRollEnchantmentService {
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
-        event(new UpdateQueenOfHeartsPanel($character->user, $this->fetchDataForApi($character)));
+        event(new UpdateQueenOfHeartsPanel($character->user, $this->randomEnchantmentService->fetchDataForApi($character)));
 
         event(new ServerMessageEvent($character->user, 'Ooooh hoo hoo hoo! I have done it child! I have made the modifications and I think you\'ll be happy! Oh child I am so happy! ooh hoo hoo hoo!', true));
     }
@@ -174,7 +177,7 @@ class ReRollEnchantmentService {
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
-        event(new UpdateQueenOfHeartsPanel($character->user, $this->fetchDataForApi($character)));
+        event(new UpdateQueenOfHeartsPanel($character->user, $this->randomEnchantmentService->fetchDataForApi($character)));
 
         event(new ServerMessageEvent($character->user, 'Ooooh hoo hoo hoo! I have done as thou have requested, my lovely, beautiful gorgeous child! Oh look at how powerful you are!', true));
 
