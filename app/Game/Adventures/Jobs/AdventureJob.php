@@ -77,7 +77,19 @@ class AdventureJob implements ShouldQueue
     {
         $name = Cache::get('character_'.$this->character->id.'_adventure_'.$this->adventure->id);
 
+        $shouldBail = false;
+
         if (is_null($name) || $name !== $this->name) {
+            if (!is_null($this->character->current_adventure_id)) {
+                if (!$this->character->current_adventure_id === $this->adventure->id) {
+                    $shouldBail = true;
+                }
+            } else  {
+                $shouldBail = true;
+            }
+        }
+
+        if ($shouldBail) {
             return;
         }
 

@@ -148,15 +148,36 @@ trait KingdomCache {
      * @return array
      */
     protected function addKingdom(Kingdom $kingdom, array $cache = []): array {
-        $cache[] = [
+
+        if (!empty($cache)) {
+            $key = array_search($kingdom->id, array_column($cache, 'id'));
+
+            if ($key !== false) {
+                $cache[$key] = $this->addOrUpdateCache($kingdom);
+            } else {
+                $cache[] = $this->addOrUpdateCache($kingdom);
+            }
+        } else {
+            $cache[] = $this->addOrUpdateCache($kingdom);
+        }
+
+        return $cache;
+    }
+
+    /**
+     * Returns an array of updated kingdom values.
+     *
+     * @param Kingdom $kingdom
+     * @return array
+     */
+    protected function addOrUpdateCache(Kingdom $kingdom): array  {
+        return  [
             'id'         => $kingdom->id,
             'name'       => $kingdom->name,
             'x_position' => $kingdom->x_position,
             'y_position' => $kingdom->y_position,
             'color'      => $kingdom->color,
         ];
-
-        return $cache;
     }
 
     /**

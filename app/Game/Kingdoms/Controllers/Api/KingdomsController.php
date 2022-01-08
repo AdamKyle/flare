@@ -3,6 +3,8 @@
 namespace App\Game\Kingdoms\Controllers\Api;
 
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Kingdoms\Events\AddKingdomToMap;
+use App\Game\Kingdoms\Events\UpdateGlobalMap;
 use App\Game\Kingdoms\Requests\KingdomDepositRequest;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 use Illuminate\Http\Request;
@@ -85,11 +87,19 @@ class KingdomsController extends Controller {
     public function rename(KingdomRenameRequest $request, Kingdom $kingdom, KingdomService $kingdomService) {
         $kingdom->update($request->all());
 
+        $character = $kingdom->character;
+
+        $kingdomService->addKingdomToCache($kingdom->character, $kingdom);
+
         $kingdomData  = new Item($kingdom->refresh(), $this->kingdom);
 
         $kingdomData  = $this->manager->createData($kingdomData)->toArray();
 
-        event(new UpdateKingdom($kingdom->character->user, $kingdomData));
+        $character = $character->refresh();
+
+        event(new UpdateKingdom($character->user, $kingdomData));
+        event(new UpdateGlobalMap($character));
+        event(new AddKingdomToMap($character));
 
         return response()->json([], 200);
     }
@@ -105,6 +115,12 @@ class KingdomsController extends Controller {
         if ($building->level + 1 > $building->gameBuilding->max_level) {
             return response()->json([
                 'message' => "Building is already max level."
+            ], 422);
+        }
+
+        if ($building->kingdom->current_population < $building->required_population) {
+            return response()->json([
+                'message' => "You do not have enough population."
             ], 422);
         }
 
