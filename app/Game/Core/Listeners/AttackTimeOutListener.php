@@ -27,7 +27,7 @@ class AttackTimeOutListener
             $time = $time - ($time * $this->findTimeReductions($event->character));
         }
 
-        if ($time <= 0) {
+        if ($time < 5) {
             $time = 5;
         }
 

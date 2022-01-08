@@ -45,7 +45,6 @@ class GoldRushCheckListener
                 $event->character->save();
 
                 $type = 'gold_capped';
-
             } else {
                 $event->character->gold = $goldRush;
                 $event->character->save();
