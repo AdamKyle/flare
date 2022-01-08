@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddOverFlowSetIdToAdventures extends Migration
+class AddOverFlowSetIdToAdventureLogs extends Migration
 {
     /**
      * Run the migrations.
@@ -16,7 +16,7 @@ class AddOverFlowSetIdToAdventures extends Migration
         Schema::table('adventure_logs', function (Blueprint $table) {
             $table->unsignedBigInteger('over_flow_set_id')->nullable();
             $table->foreign('over_flow_set_id')
-                  ->references('id')->on('inventory_sets');
+                ->references('id')->on('inventory_sets');
         });
     }
 
