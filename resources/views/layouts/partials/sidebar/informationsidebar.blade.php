@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <!-- Menu Bar -->
 <aside class="menu-bar menu-sticky">
     <div class="menu-items">
@@ -76,10 +75,6 @@
                 <a href="{{route('info.page', ['pageName' => 'skill-information'])}}">
                     <span class="ra ra-aura"></span>
                     Skills
-                </a>
-                <a href="#no-link">
-                    <span class="ra ra-muscle-up"></span>
-                    Passive Skills
                 </a>
             </div>
 
