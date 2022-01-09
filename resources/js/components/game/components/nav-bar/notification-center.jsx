@@ -103,7 +103,7 @@ export default class NotificationCenter extends React.Component {
           aria-labelledby={labeledBy}
         >
           <div className="actions clearfix">
-            <a href="#" onClick={this.clearAll.bind(this)} className="float-right mr-2">Clear</a>
+            <a href="#" onClick={this.clearAll.bind(this)} className="float-left ml-4 btn btn-sm btn-primary mb-2">Clear</a>
           </div>
           <ul className="list-unstyled">
             {children}
@@ -161,7 +161,7 @@ export default class NotificationCenter extends React.Component {
             Dropdown Button
           </Dropdown.Toggle>
 
-          <Dropdown.Menu as={this.customMenu()} className="notification-center">
+          <Dropdown.Menu as={this.customMenu()} className="notification-center tw-overflow-y-auto tw-max-h-72">
             {this.buildNotifications()}
           </Dropdown.Menu>
         </Dropdown>

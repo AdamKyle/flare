@@ -16,6 +16,7 @@ class CharacterPassiveSkill extends Model
     protected $fillable = [
         'character_id',
         'passive_skill_id',
+        'parent_skill_id',
         'current_level',
         'hours_to_next',
         'started_at',
@@ -29,11 +30,12 @@ class CharacterPassiveSkill extends Model
      * @var array
      */
     protected $casts = [
-        'current_level'  => 'integer',
-        'hours_to_next'  => 'integer',
-        'started_at'     => 'datetime',
-        'completed_at'   => 'datetime',
-        'is_locked'      => 'boolean',
+        'current_level'    => 'integer',
+        'hours_to_next'    => 'integer',
+        'passive_skill_id' => 'integer',
+        'started_at'       => 'datetime',
+        'completed_at'     => 'datetime',
+        'is_locked'        => 'boolean',
     ];
 
     public function character() {
@@ -42,6 +44,14 @@ class CharacterPassiveSkill extends Model
 
     public function passiveSkill() {
         return $this->belongsTo(PassiveSkill::class, 'passive_skill_id', 'id');
+    }
+
+    public function children() {
+        return $this->hasMany($this, 'parent_skill_id')->with('children');
+    }
+
+    public function getIsMaxedLevelAttribute() {
+        return $this->current_level === $this->passiveSkill->max_level;
     }
 
     public function getCurrentBonusAttribute() {

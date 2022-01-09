@@ -8,6 +8,7 @@
       color="primary" link="Back"
     >
     </x-core.page-title>
+<<<<<<< HEAD
     <hr />
     <x-core.cards.card>
       <p>{!! nl2br(e($skill->description)) !!}</p>
@@ -42,5 +43,8 @@
         'only'    => 'children',
         'skillId' => $skill->id
     ])
+=======
+    @include('admin.passive-skills.partials.show', ['skill' => $skill])
+>>>>>>> 1.1.10
   </div>
 @endsection

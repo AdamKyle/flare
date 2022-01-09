@@ -71,7 +71,6 @@ export default class UseManyItemsModal extends React.Component {
   }
 
   setOptions() {
-    console.log(this.props.usableItems.filter((ui) => !ui.item.damages_kingdoms));
     return this.props.usableItems.filter((ui) => !ui.item.damages_kingdoms).map((ui) => <option value={ui.id} key={ui.id}>
       {ui.item.name}
     </option>)

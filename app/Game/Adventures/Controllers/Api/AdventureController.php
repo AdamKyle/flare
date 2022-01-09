@@ -30,10 +30,15 @@ class AdventureController extends Controller {
             'can_adventure' => false,
         ]);
 
-        $character->adventureLogs()->create([
-            'character_id' => $character->id,
-            'adventure_id' => $adventure->id,
-            'in_progress'  => true,
+        $adventureLog = $character->adventureLogs()->create([
+            'character_id'     => $character->id,
+            'adventure_id'     => $adventure->id,
+            'in_progress'      => true,
+            'over_flow_set_id' => $request->has('over_flow_set') ? $request->over_flow_set : null,
+        ]);
+
+        $character->update([
+            'current_adventure_id' => $adventureLog->id,
         ]);
 
         $character = $character->refresh();
@@ -55,6 +60,7 @@ class AdventureController extends Controller {
             'can_craft'              => true,
             'can_adventure'          => true,
             'can_adventure_again_at' => null,
+            'current_adventure_id'   => null,
         ]);
 
         $adventureLog = $character->adventureLogs

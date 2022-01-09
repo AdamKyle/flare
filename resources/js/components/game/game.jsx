@@ -8,12 +8,14 @@ import ActionsSection from './sections/actions-section';
 import PortSection from './sections/port-section';
 import AdeventureActions from './sections/adventure-section';
 import TraverseSection from "./sections/traverse-section";
+import QuestSection from "./sections/quest-section";
 import KingdomManagementModal from './kingdom/modal/kingdom-management-modal';
 import KingdomSettlementModal from './kingdom/modal/kingdom-settlement-modal';
 import KingdomAttackModal from './kingdom/modal/kingdom-attack-modal';
 import TimeoutDialogue from "./timeout/modal/timeout-dialogue";
 import NpcComponentWrapper from "./npc-components/npc-component-wrapper";
 import MassEmbezzle from "./sections/modals/mass-embezzle";
+import localforage from "localforage";
 
 export default class Game extends React.Component {
   constructor(props) {
@@ -42,6 +44,7 @@ export default class Game extends React.Component {
       openKingdomAttackModal: false,
       openTimeOutModal: false,
       openMassEmbezzlement: false,
+      openQuestDetails: false,
       npcComponentName: null,
       characterId: null,
       canAdventureAgainAt: null,
@@ -49,6 +52,7 @@ export default class Game extends React.Component {
       current_x: null,
       current_y: null,
       characterGold: 0,
+      inventorySets: [],
       kingdomData: {
         my_kingdoms: [],
         can_attack: false,
@@ -62,9 +66,10 @@ export default class Game extends React.Component {
       attackAutomationIsRunning: false,
     }
 
-    this.isDead           = Echo.private('character-is-dead-' + this.props.userId);
-    this.npcComponent     = Echo.private('component-show-' + this.props.userId);
-    this.attackAutomation = Echo.private('attack-automation-status-' + this.props.userId);
+    this.isDead            = Echo.private('character-is-dead-' + this.props.userId);
+    this.npcComponent      = Echo.private('component-show-' + this.props.userId);
+    this.attackAutomation  = Echo.private('attack-automation-status-' + this.props.userId);
+    this.clearQuestStorage = Echo.private('clear-quest-storage-' + this.props.userId);
   }
 
   updateDimensions() {
@@ -92,6 +97,10 @@ export default class Game extends React.Component {
       });
     });
 
+    this.clearQuestStorage.listen('Game.Core.Events.ResetQuestStorageBroadcastEvent', () => {
+      localforage.clear().catch((err) => console.err(err));
+    });
+
     window.addEventListener('resize', this.updateDimensions.bind(this));
   }
 
@@ -101,11 +110,12 @@ export default class Game extends React.Component {
     });
   }
 
-  updateAdventure(adventureDetails, adventureLogs, adventureAgainAt) {
+  updateAdventure(adventureDetails, adventureLogs, adventureAgainAt, inventorySets) {
     this.setState({
       adventureDetails: adventureDetails,
       adventureLogs: adventureLogs,
       canAdventureAgainAt: adventureAgainAt,
+      inventorySets: inventorySets,
     });
   }
 
@@ -113,7 +123,7 @@ export default class Game extends React.Component {
     this.setState({position: position});
   }
 
-  updateTeleportLoations(locations, currentX, currentY) {
+  updateTeleportLocations(locations, currentX, currentY) {
     this.setState({
       teleportLocations: locations,
       current_x: currentX,
@@ -127,6 +137,7 @@ export default class Game extends React.Component {
       openAdventureDetails: false,
       openTeleportDetails: false,
       openTraverseDetails: false,
+      openQuestDetails: false,
     });
   }
 
@@ -136,6 +147,7 @@ export default class Game extends React.Component {
       openAdventureDetails: open,
       openTeleportDetails: false,
       openTraverseDetails: false,
+      openQuestDetails: false,
     });
   }
 
@@ -145,6 +157,7 @@ export default class Game extends React.Component {
       openAdventureDetails: false,
       openTeleportDetails: false,
       openTraverseDetails: open,
+      openQuestDetails: false,
     });
   }
 
@@ -154,6 +167,17 @@ export default class Game extends React.Component {
       openPortDetails: false,
       openAdventureDetails: false,
       openTraverseDetails: false,
+      openQuestDetails: false,
+    });
+  }
+
+  openQuestDetails(open) {
+    this.setState({
+      openQuestDetails: open,
+      openPortDetails: false,
+      openAdventureDetails: false,
+      openTraverseDetails: false,
+      openTeleportDetails: false,
     });
   }
 
@@ -344,6 +368,7 @@ export default class Game extends React.Component {
                   openAdventureDetails={this.openAdventureDetails.bind(this)}
                   adventureAgainAt={this.state.canAdventureAgainAt}
                   adventureLogs={this.state.adventureLogs}
+                  inventorySets={this.state.inventorySets}
                   openTimeOutModal={this.openTimeOutModal.bind(this)}
                 />
                 : null
@@ -372,6 +397,7 @@ export default class Game extends React.Component {
             {
               this.state.npcComponentName !== null ?
                 <NpcComponentWrapper
+                  userId={this.props.userId}
                   npcComponentName={this.state.npcComponentName}
                   close={this.closeNpcComponent.bind(this)}
                   openTimeOutModal={this.openTimeOutModal.bind(this)}
@@ -379,6 +405,11 @@ export default class Game extends React.Component {
                   isDead={this.state.isDead}
                 />
                 : null
+            }
+            {
+              this.state.openQuestDetails ?
+                <QuestSection openQuestDetails={this.openQuestDetails.bind(this)} characterId={this.state.characterId}/>
+              : null
             }
           </div>
           <div
@@ -399,8 +430,9 @@ export default class Game extends React.Component {
               openAdventureDetails={this.openAdventureDetails.bind(this)}
               openTraverserDetails={this.openTraverseDetails.bind(this)}
               updateAdventure={this.updateAdventure.bind(this)}
-              updateTeleportLoations={this.updateTeleportLoations.bind(this)}
+              updateTeleportLocations={this.updateTeleportLocations.bind(this)}
               openTeleportDetails={this.openTeleportDetails.bind(this)}
+              openQuestDetails={this.openQuestDetails.bind(this)}
               openTimeOutModal={this.openTimeOutModal.bind(this)}
               updateKingdoms={this.updateKingdoms.bind(this)}
               updateCelestial={this.updateCelestial.bind(this)}

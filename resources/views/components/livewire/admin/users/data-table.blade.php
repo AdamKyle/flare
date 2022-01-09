@@ -75,7 +75,7 @@
     </x-data-tables.header>
     <x-data-tables.body>
       @forelse($users as $user)
-        <tr wire:loading.class.delay="text-muted" class="{{!is_null($user->un_ban_request) ? 'un-ban-request' : ''}}">
+        <tr wire:loading.class.delay="text-muted" class="{{!is_null($user->un_ban_request) ? 'un-ban-request' : ($user->will_be_deleted ? 'tw-text-red-300' : '')}}">
           <td>{{$user->id}}</td>
           <td>
             <a href="{{route('users.user', [

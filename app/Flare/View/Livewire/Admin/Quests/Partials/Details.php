@@ -2,6 +2,9 @@
 
 namespace App\Flare\View\Livewire\Admin\Quests\Partials;
 
+use App\Admin\Jobs\ResetCharacterQuestStorage;
+use Cache;
+use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
 use App\Flare\Models\Npc;
 use App\Flare\Models\Quest;
@@ -25,6 +28,12 @@ class Details extends Component
         'quest.reward_xp'          => 'nullable',
         'quest.unlocks_skill'      => 'nullable',
         'quest.unlocks_skill_type' => 'nullable',
+        'quest.is_parent'          => 'nullable',
+        'quest.parent_quest_id'    => 'nullable',
+        'quest.faction_game_map_id'     => 'nullable',
+        'quest.secondary_required_item' => 'nullable',
+        'quest.required_faction_level'  => 'nullable',
+        'quest.access_to_map_id'        => 'nullable',
     ];
 
     protected $listeners = ['validateInput'];
@@ -38,6 +47,8 @@ class Details extends Component
     public $items      = [];
     public $npcs       = [];
     public $skillTypes = [];
+    public $quests     = [];
+    public $gameMaps   = [];
 
     public function validateInput(string $functionName, int $index) {
 
@@ -46,9 +57,18 @@ class Details extends Component
             $this->quest->unlocks_skill_type = null;
         }
 
+        if (is_null($this->quest->is_parent)) {
+            $this->quest->is_parent = false;
+        }
+
         $this->validate();
 
         $this->quest->save();
+
+        Cache::delete('npc-quests');
+        Cache::delete('all-quests');
+
+        ResetCharacterQuestStorage::dispatch();
 
         $this->emitTo('core.form-wizard', 'storeModel', $this->quest);
         $this->emitTo('core.form-wizard', $functionName, $index, true);
@@ -61,7 +81,9 @@ class Details extends Component
 
         $this->items      = Item::where('type', 'quest')->pluck('name', 'id');
         $this->npcs       = Npc::where('type', NpcTypes::QUEST_GIVER)->pluck('real_name', 'id');
+        $this->quests     = Quest::pluck('name', 'id');
         $this->skillTypes = SkillTypeValue::$namedValues;
+        $this->gameMaps   = GameMap::pluck('name', 'id');
     }
 
     public function render() {

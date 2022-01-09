@@ -4,6 +4,8 @@ namespace App\Game\Kingdoms\Controllers;
 
 use App\Flare\Models\KingdomLog;
 use App\Flare\Models\Notification;
+use App\Game\Adventures\Events\UpdateAdventureLogsBroadcastEvent;
+use App\Game\Kingdoms\Events\UpdateKingdomLogs;
 use App\Game\Kingdoms\Service\KingdomLogService;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
@@ -11,16 +13,8 @@ use Illuminate\Http\Request;
 
 class KingdomsController extends Controller {
 
-    /**
-     * @var KingdomLogService $kingdomLogService
-     */
     private $kingdomLogService;
 
-    /**
-     * KingdomsController constructor.
-     *
-     * @param KingdomLogService $kingdomLogService
-     */
     public function __construct(KingdomLogService $kingdomLogService) {
         $this->kingdomLogService = $kingdomLogService;
     }
@@ -28,7 +22,9 @@ class KingdomsController extends Controller {
     public function attackLogs(Character $character) {
         $logs = $character->kingdomAttackLogs()->where('published', true)->get();
 
-        Notification::where('type', 'kingdom')->delete();
+        Notification::where('type', 'kingdom')->where('character_id', $character->id)->delete();
+
+        event(new UpdateKingdomLogs($character));
 
         return view('game.kingdoms.attack-logs', [
             'logs'      => $logs,
@@ -43,7 +39,9 @@ class KingdomsController extends Controller {
 
         $kingdomLog = $kingdomLog->refresh();
 
-        Notification::where('type', 'kingdom')->delete();
+        Notification::where('type', 'kingdom')->where('character_id', $character->id)->delete();
+
+        event(new UpdateKingdomLogs($character));
 
         return view('game.kingdoms.attack-log', [
             'log'       => $this->kingdomLogService->setLog($kingdomLog)->attackReport(),

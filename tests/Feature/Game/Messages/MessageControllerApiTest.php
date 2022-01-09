@@ -2,9 +2,9 @@
 
 namespace Tests\Feature\Game\Messages;
 
+use App\Game\Messages\Jobs\ProcessNPCCommands;
+use Queue;
 use App\Flare\Services\BuildMonsterCacheService;
-use App\Game\Maps\Services\TraverseService;
-use Illuminate\Support\Facades\Cache;
 use Mockery;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
@@ -312,6 +312,8 @@ class MessageControllerApiTest extends TestCase
     }
 
     public function testNpcMessage() {
+        Queue::fake();
+
         $user = $this->character->getUser();
         $npc = $this->createNpc([
             'name'        => 'Apples',
@@ -331,6 +333,8 @@ class MessageControllerApiTest extends TestCase
                 'user_name' => $npc->name,
             ])
             ->response;
+
+        Queue::assertPushed(ProcessNPCCommands::class);
 
         $this->assertEquals(200, $response->status());
     }

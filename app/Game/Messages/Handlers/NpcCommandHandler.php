@@ -2,28 +2,19 @@
 
 namespace App\Game\Messages\Handlers;
 
+use App\Flare\Models\Character;
+use App\Flare\Values\ItemEffectsValue;
 use Exception;
 use Illuminate\Broadcasting\PendingBroadcast;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item;
-use League\Fractal\Resource\Item as ResourceItem;
 use App\Flare\Events\NpcComponentShowEvent;
 use App\Flare\Events\UpdateTopBarEvent;
-use App\Flare\Models\Character;
-use App\Flare\Models\GameSkill;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\Npc;
-use App\Flare\Models\Quest;
 use App\Flare\Models\User;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Transformers\CharacterAttackTransformer;
-use App\Flare\Transformers\MonsterTransfromer;
 use App\Flare\Values\NpcCommandTypes;
 use App\Flare\Values\NpcComponentsValue;
-use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Battle\Values\MaxLevel;
-use App\Game\Core\Events\CharacterLevelUpEvent;
-use App\Game\Core\Events\UpdateAttackStats;
 use App\Game\Core\Traits\KingdomCache;
 use App\Game\Kingdoms\Events\AddKingdomToMap;
 use App\Game\Kingdoms\Events\UpdateGlobalMap;
@@ -41,22 +32,7 @@ class NpcCommandHandler {
      */
     private $npcServerMessageBuilder;
 
-    /**
-     * @var CharacterAttackTransformer $characterAttackTransformer
-     */
-    private $characterAttackTransformer;
-
-    private $buildCharacterAttackTypes;
-
-    /**
-     * @var MonsterTransfromer $monsterTransformer
-     */
-    private $monsterTransformer;
-
-    /**
-     * @var Manager $manager
-     */
-    private $manager;
+    private $npcQuestsHandler;
 
     /**
      * KINGDOM_COST
@@ -68,21 +44,14 @@ class NpcCommandHandler {
      *
      * @param NpcServerMessageBuilder $npcServerMessageBuilder
      * @param CharacterAttackTransformer $characterAttackTransformer
-     * @param MonsterTransfromer $monsterTransformer
      * @param Manager $manager
      */
     public function __construct(
-        NpcServerMessageBuilder    $npcServerMessageBuilder,
-        CharacterAttackTransformer $characterAttackTransformer,
-        BuildCharacterAttackTypes  $buildCharacterAttackTypes,
-        MonsterTransfromer         $monsterTransformer,
-        Manager                    $manager,
+        NpcServerMessageBuilder $npcServerMessageBuilder,
+        NpcQuestsHandler        $npcQuestsHandler,
     ) {
         $this->npcServerMessageBuilder    = $npcServerMessageBuilder;
-        $this->characterAttackTransformer = $characterAttackTransformer;
-        $this->buildCharacterAttackTypes  = $buildCharacterAttackTypes;
-        $this->monsterTransformer         = $monsterTransformer;
-        $this->manager                    = $manager;
+        $this->npcQuestHandler            = $npcQuestsHandler;
     }
 
     /**
@@ -129,9 +98,25 @@ class NpcCommandHandler {
             return broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('take_a_look', $npc), true));
         }
 
+        if ($type->isReRoll()) {
+            if (!$character->map->gameMap->mapType()->isHell()) {
+                return broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('queen_plane', $npc), true));
+            }
+
+            if (!$this->characterHasQuestItemToIntereact($character, ItemEffectsValue::QUEEN_OF_HEARTS)) {
+                return broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('missing_queen_item', $npc), true));
+            } else {
+                broadcast(new NpcComponentShowEvent($user, NpcComponentsValue::ENCHANT));
+
+                return broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('what_do_you_want', $npc), true));
+            }
+
+
+        }
+
         if ($type->isQuest()) {
             if ($this->handleQuest($user, $npc)) {
-                $message     = $user->character->name . ' has completed a quest for: ' . $npc->real_name . ' And has been rewarded with a godly gift!';
+                $message     = $user->character->name . ' has completed a quest for: ' . $npc->real_name . ' and has been rewarded with a godly gift!';
                 $messageType = 'quest_complete';
             } else {
                 $messageType = 'no_quests';
@@ -145,6 +130,14 @@ class NpcCommandHandler {
         } else if (!is_null($messageType)) {
             return broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build($messageType, $npc), true));
         }
+    }
+
+    protected function characterHasQuestItemToIntereact(Character $character, string $type): bool {
+        $foundQuestItem = $character->inventory->slots->filter(function($slot) use($type) {
+            return $slot->item->type === 'quest' && $slot->item->effect === $type;
+        })->first();
+
+        return !is_null($foundQuestItem);
     }
 
     /**
@@ -205,238 +198,7 @@ class NpcCommandHandler {
         return $tookKingdom;
     }
 
-    protected function handleQuest($user, $npc) {
-        $character         = $user->character;
-        $completedQuestIds = $character->questsCompleted->pluck('quest_id')->toArray();
-
-        $quests = $npc->quests()->whereNotIn('id', $completedQuestIds)->get();
-
-        if ($quests->isEmpty()) {
-            return false;
-        }
-
-        foreach ($quests as $quest) {
-            if (!is_null($quest->item_id)) {
-                $foundItem = $character->inventory->slots->filter(function($slot) use ($quest) {
-                    return $slot->item_id === $quest->item_id;
-                })->first();
-
-                if (is_null($foundItem)) {
-                    continue;
-                }
-
-                if (!$this->canHaveReward($character, $npc, $quest)) {
-                    return false;
-                }
-
-                if ($quest->gold_dust_cost > 0 || $quest->gold_cost > 0 || $quest->shard_cost > 0) {
-                    if (!$this->canPay($character, $quest, $npc)) {
-                        return false;
-                    }
-
-                    broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('take_currency', $npc), true));
-
-                    $character->update([
-                        'gold' => !is_null($quest->gold_cost) ? ($character->gold - $quest->gold_cost) : $character->gold,
-                        'gold_dust' => !is_null($quest->gold_dust_cost) ? ($character->gold_dust - $quest->gold_dust_cost) : $character->gold_dust,
-                        'shards' => !is_null($quest->shards_cost) ? ($character->shards - $quest->shard_cost) : $character->shards,
-                    ]);
-
-                    event(new UpdateTopBarEvent($character->refresh()));
-
-                    broadcast(new ServerMessageEvent($character->user, 'You have paid ' . $npc->real_name));
-                }
-
-                $foundItem->delete();
-
-                broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('taken_item', $npc), true));
-
-                $this->handleReward($character, $quest, $npc);
-
-                return true;
-            } else {
-                if (!$this->canHaveReward($character, $npc, $quest)) {
-                    return false;
-                }
-
-                if (!$this->canPay($character, $quest, $npc)) {
-                    return false;
-                }
-
-                broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('take_currency', $npc), true));
-
-                $character->update([
-                    'gold' => !is_null($quest->gold_cost) ? $character->gold - $quest->gold_cost : $character->gold,
-                    'gold_dust' => !is_null($quest->gold_dust_cost) ? $character->gold_dust - $quest->gold_dust_cost : $character->gold_dust,
-                    'shards' => !is_null($quest->shards_cost) ? $character->shards - $quest->shards_cost : $character->shards,
-                ]);
-
-                event(new UpdateTopBarEvent($character->refresh()));
-
-                broadcast(new ServerMessageEvent($character->user, 'You have paid ' . $npc->real_name));
-
-                $this->handleReward($character, $quest, $npc);
-
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private function canHaveReward(Character $character, Npc $npc, Quest $quest) {
-        if ($character->isInventoryFull()) {
-            broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('inventory_full', $npc), true));
-            return false;
-        }
-
-        $newGold          = $character->gold + $quest->reward_gold;
-        $newGoldDust      = $character->gold_dust + $quest->reward_gold_dust;
-        $newShards        = $character->shards + $quest->reward_shards;
-
-        $maxGoldValue     = new MaxCurrenciesValue($newGold, MaxCurrenciesValue::GOLD);
-        $maxGoldDustValue = new MaxCurrenciesValue($newGoldDust, MaxCurrenciesValue::GOLD_DUST);
-        $maxShardsValue   = new MaxCurrenciesValue($newShards, MaxCurrenciesValue::SHARDS);
-
-        if ($maxGoldValue->canNotGiveCurrency()) {
-            broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('gold_capped', $npc), true));
-            return false;
-        }
-
-        if ($maxGoldDustValue->canNotGiveCurrency()) {
-            broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('gold_dust_capped', $npc), true));
-            return false;
-        }
-
-        if ($maxShardsValue->canNotGiveCurrency()) {
-            broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('shard_capped', $npc), true));
-            return false;
-        }
-
-        return true;
-    }
-
-    private function canPay(Character $character, Quest $quest, Npc $npc) : bool {
-        $canPay = false;
-
-        if (!is_null($quest->gold_cost)) {
-            $canPay = $character->gold >= $quest->gold_cost;
-        }
-
-        if (!is_null($quest->gold_dust_cost)) {
-            $canPay = $character->gold_dust >= $quest->gold_dust_cost;
-        }
-
-        if (!is_null($quest->shard_cost)) {
-            $canPay = $character->shards >= $quest->shard_cost;
-        }
-
-        if (!$canPay) {
-            broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('too_poor', $npc), true));
-        }
-
-        return $canPay;
-    }
-
-    private function handleReward(Character $character, Quest $quest, Npc $npc) {
-        if (!is_null($quest->reward_item)) {
-            $character->inventory->slots()->create([
-                'inventory_id' => $character->inventory->id,
-                'item_id'      => $quest->reward_item,
-            ]);
-
-            broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('given_item', $npc), true));
-
-            broadcast(new ServerMessageEvent($character->user, 'Received: ' . $quest->rewardItem->name, false));
-        }
-
-        if ($quest->unlocks_skill) {
-            $gameSkill = GameSkill::where('type', $quest->unlocks_skill_type)->first();
-
-            if (is_null($gameSkill)) {
-                broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('no_skill', $npc), true));
-                return false;
-            } else {
-                $characterSkill = $character->skills()->where('game_skill_id', $gameSkill->id)->where('is_locked', true)->first();
-
-                if (is_null($characterSkill)) {
-                    broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('dont_own_skill', $npc), true));
-                    return false;
-                }
-
-                $characterSkill->update([
-                    'is_locked' => false
-                ]);
-
-                $characterData = new Item($character->refresh(), $this->characterAttackTransformer);
-                event(new UpdateAttackStats($this->manager->createData($characterData)->toArray(), $character->user));
-
-                $this->updateCharacterAttakDataCache($character->refresh());
-
-                broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('skill_unlocked', $npc), true));
-                broadcast(new ServerMessageEvent($character->user, 'Unlocked: ' . $gameSkill->name . ' This skill can now be leveled!'));
-            }
-        }
-
-        if (!is_null($quest->reward_gold)) {
-            $character->update([
-                'gold' => $character->gold + $quest->reward_gold
-            ]);
-
-            broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('currency_given', $npc), true));
-            broadcast(new ServerMessageEvent($character->user, 'Received: ' . number_format($quest->reward_gold) . ' gold from: ' . $npc->real_name));
-        }
-
-        if (!is_null($quest->reward_xp)) {
-            $xp = (new MaxLevel($character->level, $quest->reward_xp))->fetchXP();
-
-            $character->update([
-                'xp' => $character->xp + $xp,
-            ]);
-
-            event(new CharacterLevelUpEvent($character->refresh()));
-
-            broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('xp_given', $npc), true));
-            broadcast(new ServerMessageEvent($character->user, 'Received: ' . number_format($quest->reward_xp) . ' XP from: ' . $npc->real_name));
-        }
-
-        if (!is_null($quest->reward_gold_dust)) {
-            $character->update([
-                'gold_dust' => $character->gold_dust + $quest->reward_gold_dust
-            ]);
-
-            broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('currency_given', $npc), true));
-            broadcast(new ServerMessageEvent($character->user, 'Received: ' . number_format($quest->reward_gold_dust) . ' gold dust from: ' . $npc->real_name));
-        }
-
-        if (!is_null($quest->reward_shards)) {
-            $character->update([
-                'shards' => $character->shards + $quest->reward_shards
-            ]);
-
-            broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('currency_given', $npc), true));
-            broadcast(new ServerMessageEvent($character->user, 'Received: ' . number_format($quest->reward_shards) . ' shards from: ' . $npc->real_name));
-        }
-
-        $character->questsCompleted()->create([
-            'character_id' => $character->id,
-            'quest_id'     => $quest->id,
-        ]);
-
-        broadcast(new ServerMessageEvent($character->user, 'Quest: ' . $quest->name . ' completed. Check quest logs under adventure logs section.'));
-
-        event(new UpdateTopBarEvent($character->refresh()));
-
-        return true;
-    }
-
-    protected function updateCharacterAttakDataCache(Character $character) {
-        $this->buildCharacterAttackTypes->buildCache($character);
-
-        $characterData = new ResourceItem($character->refresh(), $this->characterAttackTransformer);
-
-        $characterData = $this->manager->createData($characterData)->toArray();
-
-        event(new UpdateAttackStats($characterData, $character->user));
+    protected function handleQuest($user, $npc): bool {
+        return $this->npcQuestHandler->handleNpcQuests($user->character, $npc);
     }
 }

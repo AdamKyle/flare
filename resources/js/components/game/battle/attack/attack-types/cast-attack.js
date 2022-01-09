@@ -109,7 +109,7 @@ export default class CastAttack {
     const evasion = this.defender.spell_evasion;
     let dc        = 100;
     let roll      = random(1, 100);
-
+    console.log(evasion);
     if (evasion > 1.0) {
       this.addEnemyActionMessage('The enemy evades your magic!')
 

@@ -43,6 +43,9 @@ class MapControllerApiTest extends TestCase
             'game_map_id' => $this->character->getCharacter(false)->map->game_map_id,
         ]);
 
+        $this->createGameMap(['name' => 'Purgatory']);
+        $this->createGameMap(['name' => 'Hell']);
+
         resolve(BuildMonsterCacheService::class)->buildCache();
     }
 
@@ -70,7 +73,7 @@ class MapControllerApiTest extends TestCase
 
     public function testGetMapWithKingdomCache() {
 
-        Cache::put('character-kingdoms-Sample-' . $this->character->getCharacter(false)->id, [['sample']]);
+        Cache::put('character-kingdoms-Surface-' . $this->character->getCharacter(false)->id, [['sample']]);
 
         $user = $this->character->getUser();
 
@@ -246,9 +249,7 @@ class MapControllerApiTest extends TestCase
             'game_map_id' => $this->character->getCharacter(false)->map->game_map_id,
         ]);
 
-        $adventure = $this->createNewAdventure();
-
-        $location->adventures()->attach($adventure->id);
+        $adventure = $this->createNewAdventure($location);
 
         $character = $this->character->getCharacter(false);
         $user      = $this->character->getUser();
@@ -1350,26 +1351,6 @@ class MapControllerApiTest extends TestCase
 
         $gameMap = $this->createGameMap([
             'name' => 'Labyrinth'
-        ]);
-
-        $response = $this->actingAs($user)
-            ->json('POST', '/api/map/traverse/' . $character->id, [
-                'map_id' => $gameMap->id,
-            ])
-            ->response;
-
-        $content = json_decode($response->content());
-
-        $this->assertEquals(422, $response->status());
-        $this->assertEquals('You are missing a required item to travel to that plane.', $content->message);
-    }
-
-    public function testMissingItemCannotTraverseToUnknownMap() {
-        $user      = $this->character->getUser();
-        $character = $this->character->getCharacter(false);
-
-        $gameMap = $this->createGameMap([
-            'name' => 'Bananas'
         ]);
 
         $response = $this->actingAs($user)

@@ -12,6 +12,8 @@ export default class AdventureEmbark extends React.Component {
       adventure: null,
       isLoading: true,
       attackType: AttackType.ATTACK,
+      overflowSet: null,
+      inventorySets: [],
     }
   }
 
@@ -19,12 +21,14 @@ export default class AdventureEmbark extends React.Component {
     this.setState({
       adventure: this.props.adventure,
       isLoading: false,
+      inventorySets: this.props.inventorySets
     });
   }
 
   embark() {
     axios.post('/api/character/' + this.props.characterId + '/adventure/' + this.state.adventure.id, {
       attack_type: this.state.attackType,
+      over_flow_set: this.state.overflowSet,
     }).then((result) => {
       this.props.updateMessage(result.data.message);
       this.props.updateCharacterAdventures(result.data.adventure_completed_at);
@@ -51,8 +55,21 @@ export default class AdventureEmbark extends React.Component {
   }
 
   selectAttackType(event) {
+    console.log(event.target.value);
     this.setState({
       attackType: event.target.value
+    });
+  }
+
+  overFlowType(event) {
+    this.setState({
+      overflowSet: parseInt(event.target.value) || 0
+    });
+  }
+
+  buildSetSelect() {
+    return this.state.inventorySets.map((set) => {
+      return <option key={'set-' + set.id} value={set.id}>{set.name}</option>
     });
   }
 
@@ -66,6 +83,8 @@ export default class AdventureEmbark extends React.Component {
         />
       );
     }
+
+    console.log(this.state.inventorySets);
 
     return (
       <>
@@ -94,10 +113,14 @@ export default class AdventureEmbark extends React.Component {
               <li>List or Sell Items (From Shop or Market)</li>
             </ul>
             <hr/>
-            <p className="mb-0">Should you need additional help, please consider this resource on <a
+            <p>Should you need additional help, please consider this resource on <a
               href="/information/adventure" target="_blank">adventureing</a>.</p>
-            <p className="text-muted" style={{fontSize: '12px'}}> You are free to logout. Any relevant details will be
+            <p> You are free to logout. Any relevant details will be
               emailed to you should you have those settings enabled.</p>
+            <p>
+              If you have auto disenchant enabled in your settings, we will auto disenchant AS you find the items,
+              this can mean - unless it's a quest item you do not already have, you may get no items.
+            </p>
             <div className="mt-2">
               <span className="text-muted"><strong>Total Levels</strong>: {this.state.adventure.levels}</span>
               <br/>
@@ -108,15 +131,26 @@ export default class AdventureEmbark extends React.Component {
             <div className="form-group">
               <label htmlFor="attack-type">Attack Type</label>
               <select className="form-control" id="attack-type" value={this.state.attackType} onChange={this.selectAttackType.bind(this)}>
-                <option value={AttackType.ATTACK}>Attack</option>
-                <option value={AttackType.CAST}>Cast</option>
-                <option value={AttackType.CAST_AND_ATTACK}>Cast then Attack</option>
-                <option value={AttackType.ATTACK_AND_CAST}>Attack then Cast</option>
-                <option value={AttackType.DEFEND}>Defend</option>
+                <option key={AttackType.ATTACK} value={AttackType.ATTACK}>Attack</option>
+                <option key={AttackType.CAST} value={AttackType.CAST}>Cast</option>
+                <option key={AttackType.CAST_AND_ATTACK} value={AttackType.CAST_AND_ATTACK}>Cast then Attack</option>
+                <option key={AttackType.ATTACK_AND_CAST} value={AttackType.ATTACK_AND_CAST}>Attack then Cast</option>
+                <option key={AttackType.DEFEND} value={AttackType.DEFEND}>Defend</option>
               </select>
             </div>
             <p>Each attack type corresponds to the attack button from drop down critters. This attack type will be used
             for all floors in the adventure. Choose carefully, you cannot change it once you embark.</p>
+            <div className="form-group">
+              <label htmlFor="attack-type">Overflow set (optional)</label>
+              <select className="form-control" id="attack-type" value={this.state.overflowSet} onChange={this.overFlowType.bind(this)}>
+                <option value="" key={''}>Please select</option>
+                {this.buildSetSelect()}
+              </select>
+            </div>
+            <p>
+              Should your inventory be full or close to full, this empty set you select will be used. Should the list be empty and your inventory is close to being full,
+              when you go to collect the items from the adventure any you cannot collect will e lost for ever.
+            </p>
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={this.props.embarkClose}>

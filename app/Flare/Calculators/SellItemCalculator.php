@@ -37,4 +37,26 @@ class SellItemCalculator {
 
         return $cost;
     }
+
+    public function fetchMinimumSalePriceOfUnique(Item $item): int {
+        $cost = 0;
+
+        if (!is_null($item->item_suffix_id)) {
+            if ($item->itemSuffix->randomly_generated) {
+                $cost += $item->itemSuffix->cost;
+            }
+        }
+
+        if (!is_null($item->item_prefix_id)) {
+            if ($item->itemPrefix->randomly_generated) {
+                $cost += $item->itemPrefix->cost;
+            }
+        }
+
+        if ($cost === 0) {
+            return $cost;
+        }
+
+        return $cost / 2;
+    }
 }

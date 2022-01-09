@@ -3,17 +3,8 @@
 namespace App\Game\Kingdoms\Controllers\Api;
 
 use App\Flare\Models\Kingdom;
-use App\Flare\Models\KingdomLog;
-use App\Flare\Models\Notification as Notification;
-use App\Flare\Values\KingdomLogStatusValue;
-use App\Game\Core\Events\UpdateNotificationsBroadcastEvent;
-use App\Game\Kingdoms\Events\UpdateKingdomLogs;
-use App\Game\Kingdoms\Handlers\KingdomHandler;
-use App\Game\Kingdoms\Handlers\NotifyHandler;
 use App\Game\Kingdoms\Requests\UseItemsRequest;
-use App\Game\Kingdoms\Values\KingdomMaxValue;
-use App\Game\Messages\Events\GlobalMessageEvent;
-use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Kingdoms\Service\UseItemsService;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
 use App\Game\Kingdoms\Requests\AttackRequest;
@@ -47,9 +38,14 @@ class KingdomAttackController extends Controller {
            return $slot->item->usable && $slot->item->damages_kingdoms;
         })->all();
 
+        $unitTimeReductionSkill = $character->skills->filter(function($skill) {
+            return $skill->type()->effectsKingdom();
+        })->first();
+
         return response()->json([
-            'kingdoms' => $kingdoms->toArray(),
-            'items'    => array_values($usableItems),
+            'kingdoms'                     => $kingdoms->toArray(),
+            'items'                        => array_values($usableItems),
+            'unit_movement_time_reduction' => $unitTimeReductionSkill->unit_movement_time_reduction,
         ], 200);
     }
 
@@ -73,84 +69,9 @@ class KingdomAttackController extends Controller {
         return response()->json($response, $status);
     }
 
-    public function useItems(UseItemsRequest $request, Character $character, NotifyHandler $notifyHandler, KingdomHandler $kingdomHandler) {
-        $damageToKingdom = 0.0;
+    public function useItems(UseItemsRequest $request, Character $character, UseItemsService $useItemsService) {
 
-        $slots = $character->inventory->slots()->whereIn('id', $request->slots_selected)->get();
-
-        foreach ($slots as $slot) {
-            $damageToKingdom += $slot->item->kingdom_damage;
-
-            $slot->delete();
-        }
-
-        $kingdom    = Kingdom::with('buildings', 'units')->find($request->defender_id);
-        $defender   = $kingdom->character;
-        $oldKingdom = $kingdom->toArray();
-        $buildings  = $kingdom->buildings;
-        $units      = $kingdom->units;
-
-        $treasuryDefenceFromKingdom = ($kingdom->treasury / KingdomMaxValue::MAX_TREASURY) / 2;
-
-        $damageToKingdom = $damageToKingdom - $damageToKingdom * $treasuryDefenceFromKingdom;
-
-        foreach ($buildings as $building) {
-            $newDurability =  round($building->current_durability - ($building->current_durability * $damageToKingdom));
-
-            if ($newDurability < 0) {
-                $newDurability = 0;
-            }
-
-            $building->update([
-                'current_durability' => $newDurability,
-            ]);
-        }
-
-        foreach ($units as $unit) {
-            $newAmount = round($unit->amount - ($unit->amount * $damageToKingdom));
-
-            if ($newAmount < 0) {
-                $newAmount = 0;
-            }
-
-            $unit->update([
-                'amount' => $newAmount
-            ]);
-        }
-
-        $kingdom = $kingdomHandler->setKingdom($kingdom)
-                                  ->decreaseMorale()
-                                  ->getKingdom();
-
-        if (!is_null($defender)) {
-            $log = KingdomLog::create([
-                'character_id'    => $defender->id,
-                'status'          => KingdomLogStatusValue::BOMBS_DROPPED,
-                'old_defender'    => $oldKingdom,
-                'new_defender'    => $kingdom->toArray(),
-                'to_kingdom_id'   => $kingdom->id,
-                'published'       => true,
-            ]);
-
-            $message = 'Your kingdom ' . $kingdom->name . ' at (X/Y) ' . $kingdom->x_position . '/' . $kingdom->y_position . ' Had items dropped on it!';
-
-            $notifyHandler->createNotificationEvent($defender, $log, $message, 'failed', 'Items dropped!');
-
-            event(new UpdateNotificationsBroadcastEvent($defender->refresh()->notifications()->where('read', false)->get(), $defender->user));
-
-            event(new UpdateKingdomLogs($defender->refresh()));
-
-            $message = 'Your kingdom ' . $kingdom->name . ' at (X/Y) ' . $kingdom->x_position .
-                '/' . $kingdom->y_position . ' on the ' .
-                $kingdom->gameMap->name . ' plane, has had an item dropped on it doing: ' . ($damageToKingdom * 100) . '% to Buildings and Units. Check your Attack logs for more info!';
-
-            $notifyHandler->sendMessage($defender->user, 'kingdom-attacked', $message);
-        }
-
-        $message = $character->name . ' Has caused the earth to shake, the buildings to crumble and the units to slaughtered at: ' .
-            $kingdom->name . ' (kingdom) doing: '.($damageToKingdom * 100).'% damage to units and buildings, on the ' . $kingdom->gameMap->name . ' plane. Even The Creator trembles in fear.';
-
-        broadcast(new GlobalMessageEvent($message));
+        $useItemsService->useItems($character, Kingdom::find($request->defender_id), $request->slots_selected);
 
         return response()->json([
             'items' => array_values($character->inventory->slots->filter(function($slot) {

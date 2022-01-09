@@ -3,8 +3,11 @@
 namespace Tests\Feature\Game\Kingdom\Api;
 
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Kingdoms\Jobs\RecruitUnits;
+use App\Game\Kingdoms\Jobs\UpgradeBuilding;
 use DB;
 use Cache;
+use Queue;
 use Mockery;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\BuildingInQueue;
@@ -20,6 +23,7 @@ use App\Game\Kingdoms\Service\KingdomBuildingService;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 use Tests\TestCase;
 use Tests\Setup\Character\CharacterFactory;
+use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateKingdomBuilding;
 use Tests\Traits\CreateGameBuilding;
 use Tests\Traits\CreateGameUnit;
@@ -33,7 +37,8 @@ class KingdomsControllerTest extends TestCase
         CreateGameBuilding,
         CreateKingdomBuilding,
         CreateLocation,
-        CreateGameUnit;
+        CreateGameUnit,
+        CreateGameMap;
 
     private $character;
 
@@ -41,6 +46,9 @@ class KingdomsControllerTest extends TestCase
         parent::setUp();
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
+
+        $this->createGameMap(['name' => 'Purgatory']);
+        $this->createGameMap(['name' => 'Hell']);
     }
 
     public function tearDown(): void {
@@ -83,7 +91,7 @@ class KingdomsControllerTest extends TestCase
         $content = json_decode($response->content());
 
         $this->assertEquals(200, $response->status());
-        $this->assertTrue(Cache::has('character-kingdoms-Sample-' . $this->character->getCharacter(false)->id));
+        $this->assertTrue(Cache::has('character-kingdoms-Surface-' . $this->character->getCharacter(false)->id));
 
         $this->assertTrue(
             $this->character->getCharacter(false)->kingdoms->first()->buildings->isNotEmpty()
@@ -147,6 +155,7 @@ class KingdomsControllerTest extends TestCase
 
         $content = json_decode($response->content());
 
+
         $this->assertEquals(200, $response->status());
         $this->assertEmpty($content);
     }
@@ -165,7 +174,7 @@ class KingdomsControllerTest extends TestCase
     }
 
     public function testSettleKingdomWithCache() {
-        Cache::put('character-kingdoms-Sample-' . $this->character->getCharacter(false)->id, [['sample data']]);
+        Cache::put('character-kingdoms-Surface-' . $this->character->getCharacter(false)->id, [['sample data']]);
 
         $this->createGameBuilding();
 
@@ -183,7 +192,7 @@ class KingdomsControllerTest extends TestCase
 
         $this->assertEquals(200, $response->status());
         $this->assertTrue(empty($content));
-        $this->assertEquals(2, count(Cache::get('character-kingdoms-Sample-' . $this->character->getCharacter(false)->id)));
+        $this->assertEquals(2, count(Cache::get('character-kingdoms-Surface-' . $this->character->getCharacter(false)->id)));
 
         $this->assertTrue(
             $this->character->getCharacter(false)->kingdoms->first()->buildings->isNotEmpty()
@@ -497,6 +506,8 @@ class KingdomsControllerTest extends TestCase
     }
 
     public function testUpgradeKingdomBuildingWhileOnline() {
+        Queue::fake();
+
         $this->createKingdom([
             'character_id' => Character::first()->id,
             'game_map_id'  => GameMap::first()->id,
@@ -532,12 +543,16 @@ class KingdomsControllerTest extends TestCase
             'building'  => KingdomBuilding::first()->id,
         ]))->response;
 
+        Queue::assertPushed(UpgradeBuilding::class);
+
         $content = json_decode($response->content());
 
         $this->assertEquals(200, $response->status());
     }
 
     public function testUpgradeKingdomBuildingWithEmail() {
+        Queue::fake();
+
         $this->createKingdom([
             'character_id' => Character::first()->id,
             'game_map_id'  => GameMap::first()->id,
@@ -566,10 +581,14 @@ class KingdomsControllerTest extends TestCase
 
         $content = json_decode($response->content());
 
+        Queue::assertPushed(UpgradeBuilding::class);
+
         $this->assertEquals(200, $response->status());
     }
 
     public function testUpgradeKingdomBuildingThatIsResource() {
+        Queue::fake();
+
         $this->createKingdom([
             'character_id' => Character::first()->id,
             'game_map_id'  => GameMap::first()->id,
@@ -598,6 +617,8 @@ class KingdomsControllerTest extends TestCase
         ]))->response;
 
         $content = json_decode($response->content());
+
+        Queue::assertPushed(UpgradeBuilding::class);
 
         $this->assertEquals(200, $response->status());
     }
@@ -677,6 +698,8 @@ class KingdomsControllerTest extends TestCase
     }
 
     public function testRecruitUnit() {
+        Queue::fake();
+
         $kingdom = $this->createKingdom([
             'character_id'       => Character::first()->id,
             'game_map_id'        => GameMap::first()->id,
@@ -702,13 +725,12 @@ class KingdomsControllerTest extends TestCase
 
         $this->assertEquals(200, $response->status());
 
-        $kingdom = $kingdom->refresh();
-
-        $this->assertTrue($kingdom->units->isNotEmpty());
-        $this->assertEquals(5, $kingdom->units->first()->amount);
+        Queue::assertPushed(RecruitUnits::class);
     }
 
     public function testRecruitUnitWhenOnline() {
+        Queue::fake();
+
         $kingdom = $this->createKingdom([
             'character_id'       => Character::first()->id,
             'game_map_id'        => GameMap::first()->id,
@@ -749,13 +771,12 @@ class KingdomsControllerTest extends TestCase
 
         $this->assertEquals(200, $response->status());
 
-        $kingdom = $kingdom->refresh();
-
-        $this->assertTrue($kingdom->units->isNotEmpty());
-        $this->assertEquals(5, $kingdom->units->first()->amount);
+        Queue::assertPushed(RecruitUnits::class);
     }
 
     public function testRecruitAdditionalUnits() {
+        Queue::fake();
+
         $kingdom = $this->createKingdom([
             'character_id'       => Character::first()->id,
             'game_map_id'        => GameMap::first()->id,
@@ -787,13 +808,12 @@ class KingdomsControllerTest extends TestCase
 
         $this->assertEquals(200, $response->status());
 
-        $kingdom = $kingdom->refresh();
-
-        $this->assertTrue($kingdom->units->isNotEmpty());
-        $this->assertEquals(10, $kingdom->units->first()->amount);
+        Queue::assertPushed(RecruitUnits::class);
     }
 
     public function testRecruitUnitsForKingdomWithUnits() {
+        Queue::fake();
+
         $kingdom = $this->createKingdom([
             'character_id'       => Character::first()->id,
             'game_map_id'        => GameMap::first()->id,
@@ -825,10 +845,7 @@ class KingdomsControllerTest extends TestCase
 
         $this->assertEquals(200, $response->status());
 
-        $kingdom = $kingdom->refresh();
-
-        $this->assertTrue($kingdom->units->isNotEmpty());
-        $this->assertEquals(5, $kingdom->units->where('game_unit_id', GameUnit::first()->id)->first()->amount);
+        Queue::assertPushed(RecruitUnits::class);
     }
 
     public function testFailToRecruitUnitsWhenAmountIsZero() {

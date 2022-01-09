@@ -16,7 +16,7 @@ class SettingsControllerTest extends TestCase
     {
         parent::setUp();
 
-        $this->character = (new CharacterFactory)->createBaseCharacter();
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
     }
 
     public function tearDown(): void
@@ -41,7 +41,6 @@ class SettingsControllerTest extends TestCase
             'user' => $user,
         ])->see('Account Settings')->submitForm('Update Email Settings', [
             'adventure_email'         => true,
-            'new_building_email'      => true,
             'upgraded_building_email' => false,
             'rebuilt_building_email'  => false,
             'kingdom_attack_email'    => false,
@@ -50,7 +49,6 @@ class SettingsControllerTest extends TestCase
         $user = $user->refresh();
 
         $this->assertTrue($user->adventure_email);
-        $this->assertTrue($user->new_building_email);
         $this->assertFalse($user->upgraded_building_email);
         $this->assertFalse($user->rebuilt_building_email);
         $this->assertFalse($user->kingdom_attack_email);
@@ -90,5 +88,50 @@ class SettingsControllerTest extends TestCase
         $user = $user->refresh();
 
         $this->assertNotEquals($oldName, $user->character->name);
+    }
+
+    public function testEnableDisenchanting() {
+        $user = $this->character->getUser();
+
+        $this->actingAs($user)->visitRoute('user.settings', [
+            'user' => $user,
+        ])->see('Account Settings')->submitForm('Update Auto Disenchant Settings', [
+            'auto_disenchant'        => true,
+            'auto_disenchant_amount' => 'all',
+        ]);
+
+        $user = $user->refresh();
+
+        $this->assertTrue($user->auto_disenchant);
+        $this->assertEquals('all', $user->auto_disenchant_amount);
+    }
+
+    public function testFailToEnableDisenchanting() {
+        $user = $this->character->getUser();
+
+        $this->actingAs($user)->visitRoute('user.settings', [
+            'user' => $user,
+        ])->see('Account Settings')->submitForm('Update Auto Disenchant Settings', [
+            'auto_disenchant'        => true,
+        ])->see('You must select to either disenchant all items that drop or only those under 1 Billion gold.');
+
+        $user = $user->refresh();
+
+        $this->assertFalse($user->auto_disenchant);
+        $this->assertNull($user->auto_disenchant_amount);
+    }
+
+    public function testDisableAttackPopOvers() {
+        $user = $this->character->getUser();
+
+        $this->actingAs($user)->visitRoute('user.settings', [
+            'user' => $user,
+        ])->see('Account Settings')->submitForm('Update Attack Tool Tips', [
+            'disable_attack_type_popover' => true,
+        ]);
+
+        $user = $user->refresh();
+
+        $this->assertTrue($user->disable_attack_type_popover);
     }
 }

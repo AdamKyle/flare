@@ -34,6 +34,14 @@ class LocationEffectValue {
         self::INCREASE_STATS_BY_ONE_BILLION      => 'Increases monster stats by one billion',
     ];
 
+    protected static $integerValues = [
+        self::INCREASE_STATS_BY_HUNDRED_THOUSAND => 100000,
+        self::INCREASE_STATS_BY_ONE_MILLION      => 1000000,
+        self::INCREASE_STATS_BY_TEN_MILLION      => 10000000,
+        self::INCREASE_STATS_BY_HUNDRED_MILLION  => 100000000,
+        self::INCREASE_STATS_BY_ONE_BILLION      => 1000000000,
+    ];
+
     /**
      * ItemEffectsValue constructor.
      *
@@ -119,6 +127,23 @@ class LocationEffectValue {
         }
     }
 
+    public static function fetchPercentageIncrease($value): float {
+        switch ($value) {
+            case self::INCREASE_STATS_BY_HUNDRED_THOUSAND:
+                return 0.05;
+            case self::INCREASE_STATS_BY_ONE_MILLION:
+                return 0.10;
+            case self::INCREASE_STATS_BY_TEN_MILLION:
+                return 0.25;
+            case self::INCREASE_STATS_BY_HUNDRED_MILLION:
+                return 0.50;
+            case self::INCREASE_STATS_BY_ONE_BILLION:
+                return 0.70;
+            default:
+                return 0.0;
+        }
+    }
+
     /**
      * Get the named value.
      *
@@ -130,5 +155,9 @@ class LocationEffectValue {
 
     public static function getIncreaseName($value): string {
         return self::$namedValues[$value];
+    }
+
+    public static function getIncreaseByAmount($value): int {
+        return self::$integerValues[$value];
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Flare\Models;
 
+use App\Flare\Values\ItemEffectsValue;
+use App\Flare\Values\MapNameValue;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Database\Factories\GameMapFactory;
@@ -27,18 +29,33 @@ class GameMap extends Model
         'skill_training_bonus',
         'drop_chance_bonus',
         'enemy_stat_bonus',
+        'character_attack_reduction',
+        'required_location_id'
     ];
 
     protected $casts = [
-        'default'              => 'boolean',
-        'xp_bonus'             => 'float',
-        'skill_training_bonus' => 'float',
-        'drop_chance_bonus'    => 'float',
-        'enemy_stat_bonus'     => 'float',
+        'default'                    => 'boolean',
+        'xp_bonus'                   => 'float',
+        'skill_training_bonus'       => 'float',
+        'drop_chance_bonus'          => 'float',
+        'enemy_stat_bonus'           => 'float',
+        'character_attack_reduction' => 'float',
+    ];
+
+    protected $appends = [
+        'map_required_item',
     ];
 
     public function maps() {
         return $this->hasMany(Map::class, 'game_map_id', 'id');
+    }
+
+    public function requiredLocation() {
+        return $this->hasOne(Location::class, 'id', 'required_location_id');
+    }
+
+    public function mapType(): MapNameValue {
+        return new MapNameValue($this->name);
     }
 
     public function mapHasBonuses() {
@@ -51,6 +68,22 @@ class GameMap extends Model
         }
 
         return $hasBonuses;
+    }
+
+    public function getMapRequiredItemAttribute() {
+        switch ($this->name) {
+            case 'Labyrinth':
+                return Item::where('effect', ItemEffectsValue::LABYRINTH)->first();
+            case 'Dungeons':
+                return Item::where('effect', ItemEffectsValue::DUNGEON)->first();
+            case 'Shadow Plane':
+                return Item::where('effect', ItemEffectsValue::SHADOWPLANE)->first();
+            case 'Hell':
+                return Item::where('effect', ItemEffectsValue::HELL)->first();
+            case 'Surface':
+            default:
+                return null;
+        }
     }
 
     protected static function newFactory() {

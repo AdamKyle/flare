@@ -4,6 +4,7 @@ namespace Tests\Feature\Game\Core;
 
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Jobs\PurchaseItemsJob;
+use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
@@ -11,6 +12,7 @@ use Facades\App\Flare\Calculators\SellItemCalculator;
 use App\Flare\Models\InventorySlot;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
+use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateItem;
 use Tests\Setup\Character\CharacterFactory;
@@ -21,7 +23,8 @@ class ShopControllerTest extends TestCase
     use RefreshDatabase,
         CreateItem,
         CreateUser,
-        CreateItemAffix;
+        CreateItemAffix,
+        CreateGameSkill;
 
     private $character;
 
@@ -61,7 +64,10 @@ class ShopControllerTest extends TestCase
                                 ->inventoryManagement()
                                 ->giveItem($this->item)
                                 ->equipLeftHand($this->item->name)
-                                ->getCharacterFactory();
+                                ->getCharacterFactory()
+                                ->assignSkill($this->createGameSkill([
+                                    'type' => SkillTypeValue::ENCHANTING
+                                ]));
     }
 
     public function tearDown(): void {
@@ -192,23 +198,6 @@ class ShopControllerTest extends TestCase
         $this->assertTrue($this->character->getCharacter(false)->gold > 0);
     }
 
-    public function testCanSellItemTooMuchGoldOnHand() {
-
-        $user = $this->character->inventoryManagement()
-            ->unequipAll()
-            ->getCharacterFactory()
-            ->updateCharacter([
-                'gold' => MaxCurrenciesValue::MAX_GOLD - 1
-            ])
-            ->getUser();
-
-        $response = $this->actingAs($user)->post(route('game.shop.sell.item', ['character' => $this->character->getCharacter(false)->id]), [
-            'slot_id' => InventorySlot::first()->id,
-        ])->response;
-
-        $response->assertSessionHas('error', 'You don\'t seem to have enough room in your purse to sell me that. You\'re very rich though!');
-    }
-
 
     public function testCannotSellIteYouDontHave() {
         $user = $this->character->updateCharacter([
@@ -242,20 +231,6 @@ class ShopControllerTest extends TestCase
         $response = $this->actingAs($user)->post(route('game.shop.sell.all', ['character' => $this->character->getCharacter(false)->id]))->response;
 
         $response->assertSessionHas('success', 'Sold all your unequipped items for a total of: 10 gold.');
-    }
-
-    public function testCannotSellAllItemsWhenNearGoldCap() {
-        $user = $this->character->inventoryManagement()
-            ->unequipAll()
-            ->getCharacterFactory()
-            ->updateCharacter([
-                'gold' => MaxCurrenciesValue::MAX_GOLD - 1,
-            ])
-            ->getUser();
-
-        $response = $this->actingAs($user)->post(route('game.shop.sell.all', ['character' => $this->character->getCharacter(false)->id]))->response;
-
-        $response->assertSessionHas('error', 'You don\'t seem to have enough room in your purse to sell me that. You\'re very rich though!');
     }
 
     public function testSellAllItemsButQuestItems() {
@@ -541,7 +516,6 @@ class ShopControllerTest extends TestCase
         $user      = $this->character->getUser();
 
         $character = $this->character->getCharacter(false);
-
 
         $this->actingAs($user)->visitRoute('game.shop.buy', [
             'character' => $character

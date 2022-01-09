@@ -44,15 +44,15 @@ class CharacterAdventureController extends Controller {
     }
 
     public function currentAdventure() {
-        $character = auth()->user()->character;
+        $character    = auth()->user()->character;
 
-        $adventureLog = $character->adventureLogs()->orderBy('id', 'desc')->first();
+        $adventureLog = $character->adventureLogs()->find($character->current_adventure_id);
 
         if (is_null($adventureLog)) {
-            return redirect()->back()->with('error', 'You have no currently completed adventure. Check your completed adventures for more details.');
+            return redirect()->to(route('game'))->with('error', 'You have no currently completed adventure. Check your completed adventures for more details.');
         }
 
-        // Update the coresponding notification:
+        // Update the corresponding notification:
         $notification = $character->notifications()->where('adventure_id', $adventureLog->adventure->id)->where('read', false)->first();
 
         if (!is_null($notification)) {
@@ -66,11 +66,12 @@ class CharacterAdventureController extends Controller {
         return view('game.adventures.current-adventure', [
             'log'          => $adventureLog->logs[array_key_last($adventureLog->logs)],
             'adventureLog' => $adventureLog,
-            'character'    => $character,
+            'character'    => $character->refresh(),
         ]);
     }
 
     public function collectReward(Request $request, AdventureRewardService $adventureRewardService, AdventureLog $adventureLog) {
+
         $character = auth()->user()->character;
         $rewards   = $adventureLog->rewards;
 
@@ -80,28 +81,16 @@ class CharacterAdventureController extends Controller {
 
         $rewards = AdventureCompletedRewards::CombineRewards($rewards, $character);
 
-        $adventureRewardService = $adventureRewardService->distributeRewards($rewards, $character, $adventureLog->adventure);
+        $adventureRewardService = $adventureRewardService->distributeRewards($rewards, $character, $adventureLog);
         $messages               = $adventureRewardService->getMessages();
 
-        if (array_key_exists('error', $messages)) {
-            $rewards['xp'] = 0;
+        $adventureLog->update([
+            'rewards' => null,
+        ]);
 
-            if (isset($rewards['skill'])) {
-                $rewards['skill']['exp'] = 0;
-            }
-
-            $rewards['items'] = $adventureRewardService->getItemsLeft();
-
-            $adventureLog->update([
-                'rewards' => $rewards,
-            ]);
-
-            return redirect()->back()->with('error', $messages['error']);
-        } else {
-            $adventureLog->update([
-                'rewards' => null,
-            ]);
-        }
+        $character->update([
+            'current_adventure_id' => null,
+        ]);
 
         $character = $character->refresh();
 

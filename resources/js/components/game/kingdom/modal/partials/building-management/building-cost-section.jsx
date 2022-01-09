@@ -8,31 +8,66 @@ export default class BuildingCostSection extends React.Component {
   getCost(type) {
     const building = this.props.building;
 
+    let cost = 0;
+
     if (building.current_durability === 0) {
-      return building.level * building['base_' + type + '_cost'];
+      cost = building.level * building['base_' + type + '_cost'];
+    } else {
+      cost = building[type + '_cost'];
     }
 
-    return building[type + '_cost'];
+    if (type === 'iron') {
+      cost = Math.floor(cost - cost * (this.props.kingdom.building_cost_reduction + this.props.kingdom.iron_cost_reduction));
+    } else {
+      cost = Math.floor(cost - cost * this.props.kingdom.building_cost_reduction);
+    }
+
+    return cost;
   }
 
   getPopulationRequired() {
     const building = this.props.building;
 
+    let cost = 0;
+
     if (building.current_durability === 0) {
-      return building.level * building.base_population;
+      cost = building.level * building.base_population;
+    } else {
+      cost = (building.level + 1) * building.base_population;
     }
 
-    return building.population_required;
+    return Math.floor(cost - cost * (this.props.kingdom.building_cost_reduction + this.props.kingdom.population_cost_reduction));
   }
 
   getTimeRequired() {
     const building = this.props.building;
+    let timeNeeded = 0;
 
     if (building.current_durability === 0) {
-      return building.rebuild_time;
+      timeNeeded = building.rebuild_time;
+    } else {
+      timeNeeded = building.time_increase;
     }
 
-    return building.time_increase;
+    timeNeeded = timeNeeded - (timeNeeded * this.props.kingdom.building_time_reduction);
+
+    return timeNeeded
+  }
+
+  getHours() {
+    return ((1/60) * this.getTimeRequired()).toFixed(2);
+  }
+
+  getIronDeduction() {
+    return ((this.props.kingdom.building_cost_reduction + this.props.kingdom.iron_cost_reduction) * 100).toFixed(0);
+  }
+
+  getPopulationDeduction() {
+    return ((this.props.kingdom.building_cost_reduction + this.props.kingdom.population_cost_reduction) * 100).toFixed(0);
+  }
+
+  getDeduction() {
+    return (this.props.kingdom.building_cost_reduction * 100).toFixed(0);
   }
 
   render() {
@@ -41,16 +76,18 @@ export default class BuildingCostSection extends React.Component {
         <div className="col-md-6">
           <dl>
             <dt><strong>Wood Cost</strong>:</dt>
-            <dd>{this.getCost('wood')}</dd>
+            <dd>{this.getCost('wood')} (-{this.getDeduction()}%)</dd>
             <dt><strong>Clay Cost</strong>:</dt>
-            <dd>{this.getCost('clay')}</dd>
+            <dd>{this.getCost('clay')} (-{this.getDeduction()}%)</dd>
             <dt><strong>Stone Cost</strong>:</dt>
-            <dd>{this.getCost('stone')}</dd>
+            <dd>{this.getCost('stone')} (-{this.getDeduction()}%)</dd>
             <dt><strong>Iron Cost</strong>:</dt>
-            <dd>{this.getCost('iron')}</dd>
+            <dd>{this.getCost('iron')} (-{this.getIronDeduction()}%)</dd>
             <dt><strong>Population Cost</strong>:</dt>
-            <dd>{this.getPopulationRequired()}</dd>
+            <dd>{this.getPopulationRequired()} (-{this.getPopulationDeduction()}%)</dd>
           </dl>
+          <p className="mt-3">The negative percentage values come from you training: <a href="/information/passive-skills">Passive Skills</a> which help to reduce
+          things like resources needed, population needed and by training the Kingmanship skill to reduce time needed.</p>
         </div>
         <div className="col-md-6">
           <dl>
@@ -68,7 +105,7 @@ export default class BuildingCostSection extends React.Component {
                 }
               </strong>:
             </dt>
-            <dd>{this.getTimeRequired()} Minutes</dd>
+            <dd>{this.getTimeRequired()} Minutes, (~{this.getHours()} hrs.), (-{(this.props.kingdom.building_time_reduction * 100).toFixed(2)}%)</dd>
           </dl>
         </div>
       </div>

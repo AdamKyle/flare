@@ -29,7 +29,11 @@ class AdventureManagement {
 
         $log = $this->adventureLog($adventure, $item, $foundSkill);
 
-        $this->character->adventureLogs()->create($log);
+        $log = $this->character->adventureLogs()->create($log);
+
+        $this->character->update([
+            'current_adventure_id' => $log->id,
+        ]);
 
         return $this;
     }

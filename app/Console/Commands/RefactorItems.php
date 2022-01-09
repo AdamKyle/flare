@@ -2,6 +2,9 @@
 
 namespace App\Console\Commands;
 
+use App\Flare\Models\InventorySet;
+use App\Flare\Models\InventorySlot;
+use App\Flare\Models\SetSlot;
 use Illuminate\Console\Command;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
@@ -50,7 +53,10 @@ class RefactorItems extends Command
                    ->first();
 
                if (is_null($foundItem)) {
-                   $this->line($item->name . '(id: '.$item->id.') does not have a parent?');
+                   SetSlot::where('item_id', $foundItem)->delete();
+                   InventorySlot::where('item_id', $foundItem)->delete();
+
+                   continue;
                }
 
                $attributes = $foundItem->getAttributes();
@@ -78,7 +84,10 @@ class RefactorItems extends Command
                     ->first();
 
                 if (is_null($foundItem)) {
-                    $this->line($item->name . '(id: '.$item->id.') does not have a parent?');
+                    SetSlot::where('item_id', $foundItem)->delete();
+                    InventorySlot::where('item_id', $foundItem)->delete();
+
+                    continue;
                 }
 
                 $attributes = $foundItem->getAttributes();

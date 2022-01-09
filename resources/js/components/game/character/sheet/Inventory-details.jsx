@@ -29,7 +29,7 @@ export default class InventoryDetails extends React.Component {
             </dl>
           </Card.Body>
         </Card>
-        <InventoryBase characterId={this.props.characterId} userId={this.props.userId} />
+        <InventoryBase characterId={this.props.characterId} userId={this.props.userId} automations={this.props.automations}/>
       </>
     );
   }

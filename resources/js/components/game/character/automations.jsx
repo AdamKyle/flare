@@ -31,7 +31,7 @@ export default class Automations extends React.Component {
         name: "attack_type",
         text: "Type",
         cell: row => <div data-tag="allowRowEvents">
-          <div>{row.attack_type.charAt(0).toUpperCase() + row.attack_type.slice(1)}</div>
+          <div>{(row.attack_type.charAt(0).toUpperCase() + row.attack_type.slice(1)).replace(/_/g, ' ')}</div>
         </div>,
       },
       {

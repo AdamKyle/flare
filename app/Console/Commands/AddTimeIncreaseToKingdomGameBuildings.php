@@ -5,6 +5,9 @@ namespace App\Console\Commands;
 use App\Flare\Models\GameBuilding;
 use Illuminate\Console\Command;
 
+/**
+ * @codeCoverageIgnore
+ */
 class AddTimeIncreaseToKingdomGameBuildings extends Command
 {
     /**

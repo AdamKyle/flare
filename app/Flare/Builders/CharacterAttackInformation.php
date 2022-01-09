@@ -159,6 +159,10 @@ class CharacterAttackInformation {
         if ($canStack) {
             $total = ($this->handleLifeStealingAmount($slots, 'itemSuffix') + $this->handleLifeStealingAmount($slots, 'itemPrefix'));
 
+            if ($this->character->map->gameMap->mapType()->isHell() || $this->character->map->gameMap->mapType()->isPurgatory()) {
+                return $total / 2;
+            }
+
             if ($total > 1.0) {
                 return 0.99;
             }
@@ -176,6 +180,10 @@ class CharacterAttackInformation {
         }
 
         $value = max($values);
+
+        if ($this->character->map->gameMap->mapType()->isHell() || $this->character->map->gameMap->mapType()->isPurgatory()) {
+            return $value / 2;
+        }
 
         return $value > 1.0 ? .99 : $value;
     }
@@ -252,6 +260,14 @@ class CharacterAttackInformation {
 
         $chance += $resurrectionItems->sum('item.resurrection_chance');
 
+        if ($this->character->map->gameMap->maptype()->isPurgatory()) {
+            if ($classType->isProphet()) {
+                return 0.65;
+            }
+
+            return 0.45;
+        }
+
         return $chance;
     }
 
@@ -314,15 +330,23 @@ class CharacterAttackInformation {
     public function fetchVoidanceAmount(string $type): float {
         $voidance = 0.0;
 
-        $slot = $this->character->inventory->slots->filter(function($slot) use($type) {
+        $slots = $this->character->inventory->slots->filter(function($slot) use($type) {
             return $slot->item->type === 'quest' && $slot->item->{$type} > 0;
-        })->first();
+        });
 
-        if (!is_null($slot)) {
-            $voidance = $slot->item->{$type};
+        if ($slots->isNotEmpty()) {
+            foreach ($slots as $slot) {
+                $voidance += $slot->item->{$type};
+            }
         }
 
-        return $voidance + $this->fetchVoidanceFromAffixes($type);
+        $amount = $voidance + $this->fetchVoidanceFromAffixes($type);
+
+        if ($this->character->map->gameMap->mapType()->isPurgatory()) {
+            return ((($amount * 100) * .45) / 100);
+        }
+
+        return $amount;
     }
 
     /**

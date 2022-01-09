@@ -72,6 +72,30 @@
                 <dt>Move Timeout Mod Bonus:</dt>
                 <dd>{{$item->move_time_out_mod_bonus * 100}}%</dd>
             @endif
+            @if ($item->str_mod > 0.0)
+                <dt>Str Modifier</dt>
+                <dd>{{$item->str_mod * 100}}%</dd>
+            @endif
+            @if ($item->dex_mod > 0.0)
+                <dt>Dex Modifier</dt>
+                <dd>{{$item->dex_mod * 100}}%</dd>
+            @endif
+            @if ($item->int_mod > 0.0)
+                <dt>Int Modifier</dt>
+                <dd>{{$item->int_mod * 100}}%</dd>
+            @endif
+            @if ($item->chr_mod > 0.0)
+                <dt>Chr Modifier</dt>
+                <dd>{{$item->chr_mod * 100}}%</dd>
+            @endif
+            @if ($item->agi_mod > 0.0)
+                <dt>Agi Modifier</dt>
+                <dd>{{$item->agi_mod * 100}}%</dd>
+            @endif
+            @if ($item->focus_mod > 0.0)
+                <dt>Focus Modifier</dt>
+                <dd>{{$item->focus_mod * 100}}%</dd>
+            @endif
         </dl>
     @endif
 </x-cards.card-with-title>

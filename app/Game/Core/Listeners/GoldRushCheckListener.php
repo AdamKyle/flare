@@ -19,6 +19,11 @@ class GoldRushCheckListener
      */
     public function handle(GoldRushCheckEvent $event)
     {
+
+        if ($event->character->gold === MaxCurrenciesValue::MAX_GOLD) {
+            return; // They are at max, cannot receive anymore.
+        }
+
         $gameMap        = $event->character->map->gameMap;
         $gameMapBonus   = 0.0;
 
@@ -33,18 +38,21 @@ class GoldRushCheckListener
 
             $maxCurrentices = new MaxCurrenciesValue($goldRush, MaxCurrenciesValue::GOLD);
 
+            $type = 'gold_rush';
+
             if ($maxCurrentices->canNotGiveCurrency()) {
-                event(new UpdateTopBarEvent($event->character->refresh()));
+                $event->character->gold = MaxCurrenciesValue::MAX_GOLD;;
+                $event->character->save();
 
-                return;
+                $type = 'gold_capped';
+            } else {
+                $event->character->gold = $goldRush;
+                $event->character->save();
             }
-
-            $event->character->gold = $goldRush;
-            $event->character->save();
 
             $character = $event->character->refresh();
 
-            event(new ServerMessageEvent($character->user, 'gold_rush', ceil($character->gold * 0.03)));
+            event(new ServerMessageEvent($character->user, $type, number_format($goldRush)));
             event(new UpdateTopBarEvent($character));
         }
     }

@@ -40,10 +40,7 @@
                   @csrf
                 </form>
 
-                <x-core.buttons.link-buttons.success-button
-                  attributes="onclick='event.preventDefault();
-                  document.getElementById('collect-reward').submit();'"
-                >
+                <x-core.buttons.link-buttons.success-button onclick="event.preventDefault();document.getElementById('collect-reward').submit();">
                   Collect Rewards
                 </x-core.buttons.link-buttons.success-button>
               </div>
@@ -65,7 +62,7 @@
                       <div class="group inline-block">
                         <i class="fas fa-exclamation-circle ml-2 text-red-600 cursor-pointer"></i>
                         <x-core.tooltips.tooltip>
-                          You already have this item or have had the item and upgrade it. You cannot obtain this item again.
+                          You already have this item or have had the item and upgraded it. You cannot obtain this item again.
                         </x-core.tooltips.tooltip>
                       </div>
                     @endif

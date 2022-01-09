@@ -120,6 +120,9 @@ class CharacterInventoryService {
                         return $set->id === $id;
                     }) + 1,
                 'id'    => $id,
+                'name'  => $this->character->inventorySets->filter(function($set) use($id) {
+                    return $set->id === $id;
+                })->first()->name
             ];
         }
 

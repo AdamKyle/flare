@@ -27,10 +27,12 @@ class MoveTimeOutListener
             $time = $event->timeOut - ($event->timeOut * $this->findMovementMinuteTimeReduction($character));
 
             if ($time < 1) {
-                $time = 1;
+                $timeOut    = now()->addMinute();
+                $this->time = 1;
+            } else {
+                $timeOut    = now()->addMinutes($time);
+                $this->time = $time;
             }
-
-            $timeOut = now()->addMinutes($time);
 
             $character->update([
                 'can_move'          => false,
@@ -39,12 +41,9 @@ class MoveTimeOutListener
 
             $character = $character->refresh();
 
-            $this->time = $time;
-
             MoveTimeOutJob::dispatch($character)->delay($timeOut);
         } else {
-
-            $this->time = 10 - (10 * $this->findMovementTimeReductions($character));
+            $time = 10 - (10 * $this->findMovementTimeReductions($character));
 
             if ($this->time < 1) {
                 $this->time = 1;
@@ -67,7 +66,7 @@ class MoveTimeOutListener
 
     protected function findMovementTimeReductions(Character $character) {
         $skill = $character->skills->filter(function($skill) {
-            return $skill->type()->isDirectionalMovementTimer();
+            return $skill->type()->isMovementTimer();
         })->first();
 
         if (is_null($skill)) {
@@ -79,7 +78,7 @@ class MoveTimeOutListener
 
     protected function findMovementMinuteTimeReduction(Character $character) {
         $skill = $character->skills->filter(function($skill) {
-            return $skill->type()->isMinuteMovementTimer();
+            return $skill->type()->isMovementTimer();
         })->first();
 
         if (is_null($skill)) {

@@ -3,6 +3,7 @@
 namespace App\Game\Skills\Services;
 
 use App\Flare\Events\ServerMessageEvent;
+use App\Flare\Models\Item;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Messages\Events\ServerMessageEvent as MessageEvent;
 use App\Flare\Events\UpdateSkillEvent;
@@ -13,6 +14,7 @@ use App\Flare\Models\Skill;
 use App\Flare\Values\ItemEffectsValue;
 use App\Game\Skills\Events\UpdateCharacterEnchantingList;
 use App\Game\Skills\Services\Traits\SkillCheck;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class DisenchantService {
@@ -67,6 +69,29 @@ class DisenchantService {
         ));
     }
 
+    public function disenchantItemWithSkill(Character $character) {
+        $disenchantSkill = $character->skills->filter(function($skill) {
+            return $skill->type()->isDisenchanting();
+        })->first();
+
+        if (!is_null($disenchantSkill)) {
+            $characterRoll = $this->characterRoll($disenchantSkill);
+            $dcCheck       = $this->getDCCheck($disenchantSkill, 0);
+
+            if ($characterRoll > $dcCheck) {
+                $goldDust = $this->updateGoldDust($character, false, $disenchantSkill);
+
+                event(new ServerMessageEvent($character->user, 'disenchanted-adventure', $goldDust));
+                event(new UpdateSkillEvent($disenchantSkill));
+
+            } else {
+                $this->updateGoldDust($character, true);
+
+                event(new ServerMessageEvent($character->user, 'failed-to-disenchant'));
+            }
+        }
+    }
+
     /**
      * Return the total gold dust.
      *
@@ -108,7 +133,7 @@ class DisenchantService {
             }
         }
 
-        if ($characterTotalGoldDust > MaxCurrenciesValue::MAX_GOLD_DUST) {
+        if ($characterTotalGoldDust >= MaxCurrenciesValue::MAX_GOLD_DUST) {
             $characterTotalGoldDust = MaxCurrenciesValue::MAX_GOLD_DUST;
         }
 

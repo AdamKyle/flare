@@ -4,7 +4,7 @@
 
 As we talked about in [Races and Classes](/information/races-and-classes), the race you select and the class you select give bonus points towards your stats. Your class also determines your base attack stat. 
 
-For optimal game play, it’s suggested that you equip gear that helps boost your primary damage stat as well as your dexterity (more on that later).
+For optimal game play, it’s suggested that you equip gear that helps boost your primary damage stat as well as your "to hit" stat.
 
 However, as stated before, you should never feel pigeonholed into one specific class or race because “it’s most optimal.” Experiment.
 
@@ -33,14 +33,19 @@ There is also, under it, a: **To focus on for Hit%**. Most gear will increase al
 Every class will also want to focus on their Accuracy [skill](/information/skill-information) via training, which will also increase the HIT chance
 in conjunction with the stat.
 
+But beware, skills, when training, only get 0.001% towards the skill bonus (or other bonuses). This means skill leveling can take a very
+long time. Instead of focusing on say Accuracy until it's maxed out, level it a bit until you start hitting, not missing, with your weapon.
+
+Being blocked just means you need to do more damage, however, missing means you need higher To hit stat and a higher accuracy skill level.
+
 ## Gear And Stats
 
 Tlessa is a game about progressing down the enemy list and fighting stronger creatures, being able to kill them in on shot and quickly is the goal.
 
 To that end, characters need stronger and better gear. The Shop will allow you to buy gear up to the cost of Two Billion gold. There is gear beyond that, however
-you will need the appropriate crafting skill to be at the right level to get the "craft only" gear.
+you will need the appropriate [crafting skill](/information/crafting) to be at the right level to get the "craft only" gear.
 
-Gear alone, from the shop, will get you to the bottom of the list, but for even more of an added bonus, gear with affixes will get you even further, 
+Gear alone, from the shop, will get you to the bottom of the list, but for even more of an added bonus, gear with [affixes](/information/enchanting) will get you even further, 
 specifically those that affect your stats.
 
 ## Other stats matter too
@@ -61,12 +66,22 @@ looter of dungeons and so much more (if you want to be).
 > 
 > Some gear might be bad for you, however it might have an affix or two attached that help, for example, increase your weapon crafting skill.
 > While the gear might be considered bad to fight monsters with, it could be useful for crafting weapons.
+> 
+> This concept can hold true early game. For example, you might have bought some nice new shiny gear, but you found a life stealing affix,
+> being a vampire you would want this as it can steal life from the enemy and give it to you. While the item it's on is or might be garbage, 
+> the enchantment is what matters.
+> 
+> Yes you will probably replace the item later with a better one, once you can craft it, but do take time to look at what drops when you
+> first start out to see if it can be useful to you.
 
 ## Final Note
 
 As a fresh, out of the gate, character, you won't have access to a lot of the gear mentioned. 
 Or the gold to purchase it. There will always be a monster or two, an adventure or two that you can go on to level these 
 skills and find some loot as you level up and get stronger.
+
+You will start with 1000 Gold, and if you follow the [tips](/information/tips) section, you will be given a glimpse
+at roughly the first couple hours of game play.
 
 > ### ATTN!
 >

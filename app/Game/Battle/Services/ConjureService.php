@@ -2,6 +2,8 @@
 
 namespace App\Game\Battle\Services;
 
+use App\Flare\Models\GameMap;
+use App\Flare\Values\MapNameValue;
 use App\Game\Maps\Events\UpdateMapDetailsBroadcast;
 use App\Game\Maps\Services\MovementService;
 use League\Fractal\Manager;
@@ -58,7 +60,12 @@ class ConjureService {
             $damagedKingdom = $this->canDamageKingdom();
         }
 
-        $monster = Monster::where('is_celestial_entity', true)->inRandomOrder()->first();
+        $invalidMaps = [
+            GameMap::where('name', MapNameValue::HELL)->first()->id,
+            GameMap::where('name', MapNameValue::PURGATORY)->first()->id
+        ];
+
+        $monster = Monster::where('is_celestial_entity', true)->whereNotIn('game_map_id', $invalidMaps)->inRandomOrder()->first();
 
         $healthRange          = explode('-', $monster->health_range);
         $currentMonsterHealth = rand($healthRange[0], $healthRange[1]) + 10;
@@ -101,7 +108,7 @@ class ConjureService {
         }
 
         $healthRange          = explode('-', $monster->health_range);
-        $currentMonsterHealth = rand($healthRange[0], $healthRange[1]) + 10;
+        $currentMonsterHealth = rand($healthRange[0], $healthRange[1]);
 
         $celestialFight = CelestialFight::create([
             'monster_id'      => $monster->id,

@@ -255,6 +255,7 @@ export default class AdeventureActions extends React.Component {
           updateMessage={this.updateMessage.bind(this)}
           updateCharacterAdventures={this.updateCharacterAdventures.bind(this)}
           openTimeOutModal={this.props.openTimeOutModal}
+          inventorySets={this.props.inventorySets}
         /> : null}
       </Card>
     )

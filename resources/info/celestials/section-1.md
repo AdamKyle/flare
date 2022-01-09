@@ -1,5 +1,16 @@
 # Celestials
 
+> ### ATTN!!
+> 
+> Players who have over 1 trillion health will have their health capped at 1 trillion when joining the fight.
+> This is due to the fact that classes such as Vampires can get their health in to the quadrillions and the database cannot handle a number
+> that large.
+> 
+> Your attacks will still be based off the modded dur (for vampires) which will still be higher than 1 trillion. The damage does not change, the health you
+> you have when entering the fight does.
+> 
+> Other classes will have nothing to worry about, even if their health gets capped as well for the fight.
+
 Celestials in Tlessa are competitive enemies that are stronger than critters in the drop-down list and can be fought by anyone
 including groups of players.
 

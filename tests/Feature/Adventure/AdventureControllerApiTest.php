@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Game\Adventure;
+namespace Tests\Feature\Adventure;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
@@ -29,7 +29,8 @@ class AdventureControllerApiTest extends TestCase
         $this->adventure = $this->createNewAdventure();
 
         $this->character = (new CharacterFactory)
-                                ->createBaseCharacter();
+                                ->createBaseCharacter()
+                                ->givePlayerLocation();
     }
 
     public function tearDown(): void {

@@ -17,7 +17,7 @@ class ClassBonusInformationTest extends TestCase
 
         $details = (new ClassBonusInformation())->buildClassBonusDetailsForInfo($fighter->name);
 
-        $this->assertEquals('Weapon equipped', $details['requires']);
+        $this->assertEquals('Duel Weapon equipped or Weapon/Shield equipped', $details['requires']);
     }
 
     public function testGetInforForRanger() {

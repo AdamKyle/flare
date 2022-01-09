@@ -54,6 +54,34 @@ trait ItemsShowInformation {
                 $effects = 'Use Traverse (beside movement actions) to traverse to Dungeons plane';
             }
 
+            if ($effect->hell()) {
+                $effects = 'Use Traverse (beside movement actions) to traverse to Hell plane';
+            }
+
+            if ($effect->purgatory()) {
+                $effects = 'Use Traverse (beside movement actions) to traverse to Purgatory plane (only while in Hell at the location: Tear in the Fabric of Time (X/Y: 208/64))';
+            }
+
+            if ($effect->canMassEmbezzle()) {
+                $effects = 'Lets you mass embezzle from all kingdoms on the plane, while in a kingdom you own. Does not work cross plane.';
+            }
+
+            if ($effect->walkOnMagma()) {
+                $effects = 'Lets you walk on Magma in Hell.';
+            }
+
+            if ($effect->areAffixesIrresistible()) {
+                $effects = 'Makes affix damage irresistible except in Hell and Purgatory.';
+            }
+
+            if ($effect->canSpeakToQueenOfHearts()) {
+                $effects = 'Lets a character approach and speak to the Queen of Hearts in Hell.';
+            }
+
+            if ($effect->isGoldDustRush()) {
+                $effects = 'Provides a small chance for the player to get a gold dust rush when disenchanting.';
+            }
+
             if ($effect->walkOnDeathWater()) {
                 $effects = 'Walk on Water (Aka: Death Water) in Dungeons Plane';
             }

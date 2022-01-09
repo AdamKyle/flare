@@ -47,9 +47,12 @@
             </p>
         </x-core.alerts.warning-alert>
         @livewire('character.inventory.data-table', [
-            'batchSell' => true,
-            'craftOnly' => false,
-            'character' => $character,
+            'batchSell'             => true,
+            'craftOnly'             => false,
+            'isShopSelling'         => true,
+            'character'             => $character,
+            'showSkillInfo'         => false,
+            'showOtherCurrencyCost' => false
         ])
     </div>
 @endsection

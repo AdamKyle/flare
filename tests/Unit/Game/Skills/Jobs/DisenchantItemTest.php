@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Admin\Jobs;
+namespace Tests\Unit\Game\Skills\Jobs;
 
 use App\Game\Skills\Jobs\DisenchantItem;
 use App\Game\Skills\Values\SkillTypeValue;

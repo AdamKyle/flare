@@ -2,6 +2,10 @@
 
 namespace App\Game\Maps\Controllers\Api;
 
+use App\Game\Maps\Requests\QuestDataRequest;
+use Cache;
+use App\Flare\Models\Npc;
+use App\Flare\Models\Quest;
 use App\Game\Automation\Values\AutomationType;
 use App\Game\Maps\Requests\TraverseRequest;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -11,7 +15,6 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Location;
 use App\Game\Maps\Services\LocationService;
 use App\Game\Maps\Services\MovementService;
-use App\Game\Maps\Services\PortService;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Maps\Requests\IsWaterRequest;
 use App\Game\Maps\Requests\MoveRequest;
@@ -123,5 +126,22 @@ class MapController extends Controller {
         unset($response['status']);
 
         return response()->json($response, $status);
+    }
+
+    public function fetchQuests(QuestDataRequest $request, Character $character) {
+        if (!Cache::has('all-quests')) {
+            Cache::put('all-quests', Quest::where('is_parent', true)->with('childQuests', 'rewardItem', 'item', 'npc', 'npc.commands', 'npc.gameMap')->get());
+        }
+
+        $data = [
+            'completed_quests' => $character->questsCompleted()->pluck('quest_id'),
+            'map_name'         => $character->map->gameMap->name,
+        ];
+
+        if (!$request->completed_quests_only) {
+            $data['all_quests'] = Cache::get('all-quests');
+        }
+
+        return response()->json($data);
     }
 }

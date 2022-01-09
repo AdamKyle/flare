@@ -4,6 +4,7 @@ namespace App\Flare\Handlers;
 
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Models\Character;
+use App\Flare\Models\ItemAffix;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use App\Flare\Services\BuildMonsterCacheService;
@@ -138,9 +139,10 @@ class SetupFightHandler {
             return true;
         }
 
-        $dc = 100 - 100 * $devouringLight;
+        $dc   = 100 - 100 * $devouringLight;
+        $roll = rand(1, 100);
 
-        return rand(1, 100) > $dc;
+        return $roll > $dc;
     }
 
     protected function getDefenderFromSpecialLocation($attacker, $defender) {
@@ -165,49 +167,86 @@ class SetupFightHandler {
             return true;
         }
 
-        $dc = 100 - 100 * $devouringDarknessChance;
+        $dc   = 100 - 100 * $devouringDarknessChance;
+        $roll = rand(1, 100);
 
-        return rand(1, 100) > $dc;
+        return $roll > $dc;
     }
 
     protected function reduceEnemyStats($defender) {
-        $affix = $this->characterInformationBuilder->findPrefixStatReductionAffix();
+        $prefix                 = $this->characterInformationBuilder->findPrefixStatReductionAffix();
+        $affixesAreIrresistable = $this->characterInformationBuilder->canAffixesBeResisted();
 
-        if (!is_null($affix)) {
-            $dc    = 100 - $defender->affix_resistance;
+        if (!is_null($prefix)) {
 
-            if ($dc <= 0 || rand(1, 100) > $dc) {
-                $message = 'Your enemy laughs at your attempt to make them weak fails.';
-
-                $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
-
+            if (!$this->canReduce($defender, $prefix, $affixesAreIrresistable)) {
                 return $defender;
             }
 
-            $defender->str   = $defender->str - ($defender->str * $affix->str_reduction);
-            $defender->dex   = $defender->dex - ($defender->dex * $affix->dex_reduction);
-            $defender->int   = $defender->int - ($defender->int * $affix->int_reduction);
-            $defender->dur   = $defender->dur - ($defender->dur * $affix->dur_reduction);
-            $defender->chr   = $defender->chr - ($defender->chr * $affix->chr_reduction);
-            $defender->agi   = $defender->agi - ($defender->agi * $affix->agi_reduction);
-            $defender->focus = $defender->focus - ($defender->focus * $affix->focus_reduction);
+            $defender->str   = $defender->str - ($defender->str * $prefix->str_reduction);
+            $defender->dex   = $defender->dex - ($defender->dex * $prefix->dex_reduction);
+            $defender->int   = $defender->int - ($defender->int * $prefix->int_reduction);
+            $defender->dur   = $defender->dur - ($defender->dur * $prefix->dur_reduction);
+            $defender->chr   = $defender->chr - ($defender->chr * $prefix->chr_reduction);
+            $defender->agi   = $defender->agi - ($defender->agi * $prefix->agi_reduction);
+            $defender->focus = $defender->focus - ($defender->focus * $prefix->focus_reduction);
+        }
 
-            $stats = ['str', 'dex', 'int', 'chr', 'dur', 'agi', 'focus'];
+        return $this->reduceSuffixStatsOnEnemies($defender, $affixesAreIrresistable);
+    }
 
-            for ($i = 0; $i < count($stats); $i++) {
-                $iteratee = $stats[$i] . '_reduction';
-                $sumOfReductions = $this->characterInformationBuilder->findSuffixStatReductionAffixes()->sum($iteratee);
-                $defender->{$stats[$i]} = $defender->{$stats[$i]} - ($defender->{$stats[$i]} * $sumOfReductions);
+    protected function canReduce($defender, ItemAffix $affix = null, bool $irresistible = false): bool {
 
-                if ($defender->{$stats[$i]} < 0.0) {
-                    $defender->{$stats[$i]} = 0;
-                }
-            }
+        if ($irresistible) {
+            return true;
+        }
 
-            $message = 'Your enemy sinks to their knees in agony as you make them weaker.';
+        if (is_null($affix)) {
+            $dc    = 50 + 50 * ($defender->affix_resistance);
+        } else {
+            $dc    = 50 + 50 * ($defender->affix_resistance - $affix->resistance_reduction);
+        }
+
+        if ($dc > 100) {
+            $dc = 99;
+        }
+
+        if (rand(1, 100) < $dc) {
+            $message = 'Your enemy laughs at your attempt to make them weak fails.';
 
             $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
+
+            return false;
         }
+
+        return true;
+    }
+
+    protected function reduceSuffixStatsOnEnemies($defender, bool $irresistible = false) {
+        $stats               = ['str', 'dex', 'int', 'chr', 'dur', 'agi', 'focus'];
+
+        for ($i = 0; $i < count($stats); $i++) {
+            $iteratee = $stats[$i] . '_reduction';
+
+            $affix = $this->characterInformationBuilder->findSuffixStatReductionAffixes()->whereNotNull($iteratee)->sortBy([
+                'resistance_reduction' => 'asc'
+            ])->first();
+
+            if (!$this->canReduce($defender, $affix, $irresistible)) {
+                return $defender;
+            }
+
+            $sumOfReductions = $this->characterInformationBuilder->findSuffixStatReductionAffixes()->sum($iteratee);
+            $defender->{$stats[$i]} = $defender->{$stats[$i]} - ($defender->{$stats[$i]} * $sumOfReductions);
+
+            if ($defender->{$stats[$i]} < 0.0) {
+                $defender->{$stats[$i]} = 0;
+            }
+        }
+
+        $message = 'Your enemy sinks to their knees in agony as you make them weaker.';
+
+        $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
 
         return $defender;
     }

@@ -52,6 +52,7 @@ class RewardBuilder {
 
         if ($hasDrop) {
             return resolve(RandomItemDropBuilder::class)
+                        ->setLocation($adventure->location)
                         ->setMonsterPlane($monster->gameMap->name)
                         ->setCharacterLevel($character->level)
                         ->setMonsterMaxLevel($monster->max_level)

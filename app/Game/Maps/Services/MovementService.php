@@ -158,6 +158,18 @@ class MovementService {
             }
         }
 
+        if ($this->mapTile->isMagma((int) $mapTileColor)) {
+            if ($this->mapTile->canWalkOnMagma($character, $xPosition, $yPosition)) {
+                return $this->moveCharacter($character, $params);
+            } else {
+                return $this->errorResult('cannot walk on magma.');
+            }
+        }
+
+        if ($this->mapTile->isPurgatoryWater((int) $mapTileColor)) {
+            return $this->errorResult('You would slip away into the void if you tried to go that way child!');
+        }
+
         return $this->moveCharacter($character, $params);
     }
 
@@ -260,11 +272,15 @@ class MovementService {
             $canSettle = true;
         }
 
-        $owner = null;
+        $owner           = null;
+        $canMassEmbezzle = false;
 
         if (!is_null($kingdom)) {
             if (!is_null($kingdom->character_id)) {
                 $owner = $kingdom->character->name;
+
+                $canMassEmbezzle = $this->canMassEmbezzle($kingdom->character, $canManage);
+
             } else {
                 $owner = Npc::where('type', NpcTypes::KINGDOM_HOLDER)->first()->name . ' (NPC)';
             }
@@ -276,6 +292,7 @@ class MovementService {
             'can_manage'        => $canManage,
             'can_settle'        => $canSettle,
             'kingdom_to_attack' => $kingdomToAttack,
+            'can_mass_embezzle' => $canMassEmbezzle,
         ];
     }
 
@@ -333,8 +350,9 @@ class MovementService {
      * @return array
      */
     public function teleport(Character $character, int $x, int $y, int $cost, int $timeout, bool $pctCommand = false): array {
-        $canTeleportToWater = $this->mapTile->canWalkOnWater($character, $x, $y);
+        $canTeleportToWater      = $this->mapTile->canWalkOnWater($character, $x, $y);
         $canTeleportToDeathWater = $this->mapTile->canWalkOnDeathWater($character, $x, $y);
+        $canTeleportToMagma      = $this->mapTile->canWalkOnMagma($character, $x, $y);
 
         if (!$canTeleportToWater && $this->mapTile->isWaterTile($this->mapTile->getTileColor($character, $x, $y))) {
             $item = Item::where('effect', ItemEffectsValue::WALK_ON_WATER)->first();
@@ -345,7 +363,17 @@ class MovementService {
         if (!$canTeleportToDeathWater && $this->mapTile->isDeathWaterTile($this->mapTile->getTileColor($character, $x, $y))) {
             $item = Item::where('effect', ItemEffectsValue::WALK_ON_DEATH_WATER)->first();
 
-            return $this->errorResult('Cannot teleport to water locations without a ' . $item->name);
+            return $this->errorResult('Cannot teleport to Death Water locations without a ' . $item->name);
+        }
+
+        if (!$canTeleportToMagma && $this->mapTile->isMagma($this->mapTile->getTileColor($character, $x, $y))) {
+            $item = Item::where('effect', ItemEffectsValue::WALK_ON_MAGMA)->first();
+
+            return $this->errorResult('Cannot teleport to magma locations without a ' . $item->name);
+        }
+
+        if ($this->mapTile->isPurgatoryWater($this->mapTile->getTileColor($character, $x, $y))) {
+            return $this->errorResult('You would slip away into the void if you tried to go that way child!');
         }
 
         if ($character->gold < $cost) {
@@ -539,7 +567,7 @@ class MovementService {
             'kingdom_details'   => $kingdomDetails,
             'celestials'        => $this->celestialEntities(),
             'characters_on_map' => $this->getActiveUsersCountForMap($character),
-            'can_mass_embezzle' => $canEmbezzle,
+            'can_mass_embezzle' => $canEmbezzle
         ]);
     }
 

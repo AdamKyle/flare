@@ -22,6 +22,7 @@ export default class KingdomAttackModal extends React.Component {
       attackingKingdoms: [],
       items: [],
       unitsToSend: {},
+      timeReduction: 0.0,
       enableNext: false,
       enableAttack: false,
       fetchingAttackData: true,
@@ -36,6 +37,7 @@ export default class KingdomAttackModal extends React.Component {
         fetchingAttackData: false,
         kingdoms: result.data.kingdoms,
         items: result.data.items,
+        time_reduction: result.data.unit_movement_time_reduction,
       }, () => {
         const steps = this.state.steps;
 
@@ -283,7 +285,7 @@ export default class KingdomAttackModal extends React.Component {
                   defenderId={this.props.kingdomToAttack.id}
                   updateItems={this.updateItems.bind(this)}
                 />
-              : <>Test</>
+              : null
             : null
           }
           {
@@ -302,6 +304,7 @@ export default class KingdomAttackModal extends React.Component {
                 defendingKingdom={this.props.kingdomToAttack}
                 enableAttack={this.enableAttack.bind(this)}
                 setUnitsToSendValue={this.setUnitsToSendValue.bind(this)}
+                timeReduction={this.state.time_reduction}
               />
               : null
           }

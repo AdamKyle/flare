@@ -13,7 +13,9 @@ class UnitsSheet implements ToCollection {
             if ($index !== 0) {
                 $unitData = array_combine($rows[0]->toArray(), $row->toArray());
 
-                GameUnit::create($this->returnCleanUnitData($unitData));
+                $cleanData = $this->returnCleanUnitData($unitData);
+
+                GameUnit::updateOrCreate(['name' => $cleanData['name']], $cleanData);
             }
         }
     }

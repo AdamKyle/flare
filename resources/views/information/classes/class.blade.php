@@ -58,7 +58,9 @@
             </div>
         </div>
     </x-core.cards.card-with-title>
-    <x-core.cards.card css="mt-5 w-full lg:w-1/2 m-auto mb-10">
+
+    <x-core.cards.card-with-title title="Hints" css="tw-mt-5 tw-w-full lg:tw-w-1/2 tw-m-auto tw-mb-10">
+
         @if ($class->type()->isFighter())
             @include('information.classes.partials.fighter')
         @endif
@@ -82,5 +84,5 @@
         @if ($class->type()->isVampire())
             @include('information.classes.partials.vampire')
         @endif
-    </x-core.cards.card>
+    </x-core.cards.card-with-title>
 @endsection

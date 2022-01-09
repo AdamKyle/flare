@@ -24,6 +24,7 @@ class KingdomBuilding extends Model
         'current_durability',
         'max_defence',
         'max_durability',
+        'is_locked',
     ];
 
     /**
@@ -37,6 +38,7 @@ class KingdomBuilding extends Model
         'current_durability' => 'integer',
         'max_defence'        => 'integer',
         'max_durability'     => 'integer',
+        'is_locked'          => 'boolean',
     ];
 
     protected $appends = [
@@ -179,7 +181,10 @@ class KingdomBuilding extends Model
     }
 
     public function getTimeIncreaseAttribute() {
-        $time = (($this->level + 1) * ($this->gameBuilding->time_to_build) * (1 + $this->gameBuilding->time_increase_amount));
+        $nextLevel    = $this->level + 1;
+        $timeIncrease = $this->gameBuilding->time_to_build;
+        $time         = $nextLevel + $timeIncrease;
+        $time         = $time + $time * $this->gameBuilding->time_increase_amount;
 
         $now  = now();
         $time = $now->diffInMinutes($now->copy()->addMinutes($time));

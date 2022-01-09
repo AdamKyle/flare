@@ -2,6 +2,8 @@
 
 namespace App\Game\Maps\Services;
 
+use App\Flare\Values\LocationEffectValue;
+use Illuminate\Support\Collection;
 use Storage;
 use League\Fractal\Manager;
 use App\Flare\Cache\CoordinatesCache;
@@ -92,7 +94,7 @@ class LocationService {
             'map_url'                => Storage::disk('maps')->url($character->map_url),
             'character_map'          => $character->map,
             'character_id'           => $character->id,
-            'locations'              => Location::with('adventures', 'questRewardItem')->where('game_map_id', $character->map->game_map_id)->get(),
+            'locations'              => $this->fetchLocationData($character),
             'can_move'               => $character->can_move,
             'timeout'                => $character->can_move_again_at,
             'port_details'           => $this->portDetails,
@@ -100,6 +102,7 @@ class LocationService {
             'adventure_details'      => $this->adventureDetails,
             'adventure_logs'         => $character->adventureLogs,
             'adventure_completed_at' => $character->can_adventure_again_at,
+            'inventory_sets'         => $this->getSets($character),
             'is_dead'                => $character->is_dead,
             'teleport'               => $this->coordinatesCache->getFromCache(),
             'celestials'             => $this->getCelestialEntity($character),
@@ -113,6 +116,50 @@ class LocationService {
             'characters_on_map'      => $this->getActiveUsersCountForMap($character),
             'can_mass_embezzle'      => $this->canMassEmbezzle($character, $this->canManage),
         ];
+    }
+
+    protected function getSets(Character $character): array {
+        $sets = [];
+
+        foreach ($character->inventorySets as $set) {
+
+            if ($set->slots->isEmpty()) {
+                if (is_null($set->name)) {
+                    $index     = $character->inventorySets->search(function($inventorySet) use ($set) {
+                        return $inventorySet->id === $set->id;
+                    }) + 1;
+
+                    $sets[] = [
+                        'name' => 'Set ' . $index,
+                        'id'   => $set->id,
+                    ];
+                } else {
+                    $sets[] = [
+                        'name' => 'Set ' . $index,
+                        'id'   => $set->id,
+                    ];
+                }
+            }
+        }
+
+        return $sets;
+    }
+
+    protected function fetchLocationData(Character $character): Collection {
+        $locations = Location::with('adventures', 'questRewardItem')->where('game_map_id', $character->map->game_map_id)->get();
+
+        return $locations->transform(function($location) {
+
+            $location->increases_enemy_stats_by      = null;
+            $location->increase_enemty_percentage_by = null;
+
+            if (!is_null($location->enemy_strength_type)) {
+                $location->increases_enemy_stats_by     = LocationEffectValue::getIncreaseByAmount($location->enemy_strength_type);
+                $location->increase_enemy_percentage_by = LocationEffectValue::fetchPercentageIncrease($location->enemy_strength_type);
+            }
+
+            return $location;
+        });
     }
 
     protected function getCelestialEntity(Character $character) {

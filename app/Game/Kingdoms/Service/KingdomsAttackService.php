@@ -2,14 +2,6 @@
 
 namespace App\Game\Kingdoms\Service;
 
-use App\Flare\Mail\GenericMail;
-use App\Flare\Models\GameUnit;
-use App\Flare\Models\KingdomUnit;
-use App\Flare\Models\Npc;
-use App\Flare\Values\NpcCommandTypes;
-use App\Flare\Values\NpcTypes;
-use App\Game\Kingdoms\Events\UpdateUnitMovementLogs;
-use App\Game\Messages\Events\GlobalMessageEvent;
 use Illuminate\Support\Facades\Log;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
@@ -19,6 +11,13 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\UnitMovementQueue;
 use App\Flare\Transformers\KingdomTransformer;
+use App\Flare\Mail\GenericMail;
+use App\Flare\Models\GameUnit;
+use App\Flare\Models\KingdomUnit;
+use App\Flare\Models\Npc;
+use App\Flare\Values\NpcTypes;
+use App\Game\Kingdoms\Events\UpdateUnitMovementLogs;
+use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Kingdoms\Events\UpdateKingdom;
 use App\Game\Kingdoms\Jobs\MoveUnits;
@@ -28,18 +27,39 @@ class KingdomsAttackService {
 
     use ResponseBuilder;
 
-    private $selectedKingdom;
+    /**
+     * @var SelectedKingdom $selectedKingdom
+     */
+    private SelectedKingdom $selectedKingdom;
 
-    private $kingdomTransformer;
+    /**
+     * @var KingdomTransformer $kingdomTransformer
+     */
+    private KingdomTransformer $kingdomTransformer;
 
-    private $manager;
+    /**
+     * @var Manager $manager
+     */
+    private Manager $manager;
 
+    /**
+     * @param SelectedKingdom $selectedKingdom
+     * @param Manager $manager
+     * @param KingdomTransformer $kingdomTransformer
+     */
     public function __construct(SelectedKingdom $selectedKingdom, Manager $manager, KingdomTransformer $kingdomTransformer) {
         $this->selectedKingdom    = $selectedKingdom;
         $this->kingdomTransformer = $kingdomTransformer;
         $this->manager            = $manager;
     }
 
+    /**
+     * Fetches the selected kingdoms' data.
+     *
+     * @param Character $character
+     * @param array $kingdoms
+     * @return array
+     */
     public function fetchSelectedKingdomData(Character $character, array $kingdoms): array {
         $kingdomData = [];
 
@@ -59,12 +79,24 @@ class KingdomsAttackService {
         return $this->successResult($kingdomData);
     }
 
+    /**
+     * Launch an attack against a kingdom.
+     *
+     * @param Character $character
+     * @param int $defenderId
+     * @param array $params
+     * @return array
+     */
     public function attackKingdom(Character $character, int $defenderId, array $params) {
         $defender = Kingdom::where('id', $defenderId)->where('game_map_id', $character->map->game_map_id)->first();
 
         if (is_null($defender)) {
             return $this->errorResult('Defender kingdom does not exist for: ' . $defenderId);
         }
+
+        $timeReductionSkill = $character->skills->filter(function($skill) {
+            return $skill->type()->effectsKingdom();
+        })->first();
 
         foreach ($params as $kingdomName => $units) {
             $kingdom = Kingdom::where('character_id', $character->id)
@@ -75,8 +107,6 @@ class KingdomsAttackService {
                 return $this->errorResult('No such kingdom for name: ' . $kingdomName);
             }
 
-            $unitsToSend = [];
-
             try {
                 $unitsToSend = $this->fetchUnitsToSend($kingdom, $units);
             } catch (\Exception $e) {
@@ -86,6 +116,12 @@ class KingdomsAttackService {
             if (!empty($unitsToSend)) {
 
                 $totalTime = $this->fetchTotalTime($units);
+
+                $totalTime = $totalTime - $totalTime * $timeReductionSkill->unit_movement_time_reduction;
+
+                if ($totalTime <= 0.0) {
+                    $totalTime = 1;
+                }
 
                 $unitMovement = UnitMovementQueue::create([
                     'character_id'    => $character->id,
@@ -105,7 +141,7 @@ class KingdomsAttackService {
 
                 // @codeCoverageIgnoreStart
                 if ($totalTime > 15) {
-                    $timeForDispatch = $totalTime / 10;
+                    $timeForDispatch = 15;
                 }
                 // @codeCoverageIgnoreEnd
 
@@ -128,12 +164,24 @@ class KingdomsAttackService {
         return $this->successResult();
     }
 
+    /**
+     * Fetches the units to send.
+     *
+     * Can throw an exception if the unit doesn't exist on the kingdom.
+     *
+     * Can also throw if you do not have enough units in the kingdom.
+     *
+     * Will also update the kingdoms units with the reamining values.
+     *
+     * @param Kingdom $kingdom
+     * @param array $units
+     * @return array
+     * @throws \Exception
+     */
     protected function fetchUnitsToSend(Kingdom $kingdom, array $units) {
         $unitsToSend = [];
 
         foreach ($units as $unitName => $unitInformation) {
-            Log::info('Fetching Game Unit For: ' . $kingdom->name);
-            Log::info('Fetching Game Unit For: ' . $unitName);
             $unit = $this->fetchGameUnit($kingdom, $unitName);
 
             if (is_null($unit)) {
@@ -189,6 +237,12 @@ class KingdomsAttackService {
         return $kingdom->units->where('game_unit_id', $gameUnit->id)->first();
     }
 
+    /**
+     * Fetches the total movement time.
+     *
+     * @param array $unitsToSend
+     * @return int
+     */
     protected function fetchTotalTime(array $unitsToSend): int {
         $totalTime = 0;
 
@@ -199,6 +253,12 @@ class KingdomsAttackService {
         return $totalTime;
     }
 
+    /**
+     * Sends out a global attack message.
+     *
+     * @param Kingdom $defender
+     * @param Character $character
+     */
     protected function globalAttackMessage(Kingdom $defender, Character $character) {
         $defenderCharacterName = null;
 
@@ -214,6 +274,11 @@ class KingdomsAttackService {
         broadcast(new GlobalMessageEvent($message));
     }
 
+    /**
+     * Alerts the defender an attack is in coming.
+     *
+     * @param Kingdom $defender
+     */
     protected function alertDefenderToAttack(Kingdom $defender) {
         if (is_null($defender->character_id)) {
             return;

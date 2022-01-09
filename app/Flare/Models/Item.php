@@ -26,6 +26,7 @@ class Item extends Model
         'name',
         'item_suffix_id',
         'item_prefix_id',
+        'drop_location_id',
         'type',
         'default_position',
         'base_damage',
@@ -78,6 +79,7 @@ class Item extends Model
         'affix_damage_reduction',
         'devouring_light',
         'devouring_darkness',
+        'parent_id',
     ];
 
     /**
@@ -92,6 +94,7 @@ class Item extends Model
         'cost'                             => 'integer',
         'gold_dust_cost'                   => 'integer',
         'shards_cost'                      => 'integer',
+        'parent_id'                        => 'integer',
         'base_damage_mod'                  => 'float',
         'base_healing_mod'                 => 'float',
         'base_ac_mod'                      => 'float',
@@ -136,6 +139,10 @@ class Item extends Model
 
     protected $appends = [
         'affix_name',
+        'required_monster',
+        'required_quest',
+        'locations',
+        'adventures'
     ];
 
     public function itemSuffix() {
@@ -146,8 +153,16 @@ class Item extends Model
         return $this->hasOne(ItemAffix::class, 'id', 'item_prefix_id');
     }
 
-    public function slot() {
-        return $this->belongsTo(InventorySlot::class, 'id', 'item_id');
+    public function dropLocation() {
+        return $this->hasOne(Location::class, 'id', 'drop_location_id')->with('map');
+    }
+
+    public function children() {
+        return $this->hasMany($this, 'parent_id')->with('children');
+    }
+
+    public function parent() {
+        return $this->belongsTo($this, 'parent_id');
     }
 
     /**
@@ -167,11 +182,43 @@ class Item extends Model
         return $this->name;
     }
 
+    public function getRequiredMonsterAttribute() {
+        if ($this->type === 'quest') {
+            return Monster::where('quest_item_id', $this->id)->with('gameMap')->first();
+        }
+
+        return null;
+    }
+
+    public function getRequiredQuestAttribute() {
+        if ($this->type === 'quest') {
+            return Quest::where('reward_item', $this->id)->with('npc', 'npc.gameMap', 'item')->first();
+        }
+
+        return null;
+    }
+
+    public function getLocationsAttribute() {
+        if ($this->type === 'quest') {
+           return Location::where('quest_reward_item_id', $this->id)->with('map')->get();
+        }
+
+        return [];
+    }
+
+    public function getAdventuresAttribute() {
+        if ($this->type === 'quest') {
+            return Adventure::where('reward_item_id', $this->id)->with('location', 'location.map')->get();
+        }
+
+        return [];
+    }
+
     /**
      * Gets the total damage value for the item.
      *
      * In some cases an item might not have a base_damage value.
-     * how ever might have either prefix or suffix or both.
+     * however might have either prefix or suffix or both.
      *
      * In this case we will set the damage variable to one.
      * this will allow the damage modifiers to be applied to the item.
@@ -204,7 +251,7 @@ class Item extends Model
      * Gets the total defence value for the item.
      *
      * In some cases an item might not have a base_ac value.
-     * how ever might have either prefix or suffix or both.
+     * however, might have either prefix or suffix or both.
      *
      * In this case we will set the ac variable to one.
      * this will allow the ac modifiers to be applied to the item.

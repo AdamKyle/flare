@@ -10,6 +10,7 @@ import KingdomUnits from './partials/kingdom-units';
 import RecruitUnit from './recruit-unit';
 import LoadingModal from '../../components/loading/loading-modal';
 import KingdomRenameModal from './kingdom-raname-modal';
+import AlertInfo from "../../components/base/alert-info";
 
 export default class KingdomManagementModal extends React.Component {
 
@@ -196,42 +197,71 @@ export default class KingdomManagementModal extends React.Component {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Tabs defaultActiveKey="manage" id="kingdom-management-tabs">
-            <Tab eventKey="manage" title="Manage">
-              <KingdomInfo kingdom={this.state.kingdom} characterGold={this.props.characterGold}/>
-              <hr/>
-              <Tabs defaultActiveKey="buildings" id="building-unit-management">
-                <Tab eventKey="buildings" title="Buildings">
-                  {
-                    this.state.buildingUpgradeSuccess ?
-                      <div className="mb-2 mt-2">
-                        <Alert variant="success" onClose={this.closeBuildingSuccess.bind(this)} dismissible>
-                          {this.state.buildingUpgradeSuccess}
-                        </Alert>
-                      </div>
-                      : null
-                  }
-                  <KingdomBuildings kingdom={this.state.kingdom} rowClickedHandler={this.rowClickedHandler.bind(this)}/>
-                </Tab>
-                <Tab eventKey="units" title="Units">
-                  {
-                    this.state.showUnitRecruitmentSuccess ?
-                      <div className="mb-2 mt-2">
-                        <Alert variant="success" onClose={this.closeUnitRecruitmentSuccess.bind(this)} dismissible>
-                          {this.state.unitRecruitmentSuccess}
-                        </Alert>
-                      </div>
-                      : null
-                  }
-                  <KingdomUnits kingdom={this.state.kingdom} recruitUnit={this.recruitUnit.bind(this)}/>
-                </Tab>
-              </Tabs>
+          <Tabs defaultActiveKey="info" id="kingdom-management-tabs">
+            <Tab eventKey="info" title="Information">
+              <div className="mt-3">
+                <KingdomInfo kingdom={this.state.kingdom} characterGold={this.props.characterGold} characterId={this.props.characterId} />
+              </div>
             </Tab>
-            <Tab eventKey="building-queue" title="Building Queue">
-              <KingdomBuildingQueue kingdom={this.state.kingdom} queueData={this.queueData.bind(this)}/>
+            <Tab eventKey="building-management" title="Building Management">
+              <div className="mt-3">
+                <AlertInfo icon={'fas fa-question-circle'} title="Info">
+                  Click on the rows to open the building upgrade modal in the Buildings tab. Click Buildings in Queue to see
+                  the buildings currently being upgraded/rebuilt. With in the same tab, you can click on any row, to then cancel a
+                  building upgrade and get partial resources back.
+                </AlertInfo>
+                <Tabs defaultActiveKey="kingdom-buildings" id="kingdom-management-buildings">
+                  <Tab eventKey="kingdom-buildings" title="Buildings">
+                    <div className="mt-3">
+                      {
+                        this.state.buildingUpgradeSuccess ?
+                          <div className="mb-2 mt-2">
+                            <Alert variant="success" onClose={this.closeBuildingSuccess.bind(this)} dismissible>
+                              {this.state.buildingUpgradeSuccess}
+                            </Alert>
+                          </div>
+                          : null
+                      }
+                      <KingdomBuildings kingdom={this.state.kingdom} rowClickedHandler={this.rowClickedHandler.bind(this)}/>
+                    </div>
+                  </Tab>
+                  <Tab eventKey="kingdom-buildings-queue" title="Buildings in Queue">
+                    <div className="mt-3">
+                      <KingdomBuildingQueue kingdom={this.state.kingdom} queueData={this.queueData.bind(this)}/>
+                    </div>
+                  </Tab>
+                </Tabs>
+              </div>
             </Tab>
-            <Tab eventKey="unit-queue" title="Unit Queue">
-              <UnitBuildingQueue kingdom={this.state.kingdom} queueData={this.unitQueueData.bind(this)} />
+            <Tab eventKey="unit-management" title="Unit Management">
+              <div className="mt-3">
+                <AlertInfo icon={'fas fa-question-circle'} title="Info">
+                  Click on the rows to open the unit recruitment modal in the Recruitable Units tab. Click Units in Queue to see
+                  the units currently being recruited. With in the same tab, you can click on any row, to then cancel a
+                  unit recruitment and get partial resources back.
+                </AlertInfo>
+                <Tabs defaultActiveKey="kingdom-units" id="kingdom-management-buildings">
+                  <Tab eventKey="kingdom-units" title="Recruitable Units">
+                    <div className="mt-3">
+                      {
+                        this.state.showUnitRecruitmentSuccess ?
+                          <div className="mb-2 mt-2">
+                            <Alert variant="success" onClose={this.closeUnitRecruitmentSuccess.bind(this)} dismissible>
+                              {this.state.unitRecruitmentSuccess}
+                            </Alert>
+                          </div>
+                          : null
+                      }
+                      <KingdomUnits kingdom={this.state.kingdom} recruitUnit={this.recruitUnit.bind(this)}/>
+                    </div>
+                  </Tab>
+                  <Tab eventKey="kingdom-units-queue" title="Units in Queue">
+                    <div className="mt-3">
+                      <UnitBuildingQueue kingdom={this.state.kingdom} queueData={this.unitQueueData.bind(this)} />
+                    </div>
+                  </Tab>
+                </Tabs>
+              </div>
             </Tab>
           </Tabs>
         </Modal.Body>

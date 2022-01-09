@@ -116,7 +116,9 @@ export default class UnitSelection extends React.Component {
       }
     }
 
-    return totalTime;
+    totalTime = totalTime - totalTime * this.props.timeReduction;
+
+    return totalTime.toFixed(0);
   }
 
   getTotalAmount(unitsToSend) {
@@ -142,7 +144,9 @@ export default class UnitSelection extends React.Component {
       totalTime += unitsForKingdom[unit].total_time;
     }
 
-    return totalTime;
+    totalTime = totalTime - totalTime * this.props.timeReduction
+
+    return totalTime.toFixed(0);
   }
 
   renderUnitSelection(units, kingdomName) {
@@ -188,7 +192,7 @@ export default class UnitSelection extends React.Component {
                   <dt><strong>Curent Position (X/Y)</strong>:</dt>
                   <dd>{kingdom.x_position}/{kingdom.y_position}</dd>
                   <dt><strong>Total Travel Time</strong>:</dt>
-                  <dd>{this.getTravelTimeFromKingdom(this.state.unitsToSend[kingdom.kingdom_name])} Minutes</dd>
+                  <dd>{this.getTravelTimeFromKingdom(this.state.unitsToSend[kingdom.kingdom_name])} Minutes, (-{(this.props.timeReduction * 100).toFixed(0)}%)</dd>
                 </dl>
               </Card.Body>
             </Accordion.Collapse>
@@ -217,8 +221,8 @@ export default class UnitSelection extends React.Component {
                 <dl>
                   <dt><strong>Kingdom To Attack (X/Y)</strong>:</dt>
                   <dd>{this.props.defendingKingdom.x_position}/{this.props.defendingKingdom.y_position}</dd>
-                  <dt><strong>Time Till Desitnation</strong>:</dt>
-                  <dd>{this.state.totalTime} Minutes (across all kingdoms)</dd>
+                  <dt><strong>Time Till Destination</strong>:</dt>
+                  <dd>{this.state.totalTime} Minutes (across all kingdoms), (-{(this.props.timeReduction * 100).toFixed(0)}%)</dd>
                   <dt><strong>Total Units To Send</strong>:</dt>
                   <dd>{this.state.totalAmount}</dd>
                 </dl>

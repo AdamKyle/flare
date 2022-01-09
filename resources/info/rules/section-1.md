@@ -9,7 +9,7 @@ A player can be silenced for 10, 20 or 30 minutes. If the player is not online, 
 Players can be silenced via **The Creator** or through chat throttling (see below).
 
 A player can be banned for 1 day, 1 week or “For ever”. A banned player may request to be unbanned via the “banned unfairly?” form that can be accessed via the login screen.
-However, **they can only make this request if they have been banned for ever**.
+However, **they can only make this request if they have been banned forever**.
 
 A player will be emailed if they have been banned and when (or if) the ban lifts. You cannot turn these emails off. You will also always be given a reason as to why you were banned.
 
@@ -87,10 +87,23 @@ A player may only send 25 messages every 1 minutes. Failure to heed this, and th
 ## Core Rules
 
 1. There is to be no RMT (Real Money Trade) of any kind in game. This includes but not limited to: Items, characters, kingdoms, playing your character, managing your kingdoms.
-2. Multi Boxing and Multiple Accounts are NOT allowed.
-4. Taking advantage of game bugs, including accessing parts of the game you are not allowed to, and failure to report said bugs can and will get you banned.
-5. Hacking, Cheating, Scripting bots to play for you will also get you banned.
-6. Third party tools of any kind will also get you banned.
+2. Taking advantage of game bugs, including accessing parts of the game you are not allowed to, and failure to report said bugs can and will get you banned.
+3. Hacking, Cheating, Scripting bots to play for you will also get you banned.
+4. Third party tools of any kind will also get you banned.
+5. Accessing other characters information and not reporting it as a security flaw will get you banned.
+6. No racial slurs or other attacks on anyone for any reason other than playful banter in game (see Free speech above)
+
+## Being Banned and Multiple Accounts
+
+Tlessa will let you have 10 accounts. **DO NOT ASK FOR MORE**. The emails must be unique. This game doesn't really support tunes, as you can't trade between players without using the market board.
+
+Characters may log into multiple accounts, but may only send one request per client to the server at a time. This is called Multi Boxing.
+
+Players may not use scripts or third party tools to manage multiple accounts.
+
+Should one of the 10 characters be banned, even for a day or a week or god forbid, forever - **ALL CHARACTERS** will be banned. So if you and your house mate are playing, and they get banned, you just lost your account.
+
+You can still do the "banned unfairly" request and I, The Creator will review the request.
 
 
 

@@ -321,11 +321,13 @@ trait ClassBasedBonuses {
         $classSkillIds = $class->gameSkills()->pluck('id')->toArray();
         $skills        = $character->skills()->whereIn('game_skill_id', $classSkillIds)->get();
 
+        $classBonuses = [];
+
         foreach ($skills as $skill) {
-            $classBonus += $skill->{$type};
+            $classBonuses[] = $skill->{$type};
         }
 
-        return $classBonus;
+        return empty($classBonuses) ? 0.0 : max($classBonuses);
     }
 
     /**

@@ -20,12 +20,16 @@
       <dd>{{$item->itemPrefix->name}}</dd>
       <dt>Base Attack Modifier:</dt>
       <dd class="{{$item->itemPrefix->base_damage_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->base_damage_mod * 100}}%</dd>
-      <dt>Base Damage Modifier (affects skills):</dt>
+      <dt>Skill Damage Modifier:</dt>
       <dd class="{{$item->itemPrefix->base_damage_mod_bonus > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->base_damage_mod_bonus * 100}}%</dd>
       <dt>Base AC Modifier:</dt>
       <dd class="{{$item->itemPrefix->base_ac_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->base_ac_mod * 100}}%</dd>
+      <dt>Skill AC Modifier:</dt>
+      <dd class="{{$item->itemPrefix->base_ac_mod_bonus > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->base_ac_mod_bonus * 100}}%</dd>
       <dt>Base Healing Modifier:</dt>
       <dd class="{{$item->itemPrefix->base_healing_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->base_healing_mod * 100}}%</dd>
+      <dt>Skill Healing Modifier:</dt>
+      <dd class="{{$item->itemPrefix->base_healing_mod_bonus > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->base_healing_mod_bonus * 100}}%</dd>
       <dt>Class Bonus Mod:</dt>
       <dd class="{{$item->itemPrefix->class_bonus > 0.0 ? 'text-success' : ''}}">{{$item->itemPrefix->class_bonus * 100}}%</dd>
       <dt>Base Fight Timeout Modifier:</dt>
@@ -100,7 +104,7 @@
   <x-tabs.tab-content-section tab="prefix-damage-{{$damageId}}" active="false">
     <dl>
       <dt>Damage:</dt>
-      <dd class="{{$item->itemPrefix->damage > 0 ? 'text-success' : ''}}">{{number_format($item->itemPrefix->damage)}}</dd>
+      <dd class={{$item->itemPrefix->damage > 0 ? 'text-success' : ''}}>{{number_format($item->itemPrefix->damage)}}</dd>
       <dt>Is Damage Irresistible?:</dt>
       <dd>{{$item->itemPrefix->irresistible_damage ? 'Yes' : 'No'}}</dd>
       <dt>Can Stack:</dt>

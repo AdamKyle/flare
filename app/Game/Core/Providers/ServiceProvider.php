@@ -2,11 +2,15 @@
 
 namespace App\Game\Core\Providers;
 
+use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Services\BuildCharacterAttackTypes;
+use App\Flare\Services\CharacterXPService;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\Serializers\CoreSerializer;
 use App\Game\Core\Services\InventorySetService;
+use App\Game\Core\Services\RandomEnchantmentService;
 use App\Game\Core\Services\UseItemService;
+use App\Game\Skills\Services\DisenchantService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
 use App\Game\Core\Comparison\ItemComparison;
@@ -51,7 +55,14 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
         $this->app->bind(AdventureRewardService::class, function($app) {
-            return new AdventureRewardService($app->make(CharacterService::class), $app->make(BuildCharacterAttackTypes::class));
+            return new AdventureRewardService(
+                $app->make(CharacterService::class),
+                $app->make(BuildCharacterAttackTypes::class),
+                $app->make(CharacterXPService::class),
+                $app->make(InventorySetService::class),
+                $app->make(RandomAffixGenerator::class),
+                $app->make(DisenchantService::class),
+            );
         });
 
         $this->app->bind(CharacterInventoryService::class, function($app) {
@@ -66,6 +77,12 @@ class ServiceProvider extends ApplicationServiceProvider
             return new UseItemService(
                 $app->make(Manager::class),
                 $app->make(CharacterAttackTransformer::class),
+            );
+        });
+
+        $this->app->bind(RandomEnchantmentService::class, function($app) {
+            return new RandomEnchantmentService(
+                $app->make(RandomAffixGenerator::class)
             );
         });
     }

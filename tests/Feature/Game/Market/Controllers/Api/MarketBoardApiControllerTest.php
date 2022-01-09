@@ -686,7 +686,7 @@ class MarketBoardApiControllerTest extends TestCase {
             'description' => Str::random(40),
         ]);
 
-        $character = (new CharacterFactory())->createBaseCharacter()->getCharacter(false);
+        $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter(false);
 
         $item = $this->createItem([
             'item_suffix_id'  => $this->createItemAffix(['type' => 'suffix']),
@@ -717,7 +717,7 @@ class MarketBoardApiControllerTest extends TestCase {
             'description' => Str::random(40),
         ]);
 
-        $otherCharacter = (new CharacterFactory())->createBaseCharacter()->updateCharacter([
+        $otherCharacter = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->updateCharacter([
             'gold' => MaxCurrenciesValue::MAX_GOLD - 1,
         ])->getCharacter(false);
 
@@ -774,7 +774,7 @@ class MarketBoardApiControllerTest extends TestCase {
             'description' => Str::random(40),
         ]);
 
-        $character = (new CharacterFactory())->createBaseCharacter()->getCharacter(false);
+        $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter(false);
 
         $item = $this->createItem([
             'item_suffix_id'  => $this->createItemAffix(['type' => 'suffix']),
@@ -816,7 +816,7 @@ class MarketBoardApiControllerTest extends TestCase {
             'description' => Str::random(40),
         ]);
 
-        $character = (new CharacterFactory())->createBaseCharacter()->getCharacter(false);
+        $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter(false);
 
         $item = $this->createItem([
             'item_suffix_id'  => $this->createItemAffix(['type' => 'suffix']),

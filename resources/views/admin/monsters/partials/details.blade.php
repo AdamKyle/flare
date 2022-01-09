@@ -156,7 +156,6 @@
 
 @if ($monster->is_celestial_entity)
     <hr />
-    <h4 class="mt-2">Celestial Conjuration Cost</h4>
     <x-core.cards.card-with-title title="Celestial Conjuration Cost">
         <x-core.alerts.info-alert>
             <p>This is a celestial entity which can only be conjured via a special NPC. You can learn more about those <a href="/information/celestials">here</a>.</p>
@@ -169,7 +168,7 @@
             <p>
                 <strong>Vampires</strong> will only do 50% damage to these creatures via their life stealing affixes and class bonus.
             </p>
-        </x-core.alerts.info-alert>>
+        </x-core.alerts.info-alert>
         <dl class="mt-3">
             <dt>Gold Cost:</dt>
             <dd>{{number_format($monster->gold_cost)}}</dd>

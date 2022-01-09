@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!-- Menu Bar -->
 <aside class="menu-bar menu-sticky">
     <div class="menu-items">
@@ -155,6 +156,10 @@
                     <span class="fas fa-search-location"></span>
                     Map Locations
                 </a>
+                <a href="{{route('info.page', ['pageName' => 'special-locations'])}}">
+                    <span class="fas fa-dungeon"></span>
+                    Special Locations
+                </a>
             </div>
         </div>
     </div>
@@ -178,6 +183,10 @@
             <a href="{{route('info.page', ['pageName' => 'npc-kingdoms'])}}">
                 <span class="ra ra-player"></span>
                 NPC Kingdoms
+            </a>
+            <a href="{{route('info.page', ['pageName' => 'kingdom-passive-skills'])}}">
+                <span class="fas fas-site-map"></span>
+                Kingdom Passive Skills
             </a>
         </div>
     </div>
@@ -226,7 +235,7 @@
                 </a>
                 <a href="{{route('info.page', ['pageName' => 'random-enchants'])}}">
                     <span class=" ra-fairy-wand"></span>
-                    Random Enchantments
+                    Random Enchantments (Uniques)
                 </a>
             </div>
             <a href="#no-link" class="active" data-toggle="collapse" data-target="#menueLists">

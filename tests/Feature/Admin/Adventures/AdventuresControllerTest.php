@@ -165,7 +165,7 @@ class AdventuresControllerTest extends TestCase
     }
 
     public function testPublishAdventure() {
-        $adventure = $this->createNewAdventure(null, 1, 'Sample', true);
+        $adventure = $this->createNewAdventure(null, null, 1, 'Sample', true);
 
         $this->actingAs($this->user)->post(route('adventure.publish', [
             'adventure' => $adventure->id
@@ -175,7 +175,7 @@ class AdventuresControllerTest extends TestCase
     }
 
     public function testSaveAdventureFloorDescriptions() {
-        $adventure = $this->createNewAdventure(null, 1, 'Sample', true);
+        $adventure = $this->createNewAdventure(null, null, 1, 'Sample', true);
 
         $this->actingAs($this->user)->post(route('post.adventure.floor_descriptions', [
             'adventure' => $adventure->id
@@ -187,7 +187,7 @@ class AdventuresControllerTest extends TestCase
     }
 
     public function testUpdateExistingFloorDescription() {
-        $adventure = $this->createNewAdventure(null, 1, 'Sample', true, true);
+        $adventure = $this->createNewAdventure(null, null, 1, 'Sample', true, true);
 
         $this->actingAs($this->user)->post(route('post.adventure.floor_descriptions', [
             'adventure' => $adventure->id

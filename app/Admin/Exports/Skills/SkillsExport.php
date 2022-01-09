@@ -16,7 +16,7 @@ class SkillsExport implements WithMultipleSheets {
     public function sheets(): array {
         $sheets   = [];
 
-        $sheets[] = new SkillsSheet;
+        $sheets[] = new SkillsSheet();
 
         return $sheets;
     }

@@ -29,6 +29,7 @@ class LocationFactory extends Factory
             'is_port'              => null,
             'x'                    => null,
             'y'                    => null,
+
         ];
     }
 }

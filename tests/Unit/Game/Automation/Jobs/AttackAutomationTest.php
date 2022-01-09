@@ -66,11 +66,60 @@ class AttackAutomationTest extends TestCase
         $this->assertTrue($character->currentAutomations->isEmpty());
     }
 
-    public function testAutomationJobTookTooLong() {
-        $character = $this->character->getCharacter();
+    public function testAutomationJobMovingDownTheList() {
+        $character = $this->character->equipStrongGear()->updateSkill('Accuracy', [
+            'level' => 999
+        ])->assignFactionSystem()->getCharacter();
 
         $monster   = $this->createMonster([
             'health_range' => '1-1',
+            'dex'          => 0,
+            'agi'          => 0,
+            'attack_range' => '1-1',
+            'ac'           => 0,
+            'xp'           => 150,
+        ]);
+
+        // Creates the next monster
+        $this->createMonster([
+            'health_range' => '1-1',
+            'dex'          => 0,
+            'agi'          => 0,
+            'attack_range' => '1-1',
+            'ac'           => 0,
+            'xp'           => 10,
+        ]);
+
+        $automation = $this->createAttackAutomation([
+            'character_id'                 => $character->id,
+            'monster_id'                   => $monster->id,
+            'started_at'                   => now(),
+            'completed_at'                 => now()->addSeconds(2),
+            'attack_type'                  => AttackTypeValue::ATTACK,
+            'move_down_monster_list_every' => 1,
+        ]);
+
+        DB::table('sessions')->insert([[
+            'id'           => '1',
+            'user_id'      => $character->user->id,
+            'ip_address'   => '1',
+            'user_agent'   => '1',
+            'payload'      => '1',
+            'last_activity'=> 1602801731,
+        ]]);
+
+        AttackAutomation::dispatch($character, $automation->id, AttackTypeValue::ATTACK);
+
+        $character = $character->refresh();
+
+        $this->assertTrue($character->currentAutomations->isEmpty());
+    }
+
+    public function testAutomationJobTookTooLong() {
+        $character = $this->character->assignFactionSystem()->getCharacter();
+
+        $monster   = $this->createMonster([
+            'health_range' => '999-99999',
             'dex'          => 0,
             'agi'          => 0,
             'attack_range' => '1-1',
@@ -167,7 +216,6 @@ class AttackAutomationTest extends TestCase
             'payload'      => '1',
             'last_activity'=> 1602801731,
         ]]);
-
 
 
         AttackAutomation::dispatch($character, $automation->id, AttackTypeValue::ATTACK);

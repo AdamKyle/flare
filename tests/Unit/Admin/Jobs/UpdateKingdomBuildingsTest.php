@@ -22,8 +22,6 @@ class UpdateKingdomBuildingsTest extends TestCase
 
     public function testAddKingdomBuildingToKingdom()
     {
-        Mail::fake();
-
         $kingdom = $this->createKingdom([
             'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter()->id,
             'game_map_id'        => GameMap::first()->id,
@@ -40,14 +38,10 @@ class UpdateKingdomBuildingsTest extends TestCase
         $kingdom = $kingdom->refresh();
 
         $this->assertTrue($kingdom->buildings->isNotEmpty());
-
-        Mail::assertSent(GenericMail::class, 1);
     }
 
     public function testAddKingdomBuildingToKingdomWhenUserOnline()
     {
-        Mail::fake();
-
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
 
         DB::table('sessions')->insert([[
@@ -73,13 +67,10 @@ class UpdateKingdomBuildingsTest extends TestCase
         $kingdom = $kingdom->refresh();
 
         $this->assertTrue($kingdom->buildings->isNotEmpty());
-
-        Mail::assertNotSent(GenericMail::class);
     }
 
     public function testUpdateKingdomBuildingWhenKingdomHasKingdomBuildingWithUnits()
     {
-        Mail::fake();
 
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
 
@@ -130,7 +121,5 @@ class UpdateKingdomBuildingsTest extends TestCase
         $this->assertEquals($building->current_durability, 300);
         $this->assertEquals($building->max_defence, 300);
         $this->assertEquals($building->max_durability, 300);
-
-        Mail::assertNotSent(GenericMail::class);
     }
 }

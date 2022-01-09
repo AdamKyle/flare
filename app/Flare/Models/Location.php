@@ -50,7 +50,7 @@ class Location extends Model
     }
 
     public function adventures() {
-        return $this->belongsToMany(Adventure::class);
+        return $this->hasMany(Adventure::class, 'location_id', 'id');
     }
 
     /**

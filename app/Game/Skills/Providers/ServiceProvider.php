@@ -4,6 +4,7 @@ namespace App\Game\Skills\Providers;
 
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Models\Skill;
+use App\Game\Core\Services\RandomEnchantmentService;
 use App\Game\Skills\Services\AlchemyService;
 use App\Game\Skills\Services\CraftingService;
 use App\Game\Skills\Services\DisenchantService;
@@ -25,26 +26,29 @@ class ServiceProvider extends ApplicationServiceProvider
             return new EnchantItemService;
         });
 
-        $this->app->bind(CraftingService::class, function() {
-            return new CraftingService;
+        $this->app->bind(CraftingService::class, function($app) {
+            return new CraftingService(
+                $app->make(RandomEnchantmentService::class)
+            );
         });
 
         $this->app->bind(AlchemyService::class, function() {
             return new AlchemyService;
         });
 
-        $this->app->bind(DisenchantService::class, function($app) {
+        $this->app->bind(DisenchantService::class, function() {
             return new DisenchantService();
         });
 
-        $this->app->bind(SkillService::class, function($app) {
+        $this->app->bind(SkillService::class, function() {
             return new SkillService();
         });
 
         $this->app->bind(EnchantingService::class, function($app) {
             return new EnchantingService(
                 $app->make(CharacterInformationBuilder::class),
-                $app->make(EnchantItemService::class)
+                $app->make(EnchantItemService::class),
+                $app->make(RandomEnchantmentService::class),
             );
         });
     }

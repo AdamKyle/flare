@@ -70,10 +70,23 @@ class CharacterAdventureControllerTest extends TestCase
     {
         $user = $this->character->getUser();
 
-
         $this->actingAs($user)
              ->visitRoute('game.current.adventure')
              ->see('Collect Rewards');
+    }
+
+    public function testCharacterCanSeeLatestAdventureWithCache()
+    {
+
+        Cache::put('current-adventure-' . $this->character->getCharacter(false)->id, [
+            'adventure_id' => $this->adventure->id
+        ]);
+
+        $user = $this->character->getUser();
+
+        $this->actingAs($user)
+            ->visitRoute('game.current.adventure')
+            ->see('Collect Rewards');
     }
 
     public function testCharacterCanSeeLatestAdventureWithNotification()
@@ -151,9 +164,24 @@ class CharacterAdventureControllerTest extends TestCase
         $character->adventureLogs->first()->delete();
 
         $this->actingAs($user)
-             ->visitRoute('game') // So we have some where to redirect back too
+             ->visitRoute('game') // So we have somewhere to redirect back too
              ->visitRoute('game.current.adventure')
              ->see('You have no currently completed adventure. Check your completed adventures for more details.');
+    }
+
+    public function testCharacterCannotSeeLatestAdventureWithNoAdventureId()
+    {
+        $character = $this->character->getCharacter(false);
+        $user      = $this->character->getUser();
+
+        $character->update([
+            'current_adventure_id' => null,
+        ]);
+
+        $this->actingAs($user)
+            ->visitRoute('game') // So we have somewhere to redirect back too
+            ->visitRoute('game.current.adventure')
+            ->see('You have no currently completed adventure. Check your completed adventures for more details.');
     }
 
     public function testDistributeRewards() {
@@ -214,7 +242,7 @@ class CharacterAdventureControllerTest extends TestCase
                 'adventureLog' => AdventureLog::first()->id,
             ]))->response;
 
-        $response->assertSessionHas('error', 'Your inventory is full. You must clear some space, come back and finish collecting the remaining items.');
+        $response->assertSessionDoesntHaveErrors();
     }
 
     public function testCannotDistributeRewardsWhenDead() {
@@ -327,10 +355,10 @@ class CharacterAdventureControllerTest extends TestCase
     }
 
     public function testCannotBatchDeleteAdventureLog() {
-        $response = $this->actingAs($this->character->getUser())->post(route('game.adventures.batch-delete'), [
+        $response = $this->actingAs($this->character->getUser())->visit(route('game.completed.adventures'))->post(route('game.adventures.batch-delete'), [
             'logs' => [27]
         ])->response;
 
-        $response->assertSessionHas('error', "No logs exist for selected.");
+        $response->assertRedirectedToRoute('game.completed.adventures');
     }
 }

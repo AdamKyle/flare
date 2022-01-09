@@ -2,16 +2,15 @@
 
 namespace Tests\Unit\Game\Adventure\Services;
 
-use App\Flare\Calculators\DropCheckCalculator;
-use App\Flare\Calculators\GoldRushCheckCalculator;
 use DB;
 use Mail;
 use Str;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Event;
+use App\Flare\Calculators\DropCheckCalculator;
+use App\Flare\Calculators\GoldRushCheckCalculator;
 use App\Game\Adventures\Services\AdventureService;
-use App\Game\Adventures\Builders\RewardBuilder;
 use App\Game\Adventures\Mail\AdventureCompleted;
 use Mockery;
 use Tests\Setup\AdventureSetup;
@@ -218,7 +217,7 @@ class AdventureServiceTest extends TestCase
                 'level' => 10
             ]);
 
-        $adventure = $this->createNewAdventure(null, 5);
+        $adventure = $this->createNewAdventure(null, null, 5);
 
         $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(false);
 
@@ -265,7 +264,7 @@ class AdventureServiceTest extends TestCase
                 'level' => 10
             ]);
 
-        $adventure = $this->createNewAdventure(null, 5);
+        $adventure = $this->createNewAdventure(null, null, 5);
 
         $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(false);
 
@@ -317,7 +316,7 @@ class AdventureServiceTest extends TestCase
                 'level' => 10
             ]);
 
-        $adventure = $this->createNewAdventure($monster, 5);
+        $adventure = $this->createNewAdventure(null, $monster, 5);
 
         $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(false);
 
@@ -388,7 +387,7 @@ class AdventureServiceTest extends TestCase
             ->giveItem($item)
             ->getCharacterFactory();
 
-        $adventure = $this->createNewAdventure($monster, 5);
+        $adventure = $this->createNewAdventure(null, $monster, 5);
 
         $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(false);
 
@@ -439,7 +438,7 @@ class AdventureServiceTest extends TestCase
                                             'currently_training' => true
                                         ]);
 
-        $adventure = $this->createNewAdventure(null, 5);
+        $adventure = $this->createNewAdventure(null, null, 5);
 
         $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(false);
 
@@ -494,7 +493,7 @@ class AdventureServiceTest extends TestCase
                                             'level' => 10
                                         ]);
 
-        $adventure = $this->createNewAdventure(null, 5);
+        $adventure = $this->createNewAdventure(null, null, 5);
 
         $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(false);
 

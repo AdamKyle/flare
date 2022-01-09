@@ -2,11 +2,14 @@
 
 namespace Tests\Setup\Character;
 
+use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\Item;
 use App\Flare\Models\MarketBoard;
+use App\Flare\Models\Quest;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Game\Core\Values\FactionLevel;
+use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Support\Facades\Cache;
 use Str;
@@ -24,6 +27,7 @@ use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateMap;
 use Tests\Traits\CreateMarketBoardListing;
+use Tests\Traits\CreatePassiveSkill;
 use Tests\Traits\CreateRace;
 use Tests\Traits\CreateSkill;
 use Tests\Traits\CreateUser;
@@ -39,7 +43,8 @@ class CharacterFactory {
         CreateGameMap,
         CreateGameSkill,
         CreateSkill,
-        CreateMarketBoardListing;
+        CreateMarketBoardListing,
+        CreatePassiveSkill;
 
     private Character $character;
 
@@ -85,6 +90,69 @@ class CharacterFactory {
 
         $this->assignBaseSkills();
 
+        $this->assignPassiveSkills();
+
+        return $this;
+    }
+
+    public function assignPassiveSkills(GameBuilding $gameBuilding = null): CharacterFactory {
+
+        $this->createPassiveForCharacter(PassiveSkillTypeValue::KINGDOM_DEFENCE);
+        $this->createPassiveForCharacter(PassiveSkillTypeValue::KINGDOM_RESOURCE_GAIN);
+        $this->createPassiveForCharacter(PassiveSkillTypeValue::KINGDOM_UNIT_COST_REDUCTION);
+        $this->createPassiveForCharacter(PassiveSkillTypeValue::KINGDOM_BUILDING_COST_REDUCTION);
+        $this->createPassiveForCharacter(PassiveSkillTypeValue::IRON_COST_REDUCTION);
+        $this->createPassiveForCharacter(PassiveSkillTypeValue::POPULATION_COST_REDUCTION);
+
+        $this->character = $this->character->refresh();
+
+        $this->createPassiveForCharacter(PassiveSkillTypeValue::UNLOCKS_BUILDING, [
+            'name'                     => is_null($gameBuilding) ? 'Sample Passive Skill 101' : $gameBuilding->name,
+            'is_locked'                => true,
+            'unlocks_at_level'         => 1,
+            'parent_skill_id'          => $this->character->passiveSkills()->first()->passiveSkill->id,
+        ]);
+
+        return $this;
+    }
+
+    public function completeQuest(Quest $quest): CharacterFactory {
+        $this->character->questsCompleted()->create([
+            'quest_id'     => $quest->id,
+            'character_id' => $this->character->id,
+        ]);
+
+        $this->character = $this->character->refresh();
+
+        return $this;
+    }
+
+    public function createPassiveForCharacter(int $type, array $options = []): CharacterFactory {
+
+        $isLocked = false;
+        $parentId = null;
+
+        if (isset($options['is_locked'])) {
+            $isLocked = $options['is_locked'];
+        }
+
+        if (isset($options['parent_skill_id'])) {
+            $parentId = $this->character->passiveSkills()->where('passive_skill_id', $options['parent_skill_id'])->first()->id;
+        }
+
+        $this->character->passiveSkills()->create([
+            'character_id'      => $this->character->id,
+            'passive_skill_id'  => $this->createPassiveSkill(array_merge([
+                'effect_type' => $type,
+            ], $options))->id,
+            'parent_skill_id'   => $parentId,
+            'current_level'     => 0,
+            'hours_to_next'     => 1,
+            'started_at'        => null,
+            'completed_at'      => null,
+            'is_locked'         => $isLocked,
+        ]);
+
         return $this;
     }
 
@@ -105,6 +173,7 @@ class CharacterFactory {
 
         foreach ($gameMaps as $map) {
             $this->character->factions()->create([
+                'current_level' => 1,
                 'character_id'  => $this->character->id,
                 'game_map_id'   => $map->id,
                 'points_needed' => FactionLevel::getPointsNeeded(0),
@@ -281,7 +350,7 @@ class CharacterFactory {
             $id = $gameMap->first()->id;
         } else {
             $id = $this->createGameMap([
-                'name'    => 'Sample',
+                'name'    => 'Surface',
                 'path'    => 'path',
                 'default' => true,
             ])->id;
@@ -501,7 +570,7 @@ class CharacterFactory {
         $criticality     = $this->createGameSkill(['name' => 'Criticality']);
         $dodge           = $this->createGameSkill(['name' => 'Dodge']);
         $looting         = $this->createGameSkill(['name' => 'Looting']);
-        $lustForGold     = $this->createGameSkill(['name' => 'Lust for Gold', 'type' => SkillTypeValue::EFFECTS_KINGDOM_TREASURY]);
+        $lustForGold     = $this->createGameSkill(['name' => 'Lust for Gold', 'type' => SkillTypeValue::EFFECTS_KINGDOM]);
 
         $this->createSkill([
             'character_id'  => $this->character->id,

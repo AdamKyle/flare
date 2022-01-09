@@ -9,12 +9,13 @@ use App\Game\Maps\Services\MovementService;
 use Tests\TestCase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Setup\Character\KingdomManagement;
+use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateLocation;
 
 class MovementServiceTest extends TestCase {
 
-    use RefreshDatabase, CreateItem, CreateLocation;
+    use RefreshDatabase, CreateItem, CreateLocation, CreateGameMap;
 
     private $character;
 
@@ -29,6 +30,9 @@ class MovementServiceTest extends TestCase {
                                                  ->equipStartingEquipment()
                                                  ->kingdomManagement()
                                                  ->assignKingdom();
+
+        $this->createGameMap(['name' => 'Hell']);
+        $this->createGameMap(['name' => 'Purgatory']);
     }
 
     public function tearDown(): void {

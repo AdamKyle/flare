@@ -25,6 +25,7 @@ class Character extends Model
         'damage_stat',
         'game_race_id',
         'game_class_id',
+        'current_adventure_id',
         'inventory_max',
         'can_attack',
         'can_move',
@@ -65,6 +66,7 @@ class Character extends Model
      */
     protected $casts = [
         'inventory_max'               => 'integer',
+        'current_adventure_id'        => 'integer',
         'can_attack'                  => 'boolean',
         'can_move'                    => 'boolean',
         'can_craft'                   => 'boolean',
@@ -78,7 +80,6 @@ class Character extends Model
         'can_attack_again_at'         => 'datetime',
         'can_craft_again_at'          => 'datetime',
         'can_adventure_again_at'      => 'datetime',
-        'is_mass_embezzling'          => 'boolean',
         'level'                       => 'integer',
         'xp'                          => 'float',
         'xp_next'                     => 'integer',
@@ -187,7 +188,7 @@ class Character extends Model
      * Allows one to get specific information from a character.
      *
      * By returning the CharacterInformationBuilder class, we can allow you to get
-     * multiple calulculated sets of data.
+     * multiple calculated sets of data.
      *
      * @return CharacterInformationBuilder
      */

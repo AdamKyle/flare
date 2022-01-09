@@ -30,7 +30,7 @@
                 <dt>Looting Modifier</dt>
                 <dd>+ {{$race->looting_mod * 100}} %</dd>
                 <dt>Defense Modifier</dt>
-                <dd>+ {{$race->deffense_mod * 100}} %</dd>
+                <dd>+ {{$race->defense_mod * 100}} %</dd>
             </dl>
             @if (!is_null(auth()->user()))
                 @if (auth()->user()->hasRole('Admin'))

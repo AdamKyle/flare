@@ -64,7 +64,9 @@ class BattleEventHandler {
     public function processMonsterDeath(Character $character, int $monsterId) {
         $monster = Monster::find($monsterId);
 
-        $this->handleFactionPoints($character, $monster);
+        if (!$character->map->gameMap->mapType()->isPurgatory()) {
+            $this->handleFactionPoints($character, $monster);
+        }
 
         $character = $character->refresh();
 
@@ -127,7 +129,7 @@ class BattleEventHandler {
 
             $this->rewardPlayer($character, $faction, $mapName, FactionType::getTitle($faction->current_level));
 
-            event(new ServerMessageEvent($character->user, 'Achieved title: ' . FactionType::getTitle($faction->level) . ' of ' . $mapName));
+            event(new ServerMessageEvent($character->user, 'Achieved title: ' . FactionType::getTitle($faction->current_level) . ' of ' . $mapName));
 
             return;
 
@@ -193,9 +195,14 @@ class BattleEventHandler {
         $cannotHave = (new MaxCurrenciesValue($characterNewGold, 0))->canNotGiveCurrency();
 
         if ($cannotHave) {
-            event(new ServerMessageEvent($character->user, 'Failed to reward the gold as you are, or are too close to gold cap to receive: ' . number_format($gold) . ' gold.'));
+            $characterNewGold = MaxCurrenciesValue::MAX_GOLD;
 
-            return $character;
+            $character->gold = $characterNewGold;
+            $character->save();
+
+            event(new ServerMessageEvent($character->user, 'Received faction gold reward: ' . number_format($gold) . ' gold. You are now gold capped.'));
+
+            return $character->refresh();
         }
 
         $character->gold += $gold;
@@ -211,6 +218,7 @@ class BattleEventHandler {
         $item = ItemModel::where('cost', '<=', RandomAffixDetails::BASIC)
                          ->whereNull('item_prefix_id')
                          ->whereNull('item_suffix_id')
+                         ->where('cost', '<=', 4000000000)
                          ->inRandomOrder()
                          ->first();
 
@@ -219,16 +227,18 @@ class BattleEventHandler {
                             ->setCharacter($character)
                             ->setPaidAmount(RandomAffixDetails::BASIC);
 
-        $item->update([
+        $duplicateItem = $item->duplicate();
+
+        $duplicateItem->update([
             'item_prefix_id' => $randomAffix->generateAffix('prefix')->id,
         ]);
 
         if (rand(1, 100) > 50) {
-            $item->update([
+            $duplicateItem->update([
                 'item_suffix_id' => $randomAffix->generateAffix('suffix')->id
             ]);
         }
 
-        return $item;
+        return $duplicateItem;
     }
 }

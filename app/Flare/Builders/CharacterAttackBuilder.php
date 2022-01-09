@@ -136,6 +136,7 @@ class CharacterAttackBuilder {
      * @return float
      */
     public function getPositionalWeaponDamage(string $hand, bool $voided = false) {
+
         $weaponSlotOne = $this->fetchSlot($hand);
 
         $weaponDamage = 0;
@@ -150,6 +151,8 @@ class CharacterAttackBuilder {
 
         if (is_null($weaponDamage)) {
             $weaponDamage = 0;
+        } else {
+            $weaponDamage = $this->characterInformationBuilder->damageModifiers($weaponDamage, $voided);
         }
 
         return ceil($this->characterInformationBuilder->calculateWeaponDamage($weaponDamage, $voided));
@@ -163,7 +166,7 @@ class CharacterAttackBuilder {
      * @throws \Exception
      */
     protected function baseAttack(bool $voided = false): array {
-        $enemyStatBonus = $this->character->map->gameMap->enemy_stat_bonus;
+        $characterRecution = $this->character->map->gameMap->character_attack_reduction;
 
         return [
             'name'             => $this->character->name,
@@ -172,7 +175,7 @@ class CharacterAttackBuilder {
             'artifact_damage'  => $voided ? 0 : $this->characterInformationBuilder->getTotalArtifactDamage(),
             'heal_for'         => $this->characterInformationBuilder->buildHealFor($voided),
             'res_chance'       => $this->characterInformationBuilder->fetchResurrectionChance(),
-            'damage_deduction' => is_null($enemyStatBonus) ? 0.0 : $enemyStatBonus,
+            'damage_deduction' => $characterRecution,
             'affixes'          => [
                 'cant_be_resisted'       => $this->characterInformationBuilder->canAffixesBeResisted(),
                 'stacking_damage'        => $voided ? 0 : $this->characterInformationBuilder->getTotalAffixDamage(),

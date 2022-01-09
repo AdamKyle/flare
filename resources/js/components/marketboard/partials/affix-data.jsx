@@ -28,12 +28,16 @@ export default class AffixData extends React.Component {
               <dd>{item.name}</dd>
               <dt>Base Attack Modifier:</dt>
               <dd>{item.base_damage_mod !== null ? item.base_damage_mod * 100 : 0}%</dd>
-              <dt>Base Damage Modifier (affects skills):</dt>
+              <dt>Skill Damage Modifier:</dt>
               <dd>{item.base_damage_mod_bonus !== null ? item.base_damage_mod_bonus * 100 : 0}%</dd>
               <dt>Base AC Modifier:</dt>
               <dd>{item.base_ac_mod !== null ? item.base_ac_mod * 100 : 0}%</dd>
+              <dt>Skill AC Modifier:</dt>
+              <dd>{item.base_ac_mod_bonus !== null ? item.base_ac_mod_bonus * 100 : 0}%</dd>
               <dt>Base Healing Modifier:</dt>
               <dd>{item.base_healing_mod !== null ? item.base_healing_mod * 100 : 0}%</dd>
+              <dt>Skill Healing Modifier:</dt>
+              <dd>{item.base_healing_mod_bonus !== null ? item.base_healing_mod_bonus * 100 : 0}%</dd>
               <dt>Class Bonus:</dt>
               <dd>{item.class_bonus !== null ? item.class_bonus * 100 : 0}%</dd>
               <dt>Base Fight Timeout Mod:</dt>

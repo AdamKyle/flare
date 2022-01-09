@@ -2,6 +2,7 @@
 
 namespace App\Flare\View\Livewire\Admin\Kingdoms\Buildings\Partials;
 
+use App\Flare\Models\PassiveSkill;
 use Livewire\Component;
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameUnit;
@@ -13,6 +14,10 @@ class Details extends Component
 
     public $editing      = false;
 
+    public $passiveSkills;
+
+    public $units;
+
     protected $rules = [
         'gameBuilding.name'                 => 'required',
         'gameBuilding.description'          => 'required',
@@ -20,6 +25,9 @@ class Details extends Component
         'gameBuilding.base_durability'      => 'required',
         'gameBuilding.base_defence'         => 'required',
         'gameBuilding.required_population'  => 'required',
+        'gameBuilding.passive_skill_id'     => 'nullable',
+        'gameBuilding.is_locked'            => 'nullable',
+        'gameBuilding.level_required'       => 'nullable',
     ];
 
     protected $messages = [
@@ -36,6 +44,10 @@ class Details extends Component
     public function validateInput(string $functionName, int $index) {
         $this->validate();
 
+        if (is_null($this->gameBuilding->is_locked)) {
+            $this->gameBuilding->is_locked = false;
+        }
+
         $this->gameBuilding->save();
 
         $this->emitTo('core.form-wizard', 'storeModel', $this->gameBuilding->refresh());
@@ -47,7 +59,8 @@ class Details extends Component
             $this->gameBuilding = new GameBuilding;
         }
 
-        $this->units = GameUnit::all();
+        $this->passiveSkills = PassiveSkill::all();
+        $this->units         = GameUnit::all();
     }
 
     public function render()

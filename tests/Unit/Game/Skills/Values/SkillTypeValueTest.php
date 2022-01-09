@@ -42,7 +42,7 @@ class SkillTypeValueTest extends TestCase {
     }
 
     public function testIsMinutesMoveTimer() {
-        $this->assertTrue((new SkillTypeValue(7))->isMinuteMovementTimer());
+        $this->assertTrue((new SkillTypeValue(7))->isMovementTimer());
     }
 
     public function testIsKingdomBuildingTimers() {
@@ -66,7 +66,7 @@ class SkillTypeValueTest extends TestCase {
     }
 
     public function testEffectsKingdomTreasury() {
-        $this->assertTrue((new SkillTypeValue(13))->effectsKingdomTreasury());
+        $this->assertTrue((new SkillTypeValue(13))->effectsKingdom());
     }
 
     public function testIsArtifactAnnulmentName() {

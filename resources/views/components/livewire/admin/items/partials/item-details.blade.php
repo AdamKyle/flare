@@ -186,6 +186,20 @@
         </div>
     </div>
     <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="drop_location_id">Drop only from location: </label>
+                <select class="form-control" name="drop_location_id" wire:model="item.drop_location_id"{{!is_null($item->type) ? $item->type !== 'quest' ? 'disabled' : '' : 'disabled'}}>
+                    <option value="">Please select</option>
+                    @foreach($specialLocations as $location)
+                        <option value="{{$location->id}}">{{$location->name}}</option>
+                    @endforeach
+                </select>
+                <span class="text-muted">Items that drop from here are a 1/million chance with a 45% max looting bonus.</span><br />
+            </div>
+        </div>
+    </div>
+    <div class="row">
         <div class="col-md-4">
             <div class="form-group form-check-inline">
                 <input type="checkbox" class="form-check-input" id="item-can-drop" wire:model="item.can_drop">

@@ -104,4 +104,9 @@ In this case you can replace one of the items and see which one might be better 
 >        <img src="/storage/info/equipment/images/affects-skills.png" class="img-fluid" />
 >    </a>
 > </div>
-> Obviously, you will want to craft better gear with the same affix (enchanting), but it might do for now, till you find or craft better gear.
+> 
+> As you can see the gear of the left side, is what you have equipped, while gear on the right-hand side is what you want to equip.
+> The item to equip is much weaker than the item equipped and would drag your stats way down, but is a good example of where crafting 
+> gear can, in the case of weapon crafting, be better than powerful god killing gear.
+>
+> The point here is to pay attention to your gear, what it is you are trying to do and what you need to effectivly do it.

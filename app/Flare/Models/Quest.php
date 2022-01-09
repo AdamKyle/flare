@@ -22,6 +22,7 @@ class Quest extends Model {
         'name',
         'npc_id',
         'item_id',
+        'access_to_map_id',
         'gold_dust_cost',
         'shard_cost',
         'gold_cost',
@@ -32,6 +33,11 @@ class Quest extends Model {
         'reward_xp',
         'unlocks_skill',
         'unlocks_skill_type',
+        'is_parent',
+        'parent_quest_id',
+        'secondary_required_item',
+        'faction_game_map_id',
+        'required_faction_level',
     ];
 
     protected $casts = [
@@ -46,12 +52,50 @@ class Quest extends Model {
         'reward_gold'        => 'integer',
         'reward_xp'          => 'integer',
         'unlocks_skill'      => 'boolean',
+        'is_parent'          => 'boolean',
         'unlocks_skill_type' => 'integer',
+        'parent_quest_id'    => 'integer',
+        'faction_game_map_id'     => 'integer',
+        'secondary_required_item' => 'integer',
+        'required_faction_level'  => 'integer',
     ];
 
+    protected $appends = [
+        'required_item_monster',
+        'unlocks_skill_name',
+        'belongs_to_map_name',
+        'secondary_required_quest_item',
+    ];
+
+    public function childQuests() {
+        return $this->hasMany($this, 'parent_quest_id')
+                    ->with(
+                'childQuests',
+                'rewardItem',
+                        'item',
+                        'factionMap',
+                        'item.dropLocation',
+                        'requiredPlane',
+                        'npc',
+                        'npc.commands',
+                        'npc.gameMap',
+                    );
+    }
+
+    public function parent() {
+        return $this->belongsTo($this, 'parent_quest_id');
+    }
 
     public function item() {
         return $this->belongsTo(Item::class, 'item_id', 'id');
+    }
+
+    public function secondaryItem() {
+        return $this->belongsTo(Item::class, 'secondary_required_item', 'id');
+    }
+
+    public function getSecondaryRequiredQuestItemAttribute() {
+        return Item::with('dropLocation')->find($this->secondary_required_item);
     }
 
     public function rewardItem() {
@@ -60,6 +104,38 @@ class Quest extends Model {
 
     public function npc() {
         return $this->belongsTo(Npc::class, 'npc_id', 'id');
+    }
+
+    public function requiredPlane() {
+        return $this->hasOne(GameMap::class, 'id', 'access_to_map_id');
+    }
+
+    public function factionMap() {
+        return $this->hasOne(GameMap::class, 'id', 'faction_game_map_id');
+    }
+
+    public function getBelongsToMapNameAttribute() {
+        if (!is_null($this->npc)) {
+            return $this->npc->gameMap->name;
+        }
+
+        return null;
+    }
+
+    public function getRequiredItemMonsterAttribute() {
+        if (!is_null($this->item_id)) {
+            return Monster::where('quest_item_id', $this->item_id)->with('gameMap')->first();
+        }
+
+        return null;
+    }
+
+    public function getUnlocksSkillNameAttribute() {
+        if ($this->unlocks_skill) {
+            return GameSkill::where('type', $this->unlocks_skill_type)->first()->name;
+        }
+
+        return null;
     }
 
     protected static function newFactory() {

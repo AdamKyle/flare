@@ -82,7 +82,15 @@ class CharacterInformationBuilder {
             $base += $base * $this->fetchModdedStat($stat, $slot->item);
         }
 
-        return $this->characterBoons($base);
+        $base = $this->characterBoons($base);
+
+        $total = $this->characterBoons($base, $stat . '_mod');
+
+        if ($this->character->map->gameMap->mapType()->isHell() || $this->character->map->gameMap->mapType()->isPurgatory()) {
+            $total -= $total * $this->character->map->gameMap->character_attack_reduction;
+        }
+
+        return $total;
     }
 
     /**
@@ -124,6 +132,10 @@ class CharacterInformationBuilder {
      * @return ItemAffix|null
      */
     public function findPrefixStatReductionAffix(): ?ItemAffix {
+        if ($this->character->map->gameMap->mapType()->isPurgatory()) {
+            return null;
+        }
+
         return $this->characterAttackInformation
                     ->setCharacter($this->character)
                     ->findPrefixStatReductionAffix();
@@ -276,6 +288,10 @@ class CharacterInformationBuilder {
      * @return bool
      */
     public function canAffixesBeResisted(): bool {
+        if ($this->character->map->gameMap->mapType()->isHell() || $this->character->map->gameMap->mapType()->isPurgatory()) {
+          return false;
+        }
+
         return $this->character->inventory->slots->filter(function($slot) {
             return ($slot->item->type === 'quest') && ($slot->item->effect === ItemEffectsValue::AFFIXES_IRRESISTIBLE);
         })->isNotEmpty();
@@ -465,15 +481,15 @@ class CharacterInformationBuilder {
      * @param $base
      * @return float|int
      */
-    protected function characterBoons($base) {
-        if ($this->character->boons->isNotEmpty()) {
-            $boons = $this->character->boons()->where('type', ItemUsabilityType::STAT_INCREASE)->get();
+    protected function characterBoons($base, string $statAttribute = null) {
+        if (!is_null($statAttribute) && $this->character->boons->isNotEmpty()) {
+            $bonus = $this->character->boons()->whereNotNull($statAttribute)->sum($statAttribute);
 
-            if ($boons->isNotEmpty()) {
-                $sum = $boons->sum('stat_bonus');
+            $base = $base + $base * $bonus;
+        } else if ($this->character->boons->isNotEmpty()) {
+            $bonus = $this->character->boons()->where('type', ItemUsabilityType::STAT_INCREASE)->sum('stat_bonus');
 
-                $base += $base + $base * $sum;
-            }
+            $base = $base + $base * $bonus;
         }
 
         return $base;
@@ -598,6 +614,7 @@ class CharacterInformationBuilder {
     }
 
     public function calculateWeaponDamage(int|float $damage, bool $voided = false): int|float {
+
         if ($damage === 0) {
             $damage = $voided ? $this->character->{$this->character->damage_stat} : $this->statMod($this->character->damage_stat);
 

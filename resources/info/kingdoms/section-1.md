@@ -91,7 +91,7 @@ You can click on the row in the table to see the details of what it costs to upg
 
 Some buildings such as keep, walls, farm and barracks will cause your kingdom to loose morale per hour if they fall to a durability of zero.
 
-For example, lets upgrade our walls:
+For example, lets upgrade our Keep (you can scroll the modal down, as not all the details may fit o the screen):
 
 <div class="mb-4">
     <a href="/storage/info/kingdoms/images/building-upgrade.png" class="glightbox">
@@ -103,11 +103,9 @@ Here you can see the current durability and current defence as well as current l
 
 > ### ATTN!
 > 
->You can click and drag the modal, by clicking and dragging the title, this way you can see what resources you have in comparison to what you need, in this case we have the resources, indicated by the: Can Upgrade being yes.
-
-> ### ATTN
->
->You may only upgrade a building up one level at a time. You must wait for that building to finish upgrading before queueing it for the next level.
+> You can click and drag the modal, by clicking and dragging the title, this way you can see what resources you have in comparison to what you need, in this case we have the resources, indicated by the: Can Upgrade being yes.
+> 
+> You may only upgrade a building up one level at a time. You must wait for that building to finish upgrading before queueing it for the next level.
 
 The cost in resources also goes up per level.
 
@@ -115,7 +113,13 @@ In this case we need a specific number of resources, including population.
 
 Under the cost section is what changes to the building including any additional resources per hour. Since walls are not a resource building, we gain nothing there, but our defence and durability do go up.
 
-You will also notice that it will take 7 minutes to upgrade the building. Let’s upgrade this.
+One thing you might notice about the above image is a bunch of negative numbers. You might be looking at yours and wondering how do I get these negative reductions?
+
+You can train your [Passive](/information/kingdom-passive-skills) which can effect your kingdom from resource reduction to unlocking new buildings, more on that in a moment.
+
+You can also train your Kingmanship ([Skills](/information/skills)) to reduce the time required to upgrade/rebuild buildings ad recruit units.
+
+Passives can take hours and Kingmanship can take a few hours to get a to a decent level to see reductions on time.
 
 > ### ATTN!
 > 
@@ -136,6 +140,37 @@ Here you can see our building is upgrading, if we click the row in the table for
         <img src="/storage/info/kingdoms/images/building-upgrade-cancel.png" class="img-fluid" />
     </a>
 </div>
+
+**Wait, did I see that you use gold to upgrade buildings?**
+
+Yes you did child, let me show you:
+
+<div class="mb-4">
+    <a href="/storage/info/kingdoms/images/gold-upgrade-building.png" class="glightbox">
+        <img src="/storage/info/kingdoms/images/gold-upgrade-building.png" class="img-fluid" />
+    </a>
+</div>
+
+Here you can select the amount of levels you want, things like building cost reduction, population cost reduction (both from Passives) 
+as well as time reduction (from Kingmanship) will be applied here.
+
+Each building, much like each unit - as we will see later, will have its own cost which is displayed in this section of the upgrade 
+section. The only time you cannot use gold to upgrade, is when the building must be repaired.
+
+Canceling a gold investment upgrade will only get you a specific amount of resources back, as shown n the above cancellation window.
+
+When we enter a level:
+
+<div class="mb-4">
+    <a href="/storage/info/kingdoms/images/gold-upgrade-level-buildings.png" class="glightbox">
+        <img src="/storage/info/kingdoms/images/gold-upgrade-level-buildings.png" class="img-fluid" />
+    </a>
+</div>
+
+You can see the values change, and we tell you what level the building will go to. You might also see the warning about population, this is an additional
+cost that can be applied and is not given back, should you choose to cancel the building upgrade, nore is the population given back to you.
+
+This only holds true for gold related upgrades, if you use resources and cancel you will get some population back.
 
 You can see we can cancel the building; we can do the same thing for units in the unit queue.
 

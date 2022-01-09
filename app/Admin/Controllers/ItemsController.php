@@ -77,7 +77,7 @@ class ItemsController extends Controller {
         return redirect()->back()->with('success', $response['message']);
     }
 
-    public function deleteAll(Request $request) {
+    public function deleteAll(Request $request, ItemsService $itemsService) {
         foreach($request->items as $item) {
             $item  = Item::find($item);
 
@@ -85,30 +85,7 @@ class ItemsController extends Controller {
                 return redirect()->back()->with('error', 'Invalid input.');
             }
 
-            $slots = InventorySlot::where('item_id', $item->id)->get();
-            $name  = $item->affix_name;
-
-            if ($slots->isEmpty()) {
-                $item->delete();
-            }
-
-            foreach($slots as $slot) {
-                $character = $slot->inventory->character;
-
-                $slot->delete();
-
-                $gold = SellItemCalculator::fetchTotalSalePrice($item);
-
-                $character->gold += $gold;
-                $character->save();
-
-                $character = $character->refresh();
-
-                event(new ServerMessageEvent($character->user, 'deleted_item', $name));
-                event(new UpdateTopBarEvent($character));
-            }
-
-            $item->delete();
+            $itemsService->deleteItem($item);
         }
 
         return redirect()->back()->with('success', 'Deleted all selected items');

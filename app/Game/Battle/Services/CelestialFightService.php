@@ -2,10 +2,12 @@
 
 namespace App\Game\Battle\Services;
 
+use Facades\App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\CelestialFight;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterInCelestialFight;
 use App\Flare\Services\FightService;
+use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Battle\Events\UpdateCelestialFight;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Jobs\BattleAttackHandler;
@@ -28,12 +30,18 @@ class CelestialFightService {
     public function joinFight(Character $character, CelestialFight $celestialFight): CharacterInCelestialFight {
         $characterInCelestialFight = CharacterInCelestialFight::where('character_id', $character->id)->first();
 
+        $totalHealth = $character->getInformation()->buildHealth();
+
+        if ($totalHealth > 1000000000000) {
+            $totalHealth = 1000000000000;
+        }
+
         if (is_null($characterInCelestialFight)) {
             $characterInCelestialFight = CharacterInCelestialFight::create([
                 'celestial_fight_id'      => $celestialFight->id,
                 'character_id'            => $character->id,
-                'character_max_health'    => $character->getInformation()->buildHealth(),
-                'character_current_health'=> $character->getInformation()->buildHealth(),
+                'character_max_health'    => $totalHealth,
+                'character_current_health'=> $totalHealth,
             ]);
         } else {
             if (now()->diffInMinutes($characterInCelestialFight->updated_at) > 5) {
@@ -82,6 +90,8 @@ class CelestialFightService {
                 'class'   => 'enemy-action-fired',
             ];
 
+            $this->moveCelestial($character, $celestialFight);
+
             return $this->successResult([
                 'fight' => [
                     'character' =>[
@@ -98,8 +108,14 @@ class CelestialFightService {
         }
 
         if ($monsterHealth <= 0) {
+            $newShards = $character->shards + $celestialFight->monster->shards;
+
+            if ($newShards >= MaxCurrenciesValue::MAX_SHARDS) {
+                $newShards = MaxCurrenciesValue::MAX_SHARDS;
+            }
+
             $character->update([
-                'shards' => $character->shards + $celestialFight->monster->shards,
+                'shards' => $newShards
             ]);
 
             BattleAttackHandler::dispatch($character->refresh(), $celestialFight->monster_id)->onQueue('default_long');
@@ -108,7 +124,7 @@ class CelestialFightService {
 
             event(new ServerMessageEvent($character->user, 'You received: ' . $celestialFight->monster->shards . ' shards! Shards can only be used in Alchemy.'));
 
-            event(new ServerMessageEvent($character->user, 'You\'re additional rewards (XP and so on ...) are processing and will be with you shortly.'));
+            event(new ServerMessageEvent($character->user, 'Your additional rewards (XP and so on ...) are processing and will be with you shortly.'));
 
             CharacterInCelestialFight::where('celestial_fight_id', $celestialFight->id)->delete();
 
@@ -162,11 +178,31 @@ class CelestialFightService {
     }
 
     protected function updateCharacterInFight(Character $character, CharacterInCelestialFight $characterInCelestialFight) {
+        $totalHealth = $character->getInformation()->buildHealth();
+
+        if ($totalHealth > 1000000000000) {
+            $totalHealth = 1000000000000;
+        }
+
         $characterInCelestialFight->update([
-            'character_max_health'    => $character->getInformation()->buildHealth(),
-            'character_current_health'=> $character->getInformation()->buildHealth(),
+            'character_max_health'    => $totalHealth,
+            'character_current_health'=> $totalHealth,
         ]);
 
         return $characterInCelestialFight->refresh();
+    }
+
+    protected function moveCelestial(Character $character, CelestialFight $celestialFight) {
+        $monster              = $celestialFight->monster;
+        $healthRange          = explode('-', $monster->health_range);
+        $currentMonsterHealth = rand($healthRange[0], $healthRange[1]);
+
+        $celestialFight->update([
+            'x_position'      => CoordinatesCache::getFromCache()['x'][rand(CoordinatesCache::getFromCache()['x'][0], (count(CoordinatesCache::getFromCache()['x']) - 1))],
+            'y_position'      => CoordinatesCache::getFromCache()['y'][rand(CoordinatesCache::getFromCache()['y'][0], (count(CoordinatesCache::getFromCache()['y']) - 1))],
+            'current_health'  => $currentMonsterHealth,
+        ]);
+
+        event(new GlobalMessageEvent($character->name . ' Has caused: ' . $monster->name . ' to flee to the far ends of Tlessa (use /pct or /pc to find the new coordinates).'));
     }
 }

@@ -62,6 +62,14 @@ class MapTileValue {
         return in_array($color, $invalidColors);
     }
 
+    public function isMagma(int $color): bool {
+        return in_array($color, [164027]);
+    }
+
+    public function isPurgatoryWater(int $color): bool {
+        return in_array($color, [255255255]);
+    }
+
     /**
      * Can the character walk on death water?
      *
@@ -102,6 +110,27 @@ class MapTileValue {
         }
 
         // We are not water
+        return true;
+    }
+
+    /**
+     * Can we walk on water?
+     *
+     * @param Character $character
+     * @param int $x
+     * @param int $y
+     * @return bool
+     */
+    public function canWalkOnMagma(Character $character, int $x, int $y): bool {
+        $color = $this->getTileColor($character, $x, $y);
+
+        if ($this->isMagma((int) $color)) {
+            return $character->inventory->slots->filter(function($slot) {
+                return $slot->item->effect === ItemEffectsValue::WALK_ON_MAGMA;
+            })->isNotEmpty();
+        }
+
+        // We are not death water
         return true;
     }
 }

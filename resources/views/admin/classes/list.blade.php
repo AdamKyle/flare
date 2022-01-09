@@ -1,14 +1,25 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="row page-titles">
-        <div class="col-md-6 align-self-left">
-            <h4 class="mt-3">Classes</h4>
+    <div class="tw-mt-20 tw-mb-10 tw-w-full lg:tw-w-3/5 tw-m-auto">
+        <div class="tw-m-auto">
+            <x-core.page-title
+              title="Classes"
+              route="{{route('home')}}"
+              link="Home"
+              color="success"
+            >
+                <x-core.buttons.link-buttons.primary-button href="{{route('classes.create')}}" css="tw-ml-2">
+                    Create
+                </x-core.buttons.link-buttons.primary-button>
+            {{--                <x-core.buttons.link-buttons.primary-button href="{{route('races.export')}}" css="tw-ml-2">--}}
+            {{--                    <i class="fas fa-file-export"></i> Export--}}
+            {{--                </x-core.buttons.link-buttons.primary-button>--}}
+            {{--                <x-core.buttons.link-buttons.primary-button href="{{route('races.import')}}" css="tw-ml-2">--}}
+            {{--                    <i class="fas fa-file-upload"></i> Import--}}
+            {{--                </x-core.buttons.link-buttons.primary-button>--}}
+            </x-core.page-title>
         </div>
-        <div class="col-md-6 align-self-right">
-            <a href="{{route('home')}}" class="btn btn-success float-right ml-2">Home</a>
-            <a href="{{route('classes.create')}}" class="btn btn-primary float-right ml-2">Create</a>
-        </div>
+        @livewire('admin.classes.data-table')
     </div>
-    @livewire('admin.classes.data-table')
 @endsection

@@ -31,11 +31,11 @@ export default class CanHitCheck {
     let defenderDodge    = defender.dodge
     let toHitBase        = this.toHitCalculation(attacker.to_hit_base, defender.dex, attackerAccuracy, defenderDodge);
 
-    if (attackerAccuracy > 1.0) {
+    if (attackerAccuracy >= 1.0) {
       return true;
     }
 
-    if (defenderDodge > 1.0) {
+    if (defenderDodge >= 1.0) {
       return false;
     }
 
@@ -43,7 +43,6 @@ export default class CanHitCheck {
   }
 
   canCast(attacker, defender) {
-    console.log('Fucking be here!');
     const damage         = new Damage();
     let attackerAccuracy = null;
     let dodge            = null;
@@ -62,11 +61,11 @@ export default class CanHitCheck {
       dodge            = defender.skills.filter(s => s.name === 'Dodge')[0].skill_bonus;
     }
 
-    if (attackerAccuracy > 1.0) {
+    if (attackerAccuracy >= 1.0) {
       return true;
     }
 
-    if (dodge > 1.0) {
+    if (dodge >= 1.0) {
       return false;
     }
 
@@ -94,7 +93,7 @@ export default class CanHitCheck {
   calculateCanHit(toHitBase) {
     const needToHit = 100 - 100 * toHitBase;
 
-    const roll      = (Math.random() * (100 - 1) + 1);
+    const roll      = random(1 , 100);
 
     return roll > needToHit;
   }

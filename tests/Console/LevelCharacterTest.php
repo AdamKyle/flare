@@ -35,17 +35,4 @@ class LevelCharacterTest extends TestCase
 
         $this->assertEquals(1, $character->level);
     }
-
-    public function testCannotLevelCharacterPastMaxLevel() {
-        $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter(false);
-
-        $this->assertEquals(0, $this->artisan('level:character', [
-            'id' => $character->id,
-            'levels' => 20000
-        ]));
-
-        $character = $character->refresh();
-
-        $this->assertEquals(1, $character->level);
-    }
 }

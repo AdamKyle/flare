@@ -23,7 +23,7 @@ class SkillTypeValue {
 
     const EFFECTS_DIRECTIONAL_MOVE_TIMER  = 6;
 
-    const EFFECTS_MINUTE_MOVE_TIMER       = 7;
+    const EFFECTS_MOVEMENT_TIMER          = 7;
 
     const EFFECTS_KINGDOM_BUILDING_TIMERS = 8;
 
@@ -35,7 +35,7 @@ class SkillTypeValue {
 
     const EFFECTS_ARTIFACT_ANNULMENT      = 12;
 
-    const EFFECTS_KINGDOM_TREASURY        = 13;
+    const EFFECTS_KINGDOM                 = 13;
 
     /**
      * @var string[] $values
@@ -48,13 +48,13 @@ class SkillTypeValue {
         self::ALCHEMY                         => 4,
         self::EFFECTS_BATTLE_TIMER            => 5,
         self::EFFECTS_DIRECTIONAL_MOVE_TIMER  => 6,
-        self::EFFECTS_MINUTE_MOVE_TIMER       => 7,
+        self::EFFECTS_MOVEMENT_TIMER          => 7,
         self::EFFECTS_KINGDOM_BUILDING_TIMERS => 8,
         self::EFFECTS_UNIT_RECRUITMENT_TIMER  => 9,
         self::EFFECTS_UNIT_MOVEMENT_TIMER     => 10,
         self::EFFECTS_SPELL_EVASION           => 11,
         self::EFFECTS_ARTIFACT_ANNULMENT      => 12,
-        self::EFFECTS_KINGDOM_TREASURY        => 13,
+        self::EFFECTS_KINGDOM                 => 13,
 
     ];
 
@@ -66,13 +66,13 @@ class SkillTypeValue {
         4  => 'Alchemy',
         5  => 'Effects Battle Timer',
         6  => 'Effects Directional Move Timer',
-        7  => 'Effects Minute Based Movement Timer',
+        7  => 'Effects Movement Timer',
         8  => 'Effects Kingdom Building Timers',
         9  => 'Effects Unit Recruitment Timers',
         10 => 'Effects Unit Movement Timers',
         11 => 'Effects Spell Evasion',
         12 => 'Effects Artifact Annulment',
-        13 => 'Effects how much interest a kingdom gets'
+        13 => 'Effects the kingdom in some way'
 
     ];
 
@@ -161,8 +161,8 @@ class SkillTypeValue {
      *
      * @return bool
      */
-    public function isMinuteMovementTimer(): bool {
-        return $this->value === self::EFFECTS_MINUTE_MOVE_TIMER;
+    public function isMovementTimer(): bool {
+        return $this->value === self::EFFECTS_MOVEMENT_TIMER;
     }
 
     /**
@@ -211,12 +211,12 @@ class SkillTypeValue {
     }
 
     /**
-     * Does this effect the kingdom treasury?
+     * Does this effect the kingdom?
      *
      * @return bool
      */
-    public function effectsKingdomTreasury(): bool {
-        return $this->value === self::EFFECTS_KINGDOM_TREASURY;
+    public function effectsKingdom(): bool {
+        return $this->value === self::EFFECTS_KINGDOM;
     }
 
     /**

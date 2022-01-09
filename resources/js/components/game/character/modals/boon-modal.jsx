@@ -74,14 +74,64 @@ export default class BoonModal extends React.Component {
           <div className="alert alert-warning mt-2 mb-3">
             <p>By canceling this boon, your stats will adjust accordingly both here and in the game tab.</p>
           </div>
-
-          {
-            this.props.boon.type === 'Stat increase' ?
-              <>
-                <p>Increases all core character stats by: <span className="text-success">+<strong>{this.props.boon.stat_bonus * 100}</strong>%</span></p>
-              </>
-            : null
-          }
+          <dl className="mb-2">
+            {
+              this.props.boon.stat_bonus > 0.0 ?
+                <>
+                  <dt>Str Modifier</dt>
+                  <dd className="text-success">+{this.props.boon.stat_bonus * 100}%</dd>
+                </>
+                : null
+            }
+            {
+              this.props.boon.str_mod > 0.0 ?
+                <>
+                  <dt>Str Modifier</dt>
+                  <dd className="text-success">+{this.props.boon.str_mod * 100}%</dd>
+                </>
+                : null
+            }
+            {
+              this.props.boon.dex_mod > 0.0 ?
+                <>
+                  <dt>Dex Modifier</dt>
+                  <dd className="text-success">+{this.props.boon.dex_mod * 100}%</dd>
+                </>
+                : null
+            }
+            {
+              this.props.boon.int_mod > 0.0 ?
+                <>
+                  <dt>Int Modifier</dt>
+                  <dd className="text-success">+{this.props.boon.int_mod * 100}%</dd>
+                </>
+                : null
+            }
+            {
+              this.props.boon.chr_mod > 0.0 ?
+                <>
+                  <dt>Chr Modifier</dt>
+                  <dd className="text-success">+{this.props.boon.chr_mod * 100}%</dd>
+                </>
+                : null
+            }
+            {
+              this.props.boon.agi_mod > 0.0 ?
+                <>
+                  <dt>AGI Modifier</dt>
+                  <dd className="text-success">+{this.props.boon.agi_mod * 100}%</dd>
+                </>
+                : null
+            }
+            {
+              this.props.boon.focus_mod > 0.0 ?
+                <>
+                  <dt>Focus Modifier</dt>
+                  <dd className="text-success">+{this.props.boon.focus_mod * 100}%</dd>
+                </>
+                : null
+            }
+          </dl>
           {
             this.props.boon.type === 'Effects skill' ?
               <div className="mb-2">

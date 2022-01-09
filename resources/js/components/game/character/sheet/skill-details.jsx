@@ -2,6 +2,10 @@ import React, {Fragment} from 'react';
 import {Card, Tab, Tabs, OverlayTrigger, Tooltip, Alert} from "react-bootstrap";
 import TrainSkillModal from "../modals/train-skill-modal";
 import TrainPassiveSkillModal from "../modals/train-passive-skill-modal";
+import AlertWarning from "../../components/base/alert-warning";
+import PassiveSkillTree from "./skill-trees/passive-skill-tree";
+import AlertInfo from "../../components/base/alert-info";
+import AlertError from "../../components/base/alert-error";
 
 const renderTooltip = (xpTowards) => (
   <Tooltip id="button-tooltip">
@@ -22,6 +26,8 @@ export default class SkillDetails extends React.Component {
       loading: false,
       showTrainPassiveModal: false,
       passiveSkillToTrain: null,
+      timeRemaining: 0,
+      forPassiveSkill: null,
     }
   }
 
@@ -56,6 +62,8 @@ export default class SkillDetails extends React.Component {
       passiveSkillToTrain: typeof skill !== 'undefined' ? skill : null,
     });
   }
+
+
 
   stopTrainingSkill(skill) {
     this.setState({
@@ -100,6 +108,49 @@ export default class SkillDetails extends React.Component {
     });
   }
 
+  cancelPassiveTrain(passiveSkill) {
+    this.setState({
+      showError: false,
+      errorMessage: null,
+      successMessage: null,
+      loading: true,
+    }, () => {
+      axios.post('/api/stop-training/passive/' + passiveSkill.id + '/' + this.props.characterId)
+        .then((result) => {
+          this.setState({
+            loading: false,
+          }, () => {
+            this.setSuccessMessage(result.data.message);
+          });
+        }).catch((error) => {
+          this.setState({loading: false});
+          const response = error.response;
+
+          if (response.status === 401) {
+            return location.reload()
+          }
+
+          if (response.status === 429) {
+            return window.location.replace('/game');
+          }
+
+          if (response.data.hasOwnProperty('message')) {
+            this.setState({
+              showError: true,
+              errorMessage: result.data.message,
+            });
+          }
+
+          if (response.data.hasOwnProperty('error')) {
+            this.setState({
+              showError: true,
+              errorMessage: result.data.error,
+            });
+          }
+      });
+    });
+  }
+
 
   renderSkills() {
     return this.props.skills.map((s) => s.can_train ?
@@ -136,7 +187,7 @@ export default class SkillDetails extends React.Component {
                 <div className="col-xs-12 col-sm-4">
                   <button
                     className={s.is_training ? 'btn btn-success btn-sm train-skill-btn' : 'btn btn-primary btn-sm train-skill-btn'}
-                    disabled={!this.props.canAdventure || this.props.isDead}
+                    disabled={!this.props.canAdventure || this.props.isDead || this.props.automations.length > 0}
                     onClick={() => this.manageTrainSkill(s)}
                   >
                     Train { s.is_training ? <i className="ml-2 fas fa-check"></i> : null }
@@ -146,7 +197,7 @@ export default class SkillDetails extends React.Component {
                       <Fragment>
                         <button
                           className="btn btn-danger btn-sm ml-2 train-skill-btn"
-                          disabled={!this.props.canAdventure || this.props.isDead}
+                          disabled={!this.props.canAdventure || this.props.isDead || this.props.automations.length > 0}
                           onClick={() => this.stopTrainingSkill(s)}
                         >
                           Stop
@@ -253,43 +304,17 @@ export default class SkillDetails extends React.Component {
 
   renderPassiveSkills() {
     return this.props.passiveSkills.map((passiveSkill) =>
-      <Fragment>
-        <dt>
-          {
-            passiveSkill.is_locked ?
-              <a href={'/view/passive/'+passiveSkill.id+'/'+this.props.characterId} className="text-danger">
-                {passiveSkill.passive_skill.name} <i className="fas fa-lock"></i>
-              </a>
-            :
-              <a href={'/view/passive/'+passiveSkill.id+'/'+this.props.characterId}>
-                {passiveSkill.passive_skill.name}
-              </a>
-          }
-        </dt>
-        <dd>
-          <div className="tw-pl-2 row">
-            <div className="col-xs-12 col-sm-4">
-              <strong>Current Level</strong>: {passiveSkill.current_level}
-            </div>
-            <div className="col-xs-12 col-sm-3">
-              <strong>Time Till Next</strong>: {passiveSkill.hours_to_next} Hr.
-            </div>
-            <div className="col-xs-12 col-sm-3">
-              <button className="btn btn-sm btn-success"
-                      onClick={() => this.managePassiveTrainingModal(passiveSkill)}
-                      disabled={passiveSkill.is_locked}
-              >
-                Train
-              </button>
-            </div>
-            <div className="col-xs-12 col-sm-2">
-              <strong>Timer</strong>
-            </div>
-          </div>
-        </dd>
-      </Fragment>
+      <PassiveSkillTree
+        passiveSkill={passiveSkill}
+        characterId={this.props.characterId}
+        isDead={this.props.isDead}
+        managePassiveTrainingModal={this.managePassiveTrainingModal.bind(this)}
+        cancelPassiveTrain={this.cancelPassiveTrain.bind(this)}
+      />
     );
   }
+
+
 
   render() {
     return (
@@ -313,6 +338,22 @@ export default class SkillDetails extends React.Component {
                 </Alert>
               </div>
               : null
+          }
+          {
+            this.props.automations.length > 0 ?
+              <div className="mt-2 mb-3">
+                <AlertWarning icon={'fas fa-exclamation-triangle'} title={'Automation is running'}>
+                  <p>
+                    You cannot modify any of your skills except your <strong>passive</strong> skills because you are currently
+                    in the middle of an automation.
+                  </p>
+                  <p>
+                    You can still disenchant, craft and enchant, however you cannot switch which skill is currently training in relation to
+                    combat based skills.
+                  </p>
+                </AlertWarning>
+              </div>
+            : null
           }
           {
             this.state.loading ?
@@ -378,6 +419,24 @@ export default class SkillDetails extends React.Component {
                   You can click on each passive skill and see what you get per level, what it unlocks as you level it
                   and how much time it will take to level the skill.
                 </p>
+                <p>
+                  Passive skills can be trained while you are offline, that is, you can logout and this will continue to
+                  train until it is finished.
+                </p>
+                {
+                  this.props.isDead ?
+                    <AlertError icon={"fas fa-skull-crossbones"} title={'You are dead'}>
+                      <p>
+                        Dead people cannot do things, such as manage their passive skills. Please revive before attempting to stop or train a passive skill.
+                      </p>
+                    </AlertError>
+                  : <AlertInfo icon={"fas fa-question-circle"} title={"Attn!"}>
+                      <p>
+                        Canceling any skill in training, will still take the amount of hours as stated. The time you have spent training this skill,
+                        will <strong>not</strong> be taken into account when you go to train again.
+                      </p>
+                    </AlertInfo>
+                }
                 <hr />
                 <dl className="mt-4">{this.renderPassiveSkills()}</dl>
               </div>

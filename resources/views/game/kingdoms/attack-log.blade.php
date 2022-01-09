@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="w-full lg:w-3/4 m-auto">
+    <div class="w-full lg:w-3/5 m-auto">
         <x-core.page-title
             title="Attack Log ({{$type}})"
             route="{{route('game.kingdom.attack-logs', ['character' => $character])}}"

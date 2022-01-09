@@ -2,6 +2,7 @@
 
 namespace App\Game\Maps\Services;
 
+use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Location;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Game\Core\Events\UpdateAttackStats;
@@ -22,6 +23,7 @@ use App\Flare\Models\Character;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\MonsterTransfromer;
 use App\Flare\Values\ItemEffectsValue;
+use App\Game\Messages\Events\ServerMessageEvent as GameServerMessageEvent;
 use League\Fractal\Resource\Item as ResourceItem;
 
 class TraverseService {
@@ -87,7 +89,7 @@ class TraverseService {
     public function canTravel(int $mapId, Character $character): bool {
         $gameMap = GameMap::find($mapId);
 
-        if ($gameMap->name === 'Labyrinth') {
+        if ($gameMap->mapType()->isLabyrinth()) {
             $hasItem = $character->inventory->slots->filter(function($slot) {
                 return $slot->item->effect === ItemEffectsValue::LABYRINTH;
             })->all();
@@ -95,7 +97,7 @@ class TraverseService {
             return !empty($hasItem);
         }
 
-        if ($gameMap->name === 'Dungeons') {
+        if ($gameMap->mapType()->isDungeons()) {
             $hasItem = $character->inventory->slots->filter(function($slot) {
                 return $slot->item->effect === ItemEffectsValue::DUNGEON;
             })->all();
@@ -103,9 +105,25 @@ class TraverseService {
             return !empty($hasItem);
         }
 
-        if ($gameMap->name === 'Shadow Plane') {
+        if ($gameMap->mapType()->isShadowPlane()) {
             $hasItem = $character->inventory->slots->filter(function($slot) {
                 return $slot->item->effect === ItemEffectsValue::SHADOWPLANE;
+            })->all();
+
+            return !empty($hasItem);
+        }
+
+        if ($gameMap->mapType()->isHell()) {
+            $hasItem = $character->inventory->slots->filter(function($slot) {
+                return $slot->item->effect === ItemEffectsValue::HELL;
+            })->all();
+
+            return !empty($hasItem);
+        }
+
+        if ($gameMap->mapType()->isPurgatory()) {
+            $hasItem = $character->inventory->slots->filter(function($slot) {
+                return $slot->item->effect === ItemEffectsValue::PURGATORY;
             })->all();
 
             return !empty($hasItem);
@@ -125,7 +143,7 @@ class TraverseService {
      * @param Character $character
      */
     public function travel(int $mapId, Character $character) {
-        $oldMap = $character->map->game_map_id;
+        $oldMap = $character->map->gameMap;
 
         $character->map()->update([
             'game_map_id' => $mapId
@@ -150,39 +168,64 @@ class TraverseService {
 
             $color = $this->mapTileValue->getTileColor($character, $xPosition, $yPosition);
 
-            if ($this->mapTileValue->isWaterTile($color) || $this->mapTileValue->isDeathWaterTile($color)) {
+            if ($this->mapTileValue->isWaterTile($color) || $this->mapTileValue->isDeathWaterTile($color) || $this->mapTileValue->isMagma($color)) {
                 event(new ServerMessageEvent($character->user, 'moved-location', 'Your character was moved as you are missing the appropriate quest item.'));
             }
         }
         // @codeCoverageIgnoreEnd
 
-        $this->updateGlobalCharacterMapCount($oldMap);
+        $this->updateGlobalCharacterMapCount($oldMap->id);
         $this->updateMap($character);
-        $this->updateActions($mapId, $character);
+        $this->updateActions($mapId, $character, $oldMap);
         $this->updateCharacterTimeOut($character);
 
         $message = 'You have traveled to: ' . $character->map->gameMap->name;
 
         event(new ServerMessageEvent($character->user, 'plane-transfer', $message));
 
-        $name = $character->map->gameMap->name;
+        $gameMap = $character->map->gameMap;
 
-        if ($name === 'Shadow Plane') {
+        if ($character->map->gameMap->mapType()->isShadowPlane()) {
             $message = 'As you enter into the Shadow Plane, all you see for miles around are 
             shadowy figures moving across the land. The color of the land is grey and lifeless. But you 
             feel the presence of death as it creeps ever closer. 
-            (Characters can walk on water here, monster strength is increased by 25% including Devouring Light. You are reduced by 25% while here.)';
+            (Characters can walk on water here, monster strength is increased by '.($gameMap->enemy_stat_bonus * 100).'% including Devouring Light. You are reduced by '.($gameMap->enemy_stat_bonus * 100).'% (Damage wise) while here.)';
 
             event(new MessageEvent($character->user,  $message));
 
             event(new GlobalMessageEvent('The gates have opened for: ' . $character->name . '. They have entered the realm of shadows!'));
+        }
+
+        if ($character->map->gameMap->mapType()->isHell()) {
+            $message = 'The stench of sulfur fills your nose. The heat of the magma oceans bathes over you. Demonic shadows and figures move about the land. Monsters are increased by: ' .
+                ($gameMap->enemy_stat_bonus * 100) . '% while you are reduced by: '.
+                ($gameMap->character_attack_reduction * 100) . '% in both (modified) stats and damage done. Any quest items that make 
+                affixes irresistible will not work down here. Finally, all life stealing affixes be they stackable or not are reduced to half their total output for damage.';
+
+            event(new MessageEvent($character->user,  $message));
+
+            event(new GlobalMessageEvent('Hell\'s gates swing wide for: ' . $character->name . '. May the light of Argose the Angelic Saviour, be their guide through such darkness!'));
+        }
+
+        if ($character->map->gameMap->mapType()->isPurgatory()) {
+            $message = 'The silence of death fills your very being and chills you to bone. Nothing moves amongst the decay and death of this land. Monsters are increased by: ' .
+                ($gameMap->enemy_stat_bonus * 100) . '% while you are reduced by: '.
+                ($gameMap->character_attack_reduction * 100) . '% in both (modified) stats and damage done. Any quest items that make 
+                affixes irresistible will not work down here. Finally, all life stealing affixes be they stackable or not are reduced to half their total output for damage and all
+                resurrection chances are capped at 45% (prophets are capped at 65%). Devouring Light and Darkness are reduced by 45% here.';
+
+            event(new MessageEvent($character->user,  $message));
+
+            event(new GlobalMessageEvent('Thunder claps in the sky: ' . $character->name . ' has called forth The Creators gates of despair and unleashed the enemies of Kalitar! The Creator is Furious! "Hear me child! I shall face you in the depths of my despair and crush the soul from your bones!" the lands fall silent, the children no longer have faith and the fabric of time rips open ...'));
         }
     }
 
     protected function changeLocation(Character $character, array $cache) {
 
         if (!$this->mapTileValue->canWalkOnWater($character, $character->map->character_position_x, $character->map->character_position_y) ||
-            !$this->mapTileValue->canWalkOnDeathWater($character, $character->map->character_position_x, $character->map->character_position_y)
+            !$this->mapTileValue->canWalkOnDeathWater($character, $character->map->character_position_x, $character->map->character_position_y) ||
+            !$this->mapTileValue->canWalkOnMagma($character, $character->map->character_position_x, $character->map->character_position_y) ||
+            $this->mapTileValue->isPurgatoryWater($this->mapTileValue->getTileColor($character, $character->map->character_position_x, $character->map->character_position_y))
         ) {
 
             $x = $cache['x'];
@@ -219,7 +262,7 @@ class TraverseService {
      * @param int $mapId
      * @param Character $character
      */
-    protected function updateActions(int $mapId, Character $character) {
+    protected function updateActions(int $mapId, Character $character, GameMap $oldGameMap) {
         $user         = $character->user;
         $gameMap      = GameMap::find($mapId);
         $characterMap = $character->map;
@@ -230,13 +273,13 @@ class TraverseService {
                                         ->where('game_map_id', $characterMap->game_map_id)
                                         ->first();
 
-        if ($gameMap->name === 'Shadow Plane') {
-            $this->updateAtctionTypeCache($character, $gameMap->enemy_stat_bonus);
+        if ($gameMap->mapType()->isShadowPlane() || $gameMap->mapType()->isHell()) {
+            $this->updateAtctionTypeCache($character, $oldGameMap, $gameMap->enemy_stat_bonus);
         } else {
-            $this->updateAtctionTypeCache($character, 0.0);
+            $this->updateAtctionTypeCache($character, $oldGameMap, 0.0);
         }
 
-        $character = new Item($character, $this->characterAttackTransformer);
+        $characterData = new Item($character, $this->characterAttackTransformer);
 
         if (!is_null($locationWithEffect)) {
             $monsters  = Cache::get('monsters')[$locationWithEffect->name];
@@ -244,20 +287,35 @@ class TraverseService {
             $monsters  = Cache::get('monsters')[GameMap::find($mapId)->name];
         }
 
-        $character = $this->manager->createData($character)->toArray();
+        $characterData = $this->manager->createData($characterData)->toArray();
 
-        broadcast(new UpdateActionsBroadcast($character, $monsters, $user));
+        broadcast(new UpdateActionsBroadcast($characterData, $monsters, $user));
 
-        event(new UpdateAttackStats($character, $user));
+        event(new UpdateAttackStats($characterData, $user));
+
+        event(new UpdateTopBarEvent($character));
     }
 
-    protected function updateAtctionTypeCache(Character $character, float $deduction) {
+    protected function updateAtctionTypeCache(Character $character, GameMap $oldMap, float $deduction) {
+
+        if ($oldMap->mapType()->isHell()) {
+            event(new GameServerMessageEvent($character->user, 'One moment while we refresh your stats ...'));
+
+            resolve(BuildCharacterAttackTypes::class)->buildCache($character);
+        }
+
+        if ($character->map->gameMap->mapType()->isHell()) {
+            event(new GameServerMessageEvent($character->user, 'One moment while we refresh your stats ...'));
+
+            resolve(BuildCharacterAttackTypes::class)->buildCache($character);
+        }
+
         $attackData = Cache::get('character-attack-data-' . $character->id);
 
         if (is_null($attackData)) {
             resolve(BuildCharacterAttackTypes::class)->buildCache($character);
 
-            return;
+            $attackData = Cache::get('character-attack-data-' . $character->id);
         }
 
         foreach ($attackData as $key => $array) {

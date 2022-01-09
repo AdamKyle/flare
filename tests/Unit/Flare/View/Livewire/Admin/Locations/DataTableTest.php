@@ -61,9 +61,8 @@ class DataTableTest extends TestCase
 
     public function testTheComponentLoadsWithAdventure()
     {
-        $adventure = $this->createNewAdventure();
-
-        $locationA = $this->createLocation([
+        
+        $location = $this->createLocation([
             'name'                 => 'Apples',
             'game_map_id'          => $this->createGameMap([
                 'name' => 'Apples',
@@ -77,30 +76,12 @@ class DataTableTest extends TestCase
             'y'                    => 1,
         ]);
 
-        $locationA->adventures()->attach($adventure->id);
-
-        $locationB = $this->createLocation([
-            'name'                 => 'Bananas',
-            'game_map_id'          => $this->createGameMap([
-                'name' => 'Bananas',
-                'path' => 'test',
-                'default' => true
-            ])->id,
-            'quest_reward_item_id' => null,
-            'description'          => 'test',
-            'is_port'              => false,
-            'x'                    => 2,
-            'y'                    => 2,
-        ]);
-
-        $locationB->adventures()->attach($adventure->id);
+        $this->createNewAdventure($location);
         
         Livewire::test(DataTable::class)
             ->assertSee('Apples')
-            ->assertSee('Bananas')
-            ->set('search', 'Apples')
-            ->assertSee('Apples')
-            ->assertDontSee('Bananas');
+            ->set('search', '6666666')
+            ->assertDontSee('Apples');
     }
 
     public function testTheComponentFiltersOnMapName()
@@ -181,9 +162,8 @@ class DataTableTest extends TestCase
 
     public function testTheComponentSearchesOnMapNameWithAdventure()
     {
-        $adventure = $this->createNewAdventure();
 
-        $locationA = $this->createLocation([
+        $location = $this->createLocation([
             'name'                 => 'Apples',
             'game_map_id'          => $this->createGameMap([
                 'name' => 'Apples',
@@ -197,32 +177,15 @@ class DataTableTest extends TestCase
             'y'                    => 1,
         ]);
 
-        $locationA->adventures()->attach($adventure->id);
-
-        $locationB = $this->createLocation([
-            'name'                 => 'Bananas',
-            'game_map_id'          => $this->createGameMap([
-                'name' => 'Bananas',
-                'path' => 'test',
-                'default' => true
-            ])->id,
-            'quest_reward_item_id' => null,
-            'description'          => 'test',
-            'is_port'              => false,
-            'x'                    => 2,
-            'y'                    => 2,
-        ]);
-
-        $locationB->adventures()->attach($adventure->id);
+        $adventure = $this->createNewAdventure($location);
         
         Livewire::test(DataTable::class, [
             'adventureId' => $adventure->id
         ])
         ->assertSee('Apples')
-        ->assertSee('Bananas')
         ->call('sortBy', 'game_maps.name')
-        ->set('search', 'Bananas')
-        ->assertSee('Bananas')
+        ->set('search', 'Apples')
+        ->assertSee('Apples')
         ->assertSee('fa-sort-up');
     }
 }

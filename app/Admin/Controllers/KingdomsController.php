@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 
+use App\Admin\Services\UpdateKingdomsService;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Admin\Requests\KingdomImport as KingdomImportRequest;
 use App\Admin\Exports\Kingdoms\KingdomsExport;
@@ -34,13 +35,13 @@ class KingdomsController extends Controller {
     /**
      * @codeCoverageIgnore
      */
-    public function importData(KingdomImportRequest $request) {
-
-        if (GameBuilding::count() > 1) {
-            return redirect()->back()->with('error', 'You already have data in the system. Import aborted.');
-        }
+    public function importData(KingdomImportRequest $request, UpdateKingdomsService $updateKingdomsService) {
 
         Excel::import(new KingdomsImport, $request->kingdom_import);
+
+        foreach(GameBuilding::all() as $gameBuilding) {
+            $updateKingdomsService->assignNewBuildingsToCharacters($gameBuilding);
+        }
 
         return redirect()->back()->with('success', 'imported kingdom data.');
     }

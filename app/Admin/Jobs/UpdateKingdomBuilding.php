@@ -55,11 +55,13 @@ class UpdateKingdomBuilding implements ShouldQueue
             'max_durability'     => $this->building->durability,
         ]);
 
-        $building = $this->building->refresh();
-        $kingdom  = new Item($building->kingdom, $kingdomTransformer);
-        $kingdom  = $manager->createData($kingdom)->toArray();
-        $user     = $building->kingdom->character->user;
+        if (!is_null($this->building->kingdom->character)) {
+            $building = $this->building->refresh();
+            $kingdom  = new Item($building->kingdom, $kingdomTransformer);
+            $kingdom  = $manager->createData($kingdom)->toArray();
+            $user     = $building->kingdom->character->user;
 
-        event(new UpdateKingdom($user, $kingdom));
+            event(new UpdateKingdom($user, $kingdom));
+        }
     }
 }

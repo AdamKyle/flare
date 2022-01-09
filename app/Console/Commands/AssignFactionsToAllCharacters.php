@@ -7,6 +7,9 @@ use App\Flare\Models\GameMap;
 use App\Game\Core\Values\FactionLevel;
 use Illuminate\Console\Command;
 
+/**
+ * @codeCoverageIgnore
+ */
 class AssignFactionsToAllCharacters extends Command
 {
     /**
@@ -51,11 +54,15 @@ class AssignFactionsToAllCharacters extends Command
         $gameMaps = GameMap::all();
 
         foreach ($gameMaps as $gameMap) {
-            $character->factions()->create([
-                'character_id'  => $character->id,
-                'game_map_id'   => $gameMap->id,
-                'points_needed' => FactionLevel::getPointsNeeded(0),
-            ]);
+            $faction = $character->factions()->where('game_map_id', $gameMap->id)->first();
+
+            if (is_null($faction) && !$gameMap->mapType()->isPurgatory()) {
+                $character->factions()->create([
+                    'character_id' => $character->id,
+                    'game_map_id' => $gameMap->id,
+                    'points_needed' => FactionLevel::getPointsNeeded(0),
+                ]);
+            }
         }
     }
 }

@@ -54,6 +54,18 @@
                         <dt>Skill Training Bonus</dt>
                         <dd>{{$skill->skill_training_bonus * 100}}% When Skill XP is awarded</dd>
                     </dl>
+                    @if ($skill->type()->effectsKingdom())
+                        <hr />
+                        <h4 class="tw-font-light">Effects Kingdom</h4>
+                        <dl>
+                            <dt>Unit Recruitment Time Reduction:</dt>
+                            <dd>{{$skill->unit_time_reduction * 100}}%</dd>
+                            <dt>Unit Movement Time Reduction:</dt>
+                            <dd>{{$skill->unit_movement_time_reduction * 100}}%</dd>
+                            <dt>Building Upgrade/Repair Time Reduction:</dt>
+                            <dd>{{$skill->building_time_reduction * 100}}%</dd>
+                        </dl>
+                    @endif
                 </div>
             </div>
         </div>

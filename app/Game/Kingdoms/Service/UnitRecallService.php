@@ -29,39 +29,33 @@ class UnitRecallService {
      *
      * @param array $unitMovement
      * @param Character $character
+     * @param int $elapsedTime
      */
-    public function recall(array $unitMovement, Character $character, float $timeLeft) {
+    public function recall(array $unitMovement, Character $character, int $elapsedTime = 0, bool $inSeconds = false) {
         unset($unitMovement['id']);
         unset($unitMovement['created_at']);
         unset($unitMovement['updated_at']);
 
+        if ($elapsedTime === 0) {
+            $unitsMoving  = json_decode($unitMovement['units_moving']);
+
+            foreach ($unitsMoving as $unitInfo) {
+                $elapsedTime += $unitInfo->time_to_return;
+            }
+        }
+
+        $time = $inSeconds ? now()->addSeconds($elapsedTime) : now()->addMinutes($elapsedTime);
+
         $unitMovement['is_attacking'] = false;
         $unitMovement['is_recalled']  = true;
-
-        $timeToRecall = 0;
-        $unitsMoving  = json_decode($unitMovement['units_moving']);
-
-        foreach ($unitsMoving as $unitInfo) {
-            $timeToRecall += $unitInfo->time_to_return;
-        }
-
-        if ($timeLeft > 0.0) {
-            $timeToRecall = floor($timeToRecall * $timeLeft);
-        }
-
+        $unitsMoving                  = json_decode($unitMovement['units_moving']);
         $unitMovement['units_moving'] = $unitsMoving;
-        $unitMovement['completed_at'] = now()->addMinutes($timeToRecall);
+        $unitMovement['completed_at'] = $time;
         $unitMovement['started_at']   = now();
 
         $recall = UnitMovementQueue::create($unitMovement);
 
-        $timeForDelay = $timeToRecall;
-
-        if ($timeForDelay > 15) {
-            $timeForDelay = $timeToRecall / 10;
-        }
-
-        MoveUnits::dispatch($recall->id, 0, 'recalled', $character, $timeForDelay)->delay(now()->addMinutes($timeForDelay));
+        MoveUnits::dispatch($recall->id, 0, 'recalled', $character, $elapsedTime)->delay($time);
 
         UpdateUnitMovementLogs::dispatch($character);
     }

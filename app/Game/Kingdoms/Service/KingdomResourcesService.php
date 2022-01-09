@@ -162,7 +162,7 @@ class KingdomResourcesService {
                 'current_morale' => $currentMorale - 0.10,
             ]);
 
-            $message = $this->kingdom->name . ' is loosing morale, due to not being walked for more then 5 days, at Location (x/y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position;
+            $message = $this->kingdom->name . ' is loosing morale, due to not being walked for more then 5 days, at Location (x/y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position . ' on the: ' . $this->kingdom->gameMap->name . ' plane.';
 
             $this->notifyUser($message);
 
@@ -399,6 +399,7 @@ class KingdomResourcesService {
         if ($morale === 0 || $morale === 0.0) {
 
             $newAmount = $this->kingdom->current_population + 30;
+            $newAmount += $newAmount * $this->kingdom->fetchResourceBonus();
 
             if ($currentPop <= $this->kingdom->max_population) {
                 if ($newAmount > $this->kingdom->max_population) {
@@ -474,7 +475,8 @@ class KingdomResourcesService {
     }
 
     protected function increaseResource(string $resource, KingdomBuilding  $building) {
-        $newCurrent = $this->kingdom->{'current_' . $resource} + $building->{'increase_in_'.$resource};
+        $newCurrent  = $this->kingdom->{'current_' . $resource} + $building->{'increase_in_'.$resource};
+        $newCurrent += $newCurrent * $this->kingdom->fetchResourceBonus();
 
         if ($newCurrent > $this->kingdom->{'max_' . $resource}) {
             $newCurrent = $this->kingdom->{'max_' . $resource};
@@ -496,7 +498,7 @@ class KingdomResourcesService {
 
         if ($this->kingdom->current_morale > 0.50) {
             $characterSkill = $this->kingdom->character->skills->filter(function($skill) {
-                return $skill->baseSkill->type === SkillTypeValue::EFFECTS_KINGDOM_TREASURY;
+                return $skill->baseSkill->type === SkillTypeValue::EFFECTS_KINGDOM;
             })->first();
 
             $currentTreasury = $this->kingdom->treasury;
@@ -589,7 +591,7 @@ class KingdomResourcesService {
             event(new UpdateKingdom($user, $kingdom));
 
             if ($user->show_kingdom_update_messages) {
-                $serverMessage = $this->kingdom->name . ' Has updated it\'s resources at Location (x/y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position;
+                $serverMessage = $this->kingdom->name . ' Has updated it\'s resources at Location (x/y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position . ' on the: ' . $this->kingdom->gameMap->name . ' plane.';
 
                 if (!is_null($message)) {
                     $serverMessage = $message;
@@ -611,7 +613,7 @@ class KingdomResourcesService {
         event(new GlobalMessageEvent('A kingdom has fallen into the rubble at (X/Y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position . ' on the: ' . $this->kingdom->gameMap->name .' plane.'));
 
         if (UserOnlineValue::isOnline($user)) {
-            event(new ServerMessageEvent($user, 'kingdom-resources-update', $this->kingdom->name . ' Has been given to the NPC due to being abandoned, at Location (x/y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position));
+            event(new ServerMessageEvent($user, 'kingdom-resources-update', $this->kingdom->name . ' Has been given to the NPC due to being abandoned, at Location (x/y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position . ' on the: ' . $this->kingdom->gameMap->name . ' plane.'));
         } else {
             $this->updateKingdomCache($user, $kingdom);
         }

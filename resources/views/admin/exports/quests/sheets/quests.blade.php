@@ -14,6 +14,11 @@
         <th>reward_xp</th>
         <th>unlocks_skill</th>
         <th>unlocks_skill_type</th>
+        <th>is_parent</th>
+        <th>parent_quest_id</th>
+        <th>secondary_required_item</th>
+        <th>faction_game_map_id</th>
+        <th>required_faction_level</th>
     </tr>
     </thead>
     <tbody>
@@ -30,8 +35,13 @@
             <td>{{$quest->reward_shards}}</td>
             <td>{{$quest->reward_gold}}</td>
             <td>{{$quest->reward_xp}}</td>
-            <td>{{$quest->unlocks_skill}}</td>
+            <td>{{!is_null($quest->unlocks_skill) ? $quest->unlocks_skill_name : ''}}</td>
             <td>{{$quest->unlocks_skill_type}}</td>
+            <td>{{$quest->is_parent}}</td>
+            <td>{{!is_null($quest->parent_quest_id) ? $quest->parent->name : ''}}</td>
+            <td>{{!is_null($quest->secondary_required_item) ? $quest->secondaryItem->name : ''}}</td>
+            <td>{{!is_null($quest->faction_game_map_id) ? $quest->factionMap->name : ''}}</td>
+            <td>{{!is_null($quest->required_faction_level) ? $quest->required_faction_level : ''}}</td>
         </tr>
     @endforeach
     </tbody>

@@ -40,7 +40,6 @@ export default class KingdomsMenu extends React.Component {
     });
 
     this.kingdomLogs.listen('Game.Kingdoms.Events.UpdateKingdomLogs', (event) => {
-      console.log(event);
       this.setState({
         logs: event.logs,
       });

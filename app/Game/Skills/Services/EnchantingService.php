@@ -3,6 +3,8 @@
 namespace App\Game\Skills\Services;
 
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
+use App\Game\Core\Events\UpdateQueenOfHeartsPanel;
+use App\Game\Core\Services\RandomEnchantmentService;
 use App\Game\Skills\Events\UpdateCharacterEnchantingList;
 use App\Game\Skills\Values\SkillTypeValue;
 use Exception;
@@ -37,6 +39,11 @@ class EnchantingService {
     private $enchantItemService;
 
     /**
+     * @var RandomEnchantmentService
+     */
+    private $randomEnchantmentService;
+
+    /**
      * @var bool $sentToEasyMessage
      */
     private $sentToEasyMessage = false;
@@ -55,9 +62,14 @@ class EnchantingService {
      * @param EnchantItemService $enchantItemService
      * @return void
      */
-    public function __construct(CharacterInformationBuilder $characterInformationBuilder, EnchantItemService $enchantItemService) {
+    public function __construct(CharacterInformationBuilder $characterInformationBuilder,
+                                EnchantItemService $enchantItemService,
+                                RandomEnchantmentService $randomEnchantmentService)
+    {
+
         $this->characterInformationBuilder = $characterInformationBuilder;
         $this->enchantItemService          = $enchantItemService;
+        $this->randomEnchantmentService    = $randomEnchantmentService;
     }
 
     /**
@@ -69,7 +81,7 @@ class EnchantingService {
      * @return array
      */
     public function fetchAffixes(Character $character): array {
-        $characterInfo   = $this->characterInformationBuilder->setCharacter($character);
+        $characterInfo   = $this->characterInformationBuilder->setCharacter($character);;
         $enchantingSkill = $this->getEnchantingSkill($character);
 
         return [
@@ -149,14 +161,33 @@ class EnchantingService {
     protected function fetchCharacterInventory(Character $character): array {
         return $character->refresh()->inventory->slots->filter(function($slot) {
             if ($slot->item->type !== 'quest' && $slot->item->type !== 'alchemy' && !$slot->equipped) {
-                return $slot->item->load('itemSuffix', 'itemPrefix')->toArray();
+                if (!is_null($slot->item->item_prefix_id)) {
+                    if (!$slot->item->itemPrefix->randomly_generated) {
+                        return $slot->item->load('itemSuffix', 'itemPrefix')->toArray();
+                    }
+                }
+
+                if (!is_null($slot->item->item_suffix_id)) {
+                    if (!$slot->item->itemSuffix->randomly_generated) {
+                        return $slot->item->load('itemSuffix', 'itemPrefix')->toArray();
+                    }
+                }
             }
         })->values()->toArray();
     }
 
     protected function getAvailableAffixes(CharacterInformationBuilder $builder, Skill $enchantingSkill): Collection {
+
+        $currentInt = $builder->statMod('int');
+
+        // If the current intelligence is over 1 billion,
+        // set the max to 1 billion as enchanting will never go over this.
+        if ($currentInt > 1000000000) {
+            $currentInt = 1000000000;
+        }
+
         return ItemAffix::select('name', 'cost', 'id', 'type')
-                        ->where('int_required', '<=', $builder->statMod('int'))
+                        ->where('int_required', '<=', $currentInt)
                         ->where('skill_level_required', '<=', $enchantingSkill->level)
                         ->where('randomly_generated', false)
                         ->orderBy('cost', 'asc')
@@ -221,6 +252,8 @@ class EnchantingService {
         $message = 'Applied enchantment: '.$affix->name.' to: ' . $slot->item->refresh()->affix_name;
 
         event(new ServerMessageEvent($character->user, 'enchanted', $message));
+
+        event(new UpdateQueenOfHeartsPanel($character->user, $this->randomEnchantmentService->fetchDataForApi($character)));
 
         if (!$tooEasy) {
             event(new UpdateSkillEvent($enchantingSkill));

@@ -41,8 +41,8 @@ class ClassBonusInformation {
     protected function getClassDetails(CharacterClassValue $classAttackValue, array $details): array  {
         if ($classAttackValue->isFighter()) {
             $details['type'] = Str::ucfirst(ClassAttackValue::FIGHTERS_DOUBLE_DAMAGE);
-            $details['requires'] = 'Weapon equipped';
-            $details['description'] = 'With a weapon equipped you have a small chance to do damage equal to your modded attack + 5% of the modded attack, with out being blocked.';
+            $details['requires'] = 'Duel Weapon equipped or Weapon/Shield equipped';
+            $details['description'] = 'With a weapon equipped you have a small chance to do damage equal to your modded attack + 15% of the modded attack, with out being blocked. With a shield equipped you have will use your class bonus towards your defence.';
         }
 
         if ($classAttackValue->isRanger()) {
@@ -52,7 +52,7 @@ class ClassBonusInformation {
         }
 
         if ($classAttackValue->isThief()) {
-            $details['type'] = Str::ucfirst(ClassAttackValue::RANGER_TRIPLE_ATTACK);
+            $details['type'] = Str::ucfirst(ClassAttackValue::THIEVES_SHADOW_DANCE);
             $details['requires'] = 'Duel weapons equipped';
             $details['description'] = 'With duel weapons equipped, you have a chance to slip by the enemy and instantly hit them.';
         }

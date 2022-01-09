@@ -5,6 +5,7 @@ namespace Tests\Unit\Game\Kingdoms\Handlers;
 use App\Flare\Events\KingdomServerMessageEvent;
 use App\Flare\Mail\GenericMail;
 use App\Flare\Values\KingdomLogStatusValue;
+use App\Flare\Values\NpcTypes;
 use App\Game\Kingdoms\Handlers\NotifyHandler;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -13,13 +14,18 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateNpc;
 
 class NotifyHandlerTest extends TestCase {
 
-    use RefreshDatabase;
+    use RefreshDatabase, CreateNpc;
 
     public function setUp(): void {
         parent::setUp();
+
+        $this->createNpc([
+            'type' => NpcTypes::KINGDOM_HOLDER
+        ]);
     }
 
     public function tearDown(): void {

@@ -150,7 +150,8 @@ trait DefenderHandler {
             }
         }
 
-        $treasuryBonus = $defender->treasury / KingdomMaxValue::MAX_TREASURY;
+        $treasuryBonus  = $defender->treasury / KingdomMaxValue::MAX_TREASURY;
+        $treasuryBonus += $defender->fetchDefenceBonusFromPassive();
 
         return ($totalDefenders / $totalUnitTypes) + $wallsBonus + $treasuryBonus;
     }

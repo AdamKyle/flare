@@ -47,9 +47,15 @@ There are some things you cannot do:
 - You won't be able to wage war or use items on kingdoms.
 - You won't be able to apply or cancel boons from [alchemical](/information/usable-items) items.
 - You won't be able to shop or visit the [market board](/information/market-board).
-- You won't be able to manage [equipment](/information/equipment) or [sets](/information/equipment-sets).
+- You won't be able to manage [equipment](/information/equipment) or [sets](/information/equipment-sets). (There are some exceptions)
 - You won't be able to use /PCT to instantly Teleport to [Celestials](/information/celestials).
 - You won't be able to visit [special location](/information/special-locations).
+- You cannot train skills. (There are some exceptions)
+
+The exceptions to equipment is that you can still disenchant drops, craft/enchant and move items between sets, but you cannot equip items, replace equipped items or 
+equip a new set, unequipped a set or unequipped currently equipped items.
+
+Regarding skills, while you cannot switch which skill is training or even set one while this automation is running, you can still train your [Passive skills](/information/kingdom-passive-skills).
 
 Your character can select the maximum amount of time which is 8 hours. Should you manage to do a full eight hours of auto attacking,
 without dying or loosing your session (that is being kicked after 90 minutes of no activity) you will be locked out of doing 

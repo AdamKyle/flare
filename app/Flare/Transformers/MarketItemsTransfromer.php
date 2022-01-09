@@ -2,10 +2,13 @@
 
 namespace App\Flare\Transformers;
 
+use App\Flare\Traits\IsItemUnique;
 use League\Fractal\TransformerAbstract;
 use App\Flare\Models\MarketBoard;
 
 class MarketItemsTransfromer extends TransformerAbstract {
+
+    use IsItemUnique;
 
     /**
      * Gets the response data for the character sheet
@@ -23,6 +26,9 @@ class MarketItemsTransfromer extends TransformerAbstract {
             'listed_price'   => $marketListing->listed_price,
             'character_name' => $marketListing->character->name,
             'type'           => $marketListing->item->type,
+            'unique'         => $this->isUnique($marketListing->item),
         ];
     }
+
+
 }

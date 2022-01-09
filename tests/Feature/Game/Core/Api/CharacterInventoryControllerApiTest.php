@@ -19,7 +19,7 @@ use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
 use Tests\Setup\Character\CharacterFactory;
 
-class CharacterInventoryControllerApiTestTest extends TestCase
+class CharacterInventoryControllerApiTest extends TestCase
 {
     use RefreshDatabase,
         CreateItem,

@@ -43,7 +43,6 @@ export default class MapActions extends React.Component {
                     </button>
                     : null
                 }
-
                 <button type="button" className="btn btn-primary btn-sm mr-2 " data-direction="teleport"
                         disabled={this.props.disableMapButtons() || this.props.attackAutomationIsRunning} onClick={this.props.openTeleport}>
                   Teleport
@@ -53,7 +52,7 @@ export default class MapActions extends React.Component {
           </Row>
           <Row>
             <Col xs={12}>
-              Characters on map: {this.props.charactersOnMap}
+              Characters on map: {this.props.charactersOnMap} | <a href="#" onClick={this.props.openQuest}>Plane Quests</a>
             </Col>
           </Row>
         </div>

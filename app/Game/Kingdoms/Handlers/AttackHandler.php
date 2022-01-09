@@ -117,11 +117,16 @@ class AttackHandler {
      */
     public function attackTarget(KingdomBuilding $target, array $unitInfo): array {
         $totalAttack = $unitInfo['total_attack'];
+        $isCannons   = $unitInfo['is_cannons'];
 
-        $defence              = $target->current_defence;
-        $totalTreasuryDefence = $target->kingdom->treasury / KingdomMaxValue::MAX_TREASURY;
+        $defence               = $target->current_defence;
+        $kingdomDefence        = $target->kingdom->fetchKingdomDefenceBonus();
 
-        $defence = $defence + $defence * $totalTreasuryDefence;
+        if ($isCannons && $kingdomDefence > 0.45) {
+            $kingdomDefence = 0.45;
+        }
+
+        $defence = $defence + $defence * $kingdomDefence;
 
         if ($totalAttack > $target->current_defence) {
             $totalPercentageUnitsLost      = $this->calculatePerentageLost($totalAttack, $defence, true);

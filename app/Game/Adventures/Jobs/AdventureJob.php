@@ -59,7 +59,7 @@ class AdventureJob implements ShouldQueue
         Adventure $adventure,
         string $attackType,
         string $name,
-        int $currentLevel,
+        int $currentLevel = 1,
     ) {
         $this->character          = $character;
         $this->adventure          = $adventure;
@@ -77,7 +77,19 @@ class AdventureJob implements ShouldQueue
     {
         $name = Cache::get('character_'.$this->character->id.'_adventure_'.$this->adventure->id);
 
+        $shouldBail = false;
+
         if (is_null($name) || $name !== $this->name) {
+            if (!is_null($this->character->current_adventure_id)) {
+                if (!$this->character->current_adventure_id === $this->adventure->id) {
+                    $shouldBail = true;
+                }
+            } else  {
+                $shouldBail = true;
+            }
+        }
+
+        if ($shouldBail) {
             return;
         }
 
@@ -90,6 +102,11 @@ class AdventureJob implements ShouldQueue
             Cache::forget('character_'.$this->character->id.'_adventure_'.$this->adventure->id);
 
             event(new UpdateTopBarEvent($this->character->refresh()));
+        } else {
+            $delay            = $event->adventure->time_per_level;
+            $timeTillFinished = now()->addMinutes($delay);
+
+            AdventureJob::dispatch($this->character, $event->adventure, $event->attackType, $jobName, $this->currentLevel + 1)->delay($timeTillFinished);
         }
     }
 

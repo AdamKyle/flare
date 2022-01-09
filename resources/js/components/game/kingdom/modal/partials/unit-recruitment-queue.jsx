@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDatatable from '@ashvin27/react-datatable';
 import moment from 'moment';
 import {CountdownCircleTimer} from 'react-countdown-circle-timer';
-import {truncate} from 'lodash';
 
 export default class UnitRecruitmentQueue extends React.Component {
 

@@ -2,6 +2,7 @@
 
 namespace App\Game\Kingdoms\Service;
 
+use App\Game\Messages\Events\ServerMessageEvent;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
 use App\Flare\Events\UpdateTopBarEvent;
@@ -177,7 +178,7 @@ class KingdomService {
      * @param $amountToEmbezzle
      */
     public function embezzleFromKingdom(Kingdom $kingdom, $amountToEmbezzle) {
-        $newMorale = $kingdom->current_morale - 0.15;
+        $newMorale   = $kingdom->current_morale - 0.15;
 
         $kingdom->update([
             'treasury' => $kingdom->treasury - $amountToEmbezzle,
@@ -199,7 +200,22 @@ class KingdomService {
     }
 
     protected function assignKingdomBuildings(Kingdom $kingdom): Kingdom {
+        $character = $kingdom->character;
+
         foreach(GameBuilding::all() as $building) {
+
+            $isLocked  = $building->is_locked;
+
+            if ($isLocked) {
+                $passive = $character->passiveSkills()->where('passive_skill_id', $building->passive_skill_id)->first();
+
+                if (!is_null($passive)) {
+                    if ($passive->current_level === $building->level_required) {
+                        $isLocked = false;
+                    }
+                }
+            }
+
             $kingdom->buildings()->create([
                 'game_building_id'    => $building->id,
                 'kingdom_id'          => $kingdom->id,
@@ -208,6 +224,7 @@ class KingdomService {
                 'current_durability'  => $building->base_durability,
                 'max_defence'         => $building->base_defence,
                 'max_durability'      => $building->base_durability,
+                'is_locked'           => $isLocked,
             ]);
         }
 

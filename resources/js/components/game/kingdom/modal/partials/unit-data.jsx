@@ -11,12 +11,30 @@ export default class UnitData extends React.Component {
     };
   }
 
+  formatNumber(number) {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+
   calculateAmount(prop, amount) {
     if (amount === 0 || amount === '') {
       return this.props.unit[prop];
     }
 
-    return this.props.unit[prop] * amount;
+    let totalCost = this.props.unit[prop] * amount;
+
+    if (prop === 'required_population') {
+      totalCost = totalCost - totalCost * this.props.kingdom.population_cost_reduction;
+    }
+
+    if (prop === 'iron') {
+      totalCost = totalCost - totalCost * this.props.kingdom.iron_cost_reduction;
+    }
+
+    if (prop === 'time_to_recruit') {
+      totalCost = totalCost - totalCost * this.props.kingdom.unit_time_reduction;
+    }
+
+    return totalCost.toFixed(2);
   }
 
   getClass(prop, amount) {
@@ -67,6 +85,32 @@ export default class UnitData extends React.Component {
     }
   }
 
+  renderTime() {
+
+    if (this.props.amount <= 0) {
+      return '0 Seconds';
+    }
+
+    const seconds = this.calculateAmount('time_to_recruit', this.props.amount);
+    const minutes = this.calculateAmount('time_to_recruit', this.props.amount) / 60;
+    const hours   = this.calculateAmount('time_to_recruit', this.props.amount) / 3600;
+    const days    = this.calculateAmount('time_to_recruit', this.props.amount) / 86400;
+
+    if (days >= 1) {
+      return days.toFixed(2) + ' Days.';
+    }
+
+    if (hours >= 1) {
+      return hours.toFixed(2) + ' Hours.';
+    }
+
+    if (minutes >= 1) {
+      return minutes.toFixed(2) + ' Minutes.';
+    }
+
+    return (seconds >= 1 ? seconds : 1) + ' seconds';
+  }
+
   render() {
     return (
       <div className="mt-2">
@@ -115,19 +159,20 @@ export default class UnitData extends React.Component {
             <dl>
               <dd><strong>Cost in wood</strong>:</dd>
               <dd
-                className={this.getClass('wood_cost', this.props.amount)}>{this.calculateAmount('wood_cost', this.props.amount)}</dd>
+                className={this.getClass('wood_cost', this.props.amount)}>{this.formatNumber(this.calculateAmount('wood_cost', this.props.amount))}</dd>
               <dd><strong>Cost in clay</strong>:</dd>
               <dd
-                className={this.getClass('clay_cost', this.props.amount)}>{this.calculateAmount('clay_cost', this.props.amount)}</dd>
+                className={this.getClass('clay_cost', this.props.amount)}>{this.formatNumber(this.calculateAmount('clay_cost', this.props.amount))}</dd>
               <dd><strong>Cost in stone</strong>:</dd>
               <dd
-                className={this.getClass('stone_cost', this.props.amount)}>{this.calculateAmount('stone_cost', this.props.amount)}</dd>
+                className={this.getClass('stone_cost', this.props.amount)}>{this.formatNumber(this.calculateAmount('stone_cost', this.props.amount))}</dd>
               <dd><strong>Cost in iron</strong>:</dd>
               <dd
-                className={this.getClass('iron_cost', this.props.amount)}>{this.calculateAmount('iron_cost', this.props.amount)}</dd>
+                className={this.getClass('iron_cost', this.props.amount)}>{this.formatNumber(this.calculateAmount('iron_cost', this.props.amount))} (-{(this.props.kingdom.iron_cost_reduction * 100).toFixed()}%)</dd>
               <dd><strong>Required population</strong>:</dd>
               <dd
-                className={this.getClass('required_population', this.props.amount)}>{this.calculateAmount('required_population', this.props.amount)}
+                className={this.getClass('required_population', this.props.amount)}>
+                {this.formatNumber(this.calculateAmount('required_population', this.props.amount))} (-{(this.props.kingdom.population_cost_reduction * 100).toFixed()}%)
                 <OverlayTrigger
                   trigger="hover"
                   key='right'
@@ -157,9 +202,8 @@ export default class UnitData extends React.Component {
               <dd><strong>Travel Time</strong>:</dd>
               <dd>{this.props.unit.travel_time} Minutes(s)</dd>
               <dd><strong>Time To Recruit</strong>:</dd>
-              <dd
-                className={this.getClass('time_to_recruit', this.props.amount)}>{this.calculateAmount('time_to_recruit', this.props.amount)} Seconds <small
-                className="text-muted">{(this.calculateAmount('time_to_recruit', this.props.amount) / 60).toFixed(2)} Minutes</small>
+              <dd className={this.getClass('time_to_recruit', this.props.amount)}>
+                {this.renderTime()} (-{(this.props.kingdom.unit_time_reduction * 100).toFixed(2)}%)
               </dd>
             </dl>
           </div>

@@ -5,6 +5,7 @@ namespace App\Game\Market\Controllers\Api;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Item as ItemModel;
+use App\Flare\Traits\IsItemUnique;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Events\UpdateMarketBoardBroadcastEvent;
@@ -30,7 +31,7 @@ use League\Fractal\Resource\ResourceAbstract;
 
 class MarketController extends Controller {
 
-    use UpdateMarketBoard;
+    use UpdateMarketBoard, IsItemUnique;
 
     private $manager;
 
@@ -96,6 +97,10 @@ class MarketController extends Controller {
             $slot->item->name = $item->affix_name;
 
             $slot->cost = SellItemCalculator::fetchSalePriceWithAffixes($slot->item);
+
+            $slot->min_cost = SellItemCalculator::fetchMinimumSalePriceOfUnique($slot->item);
+
+            $slot->item->unique = $this->isUnique($slot->item);
 
             return $slot;
         });
@@ -189,6 +194,13 @@ class MarketController extends Controller {
 
         if (is_null($slot)) {
             return response()->json(['message' => 'item is not found.'], 422);
+        }
+
+        if ($this->isUnique($slot->item)) {
+            $minCost = SellItemCalculator::fetchMinimumSalePriceOfUnique($slot->item);
+            if ( $minCost > $request->list_for) {
+                return response()->json(['message' => 'No! The minimum selling price is: ' . number_format($minCost) . ' Gold.'], 422);
+            }
         }
 
         MarketBoard::create([

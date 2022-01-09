@@ -15,6 +15,9 @@
                 @case('walk-on-water')
                     Walk On Water
                     @break
+                @case('walk-on-magma')
+                  Walk On Magma in Hell
+                  @break
                 @case('labyrinth')
                     Access Labyrinth Plane
                     @break
@@ -22,6 +25,12 @@
                     Access Dungeons Plane
                 @case('shadow-plane')
                     Access Shadow Plane
+                    @break
+                @case('hell')
+                    Access to Hell
+                    @break
+                @case('purgatory')
+                    Access to Purgatory
                     @break
                 @case('walk-on-death-water')
                     Walk on Death Water in Dungeons
@@ -37,6 +46,12 @@
                     @break
                 @case('gold-dust-rush')
                     Gives you a 25% chance to increase your (current total) gold dust by your disenchanting skill bonus. The more gold dust, the more of a rush you get.
+                    @break
+                @case('mass-embezzle')
+                    Lets you mass embezzle, while standing in a kingdom you own.
+                    @break
+                @case('speak-to-queen-of-hearts')
+                    Let's you, while standing at her location in hell, speak with the Queen of Hearts.
                     @break
                 @default
                     N/A
@@ -57,7 +72,7 @@
         <dd>{{$item->skill_level_trivial}}</dd>
         <dt>Gold Cost:</dt>
         <dd>{{number_format($item->cost)}}</dd>
-        <dt>God Dust Cost:</dt>
+        <dt>Gold Dust Cost:</dt>
         <dd>{{!is_null($item->gold_dust_cost) ? number_format($item->gold_dust_cost) : 0}}</dd>
         <dt>Shards Cost:</dt>
         <dd>{{!is_null($item->shards_cost) ? $item->shards_cost : 0}}</dd>

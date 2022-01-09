@@ -21,8 +21,6 @@ class UpdateKingdomsServiceTest extends TestCase
 
     public function testAddKingdomBuildingToKingdomWithService()
     {
-        Mail::fake();
-
         $kingdom = $this->createKingdom([
             'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter()->id,
             'game_map_id'        => GameMap::first()->id,
@@ -39,8 +37,32 @@ class UpdateKingdomsServiceTest extends TestCase
         $kingdom = $kingdom->refresh();
 
         $this->assertTrue($kingdom->buildings->isNotEmpty());
+    }
 
-        Mail::assertSent(GenericMail::class, 1);
+    public function testAddKingdomBuildingToKingdomWithUnits()
+    {
+        $kingdom = $this->createKingdom([
+            'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter()->id,
+            'game_map_id'        => GameMap::first()->id,
+            'current_wood'       => 500,
+            'current_population' => 0,
+        ]);
+
+        $building = $this->createGameBuilding();
+
+        $units    = $this->createGameUnits([], 1);
+
+        $building->units()->create([
+            'game_building_id' => $building->id,
+            'game_unit_id'     => $units->first()->id,
+            'required_level'   => 1,
+        ]);
+
+        resolve(UpdateKingdomsService::class)->updateKingdomKingdomBuildings($building, $units->pluck('id')->toArray(), 3);
+
+        $kingdom = $kingdom->refresh();
+
+        $this->assertTrue($kingdom->buildings->isNotEmpty());
     }
 
 

@@ -17,6 +17,13 @@ class KingdomBuildingTransformer extends TransformerAbstract {
      */
     public function transform(KingdomBuilding $building) {
 
+        $passiveRequired = null;
+        $passiveSkill    = $building->gameBuilding->passive;
+
+        if (!is_null($passiveSkill)) {
+            $passiveRequired = $passiveSkill->name;
+        }
+
         return [
             'id'                          => $building->id,
             'kingdom_id'                  => $building->kingdom_id,
@@ -33,6 +40,8 @@ class KingdomBuildingTransformer extends TransformerAbstract {
             'is_church'                   => $building->is_church,
             'is_farm'                     => $building->is_farm,
             'is_resource_building'        => $building->gives_resources,
+            'is_locked'                   => $building->is_locked,
+            'passive_skill_name'          => $passiveRequired,
             'trains_units'                => $building->trains_units,
             'wood_cost'                   => $building->wood_cost,
             'stone_cost'                  => $building->stone_cost,

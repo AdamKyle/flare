@@ -7,28 +7,34 @@ namespace App\Game\Kingdoms\Values;
 class UnitCosts
 {
 
-    const SPEARMEN  = 'Spearmen';
-    const ARCHER    = 'Archer';
-    const SWORDSMEN = 'Swordsmen';
-    const RAM       = 'Ram';
-    const TREBUCHET = 'Trebuchet';
-    const PRIEST    = 'Priest';
-    const CLERIC    = 'Cleric';
-    const PALIDIN   = 'Paladin';
-    const SETTLER   = 'Settler';
-    const PERSON    = 'Person';
+    const SPEARMEN        = 'Spearmen';
+    const ARCHER          = 'Archer';
+    const SWORDSMEN       = 'Swordsmen';
+    const RAM             = 'Ram';
+    const TREBUCHET       = 'Trebuchet';
+    const MOUNTED_KNGHTS  = 'Mounted Knights';
+    const MOUNTED_ARCHERS = 'Mounted Archers';
+    const CANNON          = 'Cannon';
+    const PRIEST          = 'Priest';
+    const CLERIC          = 'Cleric';
+    const PALIDIN         = 'Paladin';
+    const SETTLER         = 'Settler';
+    const PERSON          = 'Person';
 
     protected static $values = [
-        self::SPEARMEN   => self::SPEARMEN,
-        self::ARCHER     => self::ARCHER,
-        self::SWORDSMEN  => self::SWORDSMEN,
-        self::RAM        => self::RAM,
-        self::TREBUCHET  => self::TREBUCHET,
-        self::PRIEST     => self::PRIEST,
-        self::CLERIC     => self::CLERIC,
-        self::PALIDIN    => self::PALIDIN,
-        self::SETTLER    => self::SETTLER,
-        self::PERSON     => self::PERSON,
+        self::SPEARMEN        => self::SPEARMEN,
+        self::ARCHER          => self::ARCHER,
+        self::SWORDSMEN       => self::SWORDSMEN,
+        self::RAM             => self::RAM,
+        self::TREBUCHET       => self::TREBUCHET,
+        self::CANNON          => self::CANNON,
+        self::MOUNTED_KNGHTS  => self::MOUNTED_KNGHTS,
+        self::MOUNTED_ARCHERS => self::MOUNTED_ARCHERS,
+        self::PRIEST          => self::PRIEST,
+        self::CLERIC          => self::CLERIC,
+        self::PALIDIN         => self::PALIDIN,
+        self::SETTLER         => self::SETTLER,
+        self::PERSON          => self::PERSON,
     ];
 
     private $name;
@@ -53,7 +59,13 @@ class UnitCosts
             case self::RAM:
                 return 500;
             case self::TREBUCHET:
-                return 100;
+                return 1000;
+            case self::CANNON:
+                return 5000;
+            case self::MOUNTED_KNGHTS:
+                return 700;
+            case self::MOUNTED_ARCHERS:
+                return 300;
             case self::PRIEST:
                 return 75;
             case self::CLERIC:
@@ -61,7 +73,7 @@ class UnitCosts
             case self::PALIDIN:
                 return 250;
             case self::SETTLER:
-                return 1000;
+                return 2500;
             case self::PERSON:
                 return 5;
             default:

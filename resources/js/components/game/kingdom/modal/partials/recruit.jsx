@@ -1,5 +1,6 @@
 import React, {Fragment} from 'react';
 import {Popover, OverlayTrigger} from 'react-bootstrap';
+import AlertInfo from "../../../components/base/alert-info";
 
 export default class Recruit extends React.Component {
 
@@ -7,7 +8,7 @@ export default class Recruit extends React.Component {
     super(props);
 
     this.state = {
-      max: this.props.currentPopulation,
+      max: parseInt(this.props.unit.kd_max.replace(/,/g, '')) || 0,
       value: "",
       canRecruit: true,
       loading: false,
@@ -19,16 +20,16 @@ export default class Recruit extends React.Component {
   componentDidUpdate(prevProps, prevState) {
     if (prevState.max !== this.state.max) {
       this.setState({
-        max: this.props.currentPopulation,
+        max: parseInt(this.props.unit.kd_max.replace(/,/g, '')) || 0,
         value: 0,
       });
     }
   }
 
   amountChange(event) {
-    let value = parseInt(event.target.value) || '';
+    let value = parseInt(event.target.value) || 0;
 
-    if (value !== '') {
+    if (value !== 0) {
       if (value > this.state.max) {
         value = this.state.max;
       }
@@ -43,18 +44,23 @@ export default class Recruit extends React.Component {
   }
 
   amountChangeWithGold(event) {
-    let value = parseInt(event.target.value) || '';
+    let value = parseInt(event.target.value) || 0;
 
-    if (value !== '') {
+    if (value !== 0) {
       if (value > this.state.max) {
         value = this.state.max;
       }
     }
 
+    const costReduction = this.props.kingdom.unit_cost_reduction;
+    let   totalCost     = value * this.props.unit.cost_per_unit;
+
+    totalCost = totalCost - Math.floor(totalCost * costReduction);
+
     this.setState({
       value: value,
       canRecruit: this.canRecruitWithGold(value) && value > 0,
-      totalCost: value * this.props.unit.cost_per_unit,
+      totalCost: totalCost,
     }, () => {
       this.props.updateAmount(this.state.value);
     });
@@ -114,8 +120,19 @@ export default class Recruit extends React.Component {
     for (let i = 0; i <= costTypes.length; i++) {
 
       const kingdomCurrent = this.getKingdomAmount(costTypes[i]);
+      let costReduction    = this.props.kingdom.unit_cost_reduction;
 
-      const unitTotalCost = this.props.unit[costTypes[i]] * value;
+      if (costTypes[i] === 'iron_cost') {
+        costReduction += this.props.kingdom.iron_cost_reduction;
+      }
+
+      if (costTypes[i] === 'required_population') {
+        costReduction += this.props.kingdom.population_cost_reduction;
+      }
+
+      let unitTotalCost = this.props.unit[costTypes[i]] * value;
+
+      unitTotalCost = unitTotalCost - Math.floor(unitTotalCost * costReduction);
 
       if (unitTotalCost > kingdomCurrent) {
         notEnoughTypes.push(costTypes[i])
@@ -129,6 +146,11 @@ export default class Recruit extends React.Component {
     let cost = this.props.unit.cost_per_unit;
 
     cost *= value;
+
+    const costReduction = this.props.kingdom.unit_cost_reduction;
+
+    cost = cost - Math.floor(cost * costReduction);
+
     const characterGold = parseInt(this.props.characterGold.replace(/,/g, ''));
 
     return characterGold >= cost;
@@ -177,7 +199,7 @@ export default class Recruit extends React.Component {
             : null
         }
         <div className="row">
-          <div className="col-md-6">
+          <div className="col-md-12">
             <dl className="mb-3">
               <dt><strong>Current Population</strong>:</dt>
               <dd>
@@ -202,7 +224,7 @@ export default class Recruit extends React.Component {
                   <i className="fas fa-question-circle ml-2"></i>
                 </OverlayTrigger>
               </dd>
-              <dt><strong>Maximum Allowed:</strong>: </dt>
+              <dt><strong>Maximum Allowed:</strong> </dt>
               <dd>
                 {this.props.unit.kd_max.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                 <OverlayTrigger
@@ -223,6 +245,8 @@ export default class Recruit extends React.Component {
                   <i className="fas fa-question-circle ml-2"></i>
                 </OverlayTrigger>
               </dd>
+              <dt>Cost Reduction %:</dt>
+              <dd>{this.props.kingdom.unit_cost_reduction * 100}%</dd>
             </dl>
             <div className="form-group">
               <label htmlFor="unit-recruitment-type">Recruitment Type</label>
@@ -244,6 +268,13 @@ export default class Recruit extends React.Component {
                     value={this.state.value}
                     onChange={this.amountChange.bind(this)}
                   />
+
+                  <button className="btn btn-primary mt-3"
+                          disabled={!this.state.canRecruit || !this.props.unit.can_recruit_more || this.state.recruitmentType === ''}
+                          onClick={this.recruitUnits.bind(this)}
+                  >
+                    Recruit Selected Amount
+                  </button>
                 </Fragment>
               : null
             }
@@ -251,12 +282,17 @@ export default class Recruit extends React.Component {
             {
               this.state.recruitmentType === 'recruit-with-gold' ?
                 <Fragment>
-                  <div className="alert alert-info">
+                  <AlertInfo icon={'fas fa-question-circle'} title="Info">
                     <p>You can pay gold instead of resources to recruit units.</p>
                     <p>You cannot buy more units then your population allows. You also cannot buy
                     more units then you have gold. Each unit has a cost per unit.</p>
                     <p>Recruitment time still counts. The more you recruit the more time it takes.</p>
-                  </div>
+                    <p>When recruiting with gold, you do not need to worry about the resource cost section, this is just an idea of how many resources it would take
+                    to recruit the units you wanted, if you were using resources.</p>
+                    <p>Do not use gold to purchase large amounts on units, until you have trained your Kingmanship <a href="/information/skill-information" target="_blank">Skill</a>&nbsp;
+                      to a significant portion. For example - with Kingmanship at level 1, recruiting 1 billion spearmen would take: <strong>94 years in real time</strong>,
+                      with the skill maxed out, it takes 34.72 days to recruit that many units, which is <em>much</em> better.</p>
+                  </AlertInfo>
                   <dl className="mt-3 mb-3">
                     <dt>Cost per unit:</dt>
                     <dd>{this.props.unit.cost_per_unit}</dd>
@@ -274,18 +310,17 @@ export default class Recruit extends React.Component {
                     value={this.state.value}
                     onChange={this.amountChangeWithGold.bind(this)}
                   />
+
+                  <button className="btn btn-primary mt-3"
+                          disabled={!this.state.canRecruit || !this.props.unit.can_recruit_more || this.state.recruitmentType === ''}
+                          onClick={this.recruitUnits.bind(this)}
+                  >
+                    Recruit Selected Amount
+                  </button>
                 </Fragment>
                 : null
             }
 
-          </div>
-          <div className="col-md-6">
-            <button className="btn btn-primary unit-recruit-button"
-                    disabled={!this.state.canRecruit || !this.props.unit.can_recruit_more || this.state.recruitmentType === ''}
-                    onClick={this.recruitUnits.bind(this)}
-            >
-              Recruit Selected Amount
-            </button>
           </div>
         </div>
         {

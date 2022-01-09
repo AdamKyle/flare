@@ -230,8 +230,8 @@
         <div class="{{$monster->is_celestial_entity ? 'col-md-3' : 'hide'}}">
             <div class="form-group">
                 <label for="gold_dust_cost">Gold Dust Cost: </label>
-                <input type="number" class="form-control" name="gold_dust_cost" value="" wire:model="monster.gold_cost_cost">
-                @error('monster.gold_cost_cost') <span class="text-danger">{{ $message }}</span> @enderror
+                <input type="number" class="form-control" name="gold_dust_cost" value="" wire:model="monster.gold_dust_cost">
+                @error('monster.gold_dust_cost') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
         <div class="{{$monster->is_celestial_entity ? 'col-md-3' : 'hide'}}">

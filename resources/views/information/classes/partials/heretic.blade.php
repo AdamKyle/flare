@@ -1,5 +1,3 @@
-<h2 class="font-light">Hints</h2>
-<hr />
 <p class="mt-2">
   Focus on your Intelligence and Focus stat while leveling Casting Accuracy followed by your class skill.
 </p>
@@ -23,7 +21,7 @@
   When you start you might be tempted to buy some damage spells and equip them and start casting. But you will miss a lot, until you start leveling Casting Accuracy.
 </p>
 <p>
-  For Heretics, start with training your <a href="/information/skills">Casting Accuracy skill</a> at 10% of your xp around level 3 or so.
+  For Heretics, start with training your <a href="/information/skill-information">Casting Accuracy skill</a> at 10% of your xp around level 3 or so.
   For your cast to work properly, unless its a heal spell, you need a Casting Accuracy of at least level 5 to hit more then miss.
 </p>
 <p>

@@ -1,5 +1,3 @@
-<h2 class="font-light">Hints</h2>
-<hr />
 <p class="mt-2">
   Focus on your Charisma and Focus stat while leveling Casting Accuracy followed by your class skill.
 </p>
@@ -23,5 +21,5 @@ If you have no healing spells equipped you will still do 30% healing of your chr
 </x-core.alerts.info-alert>
 <p>Prophets will want either Dryad or High Elf a their race.</p>
 <p>
-  For Casters, start with training your <a href="/information/skills">Casting Accuracy skill</a> at 10% of your xp around level 3 or so.
+  For Casters, start with training your <a href="/information/skill-information">Casting Accuracy skill</a> at 10% of your xp around level 3 or so.
 </p>

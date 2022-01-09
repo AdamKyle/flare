@@ -47,5 +47,29 @@
             </div>
         </div>
     </div>
-    
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="skill-for-monster">Required Passive Skill: </label>
+                <select class="form-control" name="passive_skill_id" wire:model="gameBuilding.passive_skill_id">
+                    @foreach($passiveSkills as $skill)
+                        <option value={{$skill->id}} {{!is_null($gameBuilding) ? ($gameBuilding->passive_skill_id === $skill->id ? 'selected' : '') : ''}}>{{$skill->name}}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="required-passive-skill-level">Required Level: </label>
+                <input type="number" class="form-control required" id="required-passive-skill-level" name="required-passive-skill-level" wire:model="gameBuilding.level_required">
+                @error('gameBuilding.level_required') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group form-check-inline">
+                <input type="checkbox" class="form-check-input" id="is_locked" wire:model="gameBuilding.is_locked">
+                <label class="form-check-label" for="is_locked">Is Locked?</label>
+            </div>
+        </div>
+    </div>
 </div>

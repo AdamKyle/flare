@@ -65,7 +65,7 @@ class KingdomBuildingService {
      * @param Character $character
      */
     public function rebuildKingdomBuilding(KingdomBuilding $building, Character $character) {
-        $timeToComplete = now()->addMinutes($building->rebuild_time);
+        $timeToComplete = now()->addMinutes($this->calculateBuildingTimeReduction($building));
 
         $queue = BuildingInQueue::create([
             'character_id' => $character->id,
@@ -86,24 +86,50 @@ class KingdomBuildingService {
      * @return Kingdom
      */
     public function updateKingdomResourcesForKingdomBuildingUpgrade(KingdomBuilding $building): Kingdom {
+        $buildingCostReduction   = $building->kingdom->fetchBuildingCostReduction();
+        $ironCostReduction       = $building->kingdom->fetchIronCostReduction();
+        $populationCostReduction = $building->kingdom->fetchPopulationCostReduction();
+
+        $woodCost       = $building->wood_cost - $building->wood_cost * $buildingCostReduction;
+        $clayCost       = $building->clay_cost - $building->clay_cost * $buildingCostReduction;
+        $stoneCost      = $building->stone_cost - $building->stone_cost * $buildingCostReduction;
+        $ironCost       = $building->iron_cost - $building->iron_cost * ($buildingCostReduction + $ironCostReduction);
+        $populationCost = $building->required_population - $building->required_population * ($buildingCostReduction + $populationCostReduction);
+
         $building->kingdom->update([
-            'current_wood'       => $building->kingdom->current_wood - $building->wood_cost,
-            'current_clay'       => $building->kingdom->current_clay - $building->clay_cost,
-            'current_stone'      => $building->kingdom->current_stone - $building->stone_cost,
-            'current_iron'       => $building->kingdom->current_iron - $building->iron_cost,
-            'current_population' => $building->kingdom->current_population - $building->required_population,
+            'current_wood'       => $building->kingdom->current_wood - $woodCost,
+            'current_clay'       => $building->kingdom->current_clay - $clayCost,
+            'current_stone'      => $building->kingdom->current_stone - $stoneCost,
+            'current_iron'       => $building->kingdom->current_iron - $ironCost,
+            'current_population' => $building->kingdom->current_population - $populationCost,
         ]);
 
         return $building->kingdom->refresh();
     }
 
     public function updateKingdomResourcesForRebuildKingdomBuilding(KingdomBuilding $building): Kingdom {
+        $buildingCostReduction   = $building->kingdom->fetchBuildingCostReduction();
+        $ironCostReduction       = $building->kingdom->fetchIronCostReduction();
+        $populationCostReduction = $building->kingdom->fetchPopulationCostReduction();
+
+        $woodCost       = $building->level * $building->base_wood_cost;
+        $clayCost       = $building->level * $building->base_clay_cost;
+        $stoneCost      = $building->level * $building->base_stone_cost;
+        $ironCost       = $building->level * $building->base_iron_cost;
+        $populationCost = $building->level * $building->base_population;
+
+        $woodCost       -= $woodCost * $buildingCostReduction;
+        $clayCost       -= $clayCost * $buildingCostReduction;
+        $stoneCost      -= $stoneCost * $buildingCostReduction;
+        $ironCost       -= $ironCost * ($buildingCostReduction + $ironCostReduction);
+        $populationCost -= $populationCost * ($buildingCostReduction + $populationCostReduction);
+
         $building->kingdom->update([
-            'current_wood'       => $building->kingdom->current_wood - ($building->level * $building->base_wood_cost),
-            'current_clay'       => $building->kingdom->current_clay - ($building->level * $building->base_clay_cost),
-            'current_stone'      => $building->kingdom->current_stone - ($building->level * $building->base_stone_cost),
-            'current_iron'       => $building->kingdom->current_iron - ($building->level * $building->base_iron_cost),
-            'current_population' => $building->kingdom->current_population - ($building->level * $building->base_population),
+            'current_wood'       => $building->kingdom->current_wood - $woodCost,
+            'current_clay'       => $building->kingdom->current_clay - $clayCost,
+            'current_stone'      => $building->kingdom->current_stone - $stoneCost,
+            'current_iron'       => $building->kingdom->current_iron - $ironCost,
+            'current_population' => $building->kingdom->current_population - $populationCost,
         ]);
 
         return $building->kingdom->refresh();
@@ -190,16 +216,11 @@ class KingdomBuildingService {
             return false;
         }
 
-        // If the new cost is greater than the request cost, we paid for population.
-        if ($cost > $params['cost_to_upgrade']) {
-            $kingdom->update([
-                'current_population' => 0,
-            ]);
-        } else {
-            $kingdom->update([
-                'current_population' => $kingdom->current_population - $params['pop_required'],
-            ]);
-        }
+        $newAmount =  $kingdom->current_population - $params['pop_required'];
+
+        $kingdom->update([
+            'current_population' => $newAmount > 0 ? $newAmount : 0
+        ]);
 
         $characterGold = $character->gold - $cost;
 
@@ -213,13 +234,14 @@ class KingdomBuildingService {
     }
 
     public function processUpgradeWithGold(KingdomBuilding $building, array $params) {
+
         $character = $building->kingdom->character;
 
         $timeToComplete = now()->addMinutes($this->calculateBuildingTimeReduction($building, $params['time']));
 
         $toLevel = $params['how_many_levels'] + $building->level;
 
-        if ($toLevel > $building->max_level) {
+        if ($toLevel > $building->gameBuilding->max_level) {
             $toLevel = $building->gameBuilding->max_level;
         }
 
@@ -239,11 +261,11 @@ class KingdomBuildingService {
 
     protected function calculateBuildingTimeReduction(KingdomBuilding $building, int $time = 0)  {
         $skillBonus = $building->kingdom->character->skills->filter(function($skill) {
-            return $skill->baseSkill->type === SkillTypeValue::EFFECTS_KINGDOM_TREASURY;
+            return $skill->baseSkill->type === SkillTypeValue::EFFECTS_KINGDOM;
         })->first()->skill_bonus;
 
         if ($time > 0) {
-            return floor($time - $time * $skillBonus);
+            return $time;
         }
 
         return floor($building->time_increase - $building->time_increase * $skillBonus);
@@ -263,12 +285,17 @@ class KingdomBuildingService {
     protected function calculateGoldNeeded(Character $character, Kingdom $kingdom, array $params): int {
         $population        = $params['pop_required'];
         $costForAdditional = 0;
+        $costReduction     = $kingdom->fetchBuildingCostReduction();
+        $costToUpgrade     = $params['cost_to_upgrade'];
 
         if ($kingdom->current_population < $population) {
-            $costForAdditional = ($population - $kingdom->current_population) * (new UnitCosts(UnitCosts::PERSON))->fetchCost();
+            $costForAdditional  = ($population - $kingdom->current_population) * (new UnitCosts(UnitCosts::PERSON))->fetchCost();
+            $costForAdditional -= $costForAdditional * $costReduction;
         }
 
-        return $params['cost_to_upgrade'] + $costForAdditional;
+        $costToUpgrade -= $costToUpgrade * $costReduction;
+
+        return $costToUpgrade + $costForAdditional;
     }
 
     /**
@@ -296,6 +323,7 @@ class KingdomBuildingService {
      * @return Kingdom
      */
     protected function updateKingdomAfterCancelation(Kingdom $kingdom, KingdomBuilding $building): Kingdom {
+
         $kingdom->update([
             'current_wood'       => $kingdom->current_wood + ($building->wood_cost * $this->totalResources),
             'current_clay'       => $kingdom->current_clay + ($building->clay_cost * $this->totalResources),

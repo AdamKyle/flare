@@ -21,9 +21,9 @@ class DataTableTest extends TestCase
 
     public function testTheComponentLoads()
     {
-        $this->createNewAdventure(null, 1, 'Apples');
+        $this->createNewAdventure(null, null, 1, 'Apples');
 
-        $this->createNewAdventure(null, 10, 'Bananas');
+        $this->createNewAdventure(null, null, 10, 'Bananas');
         
         Livewire::test(DataTable::class)
             ->assertSee('Apples')

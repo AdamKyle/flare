@@ -107,9 +107,9 @@ export default class Map extends React.Component {
           canMove: this.state.canMove,
         });
 
-        this.props.updateAdventure(this.state.adventures, this.state.adventureLogs, this.state.canAdventureAgainAt);
+        this.props.updateAdventure(this.state.adventures, this.state.adventureLogs, this.state.canAdventureAgainAt, result.data.inventory_sets);
 
-        this.props.updateTeleportLoations(this.state.teleportLocations, this.state.characterPosition.x, this.state.characterPosition.y);
+        this.props.updateTeleportLocations(this.state.teleportLocations, this.state.characterPosition.x, this.state.characterPosition.y);
 
         this.props.updateKingdoms({
           my_kingdoms: this.state.kingdoms,
@@ -228,7 +228,7 @@ export default class Map extends React.Component {
       }, () => {
         this.props.updateAdventure(event.adventureDetails, [], null);
 
-        this.props.updateTeleportLoations(this.state.teleportLocations, event.map.character_position_x, event.map.character_position_y);
+        this.props.updateTeleportLocations(this.state.teleportLocations, event.map.character_position_x, event.map.character_position_y);
 
         this.props.updatePort({
           currentPort: event.portDetails.hasOwnProperty('current_port') ? event.portDetails.current_port : null,
@@ -318,7 +318,7 @@ export default class Map extends React.Component {
 
         this.props.updateAdventure(this.state.adventures, this.state.adventureLogs, this.state.canAdventureAgainAt);
 
-        this.props.updateTeleportLoations(
+        this.props.updateTeleportLocations(
           this.state.teleportLocations,
           event.mapDetails.character_map.character_position_x,
           event.mapDetails.character_map.character_position_y
@@ -414,6 +414,10 @@ export default class Map extends React.Component {
     this.props.openTraverserDetails(true);
   }
 
+  openQuest() {
+    this.props.openQuestDetails(true);
+  }
+
   disableMapButtons() {
     return this.state.isDead || this.state.isAdventuring || !this.state.canMove;
   }
@@ -486,7 +490,7 @@ export default class Map extends React.Component {
           can_mass_embezzle: result.data.can_mass_embezzle,
         });
 
-        this.props.updateTeleportLoations(this.state.teleportLocations, this.state.characterPosition.x, this.state.characterPosition.y);
+        this.props.updateTeleportLocations(this.state.teleportLocations, this.state.characterPosition.x, this.state.characterPosition.y);
 
         this.props.updateAdventure(this.state.adventures, [], null);
 
@@ -515,17 +519,13 @@ export default class Map extends React.Component {
         if (response.status === 429) {
           return this.props.openTimeOutModal();
         }
+
+        return getServerMessage('cannot_walk_on_water', response.data.message);
       }
 
       this.setState({
         characterPosition: {x: this.state.characterPosition.x, y: this.state.characterPosition.y},
       });
-
-      if (response.status === 422) {
-        return;
-      }
-
-      return getServerMessage('cannot_walk_on_water');
     });
   }
 
@@ -588,6 +588,7 @@ export default class Map extends React.Component {
                 openAdventureDetails={this.openAdventureDetails.bind(this)}
                 openPortDetails={this.openPortDetails.bind(this)}
                 openTeleport={this.openTeleport.bind(this)}
+                openQuest={this.openQuest.bind(this)}
                 charactersOnMap={this.state.charactersOnMap}
                 attackAutomationIsRunning={this.props.attackAutomationIsRunning}
               />

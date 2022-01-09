@@ -45,12 +45,15 @@ export default class TraverseSection extends React.Component {
     } else {
       this.setState({
         error_message: null,
+        loading: true
       }, () => {
         axios.post('/api/map/traverse/' + this.props.characterId, {
           map_id: this.state.selected_plane,
-        }).then((result) => {
+        }).then(() => {
+          this.setState({loading: false});
           this.hideTraverse();
         }).catch((err) => {
+          this.setState({loading: false});
           if (err.hasOwnProperty('response')) {
             if (err.response.status === 429) {
               return this.props.openTimeOutModal()

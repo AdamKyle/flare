@@ -1,5 +1,6 @@
 import React from 'react';
 import Card from '../../components/templates/card';
+import AlertInfo from "../../components/base/alert-info";
 
 export default class Teleport extends React.Component {
 
@@ -160,6 +161,11 @@ export default class Teleport extends React.Component {
         {this.state.selected_x !== '' && this.state.selected_y !== ''
           ?
           <>
+            <AlertInfo icon={"fas fa-question-circle"} title={"Note"}>
+              <p>Your Quickfeet <a href="/information/skill-information" target="_blank">skill</a> will be applied when you move, directionally or teleport. This skill can reduce movement down to
+                1 second and teleport down to a minimum of 1 minute at max level. For example, a teleport of 8 minutes with maxed out
+                quick fee will be 1 minute and this will reflect in the timer.</p>
+            </AlertInfo>
             <div className="row">
               <div className="col-md-12">
                 <hr/>

@@ -14,11 +14,15 @@ class ItemEffectsValue {
     const LABYRINTH             = 'labyrinth';
     const DUNGEON               = 'dungeon';
     const SHADOWPLANE           = 'shadow-plane';
+    const HELL                  = 'hell';
+    const PURGATORY             = 'purgatory';
     const TELEPORT_TO_CELESTIAL = 'teleport-to-celestial';
     const AFFIXES_IRRESISTIBLE  = 'affixes-irresistible';
     const CONTNUE_LEVELING      = 'continue-leveling';
     const GOLD_DUST_RUSH        = 'gold-dust-rush';
     const MASS_EMBEZZLE         = 'mass-embezzle';
+    const WALK_ON_MAGMA         = 'walk-on-magma';
+    const QUEEN_OF_HEARTS       = 'speak-to-queen-of-hearts';
 
     /**
      * @var string[] $values
@@ -26,14 +30,18 @@ class ItemEffectsValue {
     protected static $values = [
         self::WALK_ON_WATER         => 'walk-on-water',
         self::WALK_ON_DEATH_WATER   => 'walk-on-death-water',
+        self::WALK_ON_MAGMA         => 'walk-on-magma',
         self::LABYRINTH             => 'labyrinth',
         self::DUNGEON               => 'dungeon',
         self::SHADOWPLANE           => 'shadow-plane',
+        self::HELL                  => 'hell',
         self::TELEPORT_TO_CELESTIAL => 'teleport-to-celestial',
         self::AFFIXES_IRRESISTIBLE  => 'affixes-irresistible',
         self::CONTNUE_LEVELING      => 'continue-leveling',
         self::GOLD_DUST_RUSH        => 'gold-dust-rush',
-        self:: MASS_EMBEZZLE        => 'mass-embezzle',
+        self::MASS_EMBEZZLE         => 'mass-embezzle',
+        self::QUEEN_OF_HEARTS       => 'speak-to-queen-of-hearts',
+        self::PURGATORY             => 'purgatory',
     ];
 
     /**
@@ -72,6 +80,15 @@ class ItemEffectsValue {
     }
 
     /**
+     * is Walk on Magma?
+     *
+     * @return bool
+     */
+    public function walkOnMagma(): bool {
+        return $this->value === self::WALK_ON_MAGMA;
+    }
+
+    /**
      * Can Access Labyrinth
      *
      * @return bool
@@ -89,6 +106,7 @@ class ItemEffectsValue {
         return $this->value === self::DUNGEON;
     }
 
+
     /**
      * Can access Shadow plane
      *
@@ -96,6 +114,24 @@ class ItemEffectsValue {
      */
     public function shadowPlane(): bool {
         return $this->value === self::SHADOWPLANE;
+    }
+
+    /**
+     * Can Access Hell
+     *
+     * @return bool
+     */
+    public function hell(): bool {
+        return $this->value === self::HELL;
+    }
+
+    /**
+     * Is purgatory?
+     *
+     * @return bool
+     */
+    public function purgatory(): bool {
+        return $this->value === self::PURGATORY;
     }
 
     /**
@@ -132,5 +168,14 @@ class ItemEffectsValue {
      */
     public function canMassEmbezzle(): bool {
         return $this->value === self::MASS_EMBEZZLE;
+    }
+
+    /**
+     * Can speak to the queen of hearts?
+     *
+     * @return bool
+     */
+    public function canSpeakToQueenOfHearts(): bool {
+        return $this->value === self::QUEEN_OF_HEARTS;
     }
 }

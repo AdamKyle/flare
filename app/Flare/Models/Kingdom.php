@@ -2,6 +2,8 @@
 
 namespace App\Flare\Models;
 
+use App\Game\Kingdoms\Values\KingdomMaxValue;
+use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Flare\Models\Traits\WithSearch;
@@ -41,6 +43,7 @@ class Kingdom extends Model implements Auditable
         'current_morale',
         'max_morale',
         'treasury',
+        'gold_bars',
         'published',
         'npc_owned',
         'last_walked',
@@ -69,6 +72,7 @@ class Kingdom extends Model implements Auditable
         'current_morale'     => 'float',
         'max_morale'         => 'float',
         'treasury'           => 'integer',
+        'gold_bars'          => 'integer',
         'published'          => 'boolean',
         'npc_owned'          => 'boolean',
         'last_walked'        => 'datetime',
@@ -81,6 +85,63 @@ class Kingdom extends Model implements Auditable
         $this->update([
             'last_walked' => now(),
         ]);
+    }
+
+    public function fetchDefenceBonusFromPassive(): float {
+        return $this->getPercentageForPassive(PassiveSkillTypeValue::KINGDOM_DEFENCE);
+    }
+
+    public function fetchResourceBonus(): float {
+        return $this->getPercentageForPassive(PassiveSkillTypeValue::KINGDOM_RESOURCE_GAIN);
+    }
+
+    public function fetchUnitCostReduction(): float {
+        return $this->getPercentageForPassive(PassiveSkillTypeValue::KINGDOM_UNIT_COST_REDUCTION);
+    }
+
+    public function fetchBuildingCostReduction(): float {
+        return $this->getPercentageForPassive(PassiveSkillTypeValue::KINGDOM_BUILDING_COST_REDUCTION);
+    }
+
+    public function fetchIronCostReduction(): float {
+        return $this->getPercentageForPassive(PassiveSkillTypeValue::IRON_COST_REDUCTION);
+    }
+
+    public function fetchPopulationCostReduction(): float {
+        return $this->getPercentageForPassive(PassiveSkillTypeValue::POPULATION_COST_REDUCTION);
+    }
+
+    public function fetchKingdomDefenceBonus(): float {
+        $passiveBonus = $this->fetchDefenceBonusFromPassive();
+        $treasury     = $this->fetchTreasuryDefenceBonus();
+        $walls        = $this->getWallsDefence();
+        $goldBars     = $this->fetchGoldBarsDefenceBonus();
+
+        return $walls + $treasury + $goldBars + $passiveBonus;
+    }
+
+    public function fetchTreasuryDefenceBonus(): float {
+        return $this->treasury / KingdomMaxValue::MAX_TREASURY;
+    }
+
+    public function fetchGoldBarsDefenceBonus(): float {
+        return $this->gold_bars / 1000;
+    }
+
+    public function getWallsDefence(): float {
+        $walls = $this->buildings->filter(function($building) {
+            return $building->gameBuilding->is_walls;
+        })->first();
+
+        if (is_null($walls)) {
+            return 0.0;
+        }
+
+        if ($walls->current_durability <= 0) {
+            return 0.0;
+        }
+
+        return $walls->level / 30;
     }
 
     public function gameMap() {
@@ -113,5 +174,19 @@ class Kingdom extends Model implements Auditable
 
     protected static function newFactory() {
         return KingdomFactory::new();
+    }
+
+    protected function getPercentageForPassive(int $passiveType): float {
+        $character    = $this->character;
+
+        if (is_null($character)) {
+             return 0.0;
+        }
+
+        $passive = $character->passiveSkills->filter(function($passiveSkill) use($passiveType) {
+            return $passiveSkill->passiveSkill->effect_type === $passiveType;
+        })->first();
+
+        return $passive->current_level * $passive->passiveSkill->bonus_per_level;
     }
 }

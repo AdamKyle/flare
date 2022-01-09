@@ -28,18 +28,6 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-check move-down-30">
-                            <input id="newBuildingEmail" class="form-check-input" type="checkbox" data-toggle="toggle" name="new_building_email" value="1" {{$user->new_building_email ? 'checked' : ''}}>
-                            <label for="newBuildingEmail" class="form-check-label ml-2">New Building Email</label>
-                        </div>
-                    </div>
-                    <div class="col-md-8 move-down-30 alert alert-info">
-                        By selecting this, you are saying that, should a new building be added to a kingdom you own, you'll get an email.
-                        <p class="mt-2"><strong>Note</strong>: If you own multiple kingdoms, you'll get multiple emails.</p>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="form-check move-down-30">
                             <input id="upgradedBuildingEmail" class="form-check-input" type="checkbox" data-toggle="toggle" name="upgraded_building_email" value="1" {{$user->upgraded_building_email ? 'checked' : ''}}>
                             <label for="upgradedBuildingEmail" class="form-check-label ml-2">Building Upgrade Email</label>
                         </div>

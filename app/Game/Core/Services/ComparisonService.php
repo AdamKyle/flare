@@ -101,4 +101,36 @@ class ComparisonService {
             'setIndex'     => $setIndex,
         ];
     }
+
+    public function isItemUnique(InventorySlot $slot): bool {
+        $item = $slot->item;
+
+        if (!is_null($item->itemPrefix)) {
+            return $item->itemPrefix->randomly_generated;
+        }
+
+        if (!is_null($item->itemSuffix)) {
+            return $item->itemSuffix->randomly_generated;
+        }
+
+        return false;
+    }
+
+    public function characterHasUniqueEquipped(Character $character): bool {
+        return $character->getInformation()->fetchInventory()->filter(function($slot) {
+            $item = $slot->item;
+
+            if (!is_null($item->itemPrefix)) {
+                if ($item->itemPrefix->randomly_generated) {
+                    return $slot;
+                }
+            }
+
+            if (!is_null($item->itemSuffix)) {
+                if ($item->itemSuffix->randomly_generated) {
+                    return $slot;
+                }
+            }
+        })->isNotEmpty();
+    }
 }

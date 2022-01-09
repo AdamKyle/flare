@@ -2,11 +2,13 @@
 
 Route::middleware(['auth', 'is.player.banned', 'is.character.who.they.say.they.are'])->group(function() {
 
-    // Adventure:
-    Route::post('/character/{character}/adventure/{adventure}', ['uses' => 'Api\AdventureController@adventure']);
+    Route::middleware(['character.attack.automation'])->group(function(){
+        // Adventure:
+        Route::post('/character/{character}/adventure/{adventure}', ['uses' => 'Api\AdventureController@adventure']);
 
-    // Cancel Adventure:
-    Route::post('/character/{character}/adventure/{adventure}/cancel', ['uses' => 'Api\AdventureController@cancelAdventure']);
+        // Cancel Adventure:
+        Route::post('/character/{character}/adventure/{adventure}/cancel', ['uses' => 'Api\AdventureController@cancelAdventure']);
+    });
 
     // See adventure logs
     Route::get('/character/adventure/logs', ['uses' => 'Api\AdventureController@getLogs']);

@@ -8,6 +8,7 @@ use App\Game\Messages\Events\ServerMessageEvent;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Item;
 use App\Game\Skills\Services\DisenchantService;
+use Illuminate\Support\Facades\Cache;
 
 class DisenchantingController extends Controller {
 

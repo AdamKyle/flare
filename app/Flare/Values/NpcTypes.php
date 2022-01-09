@@ -18,6 +18,8 @@ class NpcTypes
 
     const QUEST_GIVER = 2;
 
+    const SPECIAL_ENCHANTS = 3;
+
     /**
      * @var string[] $values
      */
@@ -25,6 +27,7 @@ class NpcTypes
         self::KINGDOM_HOLDER => 0,
         self::SUMMONER => 1,
         self::QUEST_GIVER => 2,
+        self::SPECIAL_ENCHANTS => 3,
     ];
 
     /**
@@ -34,6 +37,7 @@ class NpcTypes
         0 => 'Kingdom Holder',
         1 => 'Summoner',
         2 => 'Quest Giver',
+        3 => 'Special Enchantments',
     ];
 
     /**

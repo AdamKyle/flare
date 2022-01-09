@@ -59,8 +59,10 @@
                 <a href="{{route('passive.skills.skill', [
                                             'passiveSkill' => $skill->id
                                         ])}}">{{$skill->name}}</a>
-              @else
+              @elseif (isset($character))
                 <a href="{{route('view.character.passive.skill', ['passiveSkill' => $skill->id, 'character' => $characterId])}}">{{$skill->name}}</a>
+              @else
+                <a href="{{route('info.page.passive.skill', ['passiveSkill' => $skill])}}">{{$skill->name}}</a>
               @endif
             @endguest
           </td>

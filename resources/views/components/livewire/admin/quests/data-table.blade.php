@@ -1,11 +1,8 @@
 <x-core.cards.card css="mt-5 w-full m-auto">
     <x-core.alerts.warning-alert title="Caution!">
-        <p>Should an <a href="/information/npcs">NPC</a> offer any currency based quests, the currency quests will be done in order of currency from smallest to largest!</p>
-        <p>The exception is if you have the specific item and the currency, although not if another currency quest (with no item) precedes it.</p>
-        <p>You cannot select the quest to complete from the npc, they pick based on what you have on hand. It is suggested that players try and do
-        quests as early on or they could regret it later. For example, for The Soldier, if you wanted The Creepy Baby Doll, you would have to do:
-        Hunting Expedition followed by The Key to Disenchanting, before being able to get The Creepy Baby Doll.</p>
-        <p>That's a total of 55k <a href="/information/currencies">Gold Dust</a> you need.</p>
+        <p>Check the "Planes Quest" (in the map actions section, under the map) section in game to see more details about where to go, what items you need, and how to complete the quest.</p>
+        <p>For even more details you can click  "All Quests" from within that panel to see a quest tree of every single quest in game. Some quests are linked to other and thus locked behind you completing that
+        quest first. Others are just one off quests. All quests can be clicked on and will tell you all relevant details.</p>
     </x-core.alerts.warning-alert>
     <div class="row pb-2">
         <x-data-tables.per-page wire:model="perPage" />

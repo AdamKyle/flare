@@ -114,6 +114,14 @@ return [
             'block_for' => null,
         ],
 
+        'npc_commands' => [
+            'driver' => 'redis',
+            'connection' => 'npc_commands',
+            'queue' => 'default_long',
+            'retry_after' => 1200, // Run for max 20 minutes
+            'block_for' => null,
+        ],
+
     ],
 
     /*

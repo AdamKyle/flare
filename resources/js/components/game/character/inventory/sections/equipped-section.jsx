@@ -4,6 +4,8 @@ import {Alert, Card} from "react-bootstrap";
 import ReactDatatable from "@ashvin27/react-datatable";
 import SaveAsSetModal from "../modals/save-as-set-modal";
 import EquippedSectionButton from "./equipped-section-button";
+import AlertInfo from "../../../components/base/alert-info";
+import AlertWarning from "../../../components/base/alert-warning";
 
 export default class EquippedSection extends React.Component {
 
@@ -34,6 +36,12 @@ export default class EquippedSection extends React.Component {
         key: "type",
         text: "Type",
         sortable: true,
+      },
+      {
+        key: 'position',
+        text: 'Position',
+        sortable: true,
+        cell: row => <div>{row.position}</div>
       },
       {
         key: 'base_damages',
@@ -79,6 +87,10 @@ export default class EquippedSection extends React.Component {
     }
   }
 
+  seeRow(row) {
+    console.log(row);
+  }
+
   componentDidMount() {
     this.setState({
       equippedItems: this.formatDataForTable()
@@ -122,7 +134,8 @@ export default class EquippedSection extends React.Component {
   formatDataForTable() {
     if (Array.isArray(this.props.equipped)) {
       return this.props.equipped.map((e) => {
-        e.item['slot_id'] = e.id;
+        e.item['slot_id']  = e.id;
+        e.item['position'] = e.position;
 
         return e.item;
       });
@@ -130,8 +143,8 @@ export default class EquippedSection extends React.Component {
 
     if (typeof this.props.equipped === 'object') {
       return this.props.equipped.slots.map((s) => {
-        s.item['slot_id'] = s.id;
-
+        s.item['slot_id']  = s.id;
+        s.item['position'] = s.position;
         return s.item;
       });
     }
@@ -199,21 +212,20 @@ export default class EquippedSection extends React.Component {
       <Card>
         <Card.Body>
 
-          <div className="alert alert-info mt-2">
+          <AlertInfo icon={"fas fa-question-circle"} title={"Tips"}>
             <p>
               You may choose to save currently equipped items to a set that is not currently equipped.
               To do this click Save as set when you are happy with the items you have equipped.
               These items will still be equipped to you, you will just now have a set equipped.
             </p>
-          </div>
+          </AlertInfo>
 
           {
             typeof this.props.equipped === 'object' && !Array.isArray(this.props.equipped) ?
-              <div className="alert alert-warning mt-2 mb-3">
-                You currently have a set equipped. Equipping any other item, or set will replace this set completely.
-                <strong>You cannot mix and match sets or sets with non set items. It's one or the other.</strong>
-
-              </div>
+              <AlertWarning icon={'fas fa-exclamation-triangle'} title={'You have a set equipped'}>
+                You can equip other items and they will replace the set item at that
+                position. While the set is equipped you cannot empty the set.
+              </AlertWarning>
             : null
           }
 

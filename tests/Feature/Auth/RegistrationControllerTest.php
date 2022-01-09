@@ -36,7 +36,7 @@ class RegistrationControllerTest extends TestCase
         ]);
 
         $gameMap = GameMap::create([
-            'name'          => 'surface',
+            'name'          => 'Surface',
             'path'          => 'test path',
             'default'       => true,
             'kingdom_color' => '#ffffff',

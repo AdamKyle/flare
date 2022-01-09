@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Npc;
+use App\Flare\Models\PassiveSkill;
 use App\Flare\Models\Quest;
 use App\Flare\Traits\Controllers\MonstersShowInformation;
 use App\Flare\Values\ItemEffectsValue;
@@ -62,6 +63,7 @@ class InfoPageController extends Controller
                 $type          = null;
                 $craftOnly     = false;
 
+
                 $viewAttributes = isset(config('info.' . $pageName)[$index]['view_attributes']) ? config('info.' . $pageName)[$index]['view_attributes'] : null;
 
                 if (isset(config('info.' . $pageName)[$index])) {
@@ -69,9 +71,24 @@ class InfoPageController extends Controller
                     $viewAttributes      = $viewAttributes;
                     $livewire            = config('info.' . $pageName)[$index]['livewire'];
                     $only                = config('info.' . $pageName)[$index]['only'];
-                    $before              = config('info.' . $pageName)[$index]['insert_before_table'];
                     $type                = config('info.' . $pageName)[$index]['type'];
                     $craftOnly           = config('info.' . $pageName)[$index]['craft_only'];
+
+                    if (isset(config('info.' . $pageName)[$index]['insert_before_table'])) {
+                        $before = config('info.' . $pageName)[$index]['insert_before_table'];
+                    }
+
+                    if (isset(config('info.' . $pageName)[$index]['showSkillInfo'])) {
+                        $showSkillInfo = config('info.' . $pageName)[$index]['showSkillInfo'];
+                    }
+
+                    if (isset(config('info.' . $pageName)[$index]['showDropDown'])) {
+                        $showDropDown = config('info.' . $pageName)[$index]['showDropDown'];
+                    }
+
+                    if (isset(config('info.' . $pageName)[$index]['type'])) {
+                        $type = config('info.' . $pageName)[$index]['type'];
+                    }
                 }
 
                 $sections[] = [
@@ -114,6 +131,8 @@ class InfoPageController extends Controller
             'Labyrinth'    => ItemEffectsValue::LABYRINTH,
             'Dungeons'     => ItemEffectsValue::DUNGEON,
             'Shadow Plane' => ItemEffectsValue::SHADOWPLANE,
+            'Hell'         => ItemEffectsValue::HELL,
+            'Purgatory'    => ItemEffectsValue::PURGATORY,
             default        => '',
         };
 
@@ -217,6 +236,12 @@ class InfoPageController extends Controller
         return view('information.quests.quest', [
             'quest'       => $quest,
             'lockedSkill' => $skill,
+        ]);
+    }
+
+    public function viewPassiveSkill(PassiveSkill $passiveSkill) {
+        return view('information.passive-skills.skill', [
+            'skill' => $passiveSkill,
         ]);
     }
 

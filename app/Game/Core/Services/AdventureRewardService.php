@@ -2,14 +2,20 @@
 
 namespace App\Game\Core\Services;
 
+use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Models\Adventure;
+use App\Flare\Models\AdventureLog;
 use App\Flare\Models\Faction;
+use App\Flare\Models\InventorySet;
 use App\Flare\Models\Item as ItemModel;
 use App\Flare\Models\Skill;
+use App\Flare\Models\User;
 use App\Flare\Services\BuildCharacterAttackTypes;
+use App\Flare\Services\CharacterXPService;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\RandomAffixDetails;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
+use App\Game\Core\Jobs\AdventureItemDisenchantJob;
 use App\Game\Core\Traits\CanHaveQuestItem;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
@@ -17,6 +23,7 @@ use App\Game\Core\Values\FactionLevel;
 use App\Game\Core\Values\FactionType;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Skills\Services\DisenchantService;
 
 class AdventureRewardService {
 
@@ -28,6 +35,12 @@ class AdventureRewardService {
     private $characterService;
 
     private $buildCharacterAttackTypes;
+
+    private $characterXPService;
+
+    private $randomAffixGenerator;
+
+    private $disenchantService;
 
     /**
      * @var array $messages
@@ -43,10 +56,20 @@ class AdventureRewardService {
      * @param CharacterService $characterService
      * @return void
      */
-    public function __construct(CharacterService $characterService, BuildCharacterAttackTypes $buildCharacterAttackTypes) {
+    public function __construct(CharacterService $characterService,
+                                BuildCharacterAttackTypes $buildCharacterAttackTypes,
+                                CharacterXPService $characterXPService,
+                                InventorySetService $inventorySetService,
+                                RandomAffixGenerator $randomAffixGenerator,
+                                DisenchantService $disenchantService,
+    ) {
 
         $this->characterService          = $characterService;
         $this->buildCharacterAttackTypes = $buildCharacterAttackTypes;
+        $this->characterXPService        = $characterXPService;
+        $this->inventorySetService       = $inventorySetService;
+        $this->randomAffixGenerator      = $randomAffixGenerator;
+        $this->disenchantService         = $disenchantService;
     }
 
     /**
@@ -56,23 +79,35 @@ class AdventureRewardService {
      * @param Character $character
      * @return AdventureRewardService
      */
-    public function distributeRewards(array $rewards, Character $character, Adventure $adventure): AdventureRewardService {
+    public function distributeRewards(array $rewards, Character $character, AdventureLog $adventureLog): AdventureRewardService {
+        $adventure = $adventureLog->adventure;
 
-        $maxCurrencies = new MaxCurrenciesValue($character->gold + $rewards['gold'], MaxCurrenciesValue::GOLD);
+        if ($character->gold !== MaxCurrenciesValue::MAX_GOLD) {
+            $maxCurrencies = new MaxCurrenciesValue($character->gold + $rewards['gold'], MaxCurrenciesValue::GOLD);
 
-        if (!$maxCurrencies->canNotGiveCurrency()) {
-            $character->gold += $rewards['gold'];
-            $character->save();
-        } else {
-            $this->messages[] = 'You are at or near, gold cap and get no gold for this adventure.';
+            if (!$maxCurrencies->canNotGiveCurrency()) {
+                $character->gold += $rewards['gold'];
+                $character->save();
+            } else {
+                $newAmount        = $character->gold + $rewards['gold'];
+                $subtractedAmount = $newAmount - MaxCurrenciesValue::MAX_GOLD;
+                $newAmount        = $newAmount - $subtractedAmount;
+
+                $character->gold = $newAmount;
+                $character->save();
+
+                $this->messages[] = 'You now are gold capped: ' . number_format($newAmount);
+            }
         }
 
         $this->handleXp($rewards['exp'], $character);
+
         $this->handleSkillXP($rewards, $character);
+
         $this->handleFactionPoints($character, $adventure, $rewards['faction_points']);
 
         if (!empty($rewards['items'])) {
-            $this->handleItems($rewards['items'], $character);
+            $this->handleItems($rewards['items'], $character, $adventureLog->overFlowSet);
         }
 
         return $this;
@@ -99,8 +134,8 @@ class AdventureRewardService {
         $spillOver = 0;
 
         if ($points > $faction->points_needed) {
-            $spillOver = $points - $factionPoints->points_needed;
-            $points    = $factionPoints->points_needed;
+            $spillOver = $points - $faction->points_needed;
+            $points    = $faction->points_needed;
         }
 
         if ($points >= $faction->points_needed && !FactionLevel::isMaxLevel($faction->current_level, $points)) {
@@ -123,20 +158,24 @@ class AdventureRewardService {
 
             event(new GlobalMessageEvent($character->name . 'Has maxed out the faction for: ' . $faction->gameMap->name . ' They are considered legendary among the people of this land.'));
 
-            $this->factionReward($character, $faction, $faction->gameMap->name, FactionType::getTitle($newLevel));
+            $this->factionReward($character, $faction, $faction->gameMap->name, FactionType::getTitle($faction->current_level));
 
             $faction->update([
                 'maxed' => true,
             ]);
-        } else {
+
+            $faction = $faction->refresh();
+        } else if (!$faction->maxed) {
             $faction->update([
                 'current_points' => $factionPoints,
             ]);
 
+            $faction = $faction->refresh();
+
             $this->messages[] = 'Gained: ' . $factionPoints . ' Faction Points for: ' . $faction->gameMap->name;
         }
 
-        if ($spillOver > 0) {
+        if ($spillOver > 0 && !$faction->maxed) {
             $this->handleFactionPoints($character->refresh(), $adventure, $spillOver);
         }
     }
@@ -164,6 +203,9 @@ class AdventureRewardService {
     }
 
     protected function giveXP(int $xp, Character $character) {
+
+        $xp = $this->characterXPService->determineXPToAward($character, $xp);
+
         $character->xp += $xp;
         $character->save();
 
@@ -196,12 +238,16 @@ class AdventureRewardService {
             if ($totalLevels > 0) {
 
                 for ($i = 1; $i <= $totalLevels; $i++) {
-                    $this->giveSkillXP(100, $skill);
+                    $this->giveSkillXP($skill->xp_max, $skill);
 
                     $skill = $skill->refresh();
                 }
 
-                $leftOver = $xp - $totalLevels * 100;
+                if ($skill->xp_max < $xp) {
+                    $leftOver = $xp - $skill->xp_max;
+                } else {
+                    $leftOver = $xp;
+                }
 
                 $this->giveSkillXP($oldXP + $leftOver, $skill);
 
@@ -220,7 +266,7 @@ class AdventureRewardService {
         $skill = $skill->refresh();
 
         if ($skill->xp >= $skill->xp_max) {
-            if ($skill->level <= $skill->max_level) {
+            if ($skill->level < $skill->max_level) {
                 $level      = $skill->level + 1;
 
                 $skill->update([
@@ -240,21 +286,49 @@ class AdventureRewardService {
         }
     }
 
-    protected function handleItems(array $items, Character $character): void {
-        $character = $character->refresh();
-        $newItemList = $items;
+    protected function handleItems(array $items, Character $character, InventorySet $set = null): void {
+        $character         = $character->refresh();
+        $newItemList       = $items;
+        $user              = $character->user;
+
+
+        if (!is_null($set)) {
+            $characterSet = $character->innventorySets()->find($setId);
+        } else {
+            $characterSet = $character->inventorySets->filter(function($set) {
+                return $set->slots->isEmpty();
+            })->first();
+        }
 
         if (!empty($items)) {
             foreach ($items as $index => $item) {
                 $item = Item::find($item['id']);
 
+
                 if (!is_null($item)) {
-                    if ($character->isInventoryFull()) {
-                        $this->messages['error'] = 'Your inventory is full. You must clear some space, come back and finish collecting the remaining items.';
 
-                        $this->itemsLeft = array_values($newItemList);
+                    if ($item->type !== 'quest' && !is_null($user->auto_disenchant_amount)) {
+                       if ($this->autoDisenchant($character, $item)) {
+                           continue;
+                       }
+                    }
 
-                        return;
+                    if ($character->isInventoryFull() && !is_null($characterEmptySet) && $item->type !== 'quest') {
+                        $this->inventorySetService->putItemIntoSet($characterEmptySet, $item);
+
+                        if (!is_null($characterSet->name)) {
+                            $this->messages[] = 'Item: '.$item->affix_name.' has been stored in Set: '.$characterSet->name.' as your inventory is full';
+                        } else {
+                            $index     = $character->inventorySets->search(function($set) use ($characterSet) {
+                                return $set->id === $characterSet->id;
+                            });
+
+                            $this->messages[] = 'Item: '.$item->affix_name.' has been stored in Set: '.($index + 1).' as your inventory is full';
+                        }
+
+
+                    } else if ($item->type !== 'quest' && $character->isInventoryFull()) {
+                        $this->messages[] = 'You failed to get the item: '.$item->affix_name.' as your inventory is full and you have no empty set.';
                     }
 
                     if ($item->type === 'quest') {
@@ -270,7 +344,7 @@ class AdventureRewardService {
 
                             $this->messages[] = 'You gained the item: ' . $item->affix_name;
                         }
-                    } else {
+                    } else if (!$character->isInventoryFull()) {
                         $character->inventory->slots()->create([
                             'inventory_id' => $character->inventory->id,
                             'item_id'      => $item->id,
@@ -288,6 +362,32 @@ class AdventureRewardService {
                 $character = $character->refresh();
             }
         }
+    }
+
+    protected function autoDisenchant(Character $character, Item $item) {
+        $user = $character->user;
+
+        if ($user->auto_disenchant_amount === 'all') {
+            AdventureItemDisenchantJob::dispatch($character, $item)->delay(now()->addSeconds(30));
+
+            $this->messages[] = 'Item: '.$item->affix_name.' has been set to be disenchanted. (Item may have already been disenchanted if you see no message in chat)';
+
+            return true;
+        }
+
+        if ($user->auto_disenchant_amount === '1-billion') {
+            $cost = SellItemCalculator::fetchSalePriceWithAffixes($this->item);
+
+            if ($cost < 1000000000) {
+                AdventureItemDisenchantJob::dispatch($character, $item);
+
+                $this->messages[] = 'Item: '.$item->affix_name.' has been set to be disenchanted. (Item may have already been disenchanted if you see no message in chat)';
+
+                return true;
+            }
+        }
+
+        return false;
     }
 
     protected function factionReward(Character $character, Faction $faction, string $mapName, ?string $title = null) {

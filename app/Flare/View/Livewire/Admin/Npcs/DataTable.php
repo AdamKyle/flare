@@ -18,6 +18,8 @@ class DataTable extends Component {
     public $forMap      = null;
     public $only        = null;
 
+    protected $paginationTheme = 'bootstrap';
+
     public function fetchNpcs() {
 
         if (!is_null($this->forMap)) {
