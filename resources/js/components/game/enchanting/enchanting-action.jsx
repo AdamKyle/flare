@@ -342,7 +342,7 @@ export default class EnchantingAction extends React.Component {
     const newInventory = [];
 
     for (const slot of inventory) {
-      if (slot.item.item_prefix === null && slot.item.item_suffix == null) {
+      if (slot.item.item_prefix === null || slot.item.item_suffix == null) {
         newInventory.unshift(slot);
       } else {
         newInventory.push(slot);
