@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\SiteAccessedEvent;
+use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\User;
 use Illuminate\Support\Str;
@@ -118,6 +120,13 @@ class RegisterController extends Controller
         event(new CreateCharacterEvent($user, $map, $request));
 
         $this->guard()->login($user);
+
+        event(new ServerMessageEvent($user, 'Welcome! I am so glad you could join us child! What an exciting time to join a rapidly developing game.
+         If you have questions, my fabulous friend you can checkout the "Help I am stuck", at the top. You can also click the version number to see release notes and past releases.
+         There is even a discord icon up there. Finally you can ask for help here in the chat. Chat is loaded from the last 24 hours, so if someone doesn\'t respond right now, they will see this!
+          The Creator, me, also tends to answer peoples questions on discord and will also answer peoples questions here every so often through out the day! Even if you logout and come back later, chances are someone (like me :)) answered it :D'));
+
+        event(new GlobalMessageEvent('The skies open and the light shines through. The heavens have birthed forward a new hero of the land: ' . $user->character->name . '. Please take a moment and say hello.'));
 
         return $this->registered($request, $user)
                         ?: redirect($this->redirectPath());

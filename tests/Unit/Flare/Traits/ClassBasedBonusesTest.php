@@ -33,18 +33,6 @@ class ClassBasedBonusesTest extends TestCase
         $this->assertTrue($healingBonus > 0.0);
     }
 
-    public function testGetProphetDamageBonus() {
-        $character = $this->createCharacter('Prophet', $this->createItem([
-            'type' => 'spell-healing',
-        ]), 'spell-one');
-
-        $trait = $this->getObjectForTrait(ClassBasedBonuses::class);
-
-        $damageBonus = $trait->prophetDamageBonus($character);
-
-        $this->assertTrue($damageBonus > 0.0);
-    }
-
     public function testGetHereticDamageBonus() {
         $character = $this->createCharacter('Heretic', $this->createItem([
             'type' => 'spell-damage',

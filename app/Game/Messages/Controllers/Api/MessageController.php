@@ -50,9 +50,9 @@ class MessageController extends Controller {
         $messages = Message::with(['user', 'user.roles', 'user.character'])
                             ->where('from_user', null)
                             ->where('to_user', null)
-                            ->where('created_at', '>=', now()->subHour())
+                            ->where('created_at', '>=', now()->subDay())
                             ->orderBy('created_at', 'desc')
-                            ->take(15)
+                            ->take(1000)
                             ->get()
                             ->transform(function($message) {
                                 $message->x    = $message->x_position;

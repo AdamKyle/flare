@@ -111,7 +111,11 @@ export default class Chat extends React.Component {
       };
 
       messages.unshift(message);
-;
+
+      if (messages.length > 1000) {
+        messages.length = 500; // Remove the last 500 messages to clear lag.
+      }
+
       const user = cloneDeep(this.state.user);
 
       user.is_silenced = event.user.is_silenced;
