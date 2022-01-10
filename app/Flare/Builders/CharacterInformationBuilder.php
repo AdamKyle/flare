@@ -686,11 +686,11 @@ class CharacterInformationBuilder {
                 $damage += $this->statMod('int') * 0.30;
             }
         } else if ($classType->isProphet()) {
-            if ($this->prophetHasDamageBonus($this->character)) {
+            if ($this->prophetHasDamageSpells($this->character)) {
                 if ($voided) {
                     $damage += $this->character->chr * 0.15;
                 } else {
-                    $damage += $this->character->chr * 0.15;
+                    $damage += $this->statMod('chr') * 0.15;
                 }
             }
         }
