@@ -18,7 +18,7 @@ export default class AbandonKingdom extends React.Component {
       errorMessage: null,
     });
 
-    axios.post('/api/kingdoms/mass-embezzle/' + this.props.characterId, {
+    axios.post('/api/kingdoms/abandon/' + this.props.kingdom.id, {
       embezzle_amount: this.state.embezzleAmount
     }).then((result) => {
       this.props.close();
@@ -30,7 +30,6 @@ export default class AbandonKingdom extends React.Component {
   }
 
   render() {
-    console.log(this.props);
     return (
       <>
         <Modal show={this.props.show} keyboard={false} backdrop="static">

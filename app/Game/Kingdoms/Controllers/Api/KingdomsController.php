@@ -2,6 +2,8 @@
 
 namespace App\Game\Kingdoms\Controllers\Api;
 
+use App\Game\Kingdoms\Service\KingdomResourcesService;
+use App\Game\Messages\Events\GlobalMessageEvent;
 use Illuminate\Http\Request;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
@@ -158,13 +160,7 @@ class KingdomsController extends Controller
                 ], 422);
             }
 
-            if ($building->kingdom->current_population < $building->required_population) {
-                return response()->json([
-                    'message' => 'You do not have enough population.'
-                ], 422);
-            }
-
-            $kingdom = $buildingService->updateKingdomResourcesForKingdomBuildingUpgrade($building);
+            $buildingService->updateKingdomResourcesForKingdomBuildingUpgrade($building);
 
 
             $buildingService->processUpgradeWithGold($building, $request->all());
@@ -517,6 +513,12 @@ class KingdomsController extends Controller
 
     public function withdrawGoldBars(WithrawGoldBarsRequest $request, Kingdom $kingdom)
     {
+        if ($kingdom->character->id !== auth()->user()->character->id) {
+            return response()->json([
+                'message' => 'Invalid Input. Not allowed to do that.'
+            ], 422);
+        }
+
         $amount = $request->amount_to_withdraw;
 
         if ($kingdom->gold_bars < $amount) {
@@ -562,5 +564,19 @@ class KingdomsController extends Controller
         return response()->json([
             'message' => 'Exchanged: ' . $amount . ' Gold bars for: ' . $totalGold . ' Gold!',
         ], 200);
+    }
+
+    public function abandon(Kingdom $kingdom, KingdomResourcesService $kingdomResourceServer) {
+        if ($kingdom->character->id !== auth()->user()->character->id) {
+            return response()->json([
+                'message' => 'Invalid Input. Not allowed to do that.'
+            ], 422);
+        }
+
+        $kingdomResourceServer->abandonKingdom($kingdom);
+
+        event(new GlobalMessageEvent('The Creator feels for the people of: ' . $kingdom->name . ' as their leader selfishly leaves them to fend for themselves.'));
+
+        return response()->json([], 200);
     }
 }

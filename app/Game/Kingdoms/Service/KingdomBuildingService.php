@@ -85,7 +85,7 @@ class KingdomBuildingService {
      * @param KingdomBuilding $building
      * @return Kingdom
      */
-    public function updateKingdomResourcesForKingdomBuildingUpgrade(KingdomBuilding $building): Kingdom {
+    public function updateKingdomResourcesForKingdomBuildingUpgrade(KingdomBuilding $building, bool $ignorePop = false): Kingdom {
         $buildingCostReduction   = $building->kingdom->fetchBuildingCostReduction();
         $ironCostReduction       = $building->kingdom->fetchIronCostReduction();
         $populationCostReduction = $building->kingdom->fetchPopulationCostReduction();
@@ -94,14 +94,25 @@ class KingdomBuildingService {
         $clayCost       = $building->clay_cost - $building->clay_cost * $buildingCostReduction;
         $stoneCost      = $building->stone_cost - $building->stone_cost * $buildingCostReduction;
         $ironCost       = $building->iron_cost - $building->iron_cost * ($buildingCostReduction + $ironCostReduction);
-        $populationCost = $building->required_population - $building->required_population * ($buildingCostReduction + $populationCostReduction);
+
+        if (!$ignorePop) {
+            $populationCost = $building->required_population - $building->required_population * ($buildingCostReduction + $populationCostReduction);
+
+            $newPop = $building->kingdom->current_population - $populationCost;
+
+            if ($newPop < 0) {
+                $newPop = 0;
+            }
+        } else {
+            $newPop = $building->kingdom->current_population;
+        }
 
         $building->kingdom->update([
             'current_wood'       => $building->kingdom->current_wood - $woodCost,
             'current_clay'       => $building->kingdom->current_clay - $clayCost,
             'current_stone'      => $building->kingdom->current_stone - $stoneCost,
             'current_iron'       => $building->kingdom->current_iron - $ironCost,
-            'current_population' => $building->kingdom->current_population - $populationCost,
+            'current_population' => $newPop
         ]);
 
         return $building->kingdom->refresh();
@@ -218,8 +229,12 @@ class KingdomBuildingService {
 
         $newAmount =  $kingdom->current_population - $params['pop_required'];
 
+        if ($newAmount < 0) {
+            $newAmount = 0;
+        }
+
         $kingdom->update([
-            'current_population' => $newAmount > 0 ? $newAmount : 0
+            'current_population' => $newAmount
         ]);
 
         $characterGold = $character->gold - $cost;

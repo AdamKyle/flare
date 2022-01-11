@@ -217,6 +217,25 @@ class KingdomResourcesService {
         }
     }
 
+    public function abandonKingdom(Kingdom $kingdom) {
+        $character = $kingdom->character;
+
+        $this->removeKingdomFromCache($character, $kingdom);
+
+        $this->npcTookKingdom($character->user, $kingdom->refresh());
+
+        $kingdom->update([
+            'character_id'   => null,
+            'npc_owned'      => true,
+            'current_morale' => 0.10,
+            'last_walked'    => now(),
+        ]);
+
+        broadcast(new UpdateNPCKingdoms($kingdom->gameMap));
+        broadcast(new UpdateGlobalMap($character));
+        broadcast(new UpdateMapDetailsBroadcast($character->map, $character->user, $this->movementService, true));
+    }
+
     protected function angryNpc() {
         broadcast(new GlobalMessageEvent('The Old Man stomps around! "You were warned! time to pay up!"'));
 
@@ -640,7 +659,19 @@ class KingdomResourcesService {
     private function npcTookKingdom(User $user, Kingdom $kingdom) {
         $this->removeKingdomFromCache($user->character, $kingdom);
 
-        event(new GlobalMessageEvent('A kingdom has fallen into the rubble at (X/Y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position . ' on the: ' . $this->kingdom->gameMap->name .' plane.'));
+        event(new GlobalMessageEvent('A kingdom has fallen into the rubble at (X/Y): ' . $kingdom->x_position . '/' . $kingdom->y_position . ' on the: ' . $kingdom->gameMap->name .' plane.'));
+
+        if (UserOnlineValue::isOnline($user)) {
+            event(new ServerMessageEvent($user, 'kingdom-resources-update', $kingdom->name . ' Has been given to the NPC due to being abandoned, at Location (x/y): ' . $kingdom->x_position . '/' . $kingdom->y_position . ' on the: ' . $kingdom->gameMap->name . ' plane.'));
+        } else {
+            $this->updateKingdomCache($user, $kingdom);
+        }
+    }
+
+    private function giveToNpc(User $user, Kingdom $kingdom) {
+        $this->removeKingdomFromCache($user->character, $kingdom);
+
+        event(new GlobalMessageEvent('A kingdom has been abandoned at (X/Y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position . ' on the: ' . $this->kingdom->gameMap->name .' plane.'));
 
         if (UserOnlineValue::isOnline($user)) {
             event(new ServerMessageEvent($user, 'kingdom-resources-update', $this->kingdom->name . ' Has been given to the NPC due to being abandoned, at Location (x/y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position . ' on the: ' . $this->kingdom->gameMap->name . ' plane.'));
