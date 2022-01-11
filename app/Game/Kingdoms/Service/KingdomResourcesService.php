@@ -9,6 +9,7 @@ use App\Flare\Models\KingdomBuilding;
 use App\Flare\Models\KingdomLog;
 use App\Flare\Models\Session;
 use App\Flare\Models\User;
+use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Traits\KingdomCache;
 use App\Game\Kingdoms\Events\UpdateEnemyKingdomsMorale;
 use App\Game\Kingdoms\Events\UpdateGlobalMap;
@@ -217,7 +218,7 @@ class KingdomResourcesService {
     }
 
     protected function angryNpc() {
-        broadcast(new GlobalMessageEvent('The Old Man stomps around! "Why child! Why?! I warned you! time to pay up!"'));
+        broadcast(new GlobalMessageEvent('The Old Man stomps around! "You were warned! time to pay up!"'));
 
         $currentPop = $this->kingdom->current_population;
         $maxPop     = $this->kingdom->max_population;
@@ -228,6 +229,7 @@ class KingdomResourcesService {
 
         $kingdomTreasury = $this->kingdom->treasury;
         $characterGold   = $this->kingdom->character->gold;
+        $goldBars        = $this->kingdom->gold_bars;
 
         if ($totalCost > $kingdomTreasury && $kingdomTreasury > 0) {
             $totalCost = $totalCost - $kingdomTreasury;
@@ -237,7 +239,7 @@ class KingdomResourcesService {
 
             $this->kingdom = $this->kingdom->refresh();
 
-            broadcast(new GlobalMessageEvent('The Old Man grumbles! "Now I have to take the rest out of your pockets child!"'));
+            broadcast(new GlobalMessageEvent('The Old Man grumbles! "Now I have to take the rest out of your pockets child!" (Not enough Treasury)'));
         } else if ($totalCost <= $kingdomTreasury) {
             $kingdomTreasury = $kingdomTreasury - $totalCost;
 
@@ -248,7 +250,35 @@ class KingdomResourcesService {
 
             $totalCost = 0;
 
-            broadcast(new GlobalMessageEvent('The Old Man smiles! "I am glad someone paid me."'));
+            broadcast(new GlobalMessageEvent('The Old Man smiles! "I am glad someone paid me." (The treasury was enough to wet his appetite)'));
+        }
+
+        if ($goldBars > 0 && $totalCost > 0) {
+
+            $percentage = $totalCost / ($this->kingdom->gold_bars * 2000000000);
+
+            if ($percentage < 0.01) {
+                $this->kingdom->gold_bars -= 1;
+                $this->kingdom->save();
+
+                broadcast(new GlobalMessageEvent('The Old Man smiles! "A single gold bar is all I asked for." (The kingdoms gold bars were enough was enough to wet his appetite)'));
+            } else {
+                $newAmount = $this->kingdom->gold_bars - ceil($this->kingdom->gold_bars * $percentage);
+
+                if ($newAmount < 0) {
+                    $newAmount = 0;
+
+                    broadcast(new GlobalMessageEvent('The Old Man jumps for joy! "These are all mine now child!" (The kingdom lost all it\'s Gold Bars, but The Old Man is happy now ... Win, Win?)'));
+                } else {
+                    broadcast(new GlobalMessageEvent('The Old Man grumbles! "Some of these are mine now..." (The kingdom lost: '.($percentage * 100).'% Gold Bars, but The Old Man is happy now ... Win, Win?)'));
+                }
+
+                $this->kingdom->update(['gold_bars' => $newAmount]);
+
+                $this->kingdom = $this->kingdom->refresh();
+            }
+
+            $totalCost = 0;
         }
 
         if ($totalCost > $characterGold && $totalCost > 0) {
@@ -276,7 +306,7 @@ class KingdomResourcesService {
             broadcast(new GlobalMessageEvent('The Old Man smiles! "I am glad someone paid me."'));
         }
 
-        if ($totalCost > 0 && $this->kingdom->character->gold === 0 && $this->kingdom->treasury === 0) {
+        if ($totalCost > 0 && $this->kingdom->character->gold === 0 && $this->kingdom->treasury === 0 && $this->kingdom->gold_bars === 0) {
             broadcast(new GlobalMessageEvent('The Old Man is enraged "You messed with the wrong person!"'));
 
             $this->reduceEverything();
