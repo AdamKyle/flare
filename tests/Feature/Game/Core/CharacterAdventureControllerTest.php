@@ -2,9 +2,11 @@
 
 namespace Tests\Feature\Game\Core;
 
+use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use App\Flare\Models\AdventureLog;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateItem;
@@ -187,12 +189,15 @@ class CharacterAdventureControllerTest extends TestCase
     public function testDistributeRewards() {
         $user      = $this->character->getUser();
 
-        $this->actingAs($user)
+        $response = $this->actingAs($user)
              ->post(route('game.current.adventure.reward', [
                  'adventureLog' => AdventureLog::first()->id,
              ]))->response;
 
-        $this->assertTrue(Cache::has('messages-'  . AdventureLog::first()->id));
+        $this->assertEquals(302, $response->status());
+
+        $response->assertSessionHas('success');
+
     }
 
     public function testDistributeRewardsWithMultipleLevelsGained() {
@@ -224,12 +229,14 @@ class CharacterAdventureControllerTest extends TestCase
                 ]
         ])->getCharacterFactory()->getUser();
 
-        $this->actingAs($user)
-            ->post(route('game.current.adventure.reward', [
-                'adventureLog' => AdventureLog::first()->id,
-            ]));
+        $response = $this->actingAs($user)
+                         ->post(route('game.current.adventure.reward', [
+                             'adventureLog' => AdventureLog::first()->id,
+                         ]))->response;
 
-        $this->assertTrue(Cache::has('messages-'  . AdventureLog::first()->id));
+        $this->assertEquals(302, $response->status());
+
+        $response->assertSessionHas('success');
     }
 
     public function testDistributeRewardsWhenInventoryIsFull() {
@@ -273,12 +280,14 @@ class CharacterAdventureControllerTest extends TestCase
             ]
         ])->getCharacterFactory()->getUser();
 
-        $this->actingAs($user)
-             ->post(route('game.current.adventure.reward', [
-                 'adventureLog' => AdventureLog::first()->id,
-             ]));
+        $response = $this->actingAs($user)
+                         ->post(route('game.current.adventure.reward', [
+                             'adventureLog' => AdventureLog::first()->id,
+                         ]))->response;
 
-        $this->assertTrue(Cache::has('messages-' . AdventureLog::first()->id));
+        $this->assertEquals(302, $response->status());
+
+        $response->assertSessionHas('success');
     }
 
     public function testCannotGiveOutRewardsWhenThereAreNone() {

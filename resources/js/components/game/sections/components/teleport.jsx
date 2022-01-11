@@ -162,14 +162,14 @@ export default class Teleport extends React.Component {
           ?
           <>
             <AlertInfo icon={"fas fa-question-circle"} title={"Note"}>
-              <p>Your Quickfeet <a href="/information/skill-information" target="_blank">skill</a> will be applied when you move, directionally or teleport. This skill can reduce movement down to
+              <p>Your Quick Feet <a href="/information/skill-information" target="_blank">skill</a> will be applied when you move, directionally or teleport. This skill can reduce movement down to
                 1 second and teleport down to a minimum of 1 minute at max level. For example, a teleport of 8 minutes with maxed out
-                quick fee will be 1 minute and this will reflect in the timer.</p>
+                Quick Feet will be 1 minute and this will reflect in the timer.</p>
             </AlertInfo>
             <div className="row">
               <div className="col-md-12">
                 <hr/>
-                <strong>Total Disatnce: </strong> {this.samePositionAsSelected() ? 0 : this.calculateDistance()} <br/>
+                <strong>Total Distance: </strong> {this.samePositionAsSelected() ? 0 : this.calculateDistance()} <br/>
                 <strong>Total Cost: </strong> {this.samePositionAsSelected() ? 0 : this.cost()}<br/>
                 <strong>Timeout (Minutes): </strong> {this.samePositionAsSelected() ? 0 : this.time()}<br/>
               </div>

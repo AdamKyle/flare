@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\SiteAccessedEvent;
 use App\Flare\Handlers\CheatingCheck;
+use App\Flare\Jobs\LoginMessage;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
@@ -71,12 +72,10 @@ class LoginController extends Controller
             }
 
             if (!is_null($this->guard()->user()->character)) {
+
                 $character = $this->guard()->user()->character;
 
-                event(new ServerMessageEvent($this->guard()->user(), 'Well hello there and welcome back my friend. I hope you are having a fantastic day. If you need help you can ask in chat and someone will see it and respond as soon as possible.
-            I am so glad you cam back :D'));
-
-                event(new GlobalMessageEvent('There creator smiles as ' . $character->name . ' walks fro the shadows the abyss into the land of Tlessa! Say hi!'));
+                LoginMessage::dispatch($character)->delay(now()->addSeconds(5));
             }
 
             return $this->sendLoginResponse($request);

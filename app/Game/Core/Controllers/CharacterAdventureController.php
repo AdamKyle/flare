@@ -3,6 +3,7 @@
 namespace App\Game\Core\Controllers;
 
 
+use App\Game\Core\Jobs\HandleAdventureRewards;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use App\Http\Controllers\Controller;
@@ -70,10 +71,14 @@ class CharacterAdventureController extends Controller {
         ]);
     }
 
-    public function collectReward(Request $request, AdventureRewardService $adventureRewardService, AdventureLog $adventureLog) {
+    public function collectReward(Request $request, AdventureLog $adventureLog) {
 
         $character = auth()->user()->character;
         $rewards   = $adventureLog->rewards;
+
+        if (Cache::has('character-adventure-rewards-' . $character->id)) {
+            return redirect()->to(route('game'))->with('error', 'You have to wait. We are processing the XP, Skill XP and Currencies. Once done, we\'ll hand off items so you can begin the next adventure.');
+        }
 
         if (is_null($rewards)) {
             return redirect()->to(route('game'))->with('error', 'You cannot collect already collected rewards.');
@@ -81,30 +86,11 @@ class CharacterAdventureController extends Controller {
 
         $rewards = AdventureCompletedRewards::CombineRewards($rewards, $character);
 
-        $adventureRewardService = $adventureRewardService->distributeRewards($rewards, $character, $adventureLog);
-        $messages               = $adventureRewardService->getMessages();
+        HandleAdventureRewards::dispatch($character, $adventureLog, $rewards)->delay(now()->addSeconds(10));
 
-        $adventureLog->update([
-            'rewards' => null,
-        ]);
-
-        $character->update([
-            'current_adventure_id' => null,
-        ]);
-
-        $character = $character->refresh();
-
-        event(new UpdateAdventureLogsBroadcastEvent($character->adventureLogs, $character->user));
-
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
-
-        event(new UpdateTopBarEvent($character));
-
-        $messages[] = 'You are a ready for your next adventure!';
-
-        Cache::put('messages-' . $adventureLog->id, $messages);
-
-        return redirect()->to(route('game'))->with('collected-rewards', $adventureLog->id);
+        return redirect()->to(route('game'))->with('success', 'Adventure Rewards are processing. Keep an eye on chat to see the rewards come through. 
+        Once all rewards have been handed to you, you will be able to start a new adventure. Processing will begin in 10 seconds. You\'ll be able to embark on a new adventure when 
+        the menu icon stops bouncing. You do not need to re-collect rewards - everything will update for you in real time.');
     }
 
     public function delete(AdventureLog $adventureLog) {

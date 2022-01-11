@@ -129,7 +129,12 @@ class DisenchantService {
 
                 $characterTotalGoldDust = $characterTotalGoldDust + $characterTotalGoldDust * 0.05;
 
-                event(new MessageEvent($character->user, 'Gold Dust Rush! You gained 5% interest on your total gold dust. Your new total is: ' . $characterTotalGoldDust));
+                if ($characterTotalGoldDust >= MaxCurrenciesValue::MAX_GOLD_DUST) {
+                    $characterTotalGoldDust = MaxCurrenciesValue::MAX_GOLD_DUST;
+                    event(new MessageEvent($character->user, 'Gold Dust Rush! You gained 5% interest on your total gold dust. You are now capped!'));
+                } else {
+                    event(new MessageEvent($character->user, 'Gold Dust Rush! You gained 5% interest on your total gold dust. Your new total is: ' . $characterTotalGoldDust));
+                }
             }
         }
 
