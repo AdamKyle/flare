@@ -16,6 +16,7 @@ import TimeoutDialogue from "./timeout/modal/timeout-dialogue";
 import NpcComponentWrapper from "./npc-components/npc-component-wrapper";
 import MassEmbezzle from "./sections/modals/mass-embezzle";
 import localforage from "localforage";
+import AbandonKingdom from "./sections/modals/abandon-kingdom";
 
 export default class Game extends React.Component {
   constructor(props) {
@@ -45,6 +46,7 @@ export default class Game extends React.Component {
       openTimeOutModal: false,
       openMassEmbezzlement: false,
       openQuestDetails: false,
+      openAbandonKingdom: false,
       npcComponentName: null,
       characterId: null,
       canAdventureAgainAt: null,
@@ -199,6 +201,20 @@ export default class Game extends React.Component {
     }
   }
 
+  openAbandonKingdom() {
+    const kingdom = this.state.kingdomData.my_kingdoms.filter((mk) =>
+      mk.x_position === this.state.current_x &&
+      mk.y_position === this.state.current_y
+    );
+
+    if (kingdom.length > 0) {
+      this.setState({
+        openAbandonKingdom: true,
+        kingdom: kingdom[0],
+      });
+    }
+  }
+
   openMassEmbezzleModal() {
     this.setState({
       openMassEmbezzlement: !this.state.openMassEmbezzlement,
@@ -210,6 +226,13 @@ export default class Game extends React.Component {
       openKingdomManagement: false,
       kingdom: null,
     })
+  }
+
+  closeKingdomAbandonment() {
+    this.setState({
+      openAbandonKingdom: false,
+      kingdom: null,
+    });
   }
 
   setCanAttack(bool) {
@@ -337,6 +360,7 @@ export default class Game extends React.Component {
               openTimeOutModal={this.openTimeOutModal.bind(this)}
               openMassEmbezzleModal={this.openMassEmbezzleModal.bind(this)}
               updateCelestial={this.updateCelestial.bind(this)}
+              openAbandonKingdom={this.openAbandonKingdom.bind(this)}
               celestial={this.state.celestial}
               kingdomData={this.state.kingdomData}
               character_x={this.state.current_x}
@@ -445,6 +469,17 @@ export default class Game extends React.Component {
             <Chat apiUrl={this.apiUrl} userId={this.props.userId}/>
           </Col>
         </Row>
+
+        {
+          this.state.openAbandonKingdom ?
+            <AbandonKingdom
+              characterId={this.state.characterId}
+              kingdom={this.state.kingdom}
+              show={this.state.openAbandonKingdom}
+              close={this.closeKingdomAbandonment.bind(this)}
+            />
+          : null
+        }
 
         {
           this.state.openKingdomManagement ?
