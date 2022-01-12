@@ -24,7 +24,7 @@ export default class AbandonKingdom extends React.Component {
       this.props.close();
     }).catch((error) => {
       this.setState({
-        errorMessage: error.response.data.errors
+        errorMessage: error.response.data.message
       });
     });
   }

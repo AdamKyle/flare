@@ -142,7 +142,6 @@ class UnitService {
         $user    = $kingdom->character->user;
 
         if (!is_null($queue->gold_paid)) {
-
             if ($this->calculateElapsedTimePercent($queue) >= 85) {
                  return false;
             }
@@ -154,7 +153,7 @@ class UnitService {
             $character->save();
 
             $kingdom->update([
-                'current_population' => $kingdom->current_population + $queue->amount * 0.75
+                'current_population' => $kingdom->current_population + ($queue->amount * 0.25)
             ]);
 
             event(new UpdateTopBarEvent($character->refresh()));
@@ -198,7 +197,11 @@ class UnitService {
         $elapsedTime = $now->diffInMinutes($startedAt);
         $totalTime   = $completedAt->diffInMinutes($startedAt);
 
-        return 100 - ceil($elapsedTime/$totalTime);
+        if ($elapsedTime === 0) {
+            return 0;
+        }
+
+        return 100 - (100 - ceil($elapsedTime/$totalTime));
     }
 
     protected function resourceCalculation(UnitInQueue $queue) {

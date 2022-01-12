@@ -3,7 +3,7 @@
     <div class="{{!empty($log['defender_units']) ? 'col-md-6' : 'hide'}}">
         <x-core.cards.card>
             <p>
-                The following is a list of units (from the defending kingdom) and the percentage of units lost in your attack.
+                The following is a list of units (from the defending kingdom) and the percentage of units lost in the attack.
             </p>
             <dl>
                 @foreach ($log['defender_units'] as $key => $value)

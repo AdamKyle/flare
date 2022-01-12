@@ -2,6 +2,7 @@
 
 namespace App\Game\Kingdoms\Controllers\Api;
 
+use App\Flare\Models\UnitMovementQueue;
 use App\Game\Kingdoms\Service\KingdomResourcesService;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use Illuminate\Http\Request;
@@ -160,9 +161,6 @@ class KingdomsController extends Controller
                 ], 422);
             }
 
-            $buildingService->updateKingdomResourcesForKingdomBuildingUpgrade($building);
-
-
             $buildingService->processUpgradeWithGold($building, $request->all());
         } else {
             if (ResourceValidation::shouldRedirectKingdomBuilding($building, $building->kingdom)) {
@@ -199,7 +197,7 @@ class KingdomsController extends Controller
             ], 422);
         }
 
-        $kingdom = $buildingService->updateKingdomResourcesForRebuildKingdomBuilding($building, $character);
+        $kingdom = $buildingService->updateKingdomResourcesForRebuildKingdomBuilding($building);
 
         $buildingService->rebuildKingdomBuilding($building, $character);
 
@@ -247,14 +245,27 @@ class KingdomsController extends Controller
             $service->updateKingdomResources($kingdom, $gameUnit, $request->amount);
         } else {
 
+            $amount    = $gameUnit->required_population * $request->amount;
+            $reduction = $kingdom->fetchUnitCostReduction();
+
+            $amount = ceil($amount - $amount * $reduction);
+
+            if ($amount > $kingdom->current_population) {
+                return response()->json([
+                    'message' => "You do not have enough population to purchase with gold alone."
+                ], 422);
+            }
+
+            $newAmount = $kingdom->current_population - $amount;
+
+            if ($newAmount < 0) {
+                $newAmount = 0;
+            }
+
             $service->updateCharacterGold($kingdom, $gameUnit, $request->amount);
 
-            $totalAmount = $request->amount;
-            $unitCostReduction = $kingdom->fetchUnitCostReduction();
-            $totalAmount -= $totalAmount * $unitCostReduction;
-
             $kingdom->update([
-                'current_population' => $kingdom->current_population - $totalAmount
+                'current_population' => $newAmount
             ]);
 
             $paidGold = true;
@@ -570,6 +581,20 @@ class KingdomsController extends Controller
         if ($kingdom->character->id !== auth()->user()->character->id) {
             return response()->json([
                 'message' => 'Invalid Input. Not allowed to do that.'
+            ], 422);
+        }
+
+        $unitsInMovement = UnitMovementQueue::where('from_kingdom_id', $kingdom->id)->orWhere('to_kingdom_id', $kingdom->id)->get();
+
+        if ($unitsInMovement->isNotEmpty()) {
+            return response()->json([
+                'message' => 'You either sent units, that in movement, or an attack is incoming. Either way there is units in movement from or to this kingdom and you cannot abandon it.'
+            ], 422);
+        }
+
+        if ($kingdom->gold_bars > 0) {
+            return response()->json([
+                'message' => 'You cannot abandon a kingdom that has Gold Bars.'
             ], 422);
         }
 

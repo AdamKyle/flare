@@ -121,6 +121,12 @@ class UpgradeBuildingWithGold implements ShouldQueue
                                         ->where('character_id', $characterId)
                                         ->first();
 
+        $kingdom = Kingdom::find($this->building->kingdom_id);
+        $kingdom = new Item($kingdom, $kingdomTransformer);
+        $kingdom = $manager->createData($kingdom)->toArray();
+
+        event(new UpdateKingdom($this->user, $kingdom));
+
         if (!is_null($buildingInQue)) {
             $buildingInQue->delete();
         } else {

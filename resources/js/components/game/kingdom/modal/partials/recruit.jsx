@@ -8,7 +8,7 @@ export default class Recruit extends React.Component {
     super(props);
 
     this.state = {
-      max: parseInt(this.props.unit.kd_max.replace(/,/g, '')) || 0,
+      max: 0,
       value: "",
       canRecruit: true,
       loading: false,
@@ -17,13 +17,34 @@ export default class Recruit extends React.Component {
     }
   }
 
+  componentDidMount() {
+    this.setMax();
+  }
+
   componentDidUpdate(prevProps, prevState) {
     if (prevState.max !== this.state.max) {
-      this.setState({
-        max: parseInt(this.props.unit.kd_max.replace(/,/g, '')) || 0,
+      this.setMax();
+    }
+  }
+
+  setMax() {
+
+    const characterGold = parseInt(this.props.characterGold.replace(/,/g, ''));
+
+    const amountCanAfford = Math.floor( characterGold / this.props.unit.cost_per_unit);
+
+    if (amountCanAfford > this.props.kingdom.current_population) {
+
+      return this.setState({
+        max: this.props.kingdom.current_population,
         value: 0,
       });
     }
+
+    return this.setState({
+      max: amountCanAfford,
+      value: 0,
+    });
   }
 
   amountChange(event) {
@@ -203,7 +224,7 @@ export default class Recruit extends React.Component {
             <dl className="mb-3">
               <dt><strong>Current Population</strong>:</dt>
               <dd>
-                {this.state.max.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                {this.props.kingdom.current_population.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                 <OverlayTrigger
                   trigger="hover"
                   key='right'
@@ -216,6 +237,11 @@ export default class Recruit extends React.Component {
                           Pay attention to <strong>required population</strong> in the <strong>unit cost</strong> section.
                           The current population here is a total amount of all remaining people in your kingdom. Just because you have X
                           number of people does not mean you can recruit all of those people. Some units have different population requirements.
+                        </p>
+                        <p>
+                          This number does not take into account population reduction % from specific Kingdom Passives. This means, if you have 45,000
+                          people and recruit that many, you will only need ~15,000 of that 45,000. Which means for price of 45,000 people you'll save on population
+                          allowing you to recruit more.
                         </p>
                       </Popover.Content>
                     </Popover>

@@ -117,7 +117,7 @@ export default class UnitQueue extends React.Component {
         {this.upgradeDetails()}
         <hr/>
         <div className="alert alert-warning">
-          If you cancel this upgrade, you'll get a perentage of the materials and population back based on
+          If you cancel this upgrade, you'll get a percentage of the materials and population back based on
           the amount of time left. If the resources you would get back are less then 10%, you wont be able to
           cancel the unit recruitment.
         </div>
@@ -129,8 +129,8 @@ export default class UnitQueue extends React.Component {
     return (
       <Fragment>
         <div className="alert alert-info">
-          Should you cancel this at any time that is not above 85% completion, you will get 75% of the gold and population that you
-          spent to recruit these units. The remaining 25% is used to cover costs and deserters.
+          Should you cancel this at any time that is not above 85% completion, you will get 75% of the gold and 25% population that you
+          spent to recruit these units. The remaining 25% of the gold is for compensation and the 75% of the population is mostly deserters.
         </div>
         <dl className="mt-2">
           <dt>Percentage of time elapsed</dt>

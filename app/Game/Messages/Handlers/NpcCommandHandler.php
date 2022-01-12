@@ -3,7 +3,9 @@
 namespace App\Game\Messages\Handlers;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\PassiveSkill;
 use App\Flare\Values\ItemEffectsValue;
+use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use Exception;
 use Illuminate\Broadcasting\PendingBroadcast;
 use App\Flare\Events\NpcComponentShowEvent;
@@ -49,9 +51,11 @@ class NpcCommandHandler {
     public function __construct(
         NpcServerMessageBuilder $npcServerMessageBuilder,
         NpcQuestsHandler        $npcQuestsHandler,
+        NpcKingdomHandler       $npcKingdomHandler,
     ) {
         $this->npcServerMessageBuilder    = $npcServerMessageBuilder;
         $this->npcQuestHandler            = $npcQuestsHandler;
+        $this->npcKingdomHandler          = $npcKingdomHandler;
     }
 
     /**
@@ -84,36 +88,6 @@ class NpcCommandHandler {
             }
         }
 
-        if ($type->isTakeKingdom()) {
-            if ($this->handleTakingKingdom($user, $npc)) {
-                $message     = $user->character->name . ' Has paid The Old Man for a kingdom on the ' . $user->character->map->gameMap->name . ' plane.';
-                $messageType = 'took_kingdom';
-            }
-        }
-
-        if ($type->isConjure()) {
-
-            broadcast(new NpcComponentShowEvent($user, NpcComponentsValue::CONJURE));
-
-            return broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('take_a_look', $npc), true));
-        }
-
-        if ($type->isReRoll()) {
-            if (!$character->map->gameMap->mapType()->isHell()) {
-                return broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('queen_plane', $npc), true));
-            }
-
-            if (!$this->characterHasQuestItemToIntereact($character, ItemEffectsValue::QUEEN_OF_HEARTS)) {
-                return broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('missing_queen_item', $npc), true));
-            } else {
-                broadcast(new NpcComponentShowEvent($user, NpcComponentsValue::ENCHANT));
-
-                return broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('what_do_you_want', $npc), true));
-            }
-
-
-        }
-
         if ($type->isQuest()) {
             if ($this->handleQuest($user, $npc)) {
                 $message     = $user->character->name . ' has completed a quest for: ' . $npc->real_name . ' and has been rewarded with a godly gift!';
@@ -132,13 +106,7 @@ class NpcCommandHandler {
         }
     }
 
-    protected function characterHasQuestItemToIntereact(Character $character, string $type): bool {
-        $foundQuestItem = $character->inventory->slots->filter(function($slot) use($type) {
-            return $slot->item->type === 'quest' && $slot->item->effect === $type;
-        })->first();
 
-        return !is_null($foundQuestItem);
-    }
 
     /**
      * Handles taking the kingdom.
@@ -161,39 +129,61 @@ class NpcCommandHandler {
                           ->where('npc_owned', true)
                           ->first();
 
-        if (is_null($kingdom)) {
-            broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('cannot_have', $npc), true));
-        } else {
-            $gold         = $character->gold;
-            $kingdomCount = $character->kingdoms()->where('game_map_id', $character->map->game_map_id)->count();
-            $cost         = ($kingdomCount * self::KINGDOM_COST);
+        dump($kingdom);
 
-            if ($gold < $cost) {
-                broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('not_enough_gold', $npc), true));
-
-                return false;
-            } else {
-                $character->update([
-                    'gold' => $gold - $cost,
-                ]);
-
-                event(new UpdateTopBarEvent($character->refresh()));
-            }
-
-            $kingdom->update([
-                'character_id' => $character->id,
-                'npc_owned'    => false,
-                'last_walked'  => now(),
-            ]);
-
-            $this->addKingdomToCache($character->refresh(), $kingdom->refresh());
-
-            event(new AddKingdomToMap($character));
-            event(new UpdateGlobalMap($character));
-            event(new UpdateNPCKingdoms($character->map->gameMap));
-
-            $tookKingdom = true;
-        }
+//        if (is_null($kingdom)) {
+//            broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('cannot_have', $npc), true));
+//            dump('cannot have....');
+//        } else {
+//            dump('I am in here ...');
+//            $gold         = $character->gold;
+//            $kingdomCount = $character->kingdoms()->where('game_map_id', $character->map->game_map_id)->count();
+//            $cost         = ($kingdomCount * self::KINGDOM_COST);
+//
+//            if ($gold < $cost) {
+//                broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('not_enough_gold', $npc), true));
+//
+//                return false;
+//            } else {
+//                $character->update([
+//                    'gold' => $gold - $cost,
+//                ]);
+//
+//                event(new UpdateTopBarEvent($character->refresh()));
+//            }
+//
+//            $kingdom->update([
+//                'character_id' => $character->id,
+//                'npc_owned'    => false,
+//                'last_walked'  => now(),
+//            ]);
+//
+//            foreach ($kingdom->buildings as $building) {
+//                $passive = PassiveSkill::where('name', $building->name)->where('type', PassiveSkillTypeValue::UNLOCKS_BUILDING)->first();
+//
+//                if (!is_null($passive)) {
+//                    $characterPassive = $character->passiveSkills()->where('passive_skill_id', $passive->id)->first();
+//
+//                    if (!is_null($characterPassive)) {
+//                        if ($characterPassive->is_locked && $characterPassive->level < 1) {
+//                            $building->update([
+//                                'is_locked' => true,
+//                            ]);
+//
+//                            event(new ServerMessageEvent($character->user, $building->name . ' has been locked, as you do not meet the passive skill requirements.'));
+//                        }
+//                    }
+//                }
+//            }
+//
+//            $this->addKingdomToCache($character->refresh(), $kingdom->refresh());
+//
+//            event(new AddKingdomToMap($character));
+//            event(new UpdateGlobalMap($character));
+//            event(new UpdateNPCKingdoms($character->map->gameMap));
+//
+//            $tookKingdom = true;
+//        }
 
         return $tookKingdom;
     }

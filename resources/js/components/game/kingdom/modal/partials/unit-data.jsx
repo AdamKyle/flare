@@ -183,6 +183,9 @@ export default class UnitData extends React.Component {
                       <Popover.Content>
                         <p>This number will increase as you recruit more and more units. This represents how many people are needed for one unit and is then, much like resources,
                         multiplied by amount of people.</p>
+                        <p>This number will take into account specific Kingdom Passives that help to reduce the population needed. This means you can be left with gold,
+                          resources or additional population. For example if you can only recruit 45,000 units and have a population reduction of 35%, you would only need: 15,750
+                        people at the same price to get the same amount of people.</p>
                       </Popover.Content>
                     </Popover>
                   }

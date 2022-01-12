@@ -76,4 +76,20 @@ class NpcTypes
     public function getNamedValue(): string {
         return self::$namedValues[$this->value];
     }
+
+    public function isKingdomHolder(): bool {
+        return $this->value === self::KINGDOM_HOLDER;
+    }
+
+    public function isQuestHolder(): bool {
+        return $this->value === self::QUEST_GIVER;
+    }
+
+    public function isConjurer(): bool {
+        return $this->value === self::SUMMONER;
+    }
+
+    public function isEnchantress(): bool {
+        return $this->value === self::SPECIAL_ENCHANTS;
+    }
 }
