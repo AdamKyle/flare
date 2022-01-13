@@ -17,6 +17,8 @@ class NpcServerMessageBuilder {
         switch ($type) {
             case 'took_kingdom':
                 return $npc->real_name . ' smiles in your direction. "It\'s done!"';
+            case 'kingdom_time_out':
+                return $npc->real_name . ' looks disappointed as he looks at the ground and finally states: "No! You abandoned your last kingdom. You can wait...."';
             case 'cannot_have':
                 return  '"Sorry, you can\'t have that."';
             case 'too_poor':

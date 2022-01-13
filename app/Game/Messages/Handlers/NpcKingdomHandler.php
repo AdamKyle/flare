@@ -4,25 +4,14 @@ namespace App\Game\Messages\Handlers;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\PassiveSkill;
-use App\Flare\Values\ItemEffectsValue;
-use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
-use Exception;
-use Illuminate\Broadcasting\PendingBroadcast;
-use App\Flare\Events\NpcComponentShowEvent;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\Npc;
-use App\Flare\Models\User;
-use App\Flare\Services\BuildCharacterAttackTypes;
-use App\Flare\Transformers\CharacterAttackTransformer;
-use App\Flare\Values\NpcCommandTypes;
-use App\Flare\Values\NpcComponentsValue;
 use App\Game\Core\Traits\KingdomCache;
 use App\Game\Kingdoms\Events\AddKingdomToMap;
 use App\Game\Kingdoms\Events\UpdateGlobalMap;
 use App\Game\Kingdoms\Events\UpdateNPCKingdoms;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
-use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 
 class NpcKingdomHandler {
@@ -38,6 +27,15 @@ class NpcKingdomHandler {
     }
 
     public function takeKingdom(Character $character, Npc $npc): bool {
+
+        if (!is_null($character->can_settle_again_at)) {
+            broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('kingdom_time_out', $npc), true));
+
+            event(new ServerMessageEvent($character->user, 'You cannot settle another kingdom for: ' . now()->diffInMinutes($character->can_settle_again_at) . ' Minutes.'));
+
+            return false;
+        }
+
         $characterX     = $character->map->character_position_x;
         $characterY     = $character->map->character_position_y;
         $characterMapId = $character->map->game_map_id;
@@ -109,6 +107,12 @@ class NpcKingdomHandler {
                         ]);
 
                         event(new ServerMessageEvent($character->user, $building->name . ' has been locked, as you do not meet the passive skill requirements.'));
+                    } else {
+                        $building->update([
+                            'is_locked' => false,
+                        ]);
+
+                        event(new ServerMessageEvent($character->user, $building->name . ' has been unlocked, as you meet the passive skill requirements.'));
                     }
                 }
             }

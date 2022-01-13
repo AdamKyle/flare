@@ -81,9 +81,16 @@ class KingdomsController extends Controller
     public function settle(KingdomsSettleRequest $request, Character $character, KingdomService $kingdomService)
     {
 
+        if (!is_null($character->can_settle_again_at)) {
+
+            return response()->json([
+                'message' => 'You can settle another kingdom in: ' . now()->diffInMinutes($character->can_settle_again_at)
+            ], 200);
+        }
+
         if ($character->map->gameMap->mapType()->isPurgatory()) {
             return response()->json([
-                'message' => 'Child, this is not place to be a King or Queen, The Creator would destroy anything you build down here. You\'re not even suppose to be here.'
+                'message' => 'Child, this is not place to be a King or Queen, The Creator would destroy anything you build down here.'
             ], 200);
         }
 

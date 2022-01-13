@@ -14,6 +14,7 @@ use App\Game\Core\Traits\KingdomCache;
 use App\Game\Kingdoms\Events\UpdateEnemyKingdomsMorale;
 use App\Game\Kingdoms\Events\UpdateGlobalMap;
 use App\Game\Kingdoms\Events\UpdateNPCKingdoms;
+use App\Game\Kingdoms\Jobs\KingdomSettlementLockout;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 use App\Game\Maps\Events\UpdateMapDetailsBroadcast;
 use App\Game\Maps\Services\MovementService;
@@ -26,6 +27,7 @@ use App\Flare\Models\Kingdom;
 use App\Flare\Transformers\KingdomTransformer;
 use Facades\App\Flare\Values\UserOnlineValue;
 use App\Game\Kingdoms\Events\UpdateKingdom;
+use App\Game\Messages\Events\ServerMessageEvent as GameServerMessageEvent;
 use Cache;
 
 class KingdomResourcesService {
@@ -224,12 +226,65 @@ class KingdomResourcesService {
 
         $this->npcTookKingdom($character->user, $kingdom->refresh());
 
+        foreach ($kingdom->buildings as $building) {
+            $newDurability = $building->current_durability - $building->current_durability * 0.35;
+
+            if ($newDurability < 0) {
+                $newDurability = 0;
+            }
+
+            $building->update([
+                'current_durability' => $newDurability,
+            ]);
+        }
+
+        foreach ($kingdom->units as $unit) {
+            $newAmount = $unit->amount - $unit->amount * 0.75;
+
+            if ($newAmount < 0) {
+                $newAmount = 0;
+            }
+
+            $unit->update([
+                'amount' => $newAmount,
+            ]);
+        }
+
+        $newPopulation = $kingdom->current_population - $kingdom->current_population * 0.75;
+
+        if ($newPopulation < 0) {
+            $newPopulation = 0;
+        }
+
         $kingdom->update([
-            'character_id'   => null,
-            'npc_owned'      => true,
-            'current_morale' => 0.10,
-            'last_walked'    => now(),
+            'character_id'       => null,
+            'npc_owned'          => true,
+            'current_morale'     => 0.10,
+            'treasury'           => 0,
+            'last_walked'        => now(),
+            'current_population' => $newPopulation,
+            'current_morale'     => 0.50,
         ]);
+
+        $kingdom = $kingdom->refresh();
+
+        if (!is_null($character->can_settle_again_at)) {
+            $time = $character->can_settle_again_at->addMinutes(30);
+        } else {
+            $time = now()->addMinutes(30);
+        }
+
+        $character->update([
+            'can_settle_again_at' => $time
+        ]);
+
+        $character = $character->refresh();
+
+        KingdomSettlementLockout::dispatch($character)->delay(now()->addMinutes(15));
+
+        $minutes = now()->diffInMinutes($time);
+
+        event(new GameServerMessageEvent($character->user, 'You have been locked out of making a new kingdom for: '. $minutes . ' Minutes.'));
 
         broadcast(new UpdateNPCKingdoms($kingdom->gameMap));
         broadcast(new UpdateGlobalMap($character));
