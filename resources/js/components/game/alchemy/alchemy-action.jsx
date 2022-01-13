@@ -123,6 +123,7 @@ export default class AlchemyAction extends React.Component {
 
     if (this.state.itemsToCraft !== null) {
       return this.state.itemsToCraft.map((item) => {
+        if (item.gold_dust_cost === null) { console.log(item.name); }
         const goldDust = item.gold_dust_cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         const shards   = item.shards_cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 

@@ -12,11 +12,13 @@ class ItemUsabilityType {
     const STAT_INCREASE  = 0;
     const EFFECTS_SKILL  = 1;
     const KINGDOM_DAMAGE = 2;
+    const OTHER          = 3;
 
     protected static $values = [
         0 => self::STAT_INCREASE,
         1 => self::EFFECTS_SKILL,
         2 => self::KINGDOM_DAMAGE,
+        3 => self::OTHER
     ];
 
     /**
@@ -26,6 +28,7 @@ class ItemUsabilityType {
         self::STAT_INCREASE  => 'Stat increase',
         self::EFFECTS_SKILL  => 'Effects skill',
         self::KINGDOM_DAMAGE => 'Deals damage to a kingdom',
+        self::OTHER          => 'Effects multiple stats'
     ];
 
     /**
@@ -71,6 +74,15 @@ class ItemUsabilityType {
      */
     public function damagesKingdom(): bool {
         return $this->value === self::KINGDOM_DAMAGE;
+    }
+
+    /**
+     * is Other?
+     *
+     * @return bool
+     */
+    public function isOther(): bool {
+        return $this->value === self::OTHER;
     }
 
     /**

@@ -44,7 +44,7 @@ class NpcCommandService {
             return;
         }
 
-        broadcast(new ServerMessageEvent($character->user, $this->serverMessage->build('no_matching_command')));
+        broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('no_matching_command', $npc)));
     }
 
     public function handleForType(Character $character, Npc $npc) {

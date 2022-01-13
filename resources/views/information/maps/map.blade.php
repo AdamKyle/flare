@@ -71,6 +71,25 @@
                         @endif
 
                         @if ($map->mapType()->isPurgatory())
+                            <hr />
+                            <h3>Caution</h3>
+                            <p>Purgatory can only be accessed by visiting {{$map->requiredLocation->name}} on Hell. At which point this map will be in the Traverse drop down.</p>
+                            <p>Monsters are increased by 350% in stats and resistances as well as skills and other aspects.</p>
+                            <p>Players are reduced by 80% here, since you have to come from Hell, which also reduces your stats, this it not a further reduction,
+                                instead we reduce you from your Surface level stats.</p>
+                            <p>Vampire are also reduced, their life stealing caps at 50%</p>
+                            <p>Resurrection chance is capped at 45% unless you are a prophet, in which case it's 65%</p>
+                            <p>Devouring Light and Darkness are reduced by 45% here. Auto battle is not suggested as you can be voided. If you are voided here, you are dead.</p>
+                            <p>Finally all quest items that make Affix damage irresistible will not work down here.</p>
+                            <p>
+                                Players also cannot walk on water down here, nor can you settle kingdoms. Chance's are, even with the best Alchemy items and current gear you will not make it to
+                                the bottom of the monster list. This is intended as Purgatory is one of the hardest planes in game to get to and to fight in because of all the reductions.
+                            </p>
+                            <p>
+                                Players will want to be decked out in the top tier gear with one 100 Billion unique that has two enchants rolled as high as you can get them (600+% for your damage stat).
+                                Players will also want to use a few Alchemical items (you'll want to be maxed on this skill) on surface to raise their stats as high as they can go, then journey down and see how far down the list they can make it.
+                                This is a test of your character, your strength, how you built your character and so on.
+                            </p>
                         @endif
                     </div>
                 </div>

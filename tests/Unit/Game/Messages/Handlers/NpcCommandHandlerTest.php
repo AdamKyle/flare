@@ -142,48 +142,7 @@ class NpcCommandHandlerTest extends TestCase {
 
         Event::assertDispatched(ServerMessageEvent::class);
     }
-
-    public function testCharacterTakesKingdom() {
-        $user = $this->character->getCharacterFactory()->getUser();
-
-        $this->assertCount(0, $user->character->kingdoms);
-
-        $npcCommandHandler = resolve(NpcCommandHandler::class);
-
-        $npcCommandHandler->handleForType(NpcCommandTypes::TAKE_KINGDOM, $this->kingdomHolderNPC, $user);
-
-        Event::assertDispatched(ServerMessageEvent::class);
-
-        $this->assertCount(1, $user->character->kingdoms);
-    }
-
-    public function testCharacterCannotAffordKingdom() {
-        $user = $this->character->getCharacterFactory()->kingdomManagement()->assignKingdom([
-            'x_position' => 32,
-            'y_position' => 32,
-        ])->assignBuilding()->assignUnits()->getUser();
-
-        $this->assertCount(1, $user->character->kingdoms);
-
-        $npcCommandHandler = resolve(NpcCommandHandler::class);
-
-        $npcCommandHandler->handleForType(NpcCommandTypes::TAKE_KINGDOM, $this->kingdomHolderNPC, $user);
-
-        Event::assertDispatched(ServerMessageEvent::class);
-
-        $this->assertCount(1, $user->character->kingdoms);
-    }
-
-    public function testCharacterCanInteractWithConjureNpc() {
-        $npcCommandHandler = resolve(NpcCommandHandler::class);
-
-        $user = $this->character->getCharacterFactory()->getUser();
-
-        $npcCommandHandler->handleForType(NpcCommandTypes::CONJURE, $this->conjureNpc, $user);
-
-        Event::assertDispatched(ServerMessageEvent::class);
-        Event::assertDispatched(NpcComponentShowEvent::class);
-    }
+    
 
     public function testCharacterHandlesQuest() {
         $npcCommandHandler = resolve(NpcCommandHandler::class);

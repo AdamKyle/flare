@@ -42,6 +42,9 @@ class UseItemService {
             'base_damage_mod_bonus'    => $item->base_damage_mod_bonus,
             'base_healing_mod_bonus'   => $item->base_healing_mod_bonus,
             'base_ac_mod_bonus'        => $item->base_ac_mod_bonus,
+            'base_ac_mod'              => $item->base_ac_mod,
+            'base_damage_mod'          => $item->base_damage_mod,
+            'base_healing_mod'         => $item->base_healing_mod,
             'fight_time_out_mod_bonus' => $item->fight_time_out_mod_bonus,
             'move_time_out_mod_bonus'  => $item->move_time_out_mod_bonus,
             'str_mod'                  => $item->str_mod,
@@ -104,7 +107,7 @@ class UseItemService {
     }
 
     protected function getType(Item $item): int {
-        $type = null;
+        $type = ItemUsabilityType::OTHER;
 
         if ($item->stat_increase) {
             $type = ItemUsabilityType::STAT_INCREASE;

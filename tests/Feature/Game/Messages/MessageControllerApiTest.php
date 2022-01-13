@@ -312,7 +312,6 @@ class MessageControllerApiTest extends TestCase
     }
 
     public function testNpcMessage() {
-        Queue::fake();
 
         $user = $this->character->getUser();
         $npc = $this->createNpc([
@@ -333,8 +332,6 @@ class MessageControllerApiTest extends TestCase
                 'user_name' => $npc->name,
             ])
             ->response;
-
-        Queue::assertPushed(ProcessNPCCommands::class);
 
         $this->assertEquals(200, $response->status());
     }
