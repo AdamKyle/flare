@@ -49,10 +49,6 @@ class AdventureRewardService {
      */
     private $messages = [];
 
-    /**
-     * @var array $itemsLeft
-     */
-    private $itemsLeft = [];
 
     /**
      * @param CharacterService $characterService
@@ -105,10 +101,6 @@ class AdventureRewardService {
      */
     public function getMessages(): array {
         return $this->messages;
-    }
-
-    public function getItemsLeft(): array {
-        return $this->itemsLeft;
     }
 
     protected function handleCurrencies(Character $character, array $rewards) {
