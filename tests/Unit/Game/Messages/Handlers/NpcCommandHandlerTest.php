@@ -142,7 +142,7 @@ class NpcCommandHandlerTest extends TestCase {
 
         Event::assertDispatched(ServerMessageEvent::class);
     }
-    
+
 
     public function testCharacterHandlesQuest() {
         $npcCommandHandler = resolve(NpcCommandHandler::class);

@@ -210,6 +210,27 @@ We do not show you the list of new resource values for those kingdoms, just pres
 
 Resources are gained once per hour.
 
+## Abandoning Your Kingdom
+
+After you settle your kingdom, you will see a new button called Abandon Kingdom. Clicking this will show you the following modal:
+
+<div class="mb-4">
+    <a href="/storage/info/kingdoms/images/abandoning-kingdoms.png" class="glightbox">
+        <img src="/storage/info/kingdoms/images/abandoning-kingdoms.png" class="img-fluid" />
+    </a>
+</div>
+
+head this modal well, for this a penalty for recklessly abandoning your kingdoms. You cannot abandon a kingdom if:
+
+- You have units in movement or units are moving towards your kingdom.
+- You have Gold Bars in your kingdom (these are worth 2 billion each and would be a waste of gold).
+
+You will be locked out for 30 minutes from attempting to settle another kingdom, take a kingdom through npc actions or war.
+
+Should you abandon another kingdom in that 30 minute lock out window, you will in cure another 30 minute time out on top of the remaining time you have left.
+
+There is nowhere in game to see this timeout. You will be told of the time left when you attempt to settle another kingdom or wage war and 
+attempt to take one, or if you attempt to use NPC commands to take one.
 
 
 

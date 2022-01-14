@@ -7,6 +7,7 @@ use App\Game\Kingdoms\Builders\AttackBuilder;
 use App\Game\Kingdoms\Events\UpdateEnemyKingdomsMorale;
 use App\Game\Kingdoms\Events\UpdateUnitMovementLogs;
 use App\Game\Kingdoms\Handlers\NotifyHandler;
+use App\Game\Messages\Events\ServerMessageEvent;
 use Exception;
 use Facades\App\Flare\Values\UserOnlineValue;
 use App\Flare\Events\KingdomServerMessageEvent;
@@ -138,10 +139,16 @@ class AttackService {
 
         $settler = $this->findSettlerUnit();
 
-        if (!is_null($settler)) {
-            $this->settler = GameUnit::find($settler['unit_id']);
+        if (is_null($character->can_settle_again_at)) {
+            if (!is_null($settler)) {
+                $this->settler = GameUnit::find($settler['unit_id']);
 
-            return $this->handleSettlerUnit($defender, $unitMovement, $character);
+                return $this->handleSettlerUnit($defender, $unitMovement, $character);
+            }
+        } else {
+            $this->removeSettler();
+
+            event(new ServerMessageEvent($character->user, 'You lost your settler. You cannot settle again until: ' . now()->diffInMinutes($character->can_settle_again_at) . ' Minutes'));
         }
 
         $this->notifyHandler->setSentUnits($this->unitsSent)->notifyDefender(KingdomLogStatusValue::KINGDOM_ATTACKED, $defender);
@@ -385,6 +392,18 @@ class AttackService {
         }
 
         return $settler;
+    }
+
+    protected function removeSettler() {
+        if (empty($this->newRegularUnits)) {
+            return true;
+        }
+
+        foreach ($this->newRegularUnits as $index => $unitInfo) {
+            if ($unitInfo['settler']) {
+                unset($this->newRegularUnits[$index]);
+            }
+        }
     }
 
     /**

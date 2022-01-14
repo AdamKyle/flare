@@ -252,10 +252,10 @@ class KingdomsController extends Controller
             $service->updateKingdomResources($kingdom, $gameUnit, $request->amount);
         } else {
 
-            $amount    = $gameUnit->required_population * $request->amount;
-            $reduction = $kingdom->fetchUnitCostReduction();
+            $amount              = $gameUnit->required_population * $request->amount;
+            $populationReduction = $kingdom->fetchPopulationCostReduction();
 
-            $amount = ceil($amount - $amount * $reduction);
+            $amount = ceil($amount - $amount * $populationReduction);
 
             if ($amount > $kingdom->current_population) {
                 return response()->json([

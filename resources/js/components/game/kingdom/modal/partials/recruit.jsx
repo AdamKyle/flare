@@ -1,6 +1,7 @@
 import React, {Fragment} from 'react';
 import {Popover, OverlayTrigger} from 'react-bootstrap';
 import AlertInfo from "../../../components/base/alert-info";
+import AlertError from "../../../components/base/alert-error";
 
 export default class Recruit extends React.Component {
 
@@ -14,6 +15,7 @@ export default class Recruit extends React.Component {
       loading: false,
       recruitmentType: '',
       totalCost: 0,
+      errorMessage: null,
     }
   }
 
@@ -164,6 +166,23 @@ export default class Recruit extends React.Component {
   }
 
   canRecruitWithGold(value) {
+
+    let totalPopNeeded = this.props.unit.required_population * value;
+
+    totalPopNeeded = totalPopNeeded - totalPopNeeded * this.props.kingdom.population_cost_reduction;
+
+    if (totalPopNeeded > this.props.kingdom.current_population) {
+      this.setState({
+        errorMessage: 'Not enough population.',
+      });
+
+      return false;
+    } else {
+      this.setState({
+        errorMessage: null,
+      });
+    }
+
     let cost = this.props.unit.cost_per_unit;
 
     cost *= value;
@@ -309,6 +328,13 @@ export default class Recruit extends React.Component {
               this.state.recruitmentType === 'recruit-with-gold' ?
                 <Fragment>
                   <AlertInfo icon={'fas fa-question-circle'} title="Info">
+                    <p>
+                      <strong>
+                        You only need to pay attention to Required Population on the right hand side when recruiting with gold.
+                        Other resources may go red, indicating you do not have enough,
+                        how ever you only care about Required Population when purchasing with gold.
+                      </strong>
+                    </p>
                     <p>You can pay gold instead of resources to recruit units.</p>
                     <p>You cannot buy more units then your population allows. You also cannot buy
                     more units then you have gold. Each unit has a cost per unit.</p>
@@ -319,6 +345,15 @@ export default class Recruit extends React.Component {
                       to a significant portion. For example - with Kingmanship at level 1, recruiting 1 billion spearmen would take: <strong>94 years in real time</strong>,
                       with the skill maxed out, it takes 34.72 days to recruit that many units, which is <em>much</em> better.</p>
                   </AlertInfo>
+                  {
+                    this.state.errorMessage !== null ?
+                      <AlertError icon={"fas fa-exclamation"} title={'Oops!'}>
+                        <p>
+                          {this.state.errorMessage}
+                        </p>
+                      </AlertError>
+                      : null
+                  }
                   <dl className="mt-3 mb-3">
                     <dt>Cost per unit:</dt>
                     <dd>{this.props.unit.cost_per_unit}</dd>
