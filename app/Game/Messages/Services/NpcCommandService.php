@@ -28,7 +28,7 @@ class NpcCommandService {
 
     public function handleNPC(Character $character, Npc $npc, string $message) {
         if ($character->currentAutomations()->where('type', AutomationType::ATTACK)->get()->isNotempty()) {
-            broadcast(new ServerMessageEvent($user, 'Child listen! You are so busy thrashing about that you can\'t even focus on this conversation. Stop the auto fighting and then talk to me. Got it? Clear enough? Christ child!', true));
+            broadcast(new ServerMessageEvent($character->user, 'Child listen! You are so busy thrashing about that you can\'t even focus on this conversation. Stop the auto fighting and then talk to me. Got it? Clear enough? Christ child!', true));
 
             return;
         }
@@ -69,9 +69,9 @@ class NpcCommandService {
         }
 
         if ($type->isConjurer()) {
-            broadcast(new NpcComponentShowEvent($character->user, NpcComponentsValue::CONJURE));
+            event(new NpcComponentShowEvent($character->user, NpcComponentsValue::CONJURE));
 
-            return broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('take_a_look', $npc), true));
+            return event(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('take_a_look', $npc), true));
         }
 
         if ($type->isEnchantress()) {

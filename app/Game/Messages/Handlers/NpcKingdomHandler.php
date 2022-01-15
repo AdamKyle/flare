@@ -48,7 +48,7 @@ class NpcKingdomHandler {
                           ->first();
 
         if (!is_null($kingdom)) {
-            if ($this->handleGold($character)) {
+            if ($this->handleGold($character, $npc)) {
                 $kingdom->update([
                     'character_id' => $character->id,
                     'npc_owned'    => false,
@@ -67,13 +67,13 @@ class NpcKingdomHandler {
         return false;
     }
 
-    protected function handleGold(Character $character) {
+    protected function handleGold(Character $character, Npc $npc) {
         $gold         = $character->gold;
         $kingdomCount = $character->kingdoms()->where('game_map_id', $character->map->game_map_id)->count();
         $cost         = ($kingdomCount * self::KINGDOM_COST);
 
         if ($gold < $cost) {
-            broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('not_enough_gold', $npc), true));
+            broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('not_enough_gold', $npc), true));
 
             return false;
         }
