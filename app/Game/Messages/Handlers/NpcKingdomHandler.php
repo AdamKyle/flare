@@ -80,10 +80,6 @@ class NpcKingdomHandler {
 
         $newGold = $character->gold - $cost;
 
-        if ($newGold < 0) {
-            $newGold = 0;
-        }
-
         $character->update([
             'gold' => $newGold,
         ]);

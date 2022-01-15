@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e2041ddee2cebd6c79ca99772bf8c5dd",
+    "content-hash": "15d0eb604c896fa47a904ee30c243f13",
     "packages": [
         {
             "name": "asahasrabuddhe/laravel-mjml",
@@ -1195,29 +1195,29 @@
         },
         {
             "name": "dragonmantank/cron-expression",
-            "version": "v3.2.4",
+            "version": "v3.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dragonmantank/cron-expression.git",
-                "reference": "9545dea2a1d92b60c8b3d06f02025c83e999bde0"
+                "reference": "63f2a76a045bac6ec93cc2daf2b534b412aa0313"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dragonmantank/cron-expression/zipball/9545dea2a1d92b60c8b3d06f02025c83e999bde0",
-                "reference": "9545dea2a1d92b60c8b3d06f02025c83e999bde0",
+                "url": "https://api.github.com/repos/dragonmantank/cron-expression/zipball/63f2a76a045bac6ec93cc2daf2b534b412aa0313",
+                "reference": "63f2a76a045bac6ec93cc2daf2b534b412aa0313",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.2|^8.0",
-                "webmozart/assert": "^1.7.0"
+                "webmozart/assert": "^1.0"
             },
             "replace": {
                 "mtdowling/cron-expression": "^1.0"
             },
             "require-dev": {
                 "phpstan/extension-installer": "^1.0",
-                "phpstan/phpstan": "^0.12",
-                "phpstan/phpstan-webmozart-assert": "^0.12.7",
+                "phpstan/phpstan": "^1.0",
+                "phpstan/phpstan-webmozart-assert": "^1.0",
                 "phpunit/phpunit": "^7.0|^8.0|^9.0"
             },
             "type": "library",
@@ -1244,7 +1244,7 @@
             ],
             "support": {
                 "issues": "https://github.com/dragonmantank/cron-expression/issues",
-                "source": "https://github.com/dragonmantank/cron-expression/tree/v3.2.4"
+                "source": "https://github.com/dragonmantank/cron-expression/tree/v3.3.0"
             },
             "funding": [
                 {
@@ -1252,7 +1252,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-01-13T04:09:37+00:00"
+            "time": "2022-01-14T16:02:05+00:00"
         },
         {
             "name": "egulias/email-validator",
@@ -2859,16 +2859,16 @@
         },
         {
             "name": "league/commonmark",
-            "version": "1.6.6",
+            "version": "1.6.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/commonmark.git",
-                "reference": "c4228d11e30d7493c6836d20872f9582d8ba6dcf"
+                "reference": "2b8185c13bc9578367a5bf901881d1c1b5bbd09b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/commonmark/zipball/c4228d11e30d7493c6836d20872f9582d8ba6dcf",
-                "reference": "c4228d11e30d7493c6836d20872f9582d8ba6dcf",
+                "url": "https://api.github.com/repos/thephpleague/commonmark/zipball/2b8185c13bc9578367a5bf901881d1c1b5bbd09b",
+                "reference": "2b8185c13bc9578367a5bf901881d1c1b5bbd09b",
                 "shasum": ""
             },
             "require": {
@@ -2932,10 +2932,6 @@
             },
             "funding": [
                 {
-                    "url": "https://enjoy.gitstore.app/repositories/thephpleague/commonmark",
-                    "type": "custom"
-                },
-                {
                     "url": "https://www.colinodell.com/sponsor",
                     "type": "custom"
                 },
@@ -2948,15 +2944,11 @@
                     "type": "github"
                 },
                 {
-                    "url": "https://www.patreon.com/colinodell",
-                    "type": "patreon"
-                },
-                {
                     "url": "https://tidelift.com/funding/github/packagist/league/commonmark",
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-07-17T17:13:23+00:00"
+            "time": "2022-01-13T17:18:13+00:00"
         },
         {
             "name": "league/flysystem",
@@ -6219,16 +6211,16 @@
         },
         {
             "name": "react/socket",
-            "version": "v1.10.0",
+            "version": "v1.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/socket.git",
-                "reference": "d132fde589ea97f4165f2d94b5296499eac125ec"
+                "reference": "f474156aaab4f09041144fa8b57c7d70aed32a1c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/socket/zipball/d132fde589ea97f4165f2d94b5296499eac125ec",
-                "reference": "d132fde589ea97f4165f2d94b5296499eac125ec",
+                "url": "https://api.github.com/repos/reactphp/socket/zipball/f474156aaab4f09041144fa8b57c7d70aed32a1c",
+                "reference": "f474156aaab4f09041144fa8b57c7d70aed32a1c",
                 "shasum": ""
             },
             "require": {
@@ -6237,11 +6229,11 @@
                 "react/dns": "^1.8",
                 "react/event-loop": "^1.2",
                 "react/promise": "^2.6.0 || ^1.2.1",
-                "react/promise-timer": "^1.4.0",
+                "react/promise-timer": "^1.8",
                 "react/stream": "^1.2"
             },
             "require-dev": {
-                "clue/block-react": "^1.2",
+                "clue/block-react": "^1.5",
                 "phpunit/phpunit": "^9.3 || ^5.7 || ^4.8.35",
                 "react/promise-stream": "^1.2"
             },
@@ -6287,7 +6279,7 @@
             ],
             "support": {
                 "issues": "https://github.com/reactphp/socket/issues",
-                "source": "https://github.com/reactphp/socket/tree/v1.10.0"
+                "source": "https://github.com/reactphp/socket/tree/v1.11.0"
             },
             "funding": [
                 {
@@ -6299,7 +6291,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2021-11-29T10:08:24+00:00"
+            "time": "2022-01-14T10:14:32+00:00"
         },
         {
             "name": "react/stream",
@@ -6501,29 +6493,29 @@
         },
         {
             "name": "spatie/laravel-collection-macros",
-            "version": "7.9.0",
+            "version": "7.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-collection-macros.git",
-                "reference": "2cac2fb367dd37d308ede89175ffd096e5e62614"
+                "reference": "fbb8ef5be1bb09738f11489392bf5cf2e41b4e3f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-collection-macros/zipball/2cac2fb367dd37d308ede89175ffd096e5e62614",
-                "reference": "2cac2fb367dd37d308ede89175ffd096e5e62614",
+                "url": "https://api.github.com/repos/spatie/laravel-collection-macros/zipball/fbb8ef5be1bb09738f11489392bf5cf2e41b4e3f",
+                "reference": "fbb8ef5be1bb09738f11489392bf5cf2e41b4e3f",
                 "shasum": ""
             },
             "require": {
-                "illuminate/support": "^8.71",
+                "illuminate/support": "^8.71|^9.0",
                 "php": "^8.0"
             },
             "require-dev": {
                 "amphp/parallel": "^0.2.5",
                 "amphp/parallel-functions": "^0.1.3",
                 "mockery/mockery": "^1.4.2",
-                "orchestra/testbench": "^6.23",
+                "orchestra/testbench": "^6.23|^7.0",
                 "phpunit/phpunit": "^9.4.4",
-                "symfony/stopwatch": "^5.2"
+                "symfony/stopwatch": "^5.2|^6.0"
             },
             "suggest": {
                 "amphp/parallel-functions": "Required when using the parallel*-macros."
@@ -6567,7 +6559,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/laravel-collection-macros/issues",
-                "source": "https://github.com/spatie/laravel-collection-macros/tree/7.9.0"
+                "source": "https://github.com/spatie/laravel-collection-macros/tree/7.10.0"
             },
             "funding": [
                 {
@@ -6575,7 +6567,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2021-11-22T09:52:45+00:00"
+            "time": "2022-01-13T07:36:33+00:00"
         },
         {
             "name": "spatie/laravel-permission",
@@ -6657,28 +6649,27 @@
         },
         {
             "name": "spatie/laravel-short-schedule",
-            "version": "1.4.5",
+            "version": "1.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-short-schedule.git",
-                "reference": "75dc0e53583eb3cbd2f0a74be4521c861a044750"
+                "reference": "e6c4df39ea780fc3a5af87d1455c14531c39d3ba"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-short-schedule/zipball/75dc0e53583eb3cbd2f0a74be4521c861a044750",
-                "reference": "75dc0e53583eb3cbd2f0a74be4521c861a044750",
+                "url": "https://api.github.com/repos/spatie/laravel-short-schedule/zipball/e6c4df39ea780fc3a5af87d1455c14531c39d3ba",
+                "reference": "e6c4df39ea780fc3a5af87d1455c14531c39d3ba",
                 "shasum": ""
             },
             "require": {
-                "illuminate/cache": "^8.71",
+                "illuminate/cache": "^8.71|^9.0",
                 "php": "^8.0",
                 "react/event-loop": "^1.1",
                 "spatie/temporary-directory": "^2.0"
             },
             "require-dev": {
-                "friendsofphp/php-cs-fixer": "^2.16",
                 "mockery/mockery": "^1.3.3",
-                "orchestra/testbench": "^6.23",
+                "orchestra/testbench": "^6.23|^7.0",
                 "phpunit/phpunit": "^9.4",
                 "spatie/test-time": "^1.2"
             },
@@ -6715,7 +6706,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/laravel-short-schedule/issues",
-                "source": "https://github.com/spatie/laravel-short-schedule/tree/1.4.5"
+                "source": "https://github.com/spatie/laravel-short-schedule/tree/1.5.0"
             },
             "funding": [
                 {
@@ -6727,7 +6718,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-01-10T11:09:24+00:00"
+            "time": "2022-01-14T16:44:38+00:00"
         },
         {
             "name": "spatie/temporary-directory",
@@ -13489,7 +13480,7 @@
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=8.1.0"
+        "php": ">=8.0.0"
     },
     "platform-dev": [],
     "plugin-api-version": "2.2.0"
