@@ -89,8 +89,8 @@ class CharacterAdventureController extends Controller {
         HandleAdventureRewards::dispatch($character, $adventureLog, $rewards)->delay(now()->addSeconds(10));
 
         return redirect()->to(route('game'))->with('success', 'Adventure Rewards are processing. Keep an eye on chat to see the rewards come through. 
-        Once all rewards have been handed to you, you will be able to start a new adventure. Processing will begin in 10 seconds. You\'ll be able to embark on a new adventure when 
-        the menu icon stops bouncing. You do not need to re-collect rewards - everything will update for you in real time.');
+        Once all currency, xp and skill xp rewards have been handed to you, you will be able to start a new adventure. Processing will begin in 10 seconds. You\'ll be able to embark on a new adventure when 
+        the menu icon stops bouncing. You do not need to re-collect rewards - everything will update for you in real time. Auto Disenchanting is respected and players can embark on another adventure while their items are being processed.');
     }
 
     public function delete(AdventureLog $adventureLog) {

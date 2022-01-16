@@ -27,6 +27,7 @@ class UserOnlineValue {
      * Returns a collection of users currently online.
      *
      * @return Collection
+     * @codeCoverageIgnore
      */
     public function getUsersOnline(): Collection {
         return Session::where('last_activity', '<', now()->addHour()->timestamp)
@@ -40,6 +41,7 @@ class UserOnlineValue {
      * Returns a query object of sessions currently active.
      *
      * @return mixed
+     * @codeCoverageIgnore
      */
     public function getUsersOnlineQuery() {
         return Session::where('last_activity', '<', now()->addHour()->timestamp)

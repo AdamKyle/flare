@@ -123,7 +123,9 @@ class LocationEffectValue {
             case self::INCREASE_STATS_BY_ONE_BILLION:
                 return 0.14;
             default:
+                // @codeCoverageIgnoreStart
                 return 0.0;
+                // @codeCoverageIgnoreEnd
         }
     }
 

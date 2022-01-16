@@ -20,7 +20,7 @@ class MoveTimeOutJobTest extends TestCase
 
         Event::fake();
 
-        MoveTimeOutJob::dispatch($character);
+        MoveTimeOutJob::dispatch($character->id);
 
         $character->refresh();
 

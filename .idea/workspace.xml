@@ -5,22 +5,24 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b39d3677-81d8-4f95-acdd-0f40b3bc89ec" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/blade.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/adambalan.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/laravel-idea.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/laravel-plugin.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/phpunit.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Game/Messages/Handlers/NpcKingdomHandler.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Messages/Handlers/NpcKingdomHandler.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Game/Messages/Services/NpcCommandService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Messages/Services/NpcCommandService.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Setup/Character/CharacterFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Setup/Character/CharacterFactory.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Unit/Game/Messages/Handlers/NpcKingdomHandlerTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Unit/Game/Messages/Handlers/NpcKingdomHandlerTest.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Unit/Game/Messages/Values/MapChatColorTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Unit/Game/Messages/Values/MapChatColorTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Values/AttackTypeValue.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Values/AttackTypeValue.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Values/BaseSkillValue.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Values/BaseSkillValue.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Values/LocationEffectValue.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Values/LocationEffectValue.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Values/RandomAffixDetails.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Values/RandomAffixDetails.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Values/SiteAccessStatisticValue.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Values/SiteAccessStatisticValue.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Values/UserOnlineValue.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Values/UserOnlineValue.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Adventures/Jobs/AdventureJob.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Adventures/Jobs/AdventureJob.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Core/Controllers/CharacterAdventureController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Core/Controllers/CharacterAdventureController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Maps/Jobs/MoveTimeOutJob.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Maps/Jobs/MoveTimeOutJob.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Maps/Listeners/MoveTimeOutListener.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Maps/Listeners/MoveTimeOutListener.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Messages/Listeners/ServerMessageListener.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Messages/Listeners/ServerMessageListener.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/layouts/partials/user-profile-nav.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layouts/partials/user-profile-nav.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/game/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/game/api.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Unit/Flare/Values/ItemUsabilityTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Unit/Flare/Values/ItemUsabilityTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Unit/Flare/Values/NpcCommandTypes.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Unit/Flare/Values/NpcCommandTypesTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Unit/Game/Maps/Jobs/MoveTimeOutJobTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Unit/Game/Maps/Jobs/MoveTimeOutJobTest.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -260,7 +262,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/tests/Unit/Game/Messages/Jobs" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources/js/components" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
@@ -272,18 +274,18 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/tests/Unit/Game/Messages/Jobs" />
+      <recent name="$PROJECT_DIR$/resources/js/components" />
       <recent name="$PROJECT_DIR$/storage/app/public" />
+      <recent name="$PROJECT_DIR$/tests/Unit/Flare/Values" />
+      <recent name="$PROJECT_DIR$/tests/Unit/Game/Messages/Jobs" />
       <recent name="$PROJECT_DIR$/tests/Unit/Game/Core/Values" />
-      <recent name="$PROJECT_DIR$/app/Game/Kingdoms/Jobs" />
-      <recent name="$PROJECT_DIR$/resources/js/components/game/sections/modals" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/resources/js/components/game/components/nav-bar/server-clock" />
+      <recent name="$PROJECT_DIR$/resources/js/components/game/components/nav-bar" />
       <recent name="$PROJECT_DIR$/resources/info/kingdoms/images" />
       <recent name="$PROJECT_DIR$/resources/js/components/game/npc-components" />
       <recent name="$PROJECT_DIR$/app/Flare/Values" />
-      <recent name="$PROJECT_DIR$/resources/info/passive-skills/images" />
-      <recent name="$PROJECT_DIR$/app/Admin/Jobs" />
     </key>
   </component>
   <component name="RunManager">
@@ -323,7 +325,7 @@
       <workItem from="1642211803360" duration="167000" />
       <workItem from="1642212025385" duration="159000" />
       <workItem from="1642212211874" duration="484000" />
-      <workItem from="1642217356132" duration="7720000" />
+      <workItem from="1642217356132" duration="15619000" />
     </task>
     <servers />
   </component>

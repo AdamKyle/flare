@@ -103,10 +103,16 @@ class AdventureJob implements ShouldQueue
 
             event(new UpdateTopBarEvent($this->character->refresh()));
         } else {
-            $delay            = $event->adventure->time_per_level;
+            $delay            = $this->adventure->time_per_level;
             $timeTillFinished = now()->addMinutes($delay);
 
-            AdventureJob::dispatch($this->character, $event->adventure, $event->attackType, $jobName, $this->currentLevel + 1)->delay($timeTillFinished);
+            AdventureJob::dispatch(
+                $this->character,
+                $this->adventure,
+                $this->attackType,
+                $this->name,
+                $this->currentLevel + 1
+            )->delay($timeTillFinished);
         }
     }
 

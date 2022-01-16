@@ -26,6 +26,12 @@ class ItemUsabilityTest extends TestCase {
         $this->assertTrue($value->damagesKingdom());
     }
 
+    public function testIsOther() {
+        $value = new ItemUsabilityType(3);
+
+        $this->assertTrue($value->isOther());
+    }
+
     public function testGetNamedValue() {
         $value = new ItemUsabilityType(0);
 

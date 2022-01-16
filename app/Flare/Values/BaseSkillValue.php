@@ -27,22 +27,4 @@ class BaseSkillValue {
             'is_locked'          => $skill->is_locked,
         ];
     }
-
-    /**
-     * Get the base character skill value for a monster.
-     *
-     * @param Monster $monster
-     * @param GameSkill $skill
-     * @return array
-     */
-    public function getBaseMonsterSkillValue(Monster $monster, GameSkill $skill): array {
-
-        return [
-            'monster_id'         => $monster->id,
-            'game_skill_id'      => $skill->id,
-            'currently_training' => false,
-            'level'              => 0,
-            'xp'                 => 0,
-        ];
-    }
 }
