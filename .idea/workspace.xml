@@ -4,25 +4,22 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b39d3677-81d8-4f95-acdd-0f40b3bc89ec" name="Changes" comment="">
+    <list default="true" id="b57f583e-608e-4ca2-947d-cf9ab46f7914" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Flare/Values/AttackTypeValue.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Values/AttackTypeValue.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Flare/Values/BaseSkillValue.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Values/BaseSkillValue.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Flare/Values/LocationEffectValue.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Values/LocationEffectValue.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Flare/Values/RandomAffixDetails.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Values/RandomAffixDetails.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Flare/Values/SiteAccessStatisticValue.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Values/SiteAccessStatisticValue.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Flare/Values/UserOnlineValue.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Values/UserOnlineValue.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Game/Adventures/Jobs/AdventureJob.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Adventures/Jobs/AdventureJob.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Game/Core/Controllers/CharacterAdventureController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Core/Controllers/CharacterAdventureController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Game/Maps/Jobs/MoveTimeOutJob.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Maps/Jobs/MoveTimeOutJob.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Game/Maps/Listeners/MoveTimeOutListener.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Maps/Listeners/MoveTimeOutListener.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Game/Messages/Listeners/ServerMessageListener.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Messages/Listeners/ServerMessageListener.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/layouts/partials/user-profile-nav.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layouts/partials/user-profile-nav.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/game/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/game/api.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Unit/Flare/Values/ItemUsabilityTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Unit/Flare/Values/ItemUsabilityTest.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Unit/Flare/Values/NpcCommandTypes.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Unit/Flare/Values/NpcCommandTypesTest.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Unit/Game/Maps/Jobs/MoveTimeOutJobTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Unit/Game/Maps/Jobs/MoveTimeOutJobTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Events/NpcComponentShowEvent.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Events/NpcComponentShowEvent.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Events/OpenTimeOutModal.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Events/OpenTimeOutModal.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Events/SiteAccessedEvent.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Events/SiteAccessedEvent.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Jobs/DailyGoldDustJob.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Jobs/DailyGoldDustJob.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Providers/ServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Providers/ServiceProvider.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Core/Listeners/DropsCheckListener.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Core/Listeners/DropsCheckListener.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Core/Providers/ServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Core/Providers/ServiceProvider.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Kingdoms/Handlers/TakeKingdomHandler.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Kingdoms/Handlers/TakeKingdomHandler.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/data-imports/affixes.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/data-imports/affixes.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/character/sheet/character-details.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/character/sheet/character-details.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Feature/Game/Battle/BattleControllerApiTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Feature/Game/Battle/BattleControllerApiTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Unit/Flare/Calculators/DropCheckCalculatorTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Unit/Flare/Calculators/DropCheckCalculatorTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Unit/Flare/Calculators/SellItemCalculatorTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Unit/Flare/Calculators/SellItemCalculatorTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,7 +47,6 @@
     <setting file="file://$PROJECT_DIR$/tests/Unit/Game/Kingdoms/Handlers/TakeKingdomHandlerTest.php" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/app/Game/Kingdoms/Controllers/Api/KingdomUnitMovementController.php" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/app/Game/Kingdoms/Service/UnitService.php" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/tests/Unit/Game/Messages/Handlers/NpcKingdomHandlerTest.php" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/app/Game/Kingdoms/Handlers/TakeKingdomHandler.php" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/app/Game/Kingdoms/Service/UnitRecallService.php" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" />
   </component>
@@ -262,7 +258,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources/js/components" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/tests/Unit/Flare/Jobs" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
@@ -274,11 +270,11 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/tests/Unit/Flare/Jobs" />
       <recent name="$PROJECT_DIR$/resources/js/components" />
       <recent name="$PROJECT_DIR$/storage/app/public" />
       <recent name="$PROJECT_DIR$/tests/Unit/Flare/Values" />
       <recent name="$PROJECT_DIR$/tests/Unit/Game/Messages/Jobs" />
-      <recent name="$PROJECT_DIR$/tests/Unit/Game/Core/Values" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/resources/js/components/game/components/nav-bar/server-clock" />

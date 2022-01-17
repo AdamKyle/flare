@@ -164,7 +164,7 @@ export default class CharacterDetails extends React.Component {
                 <dt>Agility Modded:</dt>
                 <dd>{sheet.agi_modded}</dd>
                 <dt>Focus Modded:</dt>
-                <dd>{sheet.docus_modded}</dd>
+                <dd>{sheet.focus_modded}</dd>
               </dl>
             </Tab>
             <Tab eventKey="resistances-and-reductions" title="Resistances and Deductions">

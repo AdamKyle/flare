@@ -189,7 +189,6 @@ class TakeKingdomHandler {
         $unitMovements = UnitMovementQueue::where('character_id', $attacker->id)->get();
 
         foreach ($unitMovements as $unitMovement) {
-            dump($unitMovement);
             $unitMovementAttributes = $unitMovement->getAttributes();
 
             $this->unitRecallService->recall($unitMovementAttributes, $attacker, 0.0);

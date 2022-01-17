@@ -38,6 +38,34 @@ class DropCheckCalculatorTest extends TestCase
         $this->assertTrue($chance);
     }
 
+    public function testDropCheckCalculatorDefaultTrueWhenBonusIsAboveOneHundredPercent() {
+        $adventure = $this->createNewAdventure();
+
+        $adventure->update([
+            'item_find_chance' => 0.10,
+        ]);
+
+        $chance = DropCheckCalculator::fetchDropCheckChance(
+            $this->createMonster(['drop_check' => 0.10]), .45, 0.45, $adventure->refresh()
+        );
+
+        $this->assertTrue($chance);
+    }
+
+    public function testAssertRoll() {
+        $adventure = $this->createNewAdventure();
+
+        $adventure->update([
+            'item_find_chance' => 0.0,
+        ]);
+
+        $chance = DropCheckCalculator::fetchDropCheckChance(
+            $this->createMonster(['drop_check' => 0.0]), 0.0, 0.0, $adventure->refresh()
+        );
+
+        $this->assertIsBool($chance);
+    }
+
     public function testDropCheckFetchQuestItemDropCheckTrue() {
         $adventure = $this->createNewAdventure();
 
@@ -50,5 +78,19 @@ class DropCheckCalculatorTest extends TestCase
         );
 
         $this->assertTrue($chance);
+    }
+
+    public function testDropChanceForQuestItem() {
+        $adventure = $this->createNewAdventure();
+
+        $adventure->update([
+            'item_find_chance' => 0.0,
+        ]);
+
+        $chance = DropCheckCalculator::fetchQuestItemDropCheck(
+            $this->createMonster(['drop_check' => 0.0]), .0, 0.0, $adventure->refresh()
+        );
+
+        $this->assertIsBool($chance);
     }
 }

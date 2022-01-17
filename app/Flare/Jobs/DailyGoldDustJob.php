@@ -2,11 +2,7 @@
 
 namespace App\Flare\Jobs;
 
-use App\Flare\Events\ServerMessageEvent;
-use App\Flare\Events\UpdateTopBarEvent;
-use App\Flare\Models\Character;
-use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Messages\Events\GlobalMessageEvent;
+use Cache;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -14,7 +10,8 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Cache;
+use App\Flare\Models\Character;
+use App\Flare\Services\DailyGoldDustService;
 
 class DailyGoldDustJob implements ShouldQueue
 {
@@ -26,20 +23,6 @@ class DailyGoldDustJob implements ShouldQueue
     public Character $character;
 
     /**
-     * The chance is one-in-a-million.
-     *
-     * @var int $lottoChance
-     */
-    private $lottoChance = 999999;
-
-    /**
-     * The max for the lottery
-     *
-     * @var int $lottoMax
-     */
-    private $lottoMax     = 10000;
-
-    /**
      * Create a new job instance.
      *
      * @param Collection $characters
@@ -48,7 +31,7 @@ class DailyGoldDustJob implements ShouldQueue
         $this->character = $character;
     }
 
-    public function handle() {
+    public function handle(DailyGoldDustService $dailyGoldDustService) {
 
         if (Cache::has('won-lotto')) {
             if (Carbon::parse(Cache::get('won_lotto'))->isYesterday()) {
@@ -56,42 +39,6 @@ class DailyGoldDustJob implements ShouldQueue
             }
         }
 
-        $lottoChance = rand(1, 1000000);
-
-        if ($lottoChance > $this->lottoChance && !Cache::has('won-lotto')) {
-            event(new GlobalMessageEvent($this->character->name . 'has won the daily Gold Dust Lottery!'));
-
-            $newAmount = $this->character->gold_dust + $this->lottoMax;
-
-            if ($newAMount >= MaxCurrenciesValue::MAX_GOLD_DUST) {
-                $newAmount = MaxCurrenciesValue::MAX_GOLD_DUST;
-            }
-
-            $this->character->update([
-                'gold_dust' => $newAmount,
-            ]);
-
-            event(new ServerMessageEvent($this->character->user, 'lotto_max', $this->lottoMax));
-
-            event(new UpdateTopBarEvent($this->character->refresh()));
-
-            Cache::put('won-lotto', now());
-        } else {
-            $amount = rand(1,15);
-
-            $newAmount = $this->character->gold_dust + $this->lottoMax;
-
-            if ($newAMount >= MaxCurrenciesValue::MAX_GOLD_DUST) {
-                $newAmount = MaxCurrenciesValue::MAX_GOLD_DUST;
-            }
-
-            $this->character->update([
-                'gold_dust' => $newAmount,
-            ]);
-
-            event(new ServerMessageEvent($this->character->user, 'daily_lottery', $amount));
-
-            event(new UpdateTopBarEvent($this->character->refresh()));
-        }
+        $dailyGoldDustService->handleDailyLottery($this->character);
     }
 }
