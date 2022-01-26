@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Game\Core;
 
+use App\Flare\Models\GameMap;
 use App\Flare\Values\LocationEffectValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
@@ -19,6 +20,7 @@ class LocationsControllerTest extends TestCase
                                       ->getUser();
 
         $location  = $this->createLocation([
+            'game_map_id' => GameMap::first()->id,
             'name'        => 'Sample',
             'description' => 'Port',
             'is_port'     => true,
@@ -38,6 +40,7 @@ class LocationsControllerTest extends TestCase
             ->getUser();
 
         $location  = $this->createLocation([
+            'game_map_id'         => GameMap::first()->id,
             'name'                => 'Sample',
             'description'         => 'Port',
             'is_port'             => true,
