@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\SiteAccessedEvent;
 use App\Flare\Jobs\RegisterMessage;
+use App\Flare\Services\CanUserEnterSiteService;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\User;
@@ -36,13 +37,18 @@ class RegisterController extends Controller
 
     protected $redirectTo = '/';
 
+    private $canUserEnterSiteService;
+
     /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(CanUserEnterSiteService $canUserEnterSiteService)
     {
+
+        $this->canUserEnterSiteService = $canUserEnterSiteService;
+
         $this->middleware('guest');
     }
 
@@ -109,6 +115,9 @@ class RegisterController extends Controller
 
         $this->validator($request->all())->validate();
 
+        if (!$this->canUserEnterSiteService->canUserEnterSite($request->email)) {
+            return redirect()->back()->with('error', 'I am sorry, right now the Registration and Login has been disabled while server maintenance and stability testing is taking place. We will be back up and running soon!');
+        }
 
         try {
             $user = $this->create($request->all(), $request->ip());

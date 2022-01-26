@@ -25,6 +25,7 @@ use App\Flare\Middleware\IsCharacterWhoTheySayTheyAreMiddleware;
 use App\Flare\Middleware\IsGloballyTimedOut;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Services\BuildMonsterCacheService;
+use App\Flare\Services\CanUserEnterSiteService;
 use App\Flare\Services\CharacterXPService;
 use App\Flare\Services\DailyGoldDustService;
 use App\Flare\View\Components\EquipmentButtonForm;
@@ -297,6 +298,10 @@ class ServiceProvider extends ApplicationServiceProvider
             return new BuildCharacterAttackTypes(
                 $app->make(CharacterAttackBuilder::class),
             );
+        });
+
+        $this->app->bind(CanUserEnterSiteService::class, function($app) {
+           return new CanUserEnterSiteService();
         });
     }
 

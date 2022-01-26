@@ -4,6 +4,13 @@
     <div class="container small-container welcome">
         <div class="row justify-content-center">
             <div class="col-xl-8 col-lg-11 col-md-12">
+                @if (config('app.disabled_reg_and_login'))
+                    <x-core.alerts.info-alert title="ATTN!">
+                        Deepest apologizes, however Planes of Tlessa is currently down for maintenance and unlike other deployments,
+                        this one has had to disable the Registration and Login for a short time. We promise to be back up and running soon
+                        and hope to see you all in game soon. For more info, please check <a href="https://discord.gg/hcwdqJUerh" target="_blank">Discord.</a>
+                    </x-core.alerts.info-alert>
+                @endif
                 <div class="jumbotron  mt-5">
                     <h1>Planes of Tlessa</h1>
                     <p>A world full of mystery and exploration.</p>

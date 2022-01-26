@@ -6,6 +6,7 @@ use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\SiteAccessedEvent;
 use App\Flare\Handlers\CheatingCheck;
 use App\Flare\Jobs\LoginMessage;
+use App\Flare\Services\CanUserEnterSiteService;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
@@ -34,13 +35,17 @@ class LoginController extends Controller
      */
     protected $redirectTo = '/';
 
+    private $canUserEnterSiteService;
+
     /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(CanUserEnterSiteService $canUserEnterSiteService)
     {
+        $this->canUserEnterSiteService = $canUserEnterSiteService;
+
         $this->middleware('guest')->except('logout');
     }
 
@@ -55,6 +60,10 @@ class LoginController extends Controller
     public function login(Request $request)
     {
         $this->validateLogin($request);
+
+        if (!$this->canUserEnterSiteService->canUserEnterSite($request->{$this->username()})) {
+            return redirect()->back()->with('error', 'I am sorry, right now the Registration and Login has been disabled while server maintenance and stability testing is taking place. We hope to be bck up and running soon!');
+        }
 
         // If the class is using the ThrottlesLogins trait, we can automatically throttle
         // the login attempts for this application. We'll key this by the username and

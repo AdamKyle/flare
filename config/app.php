@@ -71,6 +71,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Application Login/Registration
+    |--------------------------------------------------------------------------
+    |
+    | Allow us to programmatically disable login and registration
+    |
+    */
+
+    'disabled_reg_and_login' => env('DISABLE_REG_AND_LOGIN', false),
+
+
+    'allowed_email' => env('ALLOWED_CHARACTER_EMAIL', null),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Locale Configuration
     |--------------------------------------------------------------------------
     |
