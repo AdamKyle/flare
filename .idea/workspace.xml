@@ -5,7 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b57f583e-608e-4ca2-947d-cf9ab46f7914" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/Feature/Game/Battle/CelestialBattleControllerApiTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Feature/Game/Battle/CelestialBattleControllerApiTest.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
