@@ -84,7 +84,7 @@ class KingdomsController extends Controller
         if (!is_null($character->can_settle_again_at)) {
 
             return response()->json([
-                'message' => 'You can settle another kingdom in: ' . now()->diffInMinutes($character->can_settle_again_at)
+                'message' => 'You can settle another kingdom in: ' . now()->diffInMinutes($character->can_settle_again_at) . ' Minutes.'
             ], 200);
         }
 
@@ -381,7 +381,7 @@ class KingdomsController extends Controller
             'is_mass_embezzling' => true
         ]);
 
-        MassEmbezzle::dispatch($character, $request->embezzle_amount)->delay(now()->addSeconds(5));
+        MassEmbezzle::dispatch($character, $request->embezzle_amount)->delay(now()->addSeconds(5))->onConnection('long_running');
 
         event(new ServerMessageEvent($character->user, 'Mass Embezzling underway...'));
 

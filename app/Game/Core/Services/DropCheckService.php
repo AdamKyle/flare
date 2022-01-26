@@ -141,6 +141,7 @@ class DropCheckService {
         $items = Item::where('drop_location_id', $this->locationWithEffect->id)->where('type', 'quest')->get();
 
         if ($items->isNotEmpty()) {
+
             foreach ($items as $item) {
                 $chance = 999999;
                 $roll   = rand(1, 1000000);

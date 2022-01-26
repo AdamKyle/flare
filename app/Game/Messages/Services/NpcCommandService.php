@@ -6,6 +6,7 @@ use App\Flare\Events\NpcComponentShowEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\Npc;
 use App\Flare\Values\ItemEffectsValue;
+use App\Flare\Values\NpcCommandTypes;
 use App\Flare\Values\NpcComponentsValue;
 use App\Flare\Values\NpcTypes;
 use App\Game\Automation\Values\AutomationType;
@@ -44,7 +45,7 @@ class NpcCommandService {
             return;
         }
 
-        broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('no_matching_command', $npc)));
+        event(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('no_matching_command', $npc), true));
     }
 
     public function handleForType(Character $character, Npc $npc) {
@@ -79,7 +80,7 @@ class NpcCommandService {
         }
 
         if ($type->isQuestHolder()) {
-            ProcessNPCCommands::dispatch($character->user, $npc, NpcTypes::QUEST_GIVER);
+            ProcessNPCCommands::dispatch($character->user, $npc, NpcCommandTypes::QUEST);
         }
     }
 

@@ -41,7 +41,9 @@ export default class AffixData extends React.Component {
               <dt>Class Bonus:</dt>
               <dd>{item.class_bonus !== null ? item.class_bonus * 100 : 0}%</dd>
               <dt>Base Fight Timeout Mod:</dt>
-              <dd>{(item.fight_time_out_mod_bonus * 100).toFixed(0)}%</dd>
+              <dd>{(item.fight_time_out_mod_bonus * 100).toFixed(2)}%</dd>
+              <dt>Base Move Timeout Mod:</dt>
+              <dd>{(item.move_time_out_mod_bonus * 100).toFixed(2)}%</dd>
             </dl>
           </Tab>
           <Tab eventKey={'stats-' + statsId} title="Stats">
@@ -49,37 +51,37 @@ export default class AffixData extends React.Component {
               <div className={item.reduces_enemy_stats ? 'col-md-6' : 'col-md-12'}>
                 <dl>
                   <dt><i className="fas fa-level-up-alt text-success"></i> Str Mod:</dt>
-                  <dd>{item.str_mod !== null ? (item.str_mod * 100).toFixed(0) : 0}%</dd>
+                  <dd>{item.str_mod !== null ? (item.str_mod * 100).toFixed(2) : 0}%</dd>
                   <dt><i className="fas fa-level-up-alt text-success"></i> Dex Mod:</dt>
-                  <dd>{item.dex_mod !== null ? (item.dex_mod * 100).toFixed(0) : 0}%</dd>
+                  <dd>{item.dex_mod !== null ? (item.dex_mod * 100).toFixed(2) : 0}%</dd>
                   <dt><i className="fas fa-level-up-alt text-success"></i> Dur Mod:</dt>
-                  <dd>{item.dur_mod !== null ? (item.dur_mod * 100).toFixed(0) : 0}%</dd>
+                  <dd>{item.dur_mod !== null ? (item.dur_mod * 100).toFixed(2) : 0}%</dd>
                   <dt><i className="fas fa-level-up-alt text-success"></i> Int Mod:</dt>
-                  <dd>{item.int_mod !== null ? (item.int_mod * 100).toFixed(0) : 0}%</dd>
+                  <dd>{item.int_mod !== null ? (item.int_mod * 100).toFixed(2) : 0}%</dd>
                   <dt><i className="fas fa-level-up-alt text-success"></i> Chr Mod:</dt>
-                  <dd>{item.chr_mod !== null ? (item.chr_mod * 100).toFixed(0) : 0}%</dd>
+                  <dd>{item.chr_mod !== null ? (item.chr_mod * 100).toFixed(2) : 0}%</dd>
                   <dt><i className="fas fa-level-up-alt text-success"></i> Agi Mod:</dt>
-                  <dd>{item.agi_mod !== null ? (item.agi_mod * 100).toFixed(0) : 0}%</dd>
+                  <dd>{item.agi_mod !== null ? (item.agi_mod * 100).toFixed(2) : 0}%</dd>
                   <dt><i className="fas fa-level-up-alt text-success"></i> Focus Mod:</dt>
-                  <dd>{item.focus_mod !== null ? (item.focus_mod * 100).toFixed(0) : 0}%</dd>
+                  <dd>{item.focus_mod !== null ? (item.focus_mod * 100).toFixed(2) : 0}%</dd>
                 </dl>
               </div>
               <div className={item.reduces_enemy_stats ? 'col-md-6' : 'hide'}>
                 <dl>
                   <dt><i className="fas fa-level-down-alt text-danger"></i> Str Mod:</dt>
-                  <dd>{item.str_mod !== null ? (item.str_reduction * 100).toFixed(0) : 0}%</dd>
+                  <dd>{item.str_mod !== null ? (item.str_reduction * 100).toFixed(2) : 0}%</dd>
                   <dt><i className="fas fa-level-down-alt text-danger"></i> Dex Mod:</dt>
-                  <dd>{item.dex_mod !== null ? (item.dex_reduction * 100).toFixed(0) : 0}%</dd>
+                  <dd>{item.dex_mod !== null ? (item.dex_reduction * 100).toFixed(2) : 0}%</dd>
                   <dt><i className="fas fa-level-down-alt text-danger"></i> Dur Mod:</dt>
-                  <dd>{item.dur_mod !== null ? (item.dur_reduction * 100).toFixed(0) : 0}%</dd>
+                  <dd>{item.dur_mod !== null ? (item.dur_reduction * 100).toFixed(2) : 0}%</dd>
                   <dt><i className="fas fa-level-down-alt text-danger"></i> Int Mod:</dt>
-                  <dd>{item.int_mod !== null ? (item.int_reduction * 100).toFixed(0) : 0}%</dd>
+                  <dd>{item.int_mod !== null ? (item.int_reduction * 100).toFixed(2) : 0}%</dd>
                   <dt><i className="fas fa-level-down-alt text-danger"></i> Chr Mod:</dt>
-                  <dd>{item.chr_mod !== null ? (item.chr_reduction * 100).toFixed(0) : 0}%</dd>
+                  <dd>{item.chr_mod !== null ? (item.chr_reduction * 100).toFixed(2) : 0}%</dd>
                   <dt><i className="fas fa-level-down-alt text-danger"></i> Agi Mod:</dt>
-                  <dd>{item.agi_mod !== null ? (item.agi_reduction * 100).toFixed(0) : 0}%</dd>
+                  <dd>{item.agi_mod !== null ? (item.agi_reduction * 100).toFixed(2) : 0}%</dd>
                   <dt><i className="fas fa-level-down-alt text-danger"></i> Focus Mod:</dt>
-                  <dd>{item.focus_mod !== null ? (item.focus_reduction * 100).toFixed(0) : 0}%</dd>
+                  <dd>{item.focus_mod !== null ? (item.focus_reduction * 100).toFixed(2) : 0}%</dd>
                 </dl>
                 <p className="mt-2 text-info">Affects enemies only.</p>
               </div>

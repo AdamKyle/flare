@@ -76,15 +76,15 @@ export default class BuildingCostSection extends React.Component {
         <div className="col-md-6">
           <dl>
             <dt><strong>Wood Cost</strong>:</dt>
-            <dd>{this.getCost('wood')} (-{this.getDeduction()}%)</dd>
+            <dd class={this.getCost('wood') > this.props.kingdom.current_wood ? 'text-danger' : 'text-success'}>{this.getCost('wood')} (-{this.getDeduction()}%)</dd>
             <dt><strong>Clay Cost</strong>:</dt>
-            <dd>{this.getCost('clay')} (-{this.getDeduction()}%)</dd>
+            <dd class={this.getCost('clay') > this.props.kingdom.current_clay ? 'text-danger' : 'text-success'}>{this.getCost('clay')} (-{this.getDeduction()}%)</dd>
             <dt><strong>Stone Cost</strong>:</dt>
-            <dd>{this.getCost('stone')} (-{this.getDeduction()}%)</dd>
+            <dd class={this.getCost('stone') > this.props.kingdom.current_stone ? 'text-danger' : 'text-success'}>{this.getCost('stone')} (-{this.getDeduction()}%)</dd>
             <dt><strong>Iron Cost</strong>:</dt>
-            <dd>{this.getCost('iron')} (-{this.getIronDeduction()}%)</dd>
+            <dd class={this.getCost('iron') > this.props.kingdom.current_iron ? 'text-danger' : 'text-success'}>{this.getCost('iron')} (-{this.getIronDeduction()}%)</dd>
             <dt><strong>Population Cost</strong>:</dt>
-            <dd>{this.getPopulationRequired()} (-{this.getPopulationDeduction()}%)</dd>
+            <dd class={this.getPopulationRequired() > this.props.kingdom.current_population ? 'text-danger' : 'text-success'}>{this.getPopulationRequired()} (-{this.getPopulationDeduction()}%)</dd>
           </dl>
           <p className="mt-3">The negative percentage values come from you training: <a href="/information/passive-skills">Passive Skills</a> which help to reduce
           things like resources needed, population needed and by training the Kingmanship skill to reduce time needed.</p>

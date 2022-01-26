@@ -80,7 +80,12 @@ class KingdomAttackedBuilder {
 
             if ($amountLeft > 0) {
                 if ($amountLeft === $unit['amount']) {
-                    $amountLeft = 0.0;
+
+                    if ($unit['settler']) {
+                        $amountLeft = 1.0;
+                    } else {
+                        $amountLeft = 0.0;
+                    }
                 } else {
                     $amountLeft = number_format($amountLeft / $unit['amount'], 2);
                 }

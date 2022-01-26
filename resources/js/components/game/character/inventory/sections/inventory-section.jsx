@@ -137,7 +137,7 @@ export default class InventorySection extends React.Component {
   manageDestroyAllModal(successMessage) {
     if (typeof successMessage === 'object') {
       return this.setState({
-        showDisenchantModal: !this.state.showDisenchantModal,
+        showDestroyAllModal: !this.state.showDestroyAllModal,
       });
     }
 

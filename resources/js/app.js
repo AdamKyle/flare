@@ -24,7 +24,6 @@ require('./components/adventure-menue');
 require('./components/kingdom-menue');
 require('./components/notification-center');
 require('./components/refresh');
-require('./components/server-time-clock');
 require('./components/marketboard/board');
 require('./components/marketboard/listing/character-items');
 

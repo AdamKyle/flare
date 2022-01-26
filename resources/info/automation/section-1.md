@@ -52,6 +52,13 @@ There are some things you cannot do:
 - You won't be able to visit [special location](/information/special-locations).
 - You cannot train skills. (There are some exceptions)
 
+> ## ATTN!
+> 
+> Auto Battle will not take into account any Fight Timeout modifiers you have. it's a flat 10 seconds each battle. This is because there is a chance for auto battle
+> to cause "reward jobs" that is the jobs that process the death of an enemy and give you all your rewards, to back up causing rewards to be delayed.
+> 
+> A player does not need to fear anything or fret, their rewards will still come in, it could just take much longer depending on how long you let auto battle run for.
+
 The exceptions to equipment is that you can still disenchant drops, craft/enchant and move items between sets, but you cannot equip items, replace equipped items or 
 equip a new set, unequipped a set or unequipped currently equipped items.
 

@@ -30,7 +30,7 @@ class NpcServerMessageBuilder {
             case 'take_a_look':
                 return '"Why don\'t you take a look, and show me what you can afford my child."';
             case 'location':
-                return '"Child! You must come to me to make the exchange. Find me at (x/y): ' . $npc->x_position . '/' . $npc->y_position . ' ('.$npc->gameMapName().' Plane). Message me again when you are here."';
+                return '"Child! You must come to me to make the exchange. Find me at (x/y): ' . $npc->x_position . '/' . $npc->y_position . ' ("'.$npc->gameMapName().'" Plane). Message me again when you are here."';
             case 'dead':
                 return '"I don\'t deal with dead people. Resurrect child."';
             case 'adventuring':
@@ -85,6 +85,8 @@ class NpcServerMessageBuilder {
                 return '"Select something child, one of those green items and tell me what you want. Remember I am not a cheap woman. You must please me to get what you want! I am the Queen of Hearts after all. Oooooh hooo hoo hoo!"';
             case 'missing_parent_quest':
                 return '"Child! there is something you have to do, before you talk to me. Go do it!" (Open Plane Quests and find the quest you are trying to complete. Quests with lines connecting must be done in order).';
+            case 'no_matching_command':
+                return  '"Huh?! What do you want child!?! I don\'t have all day for these games child! Spit it out!" ' . $npc->real_name . ' Seems annoyed by you. Maybe you misspoke?';
             default:
                 return '';
         }

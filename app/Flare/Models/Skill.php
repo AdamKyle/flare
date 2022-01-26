@@ -187,6 +187,7 @@ class Skill extends Model
     }
 
     public function getMoveTimeOutModAttribute() {
+
         $value = $this->baseSkill->move_time_out_mod_bonus_per_level;
 
         if (is_null($value) || !($value > 0.0)) {

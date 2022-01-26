@@ -154,7 +154,6 @@ class AttackService {
         $this->notifyHandler->setSentUnits($this->unitsSent)->notifyDefender(KingdomLogStatusValue::KINGDOM_ATTACKED, $defender);
 
         if (!$this->anySurvivingUnits()) {
-
             $this->notifyHandler->notifyAttacker(KingdomLogStatusValue::LOST, $defender, $character);
 
             $unitMovement->delete();
@@ -303,7 +302,7 @@ class AttackService {
 
         $this->notifyHandler = $this->notifyHandler->setNewDefendingKingdom($defender);
 
-        if ($defender->current_morale === 0 || $defender->current_morale === 0.0) {
+        if ($defender->current_morale <= 0 || $defender->current_morale <= 0.0) {
 
             $this->kingdomHandler->takeKingdom($defender, $character, $this->survivingUnits);
 
@@ -338,19 +337,21 @@ class AttackService {
      * @return bool
      */
     protected function isSettlerTheOnlyUnitLeft(): bool {
-        $allDead = false;
+        $unitsAlive = [];
 
         foreach ($this->survivingUnits as $unitInfo) {
             if (!$unitInfo['settler']) {
-                if ($unitInfo['amount'] === 0.0 || $unitInfo['amount'] === 0) {
-                    $allDead = true;
-                } else {
-                    $allDead = false;
+                if ($unitInfo['amount'] > 0) {
+                    $unitsAlive[] = $unitInfo['unit_id'];
                 }
             }
         }
 
-        return $allDead;
+        if (count($unitsAlive) > 0) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
