@@ -375,6 +375,8 @@ class CelestialBattleControllerApiTest extends TestCase {
             ])
             ->response;
 
+        dump($response->getContent());
+
         $this->assertEquals(200, $response->status());
     }
 
