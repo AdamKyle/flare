@@ -30,6 +30,16 @@ export default class BuildingManagementModal extends React.Component {
       populationRequired: 0,
       timeNeeded: 0,
       hasGold: true,
+      activeTab: 'regular-upgrade',
+    }
+  }
+
+  componentDidMount() {
+    console.log('hello?');
+    if (!this.canUpgrade()) {
+      this.setState({
+        activeTab: 'gold-upgrade'
+      });
     }
   }
 
@@ -361,8 +371,8 @@ export default class BuildingManagementModal extends React.Component {
               durability is 0.</small></p>
           </div>
           <hr/>
-          <Tabs defaultActiveKey="regular-upgrade" id="building-upgrade">
-            <Tab eventKey="regular-upgrade" title="Regular Upgrade" disabled={this.props.building.is_locked}>
+          <Tabs activeKey={this.state.activeTab} id="building-upgrade">
+            <Tab eventKey="regular-upgrade" title="Regular Upgrade" disabled={this.props.building.is_locked || !this.canUpgrade()}>
               <div className="row mt-4">
                 {this.props.building.level >= this.props.building.max_level ?
                   <div className="col-md-12">
@@ -437,7 +447,7 @@ export default class BuildingManagementModal extends React.Component {
                 }
               </div>
             </Tab>
-            <Tab eventKey="gold-upgrade" title="Gold Upgrade" disabled={!this.canUpgrade() || this.buildingNeedsToBeRebuilt() || !this.isCurrentlyInQueue() || (this.props.building.level >= this.props.building.max_level) || this.props.building.is_locked}>
+            <Tab eventKey="gold-upgrade" title="Gold Upgrade" disabled={this.buildingNeedsToBeRebuilt() || !this.isCurrentlyInQueue() || (this.props.building.level >= this.props.building.max_level) || this.props.building.is_locked}>
               <div className="mt-4">
                 <Row>
                   <Col lg={12} xl={6}>
@@ -527,7 +537,7 @@ export default class BuildingManagementModal extends React.Component {
                       onClick={this.rebuildBuilding.bind(this)}>Rebuild</button>
               :
               <button className="btn btn-success"
-                      disabled={!this.canUpgrade() || !this.isCurrentlyInQueue() || this.state.disabledButtons || this.props.building.is_locked}
+                      disabled={(!this.canUpgrade() && !(this.state.level > 0)) || !this.isCurrentlyInQueue() || this.state.disabledButtons || this.props.building.is_locked}
                       onClick={this.upgradeBuilding.bind(this)}
               >
                 Upgrade

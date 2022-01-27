@@ -29,7 +29,7 @@ class AccountDeletionController extends Controller {
 
         \Auth::logout();
 
-        AccountDeletionJob::dispatch($user)->delay(now()->addMinutes(1));
+        AccountDeletionJob::dispatch($user)->delay(now()->addMinutes(1))->onConnection('long_running');
 
         return redirect()->to('/')->with('success', 'Account deletion underway. You will receive one last email when it\'s done.');
     }
