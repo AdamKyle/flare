@@ -4,7 +4,7 @@ The game comes with a interactive map.
 
 ![map image](/storage/info/map/images/map.png)
 
-The above allows you to see where you are, respserented by the character pin drop on the map.
+The above allows you to see where you are, represented by the character pin drop on the map.
 
 > ### ATTN! 
 >
@@ -14,9 +14,9 @@ The above allows you to see where you are, respserented by the character pin dro
 
 You can drag this map around and as you move to the edges of the map, the map will scroll over or up, or down to show you where you are at all times.
 
-The blue ship icons repersent ports at which your character may set sail from. These are locations where you can access the market boards. More on this in the [Markets]() section.
+The blue ship icons represent ports at which your character may set sail from. These are locations where you can access the market boards. More on this in the [Markets]() section.
 
-Arched lookeing buildings on the map are called locations, these can contain adventures or quest items that drop or both.
+Arched looking buildings on the map are called locations, these can contain adventures or quest items that drop or both.
 
 The water requires a special item called the Flask of Fresh Air, which is a rare drop off a monster. It has a 1% chance of dropping and allows the character to walk on water.
 
@@ -62,16 +62,16 @@ Teleporting cost is based on distance / character intelligence (minimum of 1) * 
 
 ## Regarding Timeouts
 
-You can do the following while each of the time outs is playing out. At any time you can manage your kingdoms and chat with other players:
+You can do the following while each of the time-outs is playing out. At any time you can manage your kingdoms and chat with other players:
 
 - **Moving**: Applies 10 second time out. You can do everything but embark on adventures.
-- **Adventuring**: Timer dependant on total levels of adventure. You can do nothing related to your character, movement, attacking or anything else including shoping, market boards, movement and so on. You are other wise occupied.
-- **Sailing**: Timer dependant on distance. Actions are treated the same as moving.
-- **Teleport**: Timer dependant on distance. Actions are treated the same as moving.
+- **Adventuring**: Timer dependent on total levels of adventure. You can do nothing related to your character, movement, attacking or anything else including shopping, market boards, movement and so on. You are otherwise occupied.
+- **Sailing**: Timer dependent on distance. Actions are treated the same as moving.
+- **Teleport**: Timer dependent on distance. Actions are treated the same as moving.
 
-## Redgarding quest items and locations
+## Regarding quest items and locations
 
-For visiting a location you can some times get a quest item that will only be awarded to you if you dont already have the quest item.
+For visiting a location you can sometimes get a quest item that will only be awarded to you if you don't already have the quest item.
 
 ## Adventures and their rewards
 

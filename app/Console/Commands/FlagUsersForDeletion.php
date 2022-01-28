@@ -48,11 +48,11 @@ class FlagUsersForDeletion extends Command
                    'will_be_deleted' => true,
                ]);
 
-               $accountDeletionMessages = 'Your account has not been logged into for a while. As a result, next month your account will be deleted. 
+               $accountDeletionMessages = 'Your account has not been logged into for a while (5+ months). As a result, next month your account will be deleted. 
                Do not worry, you can always come back and create anew account, log into day to prevent this, or log in and delete your account your self. 
                If the system deletes your account, you will receive one more email next month to confirm this action was done.';
 
-               // Mail::to($user->email)->send(new GenericMail($user, $accountDeletionMessages, 'You haven\'t logged in for a while', true));
+               Mail::to($user->email)->send(new GenericMail($user, $accountDeletionMessages, 'You haven\'t logged in for a while', true));
            }
         });
     }

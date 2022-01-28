@@ -92,7 +92,7 @@ class AccountDeletionJob implements ShouldQueue
                 A player may only be inactive for 5 months at a time. You are of course welcome to come back at 
                 any time and start a new character.';
 
-                // Mail::to($user)->send(new GenericMail($user, $message, 'Automated Account Deletion', true));
+                Mail::to($user)->send(new GenericMail($user, $message, 'Automated Account Deletion', true));
 
                 $user->delete();
             }

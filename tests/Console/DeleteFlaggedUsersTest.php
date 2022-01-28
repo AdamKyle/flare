@@ -3,15 +3,11 @@
 namespace Tests\Console;
 
 
-use App\Flare\Jobs\DailyGoldDustJob;
-use App\Flare\Mail\GenericMail;
-use App\Flare\Models\Character;
+use App\Flare\Jobs\AccountDeletionJob;
 use App\Flare\Models\GameMap;
-use App\Flare\Models\User;
 use App\Flare\Models\UserSiteAccessStatistics;
 use App\Flare\Values\NpcTypes;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
@@ -60,6 +56,8 @@ class DeleteFlaggedUsersTest extends TestCase
         ]);
 
         Mail::fake();
+
+        Queue::fake();
     }
 
     public function testDeleteInactiveFlaggedUsers() {
@@ -69,16 +67,12 @@ class DeleteFlaggedUsersTest extends TestCase
 
         $this->assertEquals(0, $this->artisan('delete:flagged-users'));
 
-        $this->assertEquals(1, User::count());
-
-        $this->assertEquals(0, Character::count());
+        Queue::assertPushed(AccountDeletionJob::class);
     }
 
     public function testDoNotDeletedNonFlaggedUsers() {
         $this->assertEquals(0, $this->artisan('delete:flagged-users'));
 
-        $this->assertEquals(2, User::count());
-
-        $this->assertEquals(1, Character::count());
+        Queue::assertNotPushed(AccountDeletionJob::class);
     }
 }
