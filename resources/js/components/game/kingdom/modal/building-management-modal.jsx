@@ -35,7 +35,6 @@ export default class BuildingManagementModal extends React.Component {
   }
 
   componentDidMount() {
-    console.log('hello?');
     if (!this.canUpgrade()) {
       this.setState({
         activeTab: 'gold-upgrade'
@@ -305,7 +304,6 @@ export default class BuildingManagementModal extends React.Component {
   }
 
   setActiveTab(key) {
-    console.log(key);
     this.setState({
       activeTab: key,
     })
