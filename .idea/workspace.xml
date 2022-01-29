@@ -6,13 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="b57f583e-608e-4ca2-947d-cf9ab46f7914" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Console/Commands/FlagUsersForDeletion.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Console/Commands/FlagUsersForDeletion.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Flare/Jobs/AccountDeletionJob.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Jobs/AccountDeletionJob.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/composer.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/info/map/section-1.md" beforeDir="false" afterPath="$PROJECT_DIR$/resources/info/map/section-1.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Console/DeleteFlaggedUsersTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Console/DeleteFlaggedUsersTest.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Feature/AccountDeletionControllerTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Feature/AccountDeletionControllerTest.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -315,7 +308,7 @@
       <workItem from="1642212025385" duration="159000" />
       <workItem from="1642212211874" duration="484000" />
       <workItem from="1642217356132" duration="15817000" />
-      <workItem from="1643306290179" duration="10961000" />
+      <workItem from="1643306290179" duration="11187000" />
     </task>
     <servers />
   </component>
