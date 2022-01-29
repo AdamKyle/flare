@@ -505,7 +505,7 @@ class KingdomResourcesService {
             $newAmount = $this->kingdom->current_population + 30;
             $newAmount += $newAmount * $this->kingdom->fetchResourceBonus();
 
-            if ($currentPop <= $this->kingdom->max_population) {
+            if ($currentPop < $this->kingdom->max_population) {
                 if ($newAmount > $this->kingdom->max_population) {
                     $newAmount = $this->kingdom->max_population;
                 }

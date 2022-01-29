@@ -62,7 +62,7 @@ class LoginController extends Controller
         $this->validateLogin($request);
 
         if (!$this->canUserEnterSiteService->canUserEnterSite($request->{$this->username()})) {
-            return redirect()->back()->with('error', 'I am sorry, right now the Registration and Login has been disabled while server maintenance and stability testing is taking place. We hope to be bck up and running soon!');
+            return redirect()->back()->with('error', 'I am sorry, right now the Registration and Login has been disabled while server maintenance and stability testing is taking place. We hope to be back up and running soon!');
         }
 
         // If the class is using the ThrottlesLogins trait, we can automatically throttle
