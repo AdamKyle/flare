@@ -48,8 +48,6 @@ export default class UnitData extends React.Component {
 
     const currentAmount = this.getKingdomAmount(prop);
 
-    console.log(currentAmount, prop);
-
     if (currentAmount !== 0) {
       let totalCost = this.props.unit[prop] * amount;
 
