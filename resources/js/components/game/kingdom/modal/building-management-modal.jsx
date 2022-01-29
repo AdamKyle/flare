@@ -304,6 +304,13 @@ export default class BuildingManagementModal extends React.Component {
     return this.formatNumber(price);
   }
 
+  setActiveTab(key) {
+    console.log(key);
+    this.setState({
+      activeTab: key,
+    })
+  }
+
   render() {
     return (
       <Modal
@@ -371,7 +378,7 @@ export default class BuildingManagementModal extends React.Component {
               durability is 0.</small></p>
           </div>
           <hr/>
-          <Tabs activeKey={this.state.activeTab} id="building-upgrade">
+          <Tabs activeKey={this.state.activeTab} onSelect={this.setActiveTab.bind(this)} id="building-upgrade">
             <Tab eventKey="regular-upgrade" title="Regular Upgrade" disabled={this.props.building.is_locked || !this.canUpgrade()}>
               <div className="row mt-4">
                 {this.props.building.level >= this.props.building.max_level ?
