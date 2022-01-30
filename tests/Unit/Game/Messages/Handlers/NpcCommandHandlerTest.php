@@ -535,12 +535,12 @@ class NpcCommandHandlerTest extends TestCase {
 
         $npcCommandHandler->handleForType(NpcCommandTypes::QUEST, $this->questNpc, $user);
 
-        $this->assertCount(0, QuestsCompleted::all());
+        $this->assertCount(1, QuestsCompleted::all());
 
         $character = $user->character->refresh();
 
-        $this->assertLessThan(100, $character->gold_dust);
-        $this->assertLessThan(100, $character->shards);
+        $this->assertGreaterThanOrEqual(100, $character->gold_dust);
+        $this->assertGreaterThanOrEqual(100, $character->shards);
     }
 
     public function testCharacterHandlesQuestGoldDustCapped() {
@@ -554,12 +554,12 @@ class NpcCommandHandlerTest extends TestCase {
 
         $npcCommandHandler->handleForType(NpcCommandTypes::QUEST, $this->questNpc, $user);
 
-        $this->assertCount(0, QuestsCompleted::all());
+        $this->assertCount(1, QuestsCompleted::all());
 
         $character = $user->character->refresh();
 
-        $this->assertLessThan(100, $character->gold);
-        $this->assertLessThan(100, $character->shards);
+        $this->assertGreaterThanOrEqual(100, $character->gold);
+        $this->assertGreaterThanOrEqual(100, $character->shards);
     }
 
     public function testCharacterHandlesQuestShardsCapped() {
@@ -573,12 +573,12 @@ class NpcCommandHandlerTest extends TestCase {
 
         $npcCommandHandler->handleForType(NpcCommandTypes::QUEST, $this->questNpc, $user);
 
-        $this->assertCount(0, QuestsCompleted::all());
+        $this->assertCount(1, QuestsCompleted::all());
 
         $character = $user->character->refresh();
 
-        $this->assertLessThan(100, $character->gold);
-        $this->assertLessThan(100, $character->gold_dust);
+        $this->assertGreaterThanOrEqual(100, $character->gold);
+        $this->assertGreaterThanOrEqual(100, $character->gold_dust);
     }
 
     public function testHasNoQuests() {

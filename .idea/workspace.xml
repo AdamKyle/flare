@@ -6,17 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="b57f583e-608e-4ca2-947d-cf9ab46f7914" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/game/alchemy/alchemy-action.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/alchemy/alchemy-action.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/game/battle/attack/attack-types/cast-attack.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/battle/attack/attack-types/cast-attack.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/game/battle/attack/attack.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/battle/attack/attack.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/game/battle/monster/monster.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/battle/monster/monster.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/game/game.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/game.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/game/messages/chat.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/messages/chat.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/game/npc-components/random-affix-section.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/npc-components/random-affix-section.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/game/sections/fight-section.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/sections/fight-section.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/game/sections/modals/adventure-embark.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/sections/modals/adventure-embark.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/game/sections/quest-section.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/sections/quest-section.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/sass/game/chat.scss" beforeDir="false" afterPath="$PROJECT_DIR$/resources/sass/game/chat.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Feature/Game/Battle/CelestialBattleControllerApiTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Feature/Game/Battle/CelestialBattleControllerApiTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Unit/Game/Messages/Handlers/NpcCommandHandlerTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Unit/Game/Messages/Handlers/NpcCommandHandlerTest.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -319,7 +310,7 @@
       <workItem from="1642212025385" duration="159000" />
       <workItem from="1642212211874" duration="484000" />
       <workItem from="1642217356132" duration="15817000" />
-      <workItem from="1643306290179" duration="22545000" />
+      <workItem from="1643306290179" duration="23677000" />
     </task>
     <servers />
   </component>
