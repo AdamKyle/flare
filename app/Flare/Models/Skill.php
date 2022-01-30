@@ -208,11 +208,6 @@ class Skill extends Model
     }
 
     public function getSkillBonusAttribute() {
-        if (is_null($this->character)) {
-            // Monsters base skill:
-            return ($this->baseSkill->skill_bonus_per_level * $this->level);
-        }
-
         if (is_null($this->baseSkill->skill_bonus_per_level)) {
             return 0.0;
         }
@@ -278,7 +273,7 @@ class Skill extends Model
             }
         }
 
-        return empty($bonuses) ? 0.0 : max($bonuses);
+        return empty($bonuses) ? 0.0 : array_sum($bonuses);
     }
 
     protected function getCharacterBoonsBonus(string $skillBonusAttribute) {
