@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b57f583e-608e-4ca2-947d-cf9ab46f7914" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/composer.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Unit/Game/Messages/Services/NpcCommandServiceTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Unit/Game/Messages/Services/NpcCommandServiceTest.php" afterDir="false" />
-    </list>
+    <list default="true" id="b57f583e-608e-4ca2-947d-cf9ab46f7914" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -309,7 +306,7 @@
       <workItem from="1642212025385" duration="159000" />
       <workItem from="1642212211874" duration="484000" />
       <workItem from="1642217356132" duration="15817000" />
-      <workItem from="1643306290179" duration="23787000" />
+      <workItem from="1643306290179" duration="24032000" />
     </task>
     <servers />
   </component>
