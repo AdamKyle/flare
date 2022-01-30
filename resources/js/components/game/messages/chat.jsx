@@ -78,6 +78,8 @@ export default class Chat extends React.Component {
 
       this.setState({
         messages: messages
+      }, () => {
+        this.props.updateChatTabIcon(false);
       });
     });
 
@@ -92,6 +94,8 @@ export default class Chat extends React.Component {
 
       this.setState({
         messages: messages,
+      }, () => {
+        this.props.updateChatTabIcon(false);
       });
     });
 
@@ -126,6 +130,8 @@ export default class Chat extends React.Component {
         this.setState({
           messages: messages,
           user: user,
+        }, () => {
+          this.props.updateChatTabIcon(false);
         });
       }
     });
@@ -145,6 +151,8 @@ export default class Chat extends React.Component {
 
       this.setState({
         messages: messages
+      }, () => {
+        this.props.updateChatTabIcon(false);
       });
     });
   }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Fragment} from 'react';
 import {Row, Col, Tabs, Tab} from 'react-bootstrap';
 import localforage from "localforage";
 import Chat from './messages/chat';
@@ -67,6 +67,9 @@ export default class Game extends React.Component {
       isDead: false,
       windowWidth: window.innerWidth,
       attackAutomationIsRunning: false,
+      activeChatTab: 'chat',
+      showChatUpdate: false,
+      showServerMessageUpdate: false,
     }
 
     this.isDead            = Echo.private('character-is-dead-' + this.props.userId);
@@ -340,6 +343,62 @@ export default class Game extends React.Component {
     });
   }
 
+  handleTabSwitch(key) {
+    console.log(key);
+    console.log(this.state.showServerMessageUpdate);
+    this.setState({
+      activeChatTab: key,
+      showServerMessageUpdate: (key === 'server-messages' && this.state.showServerMessageUpdate) ? false : this.state.showServerMessageUpdate,
+      showChatUpdate: (key === 'chat' && this.state.showChatUpdate) ? false :  this.state.showChatUpdate
+    })
+  }
+
+  updateChatTabIcon(isServerMessage) {
+    if (isServerMessage && this.state.activeChatTab !== 'server-messages') {
+      this.setState({
+        showServerMessageUpdate: true
+      });
+    } else if (this.state.activeChatTab !== 'chat') {
+      this.setState({
+        showChatUpdate: true,
+      });
+    }
+  }
+
+  renderChatTabNotificationIcon() {
+
+    if (this.state.showChatUpdate) {
+      return (
+        <Fragment>
+          Chat <i className="fas fa-bell tw-text-yello-400"></i>
+        </Fragment>
+      )
+    }
+
+    return (
+      <Fragment>
+        Chat
+      </Fragment>
+    )
+  }
+
+  renderServerTabNotificationIcon() {
+
+    if (this.state.showServerMessageUpdate) {
+      return (
+        <Fragment>
+          Server <i className="fas fa-bell tw-text-yello-400"></i>
+        </Fragment>
+      )
+    }
+
+    return (
+      <Fragment>
+        Server
+      </Fragment>
+    )
+  }
+
   render() {
     return (
       <>
@@ -467,12 +526,12 @@ export default class Game extends React.Component {
         </div>
         <Row>
           <Col xs={12}>
-            <Tabs defaultActiveKey="chat" id="chat-tabs">
-              <Tab eventKey="chat" title="Chat">
-                <Chat apiUrl={this.apiUrl} userId={this.props.userId}/>
+            <Tabs activeKey={this.state.activeChatTab} id="chat-tabs" onSelect={this.handleTabSwitch.bind(this)}>
+              <Tab eventKey="chat" title={this.renderChatTabNotificationIcon()}>
+                <Chat apiUrl={this.apiUrl} userId={this.props.userId} updateChatTabIcon={this.updateChatTabIcon.bind(this)} />
               </Tab>
-              <Tab eventKey="server-messages" title="Server">
-                <ServerMessages userId={this.props.userId}/>
+              <Tab eventKey="server-messages" title={this.renderServerTabNotificationIcon()}>
+                <ServerMessages userId={this.props.userId} updateChatTabIcon={this.updateChatTabIcon.bind(this)} />
               </Tab>
             </Tabs>
           </Col>

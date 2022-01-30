@@ -48,6 +48,8 @@ export default class ServerMessages extends React.Component {
         this.setState({
           messages: messages,
           user: user,
+        }, () => {
+          this.props.updateChatTabIcon(true);
         });
       }
     });
