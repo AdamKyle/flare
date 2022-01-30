@@ -48,8 +48,10 @@ class SiteAccessStatisticValue {
         $data   = [];
 
         foreach ($result as $dataSet) {
+            // @codeCoverageIgnoreStart
             $labels[] = Carbon::parse($dataSet->created_at)->format('Y-m-d');
             $data[]   = $dataSet->amount_signed_in;
+            // @codeCoverageIgnoreEnd
         }
 
         return [
@@ -65,8 +67,10 @@ class SiteAccessStatisticValue {
         $data   = [];
 
         foreach ($result as $dataSet) {
+            // @codeCoverageIgnoreStart
             $labels[] = Carbon::parse($dataSet->created_at)->format('Y-m-d');
             $data[]   = $dataSet->amount_registered;
+            // @codeCoverageIgnoreEnd
         }
 
         return [

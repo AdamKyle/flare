@@ -594,9 +594,9 @@ class CharacterInformationBuilder {
     public function damageModifiers(int $damage, bool $voided): int {
         if ($this->character->classType()->isFighter()) {
             if ($voided) {
-                $statIncrease = $this->character->str * .10;
+                $statIncrease = $this->character->str * .15;
             } else {
-                $statIncrease = $this->statMod('str') * 0.10;
+                $statIncrease = $this->statMod('str') * 0.15;
             }
 
             $damage += $statIncrease;
@@ -608,6 +608,16 @@ class CharacterInformationBuilder {
             }
 
             $damage += $statIncrease;
+        } else if ($this->character->classType()->isProphet()) {
+            if ($this->prophetHasDamageBonus($this->character)) {
+                if ($voided) {
+                    $statIncrease = $this->character->chr * .10;
+                } else {
+                    $statIncrease = $this->statMod('chr') * 0.10;
+                }
+
+                $damage += $statIncrease;
+            }
         }
 
         return ceil($damage);
@@ -657,8 +667,10 @@ class CharacterInformationBuilder {
     }
 
     public function calculateClassSpellDamage(int|float $damage, bool $voided = false): float|int {
+        $classType = $this->character->classType();
+
         if ($damage === 0) {
-            $classType = $this->character->classType();
+
 
             if ($classType->isHeretic()) {
                 if (!$voided) {
@@ -667,11 +679,19 @@ class CharacterInformationBuilder {
                     $damage += $this->character->int * 0.02;
                 }
             }
-        } else if ($this->character->classType()->isHeretic()) {
+        } else if ($classType->isHeretic()) {
             if ($voided) {
                 $damage += $this->character->int * 0.30;
             } else {
                 $damage += $this->statMod('int') * 0.30;
+            }
+        } else if ($classType->isProphet()) {
+            if ($this->prophetHasDamageSpells($this->character)) {
+                if ($voided) {
+                    $damage += $this->character->chr * 0.15;
+                } else {
+                    $damage += $this->statMod('chr') * 0.15;
+                }
             }
         }
 

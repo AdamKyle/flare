@@ -16,6 +16,8 @@
                         <dd>{{$location->x}}</dd>
                         <dt>Location Y Coordinate:</dt>
                         <dd>{{$location->y}}</dd>
+                        <dt>On Map:</dt>
+                        <dd>{{$location->map->name}}}</dd>
                         <dt>Is Port:</dt>
                         <dd>{{$location->is_port ? 'Yes' : 'No'}}</dd>
                         <dt>Increases Enemy Strength By:</dt>
@@ -23,14 +25,31 @@
                         <dt>Increases Drop Rate By:</dt>
                         <dd>{{$increasesDropChanceBy * 100}}%</dd>
                     </dl>
-                    <hr />
+                    @if (!is_null($increasesEnemyStrengthBy))
+                        <hr />
+                        <h3>Items that can drop from this location.</h3>
+                        <p>
+                            Auto battle will not allow you to obtain these items. You must manually farm them. These have a 1/1,000,000 chance to drop.
+                            Looting Skill Bonus is capped at 45%.
+                        </p>
+                        <p>
+                            If this location is on a plane that effects enemy stats (Shadow Plane, Hell and Purgatory) then those stat modifications
+                            will be taken into account along with the locations enemy modifications. Your gear, stats and level matter.
+                        </p>
+                        @livewire('admin.items.data-table', [
+                            'specialLocation' => $location->id,
+                            'type'            => 'quest'
+                        ])
+                    @endif
                     @if (auth()->user())
+                        <hr />
                         @if (auth()->user()->hasRole('Admin'))
                             <a href="{{route('location.edit', [
                                 'location' => $location->id,
                             ])}}" class="btn btn-primary mt-2">Edit Location</a>
                         @endif
                     @endif
+
                 </div>
             </div>
 

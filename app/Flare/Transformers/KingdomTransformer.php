@@ -81,6 +81,10 @@ class KingdomTransformer extends TransformerAbstract {
         $collection = new Collection;
 
         foreach($buildings as $building) {
+            if ($building->is_locked) {
+                continue;
+            }
+
             $units = GameBuildingUnit::where('game_building_id', $building->gameBuilding->id)
                                      ->where('required_level', '<=', $building->level)
                                      ->get();

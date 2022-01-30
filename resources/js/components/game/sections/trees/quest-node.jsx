@@ -18,9 +18,6 @@ export default class QuestNode extends React.Component {
   }
 
   hasQuestBeenCompleted() {
-    if (this.props.quest.name === 'Map the Unseen') {
-      console.log(this.props.quest.id, this.props.completedQuests, this.props.quest);
-    }
     return this.props.completedQuests.includes(this.props.quest.id);
   }
 

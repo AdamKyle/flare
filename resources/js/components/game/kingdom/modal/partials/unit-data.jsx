@@ -49,23 +49,19 @@ export default class UnitData extends React.Component {
     const currentAmount = this.getKingdomAmount(prop);
 
     if (currentAmount !== 0) {
-      const totalCost = this.props.unit[prop] * amount;
+      let totalCost = this.props.unit[prop] * amount;
+
+      if (prop === 'required_population') {
+        totalCost = totalCost - totalCost * this.props.kingdom.population_cost_reduction;
+      }
 
       if (totalCost > currentAmount) {
 
         return 'text-danger';
       }
-
-      if (totalCost < currentAmount) {
-        return 'text-success';
-      }
-
-      if (totalCost === currentAmount) {
-        return 'text-success';
-      }
     }
 
-    return 'text-success';
+    return '';
   }
 
   getKingdomAmount(prop) {
@@ -157,19 +153,19 @@ export default class UnitData extends React.Component {
             <h5>Unit Cost</h5>
             <hr/>
             <dl>
-              <dd><strong>Cost in wood</strong>:</dd>
+              <dt><strong>Cost in wood</strong>:</dt>
               <dd
                 className={this.getClass('wood_cost', this.props.amount)}>{this.formatNumber(this.calculateAmount('wood_cost', this.props.amount))}</dd>
-              <dd><strong>Cost in clay</strong>:</dd>
+              <dt><strong>Cost in clay</strong>:</dt>
               <dd
                 className={this.getClass('clay_cost', this.props.amount)}>{this.formatNumber(this.calculateAmount('clay_cost', this.props.amount))}</dd>
-              <dd><strong>Cost in stone</strong>:</dd>
+              <dt><strong>Cost in stone</strong>:</dt>
               <dd
                 className={this.getClass('stone_cost', this.props.amount)}>{this.formatNumber(this.calculateAmount('stone_cost', this.props.amount))}</dd>
-              <dd><strong>Cost in iron</strong>:</dd>
+              <dt><strong>Cost in iron</strong>:</dt>
               <dd
                 className={this.getClass('iron_cost', this.props.amount)}>{this.formatNumber(this.calculateAmount('iron_cost', this.props.amount))} (-{(this.props.kingdom.iron_cost_reduction * 100).toFixed()}%)</dd>
-              <dd><strong>Required population</strong>:</dd>
+              <dt><strong>Required population</strong>:</dt>
               <dd
                 className={this.getClass('required_population', this.props.amount)}>
                 {this.formatNumber(this.calculateAmount('required_population', this.props.amount))} (-{(this.props.kingdom.population_cost_reduction * 100).toFixed()}%)
@@ -183,6 +179,9 @@ export default class UnitData extends React.Component {
                       <Popover.Content>
                         <p>This number will increase as you recruit more and more units. This represents how many people are needed for one unit and is then, much like resources,
                         multiplied by amount of people.</p>
+                        <p>This number will take into account specific Kingdom Passives that help to reduce the population needed. This means you can be left with gold,
+                          resources or additional population. For example if you can only recruit 45,000 units and have a population reduction of 35%, you would only need: 15,750
+                        people at the same price to get the same amount of people.</p>
                       </Popover.Content>
                     </Popover>
                   }

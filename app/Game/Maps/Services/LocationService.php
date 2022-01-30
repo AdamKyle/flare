@@ -135,7 +135,7 @@ class LocationService {
                     ];
                 } else {
                     $sets[] = [
-                        'name' => 'Set ' . $index,
+                        'name' => $set->name,
                         'id'   => $set->id,
                     ];
                 }

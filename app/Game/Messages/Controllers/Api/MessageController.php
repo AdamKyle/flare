@@ -2,42 +2,39 @@
 
 namespace App\Game\Messages\Controllers\Api;
 
-
-use App\Flare\Models\CelestialFight;
-use App\Flare\Values\ItemEffectsValue;
-use App\Game\Automation\Values\AutomationType;
-use App\Game\Battle\Values\CelestialConjureType;
-use App\Game\Maps\Services\MovementService;
-use App\Game\Messages\Jobs\ProcessNPCCommands;
-use App\Game\Messages\Request\PublicEntityRequest;
-use App\Game\Maps\Services\PctService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Flare\Models\Character;
+use App\Flare\Values\ItemEffectsValue;
+use App\Flare\Models\User;
+use App\Game\Messages\Request\PublicEntityRequest;
+use App\Game\Maps\Services\PctService;
+use App\Game\Messages\Services\NpcCommandService;
 use App\Game\Messages\Events\MessageSentEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Events\PrivateMessageEvent;
 use App\Game\Messages\Builders\ServerMessageBuilder;
-use App\Flare\Models\Character;
 use App\Game\Messages\Models\Message;
-use App\Flare\Models\User;
 use App\Admin\Events\UpdateAdminChatEvent;
 use App\Flare\Handlers\MessageThrottledHandler;
 use App\Flare\Models\Npc;
 use App\Game\Messages\Values\MapChatColor;
-use App\Game\Messages\Handlers\NpcCommandHandler;
 
 class MessageController extends Controller {
 
     private $serverMessage;
 
-    private $npcCommandHandler;
+    private $npcCommandService;
 
-    public function __construct(ServerMessageBuilder $serverMessage, NpcCommandHandler $npcCommandHandler) {
+    public function __construct(
+        ServerMessageBuilder $serverMessage,
+        NpcCommandService $npcCommandService)
+    {
         $this->serverMessage     = $serverMessage;
-        $this->npcCommandHandler = $npcCommandHandler;
+        $this->npcCommandService = $npcCommandService;
     }
 
-    public function fetchUserInfo(Request $request, User $user) {
+    public function fetchUserInfo(User $user) {
         return response()->json([
             'user' => [
                 'is_silenced'       => $user->is_silenced,
@@ -50,16 +47,14 @@ class MessageController extends Controller {
         $messages = Message::with(['user', 'user.roles', 'user.character'])
                             ->where('from_user', null)
                             ->where('to_user', null)
-                            ->where('created_at', '>=', now()->subHour())
+                            ->where('created_at', '>=', now()->subDay())
                             ->orderBy('created_at', 'desc')
-                            ->take(15)
+                            ->take(1000)
                             ->get()
                             ->transform(function($message) {
                                 $message->x    = $message->x_position;
                                 $message->y    = $message->y_position;
                                 $message->name = $message->user->hasRole('Admin') ? 'Admin' : $message->user->character->name;
-
-                                $mapName = '';
 
                                 switch ($message->color) {
                                     case '#ffffff':
@@ -96,7 +91,6 @@ class MessageController extends Controller {
     public function postPublicMessage(Request $request) {
         $x         = 0;
         $y         = 0;
-        $color     = null;
         $mapName   = null;
 
         $message = auth()->user()->messages()->create([
@@ -197,25 +191,7 @@ class MessageController extends Controller {
         $npc = Npc::where('name', $request->user_name)->first();
 
         if (!is_null($npc)) {
-
-            if (auth()->user()->character->currentAutomations()->where('type', AutomationType::ATTACK)->get()->isNotempty()) {
-                broadcast(new ServerMessageEvent($user, 'Child listen! You are so busy thrashing about that you can\'t even focus on this conversation. Stop the auto fighting and then talk to me. Got it? Clear enough? Christ child!', true));
-
-                return response()->json([], 200);
-            }
-
-            $command = $npc->commands->where('command', $request->message)->first();
-
-            if (!is_null($command)) {
-
-                broadcast(new ServerMessageEvent($user, 'Processing message ...'));
-
-                ProcessNPCCommands::dispatch($user, $npc, $command->command_type)->onConnection('npc_commands');
-
-                return response()->json([], 200);
-            }
-
-            broadcast(new ServerMessageEvent($user, $this->serverMessage->build('no_matching_command')));
+            $this->npcCommandService->handleNPC($user->character, $npc, $request->message);
 
             return response()->json([], 200);
         }

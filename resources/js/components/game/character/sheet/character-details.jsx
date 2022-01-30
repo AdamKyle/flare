@@ -164,7 +164,7 @@ export default class CharacterDetails extends React.Component {
                 <dt>Agility Modded:</dt>
                 <dd>{sheet.agi_modded}</dd>
                 <dt>Focus Modded:</dt>
-                <dd>{sheet.docus_modded}</dd>
+                <dd>{sheet.focus_modded}</dd>
               </dl>
             </Tab>
             <Tab eventKey="resistances-and-reductions" title="Resistances and Deductions">
@@ -181,7 +181,8 @@ export default class CharacterDetails extends React.Component {
                 <dd>{(sheet.res_chance * 100).toFixed(2)}%</dd>
               </dl>
               <p className="mt-4"><sup>*</sup> Only healing spells can affect this.</p>
-              <p className="mt-4"><sup>**</sup> Only affects enemies (on their turn).</p>
+              <p className="mt-2"><sup>**</sup> Only affects enemies at the beginning of battle.
+              Will stay in effect even if you die and resurrect.</p>
             </Tab>
             <Tab eventKey="voidance" title="Devouring Light/Darkness">
               <dl className="mt-4">

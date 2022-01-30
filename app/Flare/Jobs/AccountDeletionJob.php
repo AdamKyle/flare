@@ -50,8 +50,14 @@ class AccountDeletionJob implements ShouldQueue
             $user = $this->user;
             $characterName = $user->character->name;
 
-            $this->emptyCharacterInventory($user->character->inventory);
-            $this->emptyCharacterInventorysets($user->character->inventorySets);
+            if (!is_null($user->character->inventory)) {
+                $this->emptyCharacterInventory($user->character->inventory);
+            }
+
+            if (!$user->character->inventorySets->isEmpty()) {
+                $this->emptyCharacterInventorysets($user->character->inventorySets);
+            }
+
             $this->deleteCharacterMarketListings($user->character);
 
             foreach ($user->character->kingdoms as $kingdom) {
@@ -97,13 +103,13 @@ class AccountDeletionJob implements ShouldQueue
 
     protected function deleteCharacterMarketListings(Character $character) {
 
-        $marketListings = MarketBoard::where('character_id', $character->id)->get();
+        MarketBoard::where('character_id', $character->id)->chunkById(250, function($marketListings) {
+            foreach ($marketListings as $marketListing) {
+                $marketListing->delete();
+            }
+        });
 
-        foreach ($marketListings as $marketListing) {
-            $marketListing->delete();
-
-            $this->sendUpdate(resolve(MarketItemsTransfromer::class), resolve(Manager::class), $character->user);
-        }
+        $this->sendUpdate(resolve(MarketItemsTransfromer::class), resolve(Manager::class), $character->user);
     }
     protected function emptyCharacterInventory(Inventory $inventory) {
         foreach ($inventory->slots as $slot) {

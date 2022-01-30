@@ -35,7 +35,6 @@ export default class RandomAffixSection extends React.Component {
     this.fetchUniqueData();
 
     this.updateQueenOfHearts.listen('Game.Core.Events.UpdateQueenOfHeartsPanel', (event) => {
-      console.log(event);
       this.setState({
         uniquesOnHand: event.panelData.slots,
         nonUniques: event.panelData.non_unique_slots,

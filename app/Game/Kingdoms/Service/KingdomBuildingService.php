@@ -85,7 +85,7 @@ class KingdomBuildingService {
      * @param KingdomBuilding $building
      * @return Kingdom
      */
-    public function updateKingdomResourcesForKingdomBuildingUpgrade(KingdomBuilding $building): Kingdom {
+    public function updateKingdomResourcesForKingdomBuildingUpgrade(KingdomBuilding $building, bool $ignorePop = false): Kingdom {
         $buildingCostReduction   = $building->kingdom->fetchBuildingCostReduction();
         $ironCostReduction       = $building->kingdom->fetchIronCostReduction();
         $populationCostReduction = $building->kingdom->fetchPopulationCostReduction();
@@ -94,14 +94,30 @@ class KingdomBuildingService {
         $clayCost       = $building->clay_cost - $building->clay_cost * $buildingCostReduction;
         $stoneCost      = $building->stone_cost - $building->stone_cost * $buildingCostReduction;
         $ironCost       = $building->iron_cost - $building->iron_cost * ($buildingCostReduction + $ironCostReduction);
-        $populationCost = $building->required_population - $building->required_population * ($buildingCostReduction + $populationCostReduction);
+
+        if (!$ignorePop) {
+            $populationCost = $building->required_population - $building->required_population * ($buildingCostReduction + $populationCostReduction);
+
+            $newPop = $building->kingdom->current_population - $populationCost;
+
+            if ($newPop < 0) {
+                $newPop = 0;
+            }
+        } else {
+            $newPop = $building->kingdom->current_population;
+        }
+
+        $newWood  = $building->kingdom->current_wood - $woodCost;
+        $newClay  = $building->kingdom->current_clay - $clayCost;
+        $newStone = $building->kingdom->current_stone - $stoneCost;
+        $newIron  = $building->kingdom->current_iron - $ironCost;
 
         $building->kingdom->update([
-            'current_wood'       => $building->kingdom->current_wood - $woodCost,
-            'current_clay'       => $building->kingdom->current_clay - $clayCost,
-            'current_stone'      => $building->kingdom->current_stone - $stoneCost,
-            'current_iron'       => $building->kingdom->current_iron - $ironCost,
-            'current_population' => $building->kingdom->current_population - $populationCost,
+            'current_wood'       => $newWood > 0 ? $newWood : 0,
+            'current_clay'       => $newClay > 0 ? $newClay : 0,
+            'current_stone'      => $newStone > 0 ? $newStone : 0,
+            'current_iron'       => $newIron > 0 ? $newIron : 0,
+            'current_population' => $newPop
         ]);
 
         return $building->kingdom->refresh();
@@ -218,8 +234,12 @@ class KingdomBuildingService {
 
         $newAmount =  $kingdom->current_population - $params['pop_required'];
 
+        if ($newAmount < 0) {
+            $newAmount = 0;
+        }
+
         $kingdom->update([
-            'current_population' => $newAmount > 0 ? $newAmount : 0
+            'current_population' => $newAmount
         ]);
 
         $characterGold = $character->gold - $cost;
@@ -237,7 +257,9 @@ class KingdomBuildingService {
 
         $character = $building->kingdom->character;
 
-        $timeToComplete = now()->addMinutes($this->calculateBuildingTimeReduction($building, $params['time']));
+        $minutes = $this->calculateBuildingTimeReduction($building, $params['time']);
+
+        $timeToComplete = now()->addMinutes($minutes);
 
         $toLevel = $params['how_many_levels'] + $building->level;
 
@@ -256,13 +278,17 @@ class KingdomBuildingService {
             'paid_amount'    => $params['cost_to_upgrade'],
         ]);
 
-        UpgradeBuildingWithGold::dispatch($building, $character->user, $queue->id, $params['how_many_levels'])->delay(now()->addMinutes(15));
+        if ($minutes > 15) {
+            $timeToComplete = now()->addMinutes(15);
+        }
+
+        UpgradeBuildingWithGold::dispatch($building, $character->user, $queue->id, $params['how_many_levels'])->delay($timeToComplete);
     }
 
     protected function calculateBuildingTimeReduction(KingdomBuilding $building, int $time = 0)  {
         $skillBonus = $building->kingdom->character->skills->filter(function($skill) {
             return $skill->baseSkill->type === SkillTypeValue::EFFECTS_KINGDOM;
-        })->first()->skill_bonus;
+        })->first()->building_time_reduction;
 
         if ($time > 0) {
             return $time;

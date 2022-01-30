@@ -28,3 +28,5 @@ There is no email sent out to those not logged in.
 As you can see I have quite a few of these.
 
 That's all there is to it. The effects of the passives are already applied to your kingdom when the skill reaches a new level.
+
+

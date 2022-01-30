@@ -41,7 +41,7 @@ class DeleteFlaggedUsers extends Command
     {
         User::where('will_be_deleted', true)->chunkById(100, function($users) {
             foreach ($users as $user) {
-                AccountDeletionJob::dispatch($user, true);
+                AccountDeletionJob::dispatch($user, true)->onConnection('long_running');
             }
         });
     }

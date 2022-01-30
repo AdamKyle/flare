@@ -26,10 +26,19 @@ export default class BuildingManagementModal extends React.Component {
       disabledButtons: false,
       loading: false,
       costToUpgrade: this.props.building.upgrade_cost,
-      level: 0,
+      level: '',
       populationRequired: 0,
       timeNeeded: 0,
       hasGold: true,
+      activeTab: 'regular-upgrade',
+    }
+  }
+
+  componentDidMount() {
+    if (!this.canUpgrade()) {
+      this.setState({
+        activeTab: 'gold-upgrade'
+      });
     }
   }
 
@@ -39,14 +48,6 @@ export default class BuildingManagementModal extends React.Component {
     const buildingCostReduction     = this.props.kingdom.building_cost_reduction;
     const ironCostReduction         = this.props.kingdom.iron_cost_reduction;
     const populationCostReduction   = this.props.kingdom.population_cost_reduction;
-
-    if (this.state.level >= 0) {
-      return true;
-    }
-
-    if (building.level >= building.max_level) {
-      return false
-    }
 
     let buildingWoodCost = building.wood_cost;
     buildingWoodCost    -= Math.floor(buildingWoodCost * buildingCostReduction);
@@ -215,7 +216,7 @@ export default class BuildingManagementModal extends React.Component {
   }
 
   changeLevel(event) {
-    let value      = parseInt(event.target.value) || 0;
+    let value      = parseInt(event.target.value) || '';
     const maxLevel = this.props.building.max_level - this.props.building.level;
 
     if (value > maxLevel) {
@@ -245,6 +246,8 @@ export default class BuildingManagementModal extends React.Component {
   }
 
   processLevel(level) {
+    level = parseInt(level) || 0;
+
     let levelForGoldCost = level - this.props.building.level;
 
     if (levelForGoldCost <= 0) {
@@ -300,6 +303,12 @@ export default class BuildingManagementModal extends React.Component {
     const price           = amountOfPopLeft * 10;
 
     return this.formatNumber(price);
+  }
+
+  setActiveTab(key) {
+    this.setState({
+      activeTab: key,
+    })
   }
 
   render() {
@@ -369,8 +378,8 @@ export default class BuildingManagementModal extends React.Component {
               durability is 0.</small></p>
           </div>
           <hr/>
-          <Tabs defaultActiveKey="regular-upgrade" id="building-upgrade">
-            <Tab eventKey="regular-upgrade" title="Regular Upgrade" disabled={this.props.building.is_locked}>
+          <Tabs activeKey={this.state.activeTab} onSelect={this.setActiveTab.bind(this)} id="building-upgrade">
+            <Tab eventKey="regular-upgrade" title="Regular Upgrade" disabled={this.props.building.is_locked || !this.canUpgrade()}>
               <div className="row mt-4">
                 {this.props.building.level >= this.props.building.max_level ?
                   <div className="col-md-12">
@@ -445,24 +454,21 @@ export default class BuildingManagementModal extends React.Component {
                 }
               </div>
             </Tab>
-            <Tab eventKey="gold-upgrade" title="Gold Upgrade" disabled={!this.canUpgrade() || this.buildingNeedsToBeRebuilt() || !this.isCurrentlyInQueue() || (this.props.building.level >= this.props.building.max_level) || this.props.building.is_locked}>
+            <Tab eventKey="gold-upgrade" title="Gold Upgrade" disabled={this.buildingNeedsToBeRebuilt() || !this.isCurrentlyInQueue() || (this.props.building.level >= this.props.building.max_level) || this.props.building.is_locked}>
               <div className="mt-4">
-                {
-
-                }
                 <Row>
                   <Col lg={12} xl={6}>
                     <dl>
                       <dt>Max Level</dt>
                       <dd>{this.formatNumber(this.props.building.max_level)}</dd>
                       <dt>Population Required</dt>
-                      <dd>{this.formatNumber(this.state.populationRequired)} (-{((this.props.kingdom.population_cost_reduction + this.props.kingdom.building_cost_reduction) * 100).toFixed()}%)</dd>
+                      <dd>{this.formatNumber(this.state.populationRequired)} (-{((this.props.kingdom.population_cost_reduction + this.props.kingdom.building_cost_reduction) * 100).toFixed(2)}%)</dd>
                       <dt>Cost per Level</dt>
                       <dd>{this.formatNumber(this.props.building.upgrade_cost)}</dd>
                       <dt>Time Needed (Minutes)</dt>
-                      <dd>{this.formatNumber(this.state.timeNeeded)}, (~{this.calculateHours(this.state.timeNeeded)} hrs.) (-{(this.props.kingdom.building_time_reduction * 100).toFixed(0)}%)</dd>
+                      <dd>{this.formatNumber(this.state.timeNeeded)}, (~{this.calculateHours(this.state.timeNeeded)} hrs.) (-{(this.props.kingdom.building_time_reduction * 100).toFixed(2)}%)</dd>
                       <dt>Total Gold</dt>
-                      <dd>{this.state.level > 0 ? this.formatNumber(this.state.costToUpgrade * this.state.level) : 0} (-{(this.props.kingdom.building_cost_reduction * 100).toFixed()}%)</dd>
+                      <dd>{this.state.level > 0 ? this.formatNumber(this.state.costToUpgrade * this.state.level) : 0} (-{(this.props.kingdom.building_cost_reduction * 100).toFixed(2)}%)</dd>
                       <dt>Will Upgrade To Level:</dt>
                       <dd>{this.getNewLevel()}</dd>
                     </dl>
@@ -538,7 +544,7 @@ export default class BuildingManagementModal extends React.Component {
                       onClick={this.rebuildBuilding.bind(this)}>Rebuild</button>
               :
               <button className="btn btn-success"
-                      disabled={!this.canUpgrade() || !this.isCurrentlyInQueue() || this.state.disabledButtons || this.props.building.is_locked}
+                      disabled={(!this.canUpgrade() && !(this.state.level > 0)) || !this.isCurrentlyInQueue() || this.state.disabledButtons || this.props.building.is_locked || (this.props.building.level >= this.props.building.max_level)}
                       onClick={this.upgradeBuilding.bind(this)}
               >
                 Upgrade

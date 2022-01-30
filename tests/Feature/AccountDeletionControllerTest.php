@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Flare\Jobs\AccountDeletionJob;
+use Illuminate\Support\Facades\Queue;
 use Mail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Mail\GenericMail;
@@ -66,7 +68,7 @@ class AccountDeletionControllerTest extends TestCase {
             'amount_registered' => 1,
         ]);
 
-        Mail::fake();
+        Queue::fake();
     }
 
     public function tearDown(): void {
@@ -82,14 +84,7 @@ class AccountDeletionControllerTest extends TestCase {
             'user' => $user->id,
         ]));
 
-        Mail::assertSent(GenericMail::class);
-
-        $this->assertEmpty(Character::all());
-        $this->assertEmpty(Inventory::all());
-        $this->assertEmpty(InventorySet::all());
-        $this->assertEmpty(Skill::whereNull('character_id')->get());
-        $this->assertEmpty(Kingdom::whereNotNull('character_id')->get());
-        $this->assertCount(1, User::all());
+        Queue::assertPushed(AccountDeletionJob::class);
     }
 
     public function testCannotDeleteCharacter() {
@@ -102,12 +97,5 @@ class AccountDeletionControllerTest extends TestCase {
         ]))->response;
 
         $response->assertSessionHas('error', 'You cannot do that.');
-
-        $this->assertNotEmpty(Character::all());
-        $this->assertNotEmpty(Inventory::all());
-        $this->assertNotEmpty(InventorySet::all());
-        $this->assertNotEmpty(Skill::whereNotNull('character_id')->get());
-        $this->assertNotEmpty(Kingdom::whereNotNull('character_id')->get());
-        $this->assertCount(3, User::all());
     }
 }

@@ -9,10 +9,12 @@ use App\Flare\Models\KingdomBuilding;
 use App\Flare\Models\KingdomLog;
 use App\Flare\Models\Session;
 use App\Flare\Models\User;
+use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Traits\KingdomCache;
 use App\Game\Kingdoms\Events\UpdateEnemyKingdomsMorale;
 use App\Game\Kingdoms\Events\UpdateGlobalMap;
 use App\Game\Kingdoms\Events\UpdateNPCKingdoms;
+use App\Game\Kingdoms\Jobs\KingdomSettlementLockout;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 use App\Game\Maps\Events\UpdateMapDetailsBroadcast;
 use App\Game\Maps\Services\MovementService;
@@ -25,6 +27,7 @@ use App\Flare\Models\Kingdom;
 use App\Flare\Transformers\KingdomTransformer;
 use Facades\App\Flare\Values\UserOnlineValue;
 use App\Game\Kingdoms\Events\UpdateKingdom;
+use App\Game\Messages\Events\ServerMessageEvent as GameServerMessageEvent;
 use Cache;
 
 class KingdomResourcesService {
@@ -216,8 +219,84 @@ class KingdomResourcesService {
         }
     }
 
+    public function abandonKingdom(Kingdom $kingdom) {
+        $character = $kingdom->character;
+
+        $this->removeKingdomFromCache($character, $kingdom);
+
+        $this->npcTookKingdom($character->user, $kingdom->refresh());
+
+        foreach ($kingdom->buildings as $building) {
+            $newDurability = $building->current_durability - $building->current_durability * 0.35;
+
+            if ($newDurability < 0) {
+                $newDurability = 0;
+            }
+
+            $building->update([
+                'current_durability' => $newDurability,
+            ]);
+        }
+
+        foreach ($kingdom->units as $unit) {
+            $newAmount = $unit->amount - $unit->amount * 0.75;
+
+            if ($newAmount < 0) {
+                $newAmount = 0;
+            }
+
+            $unit->update([
+                'amount' => $newAmount,
+            ]);
+        }
+
+        $newPopulation = $kingdom->current_population - $kingdom->current_population * 0.75;
+
+        if ($newPopulation < 0) {
+            $newPopulation = 0;
+        }
+
+        $kingdom->update([
+            'character_id'       => null,
+            'npc_owned'          => true,
+            'current_morale'     => 0.10,
+            'treasury'           => 0,
+            'last_walked'        => now(),
+            'current_population' => $newPopulation,
+            'current_morale'     => 0.50,
+        ]);
+
+        $kingdom = $kingdom->refresh();
+
+        if (!is_null($character->can_settle_again_at)) {
+            $time = $character->can_settle_again_at->addMinutes(30);
+        } else {
+            $time = now()->addMinutes(30);
+        }
+
+        $character->update([
+            'can_settle_again_at' => $time
+        ]);
+
+        $character = $character->refresh();
+
+        KingdomSettlementLockout::dispatch($character)->delay(now()->addMinutes(15));
+
+        $minutes = now()->diffInMinutes($time);
+
+        event(new GameServerMessageEvent($character->user, 'You have been locked out of making a new kingdom for: '. $minutes . ' Minutes.'));
+
+        broadcast(new UpdateNPCKingdoms($kingdom->gameMap));
+        broadcast(new UpdateGlobalMap($character));
+        broadcast(new UpdateMapDetailsBroadcast($character->map, $character->user, $this->movementService, true));
+    }
+
     protected function angryNpc() {
-        broadcast(new GlobalMessageEvent('The Old Man stomps around! "Why child! Why?! I warned you! time to pay up!"'));
+        $character = $this->kingdom->character;
+
+        if (!is_null($character)) {
+            broadcast(new GameServerMessageEvent($character->user,'The Old Man stomps around! "You were warned! time to pay up!"'));
+        }
 
         $currentPop = $this->kingdom->current_population;
         $maxPop     = $this->kingdom->max_population;
@@ -228,6 +307,7 @@ class KingdomResourcesService {
 
         $kingdomTreasury = $this->kingdom->treasury;
         $characterGold   = $this->kingdom->character->gold;
+        $goldBars        = $this->kingdom->gold_bars;
 
         if ($totalCost > $kingdomTreasury && $kingdomTreasury > 0) {
             $totalCost = $totalCost - $kingdomTreasury;
@@ -237,7 +317,10 @@ class KingdomResourcesService {
 
             $this->kingdom = $this->kingdom->refresh();
 
-            broadcast(new GlobalMessageEvent('The Old Man grumbles! "Now I have to take the rest out of your pockets child!"'));
+            if (!is_null($character)) {
+                broadcast(new GameServerMessageEvent($character->user,'The Old Man grumbles! "Now I have to take the rest out of your pockets child!" (Not enough Treasury)'));
+            }
+
         } else if ($totalCost <= $kingdomTreasury) {
             $kingdomTreasury = $kingdomTreasury - $totalCost;
 
@@ -248,7 +331,43 @@ class KingdomResourcesService {
 
             $totalCost = 0;
 
-            broadcast(new GlobalMessageEvent('The Old Man smiles! "I am glad someone paid me."'));
+            if (!is_null($character)) {
+                broadcast(new GameServerMessageEvent($character->user,'The Old Man smiles! "I am glad someone paid me." (The treasury was enough to wet his appetite)'));
+            }
+        }
+
+        if ($goldBars > 0 && $totalCost > 0) {
+
+            $percentage = $totalCost / ($this->kingdom->gold_bars * 2000000000);
+
+            if ($percentage < 0.01) {
+                $this->kingdom->gold_bars -= 1;
+                $this->kingdom->save();
+
+                if (!is_null($character)) {
+                    broadcast(new GameServerMessageEvent($character->user,'The Old Man smiles! "A single gold bar is all I asked for." (The kingdoms gold bars were enough was enough to wet his appetite)'));
+                }
+            } else {
+                $newAmount = $this->kingdom->gold_bars - ceil($this->kingdom->gold_bars * $percentage);
+
+                if ($newAmount < 0) {
+                    $newAmount = 0;
+
+                    if (!is_null($character)) {
+                        broadcast(new GameServerMessageEvent($character->user,'The Old Man jumps for joy! "These are all mine now child!" (The kingdom lost all it\'s Gold Bars, but The Old Man is happy now ... Win, Win?)'));
+                    }
+                } else {
+                    if (!is_null($character)) {
+                        broadcast(new GameServerMessageEvent($character->user,'The Old Man grumbles! "Some of these are mine now..." (The kingdom lost: '.($percentage * 100).'% Gold Bars, but The Old Man is happy now ... Win, Win?)'));
+                    }
+                }
+
+                $this->kingdom->update(['gold_bars' => $newAmount]);
+
+                $this->kingdom = $this->kingdom->refresh();
+            }
+
+            $totalCost = 0;
         }
 
         if ($totalCost > $characterGold && $totalCost > 0) {
@@ -260,9 +379,12 @@ class KingdomResourcesService {
 
             $this->kingdom = $this->kingdom->refresh();
 
-            broadcast(new GlobalMessageEvent('The Old Man smiles! "I told you I would collect whats owed!"'));
+            if (!is_null($character)) {
+                broadcast(new GameServerMessageEvent($character->user,'The Old Man smiles! "I told you I would collect whats owed!"'));
+            }
+
             event(new UpdateTopBarEvent($this->kingdom->character->refresh()));
-        } else if ($totalCost <= $characterGold) {
+        } else if ($totalCost <= $characterGold && $totalCost > 0) {
             $characterGold = $characterGold - $totalCost;
 
             $this->kingdom->character->update([
@@ -273,11 +395,13 @@ class KingdomResourcesService {
 
             $totalCost = 0;
 
-            broadcast(new GlobalMessageEvent('The Old Man smiles! "I am glad someone paid me."'));
+            if (!is_null($character)) {
+                broadcast(new GameServerMessageEvent($character->user,'The Old Man smiles! "I am glad someone paid me."'));
+            }
         }
 
-        if ($totalCost > 0 && $this->kingdom->character->gold === 0 && $this->kingdom->treasury === 0) {
-            broadcast(new GlobalMessageEvent('The Old Man is enraged "You messed with the wrong person!"'));
+        if ($totalCost > 0 && $this->kingdom->character->gold === 0 && $this->kingdom->treasury === 0 && $this->kingdom->gold_bars === 0) {
+            broadcast(new GlobalMessageEvent('The Old Man is enraged "You messed with the wrong person ' . $character->name . '"'));
 
             $this->reduceEverything();
         }
@@ -410,42 +534,32 @@ class KingdomResourcesService {
             $this->kingdom->update([
                 'current_population' => $newAmount,
             ]);
+        } else if (!is_null($building)) {
+            if ($building->current_durability === 0) {
+                $newAmount = $this->kingdom->current_population + round($building->population_increase / 2);
 
-            $this->kingdom = $this->kingdom->refresh();
-
-            return;
-        }
-
-        if ($building->current_durability === 0) {
-            $newAmount = $this->kingdom->current_population + round($building->population_increase/ 2);
-
-            if ($currentPop <= $this->kingdom->max_population) {
-                if ($newAmount > $this->kingdom->max_population) {
-                    $newAmount = $this->kingdom->max_population;
+                if ($currentPop <= $this->kingdom->max_population) {
+                    if ($newAmount > $this->kingdom->max_population) {
+                        $newAmount = $this->kingdom->max_population;
+                    }
                 }
-            }
 
-            $this->kingdom->update([
-                'current_population' => $newAmount,
-            ]);
+                $this->kingdom->update([
+                    'current_population' => $newAmount,
+                ]);
+            } else {
+                $newAmount = $this->kingdom->current_population + $building->population_increase;
 
-            $this->kingdom = $this->kingdom->refresh();
-
-            return;
-        }
-
-        if (!is_null($building)) {
-            $newCurrent = $this->kingdom->current_population + $building->population_increase;
-
-            if ($currentPop <= $this->kingdom->max_population) {
-                if ($newCurrent > $this->kingdom->max_population) {
-                    $newCurrent = $this->kingdom->max_population;
+                if ($currentPop <= $this->kingdom->max_population) {
+                    if ($newAmount > $this->kingdom->max_population) {
+                        $newAmount = $this->kingdom->max_population;
+                    }
                 }
-            }
 
-            $this->kingdom->update([
-                'current_population' => $newCurrent,
-            ]);
+                $this->kingdom->update([
+                    'current_population' => $newAmount,
+                ]);
+            }
         }
 
         $this->kingdom = $this->kingdom->refresh();
@@ -610,7 +724,19 @@ class KingdomResourcesService {
     private function npcTookKingdom(User $user, Kingdom $kingdom) {
         $this->removeKingdomFromCache($user->character, $kingdom);
 
-        event(new GlobalMessageEvent('A kingdom has fallen into the rubble at (X/Y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position . ' on the: ' . $this->kingdom->gameMap->name .' plane.'));
+        event(new GlobalMessageEvent('A kingdom has fallen into the rubble at (X/Y): ' . $kingdom->x_position . '/' . $kingdom->y_position . ' on the: ' . $kingdom->gameMap->name .' plane.'));
+
+        if (UserOnlineValue::isOnline($user)) {
+            event(new ServerMessageEvent($user, 'kingdom-resources-update', $kingdom->name . ' Has been given to the NPC due to being abandoned, at Location (x/y): ' . $kingdom->x_position . '/' . $kingdom->y_position . ' on the: ' . $kingdom->gameMap->name . ' plane.'));
+        } else {
+            $this->updateKingdomCache($user, $kingdom);
+        }
+    }
+
+    private function giveToNpc(User $user, Kingdom $kingdom) {
+        $this->removeKingdomFromCache($user->character, $kingdom);
+
+        event(new GlobalMessageEvent('A kingdom has been abandoned at (X/Y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position . ' on the: ' . $this->kingdom->gameMap->name .' plane.'));
 
         if (UserOnlineValue::isOnline($user)) {
             event(new ServerMessageEvent($user, 'kingdom-resources-update', $this->kingdom->name . ' Has been given to the NPC due to being abandoned, at Location (x/y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position . ' on the: ' . $this->kingdom->gameMap->name . ' plane.'));

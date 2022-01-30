@@ -72,12 +72,12 @@ class UnitReturnService {
         $kingdom = Kingdom::find($unitMovement->from_kingdom_id);
 
         foreach ($unitsReturning as $unitInfo) {
-            $foundUnits = $kingdom->units()->where('game_unit_id', $unitInfo['unit_id'])->first();
-
-            if (!is_null($foundUnits)) {
-                $foundUnits->update([
-                    'amount' => $foundUnits->amount + $unitInfo['amount'],
-                ]);
+            if (count($unitInfo) == count($unitInfo, COUNT_RECURSIVE)) {
+                $this->updateUnits($kingdom, $unitInfo);
+            } else {
+                foreach ($unitInfo as $unit) {
+                    $this->updateUnits($kingdom, $unit);
+                }
             }
         }
 
@@ -91,5 +91,15 @@ class UnitReturnService {
         UpdateUnitMovementLogs::dispatch($character);
 
         event(new KingdomServerMessageEvent($character->user, 'units-recalled', $message));
+    }
+
+    protected function updateUnits(Kingdom $kingdom, array $unitInfo) {
+        $foundUnits = $kingdom->units()->where('game_unit_id', $unitInfo['unit_id'])->first();
+
+        if (!is_null($foundUnits)) {
+            $foundUnits->update([
+                'amount' => $foundUnits->amount + $unitInfo['amount'],
+            ]);
+        }
     }
 }

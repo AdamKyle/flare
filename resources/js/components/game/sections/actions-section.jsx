@@ -262,6 +262,15 @@ export default class ActionsSection extends React.Component {
                     </div>
                     : null
                 }
+                {
+                  this.props.kingdomData.is_mine ?
+                    <div className="mb-1">
+                      <button disabled={this.state.isDead || this.state.isAdventuring}
+                              onClick={() => this.props.openAbandonKingdom()}
+                              className="btn btn-danger btn-sm mb-2">Abandon Kingdom</button>
+                    </div>
+                    : null
+                }
               </Col>
               <Col xs={12} sm={12} md={12} lg={12} xl={10}>
                 {

@@ -34,7 +34,23 @@ export default class ItemName extends React.Component {
   }
 
   isUnique() {
-    return this.props.item.unique;
+    if (this.props.item.hasOwnProperty('unique')) {
+      return this.props.item.unique;
+    }
+
+    if (this.props.item.item_prefix_id !== null) {
+      if (this.props.item.item_prefix.randomly_generated) {
+        return true;
+      }
+    }
+
+    if (this.props.item.item_suffix_id !== null) {
+      if (this.props.item.item_suffix.randomly_generated) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   render() {

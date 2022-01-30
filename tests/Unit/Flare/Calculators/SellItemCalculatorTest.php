@@ -41,4 +41,23 @@ class SellItemCalculatorTest extends TestCase
 
         $this->assertTrue($price > 0);
     }
+
+    public function testSellItemWithUniqueAffixes() {
+        $price = SellItemCalculator::fetchMinimumSalePriceOfUnique(
+            $this->createItem([
+                'item_suffix_id' => $this->createItemAffix([
+                    'type' => 'suffix',
+                    'randomly_generated' => true,
+                    'cost' => 100000000
+                ])->id,
+                'item_prefix_id' => $this->createItemAffix([
+                    'type' => 'prefix',
+                    'randomly_generated' => true,
+                    'cost' => 100000000
+                ])->id,
+            ])
+        );
+
+        $this->assertEquals(100000000, $price);
+    }
 }

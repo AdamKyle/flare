@@ -1,0 +1,512 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="b57f583e-608e-4ca2-947d-cf9ab46f7914" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Console/Commands/MergeDuplicateKingdomUnits.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Flare/Jobs/LoginMessage.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Flare/Jobs/MergeDuplicateKingdomUnits.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Flare/Jobs/RegisterMessage.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Flare/Services/CanUserEnterSiteService.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Flare/Services/DailyGoldDustService.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Game/Core/Controllers/Api/ServerTimeController.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Game/Core/Jobs/HandleAdventureRewardItems.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Game/Core/Jobs/HandleAdventureRewards.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Game/Core/Services/AdventureItemRewardService.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Game/Core/Services/DropCheckService.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Game/Kingdoms/Jobs/KingdomSettlementLockout.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Game/Messages/Handlers/NpcKingdomHandler.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Game/Messages/Services/NpcCommandService.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database/migrations/2022_01_12_233248_add_kingdom_lock_out_to_characters.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database/migrations/2022_01_13_022046_add_modifiers_to_character_boons.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/backup/maps/Hell/Ih1XUJU91yLxYSAnFkBzM1p0ateuE1oqIkhO2ztv.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/backup/maps/Purgatory/oXGmrHASHlbOvfYv44UUFf0aYB7wjVQZCEX4mWdk.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/info/kingdoms/images/abandoning-kingdoms.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/js/components/game/messages/server-messages.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/js/components/game/sections/modals/abandon-kingdom.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/Unit/Flare/Jobs/DailyGoldDustTest.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/Unit/Flare/Jobs/UpdateKingdomsTest.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/Unit/Flare/Jobs/WeeklyCelestialSpawnRateTest.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/Unit/Flare/Values/AttackTypeTest.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/Unit/Flare/Values/ClassAttackValueTest.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/Unit/Flare/Values/LocationEffectValueTest.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/Unit/Flare/Values/MapNameValueTest.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/Unit/Flare/Values/NpcCommandTypesTest.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/Unit/Flare/Values/RandomAffixDetailsTest.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/Unit/Game/Core/Values/FactionTypeTest.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/Unit/Game/Messages/Handlers/NpcKingdomHandlerTest.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/Unit/Game/Messages/Jobs/ProcessNPCCommandsTest.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/Unit/Game/Messages/Services/NpcCommandServiceTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.env.example" beforeDir="false" afterPath="$PROJECT_DIR$/.env.example" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.github/workflows/laravel.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/laravel.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/blade.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/adambalan.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/flare.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/flare.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/laravel-idea.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Console/Commands/DeleteFlaggedUsers.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Console/Commands/DeleteFlaggedUsers.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Console/Commands/FlagUsersForDeletion.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Console/Commands/FlagUsersForDeletion.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Builders/CharacterAttackInformation.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Builders/CharacterAttackInformation.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Builders/CharacterInformationBuilder.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Builders/CharacterInformationBuilder.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Events/NpcComponentShowEvent.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Events/NpcComponentShowEvent.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Events/OpenTimeOutModal.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Events/OpenTimeOutModal.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Events/SiteAccessedEvent.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Events/SiteAccessedEvent.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Jobs/AccountDeletionJob.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Jobs/AccountDeletionJob.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Jobs/DailyGoldDustJob.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Jobs/DailyGoldDustJob.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Models/Character.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Models/Character.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Models/CharacterBoon.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Models/CharacterBoon.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Models/Skill.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Models/Skill.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Models/Traits/CalculateSkillBonus.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Models/Traits/CalculateSkillBonus.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Providers/ServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Providers/ServiceProvider.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Traits/ClassBasedBonuses.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Traits/ClassBasedBonuses.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Transformers/KingdomTransformer.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Transformers/KingdomTransformer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Values/AttackTypeValue.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Values/AttackTypeValue.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Values/BaseSkillValue.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Values/BaseSkillValue.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Values/ItemUsabilityType.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Values/ItemUsabilityType.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Values/LocationEffectValue.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Values/LocationEffectValue.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Values/NpcTypes.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Values/NpcTypes.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Values/RandomAffixDetails.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Values/RandomAffixDetails.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Values/SiteAccessStatisticValue.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Values/SiteAccessStatisticValue.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Values/UserOnlineValue.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Values/UserOnlineValue.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/View/Livewire/Admin/Items/DataTable.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/View/Livewire/Admin/Items/DataTable.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Adventures/Jobs/AdventureJob.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Adventures/Jobs/AdventureJob.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Automation/Services/ProcessAttackAutomation.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Automation/Services/ProcessAttackAutomation.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Core/Controllers/CharacterAdventureController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Core/Controllers/CharacterAdventureController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Core/Listeners/DropsCheckListener.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Core/Listeners/DropsCheckListener.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Core/Providers/ServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Core/Providers/ServiceProvider.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Core/Services/AdventureRewardService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Core/Services/AdventureRewardService.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Core/Services/UseItemService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Core/Services/UseItemService.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Kingdoms/Controllers/Api/KingdomsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Kingdoms/Controllers/Api/KingdomsController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Kingdoms/Handlers/TakeKingdomHandler.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Kingdoms/Handlers/TakeKingdomHandler.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Kingdoms/Jobs/MassEmbezzle.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Kingdoms/Jobs/MassEmbezzle.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Kingdoms/Jobs/UpgradeBuildingWithGold.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Kingdoms/Jobs/UpgradeBuildingWithGold.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Kingdoms/Service/AttackService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Kingdoms/Service/AttackService.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Kingdoms/Service/KingdomBuildingService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Kingdoms/Service/KingdomBuildingService.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Kingdoms/Service/KingdomResourcesService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Kingdoms/Service/KingdomResourcesService.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Kingdoms/Service/KingdomsAttackService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Kingdoms/Service/KingdomsAttackService.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Kingdoms/Service/UnitRecallService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Kingdoms/Service/UnitRecallService.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Kingdoms/Service/UnitReturnService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Kingdoms/Service/UnitReturnService.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Kingdoms/Service/UnitService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Kingdoms/Service/UnitService.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Maps/Jobs/MoveTimeOutJob.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Maps/Jobs/MoveTimeOutJob.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Maps/Listeners/MoveTimeOutListener.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Maps/Listeners/MoveTimeOutListener.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Maps/Services/LocationService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Maps/Services/LocationService.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Messages/Builders/NpcServerMessageBuilder.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Messages/Builders/NpcServerMessageBuilder.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Messages/Controllers/Api/MessageController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Messages/Controllers/Api/MessageController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Messages/Handlers/NpcCommandHandler.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Messages/Handlers/NpcCommandHandler.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Messages/Handlers/NpcQuestRewardHandler.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Messages/Handlers/NpcQuestRewardHandler.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Messages/Handlers/NpcQuestsHandler.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Messages/Handlers/NpcQuestsHandler.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Messages/Listeners/ServerMessageListener.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Messages/Listeners/ServerMessageListener.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Messages/Providers/ServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Messages/Providers/ServiceProvider.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/PassiveSkills/Services/PassiveSkillTrainingService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/PassiveSkills/Services/PassiveSkillTrainingService.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Skills/Services/DisenchantService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Skills/Services/DisenchantService.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Skills/Services/EnchantingService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Skills/Services/EnchantingService.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/AccountDeletionController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/AccountDeletionController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Auth/LoginController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Auth/LoginController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Auth/RegisterController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Auth/RegisterController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/app.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/app.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/horizon.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/horizon.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/data-imports/items-second-set.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/data-imports/items-second-set.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/data-imports/items.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/data-imports/items.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/info/adventure/section-2.md" beforeDir="false" afterPath="$PROJECT_DIR$/resources/info/adventure/section-2.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/info/automation/section-1.md" beforeDir="false" afterPath="$PROJECT_DIR$/resources/info/automation/section-1.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/info/factions/section-1.md" beforeDir="false" afterPath="$PROJECT_DIR$/resources/info/factions/section-1.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/info/kingdom-passive-skills/section-1.md" beforeDir="false" afterPath="$PROJECT_DIR$/resources/info/kingdom-passive-skills/section-1.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/info/kingdom-passive-skills/section-2.md" beforeDir="false" afterPath="$PROJECT_DIR$/resources/info/kingdom-passive-skills/section-2.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/info/kingdoms/section-1.md" beforeDir="false" afterPath="$PROJECT_DIR$/resources/info/kingdoms/section-1.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/info/map/section-1.md" beforeDir="false" afterPath="$PROJECT_DIR$/resources/info/map/section-1.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/info/random-enchants/section-1.md" beforeDir="false" afterPath="$PROJECT_DIR$/resources/info/random-enchants/section-1.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/info/special-locations/images/special-location.png" beforeDir="false" afterPath="$PROJECT_DIR$/resources/info/special-locations/images/special-location.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/alchemy/alchemy-action.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/alchemy/alchemy-action.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/battle/attack/attack-types/cast-attack.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/battle/attack/attack-types/cast-attack.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/battle/attack/attack.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/battle/attack/attack.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/battle/monster/monster.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/battle/monster/monster.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/character/inventory/sections/inventory-section.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/character/inventory/sections/inventory-section.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/character/modals/boon-modal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/character/modals/boon-modal.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/character/sheet/character-details.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/character/sheet/character-details.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/enchanting/enchanting-action.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/enchanting/enchanting-action.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/game.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/game.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/building-management-modal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/building-management-modal.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/kingdom-attack-modal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/kingdom-attack-modal.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/attack-sections/unit-selection.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/attack-sections/unit-selection.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/building-management/building-cost-section.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/building-management/building-cost-section.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/building-queue.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/building-queue.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/goblin-coin-bank.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/goblin-coin-bank.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/kingdom-buildings.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/kingdom-buildings.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/kingdom-info.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/kingdom-info.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/recruit.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/recruit.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/unit-data.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/unit-data.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/unit-queue.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/unit-queue.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/map/components/modals/location-info.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/map/components/modals/location-info.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/messages/chat.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/messages/chat.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/npc-components/random-affix-section.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/npc-components/random-affix-section.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/sections/actions-section.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/sections/actions-section.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/sections/components/teleport.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/sections/components/teleport.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/sections/fight-section.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/sections/fight-section.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/sections/modals/adventure-embark.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/sections/modals/adventure-embark.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/sections/quest-section.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/sections/quest-section.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/sections/trees/quest-node.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/sections/trees/quest-node.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/marketboard/components/item-name.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/marketboard/components/item-name.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/marketboard/partials/affix-data.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/marketboard/partials/affix-data.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/marketboard/usable-item-details.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/marketboard/usable-item-details.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/sass/game/chat.scss" beforeDir="false" afterPath="$PROJECT_DIR$/resources/sass/game/chat.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/admin/locations/partials/location.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/admin/locations/partials/location.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/components/livewire/admin/users/data-table.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/components/livewire/admin/users/data-table.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/game/items/partials/item-prefix.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/game/items/partials/item-prefix.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/game/items/partials/item-suffix.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/game/items/partials/item-suffix.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/game/items/partials/item-usable-section.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/game/items/partials/item-usable-section.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/game/kingdoms/partials/attacked-kingdom-defender-data.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/game/kingdoms/partials/attacked-kingdom-defender-data.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/game/kingdoms/partials/attacked-kingdom.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/game/kingdoms/partials/attacked-kingdom.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/information/classes/partials/prophet.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/information/classes/partials/prophet.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/information/maps/map.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/information/maps/map.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/layouts/app.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layouts/app.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/layouts/partials/alerts.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layouts/partials/alerts.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/welcome.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/welcome.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/game/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/game/api.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/game/kingdoms/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/game/kingdoms/api.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Console/DeleteFlaggedUsersTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Console/DeleteFlaggedUsersTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Feature/AccountDeletionControllerTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Feature/AccountDeletionControllerTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Feature/Game/Core/CharacterAdventureControllerTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Feature/Game/Core/CharacterAdventureControllerTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Feature/Game/Core/LocationsControllerTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Feature/Game/Core/LocationsControllerTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Feature/Game/Messages/MessageControllerApiTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Feature/Game/Messages/MessageControllerApiTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Setup/Character/CharacterFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Setup/Character/CharacterFactory.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Unit/Flare/Calculators/DropCheckCalculatorTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Unit/Flare/Calculators/DropCheckCalculatorTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Unit/Flare/Calculators/SellItemCalculatorTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Unit/Flare/Calculators/SellItemCalculatorTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Unit/Flare/Traits/ClassBasedBonusesTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Unit/Flare/Traits/ClassBasedBonusesTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Unit/Flare/Values/ItemUsabilityTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Unit/Flare/Values/ItemUsabilityTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Unit/Flare/Values/NpcCommandTypes.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Unit/Game/Maps/Jobs/MoveTimeOutJobTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Unit/Game/Maps/Jobs/MoveTimeOutJobTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Unit/Game/Messages/Builders/NpcServerMessageBuilderTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Unit/Game/Messages/Builders/NpcServerMessageBuilderTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Unit/Game/Messages/Handlers/NpcCommandHandlerTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Unit/Game/Messages/Handlers/NpcCommandHandlerTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Unit/Game/Messages/Values/MapChatColorTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Unit/Game/Messages/Values/MapChatColorTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerSettings" doNotAsk="true" synchronizationState="DONT_SYNCHRONIZE">
+    <pharConfigPath>$PROJECT_DIR$/composer.json</pharConfigPath>
+    <execution />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/app/Game/Kingdoms/Service/KingdomsAttackService.php" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/tests/Unit/Game/Messages/Events/PrivateMessageEventTest.php" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/tests/Unit/Game/Kingdoms/Handlers/TakeKingdomHandlerTest.php" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/app/Game/Kingdoms/Controllers/Api/KingdomUnitMovementController.php" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/app/Game/Kingdoms/Service/UnitService.php" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/app/Game/Kingdoms/Handlers/TakeKingdomHandler.php" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/app/Game/Kingdoms/Service/UnitRecallService.php" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="PackageJsonUpdateNotifier">
+    <dismissed value="$PROJECT_DIR$/package.json" />
+  </component>
+  <component name="PhpWorkspaceProjectConfiguration">
+    <include_path>
+      <path value="$PROJECT_DIR$/vendor/graham-campbell/github" />
+      <path value="$PROJECT_DIR$/vendor/graham-campbell/manager" />
+      <path value="$PROJECT_DIR$/vendor/graham-campbell/markdown" />
+      <path value="$PROJECT_DIR$/vendor/graham-campbell/result-type" />
+      <path value="$PROJECT_DIR$/vendor/graham-campbell/bounded-cache" />
+      <path value="$PROJECT_DIR$/vendor/asahasrabuddhe/laravel-mjml" />
+      <path value="$PROJECT_DIR$/vendor/phpdocumentor/reflection-docblock" />
+      <path value="$PROJECT_DIR$/vendor/phpdocumentor/type-resolver" />
+      <path value="$PROJECT_DIR$/vendor/phpdocumentor/reflection-common" />
+      <path value="$PROJECT_DIR$/vendor/justinrainbow/json-schema" />
+      <path value="$PROJECT_DIR$/vendor/dragonmantank/cron-expression" />
+      <path value="$PROJECT_DIR$/vendor/christianessl/landmap-generation" />
+      <path value="$PROJECT_DIR$/vendor/tijsverkoyen/css-to-inline-styles" />
+      <path value="$PROJECT_DIR$/vendor/http-interop/http-factory-guzzle" />
+      <path value="$PROJECT_DIR$/vendor/swiftmailer/swiftmailer" />
+      <path value="$PROJECT_DIR$/vendor/soundasleep/html2text" />
+      <path value="$PROJECT_DIR$/vendor/ringcentral/psr7" />
+      <path value="$PROJECT_DIR$/vendor/maatwebsite/excel" />
+      <path value="$PROJECT_DIR$/vendor/nunomaduro/collision" />
+      <path value="$PROJECT_DIR$/vendor/guzzlehttp/guzzle" />
+      <path value="$PROJECT_DIR$/vendor/guzzlehttp/psr7" />
+      <path value="$PROJECT_DIR$/vendor/guzzlehttp/promises" />
+      <path value="$PROJECT_DIR$/vendor/fzaninotto/faker" />
+      <path value="$PROJECT_DIR$/vendor/consoletvs/charts" />
+      <path value="$PROJECT_DIR$/vendor/beyondcode/laravel-dump-server" />
+      <path value="$PROJECT_DIR$/vendor/beyondcode/laravel-websockets" />
+      <path value="$PROJECT_DIR$/vendor/webmozart/assert" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/resource-operations" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/exporter" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/environment" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/code-unit" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/cli-parser" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/version" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/type" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/lines-of-code" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/recursion-context" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/diff" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/code-unit-reverse-lookup" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/complexity" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/object-reflector" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/object-enumerator" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/global-state" />
+      <path value="$PROJECT_DIR$/vendor/sebastian/comparator" />
+      <path value="$PROJECT_DIR$/vendor/ralouphie/getallheaders" />
+      <path value="$PROJECT_DIR$/vendor/phpoption/phpoption" />
+      <path value="$PROJECT_DIR$/vendor/phpoffice/phpspreadsheet" />
+      <path value="$PROJECT_DIR$/vendor/paragonie/sodium_compat" />
+      <path value="$PROJECT_DIR$/vendor/paragonie/random_compat" />
+      <path value="$PROJECT_DIR$/vendor/markbaker/matrix" />
+      <path value="$PROJECT_DIR$/vendor/markbaker/complex" />
+      <path value="$PROJECT_DIR$/vendor/maennchen/zipstream-php" />
+      <path value="$PROJECT_DIR$/vendor/fideloper/proxy" />
+      <path value="$PROJECT_DIR$/vendor/evenement/evenement" />
+      <path value="$PROJECT_DIR$/vendor/chartisan/php" />
+      <path value="$PROJECT_DIR$/vendor/php-http/promise" />
+      <path value="$PROJECT_DIR$/vendor/php-http/message-factory" />
+      <path value="$PROJECT_DIR$/vendor/beberlei/assert" />
+      <path value="$PROJECT_DIR$/vendor/php-http/httplug" />
+      <path value="$PROJECT_DIR$/vendor/barryvdh/reflection-docblock" />
+      <path value="$PROJECT_DIR$/vendor/php-http/cache-plugin" />
+      <path value="$PROJECT_DIR$/vendor/barryvdh/laravel-ide-helper" />
+      <path value="$PROJECT_DIR$/vendor/php-http/message" />
+      <path value="$PROJECT_DIR$/vendor/theseer/tokenizer" />
+      <path value="$PROJECT_DIR$/vendor/php-http/discovery" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-intl-grapheme" />
+      <path value="$PROJECT_DIR$/vendor/php-http/client-common" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-mbstring" />
+      <path value="$PROJECT_DIR$/vendor/php-http/multipart-stream-builder" />
+      <path value="$PROJECT_DIR$/vendor/symfony/console" />
+      <path value="$PROJECT_DIR$/vendor/livewire/livewire" />
+      <path value="$PROJECT_DIR$/vendor/symfony/process" />
+      <path value="$PROJECT_DIR$/vendor/hamcrest/hamcrest-php" />
+      <path value="$PROJECT_DIR$/vendor/symfony/cache-contracts" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/deprecations" />
+      <path value="$PROJECT_DIR$/vendor/symfony/error-handler" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/event-manager" />
+      <path value="$PROJECT_DIR$/vendor/symfony/var-exporter" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/instantiator" />
+      <path value="$PROJECT_DIR$/vendor/symfony/http-foundation" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/inflector" />
+      <path value="$PROJECT_DIR$/vendor/symfony/service-contracts" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/dbal" />
+      <path value="$PROJECT_DIR$/vendor/symfony/routing" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/lexer" />
+      <path value="$PROJECT_DIR$/vendor/symfony/deprecation-contracts" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/cache" />
+      <path value="$PROJECT_DIR$/vendor/symfony/string" />
+      <path value="$PROJECT_DIR$/vendor/deployer/deployer" />
+      <path value="$PROJECT_DIR$/vendor/symfony/mime" />
+      <path value="$PROJECT_DIR$/vendor/symfony/yaml" />
+      <path value="$PROJECT_DIR$/vendor/symfony/http-kernel" />
+      <path value="$PROJECT_DIR$/vendor/psr/container" />
+      <path value="$PROJECT_DIR$/vendor/symfony/psr-http-message-bridge" />
+      <path value="$PROJECT_DIR$/vendor/psr/http-message" />
+      <path value="$PROJECT_DIR$/vendor/symfony/finder" />
+      <path value="$PROJECT_DIR$/vendor/psr/event-dispatcher" />
+      <path value="$PROJECT_DIR$/vendor/symfony/dom-crawler" />
+      <path value="$PROJECT_DIR$/vendor/psr/cache" />
+      <path value="$PROJECT_DIR$/vendor/symfony/event-dispatcher-contracts" />
+      <path value="$PROJECT_DIR$/vendor/symfony/css-selector" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-intl-normalizer" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-intl-idn" />
+      <path value="$PROJECT_DIR$/vendor/symfony/options-resolver" />
+      <path value="$PROJECT_DIR$/vendor/symfony/filesystem" />
+      <path value="$PROJECT_DIR$/vendor/symfony/var-dumper" />
+      <path value="$PROJECT_DIR$/vendor/symfony/event-dispatcher" />
+      <path value="$PROJECT_DIR$/vendor/symfony/translation-contracts" />
+      <path value="$PROJECT_DIR$/vendor/symfony/translation" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-php72" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-php81" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-ctype" />
+      <path value="$PROJECT_DIR$/vendor/symfony/cache" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-php80" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-php73" />
+      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-iconv" />
+      <path value="$PROJECT_DIR$/vendor/ratchet/rfc6455" />
+      <path value="$PROJECT_DIR$/vendor/phpunit/php-file-iterator" />
+      <path value="$PROJECT_DIR$/vendor/phpunit/php-invoker" />
+      <path value="$PROJECT_DIR$/vendor/phpunit/php-code-coverage" />
+      <path value="$PROJECT_DIR$/vendor/phpunit/php-text-template" />
+      <path value="$PROJECT_DIR$/vendor/phpunit/phpunit" />
+      <path value="$PROJECT_DIR$/vendor/phpunit/php-timer" />
+      <path value="$PROJECT_DIR$/vendor/phpspec/prophecy" />
+      <path value="$PROJECT_DIR$/vendor/php-vcr/php-vcr" />
+      <path value="$PROJECT_DIR$/vendor/phar-io/version" />
+      <path value="$PROJECT_DIR$/vendor/phar-io/manifest" />
+      <path value="$PROJECT_DIR$/vendor/owen-it/laravel-auditing" />
+      <path value="$PROJECT_DIR$/vendor/myclabs/deep-copy" />
+      <path value="$PROJECT_DIR$/vendor/myclabs/php-enum" />
+      <path value="$PROJECT_DIR$/vendor/monolog/monolog" />
+      <path value="$PROJECT_DIR$/vendor/mockery/mockery" />
+      <path value="$PROJECT_DIR$/vendor/laravel/helpers" />
+      <path value="$PROJECT_DIR$/vendor/laravel/browser-kit-testing" />
+      <path value="$PROJECT_DIR$/vendor/laravel/horizon" />
+      <path value="$PROJECT_DIR$/vendor/laravel/serializable-closure" />
+      <path value="$PROJECT_DIR$/vendor/laravel/framework" />
+      <path value="$PROJECT_DIR$/vendor/laravel/tinker" />
+      <path value="$PROJECT_DIR$/vendor/laravel/ui" />
+      <path value="$PROJECT_DIR$/vendor/knplabs/github-api" />
+      <path value="$PROJECT_DIR$/vendor/egulias/email-validator" />
+      <path value="$PROJECT_DIR$/vendor/vlucas/phpdotenv" />
+      <path value="$PROJECT_DIR$/vendor/spatie/laravel-short-schedule" />
+      <path value="$PROJECT_DIR$/vendor/spatie/laravel-permission" />
+      <path value="$PROJECT_DIR$/vendor/spatie/laravel-collection-macros" />
+      <path value="$PROJECT_DIR$/vendor/spatie/temporary-directory" />
+      <path value="$PROJECT_DIR$/vendor/composer" />
+      <path value="$PROJECT_DIR$/vendor/sempro/phpunit-pretty-print" />
+      <path value="$PROJECT_DIR$/vendor/ramsey/uuid" />
+      <path value="$PROJECT_DIR$/vendor/ramsey/collection" />
+      <path value="$PROJECT_DIR$/vendor/pusher/pusher-php-server" />
+      <path value="$PROJECT_DIR$/vendor/nesbot/carbon" />
+      <path value="$PROJECT_DIR$/vendor/league/commonmark" />
+      <path value="$PROJECT_DIR$/vendor/league/fractal" />
+      <path value="$PROJECT_DIR$/vendor/league/flysystem" />
+      <path value="$PROJECT_DIR$/vendor/league/mime-type-detection" />
+      <path value="$PROJECT_DIR$/vendor/facade/ignition-contracts" />
+      <path value="$PROJECT_DIR$/vendor/facade/ignition" />
+      <path value="$PROJECT_DIR$/vendor/facade/flare-client-php" />
+      <path value="$PROJECT_DIR$/vendor/ezyang/htmlpurifier" />
+      <path value="$PROJECT_DIR$/vendor/cboden/ratchet" />
+      <path value="$PROJECT_DIR$/vendor/react/socket" />
+      <path value="$PROJECT_DIR$/vendor/react/dns" />
+      <path value="$PROJECT_DIR$/vendor/react/promise-stream" />
+      <path value="$PROJECT_DIR$/vendor/react/promise" />
+      <path value="$PROJECT_DIR$/vendor/react/promise-timer" />
+      <path value="$PROJECT_DIR$/vendor/react/http" />
+      <path value="$PROJECT_DIR$/vendor/react/stream" />
+      <path value="$PROJECT_DIR$/vendor/react/cache" />
+      <path value="$PROJECT_DIR$/vendor/react/event-loop" />
+      <path value="$PROJECT_DIR$/vendor/nikic/php-parser" />
+      <path value="$PROJECT_DIR$/vendor/brick/math" />
+      <path value="$PROJECT_DIR$/vendor/bkwld/cloner" />
+      <path value="$PROJECT_DIR$/vendor/voku/portable-ascii" />
+      <path value="$PROJECT_DIR$/vendor/seld/jsonlint" />
+      <path value="$PROJECT_DIR$/vendor/seld/phar-utils" />
+      <path value="$PROJECT_DIR$/vendor/opis/closure" />
+      <path value="$PROJECT_DIR$/vendor/filp/whoops" />
+      <path value="$PROJECT_DIR$/vendor/clue/stream-filter" />
+      <path value="$PROJECT_DIR$/vendor/psy/psysh" />
+      <path value="$PROJECT_DIR$/vendor/psr/http-factory" />
+      <path value="$PROJECT_DIR$/vendor/psr/simple-cache" />
+      <path value="$PROJECT_DIR$/vendor/psr/log" />
+      <path value="$PROJECT_DIR$/vendor/psr/http-client" />
+      <path value="$PROJECT_DIR$/vendor/marcj/topsort" />
+    </include_path>
+  </component>
+  <component name="ProjectId" id="1y74YHMKuHZ428N8k5rqo9nmnY6" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+    <option name="showMembers" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources/js/components/game/messages" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
+    <property name="nodejs_package_manager_path" value="yarn" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+    <property name="ts.external.directory.path" value="$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/jsLanguageServicesImpl/external" />
+    <property name="vue.rearranger.settings.migration" value="true" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/resources/js/components/game/messages" />
+      <recent name="$PROJECT_DIR$/storage/app/public/maps/Surface" />
+      <recent name="$PROJECT_DIR$/storage/app/public/maps" />
+      <recent name="$PROJECT_DIR$/storage/app/public" />
+      <recent name="$PROJECT_DIR$/tests/Unit/Flare/Jobs" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/resources/js/components/game/components/nav-bar/server-clock" />
+      <recent name="$PROJECT_DIR$/resources/js/components/game/components/nav-bar" />
+      <recent name="$PROJECT_DIR$/resources/info/kingdoms/images" />
+      <recent name="$PROJECT_DIR$/resources/js/components/game/npc-components" />
+      <recent name="$PROJECT_DIR$/app/Flare/Values" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="phpunit.xml" type="PHPUnitRunConfigurationType" factoryName="PHPUnit">
+      <TestRunner scope="XML" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="b57f583e-608e-4ca2-947d-cf9ab46f7914" name="Changes" comment="" />
+      <created>1631589340088</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1631589340088</updated>
+      <workItem from="1631589361751" duration="139484000" />
+      <workItem from="1632451625722" duration="199808000" />
+      <workItem from="1634152136990" duration="126052000" />
+      <workItem from="1634861003611" duration="284000" />
+      <workItem from="1634861336878" duration="231000" />
+      <workItem from="1634861621423" duration="182000" />
+      <workItem from="1634863603465" duration="129000" />
+      <workItem from="1634863812369" duration="230314000" />
+      <workItem from="1635898406001" duration="97346000" />
+      <workItem from="1636319967303" duration="107000" />
+      <workItem from="1636339178758" duration="164221000" />
+      <workItem from="1637454911431" duration="4161000" />
+      <workItem from="1637534279552" duration="98461000" />
+      <workItem from="1637987846971" duration="97627000" />
+      <workItem from="1638742605719" duration="143782000" />
+      <workItem from="1639855536792" duration="90254000" />
+      <workItem from="1640321467322" duration="2512000" />
+      <workItem from="1640325325653" duration="177771000" />
+      <workItem from="1641317459003" duration="135639000" />
+      <workItem from="1642127902017" duration="9421000" />
+      <workItem from="1642211803360" duration="167000" />
+      <workItem from="1642212025385" duration="159000" />
+      <workItem from="1642212211874" duration="484000" />
+      <workItem from="1642217356132" duration="15817000" />
+      <workItem from="1643306290179" duration="24259000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+  </component>
+</project>

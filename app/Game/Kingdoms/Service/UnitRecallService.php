@@ -40,7 +40,14 @@ class UnitRecallService {
             $unitsMoving  = json_decode($unitMovement['units_moving']);
 
             foreach ($unitsMoving as $unitInfo) {
-                $elapsedTime += $unitInfo->time_to_return;
+
+                if (is_array($unitInfo)) {
+                    foreach ($unitInfo as $unit) {
+                        $elapsedTime += $unit->time_to_return;
+                    }
+                } else {
+                    $elapsedTime += $unitInfo->time_to_return;
+                }
             }
         }
 

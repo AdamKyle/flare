@@ -5,6 +5,7 @@
 If you have no healing spells equipped you will still do 30% healing of your chr stat, either modded (not voided) or regular (voided).</p>
 
 <p>Prophets will always want one healing spell if they plan to get off their double heal special attack.</p>
+<p>Prophets who also wield a weapon and a shield will get an extra 15% of their modded CHR towards their attack.</p>
 <p>
   For affixes, focus first on chr and focus based, while having at least one <a href="/information/enchanting">life stealing affix</a> and at least
   one <a href="/information/enchanting">damaging affix</a>.

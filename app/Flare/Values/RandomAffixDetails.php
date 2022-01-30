@@ -62,15 +62,15 @@ class RandomAffixDetails {
         }
     }
 
-    public function paidOneBillion(): bool {
+    public function paidTenBillion(): bool {
         return $this->value === self::BASIC;
     }
 
-    public function paidTenBillion(): bool {
+    public function paidFiftyBillion(): bool {
         return $this->value === self::MEDIUM;
     }
 
-    public function paidFiftyBillion(): bool {
+    public function paidHundredBillion(): bool {
         return $this->value === self::LEGENDARY;
     }
 

@@ -69,7 +69,7 @@ class AttackTypeValue {
         return $this->value === self::ATTACK_AND_CAST;
     }
 
-    public function isVoidedAttackAndAttack(): bool {
+    public function isVoidedAttackAndCast(): bool {
         return $this->value === self::VOIDED_ATTACK_AND_CAST;
     }
 
@@ -78,7 +78,7 @@ class AttackTypeValue {
     }
 
     public function isVoidedCastAndAttack(): bool {
-        return $this->value === self::VOIDED_ATTACK_AND_CAST;
+        return $this->value === self::VOIDED_CAST_AND_ATTACK;
     }
 
     public function isDefend(): bool {

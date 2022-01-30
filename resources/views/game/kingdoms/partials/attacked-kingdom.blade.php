@@ -61,7 +61,8 @@
                         <p class="text-muted mt-3">
                             This unit was killed upon its duties. If you sent it alone,
                             it died long before it even got a chance to try and reduce the morale.
-                            If sent with other units, then rest assured the morale was decreased.
+                            If sent with other units, then rest assured the morale was decreased, however, if
+                          you have abandoned a kingdom recently - chances are they were slaughtered because you cannot settle another kingdom.
                         </p>
                     @endif
                     <hr />

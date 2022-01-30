@@ -8,6 +8,8 @@ use App\Flare\Models\Item;
 use App\Flare\Models\MarketBoard;
 use App\Flare\Models\Quest;
 use App\Flare\Services\BuildCharacterAttackTypes;
+use App\Flare\Values\AttackTypeValue;
+use App\Game\Automation\Values\AutomationType;
 use App\Game\Core\Values\FactionLevel;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use App\Game\Skills\Values\SkillTypeValue;
@@ -129,8 +131,9 @@ class CharacterFactory {
 
     public function createPassiveForCharacter(int $type, array $options = []): CharacterFactory {
 
-        $isLocked = false;
-        $parentId = null;
+        $isLocked     = false;
+        $parentId     = null;
+        $currentLevel = 0;
 
         if (isset($options['is_locked'])) {
             $isLocked = $options['is_locked'];
@@ -140,18 +143,37 @@ class CharacterFactory {
             $parentId = $this->character->passiveSkills()->where('passive_skill_id', $options['parent_skill_id'])->first()->id;
         }
 
+        if (isset($options['current_level'])) {
+            $currentLevel = $options['current_level'];
+
+            unset($options['current_level']);
+        }
+
         $this->character->passiveSkills()->create([
             'character_id'      => $this->character->id,
             'passive_skill_id'  => $this->createPassiveSkill(array_merge([
                 'effect_type' => $type,
             ], $options))->id,
             'parent_skill_id'   => $parentId,
-            'current_level'     => 0,
+            'current_level'     => $currentLevel,
             'hours_to_next'     => 1,
             'started_at'        => null,
             'completed_at'      => null,
             'is_locked'         => $isLocked,
         ]);
+
+        return $this;
+    }
+
+    public function assignAutomation(array $options): CharacterFactory {
+        $this->character->currentAutomations()->create(array_merge([
+            'character_id'                   => $this->character->id,
+            'monster_id'                     => null,
+            'type'                           => AutomationType::ATTACK,
+            'started_at'                     => now(),
+            'completed_at'                   => now()->addHours(25),
+            'attack_type'                    => AttackTypeValue::CAST,
+        ], $options));
 
         return $this;
     }

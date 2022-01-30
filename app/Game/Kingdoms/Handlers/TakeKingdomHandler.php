@@ -5,6 +5,7 @@ namespace App\Game\Kingdoms\Handlers;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomUnit;
+use App\Flare\Models\PassiveSkill;
 use App\Flare\Models\UnitMovementQueue;
 use App\Game\Core\Traits\KingdomCache;
 use App\Game\Kingdoms\Events\AddKingdomToMap;
@@ -12,6 +13,7 @@ use App\Game\Kingdoms\Events\UpdateGlobalMap;
 use App\Game\Kingdoms\Service\UnitRecallService;
 use App\Game\Maps\Events\UpdateMapDetailsBroadcast;
 use App\Game\Maps\Services\MovementService;
+use App\Game\Messages\Events\ServerMessageEvent;
 use phpDocumentor\Reflection\Types\Boolean;
 
 class TakeKingdomHandler {
@@ -72,6 +74,8 @@ class TakeKingdomHandler {
         ]);
 
         $kingdom = $this->updateKingdomsUnits($defender->refresh(), $survivingUnits);
+
+        $kingdom = $this->handleKingdomBuildings($kingdom->refresh(), $attacker);
 
         $this->addKingdomToCache($attacker, $kingdom);
 
@@ -140,6 +144,35 @@ class TakeKingdomHandler {
                         'game_unit_id' => $unitInfo['unit_id'],
                         'amount'       => $unitInfo['amount'],
                     ]);
+                }
+            }
+        }
+
+        return $kingdom->refresh();
+    }
+
+    protected function handleKingdomBuildings(Kingdom $kingdom, Character $character): Kingdom {
+
+        foreach ($kingdom->buildings as $building) {
+            $passive = PassiveSkill::where('name', $building->name)->first();
+
+            if (!is_null($passive)) {
+                $characterPassive = $character->passiveSkills()->where('passive_skill_id', $passive->id)->first();
+
+                if (!is_null($characterPassive)) {
+                    if ($characterPassive->is_locked && $characterPassive->level < 1) {
+                        $building->update([
+                            'is_locked' => true,
+                        ]);
+
+                        event(new ServerMessageEvent($character->user, $building->name . ' has been locked, as you do not meet the passive skill requirements.'));
+                    } else {
+                        $building->update([
+                            'is_locked' => false,
+                        ]);
+
+                        event(new ServerMessageEvent($character->user, $building->name . ' has been unlocked, as you meet the passive skill requirements.'));
+                    }
                 }
             }
         }

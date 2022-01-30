@@ -26,4 +26,20 @@ class MapChatColorTest extends TestCase
 
         $this->assertEquals(MapChatColor::LABYRINTH, $value->getColor());
     }
+
+    public function testGetHellColor() {
+        $gameMap = $this->createGameMap(['name' => 'Hell']);
+
+        $value = new MapChatColor($gameMap->name);
+
+        $this->assertEquals(MapChatColor::HELL, $value->getColor());
+    }
+
+    public function testGetPurgatoryColor() {
+        $gameMap = $this->createGameMap(['name' => 'Purgatory']);
+
+        $value = new MapChatColor($gameMap->name);
+
+        $this->assertEquals(MapChatColor::PURGATORY, $value->getColor());
+    }
 }

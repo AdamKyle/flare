@@ -1,5 +1,6 @@
-import React from 'react';
-import {Row, Col} from 'react-bootstrap';
+import React, {Fragment} from 'react';
+import {Row, Col, Tabs, Tab} from 'react-bootstrap';
+import localforage from "localforage";
 import Chat from './messages/chat';
 import Map from './map/map';
 import Teleport from './sections/components/teleport';
@@ -15,7 +16,8 @@ import KingdomAttackModal from './kingdom/modal/kingdom-attack-modal';
 import TimeoutDialogue from "./timeout/modal/timeout-dialogue";
 import NpcComponentWrapper from "./npc-components/npc-component-wrapper";
 import MassEmbezzle from "./sections/modals/mass-embezzle";
-import localforage from "localforage";
+import AbandonKingdom from "./sections/modals/abandon-kingdom";
+import ServerMessages from "./messages/server-messages";
 
 export default class Game extends React.Component {
   constructor(props) {
@@ -45,6 +47,7 @@ export default class Game extends React.Component {
       openTimeOutModal: false,
       openMassEmbezzlement: false,
       openQuestDetails: false,
+      openAbandonKingdom: false,
       npcComponentName: null,
       characterId: null,
       canAdventureAgainAt: null,
@@ -64,6 +67,9 @@ export default class Game extends React.Component {
       isDead: false,
       windowWidth: window.innerWidth,
       attackAutomationIsRunning: false,
+      activeChatTab: 'chat',
+      showChatUpdate: false,
+      showServerMessageUpdate: false,
     }
 
     this.isDead            = Echo.private('character-is-dead-' + this.props.userId);
@@ -199,6 +205,20 @@ export default class Game extends React.Component {
     }
   }
 
+  openAbandonKingdom() {
+    const kingdom = this.state.kingdomData.my_kingdoms.filter((mk) =>
+      mk.x_position === this.state.current_x &&
+      mk.y_position === this.state.current_y
+    );
+
+    if (kingdom.length > 0) {
+      this.setState({
+        openAbandonKingdom: true,
+        kingdom: kingdom[0],
+      });
+    }
+  }
+
   openMassEmbezzleModal() {
     this.setState({
       openMassEmbezzlement: !this.state.openMassEmbezzlement,
@@ -210,6 +230,13 @@ export default class Game extends React.Component {
       openKingdomManagement: false,
       kingdom: null,
     })
+  }
+
+  closeKingdomAbandonment() {
+    this.setState({
+      openAbandonKingdom: false,
+      kingdom: null,
+    });
   }
 
   setCanAttack(bool) {
@@ -316,6 +343,60 @@ export default class Game extends React.Component {
     });
   }
 
+  handleTabSwitch(key) {
+    this.setState({
+      activeChatTab: key,
+      showServerMessageUpdate: (key === 'server-messages' && this.state.showServerMessageUpdate) ? false : this.state.showServerMessageUpdate,
+      showChatUpdate: (key === 'chat' && this.state.showChatUpdate) ? false :  this.state.showChatUpdate
+    })
+  }
+
+  updateChatTabIcon(isServerMessage) {
+    if (isServerMessage && this.state.activeChatTab !== 'server-messages') {
+      this.setState({
+        showServerMessageUpdate: true
+      });
+    } else if (!isServerMessage && this.state.activeChatTab !== 'chat') {
+      this.setState({
+        showChatUpdate: true,
+      });
+    }
+  }
+
+  renderChatTabNotificationIcon() {
+
+    if (this.state.showChatUpdate) {
+      return (
+        <Fragment>
+          Chat <i className="fas fa-bell chat-tab-icon"></i>
+        </Fragment>
+      )
+    }
+
+    return (
+      <Fragment>
+        Chat
+      </Fragment>
+    )
+  }
+
+  renderServerTabNotificationIcon() {
+
+    if (this.state.showServerMessageUpdate) {
+      return (
+        <Fragment>
+          Server <i className="fas fa-bell chat-tab-icon"></i>
+        </Fragment>
+      )
+    }
+
+    return (
+      <Fragment>
+        Server
+      </Fragment>
+    )
+  }
+
   render() {
     return (
       <>
@@ -337,6 +418,7 @@ export default class Game extends React.Component {
               openTimeOutModal={this.openTimeOutModal.bind(this)}
               openMassEmbezzleModal={this.openMassEmbezzleModal.bind(this)}
               updateCelestial={this.updateCelestial.bind(this)}
+              openAbandonKingdom={this.openAbandonKingdom.bind(this)}
               celestial={this.state.celestial}
               kingdomData={this.state.kingdomData}
               character_x={this.state.current_x}
@@ -442,9 +524,27 @@ export default class Game extends React.Component {
         </div>
         <Row>
           <Col xs={12}>
-            <Chat apiUrl={this.apiUrl} userId={this.props.userId}/>
+            <Tabs activeKey={this.state.activeChatTab} id="chat-tabs" onSelect={this.handleTabSwitch.bind(this)}>
+              <Tab eventKey="chat" title={this.renderChatTabNotificationIcon()}>
+                <Chat apiUrl={this.apiUrl} userId={this.props.userId} updateChatTabIcon={this.updateChatTabIcon.bind(this)} />
+              </Tab>
+              <Tab eventKey="server-messages" title={this.renderServerTabNotificationIcon()}>
+                <ServerMessages userId={this.props.userId} updateChatTabIcon={this.updateChatTabIcon.bind(this)} />
+              </Tab>
+            </Tabs>
           </Col>
         </Row>
+
+        {
+          this.state.openAbandonKingdom ?
+            <AbandonKingdom
+              characterId={this.state.characterId}
+              kingdom={this.state.kingdom}
+              show={this.state.openAbandonKingdom}
+              close={this.closeKingdomAbandonment.bind(this)}
+            />
+          : null
+        }
 
         {
           this.state.openKingdomManagement ?

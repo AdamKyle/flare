@@ -24,6 +24,7 @@ export default class BuildingQueue extends React.Component {
       building: null,
       queue: null,
       percentageOfTimeElapsed: 0,
+      loading: false,
     }
   }
 
@@ -64,11 +65,14 @@ export default class BuildingQueue extends React.Component {
   }
 
   cancelUpgrade() {
+    this.setState({loading: true});
     axios.post('/api/kingdoms/building-upgrade/cancel', {
       queue_id: this.props.queueData.id
     }).then(() => {
+      this.setState({loading: false});
       this.props.close();
     }).catch((err) => {
+      this.setState({loading: false});
       if (err.hasOwnProperty('response')) {
         const response = err.response;
 
@@ -195,6 +199,14 @@ export default class BuildingQueue extends React.Component {
         <Modal.Body>
           {
             this.state.building === null ? 'One second' : this.state.queue.paid_with_gold ? this.modelPaidWithGoldContent() : this.modalContent()
+          }
+          {
+            this.state.loading ?
+              <div className="progress loading-progress kingdom-loading " style={{position: 'relative'}}>
+                <div className="progress-bar progress-bar-striped indeterminate">
+                </div>
+              </div>
+              : null
           }
         </Modal.Body>
         <Modal.Footer>

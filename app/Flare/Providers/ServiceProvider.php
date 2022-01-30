@@ -25,7 +25,9 @@ use App\Flare\Middleware\IsCharacterWhoTheySayTheyAreMiddleware;
 use App\Flare\Middleware\IsGloballyTimedOut;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Services\BuildMonsterCacheService;
+use App\Flare\Services\CanUserEnterSiteService;
 use App\Flare\Services\CharacterXPService;
+use App\Flare\Services\DailyGoldDustService;
 use App\Flare\View\Components\EquipmentButtonForm;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Flare\Values\BaseStatValue;
@@ -76,6 +78,11 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(AffixAttributeBuilder::class, function() {
             return new AffixAttributeBuilder();
+        });
+
+
+        $this->app->bind(DailyGoldDustService::class, function() {
+            return new DailyGoldDustService();
         });
 
         $this->app->bind(RandomAffixGenerator::class, function($app) {
@@ -291,6 +298,10 @@ class ServiceProvider extends ApplicationServiceProvider
             return new BuildCharacterAttackTypes(
                 $app->make(CharacterAttackBuilder::class),
             );
+        });
+
+        $this->app->bind(CanUserEnterSiteService::class, function($app) {
+           return new CanUserEnterSiteService();
         });
     }
 

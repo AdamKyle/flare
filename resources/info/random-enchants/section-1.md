@@ -35,36 +35,31 @@ For example, lets look at the cost to percentage range:
     <thead>
         <tr>
             <th>Gold Cost</th>
-            <th>Hell Shard Cost</th>
             <th>Percentage Range</th>
             <th>Damage Range</th>
         </tr>
     </thead>
     <tbody>
         <tr>
-            <td>1 Billion</td>
-            <td>10</td>
-            <td>75% - 125%</td>
-            <td>500k - 5 Million</td>
-        </tr>
-        <tr>
             <td>10 Billion</td>
-            <td>25</td>
-            <td>150% - 300%</td>
-            <td>10 Million - 25 Million</td>
+            <td>105% - 185%</td>
+            <td>3 Million - 8 Million</td>
         </tr>
         <tr>
             <td>50 Billion</td>
-            <td>50</td>
-            <td>325% - 750%</td>
+            <td>225% - 350%</td>
             <td>10 Million - 25 Million</td>
+        </tr>
+        <tr>
+            <td>100 Billion</td>
+            <td>375% - 700%</td>
+            <td>50 Million - 125 Million</td>
         </tr>
     </tbody>
 </table>
 
-- Cost in Gold and Hell shards is only applicable when purchasing, not re-rolling stats. Only the gold cost is used.
 - Percentage Range refers to all percentage based aspects, such as stats, resistances and so on with some % based stats only taking 10% of the random generated percentage,
-  ie, some aspects may only take 75% if you manage a perfect 750% for the percentage range.
+  ie, some aspects may only take 70% if you manage a perfect 700% for the percentage range.
 - Damage Range - the range in damage, the stacking or irresistible aspect is random.
 
 When doing [Factions](/infromation/factions) you can get any item (up to a total cost of 4 billion gold - that's beyond shop gear!) with one or two randomly generated
@@ -72,17 +67,17 @@ affixes on them. These will be green in your inventory.
 
 **Players may only equip one of these at a time, and sets may also only contain one, or the set will not be equippable**.
 
-A unique item, is any item that has one (or two) unique enchantments on it.
+A unique item, is any item that has one (or two) unique enchantments on it. These will be green in your inventory.
 
 These are unique such that they do not, cannot - drop from anywhere, except two: **The Queen of Hearts in Hell** (See [npcs](/information/npcs)). You can pay the cost to have her create one of these.
-which is paid in Gold and then re-roll them and move them to other items using Shards and Gold Dust.
+which is paid in Gold and then re-roll them and move them to other items using Shards, Gold Dust and Gold.
 
-When a player levels a Faction from 0-1, for example, they will get a randomly generated unique. There are a series of [quests](/information/quests) that you can do to access her
+When a player levels a Faction from 0-1, for example, they will get a randomly generated unique (10 Billion Valuation). There are a series of [quests](/information/quests) that you can do to access her
 as a player. Not only do you need a quest item to get into Hell, where she is located, but you also need a quest item that allows you to talk to her.
 
 ## Queen of Hearts
 
-The Queen of Hearts is inspired by a character off another game, called Disgea 5. There characters name is Seraphina, a bubbly character that might be able to have a crush on you.
+The Queen of Hearts is inspired by a character off another game, called Disgea 5. There is a character named is Seraphina, a bubbly character that might be able to have a crush on you.
 
 Players, who are familiar with Disgea will recognize this, while others who are not, will see her as a fun NPC to interact with.
 
@@ -167,6 +162,14 @@ break down. This item, as we see, generated with two affixes.
 As we saw in the breakdown, we have some good rolls and some bad ones, If you look at the stats image, you can see the second affix generated with no stats and the first one generated with stats but none
 for enemy stat reduction, which is vital as you get closer to End game (Purgatory - see [planes](/information/planes)).
 
+> ### ATTN!
+> 
+> When a character pays, for example 100 billion gold. The item can generate with one unique. If the item generates with two uniques, the valuation is technically 200 Billion.
+> This is considered a "discount." When you go to sell these on the market board, they will only be allowed to sell for half their total valuation, ie: 100 Billion in this case.
+> The limitation on sale price is to prevent high level players from giving low level players or mules expensive items.
+> 
+> There are plans to eventually allow players to "gift" uniques to their mules to make the leveling process easier.
+
 Let's now take this Unique and reroll its stats, keeping in minds that every re-roll costs gold dust and shards and is completely rng.
 
 <div class="mb-4">
@@ -215,7 +218,7 @@ Lets re roll our stats, as we have them selected.
 
 Do note, that since we are re-rolling our stats, all stats including enemy stat reductions will be re-rolled. You cannot pick and choose stats.
 
-> # ATTN!!
+> ### ATTN!!
 > 
 > If you have the item, that you purchased or re-rolled open in a new tab, you cannot refresh that tab and see the new stats, instead you must go to your inventory, find the item and open it
 > again, why? because everytime you re-roll we generate a new item and give it to you, this prevents other players who have (which is very rare) the same affix
@@ -250,7 +253,7 @@ So lets head over to the move tab:
 
 As you can see here it looks very similar to the re-roll tab we were just on. Lets select our item and another item we want to move the Affixes to.
 
-> ##ATTN
+> ### ATTN
 > 
 > The Queen will only re-roll and move Affixes that are considered unique. She can move them to an item that contains another affix, or overwrite affixes.
 > When moving, even if you move only one affix over, and have another non-unique affix attached, that item is still considered a unique, thus you can only

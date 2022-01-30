@@ -1,6 +1,7 @@
 import React, {Fragment} from 'react';
 import {Popover, OverlayTrigger} from 'react-bootstrap';
 import AlertInfo from "../../../components/base/alert-info";
+import AlertError from "../../../components/base/alert-error";
 
 export default class Recruit extends React.Component {
 
@@ -8,28 +9,50 @@ export default class Recruit extends React.Component {
     super(props);
 
     this.state = {
-      max: parseInt(this.props.unit.kd_max.replace(/,/g, '')) || 0,
+      max: 0,
       value: "",
       canRecruit: true,
       loading: false,
       recruitmentType: '',
       totalCost: 0,
+      errorMessage: null,
     }
+  }
+
+  componentDidMount() {
+    this.setMax();
   }
 
   componentDidUpdate(prevProps, prevState) {
     if (prevState.max !== this.state.max) {
-      this.setState({
-        max: parseInt(this.props.unit.kd_max.replace(/,/g, '')) || 0,
-        value: 0,
-      });
+      this.setMax();
     }
   }
 
-  amountChange(event) {
-    let value = parseInt(event.target.value) || 0;
+  setMax() {
 
-    if (value !== 0) {
+    const characterGold = parseInt(this.props.characterGold.replace(/,/g, ''));
+
+    const amountCanAfford = Math.floor( characterGold / this.props.unit.cost_per_unit);
+
+    if (amountCanAfford > this.props.kingdom.current_population) {
+
+      return this.setState({
+        max: this.props.kingdom.current_population,
+        value: "",
+      });
+    }
+
+    return this.setState({
+      max: amountCanAfford,
+      value: "",
+    });
+  }
+
+  amountChange(event) {
+    let value = parseInt(event.target.value) || "";
+
+    if (value !== "") {
       if (value > this.state.max) {
         value = this.state.max;
       }
@@ -44,18 +67,22 @@ export default class Recruit extends React.Component {
   }
 
   amountChangeWithGold(event) {
-    let value = parseInt(event.target.value) || 0;
+    let value = parseInt(event.target.value) || "";
 
-    if (value !== 0) {
+    let totalCost = 0;
+
+    if (value !== "") {
       if (value > this.state.max) {
         value = this.state.max;
       }
+
+      const costReduction = this.props.kingdom.unit_cost_reduction;
+      totalCost     = value * this.props.unit.cost_per_unit;
+
+      totalCost = totalCost - Math.floor(totalCost * costReduction);
     }
 
-    const costReduction = this.props.kingdom.unit_cost_reduction;
-    let   totalCost     = value * this.props.unit.cost_per_unit;
 
-    totalCost = totalCost - Math.floor(totalCost * costReduction);
 
     this.setState({
       value: value,
@@ -143,6 +170,27 @@ export default class Recruit extends React.Component {
   }
 
   canRecruitWithGold(value) {
+
+    if (value === "") {
+      return false
+    }
+
+    let totalPopNeeded = this.props.unit.required_population * value;
+
+    totalPopNeeded = totalPopNeeded - totalPopNeeded * this.props.kingdom.population_cost_reduction;
+
+    if (totalPopNeeded > this.props.kingdom.current_population) {
+      this.setState({
+        errorMessage: 'Not enough population.',
+      });
+
+      return false;
+    } else {
+      this.setState({
+        errorMessage: null,
+      });
+    }
+
     let cost = this.props.unit.cost_per_unit;
 
     cost *= value;
@@ -203,7 +251,7 @@ export default class Recruit extends React.Component {
             <dl className="mb-3">
               <dt><strong>Current Population</strong>:</dt>
               <dd>
-                {this.state.max.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                {this.props.kingdom.current_population.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                 <OverlayTrigger
                   trigger="hover"
                   key='right'
@@ -216,6 +264,11 @@ export default class Recruit extends React.Component {
                           Pay attention to <strong>required population</strong> in the <strong>unit cost</strong> section.
                           The current population here is a total amount of all remaining people in your kingdom. Just because you have X
                           number of people does not mean you can recruit all of those people. Some units have different population requirements.
+                        </p>
+                        <p>
+                          This number does not take into account population reduction % from specific Kingdom Passives. This means, if you have 45,000
+                          people and recruit that many, you will only need ~15,000 of that 45,000. Which means for price of 45,000 people you'll save on population
+                          allowing you to recruit more.
                         </p>
                       </Popover.Content>
                     </Popover>
@@ -283,6 +336,13 @@ export default class Recruit extends React.Component {
               this.state.recruitmentType === 'recruit-with-gold' ?
                 <Fragment>
                   <AlertInfo icon={'fas fa-question-circle'} title="Info">
+                    <p>
+                      <strong>
+                        You only need to pay attention to Required Population on the right hand side when recruiting with gold.
+                        Other resources may go red, indicating you do not have enough,
+                        how ever you only care about Required Population when purchasing with gold.
+                      </strong>
+                    </p>
                     <p>You can pay gold instead of resources to recruit units.</p>
                     <p>You cannot buy more units then your population allows. You also cannot buy
                     more units then you have gold. Each unit has a cost per unit.</p>
@@ -293,6 +353,15 @@ export default class Recruit extends React.Component {
                       to a significant portion. For example - with Kingmanship at level 1, recruiting 1 billion spearmen would take: <strong>94 years in real time</strong>,
                       with the skill maxed out, it takes 34.72 days to recruit that many units, which is <em>much</em> better.</p>
                   </AlertInfo>
+                  {
+                    this.state.errorMessage !== null ?
+                      <AlertError icon={"fas fa-exclamation"} title={'Oops!'}>
+                        <p>
+                          {this.state.errorMessage}
+                        </p>
+                      </AlertError>
+                      : null
+                  }
                   <dl className="mt-3 mb-3">
                     <dt>Cost per unit:</dt>
                     <dd>{this.props.unit.cost_per_unit}</dd>

@@ -17,6 +17,7 @@ class DataTable extends Component
     public $search                = '';
     public $sortField             = 'cost';
     public $perPage               = 10;
+    public $specialLocation       = 0;
     public $only                  = null;
     public $character             = null;
     public $isHelp                = false;
@@ -42,6 +43,12 @@ class DataTable extends Component
 
             return $this->dataQuery->get()->filter(function($item) {
                 return $item->type === 'alchemy';
+            })->paginate($this->perPage);
+        }
+
+        if ($this->specialLocation !== 0) {
+            return $this->dataQuery->get()->filter(function($item) {
+                return $item->drop_location_id === $this->specialLocation;
             })->paginate($this->perPage);
         }
 

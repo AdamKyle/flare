@@ -305,7 +305,7 @@ export default class KingdomInfo extends React.Component {
 
                   </OverlayTrigger>:</dt>
                   <dd>
-                    <span>{(this.props.kingdom.defence_bonus * 100).toFixed(4)}%</span>
+                    <span>{(this.props.kingdom.defence_bonus * 100).toFixed(2)}%</span>
                   </dd>
                 </dl>
                 <hr />
@@ -323,13 +323,13 @@ export default class KingdomInfo extends React.Component {
                 </AlertInfo>
                 <dl>
                   <dt>Wall Bonus: </dt>
-                  <dd>{(this.props.kingdom.walls_defence * 100).toFixed(0)}%</dd>
+                  <dd>{(this.props.kingdom.walls_defence * 100).toFixed(2)}%</dd>
                   <dt>Treasury Bonus: </dt>
-                  <dd>{(this.props.kingdom.treasury_defence * 100).toFixed(0)}%</dd>
+                  <dd>{(this.props.kingdom.treasury_defence * 100).toFixed(2)}%</dd>
                   <dt>Passive (Kingdom Management) Bonus: </dt>
-                  <dd>{(this.props.kingdom.passive_defence * 100).toFixed(0)}%</dd>
+                  <dd>{(this.props.kingdom.passive_defence * 100).toFixed(2)}%</dd>
                   <dt>Gold Bars (Goblin Coin Bank) Bonus: </dt>
-                  <dd>{(this.props.kingdom.gold_bars_defence * 100).toFixed(0)}%</dd>
+                  <dd>{(this.props.kingdom.gold_bars_defence * 100).toFixed(2)}%</dd>
                 </dl>
               </div>
               <div className="col-md-6">

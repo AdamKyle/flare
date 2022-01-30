@@ -10,6 +10,9 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 Use App\Flare\Models\User;
 
+/**
+ * @codeCoverageIgnore
+ */
 class NpcComponentShowEvent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;

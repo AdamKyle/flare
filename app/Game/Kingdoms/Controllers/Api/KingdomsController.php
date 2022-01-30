@@ -2,6 +2,9 @@
 
 namespace App\Game\Kingdoms\Controllers\Api;
 
+use App\Flare\Models\UnitMovementQueue;
+use App\Game\Kingdoms\Service\KingdomResourcesService;
+use App\Game\Messages\Events\GlobalMessageEvent;
 use Illuminate\Http\Request;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
@@ -78,9 +81,16 @@ class KingdomsController extends Controller
     public function settle(KingdomsSettleRequest $request, Character $character, KingdomService $kingdomService)
     {
 
+        if (!is_null($character->can_settle_again_at)) {
+
+            return response()->json([
+                'message' => 'You can settle another kingdom in: ' . now()->diffInMinutes($character->can_settle_again_at) . ' Minutes.'
+            ], 200);
+        }
+
         if ($character->map->gameMap->mapType()->isPurgatory()) {
             return response()->json([
-                'message' => 'Child, this is not place to be a King or Queen, The Creator would destroy anything you build down here. You\'re not even suppose to be here.'
+                'message' => 'Child, this is not place to be a King or Queen, The Creator would destroy anything you build down here.'
             ], 200);
         }
 
@@ -158,15 +168,6 @@ class KingdomsController extends Controller
                 ], 422);
             }
 
-            if ($building->kingdom->current_population < $building->required_population) {
-                return response()->json([
-                    'message' => 'You do not have enough population.'
-                ], 422);
-            }
-
-            $kingdom = $buildingService->updateKingdomResourcesForKingdomBuildingUpgrade($building);
-
-
             $buildingService->processUpgradeWithGold($building, $request->all());
         } else {
             if (ResourceValidation::shouldRedirectKingdomBuilding($building, $building->kingdom)) {
@@ -203,7 +204,7 @@ class KingdomsController extends Controller
             ], 422);
         }
 
-        $kingdom = $buildingService->updateKingdomResourcesForRebuildKingdomBuilding($building, $character);
+        $kingdom = $buildingService->updateKingdomResourcesForRebuildKingdomBuilding($building);
 
         $buildingService->rebuildKingdomBuilding($building, $character);
 
@@ -251,14 +252,27 @@ class KingdomsController extends Controller
             $service->updateKingdomResources($kingdom, $gameUnit, $request->amount);
         } else {
 
+            $amount              = $gameUnit->required_population * $request->amount;
+            $populationReduction = $kingdom->fetchPopulationCostReduction();
+
+            $amount = ceil($amount - $amount * $populationReduction);
+
+            if ($amount > $kingdom->current_population) {
+                return response()->json([
+                    'message' => "You do not have enough population to purchase with gold alone."
+                ], 422);
+            }
+
+            $newAmount = $kingdom->current_population - $amount;
+
+            if ($newAmount < 0) {
+                $newAmount = 0;
+            }
+
             $service->updateCharacterGold($kingdom, $gameUnit, $request->amount);
 
-            $totalAmount = $request->amount;
-            $unitCostReduction = $kingdom->fetchUnitCostReduction();
-            $totalAmount -= $totalAmount * $unitCostReduction;
-
             $kingdom->update([
-                'current_population' => $kingdom->current_population - $totalAmount
+                'current_population' => $newAmount
             ]);
 
             $paidGold = true;
@@ -367,7 +381,7 @@ class KingdomsController extends Controller
             'is_mass_embezzling' => true
         ]);
 
-        MassEmbezzle::dispatch($character, $request->embezzle_amount)->delay(now()->addSeconds(5));
+        MassEmbezzle::dispatch($character, $request->embezzle_amount)->delay(now()->addSeconds(5))->onConnection('long_running');
 
         event(new ServerMessageEvent($character->user, 'Mass Embezzling underway...'));
 
@@ -517,6 +531,12 @@ class KingdomsController extends Controller
 
     public function withdrawGoldBars(WithrawGoldBarsRequest $request, Kingdom $kingdom)
     {
+        if ($kingdom->character->id !== auth()->user()->character->id) {
+            return response()->json([
+                'message' => 'Invalid Input. Not allowed to do that.'
+            ], 422);
+        }
+
         $amount = $request->amount_to_withdraw;
 
         if ($kingdom->gold_bars < $amount) {
@@ -562,5 +582,33 @@ class KingdomsController extends Controller
         return response()->json([
             'message' => 'Exchanged: ' . $amount . ' Gold bars for: ' . $totalGold . ' Gold!',
         ], 200);
+    }
+
+    public function abandon(Kingdom $kingdom, KingdomResourcesService $kingdomResourceServer) {
+        if ($kingdom->character->id !== auth()->user()->character->id) {
+            return response()->json([
+                'message' => 'Invalid Input. Not allowed to do that.'
+            ], 422);
+        }
+
+        $unitsInMovement = UnitMovementQueue::where('from_kingdom_id', $kingdom->id)->orWhere('to_kingdom_id', $kingdom->id)->get();
+
+        if ($unitsInMovement->isNotEmpty()) {
+            return response()->json([
+                'message' => 'You either sent units, that in movement, or an attack is incoming. Either way there is units in movement from or to this kingdom and you cannot abandon it.'
+            ], 422);
+        }
+
+        if ($kingdom->gold_bars > 0) {
+            return response()->json([
+                'message' => 'You cannot abandon a kingdom that has Gold Bars.'
+            ], 422);
+        }
+
+        $kingdomResourceServer->abandonKingdom($kingdom);
+
+        event(new GlobalMessageEvent('The Creator feels for the people of: ' . $kingdom->name . ' as their leader selfishly leaves them to fend for themselves.'));
+
+        return response()->json([], 200);
     }
 }

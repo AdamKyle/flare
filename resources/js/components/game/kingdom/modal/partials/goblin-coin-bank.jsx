@@ -68,14 +68,27 @@ export default class GoblinCoinBank extends React.Component {
   }
 
   fetchMaxWithDraw() {
-    const canMake = this.fetchMaxAmountOfBars();
     const characterGold = parseInt(this.props.characterGold.replace(/,/g, ''));
+    const costPerBar    = 2000000000;
+    let maxWithdrawl    = 0;
 
     if (characterGold === 2000000000000) {
       return 0;
     }
 
-    return Math.abs(this.props.kingdom.gold_bars - canMake);
+    let gold = 2000000000000 - characterGold;
+
+    if (gold < costPerBar) {
+      return 0;
+    } else if (gold > costPerBar) {
+      maxWithdrawl = Math.floor(gold/costPerBar);
+    }
+
+    if (maxWithdrawl < this.props.kingdom.gold_bars) {
+      return maxWithdrawl
+    }
+
+    return this.props.kingdom.gold_bars
   }
 
   barAmount(e) {

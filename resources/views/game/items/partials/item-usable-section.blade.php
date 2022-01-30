@@ -61,16 +61,28 @@
                 <dd>{{$item->increase_skill_bonus_by * 100}}%</dd>
                 <dt>Skill Training Bonus: </dt>
                 <dd>{{$item->increase_skill_training_bonus_by * 100}}%</dd>
-                <dt>Base Damage Mod Bonus:</dt>
+                <dt>Skill Base Damage Mod Bonus:</dt>
                 <dd>{{$item->base_damage_mod_bonus * 100}}%</dd>
-                <dt>Base Healing Mod Bonus:</dt>
+                <dt>Skill Base Healing Mod Bonus:</dt>
                 <dd>{{$item->base_healing_mod_bonus * 100}}%</dd>
-                <dt>Base AC Mod Bonus:</dt>
+                <dt>Skill Base AC Mod Bonus:</dt>
                 <dd>{{$item->base_ac_mod_bonus * 100}}%</dd>
                 <dt>Fight Timeout Mod Bonus:</dt>
                 <dd>{{$item->fight_time_out_mod_bonus * 100}}%</dd>
                 <dt>Move Timeout Mod Bonus:</dt>
                 <dd>{{$item->move_time_out_mod_bonus * 100}}%</dd>
+            @endif
+            @if ($item->base_damage_mod > 0.0)
+                <dt>Base Damage Modifier</dt>
+                <dd>{{$item->base_damage_mod * 100}}%</dd>
+            @endif
+            @if ($item->base_ac_mod > 0.0)
+                <dt>Base AC Modifier</dt>
+                <dd>{{$item->base_ac_mod * 100}}%</dd>
+            @endif
+            @if ($item->base_healing_mod > 0.0)
+                <dt>Base Healing Modifier</dt>
+                <dd>{{$item->base_healing_mod * 100}}%</dd>
             @endif
             @if ($item->str_mod > 0.0)
                 <dt>Str Modifier</dt>
@@ -79,6 +91,10 @@
             @if ($item->dex_mod > 0.0)
                 <dt>Dex Modifier</dt>
                 <dd>{{$item->dex_mod * 100}}%</dd>
+            @endif
+            @if ($item->dur_mod > 0.0)
+                <dt>Dur Modifier</dt>
+                <dd>{{$item->dur_mod * 100}}%</dd>
             @endif
             @if ($item->int_mod > 0.0)
                 <dt>Int Modifier</dt>

@@ -43,6 +43,14 @@ export default class KingdomBuildings extends React.Component {
         sortable: true
       },
       {
+        key: "is_maxed",
+        text: "Is Max Level",
+        cell: row => <div data-tag="allowRowEvents">
+          <div key={row.id}>{row.level >= row.max_level ? 'Yes' : 'No'}</div>
+        </div>,
+        sortable: true
+      },
+      {
         key: "current_defence",
         text: "Current Defence",
         sortable: true

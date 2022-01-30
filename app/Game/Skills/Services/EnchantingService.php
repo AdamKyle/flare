@@ -165,12 +165,16 @@ class EnchantingService {
                     if (!$slot->item->itemPrefix->randomly_generated) {
                         return $slot->item->load('itemSuffix', 'itemPrefix')->toArray();
                     }
+                } else {
+                    return $slot;
                 }
 
                 if (!is_null($slot->item->item_suffix_id)) {
                     if (!$slot->item->itemSuffix->randomly_generated) {
                         return $slot->item->load('itemSuffix', 'itemPrefix')->toArray();
                     }
+                } else {
+                    return $slot;
                 }
             }
         })->values()->toArray();

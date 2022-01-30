@@ -234,7 +234,7 @@ class CharacterAttackInformation {
                 if ($voided) {
                     $healingAmount += $this->character->{$dmgStat} * 0.30;
                 } else {
-                    $healingAmount += $this->characterInformationBuilder->statMod($this->character->{$dmgStat}) * 0.30;
+                    $healingAmount += $this->characterInformationBuilder->statMod($dmgStat) * 0.30;
                 }
             }
         }

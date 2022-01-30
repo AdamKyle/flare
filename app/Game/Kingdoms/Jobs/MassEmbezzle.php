@@ -2,6 +2,7 @@
 
 namespace App\Game\Kingdoms\Jobs;
 
+use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -136,15 +137,16 @@ class MassEmbezzle implements ShouldQueue
 
     protected function embezzle(KingdomService $kingdomService, Kingdom $kingdom) {
 
-        $characterGold = $this->character->gold + $this->amount;
         $amountLeft    = $kingdom->treasury - $this->amount;
 
         $kingdomService->embezzleFromKingdom($kingdom, $this->amount);
 
         $kingdom = $kingdom->refresh();
 
+        $character = $this->character->refresh();
+
         $message = 'Embezzled!: ' . $kingdom->name . ' At: (X/Y) ' . $kingdom->x_position . '/' . $kingdom->y_position .
-            ' On the ' . $kingdom->gameMap->name . ' Plane. Amount: ' . number_format($this->amount) . ' You\'re new gold: ' . number_format($characterGold) .
+            ' On the ' . $kingdom->gameMap->name . ' Plane. Amount: ' . number_format($this->amount) . ' You\'re new gold: ' . number_format($character->gold) .
             '. Kingdom Gold Left: '.number_format($amountLeft).' Morale has been reduced 15% to: ' . ($kingdom->current_morale * 100) . '%';
 
         event(new ServerMessageEvent($this->character->user, $message));
@@ -156,6 +158,10 @@ class MassEmbezzle implements ShouldQueue
         $this->character->update([
             'is_mass_embezzling' => false,
         ]);
+
+        $character = $this->character->refresh();
+
+        event(new UpdateTopBarEvent($character));
 
         event(new ServerMessageEvent($this->character->user, $message));
     }

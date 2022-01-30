@@ -1,5 +1,6 @@
 <?php
 
+Route::get('/server-time', ['uses' => 'Api\ServerTimeController@serverTime']);
 Route::post('/character-timeout', ['uses' => 'Api\CharacterSheetController@globalTimeout']);
 
 Route::group(['middleware' => ['auth', 'throttle:100,1', 'is.character.who.they.say.they.are']], function() {

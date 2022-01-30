@@ -9,6 +9,7 @@ use App\Flare\Models\Npc;
 use App\Flare\Models\Quest;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Transformers\CharacterAttackTransformer;
+use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Events\UpdateAttackStats;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
@@ -118,8 +119,15 @@ class NpcQuestRewardHandler {
     }
 
     public function giveGold(Character $character, Quest $quest, Npc $npc) {
+
+        $newValue = $character->gold + $quest->reward_gold;
+
+        if ((new MaxCurrenciesValue($newValue, MaxCurrenciesValue::GOLD))->canNotGiveCurrency()) {
+            return;
+        }
+
         $character->update([
-            'gold' => $character->gold + $quest->reward_gold
+            'gold' => $newValue
         ]);
 
         $this->npcServerMessage($npc, $character, 'currency_given');
@@ -128,8 +136,15 @@ class NpcQuestRewardHandler {
     }
 
     public function giveGoldDust(Character $character, Quest $quest, Npc $npc) {
+
+        $newValue = $character->gold_dust + $quest->reward_gold_dust;
+
+        if ((new MaxCurrenciesValue($newValue, MaxCurrenciesValue::GOLD_DUST))->canNotGiveCurrency()) {
+            return;
+        }
+
         $character->update([
-            'gold_dust' => $character->gold_dust + $quest->reward_gold_dust
+            'gold_dust' => $newValue
         ]);
 
         $this->npcServerMessage($npc, $character, 'currency_given');
@@ -138,8 +153,15 @@ class NpcQuestRewardHandler {
     }
 
     public function giveShards(Character $character, Quest $quest, Npc $npc) {
+
+        $newValue = $character->shards + $quest->reward_shards;
+
+        if ((new MaxCurrenciesValue($newValue, MaxCurrenciesValue::SHARDS))->canNotGiveCurrency()) {
+            return;
+        }
+
         $character->update([
-            'shards' => $character->shards + $quest->reward_shards
+            'shards' => $newValue
         ]);
 
         $this->npcServerMessage($npc, $character, 'currency_given');

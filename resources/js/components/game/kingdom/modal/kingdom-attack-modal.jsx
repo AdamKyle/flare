@@ -1,5 +1,6 @@
 import React from 'react';
 import {Modal, Button, Alert} from 'react-bootstrap';
+import AlertError from "../../components/base/alert-error";
 import KingdomSelection from './partials/attack-sections/kingdom-selection';
 import UnitSelection from './partials/attack-sections/unit-selection';
 import LoadingModal from "../../components/loading/loading-modal";
@@ -28,6 +29,7 @@ export default class KingdomAttackModal extends React.Component {
       fetchingAttackData: true,
       showItemDroppedMessage: false,
       loading: false,
+      errorMessage: null,
     }
   }
 
@@ -166,6 +168,12 @@ export default class KingdomAttackModal extends React.Component {
         if (response.status === 429) {
           return this.props.openTimeOutModal();
         }
+
+        if (response.data.hasOwnProperty('message')) {
+          this.setState({
+            errorMessage: response.data.message
+          });
+        }
       }
 
       this.props.close();
@@ -261,6 +269,13 @@ export default class KingdomAttackModal extends React.Component {
                 </div>
               </div>
               : null
+          }
+          {
+            this.state.errorMessage !== null ?
+              <AlertError icon={"fas fa-exclamation"} title={'Oops!'}>
+                <p>{this.state.errorMessage}</p>
+              </AlertError>
+            : null
           }
           {
             this.state.showItemDroppedMessage ?

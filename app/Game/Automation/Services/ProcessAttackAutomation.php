@@ -86,9 +86,7 @@ class ProcessAttackAutomation {
 
         event(new AutomationAttackTimeOut($character->user, 10));
 
-        $time = 10 - 10 * $this->findTimeReductions($character);
-
-        return $time;
+        return 10;
     }
 
     protected function isCharacterAtSpecialLocation(Character $character): ?Location {

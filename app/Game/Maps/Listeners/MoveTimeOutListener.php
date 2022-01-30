@@ -41,15 +41,15 @@ class MoveTimeOutListener
 
             $character = $character->refresh();
 
-            MoveTimeOutJob::dispatch($character)->delay($timeOut);
+            MoveTimeOutJob::dispatch($character->id)->delay($timeOut);
         } else {
             $time = 10 - (10 * $this->findMovementTimeReductions($character));
 
-            if ($this->time < 1) {
-                $this->time = 1;
+            if ($time < 1) {
+                $time = 1;
             }
 
-            $timeOut = now()->addSeconds($this->time);
+            $timeOut = now()->addSeconds($time);
 
             $character->update([
                 'can_move'          => false,
@@ -58,7 +58,7 @@ class MoveTimeOutListener
 
             $character = $character->refresh();
 
-            MoveTimeOutJob::dispatch($character)->delay($timeOut);
+            MoveTimeOutJob::dispatch($character->id)->delay($timeOut);
         }
 
         broadcast(new ShowTimeOutEvent($event->character->user, true, false, $this->time, $event->setSail));

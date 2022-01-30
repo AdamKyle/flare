@@ -33,12 +33,14 @@ trait CalculateSkillBonus {
             if ($this->matchesSkillOnItem($item->itemSuffix, $skill)) {
                 $baseSkillTraining += !is_null($item->itemSuffix->{$skillAttribute}) ? $item->itemSuffix->{$skillAttribute} : 0;
             } else if (!is_null($item->itemSuffix->{$skillAttribute})) {
+
                 $baseSkillTraining += $item->itemSuffix->{$skillAttribute};
             }
         }
 
         if (!is_null($item->skill_name)) {
             if ($item->skill_name === $skill->name) {
+
                 $baseSkillTraining += $item->{$skillAttribute};
             }
         }

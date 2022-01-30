@@ -40,6 +40,8 @@ to the same set, we will just find the next empty set.
 Gold rushes in adventures will use the gold you hve on hand each time you get a gold rush as opposed to doing it based on
 the total gold of the adventure.
 
+Characters who become gold capped or are already gold capped will not get any gold.
+
 ## Information about adventures
 
 Lets go over some basics. 
@@ -85,7 +87,7 @@ Your adventure will continue to progress in the background and if you are not lo
 
 When you finish an adventure, be it successful or failure, you will see a notification at the top of the screen and a message in chat. The side bar will also glow green on the adventures icon.
 
-Clicking on it will allow you to see the rewards for the adventure. 
+Clicking on it will allow you to see the rewards for the adventure.
 
 > ### ATTN!!
 >
@@ -96,9 +98,11 @@ When you view your rewards, you will see all the rewards that you have gained.
 
 This includes, a sum total of xp, gold, skill xp and items as well as the adventures reward.
 
-To collect these rewards - simply click the collect button as shown in the below image:
+When an adventure finishes the sidebar adventure icon (looks like a path) will bounce and turn green, even if you login, 
+it will be green and bouncing to indicate you have rewards.
 
-[missing image]
+When players collect the rewards, we process this in the background. Players only need to wait for their currency, XP and Skill XP before being able to embark again,
+items will be processed on their own. This allows players to finish one adventure, and right away, start another, even if their items are still processing.
 
 ### Failing the adventure gives you no rewards.
 

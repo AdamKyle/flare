@@ -38,30 +38,6 @@ trait ClassBasedBonuses {
     }
 
     /**
-     * Get the prophet damage bonus.
-     *
-     * The damage bonus will only apply if the prophet has a healing spell equipped.
-     *
-     * @param Character $character
-     * @return float
-     * @throws \Exception
-     */
-    public function prophetDamageBonus(Character $character): float {
-        $classType  = new CharacterClassValue($character->class->name);
-        $classBonus = 0.0;
-
-        if ($classType->isProphet()) {
-            $class = $character->class;
-
-            if ($this->prophetHasHealingSpells($character)) {
-                $classBonus = $this->getClassBonus($character, $class, $classBonus, 'base_damage_mod');
-            }
-        }
-
-        return $classBonus;
-    }
-
-    /**
      * Does the prophet have healing spells equipped?
      *
      * @param Character $character
@@ -71,6 +47,18 @@ trait ClassBasedBonuses {
         return $this->getEquippedInventory($character)->slots->filter(function($slot) {
             return $slot->item->type === 'spell-healing' && $slot->equipped;
         })->isNotEmpty();
+    }
+
+    public function prophetHasDamageSpells(Character $character): bool {
+        return $this->getEquippedInventory($character)->slots->filter(function($slot) {
+                return $slot->item->type === 'spell-damage' && $slot->equipped;
+            })->isNotEmpty();
+    }
+
+    public function prophetHasDamageBonus(Character $character): bool {
+        return $this->getEquippedInventory($character)->slots->filter(function($slot) {
+            return $slot->item->type === 'weapon' || $slot->item->type === 'shield' && $slot->equipped;
+        })->count() === 2;
     }
 
     /**

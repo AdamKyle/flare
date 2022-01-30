@@ -17,7 +17,7 @@ class MoveTimeOutJob implements ShouldQueue
     /**
      * @var Character $character
      */
-    protected $character;
+    protected $characterId;
 
     /**
      * Create a new job instance.
@@ -25,9 +25,9 @@ class MoveTimeOutJob implements ShouldQueue
      * @param Character $character
      * @return void
      */
-    public function __construct(Character $character)
+    public function __construct(int $characterId)
     {
-        $this->character = $character;
+        $this->characterId = $characterId;
     }
 
     /**
@@ -37,13 +37,13 @@ class MoveTimeOutJob implements ShouldQueue
      */
     public function handle()
     {
-        $this->character->update([
+        $character = Character::find($this->characterId);
+
+        $character->update([
             'can_move' => true,
             'can_move_again_at' => null,
         ]);
 
-        $this->character->refresh();
-
-        broadcast(new ShowTimeOutEvent($this->character->user, false, true));
+        broadcast(new ShowTimeOutEvent($character->refresh()->user, false, true));
     }
 }

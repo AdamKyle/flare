@@ -34,6 +34,8 @@
       <dd class="{{$item->itemSuffix->class_bonus > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->class_bonus * 100}}%</dd>
       <dt>Base Fight Timeout Modifier:</dt>
       <dd class="{{$item->itemSuffix->fight_time_out_mod_bonus > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->fight_time_out_mod_bonus * 100}}%</dd>
+      <dt>Base Move Timeout Modifier:</dt>
+      <dd class="{{$item->itemSuffix->move_time_out_mod_bonus > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->move_time_out_mod_bonus * 100}}%</dd>
     </dl>
   </x-tabs.tab-content-section>
   <x-tabs.tab-content-section tab="suffix-stats-{{$statsId}}" active="false">
@@ -53,7 +55,7 @@
           <dt><i class="fas fa-level-up-alt text-success"></i> Agi Mod:</dt>
           <dd class="{{$item->itemSuffix->agi_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->agi_mod * 100}}%</dd>
           <dt><i class="fas fa-level-up-alt text-success"></i> Focus Mod:</dt>
-          <dd class="{{$item->itemSuffix->focus_nod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->focus_nod * 100}}%</dd>
+          <dd class="{{$item->itemSuffix->focus_mod > 0.0 ? 'text-success' : ''}}">{{$item->itemSuffix->focus_mod * 100}}%</dd>
         </dl>
       </div>
       <div class={{$item->itemSuffix->reduces_enemy_stats ? 'col-md-6' : 'hide'}}>

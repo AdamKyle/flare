@@ -4,6 +4,7 @@ namespace App\Game\Kingdoms\Service;
 
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
+use App\Flare\Models\Skill;
 use App\Game\Kingdoms\Events\UpdateKingdom;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
@@ -40,16 +41,19 @@ class UnitService {
     public function recruitUnits(Kingdom $kingdom, GameUnit $gameUnit, int $amount, bool $paidGold = false) {
         $character        = $kingdom->character;
         $totalTime        = $gameUnit->time_to_recruit * $amount;
-        $timeTillFinished = now()->addSeconds($this->calculatueUnitRecrutmentTime($character, $totalTime));
+        $totalTime        = $totalTime - $totalTime * $this->fetchTimeReduction($character)->unit_time_reduction;
+
+        $timeTillFinished = now()->addSeconds($totalTime);
 
         $goldPaid = null;
 
         if ($paidGold) {
             $goldPaid = (new UnitCosts($gameUnit->name))->fetchCost() * $amount;
+            $goldPaid = $goldPaid - $goldPaid * $kingdom->fetchUnitCostReduction();
         }
 
         $queue = UnitInQueue::create([
-            'character_id' => $kingdom->character->id,
+            'character_id' => $character->id,
             'kingdom_id'   => $kingdom->id,
             'game_unit_id' => $gameUnit->id,
             'amount'       => $amount,
@@ -118,9 +122,13 @@ class UnitService {
         $unitCostReduction = $kingdom->fetchUnitCostReduction();
 
         $totalCost = (new UnitCosts($gameUnit->name))->fetchCost() * $amount;
-        $totalCost -= $totalCost & $unitCostReduction;
+        $totalCost = $totalCost - $totalCost * $unitCostReduction;
 
         $character->gold -= $totalCost;
+
+        if ($character->gold < 0) {
+            $character->gold = 0;
+        }
 
         $character->save();
 
@@ -142,7 +150,6 @@ class UnitService {
         $user    = $kingdom->character->user;
 
         if (!is_null($queue->gold_paid)) {
-
             if ($this->calculateElapsedTimePercent($queue) >= 85) {
                  return false;
             }
@@ -154,7 +161,7 @@ class UnitService {
             $character->save();
 
             $kingdom->update([
-                'current_population' => $kingdom->current_population + $queue->amount * 0.75
+                'current_population' => $kingdom->current_population + ($queue->amount * 0.25)
             ]);
 
             event(new UpdateTopBarEvent($character->refresh()));
@@ -180,16 +187,6 @@ class UnitService {
         return true;
     }
 
-    protected function calculatueUnitRecrutmentTime(Character $character, int $time)  {
-        $skillBonus = $character->skills->filter(function($skill) {
-            return $skill->baseSkill->type === SkillTypeValue::EFFECTS_KINGDOM;
-        })->first();
-
-        $timeNeeded = floor($time - $time * $skillBonus->unit_time_reduction);
-
-        return $timeNeeded >= 1 ? $timeNeeded : 1;
-    }
-
     protected function calculateElapsedTimePercent(UnitInQueue $queue): int {
         $startedAt   = Carbon::parse($queue->started_at);
         $completedAt = Carbon::parse($queue->completed_at);
@@ -198,7 +195,11 @@ class UnitService {
         $elapsedTime = $now->diffInMinutes($startedAt);
         $totalTime   = $completedAt->diffInMinutes($startedAt);
 
-        return 100 - ceil($elapsedTime/$totalTime);
+        if ($elapsedTime === 0) {
+            return 0;
+        }
+
+        return 100 - (100 - ceil($elapsedTime/$totalTime));
     }
 
     protected function resourceCalculation(UnitInQueue $queue) {
@@ -208,6 +209,12 @@ class UnitService {
 
         $this->completed      = (($current - $start) / ($end - $start));
         $this->totalResources = 1 - $this->completed;
+    }
+
+    protected function fetchTimeReduction(Character $character): Skill  {
+        return $character->skills->filter(function($skill) {
+            return $skill->baseSkill->type === SkillTypeValue::EFFECTS_KINGDOM;
+        })->first();
     }
 
     protected function updateKingdomAfterCancelation(Kingdom $kingdom, GameUnit $unit, UnitInQueue $queue): Kingdom {
