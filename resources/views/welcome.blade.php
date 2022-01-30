@@ -1,24 +1,23 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container small-container welcome">
-        <div class="row justify-content-center">
-            <div class="col-xl-8 col-lg-11 col-md-12">
-                <div class="jumbotron  mt-5">
-                    <h1>Planes of Tlessa</h1>
-                    <p>A world full of mystery and exploration.</p>
-                    <a class="btn btn-primary btn" href="{{route('register')}}" role="button">Join Today!</a>
-                    <a class="btn btn-success btn" href="{{route('info.page', ['pageName' => 'home'])}}" role="button">Learn More</a>
-                    <a class="btn btn-warning btn" href="{{route('releases.list')}}" role="button">Releases</a>
-                </div>
-            </div>
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-10">
+            <h1 class="mb-5 font-thin text-7xl dark:text-gray-300 text-gray-800">Planes of Tlessa</h1>
+            <p class="mb-10 dark:text-gray-300 text-gray-800 italic">A world full of mystery and exploration.</p>
+            <x-core.buttons.link-buttons.primary-button  css="mr-2" href="{{route('register')}}">
+                Join Today!
+            </x-core.buttons.link-buttons.primary-button>
+            <x-core.buttons.link-buttons.success-button  css="mr-2" href="{{route('info.page', ['pageName' => 'home'])}}">
+                Learn More
+            </x-core.buttons.link-buttons.success-button>
+            <x-core.buttons.link-buttons.success-button  css="mr-2" href="{{route('releases.list')}}">
+                Releases
+            </x-core.buttons.link-buttons.success-button>
         </div>
 
-        <div class="row justify-content-center mb-2 mt-2">
-            <div class="col-lg-12">
-                <img src="{{asset('promotion/game.png')}}" class="w-100" />
-            </div>
-        </div>
+        <img src="{{asset('promotion/game.png')}}" class="w-100 mb-10" />
+        
         <div class="lg-padding">
             <div class="row justify-content-center">
                 <div class="col-xl-7 col-lg-8">
