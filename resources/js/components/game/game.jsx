@@ -344,8 +344,6 @@ export default class Game extends React.Component {
   }
 
   handleTabSwitch(key) {
-    console.log(key);
-    console.log(this.state.showServerMessageUpdate);
     this.setState({
       activeChatTab: key,
       showServerMessageUpdate: (key === 'server-messages' && this.state.showServerMessageUpdate) ? false : this.state.showServerMessageUpdate,
@@ -358,7 +356,7 @@ export default class Game extends React.Component {
       this.setState({
         showServerMessageUpdate: true
       });
-    } else if (this.state.activeChatTab !== 'chat') {
+    } else if (!isServerMessage && this.state.activeChatTab !== 'chat') {
       this.setState({
         showChatUpdate: true,
       });
@@ -370,7 +368,7 @@ export default class Game extends React.Component {
     if (this.state.showChatUpdate) {
       return (
         <Fragment>
-          Chat <i className="fas fa-bell tw-text-yello-400"></i>
+          Chat <i className="fas fa-bell chat-tab-icon"></i>
         </Fragment>
       )
     }
@@ -387,7 +385,7 @@ export default class Game extends React.Component {
     if (this.state.showServerMessageUpdate) {
       return (
         <Fragment>
-          Server <i className="fas fa-bell tw-text-yello-400"></i>
+          Server <i className="fas fa-bell chat-tab-icon"></i>
         </Fragment>
       )
     }

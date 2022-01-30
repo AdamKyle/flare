@@ -73,7 +73,7 @@ export default class Attack {
           this.lifeSteal(defender, attacker, attackData);
         }
       }
-      console.log(this.state);
+
       if (this.isMonsterDead()) {
         this.state.battleMessages.push({
           message: attacker.getMonster().name + ' has been defeated!',

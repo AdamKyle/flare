@@ -149,7 +149,7 @@ export default class Monster {
   }
 
   reduceResistances(reduction) {
-    console.log('resistance reduction %: ', reduction);
+
     let monster = JSON.parse(JSON.stringify(this.monster));
 
     if (reduction > 0.0) {

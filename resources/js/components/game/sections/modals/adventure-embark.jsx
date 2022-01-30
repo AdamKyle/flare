@@ -55,7 +55,6 @@ export default class AdventureEmbark extends React.Component {
   }
 
   selectAttackType(event) {
-    console.log(event.target.value);
     this.setState({
       attackType: event.target.value
     });
@@ -83,8 +82,6 @@ export default class AdventureEmbark extends React.Component {
         />
       );
     }
-
-    console.log(this.state.inventorySets);
 
     return (
       <>

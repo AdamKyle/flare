@@ -101,7 +101,6 @@ export default class Chat extends React.Component {
 
     this.serverMessages.listen('Game.Messages.Events.ServerMessageEvent', (event) => {
       if (event.npc || event.isLink) {
-
         const messages = cloneDeep(this.state.messages);
 
         const message = {
@@ -131,6 +130,7 @@ export default class Chat extends React.Component {
           messages: messages,
           user: user,
         }, () => {
+
           this.props.updateChatTabIcon(false);
         });
       }

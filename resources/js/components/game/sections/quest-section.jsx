@@ -25,7 +25,6 @@ export default class QuestSection extends React.Component {
   componentDidMount() {
 
     localforage.getItem('all-quests').then((value) => {
-      console.log(value);
       if (value === null) {
         this.fetchQuests(0);
       } else {
