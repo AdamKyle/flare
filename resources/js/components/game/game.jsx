@@ -1,5 +1,6 @@
 import React from 'react';
-import {Row, Col} from 'react-bootstrap';
+import {Row, Col, Tabs, Tab} from 'react-bootstrap';
+import localforage from "localforage";
 import Chat from './messages/chat';
 import Map from './map/map';
 import Teleport from './sections/components/teleport';
@@ -15,8 +16,8 @@ import KingdomAttackModal from './kingdom/modal/kingdom-attack-modal';
 import TimeoutDialogue from "./timeout/modal/timeout-dialogue";
 import NpcComponentWrapper from "./npc-components/npc-component-wrapper";
 import MassEmbezzle from "./sections/modals/mass-embezzle";
-import localforage from "localforage";
 import AbandonKingdom from "./sections/modals/abandon-kingdom";
+import ServerMessages from "./messages/server-messages";
 
 export default class Game extends React.Component {
   constructor(props) {
@@ -466,7 +467,14 @@ export default class Game extends React.Component {
         </div>
         <Row>
           <Col xs={12}>
-            <Chat apiUrl={this.apiUrl} userId={this.props.userId}/>
+            <Tabs defaultActiveKey="chat" id="chat-tabs">
+              <Tab eventKey="chat" title="Chat">
+                <Chat apiUrl={this.apiUrl} userId={this.props.userId}/>
+              </Tab>
+              <Tab eventKey="server-messages" title="Server">
+                <ServerMessages userId={this.props.userId}/>
+              </Tab>
+            </Tabs>
           </Col>
         </Row>
 

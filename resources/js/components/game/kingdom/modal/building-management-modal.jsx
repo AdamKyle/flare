@@ -26,7 +26,7 @@ export default class BuildingManagementModal extends React.Component {
       disabledButtons: false,
       loading: false,
       costToUpgrade: this.props.building.upgrade_cost,
-      level: 0,
+      level: '',
       populationRequired: 0,
       timeNeeded: 0,
       hasGold: true,
@@ -216,7 +216,7 @@ export default class BuildingManagementModal extends React.Component {
   }
 
   changeLevel(event) {
-    let value      = parseInt(event.target.value) || 0;
+    let value      = parseInt(event.target.value) || '';
     const maxLevel = this.props.building.max_level - this.props.building.level;
 
     if (value > maxLevel) {
@@ -246,6 +246,8 @@ export default class BuildingManagementModal extends React.Component {
   }
 
   processLevel(level) {
+    level = parseInt(level) || 0;
+
     let levelForGoldCost = level - this.props.building.level;
 
     if (levelForGoldCost <= 0) {
@@ -542,7 +544,7 @@ export default class BuildingManagementModal extends React.Component {
                       onClick={this.rebuildBuilding.bind(this)}>Rebuild</button>
               :
               <button className="btn btn-success"
-                      disabled={(!this.canUpgrade() && !(this.state.level > 0)) || !this.isCurrentlyInQueue() || this.state.disabledButtons || this.props.building.is_locked}
+                      disabled={(!this.canUpgrade() && !(this.state.level > 0)) || !this.isCurrentlyInQueue() || this.state.disabledButtons || this.props.building.is_locked || (this.props.building.level >= this.props.building.max_level)}
                       onClick={this.upgradeBuilding.bind(this)}
               >
                 Upgrade

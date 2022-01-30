@@ -6,8 +6,17 @@
   <component name="ChangeListManager">
     <list default="true" id="b57f583e-608e-4ca2-947d-cf9ab46f7914" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Jobs/LoginMessage.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Jobs/LoginMessage.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Transformers/KingdomTransformer.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Transformers/KingdomTransformer.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Game/Kingdoms/Service/KingdomResourcesService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Kingdoms/Service/KingdomResourcesService.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Auth/LoginController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Auth/LoginController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Messages/Builders/NpcServerMessageBuilder.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Messages/Builders/NpcServerMessageBuilder.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Messages/Handlers/NpcQuestRewardHandler.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Messages/Handlers/NpcQuestRewardHandler.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Messages/Handlers/NpcQuestsHandler.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Messages/Handlers/NpcQuestsHandler.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/game.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/game.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/building-management-modal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/building-management-modal.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/kingdom-buildings.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/kingdom-buildings.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/recruit.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/recruit.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/messages/chat.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/messages/chat.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -246,7 +255,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/storage/app/public/maps" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources/js/components/game/messages" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
@@ -258,11 +267,11 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/resources/js/components/game/messages" />
+      <recent name="$PROJECT_DIR$/storage/app/public/maps/Surface" />
       <recent name="$PROJECT_DIR$/storage/app/public/maps" />
       <recent name="$PROJECT_DIR$/storage/app/public" />
       <recent name="$PROJECT_DIR$/tests/Unit/Flare/Jobs" />
-      <recent name="$PROJECT_DIR$/resources/js/components" />
-      <recent name="$PROJECT_DIR$/tests/Unit/Flare/Values" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/resources/js/components/game/components/nav-bar/server-clock" />
@@ -310,7 +319,7 @@
       <workItem from="1642212025385" duration="159000" />
       <workItem from="1642212211874" duration="484000" />
       <workItem from="1642217356132" duration="15817000" />
-      <workItem from="1643306290179" duration="12756000" />
+      <workItem from="1643306290179" duration="19574000" />
     </task>
     <servers />
   </component>

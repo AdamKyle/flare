@@ -96,35 +96,38 @@ export default class Chat extends React.Component {
     });
 
     this.serverMessages.listen('Game.Messages.Events.ServerMessageEvent', (event) => {
-      const messages = cloneDeep(this.state.messages);
+      if (event.npc || event.isLink) {
 
-      const message = {
-        message: event.message,
-        type: 'server-message',
-        user: event.user,
-        user_id: event.user.id,
-        id: Math.random().toString(36).substring(7),
-        is_npc: event.npc,
-        isLink: event.isLink,
-        link: event.link,
-        event_id: event.id,
-      };
+        const messages = cloneDeep(this.state.messages);
 
-      messages.unshift(message);
+        const message = {
+          message: event.message,
+          type: 'server-message',
+          user: event.user,
+          user_id: event.user.id,
+          id: Math.random().toString(36).substring(7),
+          is_npc: event.npc,
+          isLink: event.isLink,
+          link: event.link,
+          event_id: event.id,
+        };
 
-      if (messages.length > 1000) {
-        messages.length = 500; // Remove the last 500 messages to clear lag.
+        messages.unshift(message);
+
+        if (messages.length > 1000) {
+          messages.length = 500; // Remove the last 500 messages to clear lag.
+        }
+
+        const user = cloneDeep(this.state.user);
+
+        user.is_silenced = event.user.is_silenced;
+        user.can_talk_again_at = event.user.can_speak_again_at;
+
+        this.setState({
+          messages: messages,
+          user: user,
+        });
       }
-
-      const user = cloneDeep(this.state.user);
-
-      user.is_silenced = event.user.is_silenced;
-      user.can_talk_again_at = event.user.can_speak_again_at;
-
-      this.setState({
-        messages: messages,
-        user: user,
-      });
     });
 
     this.privateMessages.listen('Game.Messages.Events.PrivateMessageEvent', (event) => {
@@ -191,7 +194,7 @@ export default class Chat extends React.Component {
     );
   }
 
-  rendermessages() {
+  renderMessages() {
     const elements = [];
 
     if (this.state.messages.length > 0) {
@@ -207,10 +210,10 @@ export default class Chat extends React.Component {
                 </div>
               </li>
             )
-          } else {
+          } else if (message.is_npc) {
             elements.push(
               <li key={message.id + '_server-message'}>
-                <div className={message.is_npc ? "npc-message" : "server-message"}>{message.message}</div>
+                <div className="npc-message">{message.message}</div>
               </li>
             )
           }
@@ -474,7 +477,7 @@ export default class Chat extends React.Component {
             <div className="row">
               <div className="col-md-12">
                 <div className="chat-box mt-3">
-                  <ul> {this.rendermessages()}</ul>
+                  <ul> {this.renderMessages()}</ul>
                 </div>
               </div>
             </div>

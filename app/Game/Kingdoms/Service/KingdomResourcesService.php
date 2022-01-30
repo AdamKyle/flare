@@ -292,7 +292,11 @@ class KingdomResourcesService {
     }
 
     protected function angryNpc() {
-        broadcast(new GlobalMessageEvent('The Old Man stomps around! "You were warned! time to pay up!"'));
+        $character = $this->kingdom->character;
+
+        if (!is_null($character)) {
+            broadcast(new GameServerMessageEvent($character->user,'The Old Man stomps around! "You were warned! time to pay up!"'));
+        }
 
         $currentPop = $this->kingdom->current_population;
         $maxPop     = $this->kingdom->max_population;
@@ -313,7 +317,10 @@ class KingdomResourcesService {
 
             $this->kingdom = $this->kingdom->refresh();
 
-            broadcast(new GlobalMessageEvent('The Old Man grumbles! "Now I have to take the rest out of your pockets child!" (Not enough Treasury)'));
+            if (!is_null($character)) {
+                broadcast(new GameServerMessageEvent($character->user,'The Old Man grumbles! "Now I have to take the rest out of your pockets child!" (Not enough Treasury)'));
+            }
+
         } else if ($totalCost <= $kingdomTreasury) {
             $kingdomTreasury = $kingdomTreasury - $totalCost;
 
@@ -324,7 +331,9 @@ class KingdomResourcesService {
 
             $totalCost = 0;
 
-            broadcast(new GlobalMessageEvent('The Old Man smiles! "I am glad someone paid me." (The treasury was enough to wet his appetite)'));
+            if (!is_null($character)) {
+                broadcast(new GameServerMessageEvent($character->user,'The Old Man smiles! "I am glad someone paid me." (The treasury was enough to wet his appetite)'));
+            }
         }
 
         if ($goldBars > 0 && $totalCost > 0) {
@@ -335,16 +344,22 @@ class KingdomResourcesService {
                 $this->kingdom->gold_bars -= 1;
                 $this->kingdom->save();
 
-                broadcast(new GlobalMessageEvent('The Old Man smiles! "A single gold bar is all I asked for." (The kingdoms gold bars were enough was enough to wet his appetite)'));
+                if (!is_null($character)) {
+                    broadcast(new GameServerMessageEvent($character->user,'The Old Man smiles! "A single gold bar is all I asked for." (The kingdoms gold bars were enough was enough to wet his appetite)'));
+                }
             } else {
                 $newAmount = $this->kingdom->gold_bars - ceil($this->kingdom->gold_bars * $percentage);
 
                 if ($newAmount < 0) {
                     $newAmount = 0;
 
-                    broadcast(new GlobalMessageEvent('The Old Man jumps for joy! "These are all mine now child!" (The kingdom lost all it\'s Gold Bars, but The Old Man is happy now ... Win, Win?)'));
+                    if (!is_null($character)) {
+                        broadcast(new GameServerMessageEvent($character->user,'The Old Man jumps for joy! "These are all mine now child!" (The kingdom lost all it\'s Gold Bars, but The Old Man is happy now ... Win, Win?)'));
+                    }
                 } else {
-                    broadcast(new GlobalMessageEvent('The Old Man grumbles! "Some of these are mine now..." (The kingdom lost: '.($percentage * 100).'% Gold Bars, but The Old Man is happy now ... Win, Win?)'));
+                    if (!is_null($character)) {
+                        broadcast(new GameServerMessageEvent($character->user,'The Old Man grumbles! "Some of these are mine now..." (The kingdom lost: '.($percentage * 100).'% Gold Bars, but The Old Man is happy now ... Win, Win?)'));
+                    }
                 }
 
                 $this->kingdom->update(['gold_bars' => $newAmount]);
@@ -364,9 +379,12 @@ class KingdomResourcesService {
 
             $this->kingdom = $this->kingdom->refresh();
 
-            broadcast(new GlobalMessageEvent('The Old Man smiles! "I told you I would collect whats owed!"'));
+            if (!is_null($character)) {
+                broadcast(new GameServerMessageEvent($character->user,'The Old Man smiles! "I told you I would collect whats owed!"'));
+            }
+
             event(new UpdateTopBarEvent($this->kingdom->character->refresh()));
-        } else if ($totalCost <= $characterGold) {
+        } else if ($totalCost <= $characterGold && $totalCost > 0) {
             $characterGold = $characterGold - $totalCost;
 
             $this->kingdom->character->update([
@@ -377,11 +395,13 @@ class KingdomResourcesService {
 
             $totalCost = 0;
 
-            broadcast(new GlobalMessageEvent('The Old Man smiles! "I am glad someone paid me."'));
+            if (!is_null($character)) {
+                broadcast(new GameServerMessageEvent($character->user,'The Old Man smiles! "I am glad someone paid me."'));
+            }
         }
 
         if ($totalCost > 0 && $this->kingdom->character->gold === 0 && $this->kingdom->treasury === 0 && $this->kingdom->gold_bars === 0) {
-            broadcast(new GlobalMessageEvent('The Old Man is enraged "You messed with the wrong person!"'));
+            broadcast(new GlobalMessageEvent('The Old Man is enraged "You messed with the wrong person ' . $character->name . '"'));
 
             $this->reduceEverything();
         }
@@ -505,24 +525,6 @@ class KingdomResourcesService {
             $newAmount = $this->kingdom->current_population + 30;
             $newAmount += $newAmount * $this->kingdom->fetchResourceBonus();
 
-            if ($currentPop < $this->kingdom->max_population) {
-                if ($newAmount > $this->kingdom->max_population) {
-                    $newAmount = $this->kingdom->max_population;
-                }
-            }
-
-            $this->kingdom->update([
-                'current_population' => $newAmount,
-            ]);
-
-            $this->kingdom = $this->kingdom->refresh();
-
-            return;
-        }
-
-        if ($building->current_durability === 0) {
-            $newAmount = $this->kingdom->current_population + round($building->population_increase / 2);
-
             if ($currentPop <= $this->kingdom->max_population) {
                 if ($newAmount > $this->kingdom->max_population) {
                     $newAmount = $this->kingdom->max_population;
@@ -532,24 +534,32 @@ class KingdomResourcesService {
             $this->kingdom->update([
                 'current_population' => $newAmount,
             ]);
+        } else if (!is_null($building)) {
+            if ($building->current_durability === 0) {
+                $newAmount = $this->kingdom->current_population + round($building->population_increase / 2);
 
-            $this->kingdom = $this->kingdom->refresh();
-
-            return;
-        }
-
-        if (!is_null($building)) {
-            $newCurrent = $this->kingdom->current_population + $building->population_increase;
-
-            if ($currentPop <= $this->kingdom->max_population) {
-                if ($newCurrent > $this->kingdom->max_population && $currentPop <= $this->kingdom->max_pop) {
-                    $newCurrent = $this->kingdom->max_population;
+                if ($currentPop <= $this->kingdom->max_population) {
+                    if ($newAmount > $this->kingdom->max_population) {
+                        $newAmount = $this->kingdom->max_population;
+                    }
                 }
-            }
 
-            $this->kingdom->update([
-                'current_population' => $newCurrent,
-            ]);
+                $this->kingdom->update([
+                    'current_population' => $newAmount,
+                ]);
+            } else {
+                $newAmount = $this->kingdom->current_population + $building->population_increase;
+
+                if ($currentPop <= $this->kingdom->max_population) {
+                    if ($newAmount > $this->kingdom->max_population) {
+                        $newAmount = $this->kingdom->max_population;
+                    }
+                }
+
+                $this->kingdom->update([
+                    'current_population' => $newAmount,
+                ]);
+            }
         }
 
         $this->kingdom = $this->kingdom->refresh();

@@ -92,6 +92,9 @@ class NpcQuestsHandler {
             }
 
             if ($giveRewards) {
+
+                $this->alertAboutCurrencyCapped($character, $npc, $quest);
+
                 $this->npcQuestRewardHandler->processReward($quest, $npc, $character);
 
                 $finishedAtLeastOneQuest = true;
@@ -102,7 +105,7 @@ class NpcQuestsHandler {
     }
 
     public function shouldBailOnQuest(Character $character, Npc $npc, Quest $quest, array $completedQuests) {
-        if (!$this->canHaveReward($character, $npc, $quest)) {
+        if (!$this->canHaveReward($character, $npc)) {
             // Do not continue, it would be a waste.
             return true;
         }
@@ -236,12 +239,16 @@ class NpcQuestsHandler {
         broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build($type, $npc), true));
     }
 
-    public function canHaveReward(Character $character, Npc $npc, Quest $quest): bool {
+    public function canHaveReward(Character $character, Npc $npc): bool {
         if ($character->isInventoryFull()) {
             broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('inventory_full', $npc), true));
             return false;
         }
 
+        return true;
+    }
+
+    public function alertAboutCurrencyCapped(Character $character, Npc $npc, Quest $quest) {
         $newGold          = $character->gold + $quest->reward_gold;
         $newGoldDust      = $character->gold_dust + $quest->reward_gold_dust;
         $newShards        = $character->shards + $quest->reward_shards;
@@ -252,20 +259,15 @@ class NpcQuestsHandler {
 
         if ($maxGoldValue->canNotGiveCurrency()) {
             broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('gold_capped', $npc), true));
-            return false;
         }
 
         if ($maxGoldDustValue->canNotGiveCurrency()) {
             broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('gold_dust_capped', $npc), true));
-            return false;
         }
 
         if ($maxShardsValue->canNotGiveCurrency()) {
             broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('shard_capped', $npc), true));
-            return false;
         }
-
-        return true;
     }
 
     public function canPay(Character $character, Quest $quest) : bool {

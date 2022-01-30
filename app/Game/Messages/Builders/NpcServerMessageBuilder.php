@@ -60,11 +60,11 @@ class NpcServerMessageBuilder {
             case 'inventory_full':
                 return '"I cannot take the item from you child! Your inventory is to full! Come back when you clean out some space."';
             case 'gold_capped':
-                return '"Child! You are (or very close to being) Gold capped! I cannot take the item from you. Come back when you have less gold!" (check help section under quests for how much gold is to be rewarded with what you have)';
+                return '"Child! You are (or very close to being) Gold capped! You get no Gold.';
             case 'gold_dust_capped':
-                return '"Child! You are (or are very close to being) Gold Dust capped! I cannot take the item from you. Come back when you have less gold dust!" (check help section under quests for how much gold dust is to be rewarded with what you have)';
+                return '"Child! You are (or are very close to being) Gold Dust capped! You get no Gold Dust.';
             case 'shard_capped':
-                return '"Child! You are (or are very close to being) Shard capped! I cannot take the item from you. Come back when you have less shards!" (check help section under quests for how many shards is to be rewarded with what you have)';
+                return '"Child! You are (or are very close to being) Shard capped! You get no Shards.';
             case 'currency_given':
                 return '"I have payment for you, here take this!"';
             case 'quest_complete':

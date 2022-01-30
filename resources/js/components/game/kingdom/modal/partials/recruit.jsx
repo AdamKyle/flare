@@ -39,20 +39,20 @@ export default class Recruit extends React.Component {
 
       return this.setState({
         max: this.props.kingdom.current_population,
-        value: 0,
+        value: "",
       });
     }
 
     return this.setState({
       max: amountCanAfford,
-      value: 0,
+      value: "",
     });
   }
 
   amountChange(event) {
-    let value = parseInt(event.target.value) || 0;
+    let value = parseInt(event.target.value) || "";
 
-    if (value !== 0) {
+    if (value !== "") {
       if (value > this.state.max) {
         value = this.state.max;
       }
@@ -67,18 +67,22 @@ export default class Recruit extends React.Component {
   }
 
   amountChangeWithGold(event) {
-    let value = parseInt(event.target.value) || 0;
+    let value = parseInt(event.target.value) || "";
 
-    if (value !== 0) {
+    let totalCost = 0;
+
+    if (value !== "") {
       if (value > this.state.max) {
         value = this.state.max;
       }
+
+      const costReduction = this.props.kingdom.unit_cost_reduction;
+      totalCost     = value * this.props.unit.cost_per_unit;
+
+      totalCost = totalCost - Math.floor(totalCost * costReduction);
     }
 
-    const costReduction = this.props.kingdom.unit_cost_reduction;
-    let   totalCost     = value * this.props.unit.cost_per_unit;
 
-    totalCost = totalCost - Math.floor(totalCost * costReduction);
 
     this.setState({
       value: value,
@@ -166,6 +170,10 @@ export default class Recruit extends React.Component {
   }
 
   canRecruitWithGold(value) {
+
+    if (value === "") {
+      return false
+    }
 
     let totalPopNeeded = this.props.unit.required_population * value;
 
