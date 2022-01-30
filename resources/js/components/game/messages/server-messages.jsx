@@ -19,7 +19,7 @@ export default class ServerMessages extends React.Component {
   componentDidMount() {
 
     this.serverMessages.listen('Game.Messages.Events.ServerMessageEvent', (event) => {
-      if (!event.npc && !event.link) {
+      if (!event.npc) {
         const messages = cloneDeep(this.state.messages);
 
         const message = {
@@ -55,6 +55,30 @@ export default class ServerMessages extends React.Component {
     });
   }
 
+  destroy(itemId) {
+    axios.post('/api/destroy/' + itemId).catch((err) => {
+      if (err.hasOwnProperty('response')) {
+        const response = err.response;
+
+        if (response.status === 401) {
+          return location.reload;
+        }
+      }
+    });
+  }
+
+  disenchant(itemId) {
+    axios.post('/api/disenchant/' + itemId).catch((err) => {
+      if (err.hasOwnProperty('response')) {
+        const response = err.response;
+
+        if (response.status === 401) {
+          return location.reload;
+        }
+      }
+    });
+  }
+
   renderMessages() {
     const elements = [];
 
@@ -62,7 +86,16 @@ export default class ServerMessages extends React.Component {
 
       this.state.messages.map((message) => {
         if (message.user_id === this.props.userId && message.type === 'server-message') {
-          if (!message.is_npc) {
+          if (message.isLink) {
+            elements.push(
+              <li key={message.id + '_server-message_link'}>
+                <div className="server-message">
+                  <a href={message.link} target="_blank">{message.message}</a>
+                  <button className="ml-1 btn btn-link btn-chat-action" onClick={() => this.destroy(message.event_id)}>Destroy</button> or <button className="btn btn-link btn-chat-action" onClick={() => this.disenchant(message.event_id)}>Disenchant</button>.
+                </div>
+              </li>
+            )
+          } else {
             elements.push(
               <li key={message.id + '_server-message'}>
                 <div className="server-message">{message.message}</div>
