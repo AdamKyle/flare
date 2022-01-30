@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Game\Messages\Jobs;
+namespace Tests\Unit\Game\Messages\Services;
 
 use App\Flare\Events\NpcComponentShowEvent;
 use App\Flare\Models\GameMap;
