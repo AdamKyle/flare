@@ -6,14 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="b57f583e-608e-4ca2-947d-cf9ab46f7914" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Flare/Models/ItemAffix.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Models/ItemAffix.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Flare/Providers/ServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Providers/ServiceProvider.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Flare/Services/CharacterRewardService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Services/CharacterRewardService.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Game/Battle/Handlers/BattleEventHandler.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Battle/Handlers/BattleEventHandler.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Game/Battle/Providers/ServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Battle/Providers/ServiceProvider.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Game/Core/Services/AdventureRewardService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Core/Services/AdventureRewardService.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Game/Core/Services/DropCheckService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Core/Services/DropCheckService.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Game/Skills/Services/DisenchantService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Skills/Services/DisenchantService.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Battle/Services/BattleRewardProcessing.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Battle/Services/BattleRewardProcessing.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/sections/auto-attack-section.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/sections/auto-attack-section.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

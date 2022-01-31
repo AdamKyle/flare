@@ -17,14 +17,11 @@ class BattleRewardProcessing {
 
     private $characterRewardService;
 
-    private $dropCheckService;
-
     private $goldRushService;
 
-    public function __construct(FactionHandler $factionHandler, CharacterRewardService $characterRewardService, DropCheckService $dropCheckService, GoldRush $goldRush) {
+    public function __construct(FactionHandler $factionHandler, CharacterRewardService $characterRewardService, GoldRush $goldRush) {
         $this->factionHandler         = $factionHandler;
         $this->characterRewardService = $characterRewardService;
-        $this->dropCheckService       = $dropCheckService;
         $this->goldRushService        = $goldRush;
     }
 

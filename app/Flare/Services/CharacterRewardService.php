@@ -33,10 +33,9 @@ class CharacterRewardService {
      *
      * @param CharacterXPService $characterXpService
      */
-    public function __construct(CharacterXPService $characterXpService, CharacterService $characterService, BuildCharacterAttackTypes $buildCharacterAttackTypes) {
+    public function __construct(CharacterXPService $characterXpService, CharacterService $characterService) {
         $this->characterXpService        = $characterXpService;
         $this->characterService          = $characterService;
-        $this->buildCharacterAttackTypes = $buildCharacterAttackTypes;
     }
 
     public function setCharacter(Character $character): CharacterRewardService {

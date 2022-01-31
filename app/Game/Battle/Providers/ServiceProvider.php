@@ -50,7 +50,6 @@ class ServiceProvider extends ApplicationServiceProvider
             return new BattleRewardProcessing(
                 $app->make(FactionHandler::class),
                 $app->make(CharacterRewardService::class),
-                $app->make(DropCheckService::class),
                 $app->make(GoldRush::class),
             );
         });

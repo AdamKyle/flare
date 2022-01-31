@@ -2,16 +2,6 @@
 
 namespace App\Game\Battle\Handlers;
 
-use App\Flare\Builders\RandomAffixGenerator;
-use App\Flare\Models\Faction;
-use App\Flare\Models\ItemAffix;
-use App\Game\Battle\Services\BattleRewardProcessing;
-use App\Game\Core\Values\FactionType;
-use App\Flare\Values\MaxCurrenciesValue;
-use App\Flare\Values\RandomAffixDetails;
-use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
-use App\Game\Core\Values\FactionLevel;
-use App\Game\Messages\Events\GlobalMessageEvent;
 use Illuminate\Support\Facades\Cache;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
@@ -23,13 +13,18 @@ use App\Flare\Models\GameMap;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Item as ItemModel;
 use App\Flare\Transformers\CharacterAttackTransformer;
-use App\Game\Core\Events\DropsCheckEvent;
-use App\Game\Core\Events\GoldRushCheckEvent;
-use App\Game\Core\Events\UpdateCharacterEvent;
+use App\Flare\Builders\RandomAffixGenerator;
+use App\Flare\Models\Faction;
+use App\Flare\Values\MaxCurrenciesValue;
+use App\Flare\Values\RandomAffixDetails;
 use App\Game\Maps\Events\UpdateActionsBroadcast;
 use App\Game\Core\Events\AttackTimeOutEvent;
 use App\Game\Core\Events\CharacterIsDeadBroadcastEvent;
 use App\Game\Core\Events\UpdateAttackStats;
+use App\Game\Core\Values\FactionType;
+use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
+use App\Game\Core\Values\FactionLevel;
+use App\Game\Battle\Services\BattleRewardProcessing;
 
 class BattleEventHandler {
 
@@ -71,20 +66,6 @@ class BattleEventHandler {
         $monster = Monster::find($monsterId);
 
         $this->battleRewardProcessing->handleMonster($character, $monster);
-
-//        if (!$character->map->gameMap->mapType()->isPurgatory()) {
-//            $this->handleFactionPoints($character, $monster);
-//        }
-//
-//        event(new UpdateCharacterEvent($character, $monster));
-//
-//        event(new UpdateTopBarEvent($character->refresh()));
-//        event(new DropsCheckEvent($character, $monster));
-//        event(new GoldRushCheckEvent($character, $monster));
-//
-//        $characterData = new Item($character, $this->characterAttackTransformer);
-//
-//        event(new UpdateAttackStats($this->manager->createData($characterData)->toArray(), $character->user));
     }
 
     public function processRevive(Character $character): Character {
@@ -116,8 +97,6 @@ class BattleEventHandler {
 
         return $character;
     }
-
-
 
     protected function updateFaction(Faction $faction): Faction {
 
