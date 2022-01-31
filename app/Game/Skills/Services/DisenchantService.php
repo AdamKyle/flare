@@ -69,7 +69,7 @@ class DisenchantService {
         ));
     }
 
-    public function disenchantItemWithSkill(Character $character) {
+    public function disenchantItemWithSkill(Character $character, bool $isAdventure = true) {
         $disenchantSkill = $character->skills->filter(function($skill) {
             return $skill->type()->isDisenchanting();
         })->first();
@@ -81,7 +81,11 @@ class DisenchantService {
             if ($characterRoll > $dcCheck) {
                 $goldDust = $this->updateGoldDust($character, false, $disenchantSkill);
 
-                event(new ServerMessageEvent($character->user, 'disenchanted-adventure', $goldDust));
+                if ($isAdventure) {
+                    event(new ServerMessageEvent($character->user, 'disenchanted-adventure', $goldDust));
+                } else {
+                    event(new ServerMessageEvent($character->user, 'disenchanted', $goldDust));
+                }
                 event(new UpdateSkillEvent($disenchantSkill));
 
             } else {

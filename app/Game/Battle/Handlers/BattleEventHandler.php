@@ -4,6 +4,8 @@ namespace App\Game\Battle\Handlers;
 
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Models\Faction;
+use App\Flare\Models\ItemAffix;
+use App\Game\Battle\Services\BattleRewardProcessing;
 use App\Game\Core\Values\FactionType;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\RandomAffixDetails;
@@ -37,13 +39,17 @@ class BattleEventHandler {
 
     private $randomAffixGenerator;
 
+    private $battleRewardProcessing;
+
     public function __construct(
         Manager $manager,
         CharacterAttackTransformer $characterAttackTransformer,
+        BattleRewardProcessing $battleRewardProcessing,
         RandomAffixGenerator $randomAffixGenerator,
     ) {
         $this->manager                    = $manager;
         $this->characterAttackTransformer = $characterAttackTransformer;
+        $this->battleRewardProcessing     = $battleRewardProcessing;
         $this->randomAffixGenerator       = $randomAffixGenerator;
     }
 
@@ -64,19 +70,21 @@ class BattleEventHandler {
     public function processMonsterDeath(Character $character, int $monsterId) {
         $monster = Monster::find($monsterId);
 
-        if (!$character->map->gameMap->mapType()->isPurgatory()) {
-            $this->handleFactionPoints($character, $monster);
-        }
+        $this->battleRewardProcessing->handleMonster($character, $monster);
 
-        $character = $character->refresh();
-
-        event(new UpdateCharacterEvent($character, $monster));
-        event(new DropsCheckEvent($character, $monster));
-        event(new GoldRushCheckEvent($character, $monster));
-
-        $characterData = new Item($character, $this->characterAttackTransformer);
-
-        event(new UpdateAttackStats($this->manager->createData($characterData)->toArray(), $character->user));
+//        if (!$character->map->gameMap->mapType()->isPurgatory()) {
+//            $this->handleFactionPoints($character, $monster);
+//        }
+//
+//        event(new UpdateCharacterEvent($character, $monster));
+//
+//        event(new UpdateTopBarEvent($character->refresh()));
+//        event(new DropsCheckEvent($character, $monster));
+//        event(new GoldRushCheckEvent($character, $monster));
+//
+//        $characterData = new Item($character, $this->characterAttackTransformer);
+//
+//        event(new UpdateAttackStats($this->manager->createData($characterData)->toArray(), $character->user));
     }
 
     public function processRevive(Character $character): Character {
@@ -109,45 +117,7 @@ class BattleEventHandler {
         return $character;
     }
 
-    protected function handleFactionPoints(Character $character, Monster $monster) {
-        $mapId   = $monster->gameMap->id;
-        $mapName = $monster->gameMap->name;
 
-        $faction = $character->factions()->where('game_map_id', $mapId)->first();
-
-        $faction->current_points += FactionLevel::gatPointsPerLevel($faction->current_level);
-
-        if ($faction->current_points > $faction->points_needed) {
-            $faction->current_points = $faction->points_needed;
-        }
-
-        if ($faction->current_points === $faction->points_needed && !FactionLevel::isMaxLevel($faction->current_level, $faction->current_points)) {
-
-            event(new ServerMessageEvent($character->user, $mapName . ' faction has gained a new level!'));
-
-            $faction = $this->updateFaction($faction);
-
-            $this->rewardPlayer($character, $faction, $mapName, FactionType::getTitle($faction->current_level));
-
-            event(new ServerMessageEvent($character->user, 'Achieved title: ' . FactionType::getTitle($faction->current_level) . ' of ' . $mapName));
-
-            return;
-
-        } else if (FactionLevel::isMaxLevel($faction->current_level, $faction->current_points) && !$faction->maxed) {
-            event(new ServerMessageEvent($character->user, $mapName . ' faction has become maxed out!'));
-            event(new GlobalMessageEvent($character->name . 'Has maxed out the faction for: ' . $mapName . ' They are considered legendary among the people of this land.'));
-
-            $this->rewardPlayer($character, $faction, $mapName, FactionType::getTitle($faction->current_level));
-
-            $faction->update([
-                'maxed' => true,
-            ]);
-
-            return;
-        }
-
-        $faction->save();
-    }
 
     protected function updateFaction(Faction $faction): Faction {
 

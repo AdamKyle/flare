@@ -29,6 +29,8 @@ use App\Flare\Services\CanUserEnterSiteService;
 use App\Flare\Services\CharacterXPService;
 use App\Flare\Services\DailyGoldDustService;
 use App\Flare\View\Components\EquipmentButtonForm;
+use App\Game\Battle\Jobs\BattleAttackHandler;
+use App\Game\Core\Services\CharacterService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Flare\Values\BaseStatValue;
 use App\Flare\Builders\CharacterBuilder;
@@ -150,8 +152,12 @@ class ServiceProvider extends ApplicationServiceProvider
             return new CharacterXPService();
         });
 
-        $this->app->bind(CharacterRewardService::class, function($app, $paramters) {
-            return new CharacterRewardService($paramters['character'], $app->make(CharacterXPService::class));
+        $this->app->bind(CharacterRewardService::class, function($app) {
+            return new CharacterRewardService(
+                $app->make(CharacterXPService::class),
+                $app->make(CharacterService::class),
+                $app->make(BuildCharacterAttackTypes::class),
+            );
 
         });
 

@@ -3,6 +3,7 @@
 namespace App\Game\Core\Services;
 
 
+use App\Flare\Models\User;
 use Facades\App\Flare\Calculators\DropCheckCalculator;
 use Facades\App\Flare\Calculators\SellItemCalculator;
 use App\Flare\Builders\RandomItemDropBuilder;
@@ -19,10 +20,15 @@ use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Traits\CanHaveQuestItem;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Skills\Services\DisenchantService;
+use Illuminate\Support\Facades\Cache;
 
 class DropCheckService {
 
     use CanHaveQuestItem;
+
+    const ROLL = 1000000000;
+
+    const GENERATE_RANDOM_ITEM = 999999999;
 
     private $randomItemDropBuilder;
 
@@ -63,7 +69,7 @@ class DropCheckService {
     public function handleDropChance(Character $character) {
         $canGetDrop = $this->canHaveDrop();
 
-        $this->handleDrop($canGetDrop, $character);
+        $this->handleDrop($character, true);
 
         $this->handleMonsterQuestDrop($character);
 
@@ -90,14 +96,19 @@ class DropCheckService {
         return DropCheckCalculator::fetchDropCheckChance($this->monster, $this->lootingChance, $this->gameMapBonus, $this->adventure);
     }
 
-    protected function handleDrop(bool $canGetDrop, Character $character) {
+    protected function handleDrop(Character $character, bool $canGetDrop) {
         if ($canGetDrop) {
-            $drop = $this->randomItemDropBuilder
-                         ->setLocation($this->locationWithEffect)
-                         ->setMonsterPlane($this->monster->gameMap->name)
-                         ->setCharacterLevel($character->level)
-                         ->setMonsterMaxLevel($this->monster->max_level)
-                         ->generateItem();
+
+            $drop = $this->getDropFromCache();
+
+            if (is_null($drop)) {
+                $drop = $this->randomItemDropBuilder
+                    ->setLocation($this->locationWithEffect)
+                    ->setMonsterPlane($this->monster->gameMap->name)
+                    ->setCharacterLevel($character->level)
+                    ->setMonsterMaxLevel($this->monster->max_level)
+                    ->generateItem();
+            }
 
             if (!is_null($drop)) {
                 if (!is_null($drop->itemSuffix) || !is_null($drop->itemPrefix)) {
@@ -107,6 +118,25 @@ class DropCheckService {
                 }
             }
         }
+    }
+    protected function getDropFromCache(): ?Item {
+        $drop = null;
+
+        if (Cache::has('droppable-items')) {
+            $items = Cache::get('droppable-items');
+
+            if (count($items) > 100) {
+                $drop = Item::find($items[rand(0, (count($items) - 1))]);
+            } else {
+                $roll = rand(0, self::ROLL);
+
+                if ($roll < self::GENERATE_RANDOM_ITEM) {
+                    $drop = Item::find($items[rand(0, (count($items) - 1))]);
+                }
+            }
+        }
+
+        return $drop;
     }
 
     protected function handleMonsterQuestDrop(Character $character) {
@@ -162,48 +192,58 @@ class DropCheckService {
     protected function attemptToPickUpItem(Character $character, Item $item) {
         $user      = $character->user;
 
-        if (!$character->isInventoryFull()) {
-
-            if ($this->canHaveItem($character, $item)) {
-                $slot = $character->inventory->slots()->create([
-                    'item_id' => $item->id,
-                    'inventory_id' => $character->inventory->id,
-                ]);
-
-                if ($item->type === 'quest') {
-                    $message = $character->name . ' has found: ' . $item->affix_name;
-
-                    event(new ServerMessageEvent($character->user, 'gained_item', $item->affix_name, route('game.items.item', [
-                        'item' => $item
-                    ]), $item->id));
-
-                    broadcast(new GlobalMessageEvent($message));
-                } else if ($user->auto_disenchant) {
-                    if ($user->auto_disenchant_amount === 'all') {
-                        $this->disenchantService->disenchantWithSkill($character->refresh(), $slot);
-                    }
-
-                    if ($user->auto_disenchant_amount === '1-billion') {
-                        $cost = SellItemCalculator::fetchSalePriceWithAffixes($slot->item);
-
-                        if ($cost >= 1000000000) {
-                            event(new ServerMessageEvent($character->user, 'gained_item', $item->affix_name, route('game.items.item', [
-                                'item' => $item
-                            ]), $item->id));
-                        } else {
-                            $this->disenchantService->disenchantWithSkill($character->refresh(), $slot);
-                        }
-                    }
-                } else {
-                    event(new ServerMessageEvent($character->user, 'gained_item', $item->affix_name, route('game.items.item', [
-                        'item' => $item
-                    ]), $item->id));
-                }
-
-
-            }
+        if ($user->auto_disenchant) {
+            $this->autoDisenchantItem($character, $item);
         } else {
-            event(new ServerMessageEvent($character->user, 'inventory_full'));
+            if (!$character->isInventoryFull()) {
+
+                $this->giveItemToPlayer($character, $item);
+            } else {
+                event(new ServerMessageEvent($character->user, 'inventory_full'));
+            }
+        }
+    }
+
+    private function autoDisenchantItem(Character $character, $item) {
+        $user = $character->user;
+
+        if ($user->auto_disenchant_amount === 'all') {
+            $this->disenchantService->disenchantItemWithSkill($character->refresh(), false);
+        }
+
+        if ($user->auto_disenchant_amount === '1-billion') {
+            $cost = SellItemCalculator::fetchSalePriceWithAffixes($item);
+
+            if ($cost >= 1000000000) {
+                event(new ServerMessageEvent($character->user, 'gained_item', $item->affix_name, route('game.items.item', [
+                    'item' => $item
+                ]), $item->id));
+            } else {
+                $this->disenchantService->disenchantItemWithSkill($character->refresh(), false);
+            }
+        }
+    }
+
+    private function giveItemToPlayer(Character $character, Item $item) {
+        if ($this->canHaveItem($character, $item)) {
+            $character->inventory->slots()->create([
+                'item_id' => $item->id,
+                'inventory_id' => $character->inventory->id,
+            ]);
+
+            if ($item->type === 'quest') {
+                $message = $character->name . ' has found: ' . $item->affix_name;
+
+                event(new ServerMessageEvent($character->user, 'gained_item', $item->affix_name, route('game.items.item', [
+                    'item' => $item
+                ]), $item->id));
+
+                broadcast(new GlobalMessageEvent($message));
+            } else {
+                event(new ServerMessageEvent($character->user, 'gained_item', $item->affix_name, route('game.items.item', [
+                    'item' => $item
+                ]), $item->id));
+            }
         }
     }
 

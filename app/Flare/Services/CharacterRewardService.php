@@ -3,12 +3,17 @@
 namespace App\Flare\Services;
 
 use App\Flare\Calculators\XPCalculator as CalculatorsXPCalculator;
+use App\Flare\Events\ServerMessageEvent;
+use App\Flare\Events\UpdateCharacterAttackEvent;
+use App\Flare\Events\UpdateTopBarEvent;
+use App\Flare\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Flare\Models\Adventure;
 use App\Flare\Models\Character;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Skill;
 use App\Flare\Events\UpdateSkillEvent;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Core\Services\CharacterService;
 use Facades\App\Flare\Calculators\XPCalculator;
 
 class CharacterRewardService {
@@ -26,12 +31,18 @@ class CharacterRewardService {
     /**
      * Constructor
      *
-     * @param Character $character
      * @param CharacterXPService $characterXpService
      */
-    public function __construct(Character $character, CharacterXPService $characterXpService) {
-        $this->character          = $character;
-        $this->characterXpService = $characterXpService;
+    public function __construct(CharacterXPService $characterXpService, CharacterService $characterService, BuildCharacterAttackTypes $buildCharacterAttackTypes) {
+        $this->characterXpService        = $characterXpService;
+        $this->characterService          = $characterService;
+        $this->buildCharacterAttackTypes = $buildCharacterAttackTypes;
+    }
+
+    public function setCharacter(Character $character): CharacterRewardService {
+        $this->character = $character;
+
+        return $this;
     }
 
     /**
@@ -42,37 +53,13 @@ class CharacterRewardService {
      * @return void
      */
     public function distributeGoldAndXp(Monster $monster, Adventure $adventure = null) {
-        $currentSkill = $this->fetchCurrentSkillInTraining();
-        $xpReduction  = 0.0;
-        $gameMap      = $this->character->map->gameMap;
+        $this->distributeXP($monster, $adventure);
 
-        if (!is_null($currentSkill)) {
-            $xpReduction = $currentSkill->xp_towards;
-
-            $this->trainSkill($currentSkill, $adventure, $monster);
+        if ($this->character->xp >= $this->character->xp_next) {
+            $this->handleCharacterLevelUp();
         }
 
-        $xp = XPCalculator::fetchXPFromMonster($monster, $this->character->level, $xpReduction);
-        $xp = $this->characterXpService->determineXPToAward($this->character, $xp);
-
-        if (!is_null($gameMap->xp_bonus)) {
-            $xp = $xp * (1 + $gameMap->xp_bonus);
-        }
-
-        $this->character->xp += $xp;
-        $newGold              = $this->character->gold + $monster->gold;
-
-        $maxCurrencies = new MaxCurrenciesValue($newGold, MaxCurrenciesValue::GOLD);
-
-        if ($maxCurrencies->canNotGiveCurrency()) {
-            $this->character->save();
-
-            return;
-        }
-
-        $this->character->gold += $monster->gold;
-
-        $this->character->save();
+        $this->distributeGold($monster);
     }
 
     /**
@@ -85,7 +72,7 @@ class CharacterRewardService {
     }
 
     /**
-     * Get the skill in trainind or null
+     * Get the skill in training or null
      *
      * @return mixed
      */
@@ -104,5 +91,67 @@ class CharacterRewardService {
      */
     public function trainSkill(Skill $skill, Adventure $adventure = null, Monster $monster = null) {
         event(new UpdateSkillEvent($skill, $adventure, $monster));
+    }
+
+    /**
+     * Assigns XP to the character.
+     *
+     * @param Monster $monster
+     * @param Adventure|null $adventure
+     * @return void
+     */
+    protected function distributeXP(Monster $monster, Adventure $adventure = null) {
+        $currentSkill = $this->fetchCurrentSkillInTraining();
+        $xpReduction  = 0.0;
+        $gameMap      = $this->character->map->gameMap;
+
+        if (!is_null($currentSkill)) {
+            $xpReduction = $currentSkill->xp_towards;
+
+            $this->trainSkill($currentSkill, $adventure, $monster);
+        }
+
+        $xp = XPCalculator::fetchXPFromMonster($monster, $this->character->level, $xpReduction);
+        $xp = $this->characterXpService->determineXPToAward($this->character, $xp);
+
+        if (!is_null($gameMap->xp_bonus)) {
+            $xp = $xp * (1 + $gameMap->xp_bonus);
+        }
+
+        $xp = $this->character->xp + $xp;
+
+        $this->character->update([
+            'xp' => $xp
+        ]);
+
+        $this->character = $this->character->refresh();
+    }
+
+    protected function handleCharacterLevelUp() {
+        $this->characterService->levelUpCharacter($this->character);
+
+        $character = $this->character->refresh();
+
+        CharacterAttackTypesCacheBuilder::dispatch($character);
+
+        event(new ServerMessageEvent($character->user, 'level_up'));
+        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterAttackEvent($character));
+    }
+
+    /**
+     * Gives gold to the player.
+     *
+     * @param Monster $monster
+     * @return void
+     * @throws \Exception
+     */
+    protected function distributeGold(Monster $monster) {
+        $newGold       = $this->character->gold + $monster->gold;
+        $maxCurrencies = new MaxCurrenciesValue($newGold, MaxCurrenciesValue::GOLD);
+
+        if (!$maxCurrencies->canNotGiveCurrency()) {
+            $this->character->update(['gold' => $monster->gold]);
+        }
     }
 }
