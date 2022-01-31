@@ -69,7 +69,7 @@ class DropCheckService {
     public function handleDropChance(Character $character) {
         $canGetDrop = $this->canHaveDrop();
 
-        $this->handleDrop($character, true);
+        $this->handleDrop($character, $canGetDrop);
 
         $this->handleMonsterQuestDrop($character);
 

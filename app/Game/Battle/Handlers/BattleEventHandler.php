@@ -32,20 +32,16 @@ class BattleEventHandler {
 
     private $characterAttackTransformer;
 
-    private $randomAffixGenerator;
-
     private $battleRewardProcessing;
 
     public function __construct(
         Manager $manager,
         CharacterAttackTransformer $characterAttackTransformer,
         BattleRewardProcessing $battleRewardProcessing,
-        RandomAffixGenerator $randomAffixGenerator,
     ) {
         $this->manager                    = $manager;
         $this->characterAttackTransformer = $characterAttackTransformer;
         $this->battleRewardProcessing     = $battleRewardProcessing;
-        $this->randomAffixGenerator       = $randomAffixGenerator;
     }
 
     public function processDeadCharacter(Character $character) {
@@ -98,96 +94,5 @@ class BattleEventHandler {
         return $character;
     }
 
-    protected function updateFaction(Faction $faction): Faction {
 
-        $newLevel = $faction->current_level + 1;
-
-        $faction->update([
-            'current_points' => 0,
-            'current_level'  => $newLevel,
-            'points_needed'  => FactionLevel::getPointsNeeded($newLevel),
-            'title'          => FactionType::getTitle($newLevel)
-        ]);
-
-        return $faction->refresh();
-    }
-
-    protected function rewardPlayer(Character $character, Faction $faction, string $mapName, ?string $title = null) {
-        $character = $this->giveCharacterGold($character, $faction->current_level);
-        $item      = $this->giveCharacterRandomItem($character);
-
-        event(new ServerMessageEvent($character->user, 'Achieved title: ' . $title . ' of ' . $mapName));
-
-        if ($character->isInventoryFull()) {
-
-            event(new ServerMessageEvent($character->user, 'You got no item as your inventory is full. Clear space for the next time!'));
-        } else {
-
-            $character->inventory->slots()->create([
-                'inventory_id' => $character->inventory->id,
-                'item_id'      => $item->id,
-            ]);
-
-            $character = $character->refresh();
-
-            event(new CharacterInventoryUpdateBroadCastEvent($character->user));
-
-            event(new ServerMessageEvent($character->user, 'Rewarded with (item with randomly generated affix(es)): ' . $item->affix_name));
-        }
-    }
-
-    protected function giveCharacterGold(Character $character, int $factionLevel) {
-        $gold = FactionLevel::getGoldReward($factionLevel);
-
-        $characterNewGold = $character->gold + $gold;
-
-        $cannotHave = (new MaxCurrenciesValue($characterNewGold, 0))->canNotGiveCurrency();
-
-        if ($cannotHave) {
-            $characterNewGold = MaxCurrenciesValue::MAX_GOLD;
-
-            $character->gold = $characterNewGold;
-            $character->save();
-
-            event(new ServerMessageEvent($character->user, 'Received faction gold reward: ' . number_format($gold) . ' gold. You are now gold capped.'));
-
-            return $character->refresh();
-        }
-
-        $character->gold += $gold;
-
-        event(new ServerMessageEvent($character->user, 'Received faction gold reward: ' . number_format($gold) . ' gold.'));
-
-        $character->save();
-
-        return $character->refresh();
-    }
-
-    protected function giveCharacterRandomItem(Character $character) {
-        $item = ItemModel::where('cost', '<=', RandomAffixDetails::BASIC)
-                         ->whereNull('item_prefix_id')
-                         ->whereNull('item_suffix_id')
-                         ->where('cost', '<=', 4000000000)
-                         ->inRandomOrder()
-                         ->first();
-
-
-        $randomAffix = $this->randomAffixGenerator
-                            ->setCharacter($character)
-                            ->setPaidAmount(RandomAffixDetails::BASIC);
-
-        $duplicateItem = $item->duplicate();
-
-        $duplicateItem->update([
-            'item_prefix_id' => $randomAffix->generateAffix('prefix')->id,
-        ]);
-
-        if (rand(1, 100) > 50) {
-            $duplicateItem->update([
-                'item_suffix_id' => $randomAffix->generateAffix('suffix')->id
-            ]);
-        }
-
-        return $duplicateItem;
-    }
 }

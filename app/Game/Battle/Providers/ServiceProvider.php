@@ -39,7 +39,9 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
         $this->app->bind(FactionHandler::class, function($app) {
-            return new FactionHandler();
+            return new FactionHandler(
+                $app->make(RandomAffixGenerator::class)
+            );
         });
 
         $this->app->bind(GoldRush::class, function($app) {
@@ -59,7 +61,6 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(Manager::class),
                 $app->make(CharacterAttackTransformer::class),
                 $app->make(BattleRewardProcessing::class),
-                $app->make(RandomAffixGenerator::class),
             );
         });
 
