@@ -33,15 +33,18 @@ class AttackAutomationService {
      * @param array $params
      */
     public function beginAutomation(Character $character, array $params): array {
-        $result = $this->switchSkills($character, $params['skill_id'], $params['xp_towards']);
 
-        if (!$result instanceof Character) {
-            // @codeCoverageIgnoreStart
-            return $result;
-            // @codeCoverageIgnoreEnd
+        if (!is_null($params['skill_id']) && !is_null($params['xp_towards'])) {
+            $result = $this->switchSkills($character, $params['skill_id'], $params['xp_towards']);
+
+            if (!$result instanceof Character) {
+                // @codeCoverageIgnoreStart
+                return $result;
+                // @codeCoverageIgnoreEnd
+            }
+
+            $character = $result;
         }
-
-        $character = $result;
 
         $automation = CharacterAutomation::create([
             'character_id'                  => $character->id,
