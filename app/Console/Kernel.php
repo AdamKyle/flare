@@ -47,6 +47,9 @@ class Kernel extends ConsoleKernel {
         // Update kingdoms every hour.
         $schedule->command('update:kingdom')->hourly()->timezone(config('app.timezone'));
 
+        // Refresh the droppable items.
+        $schedule->command('cache:droppable-items')->hourly()->timezone(config('app.timezone'));
+
         // Give people a chance to win daily lottery for gold dust
         $schedule->command('daily:gold-dust')->dailyAt('12:00')->timezone(config('app.timezone'));
 

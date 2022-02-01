@@ -24,6 +24,13 @@ class AttackAutomationController extends Controller {
     }
 
     public function begin(AttackAutomationStartRequest $request, Character $character, AttackAutomationService $attackAutomationService) {
+
+        if (!$character->user->can_auto_battle) {
+            return response()->json([
+                'message' => 'You are not allowed to auto battle.'
+            ], 422);
+        }
+
         $response = $attackAutomationService->beginAutomation($character, $request->all());
 
         return response()->json([

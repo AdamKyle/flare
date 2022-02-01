@@ -2,16 +2,16 @@
 
 namespace App\Admin\Controllers;
 
+
+use App\Flare\Models\CharacterAutomation;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Admin\Events\ForceNameChangeEvent;
 use App\Admin\Mail\ResetPasswordEmail;
 use App\Admin\Services\UserService;
-use App\Flare\Jobs\UpdateSilencedUserJob;
 use App\Flare\Models\User;
-use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Mail\GenericMail;
 use App\Flare\Jobs\SendOffEmail;
+use App\Game\Messages\Events\ServerMessageEvent;
 
 class UsersController extends Controller {
 
@@ -138,5 +138,23 @@ class UsersController extends Controller {
         $this->userService->forceNameChange($user);
 
         return redirect()->back()->with('success', $user->character->name . ' forced to change their name.');
+    }
+
+    public function enableAutoBattle(Request $request, User $user) {
+        $user->update(['can_auto_battle' => true]);
+
+        event(new ServerMessageEvent($user->refresh(), 'The Creator has enabled auto battle for you. Please refresh.'));
+
+        return redirect()->back()->with('success', $user->character->name . ' can now use auto battle.');
+    }
+
+    public function disableAutoBattle(Request $request, User $user) {
+        $user->update(['can_auto_battle' => false]);
+
+        CharacterAutomation::where('character_id', $user->character->id)->delete();
+
+        event(new ServerMessageEvent($user->refresh(), 'The Creator has disabled auto battle on your account. Please refresh.'));
+
+        return redirect()->back()->with('success', $user->character->name . ' can now use auto battle.');
     }
 }
