@@ -66,6 +66,45 @@ There are many ways you can catch up. You could be the type of player who runs a
 
 <sup>**</sup> The information section is composed of mark down files. This is very experimental at the moment. It takes a series of mark down files, converts them into one document and displays it to the user. The information section is like a Help section.
 
+## Importing the database
+
+Under `/resources/data-imports/database` is a database called flare.sql.
+
+This contains all the current users of the game, but all their emails and passwords have been masked out and changed for development and 
+security purposes. This is the closest approximate of production database.
+
+Once imported you have an Admin user:
+
+- User name: admin@email.com
+- Password: TestPassword
+
+All characters have their password set as TestPassword but use random strings for their emails, so you will need to use the admin users table
+to find the player you want and then change their email and password.
+
+**No sensitive information is stored in this copy of production database and no PR that has this database changed will be accepted. 
+Do not make changes to this export and then re-export it for commit.**
+
+Once you have the database in place, next copy the maps from `/resources/backups/maps` copy the whole directory to Public/Storage/
+
+If you do not have a public storage remember to use: `php artisan storage:link`
+
+Once this is done, next run (in order):
+
+- php artisan cache:clear
+- php artisan cache:droppable-items
+- php artisan cache:high-end-items
+
+These last two will cache items that can be given to players.
+
+Finally, do `php artisan tinker` and run:
+
+- `resolve(App\Flare\Services\BuildMonsterCacheService::class)->buildCache()`
+
+
+This allows you to face off against monsters in special locations
+
+With that done. You have the game imported.
+
 ## Redis
 
 We use redis for jobs and queues with in the system. To get started, make sure you have php redis installed, the redis server and that its running.
