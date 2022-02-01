@@ -25,7 +25,7 @@ class BattleRewardProcessing {
         $this->goldRushService        = $goldRush;
     }
 
-    public function handleMonster(Character $character, Monster $monster) {
+    public function handleMonster(Character $character, Monster $monster, bool $isAutomation = false) {
         if (!$character->map->gameMap->mapType()->isPurgatory()) {
             $this->factionHandler->handleFaction($character, $monster);
         }
@@ -34,7 +34,9 @@ class BattleRewardProcessing {
 
         $character = $this->characterRewardService->getCharacter();
 
-        BattleItemHandler::dispatch($character, $monster);
+        if (!$isAutomation) {
+            BattleItemHandler::dispatch($character, $monster);
+        }
 
         $this->goldRushService->processPotentialGoldRush($character, $monster);
 

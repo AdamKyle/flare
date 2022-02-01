@@ -58,10 +58,10 @@ class BattleEventHandler {
         event(new UpdateAttackStats($this->manager->createData($characterData)->toArray(), $character->user));
     }
 
-    public function processMonsterDeath(Character $character, int $monsterId) {
+    public function processMonsterDeath(Character $character, int $monsterId, bool $isAutomation = false) {
         $monster = Monster::find($monsterId);
 
-        $this->battleRewardProcessing->handleMonster($character, $monster);
+        $this->battleRewardProcessing->handleMonster($character, $monster, $isAutomation);
     }
 
     public function processRevive(Character $character): Character {

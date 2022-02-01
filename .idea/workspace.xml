@@ -6,13 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="b57f583e-608e-4ca2-947d-cf9ab46f7914" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Admin/Console/Commands/CreateAdminAccount.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Admin/Console/Commands/CreateAdminAccount.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Console/Commands/CacheDroppableItems.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Console/Commands/CacheDroppableItems.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Console/Kernel.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Console/Kernel.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Game/Core/Services/DropCheckService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Core/Services/DropCheckService.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Game/Kingdoms/Service/KingdomResourcesService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Kingdoms/Service/KingdomResourcesService.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Auth/RegisterController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Auth/RegisterController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/factories/UserFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/factories/UserFactory.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Automation/Services/ProcessAttackAutomation.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Automation/Services/ProcessAttackAutomation.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Battle/Handlers/BattleEventHandler.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Battle/Handlers/BattleEventHandler.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Battle/Jobs/BattleAttackHandler.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Battle/Jobs/BattleAttackHandler.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Battle/Services/BattleRewardProcessing.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Battle/Services/BattleRewardProcessing.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

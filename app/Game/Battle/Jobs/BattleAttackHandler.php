@@ -18,12 +18,15 @@ class BattleAttackHandler implements ShouldQueue
 
     private $monsterId;
 
-    public function __construct(Character $character, int $monsterId) {
-        $this->character = $character;
-        $this->monsterId = $monsterId;
+    private $isAutomation;
+
+    public function __construct(Character $character, int $monsterId, bool $isAutomation = false) {
+        $this->character    = $character;
+        $this->monsterId    = $monsterId;
+        $this->isAutomation = $isAutomation;
     }
 
     public function handle(BattleEventHandler $battleEventHandler) {
-        $battleEventHandler->processMonsterDeath($this->character, $this->monsterId);
+        $battleEventHandler->processMonsterDeath($this->character, $this->monsterId, $this->isAutomation);
     }
 }
