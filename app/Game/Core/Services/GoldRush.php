@@ -2,10 +2,8 @@
 
 namespace App\Game\Core\Services;
 
-
-use App\Flare\Events\ServerMessageEvent;
-use App\Flare\Events\UpdateTopBarEvent;
 use Facades\App\Flare\Calculators\GoldRushCheckCalculator;
+use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Models\Adventure;
 use App\Flare\Models\Character;
@@ -26,24 +24,26 @@ class GoldRush {
     }
 
     protected function giveGoldRush(Character $character) {
-        $goldRush      = ceil($character->gold + $character->gold * 0.03);
+        $goldRush      = ceil($character->gold + ($character->gold * 0.05));
+        dump($goldRush);
         $maxCurrencies = new MaxCurrenciesValue($goldRush, MaxCurrenciesValue::GOLD);
 
         $type = 'gold_rush';
 
         if ($maxCurrencies->canNotGiveCurrency()) {
-            $character->gold = MaxCurrenciesValue::MAX_GOLD;;
+            dump('no');
+            $character->gold = MaxCurrenciesValue::MAX_GOLD;
             $character->save();
 
             $type = 'gold_capped';
         } else {
-            $character->gold = $goldRush;
+            $character->gold += $goldRush;
             $character->save();
         }
 
         $character = $character->refresh();
 
-        event(new ServerMessageEvent($character->user, $type, number_format($goldRush)));
+        event(new ServerMessageEvent($character->user, $type, number_format($character->gold)));
     }
 
     protected function getGameMapBonus(Character $character): float {

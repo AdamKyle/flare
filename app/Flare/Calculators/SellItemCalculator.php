@@ -25,7 +25,7 @@ class SellItemCalculator {
      * @return int
      */
     public function fetchSalePriceWithAffixes(Item $item): int {
-        $cost = Item::find($item->id)->cost;
+        $cost = $item->cost;
 
         if (!is_null($item->item_suffix_id)) {
             $cost += $item->itemSuffix->cost;
@@ -57,6 +57,6 @@ class SellItemCalculator {
             return $cost;
         }
 
-        return $cost / 2;
+        return (int) floor($cost / 2);
     }
 }

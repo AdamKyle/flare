@@ -149,8 +149,9 @@ class CharacterRewardService {
         $newGold       = $this->character->gold + $monster->gold;
         $maxCurrencies = new MaxCurrenciesValue($newGold, MaxCurrenciesValue::GOLD);
 
+
         if (!$maxCurrencies->canNotGiveCurrency()) {
-            $this->character->update(['gold' => $monster->gold]);
+            $this->character->update(['gold' => $newGold]);
         }
     }
 }

@@ -32,13 +32,17 @@ class BattleRewardProcessing {
 
         $this->characterRewardService->setCharacter($character->refresh())->distributeGoldAndXp($monster);
 
-        $character = $character->refresh();
+        $character = $this->characterRewardService->getCharacter();
 
         BattleItemHandler::dispatch($character, $monster);
 
         $this->goldRushService->processPotentialGoldRush($character, $monster);
 
-        event(new UpdateTopBarEvent($character->refresh()));
+        $character = $character->refresh();
+
+        dump('Battle Reward Processing: ' . $character->gold);
+
+        event(new UpdateTopBarEvent($character));
     }
 
 }
