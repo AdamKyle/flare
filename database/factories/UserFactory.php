@@ -41,6 +41,7 @@ class UserFactory extends Factory
             'upgraded_building_email' => true,
             'rebuilt_building_email'  => true,
             'kingdom_attack_email'    => true,
+            'can_auto_battle'         => true,
         ];
     }
 }

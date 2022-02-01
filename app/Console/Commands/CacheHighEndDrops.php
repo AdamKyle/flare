@@ -6,21 +6,21 @@ use App\Flare\Models\Item;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 
-class CacheDroppableItems extends Command
+class CacheHighEndDrops extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'cache:droppable-items';
+    protected $signature = 'cache:high-end-items';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Caches a list of items that can drop for the player.';
+    protected $description = 'Caches a list of high end items that can drop for the player in various special locations.';
 
     protected $itemIds = [];
 
@@ -42,10 +42,10 @@ class CacheDroppableItems extends Command
     public function handle()
     {
 
-        $prefixes = Item::inRandomOrder()->where('can_drop', true)->whereHas('itemPrefix')->take(100)->pluck('id')->toArray();
-        $suffixes = Item::inRandomOrder()->where('can_drop', true)->whereHas('itemSuffix')->take(100)->pluck('id')->toArray();
+        $prefixItems = Item::inRandomOrder()->where('cost', '<=', 4000000000)->whereHas('itemPrefix')->take(100)->pluck('id')->toArray();
+        $suffixItems = Item::inRandomOrder()->where('cost', '<=', 4000000000)->whereHas('itemSuffix')->take(100)->pluck('id')->toArray();
 
-        $this->itemIds = array_merge($prefixes, $suffixes);
+        $this->itemIds = array_merge($suffixItems, $prefixItems);
 
         if (!empty($this->itemIds)) {
             $randomItems = [];
@@ -59,7 +59,7 @@ class CacheDroppableItems extends Command
                 }
             }
 
-            Cache::put('droppable-items', $randomItems);
+            Cache::put('highend-droppable-items', $randomItems);
         }
     }
 }

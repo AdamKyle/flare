@@ -4,6 +4,7 @@ namespace App\Game\Core\Services;
 
 
 use App\Flare\Models\User;
+use App\Flare\Values\MapNameValue;
 use Facades\App\Flare\Calculators\DropCheckCalculator;
 use Facades\App\Flare\Calculators\SellItemCalculator;
 use App\Flare\Builders\RandomItemDropBuilder;
@@ -99,7 +100,7 @@ class DropCheckService {
     protected function handleDrop(Character $character, bool $canGetDrop) {
         if ($canGetDrop) {
 
-            $drop = $this->getDropFromCache();
+            $drop = $this->getDropFromCache($character, $this->monster->gameMap->name, $this->locationWithEffect);
 
             if (is_null($drop)) {
                 $drop = $this->randomItemDropBuilder
@@ -119,24 +120,41 @@ class DropCheckService {
             }
         }
     }
-    protected function getDropFromCache(): ?Item {
-        $drop = null;
 
-        if (Cache::has('droppable-items')) {
-            $items = Cache::get('droppable-items');
+    protected function getDropFromCache(Character $character, string $gameMapName, Location $locationWithEffect = null): ?Item {
+        $levelDifference = $character->level - $this->monster->max_level;
+
+        if ($gameMapName === MapNameValue::SHADOW_PLANE) {
+            if ($levelDifference >= 10) {
+                return $this->getDrop('highend-droppable-items');
+            }
+        }
+
+        if (!is_null($locationWithEffect)) {
+            if ($levelDifference >= 10) {
+                return $this->getDrop('highend-droppable-items');
+            }
+        }
+
+        return $this->getDrop('droppable-items');
+    }
+
+    protected function getDrop(string $cacheName): ?Item {
+        if (Cache::has($cacheName)) {
+            $items = Cache::get($cacheName);
 
             if (count($items) > 100) {
-                $drop = Item::find($items[rand(0, (count($items) - 1))]);
+                return Item::find($items[rand(0, (count($items) - 1))]);
             } else {
                 $roll = rand(0, self::ROLL);
 
                 if ($roll < self::GENERATE_RANDOM_ITEM) {
-                    $drop = Item::find($items[rand(0, (count($items) - 1))]);
+                    return Item::find($items[rand(0, (count($items) - 1))]);
                 }
             }
         }
 
-        return $drop;
+        return null;
     }
 
     protected function handleMonsterQuestDrop(Character $character) {

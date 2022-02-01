@@ -95,6 +95,7 @@ class RegisterController extends Controller
             'email'            => $data['email'],
             'password'         => Hash::make($data['password']),
             'ip_address'       => $ip,
+            'can_auto_battle'  => false,
             'last_logged_in'   => now(),
         ]);
     }
