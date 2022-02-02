@@ -111,7 +111,7 @@ export default class CharacterSheet extends React.Component {
                       <Automations automations={this.state.characterSheet.automations} />
                     </Tab>
                     <Tab eventKey="character-faction" title='Factions'>
-                      <Factions factions={this.state.characterSheet.factions} />
+                      <Factions factions={this.state.characterSheet.factions} canAutoBattle={this.state.characterSheet.can_auto_battle}/>
                     </Tab>
                   </Tabs>
                   <SkillDetails

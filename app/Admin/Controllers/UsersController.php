@@ -143,6 +143,18 @@ class UsersController extends Controller {
     public function enableAutoBattle(Request $request, User $user) {
         $user->update(['can_auto_battle' => true]);
 
+        $character = $user->character;
+
+        foreach ($character->factions as $faction) {
+            $newPointsNeeded  = $faction->points_needed * 10;
+            $newCurrentPoints = $faction->current_points * 10;
+
+            $faction->update([
+                'current_points' => $newCurrentPoints,
+                'points_needed'  => $newPointsNeeded,
+            ]);
+        }
+
         event(new ServerMessageEvent($user->refresh(), 'The Creator has enabled auto battle for you. Please refresh.'));
 
         return redirect()->back()->with('success', $user->character->name . ' can now use auto battle.');
@@ -150,6 +162,23 @@ class UsersController extends Controller {
 
     public function disableAutoBattle(Request $request, User $user) {
         $user->update(['can_auto_battle' => false]);
+
+        $character = $user->character;
+
+        foreach ($character->factions as $faction) {
+            $newCurrentPoints = $faction->current_points;
+
+            $newPointsNeeded = $faction->points_needed / 10;
+
+            if ($faction->current_points > $newPointsNeeded) {
+                $newCurrentPoints = $faction->current_points / 10;
+            }
+
+            $faction->update([
+                'current_points' => $newCurrentPoints,
+                'points_needed'  => $newPointsNeeded,
+            ]);
+        }
 
         CharacterAutomation::where('character_id', $user->character->id)->delete();
 

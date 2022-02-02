@@ -124,7 +124,8 @@ class AdventureRewardService {
     }
 
     protected function handleFactionPoints(Character $character, Adventure $adventure, int $factionPoints) {
-        $faction   = $character->factions()->where('game_map_id', $adventure->location->map->id)->first();
+        $faction            = $character->factions()->where('game_map_id', $adventure->location->map->id)->first();
+        $autoBattleDisabled = $character->user->can_can_auto_battle ? false : true;
 
         $points    = $faction->current_points + $factionPoints;
 
@@ -135,7 +136,7 @@ class AdventureRewardService {
             $points    = $faction->points_needed;
         }
 
-        if ($points >= $faction->points_needed && !FactionLevel::isMaxLevel($faction->current_level, $points)) {
+        if ($points >= $faction->points_needed && !FactionLevel::isMaxLevel($faction->current_level, $points, $autoBattleDisabled)) {
             $newLevel = $faction->current_level + 1;
 
             $faction->update([
@@ -152,7 +153,7 @@ class AdventureRewardService {
             event(new UpdateTopBarEvent($character));
 
             $this->factionReward($character, $faction, $faction->gameMap->name, FactionType::getTitle($newLevel));
-        } else if ($points >= $faction->points_needed && FactionLevel::isMaxLevel($faction->current_level, $points) && !$faction->maxed) {
+        } else if ($points >= $faction->points_needed && FactionLevel::isMaxLevel($faction->current_level, $points, $autoBattleDisabled) && !$faction->maxed) {
             event(new ServerMessageEvent($character->user,$faction->gameMap->name . ' faction has become maxed out!'));
 
             event(new UpdateTopBarEvent($character));

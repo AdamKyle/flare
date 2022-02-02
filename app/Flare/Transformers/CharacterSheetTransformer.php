@@ -85,6 +85,7 @@ class CharacterSheetTransformer extends TransformerAbstract {
             'attack_stats'       => Cache::get('character-attack-data-' . $character->id),
             'automations'        => $this->getAutomations($character),
             'factions'           => $this->getFactions($character),
+            'can_auto_battle'    => $character->user->can_auto_battle,
         ];
     }
 

@@ -25,8 +25,14 @@ class FactionLevel {
         return self::POINTS_NEEDED[$currentLevel];
     }
 
-    public static function isMaxLevel(int $currentLevel, int $currentPoints): bool {
-        return $currentLevel === self::MAX_LEVEL || $currentPoints === self::POINTS_NEEDED[self::MAX_LEVEL];
+    public static function isMaxLevel(int $currentLevel, int $currentPoints, bool $disabledAutoBattle = false): bool {
+        $pointsNeeded = self::POINTS_NEEDED[self::MAX_LEVEL];
+
+        if ($disabledAutoBattle) {
+            $pointsNeeded = $pointsNeeded / 10;
+        }
+
+        return $currentLevel === self::MAX_LEVEL || $currentPoints === $pointsNeeded;
     }
 
     public static function gatPointsPerLevel(int $currentLevel): int {

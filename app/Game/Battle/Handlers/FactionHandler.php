@@ -29,9 +29,10 @@ class FactionHandler {
     }
 
     protected function handleFactionPoints(Character $character, Monster $monster) {
-        $mapId   = $monster->gameMap->id;
-        $mapName = $monster->gameMap->name;
-        $faction = $character->factions()->where('game_map_id', $mapId)->first();
+        $mapId                = $monster->gameMap->id;
+        $mapName              = $monster->gameMap->name;
+        $faction              = $character->factions()->where('game_map_id', $mapId)->first();
+        $autoBattleIsDisabled = $character->user->can_auto_battle ? false : true;
 
         $faction->current_points += FactionLevel::gatPointsPerLevel($faction->current_level);
 
@@ -39,11 +40,11 @@ class FactionHandler {
             $faction->current_points = $faction->points_needed;
         }
 
-        if ($faction->current_points === $faction->points_needed && !FactionLevel::isMaxLevel($faction->current_level, $faction->current_points)) {
+        if ($faction->current_points === $faction->points_needed && !FactionLevel::isMaxLevel($faction->current_level, $faction->current_points, $autoBattleIsDisabled)) {
 
             return $this->handleFactionLevelUp($character, $faction, $mapName);
 
-        } else if (FactionLevel::isMaxLevel($faction->current_level, $faction->current_points) && !$faction->maxed) {
+        } else if (FactionLevel::isMaxLevel($faction->current_level, $faction->current_points, $autoBattleIsDisabled) && !$faction->maxed) {
 
             return $this->handleFactionMaxedOut($character, $faction, $mapName);
         }
@@ -76,10 +77,16 @@ class FactionHandler {
 
         $newLevel = $faction->current_level + 1;
 
+        $pointsNeeded = FactionLevel::getPointsNeeded($newLevel);
+
+        if (!$faction->character->user->can_auto_battle) {
+            $pointsNeeded = $pointsNeeded / 10;
+        }
+
         $faction->update([
             'current_points' => 0,
             'current_level'  => $newLevel,
-            'points_needed'  => FactionLevel::getPointsNeeded($newLevel),
+            'points_needed'  => $pointsNeeded,
             'title'          => FactionType::getTitle($newLevel)
         ]);
 
