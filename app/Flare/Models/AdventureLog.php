@@ -61,7 +61,7 @@ class AdventureLog extends Model
     }
 
     public function overFlowSet() {
-        return $this->hasOne(SetSlot::class, 'id', 'over_flow_set_id');
+        return $this->hasOne(InventorySet::class, 'id', 'over_flow_set_id');
     }
 
     protected static function newFactory() {
