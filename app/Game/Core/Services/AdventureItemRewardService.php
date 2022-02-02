@@ -80,7 +80,7 @@ class AdventureItemRewardService {
         if ($character->isInventoryFull() && !is_null($inventorySet) && $item->type !== 'quest') {
             $this->inventorySetService->putItemIntoSet($inventorySet, $item);
 
-            if (!is_null($characterSet->name)) {
+            if (!is_null($inventorySet->name)) {
                 $message = 'Item: '.$item->affix_name.' has been stored in Set: '.$inventorySet->name.' as your inventory is full';
 
                 event(new ServerMessageEvent($user, $message));

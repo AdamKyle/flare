@@ -302,7 +302,7 @@ class AdventureRewardService {
         $character         = $character->refresh();
 
         if (!is_null($set)) {
-            $characterSet = $character->innventorySets()->find($set->id);
+            $characterSet = $character->inventorySets()->find($set->id);
         } else {
             $characterSet = $character->inventorySets->filter(function($set) {
                 return $set->slots->isEmpty();
