@@ -550,6 +550,12 @@ class CharacterAttackInformation {
         return $percentageBonus;
     }
 
+    /**
+     * Fetch voidance from players Affixes
+     *
+     * @param string $type
+     * @return float
+     */
     private function fetchVoidanceFromAffixes(string $type): float {
         $prefixDevouringLight  = $this->fetchInventory()->pluck('item.itemPrefix.' . $type)->toArray();
         $sufficDevouringLight  = $this->fetchInventory()->pluck('item.itemSuffix.' . $type)->toArray();
