@@ -210,7 +210,7 @@ class DropCheckService {
     protected function attemptToPickUpItem(Character $character, Item $item) {
         $user      = $character->user;
 
-        if ($user->auto_disenchan && $item->type !== 'quest') {
+        if ($user->auto_disenchant && $item->type !== 'quest') {
             $this->autoDisenchantItem($character, $item);
         } else {
             if (!$character->isInventoryFull()) {
