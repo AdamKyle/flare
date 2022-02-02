@@ -25,13 +25,12 @@ class GoldRush {
 
     protected function giveGoldRush(Character $character) {
         $goldRush      = ceil($character->gold + ($character->gold * 0.05));
-        dump($goldRush);
+
         $maxCurrencies = new MaxCurrenciesValue($goldRush, MaxCurrenciesValue::GOLD);
 
         $type = 'gold_rush';
 
         if ($maxCurrencies->canNotGiveCurrency()) {
-            dump('no');
             $character->gold = MaxCurrenciesValue::MAX_GOLD;
             $character->save();
 

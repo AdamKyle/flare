@@ -160,7 +160,7 @@ class DropCheckService {
     protected function handleMonsterQuestDrop(Character $character) {
         if (!is_null($this->monster->quest_item_id)) {
             $canGetQuestItem = DropCheckCalculator::fetchQuestItemDropCheck($this->monster, $this->lootingChance, $this->gameMapBonus, $this->adventure);
-
+            dump($canGetQuestItem);
             if ($canGetQuestItem) {
                 $this->attemptToPickUpItem($character, $this->monster->questItem);
 
@@ -210,7 +210,7 @@ class DropCheckService {
     protected function attemptToPickUpItem(Character $character, Item $item) {
         $user      = $character->user;
 
-        if ($user->auto_disenchant) {
+        if ($user->auto_disenchan && $item->type !== 'quest') {
             $this->autoDisenchantItem($character, $item);
         } else {
             if (!$character->isInventoryFull()) {
