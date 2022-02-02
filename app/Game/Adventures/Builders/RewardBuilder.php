@@ -9,12 +9,19 @@ use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Skill;
+use App\Game\Battle\Services\BattleDrop;
 use Facades\App\Flare\Calculators\XPCalculator;
 use Facades\App\Flare\Calculators\SkillXPCalculator;
 use Facades\App\Flare\Calculators\DropCheckCalculator;
 use Facades\App\Flare\Calculators\GoldRushCheckCalculator;
 
 class RewardBuilder {
+
+    private $battleDrop;
+
+    public function __construct(BattleDrop $battleDrop) {
+        $this->battleDrop = $battleDrop;
+    }
 
     /**
      * Fetch the Xp Reward
@@ -46,20 +53,17 @@ class RewardBuilder {
      * @return mixed Item | null
      */
     public function fetchDrops(Monster $monster, Character $character, Adventure $adventure, float $gameMapBonus): ?Item {
+
         $lootingChance = $character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
+
+        $battleDrop = $this->battleDrop->setAdventure($adventure)
+                           ->setGameMapBonus($gameMapBonus)
+                           ->setLootingChance($lootingChance)
+                           ->setMonster($monster);
 
         $hasDrop = DropCheckCalculator::fetchDropCheckChance($monster, $lootingChance, $gameMapBonus, $adventure);
 
-        if ($hasDrop) {
-            return resolve(RandomItemDropBuilder::class)
-                        ->setLocation($adventure->location)
-                        ->setMonsterPlane($monster->gameMap->name)
-                        ->setCharacterLevel($character->level)
-                        ->setMonsterMaxLevel($monster->max_level)
-                        ->generateItem();
-        }
-
-        return null;
+        return $battleDrop->handleDrop($character, $hasDrop);
     }
 
     /**

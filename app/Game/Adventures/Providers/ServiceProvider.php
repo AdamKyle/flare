@@ -4,6 +4,7 @@ namespace App\Game\Adventures\Providers;
 
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Services\FightService;
+use App\Game\Battle\Services\BattleDrop;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Game\Adventures\Console\Commands\DeleteAdventureLogs;
 use App\Game\Adventures\Builders\RewardBuilder;
@@ -27,7 +28,9 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
         $this->app->bind(RewardBuilder::class, function($app) {
-            return new RewardBuilder();
+            return new RewardBuilder(
+                $app->make(BattleDrop::class)
+            );
         });
 
         $this->app->bind(AdventureFightService::class, function($app) {
