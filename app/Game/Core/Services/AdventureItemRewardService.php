@@ -80,7 +80,7 @@ class AdventureItemRewardService {
         if ($character->isInventoryFull() && !is_null($inventorySet) && $item->type !== 'quest') {
             $this->inventorySetService->putItemIntoSet($inventorySet, $item);
 
-            if (!is_null($characterSet->name)) {
+            if (!is_null($inventorySet->name)) {
                 $message = 'Item: '.$item->affix_name.' has been stored in Set: '.$inventorySet->name.' as your inventory is full';
 
                 event(new ServerMessageEvent($user, $message));
@@ -126,6 +126,8 @@ class AdventureItemRewardService {
                 event(new ServerMessageEvent($user, 'You gained the item: ' . $item->affix_name));
 
                 return true;
+            } else {
+                event(new ServerMessageEvent($character->user, 'Cannot have Quest Item because: You already had this item or upgraded this item.'));
             }
         } else  {
             $character->inventory->slots()->create([

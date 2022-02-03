@@ -219,6 +219,8 @@ class AdventureRewardService {
             $character = $character->refresh();
 
             $this->buildCharacterAttackTypes->buildCache($character);
+
+            event(new ServerMessageEvent($character->user, 'Gained new level, you are now: LV ' . $character->level));
         }
 
         event(new ServerMessageEvent($character->user, 'Awarded XP from previous adventure'));
@@ -302,7 +304,7 @@ class AdventureRewardService {
         $character         = $character->refresh();
 
         if (!is_null($set)) {
-            $characterSet = $character->innventorySets()->find($set->id);
+            $characterSet = $character->inventorySets()->find($set->id);
         } else {
             $characterSet = $character->inventorySets->filter(function($set) {
                 return $set->slots->isEmpty();

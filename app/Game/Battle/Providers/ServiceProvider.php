@@ -3,16 +3,19 @@
 namespace App\Game\Battle\Providers;
 
 use App\Flare\Builders\RandomAffixGenerator;
+use App\Flare\Builders\RandomItemDropBuilder;
 use App\Flare\Services\CharacterRewardService;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Game\Battle\Console\Commands\ClearCelestials;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Handlers\FactionHandler;
 use App\Game\Battle\Jobs\BattleAttackHandler;
+use App\Game\Battle\Services\BattleDrop;
 use App\Game\Battle\Services\BattleRewardProcessing;
 use App\Game\Battle\Services\CelestialFightService;
 use App\Game\Core\Services\DropCheckService;
 use App\Game\Core\Services\GoldRush;
+use App\Game\Skills\Services\DisenchantService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
 use App\Flare\Transformers\CharacterSheetTransformer;
@@ -46,6 +49,13 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(GoldRush::class, function($app) {
             return new GoldRush();
+        });
+
+        $this->app->bind(BattleDrop::class, function($app) {
+            return new BattleDrop(
+                $app->make(RandomItemDropBuilder::class),
+                $app->make(DisenchantService::class)
+            );
         });
 
         $this->app->bind(BattleRewardProcessing::class, function($app) {
