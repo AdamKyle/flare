@@ -63,7 +63,7 @@ class RewardBuilder {
 
         $hasDrop = DropCheckCalculator::fetchDropCheckChance($monster, $lootingChance, $gameMapBonus, $adventure);
 
-        return $battleDrop->handleDrop($character, $hasDrop);
+        return $battleDrop->handleDrop($character, $hasDrop, true);
     }
 
     /**

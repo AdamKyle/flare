@@ -219,6 +219,8 @@ class AdventureRewardService {
             $character = $character->refresh();
 
             $this->buildCharacterAttackTypes->buildCache($character);
+
+            event(new ServerMessageEvent($character->user, 'Gained new level, you are now: LV ' . $character->level));
         }
 
         event(new ServerMessageEvent($character->user, 'Awarded XP from previous adventure'));

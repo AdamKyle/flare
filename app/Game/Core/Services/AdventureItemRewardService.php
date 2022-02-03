@@ -126,6 +126,8 @@ class AdventureItemRewardService {
                 event(new ServerMessageEvent($user, 'You gained the item: ' . $item->affix_name));
 
                 return true;
+            } else {
+                event(new ServerMessageEvent($character->user, 'Cannot have Quest Item because: You already had this item or upgraded this item.'));
             }
         } else  {
             $character->inventory->slots()->create([
