@@ -4,6 +4,7 @@ namespace App\Game\Core\Controllers\Api;
 
 use App\Admin\Events\UpdateAdminChatEvent;
 
+use App\Flare\Transformers\CharacterTopBarTransformer;
 use Illuminate\Http\Request;
 use League\Fractal\Resource\Item;
 use League\Fractal\Manager;
@@ -13,7 +14,6 @@ use App\Flare\Models\GameSkill;
 use App\Flare\Models\User;
 use App\Flare\Values\ItemUsabilityType;
 use App\Flare\Models\Character;
-use App\Flare\Transformers\CharacterSheetTransformer;
 use App\Game\Core\Jobs\EndGlobalTimeOut;
 use App\Game\Core\Services\UseItemService;
 
@@ -21,16 +21,16 @@ class CharacterSheetController extends Controller {
 
     private $manager;
 
-    private $characterSheetTransformer;
+    private $characterTopBarTransformer;
 
-    public function __construct(Manager $manager, CharacterSheetTransformer $characterSheetTransformer) {
+    public function __construct(Manager $manager, CharacterTopBarTransformer $characterTopBarTransformer) {
 
-        $this->manager                   = $manager;
-        $this->characterSheetTransformer = $characterSheetTransformer;
+        $this->manager                    = $manager;
+        $this->characterTopBarTransformer = $characterTopBarTransformer;
     }
 
     public function sheet(Character $character) {
-        $character = new Item($character, $this->characterSheetTransformer);
+        $character = new Item($character, $this->characterTopBarTransformer);
         $sheet     = $this->manager->createData($character)->toArray();
 
         return response()->json([

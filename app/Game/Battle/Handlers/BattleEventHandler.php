@@ -2,6 +2,7 @@
 
 namespace App\Game\Battle\Handlers;
 
+use App\Game\Battle\Events\UpdateCharacterStatus;
 use Illuminate\Support\Facades\Cache;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
@@ -53,6 +54,7 @@ class BattleEventHandler {
         event(new AttackTimeOutEvent($character));
         event(new CharacterIsDeadBroadcastEvent($character->user, true));
         event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterStatus($character));
 
         $characterData = new Item($character, $this->characterAttackTransformer);
         event(new UpdateAttackStats($this->manager->createData($characterData)->toArray(), $character->user));
@@ -81,15 +83,7 @@ class BattleEventHandler {
         event(new UpdateTopBarEvent($character));
 
         $character = $character->refresh();
-        $mapId     = $character->map->gameMap->id;
-        $user      = $character->user;
-
-        $monsters  = Cache::get('monsters')[GameMap::find($mapId)->name];
-
-        $characterData = new Item($character, $this->characterAttackTransformer);
-        $characterData = $this->manager->createData($characterData)->toArray();
-
-        broadcast(new UpdateActionsBroadcast($characterData, $monsters, $user));
+        broadcast(new UpdateCharacterStatus($character));
 
         return $character;
     }

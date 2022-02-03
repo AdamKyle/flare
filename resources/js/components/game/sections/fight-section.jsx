@@ -73,18 +73,21 @@ export default class FightSection extends React.Component {
       monsterMaxHealth: null,
       characterMaxHealth: null,
       characterCurrentHealth: null,
-      canAttack: this.props.character.can_attack,
+      canAttack: true,
+      isDead: false,
       battleMessages: [],
       missCounter: 0,
       isCharacterVoided: false,
       isMonsterVoided: false,
       isMonsterDevoided: false,
+      resetMonster: false,
     }
 
     this.timeOut = Echo.private('show-timeout-bar-' + this.props.userId);
     this.attackUpdate = Echo.private('update-character-attack-' + this.props.userId);
     this.isDead = Echo.private('character-is-dead-' + this.props.userId);
     this.attackStats = Echo.private('update-character-attack-' + this.props.userId);
+    this.updateCharacterStatus = Echo.private('update-character-status-' + this.props.userId);
 
     this.battleMessagesBeforeFight = [];
     this.isMonsterVoided           = false;
@@ -93,6 +96,10 @@ export default class FightSection extends React.Component {
   }
 
   componentDidMount() {
+    this.setState({
+      isDead: this.props.character.is_dead,
+    });
+
     this.attackUpdate.listen('Flare.Events.UpdateCharacterAttackBroadcastEvent', (event) => {
       this.setState({
         character: event.attack,
@@ -121,12 +128,22 @@ export default class FightSection extends React.Component {
       this.setState({
         canAttack: event.canAttack,
       }, () => {
-        this.props.canAttack(this.state.canAttack);
+        this.props.canAttack(event.canAttack);
       });
+    });
+
+    this.updateCharacterStatus.listen('Game.Battle.Events.UpdateCharacterStatus', (event) => {
+      this.setState({isDead: event.data.is_dead});
+
+      if (!event.data.is_dead && this.props.monster !== null) {
+        this.setState({characterCurrentHealth: null});
+
+        this.setMonsterInfo(true);
+      }
     });
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps) {
 
     let stateMonster = this.state.monster;
     let propsMonster = this.props.monster;
@@ -137,7 +154,7 @@ export default class FightSection extends React.Component {
         this.setState({characterCurrentHealth: null});
       }
 
-      this.setMonsterInfo();
+      this.setMonsterInfo(false);
     } else if (propsMonster !== null && stateMonster !== null) {
 
       if (!stateMonster.hasOwnProperty('name')) {
@@ -158,17 +175,22 @@ export default class FightSection extends React.Component {
           characterMaxHealth: null,
           monsterMaxHealth: null,
         }, () => {
-          this.setMonsterInfo();
+          this.setMonsterInfo(false);
         })
       }
     }
   }
 
-  setMonsterInfo() {
+  setMonsterInfo(keepHealth) {
 
-    if (this.state.characterCurrentHealth !== null || this.state.monsterCurrentHealth !== null) {
-
+    if (this.state.characterCurrentHealth !== null) {
       return;
+    }
+
+    if (!keepHealth) {
+      this.setState({
+        monsterCurrentHealth: null,
+      })
     }
 
     const monsterInfo   = new Monster(this.props.monster);
@@ -229,15 +251,18 @@ export default class FightSection extends React.Component {
       characterHealth = this.props.character.voided_dur
     }
 
+    console.log(this.props.charactr, characterHealth)
+
     this.setState({
-      battleMessages: [],
+      battleMessages: keepHealth ? this.state.battleMessages : [],
       missCounter: 0,
       monster: monsterInfo,
-      monsterCurrentHealth: health,
       characterCurrentHealth: characterHealth,
       characterMaxHealth: characterHealth,
-      monsterMaxHealth: health,
+      monsterCurrentHealth: keepHealth ? this.state.monsterCurrentHealth : health,
+      monsterMaxHealth: keepHealth ? this.state.monsterMaxHealth : health,
     }, () => {
+      console.log(this.state);
       this.props.setMonster(null)
     });
   }
@@ -311,52 +336,52 @@ export default class FightSection extends React.Component {
     this.setState(state);
 
     if (state.monsterCurrentHealth <= 0 || state.characterCurrentHealth <= 0) {
-      axios.post('/api/battle-results/' + this.state.character.id, {
-        is_character_dead: state.characterCurrentHealth <= 0,
-        is_defender_dead: state.monsterCurrentHealth <= 0,
-        defender_type: 'monster',
-        monster_id: this.state.monster.monster.id,
-      }).then(() => {
-        let health = state.characterCurrentHealth;
-        let monster = this.state.monster;
+      let health = state.characterCurrentHealth;
+      let monster = this.state.monster;
 
-        if (health >= 0 && state.monsterCurrentHealth >= 0) {
-          health = this.state.characterMaxHealth;
-        } else if (health <= 0 && state.monsterCurrentHealth >= 0) {
-          health = 0;
-        } else {
-          health = null;
-        }
+      if (health >= 0 && state.monsterCurrentHealth >= 0) {
+        health = this.state.characterMaxHealth;
+      } else if (health <= 0 && state.monsterCurrentHealth >= 0) {
+        health = 0;
+      } else {
+        health = null;
+      }
 
-        if (state.monsterCurrentHealth <= 0) {
-          monster = null;
+      if (state.monsterCurrentHealth <= 0) {
+        monster = null;
 
-          this.isMonsterDevoided = false;
-          this.isMonsterVoided   = false;
-          this.isCharacterVoided = false;
-        }
+        this.isMonsterDevoided = false;
+        this.isMonsterVoided   = false;
+        this.isCharacterVoided = false;
+      }
 
-        this.setState({
-          characterCurrentHealth: health,
-          characterMaxHealth: health,
-          monsterCurrentHealth: monster !== null ? state.monsterCurrentHealth : null,
-          monsterMaxHealth: monster !== null ? this.state.monsterMaxHealth : null,
-          canAttack: false,
-          monster: monster,
+      this.setState({
+        characterCurrentHealth: health,
+        characterMaxHealth: health,
+        monsterCurrentHealth: monster !== null ? state.monsterCurrentHealth : null,
+        monsterMaxHealth: monster !== null ? this.state.monsterMaxHealth : null,
+        canAttack: false,
+        monster: monster,
+      }, () => {
+        axios.post('/api/battle-results/' + this.state.character.id, {
+          is_character_dead: state.characterCurrentHealth <= 0,
+          is_defender_dead: state.monsterCurrentHealth <= 0,
+          defender_type: 'monster',
+          monster_id: this.state.monster.monster.id,
+        }).catch((err) => {
+          if (err.hasOwnProperty('response')) {
+            const response = err.response;
+
+            if (response.status === 429) {
+              // Reload to show them their notification.
+              return this.props.openTimeOutModal();
+            }
+
+            if (response.status === 401) {
+              return location.reload();
+            }
+          }
         });
-      }).catch((err) => {
-        if (err.hasOwnProperty('response')) {
-          const response = err.response;
-
-          if (response.status === 429) {
-            // Reload to show them their notification.
-            return this.props.openTimeOutModal();
-          }
-
-          if (response.status === 401) {
-            return location.reload();
-          }
-        }
       });
     }
   }
@@ -518,7 +543,7 @@ export default class FightSection extends React.Component {
               : null
           }
           {
-            this.state.character.is_dead ?
+            this.state.isDead ?
               <ReviveSection
                 characterId={this.state.character.id}
                 canAttack={this.state.canAttack}

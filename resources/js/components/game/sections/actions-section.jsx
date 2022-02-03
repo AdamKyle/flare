@@ -34,7 +34,8 @@ export default class ActionsSection extends React.Component {
       resetBattleAction: false
     };
 
-    this.updateActions = Echo.private('update-actions-' + this.props.userId);
+    this.updateActions         = Echo.private('update-actions-' + this.props.userId);
+    this.updateCharacterStatus = Echo.private('update-character-status-' + this.props.userId);
   }
 
   componentDidMount() {
@@ -47,8 +48,6 @@ export default class ActionsSection extends React.Component {
         character: result.data.character,
         monsters: result.data.monsters,
         isLoading: false,
-        isDead: result.data.character.is_dead,
-        cannotAutoAttack: result.data.character.is_attack_automation_locked,
       }, () => {
         this.props.setCharacterId(this.state.character.id);
       });
@@ -76,7 +75,6 @@ export default class ActionsSection extends React.Component {
       this.setState({
         character: event.character,
         monsters: event.monsters,
-        isDead: event.character.is_dead,
       }, () => {
 
         // We are on a new plane.
@@ -93,6 +91,13 @@ export default class ActionsSection extends React.Component {
           });
         }
       });
+    });
+
+    this.updateCharacterStatus.listen('Game.Battle.Events.UpdateCharacterStatus', (event) => {
+      this.setState({
+        isDead: event.data.is_dead,
+        cannotAutoAttack: event.data.automation_locked,
+      })
     });
   }
 
@@ -353,6 +358,7 @@ export default class ActionsSection extends React.Component {
                       monster={this.state.monster}
                       userId={this.props.userId}
                       isCharacterDead={this.characterIsDead.bind(this)}
+                      isDead={this.state.isDead}
                       setMonster={this.setMonster.bind(this)}
                       canAttack={this.props.canAttack}
                       isAdventuring={this.state.isAdventuring}

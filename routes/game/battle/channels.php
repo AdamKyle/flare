@@ -31,6 +31,11 @@ Broadcast::channel('update-celestial-fight-{userId}', function ($user, $userId) 
     return $user->id === (int) $userId;
 });
 
+// When we update the status of the character
+Broadcast::channel('update-character-status-{userId}', function ($user, $userId) {
+    return $user->id === (int) $userId;
+});
+
 // When the Celestial Fight Details Change:
 Broadcast::channel('celestial-fight-changes', function ($user) {
     return $user;
