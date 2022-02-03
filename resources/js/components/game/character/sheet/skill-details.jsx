@@ -221,7 +221,7 @@ export default class SkillDetails extends React.Component {
                       <Fragment>
                         <button
                           className="btn btn-danger btn-sm ml-2 train-skill-btn"
-                          disabled={!this.props.canAdventure || this.props.isDead || this.props.automations.length > 0}
+                          disabled={!this.props.canAdventure || this.props.isDead}
                           onClick={() => this.stopTrainingSkill(s)}
                         >
                           Stop

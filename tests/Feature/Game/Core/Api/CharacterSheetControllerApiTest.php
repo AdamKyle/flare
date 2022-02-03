@@ -58,7 +58,6 @@ class CharacterSheetControllerApiTest extends TestCase {
         $content = json_decode($response->content());
 
         $this->assertEquals(200, $response->status());
-        $this->assertFalse(empty($content->sheet->skills));
         $this->assertEquals($this->character->getCharacter(false)->name, $content->sheet->name);
     }
 
@@ -73,7 +72,6 @@ class CharacterSheetControllerApiTest extends TestCase {
         $content = json_decode($response->content());
 
         $this->assertEquals(200, $response->status());
-        $this->assertFalse(empty($content->sheet->skills));
         $this->assertEquals($this->character->getCharacter(false)->name, $content->sheet->name);
     }
 
@@ -88,7 +86,6 @@ class CharacterSheetControllerApiTest extends TestCase {
         $content = json_decode($response->content());
 
         $this->assertEquals(200, $response->status());
-        $this->assertFalse(empty($content->sheet->skills));
         $this->assertEquals($this->character->getCharacter(false)->name, $content->sheet->name);
     }
 
@@ -100,10 +97,7 @@ class CharacterSheetControllerApiTest extends TestCase {
                          ->json('GET', '/api/character-sheet/' . $character->id)
                          ->response;
 
-        $content = json_decode($response->content());
-
         $this->assertEquals(200, $response->status());
-        $this->assertFalse(empty($content->sheet->skills));
     }
 
     public function testGetCharacterInfoWithModdedStat() {
