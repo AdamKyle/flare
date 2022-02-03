@@ -28,7 +28,33 @@ export default class SkillDetails extends React.Component {
       passiveSkillToTrain: null,
       timeRemaining: 0,
       forPassiveSkill: null,
+      isFetching: true,
+      skills: [],
+      passiveSkills: [],
     }
+  }
+
+  componentDidMount() {
+    axios.get('/api/character-sheet/'+this.props.characterId+'/skills').then((result) => {
+      this.setState({
+        skills: result.data.skills,
+        passiveSkills: result.data.passives,
+        isFetching: false
+      })
+    }).catch((err) => {
+      this.setState({isFetching: false});
+      if (err.hasOwnProperty('response')) {
+        const response = err.response;
+
+        if (response.status === 401) {
+          return location.reload()
+        }
+
+        if (response.status === 429) {
+          return this.props.openTimeOutModal()
+        }
+      }
+    });
   }
 
   clearSuccessMessage() {
@@ -62,8 +88,6 @@ export default class SkillDetails extends React.Component {
       passiveSkillToTrain: typeof skill !== 'undefined' ? skill : null,
     });
   }
-
-
 
   stopTrainingSkill(skill) {
     this.setState({
@@ -153,7 +177,7 @@ export default class SkillDetails extends React.Component {
 
 
   renderSkills() {
-    return this.props.skills.map((s) => s.can_train ?
+    return this.state.skills.map((s) => s.can_train ?
       <Fragment key={Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5)}>
         <dt key={Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5)}>
           <a href={"/skill/" + s.id}
@@ -187,7 +211,7 @@ export default class SkillDetails extends React.Component {
                 <div className="col-xs-12 col-sm-4">
                   <button
                     className={s.is_training ? 'btn btn-success btn-sm train-skill-btn' : 'btn btn-primary btn-sm train-skill-btn'}
-                    disabled={!this.props.canAdventure || this.props.isDead || this.props.automations.length > 0}
+                    disabled={!this.props.canAdventure || this.props.isDead}
                     onClick={() => this.manageTrainSkill(s)}
                   >
                     Train { s.is_training ? <i className="ml-2 fas fa-check"></i> : null }
@@ -223,7 +247,7 @@ export default class SkillDetails extends React.Component {
   }
 
   renderCraftingSkills() {
-    return this.props.skills.map((s) => s.skill_type === 'Crafting' || s.skill_type === 'Enchanting' || s.skill_type == 'Alchemy'   ?
+    return this.state.skills.map((s) => s.skill_type === 'Crafting' || s.skill_type === 'Enchanting' || s.skill_type == 'Alchemy'   ?
       <Fragment key={Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5)}>
         <dt key={Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5)}>
           <a href={"/skill/" + s.id}
@@ -260,7 +284,7 @@ export default class SkillDetails extends React.Component {
   }
 
   renderMiscSkills() {
-    return this.props.skills.map((s) => s.skill_type !== 'Training'
+    return this.state.skills.map((s) => s.skill_type !== 'Training'
       && s.skill_type !== 'Crafting'
       && s.skill_type !== 'Enchanting'
       && s.skill_type !== 'Alchemy'
@@ -303,7 +327,7 @@ export default class SkillDetails extends React.Component {
   }
 
   renderPassiveSkills() {
-    return this.props.passiveSkills.map((passiveSkill) =>
+    return this.state.passiveSkills.map((passiveSkill) =>
       <PassiveSkillTree
         passiveSkill={passiveSkill}
         characterId={this.props.characterId}
@@ -317,6 +341,15 @@ export default class SkillDetails extends React.Component {
 
 
   render() {
+    if (this.state.isFetching) {
+      return (
+        <div className="progress loading-progress mt-2 mb-2" style={{position: 'relative'}}>
+          <div className="progress-bar progress-bar-striped indeterminate">
+          </div>
+        </div>
+      );
+    }
+
     return (
       <Card>
         <Card.Body>
@@ -340,7 +373,7 @@ export default class SkillDetails extends React.Component {
               : null
           }
           {
-            this.props.automations.length > 0 ?
+            !this.props.canAutoBattle ?
               <div className="mt-2 mb-3">
                 <AlertWarning icon={'fas fa-exclamation-triangle'} title={'Automation is running'}>
                   <p>

@@ -3,12 +3,12 @@
 namespace App\Game\Core\Providers;
 
 use App\Flare\Builders\RandomAffixGenerator;
-use App\Flare\Builders\RandomItemDropBuilder;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Services\CharacterXPService;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\Serializers\CoreSerializer;
 use App\Game\Battle\Services\BattleDrop;
+use App\Game\Core\Services\CharacterPassiveSkills;
 use App\Game\Core\Services\DropCheckService;
 use App\Game\Core\Services\InventorySetService;
 use App\Game\Core\Services\RandomEnchantmentService;
@@ -47,6 +47,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(InventorySetService::class, function($app) {
             return new InventorySetService();
+        });
+
+        $this->app->bind(CharacterPassiveSkills::class, function() {
+            return new CharacterPassiveSkills();
         });
 
         $this->app->bind(DropCheckService::class, function($app) {

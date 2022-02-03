@@ -28,7 +28,7 @@ export default class CharacterSheet extends React.Component {
           loading: false,
         }, () => {
           if (result.data.sheet.timeout_until !== null) {
-            this.props.openTimeOutModal(result.data.sheet.timeout_until)
+            // this.props.openTimeOutModal(result.data.sheet.timeout_until)
           }
         });
       }).catch((err) => {
@@ -54,9 +54,8 @@ export default class CharacterSheet extends React.Component {
   }
 
   automationsTitle() {
-    const automations = this.state.characterSheet.automations;
 
-    if (automations.length > 0) {
+    if (this.state.characterSheet.is_auto_battling) {
       return <span className="tw-text-green-600">
         <i className="fas fa-cog fa-spin"></i> Current Automations
       </span>
@@ -101,23 +100,21 @@ export default class CharacterSheet extends React.Component {
                   <Tabs defaultActiveKey="character-info" id="character-section">
                     <Tab eventKey="character-info" title="Character Info">
                       <CharacterDetails
-                        characterSheet={this.state.characterSheet}
+                        characterId={this.props.characterId}
                       />
                     </Tab>
                     <Tab eventKey="character-boons" title="Active Boons">
                       <Boons characterId={this.props.characterId} userId={this.props.userId} />
                     </Tab>
                     <Tab eventKey="character-automation" title={this.automationsTitle()}>
-                      <Automations automations={this.state.characterSheet.automations} />
+                      <Automations characterId={this.props.characterId} />
                     </Tab>
                     <Tab eventKey="character-faction" title='Factions'>
-                      <Factions factions={this.state.characterSheet.factions} canAutoBattle={this.state.characterSheet.can_auto_battle}/>
+                      <Factions characterId={this.props.characterId} canAutoBattle={this.state.characterSheet.can_auto_battle}/>
                     </Tab>
                   </Tabs>
                   <SkillDetails
-                    automations={this.state.characterSheet.automations}
-                    skills={this.state.characterSheet.skills}
-                    passiveSkills={this.state.characterSheet.passive_skills}
+                    canAutoBattle={true}
                     characterId={this.props.characterId}
                     userId={this.props.userId}
                     canAdventure={this.state.characterSheet.can_adventure}

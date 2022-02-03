@@ -28,6 +28,7 @@ use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Services\CanUserEnterSiteService;
 use App\Flare\Services\CharacterXPService;
 use App\Flare\Services\DailyGoldDustService;
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\View\Components\EquipmentButtonForm;
 use App\Game\Battle\Jobs\BattleAttackHandler;
 use App\Game\Core\Services\CharacterService;
@@ -114,6 +115,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(CharacterSheetTransformer::class, function($app){
             return new CharacterSheetTransformer();
+        });
+
+        $this->app->bind(CharacterSheetBaseInfoTransformer::class, function() {
+            return new CharacterSheetBaseInfoTransformer();
         });
 
         $this->app->bind(KingdomTransformer::class, function($app){

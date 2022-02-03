@@ -6,6 +6,33 @@ export default class CharacterDetails extends React.Component {
 
   constructor(props) {
     super(props);
+
+    this.state = {
+      loading: true,
+      baseData: {},
+    }
+  }
+
+  componentDidMount() {
+    axios.get('/api/character-base-data/' + this.props.characterId).then((result) => {
+      this.setState({
+        baseData: result.data.base_info,
+        loading: false,
+      });
+    }).catch((err) => {
+      this.setState({loading: false});
+      if (err.hasOwnProperty('response')) {
+        const response = err.response;
+
+        if (response.status === 401) {
+          return location.reload()
+        }
+
+        if (response.status === 429) {
+          return this.props.openTimeOutModal()
+        }
+      }
+    })
   }
 
   buildEachTab(attackData, voided) {
@@ -71,7 +98,18 @@ export default class CharacterDetails extends React.Component {
 
   render() {
 
-    const sheet = this.props.characterSheet;
+    if (this.state.loading) {
+      return (
+        <div className="progress loading-progress mt-2 mb-2" style={{position: 'relative'}}>
+          <div className="progress-bar progress-bar-striped indeterminate">
+          </div>
+        </div>
+      );
+    }
+
+    const sheet = this.state.baseData;
+
+    console.log(sheet);
 
     const xpValue = sheet.xp / sheet.xp_next * 100;
 

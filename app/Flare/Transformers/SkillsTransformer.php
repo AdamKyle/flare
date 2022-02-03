@@ -16,7 +16,6 @@ class SkillsTransformer extends TransformerAbstract {
         return [
             'id'              => $skill->id,
             'character_id'    => $skill->character_id,
-            'monster_id'      => $skill->monster_id,
             'name'            => $skill->name,
             'skill_bonus'     => $skill->skill_bonus,
             'skill_type'      => $skill->baseSkill->skillType()->getNamedValue(),

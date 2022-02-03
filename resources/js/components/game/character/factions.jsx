@@ -8,10 +8,8 @@ export default class Factions extends React.Component {
     super(props);
 
     this.state = {
-      characterBoons: [],
-      boonToCancel: null,
-      showBoonModal: false,
-      showSuccess: false,
+      loading: true,
+      factions: [],
     }
 
     this.factionsConfig = {
@@ -61,7 +59,40 @@ export default class Factions extends React.Component {
     ];
   }
 
+  componentDidMount() {
+    axios.get('/api/character-sheet/'+this.props.characterId+'/factions').then((result) => {
+      this.setState({
+        factions: result.data.factions,
+        loading: false
+      })
+    }).catch((err) => {
+      this.setState({loading: false});
+
+      if (err.hasOwnProperty('response')) {
+        const response = err.response;
+
+        if (response.status === 401) {
+          return location.reload()
+        }
+
+        if (response.status === 429) {
+          return this.props.openTimeOutModal()
+        }
+      }
+    });
+  }
+
   render() {
+
+    if (this.state.loading) {
+      return (
+        <div className="progress loading-progress mt-2 mb-2" style={{position: 'relative'}}>
+          <div className="progress-bar progress-bar-striped indeterminate">
+          </div>
+        </div>
+      );
+    }
+
     return (
       <Card>
         { this.props.canAutoBattle ?
@@ -101,7 +132,7 @@ export default class Factions extends React.Component {
 
         <ReactDatatable
           config={this.factionsConfig}
-          records={this.props.factions}
+          records={this.state.factions}
           columns={this.factionColumns}
         />
       </Card>

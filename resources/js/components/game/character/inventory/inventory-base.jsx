@@ -70,17 +70,17 @@ export default class InventoryBase extends React.Component {
             </div>
           :
             <Fragment>
-              {
-                this.props.automations.length > 0 ?
-                  <AlertWarning icon={'fas fa-exclamation-triangle'} title={'Automation is running'}>
-                    <p>
-                      You cannot equip items while you have automation running. You cannot equip sets, or manage currently
-                      equipped items. How ever, you can move items between sets, destroy and disenchant items.
-                      For example, if you are auto battling and get a Faction reward item, you CAN move it to a set, but you CANNOT equip it.
-                    </p>
-                  </AlertWarning>
-                : null
-              }
+              {/*{*/}
+              {/*  this.props.automations.length > 0 ?*/}
+              {/*    <AlertWarning icon={'fas fa-exclamation-triangle'} title={'Automation is running'}>*/}
+              {/*      <p>*/}
+              {/*        You cannot equip items while you have automation running. You cannot equip sets, or manage currently*/}
+              {/*        equipped items. How ever, you can move items between sets, destroy and disenchant items.*/}
+              {/*        For example, if you are auto battling and get a Faction reward item, you CAN move it to a set, but you CANNOT equip it.*/}
+              {/*      </p>*/}
+              {/*    </AlertWarning>*/}
+              {/*  : null*/}
+              {/*}*/}
 
               <Tabs defaultActiveKey="inventory" id="inventory-section">
                 <Tab eventKey="inventory" title="Inventory">
