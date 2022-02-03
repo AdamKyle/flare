@@ -3,6 +3,7 @@
 namespace App\Game\Battle\Handlers;
 
 use App\Flare\Services\BuildCharacterAttackTypes;
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use League\Fractal\Manager;
@@ -26,7 +27,7 @@ class BattleEventHandler {
 
     public function __construct(
         Manager $manager,
-        BuildCharacterAttackTypes $characterAttackTransformer,
+        CharacterSheetBaseInfoTransformer $characterAttackTransformer,
         BattleRewardProcessing $battleRewardProcessing,
     ) {
         $this->manager                    = $manager;
@@ -46,6 +47,8 @@ class BattleEventHandler {
         event(new UpdateCharacterStatus($character));
 
         $characterData = new Item($character, $this->characterAttackTransformer);
+        $characterData = $this->manager->createData($characterData)->toArray();
+
         event(new UpdateBaseCharacterInformation($character->user, $characterData));
     }
 

@@ -534,7 +534,7 @@ class MovementService {
 
         broadcast(new UpdateActionsBroadcast($character, $monsters, $user));
 
-        event(new UpdateBaseCharacterInformation($character, $user));
+        event(new UpdateBaseCharacterInformation($user, $character));
     }
 
     /**

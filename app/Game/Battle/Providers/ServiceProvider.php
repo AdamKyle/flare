@@ -7,6 +7,7 @@ use App\Flare\Builders\RandomItemDropBuilder;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Services\CharacterRewardService;
 use App\Flare\Transformers\CharacterAttackTransformer;
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Battle\Console\Commands\ClearCelestials;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Handlers\FactionHandler;
@@ -70,7 +71,7 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(BattleEventHandler::class, function($app) {
             return new BattleEventHandler(
                 $app->make(Manager::class),
-                $app->make(BuildCharacterAttackTypes::class),
+                $app->make(CharacterSheetBaseInfoTransformer::class),
                 $app->make(BattleRewardProcessing::class),
             );
         });

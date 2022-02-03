@@ -87,7 +87,7 @@ class UseItemService {
 
         $characterAttack = new ResourceItem($character, $this->characterAttackTransformer);
 
-        event(new UpdateBaseCharacterInformation($this->manager->createData($characterAttack)->toArray(), $character->user));
+        event(new UpdateBaseCharacterInformation($character->user, $this->manager->createData($characterAttack)->toArray()));
         event(new UpdateTopBarEvent($character));
 
         if (!is_null($item)) {

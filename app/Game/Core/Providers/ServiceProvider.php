@@ -6,6 +6,7 @@ use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Services\CharacterXPService;
 use App\Flare\Transformers\CharacterAttackTransformer;
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Transformers\Serializers\CoreSerializer;
 use App\Game\Battle\Services\BattleDrop;
 use App\Game\Core\Services\CharacterPassiveSkills;
@@ -89,7 +90,7 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(UseItemService::class, function($app) {
             return new UseItemService(
                 $app->make(Manager::class),
-                $app->make(CharacterAttackTransformer::class),
+                $app->make(CharacterSheetBaseInfoTransformer::class),
             );
         });
 

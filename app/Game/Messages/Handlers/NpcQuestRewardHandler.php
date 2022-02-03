@@ -182,7 +182,7 @@ class NpcQuestRewardHandler {
 
         $characterData = $this->manager->createData($characterData)->toArray();
 
-        event(new UpdateBaseCharacterInformation($characterData, $character->user));
+        event(new UpdateBaseCharacterInformation($character->user, $characterData));
     }
 
     public function createQuestLog(Character $character, Quest $quest) {
