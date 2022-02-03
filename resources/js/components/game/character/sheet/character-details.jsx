@@ -37,7 +37,6 @@ export default class CharacterDetails extends React.Component {
     });
 
     this.updateBaseDetails.listen('Game.Core.Events.UpdateBaseCharacterInformation', (event) => {
-      console.log(event);
       this.setState({
         baseData: event.baseStats,
       });

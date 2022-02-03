@@ -42,7 +42,7 @@ export default class AttackAndCast {
       const castAttack       = new CastAttack(this.attacker, this.defender, this.characterCurrentHealth, this.monsterHealth, this.voided);
 
       if (attackData.spell_damage > 0) {
-        castAttack.attackWithSpells(attackData);
+        castAttack.attackWithSpells(attackData, canEntrance);
       }
 
       if (attackData.heal_for > 0) {

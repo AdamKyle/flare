@@ -4,6 +4,7 @@ namespace App\Flare\Transformers;
 
 use App\Flare\Models\CharacterPassiveSkill;
 use App\Flare\Models\PassiveSkill;
+use App\Flare\Values\ClassAttackValue;
 use App\Game\Automation\Values\AutomationType;
 use Cache;
 use App\Flare\Models\MaxLevelConfiguration;
@@ -38,6 +39,10 @@ class CharacterSheetBaseInfoTransformer extends TransformerAbstract {
             'heal_for'          => number_format($characterInformation->buildHealFor()),
             'damage_stat'       => $character->damage_stat,
             'to_hit_stat'       => $character->class->to_hit_stat,
+            'to_hit_base'        => $this->getToHitBase($character, $characterInformation),
+            'voided_to_hit_base' => $this->getToHitBase($character, $characterInformation, true),
+            'base_stat'          => $characterInformation->statMod($character->class->damage_stat),
+            'voided_base_stat'   => $character->{$character->class->damage_stat},
             'race'              => $character->race->name,
             'class'             => $character->class->name,
             'inventory_max'     => $character->inventory_max,
@@ -70,8 +75,14 @@ class CharacterSheetBaseInfoTransformer extends TransformerAbstract {
             'artifact_damage'   => number_format($characterInformation->getTotalArtifactDamage()),
             'class_bonus'       => (new ClassBonusInformation())->buildClassBonusDetails($character),
             'devouring_light'   => $characterInformation->getDevouringLight(),
-            'devouring_darkness' => $characterInformation->getDevouringDarkness(),
-            'attack_stats'       => Cache::get('character-attack-data-' . $character->id),
+            'devouring_darkness'  => $characterInformation->getDevouringDarkness(),
+            'attack_stats'        => Cache::get('character-attack-data-' . $character->id),
+            'extra_action_chance' => (new ClassAttackValue($character))->buildAttackData(),
+            'stat_affixes'        => [
+                'cant_be_resisted'   => $characterInformation->canAffixesBeResisted(),
+                'all_stat_reduction' => $characterInformation->findPrefixStatReductionAffix(),
+                'stat_reduction'     => $characterInformation->findSuffixStatReductionAffixes(),
+            ],
         ];
     }
 
@@ -85,5 +96,14 @@ class CharacterSheetBaseInfoTransformer extends TransformerAbstract {
         }
 
         return MaxLevel::MAX_LEVEL;
+    }
+
+    private function getToHitBase(Character $character, CharacterInformationBuilder $characterInformation, bool $voided = false): int {
+
+        if (!$voided) {
+            return $characterInformation->statMod($character->class->to_hit_stat);
+        }
+
+        return $character->{$character->class->to_hit_stat};
     }
 }

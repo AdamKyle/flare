@@ -86,7 +86,7 @@ export default class FightSection extends React.Component {
     this.timeOut = Echo.private('show-timeout-bar-' + this.props.userId);
     this.attackUpdate = Echo.private('update-character-attack-' + this.props.userId);
     this.isDead = Echo.private('character-is-dead-' + this.props.userId);
-    this.attackStats = Echo.private('update-character-attack-' + this.props.userId);
+    this.attackStats = Echo.private('update-character-base-stats-' + this.props.userId);
     this.updateCharacterStatus = Echo.private('update-character-status-' + this.props.userId);
 
     this.battleMessagesBeforeFight = [];
@@ -120,8 +120,33 @@ export default class FightSection extends React.Component {
       });
     });
 
-    this.attackStats.listen('Game.Core.Events.UpdateAttackStats', (event) => {
-      this.setState({character: event.character});
+    this.attackStats.listen('Game.Core.Events.UpdateBaseCharacterInformation', (event) => {
+
+      let baseStats = JSON.parse(JSON.stringify(event.baseStats));
+      let character = JSON.parse(JSON.stringify(this.state.character));
+
+      Object.keys(baseStats).forEach(function(el){
+        if (typeof baseStats[el] === 'string') {
+          if (baseStats[el].indexOf(',') !== -1) {
+            baseStats[el] = parseFloat(baseStats[el].replace(/,/g, ''))
+          }
+        } else {
+          baseStats[el] = parseFloat(baseStats[el]) || baseStats[el]
+        }
+
+        if (el === 'attack_stats') {
+          baseStats['attack_types'] = baseStats[el];
+        }
+      });
+
+
+      Object.keys(baseStats).filter(key => key in character).forEach(key => {
+        character[key] = baseStats[key];
+      });
+
+      this.setState({
+        character: character
+      });
     });
 
     this.timeOut.listen('Game.Core.Events.ShowTimeOutEvent', (event) => {

@@ -16,7 +16,7 @@ class BuildCharacterAttackTypes {
 
     public function buildCache(Character $character): array {
 
-        $characterAttack = $this->characterAttackBuilder->setCharacter($character);
+        $characterAttack = $this->characterAttackBuilder->setCharacter($character->refresh());
 
         Cache::put('character-attack-data-' . $character->id, [
             'attack'                 => $characterAttack->buildAttack(),

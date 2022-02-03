@@ -616,10 +616,10 @@ export default class Game extends React.Component {
             />
           : null
         }
-        {
-          this.state.openTimeOutModal ?
-            <TimeoutDialogue userId={this.props.userId} show={this.state.openTimeOutModal} timeOutFor={this.state.timeOutFor}/> : null
-        }
+        {/*{*/}
+        {/*  this.state.openTimeOutModal ?*/}
+        {/*    <TimeoutDialogue userId={this.props.userId} show={this.state.openTimeOutModal} timeOutFor={this.state.timeOutFor}/> : null*/}
+        {/*}*/}
         </>
     )
   }

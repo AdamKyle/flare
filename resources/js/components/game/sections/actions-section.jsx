@@ -34,7 +34,7 @@ export default class ActionsSection extends React.Component {
       resetBattleAction: false
     };
 
-    this.updateActions         = Echo.private('update-actions-' + this.props.userId);
+    this.updateActions         = Echo.private('update-character-base-stats-' + this.props.userId);
     this.updateCharacterStatus = Echo.private('update-character-status-' + this.props.userId);
   }
 
@@ -65,32 +65,52 @@ export default class ActionsSection extends React.Component {
       }
     });
 
-    this.updateActions.listen('Game.Maps.Events.UpdateActionsBroadcast', (event) => {
-      const oldFirstMonsterName = this.state.monsters[0].name;
-      const newFirstMonsterName = event.monsters[0].name;
+    this.updateActions.listen('Game.Core.Events.UpdateBaseCharacterInformation', (event) => {
+      let baseStats = JSON.parse(JSON.stringify(event.baseStats));
+      let character = JSON.parse(JSON.stringify(this.state.character));
 
-      const oldMonster = this.state.monsters[0];
-      const newMonster = event.monsters[0];
-
-      this.setState({
-        character: event.character,
-        monsters: event.monsters,
-      }, () => {
-
-        // We are on a new plane.
-        if (oldFirstMonsterName !== newFirstMonsterName && !this.state.resetBattleAction) {
-          this.setState({
-            resetBattleAction: true,
-          })
-        }
-
-        // We are at a location that increases the enemy stats.
-        if (oldMonster.str !== newMonster.str) {
-          this.setState({
-            resetBattleAction: true,
-          });
+      Object.keys(baseStats).forEach(function(el){
+        if (typeof baseStats[el] === 'string') {
+          if (baseStats[el].indexOf(',') !== -1) {
+            baseStats[el] = parseFloat(baseStats[el].replace(/,/g, ''))
+          }
+        } else {
+          baseStats[el] = parseFloat(baseStats[el]) || baseStats[el]
         }
       });
+
+      character = {...character, ...baseStats};
+
+      this.setState({
+        character: character
+      })
+
+
+      // const oldFirstMonsterName = this.state.monsters[0].name;
+      // const newFirstMonsterName = event.monsters[0].name;
+      //
+      // const oldMonster = this.state.monsters[0];
+      // const newMonster = event.monsters[0];
+      //
+      // this.setState({
+      //   character: event.character,
+      //   monsters: event.monsters,
+      // }, () => {
+      //
+      //   // We are on a new plane.
+      //   if (oldFirstMonsterName !== newFirstMonsterName && !this.state.resetBattleAction) {
+      //     this.setState({
+      //       resetBattleAction: true,
+      //     })
+      //   }
+      //
+      //   // We are at a location that increases the enemy stats.
+      //   if (oldMonster.str !== newMonster.str) {
+      //     this.setState({
+      //       resetBattleAction: true,
+      //     });
+      //   }
+      // });
     });
 
     this.updateCharacterStatus.listen('Game.Battle.Events.UpdateCharacterStatus', (event) => {
