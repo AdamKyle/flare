@@ -14,3 +14,8 @@ Broadcast::channel('update-enchanting-list-{userId}', function($user, $userId) {
 Broadcast::channel('update-alchemy-list-{userId}', function($user, $userId) {
     return $user->id === (int) $userId;
 });
+
+// When a characters' alchemy list updates
+Broadcast::channel('update-skill-{userId}', function($user, $userId) {
+    return $user->id === (int) $userId;
+});

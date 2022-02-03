@@ -5,6 +5,7 @@ namespace App\Game\Core\Jobs;
 use App\Flare\Events\UpdateCharacterAttackEvent;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\InventorySlot;
+use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Services\UseItemService;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -59,6 +60,8 @@ class UseMultipleItems implements ShouldQueue
             $useItemService->useItem($inventorySlot, $character, $inventorySlot->item);
 
             event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+            event(new CharacterInventoryDetailsUpdate($character->user));
 
             event(new UpdateTopBarEvent($character));
 

@@ -15,6 +15,7 @@ use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Services\CharacterXPService;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\RandomAffixDetails;
+use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Jobs\AdventureItemDisenchantJob;
 use App\Game\Core\Jobs\HandleAdventureRewardItems;
@@ -353,6 +354,8 @@ class AdventureRewardService {
             $character = $character->refresh();
 
             event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+            event(new CharacterInventoryDetailsUpdate($character->user));
 
             event(new ServerMessageEvent($character->user, 'Faction rewarded with (item with randomly generated affix(es)): ' . $item->affix_name));
         }

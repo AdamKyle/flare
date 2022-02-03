@@ -10,6 +10,7 @@ use App\Flare\Models\Item as ItemModel;
 use App\Flare\Models\Monster;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\RandomAffixDetails;
+use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Values\FactionLevel;
 use App\Game\Core\Values\FactionType;
@@ -112,6 +113,8 @@ class FactionHandler {
             $character = $character->refresh();
 
             event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+            event(new CharacterInventoryDetailsUpdate($character->user));
 
             event(new ServerMessageEvent($character->user, 'Rewarded with (item with randomly generated affix(es)): ' . $item->affix_name));
         }

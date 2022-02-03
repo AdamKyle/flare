@@ -5,6 +5,7 @@ namespace App\Game\Core\Controllers;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\UpdateAttackStats;
 use App\Game\Core\Exceptions\EquipItemException;
 use App\Game\Core\Requests\ShopReplaceItemValidation;
@@ -96,6 +97,8 @@ class ShopController extends Controller {
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
+        event(new CharacterInventoryDetailsUpdate($character->user));
+
         return redirect()->back()->with('success', 'Sold all your unequipped items for a total of: ' . $totalSoldFor . ' gold.');
     }
 
@@ -175,6 +178,8 @@ class ShopController extends Controller {
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
+        event(new CharacterInventoryDetailsUpdate($character->user));
+
         return redirect()->back()->with('success', 'Sold: ' . $item->affix_name . ' for: ' . $totalSoldFor . ' gold.');
     }
 
@@ -194,6 +199,8 @@ class ShopController extends Controller {
         }
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        event(new CharacterInventoryDetailsUpdate($character->user));
 
         return redirect()->back()->with('success', 'Sold selected items for: ' . $totalSoldFor . ' gold.');
     }
@@ -252,6 +259,8 @@ class ShopController extends Controller {
         $this->updateCharacterAttakDataCache($character);
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        event(new CharacterInventoryDetailsUpdate($character->user));
 
         return redirect()->to(route('game.shop.buy', ['character' => $character]))->with('success', 'Purchased and equipped: ' . $item->affix_name . '.');
     }

@@ -115,6 +115,16 @@ export default class ActionsSection extends React.Component {
     })
   }
 
+  updateCharacterHealth(health) {
+    let character = this.state.character;
+
+    character.health = health;
+
+    this.setState({
+      character: character
+    });
+  }
+
   characterIsDead(isDead, callback) {
     this.setState({
       isDead: isDead,
@@ -364,6 +374,7 @@ export default class ActionsSection extends React.Component {
                       isAdventuring={this.state.isAdventuring}
                       openTimeOutModal={this.props.openTimeOutModal}
                       resetBattleAction={this.state.resetBattleAction}
+                      updateCharacterHealth={this.updateCharacterHealth.bind(this)}
                     />
                     :
                     this.props.celestial !== null ?

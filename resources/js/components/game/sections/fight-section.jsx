@@ -244,25 +244,29 @@ export default class FightSection extends React.Component {
       }
     }
 
-    const health = monsterInfo.health();
-    let characterHealth = this.props.character.health;
+    let health    = monsterInfo.monsterHP();
+    let maxHealth = health;
 
-    if (this.isCharacterVoided) {
-      characterHealth = this.props.character.voided_dur
+    if (keepHealth) {
+      health    = this.state.monsterCurrentHealth
+      maxHealth = this.state.monsterMaxHealth
     }
 
-    console.log(this.props.charactr, characterHealth)
+    let characterMaxHealth = this.props.character.health;
+
+    if (this.isCharacterVoided) {
+      characterMaxHealth = this.props.character.voided_dur
+    }
 
     this.setState({
       battleMessages: keepHealth ? this.state.battleMessages : [],
       missCounter: 0,
       monster: monsterInfo,
-      characterCurrentHealth: characterHealth,
-      characterMaxHealth: characterHealth,
-      monsterCurrentHealth: keepHealth ? this.state.monsterCurrentHealth : health,
-      monsterMaxHealth: keepHealth ? this.state.monsterMaxHealth : health,
+      characterCurrentHealth: 100,
+      characterMaxHealth: 100,
+      monsterCurrentHealth: health,
+      monsterMaxHealth: maxHealth,
     }, () => {
-      console.log(this.state);
       this.props.setMonster(null)
     });
   }
@@ -277,6 +281,8 @@ export default class FightSection extends React.Component {
     this.setState({
       characterMaxHealth: data.character_health,
       characterCurrentHealth: data.character_health,
+    }, () => {
+      this.props.updateCharacterHealth(data.character_health)
     });
   }
 
@@ -336,8 +342,9 @@ export default class FightSection extends React.Component {
     this.setState(state);
 
     if (state.monsterCurrentHealth <= 0 || state.characterCurrentHealth <= 0) {
-      let health = state.characterCurrentHealth;
-      let monster = this.state.monster;
+      let health      = state.characterCurrentHealth;
+      let monster     = this.state.monster;
+      const monsterId = monster.monster.id;
 
       if (health >= 0 && state.monsterCurrentHealth >= 0) {
         health = this.state.characterMaxHealth;
@@ -348,8 +355,7 @@ export default class FightSection extends React.Component {
       }
 
       if (state.monsterCurrentHealth <= 0) {
-        monster = null;
-
+        monster                = null;
         this.isMonsterDevoided = false;
         this.isMonsterVoided   = false;
         this.isCharacterVoided = false;
@@ -367,7 +373,7 @@ export default class FightSection extends React.Component {
           is_character_dead: state.characterCurrentHealth <= 0,
           is_defender_dead: state.monsterCurrentHealth <= 0,
           defender_type: 'monster',
-          monster_id: this.state.monster.monster.id,
+          monster_id: monsterId,
         }).catch((err) => {
           if (err.hasOwnProperty('response')) {
             const response = err.response;

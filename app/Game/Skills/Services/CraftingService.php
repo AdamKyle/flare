@@ -4,6 +4,7 @@ namespace App\Game\Skills\Services;
 
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateSkillEvent;
+use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Events\UpdateQueenOfHeartsPanel;
 use App\Game\Core\Services\RandomEnchantmentService;
@@ -80,6 +81,8 @@ class CraftingService {
         $this->attemptToCraftItem($character, $skill, $item);
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        event(new CharacterInventoryDetailsUpdate($character->user));
 
         event(new UpdateCharacterCraftingList($character->user, $this->getItems($params['type'], $skill)));
     }

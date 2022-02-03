@@ -8,7 +8,7 @@ export default class Monster {
     this.monster = monster;
   }
 
-  health() {
+  monsterHP() {
 
     if (typeof this.monster === 'undefined') {
       return  0;

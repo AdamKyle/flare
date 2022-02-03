@@ -15,6 +15,7 @@ use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Services\CharacterXPService;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\RandomAffixDetails;
+use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Jobs\AdventureItemDisenchantJob;
 use App\Game\Core\Traits\CanHaveQuestItem;
@@ -62,6 +63,10 @@ class AdventureItemRewardService {
         event(new UpdateTopBarEvent($character));
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        event(new CharacterInventoryDetailsUpdate($character->user));
+
+        event(new CharacterInventoryDetailsUpdate($character->user));
     }
 
     public function autoDisenchanted(Item $item, Character $character): bool {

@@ -32,6 +32,8 @@ export default class SkillDetails extends React.Component {
       skills: [],
       passiveSkills: [],
     }
+
+    this.updateSkill = Echo.private('update-skill-' + this.props.userId);
   }
 
   componentDidMount() {
@@ -54,6 +56,12 @@ export default class SkillDetails extends React.Component {
           return this.props.openTimeOutModal()
         }
       }
+    });
+
+    this.updateSkill.listen('Game.Skills.Events.UpdateCharacterSkills', (event) => {
+      this.setState({
+        skills: event.skills,
+      });
     });
   }
 

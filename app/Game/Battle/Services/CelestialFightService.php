@@ -2,6 +2,7 @@
 
 namespace App\Game\Battle\Services;
 
+use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use Facades\App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\CelestialFight;
 use App\Flare\Models\Character;
@@ -133,6 +134,8 @@ class CelestialFightService {
             event(new UpdateCelestialFight(null, true));
 
             event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+            event(new CharacterInventoryDetailsUpdate($character->user));
 
             return $this->successResult([
                 'battle_over' => true,

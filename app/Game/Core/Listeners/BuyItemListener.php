@@ -4,6 +4,7 @@ namespace App\Game\Core\Listeners;
 
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Game\Core\Events\BuyItemEvent;
+use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Skills\Events\UpdateCharacterEnchantingList;
 use App\Game\Skills\Services\EnchantingService;
@@ -38,6 +39,8 @@ class BuyItemListener
         ));
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        event(new CharacterInventoryDetailsUpdate($character->user));
 
         event(new UpdateTopBarEvent($character));
     }

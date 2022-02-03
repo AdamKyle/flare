@@ -2,6 +2,7 @@
 
 namespace App\Game\Core\Jobs;
 
+use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Skills\Events\UpdateCharacterEnchantingList;
 use App\Game\Skills\Services\EnchantingService;
 use Illuminate\Bus\Queueable;
@@ -59,6 +60,8 @@ class PurchaseItemsJob implements ShouldQueue
             event(new BuyItemEvent($item, $character));
 
             event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+            event(new CharacterInventoryDetailsUpdate($character->user));
 
             event(new ServerMessageEvent($character->user, 'Purchased: ' . $item->name));
         }

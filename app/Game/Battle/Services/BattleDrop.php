@@ -11,6 +11,7 @@ use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use App\Flare\Values\MapNameValue;
 use App\Game\Automation\Values\AutomationType;
+use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Traits\CanHaveQuestItem;
 use App\Game\Messages\Events\GlobalMessageEvent;
@@ -105,6 +106,8 @@ class BattleDrop {
                     $this->attemptToPickUpItem($character, $drop);
 
                     event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+                    event(new CharacterInventoryDetailsUpdate($character->user));
                 } else {
                     return $drop;
                 }
@@ -130,6 +133,8 @@ class BattleDrop {
                 $this->attemptToPickUpItem($character, $this->monster->questItem);
 
                 event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+                event(new CharacterInventoryDetailsUpdate($character->user));
             } else if ($canGetQuestItem && $returnItem) {
                 return $this->monster->questItem;
             }
@@ -175,6 +180,8 @@ class BattleDrop {
                     $this->attemptToPickUpItem($character, $item);
 
                     event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+                    event(new CharacterInventoryDetailsUpdate($character->user));
 
                     return;
                 }

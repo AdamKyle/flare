@@ -9,6 +9,7 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
 use App\Flare\Values\RandomAffixDetails;
+use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Events\UpdateQueenOfHeartsPanel;
 use App\Game\Messages\Events\GlobalMessageEvent;
@@ -74,6 +75,8 @@ class ReRollEnchantmentService {
         event(new UpdateTopBarEvent($character));
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        event(new CharacterInventoryDetailsUpdate($character->user));
 
         event(new UpdateQueenOfHeartsPanel($character->user, $this->randomEnchantmentService->fetchDataForApi($character)));
 
@@ -176,6 +179,8 @@ class ReRollEnchantmentService {
         event(new UpdateTopBarEvent($character));
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        event(new CharacterInventoryDetailsUpdate($character->user));
 
         event(new UpdateQueenOfHeartsPanel($character->user, $this->randomEnchantmentService->fetchDataForApi($character)));
 

@@ -6,6 +6,7 @@ use App\Flare\Models\InventorySet;
 use App\Flare\Models\Item;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Values\RandomAffixDetails;
+use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Jobs\UseMultipleItems;
 use App\Game\Core\Requests\RemoveItemRequest;
 use App\Game\Core\Requests\RenameSetRequest;
@@ -89,6 +90,8 @@ class CharacterInventoryController extends Controller {
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
+        event(new CharacterInventoryDetailsUpdate($character->user));
+
         event(new UpdateTopBarEvent($character->refresh()));
 
         return response()->json(['message' => 'Destroyed ' . $name . '.'], 200);
@@ -102,6 +105,8 @@ class CharacterInventoryController extends Controller {
         $character->inventory->slots()->whereIn('id', $slotIds)->delete();
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        event(new CharacterInventoryDetailsUpdate($character->user));
 
         event(new UpdateTopBarEvent($character->refresh()));
 
@@ -165,6 +170,8 @@ class CharacterInventoryController extends Controller {
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
+        event(new CharacterInventoryDetailsUpdate($character->user));
+
         event(new UpdateTopBarEvent($character->refresh()));
 
         $affixData = $this->enchantingService->fetchAffixes($character->refresh());
@@ -205,6 +212,8 @@ class CharacterInventoryController extends Controller {
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
+        event(new CharacterInventoryDetailsUpdate($character->user));
+
         event(new UpdateTopBarEvent($character->refresh()));
 
         return response()->json([
@@ -241,6 +250,8 @@ class CharacterInventoryController extends Controller {
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
+        event(new CharacterInventoryDetailsUpdate($character->user));
+
         return response()->json(['message' => 'Set ' . $setIndex + 1 . ' is now equipped (equipment has been moved to the set)']);
     }
 
@@ -271,6 +282,8 @@ class CharacterInventoryController extends Controller {
         });
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        event(new CharacterInventoryDetailsUpdate($character->user));
 
         event(new UpdateTopBarEvent($character->refresh()));
 
@@ -313,6 +326,8 @@ class CharacterInventoryController extends Controller {
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
+        event(new CharacterInventoryDetailsUpdate($character->user));
+
         event(new UpdateTopBarEvent($character->refresh()));
 
         $affixData = $this->enchantingService->fetchAffixes($character->refresh());
@@ -335,6 +350,8 @@ class CharacterInventoryController extends Controller {
 
             event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
+            event(new CharacterInventoryDetailsUpdate($character->user));
+
             return response()->json(['message' => 'Unequipped Set ' . $inventoryIndex + 1 . '.'], 200);
         }
 
@@ -354,6 +371,8 @@ class CharacterInventoryController extends Controller {
         $this->updateCharacterAttakDataCache($character);
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        event(new CharacterInventoryDetailsUpdate($character->user));
 
         $affixData = $this->enchantingService->fetchAffixes($character->refresh());
 
@@ -388,6 +407,8 @@ class CharacterInventoryController extends Controller {
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
+        event(new CharacterInventoryDetailsUpdate($character->user));
+
         $affixData = $this->enchantingService->fetchAffixes($character->refresh());
 
         event(new UpdateCharacterEnchantingList(
@@ -417,6 +438,8 @@ class CharacterInventoryController extends Controller {
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
+        event(new CharacterInventoryDetailsUpdate($character->user));
+
         $this->updateCharacterAttakDataCache($character);
 
         event(new UpdateTopBarEvent($character->refresh()));
@@ -444,6 +467,8 @@ class CharacterInventoryController extends Controller {
         $this->updateCharacterAttakDataCache($character);
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        event(new CharacterInventoryDetailsUpdate($character->user));
 
         return response()->json(['message' => 'Set ' . $setIndex + 1 . ' is now equipped']);
     }

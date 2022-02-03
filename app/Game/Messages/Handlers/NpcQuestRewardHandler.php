@@ -10,6 +10,7 @@ use App\Flare\Models\Quest;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Events\UpdateAttackStats;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
@@ -196,5 +197,7 @@ class NpcQuestRewardHandler {
         event(new UpdateTopBarEvent($character));
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        event(new CharacterInventoryDetailsUpdate($character->user));
     }
 }

@@ -5,6 +5,7 @@ namespace App\Game\Core\Controllers\Api;
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Values\RandomAffixDetails;
+use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Events\UpdateQueenOfHeartsPanel;
 use App\Game\Core\Requests\MoveRandomEnchantment;
@@ -65,6 +66,8 @@ class RandomEnchantController extends Controller {
         $character = $character->refresh();
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        event(new CharacterInventoryDetailsUpdate($character->user));
 
         event(new UpdateTopBarEvent($character));
 

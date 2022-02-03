@@ -11,6 +11,8 @@ export default class InventoryDetails extends React.Component {
       loading: true,
       inventoryBaseInfo: {},
     }
+
+    this.updateInventoryDetails = Echo.private('update-inventory-details-' + this.props.userId);
   }
 
   componentDidMount() {
@@ -32,6 +34,12 @@ export default class InventoryDetails extends React.Component {
           return this.props.openTimeOutModal()
         }
       }
+    });
+
+    this.updateInventoryDetails.listen('Game.Core.Events.CharacterInventoryDetailsUpdate', (event) => {
+      this.setState({
+        inventoryBaseInfo: event.inventoryDetails,
+      });
     });
   }
 

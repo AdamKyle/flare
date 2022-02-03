@@ -8,6 +8,7 @@ use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Models\Skill;
+use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Skills\Events\UpdateCharacterAlchemyList;
@@ -72,6 +73,8 @@ class AlchemyService {
 
             event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
+            event(new CharacterInventoryDetailsUpdate($character->user));
+
             event(new UpdateCharacterAlchemyList($character->user, $this->fetchAlchemistItems($character)));
 
             event(new UpdateTopBarEvent($character->refresh()));
@@ -86,6 +89,8 @@ class AlchemyService {
             $this->pickUpItem($character, $item, $skill, true);
 
             event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+            event(new CharacterInventoryDetailsUpdate($character->user));
 
             event(new UpdateCharacterAlchemyList($character->user, $this->fetchAlchemistItems($character)));
 
@@ -103,6 +108,8 @@ class AlchemyService {
             event(new UpdateCharacterAlchemyList($character->user, $this->fetchAlchemistItems($character)));
 
             event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+            event(new CharacterInventoryDetailsUpdate($character->user));
 
             event(new UpdateTopBarEvent($character->refresh()));
 
