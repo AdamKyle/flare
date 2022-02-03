@@ -514,7 +514,7 @@ class CharacterInventoryController extends Controller {
         $characterData = new ResourceItem($character->refresh(), $this->characterTransformer);
 
         $characterData = $this->manager->createData($characterData)->toArray();
-
+        dump($characterData);
         event(new UpdateBaseCharacterInformation($character->user, $characterData));
     }
 }

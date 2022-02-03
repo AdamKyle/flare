@@ -13,6 +13,7 @@ use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Events\UpdateAttackStats;
+use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use League\Fractal\Manager;
@@ -181,7 +182,7 @@ class NpcQuestRewardHandler {
 
         $characterData = $this->manager->createData($characterData)->toArray();
 
-        event(new UpdateAttackStats($characterData, $character->user));
+        event(new UpdateBaseCharacterInformation($characterData, $character->user));
     }
 
     public function createQuestLog(Character $character, Quest $quest) {

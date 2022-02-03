@@ -14,10 +14,12 @@ use App\Flare\Models\Location;
 use App\Flare\Models\Npc;
 use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Transformers\CharacterAttackTransformer;
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\NpcTypes;
 use App\Game\Battle\Services\ConjureService;
 use App\Game\Core\Events\UpdateAttackStats;
+use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Events\UpdateActionsBroadcast;
@@ -108,7 +110,7 @@ class MovementService {
      */
     public function __construct(PortService $portService,
                                 MapTileValue $mapTile,
-                                CharacterAttackTransformer $characterAttackTransformer,
+                                CharacterSheetBaseInfoTransformer $characterAttackTransformer,
                                 CoordinatesCache $coordinatesCache,
                                 MapPositionValue $mapPositionValue,
                                 TraverseService $traverseService,
@@ -532,7 +534,7 @@ class MovementService {
 
         broadcast(new UpdateActionsBroadcast($character, $monsters, $user));
 
-        event(new UpdateAttackStats($character, $user));
+        event(new UpdateBaseCharacterInformation($character, $user));
     }
 
     /**

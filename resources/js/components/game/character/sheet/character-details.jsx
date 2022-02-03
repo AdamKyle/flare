@@ -118,8 +118,6 @@ export default class CharacterDetails extends React.Component {
 
     const sheet = this.state.baseData;
 
-    console.log(sheet);
-
     const xpValue = sheet.xp / sheet.xp_next * 100;
 
     return (

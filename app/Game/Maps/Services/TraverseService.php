@@ -5,7 +5,9 @@ namespace App\Game\Maps\Services;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Location;
 use App\Flare\Services\BuildCharacterAttackTypes;
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Core\Events\UpdateAttackStats;
+use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Events\UpdateGlobalCharacterCountBroadcast;
 use App\Game\Maps\Values\MapTileValue;
@@ -66,17 +68,19 @@ class TraverseService {
     public function __construct(
         Manager $manager,
         CharacterAttackTransformer $characterAttackTransformer,
+        CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer,
         BuildCharacterAttackTypes $buildCharacterAttackTypes,
         MonsterTransfromer $monsterTransformer,
         LocationService $locationService,
         MapTileValue $mapTileValue
     ) {
-        $this->manager                    = $manager;
-        $this->characterAttackTransformer = $characterAttackTransformer;
-        $this->buildCharacterAttackTypes  = $buildCharacterAttackTypes;
-        $this->monsterTransformer         = $monsterTransformer;
-        $this->locationService            = $locationService;
-        $this->mapTileValue               = $mapTileValue;
+        $this->manager                           = $manager;
+        $this->characterAttackTransformer        = $characterAttackTransformer;
+        $this->characterSheetBaseInfoTransformer = $characterSheetBaseInfoTransformer;
+        $this->buildCharacterAttackTypes         = $buildCharacterAttackTypes;
+        $this->monsterTransformer                = $monsterTransformer;
+        $this->locationService                   = $locationService;
+        $this->mapTileValue                      = $mapTileValue;
     }
 
     /**
@@ -220,6 +224,15 @@ class TraverseService {
         }
     }
 
+    /**
+     * Change the players' location if they cannot walk on the planes water.
+     *
+     * We do this till we find ground.
+     *
+     * @param Character $character
+     * @param array $cache
+     * @return Character
+     */
     protected function changeLocation(Character $character, array $cache) {
 
         if (!$this->mapTileValue->canWalkOnWater($character, $character->map->character_position_x, $character->map->character_position_y) ||
@@ -274,12 +287,13 @@ class TraverseService {
                                         ->first();
 
         if ($gameMap->mapType()->isShadowPlane() || $gameMap->mapType()->isHell()) {
-            $this->updateAtctionTypeCache($character, $oldGameMap, $gameMap->enemy_stat_bonus);
+            $this->updateActionTypeCache($character, $oldGameMap, $gameMap->enemy_stat_bonus);
         } else {
-            $this->updateAtctionTypeCache($character, $oldGameMap, 0.0);
+            $this->updateActionTypeCache($character, $oldGameMap, 0.0);
         }
 
-        $characterData = new Item($character, $this->characterAttackTransformer);
+        $characterData      = new Item($character, $this->characterAttackTransformer);
+        $characterBaseStats = new Item($character, $this->characterSheetBaseInfoTransformer);
 
         if (!is_null($locationWithEffect)) {
             $monsters  = Cache::get('monsters')[$locationWithEffect->name];
@@ -287,16 +301,25 @@ class TraverseService {
             $monsters  = Cache::get('monsters')[GameMap::find($mapId)->name];
         }
 
-        $characterData = $this->manager->createData($characterData)->toArray();
+        $characterData      = $this->manager->createData($characterData)->toArray();
+        $characterBaseStats = $this->manager->createData($characterBaseStats)->toArray();
 
         broadcast(new UpdateActionsBroadcast($characterData, $monsters, $user));
 
-        event(new UpdateAttackStats($characterData, $user));
+        event(new UpdateBaseCharacterInformation($user, $characterBaseStats));
 
         event(new UpdateTopBarEvent($character));
     }
 
-    protected function updateAtctionTypeCache(Character $character, GameMap $oldMap, float $deduction) {
+    /**
+     * Update the actions cache.
+     *
+     * @param Character $character
+     * @param GameMap $oldMap
+     * @param float $deduction
+     * @return void
+     */
+    protected function updateActionTypeCache(Character $character, GameMap $oldMap, float $deduction) {
 
         if ($oldMap->mapType()->isHell()) {
             event(new GameServerMessageEvent($character->user, 'One moment while we refresh your stats ...'));

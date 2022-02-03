@@ -3,6 +3,7 @@
 namespace App\Game\Core\Controllers;
 
 use App\Flare\Services\BuildCharacterAttackTypes;
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Services\ComparisonService;
@@ -41,7 +42,7 @@ class CharacterInventoryController extends Controller {
     public function __construct(
         EquipItemService $equipItemService,
         BuildCharacterAttackTypes $buildCharacterAttackTypes,
-        CharacterAttackTransformer $characterTransformer,
+        CharacterSheetBaseInfoTransformer $characterTransformer,
         EnchantingService $enchantingService,
         Manager $manager
     ) {

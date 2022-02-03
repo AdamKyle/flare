@@ -4,9 +4,11 @@ namespace App\Game\Core\Controllers;
 
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Transformers\CharacterAttackTransformer;
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\UpdateAttackStats;
+use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Exceptions\EquipItemException;
 use App\Game\Core\Requests\ShopReplaceItemValidation;
 use App\Game\Core\Services\EquipItemService;
@@ -33,24 +35,24 @@ class ShopController extends Controller {
 
     private $buildCharacterAttackTypes;
 
-    private $characterTransformer;
+    private $characterSheetBaseInfoTransformer;
 
     private $manager;
 
     public function __construct(
         EquipItemService $equipItemService,
         BuildCharacterAttackTypes $buildCharacterAttackTypes,
-        CharacterAttackTransformer $characterTransformer,
+        CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer,
         Manager $manager
     ) {
         $this->middleware('auth');
         $this->middleware('is.character.dead');
         $this->middleware('is.character.adventuring');
 
-        $this->equipItemService          = $equipItemService;
-        $this->buildCharacterAttackTypes = $buildCharacterAttackTypes;
-        $this->characterTransformer      = $characterTransformer;
-        $this->manager                   = $manager;
+        $this->equipItemService                       = $equipItemService;
+        $this->buildCharacterAttackTypes              = $buildCharacterAttackTypes;
+        $this->characterSheetBaseInfoTransformer      = $characterSheetBaseInfoTransformer;
+        $this->manager                                = $manager;
     }
 
     public function shopBuy(Character $character) {
@@ -256,7 +258,7 @@ class ShopController extends Controller {
             ->setCharacter($character)
             ->replaceItem();
 
-        $this->updateCharacterAttakDataCache($character);
+        $this->updateCharacterAttackDataCache($character);
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
@@ -265,13 +267,13 @@ class ShopController extends Controller {
         return redirect()->to(route('game.shop.buy', ['character' => $character]))->with('success', 'Purchased and equipped: ' . $item->affix_name . '.');
     }
 
-    protected function updateCharacterAttakDataCache(Character $character) {
+    protected function updateCharacterAttackDataCache(Character $character) {
         $this->buildCharacterAttackTypes->buildCache($character);
 
-        $characterData = new ResourceItem($character->refresh(), $this->characterTransformer);
+        $characterData = new ResourceItem($character->refresh(), $this->characterSheetBaseInfoTransformer);
 
         $characterData = $this->manager->createData($characterData)->toArray();
 
-        event(new UpdateAttackStats($characterData, $character->user));
+        event(new UpdateBaseCharacterInformation($character->user, $characterData));
     }
 }
