@@ -199,11 +199,6 @@ class CharacterAdventureControllerTest extends TestCase
              ]))->response;
 
         $this->assertEquals(302, $response->status());
-
-        $response->assertSessionHas('success');
-
-        Queue::assertPushed(AdventureCompletedRewards::class);
-
     }
 
     public function testDistributeRewardsWithMultipleLevelsGained() {

@@ -170,7 +170,7 @@ class AdventureRewardService {
             $faction = $faction->refresh();
         } else if (!$faction->maxed) {
             $faction->update([
-                'current_points' => $factionPoints,
+                'current_points' => $points,
             ]);
 
             $faction = $faction->refresh();
