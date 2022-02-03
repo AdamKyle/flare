@@ -403,7 +403,7 @@ export default class Game extends React.Component {
       <>
         <Tabs defaultActiveKey="game" id="game-tabs">
           <Tab eventKey="game" title="Game">
-            <div className="row">
+            <div className="row mt-2">
               <div className={this.state.windowWidth <= 1900 ? "col-12" : "col-12 col-lg-9"}>
                 <CharacterInfoTopSection
                   characterId={this.props.characterId}
@@ -527,7 +527,9 @@ export default class Game extends React.Component {
             </div>
           </Tab>
           <Tab eventKey="character-sheet" title="Character Sheet">
-            <CharacterSheet userId={this.props.userId} characterId={this.state.characterId} />
+            <div className="mt-2">
+              <CharacterSheet userId={this.props.userId} characterId={this.state.characterId} />
+            </div>
           </Tab>
         </Tabs>
         <Row>
