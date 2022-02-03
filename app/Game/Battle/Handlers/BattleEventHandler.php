@@ -2,29 +2,18 @@
 
 namespace App\Game\Battle\Handlers;
 
+use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Game\Battle\Events\UpdateCharacterStatus;
-use Illuminate\Support\Facades\Cache;
+use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterInCelestialFight;
-use App\Flare\Models\GameMap;
 use App\Flare\Models\Monster;
-use App\Flare\Models\Item as ItemModel;
-use App\Flare\Transformers\CharacterAttackTransformer;
-use App\Flare\Builders\RandomAffixGenerator;
-use App\Flare\Models\Faction;
-use App\Flare\Values\MaxCurrenciesValue;
-use App\Flare\Values\RandomAffixDetails;
-use App\Game\Maps\Events\UpdateActionsBroadcast;
 use App\Game\Core\Events\AttackTimeOutEvent;
 use App\Game\Core\Events\CharacterIsDeadBroadcastEvent;
-use App\Game\Core\Events\UpdateAttackStats;
-use App\Game\Core\Values\FactionType;
-use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
-use App\Game\Core\Values\FactionLevel;
 use App\Game\Battle\Services\BattleRewardProcessing;
 
 class BattleEventHandler {
@@ -37,7 +26,7 @@ class BattleEventHandler {
 
     public function __construct(
         Manager $manager,
-        CharacterAttackTransformer $characterAttackTransformer,
+        BuildCharacterAttackTypes $characterAttackTransformer,
         BattleRewardProcessing $battleRewardProcessing,
     ) {
         $this->manager                    = $manager;
@@ -57,7 +46,7 @@ class BattleEventHandler {
         event(new UpdateCharacterStatus($character));
 
         $characterData = new Item($character, $this->characterAttackTransformer);
-        event(new UpdateAttackStats($this->manager->createData($characterData)->toArray(), $character->user));
+        event(new UpdateBaseCharacterInformation($character->user, $characterData));
     }
 
     public function processMonsterDeath(Character $character, int $monsterId, bool $isAutomation = false) {

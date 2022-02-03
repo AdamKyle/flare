@@ -10,7 +10,9 @@ use App\Flare\Models\Monster;
 use App\Flare\Models\Skill;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Transformers\CharacterAttackTransformer;
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Core\Events\UpdateAttackStats;
+use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Skills\Services\SkillService;
 use App\Game\Skills\Values\SkillTypeValue;
 use Facades\App\Flare\Calculators\SkillXPCalculator;
@@ -105,10 +107,10 @@ class UpdateSkillListener
     protected function updateCharacterAttackDataCache(Character $character) {
         resolve(BuildCharacterAttackTypes::class)->buildCache($character);
 
-        $characterData = new ResourceItem($character->refresh(), resolve(CharacterAttackTransformer::class));
+        $characterData = new ResourceItem($character->refresh(), resolve(CharacterSheetBaseInfoTransformer::class));
 
         $characterData = resolve(Manager::class)->createData($characterData)->toArray();
 
-        event(new UpdateAttackStats($characterData, $character->user));
+        event(new UpdateBaseCharacterInformation($character->user, $characterData));
     }
 }

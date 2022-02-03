@@ -4,6 +4,7 @@ namespace App\Game\Core\Controllers;
 
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
+use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Services\ComparisonService;
 use App\Game\Skills\Events\UpdateCharacterEnchantingList;
 use App\Game\Skills\Services\EnchantingService;
@@ -136,6 +137,6 @@ class CharacterInventoryController extends Controller {
 
         $characterData = $this->manager->createData($characterData)->toArray();
 
-        event(new UpdateAttackStats($characterData, $character->user));
+        event(new UpdateBaseCharacterInformation($character->user, $characterData));
     }
 }

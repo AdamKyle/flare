@@ -528,7 +528,16 @@ export default class Game extends React.Component {
           </Tab>
           <Tab eventKey="character-sheet" title="Character Sheet">
             <div className="mt-2">
-              <CharacterSheet userId={this.props.userId} characterId={this.state.characterId} />
+              {
+                this.state.characterId !== null ?
+                  <CharacterSheet userId={this.props.userId} characterId={this.state.characterId} />
+                :
+                  <div className="progress loading-progress mt-2 mb-2" style={{position: 'relative'}}>
+                    <div className="progress-bar progress-bar-striped indeterminate">
+                    </div>
+                  </div>
+              }
+
             </div>
           </Tab>
         </Tabs>

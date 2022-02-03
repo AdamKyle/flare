@@ -11,6 +11,8 @@ export default class CharacterDetails extends React.Component {
       loading: true,
       baseData: {},
     }
+
+    this.updateBaseDetails = Echo.private('update-character-base-stats-' + this.props.userId);
   }
 
   componentDidMount() {
@@ -32,7 +34,14 @@ export default class CharacterDetails extends React.Component {
           return this.props.openTimeOutModal()
         }
       }
-    })
+    });
+
+    this.updateBaseDetails.listen('Game.Core.Events.UpdateBaseCharacterInformation', (event) => {
+      console.log(event);
+      this.setState({
+        baseData: event.baseStats,
+      });
+    });
   }
 
   buildEachTab(attackData, voided) {

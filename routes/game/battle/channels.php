@@ -26,6 +26,11 @@ Broadcast::channel('update-character-attack-{userId}', function ($user, $userId)
     return $user->id === (int) $userId;
 });
 
+// When we update a characters base stats.
+Broadcast::channel('update-character-base-stats-{userId}', function ($user, $userId) {
+    return $user->id === (int) $userId;
+});
+
 // When a character makes an attack on a celestial entity.
 Broadcast::channel('update-celestial-fight-{userId}', function ($user, $userId) {
     return $user->id === (int) $userId;

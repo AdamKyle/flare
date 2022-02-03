@@ -101,6 +101,7 @@ export default class CharacterSheet extends React.Component {
                     <Tab eventKey="character-info" title="Character Info">
                       <CharacterDetails
                         characterId={this.props.characterId}
+                        userId={this.props.userId}
                       />
                     </Tab>
                     <Tab eventKey="character-boons" title="Active Boons">

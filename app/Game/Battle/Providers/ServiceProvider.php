@@ -4,6 +4,7 @@ namespace App\Game\Battle\Providers;
 
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Builders\RandomItemDropBuilder;
+use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Services\CharacterRewardService;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Game\Battle\Console\Commands\ClearCelestials;
@@ -69,7 +70,7 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(BattleEventHandler::class, function($app) {
             return new BattleEventHandler(
                 $app->make(Manager::class),
-                $app->make(CharacterAttackTransformer::class),
+                $app->make(BuildCharacterAttackTypes::class),
                 $app->make(BattleRewardProcessing::class),
             );
         });

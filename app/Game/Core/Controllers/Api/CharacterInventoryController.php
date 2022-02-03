@@ -5,8 +5,10 @@ namespace App\Game\Core\Controllers\Api;
 use App\Flare\Models\InventorySet;
 use App\Flare\Models\Item;
 use App\Flare\Services\BuildCharacterAttackTypes;
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Values\RandomAffixDetails;
 use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
+use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Jobs\UseMultipleItems;
 use App\Game\Core\Requests\RemoveItemRequest;
 use App\Game\Core\Requests\RenameSetRequest;
@@ -43,7 +45,7 @@ class CharacterInventoryController extends Controller {
     private $manager;
 
     public function __construct(CharacterInventoryService $characterInventoryService,
-                                CharacterAttackTransformer $characterTransformer,
+                                CharacterSheetBaseInfoTransformer $characterTransformer,
                                 BuildCharacterAttackTypes $buildCharacterAttackTypes,
                                 EnchantingService $enchantingService,
                                 Manager $manager) {
@@ -246,7 +248,7 @@ class CharacterInventoryController extends Controller {
 
         event(new UpdateTopBarEvent($character));
 
-        $this->updateCharacterAttakDataCache($character);
+        $this->updateCharacterAttackDataCache($character);
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
@@ -368,7 +370,7 @@ class CharacterInventoryController extends Controller {
 
         event(new UpdateTopBarEvent($character->refresh()));
 
-        $this->updateCharacterAttakDataCache($character);
+        $this->updateCharacterAttackDataCache($character);
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
@@ -403,7 +405,7 @@ class CharacterInventoryController extends Controller {
 
         event(new UpdateTopBarEvent($character->refresh()));
 
-        $this->updateCharacterAttakDataCache($character);
+        $this->updateCharacterAttackDataCache($character);
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
@@ -440,7 +442,7 @@ class CharacterInventoryController extends Controller {
 
         event(new CharacterInventoryDetailsUpdate($character->user));
 
-        $this->updateCharacterAttakDataCache($character);
+        $this->updateCharacterAttackDataCache($character);
 
         event(new UpdateTopBarEvent($character->refresh()));
 
@@ -464,7 +466,7 @@ class CharacterInventoryController extends Controller {
 
         event(new UpdateTopBarEvent($character));
 
-        $this->updateCharacterAttakDataCache($character);
+        $this->updateCharacterAttackDataCache($character);
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
@@ -500,13 +502,19 @@ class CharacterInventoryController extends Controller {
         return response()->json(['message' => 'Boons are being applied. You can check Active Boons tab to see them be applied or check chat to see boons being applied.'], 200);
     }
 
-    protected function updateCharacterAttakDataCache(Character $character) {
+    /**
+     * Updates the character stats.
+     *
+     * @param Character $character
+     * @return void
+     */
+    protected function updateCharacterAttackDataCache(Character $character) {
         $this->buildCharacterAttackTypes->buildCache($character);
 
         $characterData = new ResourceItem($character->refresh(), $this->characterTransformer);
 
         $characterData = $this->manager->createData($characterData)->toArray();
 
-        event(new UpdateAttackStats($characterData, $character->user));
+        event(new UpdateBaseCharacterInformation($character->user, $characterData));
     }
 }
