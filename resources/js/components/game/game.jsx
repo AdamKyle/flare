@@ -121,7 +121,7 @@ export default class Game extends React.Component {
       adventureDetails: adventureDetails,
       adventureLogs: adventureLogs,
       canAdventureAgainAt: adventureAgainAt,
-      inventorySets: inventorySets,
+      inventorySets: typeof inventorySets === 'undefined' ? this.state.inventorySets : inventorySets,
     });
   }
 

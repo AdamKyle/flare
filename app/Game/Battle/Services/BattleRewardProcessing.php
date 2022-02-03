@@ -42,8 +42,6 @@ class BattleRewardProcessing {
 
         $character = $character->refresh();
 
-        dump('Battle Reward Processing: ' . $character->gold);
-
         event(new UpdateTopBarEvent($character));
     }
 

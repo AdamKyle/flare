@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Game\Core;
 
+use Illuminate\Support\Facades\Queue;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
@@ -187,6 +188,8 @@ class CharacterAdventureControllerTest extends TestCase
     }
 
     public function testDistributeRewards() {
+        Queue::fake();
+
         $user      = $this->character->getUser();
 
         $response = $this->actingAs($user)
@@ -195,8 +198,6 @@ class CharacterAdventureControllerTest extends TestCase
              ]))->response;
 
         $this->assertEquals(302, $response->status());
-
-        $response->assertSessionHas('success');
 
     }
 
