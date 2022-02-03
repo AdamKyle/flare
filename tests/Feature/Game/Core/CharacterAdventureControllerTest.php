@@ -194,6 +194,8 @@ class CharacterAdventureControllerTest extends TestCase
                  'adventureLog' => AdventureLog::first()->id,
              ]))->response;
 
+        dump($response->content());
+
         $this->assertEquals(302, $response->status());
 
         $response->assertSessionHas('success');
