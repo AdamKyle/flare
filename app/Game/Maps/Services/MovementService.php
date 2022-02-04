@@ -216,8 +216,9 @@ class MovementService {
             if (!is_null($location->enemy_strength_type)) {
                 $this->updateActions($character, $location->name);
 
-                event(new GameServerMessageEvent($character->user, 'You have entered: ' . $location->name . ' monsters here are much stronger. 
-                Special location enemy strength is also effected by the planes monster strength if you on Shadow Planes or Lower. Gear will matter here. 
+                event(new GameServerMessageEvent($character->user, 'You have entered: ' . $location->name . '. Monsters here are much stronger. 
+                Special location enemy strength is also effected by the planes monster strength if you on Shadow Planes or Lower. 
+                Remember, if you are here to get quest items, they will not drop if you are auto battling. Gear will matter here. 
                 There are quests you can do for Voidance and Devoidance Quest items which make your time here much easier. 
                 Locations such as these can drop special quest items. Check your quest section under: Plane Quests (on the map) -> All quests. 
                 If you need further help, click Help I\'m stuck at the top or the Discord button to join discord and ask for help in #help.'));

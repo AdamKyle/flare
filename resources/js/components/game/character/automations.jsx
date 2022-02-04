@@ -73,7 +73,7 @@ export default class Automations extends React.Component {
       this.setState({
         automations: event.automations,
       }, () => {
-        this.props.isAutomationRunning(result.data.automations.length > 0)
+        this.props.isAutomationRunning(event.automations.length > 0)
       });
     });
   }

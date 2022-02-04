@@ -2,22 +2,21 @@
 
 namespace App\Game\Core\Jobs;
 
-use App\Flare\Events\UpdateCharacterAttackEvent;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\InventorySlot;
 use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
+use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Services\UseItemService;
-use App\Game\Messages\Events\ServerMessageEvent;
-use App\Game\Skills\Services\DisenchantService;
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use App\Flare\Models\Character;
-use App\Game\Core\Events\ShowTimeOutEvent;
-use Illuminate\Support\Facades\Cache;
 
 class UseMultipleItems implements ShouldQueue
 {
@@ -48,7 +47,7 @@ class UseMultipleItems implements ShouldQueue
      *
      * @param UseItemService $useItemService
      */
-    public function handle(UseItemService $useItemService) {
+    public function handle(UseItemService $useItemService, Manager $manager, CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer) {
         $inventorySlot = InventorySlot::where('inventory_id', $this->character->inventory->id)
                                       ->where('id', $this->slotId)
                                       ->first();
@@ -65,7 +64,10 @@ class UseMultipleItems implements ShouldQueue
 
             event(new UpdateTopBarEvent($character));
 
-            event(new UpdateCharacterAttackEvent($character));
+            $characterData = new Item($character, $characterSheetBaseInfoTransformer);
+            $characterData = $manager->createData($characterData)->toArray();
+
+            event(new UpdateBaseCharacterInformation($character->user, $characterData));
         }
     }
 }

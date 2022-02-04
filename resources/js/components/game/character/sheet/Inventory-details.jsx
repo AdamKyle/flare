@@ -73,7 +73,7 @@ export default class InventoryDetails extends React.Component {
             </dl>
           </Card.Body>
         </Card>
-        <InventoryBase characterId={this.props.characterId} userId={this.props.userId} automations={this.props.automations}/>
+        <InventoryBase characterId={this.props.characterId} userId={this.props.userId} isAutomationRunning={this.props.isAutomationRunning}/>
       </>
     );
   }

@@ -71,24 +71,28 @@ export default class AutoAttackSection extends React.Component {
 
     this.automation.listen('Game.Automation.Events.AutomationAttackTimeOut', (event) => {
       this.setState({
+        errorMessage: null,
         timeRemaining: event.forLength,
       })
     });
 
     this.automationAttackMessages.listen('Game.Automation.Events.AutomatedAttackMessage', (event) => {
       this.setState({
+        errorMessage: null,
         attackMessages: event.messages,
       })
     });
     
     this.automationAttackDetails.listen('Game.Automation.Events.AutomatedAttackDetails', (event) => {
       this.setState({
+        errorMessage: null,
         params: event.details,
       })
     });
 
     this.isDead.listen('Game.Core.Events.CharacterIsDeadBroadcastEvent', (event) => {
       this.setState({
+        errorMessage: null,
         isDead: event.isDead,
       });
     });
@@ -309,6 +313,12 @@ export default class AutoAttackSection extends React.Component {
 
           if (response.status === 429) {
             return this.props.openTimeOutModal();
+          }
+
+          if (response.status == 404) {
+            this.setState({
+              errorMessage: 'Automation is stopping, please wait ...'
+            })
           }
         }
       });

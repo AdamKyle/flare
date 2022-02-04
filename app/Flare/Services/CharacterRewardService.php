@@ -124,7 +124,7 @@ class CharacterRewardService {
         $xp = $this->characterXpService->determineXPToAward($this->character, $xp);
 
         if (!is_null($gameMap->xp_bonus)) {
-            $xp = $xp * (1 + $gameMap->xp_bonus);
+            $xp = ($xp + $xp * $gameMap->xp_bonus);
         }
 
         $xp = $this->character->xp + $xp;

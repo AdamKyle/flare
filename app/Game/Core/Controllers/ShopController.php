@@ -3,18 +3,14 @@
 namespace App\Game\Core\Controllers;
 
 use App\Flare\Services\BuildCharacterAttackTypes;
-use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
-use App\Game\Core\Events\UpdateAttackStats;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
-use App\Game\Core\Exceptions\EquipItemException;
 use App\Game\Core\Requests\ShopReplaceItemValidation;
 use App\Game\Core\Services\EquipItemService;
 use Cache;
 use App\Game\Core\Jobs\PurchaseItemsJob;
-use App\Game\Core\Requests\EquipItemValidation;
 use App\Game\Core\Services\ComparisonService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;

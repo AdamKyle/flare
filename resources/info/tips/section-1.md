@@ -18,6 +18,16 @@
 > 
 > I, The Creator, always check discord, multiple times per day to make sure no one is having issues and every one is having fun.
 
+
+> ## ATTN!
+>
+> [Automation](/information/automation) has been turned off in game due to server issues as it would cause the CPU to spike to 200%.
+>
+> In the meantime, players are encouraged to use [adventures](/information/adventure) to get [faction](/information/factions) points.
+> 
+> What you can do for this document is that where I state I want you to faction farm, you will instead queue up for adventures. 
+> It will take a bit longer (and can be done offline), but it's the same result and more points than just manually clicking.
+
 *Ahem... Let's get on with this shall we child? Are you ready? The road ahead is long, the night is full of creatures that haunt your waking nightmarish existence.*
 
 I could list out things you should focus on, things you should and should not do. That's fun and all, but instead let me

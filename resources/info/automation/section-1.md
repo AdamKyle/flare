@@ -1,5 +1,11 @@
 # Automation
 
+> ## ATTN!
+> 
+> Automation has been turned off in game due to server issues as it would cause the CPU to spike to 200%.
+> 
+> In the meantime, players are encouraged to use [adventures](/information/adventure) to get [faction](/information/factions) points.
+
 Tlessa has introduced and will continue to introduce three types of Automation. One, at the time of this writing, has been implemented with
 the other two to follow in later patches.
 

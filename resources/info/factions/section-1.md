@@ -1,5 +1,14 @@
 ## Factions
 
+> ## ATTN!
+>
+> Automation has been turned off in game due to server issues as it would cause the CPU to spike to 200%.
+> At this time this document still holds true, however: The points you need have been reduced by a factor of 10. Just divide the chart below by
+> 10 for points needed and your current points. Should automation make a return this will increase both points needed and your current points by a factor
+> of ten to match the table.
+>
+> In the meantime, players are encouraged to use [adventures](/information/adventure) to get faction points.
+
 With in Tlessa there are a specific number of maps (see [planes](/information/planes)). Each map has its own faction
 that you have already probably been leveling by just fighting monsters. **Any Monster**. 
 

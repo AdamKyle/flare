@@ -5,7 +5,6 @@ import EquippedSection from "./sections/equipped-section";
 import SetsSection from "./sections/sets-section";
 import QuestSection from "./sections/quest-section";
 import UsableItemsSection from "./sections/usable-items-section";
-import AlertInfo from "../../components/base/alert-info";
 import AlertWarning from "../../components/base/alert-warning";
 
 export default class InventoryBase extends React.Component {
@@ -70,17 +69,17 @@ export default class InventoryBase extends React.Component {
             </div>
           :
             <Fragment>
-              {/*{*/}
-              {/*  this.props.automations.length > 0 ?*/}
-              {/*    <AlertWarning icon={'fas fa-exclamation-triangle'} title={'Automation is running'}>*/}
-              {/*      <p>*/}
-              {/*        You cannot equip items while you have automation running. You cannot equip sets, or manage currently*/}
-              {/*        equipped items. How ever, you can move items between sets, destroy and disenchant items.*/}
-              {/*        For example, if you are auto battling and get a Faction reward item, you CAN move it to a set, but you CANNOT equip it.*/}
-              {/*      </p>*/}
-              {/*    </AlertWarning>*/}
-              {/*  : null*/}
-              {/*}*/}
+              {
+                this.props.isAutomationRunning?
+                  <AlertWarning icon={'fas fa-exclamation-triangle'} title={'Automation is running'}>
+                    <p>
+                      You cannot equip items while you have automation running. You cannot equip sets, or manage currently
+                      equipped items. However, you can move items between sets, destroy and disenchant items.
+                      For example, if you are auto battling and get a Faction reward item, you CAN move it to a set, but you CANNOT equip it.
+                    </p>
+                  </AlertWarning>
+                : null
+              }
 
               <Tabs defaultActiveKey="inventory" id="inventory-section">
                 <Tab eventKey="inventory" title="Inventory">

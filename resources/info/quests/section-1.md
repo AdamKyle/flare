@@ -1,5 +1,13 @@
 # Quests
 
+> ## ATTN!
+>
+> [Automation](/information/automation) has been turned off in game due to server issues as it would cause the CPU to spike to 200%.
+>
+> In the meantime, players are encouraged to use [adventures](/information/adventure) to get [faction](/information/factions) points.
+> 
+> Some quests require you to be specific faction levels to complete.
+
 > ### ATTN!
 >
 > This document makes use of example images from development and may not reflect actual locations of NPC’s or items names. Consult the appropriate links in this document, for correct info on NPC’s and where they are located.

@@ -219,7 +219,7 @@ export default class SkillDetails extends React.Component {
                 <div className="col-xs-12 col-sm-4">
                   <button
                     className={s.is_training ? 'btn btn-success btn-sm train-skill-btn' : 'btn btn-primary btn-sm train-skill-btn'}
-                    disabled={!this.props.canAdventure || this.props.isDead}
+                    disabled={!this.props.canAdventure || this.props.isDead || !this.props.canAutoBattle}
                     onClick={() => this.manageTrainSkill(s)}
                   >
                     Train { s.is_training ? <i className="ml-2 fas fa-check"></i> : null }
@@ -229,7 +229,7 @@ export default class SkillDetails extends React.Component {
                       <Fragment>
                         <button
                           className="btn btn-danger btn-sm ml-2 train-skill-btn"
-                          disabled={!this.props.canAdventure || this.props.isDead}
+                          disabled={!this.props.canAdventure || this.props.isDead || !this.props.canAutoBattle}
                           onClick={() => this.stopTrainingSkill(s)}
                         >
                           Stop
