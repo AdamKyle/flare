@@ -28,10 +28,6 @@ export default class CharacterInfoTopSection extends React.Component {
           isLoading: false,
           forceNameChange: result.data.sheet.force_name_change,
         }, () => {
-          if (result.data.sheet.timeout_until !== null) {
-            this.props.openTimeOutModal(result.data.sheet.timeout_until)
-          }
-
           this.props.updateCharacterGold(result.data.sheet.gold);
         });
       }).catch((err) => {

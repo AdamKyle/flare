@@ -28,10 +28,6 @@ export default class CharacterSheet extends React.Component {
         this.setState({
           characterSheet: result.data.sheet,
           loading: false,
-        }, () => {
-          if (result.data.sheet.timeout_until !== null) {
-            // this.props.openTimeOutModal(result.data.sheet.timeout_until)
-          }
         });
       }).catch((err) => {
         this.setState({loading: false});

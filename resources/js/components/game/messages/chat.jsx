@@ -162,6 +162,10 @@ export default class Chat extends React.Component {
   }
 
   isGod(user) {
+    if (!user.hasOwnProperty('roles')) {
+      return false;
+    }
+
     if (isEmpty(user.roles)) {
       return false;
     }
