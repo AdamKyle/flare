@@ -569,13 +569,13 @@
             ],
             "type": "library",
             "autoload": {
-                "psr-4": {
-                    "Deployer\\": "src/"
-                },
                 "files": [
                     "src/Support/helpers.php",
                     "src/functions.php"
-                ]
+                ],
+                "psr-4": {
+                    "Deployer\\": "src/"
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -707,16 +707,16 @@
         },
         {
             "name": "doctrine/dbal",
-            "version": "3.3.0",
+            "version": "3.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/dbal.git",
-                "reference": "a4b37db6f186b6843474189b424aed6a7cc5de4b"
+                "reference": "5b6eb6c8ce65ebdc60b0c0960a676cf76758dbf2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/dbal/zipball/a4b37db6f186b6843474189b424aed6a7cc5de4b",
-                "reference": "a4b37db6f186b6843474189b424aed6a7cc5de4b",
+                "url": "https://api.github.com/repos/doctrine/dbal/zipball/5b6eb6c8ce65ebdc60b0c0960a676cf76758dbf2",
+                "reference": "5b6eb6c8ce65ebdc60b0c0960a676cf76758dbf2",
                 "shasum": ""
             },
             "require": {
@@ -798,7 +798,7 @@
             ],
             "support": {
                 "issues": "https://github.com/doctrine/dbal/issues",
-                "source": "https://github.com/doctrine/dbal/tree/3.3.0"
+                "source": "https://github.com/doctrine/dbal/tree/3.3.1"
             },
             "funding": [
                 {
@@ -814,7 +814,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-01-18T00:13:52+00:00"
+            "time": "2022-01-30T17:50:59+00:00"
         },
         {
             "name": "doctrine/deprecations",
@@ -1459,6 +1459,62 @@
             "time": "2020-10-22T13:48:01+00:00"
         },
         {
+            "name": "fig/http-message-util",
+            "version": "1.1.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/http-message-util.git",
+                "reference": "9d94dc0154230ac39e5bf89398b324a86f63f765"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/http-message-util/zipball/9d94dc0154230ac39e5bf89398b324a86f63f765",
+                "reference": "9d94dc0154230ac39e5bf89398b324a86f63f765",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.3 || ^7.0 || ^8.0"
+            },
+            "suggest": {
+                "psr/http-message": "The package containing the PSR-7 interfaces"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Fig\\Http\\Message\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "https://www.php-fig.org/"
+                }
+            ],
+            "description": "Utility classes and constants for use with PSR-7 (psr/http-message)",
+            "keywords": [
+                "http",
+                "http-message",
+                "psr",
+                "psr-7",
+                "request",
+                "response"
+            ],
+            "support": {
+                "issues": "https://github.com/php-fig/http-message-util/issues",
+                "source": "https://github.com/php-fig/http-message-util/tree/1.1.5"
+            },
+            "time": "2020-11-24T22:02:12+00:00"
+        },
+        {
             "name": "graham-campbell/bounded-cache",
             "version": "v1.1.3",
             "source": {
@@ -2070,12 +2126,12 @@
                 }
             },
             "autoload": {
-                "psr-4": {
-                    "GuzzleHttp\\Psr7\\": "src/"
-                },
                 "files": [
                     "src/functions_include.php"
-                ]
+                ],
+                "psr-4": {
+                    "GuzzleHttp\\Psr7\\": "src/"
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -2292,16 +2348,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v8.81.0",
+            "version": "v8.82.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "9cc0efd724ce67a190b1695ba31a27bbb1ae9177"
+                "reference": "411d5243c58cbf12b0fc89cab1ceb50088968c27"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/9cc0efd724ce67a190b1695ba31a27bbb1ae9177",
-                "reference": "9cc0efd724ce67a190b1695ba31a27bbb1ae9177",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/411d5243c58cbf12b0fc89cab1ceb50088968c27",
+                "reference": "411d5243c58cbf12b0fc89cab1ceb50088968c27",
                 "shasum": ""
             },
             "require": {
@@ -2461,7 +2517,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2022-01-25T16:41:46+00:00"
+            "time": "2022-02-01T16:13:57+00:00"
         },
         {
             "name": "laravel/helpers",
@@ -2598,16 +2654,16 @@
         },
         {
             "name": "laravel/serializable-closure",
-            "version": "v1.0.5",
+            "version": "v1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/serializable-closure.git",
-                "reference": "25de3be1bca1b17d52ff0dc02b646c667ac7266c"
+                "reference": "65c9faf50d567b65d81764a44526545689e3fe63"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/serializable-closure/zipball/25de3be1bca1b17d52ff0dc02b646c667ac7266c",
-                "reference": "25de3be1bca1b17d52ff0dc02b646c667ac7266c",
+                "url": "https://api.github.com/repos/laravel/serializable-closure/zipball/65c9faf50d567b65d81764a44526545689e3fe63",
+                "reference": "65c9faf50d567b65d81764a44526545689e3fe63",
                 "shasum": ""
             },
             "require": {
@@ -2653,7 +2709,7 @@
                 "issues": "https://github.com/laravel/serializable-closure/issues",
                 "source": "https://github.com/laravel/serializable-closure"
             },
-            "time": "2021-11-30T15:53:04+00:00"
+            "time": "2022-02-01T16:29:39+00:00"
         },
         {
             "name": "laravel/tinker",
@@ -3169,26 +3225,26 @@
         },
         {
             "name": "maatwebsite/excel",
-            "version": "3.1.35",
+            "version": "3.1.36",
             "source": {
                 "type": "git",
                 "url": "https://github.com/SpartnerNL/Laravel-Excel.git",
-                "reference": "6f171c8b79e1c0fb254f3ec40f7a11ac79289eaa"
+                "reference": "eb31f30d72c51c3fb11644b636945accbe50404f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/SpartnerNL/Laravel-Excel/zipball/6f171c8b79e1c0fb254f3ec40f7a11ac79289eaa",
-                "reference": "6f171c8b79e1c0fb254f3ec40f7a11ac79289eaa",
+                "url": "https://api.github.com/repos/SpartnerNL/Laravel-Excel/zipball/eb31f30d72c51c3fb11644b636945accbe50404f",
+                "reference": "eb31f30d72c51c3fb11644b636945accbe50404f",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
-                "illuminate/support": "5.8.*|^6.0|^7.0|^8.0",
+                "illuminate/support": "5.8.*|^6.0|^7.0|^8.0|^9.0",
                 "php": "^7.0|^8.0",
                 "phpoffice/phpspreadsheet": "^1.18"
             },
             "require-dev": {
-                "orchestra/testbench": "^6.0",
+                "orchestra/testbench": "^6.0|^7.0",
                 "predis/predis": "^1.1"
             },
             "type": "library",
@@ -3231,7 +3287,7 @@
             ],
             "support": {
                 "issues": "https://github.com/SpartnerNL/Laravel-Excel/issues",
-                "source": "https://github.com/SpartnerNL/Laravel-Excel/tree/3.1.35"
+                "source": "https://github.com/SpartnerNL/Laravel-Excel/tree/3.1.36"
             },
             "funding": [
                 {
@@ -3243,7 +3299,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-01-04T15:05:43+00:00"
+            "time": "2022-01-27T18:34:20+00:00"
         },
         {
             "name": "maennchen/zipstream-php",
@@ -3863,29 +3919,30 @@
         },
         {
             "name": "owen-it/laravel-auditing",
-            "version": "v12.0.0",
+            "version": "12.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/owen-it/laravel-auditing.git",
-                "reference": "5659c736f17aa75805b60c0d0a23783f3bf5c2a1"
+                "reference": "4b6398683859c240b6b7136ef60215698d897f3d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/owen-it/laravel-auditing/zipball/5659c736f17aa75805b60c0d0a23783f3bf5c2a1",
-                "reference": "5659c736f17aa75805b60c0d0a23783f3bf5c2a1",
+                "url": "https://api.github.com/repos/owen-it/laravel-auditing/zipball/4b6398683859c240b6b7136ef60215698d897f3d",
+                "reference": "4b6398683859c240b6b7136ef60215698d897f3d",
                 "shasum": ""
             },
             "require": {
-                "illuminate/console": "^6.0|^7.0|^8.0",
-                "illuminate/database": "^6.0|^7.0|^8.0",
-                "illuminate/filesystem": "^6.0|^7.0|^8.0",
+                "ext-json": "*",
+                "illuminate/console": "^6.0|^7.0|^8.0|^9.0",
+                "illuminate/database": "^6.0|^7.0|^8.0|^9.0",
+                "illuminate/filesystem": "^6.0|^7.0|^8.0|^9.0",
                 "php": "^7.3|^8.0"
             },
             "require-dev": {
+                "laravel/legacy-factories": "*",
                 "mockery/mockery": "^1.0",
-                "orchestra/testbench": "^4.0",
-                "phpunit/phpunit": "^9.0",
-                "ramsey/uuid": "^3.0"
+                "orchestra/testbench": "^4.0|^5.0|^6.0|^7.0",
+                "phpunit/phpunit": "^9.0"
             },
             "suggest": {
                 "laravelista/lumen-vendor-publish": "Needed to publish the package configuration in Lumen"
@@ -3916,10 +3973,6 @@
                     "email": "anteriovieira@gmail.com"
                 },
                 {
-                    "name": "Quetzy Garcia",
-                    "email": "quetzyg@altek.org"
-                },
-                {
                     "name": "Raphael França",
                     "email": "raphaelfrancabsb@gmail.com"
                 }
@@ -3946,7 +3999,7 @@
                 "issues": "https://github.com/owen-it/laravel-auditing/issues",
                 "source": "https://github.com/owen-it/laravel-auditing"
             },
-            "time": "2020-12-15T19:19:43+00:00"
+            "time": "2022-02-02T11:09:52+00:00"
         },
         {
             "name": "paragonie/random_compat",
@@ -5825,20 +5878,21 @@
         },
         {
             "name": "react/http",
-            "version": "v1.5.0",
+            "version": "v1.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/http.git",
-                "reference": "8a0fd7c0aa74f0db3008b1e47ca86c613cbb040e"
+                "reference": "59961cc4a5b14481728f07c591546be18fa3a5c7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/http/zipball/8a0fd7c0aa74f0db3008b1e47ca86c613cbb040e",
-                "reference": "8a0fd7c0aa74f0db3008b1e47ca86c613cbb040e",
+                "url": "https://api.github.com/repos/reactphp/http/zipball/59961cc4a5b14481728f07c591546be18fa3a5c7",
+                "reference": "59961cc4a5b14481728f07c591546be18fa3a5c7",
                 "shasum": ""
             },
             "require": {
                 "evenement/evenement": "^3.0 || ^2.0 || ^1.0",
+                "fig/http-message-util": "^1.1",
                 "php": ">=5.3.0",
                 "psr/http-message": "^1.0",
                 "react/event-loop": "^1.2",
@@ -5849,10 +5903,10 @@
                 "ringcentral/psr7": "^1.2"
             },
             "require-dev": {
-                "clue/block-react": "^1.1",
-                "clue/http-proxy-react": "^1.3",
-                "clue/reactphp-ssh-proxy": "^1.0",
-                "clue/socks-react": "^1.0",
+                "clue/block-react": "^1.5",
+                "clue/http-proxy-react": "^1.7",
+                "clue/reactphp-ssh-proxy": "^1.3",
+                "clue/socks-react": "^1.3",
                 "phpunit/phpunit": "^9.3 || ^5.7 || ^4.8.35"
             },
             "type": "library",
@@ -5903,7 +5957,7 @@
             ],
             "support": {
                 "issues": "https://github.com/reactphp/http/issues",
-                "source": "https://github.com/reactphp/http/tree/v1.5.0"
+                "source": "https://github.com/reactphp/http/tree/v1.6.0"
             },
             "funding": [
                 {
@@ -5915,7 +5969,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2021-08-04T12:24:55+00:00"
+            "time": "2022-02-03T13:17:37+00:00"
         },
         {
             "name": "react/promise",
@@ -11162,12 +11216,12 @@
             },
             "type": "library",
             "autoload": {
-                "psr-4": {
-                    "DeepCopy\\": "src/DeepCopy/"
-                },
                 "files": [
                     "src/DeepCopy/deep_copy.php"
-                ]
+                ],
+                "psr-4": {
+                    "DeepCopy\\": "src/DeepCopy/"
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
