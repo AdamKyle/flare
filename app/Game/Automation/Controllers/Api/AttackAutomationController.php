@@ -49,8 +49,6 @@ class AttackAutomationController extends Controller {
 
         $characterAutomation->delete();
 
-        event(new UpdateTopBarEvent($character->refresh()));
-
         return response()->json([
             'message' => 'Attack Automation is stopping. Please wait for the timer to finish.'
         ]);

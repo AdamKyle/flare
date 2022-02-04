@@ -12,9 +12,13 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Skill;
 use App\Flare\Events\UpdateSkillEvent;
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Services\CharacterService;
 use Facades\App\Flare\Calculators\XPCalculator;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item;
 
 class CharacterRewardService {
 
@@ -28,14 +32,20 @@ class CharacterRewardService {
      */
     private $characterXpService;
 
+    private $manager;
+
+    private $characterSheetBaseInfoTransformer;
+
     /**
      * Constructor
      *
      * @param CharacterXPService $characterXpService
      */
-    public function __construct(CharacterXPService $characterXpService, CharacterService $characterService) {
-        $this->characterXpService        = $characterXpService;
-        $this->characterService          = $characterService;
+    public function __construct(CharacterXPService $characterXpService, CharacterService $characterService, Manager $manager, CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer) {
+        $this->characterXpService                = $characterXpService;
+        $this->characterService                  = $characterService;
+        $this->characterSheetBaseInfoTransformer = $characterSheetBaseInfoTransformer;
+        $this->manager                           = $manager;
     }
 
     public function setCharacter(Character $character): CharacterRewardService {
@@ -135,7 +145,11 @@ class CharacterRewardService {
 
         event(new ServerMessageEvent($character->user, 'level_up'));
         event(new UpdateTopBarEvent($character));
-        event(new UpdateCharacterAttackEvent($character));
+
+        $characterData = new Item($character, $this->characterSheetBaseInfoTransformer);
+        $characterData = $this->manager->createData($characterData)->toArray();
+
+        event(new UpdateBaseCharacterInformation($character->user, $characterData));
     }
 
     /**

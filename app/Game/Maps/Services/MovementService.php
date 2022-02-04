@@ -24,11 +24,13 @@ use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Events\UpdateActionsBroadcast;
 use App\Game\Maps\Events\UpdateMapDetailsBroadcast;
+use App\Game\Maps\Events\UpdateMonsterList;
 use App\Game\Maps\Services\Common\CanPlayerMassEmbezzle;
 use App\Game\Maps\Services\Common\LiveCharacterCount;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Maps\Values\MapPositionValue;
 use App\Game\Messages\Events\GlobalMessageEvent;
+use App\Game\Messages\Events\ServerMessageEvent as GameServerMessageEvent;
 use Illuminate\Support\Facades\Cache;
 use League\Fractal\Manager;
 
@@ -213,6 +215,12 @@ class MovementService {
 
             if (!is_null($location->enemy_strength_type)) {
                 $this->updateActions($character, $location->name);
+
+                event(new GameServerMessageEvent($character->user, 'You have entered: ' . $location->name . ' monsters here are much stronger. 
+                Special location enemy strength is also effected by the planes monster strength if you on Shadow Planes or Lower. Gear will matter here. 
+                There are quests you can do for Voidance and Devoidance Quest items which make your time here much easier. 
+                Locations such as these can drop special quest items. Check your quest section under: Plane Quests (on the map) -> All quests. 
+                If you need further help, click Help I\'m stuck at the top or the Discord button to join discord and ask for help in #help.'));
             }
         } else {
             $this->updateActions($character, null, $character->map->gameMap->name);
@@ -532,7 +540,7 @@ class MovementService {
 
         $character = $this->manager->createData($character)->toArray();
 
-        broadcast(new UpdateActionsBroadcast($character, $monsters, $user));
+        broadcast(new UpdateMonsterList($monsters, $user));
 
         event(new UpdateBaseCharacterInformation($user, $character));
     }

@@ -80,5 +80,10 @@ Broadcast::channel('update-queen-of-hearts-panel-{userId}', function ($user, $us
     return $user->id === (int) $userId;
 });
 
+// When the characters factions update.
+Broadcast::channel('update-factions-{userId}', function ($user, $userId) {
+    return $user->id === (int) $userId;
+});
+
 
 

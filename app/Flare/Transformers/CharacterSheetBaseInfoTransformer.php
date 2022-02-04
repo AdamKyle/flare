@@ -83,6 +83,7 @@ class CharacterSheetBaseInfoTransformer extends TransformerAbstract {
                 'all_stat_reduction' => $characterInformation->findPrefixStatReductionAffix(),
                 'stat_reduction'     => $characterInformation->findSuffixStatReductionAffixes(),
             ],
+            'is_alchemy_locked'      => $this->isAlchemyLocked($character),
         ];
     }
 
@@ -96,6 +97,18 @@ class CharacterSheetBaseInfoTransformer extends TransformerAbstract {
         }
 
         return MaxLevel::MAX_LEVEL;
+    }
+
+    private function isAlchemyLocked(Character $character) {
+        $skill = $character->skills->filter(function($skill) {
+            return $skill->type()->isAlchemy();
+        })->first();
+
+        if (!is_null($skill)) {
+            return $skill->is_locked;
+        }
+
+        return true;
     }
 
     private function getToHitBase(Character $character, CharacterInformationBuilder $characterInformation, bool $voided = false): int {

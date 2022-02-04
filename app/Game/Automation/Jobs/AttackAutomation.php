@@ -7,6 +7,7 @@ use App\Flare\Models\Monster;
 use App\Game\Automation\Events\AutomatedAttackDetails;
 use App\Game\Automation\Events\AutomatedAttackStatus;
 use App\Game\Automation\Events\AutomationAttackTimeOut;
+use App\Game\Automation\Events\UpdateAutomationsList;
 use App\Game\Automation\Services\AttackAutomationService;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Bus\Queueable;
@@ -46,8 +47,11 @@ class AttackAutomation implements ShouldQueue
                 $automation->delete();
             }
 
-            event (new AutomatedAttackStatus($this->character->user, false));
-            event(new UpdateTopBarEvent($this->character->refresh()));
+            $character = $this->character->refresh();
+
+            event (new AutomatedAttackStatus($character->user, false));
+            event(new UpdateTopBarEvent($character));
+            event(new UpdateAutomationsList($character->user, $character->currentAutomations));
 
             return;
         }

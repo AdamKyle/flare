@@ -12,6 +12,7 @@ use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\RandomAffixDetails;
 use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
+use App\Game\Core\Events\UpdateCharacterFactions;
 use App\Game\Core\Values\FactionLevel;
 use App\Game\Core\Values\FactionType;
 use App\Game\Messages\Events\GlobalMessageEvent;
@@ -51,12 +52,21 @@ class FactionHandler {
         }
 
         $faction->save();
+
+        $factions = $character->refresh()->factions->transform(function($faction) {
+            $faction->map_name = $faction->gameMap->name;
+
+            return $faction;
+        });
+
+        event(new UpdateCharacterFactions($character->user, $factions));
     }
 
     protected function handleFactionLevelUp(Character $character, Faction $faction, string $mapName) {
         event(new ServerMessageEvent($character->user, $mapName . ' faction has gained a new level!'));
 
         $faction = $this->updateFaction($faction);
+
 
         $this->rewardPlayer($character, $faction, $mapName, FactionType::getTitle($faction->current_level));
 

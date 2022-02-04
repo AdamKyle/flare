@@ -161,6 +161,8 @@ class ServiceProvider extends ApplicationServiceProvider
             return new CharacterRewardService(
                 $app->make(CharacterXPService::class),
                 $app->make(CharacterService::class),
+                $app->make(Manager::class),
+                $app->make(CharacterSheetBaseInfoTransformer::class)
             );
 
         });

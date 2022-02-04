@@ -170,6 +170,14 @@ export default class FightSection extends React.Component {
 
   componentDidUpdate(prevProps) {
 
+    if (this.props.resetBattleAction) {
+      this.setState({
+        monster: null
+      }, () => {
+        this.props.updateResetBattleAction(false);
+      });
+    }
+
     let stateMonster = this.state.monster;
     let propsMonster = this.props.monster;
 

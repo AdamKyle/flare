@@ -5,6 +5,11 @@ Broadcast::channel('update-map-{userId}', function($user, $userId) {
 	return $user->id === (int) $userId;
 });
 
+// When we update the monsters list based on location.
+Broadcast::channel('update-monsters-list-{userId}', function($user, $userId) {
+    return $user->id === (int) $userId;
+});
+
 // When a user is traveling to another plane.
 Broadcast::channel('update-map-plane-{userId}', function($user, $userId) {
    return $user->id === (int) $userId;
@@ -19,7 +24,6 @@ Broadcast::channel('global-character-count-plane', function($user) {
 BroadCast::channel('global-map-update', function($user) {
    return $user;
 });
-
 
 // When the NPC Kingdoms update.
 Broadcast::channel('npc-kingdoms-update', function($user) {

@@ -14,6 +14,7 @@ export default class CharacterSheet extends React.Component {
 
     this.state = {
       characterSheet: {},
+      isAutomationRunning: false,
       loading: true,
     }
 
@@ -55,13 +56,19 @@ export default class CharacterSheet extends React.Component {
 
   automationsTitle() {
 
-    if (this.state.characterSheet.is_auto_battling) {
+    if (this.state.isAutomationRunning) {
       return <span className="tw-text-green-600">
         <i className="fas fa-cog fa-spin"></i> Current Automations
       </span>
     }
 
     return <span>Current Automations</span>
+  }
+
+  isAutomationRunning(isRunning) {
+    this.setState({
+      isAutomationRunning: isRunning,
+    })
   }
 
   render() {
@@ -108,10 +115,10 @@ export default class CharacterSheet extends React.Component {
                       <Boons characterId={this.props.characterId} userId={this.props.userId} />
                     </Tab>
                     <Tab eventKey="character-automation" title={this.automationsTitle()}>
-                      <Automations characterId={this.props.characterId} />
+                      <Automations characterId={this.props.characterId} userId={this.props.userId} isAutomationRunning={this.isAutomationRunning.bind(this)}/>
                     </Tab>
                     <Tab eventKey="character-faction" title='Factions'>
-                      <Factions characterId={this.props.characterId} canAutoBattle={this.state.characterSheet.can_auto_battle}/>
+                      <Factions characterId={this.props.characterId} userId={this.props.userId} canAutoBattle={this.state.characterSheet.can_auto_battle}/>
                     </Tab>
                   </Tabs>
                   <SkillDetails

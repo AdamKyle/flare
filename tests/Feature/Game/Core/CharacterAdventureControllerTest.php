@@ -202,6 +202,8 @@ class CharacterAdventureControllerTest extends TestCase
     }
 
     public function testDistributeRewardsWithMultipleLevelsGained() {
+        Queue::fake();
+
         $item = $this->createItem([
             'type' => 'quest'
         ]);
@@ -236,8 +238,6 @@ class CharacterAdventureControllerTest extends TestCase
                          ]))->response;
 
         $this->assertEquals(302, $response->status());
-
-        $response->assertSessionHas('success');
     }
 
     public function testDistributeRewardsWhenInventoryIsFull() {
@@ -266,6 +266,7 @@ class CharacterAdventureControllerTest extends TestCase
     }
 
     public function testShowDifferentSuccessWhenThereIsNoReward() {
+        Queue::fake();
 
         $user = $this->character->adventureManagement()->updateLog([
             'rewards' => [

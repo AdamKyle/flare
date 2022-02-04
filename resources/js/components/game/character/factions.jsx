@@ -57,6 +57,8 @@ export default class Factions extends React.Component {
         </div>,
       },
     ];
+
+    this.updateFactions = Echo.private('update-factions-' + this.props.userId);
   }
 
   componentDidMount() {
@@ -79,6 +81,12 @@ export default class Factions extends React.Component {
           return this.props.openTimeOutModal()
         }
       }
+    });
+
+    this.updateFactions.listen('Game.Core.Events.UpdateCharacterFactions', (event) => {
+      this.setState({
+        factions: event.factions,
+      });
     });
   }
 

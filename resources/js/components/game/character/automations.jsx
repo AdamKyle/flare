@@ -42,6 +42,8 @@ export default class Automations extends React.Component {
         </div>,
       },
     ];
+
+    this.updateAutomations = Echo.private('automations-list-' + this.props.userId);
   }
 
   componentDidMount() {
@@ -49,6 +51,8 @@ export default class Automations extends React.Component {
       this.setState({
         isLoading: false,
         automations: result.data.automations
+      }, () => {
+        this.props.isAutomationRunning(result.data.automations.length > 0)
       });
     }).catch((err) => {
       this.setState({loading: false});
@@ -63,7 +67,15 @@ export default class Automations extends React.Component {
           return this.props.openTimeOutModal()
         }
       }
-    })
+    });
+
+    this.updateAutomations.listen('Game.Automation.Events.UpdateAutomationsList', (event) => {
+      this.setState({
+        automations: event.automations,
+      }, () => {
+        this.props.isAutomationRunning(result.data.automations.length > 0)
+      });
+    });
   }
 
   fetchTime(time) {

@@ -53,7 +53,6 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(TraverseService::class, function($app) {
            return new TraverseService(
                $app->make(Manager::class),
-               $app->make(CharacterAttackTransformer::class),
                $app->make(CharacterSheetBaseInfoTransformer::class),
                $app->make(BuildCharacterAttackTypes::class),
                $app->make(MonsterTransfromer::class),

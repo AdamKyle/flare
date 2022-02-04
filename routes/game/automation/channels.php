@@ -20,3 +20,8 @@ Broadcast::channel('attack-automation-status-{userId}', function ($user, $userId
 Broadcast::channel('automation-attack-details-{userId}', function ($user, $userId) {
     return $user->id === (int) $userId;
 });
+
+// When automation is running update the list.
+Broadcast::channel('automations-list-{userId}', function ($user, $userId) {
+    return $user->id === (int) $userId;
+});

@@ -31,6 +31,7 @@ export default class BattleAction extends React.Component {
     this.adventureLogs = Echo.private('update-adventure-logs-' + this.props.userId);
     this.canAttack = Echo.private('show-timeout-bar-' + this.props.userId);
     this.updateCharacterStatus = Echo.private('update-character-status-' + this.props.userId);
+    this.updateMonstersList    = Echo.private('update-monsters-list-' + this.props.userId);
   }
 
   componentDidMount() {
@@ -66,6 +67,14 @@ export default class BattleAction extends React.Component {
         if (!event.is_dead) {
           this.props.setMonster(this.state.monster !== 0  ? this.state.monster : null);
         }
+      });
+    });
+
+    this.updateMonstersList.listen('Game.Maps.Events.UpdateMonsterList', (event) => {
+      this.setState({
+        monsters: event.monsters,
+      }, () => {
+        this.props.updateResetBattleAction(true);
       });
     });
 

@@ -7,6 +7,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Game\Automation\Events\AutomatedAttackStatus;
 use App\Game\Automation\Events\AutomationAttackTimeOut;
+use App\Game\Automation\Events\UpdateAutomationsList;
 use App\Game\Automation\Jobs\AttackAutomation;
 use App\Game\Automation\Values\AutomationType;
 use App\Game\Core\Traits\ResponseBuilder;
@@ -60,9 +61,12 @@ class AttackAutomationService {
 
         $delay = now()->addSeconds(30);
 
+        $character = $character->refresh();
+
         event(new AutomationAttackTimeOut($character->user, 30));
         event (new AutomatedAttackStatus($character->user, true));
-        event(new UpdateTopBarEvent($character->refresh()));
+        event(new UpdateTopBarEvent($character));
+        event(new UpdateAutomationsList($character->user, $character->currentAutomations));
 
         AttackAutomation::dispatch($character, $automation->id, $automation->attack_type)->delay($delay);
 
