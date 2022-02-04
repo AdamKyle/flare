@@ -34,7 +34,6 @@ class FactionHandler {
         $mapId                = $monster->gameMap->id;
         $mapName              = $monster->gameMap->name;
         $faction              = $character->factions()->where('game_map_id', $mapId)->first();
-        $autoBattleIsDisabled = $character->user->can_auto_battle ? false : true;
 
         $faction->current_points += FactionLevel::gatPointsPerLevel($faction->current_level);
 
@@ -42,46 +41,58 @@ class FactionHandler {
             $faction->current_points = $faction->points_needed;
         }
 
-        if ($faction->current_points === $faction->points_needed && !FactionLevel::isMaxLevel($faction->current_level, $faction->current_points, $autoBattleIsDisabled)) {
+        if ($faction->current_points === $faction->points_needed && !FactionLevel::isMaxLevel($faction->current_level)) {
 
             return $this->handleFactionLevelUp($character, $faction, $mapName);
 
-        } else if (FactionLevel::isMaxLevel($faction->current_level, $faction->current_points, $autoBattleIsDisabled) && !$faction->maxed) {
+        } else if (FactionLevel::isMaxLevel($faction->current_level) && !$faction->maxed) {
 
             return $this->handleFactionMaxedOut($character, $faction, $mapName);
         }
 
         $faction->save();
 
-        $factions = $character->refresh()->factions->transform(function($faction) {
-            $faction->map_name = $faction->gameMap->name;
-
-            return $faction;
-        });
-
-        event(new UpdateCharacterFactions($character->user, $factions));
+        $this->updateFactions($character);
     }
 
     protected function handleFactionLevelUp(Character $character, Faction $faction, string $mapName) {
         event(new ServerMessageEvent($character->user, $mapName . ' faction has gained a new level!'));
 
-        $faction = $this->updateFaction($faction);
+        $faction   = $this->updateFaction($faction);
+        $character = $character->refresh();
 
+        $this->updateFactions($character);
 
         $this->rewardPlayer($character, $faction, $mapName, FactionType::getTitle($faction->current_level));
 
-        event(new ServerMessageEvent($character->user, 'Achieved title: ' . FactionType::getTitle($faction->current_level) . ' of ' . $mapName));
+        if (FactionLevel::isMaxLevel($faction->current_level)) {
+            $this->handleFactionMaxedOut($character, $faction, $mapName);
+        }
     }
 
     protected function handleFactionMaxedOut(Character $character, Faction $faction, string $mapName) {
         event(new ServerMessageEvent($character->user, $mapName . ' faction has become maxed out!'));
-        event(new GlobalMessageEvent($character->name . 'Has maxed out the faction for: ' . $mapName . ' They are considered legendary among the people of this land.'));
+        event(new GlobalMessageEvent($character->name . ' Has maxed out the faction for: ' . $mapName . ' They are considered legendary among the people of this land.'));
 
         $this->rewardPlayer($character, $faction, $mapName, FactionType::getTitle($faction->current_level));
 
         $faction->update([
             'maxed' => true,
         ]);
+
+        $this->updateFactions($character);
+    }
+
+    protected function updateFactions(Character $character) {
+        $character = $character->refresh();
+
+        $factions = $character->factions->transform(function($faction) {
+            $faction->map_name = $faction->gameMap->name;
+
+            return $faction;
+        });
+
+        event(new UpdateCharacterFactions($character->user, $factions));
     }
 
     protected function updateFaction(Faction $faction): Faction {

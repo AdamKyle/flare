@@ -73,7 +73,7 @@ class AdventureJob implements ShouldQueue
      *
      * @return void
      */
-    public function handle(AdventureService $adventureService)
+    public function handle()
     {
         $name = Cache::get('character_'.$this->character->id.'_adventure_'.$this->adventure->id);
 
@@ -93,10 +93,7 @@ class AdventureJob implements ShouldQueue
             return;
         }
 
-        $adventureService = $adventureService->setAdventure($this->adventure)
-                                             ->setCharacter($this->character);
-
-        $adventureService->processAdventure($this->currentLevel, $this->adventure->levels, $this->attackType);
+        ProcessAdventure::dispatch($this->character->id, $this->adventure->id, $this->currentLevel, $this->attackType);
 
         if ($this->currentLevel === $this->adventure->levels) {
             Cache::forget('character_'.$this->character->id.'_adventure_'.$this->adventure->id);

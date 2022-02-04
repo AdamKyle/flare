@@ -35,7 +35,7 @@ class DataTable extends Component {
         }
 
         $npcs = $npcs->transform(function($npc) {
-            $npc->type        = (new NpcTypes($npc->type))->getNamedValue();
+            $npc->npc_type_name = $npc->type()->getNamedValue();
 
             return $npc;
         });

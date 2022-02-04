@@ -165,7 +165,7 @@ export default class Chat extends React.Component {
     if (typeof user === 'undefined') {
       return false;
     }
-    
+
     if (!user.hasOwnProperty('roles')) {
       return false;
     }

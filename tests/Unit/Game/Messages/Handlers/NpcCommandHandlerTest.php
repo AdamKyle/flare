@@ -351,9 +351,9 @@ class NpcCommandHandlerTest extends TestCase {
         $character = $user->character;
 
         $character->factions()->where('game_map_id', $character->map->gameMap->id)->first()->update([
-            'current_level'  => 4,
+            'current_level'  => 5,
             'maxed'          => true,
-            'current_points' => 8000
+            'current_points' => 0
         ]);
 
         $this->quest->delete();

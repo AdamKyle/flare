@@ -48,8 +48,12 @@ class FactionTypeTest extends TestCase
         $this->assertEquals(FactionType::LEGENDARY_SLAYER, FactionType::getTitle(4));
     }
 
-    public function testLevelFiveIsNullTitle() {
-        $this->assertNull(FactionType::getTitle(5));
+    public function testLevelFiveIsMythicProtectorTitle() {
+        $this->assertEquals(FactionType::MYTHIC_PROTECTOR, FactionType::getTitle(5));
+    }
+
+    public function testLevelSixIsNullTitle() {
+        $this->assertNull(FactionType::getTitle(6));
     }
 
 }

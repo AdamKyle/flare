@@ -49,7 +49,7 @@ class AttackAutomation implements ShouldQueue
 
             $character = $this->character->refresh();
 
-            event (new AutomatedAttackStatus($character->user, false));
+            event(new AutomatedAttackStatus($character->user, false));
             event(new UpdateTopBarEvent($character));
             event(new UpdateAutomationsList($character->user, $character->currentAutomations));
 

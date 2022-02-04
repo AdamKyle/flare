@@ -89,12 +89,27 @@ export default class QuestDetails extends React.Component {
             </AlertInfo>
             : null
         }
+        {
+          item.required_monster !== null ?
+            item.required_monster.is_celestial_entity ?
+              <AlertInfo icon={'fas fa-question-circle'} title={"Celestial Fight is required"}>
+                <p>
+                  Some quests such as this one may have you fighting a Celestial entity. You can check the <a href="/information/npcs" target="_blank">help docs (NPC's)</a> to find out, based on which plane,
+                  which Summoning NPC you ned to speak to inorder to conjure the entity, there is only one per plane.
+                </p>
+                <p>
+                  Celestial Entities below Dungeons plane, will not be included in the weekly spawn.
+                </p>
+              </AlertInfo>
+            : null
+          : null
+        }
         <dl>
           {
             item.required_monster !== null ?
               <Fragment>
                 <dt>Obtained by killing</dt>
-                <dd>{item.required_monster.name}</dd>
+                <dd>{item.required_monster.name} {item.required_monster.is_celestial_entity ? "(Celestial)" : "(Regular Monster)"}</dd>
                 <dt>Resides on plane</dt>
                 <dd>{item.required_monster.game_map.name}</dd>
                 {this.renderPlaneAccessRequirements(item.required_monster.game_map)}
@@ -271,7 +286,7 @@ export default class QuestDetails extends React.Component {
                               <dt>Plane Faction Name (Map to fight on)</dt>
                               <dd>{this.props.quest.faction_map.name}</dd>
                               <dt>Level required</dt>
-                              <dd>{this.props.quest.required_faction_level > 4 ? '4 Maxed' : this.props.quest.required_faction_level}</dd>
+                              <dd>{this.props.quest.required_faction_level}</dd>
                             </Fragment>
                           : null
                         }

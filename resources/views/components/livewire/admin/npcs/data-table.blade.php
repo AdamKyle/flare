@@ -20,6 +20,13 @@
               field="game_map_id"
             />
             <x-data-tables.header-row
+              wire:click.prevent="sortBy('type')"
+              header-text="Type"
+              sort-by="{{$sortBy}}"
+              sort-field="{{$sortField}}"
+              field="type"
+            />
+            <x-data-tables.header-row
               wire:click.prevent="sortBy('moves_around_map')"
               header-text="Moves Around Map"
               sort-by="{{$sortBy}}"
@@ -69,6 +76,7 @@
                         @endguest
                     </td>
                     <td>{{$npc->gameMap->name}}</td>
+                    <td>{{$npc->npc_type_name}}</td>
                     <td>{{$npc->moves_around_the_map ? 'Yes' : 'No'}}</td>
                     <td>{{$npc->must_be_at_same_location ? 'Yes' : 'No'}}</td>
                     <td>{{$npc->text_command_to_message}} {{$npc->commands->first()->command}}</td>

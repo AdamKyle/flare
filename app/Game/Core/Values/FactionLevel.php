@@ -4,7 +4,7 @@ namespace App\Game\Core\Values;
 
 class FactionLevel {
 
-    const MAX_LEVEL = 4;
+    const MAX_LEVEL = 5;
 
     const POINTS_NEEDED = [
         0 => 500,
@@ -12,6 +12,7 @@ class FactionLevel {
         2 => 2000,
         3 => 4000,
         4 => 8000,
+        5 => 0,
     ];
 
     const GOLD_LEVEL = [
@@ -19,20 +20,15 @@ class FactionLevel {
         2 => 1000000,
         3 => 100000000,
         4 => 1000000000,
+        5 => 5000000000,
     ];
 
     public static function getPointsNeeded(int $currentLevel) {
         return self::POINTS_NEEDED[$currentLevel];
     }
 
-    public static function isMaxLevel(int $currentLevel, int $currentPoints, bool $disabledAutoBattle = false): bool {
-        $pointsNeeded = self::POINTS_NEEDED[self::MAX_LEVEL];
-
-        if ($disabledAutoBattle) {
-            $pointsNeeded = $pointsNeeded / 10;
-        }
-
-        return $currentLevel === self::MAX_LEVEL || $currentPoints === $pointsNeeded;
+    public static function isMaxLevel(int $currentLevel): bool {
+        return $currentLevel === self::MAX_LEVEL;
     }
 
     public static function gatPointsPerLevel(int $currentLevel): int {

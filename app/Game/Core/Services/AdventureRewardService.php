@@ -17,6 +17,7 @@ use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\RandomAffixDetails;
 use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
+use App\Game\Core\Events\UpdateCharacterFactions;
 use App\Game\Core\Jobs\AdventureItemDisenchantJob;
 use App\Game\Core\Jobs\HandleAdventureRewardItems;
 use App\Game\Core\Traits\CanHaveQuestItem;
@@ -126,7 +127,6 @@ class AdventureRewardService {
 
     protected function handleFactionPoints(Character $character, Adventure $adventure, int $factionPoints) {
         $faction            = $character->factions()->where('game_map_id', $adventure->location->map->id)->first();
-        $autoBattleDisabled = $character->user->can_can_auto_battle ? false : true;
 
         $points    = $faction->current_points + $factionPoints;
 
@@ -137,14 +137,15 @@ class AdventureRewardService {
             $points    = $faction->points_needed;
         }
 
-        if ($points >= $faction->points_needed && !FactionLevel::isMaxLevel($faction->current_level, $points, $autoBattleDisabled)) {
+        if ($points >= $faction->points_needed && !FactionLevel::isMaxLevel($faction->current_level)) {
             $newLevel = $faction->current_level + 1;
 
             $faction->update([
                 'current_level'  => $newLevel,
                 'current_points' => 0,
-                'points_needed'  => FactionLevel::gatPointsPerLevel($newLevel),
+                'points_needed'  => FactionLevel::getPointsNeeded($newLevel),
                 'title'          => FactionType::getTitle($newLevel),
+                'maxed'          => false,
             ]);
 
             $faction = $faction->refresh();
@@ -154,21 +155,30 @@ class AdventureRewardService {
             event(new UpdateTopBarEvent($character));
 
             $this->factionReward($character, $faction, $faction->gameMap->name, FactionType::getTitle($newLevel));
-        } else if ($points >= $faction->points_needed && FactionLevel::isMaxLevel($faction->current_level, $points, $autoBattleDisabled) && !$faction->maxed) {
+
+            $this->updateFactions($character);
+        }
+
+        dump($faction->current_level, $faction->maxed, FactionLevel::isMaxLevel($faction->current_level), (FactionLevel::isMaxLevel($faction->current_level) && !$faction->maxed));
+
+        if (FactionLevel::isMaxLevel($faction->current_level) && !$faction->maxed) {
+            dump("Hello?");
             event(new ServerMessageEvent($character->user,$faction->gameMap->name . ' faction has become maxed out!'));
 
             event(new UpdateTopBarEvent($character));
 
             event(new GlobalMessageEvent($character->name . 'Has maxed out the faction for: ' . $faction->gameMap->name . ' They are considered legendary among the people of this land.'));
 
-            $this->factionReward($character, $faction, $faction->gameMap->name, FactionType::getTitle($faction->current_level));
-
             $faction->update([
                 'maxed' => true,
             ]);
 
             $faction = $faction->refresh();
-        } else if (!$faction->maxed) {
+
+            $this->updateFactions($character);
+        }
+
+        if (!$faction->maxed) {
             $faction->update([
                 'current_points' => $points,
             ]);
@@ -178,6 +188,8 @@ class AdventureRewardService {
             event(new ServerMessageEvent($character->user,'Gained: ' . $factionPoints . ' Faction Points for: ' . $faction->gameMap->name));
 
             event(new UpdateTopBarEvent($character));
+
+            $this->updateFactions($character);
         }
 
         if ($spillOver > 0 && !$faction->maxed) {
@@ -406,5 +418,17 @@ class AdventureRewardService {
         }
 
         return $item;
+    }
+
+    protected function updateFactions(Character $character) {
+        $character = $character->refresh();
+
+        $factions = $character->factions->transform(function($faction) {
+            $faction->map_name = $faction->gameMap->name;
+
+            return $faction;
+        });
+
+        event(new UpdateCharacterFactions($character->user, $factions));
     }
 }

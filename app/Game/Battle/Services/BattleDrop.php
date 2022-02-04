@@ -92,15 +92,6 @@ class BattleDrop {
 
             $drop = $this->getDropFromCache($character, $this->monster->gameMap->name, $this->locationWithEffect);
 
-            if (is_null($drop)) {
-                $drop = $this->randomItemDropBuilder
-                    ->setLocation($this->locationWithEffect)
-                    ->setMonsterPlane($this->monster->gameMap->name)
-                    ->setCharacterLevel($character->level)
-                    ->setMonsterMaxLevel($this->monster->max_level)
-                    ->generateItem();
-            }
-
             if (!is_null($drop)) {
                 if ((!is_null($drop->itemSuffix) || !is_null($drop->itemPrefix))  && !$returnItem) {
                     $this->attemptToPickUpItem($character, $drop);
@@ -212,7 +203,18 @@ class BattleDrop {
             }
         }
 
-        return $this->getDrop('droppable-items');
+        $drop = $this->getDrop('droppable-items');
+
+        if (is_null($drop)) {
+            $drop = $this->randomItemDropBuilder
+                         ->setLocation($this->locationWithEffect)
+                         ->setMonsterPlane($this->monster->gameMap->name)
+                         ->setCharacterLevel($character->level)
+                         ->setMonsterMaxLevel($this->monster->max_level)
+                         ->generateItem();
+        }
+
+        return $drop;
     }
 
     /**
@@ -225,15 +227,7 @@ class BattleDrop {
         if (Cache::has($cacheName)) {
             $items = Cache::get($cacheName);
 
-            if (count($items) > 100) {
-                return Item::find($items[rand(0, (count($items) - 1))]);
-            } else {
-                $roll = rand(0, self::ROLL);
-
-                if ($roll < self::GENERATE_RANDOM_ITEM) {
-                    return Item::find($items[rand(0, (count($items) - 1))]);
-                }
-            }
+            return Item::find($items[rand(0, (count($items) - 1))]);
         }
 
         return null;
