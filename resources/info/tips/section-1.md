@@ -73,6 +73,11 @@ You can also see you have a [map](/information/map) that you can move around on,
 Below your stats and beside the map you have an actions tab, this is broken into two sections: [Auto Attack](/information/automation) and your regular
 actions section.
 
+> ## ATTN!
+> 
+> The following part about opening the character sheet in a separate tab can be ignored. As the Game screen now has a tab called Character Sheet
+> that also updated in real time allowing players to just switch between tabs and still chat with other players without losing engagement.
+
 Do me a favour and right click, open in a new tab, the character sheet from the menu (hover on the menu to open the sub menu):
 
 <div class="mb-4">

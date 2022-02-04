@@ -79,7 +79,9 @@ export default class Chat extends React.Component {
       this.setState({
         messages: messages
       }, () => {
-        this.props.updateChatTabIcon(false);
+        if (!this.isGod(event.user)) {
+          this.props.updateChatTabIcon(false);
+        }
       });
     });
 
@@ -95,7 +97,9 @@ export default class Chat extends React.Component {
       this.setState({
         messages: messages,
       }, () => {
-        this.props.updateChatTabIcon(false);
+        if (!this.isGod(event.user)) {
+          this.props.updateChatTabIcon(false);
+        }
       });
     });
 
