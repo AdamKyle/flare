@@ -40,24 +40,16 @@ class BattleController extends Controller {
         $this->battleEventHandler = $battleEventHandler;
     }
 
-    public function index(Request $request) {
-        $user           = User::find($request->user_id);
+    public function index() {
+        $character          = auth()->user()->character;
 
-        if ($user->id !== auth()->user()->id) {
-            return response()->json([
-                'message' => 'You do not have permission to do that.'
-            ], 422);
-        }
+        $characterMap       = $character->map;
 
-        $foundCharacter       = $user->character;
-        $characterMap         = $foundCharacter->map;
-        $locationWithEffect   = Location::whereNotNull('enemy_strength_type')
-                                         ->where('x', $characterMap->character_position_x)
-                                         ->where('y', $characterMap->character_position_y)
-                                         ->where('game_map_id', $characterMap->game_map_id)
-                                         ->first();
-
-        $character             = new Item($foundCharacter, $this->character);
+        $locationWithEffect = Location::whereNotNull('enemy_strength_type')
+                                      ->where('x', $characterMap->character_position_x)
+                                      ->where('y', $characterMap->character_position_y)
+                                      ->where('game_map_id', $characterMap->game_map_id)
+                                      ->first();
 
         if (!Cache::has('monsters')) {
             resolve(BuildMonsterCacheService::class)->buildCache();
@@ -66,13 +58,16 @@ class BattleController extends Controller {
         if (!is_null($locationWithEffect)) {
             $monsters = Cache::get('monsters')[$locationWithEffect->name];
         } else {
-            $monsters = Cache::get('monsters')[$foundCharacter->map->gameMap->name];
+            $monsters = Cache::get('monsters')[$character->map->gameMap->name];
         }
+
+        $characterData = new Item($character, $this->character);
+        $characterData = $this->manager->createData($characterData)->toArray();
 
         return response()->json([
             'monsters'  => $monsters,
-            'character' => $this->manager->createData($character)->toArray(),
-        ], 200);
+            'character' => $characterData,
+        ]);
     }
 
     public function battleResults(Request $request, Character $character) {

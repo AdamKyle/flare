@@ -82,7 +82,7 @@ export default class AutoAttackSection extends React.Component {
         attackMessages: event.messages,
       })
     });
-    
+
     this.automationAttackDetails.listen('Game.Automation.Events.AutomatedAttackDetails', (event) => {
       this.setState({
         errorMessage: null,

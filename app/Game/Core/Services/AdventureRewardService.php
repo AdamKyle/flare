@@ -12,11 +12,14 @@ use App\Flare\Models\Item as ItemModel;
 use App\Flare\Models\Skill;
 use App\Flare\Models\User;
 use App\Flare\Services\BuildCharacterAttackTypes;
+use App\Flare\Services\CharacterRewardService;
 use App\Flare\Services\CharacterXPService;
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\RandomAffixDetails;
 use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
+use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Events\UpdateCharacterFactions;
 use App\Game\Core\Jobs\AdventureItemDisenchantJob;
 use App\Game\Core\Jobs\HandleAdventureRewardItems;
@@ -28,6 +31,7 @@ use App\Game\Core\Values\FactionType;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Services\DisenchantService;
+use League\Fractal\Resource\Item as ResourceItem;
 
 class AdventureRewardService {
 
@@ -37,6 +41,8 @@ class AdventureRewardService {
      * @var CharacterService $characterService
      */
     private $characterService;
+
+    private $characterRewardService;
 
     private $buildCharacterAttackTypes;
 
@@ -57,6 +63,7 @@ class AdventureRewardService {
      * @return void
      */
     public function __construct(CharacterService $characterService,
+                                CharacterRewardService $characterRewardService,
                                 BuildCharacterAttackTypes $buildCharacterAttackTypes,
                                 CharacterXPService $characterXPService,
                                 InventorySetService $inventorySetService,
@@ -65,6 +72,7 @@ class AdventureRewardService {
     ) {
 
         $this->characterService          = $characterService;
+        $this->characterRewardService    = $characterRewardService;
         $this->buildCharacterAttackTypes = $buildCharacterAttackTypes;
         $this->characterXPService        = $characterXPService;
         $this->inventorySetService       = $inventorySetService;
@@ -204,6 +212,7 @@ class AdventureRewardService {
         if ($totalLevels > 0) {
 
             for ($i = 1; $i <= $totalLevels; $i++) {
+
                 $this->giveXP(100, $character);
 
                 $character = $character->refresh();
@@ -226,17 +235,13 @@ class AdventureRewardService {
         $character->xp += $xp;
         $character->save();
 
+        event(new ServerMessageEvent($character->user, 'Awarded XP from previous adventure'));
+
         if ($character->xp >= $character->xp_next) {
-            $this->characterService->levelUpCharacter($character);
-
-            $character = $character->refresh();
-
-            $this->buildCharacterAttackTypes->buildCache($character);
+            $this->characterRewardService->setCharacter($character)->handleCharacterLevelUp();
 
             event(new ServerMessageEvent($character->user, 'Gained new level, you are now: LV ' . $character->level));
         }
-
-        event(new ServerMessageEvent($character->user, 'Awarded XP from previous adventure'));
 
         event(new UpdateTopBarEvent($character));
     }
@@ -430,5 +435,16 @@ class AdventureRewardService {
         });
 
         event(new UpdateCharacterFactions($character->user, $factions));
+    }
+
+    protected function updateCharacterBaseStats(Character $character) {
+        $manager = resolve(Manager::class);
+        $characterBaseInfo = resolve(CharacterSheetBaseInfoTransformer::class);
+
+
+        $data = new ResourceItem($character, $characterBaseInfo);
+        $data = $manager->createData($data)->toArray();
+
+        event(new UpdateBaseCharacterInformation($character->user, $data));
     }
 }

@@ -2,18 +2,17 @@
 
 namespace App\Flare\Transformers;
 
-use App\Flare\Builders\CharacterAttackBuilder;
-use App\Flare\Services\BuildCharacterAttackTypes;
+use App\Flare\Models\GameClass;
+use App\Flare\Models\GameSkill;
+use App\Flare\Models\Skill;
 use App\Flare\Values\ClassAttackValue;
+use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Support\Facades\Cache;
 use League\Fractal\TransformerAbstract;
-use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Models\Character;
-use App\Flare\Transformers\Traits\SkillsTransformerTrait;
 
 class CharacterAttackTransformer extends TransformerAbstract {
 
-    use SkillsTransformerTrait;
 
     /**
      * creates response data for character attack data.
@@ -22,41 +21,38 @@ class CharacterAttackTransformer extends TransformerAbstract {
      * @return mixed
      */
     public function transform(Character $character) {
-        $characterInformation = resolve(CharacterInformationBuilder::class)->setCharacter($character);
+
+        $gameClass = GameClass::find($character->game_class_id);
 
         return [
             'id'                          => $character->id,
             'name'                        => $character->name,
-            'class'                       => $character->class->name,
-            'dex'                         => $characterInformation->statMod('dex'),
-            'dur'                         => $characterInformation->statMod('dur'),
-            'focus'                       => $characterInformation->statMod('focus'),
+            'class'                       => $gameClass->name,
+            'dex'                         => $this->fetchStats($character, 'dex_modded'),
+            'dur'                         => $this->fetchStats($character, 'dur_modded'),
+            'focus'                       => $this->fetchStats($character, 'focus_modded'),
             'voided_dex'                  => $character->dex,
             'voided_dur'                  => $character->dur,
             'voided_focus'                => $character->focus,
-            'to_hit_base'                 => $this->getToHitBase($character, $characterInformation),
-            'voided_to_hit_base'          => $this->getToHitBase($character, $characterInformation, true),
-            'base_stat'                   => $characterInformation->statMod($character->class->damage_stat),
-            'voided_base_stat'            => $character->{$character->class->damage_stat},
-            'health'                      => $characterInformation->buildHealth(),
+            'to_hit_base'                 => $this->fetchStats($character, 'to_hit_base'),
+            'voided_to_hit_base'          => $this->fetchStats($character, 'voided_to_hit_base'),
+            'base_stat'                   => $this->fetchStats($character, $gameClass->damage_stat . '_modded'),
+            'voided_base_stat'            => $character->{$gameClass->damage_stat},
+            'health'                      => $this->fetchStats($character, 'health'),
             'voided_health'               => $character->dur,
-            'artifact_annulment'          => $characterInformation->getTotalDeduction('artifact_annulment'),
-            'spell_evasion'               => $characterInformation->getTotalDeduction('spell_evasion'),
-            'affix_damage_reduction'      => $characterInformation->getTotalDeduction('affix_damage_reduction'),
-            'healing_reduction'           => $characterInformation->getTotalDeduction('healing_reduction'),
-            'skills'                      => $this->fetchSkills($character->skills),
+            'artifact_annulment'          => $this->fetchStats($character, 'artifact_annulment'),
+            'spell_evasion'               => $this->fetchStats($character, 'spell_evasion'),
+            'affix_damage_reduction'      => $this->fetchStats($character, 'affix_damage_reduction'),
+            'healing_reduction'           => $this->fetchStats($character, 'healing_reduction'),
+            'skills'                      => $this->fetchSkills($character),
             'is_dead'                     => $character->is_dead,
-            'devouring_light'             => $characterInformation->getDevouringLight(),
-            'devouring_darkness'          => $characterInformation->getDevouringDarkness(),
+            'devouring_light'             => $this->fetchStats($character, 'devouring_light'),
+            'devouring_darkness'          => $this->fetchStats($character, 'devouring_darkness'),
             'extra_action_chance'         => (new ClassAttackValue($character))->buildAttackData(),
             'is_alchemy_locked'           => $this->isAlchemyLocked($character),
-            'stat_affixes'                => [
-                'cant_be_resisted'   => $characterInformation->canAffixesBeResisted(),
-                'all_stat_reduction' => $characterInformation->findPrefixStatReductionAffix(),
-                'stat_reduction'     => $characterInformation->findSuffixStatReductionAffixes(),
-            ],
-            'skill_reduction'             => $characterInformation->getBestSkillReduction(),
-            'resistance_reduction'        => $characterInformation->getBestResistanceReduction(),
+            'stat_affixes'                => $this->fetchStatAffixes($character),
+            'skill_reduction'             => $this->fetchStats($character, 'skill_reduction'),
+            'resistance_reduction'        => $this->fetchStats($character, 'resistance_reduction'),
             'attack_types'                => $this->fetchAttackTypes($character),
             'disable_pop_overs'           => $character->user->disable_attack_type_popover,
             'is_attack_automation_locked' => $character->is_attack_automation_locked,
@@ -65,34 +61,59 @@ class CharacterAttackTransformer extends TransformerAbstract {
         ];
     }
 
-    public function fetchAttackTypes(Character $character) {
+    public function fetchAttackTypes(Character $character): array {
         $cache = Cache::get('character-attack-data-' . $character->id);
 
         if (is_null($cache)) {
-            return resolve(BuildCharacterAttackTypes::class)->buildCache($character);
+            return [];
         }
 
-        return $cache;
+        return $cache['attack_types'];
+    }
+
+    public function fetchStats(Character $character, string $stat): mixed {
+        $cache = Cache::get('character-attack-data-' . $character->id);
+
+        if (is_null($cache)) {
+            return 0.0;
+        }
+
+        return $cache['character_data'][$stat];
+    }
+
+    public function fetchStatAffixes(Character $character): array {
+        $cache = Cache::get('character-attack-data-' . $character->id);
+
+        if (is_null($cache)) {
+            return [];
+        }
+
+        return $cache['stat_affixes'];
+    }
+
+    public function fetchSkills(Character $character): array {
+        $cache = Cache::get('character-attack-data-' . $character->id);
+
+        if (is_null($cache)) {
+            return [];
+        }
+
+        return $cache['skills'];
     }
 
     private function isAlchemyLocked(Character $character) {
-        $skill = $character->skills->filter(function($skill) {
-            return $skill->type()->isAlchemy();
-        })->first();
+        $alchemy = GameSkill::where('type', SkillTypeValue::ALCHEMY)->first();
+
+        if (is_null($alchemy)) {
+            return true;
+        }
+
+        $skill = Skill::where('game_skill_id', $alchemy->id)->where('character_id', $character->id)->first();
 
         if (!is_null($skill)) {
             return $skill->is_locked;
         }
 
         return true;
-    }
-
-    private function getToHitBase(Character $character, CharacterInformationBuilder $characterInformation, bool $voided = false): int {
-
-        if (!$voided) {
-            return $characterInformation->statMod($character->class->to_hit_stat);
-        }
-
-        return $character->{$character->class->to_hit_stat};
     }
 }

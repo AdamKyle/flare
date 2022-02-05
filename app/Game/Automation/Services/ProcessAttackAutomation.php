@@ -81,7 +81,7 @@ class ProcessAttackAutomation {
         event(new AutomatedAttackMessage($character->user, $battleMessages));
         
         if ($this->fightService->getMonsterHealth() <= 0) {
-            // BattleAttackHandler::dispatch($character->refresh(), $automation->monster_id, true)->onQueue('default_long');
+            BattleAttackHandler::dispatch($character->refresh(), $automation->monster_id, true)->onQueue('default_long');
         }
 
         event(new AutomationAttackTimeOut($character->user, 10));

@@ -60,10 +60,6 @@ class HandleAdventureRewards implements ShouldQueue
             'rewards' => null,
         ]);
 
-        $character->update([
-            'current_adventure_id' => null,
-        ]);
-
         $character = $character->refresh();
 
         event(new UpdateAdventureLogsBroadcastEvent($character->adventureLogs, $character->user));

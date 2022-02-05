@@ -2,7 +2,9 @@
 
 namespace App\Game\Core\Listeners;
 
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Transformers\CharacterTopBarTransformer;
+use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use League\Fractal\Resource\Item;
 use League\Fractal\Manager;
 use App\Flare\Transformers\CharacterSheetTransformer;
@@ -22,13 +24,16 @@ class UpdateTopBarListener
      */
     private $characterTopBarTransformer;
 
+    private $characterSheetBaseInfoTransformer;
+
     /**
      * @param Manager $manager
      * @param CharacterTopBarTransformer $characterTopBarTransformer
      */
-    public function __construct(Manager $manager, CharacterTopBarTransformer $characterTopBarTransformer) {
-        $this->manager                    = $manager;
-        $this->characterTopBarTransformer = $characterTopBarTransformer;
+    public function __construct(Manager $manager, CharacterTopBarTransformer $characterTopBarTransformer, CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer) {
+        $this->manager                           = $manager;
+        $this->characterTopBarTransformer        = $characterTopBarTransformer;
+        $this->characterSheetBaseInfoTransformer = $characterSheetBaseInfoTransformer;
     }
 
     /**

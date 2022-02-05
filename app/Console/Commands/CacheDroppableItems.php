@@ -47,6 +47,10 @@ class CacheDroppableItems extends Command
 
         $this->itemIds = array_merge($prefixes, $suffixes);
 
+        if (!empty($this->itemIds) && count($this->itemIds) <= 100) {
+            Cache::put('droppable-items', $this->itemIds);
+        }
+
         if (!empty($this->itemIds)) {
             $randomItems = [];
 

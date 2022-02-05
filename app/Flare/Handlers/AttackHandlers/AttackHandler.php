@@ -150,7 +150,7 @@ class AttackHandler {
     }
 
     protected function getAttackData(string $attackType, $attacker): array {
-        return Cache::get('character-attack-data-' . $attacker->id)[$attackType];
+        return Cache::get('character-attack-data-' . $attacker->id)['attack_types'][$attackType];
     }
 
     protected function isAttackVoided(string $attackType): bool {

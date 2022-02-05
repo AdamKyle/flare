@@ -21,6 +21,7 @@
         "graham-campbell/markdown": "^13.1",
         "guzzlehttp/guzzle": "^7.0",
         "http-interop/http-factory-guzzle": "^1.0",
+        "itsgoingd/clockwork": "^5.1",
         "knplabs/github-api": "^3.0",
         "laravel/framework": "^8.0",
         "laravel/helpers": "^1.2",

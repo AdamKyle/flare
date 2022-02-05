@@ -145,6 +145,22 @@ class Item extends Model
         'adventures'
     ];
 
+    public function inventorySlots() {
+        return $this->hasMany(InventorySlot::class, 'item_id', 'id');
+    }
+
+    public function inventorySetSlots() {
+        return $this->hasMany(SetSlot::class, 'item_id', 'id');
+    }
+
+    public function marketListings() {
+        return $this->hasMany(MarketBoard::class, 'item_id', 'id');
+    }
+
+    public function marketHistory() {
+        return $this->hasMany(MarketHistory::class, 'item_id', 'id');
+    }
+
     public function itemSuffix() {
         return $this->hasOne(ItemAffix::class, 'id', 'item_suffix_id');
     }

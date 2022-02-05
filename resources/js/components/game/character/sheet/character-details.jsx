@@ -13,6 +13,7 @@ export default class CharacterDetails extends React.Component {
     }
 
     this.updateBaseDetails = Echo.private('update-character-base-stats-' + this.props.userId);
+    this.topBar            = Echo.private('update-top-bar-' + this.props.userId);
   }
 
   componentDidMount() {
@@ -39,6 +40,17 @@ export default class CharacterDetails extends React.Component {
     this.updateBaseDetails.listen('Game.Core.Events.UpdateBaseCharacterInformation', (event) => {
       this.setState({
         baseData: event.baseStats,
+      });
+    });
+
+    this.topBar.listen('Game.Core.Events.UpdateTopBarBroadcastEvent', (event) => {
+      let baseData = JSON.parse(JSON.stringify(this.state.baseData));
+
+      baseData.xp  = event.characterSheet.xp;
+      baseData.xp_next = event.characterSheet.xp_next;
+
+      this.setState({
+        baseData: baseData,
       });
     });
   }

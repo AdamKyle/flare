@@ -4,6 +4,7 @@ namespace App\Game\Core\Providers;
 
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Services\BuildCharacterAttackTypes;
+use App\Flare\Services\CharacterRewardService;
 use App\Flare\Services\CharacterXPService;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
@@ -71,6 +72,7 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(AdventureRewardService::class, function($app) {
             return new AdventureRewardService(
                 $app->make(CharacterService::class),
+                $app->make(CharacterRewardService::class),
                 $app->make(BuildCharacterAttackTypes::class),
                 $app->make(CharacterXPService::class),
                 $app->make(InventorySetService::class),

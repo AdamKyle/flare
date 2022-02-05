@@ -2,8 +2,11 @@
 
 namespace App\Flare\Transformers;
 
+use App\Flare\Models\Inventory;
+use App\Flare\Models\InventorySlot;
+use App\Flare\Models\Item;
+use Illuminate\Support\Facades\Cache;
 use League\Fractal\TransformerAbstract;
-use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Models\Character;
 use App\Flare\Models\MaxLevelConfiguration;
 use App\Flare\Values\ItemEffectsValue;
@@ -18,27 +21,25 @@ class CharacterTopBarTransformer extends TransformerAbstract {
      * @return mixed
      */
     public function transform(Character $character) {
-        $characterInformation = resolve(CharacterInformationBuilder::class)->setCharacter($character);
-
         return [
             'id'                => $character->id,
             'name'              => $character->name,
-            'attack'            => number_format($characterInformation->buildTotalAttack()),
-            'health'            => number_format($characterInformation->buildHealth()),
-            'ac'                => number_format($characterInformation->buildDefence()),
+            'attack'            => number_format($this->getFromCache($character, 'attack')),
+            'health'            => number_format($this->getFromCache($character, 'health')),
+            'ac'                => number_format($this->getFromCache($character, 'ac')),
             'race'              => $character->race->name,
             'class'             => $character->class->name,
             'level'             => number_format($character->level),
             'max_level'         => number_format($this->getMaxLevel($character)),
-            'xp'                => $character->xp,
-            'xp_next'           => $character->xp_next,
-            'str_modded'        => number_format(round($characterInformation->statMod('str'))),
-            'dur_modded'        => number_format(round($characterInformation->statMod('dur'))),
-            'dex_modded'        => number_format(round($characterInformation->statMod('dex'))),
-            'chr_modded'        => number_format(round($characterInformation->statMod('chr'))),
-            'int_modded'        => number_format(round($characterInformation->statMod('int'))),
-            'agi_modded'        => number_format(round($characterInformation->statMod('agi'))),
-            'focus_modded'      => number_format(round($characterInformation->statMod('focus'))),
+            'xp'                => (int) $character->xp,
+            'xp_next'           => (int) $character->xp_next,
+            'str_modded'        => number_format($this->getFromCache($character, 'str_modded')),
+            'dur_modded'        => number_format($this->getFromCache($character, 'dur_modded')),
+            'dex_modded'        => number_format($this->getFromCache($character, 'dex_modded')),
+            'chr_modded'        => number_format($this->getFromCache($character, 'chr_modded')),
+            'int_modded'        => number_format($this->getFromCache($character, 'int_modded')),
+            'agi_modded'        => number_format($this->getFromCache($character, 'agi_modded')),
+            'focus_modded'      => number_format($this->getFromCache($character, 'focus_modded')),
             'gold'              => number_format($character->gold),
             'gold_dust'         => number_format($character->gold_dust),
             'shards'            => number_format($character->shards),
@@ -48,14 +49,31 @@ class CharacterTopBarTransformer extends TransformerAbstract {
     }
 
     protected function getMaxLevel(Character $character) {
-        $slot = $character->inventory->slots->filter(function($slot) {
-            return $slot->item->type === 'quest' && $slot->item->effect === ItemEffectsValue::CONTNUE_LEVELING;
-        })->first();
+
+        $item = Item::where('effect', ItemEffectsValue::CONTNUE_LEVELING)->first();
+
+        if (is_null($item)) {
+            return MaxLevel::MAX_LEVEL;
+        }
+
+        $inventory = Inventory::where('character_id', $character->id)->first();
+
+        $slot = InventorySlot::where('item_id', $item->id)->where('inventory_id', $inventory->id)->first();
 
         if (!is_null($slot)) {
             return MaxLevelConfiguration::first()->max_level;
         }
 
         return MaxLevel::MAX_LEVEL;
+    }
+
+    protected function getFromCache(Character $character, string $stat): mixed {
+        if (!Cache::has('character-attack-data-' . $character->id)) {
+            return 0.0;
+        }
+
+        $cache = Cache::get('character-attack-data-' . $character->id);
+
+        return $cache['character_data'][$stat];
     }
 }

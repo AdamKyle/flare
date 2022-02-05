@@ -136,16 +136,20 @@ class CharacterRewardService {
         $this->character = $this->character->refresh();
     }
 
-    protected function handleCharacterLevelUp() {
+    public function handleCharacterLevelUp() {
         $this->characterService->levelUpCharacter($this->character);
 
         $character = $this->character->refresh();
 
         CharacterAttackTypesCacheBuilder::dispatch($character);
 
+        $this->updateCharacterStats($character);
+
         event(new ServerMessageEvent($character->user, 'level_up'));
         event(new UpdateTopBarEvent($character));
+    }
 
+    protected function updateCharacterStats(Character $character) {
         $characterData = new Item($character, $this->characterSheetBaseInfoTransformer);
         $characterData = $this->manager->createData($characterData)->toArray();
 

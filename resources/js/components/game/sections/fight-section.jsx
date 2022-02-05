@@ -135,10 +135,9 @@ export default class FightSection extends React.Component {
         }
 
         if (el === 'attack_stats') {
-          baseStats['attack_types'] = baseStats[el];
+          baseStats.attack_types = baseStats[el].attack_types;
         }
       });
-
 
       Object.keys(baseStats).filter(key => key in character).forEach(key => {
         character[key] = baseStats[key];
@@ -158,6 +157,7 @@ export default class FightSection extends React.Component {
     });
 
     this.updateCharacterStatus.listen('Game.Battle.Events.UpdateCharacterStatus', (event) => {
+      console.log('Called')
       this.setState({isDead: event.data.is_dead});
 
       if (!event.data.is_dead && this.props.monster !== null) {

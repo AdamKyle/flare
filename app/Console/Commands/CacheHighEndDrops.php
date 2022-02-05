@@ -47,6 +47,10 @@ class CacheHighEndDrops extends Command
 
         $this->itemIds = array_merge($suffixItems, $prefixItems);
 
+        if (!empty($this->itemIds) && count($this->itemIds) <= 100) {
+            Cache::put('highend-droppable-items', $this->itemIds);
+        }
+
         if (!empty($this->itemIds)) {
             $randomItems = [];
 

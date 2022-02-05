@@ -122,21 +122,6 @@ class BattleControllerApiTest extends TestCase
         $this->assertEquals($character->name, $content->character->name);
     }
 
-    public function testCannotGetActionsForAnotherPlayer() {
-
-
-        $user     = $this->character->getUser();
-        $secondCharacter = (new CharacterFactory())->createBaseCharacter()->getCharacter(false);
-
-        $response = $this->actingAs($user)
-            ->json('GET', '/api/actions', [
-                'user_id' => $secondCharacter->user->id
-            ])
-            ->response;
-
-        $this->assertEquals(422, $response->status());
-    }
-
     public function testCanGetActionsWithSkills() {
 
         $user     = $this->character->getUser();
