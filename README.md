@@ -66,23 +66,25 @@ There are many ways you can catch up. You could be the type of player who runs a
 
 <sup>**</sup> The information section is composed of mark down files. This is very experimental at the moment. It takes a series of mark down files, converts them into one document and displays it to the user. The information section is like a Help section.
 
-## Importing the database
+## Copy of prod.
 
-Under `/resources/data-imports/database` is a database called flare.sql.
+While it is possible to set up Planes of Tlessa from scratch, you would also need to do the imports, which are in `/resources/data-imports` in a specific order:
 
-This contains all the current users of the game, but all their emails and passwords have been masked out and changed for development and 
-security purposes. This is the closest approximate of production database.
+- Maps must be imported first. (/resources/maps)
+- Next import passive skills
+- import skills
+- import kingdoms
+- import affixes
+- import items (set one then set two)
+- import npcs
+- import quests
 
-Once imported you have an Admin user:
+You can ask on discord for a copy of Production database which has everything set up. This database will be emailed to you at your request and will contain no sensitive
+information. You will have all the characters as they are, an admin account. You can then use the appropriate tools to change data to use an existing character.
 
-- User name: admin@email.com
-- Password: TestPassword
+All user info will be changed.
 
-All characters have their password set as TestPassword but use random strings for their emails, so you will need to use the admin users table
-to find the player you want and then change their email and password.
-
-**No sensitive information is stored in this copy of production database and no PR that has this database changed will be accepted. 
-Do not make changes to this export and then re-export it for commit.**
+## Importing the images
 
 Once you have the database in place, next copy the maps from `/resources/backups/maps` copy the whole directory to Public/Storage/
 
