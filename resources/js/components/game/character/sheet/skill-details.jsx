@@ -339,6 +339,7 @@ export default class SkillDetails extends React.Component {
       <PassiveSkillTree
         passiveSkill={passiveSkill}
         characterId={this.props.characterId}
+        userId={this.props.userId}
         isDead={this.props.isDead}
         managePassiveTrainingModal={this.managePassiveTrainingModal.bind(this)}
         cancelPassiveTrain={this.cancelPassiveTrain.bind(this)}

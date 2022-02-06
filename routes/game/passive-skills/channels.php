@@ -4,3 +4,8 @@
 Broadcast::channel('update-passive-skill-timer-{userId}', function ($user, $userId) {
     return $user->id === (int) $userId;
 });
+
+// When the passive skills update:
+Broadcast::channel('update-passive-skills-{userId}', function ($user, $userId) {
+    return $user->id === (int) $userId;
+});

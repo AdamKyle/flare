@@ -90,9 +90,7 @@ class FactionHandler {
     protected function updateFactions(Character $character) {
         $character = $character->refresh();
 
-
-
-        $factions = Faction::where('character_id')->get()->transform(function($faction) {
+        $factions = Faction::where('character_id', $character->id)->get()->transform(function($faction) {
             $faction->map_name = $faction->gameMap->name;
 
             return $faction;

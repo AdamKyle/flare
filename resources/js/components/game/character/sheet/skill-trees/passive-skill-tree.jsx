@@ -9,7 +9,18 @@ export default class PassiveSkillTree extends React.Component {
 
     this.state = {
       timerIsRunning: false,
+      passiveSkillWithChildren: this.props.passiveSkill,
     }
+
+    this.passiveSkillTree = Echo.private('update-passive-skills-' + this.props.userId);
+  }
+
+  componentDidMount() {
+    this.passiveSkillTree.listen('Game.PassiveSkills.Events.UpdatePassiveTree', (event) => {
+      this.setState({
+        passiveSkillWithChildren: event.passiveSkills[0]
+      });
+    });
   }
 
   buildNodes(passiveSkill) {
@@ -50,7 +61,7 @@ export default class PassiveSkillTree extends React.Component {
         lineColor={'green'}
         lineBorderRadius={'10px'}
         label={<SkillNode
-          passive={this.props.passiveSkill}
+          passive={this.state.passiveSkillWithChildren}
           characterId={this.props.characterId}
           managePassiveTrainingModal={this.props.managePassiveTrainingModal}
           cancelPassiveTrain={this.props.cancelPassiveTrain}
@@ -59,7 +70,7 @@ export default class PassiveSkillTree extends React.Component {
           isDead={this.props.isDead}
         />}
       >
-        {this.buildNodes(this.props.passiveSkill)}
+        {this.buildNodes(this.state.passiveSkillWithChildren)}
       </Tree>
     )
   }

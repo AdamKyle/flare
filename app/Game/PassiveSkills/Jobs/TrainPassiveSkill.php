@@ -4,6 +4,7 @@ namespace App\Game\PassiveSkills\Jobs;
 
 use App\Flare\Models\GameBuilding;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\PassiveSkills\Events\UpdatePassiveTree;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
 use Illuminate\Bus\Queueable;
@@ -118,7 +119,11 @@ class TrainPassiveSkill implements ShouldQueue
 
         $this->createNotifactionEvent($newPassive);
 
-        event(new UpdateTopBarEvent($this->character->refresh()));
+        $character = $this->character->Refresh();
+
+        event(new UpdateTopBarEvent($character));
+
+        event(new UpdatePassiveTree($character->user, $character->passiveSkills));
     }
 
     protected function createNotifactionEvent(CharacterPassiveSkill $characterPassiveSkill) {
