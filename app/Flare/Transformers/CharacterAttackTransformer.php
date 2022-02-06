@@ -98,7 +98,11 @@ class CharacterAttackTransformer extends TransformerAbstract {
             return [];
         }
 
-        return $cache['skills'];
+        $skills = $cache['skills'];
+
+        sort($skills);
+
+        return $skills;
     }
 
     private function isAlchemyLocked(Character $character) {
