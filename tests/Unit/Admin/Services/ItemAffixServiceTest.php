@@ -33,9 +33,9 @@ class ItemAffixServiceTest extends TestCase
     public function testItemWithAffixIsDeletedAndCharacterItemIsSwapped() {
         $service = resolve(ItemAffixService::class);
 
-        $suffix = $this->item->itemSuffix;
+        $suffix = $this->item->itemPrefix;
 
-        $service->deleteAffix($this->item->itemSuffix);
+        $service->deleteAffix($this->item->itemPrefix);
 
         $this->assertNull(ItemAffix::find($suffix->id));
 
@@ -51,17 +51,17 @@ class ItemAffixServiceTest extends TestCase
 
         $this->character->inventory->slots()->truncate();
 
-        $suffix = $this->item->itemSuffix;
+        $prefix = $this->item->itemPrefix;
 
-        $service->deleteAffix($this->item->itemSuffix);
+        $service->deleteAffix($this->item->itemPrefix);
 
-        $this->assertNull(ItemAffix::find($suffix->id));
+        $this->assertNull(ItemAffix::find($prefix->id));
     }
 
     protected function baseSetUp() {
         $this->item = $this->createItem();
 
-        $this->item->item_suffix_id = $this->createItemAffix()->id;
+        $this->item->item_prefix_id = $this->createItemAffix()->id;
 
         $this->item->save();
 

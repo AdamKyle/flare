@@ -189,6 +189,22 @@ class BattleDrop {
      * @return Item|null
      */
     protected function getDropFromCache(Character $character, string $gameMapName, Location $locationWithEffect = null): ?Item {
+
+        $drop = $this->getCacheDrop($character, $gameMapName, $locationWithEffect);
+
+        if (is_null($drop)) {
+            return $this->randomItemDropBuilder
+                        ->setLocation($this->locationWithEffect)
+                        ->setMonsterPlane($this->monster->gameMap->name)
+                        ->setCharacterLevel($character->level)
+                        ->setMonsterMaxLevel($this->monster->max_level)
+                        ->generateItem();
+        }
+
+        return $drop;
+    }
+
+    protected function getCacheDrop(Character $character, string $gameMapName, Location $locationWithEffect = null): ?Item {
         $levelDifference = $character->level - $this->monster->max_level;
 
         if ($gameMapName === MapNameValue::SHADOW_PLANE) {
@@ -203,18 +219,7 @@ class BattleDrop {
             }
         }
 
-        $drop = $this->getDrop('droppable-items');
-
-        if (is_null($drop)) {
-            $drop = $this->randomItemDropBuilder
-                         ->setLocation($this->locationWithEffect)
-                         ->setMonsterPlane($this->monster->gameMap->name)
-                         ->setCharacterLevel($character->level)
-                         ->setMonsterMaxLevel($this->monster->max_level)
-                         ->generateItem();
-        }
-
-        return $drop;
+        return $this->getDrop('droppable-items');
     }
 
     /**
@@ -226,6 +231,10 @@ class BattleDrop {
     protected function getDrop(string $cacheName): ?Item {
         if (Cache::has($cacheName)) {
             $items = Cache::get($cacheName);
+
+            if (count($items) < 75) {
+                return null;
+            }
 
             return Item::find($items[rand(0, (count($items) - 1))]);
         }

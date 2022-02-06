@@ -68,6 +68,18 @@ class BuildCharacterAttackTypes {
         return Cache::get('character-attack-data-' . $character->id);
     }
 
+    public function updateSkillCache(Character $character) {
+        $cache = Cache::get('character-attack-data-' . $character->id);
+
+        if (is_null($cache)) {
+            return;
+        }
+
+        $cache['skills'] = $this->fetchSkills($character->skills);
+
+        Cache::put('character-attack-data-' . $character->id, $cache);
+    }
+
     private function getToHitBase(Character $character, CharacterInformationBuilder $characterInformation, bool $voided = false): int {
 
         if (!$voided) {

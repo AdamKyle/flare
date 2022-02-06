@@ -297,8 +297,8 @@ export default class FightSection extends React.Component {
       monster: monsterInfo,
       characterCurrentHealth: 100,
       characterMaxHealth: 100,
-      monsterCurrentHealth: health,
-      monsterMaxHealth: maxHealth,
+      monsterCurrentHealth: characterMaxHealth,
+      monsterMaxHealth: characterMaxHealth,
     }, () => {
       this.props.setMonster(null)
     });

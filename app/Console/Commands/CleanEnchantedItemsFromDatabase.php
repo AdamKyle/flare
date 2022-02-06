@@ -38,6 +38,7 @@ class CleanEnchantedItemsFromDatabase extends Command
      */
     public function handle()
     {
+
        Item::whereHas('itemPrefix')
            ->whereDoesntHave('inventorySlots')
            ->whereDoesntHave('inventorySetSlots')

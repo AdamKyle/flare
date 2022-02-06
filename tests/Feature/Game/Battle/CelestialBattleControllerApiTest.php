@@ -519,9 +519,11 @@ class CelestialBattleControllerApiTest extends TestCase {
 
         resolve(BuildMonsterCacheService::class)->buildCache();
 
-        $character = $this->character->updateCharacter([
-            'is_dead' => true
-        ])->getCharacter(false);
+        $character = $this->character->getCharacter(true);
+
+        $character->update(['is_dead' => true]);
+
+        $character = $character->refresh();
 
         $celestialFight = $this->createCelestialFight([
             'monster_id'        => $monster->id,

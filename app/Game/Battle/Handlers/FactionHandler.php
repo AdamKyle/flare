@@ -6,6 +6,7 @@ namespace App\Game\Battle\Handlers;
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Models\Character;
 use App\Flare\Models\Faction;
+use App\Flare\Models\GameMap;
 use App\Flare\Models\Item as ItemModel;
 use App\Flare\Models\Monster;
 use App\Flare\Values\MaxCurrenciesValue;
@@ -31,9 +32,12 @@ class FactionHandler {
     }
 
     protected function handleFactionPoints(Character $character, Monster $monster) {
-        $mapId                = $monster->gameMap->id;
-        $mapName              = $monster->gameMap->name;
-        $faction              = $character->factions()->where('game_map_id', $mapId)->first();
+        $map     = GameMap::find($monster->game_map_id);
+        $faction = Faction::where('character_id', $character->id)->where('game_map_id', $map->id)->first();
+
+        if ($faction->maxed) {
+            return;
+        }
 
         $faction->current_points += FactionLevel::gatPointsPerLevel($faction->current_level);
 
@@ -43,11 +47,11 @@ class FactionHandler {
 
         if ($faction->current_points === $faction->points_needed && !FactionLevel::isMaxLevel($faction->current_level)) {
 
-            return $this->handleFactionLevelUp($character, $faction, $mapName);
+            return $this->handleFactionLevelUp($character, $faction, $map->name);
 
         } else if (FactionLevel::isMaxLevel($faction->current_level) && !$faction->maxed) {
 
-            return $this->handleFactionMaxedOut($character, $faction, $mapName);
+            return $this->handleFactionMaxedOut($character, $faction, $map->name);
         }
 
         $faction->save();
@@ -86,7 +90,9 @@ class FactionHandler {
     protected function updateFactions(Character $character) {
         $character = $character->refresh();
 
-        $factions = $character->factions->transform(function($faction) {
+
+
+        $factions = Faction::where('character_id')->get()->transform(function($faction) {
             $faction->map_name = $faction->gameMap->name;
 
             return $faction;

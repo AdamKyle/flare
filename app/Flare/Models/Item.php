@@ -187,15 +187,27 @@ class Item extends Model
      * When calling affix_name on the item, it will return the name with all affixes applied.
      */
     public function getAffixNameAttribute() {
-        if (!is_null($this->item_suffix_id) && !is_null($this->item_prefix_id)) {
-            return '*' . $this->itemPrefix->name . '*' . ' ' . $this->name . ' ' .  '*' . $this->itemSuffix->name . '*';
-        } else if (!is_null($this->item_suffix_id)) {
-            return $this->name . ' ' .  '*' . $this->itemSuffix->name . '*';
-        } else if (!is_null($this->item_prefix_id)) {
-            return '*' . $this->itemPrefix->name . '*' . ' ' . $this->name;
+        $itemPrefix = ItemAffix::find($this->item_prefix_id);
+        $itemSuffix = ItemAffix::find($this->item_suffix_id);
+        $itemName   = '';
+
+        if (!is_null($itemPrefix)) {
+            $itemName = '*'.$itemPrefix->name.'* ' . $this->name;
         }
 
-        return $this->name;
+        if (!is_null($itemSuffix)) {
+            if ($itemName !== '') {
+                $itemName .= ' *'.$itemSuffix->name.'*';
+            } else {
+                $itemName = $this->name . ' *'.$itemSuffix->name.'*';
+            }
+        }
+
+        if ($itemName === '') {
+            return $this->name;
+        }
+
+        return $itemName;
     }
 
     public function getRequiredMonsterAttribute() {

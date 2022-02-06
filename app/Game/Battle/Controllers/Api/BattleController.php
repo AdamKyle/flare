@@ -87,7 +87,7 @@ class BattleController extends Controller {
             switch ($request->defender_type) {
                 case 'monster':
                     event(new AttackTimeOutEvent($character));
-                    BattleAttackHandler::dispatch($character, $request->monster_id)->onQueue('default_long');
+                    BattleAttackHandler::dispatch($character->id, $request->monster_id)->onQueue('default_long');
                     break;
                 default:
                     return response()->json([
@@ -102,10 +102,8 @@ class BattleController extends Controller {
     public function revive(Character $character) {
         $character = $this->battleEventHandler->processRevive($character);
 
-        $characterHealth = $character->getInformation()->buildHealth();
-
         return response()->json([
-            'character_health' => $characterHealth
+            'character_health' => $this->battleEventHandler->fetchStatFromCache($character, 'health'),
         ], 200);
     }
 

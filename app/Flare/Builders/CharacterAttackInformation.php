@@ -308,12 +308,12 @@ class CharacterAttackInformation {
     public function getTotalAffixDamage(bool $canStack = true): int {
         $slots = $this->fetchInventory()->filter(function ($slot) use ($canStack) {
 
-            if (!is_null($slot->item->itemPrefix) && $slot->equipped) {
+            if (!is_null($slot->item->item_prefix_id) && $slot->equipped) {
                 return $this->getDamageAffixSlot($slot, 'itemPrefix', $canStack);
 
             }
 
-            if (!is_null($slot->item->itemSuffix) && $slot->equipped) {
+            if (!is_null($slot->item->item_suffix_id) && $slot->equipped) {
                 return $this->getDamageAffixSlot($slot, 'itemSuffix', $canStack);
             }
         });
@@ -360,9 +360,7 @@ class CharacterAttackInformation {
             if ($slot->item->{$prefixType}->damage > 0 && $slot->item->{$prefixType}->damage_can_stack) {
                 return $slot;
             }
-        }
-
-        if ($slot->item->{$prefixType}->damage > 0 && !$slot->item->{$prefixType}->damage_can_stack) {
+        } else if ($slot->item->{$prefixType}->damage > 0 && !$slot->item->{$prefixType}->damage_can_stack) {
             return $slot;
         }
 

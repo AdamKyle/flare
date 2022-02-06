@@ -94,34 +94,30 @@ The cost of the enchantment you want (ie, 1000) + half the cost of the enchantme
 
 Enchanted items cannot be sold via the shop. 
 
-They can be destroyed or sold on the [market]() board. This provides a great way for the player to make some money.
+They can be destroyed or sold on the [market](/information/market-board) board. This provides a great way for the player to make some money.
 
 > ### ATTN
 > 
 > There is nothing in game you can buy with real world money to gain an advantage on enchanting. No quest items, no gear, no nothing.
 
 
-## Stacking on and non stacking Enchants.
+## Damage and Stacking/Non Stacking
 
-Some high level enchants that can void, do damage, life steal and or raise stats - might state they do not stack.
-What this means is particular aspects will not stack and those are documented on the enchantment themselves.
+When it comes to damage on Affixes, there are two types: Stacking and non Stacking.
 
-Let's take: Mages Golden Demonic Aspiration as an example.
+If the affix states the damage will stack, that means equipping other affixes where the damage also states it will stack, will add all that
+damage up as one attack.
 
-This enchants is a high level enchant that costs 1 billion per enchant. This enchantment is the best there is for Heretics.
+If the affix states the damage does not stack, we take the best of all the non stacking affixes you have. If you have three where two do 1 million in damage and one that does 2 million
+we will take the 2 million damage as the attack.
 
-For a mage, the life stealing aspect will not stack. The Damage does not already stack. So you might be thinking, why would I want two of these if the 
-Life stealing and the Damage does not stack? Because the stats do. If you search for this item in the enchanting list below, you will see three tabs:
+You can mix and match these, however, it's best to go with stacking over non.
 
-- Base information
-- Stats
-- Skills
+## Damage Resistance
 
-These three tabs **WILL** stack. If the damage was stackable, it would also stack. If you were a caster vampire with a high intelligence gear,
-you would want many of these for the life stacking.
+All enemies have a chance to resist affix damage. Some enchantments state that the damage is irresistible meaning it by passes all enemy resistances.
 
-Make sure to investigate an enchantment that states it won't stack for any stackable information. For example 14 of these Enchantments
-on your gear would bring your modded intelligence 2800% higher. As a caster you would want this to do ungodly damage.
+Ideally, players want irresistible stacking damage, as this will by pass and stack all the affixes who can stack together.
 
 ## Enemies can resist damage
 
@@ -147,6 +143,11 @@ The reason for that is because, if your character is a vampire these affixes hav
 and again after the enemy attacks, assuming you or the enemy are not dead.
 
 For other classes, these affixes will only fire after the enemies turn, assuming you or the enemy are not dead.
+
+**Life stealing will never do more than your character's health in damage. The more durability a character, specifically vampires, have, the more damage you do when it comes
+to life stealing. What ever your health is at the time of firing is the health we will use to determine if the amount is greater than or not.**
+
+Life stealing will also not fire if the enemies' health is already below 0.
 
 ## Stat Reduction
 

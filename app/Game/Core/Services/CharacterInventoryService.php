@@ -70,7 +70,7 @@ class CharacterInventoryService {
             'usable_sets'  => $this->getUsableSets(),
             'savable_sets' => $this->getSaveableSets(),
             'equipped'     => !is_null($equipped) ? $equipped : [],
-            'sets'         => $this->character->inventorySets()->with(['slots', 'slots.item'])->get(),
+            'sets'         => $this->character->inventorySets()->with(['slots', 'slots.item', 'slots.item.itemPrefix', 'slots.item.itemSuffix'])->get(),
             'quest_items'  => $this->getQuestItems(),
             'usable_items' => $this->getUsableItems(),
         ];
@@ -84,7 +84,7 @@ class CharacterInventoryService {
     public function getUsableItems(): Collection {
         return $this->character->inventory->slots->filter(function($slot) {
             return $slot->item->usable;
-        })->values();
+        })->load(['item.itemPrefix', 'item.itemSuffix'])->values();
     }
 
     /**
@@ -95,7 +95,7 @@ class CharacterInventoryService {
     public function getQuestItems(): Collection {
         return $this->character->inventory->slots->filter(function($slot) {
             return $slot->item->type === 'quest';
-        })->values();
+        })->load(['item.itemPrefix', 'item.itemSuffix'])->values();
     }
 
     /**
@@ -166,7 +166,7 @@ class CharacterInventoryService {
     public function fetchCharacterInventory(): Collection {
         return $this->character->inventory->slots->filter(function($slot) {
             return !$slot->equipped && !$slot->item->usable && $slot->item->type !== 'quest';
-        });
+        })->load(['item.itemSuffix', 'item.itemPrefix']);
     }
 
     public function fetchEquipped(): Collection|InventorySet|null {
@@ -178,7 +178,10 @@ class CharacterInventoryService {
             return $inventory->values();
         }
 
-        return $this->character->inventorySets()->with(['slots', 'slots.item'])->where('is_equipped', true)->first();
+        return $this->character->inventorySets()
+                               ->with(['slots', 'slots.item', 'slots.item.itemSuffix', 'slots.item.itemPrefix'])
+                               ->where('is_equipped', true)
+                               ->first();
     }
 
     /**

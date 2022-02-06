@@ -119,7 +119,7 @@ class CelestialFightService {
                 'shards' => $newShards
             ]);
 
-            BattleAttackHandler::dispatch($character->refresh(), $celestialFight->monster_id)->onQueue('default_long');
+            BattleAttackHandler::dispatch($character->id, $celestialFight->monster_id)->onQueue('default_long');
 
             event(new GlobalMessageEvent($character->name . ' has slain the '.$celestialFight->monster->name.'! They have been rewarded with a godly gift!'));
 

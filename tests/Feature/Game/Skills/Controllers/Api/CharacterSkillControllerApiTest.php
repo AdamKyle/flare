@@ -624,7 +624,7 @@ class CharacterSkillControllerApiTest extends TestCase {
 
     public function testCanEnchantItemTooEasy() {
 
-        $this->createItemAffix([
+        $affix = $this->createItemAffix([
             'skill_level_required' => 1
         ]);
 
@@ -656,17 +656,17 @@ class CharacterSkillControllerApiTest extends TestCase {
         $response = $this->actingAs($user)
                          ->json('POST', '/api/enchant/' . $character->id, [
                             'slot_id'   => $character->inventory->slots->first()->id,
-                            'affix_ids' => [ItemAffix::first()->id],
+                            'affix_ids' => [$affix->id],
                             'cost'      => 1000,
                             'extraTime' => 'double'
                          ])->response;
 
-        $character = $this->character->getCharacter(false);
+        $character = $character->refresh();
 
         $this->assertEquals(200, $response->status());
         $this->assertFalse($currentGold === $character->gold);
         $this->assertTrue($currentXp === $character->refresh()->skills->where('name', 'Enchanting')->first()->xp);
-        $this->assertNotNull($character->inventory->slots->first()->item->item_suffix_id);
+        $this->assertNotNull($character->inventory->slots->first()->item->item_prefix_id);
     }
 
     public function testCannotCraftItemCostsTooMuch() {

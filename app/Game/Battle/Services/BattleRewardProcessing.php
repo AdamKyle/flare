@@ -4,6 +4,8 @@ namespace App\Game\Battle\Services;
 
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
+use App\Flare\Models\GameMap;
+use App\Flare\Models\Map;
 use App\Flare\Models\Monster;
 use App\Flare\Services\CharacterRewardService;
 use App\Game\Battle\Handlers\FactionHandler;
@@ -26,7 +28,10 @@ class BattleRewardProcessing {
     }
 
     public function handleMonster(Character $character, Monster $monster, bool $isAutomation = false) {
-        if (!$character->map->gameMap->mapType()->isPurgatory()) {
+        $map     = Map::where('character_id', $character->id)->first();
+        $gameMap = GameMap::find($map->game_map_id);
+
+        if (!$gameMap->mapType()->isPurgatory()) {
             $this->factionHandler->handleFaction($character, $monster);
         }
 

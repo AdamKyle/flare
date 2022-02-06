@@ -46,6 +46,10 @@ class ItemHandler {
 
                 $damage     -= $damage * $dmgReduction;
 
+                if ($damage > $this->getCharacterHealth()) {
+                    $damage = $this->getCharacterHealth();
+                }
+
                 $this->useLifeStealingAffixes($defender, $damage, $canResist);
             }
         }

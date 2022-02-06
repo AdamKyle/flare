@@ -119,19 +119,19 @@ class MonsterAttackHandler {
 
         $this->useItems($attacker, $defender, $attackType, $isDefenderVoided);
 
-        $this->defenderAttmptToHeal($defender, $attacker, $isDefenderVoided);
+        $this->defenderAttemptToHeal($defender, $attacker, $isDefenderVoided);
 
     }
 
-    protected function defenderAttmptToHeal($defender, $attacker, bool $isDefenderVoided = false) {
+    protected function defenderAttemptToHeal($defender, $attacker, bool $isDefenderVoided = false) {
         if ($this->characterHealth <= 0) {
-            $this->attemptToRessurect($defender, $attacker, $isDefenderVoided);
+            $this->attemptToResurrect($defender, $attacker, $isDefenderVoided);
         } else if (!$isDefenderVoided){
-            $this->useLifestealingAffixes($attacker, $defender);
+            $this->useLifeStealingAffixes($attacker, $defender);
         }
     }
 
-    private function attemptToRessurect($defender, $attacker, bool $isDefenderVoided = false) {
+    private function attemptToResurrect($defender, $attacker, bool $isDefenderVoided = false) {
         $resChance = $this->characterInformationBuilder->setCharacter($defender)->fetchResurrectionChance();
 
         $dc = 100 - 100 * $resChance;
@@ -143,17 +143,21 @@ class MonsterAttackHandler {
             $this->battleLogs = $this->addMessage($message, 'action-fired', $this->battleLogs);
 
             if (!$isDefenderVoided) {
-                $this->useLifestealingAffixes($attacker, $defender);
+                $this->useLifeStealingAffixes($attacker, $defender);
             }
         }
     }
 
-    private function useLifestealingAffixes($attacker, $defender) {
+    private function useLifeStealingAffixes($attacker, $defender) {
         $handler = $this->itemHandler->setCharacterHealth($this->characterHealth)->setMonsterHealth($this->monsterHealth);
         $info    = $this->characterInformationBuilder->setCharacter($defender);
 
         $canResist  = $info->canAffixesBeResisted();
         $damage     = $info->findLifeStealingAffixes(true);
+
+        if ($damage > $this->characterHealth) {
+            $damage = $this->characterHealth;
+        }
 
         $handler->useLifeStealingAffixes($attacker, $damage, $canResist);
 

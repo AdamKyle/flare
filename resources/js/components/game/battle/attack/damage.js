@@ -18,6 +18,10 @@ export default class Damage {
 
     let totalDamage   = monsterCurrentHealth * attacker[stacking ? 'stacking_life_stealing' : 'life_stealing'];
 
+    if (totalDamage > characterCurrentHealth) {
+      totalDamage = characterCurrentHealth;
+    }
+
     const cantResist  = attacker.cant_be_resisted;
 
     if (totalDamage <= 0 || totalDamage <= 0.0) {
@@ -37,7 +41,7 @@ export default class Damage {
       if (cantResist) {
 
         totalDamage = totalDamage - totalDamage * damageDeduction;
-
+        console.log(damageDeduction);
         this.addActionMessage('The enemies blood flows through the air and gives you life: ' + this.formatNumber(Math.ceil(totalDamage)));
 
         monsterCurrentHealth -= totalDamage;
@@ -70,10 +74,6 @@ export default class Damage {
     let totalDamage   = attacker.stacking_damage - attacker.stacking_damage * damageDeduction;
     const cantResist  = attacker.cant_be_resisted;
 
-    if (totalDamage <= 0.0) {
-      return monsterCurrentHealth;
-    }
-
     if (cantResist) {
       this.addMessage('The enemy cannot resist your enchantments! They are so glowy!');
 
@@ -88,6 +88,10 @@ export default class Damage {
           totalDamage += attacker.non_stacking_damage;
         }
       }
+    }
+
+    if (totalDamage <= 0.0) {
+      return monsterCurrentHealth;
     }
 
     if (totalDamage > 0) {
@@ -311,7 +315,7 @@ export default class Damage {
         this.addMessage('There is a thirst child, its in your soul! Lash out and kill!');
 
         let totalAttack = Math.round(attacker.dur + attacker.dur * 0.15);
-
+        console.log(totalAttack)
         totalAttack     = totalAttack - totalAttack * damageDeduction;
 
         monsterCurrentHealth   = monsterCurrentHealth - totalAttack;

@@ -6,6 +6,7 @@ use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
+use Illuminate\Support\Facades\Cache;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -52,8 +53,9 @@ class BattleEventHandler {
         event(new UpdateBaseCharacterInformation($character->user, $characterData));
     }
 
-    public function processMonsterDeath(Character $character, int $monsterId, bool $isAutomation = false) {
-        $monster = Monster::find($monsterId);
+    public function processMonsterDeath(int $characterId, int $monsterId, bool $isAutomation = false) {
+        $monster   = Monster::find($monsterId);
+        $character = Character::find($characterId);
 
         $this->battleRewardProcessing->handleMonster($character, $monster, $isAutomation);
     }
@@ -67,7 +69,7 @@ class BattleEventHandler {
 
         if (!is_null($characterInCelestialFight)) {
             $characterInCelestialFight->update([
-                'character_current_health' => $character->getInformation()->buildHealth(),
+                'character_current_health' => $this->fetchStatFromCache($character, 'health'),
             ]);
         }
 
@@ -78,6 +80,15 @@ class BattleEventHandler {
         broadcast(new UpdateCharacterStatus($character));
 
         return $character;
+    }
+
+    public function fetchStatFromCache(Character $character, string $stat): mixed {
+        if (Cache::has('character-attack-data-' . $character->id)) {
+            dump(Cache::get('character-attack-data-' . $character->id));
+            return Cache::get('character-attack-data-' . $character->id)['character_data'][$stat];
+        }
+
+        return 0.0;
     }
 
 

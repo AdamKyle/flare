@@ -86,9 +86,7 @@ class CharacterRewardService {
      * @return mixed
      */
     public function fetchCurrentSkillInTraining() {
-        return $this->character->skills->filter(function($skill) {
-            return $skill->currently_training;
-        })->first();
+        return Skill::where('character_id', $this->character->id)->where('currently_training', true)->first();
     }
 
     /**

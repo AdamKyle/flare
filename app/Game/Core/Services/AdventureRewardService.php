@@ -7,6 +7,7 @@ use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Adventure;
 use App\Flare\Models\AdventureLog;
 use App\Flare\Models\Faction;
+use App\Flare\Models\GameSkill;
 use App\Flare\Models\InventorySet;
 use App\Flare\Models\Item as ItemModel;
 use App\Flare\Models\Skill;
@@ -15,6 +16,7 @@ use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Services\CharacterRewardService;
 use App\Flare\Services\CharacterXPService;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
+use App\Flare\Transformers\SkillsTransformer;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\RandomAffixDetails;
 use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
@@ -30,7 +32,10 @@ use App\Game\Core\Values\FactionLevel;
 use App\Game\Core\Values\FactionType;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Skills\Events\UpdateCharacterSkills;
 use App\Game\Skills\Services\DisenchantService;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item as ResourceItem;
 
 class AdventureRewardService {
@@ -131,6 +136,8 @@ class AdventureRewardService {
                 event(new ServerMessageEvent($character->user,'You now are gold capped: ' . number_format($newAmount)));
             }
         }
+
+        event(new UpdateTopBarEvent($character->refresh()));
     }
 
     protected function handleFactionPoints(Character $character, Adventure $adventure, int $factionPoints) {
@@ -167,10 +174,7 @@ class AdventureRewardService {
             $this->updateFactions($character);
         }
 
-        dump($faction->current_level, $faction->maxed, FactionLevel::isMaxLevel($faction->current_level), (FactionLevel::isMaxLevel($faction->current_level) && !$faction->maxed));
-
         if (FactionLevel::isMaxLevel($faction->current_level) && !$faction->maxed) {
-            dump("Hello?");
             event(new ServerMessageEvent($character->user,$faction->gameMap->name . ' faction has become maxed out!'));
 
             event(new UpdateTopBarEvent($character));
@@ -293,6 +297,10 @@ class AdventureRewardService {
 
         $character = $skill->character;
 
+        event(new ServerMessageEvent($character->user, 'Awarded Skill XP from previous adventure'));
+
+        $this->updateSkills($character);
+
         if ($skill->xp >= $skill->xp_max) {
             if ($skill->level < $skill->max_level) {
                 $level      = $skill->level + 1;
@@ -309,13 +317,63 @@ class AdventureRewardService {
                     'xp'                 => 0,
                 ]);
 
+                $skill = $skill->refresh();
+
+                $this->updateSkills($character);
+
+                if ($this->shouldUpdateCharacterAttackData($skill->baseSkill)) {
+                    $this->updateCharacterAttackDataCache($character);
+                }
+
                 event(new ServerMessageEvent($character->user,'Your skill: ' . $skill->name . ' gained a level and is now level: ' . $skill->level));
             }
         }
 
-        event(new ServerMessageEvent($character->user, 'Awarded Skill XP from previous adventure'));
-
         event(new UpdateTopBarEvent($character));
+    }
+
+    public function updateSkills(Character $character) {
+        $manager           = resolve(Manager::class);
+        $skillsTransformer = resolve(SkillsTransformer::class);
+
+        $skillData         = new Collection($character->skills, $skillsTransformer);
+        $skillData         = $manager->createData($skillData)->toArray();
+
+        event(new UpdateCharacterSkills($character->user, $skillData));
+    }
+
+    protected function shouldUpdateCharacterAttackData(GameSkill $skill): bool {
+        if (!is_null($skill->base_damage_mod_bonus_per_level)) {
+            return false;
+        }
+
+        if (!is_null($skill->base_healing_mod_bonus_per_level)) {
+            return false;
+        }
+
+        if (!is_null($skill->base_ac_mod_bonus_per_level)) {
+            return false;
+        }
+
+        if (!is_null($skill->fight_time_out_mod_bonus_per_level)) {
+            return false;
+        }
+
+        if (!is_null($skill->move_time_out_mod_bonus_per_level)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    protected function updateCharacterAttackDataCache(Character $character) {
+        resolve(BuildCharacterAttackTypes::class)->buildCache($character);
+
+        $characterData = new ResourceItem($character->refresh(), resolve(CharacterSheetBaseInfoTransformer::class));
+
+        $characterData = resolve(Manager::class)->createData($characterData)->toArray();
+
+        event(new UpdateBaseCharacterInformation($character->user, $characterData));
     }
 
     protected function handleItems(array $items, Character $character, InventorySet $set = null): void {

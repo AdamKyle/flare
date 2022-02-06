@@ -130,6 +130,10 @@ class AdventureItemRewardService {
 
                 event(new ServerMessageEvent($user, 'You gained the item: ' . $item->affix_name));
 
+                event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+                event(new CharacterInventoryDetailsUpdate($character->user));
+
                 return true;
             } else {
                 event(new ServerMessageEvent($character->user, 'Cannot have Quest Item because: You already had this item or upgraded this item.'));
@@ -141,6 +145,10 @@ class AdventureItemRewardService {
             ]);
 
             event(new ServerMessageEvent($user, 'You gained the item: ' . $item->affix_name));
+
+            event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+            event(new CharacterInventoryDetailsUpdate($character->user));
 
             return true;
         }
