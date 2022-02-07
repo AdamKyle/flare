@@ -6,6 +6,7 @@ use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateSkillEvent;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
+use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
 use App\Flare\Models\Skill;
 use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
@@ -15,14 +16,14 @@ use App\Game\Skills\Events\UpdateCharacterAlchemyList;
 use App\Game\Skills\Services\Traits\SkillCheck;
 use App\Game\Skills\Services\Traits\UpdateCharacterGold;
 use App\Game\Messages\Events\ServerMessageEvent as GameServerMessageEvent;
+use App\Game\Skills\Values\SkillTypeValue;
 
 class AlchemyService {
     use ResponseBuilder, SkillCheck, UpdateCharacterGold;
 
     public function fetchAlchemistItems($character) {
-        $skill = $character->skills->filter(function ($skill) {
-            return $skill->type()->isAlchemy();
-        })->first();
+        $gameSkill = GameSkill::where('type', SkillTypeValue::ALCHEMY)->first();
+        $skill     = Skill::where('game_skill_id', $gameSkill->id)->where('character_id', $character->id)->first();
 
         return Item::where('can_craft', true)
             ->where('crafting_type', 'alchemy')
@@ -35,11 +36,9 @@ class AlchemyService {
     }
 
     public function transmute(Character $character, int $itemId): void {
-        $skill = $character->skills->filter(function ($skill) {
-            return $skill->type()->isAlchemy();
-        })->first();
-
-        $item = Item::find($itemId);
+        $gameSkill = GameSkill::where('type', SkillTypeValue::ALCHEMY)->first();
+        $skill     = Skill::where('game_skill_id', $gameSkill->id)->where('character_id', $character->id)->first();
+        $item      = Item::find($itemId);
 
         if (is_null($item)) {
             event(new GameServerMessageEvent($character->user, 'Nope. No item exists.'));

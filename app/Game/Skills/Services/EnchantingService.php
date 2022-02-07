@@ -2,6 +2,7 @@
 
 namespace App\Game\Skills\Services;
 
+use App\Flare\Models\Inventory;
 use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Events\UpdateQueenOfHeartsPanel;
@@ -146,7 +147,9 @@ class EnchantingService {
     }
 
     public function getSlotFromInventory(Character $character, int $slotId) {
-        return $character->refresh()->inventory->slots->where('id', $slotId)->where('equipped', false)->first();
+        $inventory = Inventory::where('character_id', $character->id)->first();
+
+        return InventorySlot::where('id', $slotId)->where('inventory_id', $inventory->id)->where('equipped', false)->first();
     }
 
     protected function updateCharacterAffixList(Character $character, CharacterInformationBuilder $characterInfo, Skill $enchantingSkill) {
@@ -158,7 +161,9 @@ class EnchantingService {
     }
 
     protected function getEnchantingSkill(Character $character): Skill {
-        return $character->skills()->where('game_skill_id', GameSkill::where('type', SkillTypeValue::ENCHANTING)->first()->id)->first();
+        $gameSkill = GameSkill::where('type', SkillTypeValue::ENCHANTING)->first();
+
+        return Skill::where('character_id', $character->id)->where('game_skill_id', $gameSkill->id)->first();
     }
 
     protected function fetchCharacterInventory(Character $character): array {
@@ -201,8 +206,7 @@ class EnchantingService {
                         ->get();
     }
 
-    protected function attachAffixes
-    (array $affixes, InventorySlot $slot, Skill $enchantingSkill, Character $character) {
+    protected function attachAffixes(array $affixes, InventorySlot $slot, Skill $enchantingSkill, Character $character) {
         foreach ($affixes as $affixId) {
             $affix = ItemAffix::find($affixId);
 
@@ -224,7 +228,6 @@ class EnchantingService {
                 $this->processedEnchant($slot, $affix, $character, $enchantingSkill, true);
 
                 $this->wasTooEasy = true;
-
             }
 
             /**

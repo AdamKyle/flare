@@ -218,9 +218,15 @@ class Character extends Model
      * @return int
      */
     public function getInventoryCount(): int {
-        return $this->inventory->slots->filter(function($slot) {
-            return $slot->item->type !== 'quest' && !$slot->equipped;
-        })->count();
+        $inventory = Inventory::where('character_id', $this->id)->first();
+
+        return InventorySlot::select('inventory_slots.*')
+                            ->where('inventory_slots.inventory_id', $inventory->id)
+                            ->where('inventory_slots.equipped', false)
+                            ->join('items', function($join) {
+                                $join->on('items.id', '=', 'inventory_slots.item_id')
+                                     ->where('items.type', '!=', 'quest');
+                           })->count();
     }
 
     /**
