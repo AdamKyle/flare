@@ -10,6 +10,7 @@ use App\Flare\Models\GameClass;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
+use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Values\BaseStatValue;
 use App\Flare\Values\BaseSkillValue;
 use App\Game\Core\Values\FactionLevel;
@@ -30,6 +31,18 @@ class CharacterBuilder {
      * @var Character $character
      */
     private $character;
+
+    /**
+     * @var BuildCharacterAttackTypes $buildCharacterAttackTypes
+     */
+    private $buildCharacterAttackTypes;
+
+    /**
+     * @param BuildCharacterAttackTypes $buildCharacterAttackTypes
+     */
+    public function __construct(BuildCharacterAttackTypes $buildCharacterAttackTypes) {
+        $this->buildCharacterAttackTypes = $buildCharacterAttackTypes;
+    }
 
     /**
      * Set the chosen race
@@ -248,6 +261,15 @@ class CharacterBuilder {
         }
 
         $this->character = $this->character->refresh();
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function buildCharacterCache(): CharacterBuilder {
+        $this->buildCharacterAttackTypes->buildCache($this->character);
 
         return $this;
     }

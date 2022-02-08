@@ -15,7 +15,7 @@ class CreateCharacterListener
 
     /**
      * Constructor
-     * 
+     *
      * @param CharacterBuilder $characterBuilder
      * @return void
      */
@@ -35,6 +35,7 @@ class CreateCharacterListener
                                ->setClass($event->class)
                                ->createCharacter($event->user, $event->map, $event->characterName)
                                ->assignSkills()
-                               ->assignPassiveSkills();
+                               ->assignPassiveSkills()
+                               ->buildCharacterCache();
     }
 }

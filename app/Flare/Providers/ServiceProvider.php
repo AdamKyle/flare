@@ -72,7 +72,9 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
         $this->app->bind(CharacterBuilder::class, function ($app) {
-            return new CharacterBuilder();
+            return new CharacterBuilder(
+                $app->make(BuildCharacterAttackTypes::class)
+            );
         });
 
         $this->app->bind(CharacterAttackInformation::class, function() {
