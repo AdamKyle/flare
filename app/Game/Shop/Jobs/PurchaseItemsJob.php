@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Core\Jobs;
+namespace App\Game\Shop\Jobs;
 
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Game\Core\Events\CharacterInventoryDetailsUpdate;

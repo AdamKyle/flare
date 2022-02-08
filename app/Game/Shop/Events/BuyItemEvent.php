@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Core\Events;
+namespace App\Game\Shop\Events;
 
 use Illuminate\Queue\SerializesModels;
 use App\Flare\Models\Character;
@@ -22,7 +22,7 @@ class BuyItemEvent
 
     /**
      * Constructor
-     * 
+     *
      * @param Item $item
      * @param Character $character
      * @return void

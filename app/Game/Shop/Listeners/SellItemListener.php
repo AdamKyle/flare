@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Core\Listeners;
+namespace App\Game\Shop\Listeners;
 
 use App\Flare\Models\Item;
 use App\Flare\Events\UpdateTopBarEvent;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Core\Services;
+namespace App\Game\Shop\Services;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;

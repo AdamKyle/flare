@@ -1,32 +1,33 @@
 <?php
 
-namespace App\Game\Core\Controllers;
+namespace App\Game\Shop\Controllers;
 
+use Cache;
+use Illuminate\Http\Request;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item as ResourceItem;
+use App\Http\Controllers\Controller;
+use Facades\App\Flare\Calculators\SellItemCalculator;
+use App\Flare\Models\Character;
+use App\Flare\Models\Item;
+use App\Flare\Models\Location;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
-use App\Game\Core\Requests\ShopReplaceItemValidation;
 use App\Game\Core\Services\EquipItemService;
-use Cache;
-use App\Game\Core\Jobs\PurchaseItemsJob;
 use App\Game\Core\Services\ComparisonService;
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Flare\Models\Character;
-use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
-use App\Flare\Models\Item;
-use App\Flare\Models\Location;
-use Facades\App\Flare\Calculators\SellItemCalculator;
-use App\Game\Core\Events\BuyItemEvent;
-use App\Game\Core\Events\SellItemEvent;
-use App\Game\Core\Services\ShopService;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item as ResourceItem;
+use App\Game\Shop\Jobs\PurchaseItemsJob;
+use App\Game\Shop\Events\BuyItemEvent;
+use App\Game\Shop\Events\SellItemEvent;
+use App\Game\Shop\Services\ShopService;
+use App\Game\Shop\Requests\ShopReplaceItemValidation;
+
 
 class ShopController extends Controller {
 
@@ -58,7 +59,7 @@ class ShopController extends Controller {
 
         $location = Location::where('x', $character->map->character_position_x)->where('y', $character->map->character_position_y)->first();
 
-        return view('game.core.shop.buy', [
+        return view('game.shop.buy', [
             'isLocation' => !is_null($location),
             'gold'       => $character->gold,
             'character'  => $character,
@@ -69,7 +70,7 @@ class ShopController extends Controller {
 
         $location = Location::where('x', $character->map->character_position_x)->where('y', $character->map->character_position_y)->first();
 
-        return view('game.core.shop.sell', [
+        return view('game.shop.sell', [
             'isLocation' => !is_null($location),
             'gold'       => $character->gold,
             'character'  => $character,
@@ -239,7 +240,7 @@ class ShopController extends Controller {
             return redirect()->to(route('game.shop.buy', ['character' => $character->id]))->with('error', 'Comparison cache has expired. Please click compare again. Cache expires after 10 minutes');
         }
 
-        return view('game.core.shop.comparison', $cache);
+        return view('game.shop.comparison', $cache);
     }
 
     public function buyAndReplace(ShopReplaceItemValidation $request, Character $character) {
