@@ -2,13 +2,12 @@
 
 namespace Tests\Feature\Game\Core;
 
-use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Core\Jobs\PurchaseItemsJob;
-use App\Game\Skills\Values\SkillTypeValue;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Facades\App\Flare\Calculators\SellItemCalculator;
+use App\Game\Shop\Jobs\PurchaseItemsJob;
+use App\Game\Skills\Values\SkillTypeValue;
 use App\Flare\Models\InventorySlot;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
@@ -351,10 +350,11 @@ class ShopControllerTest extends TestCase
         ]);
 
         $user      = $this->character->inventoryManagement()
-                                ->giveItem($item)
-                                ->giveItem($weapon)
-                                ->getCharacterFactory()
-                                ->getUser();
+                                     ->giveItem($item)
+                                     ->giveItem($weapon)
+                                     ->getCharacterFactory()
+                                     ->getUser();
+
         $character = $this->character->getCharacter(false);
 
 
@@ -508,7 +508,6 @@ class ShopControllerTest extends TestCase
         $user      = $this->character->getUser();
 
         $character = $this->character->getCharacter(false);
-
 
         $this->actingAs($user)->visitRoute('game.shop.buy', [
             'character' => $character

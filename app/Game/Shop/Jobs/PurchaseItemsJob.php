@@ -4,8 +4,6 @@ namespace App\Game\Shop\Jobs;
 
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
-use App\Game\Skills\Events\UpdateCharacterEnchantingList;
-use App\Game\Skills\Services\EnchantingService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -13,7 +11,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use App\Flare\Models\Character;
-use App\Game\Core\Events\BuyItemEvent;
+use App\Game\Shop\Events\BuyItemEvent;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 

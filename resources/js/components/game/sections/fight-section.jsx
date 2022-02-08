@@ -135,7 +135,13 @@ export default class FightSection extends React.Component {
         }
 
         if (el === 'attack_stats') {
-          baseStats.attack_types = baseStats[el].attack_types;
+          let attackTypes = baseStats[el];
+
+          if (attackTypes.hasOwnProperty('attack_types')) {
+            attackTypes = attackTypes.attack_types;
+          }
+
+          baseStats.attack_types = attackTypes;
         }
       });
 
@@ -143,6 +149,22 @@ export default class FightSection extends React.Component {
         character[key] = baseStats[key];
       });
 
+      if (!character.hasOwnProperty('attack_types')) {
+        let attackTypes;
+
+        if (baseStats.hasOwnProperty('attack_stats')) {
+          attackTypes = baseStats.attack_stats;
+
+          if (attackTypes.hasOwnProperty('attack_types')) {
+            attackTypes = attackTypes.attack_types;
+          }
+        } else {
+          attackTypes = baseStats.attack_types;
+        }
+
+        character['attack_types'] = attackTypes;
+      }
+      console.log('Character: ', character);
       this.setState({
         character: character
       });

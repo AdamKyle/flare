@@ -3,9 +3,7 @@
 namespace App\Game\Shop\Services;
 
 use App\Flare\Models\Character;
-use App\Flare\Models\InventorySlot;
-use App\Flare\Models\Item;
-use App\Game\Core\Events\SellItemEvent;
+use App\Game\Shop\Events\SellItemEvent;
 use Facades\App\Flare\Calculators\SellItemCalculator;
 use Illuminate\Database\Eloquent\Collection;
 

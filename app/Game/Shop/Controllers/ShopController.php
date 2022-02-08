@@ -263,7 +263,7 @@ class ShopController extends Controller {
 
         $character = $character->refresh();
 
-        $inventory = Inventory::where('character_id', $character->id);
+        $inventory = Inventory::where('character_id', $character->id)->first();
 
         $slot      = InventorySlot::where('equipped', false)->where('item_id', $item->id)->first();
 
