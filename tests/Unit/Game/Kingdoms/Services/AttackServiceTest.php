@@ -58,7 +58,7 @@ class AttackServiceTest extends TestCase {
             'can_not_be_healed' => true,
         ]);
 
-        $character       = $attacker->getCharacter(false);
+        $character       = $attacker->getCharacter();
         $attackerKingdom = $attacker->getKingdom();
 
         foreach ($defender->units as $unit) {
@@ -90,7 +90,7 @@ class AttackServiceTest extends TestCase {
 
         $attacker = $this->createCharacterKingdom();
 
-        $character       = $attacker->getCharacter(false);
+        $character       = $attacker->getCharacter();
         $attackerKingdom = $attacker->getKingdom();
 
         foreach ($defender->units as $unit) {
@@ -122,7 +122,7 @@ class AttackServiceTest extends TestCase {
 
         $attacker = $this->createCharacterKingdom();
 
-        $character       = $attacker->getCharacter(false);
+        $character       = $attacker->getCharacter();
         $attackerKingdom = $attacker->getKingdom();
 
         foreach ($defender->units as $unit) {
@@ -149,7 +149,7 @@ class AttackServiceTest extends TestCase {
 
         $defender = $this->createNPCKingdom();
 
-        $character       = $attacker->getCharacter(false);
+        $character       = $attacker->getCharacter();
         $attackerKingdom = $attacker->getKingdom();
 
         foreach ($defender->units as $unit) {
@@ -178,7 +178,7 @@ class AttackServiceTest extends TestCase {
             'reduces_morale_by' => 0.10
         ]);
 
-        $character = $attacker->getCharacter(false);
+        $character = $attacker->getCharacter();
 
         $unitMovementQueue = $this->createUnitMovement($defender, $attacker->getKingdom());
 
@@ -196,7 +196,7 @@ class AttackServiceTest extends TestCase {
 
 
     public function testSettlerReducesMoraleForNPCKingdom() {
-        
+
         $attacker = $this->createCharacterKingdom()->assignUnits([
             'attack'  => 5000,
             'defence' => 5000,
@@ -208,7 +208,7 @@ class AttackServiceTest extends TestCase {
 
         $defender = $this->createNPCKingdom();
 
-        $character = $attacker->getCharacter(false);
+        $character = $attacker->getCharacter();
 
         $unitMovementQueue = $this->createUnitMovement($defender, $attacker->getKingdom());
 
@@ -249,7 +249,7 @@ class AttackServiceTest extends TestCase {
 
         $defender          = $defender->refresh();
 
-        $character         = $attacker->getCharacter(false);
+        $character         = $attacker->getCharacter();
 
         $unitMovementQueue = $this->createUnitMovement($defender, $attacker->getKingdom());
 
@@ -292,7 +292,7 @@ class AttackServiceTest extends TestCase {
 
         $defender          = $defender->refresh();
 
-        $character         = $attacker->getCharacter(false);
+        $character         = $attacker->getCharacter();
 
         $unitMovementQueue = $this->createUnitMovement($defender, $attacker->getKingdom());
 
@@ -332,7 +332,7 @@ class AttackServiceTest extends TestCase {
 
         $defender          = $defender->refresh();
 
-        $character         = $attacker->getCharacter(false);
+        $character         = $attacker->getCharacter();
 
         $unitMovementQueue = $this->createUnitMovement($defender, $attacker->getKingdom());
 
@@ -374,7 +374,7 @@ class AttackServiceTest extends TestCase {
 
         $defender          = $defender->refresh();
 
-        $character         = $attacker->getCharacter(false);
+        $character         = $attacker->getCharacter();
 
         $unitMovementQueue = $this->createUnitMovement($defender, $attacker->getKingdom());
 
@@ -409,6 +409,7 @@ class AttackServiceTest extends TestCase {
     protected function createCharacterKingdom(): KingdomManagement {
         return (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
+            ->buildCharacterCacheData()
             ->kingdomManagement()
             ->assignKingdom()
             ->assignBuilding([
@@ -422,7 +423,7 @@ class AttackServiceTest extends TestCase {
             ->assignBuilding()
             ->assignUnits();
     }
-    
+
     protected function createNPCKingdom(): Kingdom {
         $this->createNpc([
             'game_map_id' => GameMap::first()->id,

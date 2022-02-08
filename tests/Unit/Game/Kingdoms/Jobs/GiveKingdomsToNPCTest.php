@@ -18,6 +18,7 @@ class GiveKingdomsToNPCTest extends TestCase {
 
         $character = (new CharacterFactory())->createBaseCharacter()
                                              ->givePlayerLocation()
+                                             ->buildCharacterCacheData()
                                              ->kingdomManagement()
                                              ->assignKingdom()
                                              ->getCharacter();
@@ -38,7 +39,7 @@ class GiveKingdomsToNPCTest extends TestCase {
 
         $character = (new CharacterFactory())->createBaseCharacter()
             ->givePlayerLocation()
-            ->getCharacter(false);
+            ->getCharacter(true);
 
         $this->createNpc([
             'game_map_id' => $character->map->gameMap->id,

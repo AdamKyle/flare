@@ -2,6 +2,9 @@
 
 namespace App\Game\Core\Controllers;
 
+use App\Flare\Events\UpdateTopBarEvent;
+use App\Flare\Models\Inventory;
+use App\Flare\Models\InventorySlot;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Values\MaxCurrenciesValue;
@@ -93,9 +96,13 @@ class ShopController extends Controller {
             return redirect()->back()->with('error', 'You have nothing that you can sell.');
         }
 
+        $character = $character->refresh();
+
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
         event(new CharacterInventoryDetailsUpdate($character->user));
+
+        event(new UpdateTopBarEvent($character));
 
         return redirect()->back()->with('success', 'Sold all your unequipped items for a total of: ' . $totalSoldFor . ' gold.');
     }
@@ -114,7 +121,7 @@ class ShopController extends Controller {
 
         PurchaseItemsJob::dispatch($character, $items)->onConnection('shop_buying');
 
-        return redirect()->back()->with('success', 'Your items are being purchased. 
+        return redirect()->back()->with('success', 'Your items are being purchased.
         You can check your character sheet to see them come in. If you cannot afford the items, the game chat section will update.
         Once all items are purchased, the chat section will update to inform you.');
 
@@ -182,23 +189,36 @@ class ShopController extends Controller {
     }
 
     public function shopSellBulk(Request $request, Character $character, ShopService $service) {
-        $inventorySlots = $character->inventory->slots()->findMany($request->slots);
-
-        if ($inventorySlots->isEmpty()) {
+        if (empty($request->slots)) {
             return redirect()->back()->with('error', 'No items could be found. Did you select any?');
         }
 
-        $totalSoldFor = $service->fetchTotalSoldFor($inventorySlots, $character);
+        $inventory = Inventory::where('character_id', $character->id)->first();
+        $slots     = InventorySlot::whereIn('id', $request->slots)->where('inventory_id', $inventory->id)->get();
 
-        $maxCurrencies = new MaxCurrenciesValue($character->gold + $totalSoldFor, MaxCurrenciesValue::GOLD);
+        $totalSoldFor = $service->fetchTotalSoldFor($slots, $character);
+
+        $newGold      = $character->gold + $totalSoldFor;
+
+        $maxCurrencies = new MaxCurrenciesValue($newGold, MaxCurrenciesValue::GOLD);
 
         if ($maxCurrencies->canNotGiveCurrency()) {
-            return redirect()->back()->with('error', 'You don\'t seem to have enough room in your purse to sell me that. You\'re very rich though!');
+            $newGold = MaxCurrenciesValue::MAX_GOLD;
         }
+
+        $character->update([
+            'gold' => $newGold
+        ]);
+
+        InventorySlot::whereIn('id', $request->slots)->where('inventory_id', $inventory->id)->delete();
+
+        $character = $character->refresh();
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
         event(new CharacterInventoryDetailsUpdate($character->user));
+
+        event(new UpdateTopBarEvent($character));
 
         return redirect()->back()->with('success', 'Sold selected items for: ' . $totalSoldFor . ' gold.');
     }
@@ -242,9 +262,9 @@ class ShopController extends Controller {
 
         $character = $character->refresh();
 
-        $slot = $character->inventory->slots->filter(function($slot) use($item) {
-            return $slot->item->id === $item->id && !$slot->equipped;
-        })->first();
+        $inventory = Inventory::where('character_id', $character->id);
+
+        $slot      = InventorySlot::where('equipped', false)->where('item_id', $item->id)->first();
 
         $request->merge([
             'slot_id' => $slot->id,

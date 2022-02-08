@@ -2,6 +2,8 @@
 
 namespace App\Game\Core\Services;
 
+use App\Flare\Models\Inventory;
+use App\Flare\Models\SetSlot;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use App\Flare\Models\Character;
@@ -169,19 +171,29 @@ class CharacterInventoryService {
         })->load(['item.itemSuffix', 'item.itemPrefix']);
     }
 
+    /**
+     * Fetch equipped items.
+     *
+     * @return Collection|InventorySet|null
+     */
     public function fetchEquipped(): Collection|InventorySet|null {
-        $inventory = $this->character->inventory->slots()->with('item')->get()->filter(function($slot) {
-            return $slot->equipped;
-        });
 
-        if ($inventory->isNotEmpty()) {
-            return $inventory->values();
+        $inventory = Inventory::where('character_id', $this->character->id)->first();
+
+        $slots     = InventorySlot::where('inventory_id', $inventory->id)->where('equipped', true)->with(['item', 'item.itemPrefix', 'item.itemSuffix'])->get();
+
+
+        if ($slots->isNotEmpty()) {
+            return $slots->values();
         }
 
-        return $this->character->inventorySets()
-                               ->with(['slots', 'slots.item', 'slots.item.itemSuffix', 'slots.item.itemPrefix'])
-                               ->where('is_equipped', true)
-                               ->first();
+        $inventorySet = InventorySet::where('character_id', $this->character->id)->where('is_equipped')->first();
+
+        if (is_null($inventorySet)) {
+            return null;
+        }
+
+        return SetSlot::where('inventory_set_id', $inventorySet->id)->with(['item', 'item.itemPrefix', 'item.itemSuffix'])->get();
     }
 
     /**

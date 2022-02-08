@@ -84,7 +84,6 @@ class BattleEventHandler {
 
     public function fetchStatFromCache(Character $character, string $stat): mixed {
         if (Cache::has('character-attack-data-' . $character->id)) {
-            dump(Cache::get('character-attack-data-' . $character->id));
             return Cache::get('character-attack-data-' . $character->id)['character_data'][$stat];
         }
 

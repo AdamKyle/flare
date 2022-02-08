@@ -28,7 +28,7 @@ class TakeKingdomHandlerTest extends TestCase {
     }
 
     public function testAddUnitsToKingdom() {
-        $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter(false);
+        $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter(true);
 
         $kingdom = $this->createKingdom([
             'character_id' => $character->id,
@@ -61,7 +61,7 @@ class TakeKingdomHandlerTest extends TestCase {
     public function testTakeKingdomWithUnitsInMovement() {
         Queue::fake();
 
-        $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter(false);
+        $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter(true);
 
         $kingdom = $this->createKingdom([
             'character_id' => $character->id,

@@ -145,8 +145,8 @@ class CharacterInventoryController extends Controller {
 
             DisenchantItem::withChain($jobs)->onConnection('disenchanting')->dispatch($character, $slots->first()->id);
 
-            return response()->json(['message' => 'You can freely move about. 
-                Your inventory will update as items disenchant. Check chat to see 
+            return response()->json(['message' => 'You can freely move about.
+                Your inventory will update as items disenchant. Check chat to see
                 the total gold dust earned.'
             ]);
         }
@@ -424,7 +424,7 @@ class CharacterInventoryController extends Controller {
 
     public function useItem(Character $character, Item $item, UseItemService $useItemService) {
         if ($character->boons->count() === 10) {
-            return response()->json(['message' => 'You can only have a max of ten boons applied. 
+            return response()->json(['message' => 'You can only have a max of ten boons applied.
             Check active boons to see which ones you have. You can always cancel one by clicking on the row.'], 422);
         }
 
@@ -477,7 +477,7 @@ class CharacterInventoryController extends Controller {
 
     public function UseManyItems(UseManyItemsValidation $request, Character $character) {
         if ($character->boons->count() === 10) {
-            return response()->json(['message' => 'You can only have a max of ten boons applied. 
+            return response()->json(['message' => 'You can only have a max of ten boons applied.
             Check active boons to see which ones you have. You can always cancel one by clicking on the row.'], 422);
         }
 

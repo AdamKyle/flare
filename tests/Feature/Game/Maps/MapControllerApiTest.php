@@ -124,7 +124,7 @@ class MapControllerApiTest extends TestCase
         $water->shouldReceive('getTileColor')->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(false);
 
-        $character = $this->character->getCharacter(false);
+        $character = $this->character->getCharacter(true);
         $user      = $this->character->getUser();
 
         $response = $this->actingAs($user)
@@ -138,7 +138,7 @@ class MapControllerApiTest extends TestCase
 
         $this->assertEquals(200, $response->status());
 
-        $character = $this->character->getCharacter(false);
+        $character = $this->character->getCharacter(true);
 
         $this->assertEquals(0, $character->map->position_x);
         $this->assertEquals(48, $character->map->character_position_x);
@@ -166,7 +166,7 @@ class MapControllerApiTest extends TestCase
         $water->shouldReceive('getTileColor')->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(false);
 
-        $character = $this->character->getCharacter(false);
+        $character = $this->character->getCharacter(true);
         $user      = $this->character->getUser();
 
         $response = $this->actingAs($user)
@@ -180,7 +180,7 @@ class MapControllerApiTest extends TestCase
 
         $this->assertEquals(200, $response->status());
 
-        $character = $this->character->getCharacter(false);
+        $character = $this->character->getCharacter(true);
 
         $this->assertEquals(0, $character->map->position_x);
         $this->assertEquals(48, $character->map->character_position_x);
@@ -191,7 +191,7 @@ class MapControllerApiTest extends TestCase
 
         $character = $this->character->updateCharacter([
             'can_move' => false,
-        ])->getCharacter(false);
+        ])->getCharacter(true);
 
         $user      = $this->character->getUser();
 
@@ -208,7 +208,7 @@ class MapControllerApiTest extends TestCase
     }
 
     public function testCannotMoveAnotherCharacter() {
-        $character = $this->character->getCharacter(false);
+        $character = $this->character->getCharacter(true);
         $user      = $this->character->getUser();
 
         $otherUser = (new CharacterFactory())->createBaseCharacter()->getUser();
@@ -251,7 +251,7 @@ class MapControllerApiTest extends TestCase
 
         $adventure = $this->createNewAdventure($location);
 
-        $character = $this->character->getCharacter(false);
+        $character = $this->character->getCharacter(true);
         $user      = $this->character->getUser();
 
         $response = $this->actingAs($user)
@@ -303,7 +303,7 @@ class MapControllerApiTest extends TestCase
             'quest_reward_item_id' => $item->id,
         ]);
 
-        $character = $this->character->getCharacter(false);
+        $character = $this->character->getCharacter(true);
         $user      = $this->character->getUser();
 
         $response = $this->actingAs($user)
@@ -317,7 +317,7 @@ class MapControllerApiTest extends TestCase
 
         $this->assertEquals(200, $response->status());
 
-        $character = $this->character->getCharacter(false);
+        $character = $this->character->getCharacter(true);
 
         $this->assertEquals($location->x, $character->map->character_position_x);
         $this->assertEquals($location->y, $character->map->character_position_y);
@@ -368,7 +368,7 @@ class MapControllerApiTest extends TestCase
             'quest_reward_item_id' => $item->id,
         ]);
 
-        $character = $this->character->getCharacter(false);
+        $character = $this->character->getCharacter(true);
         $user      = $this->character->getUser();
 
         $response = $this->actingAs($user)
@@ -382,7 +382,7 @@ class MapControllerApiTest extends TestCase
 
         $this->assertEquals(200, $response->status());
 
-        $character = $this->character->getCharacter(false);
+        $character = $this->character->getCharacter(true);
 
         $this->assertEquals($location->x, $character->map->character_position_x);
         $this->assertEquals($location->y, $character->map->character_position_y);
@@ -433,7 +433,7 @@ class MapControllerApiTest extends TestCase
             'quest_reward_item_id' => $item->id,
         ]);
 
-        $character = $this->character->updateCharacter(['inventory_max' => 0])->getCharacter(false);
+        $character = $this->character->updateCharacter(['inventory_max' => 0])->getCharacter(true);
         $user      = $this->character->getUser();
 
         $response = $this->actingAs($user)
@@ -447,7 +447,7 @@ class MapControllerApiTest extends TestCase
 
         $this->assertEquals(200, $response->status());
 
-        $character = $this->character->getCharacter(false);
+        $character = $this->character->getCharacter(true);
 
         $this->assertEquals($location->x, $character->map->character_position_x);
         $this->assertEquals($location->y, $character->map->character_position_y);
@@ -499,7 +499,7 @@ class MapControllerApiTest extends TestCase
         $character = $this->character->inventoryManagement()
                                      ->giveItem($item)
                                      ->getCharacterFactory()
-                                     ->getCharacter(false);
+                                     ->getCharacter(true);
 
         $user      = $this->character->getUser();
 
@@ -514,7 +514,7 @@ class MapControllerApiTest extends TestCase
 
         $this->assertEquals(200, $response->status());
 
-        $character = $this->character->getCharacter(false);
+        $character = $this->character->getCharacter(true);
 
         $this->assertEquals($location->x, $character->map->character_position_x);
         $this->assertEquals($location->y, $character->map->character_position_y);
@@ -544,7 +544,7 @@ class MapControllerApiTest extends TestCase
         $water->shouldReceive('getTileColor')->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(false);
 
-        $character = $this->character->getCharacter(false);
+        $character = $this->character->getCharacter(true);
         $user      = $this->character->getUser();
 
         $response = $this->actingAs($user)
@@ -575,7 +575,7 @@ class MapControllerApiTest extends TestCase
         $water->shouldReceive('getTileColor')->andReturn("1");
         $water->shouldReceive('isWaterTile')->once()->andReturn(false);
 
-        $character = $this->character->getCharacter(false);
+        $character = $this->character->getCharacter(true);
         $user      = $this->character->getUser();
 
         $response = $this->actingAs($user)
@@ -595,7 +595,7 @@ class MapControllerApiTest extends TestCase
             MoveTimeOutEvent::class,
         ]);
 
-        $character = $this->character->getCharacter(false);
+        $character = $this->character->getCharacter(true);
         $user      = $this->character->getUser();
 
         $water = Mockery::mock(MapTileValue::class)->makePartial();
@@ -622,7 +622,7 @@ class MapControllerApiTest extends TestCase
             MoveTimeOutEvent::class,
         ]);
 
-        $character = $this->character->getCharacter(false);
+        $character = $this->character->getCharacter(true);
         $user      = $this->character->getUser();
 
         $water = Mockery::mock(MapTileValue::class)->makePartial();
@@ -660,7 +660,7 @@ class MapControllerApiTest extends TestCase
             'can_craft'            => false,
         ]);
 
-        $character = $this->character->getCharacter(false);
+        $character = $this->character->getCharacter(true);
         $user      = $this->character->getUser();
 
         $water = Mockery::mock(MapTileValue::class)->makePartial();
@@ -695,7 +695,7 @@ class MapControllerApiTest extends TestCase
             'can_craft'            => false,
         ]);
 
-        $character = $this->character->getCharacter(false);
+        $character = $this->character->getCharacter(true);
         $user      = $this->character->getUser();
 
         $water = Mockery::mock(MapTileValue::class)->makePartial();
@@ -724,7 +724,7 @@ class MapControllerApiTest extends TestCase
 
         $character = $this->character->updateCharacter([
             'can_move' => false,
-        ])->getCharacter(false);
+        ])->getCharacter(true);
 
         $user      = $this->character->getUser();
 
@@ -745,7 +745,7 @@ class MapControllerApiTest extends TestCase
             MoveTimeOutEvent::class,
         ]);
 
-        $character = $this->character->updateCharacter(['gold' => 0])->getCharacter(false);
+        $character = $this->character->updateCharacter(['gold' => 0])->getCharacter(true);
         $user      = $this->character->getUser();
 
         $water = Mockery::mock(MapTileValue::class)->makePartial();
@@ -772,7 +772,7 @@ class MapControllerApiTest extends TestCase
             MoveTimeOutEvent::class,
         ]);
 
-        $character = $this->character->getCharacter(false);
+        $character = $this->character->getCharacter(true);
         $user      = $this->character->getUser();
 
         $water = Mockery::mock(MapTileValue::class)->makePartial();
@@ -807,7 +807,8 @@ class MapControllerApiTest extends TestCase
                                         'cost'           => 10,
                                         'effect'         => 'walk-on-water',
                                     ]))
-                                     ->getCharacter(false);
+                                     ->getCharacterFactory()
+                                     ->getCharacter(true);
         $user      = $this->character->getUser();
 
         $water = Mockery::mock(MapTileValue::class)->makePartial();
@@ -842,7 +843,9 @@ class MapControllerApiTest extends TestCase
                 'cost'           => 10,
                 'effect'         => ItemEffectsValue::WALK_ON_DEATH_WATER,
             ]))
-            ->getCharacter(false);
+            ->getCharacterFactory()
+            ->getCharacter(true);
+
         $user      = $this->character->getUser();
 
         $water = Mockery::mock(MapTileValue::class)->makePartial();
@@ -880,7 +883,9 @@ class MapControllerApiTest extends TestCase
                                         'cost'           => 10,
                                         'effect'         => 'walk-on-water',
                                     ]))
-                                     ->getCharacter(false);
+                                    ->getCharacterFactory()
+                                    ->getCharacter(true);
+
         $user      = $this->character->getUser();
 
         $water = Mockery::mock(MapTileValue::class)->makePartial();
@@ -903,7 +908,7 @@ class MapControllerApiTest extends TestCase
     }
 
     public function testCannotSetSailUnrecognizedPort() {
-        $character = $this->character->getCharacter(false);
+        $character = $this->character->getCharacter(true);
         $user      = $this->character->getUser();
 
         $port = $this->createLocation([
@@ -945,7 +950,7 @@ class MapControllerApiTest extends TestCase
             'y'           => 32,
         ]);
 
-        $character = $this->character->getCharacter(false);
+        $character = $this->character->getCharacter(true);
         $user      = $this->character->getUser();
 
         $response = $this->actingAs($user)
@@ -981,7 +986,7 @@ class MapControllerApiTest extends TestCase
 
         $character = $this->character->updateCharacter([
             'can_move' => false
-        ])->getCharacter(false);
+        ])->getCharacter(true);
 
         $user      = $this->character->getUser();
 
@@ -1005,7 +1010,7 @@ class MapControllerApiTest extends TestCase
             'y'           => 64,
         ]);
 
-        $character = $this->character->getCharacter(false);
+        $character = $this->character->getCharacter(true);
         $user      = $this->character->getUser();
 
         $response = $this->actingAs($user)
@@ -1040,7 +1045,7 @@ class MapControllerApiTest extends TestCase
             'game_map_id' => $this->character->getCharacter(false)->map->game_map_id,
         ]);
 
-        $character = $this->character->getCharacter(false);
+        $character = $this->character->getCharacter(true);
         $user      = $this->character->getUser();
 
         $response = $this->actingAs($user)
@@ -1077,7 +1082,7 @@ class MapControllerApiTest extends TestCase
             'game_map_id' => $this->character->getCharacter(false)->map->game_map_id,
         ]);
 
-        $character = $this->character->updateCharacter(['gold' => 1000])->getCharacter(false);
+        $character = $this->character->updateCharacter(['gold' => 1000])->getCharacter(true);
         $user      = $this->character->getUser();
 
         $response = $this->actingAs($user)
@@ -1095,7 +1100,7 @@ class MapControllerApiTest extends TestCase
         $this->assertEquals(64, $content->character_position_details->character_position_x);
         $this->assertEquals(64, $content->character_position_details->character_position_y);
 
-        $character = $this->character->getCharacter(false);
+        $character = $this->character->getCharacter(true);
 
         $this->assertNotNull($character->can_move_again_at);
         $this->assertFalse($character->can_move);
@@ -1131,7 +1136,7 @@ class MapControllerApiTest extends TestCase
             'quest_reward_item_id' => $item->id,
         ]);
 
-        $character = $this->character->updateCharacter(['gold' => 1000])->getCharacter(false);
+        $character = $this->character->updateCharacter(['gold' => 1000])->getCharacter(true);
         $user      = $this->character->getUser();
 
         $response = $this->actingAs($user)
@@ -1144,7 +1149,7 @@ class MapControllerApiTest extends TestCase
 
         $this->assertEquals(200, $response->status());
 
-        $character = $this->character->getCharacter(false);
+        $character = $this->character->getCharacter(true);
 
         $slots = $character->inventory->slots;
 
@@ -1189,7 +1194,7 @@ class MapControllerApiTest extends TestCase
             'quest_reward_item_id' => $item->id,
         ]);
 
-        $character = $this->character->updateCharacter(['gold' => 1000])->getCharacter(false);
+        $character = $this->character->updateCharacter(['gold' => 1000])->getCharacter(true);
         $user      = $this->character->getUser();
 
         $water = Mockery::mock(MapTileValue::class)->makePartial();
@@ -1210,7 +1215,7 @@ class MapControllerApiTest extends TestCase
 
         $this->assertEquals(200, $response->status());
 
-        $character = $this->character->getCharacter(false);
+        $character = $this->character->getCharacter(true);
 
         $slots = $character->inventory->slots;
 
@@ -1257,7 +1262,7 @@ class MapControllerApiTest extends TestCase
 
         $character = $this->character->updateCharacter([
             'gold' => 1000,
-        ])->inventoryManagement()->giveItem($item)->getCharacterFactory()->getCharacter(false);
+        ])->inventoryManagement()->giveItem($item)->getCharacterFactory()->getCharacter(true);
         $user      = $this->character->getUser();
 
         $response = $this->actingAs($user)
@@ -1306,7 +1311,7 @@ class MapControllerApiTest extends TestCase
 
         $character = $this->character->updateCharacter([
             'gold' => 1000,
-        ])->inventoryManagement()->giveItem($item)->getCharacterFactory()->getCharacter(false);
+        ])->inventoryManagement()->giveItem($item)->getCharacterFactory()->getCharacter(true);
         $user      = $this->character->getUser();
 
         $water = Mockery::mock(MapTileValue::class)->makePartial();
@@ -1333,7 +1338,7 @@ class MapControllerApiTest extends TestCase
 
     public function testCannotTraverseMissingParams() {
         $user = $this->character->getUser();
-        $character = $this->character->getCharacter(false);
+        $character = $this->character->getCharacter(true);
 
         $response = $this->actingAs($user)
                          ->json('POST', '/api/map/traverse/' . $character->id)
@@ -1347,7 +1352,7 @@ class MapControllerApiTest extends TestCase
 
     public function testMissingItemCannotTraverse() {
         $user      = $this->character->getUser();
-        $character = $this->character->getCharacter(false);
+        $character = $this->character->getCharacter(true);
 
         $gameMap = $this->createGameMap([
             'name' => 'Labyrinth'
@@ -1407,7 +1412,7 @@ class MapControllerApiTest extends TestCase
             'can_move' => false,
         ])->inventoryManagement()->giveItem(
             $this->createItem(['effect' => ItemEffectsValue::LABYRINTH])
-        )->getCharacter(false);
+        )->getCharacter(true);
 
         $gameMap = $this->createGameMap([
             'name' => 'Labyrinth'
@@ -1424,7 +1429,7 @@ class MapControllerApiTest extends TestCase
 
     public function testCanTraverseBackToSurface() {
         $user      = $this->character->getUser();
-        $character = $this->character->getCharacter(false);
+        $character = $this->character->getCharacter(true);
 
 
         $gameMap = $this->createGameMap([

@@ -2,6 +2,7 @@
 
 namespace App\Game\Core\Jobs;
 
+use App\Flare\Events\UpdateTopBarEvent;
 use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Skills\Events\UpdateCharacterEnchantingList;
 use App\Game\Skills\Services\EnchantingService;
@@ -62,6 +63,8 @@ class PurchaseItemsJob implements ShouldQueue
             event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
             event(new CharacterInventoryDetailsUpdate($character->user));
+
+            event(new UpdateTopBarEvent($character));
 
             event(new ServerMessageEvent($character->user, 'Purchased: ' . $item->name));
         }

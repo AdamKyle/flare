@@ -21,7 +21,7 @@ class SellItemListener
     public function handle(SellItemEvent $event)
     {
         $item = $event->inventorySlot->item;
-        
+
         $event->character->gold += SellItemCalculator::fetchTotalSalePrice($item);
         $event->character->save();
 
@@ -37,7 +37,7 @@ class SellItemListener
             $affixData['character_inventory'],
         ));
 
-        event(new UpdateTopBarEvent($event->character));
+        event(new UpdateTopBarEvent($event->character->refresh()));
     }
 
 

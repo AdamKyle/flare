@@ -9,6 +9,7 @@ use App\Flare\Models\Npc;
 use App\Flare\Models\Quest;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Transformers\CharacterAttackTransformer;
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
@@ -30,7 +31,7 @@ class NpcQuestRewardHandler {
     private $manager;
 
     public function __construct(NpcServerMessageBuilder    $npcServerMessageBuilder,
-                                CharacterAttackTransformer $characterAttackTransformer,
+                                CharacterSheetBaseInfoTransformer $characterAttackTransformer,
                                 BuildCharacterAttackTypes  $buildCharacterAttackTypes,
                                 Manager                    $manager
     ) {

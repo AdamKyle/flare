@@ -238,7 +238,17 @@ class NotifyHandler {
             }
 
             if ($logStatus->tookKingdom()) {
-                $message = 'You have taken ' . $characterName . '\'s kingdom at (X\Y) ' . $defender->x_position . '/' . $defender->y_position .
+                $name = '';
+
+                if (!is_null($defender->character)) {
+                    $npc = Npc::where('type', NpcTypes::KINGDOM_HOLDER)->first();
+
+                    $name = $npc->real_name;
+                } else {
+                    $name = $defender->character->name;
+                }
+
+                $message = 'You have taken ' . $name . '\'s kingdom at (X\Y) ' . $defender->x_position . '/' . $defender->y_position .
                     ' on the ' . $mapName . ' plane.';
 
                 $this->createNotificationEvent($character, $attackLog, $message, 'success', 'Took Kingdom!');

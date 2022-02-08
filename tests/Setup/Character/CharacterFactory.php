@@ -546,6 +546,21 @@ class CharacterFactory {
     }
 
     /**
+     * Builds the character cache data.
+     *
+     * @return $this
+     */
+    public function buildCharacterCacheData(): CharacterFactory {
+        $character = $this->character->Refresh();
+
+        if (!Cache::has('character-attack-data-' . $character->id)) {
+            resolve(BuildCharacterAttackTypes::class)->buildCache($character);
+        }
+
+        return $this;
+    }
+
+    /**
      * Creates a market board listing.
      *
      * @param Item|null $item

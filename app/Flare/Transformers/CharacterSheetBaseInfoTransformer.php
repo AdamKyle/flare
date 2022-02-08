@@ -76,7 +76,7 @@ class CharacterSheetBaseInfoTransformer extends TransformerAbstract {
             'class_bonus'       => (new ClassBonusInformation())->buildClassBonusDetails($character),
             'devouring_light'   => $characterInformation->getDevouringLight(),
             'devouring_darkness'  => $characterInformation->getDevouringDarkness(),
-            'attack_stats'        => Cache::get('character-attack-data-' . $character->id),
+            'attack_stats'        => Cache::get('character-attack-data-' . $character->id)['attack_types'],
             'extra_action_chance' => (new ClassAttackValue($character))->buildAttackData(),
             'stat_affixes'        => [
                 'cant_be_resisted'   => $characterInformation->canAffixesBeResisted(),
