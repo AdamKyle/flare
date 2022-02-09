@@ -182,12 +182,11 @@ class CharacterInventoryService {
 
         $slots     = InventorySlot::where('inventory_id', $inventory->id)->where('equipped', true)->with(['item', 'item.itemPrefix', 'item.itemSuffix'])->get();
 
-
         if ($slots->isNotEmpty()) {
             return $slots->values();
         }
 
-        $inventorySet = InventorySet::where('character_id', $this->character->id)->where('is_equipped')->first();
+        $inventorySet = InventorySet::where('character_id', $this->character->id)->where('is_equipped', true)->first();
 
         if (is_null($inventorySet)) {
             return null;
