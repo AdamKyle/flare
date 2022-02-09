@@ -9,7 +9,13 @@ use App\Flare\Transformers\SkillsTransformer;
 
 trait SkillsTransformerTrait {
 
-    protected function fetchSkills(SupportCollection $skills) {
+    /**
+     * Transform the character skills.
+     *
+     * @param SupportCollection $skills
+     * @return array
+     */
+    protected function fetchSkills(SupportCollection $skills): array {
         $manager = resolve(Manager::class);
 
         $skills = new Collection($skills, new SkillsTransformer);

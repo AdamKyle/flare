@@ -2,11 +2,17 @@
 
 namespace App\Flare\Builders;
 
+use App\Flare\Builders\Traits\Inventory;
 use App\Flare\Models\Character;
+use App\Flare\Models\GameClass;
+use App\Flare\Models\GameMap;
 use App\Flare\Models\InventorySlot;
+use App\Flare\Models\Map;
 use App\Flare\Models\SetSlot;
 
 class CharacterAttackBuilder {
+
+    use Inventory;
 
     /**
      * @var Character $character
@@ -104,7 +110,9 @@ class CharacterAttackBuilder {
             $str = $this->character->str * 0.05;
         }
 
-        if ($this->character->classType()->isFighter()) {
+        $class = GameClass::find($this->character->game_class_id);
+
+        if ($class->type()->isFighter()) {
             $str = $this->characterInformationBuilder->statMod('str') * 0.15;
 
             if ($voided) {
@@ -166,7 +174,10 @@ class CharacterAttackBuilder {
      * @throws \Exception
      */
     protected function baseAttack(bool $voided = false): array {
-        $characterRecution = $this->character->map->gameMap->character_attack_reduction;
+        $map     = Map::where('character_id', $this->character->id)->first();
+        $gameMap = GameMap::find($map->game_map_id);
+
+        $characterReduction = $gameMap->character_attack_reduction;
 
         return [
             'name'             => $this->character->name,
@@ -175,7 +186,7 @@ class CharacterAttackBuilder {
             'artifact_damage'  => $voided ? 0 : $this->characterInformationBuilder->getTotalArtifactDamage(),
             'heal_for'         => $this->characterInformationBuilder->buildHealFor($voided),
             'res_chance'       => $this->characterInformationBuilder->fetchResurrectionChance(),
-            'damage_deduction' => $characterRecution,
+            'damage_deduction' => $characterReduction,
             'affixes'          => [
                 'cant_be_resisted'       => $this->characterInformationBuilder->canAffixesBeResisted(),
                 'stacking_damage'        => $voided ? 0 : $this->characterInformationBuilder->getTotalAffixDamage(),
@@ -229,7 +240,7 @@ class CharacterAttackBuilder {
                     $spellDamage = $spellSlotOne->item->base_damage;
                 }
 
-                $bonus = $this->characterInformationBuilder->hereticSpellDamageBonus($this->character);
+                $bonus = $this->characterInformationBuilder->getBaseCharacterInfo()->getClassBonuses()->hereticSpellDamageBonus($this->character);
 
                 $spellDamage = $this->characterInformationBuilder->calculateClassSpellDamage($spellDamage, $voided);
 
@@ -267,13 +278,12 @@ class CharacterAttackBuilder {
      * @return InventorySlot|SetSlot|null
      */
     protected function fetchSlot(string $position): InventorySlot|SetSlot|null {
-        $slot = $this->characterInformationBuilder->fetchInventory()->filter(function($slot) use($position) {
-            return $slot->position === $position && $slot->equipped;
-        })->first();
+        $slots = $this->fetchEquipped($this->character);
+        $slot  = null;
 
         // Check to see if the user is holding a bow.
-        if (is_null($slot) && ($position === 'left-hand' || $position === 'right-hand')) {
-            $slot = $this->characterInformationBuilder->fetchInventory()->filter(function($slot) use($position) {
+        if (!is_null($slots) && ($position === 'left-hand' || $position === 'right-hand')) {
+            $slot = $slots->filter(function($slot) use($position) {
                 return $slot->item->type === 'bow';
             })->first();
         }

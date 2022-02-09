@@ -4,8 +4,10 @@ namespace App\Flare\Providers;
 
 
 use App\Flare\Builders\AffixAttributeBuilder;
+use App\Flare\Builders\BaseCharacterInfo;
 use App\Flare\Builders\CharacterAttackBuilder;
 use App\Flare\Builders\CharacterAttackInformation;
+use App\Flare\Builders\ClassBonuses;
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Handlers\AttackExtraActionHandler;
 use App\Flare\Handlers\AttackHandlers\AttackAndCastHandler;
@@ -96,8 +98,19 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
+        $this->app->bind(ClassBonuses::class, function($app) {
+            return new ClassBonuses();
+        });
+
+        $this->app->bind(BaseCharacterInfo::class, function($app) {
+            return new BaseCharacterInfo(
+                $app->make(ClassBonuses::class)
+            );
+        });
+
         $this->app->bind(CharacterInformationBuilder::class, function($app) {
             return new CharacterInformationBuilder(
+                $app->make(BaseCharacterInfo::class),
                 $app->make(CharacterAttackInformation::class)
             );
         });

@@ -3,6 +3,8 @@
 namespace App\Flare\Services;
 
 use App\Flare\Builders\CharacterInformationBuilder;
+use App\Flare\Models\GameClass;
+use App\Flare\Models\Skill;
 use App\Flare\Transformers\Traits\SkillsTransformerTrait;
 use Cache;
 use App\Flare\Builders\CharacterAttackBuilder;
@@ -12,12 +14,25 @@ class BuildCharacterAttackTypes {
 
     use SkillsTransformerTrait;
 
+    /**
+     * @var CharacterAttackBuilder $characterAttackBuilder
+     */
     private $characterAttackBuilder;
 
+    /**
+     * @param CharacterAttackBuilder $characterAttackBuilder
+     */
     public function __construct(CharacterAttackBuilder $characterAttackBuilder) {
         $this->characterAttackBuilder = $characterAttackBuilder;
     }
 
+    /**
+     * Build character attack data cache
+     *
+     * @param Character $character
+     * @return array
+     * @throws \Exception
+     */
     public function buildCache(Character $character): array {
 
         $characterAttack = $this->characterAttackBuilder->setCharacter($character->refresh());
@@ -62,12 +77,18 @@ class BuildCharacterAttackTypes {
                 'all_stat_reduction' => $characterAttack->getInformationBuilder()->findPrefixStatReductionAffix(),
                 'stat_reduction'     => $characterAttack->getInformationBuilder()->findSuffixStatReductionAffixes(),
             ],
-            'skills' => $this->fetchSkills($character->skills)
+            'skills' => $this->getSkills($character)
         ]);
 
         return Cache::get('character-attack-data-' . $character->id);
     }
 
+    /**
+     * Update just the skill portion of the cache
+     *
+     * @param Character $character
+     * @return void
+     */
     public function updateSkillCache(Character $character) {
         $cache = Cache::get('character-attack-data-' . $character->id);
 
@@ -80,12 +101,34 @@ class BuildCharacterAttackTypes {
         Cache::put('character-attack-data-' . $character->id, $cache);
     }
 
+    /**
+     * Get the to hit base stat.
+     *
+     * @param Character $character
+     * @param CharacterInformationBuilder $characterInformation
+     * @param bool $voided
+     * @return int
+     */
     private function getToHitBase(Character $character, CharacterInformationBuilder $characterInformation, bool $voided = false): int {
 
+        $class = GameClass::find($character->game_class_id);
+
         if (!$voided) {
-            return $characterInformation->statMod($character->class->to_hit_stat);
+            return $characterInformation->statMod($class->to_hit_stat);
         }
 
-        return $character->{$character->class->to_hit_stat};
+        return $character->{$class->to_hit_stat};
+    }
+
+    /**
+     * Get skills.
+     *
+     * @param Character $character
+     * @return array
+     */
+    private function getSkills(Character $character): array {
+        $skills = Skill::where('character_id', $character->id)->get();
+
+        return $this->fetchSkills($skills);
     }
 }

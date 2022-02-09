@@ -2,7 +2,9 @@
 
 namespace App\Flare\Builders;
 
+use App\Flare\Builders\Traits\Inventory;
 use App\Flare\Models\Character;
+use App\Flare\Models\GameClass;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\ItemAffix;
 use App\Flare\Models\SetSlot;
@@ -12,7 +14,7 @@ use Illuminate\Support\Collection;
 
 class CharacterAttackInformation {
 
-    use ClassBasedBonuses;
+    use ClassBasedBonuses, Inventory;
 
     /**
      * @var Character $character
@@ -60,17 +62,13 @@ class CharacterAttackInformation {
      */
     public function fetchInventory(): Collection
     {
-        if ($this->inventory->isNotEmpty()) {
-            return $this->inventory;
+        $slots = $this->fetchEquipped($this->character);
+
+        if (is_null($slots)) {
+            return collect([]);
         }
 
-        $inventorySet = $this->character->inventorySets()->where('is_equipped', true)->first();
-
-        if (!is_null($inventorySet)) {
-            return $inventorySet->slots;
-        }
-
-        return $this->inventory;
+        return $slots;
     }
 
     /**
@@ -79,7 +77,7 @@ class CharacterAttackInformation {
      * @param string $attribute
      * @return float
      */
-    public function calulateAttributeValue(string $attribute): float {
+    public function calculateAttributeValue(string $attribute): float {
         $slots = $this->fetchInventory()->filter(function($slot) use($attribute) {
             if (!is_null($slot->item->itemPrefix))  {
                 if ($slot->item->itemPrefix->{$attribute} > 0) {
@@ -211,9 +209,12 @@ class CharacterAttackInformation {
      * @throws \Exception
      */
     public function buildHealFor(bool $voided = false): int {
-        $classBonus    = $this->prophetHealingBonus($this->character) + $this->getVampiresHealingBonus($this->character);
+        $prophetBonus  = $this->characterInformationBuilder->getBaseCharacterInfo()->getClassBonuses()->prophetHealingBonus($this->character);
+        $vampireBonus  = $this->characterInformationBuilder->getBaseCharacterInfo()->getClassBonuses()->getVampiresHealingBonus($this->character);
+        $classBonus    = $prophetBonus + $vampireBonus;
+        $class         = GameClass::find($this->character->game_class_id);
 
-        $classType     = new CharacterClassValue($this->character->class->name);
+        $classType     = new CharacterClassValue($class->name);
 
         $healingAmount = $this->fetchHealingAmount($voided);
         $dmgStat       = $this->character->class->damage_stat;
@@ -242,6 +243,12 @@ class CharacterAttackInformation {
         return round($healingAmount + ($healingAmount * ($this->fetchSkillHealingMod() + $classBonus)));
     }
 
+    /**
+     * Fetch the character Resurrection Chance
+     *
+     * @return float
+     * @throws \Exception
+     */
     public function fetchResurrectionChance(): float {
         $resurrectionItems = $this->fetchInventory()->filter(function($slot) {
             return $slot->item->can_resurrect;
@@ -435,6 +442,13 @@ class CharacterAttackInformation {
         return $totalPercent;
     }
 
+    /**
+     * Fetch Life Stealing Amount
+     *
+     * @param Collection $slots
+     * @param string $affixType
+     * @return array
+     */
     protected function fetchAmountOfLifeStealing(Collection $slots, string $affixType): array {
         $values = [];
 

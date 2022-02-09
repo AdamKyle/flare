@@ -3,9 +3,11 @@
 namespace App\Flare\Builders;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\GameClass;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
+use App\Flare\Models\Skill;
 use App\Flare\Traits\ClassBasedBonuses;
 use App\Flare\Values\CharacterClassValue;
 use App\Flare\Values\ItemEffectsValue;
@@ -15,6 +17,11 @@ use Illuminate\Support\Collection;
 class CharacterInformationBuilder {
 
     use ClassBasedBonuses;
+
+    /**
+     * @var BaseCharacterInfo $baseCharacterInfo
+     */
+    private $baseCharacterInfo;
 
     /**
      * @var CharacterAttackInformation $characterAttackInformation
@@ -32,9 +39,11 @@ class CharacterInformationBuilder {
     private $inventory;
 
     /**
+     * @param BaseCharacterInfo $baseCharacterInfo
      * @param CharacterAttackInformation $characterAttackInformation
      */
-    public function __construct(CharacterAttackInformation $characterAttackInformation) {
+    public function __construct(BaseCharacterInfo $baseCharacterInfo, CharacterAttackInformation $characterAttackInformation) {
+        $this->baseCharacterInfo          = $baseCharacterInfo;
         $this->characterAttackInformation = $characterAttackInformation;
     }
 
@@ -54,8 +63,22 @@ class CharacterInformationBuilder {
         return $this;
     }
 
+    /**
+     * Get the character.
+     *
+     * @return Character
+     */
     public function getCharacter(): Character {
         return $this->character;
+    }
+
+    /**
+     * Get the BaseCharacterInfo instance.
+     *
+     * @return BaseCharacterInfo
+     */
+    public function getBaseCharacterInfo(): BaseCharacterInfo {
+        return $this->baseCharacterInfo;
     }
 
     /**
@@ -65,32 +88,10 @@ class CharacterInformationBuilder {
      * inventory assuming the user has anything equipped at all.
      *
      * @param string $stat
-     * @return mixed
+     * @return float
      */
-    public function statMod(string $stat) {
-        $base = $this->character->{$stat};
-
-        $equipped = $this->fetchInventory()->filter(function($slot) {
-            return $slot->equipped;
-        });
-
-        if ($equipped->isEmpty()) {
-            return $this->characterBoons($base);
-        }
-
-        foreach ($equipped as $slot) {
-            $base += $base * $this->fetchModdedStat($stat, $slot->item);
-        }
-
-        $base = $this->characterBoons($base);
-
-        $total = $this->characterBoons($base, $stat . '_mod');
-
-        if ($this->character->map->gameMap->mapType()->isHell() || $this->character->map->gameMap->mapType()->isPurgatory()) {
-            $total -= $total * $this->character->map->gameMap->character_attack_reduction;
-        }
-
-        return $total;
+    public function statMod(string $stat): float {
+        return $this->baseCharacterInfo->statMod($this->character, $stat);
     }
 
     /**
@@ -100,11 +101,7 @@ class CharacterInformationBuilder {
      * @return float
      */
     public function getSkill(string $skillName): float {
-        $skill = $this->character->skills->filter(function($skill) use ($skillName) {
-            return $skill->name === $skillName;
-        })->first();
-
-        return $skill->skill_bonus;
+        return $this->baseCharacterInfo->getSkill($this->character, $skillName);
     }
 
     /**
@@ -118,7 +115,7 @@ class CharacterInformationBuilder {
     public function classBonus(): float {
         return $this->characterAttackInformation
                     ->setCharacter($this->character)
-                    ->calulateAttributeValue('class_bonus');
+                    ->calculateAttributeValue('class_bonus');
     }
 
     /**
@@ -161,7 +158,7 @@ class CharacterInformationBuilder {
     public function getEntrancedChance(): float {
         return $this->characterAttackInformation
                     ->setCharacter($this->character)
-                    ->calulateAttributeValue('entranced_chance');
+                    ->calculateAttributeValue('entranced_chance');
     }
 
     /**
@@ -172,7 +169,7 @@ class CharacterInformationBuilder {
     public function getBestSkillReduction() : float {
         return $this->characterAttackInformation
                     ->setCharacter($this->character)
-                    ->calulateAttributeValue('skill_reduction');
+                    ->calculateAttributeValue('skill_reduction');
     }
 
     /**
@@ -183,7 +180,7 @@ class CharacterInformationBuilder {
     public function getBestResistanceReduction() : float {
         return $this->characterAttackInformation
                     ->setCharacter($this->character)
-                    ->calulateAttributeValue('resistance_reduction');
+                    ->calculateAttributeValue('resistance_reduction');
     }
 
     /**
@@ -213,10 +210,11 @@ class CharacterInformationBuilder {
      * Fetches the defence based off a base of ten plus the equipment, skills and other
      * bonuses.
      *
+     * @param bool $voided
      * @return int
      */
     public function buildDefence(bool $voided = false): int {
-        return round((10 + $this->getDefence($voided)) * (1 + $this->fetchSkillACMod() + $this->getFightersDefence($this->character)));
+        return $this->baseCharacterInfo->buildDefence($this->character, $voided);
     }
 
     /**
@@ -423,29 +421,11 @@ class CharacterInformationBuilder {
      * Build the characters health based off equipment, plus the characters health and
      * a base of 10.
      *
+     * @param bool $voided
      * @return int
      */
     public function buildHealth(bool $voided = false): int {
-
-        if ($this->character->is_dead) {
-            return 0;
-        }
-
-        $baseHealth = $this->character->dur + 10;
-
-        if ($voided) {
-            return $baseHealth;
-        }
-
-        foreach ($this->fetchInventory() as $slot) {
-            if ($slot->equipped) {
-                $percentage = $slot->item->getTotalPercentageForStat('dur');
-
-                $baseHealth += $baseHealth * $percentage;
-            }
-        }
-
-        return $baseHealth;
+        return $this->baseCharacterInfo->buildHealth($this->character, $voided);
     }
 
     /**
@@ -476,24 +456,6 @@ class CharacterInformationBuilder {
                     ->fetchInventory();
     }
 
-    /**
-     * applies character boons to the
-     * @param $base
-     * @return float|int
-     */
-    protected function characterBoons($base, string $statAttribute = null) {
-        if (!is_null($statAttribute) && $this->character->boons->isNotEmpty()) {
-            $bonus = $this->character->boons()->whereNotNull($statAttribute)->sum($statAttribute);
-
-            $base = $base + $base * $bonus;
-        } else if ($this->character->boons->isNotEmpty()) {
-            $bonus = $this->character->boons()->where('type', ItemUsabilityType::STAT_INCREASE)->sum('stat_bonus');
-
-            $base = $base + $base * $bonus;
-        }
-
-        return $base;
-    }
 
     protected function getDeduction(string $type): float {
         $itemsDeduction = $this->fetchInventory()->filter(function ($slot) {
@@ -570,7 +532,13 @@ class CharacterInformationBuilder {
     protected function getWeaponDamage(bool $voided = false): int {
         $damage = [];
 
-        foreach ($this->fetchInventory() as $slot) {
+        $slots = $this->fetchInventory();
+
+        if (is_null($slots)) {
+            return 0;
+        }
+
+        foreach ($slots as $slot) {
             if ($slot->item->type === 'weapon') {
                 if (!$voided) {
                     $damage[] = $slot->item->getTotalDamage();
@@ -592,7 +560,9 @@ class CharacterInformationBuilder {
     }
 
     public function damageModifiers(int $damage, bool $voided): int {
-        if ($this->character->classType()->isFighter()) {
+        $class = GameClass::find($this->character->game_class_id);
+
+        if ($class->type()->isFighter()) {
             if ($voided) {
                 $statIncrease = $this->character->str * .15;
             } else {
@@ -600,7 +570,9 @@ class CharacterInformationBuilder {
             }
 
             $damage += $statIncrease;
-        } else if($this->character->classType()->isThief() || $this->character->classType()->isRanger()) {
+        }
+
+        if($class->type()->isThief() || $this->character->classType()->isRanger()) {
             if ($voided) {
                 $statIncrease = $this->character->dex * .05;
             } else {
@@ -608,7 +580,9 @@ class CharacterInformationBuilder {
             }
 
             $damage += $statIncrease;
-        } else if ($this->character->classType()->isProphet()) {
+        }
+
+        if ($class->type()->isProphet()) {
             if ($this->prophetHasDamageBonus($this->character)) {
                 if ($voided) {
                     $statIncrease = $this->character->chr * .10;
@@ -626,18 +600,18 @@ class CharacterInformationBuilder {
     public function calculateWeaponDamage(int|float $damage, bool $voided = false): int|float {
 
         if ($damage === 0) {
+            $class  = GameClass::find($this->character->game_class_id);
             $damage = $voided ? $this->character->{$this->character->damage_stat} : $this->statMod($this->character->damage_stat);
 
-            if ($this->character->classType()->isFighter()) {
+            if ($class->type()->isFighter()) {
                 $damage = $damage * 0.05;
             } else {
                 $damage = $damage * 0.02;
             }
         }
 
-        $skills = $this->character->skills->filter(function($skill) {
-            return $skill->baseSkill->base_damage_mod_bonus_per_level > 0.0;
-        });
+        $gameSkillIds = GameSkill::where('base_damage_mod_bonus_per_level', '>', 0.0)->pluck('id')->toArray();
+        $skills       = Skill::whereIn('game_skill_id', $gameSkillIds)->where('character_id', $this->character->id)->get();
 
         foreach ($skills as $skill) {
             $damage += $damage * $skill->base_damage_mod;
@@ -732,40 +706,5 @@ class CharacterInformationBuilder {
         }
 
         return 0;
-    }
-
-    protected function getDefence(bool $voided = false): int {
-        $defence = 0;
-
-        foreach ($this->fetchInventory() as $slot) {
-            if (!$voided) {
-                $defence += $slot->item->getTotalDefence();
-            } else {
-                $defence += $slot->item->base_ac;
-            }
-        }
-
-        if ($defence !== 10) {
-            return $defence / 6;
-        }
-
-        return $defence;
-    }
-
-    protected function fetchModdedStat(string $stat, Item $item): float {
-        $staMod          = $item->{$stat . '_mod'};
-        $totalPercentage = !is_null($staMod) ? $staMod : 0.0;
-
-        if (!is_null($item->itemPrefix)) {
-            $prefixMod        = $item->itemPrefix->{$stat . '_mod'};
-            $totalPercentage += !is_null($prefixMod) ? $prefixMod : 0.0;
-        }
-
-        if (!is_null($item->itemSuffix)) {
-            $suffixMod        = $item->itemSuffix->{$stat . '_mod'};
-            $totalPercentage += !is_null($suffixMod) ? $suffixMod : 0.0;
-        }
-
-        return  $totalPercentage;
     }
 }
