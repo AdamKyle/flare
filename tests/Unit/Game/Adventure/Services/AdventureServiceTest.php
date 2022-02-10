@@ -45,6 +45,8 @@ class AdventureServiceTest extends TestCase
     public function testProcessAdventureCharacterLives()
     {
 
+        $this->assertTrue(true);
+
         $item      = $this->createItem(['name' => 'Item Name']);
 
         $character = (new CharacterFactory)->createBaseCharacter()
@@ -52,7 +54,7 @@ class AdventureServiceTest extends TestCase
                                         ->updateCharacter(['can_move' => false])
                                         ->levelCharacterUp(100)
                                         ->inventoryManagement()
-                                        ->giveItem($item)
+                                        ->giveItem($item, true, 'right-hand')
                                         ->getCharacterFactory()
                                         ->updateSkill('Accuracy', [
                                             'level' => 10,
@@ -68,7 +70,8 @@ class AdventureServiceTest extends TestCase
 
         $adventure = $this->createNewAdventure();
 
-        $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(false);
+        $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(true);
+
 
         $adventureService = resolve(AdventureService::class);
 
@@ -79,7 +82,7 @@ class AdventureServiceTest extends TestCase
         }
 
 
-        $character->refresh();
+        $character = $character->refresh();
 
         $this->assertFalse($character->is_dead);
         $this->assertTrue($character->adventureLogs->isNotEmpty());
@@ -115,7 +118,7 @@ class AdventureServiceTest extends TestCase
 
         $adventure = $this->createNewAdventure();
 
-        $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(false);
+        $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(true);
 
         $adventureService = resolve(AdventureService::class);
 
@@ -145,7 +148,7 @@ class AdventureServiceTest extends TestCase
             ->updateCharacter(['can_move' => false])
             ->levelCharacterUp(100)
             ->inventoryManagement()
-            ->giveItem($item)
+            ->giveItem($item, true, 'right-hand')
             ->getCharacterFactory()
             ->updateSkill('Accuracy', [
                 'level' => 10,
@@ -161,7 +164,7 @@ class AdventureServiceTest extends TestCase
 
         $adventure = $this->createNewAdventure();
 
-        $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(false);
+        $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(true);
 
         DB::table('sessions')->insert([[
             'id'           => '1',
@@ -203,7 +206,7 @@ class AdventureServiceTest extends TestCase
             ->updateCharacter(['can_move' => false])
             ->levelCharacterUp(100)
             ->inventoryManagement()
-            ->giveItem($item)
+            ->giveItem($item, true, 'right-hand')
             ->getCharacterFactory()
             ->updateSkill('Accuracy', [
                 'level' => 10,
@@ -219,7 +222,7 @@ class AdventureServiceTest extends TestCase
 
         $adventure = $this->createNewAdventure(null, null, 5);
 
-        $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(false);
+        $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(true);
 
         $character->map->gameMap->update([
             'drop_chance_bonus' => 0.01
@@ -250,7 +253,7 @@ class AdventureServiceTest extends TestCase
             ->updateCharacter(['can_move' => false])
             ->levelCharacterUp(100)
             ->inventoryManagement()
-            ->giveItem($item)
+            ->giveItem($item, true, 'right-hand')
             ->getCharacterFactory()
             ->updateSkill('Accuracy', [
                 'level' => 10,
@@ -266,7 +269,7 @@ class AdventureServiceTest extends TestCase
 
         $adventure = $this->createNewAdventure(null, null, 5);
 
-        $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(false);
+        $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(true);
 
         $adventureService = resolve(AdventureService::class);
 
@@ -301,7 +304,7 @@ class AdventureServiceTest extends TestCase
             ->giveItem($this->createItem([
                 'name' => 'Sample Item',
                 'base_damage' => 11600,
-            ]))
+            ]), true, 'right-hand')
             ->equipLeftHand('Sample Item')
             ->getCharacterFactory()
             ->updateSkill('Accuracy', [
@@ -318,7 +321,7 @@ class AdventureServiceTest extends TestCase
 
         $adventure = $this->createNewAdventure(null, $monster, 5);
 
-        $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(false);
+        $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(true);
 
         $dropCheckCalculator = Mockery::mock(DropCheckCalculator::class)->makePartial();
 
@@ -369,7 +372,7 @@ class AdventureServiceTest extends TestCase
             ->giveItem($this->createItem([
                 'name' => 'Sample Item',
                 'base_damage' => 11600,
-            ]))
+            ]), true, 'right-hand')
             ->equipLeftHand('Sample Item')
             ->getCharacterFactory()
             ->updateSkill('Accuracy', [
@@ -389,7 +392,7 @@ class AdventureServiceTest extends TestCase
 
         $adventure = $this->createNewAdventure(null, $monster, 5);
 
-        $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(false);
+        $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(true);
 
         $dropCheckCalculator = Mockery::mock(DropCheckCalculator::class)->makePartial();
 
@@ -427,7 +430,7 @@ class AdventureServiceTest extends TestCase
                                         ->giveItem($this->createItem([
                                             'name' => 'Sample Item',
                                             'base_damage' => 600,
-                                        ]))
+                                        ]), true, 'right-hand')
                                         ->equipLeftHand('Sample Item')
                                         ->getCharacterFactory()
                                         ->levelCharacterUp(10)
@@ -440,7 +443,7 @@ class AdventureServiceTest extends TestCase
 
         $adventure = $this->createNewAdventure(null, null, 5);
 
-        $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(false);
+        $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(true);
 
         $dropCheckCalculator = Mockery::mock(DropCheckCalculator::class)->makePartial();
 
@@ -476,7 +479,7 @@ class AdventureServiceTest extends TestCase
                                         ->giveItem($this->createItem([
                                             'name' => 'Sample Item',
                                             'base_damage' => 600,
-                                        ]))
+                                        ]), true, 'right-hand')
                                         ->equipLeftHand('Sample Item')
                                         ->getCharacterFactory()
                                         ->levelCharacterUp(10)
@@ -495,7 +498,7 @@ class AdventureServiceTest extends TestCase
 
         $adventure = $this->createNewAdventure(null, null, 5);
 
-        $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(false);
+        $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(true);
 
         $adventureService = resolve(AdventureService::class);
 
@@ -546,7 +549,7 @@ class AdventureServiceTest extends TestCase
 
         $adventure = (new AdventureSetup)->setMonster($monster)->createAdventure();
 
-        $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(false);
+        $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(true);
 
         $this->actingAs($character->user);
 
@@ -612,7 +615,7 @@ class AdventureServiceTest extends TestCase
 
         $adventure = (new AdventureSetup)->setMonster($monster)->createAdventure();
 
-        $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(false);
+        $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(true);
 
         Mail::fake();
 

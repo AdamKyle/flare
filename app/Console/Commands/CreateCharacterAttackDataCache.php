@@ -48,7 +48,7 @@ class CreateCharacterAttackDataCache extends Command
 
         Character::chunkById(100, function($characters) {
             foreach ($characters as $character) {
-                CreateCharacterAttackData::dispatch($character->id);
+                CreateCharacterAttackData::dispatch($character->id)->onConnection('long_running');
             }
         });
 

@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Flare\Builders;
+namespace App\Flare\Builders\Character;
 
-use App\Flare\Builders\Traits\Boons;
-use App\Flare\Builders\Traits\Inventory;
+use App\Flare\Builders\Character\Traits\Boons;
+use App\Flare\Builders\Character\Traits\FetchEquipped;
+use App\Flare\Builders\Character\ClassDetails\ClassBonuses;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameMap;
@@ -15,7 +16,7 @@ use App\Flare\Models\Skill;
 
 class BaseCharacterInfo {
 
-    use Inventory, Boons;
+    use FetchEquipped, Boons;
 
     /**
      * @var ClassBonuses $classBonuses
@@ -83,7 +84,6 @@ class BaseCharacterInfo {
      * @return int
      */
     public function buildHealth(Character $character, bool $voided = false): int {
-
         if ($character->is_dead) {
             return 0;
         }

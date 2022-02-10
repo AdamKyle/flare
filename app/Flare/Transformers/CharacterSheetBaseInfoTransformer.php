@@ -2,20 +2,25 @@
 
 namespace App\Flare\Transformers;
 
-use App\Flare\Models\CharacterPassiveSkill;
-use App\Flare\Models\PassiveSkill;
-use App\Flare\Values\ClassAttackValue;
-use App\Game\Automation\Values\AutomationType;
+
 use Cache;
+use League\Fractal\TransformerAbstract;
 use App\Flare\Models\MaxLevelConfiguration;
 use App\Flare\Values\ItemEffectsValue;
 use App\Game\Battle\Values\MaxLevel;
 use App\Game\Core\Values\View\ClassBonusInformation;
-use Illuminate\Support\Collection;
-use League\Fractal\TransformerAbstract;
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Models\Character;
 use App\Flare\Transformers\Traits\SkillsTransformerTrait;
+use App\Flare\Builders\Character\AttackDetails\CharacterAffixInformation;
+use App\Flare\Builders\Character\AttackDetails\CharacterHealthInformation;
+use App\Flare\Models\GameSkill;
+use App\Flare\Models\Inventory;
+use App\Flare\Models\InventorySlot;
+use App\Flare\Models\Item;
+use App\Flare\Models\Skill;
+use App\Flare\Values\ClassAttackValue;
+use App\Game\Skills\Values\SkillTypeValue;
 
 class CharacterSheetBaseInfoTransformer extends TransformerAbstract {
 
@@ -28,7 +33,9 @@ class CharacterSheetBaseInfoTransformer extends TransformerAbstract {
      * @return mixed
      */
     public function transform(Character $character) {
-        $characterInformation = resolve(CharacterInformationBuilder::class)->setCharacter($character);
+        $characterInformation       = resolve(CharacterInformationBuilder::class)->setCharacter($character);
+        $characterHealthInformation = resolve(CharacterHealthInformation::class)->setCharacter($character);
+        $characterAffixInformation  = resolve(CharacterAffixInformation::class)->setCharacter($character);
 
         return [
             'id'                => $character->id,
@@ -36,7 +43,7 @@ class CharacterSheetBaseInfoTransformer extends TransformerAbstract {
             'attack'            => number_format($characterInformation->buildTotalAttack()),
             'health'            => number_format($characterInformation->buildHealth()),
             'ac'                => number_format($characterInformation->buildDefence()),
-            'heal_for'          => number_format($characterInformation->buildHealFor()),
+            'heal_for'          => number_format($characterHealthInformation->buildHealFor()),
             'damage_stat'       => $character->damage_stat,
             'to_hit_stat'       => $character->class->to_hit_stat,
             'to_hit_base'        => $this->getToHitBase($character, $characterInformation),
@@ -68,7 +75,7 @@ class CharacterSheetBaseInfoTransformer extends TransformerAbstract {
             'artifact_anull'    => $characterInformation->getTotalDeduction('artifact_annulment'),
             'healing_reduction' => $characterInformation->getTotalDeduction('healing_reduction'),
             'affix_damage_red'  => $characterInformation->getTotalDeduction('affix_damage_reduction'),
-            'res_chance'        => $characterInformation->fetchResurrectionChance(),
+            'res_chance'        => $characterHealthInformation->fetchResurrectionChance(),
             'weapon_attack'     => number_format($characterInformation->getTotalWeaponDamage()),
             'rings_attack'      => number_format($characterInformation->getTotalRingDamage()),
             'spell_damage'      => number_format($characterInformation->getTotalSpellDamage()),
@@ -80,17 +87,22 @@ class CharacterSheetBaseInfoTransformer extends TransformerAbstract {
             'extra_action_chance' => (new ClassAttackValue($character))->buildAttackData(),
             'stat_affixes'        => [
                 'cant_be_resisted'   => $characterInformation->canAffixesBeResisted(),
-                'all_stat_reduction' => $characterInformation->findPrefixStatReductionAffix(),
-                'stat_reduction'     => $characterInformation->findSuffixStatReductionAffixes(),
+                'all_stat_reduction' => $characterAffixInformation->findPrefixStatReductionAffix(),
+                'stat_reduction'     => $characterAffixInformation->findSuffixStatReductionAffixes(),
             ],
             'is_alchemy_locked'      => $this->isAlchemyLocked($character),
         ];
     }
 
     protected function getMaxLevel(Character $character) {
-        $slot = $character->inventory->slots->filter(function($slot) {
-            return $slot->item->type === 'quest' && $slot->item->effect === ItemEffectsValue::CONTNUE_LEVELING;
-        })->first();
+        $item      = Item::where('effect', ItemEffectsValue::CONTNUE_LEVELING)->first();
+
+        if (is_null($item)) {
+            return MaxLevel::MAX_LEVEL;
+        }
+
+        $inventory = Inventory::where('character_id', $character->id)->first();
+        $slot      = InventorySlot::where('item_id', $item->id)->where('inventory_id', $inventory->id)->first();
 
         if (!is_null($slot)) {
             return MaxLevelConfiguration::first()->max_level;
@@ -100,9 +112,14 @@ class CharacterSheetBaseInfoTransformer extends TransformerAbstract {
     }
 
     private function isAlchemyLocked(Character $character) {
-        $skill = $character->skills->filter(function($skill) {
-            return $skill->type()->isAlchemy();
-        })->first();
+
+        $gameSkill = GameSkill::where('type', SkillTypeValue::ALCHEMY)->first();
+
+        if (is_null($gameSkill)) {
+            return true;
+        }
+
+        $skill     = Skill::where('character_id', $character->id)->where('game_skill_id', $gameSkill->id)->first();
 
         if (!is_null($skill)) {
             return $skill->is_locked;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Flare\Builders\Traits;
+namespace App\Flare\Builders\Character\Traits;
 
 use Illuminate\Database\Eloquent\Collection;
 use App\Flare\Models\Character;
@@ -9,7 +9,7 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Models\SetSlot;
 use \App\Flare\Models\Inventory as InventoryModel;
 
-trait Inventory {
+trait FetchEquipped {
 
     /**
      * Fetches the equipped items from player.

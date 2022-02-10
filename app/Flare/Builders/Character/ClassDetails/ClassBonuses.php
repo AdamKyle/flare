@@ -1,19 +1,17 @@
 <?php
 
-namespace App\Flare\Builders;
+namespace App\Flare\Builders\Character\ClassDetails;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Skill;
 use App\Flare\Values\CharacterClassValue;
-use App\Flare\Builders\Traits\Inventory as InventoryConcern;
+use App\Flare\Builders\Character\Traits\FetchEquipped;
 
 class ClassBonuses {
 
-    use InventoryConcern;
-
-
+    use FetchEquipped;
 
     /**
      * Get prophet healing bonus from class specific skills.
@@ -32,7 +30,7 @@ class ClassBonuses {
 
         if ($classType->isProphet()) {
             if ($this->prophetHasHealingSpells($character)) {
-                $classBonus = $this->getClassBonus($character, $class, $classBonus, 'base_healing_mod');
+                $classBonus = $this->getClassBonus($character, $class, 'base_healing_mod');
             }
         }
 
@@ -120,7 +118,7 @@ class ClassBonuses {
             })->isNotEmpty();
 
             if ($damageSpellsEquipped) {
-                $classBonus = $this->getClassBonus($character, $class, $classBonus, 'base_damage_mod');
+                $classBonus = $this->getClassBonus($character, $class, 'base_damage_mod');
             }
         }
 
@@ -154,7 +152,7 @@ class ClassBonuses {
             })->isNotEmpty();
 
             if ($weaponEquipped) {
-                $classBonus = $this->getClassBonus($character, $class, $classBonus, 'base_damage_mod');
+                $classBonus = $this->getClassBonus($character, $class, 'base_damage_mod');
             }
         }
 
@@ -188,7 +186,7 @@ class ClassBonuses {
             })->isNotEmpty();
 
             if ($shieldEquipped) {
-                $classBonus = $this->getClassBonus($character, $class, $classBonus, 'base_ac_mod');
+                $classBonus = $this->getClassBonus($character, $class, 'base_ac_mod');
             }
         }
 
@@ -222,7 +220,7 @@ class ClassBonuses {
             })->count();
 
             if ($dualWielding === 2) {
-                $classBonus = $this->getClassBonus($character, $class, $classBonus, 'base_damage_mod');
+                $classBonus = $this->getClassBonus($character, $class, 'base_damage_mod');
             }
         }
 
@@ -251,12 +249,12 @@ class ClassBonuses {
                 return $classBonus;
             }
 
-            $dualWielding = $this->getEquippedInventory($character)->slots->filter(function($slot) {
+            $dualWielding = $slots->filter(function($slot) {
                 return $slot->item->type === 'weapon';
             })->count();
 
             if ($dualWielding === 2) {
-                $classBonus = $this->getClassBonus($character, $class, $classBonus, 'fight_time_out_mod');
+                $classBonus = $this->getClassBonus($character, $class, 'fight_time_out_mod');
             }
         }
 
@@ -290,7 +288,7 @@ class ClassBonuses {
             })->isNotEmpty();
 
             if ($hasBow) {
-                $classBonus = $this->getClassBonus($character, $class, $classBonus, 'base_damage_mod');
+                $classBonus = $this->getClassBonus($character, $class, 'base_damage_mod');
             }
         }
 
@@ -324,7 +322,7 @@ class ClassBonuses {
             })->isNotEmpty();
 
             if ($hasBow) {
-                $classBonus = $this->getClassBonus($character, $class, $classBonus, 'fight_time_out_mod');
+                $classBonus = $this->getClassBonus($character, $class, 'fight_time_out_mod');
             }
         }
 

@@ -4,7 +4,7 @@ namespace App\Flare\Handlers\AttackHandlers;
 
 use App\Flare\Builders\CharacterInformationBuilder;
 use Cache;
-use App\Flare\Builders\CharacterAttackBuilder;
+use App\Flare\Builders\Character\AttackDetails\CharacterAttackBuilder;
 use App\Flare\Handlers\AttackExtraActionHandler;
 use App\Game\Adventures\Traits\CreateBattleMessages;
 

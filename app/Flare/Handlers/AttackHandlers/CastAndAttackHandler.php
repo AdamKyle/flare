@@ -3,7 +3,7 @@
 namespace App\Flare\Handlers\AttackHandlers;
 
 use Cache;
-use App\Flare\Builders\CharacterAttackBuilder;
+use App\Flare\Builders\Character\AttackDetails\CharacterAttackBuilder;
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Handlers\AttackExtraActionHandler;
 use App\Flare\Handlers\HealingExtraActionHandler;

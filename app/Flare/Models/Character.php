@@ -2,6 +2,7 @@
 
 namespace App\Flare\Models;
 
+use App\Flare\Builders\Character\AttackDetails\CharacterHealthInformation;
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Values\CharacterClassValue;
 use Illuminate\Database\Eloquent\Model;
@@ -198,6 +199,17 @@ class Character extends Model
         $info = resolve(CharacterInformationBuilder::class);
 
         return $info->setCharacter($this);
+    }
+
+    /**
+     * Allows one to get health information about the character.
+     *
+     * @return CharacterHealthInformation
+     */
+    public function getHeathInformation(): CharacterHealthInformation {
+        $healthInfo = resolve(CharacterHealthInformation::class);
+
+        return $healthInfo->setCharacter($this);
     }
 
     /**

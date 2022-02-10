@@ -2,6 +2,8 @@
 
 namespace App\Flare\Transformers;
 
+use App\Flare\Builders\Character\AttackDetails\CharacterAffixInformation;
+use App\Flare\Builders\Character\AttackDetails\CharacterHealthInformation;
 use App\Flare\Models\CharacterPassiveSkill;
 use App\Flare\Models\PassiveSkill;
 use App\Game\Automation\Values\AutomationType;
@@ -28,6 +30,8 @@ class CharacterSheetTransformer extends TransformerAbstract {
      */
     public function transform(Character $character) {
         $characterInformation = resolve(CharacterInformationBuilder::class)->setCharacter($character);
+        $characterHealthInformation = resolve(CharacterHealthInformation::class)->setCharacter($character);
+        $characterAffixInformation  = resolve(CharacterAffixInformation::class)->setCharacter($character);
 
         return [
             'id'                => $character->id,
@@ -35,7 +39,7 @@ class CharacterSheetTransformer extends TransformerAbstract {
             'attack'            => number_format($characterInformation->buildTotalAttack()),
             'health'            => number_format($characterInformation->buildHealth()),
             'ac'                => number_format($characterInformation->buildDefence()),
-            'heal_for'          => number_format($characterInformation->buildHealFor()),
+            'heal_for'          => number_format($characterHealthInformation->buildHealFor()),
             'skills'            => $this->fetchSkills($character->skills),
             'passive_skills'    => $this->getPassiveSkills($character),
             'damage_stat'       => $character->damage_stat,
@@ -65,7 +69,7 @@ class CharacterSheetTransformer extends TransformerAbstract {
             'artifact_anull'    => $characterInformation->getTotalDeduction('artifact_annulment'),
             'healing_reduction' => $characterInformation->getTotalDeduction('healing_reduction'),
             'affix_damage_red'  => $characterInformation->getTotalDeduction('affix_damage_reduction'),
-            'res_chance'        => $characterInformation->fetchResurrectionChance(),
+            'res_chance'        => $characterHealthInformation->fetchResurrectionChance(),
             'weapon_attack'     => number_format($characterInformation->getTotalWeaponDamage()),
             'rings_attack'      => number_format($characterInformation->getTotalRingDamage()),
             'spell_damage'      => number_format($characterInformation->getTotalSpellDamage()),

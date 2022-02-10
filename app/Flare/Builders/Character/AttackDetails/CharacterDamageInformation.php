@@ -1,0 +1,119 @@
+<?php
+
+namespace App\Flare\Builders\Character\AttackDetails;
+
+use App\Flare\Builders\Character\AttackDetails\DamageDetails\DamageSpellInformation;
+use App\Flare\Builders\Character\AttackDetails\DamageDetails\WeaponInformation;
+use App\Flare\Builders\Character\Traits\FetchEquipped;
+use App\Flare\Models\Character;
+use Illuminate\Support\Collection;
+
+class CharacterDamageInformation {
+
+    use FetchEquipped;
+
+    private $weaponInformation;
+
+    private $damageSpellInformation;
+
+    public function __construct(WeaponInformation $weaponInformation, DamageSpellInformation $damageSpellInformation) {
+        $this->weaponInformation      = $weaponInformation;
+        $this->damageSpellInformation = $damageSpellInformation;
+    }
+
+    /**
+     *
+     * @param Character $character
+     * @param bool $voided
+     * @return int
+     * @throws \Exception
+     */
+    public function getWeaponDamage(Character $character, bool $voided = false): int {
+        return $this->weaponInformation->getWeaponDamage($character, $voided);
+    }
+
+    /**
+     * Returns an instance of the Weapon Information.
+     *
+     * @return WeaponInformation
+     */
+    public function getWeaponInformation(): WeaponInformation {
+        return $this->weaponInformation;
+    }
+
+    /**
+     * Get the spell damage for a character.
+     *
+     * @param Character $character
+     * @param bool $voided
+     * @return int
+     * @throws \Exception
+     */
+    public function getSpellDamage(Character $character, bool $voided = false): int {
+        return $this->damageSpellInformation->getSpellDamage($character, $voided);
+    }
+
+    /**
+     * Get the character's artifact Damage.
+     *
+     * @param bool $voided
+     * @return int
+     */
+    public function getArtifactDamage(Character $character, bool $voided = false): int {
+        $damage = 0;
+
+        foreach ($this->fetchInventory($character) as $slot) {
+            if ($slot->item->type === 'artifact') {
+                if ($damage === 0) {
+                    $damage += $slot->item->getTotalDamage();
+                } else {
+                    $damage += ceil($slot->item->getTotalDamage() / 2);
+                }
+            }
+        }
+
+        return $damage;
+    }
+
+    /**
+     * Get the characters ring damage.
+     *
+     * @param bool $voided
+     * @return int
+     */
+    public function getRingDamage(Character $character, bool $voided = false): int {
+        $damage = [];
+
+        foreach ($this->fetchInventory($character) as $slot) {
+            if ($slot->item->type === 'ring') {
+                if (!$voided) {
+                    $damage[] = $slot->item->getTotalDamage();
+                } else {
+                    $damage[] = $slot->item->base_damage;
+                }
+            }
+        }
+
+        if (!empty($damage)) {
+            return max($damage);
+        }
+
+        return 0;
+    }
+
+    /**
+     * Fetch the inventory for the character with equipped items.
+     *
+     * @return Collection
+     */
+    protected function fetchInventory(Character $character): Collection
+    {
+        $slots = $this->fetchEquipped($character);
+
+        if (is_null($slots)) {
+            return collect([]);
+        }
+
+        return $slots;
+    }
+}

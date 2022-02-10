@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Flare\Builders\Traits;
+namespace App\Flare\Builders\Character\Traits;
 
 use Illuminate\Database\Eloquent\Collection;
 use App\Flare\Values\ItemUsabilityType;

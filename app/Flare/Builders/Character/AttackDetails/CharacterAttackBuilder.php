@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Flare\Builders;
+namespace App\Flare\Builders\Character\AttackDetails;
 
-use App\Flare\Builders\Traits\Inventory;
+use App\Flare\Builders\Character\Traits\FetchEquipped;
+use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameMap;
@@ -12,7 +13,7 @@ use App\Flare\Models\SetSlot;
 
 class CharacterAttackBuilder {
 
-    use Inventory;
+    use FetchEquipped;
 
     /**
      * @var Character $character
@@ -24,11 +25,17 @@ class CharacterAttackBuilder {
      */
     private $characterInformationBuilder;
 
+    private $characterHealthInformation;
+
+    private $characterAffixReduction;
+
     /**
      * @param CharacterInformationBuilder $characterInformationBuilder
      */
-    public function __construct(CharacterInformationBuilder $characterInformationBuilder) {
+    public function __construct(CharacterInformationBuilder $characterInformationBuilder, CharacterHealthInformation $characterHealthInformation, CharacterAffixInformation $characterAffixInformation) {
         $this->characterInformationBuilder = $characterInformationBuilder;
+        $this->characterHealthInformation  = $characterHealthInformation;
+        $this->characterAffixReduction     = $characterAffixInformation;
     }
 
     /**
@@ -41,6 +48,8 @@ class CharacterAttackBuilder {
         $this->character = $character;
 
         $this->characterInformationBuilder = $this->characterInformationBuilder->setCharacter($character);
+        $this->characterAffixReduction     = $this->characterAffixReduction->setCharacter($character);
+        $this->characterHealthInformation  = $this->characterHealthInformation->setCharacter($character);
 
         return $this;
     }
@@ -50,6 +59,7 @@ class CharacterAttackBuilder {
      *
      * @param bool $voided
      * @return array
+     * @throws \Exception
      */
     public function buildAttack(bool $voided = false): array {
         $attack = $this->baseAttack($voided);
@@ -64,6 +74,7 @@ class CharacterAttackBuilder {
      *
      * @param bool $voided
      * @return array
+     * @throws \Exception
      */
     public function buildCastAttack(bool $voided = false) {
         $attack = $this->baseAttack($voided);
@@ -78,6 +89,7 @@ class CharacterAttackBuilder {
      *
      * @param bool $voided
      * @return array
+     * @throws \Exception
      */
     public function buildCastAndAttack(bool $voided = false): array {
         return $this->castAndAttackPositionalDamage('spell-one', 'left-hand', $voided);
@@ -88,6 +100,7 @@ class CharacterAttackBuilder {
      *
      * @param bool $voided
      * @return array
+     * @throws \Exception
      */
     public function buildAttackAndCast(bool $voided = false): array {
         return $this->castAndAttackPositionalDamage('spell-two', 'right-hand', $voided);
@@ -184,15 +197,15 @@ class CharacterAttackBuilder {
             'defence'          => $this->characterInformationBuilder->buildDefence($voided),
             'ring_damage'      => $this->characterInformationBuilder->getTotalRingDamage($voided),
             'artifact_damage'  => $voided ? 0 : $this->characterInformationBuilder->getTotalArtifactDamage(),
-            'heal_for'         => $this->characterInformationBuilder->buildHealFor($voided),
-            'res_chance'       => $this->characterInformationBuilder->fetchResurrectionChance(),
+            'heal_for'         => $this->characterHealthInformation->buildHealFor($voided),
+            'res_chance'       => $this->characterHealthInformation->fetchResurrectionChance(),
             'damage_deduction' => $characterReduction,
             'affixes'          => [
                 'cant_be_resisted'       => $this->characterInformationBuilder->canAffixesBeResisted(),
                 'stacking_damage'        => $voided ? 0 : $this->characterInformationBuilder->getTotalAffixDamage(),
                 'non_stacking_damage'    => $voided ? 0 : $this->characterInformationBuilder->getTotalAffixDamage(false),
-                'stacking_life_stealing' => $voided ? 0 : $this->characterInformationBuilder->findLifeStealingAffixes(true),
-                'life_stealing'          => $voided ? 0 : $this->characterInformationBuilder->findLifeStealingAffixes(),
+                'stacking_life_stealing' => $voided ? 0 : $this->characterAffixReduction ->findLifeStealingAffixes(true),
+                'life_stealing'          => $voided ? 0 : $this->characterAffixReduction ->findLifeStealingAffixes(),
                 'entrancing_chance'      => $voided ? 0 : $this->characterInformationBuilder->getEntrancedChance(),
             ]
         ];

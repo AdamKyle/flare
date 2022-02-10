@@ -3,6 +3,7 @@
 namespace App\Flare\Handlers;
 
 
+use App\Flare\Builders\Character\AttackDetails\CharacterAffixInformation;
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Handlers\AttackHandlers\CanHitHandler;
 use App\Flare\Handlers\AttackHandlers\EntrancingChanceHandler;
@@ -15,6 +16,8 @@ class MonsterAttackHandler {
     use CreateBattleMessages;
 
     private $characterInformationBuilder;
+
+    private $characterAffixInformation;
 
     private $entrancingChanceHandler;
 
@@ -32,11 +35,13 @@ class MonsterAttackHandler {
 
     public function __construct(
         CharacterInformationBuilder $characterInformationBuilder,
-        EntrancingChanceHandler $entrancingChanceHandler,
-        ItemHandler $itemHandler,
-        CanHitHandler $canHitHandler,
+        CharacterAffixInformation   $characterAffixInformation,
+        EntrancingChanceHandler     $entrancingChanceHandler,
+        ItemHandler                 $itemHandler,
+        CanHitHandler               $canHitHandler,
     ) {
         $this->characterInformationBuilder = $characterInformationBuilder;
+        $this->characterAffixInformation    = $characterAffixInformation;
         $this->entrancingChanceHandler     = $entrancingChanceHandler;
         $this->canHitHandler               = $canHitHandler;
         $this->itemHandler                 = $itemHandler;
@@ -149,11 +154,12 @@ class MonsterAttackHandler {
     }
 
     private function useLifeStealingAffixes($attacker, $defender) {
+        $affixes = $this->characterAffixInformation->setCharacter($defender);
         $handler = $this->itemHandler->setCharacterHealth($this->characterHealth)->setMonsterHealth($this->monsterHealth);
         $info    = $this->characterInformationBuilder->setCharacter($defender);
 
         $canResist  = $info->canAffixesBeResisted();
-        $damage     = $info->findLifeStealingAffixes(true);
+        $damage     = $affixes->findLifeStealingAffixes(true);
 
         if ($damage > $this->characterHealth) {
             $damage = $this->characterHealth;
