@@ -7,8 +7,12 @@ use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Models\Character;
 use App\Flare\Models\Faction;
 use App\Flare\Models\GameMap;
+use App\Flare\Models\Inventory;
+use App\Flare\Models\InventorySlot;
+use App\Flare\Models\Item;
 use App\Flare\Models\Item as ItemModel;
 use App\Flare\Models\Monster;
+use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\RandomAffixDetails;
 use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
@@ -39,8 +43,12 @@ class FactionHandler {
             return;
         }
 
-        $faction->current_points += FactionLevel::gatPointsPerLevel($faction->current_level);
-
+        if ($this->playerHasQuestItem($character)) {
+            $faction->current_points += 10;
+        } else {
+            $faction->current_points += FactionLevel::gatPointsPerLevel($faction->current_level);
+        }
+        
         if ($faction->current_points > $faction->points_needed) {
             $faction->current_points = $faction->points_needed;
         }
@@ -198,5 +206,13 @@ class FactionHandler {
         }
 
         return $duplicateItem;
+    }
+
+    protected function playerHasQuestItem(Character $character): bool {
+        $inventory = Inventory::where('character_id', $character->id)->first();
+        $item      = Item::where('effect', ItemEffectsValue::FACTION_POINTS)->first();
+
+
+        return is_null(InventorySlot::where('inventory_id', $inventory->id)->where('item_id', $item->id)->first());
     }
 }
