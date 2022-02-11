@@ -5,19 +5,18 @@ export default class EquippedSectionButton extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-
-
-    }
   }
 
   unequipItem() {
+    this.props.setLoading(true);
     axios.post('/api/character/'+this.props.characterId+'/inventory/unequip', {
       inventory_set_equipped: this.props.hasSetEquipped,
       item_to_remove: this.props.findEquippedSlotId(this.props.item.id)
     }).then((result) => {
+      this.props.setLoading(false);
       this.props.setSuccessMessage(result.data.message)
     }).catch((error) => {
+      this.props.setLoading(false);
       if (error.hasOwnProperty('response')) {
         const response = error.response;
 

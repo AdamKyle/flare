@@ -163,7 +163,6 @@ export default class QuestDetails extends React.Component {
   }
 
   render() {
-    console.log(this.props.quest);
     const npcPLaneAccess = this.renderPlaneAccessRequirements(this.props.quest.npc.game_map);
 
     return (

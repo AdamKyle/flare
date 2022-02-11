@@ -164,7 +164,7 @@ export default class FightSection extends React.Component {
 
         character['attack_types'] = attackTypes;
       }
-      console.log('Character: ', character);
+
       this.setState({
         character: character
       });

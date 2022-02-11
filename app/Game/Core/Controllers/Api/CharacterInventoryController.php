@@ -388,6 +388,7 @@ class CharacterInventoryController extends Controller {
     }
 
     public function unequipAll(Request $request, Character $character, InventorySetService $inventorySetService) {
+
         if ($request->is_set_equipped) {
             $inventorySet = $character->inventorySets()->where('is_equipped', true)->first();
 
