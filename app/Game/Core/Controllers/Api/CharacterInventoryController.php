@@ -516,5 +516,7 @@ class CharacterInventoryController extends Controller {
         $characterData = $this->manager->createData($characterData)->toArray();
 
         event(new UpdateBaseCharacterInformation($character->user, $characterData));
+
+        event(new UpdateTopBarEvent($character));
     }
 }

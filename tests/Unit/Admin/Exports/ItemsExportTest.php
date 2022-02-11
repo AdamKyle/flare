@@ -15,16 +15,7 @@ class ItemsExportTest extends TestCase
 
     public function testExport()
     {
-        Excel::store(new ItemsExport(false), 'test.xlsx');
-
-        Storage::disk('local')->assertExists('test.xlsx');
-
-        Storage::disk('local')->delete('test.xlsx');
-    }
-
-    public function testExportWithAffixes()
-    {
-        Excel::store(new ItemsExport(true), 'test.xlsx');
+        Excel::store(new ItemsExport(['weapon']), 'test.xlsx');
 
         Storage::disk('local')->assertExists('test.xlsx');
 

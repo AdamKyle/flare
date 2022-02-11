@@ -48,7 +48,7 @@ class FactionHandler {
         } else {
             $faction->current_points += FactionLevel::gatPointsPerLevel($faction->current_level);
         }
-        
+
         if ($faction->current_points > $faction->points_needed) {
             $faction->current_points = $faction->points_needed;
         }
@@ -212,6 +212,9 @@ class FactionHandler {
         $inventory = Inventory::where('character_id', $character->id)->first();
         $item      = Item::where('effect', ItemEffectsValue::FACTION_POINTS)->first();
 
+        if (is_null($item)) {
+             return false;
+        }
 
         return is_null(InventorySlot::where('inventory_id', $inventory->id)->where('item_id', $item->id)->first());
     }

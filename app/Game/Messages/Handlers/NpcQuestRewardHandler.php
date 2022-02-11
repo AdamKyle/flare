@@ -94,12 +94,14 @@ class NpcQuestRewardHandler {
 
     public function giveItem(Character $character, Quest $quest, Npc $npc) {
 
-        $effectType = new ItemEffectsValue($quest->item->effect);
+        if (!is_null($quest->rewardItem->effect)) {
+            $effectType = new ItemEffectsValue($quest->rewardItem->effect);
 
-        if ($effectType->getCopperCoins()) {
-            broadcast(new GlobalMessageEvent('Lighting streaks across the skies, blackness fills the skies. A thunderous roar is heard across the land.'));
+            if ($effectType->getCopperCoins()) {
+                broadcast(new GlobalMessageEvent('Lighting streaks across the skies, blackness fills the skies. A thunderous roar is heard across the land.'));
 
-            broadcast(new ServerMessageEvent($character->user, 'Careful child. You seem to have angered The Creator. Are you prepared?', true));
+                broadcast(new ServerMessageEvent($character->user, 'Careful child. You seem to have angered The Creator. Are you prepared?', true));
+            }
         }
 
         $character->inventory->slots()->create([

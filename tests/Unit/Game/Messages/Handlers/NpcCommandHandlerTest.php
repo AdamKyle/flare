@@ -497,33 +497,6 @@ class NpcCommandHandlerTest extends TestCase {
         $this->assertNull($skill);
     }
 
-
-    public function testCharacterHandlesQuestDoesntInventorySpace() {
-        $npcCommandHandler = resolve(NpcCommandHandler::class);
-
-        $user = $this->character->getCharacterFactory()->updateCharacter([
-            'inventory_max' => 0
-        ])->getUser();
-
-        $user = $user->refresh();
-
-        $npcCommandHandler->handleForType(NpcCommandTypes::QUEST, $this->questNpc, $user);
-
-        $this->assertCount(0, QuestsCompleted::all());
-
-        $character = $user->character->refresh();
-
-        $this->assertLessThan(100, $character->gold);
-        $this->assertLessThan(100, $character->gold_dust);
-        $this->assertLessThan(100, $character->shards);
-
-        $skill = $character->skills->filter(function($skill) {
-            return !$skill->is_locked && $skill->type()->isAlchemy();
-        })->first();
-
-        $this->assertNull($skill);
-    }
-
     public function testCharacterHandlesQuestGoldCapped() {
         $npcCommandHandler = resolve(NpcCommandHandler::class);
 

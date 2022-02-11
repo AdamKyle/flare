@@ -12,7 +12,7 @@ class ItemsImportTest extends TestCase {
     use RefreshDatabase;
 
     public function testImport() {
-        Excel::import(new ItemsImport(), resource_path('data-imports/items.xlsx'));
+        Excel::import(new ItemsImport(), resource_path('data-imports/items/weapons.xlsx'));
 
         $this->assertTrue(true);
     }
