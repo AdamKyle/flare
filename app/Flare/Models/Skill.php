@@ -279,12 +279,10 @@ class Skill extends Model
     protected function getCharacterBoonsBonus(string $skillBonusAttribute) {
         $newBonus = 0.0;
 
-        if ($this->character->boons->isNotEmpty()) {
-            $boons = $this->character->boons;
+        $boons = CharacterBoon::where('character_id', $this->character->id)->get();
 
-            if ($boons->isNotEmpty()) {
-                $newBonus += $boons->sum($skillBonusAttribute);
-            }
+        if ($boons->isNotEmpty()) {
+            $newBonus += $boons->sum($skillBonusAttribute);
         }
 
         return $newBonus;

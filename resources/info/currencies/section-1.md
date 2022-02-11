@@ -40,7 +40,7 @@ You can have Two Billion Gold Dust at any one time. If you have over you won't b
 NPC Quests will never allow you to go over the cap, even if you just a bit under.
 
 
-## Shards
+## Crystal Shards (Crys. Shards or Shards)
 
 Shards are a form of currency only gained by defeating [celestial entities](/information/celestials). 
 
@@ -50,4 +50,13 @@ You can have Two Billion Shards at any one time. If you have over, you won't be 
 shards.
 
 NPC Quests will never allow you to go over the cap, even if you just a bit under.
+
+## Copper Coins (Cpp. Coins)
+
+Copper coins are only attainable by those who have access to purgatory, which requires an extensive quest chain Starting on surface. On your way, you will gain access
+to Hell which has a quest chain to unlock Copper Coins currency which can only be gained by fighting monsters in purgatory.
+
+All monsters, in relation to their gold, will also drop 5-20 copper coins. Players may only have 100,000 of these coins.
+
+Copper coins will be used for the new Purgatory smith, which will allow players to upgrade their high-end crafted gear to a new set of gear.
 

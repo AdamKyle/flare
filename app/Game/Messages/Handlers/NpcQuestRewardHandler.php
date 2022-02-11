@@ -10,12 +10,14 @@ use App\Flare\Models\Quest;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
+use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Events\UpdateAttackStats;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
+use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
@@ -91,6 +93,15 @@ class NpcQuestRewardHandler {
     }
 
     public function giveItem(Character $character, Quest $quest, Npc $npc) {
+
+        $effectType = new ItemEffectsValue($quest->item->effect);
+
+        if ($effectType->getCopperCoins()) {
+            broadcast(new GlobalMessageEvent('Lighting streaks across the skies, blackness fills the skies. A thunderous roar is heard across the land.'));
+
+            broadcast(new ServerMessageEvent($character->user, 'Careful child. You seem to have angered The Creator. Are you prepared?', true));
+        }
+
         $character->inventory->slots()->create([
             'inventory_id' => $character->inventory->id,
             'item_id'      => $quest->reward_item,

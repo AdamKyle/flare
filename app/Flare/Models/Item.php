@@ -80,6 +80,8 @@ class Item extends Model
         'devouring_light',
         'devouring_darkness',
         'parent_id',
+        'xp_bonus',
+        'ignores_caps',
     ];
 
     /**
@@ -121,9 +123,10 @@ class Item extends Model
         'market_sellable'                  => 'boolean',
         'usable'                           => 'boolean',
         'damages_kingdoms'                 => 'boolean',
+        'ignores_caps'                     => 'boolean',
+        'stat_increase'                    => 'boolean',
         'kingdom_damage'                   => 'float',
         'lasts_for'                        => 'integer',
-        'stat_increase'                    => 'boolean',
         'increase_stat_by'                 => 'float',
         'affects_skill_type'               => 'integer',
         'increase_skill_bonus_by'          => 'float',
@@ -135,6 +138,7 @@ class Item extends Model
         'affix_damage_reduction'           => 'float',
         'devouring_light'                  => 'float',
         'devouring_darkness'               => 'float',
+        'xp_bonus'                         => 'float',
     ];
 
     protected $appends = [

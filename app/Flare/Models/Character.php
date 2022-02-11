@@ -59,6 +59,7 @@ class Character extends Model
         'gold',
         'gold_dust',
         'shards',
+        'copper_coins',
     ];
 
     /**
@@ -97,6 +98,7 @@ class Character extends Model
         'gold'                        => 'integer',
         'gold_dust'                   => 'integer',
         'shards'                      => 'integer',
+        'copper_coins'                => 'integer',
     ];
 
     public function race() {

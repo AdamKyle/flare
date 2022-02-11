@@ -57,6 +57,8 @@
         <th>devouring_light</th>
         <th>devouring_darkness</th>
         <th>drop_location_id</th>
+        <th>xp_bonus</th>
+        <th>ignores_caps</th>
     </tr>
     </thead>
     <tbody>
@@ -118,6 +120,8 @@
             <td>{{$item->devouring_light}}</td>
             <td>{{$item->devouring_darkness}}</td>
             <td>{{!is_null($item->dropLocation) ? $item->dropLocation->name : null}}</td>
+            <td>{{$item->xp_bonus}}</td>
+            <td>{{$item->ignores_caps}}</td>
         </tr>
     @endforeach
     </tbody>

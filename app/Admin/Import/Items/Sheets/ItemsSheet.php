@@ -78,6 +78,10 @@ class ItemsSheet implements ToCollection {
             $item['can_resurrect'] = false;
         }
 
+        if (!isset($item['ignores_caps'])) {
+            $item['ignores_caps'] = false;
+        }
+
         foreach ($item as $key => $value) {
             if (!is_null($value) || ($key === 'item_suffix_id' || $key === 'item_prefix_id')) {
 

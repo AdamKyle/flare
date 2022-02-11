@@ -2,13 +2,13 @@
 
 namespace App\Game\Automation\Services;
 
-use App\Flare\Models\Monster;
 use Cache;
+use App\Flare\Builders\Character\ClassDetails\ClassBonuses;
+use App\Flare\Models\Monster;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\Location;
 use App\Flare\Services\FightService;
-use App\Flare\Traits\ClassBasedBonuses;
 use App\Game\Automation\Events\AutomatedAttackMessage;
 use App\Game\Automation\Events\AutomationAttackTimeOut;
 use App\Game\Battle\Handlers\BattleEventHandler;
@@ -16,15 +16,16 @@ use App\Game\Battle\Jobs\BattleAttackHandler;
 
 class ProcessAttackAutomation {
 
-    use ClassBasedBonuses;
-
     private $fightService;
 
     private $battleEventHandler;
 
-    public function __construct(FightService $fightService, BattleEventHandler $battleEventHandler) {
+    private $classBonuses;
+
+    public function __construct(FightService $fightService, BattleEventHandler $battleEventHandler, ClassBonuses $classBonuses) {
+        $this->classBonuses        = $classBonuses;
         $this->fightService        = $fightService;
-        $this->battleEventHandler = $battleEventHandler;
+        $this->battleEventHandler  = $battleEventHandler;
     }
 
     public function processFight(CharacterAutomation $automation, Character $character, string $attackType) {
@@ -113,7 +114,7 @@ class ProcessAttackAutomation {
             return 0;
         }
 
-        $classBonus = $this->getThievesFightTimeout($character) + $this->getRangersFightTimeout($character);
+        $classBonus = $this->classBonuses->getThievesFightTimeout($character) + $this->classBonuses->getRangersFightTimeout($character);
 
         return $skill->fight_time_out_mod + $classBonus;
     }

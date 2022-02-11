@@ -3,17 +3,13 @@
 namespace App\Flare\Builders;
 
 use App\Flare\Builders\Character\AttackDetails\CharacterAttackInformation;
-use App\Flare\Builders\Character\AttackDetails\CharacterHealthInformation;
 use App\Flare\Builders\Character\BaseCharacterInfo;
 use App\Flare\Models\Character;
 use App\Flare\Models\ItemAffix;
-use App\Flare\Traits\ClassBasedBonuses;
 use App\Flare\Values\ItemEffectsValue;
 use Illuminate\Support\Collection;
 
 class CharacterInformationBuilder {
-
-    use ClassBasedBonuses;
 
     /**
      * @var BaseCharacterInfo $baseCharacterInfo

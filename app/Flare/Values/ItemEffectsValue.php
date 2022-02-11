@@ -23,6 +23,8 @@ class ItemEffectsValue {
     const MASS_EMBEZZLE         = 'mass-embezzle';
     const WALK_ON_MAGMA         = 'walk-on-magma';
     const QUEEN_OF_HEARTS       = 'speak-to-queen-of-hearts';
+    const FACTION_POINTS        = 'effects-faction-points';
+    const GET_COPPER_COINS      = 'get-copper-coins';
 
     /**
      * @var string[] $values
@@ -42,6 +44,8 @@ class ItemEffectsValue {
         self::MASS_EMBEZZLE         => 'mass-embezzle',
         self::QUEEN_OF_HEARTS       => 'speak-to-queen-of-hearts',
         self::PURGATORY             => 'purgatory',
+        self::FACTION_POINTS        => 'effects-faction-points',
+        self::GET_COPPER_COINS      => 'get-copper-coins',
     ];
 
     /**
@@ -177,5 +181,23 @@ class ItemEffectsValue {
      */
     public function canSpeakToQueenOfHearts(): bool {
         return $this->value === self::QUEEN_OF_HEARTS;
+    }
+
+    /**
+     * Does this effect Faction points?
+     *
+     * @return bool
+     */
+    public function effectsFactionPoints(): bool {
+        return $this->value === self::FACTION_POINTS;
+    }
+
+    /**
+     * Does this let the player receive copper coins?
+     *
+     * @return bool
+     */
+    public function getCopperCoins(): bool {
+        return $this->value === self::GET_COPPER_COINS;
     }
 }

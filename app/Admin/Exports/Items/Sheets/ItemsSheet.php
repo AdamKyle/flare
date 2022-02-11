@@ -11,20 +11,20 @@ use phpDocumentor\Reflection\Types\Boolean;
 
 class ItemsSheet implements FromView, WithTitle, ShouldAutoSize {
 
-    private bool $affixesOnly = false;
+    private array $itemTypes;
 
-    public function __construct(bool $affixesOnly) {
-        $this->affixesOnly = $affixesOnly;
+    public function __construct(array $itemTypes = []) {
+        $this->itemTypes = $itemTypes;
     }
 
     /**
      * @return View
      */
     public function view(): View {
-        $items = Item::whereNull('item_suffix_id')->whereNull('item_prefix_id')->orderBy('type', 'desc')->orderBy('cost', 'asc')->get();
-
-        if ($this->affixesOnly) {
-            $items = Item::whereNotNull('item_suffix_id')->orWhereNotNull('item_prefix_id')->orderBy('type', 'desc')->orderBy('cost', 'asc')->get();
+        if (empty($this->itemTypes)) {
+            $items = Item::whereNull('item_suffix_id')->whereNull('item_prefix_id')->orderBy('type', 'desc')->orderBy('cost', 'asc')->get();
+        } else {
+            $items = Item::whereNull('item_suffix_id')->whereNull('item_prefix_id')->whereIn('type', $this->itemTypes)->orderBy('type', 'desc')->orderBy('cost', 'asc')->get();
         }
 
         return view('admin.exports.items.sheets.items', [

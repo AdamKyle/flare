@@ -43,6 +43,7 @@ class CharacterTopBarTransformer extends TransformerAbstract {
             'gold'              => number_format($character->gold),
             'gold_dust'         => number_format($character->gold_dust),
             'shards'            => number_format($character->shards),
+            'copper_coins'      => number_format($character->copper_coins),
             'is_dead'           => $character->is_dead,
             'can_adventure'     => $character->can_adventure,
         ];

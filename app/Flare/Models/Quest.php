@@ -71,7 +71,7 @@ class Quest extends Model {
         return $this->hasMany($this, 'parent_quest_id')
                     ->with(
                 'childQuests',
-                'rewardItem',
+                        'rewardItem',
                         'item',
                         'factionMap',
                         'item.dropLocation',

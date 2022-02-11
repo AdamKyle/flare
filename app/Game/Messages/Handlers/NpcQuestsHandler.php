@@ -105,11 +105,6 @@ class NpcQuestsHandler {
     }
 
     public function shouldBailOnQuest(Character $character, Npc $npc, Quest $quest, array $completedQuests) {
-        if (!$this->canHaveReward($character, $npc)) {
-            // Do not continue, it would be a waste.
-            return true;
-        }
-
         if (!$this->validateParentQuest($quest, $completedQuests)) {
             return true;
         }
@@ -239,15 +234,6 @@ class NpcQuestsHandler {
         broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build($type, $npc), true));
     }
 
-    public function canHaveReward(Character $character, Npc $npc): bool {
-        if ($character->isInventoryFull()) {
-            broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('inventory_full', $npc), true));
-            return false;
-        }
-
-        return true;
-    }
-
     public function alertAboutCurrencyCapped(Character $character, Npc $npc, Quest $quest) {
         $newGold          = $character->gold + $quest->reward_gold;
         $newGoldDust      = $character->gold_dust + $quest->reward_gold_dust;
@@ -310,7 +296,7 @@ class NpcQuestsHandler {
         $character->update([
             'gold' => !is_null($quest->gold_cost) ? $newGold : $character->gold,
             'gold_dust' => !is_null($quest->gold_dust_cost) ? $newGoldDust : $character->gold_dust,
-            'shards' => !is_null($quest->shards_cost) ? $newShards : $character->shards,
+            'shards' => !is_null($quest->shard_cost) ? $newShards : $character->shards,
         ]);
 
         event(new UpdateTopBarEvent($character->refresh()));

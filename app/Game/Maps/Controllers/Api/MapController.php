@@ -130,7 +130,7 @@ class MapController extends Controller {
 
     public function fetchQuests(QuestDataRequest $request, Character $character) {
         if (!Cache::has('all-quests')) {
-            Cache::put('all-quests', Quest::where('is_parent', true)->with('childQuests', 'rewardItem', 'item', 'npc', 'npc.commands', 'npc.gameMap')->get());
+            Cache::put('all-quests', Quest::where('is_parent', true)->with('childQuests', 'factionMap', 'rewardItem', 'item', 'npc', 'npc.commands', 'npc.gameMap')->get());
         }
 
         $data = [

@@ -2,23 +2,26 @@
 
 namespace App\Flare\Services;
 
-use App\Flare\Calculators\XPCalculator as CalculatorsXPCalculator;
 use App\Flare\Events\ServerMessageEvent;
-use App\Flare\Events\UpdateCharacterAttackEvent;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Flare\Models\Adventure;
 use App\Flare\Models\Character;
+use App\Flare\Models\GameMap;
+use App\Flare\Models\Inventory;
+use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Skill;
 use App\Flare\Events\UpdateSkillEvent;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
+use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Services\CharacterService;
 use Facades\App\Flare\Calculators\XPCalculator;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
+use App\Flare\Models\Item as ItemModel;
 
 class CharacterRewardService {
 
@@ -32,14 +35,23 @@ class CharacterRewardService {
      */
     private $characterXpService;
 
+    /**
+     * @var Manager $manager
+     */
     private $manager;
 
+    /**
+     * @var CharacterSheetBaseInfoTransformer  $characterSheetBaseInfoTransformer
+     */
     private $characterSheetBaseInfoTransformer;
 
     /**
      * Constructor
      *
      * @param CharacterXPService $characterXpService
+     * @param CharacterService $characterService
+     * @param Manager $manager
+     * @param CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer
      */
     public function __construct(CharacterXPService $characterXpService, CharacterService $characterService, Manager $manager, CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer) {
         $this->characterXpService                = $characterXpService;
@@ -48,6 +60,12 @@ class CharacterRewardService {
         $this->manager                           = $manager;
     }
 
+    /**
+     * Set the character.
+     *
+     * @param Character $character
+     * @return $this
+     */
     public function setCharacter(Character $character): CharacterRewardService {
         $this->character = $character;
 
@@ -58,8 +76,9 @@ class CharacterRewardService {
      * Distribute the gold and xp to the character.
      *
      * @param Monster $monster
-     * @param Adventure $adventure | null
+     * @param Adventure|null $adventure | null
      * @return void
+     * @throws \Exception
      */
     public function distributeGoldAndXp(Monster $monster, Adventure $adventure = null) {
         $this->distributeXP($monster, $adventure);
@@ -69,6 +88,8 @@ class CharacterRewardService {
         }
 
         $this->distributeGold($monster);
+
+        $this->distributeCopperCoins($monster);
     }
 
     /**
@@ -93,7 +114,8 @@ class CharacterRewardService {
      * Fire the update skill event.
      *
      * @param Skill $skill
-     * @param Adventure $adventure | nul
+     * @param Adventure|null $adventure | nul
+     * @param Monster|null $monster
      * @return void
      */
     public function trainSkill(Skill $skill, Adventure $adventure = null, Monster $monster = null) {
@@ -134,6 +156,11 @@ class CharacterRewardService {
         $this->character = $this->character->refresh();
     }
 
+    /**
+     * Handle character level up.
+     *
+     * @return void
+     */
     public function handleCharacterLevelUp() {
         $this->characterService->levelUpCharacter($this->character);
 
@@ -147,6 +174,12 @@ class CharacterRewardService {
         event(new UpdateTopBarEvent($character));
     }
 
+    /**
+     * Update the character stats.
+     *
+     * @param Character $character
+     * @return void
+     */
     protected function updateCharacterStats(Character $character) {
         $characterData = new Item($character, $this->characterSheetBaseInfoTransformer);
         $characterData = $this->manager->createData($characterData)->toArray();
@@ -168,6 +201,32 @@ class CharacterRewardService {
 
         if (!$maxCurrencies->canNotGiveCurrency()) {
             $this->character->update(['gold' => $newGold]);
+        }
+    }
+
+    /**
+     * Give copper coins only to those that have the quest item and are on purgatory.
+     *
+     * @param Monster $monster
+     * @return void
+     * @throws \Exception
+     */
+    protected function distributeCopperCoins(Monster $monster) {
+        $gameMap = GameMap::find($monster->game_map_id);
+
+        if ($gameMap->mapType()->isPurgatory()) {
+            $inventory = Inventory::where('character_id', $this->character->id)->first();
+            $item      = ItemModel::where('effect', ItemEffectsValue::GET_COPPER_COINS)->first();
+            $slot      = InventorySlot::where('inventory_id', $inventory->id)->where('item_id', $item->id)->first();
+
+            if (!is_null($slot)) {
+                $newCoins      = $this->character->copper_coins + rand(5, 20);
+                $maxCurrencies = new MaxCurrenciesValue($newCoins, MaxCurrenciesValue::COPPER);
+
+                if (!$maxCurrencies->canNotGiveCurrency()) {
+                    $this->character->update(['copper_coins' => $newCoins]);
+                }
+            }
         }
     }
 }

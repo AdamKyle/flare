@@ -53,6 +53,29 @@
                     @endif
 
                 </dd>
+                <dt>Required Secondary Item:</dt>
+                <dd>
+                    @if (!is_null($quest->secondary_required_item))
+                        @auth
+                            @if (auth()->user()->hasRole('Admin'))
+                                <a href="{{route('items.item', [
+                                            'item' => $quest->secondaryItem->id
+                                        ])}}">{{$quest->secondaryItem->name}}</a>
+                            @else
+                                <a href="{{route('game.items.item', [
+                                            'item' => $quest->secondaryItem->id
+                                        ])}}">{{$quest->secondaryItem->name}}</a>
+                            @endif
+                        @else
+                            <a href="{{route('info.page.item', [
+                                            'item' => $quest->secondaryItem->id
+                                        ])}}">{{$quest->secondaryItem->name}}</a>
+                        @endauth
+                    @else
+                        None Required.
+                    @endif
+
+                </dd>
 
                 @if (!is_null($quest->gold_cost))
                     <dt>Required Gold:</dt>

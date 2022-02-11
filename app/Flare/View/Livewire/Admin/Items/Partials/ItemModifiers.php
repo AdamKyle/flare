@@ -26,6 +26,8 @@ class ItemModifiers extends Component
         ItemEffectsValue::MASS_EMBEZZLE,
         ItemEffectsValue::QUEEN_OF_HEARTS,
         ItemEffectsValue::PURGATORY,
+        ItemEffectsValue::FACTION_POINTS,
+        ItemEffectsValue::GET_COPPER_COINS,
     ];
 
     public $editing = false;

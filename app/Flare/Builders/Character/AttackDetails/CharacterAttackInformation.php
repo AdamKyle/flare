@@ -2,22 +2,16 @@
 
 namespace App\Flare\Builders\Character\AttackDetails;
 
+use App\Flare\Builders\Character\ClassDetails\ClassBonuses;
 use App\Flare\Builders\Character\Traits\FetchEquipped;
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Models\Character;
-use App\Flare\Models\GameClass;
-use App\Flare\Models\GameMap;
-use App\Flare\Models\InventorySlot;
 use App\Flare\Models\ItemAffix;
-use App\Flare\Models\Map;
-use App\Flare\Models\SetSlot;
-use App\Flare\Traits\ClassBasedBonuses;
-use App\Flare\Values\CharacterClassValue;
 use Illuminate\Support\Collection;
 
 class CharacterAttackInformation {
 
-    use ClassBasedBonuses, FetchEquipped;
+    use FetchEquipped;
 
     /**
      * @var Character $character

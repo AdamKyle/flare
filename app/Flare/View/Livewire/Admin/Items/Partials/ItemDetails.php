@@ -135,6 +135,8 @@ class ItemDetails extends Component
         'item.devouring_light'                  => 'nullable',
         'item.devouring_darkness'               => 'nullable',
         'item.drop_location_id'                 => 'nullable',
+        'item.xp_bonus'                         => 'nullable',
+        'item.ignores_caps'                     => 'nullable',
     ];
 
     protected $messages = [
@@ -166,6 +168,10 @@ class ItemDetails extends Component
 
             if (is_null($this->item->can_resurrect)) {
                 $this->item->can_resurrect = false;
+            }
+
+            if (is_null($this->item->ignores_caps)) {
+                $this->item->ignores_caps = false;
             }
 
             if (is_null($this->item->usable)) {

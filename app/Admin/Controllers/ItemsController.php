@@ -56,7 +56,28 @@ class ItemsController extends Controller {
      * @codeCoverageIgnore
      */
     public function export(Request $request) {
-        $response = Excel::download(new ItemsExport($request->has('affixes')), 'items.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+        $types = [
+            'weapons' => [
+                'weapon', 'bow'
+            ],
+            'armour' => [
+                'helmet', 'body', 'leggings', 'sleeves', 'feet', 'shield', 'gloves'
+            ],
+            'rings' => [
+                'ring'
+            ],
+            'quest' => [
+                'quest'
+            ],
+            'alchemy' => [
+                'alchemy'
+            ],
+            'artifacts' => [
+                'artifact'
+            ]
+        ];
+
+        $response = Excel::download(new ItemsExport($types[$request->type_to_export]), 'items.xlsx', \Maatwebsite\Excel\Excel::XLSX);
         ob_end_clean();
 
         return $response;

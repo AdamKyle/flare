@@ -58,12 +58,14 @@ export default class InventoryDetails extends React.Component {
         <Card>
           <Card.Body>
             <dl>
-              <dt>Total gold:</dt>
+              <dt>Total Gold:</dt>
               <dd>{this.state.inventoryBaseInfo.gold}</dd>
-              <dt>Total gold dust:</dt>
+              <dt>Total Gold Dust:</dt>
               <dd>{this.state.inventoryBaseInfo.gold_dust}</dd>
-              <dt>Total shards:</dt>
+              <dt>Total Shards:</dt>
               <dd>{this.state.inventoryBaseInfo.shards}</dd>
+              <dt>Total Copper Coins:</dt>
+              <dd>{this.state.inventoryBaseInfo.copper_coins}</dd>
               <dt>Used / Max inventory space:</dt>
               <dd>{this.state.inventoryBaseInfo.inventory_used} / {this.state.inventoryBaseInfo.inventory_max}</dd>
               <dt>Stat to focus on for max damage:</dt>

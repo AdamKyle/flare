@@ -603,6 +603,7 @@ class CharacterFactory {
      */
     protected function assignBaseSkills() {
         $accuracy        = $this->createGameSkill(['name' => 'Accuracy']);
+        $timeout         = $this->createGameSkill(['name' => 'Fighters Timeout', 'type' => SkillTypeValue::EFFECTS_BATTLE_TIMER]);
         $castingAccuracy = $this->createGameSkill(['name' => 'Casting Accuracy']);
         $criticality     = $this->createGameSkill(['name' => 'Criticality']);
         $dodge           = $this->createGameSkill(['name' => 'Dodge']);
@@ -612,6 +613,11 @@ class CharacterFactory {
         $this->createSkill([
             'character_id'  => $this->character->id,
             'game_skill_id' => $accuracy->id,
+        ]);
+
+        $this->createSkill([
+            'character_id'  => $this->character->id,
+            'game_skill_id' => $timeout->id,
         ]);
 
         $this->createSkill([
