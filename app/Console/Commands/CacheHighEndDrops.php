@@ -6,6 +6,9 @@ use App\Flare\Models\Item;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 
+/**
+ * @codeCoverageIgnore
+ */
 class CacheHighEndDrops extends Command
 {
     /**

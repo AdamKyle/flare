@@ -15,10 +15,10 @@ class HealingExtraActionHandler {
 
     public function healSpells(CharacterInformationBuilder $characterInformationBuilder, int $characterHealth, bool $voided = false): int {
 
-        $critcialChance = $characterInformationBuilder->getSkill('Criticality');
+        $criticalChance = $characterInformationBuilder->getSkill('Criticality');
         $healFor        = $characterInformationBuilder->buildHealFor($voided);
 
-        $dc = 100 - 100 * $critcialChance;
+        $dc = 100 - 100 * $criticalChance;
 
         if (rand(1, 100) > $dc) {
             $message = 'The heavens open and your wounds start to heal over (Critical heal!)';
@@ -50,7 +50,7 @@ class HealingExtraActionHandler {
 
             $message          = 'The Lords Blessing washes over you. Your healing spells fire again!';
 
-            $this->messages   = $this->addMessage($message, 'enemy-action-fired', $this->messages);
+            $this->messages   = $this->addMessage($message, 'action-fired', $this->messages);
 
             $healFor          = $characterInformationBuilder->buildHealFor();
 
@@ -60,7 +60,7 @@ class HealingExtraActionHandler {
 
             if (rand(1, 100) > $dc) {
                 $message = 'The heavens open and your wounds start to heal over (Critical heal!)';
-                $this->messages = $this->addMessage($message, 'enemy-action-fired', $this->messages);
+                $this->messages = $this->addMessage($message, 'action-fired', $this->messages);
 
                 $healFor *= 2;
             }
@@ -69,7 +69,7 @@ class HealingExtraActionHandler {
 
             $message          = 'Your healing spell(s) heals for: ' . number_format($healFor);
 
-            $this->messages   = $this->addMessage($message, 'enemy-action-fired', $this->messages);
+            $this->messages   = $this->addMessage($message, 'action-fired', $this->messages);
         }
 
         return $characterHealth;

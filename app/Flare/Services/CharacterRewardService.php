@@ -212,11 +212,16 @@ class CharacterRewardService {
      * @throws \Exception
      */
     protected function distributeCopperCoins(Monster $monster) {
+        $item      = ItemModel::where('effect', ItemEffectsValue::GET_COPPER_COINS)->first();
+
+        if (is_null($item)) {
+            return;
+        }
+
         $gameMap = GameMap::find($monster->game_map_id);
 
         if ($gameMap->mapType()->isPurgatory()) {
             $inventory = Inventory::where('character_id', $this->character->id)->first();
-            $item      = ItemModel::where('effect', ItemEffectsValue::GET_COPPER_COINS)->first();
             $slot      = InventorySlot::where('inventory_id', $inventory->id)->where('item_id', $item->id)->first();
 
             if (!is_null($slot)) {

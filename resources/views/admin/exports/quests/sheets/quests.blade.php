@@ -7,6 +7,7 @@
         <th>gold_dust_cost</th>
         <th>shard_cost</th>
         <th>gold_cost</th>
+        <th>copper_coin_cost</th>
         <th>reward_item</th>
         <th>reward_gold_dust</th>
         <th>reward_shards</th>
@@ -30,6 +31,7 @@
             <td>{{$quest->gold_dust_cost}}</td>
             <td>{{$quest->shard_cost}}</td>
             <td>{{$quest->gold_cost}}</td>
+            <td>{{$quest->copper_coin_cost}}</td>
             <td>{{!is_null($quest->rewardItem) ? $quest->rewardItem->name : ''}}</td>
             <td>{{$quest->reward_gold_dust}}</td>
             <td>{{$quest->reward_shards}}</td>

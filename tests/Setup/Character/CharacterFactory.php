@@ -365,7 +365,7 @@ class CharacterFactory {
      * @return CharacterFactory
      */
     public function givePlayerLocation(int $x = 16, int $y = 16): CharacterFactory {
-        $gameMap = GameMap::all();
+        $gameMap = GameMap::where('default', true)->get();
         $id      = 0;
 
         if ($gameMap->isNotEmpty()) {

@@ -6,6 +6,9 @@ use Illuminate\Console\Command;
 use App\Flare\Models\Kingdom;
 use App\Flare\Jobs\MergeDuplicateKingdomUnits as MergeDuplicateKingdomUnitsJob;
 
+/**
+ * @codeCoverageIgnore
+ */
 class MergeDuplicateKingdomUnits extends Command
 {
     /**

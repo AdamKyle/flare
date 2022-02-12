@@ -21,6 +21,7 @@ class Details extends Component
         'quest.gold_dust_cost'     => 'nullable',
         'quest.shard_cost'         => 'nullable',
         'quest.gold_cost'          => 'nullable',
+        'quest.copper_coin_cost'   => 'nullable',
         'quest.reward_item'        => 'nullable',
         'quest.reward_gold_dust'   => 'nullable',
         'quest.reward_shards'      => 'nullable',

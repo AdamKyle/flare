@@ -278,6 +278,10 @@ class AttackExtraActionHandler {
     }
 
     private function canUse(float $chance): bool {
+        if ($chance >= 1.0) {
+            return true;
+        }
+
         $dc = 100 - 100 * $chance;
 
         return rand(1, 100) > $dc;
@@ -291,7 +295,7 @@ class AttackExtraActionHandler {
         $castingAccuracyBonus = $character->getInformation()->getSkill('Casting Accuracy');
         $focus                = $character->getInformation()->statMod('focus');
 
-        if ($spellEvasion > 1.0) {
+        if ($spellEvasion >= 1.0) {
             $this->messages = $this->addMessage('The enemy evades your spells', 'enemy-action-fired', $this->messages);
 
             return 0.0;

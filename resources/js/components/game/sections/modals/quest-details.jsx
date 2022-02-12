@@ -222,6 +222,10 @@ export default class QuestDetails extends React.Component {
                   If this NPC only accepts currency, you should probably do the quests in order,
                   specially if they have another quest where the currency is the same and of higher requirement.
                 </p>
+                <p>
+                  If this quest requires copper coins, you will have to do a Quest line in Hell first to unlock Copper coins to drop off
+                  monsters in Purgatory. Copper coins will never be rewarded for completing a quest.
+                </p>
                 <hr />
                 <div className="mt-3">
                   <Tabs defaultActiveKey="base-required-info" id="quest-info">
@@ -250,6 +254,15 @@ export default class QuestDetails extends React.Component {
                             <Fragment>
                               <dt>Shards Cost:</dt>
                               <dd>{this.formatNumber(this.props.quest.shard_cost)}</dd>
+                            </Fragment>
+                            :
+                            null
+                        }
+                        {
+                          this.props.quest.copper_coin_cost !== null ?
+                            <Fragment>
+                              <dt>Copper Coin Cost:</dt>
+                              <dd>{this.formatNumber(this.props.quest.copper_coin_cost)}</dd>
                             </Fragment>
                             :
                             null

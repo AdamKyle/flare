@@ -9,6 +9,7 @@ use App\Flare\Models\GameClass;
 use App\Flare\Models\User;
 use Tests\TestCase;
 use Tests\Traits\CreateGameSkill;
+use Tests\Traits\CreatePassiveSkill;
 use Tests\Traits\CreateRace;
 use Tests\Traits\CreateClass;
 use Tests\Traits\CreateCharacter;
@@ -24,7 +25,8 @@ class RegistrationControllerTest extends TestCase
         CreateUser,
         CreateItem,
         CreateCharacter,
-        CreateGameSkill;
+        CreateGameSkill,
+        CreatePassiveSkill;
 
     public function setUp(): void {
         parent::setUp();
@@ -35,12 +37,14 @@ class RegistrationControllerTest extends TestCase
             'base_damage' => 3,
         ]);
 
-        $gameMap = GameMap::create([
+        GameMap::create([
             'name'          => 'Surface',
             'path'          => 'test path',
             'default'       => true,
             'kingdom_color' => '#ffffff',
         ]);
+
+        $this->createPassiveSkill();
     }
 
     public function tearDown(): void {

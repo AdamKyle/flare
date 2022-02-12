@@ -5,7 +5,9 @@ namespace App\Flare\Builders;
 use App\Flare\Builders\Character\AttackDetails\CharacterAttackInformation;
 use App\Flare\Builders\Character\BaseCharacterInfo;
 use App\Flare\Models\Character;
+use App\Flare\Models\GameMap;
 use App\Flare\Models\ItemAffix;
+use App\Flare\Models\Map;
 use App\Flare\Values\ItemEffectsValue;
 use Illuminate\Support\Collection;
 
@@ -118,10 +120,6 @@ class CharacterInformationBuilder {
      * @return ItemAffix|null
      */
     public function findPrefixStatReductionAffix(): ?ItemAffix {
-        if ($this->character->map->gameMap->mapType()->isPurgatory()) {
-            return null;
-        }
-
         return $this->characterAttackInformation
                     ->setCharacter($this->character)
                     ->findPrefixStatReductionAffix();
@@ -195,29 +193,6 @@ class CharacterInformationBuilder {
         return $this->baseCharacterInfo->buildDefence($this->character, $voided);
     }
 
-    /**
-     * Build the characters damage stat.
-     *
-     * @param bool $voided
-     * @return float|int
-     * @throws \Exception
-     */
-    public function buildCharacterDamageStat(bool $voided = false): float|int {
-        $characterDamageStat = $this->statMod($this->character->damage_stat);
-
-        if ($voided) {
-            $characterDamageStat = $this->character->{$this->character->damage_stat};
-        }
-
-        $classType = $this->character->classType();
-
-        if ($classType->isFighter() || $classType->isRanger() || $classType->isThief()) {
-            return $characterDamageStat * 0.15;
-        }
-
-        return $characterDamageStat * 0.05;
-    }
-
 
     /**
      * Build heal for
@@ -240,17 +215,6 @@ class CharacterInformationBuilder {
     public function hasArtifacts(): bool {
         return $this->fetchInventory()->filter(function ($slot) {
             return $slot->item->type === 'artifact' && $slot->equipped;
-        })->isNotEmpty();
-    }
-
-    /**
-     * Does the character have any items with affixes?
-     *
-     * @return bool
-     */
-    public function hasAffixes(): bool {
-        return $this->fetchInventory()->filter(function ($slot) {
-            return !is_null($slot->item->itemPrefix || (!is_null($slot->item->itemSuffix)) && $slot->equipped);
         })->isNotEmpty();
     }
 

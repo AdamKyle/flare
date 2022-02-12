@@ -43,7 +43,7 @@ class FactionHandler {
             return;
         }
 
-        if ($this->playerHasQuestItem($character)) {
+        if ($this->playerHasQuestItem($character) && $faction->current_level >= 1) {
             $faction->current_points += 10;
         } else {
             $faction->current_points += FactionLevel::gatPointsPerLevel($faction->current_level);
@@ -216,6 +216,6 @@ class FactionHandler {
              return false;
         }
 
-        return is_null(InventorySlot::where('inventory_id', $inventory->id)->where('item_id', $item->id)->first());
+        return !is_null(InventorySlot::where('inventory_id', $inventory->id)->where('item_id', $item->id)->first());
     }
 }
