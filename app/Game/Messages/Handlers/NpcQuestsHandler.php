@@ -36,7 +36,6 @@ class NpcQuestsHandler {
         $finishedAtLeastOneQuest = false;
 
         foreach ($quests as $quest) {
-
             if ($this->shouldBailOnQuest($character, $npc, $quest, $completedQuests)) {
                 continue;
             }
@@ -259,19 +258,19 @@ class NpcQuestsHandler {
     public function canPay(Character $character, Quest $quest) : bool {
         $canPay = true;
 
-        if (!is_null($quest->gold_cost)) {
+        if ($quest->gold_cost > 0) {
             $canPay = $character->gold >= $quest->gold_cost;
         }
 
-        if (!is_null($quest->gold_dust_cost)) {
+        if ($quest->gold_dust_cost > 0) {
             $canPay = $character->gold_dust >= $quest->gold_dust_cost;
         }
 
-        if (!is_null($quest->shard_cost)) {
+        if ($quest->shard_cost > 0) {
             $canPay = $character->shards >= $quest->shard_cost;
         }
 
-        if (!is_null($quest->copper_coin_cost)) {
+        if ($quest->copper_coin_cost > 0) {
             $canPay = $character->copper_coins >= $quest->copper_coin_cost;
         }
 
