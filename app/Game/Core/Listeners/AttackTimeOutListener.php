@@ -51,7 +51,7 @@ class AttackTimeOutListener
     protected function findTimeReductions(Character $character) {
 
         $gameSkill = GameSkill::where('type', '=', SkillTypeValue::EFFECTS_BATTLE_TIMER)->first();
-        $skill     = Skill::where('character_id', $character)->where('game_skill_id', $gameSkill->id)->first();
+        $skill     = Skill::where('character_id', $character->id)->where('game_skill_id', $gameSkill->id)->first();
 
         if (is_null($skill)) {
             return 0;
