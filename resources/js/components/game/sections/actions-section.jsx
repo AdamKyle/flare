@@ -214,13 +214,13 @@ export default class ActionsSection extends React.Component {
     if (this.props.attackAutomationIsRunning) {
       return (
         <span className="tw-text-green-600">
-          <i className="ra ra-muscle-fat"></i> Auto Attack
+          <i className="ra ra-muscle-fat"></i> Exploration
         </span>
       )
     }
 
     return (
-      <span>Auto Attack</span>
+      <span>Exploration</span>
     )
   }
 
@@ -419,7 +419,7 @@ export default class ActionsSection extends React.Component {
               </Col>
             </div>
           </Tab>
-          <Tab eventKey="auto-attack" title={this.buildAutomationAttackTabTitle()} disabled={this.state.cannotAutoAttack || this.state.isAdventuring || this.state.isDead}>
+          <Tab eventKey="exploration" title={this.buildAutomationAttackTabTitle()} disabled={this.state.cannotAutoAttack || this.state.isAdventuring || this.state.isDead}>
             <AutoAttackSection
               character={this.state.character}
               monsters={this.state.monsters}

@@ -20,7 +20,6 @@ use App\Game\Core\Services\GoldRush;
 use App\Game\Skills\Services\DisenchantService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
-use App\Flare\Transformers\CharacterSheetTransformer;
 use App\Flare\Transformers\KingdomTransformer;
 use App\Game\Battle\Services\ConjureService;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
@@ -38,7 +37,7 @@ class ServiceProvider extends ApplicationServiceProvider
             return new ConjureService(
                 $app->make(Manager::class),
                 $app->make(KingdomTransformer::class),
-                $app->make(CharacterSheetTransformer::class),
+                $app->make(CharacterSheetBaseInfoTransformer::class),
                 $app->make(NpcServerMessageBuilder::class),
             );
         });

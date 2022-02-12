@@ -2,12 +2,10 @@
 
 namespace App\Game\Core\Listeners;
 
-use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
-use App\Flare\Transformers\CharacterTopBarTransformer;
-use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use League\Fractal\Resource\Item;
 use League\Fractal\Manager;
-use App\Flare\Transformers\CharacterSheetTransformer;
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
+use App\Flare\Transformers\CharacterTopBarTransformer;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Game\Core\Events\UpdateTopBarBroadcastEvent;
 

@@ -51,7 +51,6 @@ use App\Flare\Services\CharacterRewardService;
 use App\Flare\Services\FightService;
 use App\Flare\Transformers\KingdomBuildingTransformer;
 use App\Flare\Transformers\CharacterAttackTransformer;
-use App\Flare\Transformers\CharacterSheetTransformer;
 use App\Flare\Transformers\ItemTransfromer;
 use App\Flare\Transformers\KingdomTransformer;
 use App\Flare\Transformers\MarketItemsTransfromer;
@@ -171,10 +170,6 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(CharacterAttackTransformer::class, function($app) {
             return new CharacterAttackTransformer();
-        });
-
-        $this->app->bind(CharacterSheetTransformer::class, function($app){
-            return new CharacterSheetTransformer();
         });
 
         $this->app->bind(CharacterSheetBaseInfoTransformer::class, function() {

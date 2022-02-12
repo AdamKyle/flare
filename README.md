@@ -49,6 +49,16 @@ There are many ways you can catch up. You could be the type of player who runs a
 
 # Development and Testing
 
+Planes of Tlessa does not use Docker or Vagrant. We run off the metal. This means you will need a few tabs open:
+
+- php artisan serve
+- php artisan websockets:serve
+- php artisan horizon
+- yarn watch
+
+These are all run through supervisor jobs (except the last one) on production. If you choose to docker-ize the app then you will need to make
+sure that these also run. Yarn watch should be converted to some command that refreshes the browser from docker.
+
 ## Getting started with Development:
 
 - `git clone ...`
@@ -65,47 +75,6 @@ There are many ways you can catch up. You could be the type of player who runs a
 <sup>*</sup> See setting up an email below.
 
 <sup>**</sup> The information section is composed of mark down files. This is very experimental at the moment. It takes a series of mark down files, converts them into one document and displays it to the user. The information section is like a Help section.
-
-## Copy of prod.
-
-While it is possible to set up Planes of Tlessa from scratch, you would also need to do the imports, which are in `/resources/data-imports` in a specific order:
-
-- Maps must be imported first. (/resources/maps)
-- Next import passive skills
-- import skills
-- import kingdoms
-- import affixes
-- import items (set one then set two)
-- import npcs
-- import quests
-
-You can ask on discord for a copy of Production database which has everything set up. This database will be emailed to you at your request and will contain no sensitive
-information. You will have all the characters as they are, an admin account. You can then use the appropriate tools to change data to use an existing character.
-
-All user info will be changed.
-
-## Importing the images
-
-Once you have the database in place, next copy the maps from `/resources/backups/maps` copy the whole directory to Public/Storage/
-
-If you do not have a public storage remember to use: `php artisan storage:link`
-
-Once this is done, next run (in order):
-
-- php artisan cache:clear
-- php artisan cache:droppable-items
-- php artisan cache:high-end-items
-
-These last two will cache items that can be given to players.
-
-Finally, do `php artisan tinker` and run:
-
-- `resolve(App\Flare\Services\BuildMonsterCacheService::class)->buildCache()`
-
-
-This allows you to face off against monsters in special locations
-
-With that done. You have the game imported.
 
 ## Redis
 
@@ -152,9 +121,45 @@ In the ENV example file is some extra bits you can set:
 
 ## Setting up Email:
 
-This game, for the admin section at the time of this writing, requires a way to send out emails. 
+This game, for the admin section at the time of this writing, requires a way to send out emails.
 
 For example, you can read [here](https://medium.com/@agavitalis/how-to-send-an-email-in-laravel-using-gmail-smtp-server-53d962f01a0c) about setting up gmail with laravel.
+
+## Setting up the database
+
+When setting up the databsse you need to things in order, or you can get unexpected results. Follow the steps below to get Tlessa up and running:
+
+- php artisan storage:link
+- php artisan migrate
+- php artisan migrate:seed
+- php artisan create:admin youremail@email.com (an email will be sent to you, so make sure email s configured properly.)
+- Maps must be imported first. (/resources/maps)
+
+The next set of steps requires you to use the excel sheets in resources/data-imports:
+
+- Next import passive skills
+- import skills
+- import kingdoms
+- import affixes
+- import items (from /resources/data-imports/items - import all these files in any order)
+- import npcs
+- import quests
+- import monsters
+
+There is no location export data, so your maps won't have locations or ports, you are free to set this up your self. However, in the QuestItems excel there are specific locations
+for some quest items to drop. You can create locations with the same name before importing the quest items.
+
+## Caching Things
+
+Next we need to cache monsters for various maps, locations and so on.
+
+Finally, do `php artisan tinker` and run:
+
+- `resolve(App\Flare\Services\BuildMonsterCacheService::class)->buildCache()`
+
+This allows you to face off against monsters in special locations
+
+With that done. You have the game imported.
 
 ## Testing
 

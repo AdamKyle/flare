@@ -66,7 +66,7 @@ class CelestialBattleControllerApiTest extends TestCase {
             'gold_dust_cost'      => 1000,
         ]);
 
-        $character = $this->character->getCharacter(false);
+        $character = $this->character->getCharacter(true);
 
         $response = $this->actingAs($character->user)
             ->json('POST', '/api/conjure/' . $character->id, [

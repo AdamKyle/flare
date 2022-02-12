@@ -3,6 +3,7 @@
 namespace App\Game\Battle\Services;
 
 use App\Flare\Models\GameMap;
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Values\MapNameValue;
 use App\Game\Maps\Events\UpdateMapDetailsBroadcast;
 use App\Game\Maps\Services\MovementService;
@@ -13,7 +14,6 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Npc;
-use App\Flare\Transformers\CharacterSheetTransformer;
 use App\Flare\Transformers\KingdomTransformer;
 use App\Flare\Values\NpcTypes;
 use App\Game\Battle\Values\CelestialConjureType;
@@ -37,7 +37,7 @@ class ConjureService {
 
     private $npcServerMessageBuilder;
 
-    public function __construct(Manager $manager, KingdomTransformer $kingdom, CharacterSheetTransformer $characterSheetTransformer, NpcServerMessageBuilder $npcServerMessageBuilder) {
+    public function __construct(Manager $manager, KingdomTransformer $kingdom, CharacterSheetBaseInfoTransformer $characterSheetTransformer, NpcServerMessageBuilder $npcServerMessageBuilder) {
         $this->manager                 = $manager;
         $this->kingdomTransformer      = $kingdom;
         $this->characterTransformer    = $characterSheetTransformer;

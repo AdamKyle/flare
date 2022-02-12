@@ -568,42 +568,64 @@ export default class AutoAttackSection extends React.Component {
           <Tab eventKey="help" title="Help">
             <div className="mt-4">
               <div className="tw-overflow-y-auto tw-h-60">
-                <AlertWarning icon={'fas fa-exclamation-triangle'} title={"ATTN!"}>
-                  <p>If you log out or your session dies, <strong>this will stop</strong>. If you die, <strong>this will stop</strong>.</p>
-                  <p>Once you reach a total of 8 hours, at once (see below about refreshing) <strong>This will stop</strong> AND <strong>You wont be able
-                  to initiate another auto battle for the rest of the day.</strong></p>
-                </AlertWarning>
-                <p className="tw-text-red-700">
-                  This feature was designed for players who want to play with this game in a separate tab and check on it every once in a while. Not for
-                  players who want to set it and forget it. That is not Tlessa!
-                </p>
-                <h3>What can I do while this is running?</h3>
                 <p>
-                  While the auto attack runs, you can still craft, enchant, craft alchemical items, move around (but not traverse, teleport or set sail) and manage your kingdoms.
-                  You will not be able to traverse, go on adventures or take part in Celestial fights, including being able to instantly teleport to one.
-                  You will also not be able to complete quests or interact with NPC's. Quest drops are fine, but the interacting with NPC's,
-                  they will tell you "you are too busy". You will also not be able to use any items be it on your self or kingdoms and you cannot wage war.
+                  Exploration is similar to <a href="/information/adventure">Adventures</a>, with the exception that they
+                  do not lock you out of doing specific action, but <strong>do let you log out</strong>.
                 </p>
-                <p>You also cannot manage your character in terms of equipping, changing sets or manging training based skills.</p>
-                <p><em>Don't look at me like that child, you can't be able to wage a war and fight a beast at the same time. You need to focus on one thing at a time.</em></p>
-                <h3>Why can't I just leave this running for ever?</h3>
                 <p>
-                  Planes of Tlessa is an active game. To keep you coming back, we limit the time frame this feature can run in.
-                  Your session also expires after 90 minutes of inactivity. Most players will come back before the session expires
-                  to refresh the page.
+                  while on a mission you can:
                 </p>
-                <h3>So I can just refresh every 85 minutes or so and go for ever?</h3>
+                <ul>
+                  <li>Move, but not teleport, set sail, traverse or use /PCT to move to and engage with celestials.</li>
+                  <li>Manage your kingdoms, but not: wage war or use items on other kingdoms</li>
+                  <li>Manage equipment, to an extent. You cannot equip items, but you can move items to other sets, destroy and disenchant items.</li>
+                  <li>Manage your Passive skills, Craft, Enchant but not: Switch which skill is in training.</li>
+                </ul>
+                <p>You cannot use the shop or visit the market. You cannot enter special locations while you are exploring.</p>
                 <p>
-                  Yes and no. If the auto attack has run for longer then 8 hours<sup>*</sup> it will cut out and you wont be able to
-                  set up auto attack for the rest of the day. Tlessa wants you engaged with the game and the community, this is just an
-                  additional part to take some of the strain of leveling out.
+                  Exploration works differently from adventures such that every 10 minutes your character will do 4 actions, all of them give you XP.
                 </p>
-                <p><sup>*</sup> That's 8 <strong>full uninterrupted hours</strong>. Doing it in pieces, 2 hours here, 4 hours there and 6 hours an hour later will <strong>NOT</strong>
-                count towards the 8 hour limit.</p>
-                <AlertInfo icon={'fas fa-question-circle'} title={"ATTN!"}>
-                  <p>Tlessa was never intended to be an idle game, and while idle features do make their way in, they come with limitations.</p>
-                  <p>The auto attack is the only automatic feature that will stop you from being able to set it up again after the max time has passed.</p>
-                </AlertInfo>
+                <p>While exploring, every ten minutes your character will:</p>
+                <ul>
+                  <li>Explore the area around them (can find items and gold), rewards 5 XP</li>
+                  <li>Fight (fights the selected monster) (50% chance)</li>
+                  <li>Investigate (can trigger a fight or reward with gold and items - if no monster is fought, you get 5xp)</li>
+                  <li>Plunder (fights the selected monster 1-6 times)</li>
+                </ul>
+                <p>
+                  At the end of the "encounter" we will reward bonus XP and Faction points:
+                </p>
+                <ul>
+                  <li>
+                    +200 XP (2 levels)
+                  </li>
+                  <li>
+                    +5 Faction Points (if you have a quest item you will get 50 if you are above level 0. Else you will get 5)
+                  </li>
+                  <li>
+                    +10,000 Gold
+                  </li>
+                </ul>
+                <p>
+                  Once Exploration timer is done we give you a total bonus reward:
+                </p>
+                <ul>
+                  <li>
+                    +1000 XP (10 levels)
+                  </li>
+                  <li>
+                    +100 FactionPoints (if you have a quest item you will get 1000 if you are above level 0. Else you will get 100)
+                  </li>
+                  <li>
+                    +X Million Gold (25 For 1 Hour, 50 for 2 hours, 75 for 4 hours, 125 for 8 hours)
+                  </li>
+                </ul>
+                <p>Should you die, this will end and we will show you, where the timer is, the result of the last battle message so you can see why you died. If you are logged out, you will not be able to
+                know what killed you as the Event Log tab below works like server messages, they are not saved.</p>
+                <p>Should you choose to do the 8 hour mark, you will be locked out of explorations till the next real world day at 12pm GMT -7</p>
+                <p>You can do Exploration in bits and pieces, such an hour here and a 4 over there and 6 an hour later, <strong>this will not count towards the 8 hour mark.</strong></p>
+                <p>Each action will spit out to the Event Logs tab down in the chat section, we will not show you the results of battles unless you die.</p>
+                <p>Finally, all rewards listed above will be given to you automatically and we do respect auto disenchanting <a href="/information/settings">settings</a>.</p>
               </div>
             </div>
           </Tab>
