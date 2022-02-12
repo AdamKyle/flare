@@ -82,7 +82,7 @@ class CharacterAttackInformation {
 
     /**
      * Get affix information.
-     * 
+     *
      * @return CharacterAffixInformation
      */
     public function getAffixInformation(): CharacterAffixInformation {

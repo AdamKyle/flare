@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Cache;
 use League\Fractal\TransformerAbstract;
 use App\Flare\Models\Character;
 
-class CharacterAttackTransformer extends TransformerAbstract {
+class CharacterAttackTransformer extends BaseTransformer {
 
 
     /**
@@ -28,8 +28,8 @@ class CharacterAttackTransformer extends TransformerAbstract {
             'id'                          => $character->id,
             'name'                        => $character->name,
             'class'                       => $gameClass->name,
-            'dex'                         => $this->fetchStats($character, 'dex_modded'),
-            'dur'                         => $this->fetchStats($character, 'dur_modded'),
+            'dex_modded'                  => $this->fetchStats($character, 'dex_modded'),
+            'dur_modded'                  => $this->fetchStats($character, 'dur_modded'),
             'focus'                       => $this->fetchStats($character, 'focus_modded'),
             'voided_dex'                  => $character->dex,
             'voided_dur'                  => $character->dur,
@@ -59,65 +59,5 @@ class CharacterAttackTransformer extends TransformerAbstract {
             'can_auto_battle'             => $character->user->can_auto_battle,
             'can_attack_again_at'         => $character->can_attack_again_at,
         ];
-    }
-
-    public function fetchAttackTypes(Character $character): array {
-        $cache = Cache::get('character-attack-data-' . $character->id);
-
-        if (is_null($cache)) {
-            return [];
-        }
-
-        return $cache['attack_types'];
-    }
-
-    public function fetchStats(Character $character, string $stat): mixed {
-        $cache = Cache::get('character-attack-data-' . $character->id);
-
-        if (is_null($cache)) {
-            return 0.0;
-        }
-
-        return $cache['character_data'][$stat];
-    }
-
-    public function fetchStatAffixes(Character $character): array {
-        $cache = Cache::get('character-attack-data-' . $character->id);
-
-        if (is_null($cache)) {
-            return [];
-        }
-
-        return $cache['stat_affixes'];
-    }
-
-    public function fetchSkills(Character $character): array {
-        $cache = Cache::get('character-attack-data-' . $character->id);
-
-        if (is_null($cache)) {
-            return [];
-        }
-
-        $skills = $cache['skills'];
-
-        sort($skills);
-
-        return $skills;
-    }
-
-    private function isAlchemyLocked(Character $character) {
-        $alchemy = GameSkill::where('type', SkillTypeValue::ALCHEMY)->first();
-
-        if (is_null($alchemy)) {
-            return true;
-        }
-
-        $skill = Skill::where('game_skill_id', $alchemy->id)->where('character_id', $character->id)->first();
-
-        if (!is_null($skill)) {
-            return $skill->is_locked;
-        }
-
-        return true;
     }
 }

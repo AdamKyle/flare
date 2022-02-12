@@ -1,4 +1,4 @@
-import React, {Fragment} from 'react';
+ import React, {Fragment} from 'react';
 import {OverlayTrigger, Tooltip} from 'react-bootstrap';
 import { v4 as uuidv4 } from 'uuid';
 import Attack from '../battle/attack/attack';
@@ -300,11 +300,10 @@ export default class FightSection extends React.Component {
     }
 
     let health    = monsterInfo.monsterHP();
-    let maxHealth = health;
+    const maxHealth = health;
 
     if (keepHealth) {
-      health    = this.state.monsterCurrentHealth
-      maxHealth = this.state.monsterMaxHealth
+      health    = this.state.monsterCurrentHealth;
     }
 
     let characterMaxHealth = this.props.character.health;
@@ -317,10 +316,10 @@ export default class FightSection extends React.Component {
       battleMessages: keepHealth ? this.state.battleMessages : [],
       missCounter: 0,
       monster: monsterInfo,
-      characterCurrentHealth: 100,
-      characterMaxHealth: 100,
-      monsterCurrentHealth: characterMaxHealth,
-      monsterMaxHealth: characterMaxHealth,
+      characterCurrentHealth: characterMaxHealth,
+      characterMaxHealth: characterMaxHealth,
+      monsterCurrentHealth: health,
+      monsterMaxHealth: maxHealth,
     }, () => {
       this.props.setMonster(null)
     });

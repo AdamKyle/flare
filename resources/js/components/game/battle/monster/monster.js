@@ -16,9 +16,12 @@ export default class Monster {
 
     const healthRange = this.monster.health_range.split('-');
 
-    let health = randomNumber(healthRange[0], healthRange[1]) + this.monster.dur;
+    let health = randomNumber(healthRange[0], healthRange[1]);
 
-    health = health + health * this.monster.increases_damage_by;
+
+    if (this.monster.increases_damage_by !== null) {
+      health = health + health * this.monster.increases_damage_by;
+    }
 
     return parseInt(health);
   }

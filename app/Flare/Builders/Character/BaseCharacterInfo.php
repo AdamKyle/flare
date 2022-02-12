@@ -88,7 +88,7 @@ class BaseCharacterInfo {
             return 0;
         }
 
-        $baseHealth = $character->dur;
+        $baseHealth = $character->getInformation()->statMod('dur');
 
         $equipped   = $this->fetchEquipped($character);
 
@@ -96,15 +96,16 @@ class BaseCharacterInfo {
             return $baseHealth;
         }
 
+        $totalPercent = 0.0;
+
         foreach ($equipped as $slot) {
             if ($slot->equipped) {
                 $percentage = $slot->item->getTotalPercentageForStat('dur');
-
-                $baseHealth += $baseHealth * $percentage;
+                $totalPercent += $percentage;
             }
         }
 
-        return $baseHealth;
+        return $baseHealth + $baseHealth * $totalPercent;
     }
 
     /**

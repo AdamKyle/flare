@@ -22,9 +22,7 @@ use App\Flare\Models\Skill;
 use App\Flare\Values\ClassAttackValue;
 use App\Game\Skills\Values\SkillTypeValue;
 
-class CharacterSheetBaseInfoTransformer extends TransformerAbstract {
-
-    use SkillsTransformerTrait;
+class CharacterSheetBaseInfoTransformer extends BaseTransformer {
 
     /**
      * Gets the response data for the character sheet
@@ -40,9 +38,9 @@ class CharacterSheetBaseInfoTransformer extends TransformerAbstract {
         return [
             'id'                => $character->id,
             'name'              => $character->name,
-            'attack'            => number_format($characterInformation->buildTotalAttack()),
-            'health'            => number_format($characterInformation->buildHealth()),
-            'ac'                => number_format($characterInformation->buildDefence()),
+            'attack'            => number_format($this->fetchStats($character,'attack')),
+            'health'            => number_format($this->fetchStats($character,'health')),
+            'ac'                => number_format($this->fetchStats($character,'ac')),
             'heal_for'          => number_format($characterHealthInformation->buildHealFor()),
             'damage_stat'       => $character->damage_stat,
             'to_hit_stat'       => $character->class->to_hit_stat,
@@ -64,13 +62,13 @@ class CharacterSheetBaseInfoTransformer extends TransformerAbstract {
             'int'               => number_format($character->int),
             'agi'               => number_format($character->agi),
             'focus'             => number_format($character->focus),
-            'str_modded'        => number_format(round($characterInformation->statMod('str'))),
-            'dur_modded'        => number_format(round($characterInformation->statMod('dur'))),
-            'dex_modded'        => number_format(round($characterInformation->statMod('dex'))),
-            'chr_modded'        => number_format(round($characterInformation->statMod('chr'))),
-            'int_modded'        => number_format(round($characterInformation->statMod('int'))),
-            'agi_modded'        => number_format(round($characterInformation->statMod('agi'))),
-            'focus_modded'      => number_format(round($characterInformation->statMod('focus'))),
+            'str_modded'        => number_format($this->fetchStats($character, 'str_modded')),
+            'dur_modded'        => number_format($this->fetchStats($character, 'dur_modded')),
+            'dex_modded'        => number_format($this->fetchStats($character, 'dex_modded')),
+            'chr_modded'        => number_format($this->fetchStats($character, 'chr_modded')),
+            'int_modded'        => number_format($this->fetchStats($character, 'int_modded')),
+            'agi_modded'        => number_format($this->fetchStats($character, 'agi_modded')),
+            'focus_modded'      => number_format($this->fetchStats($character, 'focus_modded')),
             'spell_evasion'     => $characterInformation->getTotalDeduction('spell_evasion'),
             'artifact_anull'    => $characterInformation->getTotalDeduction('artifact_annulment'),
             'healing_reduction' => $characterInformation->getTotalDeduction('healing_reduction'),
@@ -92,48 +90,5 @@ class CharacterSheetBaseInfoTransformer extends TransformerAbstract {
             ],
             'is_alchemy_locked'      => $this->isAlchemyLocked($character),
         ];
-    }
-
-    protected function getMaxLevel(Character $character) {
-        $item      = Item::where('effect', ItemEffectsValue::CONTNUE_LEVELING)->first();
-
-        if (is_null($item)) {
-            return MaxLevel::MAX_LEVEL;
-        }
-
-        $inventory = Inventory::where('character_id', $character->id)->first();
-        $slot      = InventorySlot::where('item_id', $item->id)->where('inventory_id', $inventory->id)->first();
-
-        if (!is_null($slot)) {
-            return MaxLevelConfiguration::first()->max_level;
-        }
-
-        return MaxLevel::MAX_LEVEL;
-    }
-
-    private function isAlchemyLocked(Character $character) {
-
-        $gameSkill = GameSkill::where('type', SkillTypeValue::ALCHEMY)->first();
-
-        if (is_null($gameSkill)) {
-            return true;
-        }
-
-        $skill     = Skill::where('character_id', $character->id)->where('game_skill_id', $gameSkill->id)->first();
-
-        if (!is_null($skill)) {
-            return $skill->is_locked;
-        }
-
-        return true;
-    }
-
-    private function getToHitBase(Character $character, CharacterInformationBuilder $characterInformation, bool $voided = false): int {
-
-        if (!$voided) {
-            return $characterInformation->statMod($character->class->to_hit_stat);
-        }
-
-        return $character->{$character->class->to_hit_stat};
     }
 }

@@ -183,9 +183,9 @@ class TraverseService {
         $gameMap = $character->map->gameMap;
 
         if ($character->map->gameMap->mapType()->isShadowPlane()) {
-            $message = 'As you enter into the Shadow Plane, all you see for miles around are 
-            shadowy figures moving across the land. The color of the land is grey and lifeless. But you 
-            feel the presence of death as it creeps ever closer. 
+            $message = 'As you enter into the Shadow Plane, all you see for miles around are
+            shadowy figures moving across the land. The color of the land is grey and lifeless. But you
+            feel the presence of death as it creeps ever closer.
             (Characters can walk on water here, monster strength is increased by '.($gameMap->enemy_stat_bonus * 100).'% including Devouring Light. You are reduced by '.($gameMap->enemy_stat_bonus * 100).'% (Damage wise) while here.)';
 
             event(new MessageEvent($character->user,  $message));
@@ -196,7 +196,7 @@ class TraverseService {
         if ($character->map->gameMap->mapType()->isHell()) {
             $message = 'The stench of sulfur fills your nose. The heat of the magma oceans bathes over you. Demonic shadows and figures move about the land. Monsters are increased by: ' .
                 ($gameMap->enemy_stat_bonus * 100) . '% while you are reduced by: '.
-                ($gameMap->character_attack_reduction * 100) . '% in both (modified) stats and damage done. Any quest items that make 
+                ($gameMap->character_attack_reduction * 100) . '% in both (modified) stats and damage done. Any quest items that make
                 affixes irresistible will not work down here. Finally, all life stealing affixes be they stackable or not are reduced to half their total output for damage.';
 
             event(new MessageEvent($character->user,  $message));
@@ -207,7 +207,7 @@ class TraverseService {
         if ($character->map->gameMap->mapType()->isPurgatory()) {
             $message = 'The silence of death fills your very being and chills you to bone. Nothing moves amongst the decay and death of this land. Monsters are increased by: ' .
                 ($gameMap->enemy_stat_bonus * 100) . '% while you are reduced by: '.
-                ($gameMap->character_attack_reduction * 100) . '% in both (modified) stats and damage done. Any quest items that make 
+                ($gameMap->character_attack_reduction * 100) . '% in both (modified) stats and damage done. Any quest items that make
                 affixes irresistible will not work down here. Finally, all life stealing affixes be they stackable or not are reduced to half their total output for damage and all
                 resurrection chances are capped at 45% (prophets are capped at 65%). Devouring Light and Darkness are reduced by 45% here.';
 
@@ -294,12 +294,14 @@ class TraverseService {
         }
 
         $characterBaseStats = $this->manager->createData($characterBaseStats)->toArray();
-
+        dump($characterBaseStats);
         broadcast(new UpdateMonsterList($monsters, $user));
 
         event(new UpdateBaseCharacterInformation($user, $characterBaseStats));
 
         event(new UpdateTopBarEvent($character));
+
+
     }
 
     /**
