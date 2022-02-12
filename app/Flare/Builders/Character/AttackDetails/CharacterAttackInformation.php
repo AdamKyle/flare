@@ -81,6 +81,15 @@ class CharacterAttackInformation {
     }
 
     /**
+     * Get affix information.
+     * 
+     * @return CharacterAffixInformation
+     */
+    public function getAffixInformation(): CharacterAffixInformation {
+        return $this->characterAffixInformation;
+    }
+
+    /**
      * Fetch the inventory for the character with equipped items.
      *
      * @return Collection

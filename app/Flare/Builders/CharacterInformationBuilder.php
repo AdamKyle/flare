@@ -392,6 +392,19 @@ class CharacterInformationBuilder {
     }
 
     /**
+     * Finds the life stealing amount for a character.
+     *
+     * @param bool $canStack
+     * @return float
+     */
+    public function findLifeStealingAffixes(bool $canStack = false): float {
+        return $this->characterAttackInformation
+            ->setCharacter($this->character)
+            ->getAffixInformation()
+            ->findLifeStealingAffixes($canStack);
+    }
+
+    /**
      * Does the character have any damage spells
      *
      * @return bool
