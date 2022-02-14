@@ -58,7 +58,7 @@ class MapController extends Controller {
                             ->first();
 
         if (!is_null($location)) {
-            if (!is_null($location->enemy_strength_type) && $character->currentAutomations()->where('type', AutomationType::ATTACK)->get()->isNotEmpty()) {
+            if (!is_null($location->enemy_strength_type) && $character->currentAutomations()->where('type', AutomationType::EXPLORING)->get()->isNotEmpty()) {
                 event(new ServerMessageEvent($character->user, 'No. You are currently auto battling and the monsters here are different. Stop auto battling, then enter, then begin again.'));
                 return response()->json(['message' => 'You\'re too busy.'], 422);
             }
@@ -71,7 +71,7 @@ class MapController extends Controller {
             ->first();
 
         if (!is_null($location)) {
-            if (!is_null($location->enemy_strength_type) && $character->currentAutomations()->where('type', AutomationType::ATTACK)->get()->isNotEmpty()) {
+            if (!is_null($location->enemy_strength_type) && $character->currentAutomations()->where('type', AutomationType::EXPLORING)->get()->isNotEmpty()) {
                 event(new ServerMessageEvent($character->user, 'No. You are currently auto battling and the monsters here are different. Stop auto battling, then enter, then begin again.'));
                 return response()->json(['message' => 'You\'re too busy.'], 422);
             }

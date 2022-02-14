@@ -9,7 +9,7 @@ Route::group(['middleware' => [
     'can.access.market',
 ]], function() {
 
-    Route::middleware(['character.attack.automation'])->group(function() {
+    Route::middleware(['is.character.exploring'])->group(function() {
         Route::get('/market-board/character-items/{character}', ['uses' => 'Api\MarketController@fetchCharacterItems']);
         Route::get('/market-board/item', ['uses' => 'Api\MarketController@fetchItemData']);
         Route::get('/market-board/items', ['uses' => 'Api\MarketController@marketItems']);

@@ -2,7 +2,7 @@
 
 Route::middleware(['auth', 'is.player.banned', 'is.character.who.they.say.they.are'])->group(function() {
 
-    Route::middleware(['character.attack.automation'])->group(function(){
+    Route::middleware(['is.character.exploring'])->group(function(){
         // Adventure:
         Route::post('/character/{character}/adventure/{adventure}', ['uses' => 'Api\AdventureController@adventure']);
 

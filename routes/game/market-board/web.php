@@ -6,7 +6,7 @@ Route::group(['middleware' => [
     'is.character.dead',
     'is.character.adventuring',
     'can.access.market',
-    'character.attack.automation'
+    'is.character.exploring'
 ]], function() {
     Route::get('/market/', ['as' => 'game.market', 'uses' => 'MarketController@index']);
     Route::get('/market/sell', ['as' => 'game.market.sell', 'uses' => 'MarketController@sell']);

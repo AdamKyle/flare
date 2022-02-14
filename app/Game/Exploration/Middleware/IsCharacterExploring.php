@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Game\Automation\Middleware;
+namespace App\Game\Exploration\Middleware;
 
 use App\Game\Automation\Values\AutomationType;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Closure;
 
-class IsCharacterInAttackAutomation
+class IsCharacterExploring
 {
     /**
      * Handle an incoming request.
@@ -26,15 +26,15 @@ class IsCharacterInAttackAutomation
                 event(new ServerMessageEvent(auth()->user(), 'No. You\'re too busy. (Are you auto battling? If so, stop. Then engage the action you want.)'));
 
                 return response()->json([
-                    'error' => 'You are too busy to do that. You are currently auto attacking.',
+                    'error' => 'You are too busy to do that. You are currently exploring.',
                 ], 422);
             }
         } else {
             if ($isTooBusy) {
 
-                event(new ServerMessageEvent(auth()->user(), 'No. You\'re too busy. (Are you auto battling? If so, stop. Then engage the action you want.)'));
+                event(new ServerMessageEvent(auth()->user(), 'No. You\'re too busy. (Are you exploring? Stop exploring and attempt the action again.)'));
 
-                return redirect()->route('game')->with('error', 'You are too busy to do that. You are currently auto attacking.');
+                return redirect()->route('game')->with('error', 'You are too busy to do that. You are currently exploring.');
             }
         }
 

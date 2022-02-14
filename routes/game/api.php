@@ -14,7 +14,7 @@ Route::group(['middleware' => ['auth', 'throttle:100,1', 'is.character.who.they.
     Route::get('/character-base-data/{character}', ['uses' => 'Api\CharacterSheetController@baseCharacterInformation']);
     Route::post('/character-sheet/{character}/name-change', ['uses' => 'Api\CharacterSheetController@nameChange']);
 
-    Route::middleware(['character.attack.automation'])->group(function() {
+    Route::middleware(['is.character.exploring'])->group(function() {
         Route::post('/character-sheet/{character}/remove-boon/{boon}', ['uses' => 'Api\CharacterSheetController@cancelBoon']);
     });
 
@@ -26,7 +26,7 @@ Route::group(['middleware' => ['auth', 'throttle:100,1', 'is.character.who.they.
     Route::get('/character/{character}/inventory', ['uses' => 'Api\CharacterInventoryController@inventory']);
 
     Route::group(['middleware' => ['is.character.dead', 'is.character.adventuring']], function() {
-        Route::middleware(['character.attack.automation'])->group(function() {
+        Route::middleware(['is.character.exploring'])->group(function() {
 
             Route::post('/character/{character}/inventory/destroy', ['uses' => 'Api\CharacterInventoryController@destroy']);
 

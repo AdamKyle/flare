@@ -19,6 +19,7 @@ import MassEmbezzle from "./sections/modals/mass-embezzle";
 import AbandonKingdom from "./sections/modals/abandon-kingdom";
 import ServerMessages from "./messages/server-messages";
 import CharacterSheet from "./character/character-sheet";
+import ExplorationMessages from "./messages/exploration-messages";
 
 export default class Game extends React.Component {
   constructor(props) {
@@ -71,6 +72,7 @@ export default class Game extends React.Component {
       activeChatTab: 'chat',
       showChatUpdate: false,
       showServerMessageUpdate: false,
+      showExplorersLogUpdate: false
     }
 
     this.isDead            = Echo.private('character-is-dead-' + this.props.userId);
@@ -348,7 +350,8 @@ export default class Game extends React.Component {
     this.setState({
       activeChatTab: key,
       showServerMessageUpdate: (key === 'server-messages' && this.state.showServerMessageUpdate) ? false : this.state.showServerMessageUpdate,
-      showChatUpdate: (key === 'chat' && this.state.showChatUpdate) ? false :  this.state.showChatUpdate
+      showChatUpdate: (key === 'chat' && this.state.showChatUpdate) ? false :  this.state.showChatUpdate,
+      showExplorersLogUpdate: (key === 'explorer-messages' && this.state.showExplorersLogUpdate) ? false : this.state.showExplorersLogUpdate,
     })
   }
 
@@ -357,9 +360,17 @@ export default class Game extends React.Component {
       this.setState({
         showServerMessageUpdate: true
       });
-    } else if (!isServerMessage && this.state.activeChatTab !== 'chat') {
+    } else if (!isServerMessage && !this.state.showExplorersLogUpdate && this.state.activeChatTab !== 'chat') {
       this.setState({
-        showChatUpdate: true,
+        showExplorersLogUpdate: true,
+      });
+    }
+  }
+
+  updateExplorerTab() {
+    if (this.state.activeChatTab !== 'explorer-messages') {
+      this.setState({
+        showExplorersLogUpdate: true,
       });
     }
   }
@@ -394,6 +405,23 @@ export default class Game extends React.Component {
     return (
       <Fragment>
         Server
+      </Fragment>
+    )
+  }
+
+  renderExplorationLogsNotificationIcon() {
+
+    if (this.state.showExplorersLogUpdate) {
+      return (
+        <Fragment>
+          Exploration Log <i className="fas fa-bell chat-tab-icon"></i>
+        </Fragment>
+      )
+    }
+
+    return (
+      <Fragment>
+        Exploration Log
       </Fragment>
     )
   }
@@ -549,6 +577,9 @@ export default class Game extends React.Component {
               </Tab>
               <Tab eventKey="server-messages" title={this.renderServerTabNotificationIcon()}>
                 <ServerMessages userId={this.props.userId} updateChatTabIcon={this.updateChatTabIcon.bind(this)} />
+              </Tab>
+              <Tab eventKey="explorer-messages" title={this.renderExplorationLogsNotificationIcon()}>
+                <ExplorationMessages userId={this.props.userId} updateChatTabIcon={this.updateExplorerTab.bind(this)} />
               </Tab>
             </Tabs>
           </Col>

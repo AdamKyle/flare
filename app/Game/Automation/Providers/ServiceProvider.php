@@ -48,6 +48,6 @@ class ServiceProvider extends ApplicationServiceProvider
     {
         $router = $this->app['router'];
 
-        $router->aliasMiddleware('character.attack.automation', IsCharacterInAttackAutomation::class);
+        $router->aliasMiddleware('is.character.exploring', IsCharacterInAttackAutomation::class);
     }
 }

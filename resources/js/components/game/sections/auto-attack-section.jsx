@@ -1,7 +1,6 @@
 import React from 'react';
 import {Col, Tab, Tabs} from "react-bootstrap";
 import AlertWarning from "../components/base/alert-warning";
-import AlertInfo from "../components/base/alert-info";
 import TimeOutBar from "../timeout/timeout-bar";
 import AlertError from "../components/base/alert-error";
 import AttackType from "../battle/attack/attack-type";
@@ -21,7 +20,8 @@ export default class AutoAttackSection extends React.Component {
       errorMessage: null,
       successMessage: null,
       successTitle: null,
-      isLoading: false,
+      isLoading: true,
+      isStarting: false,
       isStopping: false,
       timeRemaining: null,
       showSkillSection: false,
@@ -46,16 +46,20 @@ export default class AutoAttackSection extends React.Component {
   }
 
   componentDidMount() {
-    axios.get('/api/attack-automation/' + this.props.character.id).then((result) => {
+    axios.get('/api/exploration-automations/' + this.props.character.id).then((result) => {
+      this.setState({isLoading: false});
 
       const automation = result.data.automation;
 
       if (automation.hasOwnProperty('skill_id')) {
         this.setState({
-          params: result.data.automation
+          params: result.data.automation,
+          timeRemaining: result.data.automation.auto_attack_length
         });
       }
     }).catch((err) => {
+      this.setState({isLoading: false});
+
       if (err.hasOwnProperty('response')) {
         const response = err.response;
 
@@ -258,11 +262,11 @@ export default class AutoAttackSection extends React.Component {
     this.setState({
       errorMessage: null,
       successMessage: null,
-      isLoading: true,
+      isStarting: true,
     }, () => {
-      axios.post('/api/attack-automation/'+this.props.character.id+'/start', this.state.params).then((result) => {
+      axios.post('/api/exploration/'+this.props.character.id+'/start', this.state.params).then((result) => {
         this.setState({
-          isLoading: false,
+          isStarting: false,
           successMessage: result.data.message,
           successTitle: 'It has begun!',
           params: {...this.state.params, ...{id: result.data.id}},
@@ -297,7 +301,7 @@ export default class AutoAttackSection extends React.Component {
       successMessage: null,
       isStopping: true,
     }, () => {
-      axios.post('/api/attack-automation/'+this.state.params.id+'/'+this.props.character.id+'/stop').then((result) => {
+      axios.post('/api/exploration/'+this.state.params.id+'/'+this.props.character.id+'/stop').then((result) => {
         this.setState({
           isStopping: false,
           successMessage: result.data.message,
@@ -317,7 +321,7 @@ export default class AutoAttackSection extends React.Component {
 
           if (response.status == 404) {
             this.setState({
-              errorMessage: 'Automation is stopping, please wait ...'
+              errorMessage: 'Exploration is stopping, please wait ...'
             })
           }
         }
@@ -326,28 +330,11 @@ export default class AutoAttackSection extends React.Component {
   }
 
   render() {
-
-    if (!this.props.character.can_auto_battle) {
+    if (this.state.isLoading) {
       return (
-        <div className="mt-4">
-          <AlertWarning icon={'fas fa-exclamation-triangle'} title={'Attn!'}>
-            <p>
-              I sincerely apologize for the inconvenience and heart ache this is causing you. It causes my heart to ache
-              too.
-              Alas auto battle is not working right at the moment, and The Creator has decided it is in the best
-              interest of every one
-              if he takes it off line for a little while. You can still do Faction Farming, it will just take you much
-              longer now.
-            </p>
-            <p>
-              Auto battle is schedule to return once The Creator is satisfied that it won't cause issues.
-            </p>
-            <p>
-              You can ask The Creator in <a href="https://discord.gg/hcwdqJUerh" target="_blank">discord</a> to enable auto battle for your account. This request can be denied based on how the server is
-              handling the weight of the amount of jobs running. The Creator is working hard to ensure every one can use auto battle and the server
-              won't fall over or "reward jobs" do not get backed up. Patience is requested.
-            </p>
-          </AlertWarning>
+        <div className="progress loading-progress mt-2 mb-2" style={{position: 'relative'}}>
+          <div className="progress-bar progress-bar-striped indeterminate">
+          </div>
         </div>
       );
     }
@@ -419,15 +406,15 @@ export default class AutoAttackSection extends React.Component {
                 </div>
                 <button className="btn btn-primary mt-3"
                         onClick={this.beginFight.bind(this)}
-                        disabled={this.state.isLoading || this.props.attackAutomationIsRunning || this.props.character.isDead}
+                        disabled={this.state.isStarting || this.state.isStopping || this.props.attackAutomationIsRunning || this.props.character.isDead}
                 >
-                  {this.state.isLoading ? <i className="fas fa-spinner fa-spin"></i> : null} Begin!
+                  {this.state.isStarting ? <i className="fas fa-spinner fa-spin"></i> : null} Begin!
                 </button>
                 {
                   this.props.attackAutomationIsRunning ?
                     <button className="btn btn-danger ml-2 mt-3"
                             onClick={this.stopAutomation.bind(this)}
-                            disabled={this.state.isLoading ||this.state.isStopping || this.props.character.isDead}
+                            disabled={this.state.isLoading || this.state.isStopping || this.state.isStarting || this.props.character.isDead}
                     >
                       {this.state.isStopping ? <i className="fas fa-spinner fa-spin"></i> : null} Stop!
                     </button>
@@ -437,13 +424,24 @@ export default class AutoAttackSection extends React.Component {
 
               <Col lg={12} xl={6}>
                 <div className="tw-text-center">
-                  <TimeOutBar
-                    innerTimerCss={'auto-attack'}
-                    readyCssClass={'character-ready'}
-                    timeRemaining={this.state.timeRemaining}
-                    channel={'automation-attack-timeout-' + this.props.userId}
-                    eventClass={'Game.Automation.Events.AutomationAttackTimeOut'}
-                  />
+                  {
+                    this.state.timeRemaining > 0 ?
+                      <TimeOutBar
+                        innerTimerCss={'auto-attack'}
+                        readyCssClass={'character-ready'}
+                        timeRemaining={this.state.timeRemaining}
+                        channel={'automation-attack-timeout-' + this.props.userId}
+                        eventClass={'Game.Automation.Events.AutomationAttackTimeOut'}
+                      />
+                    :
+                      <div className="character-ready">
+                        Ready!
+                      </div>
+                  }
+                  <div className="tw-mt-2">
+                    Every <strong>ten minutes</strong> the Exploration Log tab will update with results from the previous battle. Keep an eye on that for updates!
+                    The timer above is how long you have left on this current automation. <strong>You can log out and this will still process</strong>.
+                  </div>
                   <div className="tw-mt-2">
                     {
                       this.state.attackMessages.length > 0 ? this.displayAttackMessages() : null
@@ -570,7 +568,7 @@ export default class AutoAttackSection extends React.Component {
               <div className="tw-overflow-y-auto tw-h-60">
                 <p>
                   Exploration is similar to <a href="/information/adventure">Adventures</a>, with the exception that they
-                  do not lock you out of doing specific action, but <strong>do let you log out</strong>.
+                  do not lock you out of doing specific actions, but <strong>do let you log out</strong>.
                 </p>
                 <p>
                   while on a mission you can:
@@ -583,14 +581,13 @@ export default class AutoAttackSection extends React.Component {
                 </ul>
                 <p>You cannot use the shop or visit the market. You cannot enter special locations while you are exploring.</p>
                 <p>
-                  Exploration works differently from adventures such that every 10 minutes your character will do 4 actions, all of them give you XP.
+                  Exploration works differently from adventures such that every 10 minutes your character will do 3 actions, all of them give you XP.
                 </p>
                 <p>While exploring, every ten minutes your character will:</p>
                 <ul>
-                  <li>Explore the area around them (can find items and gold), rewards 5 XP</li>
-                  <li>Fight (fights the selected monster) (50% chance)</li>
-                  <li>Investigate (can trigger a fight or reward with gold and items - if no monster is fought, you get 5xp)</li>
-                  <li>Plunder (fights the selected monster 1-6 times)</li>
+                  <li>Explore the area around them and engage in an encounter.</li>
+                  <li>Fight the creature you selected.</li>
+                  <li>Plunder fights the selected monster 1-6 times.</li>
                 </ul>
                 <p>
                   At the end of the "encounter" we will reward bonus XP and Faction points:
@@ -617,7 +614,7 @@ export default class AutoAttackSection extends React.Component {
                     +100 FactionPoints (if you have a quest item you will get 1000 if you are above level 0. Else you will get 100)
                   </li>
                   <li>
-                    +X Million Gold (25 For 1 Hour, 50 for 2 hours, 75 for 4 hours, 125 for 8 hours)
+                    + 100,000 Gold
                   </li>
                 </ul>
                 <p>Should you die, this will end and we will show you, where the timer is, the result of the last battle message so you can see why you died. If you are logged out, you will not be able to

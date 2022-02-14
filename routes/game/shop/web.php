@@ -6,7 +6,7 @@ Route::middleware([
     'is.globally.timed.out',
 ])->group(function() {
 
-    Route::middleware(['character.attack.automation'])->group(function() {
+    Route::middleware(['is.character.exploring'])->group(function() {
         Route::get('/shop/buy/{character}', ['as' => 'game.shop.buy', 'uses' => 'ShopController@shopBuy']);
         Route::get('/shop/sell/{character}', ['as' => 'game.shop.sell', 'uses' => 'ShopController@shopSell']);
         Route::get('/shop/compare/item/{character}', ['as' => 'game.shop.compare.item', 'uses' => 'ShopController@shopCompare']);

@@ -3,7 +3,7 @@
 namespace Tests\Feature\Automation;
 
 use App\Flare\Values\AttackTypeValue;
-use App\Game\Automation\Jobs\AttackAutomation;
+use App\Game\Automation\Jobs\Exploration;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -80,7 +80,7 @@ class AttackAutomationControllerApiTest extends TestCase
 
         $this->assertEquals(200, $response->status());
 
-        Queue::assertPushed(AttackAutomation::class);
+        Queue::assertPushed(Exploration::class);
     }
 
     public function testCanStopAutomationAttack() {

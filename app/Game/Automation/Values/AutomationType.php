@@ -9,13 +9,13 @@ class AutomationType {
      */
     private $value;
 
-    const ATTACK = 0;
+    const EXPLORING = 0;
 
     /**
      * @var int[] $values
      */
     protected static $values = [
-        0 => self::ATTACK,
+        0 => self::EXPLORING,
     ];
 
     /**
@@ -36,8 +36,8 @@ class AutomationType {
     /**
      * @return bool
      */
-    public function isAttack(): bool {
-        return $this->value === self::ATTACK;
+    public function isExploring(): bool {
+        return $this->value === self::EXPLORING;
     }
 
 }

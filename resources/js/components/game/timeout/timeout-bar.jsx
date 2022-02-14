@@ -76,6 +76,22 @@ export default class TimeOutBar extends React.Component {
     });
   }
 
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (this.props.timeRemaining !== null && (this.state.maxTimeOut === null || this.state.maxTimeOut <= 0)) {
+      let now  = moment();
+      let then = moment().add(this.props.timeRemaining, 'seconds');
+
+      let duration = moment.duration(then.diff(now));
+
+      const maxTimeOut = duration.asSeconds();
+
+      this.setState({
+        maxTimeOut: maxTimeOut,
+        active: maxTimeOut > 0,
+      });
+    }
+  }
+
   componentWillUnmount() {
     Echo.leaveChannel(this.props.chanel);
   }
@@ -84,6 +100,10 @@ export default class TimeOutBar extends React.Component {
     const maxTimeOut = this.state.maxTimeOut;
     const isHours = (maxTimeOut / 3600) > 1;
     const isMinutes = (maxTimeOut / 60) > 1;
+
+    if (maxTimeOut === 0) {
+      return;
+    }
 
     if (isHours) {
       return (

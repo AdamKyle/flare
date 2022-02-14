@@ -5,7 +5,7 @@ namespace Tests\Unit\Game\Automation\Jobs;
 use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Values\AttackTypeValue;
-use App\Game\Automation\Jobs\AttackAutomation;
+use App\Game\Automation\Jobs\Exploration;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateCharacterAutomation;
@@ -59,7 +59,7 @@ class AttackAutomationTest extends TestCase
             'last_activity'=> 1602801731,
         ]]);
 
-        AttackAutomation::dispatch($character, $automation->id, AttackTypeValue::ATTACK);
+        Exploration::dispatch($character, $automation->id, AttackTypeValue::ATTACK);
 
         $character = $character->refresh();
 
@@ -108,7 +108,7 @@ class AttackAutomationTest extends TestCase
             'last_activity'=> 1602801731,
         ]]);
 
-        AttackAutomation::dispatch($character, $automation->id, AttackTypeValue::ATTACK);
+        Exploration::dispatch($character, $automation->id, AttackTypeValue::ATTACK);
 
         $character = $character->refresh();
 
@@ -143,7 +143,7 @@ class AttackAutomationTest extends TestCase
             'last_activity'=> 1602801731,
         ]]);
 
-        AttackAutomation::dispatch($character, $automation->id, AttackTypeValue::ATTACK);
+        Exploration::dispatch($character, $automation->id, AttackTypeValue::ATTACK);
 
         $this->assertTrue($character->currentAutomations->isEmpty());
     }
@@ -160,7 +160,7 @@ class AttackAutomationTest extends TestCase
             'last_activity'=> 1602801731,
         ]]);
 
-        AttackAutomation::dispatch($character, 16, AttackTypeValue::ATTACK);
+        Exploration::dispatch($character, 16, AttackTypeValue::ATTACK);
 
         $this->assertTrue(true);
     }
@@ -184,7 +184,7 @@ class AttackAutomationTest extends TestCase
             'attack_type'  => AttackTypeValue::ATTACK
         ]);
 
-        AttackAutomation::dispatch($character, $automation->id, AttackTypeValue::ATTACK);
+        Exploration::dispatch($character, $automation->id, AttackTypeValue::ATTACK);
 
         $this->assertTrue($character->currentAutomations->isEmpty());
     }
@@ -218,7 +218,7 @@ class AttackAutomationTest extends TestCase
         ]]);
 
 
-        AttackAutomation::dispatch($character, $automation->id, AttackTypeValue::ATTACK);
+        Exploration::dispatch($character, $automation->id, AttackTypeValue::ATTACK);
 
         $character = $character->refresh();
 

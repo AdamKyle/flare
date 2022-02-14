@@ -11,6 +11,7 @@ use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\Item as ItemModel;
+use App\Flare\Models\Map;
 use App\Flare\Models\Monster;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MaxCurrenciesValue;
@@ -65,6 +66,42 @@ class FactionHandler {
         $faction->save();
 
         $this->updateFactions($character);
+    }
+
+    public function handleCustomFactionAmount(Character $character, int $amount) {
+        $map     = Map::where('character_id', $character->id)->first();
+        $gameMap = GameMap::find($map->game_map_id);
+        $faction = Faction::where('character_id', $character->id)->where('game_map_id', $gameMap->id)->first();
+
+        if (is_null($faction)) {
+            return;
+        }
+
+        if ($faction->maxed) {
+            return;
+        }
+
+        if ($this->playerHasQuestItem($character) && $faction->current_level >= 1) {
+            $amount *= 10;
+        }
+
+        $newAmount = $faction->current_points + $amount;
+
+        $faction->update(['current_points' => $newAmount]);
+
+        $faction = $faction->refresh();
+
+        if ($faction->current_points === $faction->points_needed && !FactionLevel::isMaxLevel($faction->current_level)) {
+
+            return $this->handleFactionLevelUp($character, $faction, $map->name);
+
+        } else if (FactionLevel::isMaxLevel($faction->current_level) && !$faction->maxed) {
+
+            return $this->handleFactionMaxedOut($character, $faction, $map->name);
+        }
+
+        $this->updateFactions($character);
+
     }
 
     protected function handleFactionLevelUp(Character $character, Faction $faction, string $mapName) {

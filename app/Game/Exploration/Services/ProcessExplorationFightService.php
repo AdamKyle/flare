@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Game\Automation\Services;
+namespace App\Game\Exploration\Services;
 
-use App\Game\Exploration\Events\ExplorationLogUpdate;
+use App\Game\Core\Events\AttackTimeOutEvent;
 use Cache;
+use App\Game\Exploration\Events\ExplorationLogUpdate;
 use App\Flare\Builders\Character\ClassDetails\ClassBonuses;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Character;
@@ -15,7 +16,7 @@ use App\Game\Automation\Events\AutomationAttackTimeOut;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Jobs\BattleAttackHandler;
 
-class ProcessAttackAutomation {
+class ProcessExplorationFightService {
 
     private $fightService;
 
@@ -29,7 +30,7 @@ class ProcessAttackAutomation {
         $this->battleEventHandler  = $battleEventHandler;
     }
 
-    public function processFight(CharacterAutomation $automation, Character $character, string $attackType) {
+    public function processFight(CharacterAutomation $automation, Character $character) {
         $location = $this->isCharacterAtSpecialLocation($character);
 
         if (!is_null($location)) {
@@ -50,7 +51,7 @@ class ProcessAttackAutomation {
 
         event(new ExplorationLogUpdate($character->user, 'Encountered a: ' . $monster->name));
 
-        $this->fightService->processFight($character, $monster, $attackType);
+        $this->fightService->processFight($character, $monster, $automation->attack_type);
 
         $battleMessages = $this->fightService->getBattleMessages();
 
@@ -73,7 +74,7 @@ class ProcessAttackAutomation {
             $automation->delete();
 
             $battleMessages[] = [
-                'message' => 'The Automation has been stopped! Revive to try again.',
+                'message' => 'The exploration has stopped! Revive to try again.',
                 'class'   => 'enemy-action-fired',
             ];
 
@@ -87,23 +88,18 @@ class ProcessAttackAutomation {
         }
 
 
-
         if ($this->fightService->getMonsterHealth() <= 0) {
             event(new ExplorationLogUpdate($character->user, 'Your survived to fight another day, killing the fiend before you with such rage and vigor! Off to the next one!'));
 
             BattleAttackHandler::dispatch($character->id, $automation->monster_id, true)->onQueue('default_long');
         }
-
-        event(new AutomationAttackTimeOut($character->user, 10));
-
-        return 10;
     }
 
     protected function isCharacterAtSpecialLocation(Character $character): ?Location {
         $location = Location::where('x', $character->x_position)
-                            ->where('y', $character->y_position)
-                            ->where('game_map_id', $character->map->game_map_id)
-                            ->first();
+            ->where('y', $character->y_position)
+            ->where('game_map_id', $character->map->game_map_id)
+            ->first();
 
         if (!is_null($location)) {
             if (!is_null($location->enemy_strength_type)) {

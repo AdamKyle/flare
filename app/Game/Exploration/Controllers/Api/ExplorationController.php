@@ -1,29 +1,30 @@
 <?php
 
-namespace App\Game\Automation\Controllers\Api;
+namespace App\Game\Exploration\Controllers\Api;
 
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\CharacterAutomation;
 use App\Game\Automation\Events\AutomatedAttackStatus;
 use App\Game\Automation\Services\AttackAutomationService;
 use App\Game\Automation\Values\AutomationType;
+use App\Game\Exploration\Services\ExplorationAutomationService;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
 use App\Game\Automation\Request\AttackAutomationStartRequest;
 
-class AttackAutomationController extends Controller {
+class ExplorationController extends Controller {
 
-    public function index(Character $character, AttackAutomationService $attackAutomationService) {
+    public function index(Character $character, ExplorationAutomationService $explorationAutomationService) {
         $automation = $character->currentAutomations()->where('type', AutomationType::EXPLORING)->first();
 
-        $data = $attackAutomationService->fetchData($character, $automation);
+        $data = $explorationAutomationService->fetchData($character, $automation);
 
         return response()->json([
             'automation' => $data,
         ], 200);
     }
 
-    public function begin(AttackAutomationStartRequest $request, Character $character, AttackAutomationService $attackAutomationService) {
+    public function begin(AttackAutomationStartRequest $request, Character $character, ExplorationAutomationService $explorationAutomationService) {
 
         if (!$character->user->can_auto_battle) {
             return response()->json([
@@ -31,7 +32,7 @@ class AttackAutomationController extends Controller {
             ], 422);
         }
 
-        $response = $attackAutomationService->beginAutomation($character, $request->all());
+        $response = $explorationAutomationService->beginAutomation($character, $request->all());
 
         return response()->json([
             'message' => $response['message'],

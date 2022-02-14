@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Automation\Jobs;
+namespace App\Game\Exploration\Jobs;
 
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Monster;
@@ -8,7 +8,10 @@ use App\Game\Automation\Events\AutomatedAttackDetails;
 use App\Game\Automation\Events\AutomatedAttackStatus;
 use App\Game\Automation\Events\AutomationAttackTimeOut;
 use App\Game\Automation\Events\UpdateAutomationsList;
-use App\Game\Automation\Services\AttackAutomationService;
+use App\Game\Exploration\Events\ExplorationLogUpdate;
+use App\Game\Exploration\Handlers\RewardHandler;
+use App\Game\Exploration\Services\EncounterService;
+use App\Game\Exploration\Services\ExplorationAutomationService;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -18,9 +21,8 @@ use Illuminate\Queue\SerializesModels;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Values\UserOnlineValue;
 use App\Flare\Models\Character;
-use App\Game\Automation\Services\ProcessAttackAutomation;
 
-class AttackAutomation implements ShouldQueue
+class Exploration implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -36,22 +38,12 @@ class AttackAutomation implements ShouldQueue
         $this->attackType   = $attackType;
     }
 
-    public function handle(ProcessAttackAutomation $processAttackAutomation, AttackAutomationService $attackAutomationService) {
-
-        event(new AutomationAttackTimeOut($this->character->user));
+    public function handle(EncounterService $encounterService, ExplorationAutomationService $explorationAutomationService, RewardHandler $rewardHandler) {
 
         $automation = CharacterAutomation::find($this->automationId);
 
         if ($this->shouldBail($automation)) {
-            if (!is_null($automation)) {
-                $automation->delete();
-            }
-
-            $character = $this->character->refresh();
-
-            event(new AutomatedAttackStatus($character->user, false));
-            event(new UpdateTopBarEvent($character));
-            event(new UpdateAutomationsList($character->user, $character->currentAutomations));
+            $this->endAutomation($rewardHandler, $automation);
 
             return;
         }
@@ -77,34 +69,32 @@ class AttackAutomation implements ShouldQueue
                         'previous_level' => $characterLevel,
                     ]);
 
-                    $data = $attackAutomationService->fetchData($this->character, $automation->refresh());
+                    $data = $explorationAutomationService->fetchData($this->character, $automation->refresh());
 
                     event(new AutomatedAttackDetails($this->character->user, $data));
                 }
             }
         }
 
-        $timeTillNext = $processAttackAutomation->processFight($automation, $this->character, $this->attackType);
+        $encounterService->processEncounter($this->character, $automation);
 
-        if ($timeTillNext <= 0) {
-            event (new AutomatedAttackStatus($this->character->user, false));
+        $timeLeft = now()->diffInMinutes($automation->completed_at);
 
-            event(new UpdateTopBarEvent($this->character->refresh()));
+        if ($timeLeft < 10) {
+            $this->endAutomation($rewardHandler, $automation);
+
             return;
         }
 
-        Exploration::dispatch($this->character, $automation->id, $this->attackType)->delay($timeTillNext);
+        event(new ExplorationLogUpdate($this->character->user, 'Next encounter will start in 10 minutes.'));
+
+        Exploration::dispatch($this->character, $automation->id, $this->attackType)->onConnection('long_running')->delay(now()->addMinutes(10));
+
     }
 
     protected function shouldBail(CharacterAutomation $automation = null): bool {
 
         if (is_null($automation)) {
-            return true;
-        }
-
-        $activeSession = (new UserOnlineValue())->isOnline($this->character->user);
-
-        if (!$activeSession) {
             return true;
         }
 
@@ -117,11 +107,32 @@ class AttackAutomation implements ShouldQueue
                 'is_attack_automation_locked' => true,
             ]);
 
-            event(new ServerMessageEvent($automation->character->user, 'Attack Automation Suspended until tomorrow. You have reached the max time limit for today.'));
+            event(new ServerMessageEvent($automation->character->user, 'Exploration suspended until tomorrow at 12pm GMT -7. You have reached the max time limit for today.'));
 
             return true;
         }
 
         return false;
+    }
+
+    protected function endAutomation(RewardHandler $rewardHandler, ?CharacterAutomation $automation) {
+        if (!is_null($automation)) {
+            $automation->delete();
+
+            event(new ExplorationLogUpdate($this->character->user, 'Phew child! I did not think we would survive all of your shenanigans.
+                So many time I could have died! Do you ever think about anyone other than your self? No? Didn\'t think so. Either way, I am off.
+                Let me know when we go our next adventure.', true));
+
+            $rewardHandler->processRewardsForExplorationComplete($this->character);
+
+            event(new ExplorationLogUpdate($this->character->user, 'Exploration is now ending ....'));
+        }
+
+        $character = $this->character->refresh();
+
+        event(new AutomationAttackTimeOut($character->user, 0));
+        event(new AutomatedAttackStatus($character->user, false));
+        event(new UpdateTopBarEvent($character));
+        event(new UpdateAutomationsList($character->user, $character->currentAutomations));
     }
 }

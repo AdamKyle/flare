@@ -141,7 +141,7 @@ class BattleDrop {
      * @return void
      */
     public function handleSpecialLocationQuestItem(Character $character) {
-        $automation = $character->currentAutomations()->where('type', AutomationType::ATTACK)->first();
+        $automation = $character->currentAutomations()->where('type', AutomationType::EXPLORING)->first();
 
         if (!is_null($automation)) {
             return; // Characters cannot use automation to get these.
