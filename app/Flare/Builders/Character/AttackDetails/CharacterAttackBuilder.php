@@ -92,7 +92,7 @@ class CharacterAttackBuilder {
      * @throws \Exception
      */
     public function buildCastAndAttack(bool $voided = false): array {
-        return $this->castAndAttackPositionalDamage('spell-one', 'left-hand', $voided);
+        return $this->castAndAttackPositionalDamage('spell-one', 'left-hand', $voided, true);
     }
 
     /**
@@ -103,7 +103,7 @@ class CharacterAttackBuilder {
      * @throws \Exception
      */
     public function buildAttackAndCast(bool $voided = false): array {
-        return $this->castAndAttackPositionalDamage('spell-two', 'right-hand', $voided);
+        return $this->castAndAttackPositionalDamage('spell-two', 'right-hand', $voided, true);
     }
 
     /**
@@ -186,7 +186,7 @@ class CharacterAttackBuilder {
      * @return array
      * @throws \Exception
      */
-    protected function baseAttack(bool $voided = false): array {
+    protected function baseAttack(bool $voided = false, bool $isPositional = false): array {
         $map     = Map::where('character_id', $this->character->id)->first();
         $gameMap = GameMap::find($map->game_map_id);
 
@@ -197,7 +197,7 @@ class CharacterAttackBuilder {
             'defence'          => $this->characterInformationBuilder->buildDefence($voided),
             'ring_damage'      => $this->characterInformationBuilder->getTotalRingDamage($voided),
             'artifact_damage'  => $voided ? 0 : $this->characterInformationBuilder->getTotalArtifactDamage(),
-            'heal_for'         => $this->characterHealthInformation->buildHealFor($voided),
+            'heal_for'         => $this->characterHealthInformation->buildHealFor($voided, $isPositional),
             'res_chance'       => $this->characterHealthInformation->fetchResurrectionChance(),
             'damage_deduction' => $characterReduction,
             'affixes'          => [
@@ -220,8 +220,8 @@ class CharacterAttackBuilder {
      * @return array
      * @throws \Exception
      */
-    protected function castAndAttackPositionalDamage(string $spellPosition, string $weaponPosition, bool $voided = false): array {
-        $attack = $this->baseAttack($voided);
+    protected function castAndAttackPositionalDamage(string $spellPosition, string $weaponPosition, bool $voided = false, bool $isPositional = false): array {
+        $attack = $this->baseAttack($voided, $isPositional);
 
         $spellSlotOne  = $this->fetchSlot($spellPosition);
         $weaponSlotOne = $this->fetchSlot($weaponPosition);
@@ -261,7 +261,7 @@ class CharacterAttackBuilder {
             }
 
             if ($spellSlotOne->item->type === 'spell-healing') {
-                $spellDamage = $this->characterInformationBuilder->buildHealFor($voided);
+                $spellDamage = $this->characterInformationBuilder->buildHealFor($voided, true);
             }
 
             if ($spellSlotOne->item->type === 'spell-damage') {
@@ -298,6 +298,13 @@ class CharacterAttackBuilder {
         if (!is_null($slots) && ($position === 'left-hand' || $position === 'right-hand')) {
             $slot = $slots->filter(function($slot) use($position) {
                 return $slot->item->type === 'bow';
+            })->first();
+
+        }
+
+        if (!is_null($slots)) {
+            $slot = $slots->filter(function($slot) use($position) {
+                return $slot->position === $position;
             })->first();
         }
 

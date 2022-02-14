@@ -56,6 +56,16 @@ class ClassBonuses {
     }
 
     /**
+     * Does the ranger have any healing spells?
+     *
+     * @param Character $character
+     * @return bool
+     */
+    public function rangerHasHealingSpells(Character $character): bool {
+        return $this->prophetHasHealingSpells($character);
+    }
+
+    /**
      * Does the prophet have damage spells equipped?
      *
      * @param Character $character
