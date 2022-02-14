@@ -26,8 +26,10 @@ class DamageSpellInformation {
      * @param BaseCharacterInfo $baseCharacterInfo
      * @return void
      */
-    public function setCharacterInformation(BaseCharacterInfo $baseCharacterInfo) {
+    public function setCharacterInformation(BaseCharacterInfo $baseCharacterInfo): DamageSpellInformation {
         $this->baseCharacterInfo = $baseCharacterInfo;
+
+        return $this;
     }
 
     /**
@@ -75,7 +77,6 @@ class DamageSpellInformation {
      */
     public function calculateClassSpellDamage(Character $character, int|float $damage, bool $voided = false): float|int {
         $classType = $character->classType();
-
         if ($damage === 0) {
             if ($classType->isHeretic()) {
                 if (!$voided) {

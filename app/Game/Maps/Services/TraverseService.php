@@ -294,7 +294,7 @@ class TraverseService {
         }
 
         $characterBaseStats = $this->manager->createData($characterBaseStats)->toArray();
-        dump($characterBaseStats);
+
         broadcast(new UpdateMonsterList($monsters, $user));
 
         event(new UpdateBaseCharacterInformation($user, $characterBaseStats));

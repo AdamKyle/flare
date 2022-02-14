@@ -131,6 +131,7 @@ export default class CastAttack {
 
     const skillBonus = this.attacker.skills.filter(s => s.name === 'Criticality')[0].skill_bonus;
     let damage       = attackData.spell_damage;
+
     const critDc     = 100 - 100 * skillBonus;
 
     if (random(1, 100) > critDc) {

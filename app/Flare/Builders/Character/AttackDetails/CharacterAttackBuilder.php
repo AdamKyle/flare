@@ -265,7 +265,7 @@ class CharacterAttackBuilder {
             }
 
             if ($spellSlotOne->item->type === 'spell-damage') {
-                $attack['spell_damage'] = $spellDamage;
+                $attack['spell_damage'] = (int) ($spellDamage / 2);
                 $attack['heal_for']     = 0;
             } else {
                 $attack['heal_for']     = $spellDamage;
