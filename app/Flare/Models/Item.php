@@ -250,7 +250,7 @@ class Item extends Model
      * Gets the total damage value for the item.
      *
      * In some cases an item might not have a base_damage value.
-     * however might have either prefix or suffix or both.
+     * however, might have either prefix or suffix or both.
      *
      * In this case we will set the damage variable to one.
      * this will allow the damage modifiers to be applied to the item.

@@ -29,7 +29,7 @@ class CharacterDamageInformation {
      * @throws \Exception
      */
     public function getWeaponDamage(Character $character, bool $voided = false): int {
-        return $this->weaponInformation->getWeaponDamage($character, $voided);
+        return $this->weaponInformation->setCharacterInformation($character->getInformation()->getBaseCharacterInfo())->getWeaponDamage($character, $voided);
     }
 
     /**
@@ -42,6 +42,15 @@ class CharacterDamageInformation {
     }
 
     /**
+     * Returns an instance of the damage spell info.
+     *
+     * @return DamageSpellInformation
+     */
+    public function getDamageSpellInformation(): DamageSpellInformation {
+        return $this->damageSpellInformation;
+    }
+
+    /**
      * Get the spell damage for a character.
      *
      * @param Character $character
@@ -50,7 +59,7 @@ class CharacterDamageInformation {
      * @throws \Exception
      */
     public function getSpellDamage(Character $character, bool $voided = false): int {
-        return $this->damageSpellInformation->getSpellDamage($character, $voided);
+        return $this->damageSpellInformation->setCharacterInformation($character->getInformation()->getBaseCharacterInfo())->getSpellDamage($character, $voided);
     }
 
     /**

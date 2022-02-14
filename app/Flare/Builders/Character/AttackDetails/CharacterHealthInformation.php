@@ -62,9 +62,10 @@ class CharacterHealthInformation {
      * @return int
      * @throws \Exception
      */
-    public function buildHealFor(bool $voided = false): int {
+    public function buildHealFor(bool $voided = false, bool $isPositional = false): int {
         $prophetBonus  = $this->characterInformationBuilder->getBaseCharacterInfo()->getClassBonuses()->prophetHealingBonus($this->character);
         $vampireBonus  = $this->characterInformationBuilder->getBaseCharacterInfo()->getClassBonuses()->getVampiresHealingBonus($this->character);
+
         $classBonus    = $prophetBonus + $vampireBonus;
         $class         = GameClass::find($this->character->game_class_id);
 
@@ -94,7 +95,13 @@ class CharacterHealthInformation {
             }
         }
 
-        return round($healingAmount + ($healingAmount * ($this->fetchSkillHealingMod() + $classBonus)));
+        $amount = round($healingAmount + ($healingAmount * ($this->fetchSkillHealingMod() + $classBonus)));
+
+        if ($isPositional) {
+            return $amount / 2;
+        }
+
+        return $amount;
     }
 
     /**

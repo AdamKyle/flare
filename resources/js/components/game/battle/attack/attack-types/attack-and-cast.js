@@ -32,7 +32,6 @@ export default class AttackAndCast {
 
 
     if (canEntrance) {
-
       const weaponAttack     = new WeaponAttack(this.attacker, this.defender, this.characterCurrentHealth, this.monsterHealth, this.voided);
 
       weaponAttack.attackWithWeapon(attackData);

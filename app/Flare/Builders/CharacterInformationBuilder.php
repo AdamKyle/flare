@@ -203,8 +203,8 @@ class CharacterInformationBuilder {
      * @return int
      * @throws \Exception
      */
-    public function buildHealFor(bool $voided = false): int {
-        return $this->character->getHeathInformation()->buildHealFor($voided);
+    public function buildHealFor(bool $voided = false, bool $isPositional = false): int {
+        return $this->character->getHeathInformation()->buildHealFor($voided, $isPositional);
     }
 
     /**
@@ -282,7 +282,7 @@ class CharacterInformationBuilder {
      * @throws \Exception
      */
     public function getTotalSpellDamage(bool $voided = false): int {
-        return $this->characterAttackInformation->getCharacterDamageInformation()->getWeaponDamage($this->character, $voided);
+        return $this->characterAttackInformation->getCharacterDamageInformation()->getSpellDamage($this->character, $voided);
     }
 
     /**
@@ -413,6 +413,18 @@ class CharacterInformationBuilder {
         return $this->fetchInventory()->filter(function ($slot) {
             return $slot->item->type === 'spell-damage' && $slot->equipped;
         })->isNotEmpty();
+    }
+
+    /**
+     * Calculate the players spell damage.
+     *
+     * @param int $spellDamage
+     * @param bool $voided
+     * @return int
+     * @throws \Exception
+     */
+    public function calculateClassSpellDamage(int $spellDamage, bool $voided = false): int {
+        return $this->characterAttackInformation->getCharacterDamageInformation()->getDamageSpellInformation()->calculateClassSpellDamage($this->character, $spellDamage, $voided);
     }
 
     /**
