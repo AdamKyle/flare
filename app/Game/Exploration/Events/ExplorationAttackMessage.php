@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Automation\Events;
+namespace App\Game\Exploration\Events;
 
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
@@ -11,7 +11,7 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use App\Flare\Models\User;
 
-class AutomationAttackTimeOut implements ShouldBroadcast
+class ExplorationAttackMessage implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -23,12 +23,7 @@ class AutomationAttackTimeOut implements ShouldBroadcast
     /**
      * @var int $forLength
      */
-    public $forLength;
-
-    /**
-     * @var bool $activatebar
-     */
-    public $activatebar;
+    public $messages;
 
     /**
      * Create a new event instance.
@@ -37,11 +32,10 @@ class AutomationAttackTimeOut implements ShouldBroadcast
      * @param int $forLength | 0
      * @return void
      */
-    public function __construct(User $user, int $forLength = 0)
+    public function __construct(User $user, array $messages)
     {
         $this->user        = $user;
-        $this->forLength   = $forLength;
-        $this->activatebar = true;
+        $this->messages    = $messages;
     }
 
     /**
@@ -51,6 +45,6 @@ class AutomationAttackTimeOut implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('exploration-timeout-' . $this->user->id);
+        return new PrivateChannel('exploration-attack-messages-' . $this->user->id);
     }
 }

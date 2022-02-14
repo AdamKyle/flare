@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Automation\Events;
+namespace App\Game\Exploration\Events;
 
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
@@ -11,7 +11,7 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use App\Flare\Models\User;
 
-class AutomationAttackTimeOut implements ShouldBroadcast
+class ExplorationTimeOut implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 

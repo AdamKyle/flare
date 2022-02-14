@@ -77,7 +77,7 @@ export default class Game extends React.Component {
 
     this.isDead            = Echo.private('character-is-dead-' + this.props.userId);
     this.npcComponent      = Echo.private('component-show-' + this.props.userId);
-    this.attackAutomation  = Echo.private('attack-automation-status-' + this.props.userId);
+    this.attackAutomation  = Echo.private('exploration-status-' + this.props.userId);
     this.clearQuestStorage = Echo.private('clear-quest-storage-' + this.props.userId);
   }
 
@@ -100,7 +100,7 @@ export default class Game extends React.Component {
       this.openNpcComponent(event.componentName);
     });
 
-    this.attackAutomation.listen('Game.Automation.Events.AutomatedAttackStatus', (event) => {
+    this.attackAutomation.listen('Game.Exploration.Events.ExplorationStatus', (event) => {
       this.setState({
         attackAutomationIsRunning: event.isRunning
       });

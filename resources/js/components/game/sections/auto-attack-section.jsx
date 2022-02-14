@@ -39,9 +39,9 @@ export default class AutoAttackSection extends React.Component {
       }
     }
 
-    this.automation               = Echo.private('automation-attack-timeout-' + this.props.userId);
-    this.automationAttackMessages = Echo.private('automation-attack-messages-' + this.props.userId);
-    this.automationAttackDetails  = Echo.private('automation-attack-details-' + this.props.userId);
+    this.automation               = Echo.private('exploration-timeout-' + this.props.userId);
+    this.automationAttackMessages = Echo.private('exploration-attack-messages-' + this.props.userId);
+    this.automationAttackDetails  = Echo.private('exploration-attack-details-' + this.props.userId);
     this.isDead                   = Echo.private('character-is-dead-' + this.props.userId);
   }
 
@@ -73,21 +73,21 @@ export default class AutoAttackSection extends React.Component {
       }
     });
 
-    this.automation.listen('Game.Automation.Events.AutomationAttackTimeOut', (event) => {
+    this.automation.listen('Game.Exploration.Events.ExplorationTimeOut', (event) => {
       this.setState({
         errorMessage: null,
         timeRemaining: event.forLength,
       })
     });
 
-    this.automationAttackMessages.listen('Game.Automation.Events.AutomatedAttackMessage', (event) => {
+    this.automationAttackMessages.listen('Game.Exploration.Events.ExplorationAttackMessage', (event) => {
       this.setState({
         errorMessage: null,
         attackMessages: event.messages,
       })
     });
 
-    this.automationAttackDetails.listen('Game.Automation.Events.AutomatedAttackDetails', (event) => {
+    this.automationAttackDetails.listen('Game.Exploration.Events.ExplorationDetails', (event) => {
       this.setState({
         errorMessage: null,
         params: event.details,
@@ -430,8 +430,8 @@ export default class AutoAttackSection extends React.Component {
                         innerTimerCss={'auto-attack'}
                         readyCssClass={'character-ready'}
                         timeRemaining={this.state.timeRemaining}
-                        channel={'automation-attack-timeout-' + this.props.userId}
-                        eventClass={'Game.Automation.Events.AutomationAttackTimeOut'}
+                        channel={'exploration-timeout-' + this.props.userId}
+                        eventClass={'Game.Exploration.Events.ExplorationTimeOut'}
                       />
                     :
                       <div className="character-ready">

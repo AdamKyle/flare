@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Game\Automation\Events;
+namespace App\Game\Exploration\Events;
 
 use Illuminate\Broadcasting\Channel;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -11,7 +12,7 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use App\Flare\Models\User;
 
-class AutomationAttackTimeOut implements ShouldBroadcast
+class UpdateAutomationsList implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -21,9 +22,9 @@ class AutomationAttackTimeOut implements ShouldBroadcast
     public $user;
 
     /**
-     * @var int $forLength
+     * @var Collection $automations
      */
-    public $forLength;
+    public $automations;
 
     /**
      * @var bool $activatebar
@@ -31,17 +32,13 @@ class AutomationAttackTimeOut implements ShouldBroadcast
     public $activatebar;
 
     /**
-     * Create a new event instance.
-     *
      * @param User $user
-     * @param int $forLength | 0
-     * @return void
+     * @param Collection $automations
      */
-    public function __construct(User $user, int $forLength = 0)
+    public function __construct(User $user, Collection $automations)
     {
         $this->user        = $user;
-        $this->forLength   = $forLength;
-        $this->activatebar = true;
+        $this->automations = $automations;
     }
 
     /**
@@ -51,6 +48,6 @@ class AutomationAttackTimeOut implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('exploration-timeout-' . $this->user->id);
+        return new PrivateChannel('automations-list-' . $this->user->id);
     }
 }

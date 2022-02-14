@@ -42,6 +42,6 @@ class AutomatedAttackStatus implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('attack-automation-status-' . $this->user->id);
+        return new PrivateChannel('exploration-status-' . $this->user->id);
     }
 }
