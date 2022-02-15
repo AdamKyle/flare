@@ -26,7 +26,7 @@ class CharacterAutomationFactory extends Factory
         return [
             'character_id'                   => null,
             'monster_id'                     => null,
-            'type'                           => AutomationType::ATTACK,
+            'type'                           => AutomationType::EXPLORING,
             'started_at'                     => now(),
             'completed_at'                   => now()->addSeconds(5),
             'move_down_monster_list_every'   => null,

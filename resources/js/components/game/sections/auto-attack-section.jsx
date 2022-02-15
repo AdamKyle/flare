@@ -245,7 +245,7 @@ export default class AutoAttackSection extends React.Component {
 
     if (this.state.params.auto_attack_length === null) {
       this.setState({
-        errorMessage: 'How long should this auto attack go for? Check Advanced tab and configure a length.'
+        errorMessage: 'How long should this exploration go for? Check Advanced tab and configure a length.'
       });
 
       return;
@@ -321,7 +321,7 @@ export default class AutoAttackSection extends React.Component {
 
           if (response.status == 404) {
             this.setState({
-              errorMessage: 'Exploration is stopping, please wait ...'
+              errorMessage: 'Exploration has stopped.'
             })
           }
         }
@@ -358,7 +358,7 @@ export default class AutoAttackSection extends React.Component {
                   this.state.isDead ?
                     <AlertError icon={"fas fa-skull-crossbones"} title={'Uh... You died!'}>
                       <p>
-                        Automated attack has ended. Please revive.
+                        Exploration has been stopped. You died. Please revive.
                       </p>
                     </AlertError>
                     : null
@@ -501,10 +501,8 @@ export default class AutoAttackSection extends React.Component {
               <div className="form-group">
                 <AlertWarning icon={'fas fa-exclamation-triangle'} title={'Attn!'}>
                   <p>
-                    Should you choose the 8 hour mark, you will not be able to start another auto attack session after the full
-                    eight hours. You will need to refresh your screen every 45 minutes or so, so your session does not die.
-                    Most players will play with the character screen in one tab and the game in the other, allowing them to refresh the character sheet
-                    and not loose chat history in the game tab. You could do the same, and just refresh the character tab every so often.
+                    Should you choose the 8 hour mark, you will not be able to start another exploration session after the full
+                    eight hours until the next real world day at 12 pm GMT-7. <strong>You can log out and this will continue to run.</strong>
                   </p>
                   <p>The eight hour limit only applies if your auto attack is 8 full complete uninterrupted hours. If you do 2 here, 4 there and 6 over here
                   that will not count towards your total, it must be 8 continuous uninterrupted hours.</p>
@@ -536,7 +534,7 @@ export default class AutoAttackSection extends React.Component {
                 <div className="form-group">
                   <AlertWarning icon={'fas fa-exclamation-triangle'} title={'Attn!'}>
                     <p>
-                      Should you choose to move down the list and a monster kills you, the auto battle will stop.
+                      Should you choose to move down the list and a monster kills you, the exploration will stop.
                       New players are suggested to pick higher values to give more time between leveling.
                     </p>
                     <p>

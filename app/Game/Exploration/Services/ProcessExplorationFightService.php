@@ -2,17 +2,14 @@
 
 namespace App\Game\Exploration\Services;
 
-use App\Game\Core\Events\AttackTimeOutEvent;
 use Cache;
 use App\Game\Exploration\Events\ExplorationLogUpdate;
-use App\Flare\Builders\Character\ClassDetails\ClassBonuses;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\Location;
 use App\Flare\Services\FightService;
-use App\Game\Automation\Events\AutomatedAttackMessage;
-use App\Game\Automation\Events\AutomationAttackTimeOut;
+use App\Game\Exploration\Events\ExplorationAttackMessage;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Jobs\BattleAttackHandler;
 
@@ -22,10 +19,7 @@ class ProcessExplorationFightService {
 
     private $battleEventHandler;
 
-    private $classBonuses;
-
-    public function __construct(FightService $fightService, BattleEventHandler $battleEventHandler, ClassBonuses $classBonuses) {
-        $this->classBonuses        = $classBonuses;
+    public function __construct(FightService $fightService, BattleEventHandler $battleEventHandler) {
         $this->fightService        = $fightService;
         $this->battleEventHandler  = $battleEventHandler;
     }
@@ -63,7 +57,7 @@ class ProcessExplorationFightService {
                 'class'   => 'enemy-action-fired',
             ];
 
-            event(new AutomatedAttackMessage($character->user, $battleMessages));
+            event(new ExplorationAttackMessage($character->user, $battleMessages));
 
             event(new ExplorationLogUpdate($character->user, 'You and the enemy are just missing each other ...'));
 
@@ -78,7 +72,7 @@ class ProcessExplorationFightService {
                 'class'   => 'enemy-action-fired',
             ];
 
-            event(new AutomatedAttackMessage($character->user, $battleMessages));
+            event(new ExplorationAttackMessage($character->user, $battleMessages));
 
             event(new ExplorationLogUpdate($character->user, 'Oh! Christ! You\'re dead.'));
 

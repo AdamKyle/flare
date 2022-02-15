@@ -169,7 +169,7 @@ class CharacterFactory {
         $this->character->currentAutomations()->create(array_merge([
             'character_id'                   => $this->character->id,
             'monster_id'                     => null,
-            'type'                           => AutomationType::ATTACK,
+            'type'                           => AutomationType::EXPLORING,
             'started_at'                     => now(),
             'completed_at'                   => now()->addHours(25),
             'attack_type'                    => AttackTypeValue::CAST,

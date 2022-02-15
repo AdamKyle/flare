@@ -1,10 +1,7 @@
 <?php
 
-namespace Tests\Unit\Game\Automation\Services;
+namespace Tests\Unit\Game\Exploration\Services;
 
-use App\Flare\Services\BuildMonsterCacheService;
-use App\Flare\Values\AttackTypeValue;
-use App\Flare\Values\LocationEffectValue;
 use App\Game\Exploration\Services\ExplorationAutomationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;

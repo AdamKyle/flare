@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Game\Automation\Jobs;
+namespace Tests\Unit\Game\Exploration\Jobs;
 
 use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;

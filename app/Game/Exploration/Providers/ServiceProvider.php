@@ -32,8 +32,7 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(ProcessExplorationFightService::class, function($app) {
             return new ProcessExplorationFightService(
                 $app->make(FightService::class),
-                $app->make(BattleEventHandler::class),
-                $app->make(ClassBonuses::class),
+                $app->make(BattleEventHandler::class)
             );
         });
 

@@ -4,6 +4,7 @@ namespace App\Game\Exploration\Controllers\Api;
 
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\CharacterAutomation;
+use App\Game\Exploration\Events\ExplorationLogUpdate;
 use App\Game\Exploration\Events\ExplorationStatus;
 use App\Game\Exploration\Services\AttackAutomationService;
 use App\Flare\Values\AutomationType;
@@ -52,6 +53,8 @@ class ExplorationController extends Controller {
         event(new ExplorationStatus($character->user, false));
         event(new UpdateTopBarEvent($character));
         event(new UpdateAutomationsList($character->user, $character->currentAutomations));
+
+        event(new ExplorationLogUpdate($character->user, 'Exploration has ended.'));
 
         return response()->json([
             'message' => 'Exploration has stopped.'

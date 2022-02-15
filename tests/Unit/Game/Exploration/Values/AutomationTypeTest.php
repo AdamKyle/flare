@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Game\Automation\Values;
+namespace Tests\Unit\Game\Exploration\Values;
 
 use App\Flare\Values\AutomationType;
 use Illuminate\Foundation\Testing\RefreshDatabase;

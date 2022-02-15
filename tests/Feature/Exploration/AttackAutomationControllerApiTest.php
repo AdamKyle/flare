@@ -67,7 +67,7 @@ class AttackAutomationControllerApiTest extends TestCase
             return $skill->baseSkill->name === 'Accuracy';
         })->first();
 
-        $response = $this->actingAs($character->user)->postJson(route('exploration.automation.start', [
+        $response = $this->actingAs($character->user)->postJson(route('exploration.start', [
             'character' => $character->id
         ]), [
             'skill_id'                 => $accuracySkill->id,
@@ -96,7 +96,7 @@ class AttackAutomationControllerApiTest extends TestCase
 
         $this->assertFalse($character->refresh()->currentAutomations->isEmpty());
 
-        $response = $this->actingAs($character->user)->postJson(route('exploration.automation.stop', [
+        $response = $this->actingAs($character->user)->postJson(route('exploration.stop', [
             'characterAutomation' => $automation->id,
             'character'           => $character->id
         ]))->response;
@@ -120,7 +120,7 @@ class AttackAutomationControllerApiTest extends TestCase
 
         $this->assertFalse($otherCharacter->refresh()->currentAutomations->isEmpty());
 
-        $response = $this->actingAs($character->user)->postJson(route('exploration.automation.stop', [
+        $response = $this->actingAs($character->user)->postJson(route('exploration.stop', [
             'characterAutomation' => $automation->id,
             'character'           => $character->id
         ]))->response;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Console\Automation;
+namespace Tests\Console\Exploration;
 
 use App\Flare\Models\AdventureLog;
 use App\Flare\Models\Character;
@@ -10,7 +10,7 @@ use Tests\TestCase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Traits\CreateAdventure;
 
-class ClearAutoAttackTimeOutsTest extends TestCase
+class ClearExplorationTimeOutsTest extends TestCase
 {
 
     use RefreshDatabase, CreateAdventure;
@@ -21,7 +21,7 @@ class ClearAutoAttackTimeOutsTest extends TestCase
             'is_attack_automation_locked' => true,
         ]);
 
-        $this->assertEquals(0, $this->artisan('clear:locked-auto-attack'));
+        $this->assertEquals(0, $this->artisan('clear:locked-exploration'));
 
         $this->assertTrue(Character::where('is_attack_automation_locked', true)->get()->isEmpty());
     }
