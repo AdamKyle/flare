@@ -69,7 +69,7 @@ export default class Automations extends React.Component {
       }
     });
 
-    this.updateAutomations.listen('Game.Automation.Events.UpdateAutomationsList', (event) => {
+    this.updateAutomations.listen('Game.Exploration.Events.UpdateAutomationsList', (event) => {
       this.setState({
         automations: event.automations,
       }, () => {

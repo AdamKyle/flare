@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use App\Flare\Models\CharacterAutomation;
-use App\Game\Automation\Values\AutomationType;
+use App\Flare\Values\AutomationType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Flare\Models\GameBuildingUnit;
 

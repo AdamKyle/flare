@@ -4,7 +4,6 @@ namespace App\Game\Exploration\Handlers;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
-use App\Flare\Models\Monster;
 use App\Game\Exploration\Events\ExplorationLogUpdate;
 use App\Game\Exploration\Services\ProcessExplorationFightService;
 

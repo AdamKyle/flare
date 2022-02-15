@@ -10,7 +10,7 @@ use App\Flare\Models\Item;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use App\Flare\Values\MapNameValue;
-use App\Game\Automation\Values\AutomationType;
+use App\Flare\Values\AutomationType;
 use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Traits\CanHaveQuestItem;

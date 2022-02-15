@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Automation\Values;
+namespace App\Flare\Values;
 
 class AutomationType {
 

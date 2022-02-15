@@ -2,20 +2,13 @@
 
 namespace App\Game\Exploration\Services;
 
-use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
-use App\Flare\Models\GameMap;
-use App\Flare\Models\Map;
-use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Battle\Handlers\FactionHandler;
-use App\Game\Core\Events\CharacterLevelUpEvent;
 use App\Game\Exploration\Events\ExplorationLogUpdate;
 use App\Game\Exploration\Handlers\ExplorationHandler;
 use App\Game\Exploration\Handlers\FightHandler;
 use App\Game\Exploration\Handlers\PlunderHandler;
 use App\Game\Exploration\Handlers\RewardHandler;
-use Carbon\Carbon;
 
 class EncounterService {
 

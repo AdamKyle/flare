@@ -9,7 +9,7 @@ use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\NpcCommandTypes;
 use App\Flare\Values\NpcComponentsValue;
 use App\Flare\Values\NpcTypes;
-use App\Game\Automation\Values\AutomationType;
+use App\Flare\Values\AutomationType;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;

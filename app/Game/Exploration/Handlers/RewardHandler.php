@@ -5,9 +5,15 @@ namespace App\Game\Exploration\Handlers;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
+use App\Flare\Models\Inventory;
+use App\Flare\Models\InventorySlot;
+use App\Flare\Models\Item;
 use App\Flare\Models\Map;
+use App\Flare\Models\MaxLevelConfiguration;
+use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Battle\Handlers\FactionHandler;
+use App\Game\Battle\Values\MaxLevel;
 use App\Game\Core\Events\CharacterLevelUpEvent;
 use App\Game\Exploration\Events\ExplorationLogUpdate;
 
@@ -55,12 +61,13 @@ class RewardHandler {
 
     protected function processEncounterXPBonus(Character $character, int $xp) {
 
-        if ($character->level >= $character->max_level) {
+        if ($character->level >= $this->getMaxLevel($character)) {
             return;
         }
 
         $oldXP        = $character->xp;
-        $levelsGained = round(100 / $xp);
+        $levelsGained = round($xp / 100);
+
 
         while ($levelsGained > 0) {
             $levelsGained -= 1;
@@ -103,5 +110,22 @@ class RewardHandler {
         ]);
 
         event(new UpdateTopBarEvent($character->refresh()));
+    }
+
+    private function getMaxLevel(Character $character): int {
+        $item      = Item::where('effect', ItemEffectsValue::CONTNUE_LEVELING)->first();
+
+        if (is_null($item)) {
+            return MaxLevel::MAX_LEVEL;
+        }
+
+        $inventory = Inventory::where('character_id', $character->id)->first();
+        $slot      = InventorySlot::where('item_id', $item->id)->where('inventory_id', $inventory->id)->first();
+
+        if (!is_null($slot)) {
+            return MaxLevelConfiguration::first()->max_level;
+        }
+
+        return MaxLevel::MAX_LEVEL;
     }
 }

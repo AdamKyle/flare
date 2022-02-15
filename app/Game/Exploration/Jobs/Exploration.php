@@ -4,10 +4,10 @@ namespace App\Game\Exploration\Jobs;
 
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Monster;
-use App\Game\Automation\Events\AutomatedAttackDetails;
-use App\Game\Automation\Events\AutomatedAttackStatus;
-use App\Game\Automation\Events\AutomationAttackTimeOut;
-use App\Game\Automation\Events\UpdateAutomationsList;
+use App\Game\Exploration\Events\ExplorationDetails;
+use App\Game\Exploration\Events\ExplorationStatus;
+use App\Game\Exploration\Events\ExplorationTimeOut;
+use App\Game\Exploration\Events\UpdateAutomationsList;
 use App\Game\Exploration\Events\ExplorationLogUpdate;
 use App\Game\Exploration\Handlers\RewardHandler;
 use App\Game\Exploration\Services\EncounterService;
@@ -71,7 +71,7 @@ class Exploration implements ShouldQueue
 
                     $data = $explorationAutomationService->fetchData($this->character, $automation->refresh());
 
-                    event(new AutomatedAttackDetails($this->character->user, $data));
+                    event(new ExplorationDetails($this->character->user, $data));
                 }
             }
         }
@@ -89,7 +89,6 @@ class Exploration implements ShouldQueue
         event(new ExplorationLogUpdate($this->character->user, 'Next encounter will start in 10 minutes.'));
 
         Exploration::dispatch($this->character, $automation->id, $this->attackType)->onConnection('long_running')->delay(now()->addMinutes(10));
-
     }
 
     protected function shouldBail(CharacterAutomation $automation = null): bool {
@@ -120,7 +119,7 @@ class Exploration implements ShouldQueue
             $automation->delete();
 
             event(new ExplorationLogUpdate($this->character->user, 'Phew child! I did not think we would survive all of your shenanigans.
-                So many time I could have died! Do you ever think about anyone other than your self? No? Didn\'t think so. Either way, I am off.
+                So many times I could have died! Do you ever think about anyone other than your self? No? Didn\'t think so. Either way, I am off.
                 Let me know when we go our next adventure.', true));
 
             $rewardHandler->processRewardsForExplorationComplete($this->character);
@@ -130,8 +129,8 @@ class Exploration implements ShouldQueue
 
         $character = $this->character->refresh();
 
-        event(new AutomationAttackTimeOut($character->user, 0));
-        event(new AutomatedAttackStatus($character->user, false));
+        event(new ExplorationTimeOut($character->user, 0));
+        event(new ExplorationStatus($character->user, false));
         event(new UpdateTopBarEvent($character));
         event(new UpdateAutomationsList($character->user, $character->currentAutomations));
     }

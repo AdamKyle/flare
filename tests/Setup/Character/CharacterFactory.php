@@ -9,7 +9,7 @@ use App\Flare\Models\MarketBoard;
 use App\Flare\Models\Quest;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Values\AttackTypeValue;
-use App\Game\Automation\Values\AutomationType;
+use App\Flare\Values\AutomationType;
 use App\Game\Core\Values\FactionLevel;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use App\Game\Skills\Values\SkillTypeValue;

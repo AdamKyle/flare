@@ -62,14 +62,6 @@
       />
 
       <x-data-tables.header-row
-        wire:click.prevent="sortBy('can_auto_battle')"
-        header-text="Can Auto Battle?"
-        sort-by="{{$sortBy}}"
-        sort-field="{{$sortField}}"
-        field="can_auto_battle"
-      />
-
-      <x-data-tables.header-row
         wire:click.prevent="sortBy('last_logged_in')"
         header-text="Logged In At"
         sort-by="{{$sortBy}}"
@@ -110,13 +102,6 @@
             @endif
           </td>
           <td>
-            @if ($user->can_auto_battle)
-              Yes
-            @else
-              No
-            @endif
-          </td>
-          <td>
             @if (!is_null($user->last_logged_in))
               {{ $user->last_logged_in->setTimeZone(config('app.timezone'))->format('l jS \\of F Y h:i:s A') }}
             @else
@@ -138,20 +123,6 @@
                 formRoute="{{route('user.force.name.change', ['user' => $user->id])}}"
                 formId="{{'force-name-change-' . $user->id}}"
                 buttonTitle="Force Name Change"
-                class="btn btn-primary btn-sm"
-              />
-
-              <x-forms.button-with-form
-                formRoute="{{route('user.enable.auto.battle', ['user' => $user->id])}}"
-                formId="{{'enable-auto-battle' . $user->id}}"
-                buttonTitle="Enable Auto Battle"
-                class="btn btn-primary btn-sm"
-              />
-
-              <x-forms.button-with-form
-                formRoute="{{route('user.disable.auto.battle', ['user' => $user->id])}}"
-                formId="{{'disable-auto-battle' . $user->id}}"
-                buttonTitle="Disable Auto Battle"
                 class="btn btn-primary btn-sm"
               />
 

@@ -2,7 +2,7 @@
 
 namespace App\Game\Exploration\Middleware;
 
-use App\Game\Automation\Values\AutomationType;
+use App\Flare\Values\AutomationType;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Closure;
 

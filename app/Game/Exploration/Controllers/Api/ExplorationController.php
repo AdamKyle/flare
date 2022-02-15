@@ -4,9 +4,12 @@ namespace App\Game\Exploration\Controllers\Api;
 
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\CharacterAutomation;
-use App\Game\Automation\Events\AutomatedAttackStatus;
-use App\Game\Automation\Services\AttackAutomationService;
-use App\Game\Automation\Values\AutomationType;
+use App\Game\Exploration\Events\ExplorationStatus;
+use App\Game\Exploration\Services\AttackAutomationService;
+use App\Flare\Values\AutomationType;
+use App\Game\Exploration\Events\ExplorationTimeOut;
+use App\Game\Exploration\Events\UpdateAutomationsList;
+use App\Game\Exploration\Requests\ExplorationRequest;
 use App\Game\Exploration\Services\ExplorationAutomationService;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
@@ -24,14 +27,7 @@ class ExplorationController extends Controller {
         ], 200);
     }
 
-    public function begin(AttackAutomationStartRequest $request, Character $character, ExplorationAutomationService $explorationAutomationService) {
-
-        if (!$character->user->can_auto_battle) {
-            return response()->json([
-                'message' => 'You are not allowed to auto battle.'
-            ], 422);
-        }
-
+    public function begin(ExplorationRequest $request, Character $character, ExplorationAutomationService $explorationAutomationService) {
         $response = $explorationAutomationService->beginAutomation($character, $request->all());
 
         return response()->json([
@@ -50,8 +46,15 @@ class ExplorationController extends Controller {
 
         $characterAutomation->delete();
 
+        $character = $character->refresh();
+
+        event(new ExplorationTimeOut($character->user, 0));
+        event(new ExplorationStatus($character->user, false));
+        event(new UpdateTopBarEvent($character));
+        event(new UpdateAutomationsList($character->user, $character->currentAutomations));
+
         return response()->json([
-            'message' => 'Attack Automation is stopping. Please wait for the timer to finish.'
+            'message' => 'Exploration has stopped.'
         ]);
     }
 }

@@ -150,10 +150,6 @@ class FactionHandler {
 
         $pointsNeeded = FactionLevel::getPointsNeeded($newLevel);
 
-        if (!$faction->character->user->can_auto_battle) {
-            $pointsNeeded = $pointsNeeded / 10;
-        }
-
         $faction->update([
             'current_points' => 0,
             'current_level'  => $newLevel,

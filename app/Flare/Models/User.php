@@ -46,7 +46,6 @@ class User extends Authenticatable
         'timeout_until',
         'is_test',
         'will_be_deleted',
-        'can_auto_battle',
     ];
 
     /**
@@ -86,7 +85,6 @@ class User extends Authenticatable
         'auto_disenchant'                => 'boolean',
         'disable_attack_type_popover'    => 'boolean',
         'will_be_deleted'                => 'boolean',
-        'can_auto_battle'                => 'boolean',
     ];
 
     public function character() {
@@ -95,10 +93,6 @@ class User extends Authenticatable
 
     public function messages() {
         return $this->hasMany(Message::class);
-    }
-
-    public function securityQuestions() {
-        return $this->hasMany(SecurityQuestion::class);
     }
 
     protected static function newFactory() {

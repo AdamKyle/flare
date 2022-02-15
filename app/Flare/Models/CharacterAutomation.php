@@ -2,7 +2,7 @@
 
 namespace App\Flare\Models;
 
-use App\Game\Automation\Values\AutomationType;
+use App\Flare\Values\AutomationType;
 use Database\Factories\CelestialFightFactory;
 use Database\Factories\CharacterAutomationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

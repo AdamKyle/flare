@@ -6,7 +6,7 @@ use App\Game\Maps\Requests\QuestDataRequest;
 use Cache;
 use App\Flare\Models\Npc;
 use App\Flare\Models\Quest;
-use App\Game\Automation\Values\AutomationType;
+use App\Flare\Values\AutomationType;
 use App\Game\Maps\Requests\TraverseRequest;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Http\Controllers\Controller;

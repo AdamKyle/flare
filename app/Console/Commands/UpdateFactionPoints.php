@@ -1,0 +1,64 @@
+<?php
+
+namespace App\Console\Commands;
+
+use App\Flare\Models\Character;
+use App\Game\Core\Values\FactionLevel;
+use Illuminate\Console\Command;
+
+/**
+ * @codeCoverageIgnore
+ */
+class UpdateFactionPoints extends Command
+{
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'update:faction-points';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Updates characters faction points';
+
+    /**
+     * Create a new command instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    /**
+     * Execute the console command.
+     *
+     * @return int
+     */
+    public function handle()
+    {
+        Character::chunkById(250, function($characters) {
+            foreach ($characters as $character) {
+                $this->updateFactions($character);
+            }
+        });
+    }
+
+    protected function updateFactions(Character $character) {
+        foreach ($character->factions as $faction) {
+            if (FactionLevel::isMaxLevel($faction->current_level)) {
+                continue;
+            }
+
+            $faction->update([
+                'current_points' => $faction->current_points * 10,
+                'points_needed'  => FactionLevel::gatPointsPerLevel($faction->current_level)
+            ]);
+        }
+    }
+}

@@ -5,14 +5,14 @@ namespace App\Game\Exploration\Services;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
-use App\Game\Automation\Events\AutomatedAttackStatus;
-use App\Game\Automation\Events\AutomationAttackTimeOut;
-use App\Game\Automation\Events\UpdateAutomationsList;
 use App\Game\Exploration\Jobs\Exploration;
-use App\Game\Automation\Values\AutomationType;
+use App\Flare\Values\AutomationType;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Exploration\Events\ExplorationLogUpdate;
 use App\Game\Skills\Services\SkillService;
+use App\Game\Exploration\Events\ExplorationStatus;
+use App\Game\Exploration\Events\ExplorationTimeOut;
+use App\Game\Exploration\Events\UpdateAutomationsList;
 
 class ExplorationAutomationService {
 
@@ -64,8 +64,8 @@ class ExplorationAutomationService {
 
         $character = $character->refresh();
 
-        event(new AutomationAttackTimeOut($character->user, $delay));
-        event (new AutomatedAttackStatus($character->user, true));
+        event(new ExplorationTimeOut($character->user, $delay));
+        event (new ExplorationStatus($character->user, true));
         event(new UpdateTopBarEvent($character));
         event(new UpdateAutomationsList($character->user, $character->currentAutomations));
 
@@ -97,9 +97,9 @@ class ExplorationAutomationService {
                 'attack_type'              => $automation->attack_type,
             ];
 
-            event(new AutomatedAttackStatus($character->user, true));
+            event(new ExplorationStatus($character->user, true));
         } else {
-            event(new AutomatedAttackStatus($character->user, false));
+            event(new ExplorationStatus($character->user, false));
         }
 
         return $data;

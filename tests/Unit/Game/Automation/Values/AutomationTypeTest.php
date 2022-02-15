@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Game\Automation\Values;
 
-use App\Game\Automation\Values\AutomationType;
+use App\Flare\Values\AutomationType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

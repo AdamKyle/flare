@@ -55,7 +55,6 @@ class CreateAdminAccount extends Command
             'password'         => Hash::make(Str::random(10)),
             'game_key'         => hash('sha256', $token),
             'private_game_key' => $token,
-            'can_auto_battle'  => false,
         ]);
 
         // Make them an admin

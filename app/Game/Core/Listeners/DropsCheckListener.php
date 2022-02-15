@@ -4,7 +4,7 @@ namespace App\Game\Core\Listeners;
 
 use App\Flare\Models\Location;
 use App\Flare\Values\LocationEffectValue;
-use App\Game\Automation\Values\AutomationType;
+use App\Flare\Values\AutomationType;
 use App\Game\Core\Services\DropCheckService;
 use App\Game\Core\Traits\CanHaveQuestItem;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
