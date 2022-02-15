@@ -22,6 +22,7 @@ class Location extends Model
         'name',
         'game_map_id',
         'quest_reward_item_id',
+        'required_quest_item_id',
         'description',
         'is_port',
         'enemy_strength_type',
@@ -51,6 +52,10 @@ class Location extends Model
 
     public function adventures() {
         return $this->hasMany(Adventure::class, 'location_id', 'id');
+    }
+
+    public function requiredQuestItem() {
+        return $this->hasOne(Item::class, 'id', 'required_quest_item_id');
     }
 
     /**

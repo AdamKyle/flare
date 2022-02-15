@@ -141,9 +141,10 @@ class MovementService {
      * @return array
      */
     public function updateCharacterPosition(Character $character, array $params): array {
-        $xPosition    = $params['character_position_x'];
-        $yPosition    = $params['character_position_y'];
-        $mapTileColor = $this->mapTile->getTileColor($character, $xPosition, $yPosition);
+        $xPosition      = $params['character_position_x'];
+        $yPosition      = $params['character_position_y'];
+        $mapTileColor   = $this->mapTile->getTileColor($character, $xPosition, $yPosition);
+        $lockedLocation = Location::where('x', $xPosition)->where('y', $yPosition)->where('game_map_id', $character->map->game_map_id)->where('required_quest_item_id', true)->first();
 
         if ($this->mapTile->isWaterTile((int) $mapTileColor)) {
             if ($this->mapTile->canWalkOnWater($character, $xPosition, $yPosition)) {
@@ -172,6 +173,15 @@ class MovementService {
 
         if ($this->mapTile->isPurgatoryWater((int) $mapTileColor)) {
             return $this->errorResult('You would slip away into the void if you tried to go that way child!');
+        }
+
+        if (!is_null($lockedLocation)) {
+            $item = Item::where('id', $lockedLocation->required_quest_item_id)->first();
+            $slot = $character->inventory->slots()->where('item_id', $item->id)->first();
+
+            if (is_null($slot)) {
+                return $this->errorResult('Cannot enter this location without a ' . $item->name);
+            }
         }
 
         return $this->moveCharacter($character, $params);
@@ -216,11 +226,11 @@ class MovementService {
             if (!is_null($location->enemy_strength_type)) {
                 $this->updateActions($character, $location->name);
 
-                event(new GameServerMessageEvent($character->user, 'You have entered: ' . $location->name . '. Monsters here are much stronger. 
-                Special location enemy strength is also effected by the planes monster strength if you on Shadow Planes or Lower. 
-                Remember, if you are here to get quest items, they will not drop if you are auto battling. Gear will matter here. 
-                There are quests you can do for Voidance and Devoidance Quest items which make your time here much easier. 
-                Locations such as these can drop special quest items. Check your quest section under: Plane Quests (on the map) -> All quests. 
+                event(new GameServerMessageEvent($character->user, 'You have entered: ' . $location->name . '. Monsters here are much stronger.
+                Special location enemy strength is also effected by the planes monster strength if you on Shadow Planes or Lower.
+                Remember, if you are here to get quest items, they will not drop if you are auto battling. Gear will matter here.
+                There are quests you can do for Voidance and Devoidance Quest items which make your time here much easier.
+                Locations such as these can drop special quest items. Check your quest section under: Plane Quests (on the map) -> All quests.
                 If you need further help, click Help I\'m stuck at the top or the Discord button to join discord and ask for help in #help.'));
             }
         } else {
@@ -364,6 +374,7 @@ class MovementService {
         $canTeleportToWater      = $this->mapTile->canWalkOnWater($character, $x, $y);
         $canTeleportToDeathWater = $this->mapTile->canWalkOnDeathWater($character, $x, $y);
         $canTeleportToMagma      = $this->mapTile->canWalkOnMagma($character, $x, $y);
+        $lockedLocation          = Location::where('x', $x)->where('y', $y)->where('game_map_id', $character->map->game_map_id)->whereNotNull('required_quest_item_id')->first();
 
         if (!$canTeleportToWater && $this->mapTile->isWaterTile($this->mapTile->getTileColor($character, $x, $y))) {
             $item = Item::where('effect', ItemEffectsValue::WALK_ON_WATER)->first();
@@ -385,6 +396,15 @@ class MovementService {
 
         if ($this->mapTile->isPurgatoryWater($this->mapTile->getTileColor($character, $x, $y))) {
             return $this->errorResult('You would slip away into the void if you tried to go that way child!');
+        }
+
+        if (!is_null($lockedLocation)) {
+            $item = Item::where('id', $lockedLocation->required_quest_item_id)->first();
+            $slot = $character->inventory->slots()->where('item_id', $item->id)->first();
+
+            if (is_null($slot)) {
+                return $this->errorResult('Cannot enter this location without a ' . $item->name);
+            }
         }
 
         if ($character->gold < $cost) {
