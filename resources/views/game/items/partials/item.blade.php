@@ -15,6 +15,12 @@
                             @endif
                         @endguest
                 </x-core.cards.card-with-title>
+
+                @if ($item->appliedHolyStacks->isNotEmpty())
+                    <x-core.cards.card-with-title title="Applied Holy Stacks" css="tw-mt-4">
+                        @include('game.items.partials.item-holy-section', ['item' => $item])
+                    </x-core.cards.card-with-title>
+                @endif
             </div>
 
             @if ($item->type == 'quest')

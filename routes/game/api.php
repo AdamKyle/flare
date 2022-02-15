@@ -43,6 +43,7 @@ Route::group(['middleware' => ['auth', 'throttle:100,1', 'is.character.who.they.
             Route::post('/character/{character}/random-enchant/move', ['uses' => 'Api\RandomEnchantController@moveAffixes']);
 
             Route::get('/character/{character}/inventory/smiths-workbench', ['uses' => 'Api\HolyitemsController@index']);
+            Route::post('/character/{character}/smithy-workbench/apply', ['uses' => 'Api\HolyitemsController@apply']);
         });
 
         Route::post('/character/{character}/inventory-set/remove', ['uses' => 'Api\CharacterInventoryController@removeFromSet']);

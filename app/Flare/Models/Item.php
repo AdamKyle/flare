@@ -408,6 +408,10 @@ class Item extends Model
             $baseStat += !is_null($statBonus) ? $statBonus : 0.0;
         }
 
+        if ($this->holy_stack_stat_bonus > 0) {
+            $baseStat += $this->holy_stack_stat_bonus;
+        }
+
         return number_format($baseStat, 2);
     }
 

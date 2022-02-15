@@ -200,8 +200,12 @@ class CharacterAffixInformation {
 
         $amount = $voidance + $this->fetchVoidanceFromAffixes($type);
 
+        if ($type === 'devouring_darkness') {
+            $amount = $voidance + $this->fetchVoidanceFromHolyitems();
+        }
+
         if ($this->character->map->gameMap->mapType()->isPurgatory()) {
-            return ((($amount * 100) * .45) / 100);
+            return $amount - .45;
         }
 
         return $amount;
@@ -226,6 +230,14 @@ class CharacterAffixInformation {
         $max = max($amounts);
 
         return is_null($max) ? 0.0 : $max;
+    }
+
+    protected function fetchVoidanceFromHolyItems(): float {
+        $slots = $this->fetchInventory();
+
+        return $slots->filter(function($slot) {
+            return $slot->item->appliedHolyStacks->isNotEmpty();
+        })->sum('item.holy_stack_devouring_darkness');
     }
 
     /**

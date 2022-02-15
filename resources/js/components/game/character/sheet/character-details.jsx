@@ -249,6 +249,25 @@ export default class CharacterDetails extends React.Component {
               </dl>
               <p className="mt-4">For more information, please see <a href="/information/voidance">Voidance help</a>. </p>
             </Tab>
+            <Tab eventKey="holy-bonus" title="Holy Bonuses">
+              <dl className="mt-4">
+                <dt>Over All Holy Bonus:</dt>
+                <dd>100%</dd>
+                <dt>Holy Stacks</dt>
+                <dd>280/280</dd>
+                <dt>Voidance Resistance Bonus:</dt>
+                <dd>100%</dd>
+                <dt>Devoidance Resistance Bonus:</dt>
+                <dd>100%</dd>
+                <dt>Bonus Attack %</dt>
+                <dd>100%</dd>
+                <dt>Bonus AC %</dt>
+                <dd>100%</dd>
+                <dt>Bonus Healing %</dt>
+                <dd>100%</dd>
+              </dl>
+              <p className="mt-4">For more information, please see <a href="/information/holy-items">Holy Items help</a>. </p>
+            </Tab>
           </Tabs>
           <hr />
           <Row>
