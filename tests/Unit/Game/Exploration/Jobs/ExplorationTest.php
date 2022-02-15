@@ -5,14 +5,14 @@ namespace Tests\Unit\Game\Automation\Jobs;
 use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Values\AttackTypeValue;
-use App\Game\Automation\Jobs\Exploration;
+use App\Game\Exploration\Jobs\Exploration;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateCharacterAutomation;
 use Tests\Traits\CreateItemAffix;
 use Tests\Traits\CreateMonster;
 
-class AttackAutomationTest extends TestCase
+class ExplorationTest extends TestCase
 {
     use RefreshDatabase, CreateMonster, CreateCharacterAutomation, CreateItemAffix;
 
@@ -42,7 +42,7 @@ class AttackAutomationTest extends TestCase
             'ac'           => 0,
         ]);
 
-        $automation = $this->createAttackAutomation([
+        $automation = $this->createExploringAutomation([
             'character_id' => $character->id,
             'monster_id'   => $monster->id,
             'started_at'   => now(),
@@ -90,7 +90,7 @@ class AttackAutomationTest extends TestCase
             'xp'           => 10,
         ]);
 
-        $automation = $this->createAttackAutomation([
+        $automation = $this->createExploringAutomation([
             'character_id'                 => $character->id,
             'monster_id'                   => $monster->id,
             'started_at'                   => now(),
@@ -126,7 +126,7 @@ class AttackAutomationTest extends TestCase
             'ac'           => 0,
         ]);
 
-        $automation = $this->createAttackAutomation([
+        $automation = $this->createExploringAutomation([
             'character_id' => $character->id,
             'monster_id'   => $monster->id,
             'started_at'   => now(),
@@ -176,7 +176,7 @@ class AttackAutomationTest extends TestCase
             'ac'           => 0,
         ]);
 
-        $automation = $this->createAttackAutomation([
+        $automation = $this->createExploringAutomation([
             'character_id' => $character->id,
             'monster_id'   => $monster->id,
             'started_at'   => now(),
@@ -200,7 +200,7 @@ class AttackAutomationTest extends TestCase
             'ac'           => 0,
         ]);
 
-        $automation = $this->createAttackAutomation([
+        $automation = $this->createExploringAutomation([
             'character_id' => $character->id,
             'monster_id'   => $monster->id,
             'started_at'   => now()->subHours(25),

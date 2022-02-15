@@ -18,9 +18,9 @@ trait CreateCharacterAutomation {
      * @param array $details
      * @return CharacterAutomation
      */
-    public function createAttackAutomation(array $details): CharacterAutomation {
+    public function createExploringAutomation(array $details): CharacterAutomation {
         return CharacterAutomation::factory()->create(array_merge($details, [
-            'type' => AutomationType::ATTACK
+            'type' => AutomationType::EXPLORING
         ]));
     }
 }

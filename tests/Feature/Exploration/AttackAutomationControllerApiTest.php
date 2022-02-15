@@ -3,7 +3,7 @@
 namespace Tests\Feature\Automation;
 
 use App\Flare\Values\AttackTypeValue;
-use App\Game\Automation\Jobs\Exploration;
+use App\Game\Exploration\Jobs\Exploration;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -32,7 +32,7 @@ class AttackAutomationControllerApiTest extends TestCase
     public function testCanGetAttackAutomation() {
         $character = $this->character->getCharacter(false);
 
-        $this->createAttackAutomation([
+        $this->createExploringAutomation([
             'character_id' => $character->id,
             'monster_id'   => $this->monster->id,
             'started_at'   => now(),
@@ -40,7 +40,7 @@ class AttackAutomationControllerApiTest extends TestCase
             'attack_type'  => AttackTypeValue::CAST
         ]);
 
-        $response = $this->actingAs($character->user)->getJson(route('attack.automation.index', [
+        $response = $this->actingAs($character->user)->getJson(route('exploration.automation.index', [
             'character'           => $character->id
         ]))->response;
 
@@ -50,7 +50,7 @@ class AttackAutomationControllerApiTest extends TestCase
     public function testHasNoAutomation() {
         $character = $this->character->getCharacter(false);
 
-        $response = $this->actingAs($character->user)->getJson(route('attack.automation.index', [
+        $response = $this->actingAs($character->user)->getJson(route('exploration.automation.index', [
             'character'           => $character->id
         ]))->response;
 
@@ -67,7 +67,7 @@ class AttackAutomationControllerApiTest extends TestCase
             return $skill->baseSkill->name === 'Accuracy';
         })->first();
 
-        $response = $this->actingAs($character->user)->postJson(route('attack.automation.start', [
+        $response = $this->actingAs($character->user)->postJson(route('exploration.automation.start', [
             'character' => $character->id
         ]), [
             'skill_id'                 => $accuracySkill->id,
@@ -86,7 +86,7 @@ class AttackAutomationControllerApiTest extends TestCase
     public function testCanStopAutomationAttack() {
         $character = $this->character->getCharacter(false);
 
-        $automation = $this->createAttackAutomation([
+        $automation = $this->createExploringAutomation([
             'character_id' => $character->id,
             'monster_id'   => $this->monster->id,
             'started_at'   => now(),
@@ -96,7 +96,7 @@ class AttackAutomationControllerApiTest extends TestCase
 
         $this->assertFalse($character->refresh()->currentAutomations->isEmpty());
 
-        $response = $this->actingAs($character->user)->postJson(route('attack.automation.stop', [
+        $response = $this->actingAs($character->user)->postJson(route('exploration.automation.stop', [
             'characterAutomation' => $automation->id,
             'character'           => $character->id
         ]))->response;
@@ -110,7 +110,7 @@ class AttackAutomationControllerApiTest extends TestCase
         $character      = $this->character->getCharacter(false);
         $otherCharacter = (new CharacterFactory())->createBaseCharacter()->getCharacter(false);
 
-        $automation = $this->createAttackAutomation([
+        $automation = $this->createExploringAutomation([
             'character_id' => $otherCharacter->id,
             'monster_id'   => $this->monster->id,
             'started_at'   => now(),
@@ -120,7 +120,7 @@ class AttackAutomationControllerApiTest extends TestCase
 
         $this->assertFalse($otherCharacter->refresh()->currentAutomations->isEmpty());
 
-        $response = $this->actingAs($character->user)->postJson(route('attack.automation.stop', [
+        $response = $this->actingAs($character->user)->postJson(route('exploration.automation.stop', [
             'characterAutomation' => $automation->id,
             'character'           => $character->id
         ]))->response;

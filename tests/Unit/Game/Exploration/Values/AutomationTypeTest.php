@@ -11,7 +11,7 @@ class AutomationTypeTest extends TestCase
     use RefreshDatabase;
 
     public function testIsAttackType() {
-        $this->assertTrue((new AutomationType(0))->isAttack());
+        $this->assertTrue((new AutomationType(0))->isExploring());
     }
 
     public function testThrowsError() {
