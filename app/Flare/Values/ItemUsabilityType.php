@@ -13,12 +13,14 @@ class ItemUsabilityType {
     const EFFECTS_SKILL  = 1;
     const KINGDOM_DAMAGE = 2;
     const OTHER          = 3;
+    const USE_ON_ITEMS   = 4;
 
     protected static $values = [
         0 => self::STAT_INCREASE,
         1 => self::EFFECTS_SKILL,
         2 => self::KINGDOM_DAMAGE,
-        3 => self::OTHER
+        3 => self::OTHER,
+        4 => self::USE_ON_ITEMS,
     ];
 
     /**
@@ -28,7 +30,8 @@ class ItemUsabilityType {
         self::STAT_INCREASE  => 'Stat increase',
         self::EFFECTS_SKILL  => 'Effects skill',
         self::KINGDOM_DAMAGE => 'Deals damage to a kingdom',
-        self::OTHER          => 'Effects multiple stats'
+        self::OTHER          => 'Effects multiple stats',
+        self::USE_ON_ITEMS   => 'Use on items.'
     ];
 
     /**
@@ -83,6 +86,15 @@ class ItemUsabilityType {
      */
     public function isOther(): bool {
         return $this->value === self::OTHER;
+    }
+
+    /**
+     * Can we use this item on other items?
+     *
+     * @return bool
+     */
+    public function canUseOnItems(): bool {
+        return $this->value === self::USE_ON_ITEMS;
     }
 
     /**

@@ -82,6 +82,11 @@ class ItemsSheet implements ToCollection {
             $item['ignores_caps'] = false;
         }
 
+        if (!isset($item['can_use_on_other_items'])) {
+            $item['can_use_on_other_items'] = false;
+            $item['holy_level']             = null;
+        }
+
         foreach ($item as $key => $value) {
             if (!is_null($value) || ($key === 'item_suffix_id' || $key === 'item_prefix_id')) {
 

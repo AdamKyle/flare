@@ -201,6 +201,21 @@
         </div>
     </div>
     <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="devouring_darkness">Holy Level: </label>
+                <input type="number" class="form-control" id="holy_level" name="holy_level" wire:model="item.holy_level">
+                @error('item.holy_level') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group form-check-inline">
+                <input type="checkbox" class="form-check-input" id="can_use_on_other_items" wire:model="item.can_use_on_other_items">
+                <label class="form-check-label" for="can_use_on_other_items">Can use on other items?</label>
+            </div>
+        </div>
+    </div>
+    <div class="row">
         <div class="col-md-12">
             <div class="form-group">
                 <label for="drop_location_id">Drop only from location: </label>

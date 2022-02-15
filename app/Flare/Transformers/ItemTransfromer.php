@@ -9,7 +9,7 @@ use League\Fractal\TransformerAbstract;
 use App\Flare\Models\Item;
 
 class ItemTransfromer extends TransformerAbstract {
-    
+
     use IsItemUnique;
 
     /**
@@ -47,7 +47,6 @@ class ItemTransfromer extends TransformerAbstract {
             'skill_level_req'                  => $item->skill_level_required,
             'skill_level_trivial'              => $item->skill_level_trivial,
             'cost'                             => SellItemCalculator::fetchSalePriceWithAffixes($item),
-            'usable'                           => $item->usable,
             'base_damage_mod_bonus'            => $item->getTotalBaseDamageMod(),
             'base_healing_mod_bonus'           => $item->base_healing_mod_bonus,
             'base_ac_mod_bonus'                => $item->base_ac_mod_bonus,
@@ -67,6 +66,8 @@ class ItemTransfromer extends TransformerAbstract {
             'increase_skill_training_bonus_by' => $item->increase_skill_training_bonus_by,
             'unique'                           => $this->isUnique($item),
             'min_cost'                         => SellItemCalculator::fetchMinimumSalePriceOfUnique($item),
+            'can_use_on_other_items'           => $item->can_use_on_other_items,
+            'holy_level'                       => $item->holy_level,
         ];
     }
 }

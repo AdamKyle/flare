@@ -46,7 +46,7 @@ class ItemDisplayColor extends Component
                 $this->color = 'one-enchant';
             } elseif ($this->item->type === 'quest') {
                 $this->color = 'quest-item';
-            } elseif ($this->item->usable) {
+            } elseif ($this->item->usable || $this->item->can_use_on_other_items) {
                 $this->color = 'usable-item';
             } else {
                 $this->color = 'normal-item';

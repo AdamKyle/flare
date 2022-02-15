@@ -82,6 +82,8 @@ class Item extends Model
         'parent_id',
         'xp_bonus',
         'ignores_caps',
+        'can_use_on_other_items',
+        'holy_level',
     ];
 
     /**
@@ -97,6 +99,7 @@ class Item extends Model
         'gold_dust_cost'                   => 'integer',
         'shards_cost'                      => 'integer',
         'parent_id'                        => 'integer',
+        'holy_level'                       => 'integer',
         'base_damage_mod'                  => 'float',
         'base_healing_mod'                 => 'float',
         'base_ac_mod'                      => 'float',
@@ -125,6 +128,7 @@ class Item extends Model
         'damages_kingdoms'                 => 'boolean',
         'ignores_caps'                     => 'boolean',
         'stat_increase'                    => 'boolean',
+        'can_use_on_other_items'           => 'boolean',
         'kingdom_damage'                   => 'float',
         'lasts_for'                        => 'integer',
         'increase_stat_by'                 => 'float',

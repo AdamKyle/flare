@@ -59,6 +59,8 @@
         <th>drop_location_id</th>
         <th>xp_bonus</th>
         <th>ignores_caps</th>
+        <th>can_use_on_other_items</th>
+        <th>holy_level</th>
     </tr>
     </thead>
     <tbody>
@@ -122,6 +124,8 @@
             <td>{{!is_null($item->dropLocation) ? $item->dropLocation->name : null}}</td>
             <td>{{$item->xp_bonus}}</td>
             <td>{{$item->ignores_caps}}</td>
+            <td>{{$item->can_use_on_other_items}}</td>
+            <td>{{$item->holy_level}}</td>
         </tr>
     @endforeach
     </tbody>

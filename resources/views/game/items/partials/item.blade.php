@@ -34,6 +34,12 @@
                         'skill'  => $skill,
                     ])
                 </div>
+            @elseif($item->can_use_on_other_items)
+                <div class="col-md-6">
+                    @include('game.items.partials.item-use-on-other-items', [
+                        'item'   => $item,
+                    ])
+                </div>
             @else
                 <div class="col-md-6">
                     <x-core.cards.card-with-title title="Base Equip Stats">

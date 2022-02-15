@@ -137,6 +137,8 @@ class ItemDetails extends Component
         'item.drop_location_id'                 => 'nullable',
         'item.xp_bonus'                         => 'nullable',
         'item.ignores_caps'                     => 'nullable',
+        'item.can_use_on_other_items'           => 'nullable',
+        'item.holy_level'                       => 'nullable',
     ];
 
     protected $messages = [
@@ -172,6 +174,11 @@ class ItemDetails extends Component
 
             if (is_null($this->item->ignores_caps)) {
                 $this->item->ignores_caps = false;
+            }
+
+            if (is_null($this->item->can_use_on_other_items)) {
+                $this->item->can_use_on_other_items = false;
+                $this->item->holy_level             = null;
             }
 
             if (is_null($this->item->usable)) {

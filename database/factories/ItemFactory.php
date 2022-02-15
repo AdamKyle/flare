@@ -29,7 +29,8 @@ class ItemFactory extends Factory
             'crafting_type'       => 'weapon',
             'description'         => 'sample',
             'can_resurrect'       => false,
-            'resurrection_chance' => 0.0
+            'resurrection_chance' => 0.0,
+            'can_use_on_other_items' => false,
         ];
     }
 }
