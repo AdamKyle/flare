@@ -84,6 +84,7 @@ class Item extends Model
         'ignores_caps',
         'can_use_on_other_items',
         'holy_level',
+        'holy_stacks',
     ];
 
     /**
@@ -100,6 +101,7 @@ class Item extends Model
         'shards_cost'                      => 'integer',
         'parent_id'                        => 'integer',
         'holy_level'                       => 'integer',
+        'holy_stacks'                      => 'integer',
         'base_damage_mod'                  => 'float',
         'base_healing_mod'                 => 'float',
         'base_ac_mod'                      => 'float',
@@ -150,7 +152,10 @@ class Item extends Model
         'required_monster',
         'required_quest',
         'locations',
-        'adventures'
+        'adventures',
+        'holy_stack_devouring_darkness',
+        'holy_stack_stat_bonus',
+        'holy_stacks_applied'
     ];
 
     public function inventorySlots() {
@@ -175,6 +180,10 @@ class Item extends Model
 
     public function itemPrefix() {
         return $this->hasOne(ItemAffix::class, 'id', 'item_prefix_id');
+    }
+
+    public function appliedHolyStacks() {
+        return $this->hasMany(HolyStack::class, 'item_id', 'id');
     }
 
     public function dropLocation() {
@@ -248,6 +257,30 @@ class Item extends Model
         }
 
         return [];
+    }
+
+    public function getHolyStackDevouringDarknessAttribute() {
+        if ($this->appliedHolyStacks->isNotEmpty()) {
+            return $this->appliedHolyStacks->sum('devouring_darkness_bonus');
+        }
+
+        return 0.0;
+    }
+
+    public function getHolyStackStatBonusAttribute() {
+        if ($this->appliedHolyStacks->isNotEmpty()) {
+            return $this->appliedHolyStacks->sum('stat_increase_bonus');
+        }
+
+        return 0.0;
+    }
+
+    public function getHolyStacksAppliedAttribute() {
+        if ($this->appliedHolyStacks->isNotEmpty()) {
+            return $this->appliedHolyStacks->count();
+        }
+
+        return 0;
     }
 
     /**

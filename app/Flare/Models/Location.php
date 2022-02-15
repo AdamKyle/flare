@@ -28,6 +28,7 @@ class Location extends Model
         'enemy_strength_type',
         'x',
         'y',
+        'type',
     ];
 
     /**
@@ -38,6 +39,7 @@ class Location extends Model
     protected $casts = [
         'y'                   => 'integer',
         'x'                   => 'integer',
+        'type'                => 'integer',
         'enemy_strength_type' => 'string',
         'is_port'             => 'boolean',
     ];

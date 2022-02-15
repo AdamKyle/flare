@@ -1,6 +1,7 @@
 import React from 'react';
 import {Dropdown} from 'react-bootstrap';
 import {getServerMessage} from '../../helpers/server_message';
+import LockedLocationType from "../lib/LockedLocationType";
 
 export default class AdditionalActionsDropDown extends React.Component {
 
@@ -11,6 +12,7 @@ export default class AdditionalActionsDropDown extends React.Component {
       showCrafting: false,
       showEnchanting: false,
       showAlchemy: false,
+      showSmithingBench: false,
     }
   }
 
@@ -62,6 +64,24 @@ export default class AdditionalActionsDropDown extends React.Component {
     });
   }
 
+  addPurgatorySmithSection() {
+    if (!this.props.canCraft) {
+      return getServerMessage('cant_use_smithy_bench');
+    }
+
+    this.setState({
+      showEnchanting: false,
+      showCrafting: false,
+      showAlchemy: false,
+      showSmithingBench: !this.state.showSmithingBench
+    }, () => {
+      this.props.updateShowCrafting(this.state.showCrafting);
+      this.props.updateShowEnchanting(this.state.showEnchanting);
+      this.props.updateShowAlchemy(this.state.showAlchemy);
+      this.props.updateShowSmithingBench(this.state.showSmithingBench);
+    });
+  }
+
   changeType() {
     if (!this.props.canCraft) {
       return getServerMessage('cant_craft');
@@ -88,6 +108,12 @@ export default class AdditionalActionsDropDown extends React.Component {
               !this.props.isAlchemyLocked ?
                 <Dropdown.Item
                   onClick={this.addAlchemySection.bind(this)}>{this.state.showAlchemy ? 'Remove Alchemy' : 'Alchemy'}</Dropdown.Item>
+              : null
+            }
+            {
+              this.props.lockedLocationType === LockedLocationType.PURGATORYSMITHSHOUSE ?
+                <Dropdown.Item
+                  onClick={this.addPurgatorySmithSection.bind(this)}>{this.state.showPurgatorySmithWorkBench ? 'Remove Work Bench' : 'Smiths Work Bench'}</Dropdown.Item>
               : null
             }
 

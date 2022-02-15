@@ -61,6 +61,7 @@
         <th>ignores_caps</th>
         <th>can_use_on_other_items</th>
         <th>holy_level</th>
+        <th>holy_stacks</th>
     </tr>
     </thead>
     <tbody>
@@ -126,6 +127,7 @@
             <td>{{$item->ignores_caps}}</td>
             <td>{{$item->can_use_on_other_items}}</td>
             <td>{{$item->holy_level}}</td>
+            <td>{{$item->holy_stacks}}</td>
         </tr>
     @endforeach
     </tbody>

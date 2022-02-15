@@ -76,7 +76,13 @@
         <dd>{{!is_null($item->gold_dust_cost) ? number_format($item->gold_dust_cost) : 0}}</dd>
         <dt>Shards Cost:</dt>
         <dd>{{!is_null($item->shards_cost) ? $item->shards_cost : 0}}</dd>
+        <dt>Holy Stacks <sup>*</sup>:</dt>
+        <dd>{{$item->holy_stacks}}</dd>
     </dl>
+    <p class="mt-3">
+        <sup>*</sup> If an item has 0 Holy Stacks, you won't be able to use the Purgatory Smiths Workbench, in Purgatory, to
+        apply holy stacks to the item.
+    </p>
 @endif
 
 @if (!empty($item->getItemSkills()))

@@ -85,7 +85,7 @@ class CharacterInventoryService {
      */
     public function getUsableItems(): Collection {
         return $this->character->inventory->slots->filter(function($slot) {
-            return $slot->item->usable;
+            return $slot->item->usable || $slot->item->can_use_on_other_items;
         })->load(['item.itemPrefix', 'item.itemSuffix'])->values();
     }
 

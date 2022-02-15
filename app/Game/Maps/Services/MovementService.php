@@ -148,7 +148,7 @@ class MovementService {
 
         if ($this->mapTile->isWaterTile((int) $mapTileColor)) {
             if ($this->mapTile->canWalkOnWater($character, $xPosition, $yPosition)) {
-                return $this->moveCharacter($character, $params);
+                return $this->moveCharacter($character, $params, $lockedLocation);
             } else {
                 return $this->errorResult('cannot walk on water.');
             }
@@ -157,7 +157,7 @@ class MovementService {
         if ($this->mapTile->isDeathWaterTile((int) $mapTileColor)) {
 
             if ($this->mapTile->canWalkOnDeathWater($character, $xPosition, $yPosition)) {
-                return $this->moveCharacter($character, $params);
+                return $this->moveCharacter($character, $params, $lockedLocation);
             } else {
                 return $this->errorResult('cannot walk on death water.');
             }
@@ -165,7 +165,7 @@ class MovementService {
 
         if ($this->mapTile->isMagma((int) $mapTileColor)) {
             if ($this->mapTile->canWalkOnMagma($character, $xPosition, $yPosition)) {
-                return $this->moveCharacter($character, $params);
+                return $this->moveCharacter($character, $params, $lockedLocation);
             } else {
                 return $this->errorResult('cannot walk on magma.');
             }
@@ -184,7 +184,7 @@ class MovementService {
             }
         }
 
-        return $this->moveCharacter($character, $params);
+        return $this->moveCharacter($character, $params, $lockedLocation);
     }
 
     /**
@@ -432,13 +432,15 @@ class MovementService {
 
         $this->teleportCharacter($character, $timeout, $cost, $pctCommand);
 
-        return $this->successResult();
+        return $this->successResult([
+            'lockedLocationType' => is_null($lockedLocation) ? null : $lockedLocation->type,
+        ]);
     }
 
     /**
      * Set sail.
      *
-     * Moves the character fro one port to another assuming they can.
+     * Moves the character from one port to another assuming they can.
      *
      * @param Character $character
      * @param Location $location
@@ -574,7 +576,7 @@ class MovementService {
      * @param array $params
      * @return array
      */
-    protected function moveCharacter(Character $character, array $params): array {
+    protected function moveCharacter(Character $character, array $params, ?Location $lockedLocation): array {
         $character->map->update($params);
 
         $character = $character->refresh();
@@ -593,12 +595,13 @@ class MovementService {
         }
 
         return $this->successResult([
-            'port_details'      => $this->portDetails(),
-            'adventure_details' => $this->adventureDetails(),
-            'kingdom_details'   => $kingdomDetails,
-            'celestials'        => $this->celestialEntities(),
-            'characters_on_map' => $this->getActiveUsersCountForMap($character),
-            'can_mass_embezzle' => $canEmbezzle
+            'port_details'       => $this->portDetails(),
+            'adventure_details'  => $this->adventureDetails(),
+            'kingdom_details'    => $kingdomDetails,
+            'celestials'         => $this->celestialEntities(),
+            'characters_on_map'  => $this->getActiveUsersCountForMap($character),
+            'can_mass_embezzle'  => $canEmbezzle,
+            'lockedLocationType' => is_null($lockedLocation) ? null : $lockedLocation->type,
         ]);
     }
 

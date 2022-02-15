@@ -91,6 +91,20 @@
             </div>
         </div>
     </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="type">Location Type: </label>
+                <select class="custom-select form-control required" id="type" name="type" wire:model="location.type">
+                    <option value="">Select Type</option>
+                    @foreach($locationTypes as $type => $typeName)
+                        <option value="{{$type}}">{{$typeName}}</option>
+                    @endforeach
+                </select>
+                @error('location.type') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+    </div>
 
 </div>
 

@@ -10,6 +10,7 @@ import FightSection from './fight-section';
 import CelestialFightSection from "./celestial-fight-section";
 import AlchemyAction from "../alchemy/alchemy-action";
 import AutoAttackSection from "./auto-attack-section";
+import SmithyWorkBench from "../smithy-work-bench/SmithyWorkBench";
 
 export default class ActionsSection extends React.Component {
 
@@ -24,6 +25,7 @@ export default class ActionsSection extends React.Component {
       showCrafting: false,
       showEnchanting: false,
       showAlchemy: false,
+      showSmithingBench: false,
       characterId: null,
       isLoading: true,
       character: null,
@@ -188,6 +190,12 @@ export default class ActionsSection extends React.Component {
     });
   }
 
+  updateShowSmithingBench(show) {
+    this.setState({
+      showSmithingBench: show,
+    });
+  }
+
   updateCanCraft(can) {
     this.setState({
       canCraft: can,
@@ -244,6 +252,7 @@ export default class ActionsSection extends React.Component {
             <div className="row mt-4">
               <Col xs={12} sm={12} md={12} lg={12} xl={2}>
                 <AdditionalActionsDropDown
+                  lockedLocationType={this.props.lockedLocationType}
                   isDead={this.state.isDead}
                   isAdventuring={this.state.isAdventuring}
                   isAlchemyLocked={this.state.character.is_alchemy_locked}
@@ -251,6 +260,7 @@ export default class ActionsSection extends React.Component {
                   updateShowCrafting={this.updateShowCrafting.bind(this)}
                   updateShowEnchanting={this.updateShowEnchanting.bind(this)}
                   updateShowAlchemy={this.updateShowAlchemy.bind(this)}
+                  updateShowSmithingBench={this.updateShowSmithingBench.bind(this)}
                   canCraft={this.state.canCraft}
                 />
                 {
@@ -383,7 +393,11 @@ export default class ActionsSection extends React.Component {
                   />
                   : null
                 }
-
+                {
+                  this.state.showSmithingBench ?
+                    <SmithyWorkBench characterId={this.state.character.id} openTimeOutModal={this.props.openTimeOutModal} />
+                  : null
+                }
                 {
                   this.state.actionComponent === 'battle-action' ?
                     <FightSection

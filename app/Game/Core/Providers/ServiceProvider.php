@@ -12,6 +12,7 @@ use App\Flare\Transformers\Serializers\CoreSerializer;
 use App\Game\Battle\Services\BattleDrop;
 use App\Game\Core\Services\CharacterPassiveSkills;
 use App\Game\Core\Services\DropCheckService;
+use App\Game\Core\Services\HolyItemService;
 use App\Game\Core\Services\InventorySetService;
 use App\Game\Core\Services\RandomEnchantmentService;
 use App\Game\Core\Services\UseItemService;
@@ -100,6 +101,10 @@ class ServiceProvider extends ApplicationServiceProvider
             return new RandomEnchantmentService(
                 $app->make(RandomAffixGenerator::class)
             );
+        });
+
+        $this->app->bind(HolyItemService::class, function() {
+            return new HolyItemService();
         });
     }
 

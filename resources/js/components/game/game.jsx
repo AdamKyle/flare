@@ -72,7 +72,8 @@ export default class Game extends React.Component {
       activeChatTab: 'chat',
       showChatUpdate: false,
       showServerMessageUpdate: false,
-      showExplorersLogUpdate: false
+      showExplorersLogUpdate: false,
+      lockedLocationType: null,
     }
 
     this.isDead            = Echo.private('character-is-dead-' + this.props.userId);
@@ -251,6 +252,12 @@ export default class Game extends React.Component {
   updateKingdoms(kingdomData) {
     this.setState({
       kingdomData: kingdomData,
+    });
+  }
+
+  updateLockedLocationType(type) {
+    this.setState({
+      lockedLocationType: type
     });
   }
 
@@ -454,6 +461,7 @@ export default class Game extends React.Component {
                   kingdomData={this.state.kingdomData}
                   character_x={this.state.current_x}
                   character_y={this.state.current_y}
+                  lockedLocationType={this.state.lockedLocationType}
                   attackAutomationIsRunning={this.state.attackAutomationIsRunning}
                 />
 
@@ -495,6 +503,7 @@ export default class Game extends React.Component {
                       currentY={this.state.current_y}
                       characterId={this.props.characterId}
                       openTimeOutModal={this.openTimeOutModal.bind(this)}
+                      updateLockedLocationType={this.updateLockedLocationType.bind(this)}
                     />
                     : null
                 }
@@ -549,6 +558,7 @@ export default class Game extends React.Component {
                   openTimeOutModal={this.openTimeOutModal.bind(this)}
                   updateKingdoms={this.updateKingdoms.bind(this)}
                   updateCelestial={this.updateCelestial.bind(this)}
+                  updateLockedLocationType={this.updateLockedLocationType.bind(this)}
                   attackAutomationIsRunning={this.state.attackAutomationIsRunning}
                 />
               </div>

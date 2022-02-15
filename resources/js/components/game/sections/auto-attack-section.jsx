@@ -1,7 +1,7 @@
 import React from 'react';
 import {Col, Tab, Tabs} from "react-bootstrap";
 import AlertWarning from "../components/base/alert-warning";
-import TimeOutBar from "../timeout/timeout-bar";
+import ExplorationTimeOutBar from "../timeout/exploration-timeout-bar";
 import AlertError from "../components/base/alert-error";
 import AttackType from "../battle/attack/attack-type";
 import AlertSuccess from "../components/base/alert-success";
@@ -426,7 +426,7 @@ export default class AutoAttackSection extends React.Component {
                 <div className="tw-text-center">
                   {
                     this.state.timeRemaining > 0 ?
-                      <TimeOutBar
+                      <ExplorationTimeOutBar
                         innerTimerCss={'auto-attack'}
                         readyCssClass={'character-ready'}
                         timeRemaining={this.state.timeRemaining}

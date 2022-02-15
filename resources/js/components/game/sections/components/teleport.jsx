@@ -111,7 +111,9 @@ export default class Teleport extends React.Component {
       y: this.state.selected_y,
       cost: this.cost(),
       timeout: this.time(),
-    }).then(() => {
+    }).then((result) => {
+      this.props.updateLockedLocationType(result.data.lockedLocationType);
+
       this.closeDetails();
     }).catch((error) => {
       if (error.hasOwnProperty('response')) {

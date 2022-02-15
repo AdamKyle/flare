@@ -14,7 +14,7 @@ export default class ItemName extends React.Component {
       return 'unique-item';
     }
 
-    if (this.props.item.usable) {
+    if (this.props.item.usable || this.props.item.can_use_on_other_items) {
       return 'usable-item';
     }
 

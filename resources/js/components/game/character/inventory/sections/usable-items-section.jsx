@@ -85,7 +85,7 @@ export default class UsableItemsSection extends React.Component {
   }
 
   canUseItem(item) {
-    return item.damages_kingdoms;
+    return item.damages_kingdoms || item.can_use_on_other_items;
   }
 
   manageUseItem(item) {
