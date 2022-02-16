@@ -47,7 +47,7 @@ class AddHolyStacksToItems extends Command
 
                     $maxStacks = ($maxLevel / 10) / 2;
 
-                    if ($maxLevel <= 1) {
+                    if ($maxStacks < 1) {
                         $maxStacks = 1;
                     }
 

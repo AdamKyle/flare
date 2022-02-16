@@ -14,13 +14,16 @@ class CharacterLevelUpEvent
      */
     public $character;
 
+    public $shouldUpdateCache;
+
     /**
      * Constructor
      *
      * @param Character $character
      */
-    public function __construct(Character $character)
+    public function __construct(Character $character, bool $shouldUpdateCache = true)
     {
-        $this->character = $character;
+        $this->character         = $character;
+        $this->shouldUpdateCache = $shouldUpdateCache;
     }
 }

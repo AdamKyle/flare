@@ -48,6 +48,7 @@ class ExplorationAutomationService {
             $character = $result;
         }
 
+
         $automation = CharacterAutomation::create([
             'character_id'                  => $character->id,
             'monster_id'                    => $params['selected_monster_id'],

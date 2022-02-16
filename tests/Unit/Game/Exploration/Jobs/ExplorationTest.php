@@ -6,6 +6,7 @@ use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Values\AttackTypeValue;
 use App\Game\Exploration\Jobs\Exploration;
+use Illuminate\Support\Facades\Queue;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateCharacterAutomation;
@@ -30,6 +31,7 @@ class ExplorationTest extends TestCase
     }
 
     public function testAutomationJob() {
+
         $character = $this->character->equipStrongGear()->updateSkill('Accuracy', [
             'level' => 999
         ])->assignFactionSystem()->getCharacter();

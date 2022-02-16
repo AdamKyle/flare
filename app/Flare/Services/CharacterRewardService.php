@@ -171,7 +171,6 @@ class CharacterRewardService {
         $this->updateCharacterStats($character);
 
         event(new ServerMessageEvent($character->user, 'level_up'));
-        event(new UpdateTopBarEvent($character));
     }
 
     /**

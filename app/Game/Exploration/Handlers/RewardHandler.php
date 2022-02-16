@@ -3,6 +3,7 @@
 namespace App\Game\Exploration\Handlers;
 
 use App\Flare\Events\UpdateTopBarEvent;
+use App\Flare\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Inventory;
@@ -16,6 +17,7 @@ use App\Game\Battle\Handlers\FactionHandler;
 use App\Game\Battle\Values\MaxLevel;
 use App\Game\Core\Events\CharacterLevelUpEvent;
 use App\Game\Exploration\Events\ExplorationLogUpdate;
+use App\Game\Messages\Events\ServerMessageEvent;
 
 class RewardHandler {
 
@@ -78,7 +80,7 @@ class RewardHandler {
 
             $character = $character->refresh();
 
-            event(new CharacterLevelUpEvent($character));
+            event(new CharacterLevelUpEvent($character, false));
         }
 
         $character->update([
@@ -87,9 +89,13 @@ class RewardHandler {
 
         $character = $character->refresh();
 
-        event(new CharacterLevelUpEvent($character));
+        event(new CharacterLevelUpEvent($character, false));
 
-        event(new ExplorationLogUpdate($character->user, 'Gained an additional 200XP.', false, true));
+        event(new ExplorationLogUpdate($character->user, 'Gained an additional ' . $xp . ' XP.' , false, true));
+
+        CharacterAttackTypesCacheBuilder::dispatch($character, true)->delay(now()->addSeconds(5));
+
+        event(new ExplorationLogUpdate($character->user, 'Your character stats will update in a moment ...', false, true));
     }
 
     protected function processEncounterFactionBonus(Character $character, int $amount) {

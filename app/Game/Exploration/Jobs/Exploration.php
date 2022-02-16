@@ -79,7 +79,7 @@ class Exploration implements ShouldQueue
         $encounterService->processEncounter($this->character, $automation);
 
         $timeLeft = now()->diffInMinutes($automation->completed_at);
-        dump($timeLeft);
+
         if ($timeLeft < 10) {
             $this->endAutomation($rewardHandler, $automation);
 
