@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Game\Exploration\Jobs;
 
+use App\Game\Exploration\Handlers\RewardHandler;
 use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Values\AttackTypeValue;
@@ -21,6 +22,8 @@ class ExplorationTest extends TestCase
 
     private $processAttackAutomation;
 
+    private $rewardHandler;
+
     public function setUp(): void {
         parent::setUp();
 
@@ -28,9 +31,16 @@ class ExplorationTest extends TestCase
             ->givePlayerLocation();
 
         $this->createItemAffix(); // when random items are generated.
+
+        $this->rewardHandler = \Mockery::mock(RewardHandler::class);
     }
 
     public function testAutomationJob() {
+
+        $this->rewardHandler->shouldReceive('processRewardsForEncounter')->once()->andReturn(null);
+        $this->rewardHandler->shouldReceive('processRewardsForExplorationComplete')->once()->andReturn(null);
+
+        $this->app->instance(RewardHandler::class, $this->rewardHandler);
 
         $character = $this->character->equipStrongGear()->updateSkill('Accuracy', [
             'level' => 999
@@ -69,6 +79,11 @@ class ExplorationTest extends TestCase
     }
 
     public function testAutomationJobMovingDownTheList() {
+        $this->rewardHandler->shouldReceive('processRewardsForEncounter')->once()->andReturn(null);
+        $this->rewardHandler->shouldReceive('processRewardsForExplorationComplete')->once()->andReturn(null);
+
+        $this->app->instance(RewardHandler::class, $this->rewardHandler);
+
         $character = $this->character->equipStrongGear()->updateSkill('Accuracy', [
             'level' => 999
         ])->assignFactionSystem()->getCharacter();
@@ -165,30 +180,6 @@ class ExplorationTest extends TestCase
         Exploration::dispatch($character, 16, AttackTypeValue::ATTACK);
 
         $this->assertTrue(true);
-    }
-
-    public function testAutomationBailWhenNotOnline() {
-        $character = $this->character->getCharacter();
-
-        $monster   = $this->createMonster([
-            'health_range' => '1-1',
-            'dex'          => 0,
-            'agi'          => 0,
-            'attack_range' => '1-1',
-            'ac'           => 0,
-        ]);
-
-        $automation = $this->createExploringAutomation([
-            'character_id' => $character->id,
-            'monster_id'   => $monster->id,
-            'started_at'   => now(),
-            'completed_at' => now()->addSeconds(2),
-            'attack_type'  => AttackTypeValue::ATTACK
-        ]);
-
-        Exploration::dispatch($character, $automation->id, AttackTypeValue::ATTACK);
-
-        $this->assertTrue($character->currentAutomations->isEmpty());
     }
 
     public function testAutomationBailWhenMaxTimeIsUp() {
