@@ -337,6 +337,17 @@ export default class FightSection extends React.Component {
       characterCurrentHealth: data.character_health,
     }, () => {
       this.props.updateCharacterHealth(data.character_health)
+
+      this.battleMessagesBeforeFight = [];
+      this.isMonsterVoided           = false;
+      this.isMonsterDevoided         = false;
+      this.isCharacterVoided         = false;
+
+      this.setState({
+        battleMessages: [],
+      }, () => {
+        this.setMonsterInfo(true)
+      });
     });
   }
 
