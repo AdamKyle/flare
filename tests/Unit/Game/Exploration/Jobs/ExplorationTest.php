@@ -148,7 +148,7 @@ class ExplorationTest extends TestCase
         $this->assertTrue($character->currentAutomations->isEmpty());
     }
 
-    public function testAutomAtionBailWhenNoAutomation() {
+    public function testAutomationBailWhenNoAutomation() {
         $character = $this->character->getCharacter();
 
         DB::table('sessions')->insert([[

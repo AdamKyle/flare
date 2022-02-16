@@ -79,7 +79,7 @@ class Exploration implements ShouldQueue
         $encounterService->processEncounter($this->character, $automation);
 
         $timeLeft = now()->diffInMinutes($automation->completed_at);
-
+        dump($timeLeft);
         if ($timeLeft < 10) {
             $this->endAutomation($rewardHandler, $automation);
 
@@ -88,7 +88,7 @@ class Exploration implements ShouldQueue
 
         event(new ExplorationLogUpdate($this->character->user, 'Next encounter will start in 10 minutes.'));
 
-        Exploration::dispatch($this->character, $automation->id, $this->attackType)->onConnection('long_running')->delay(now()->addMinutes(10));
+        Exploration::dispatch($this->character, $automation->id, $this->attackType)->delay(now()->addMinutes(10));
     }
 
     protected function shouldBail(CharacterAutomation $automation = null): bool {
