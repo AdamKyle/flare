@@ -95,7 +95,6 @@ export default class UsableItemsSection extends React.Component {
   }
 
   manageUseMany() {
-    console.log('hello?')
     this.setState({
       showUseMany: !this.state.showUseMany,
     })

@@ -56,19 +56,19 @@ class ItemHolyValue {
         }
 
         if ($this->value === self::LEVEL_TWO) {
-            return rand (1, 8);
+            return rand (1, 5);
         }
 
         if ($this->value === self::LEVEL_THREE) {
-            return rand (1, 15);
+            return rand (1, 8);
         }
 
         if ($this->value === self::LEVEL_FOUR) {
-            return rand (1, 25);
+            return rand (1, 10);
         }
 
         // Level 5
-        return rand (1, 35);
+        return rand (1, 15);
     }
 
     /**
@@ -82,18 +82,18 @@ class ItemHolyValue {
         }
 
         if ($this->value === self::LEVEL_TWO) {
-            return rand (1, 8);
+            return rand (1, 5);
         }
 
         if ($this->value === self::LEVEL_THREE) {
-            return rand (1, 12);
+            return rand (1, 8);
         }
 
         if ($this->value === self::LEVEL_FOUR) {
-            return rand (1, 18);
+            return rand (1, 10);
         }
 
         // Level 5
-        return rand (1, 20);
+        return rand (1, 15);
     }
 }

@@ -179,7 +179,7 @@ class MonsterAttackHandler {
 
         if (!$this->isMonsterVoided) {
             $itemHandler = $this->itemHandler->setCharacterHealth($this->characterHealth)
-                ->setMonsterHealth($this->monsterHealth);
+                                             ->setMonsterHealth($this->monsterHealth);
 
             $itemHandler->useArtifacts($attacker, $defender);
 
@@ -266,16 +266,21 @@ class MonsterAttackHandler {
             $healing            = $attacker->dur * $attacker->max_healing;
 
             if ($defenderReduction > 0) {
-                $message = 'Your rings negate some of the enemies healing power.';
-                $this->battleLogs = $this->addMessage($message, 'action-fired', $this->battleLogs);
-
                 $healing -= ceil($healing * $defenderReduction);
             }
 
-            $message = $attacker->name . '\'s healing spells wash over them for: ' . number_format($healing);
-            $this->battleLogs = $this->addMessage($message, 'action-fired', $this->battleLogs);
+            if ($healing >= 1) {
+                $message = 'Your rings negate some of the enemies healing power.';
+                $this->battleLogs = $this->addMessage($message, 'action-fired', $this->battleLogs);
 
-            $this->monsterHealth += $healing;
+                $message = $attacker->name . '\'s healing spells wash over them for: ' . number_format($healing);
+                $this->battleLogs = $this->addMessage($message, 'action-fired', $this->battleLogs);
+
+                $this->monsterHealth += $healing;
+            } else {
+                $message = 'Your rings negate all of the enemies healing power.';
+                $this->battleLogs = $this->addMessage($message, 'action-fired', $this->battleLogs);
+            }
         }
     }
 

@@ -61,7 +61,7 @@ class CelestialFightService {
         $fightService = resolve(FightService::class, [
             'character' => $character,
             'monster'   => $celestialFight->monster,
-        ])->setAttackTimes(1);
+        ])->setAttackTimes(1)->setCelestialFightHealth($celestialFight->current_health);
 
         $fightService->processFight($character, $celestialFight->monster, $attackType);
 
