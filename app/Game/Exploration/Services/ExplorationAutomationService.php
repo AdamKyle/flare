@@ -54,7 +54,7 @@ class ExplorationAutomationService {
             'monster_id'                    => $params['selected_monster_id'],
             'type'                          => AutomationType::EXPLORING,
             'started_at'                    => now(),
-            'completed_at'                  => now()->addMinutes(12), // now()->addHours($params['auto_attack_length']),
+            'completed_at'                  => now()->addHours($params['auto_attack_length']),
             'move_down_monster_list_every'  => $params['move_down_the_list_every'],
             'previous_level'                => $character->level,
             'current_level'                 => $character->level,
