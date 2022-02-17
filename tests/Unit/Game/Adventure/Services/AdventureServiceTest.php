@@ -5,6 +5,7 @@ namespace Tests\Unit\Game\Adventure\Services;
 use DB;
 use Mail;
 use Str;
+use Cache;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Event;
@@ -14,6 +15,7 @@ use App\Game\Adventures\Services\AdventureService;
 use App\Game\Adventures\Mail\AdventureCompleted;
 use Mockery;
 use Tests\Setup\AdventureSetup;
+use Tests\Setup\MockRewardBuilder;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateAdventure;
@@ -49,6 +51,8 @@ class AdventureServiceTest extends TestCase
 
         $item      = $this->createItem(['name' => 'Item Name']);
 
+        (new MockRewardBuilder())->mockRewardBuilder($this->app);
+
         $character = (new CharacterFactory)->createBaseCharacter()
                                         ->givePlayerLocation()
                                         ->updateCharacter(['can_move' => false])
@@ -72,6 +76,7 @@ class AdventureServiceTest extends TestCase
 
         $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(true);
 
+        $this->attackDataMock->mockAttackDataCache($this->app, $character);
 
         $adventureService = resolve(AdventureService::class);
 
@@ -97,6 +102,8 @@ class AdventureServiceTest extends TestCase
 
         $item      = $this->createItem(['name' => 'Item Name']);
 
+        (new MockRewardBuilder())->mockRewardBuilder($this->app);
+
         $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
             ->updateCharacter(['can_move' => false])
@@ -119,6 +126,8 @@ class AdventureServiceTest extends TestCase
         $adventure = $this->createNewAdventure();
 
         $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(true);
+
+        $this->attackDataMock->mockAttackDataCache($this->app, $character);
 
         $adventureService = resolve(AdventureService::class);
 
@@ -143,6 +152,8 @@ class AdventureServiceTest extends TestCase
 
         $item      = $this->createItem(['name' => 'Item Name']);
 
+        (new MockRewardBuilder())->mockRewardBuilder($this->app);
+
         $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
             ->updateCharacter(['can_move' => false])
@@ -165,6 +176,8 @@ class AdventureServiceTest extends TestCase
         $adventure = $this->createNewAdventure();
 
         $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(true);
+
+        $this->attackDataMock->mockAttackDataCache($this->app, $character);
 
         DB::table('sessions')->insert([[
             'id'           => '1',
@@ -201,6 +214,8 @@ class AdventureServiceTest extends TestCase
 
         $item      = $this->createItem(['name' => 'Item Name']);
 
+        (new MockRewardBuilder())->mockRewardBuilder($this->app);
+
         $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
             ->updateCharacter(['can_move' => false])
@@ -223,6 +238,8 @@ class AdventureServiceTest extends TestCase
         $adventure = $this->createNewAdventure(null, null, 5);
 
         $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(true);
+
+        $this->attackDataMock->mockAttackDataCache($this->app, $character);
 
         $character->map->gameMap->update([
             'drop_chance_bonus' => 0.01
@@ -248,6 +265,8 @@ class AdventureServiceTest extends TestCase
 
         $item      = $this->createItem(['name' => 'Item Name']);
 
+        (new MockRewardBuilder())->mockRewardBuilder($this->app);
+
         $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
             ->updateCharacter(['can_move' => false])
@@ -270,6 +289,8 @@ class AdventureServiceTest extends TestCase
         $adventure = $this->createNewAdventure(null, null, 5);
 
         $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(true);
+
+        $this->attackDataMock->mockAttackDataCache($this->app, $character);
 
         $adventureService = resolve(AdventureService::class);
 
@@ -323,6 +344,12 @@ class AdventureServiceTest extends TestCase
 
         $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(true);
 
+        $this->attackDataMock->mockAttackDataCache($this->app, $character);
+
+        Cache::shouldReceive('has')->withAnyArgs()->andReturn(true);
+
+        Cache::shouldReceive('get')->with('droppable-items')->andReturn([]);
+
         $dropCheckCalculator = Mockery::mock(DropCheckCalculator::class)->makePartial();
 
         $this->app->instance(DropCheckCalculator::class, $dropCheckCalculator);
@@ -354,6 +381,7 @@ class AdventureServiceTest extends TestCase
 
     public function testProcessAdventureWithMultipleLevelsAndCannotReceiveQuestItem()
     {
+
         $item = $this->createItem([
             'name' => 'Apples',
             'type' => 'quest',
@@ -393,6 +421,12 @@ class AdventureServiceTest extends TestCase
         $adventure = $this->createNewAdventure(null, $monster, 5);
 
         $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(true);
+
+        $this->attackDataMock->mockAttackDataCache($this->app, $character);
+
+        Cache::shouldReceive('has')->withAnyArgs()->andReturn(true);
+
+        Cache::shouldReceive('get')->with('droppable-items')->andReturn([]);
 
         $dropCheckCalculator = Mockery::mock(DropCheckCalculator::class)->makePartial();
 
@@ -445,9 +479,15 @@ class AdventureServiceTest extends TestCase
 
         $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(true);
 
+        $this->attackDataMock->mockAttackDataCache($this->app, $character);
+
         $dropCheckCalculator = Mockery::mock(DropCheckCalculator::class)->makePartial();
 
         $this->app->instance(DropCheckCalculator::class, $dropCheckCalculator);
+
+        Cache::shouldReceive('has')->withAnyArgs()->andReturn(true);
+
+        Cache::shouldReceive('get')->with('droppable-items')->andReturn([]);
 
         $dropCheckCalculator->shouldReceive('fetchDropCheckChance')->andReturn(false);
 
@@ -500,6 +540,12 @@ class AdventureServiceTest extends TestCase
 
         $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(true);
 
+        $this->attackDataMock->mockAttackDataCache($this->app, $character);
+
+        Cache::shouldReceive('has')->withAnyArgs()->andReturn(true);
+
+        Cache::shouldReceive('get')->with('droppable-items')->andReturn([]);
+
         $adventureService = resolve(AdventureService::class);
 
         $adventureService->setCharacter($character)->setAdventure($adventure)->setName(Str::random(8));
@@ -530,6 +576,7 @@ class AdventureServiceTest extends TestCase
             'health_range' => '999-9999',
             'attack_range' => '99-999',
             'drop_check' => 0.1,
+            'devouring_light_chance' => 1.1,
         ]);
 
         $character = (new CharacterFactory)->createBaseCharacter()
@@ -550,6 +597,10 @@ class AdventureServiceTest extends TestCase
         $adventure = (new AdventureSetup)->setMonster($monster)->createAdventure();
 
         $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(true);
+
+        $this->attackDataMock->mockAttackDataCache($this->app, $character);
+
+        Cache::shouldReceive('forget')->andReturn(null);
 
         $this->actingAs($character->user);
 
@@ -596,6 +647,7 @@ class AdventureServiceTest extends TestCase
             'health_range' => '999-9999',
             'attack_range' => '99-999',
             'drop_check' => 0.1,
+            'devouring_light_chance' => 1.1
         ]);
 
         $character = (new CharacterFactory)->createBaseCharacter()
@@ -616,6 +668,10 @@ class AdventureServiceTest extends TestCase
         $adventure = (new AdventureSetup)->setMonster($monster)->createAdventure();
 
         $character = $character->assignFactionSystem()->createAdventureLog($adventure)->getCharacter(true);
+
+        $this->attackDataMock->mockAttackDataCache($this->app, $character);
+
+        Cache::shouldReceive('forget')->andReturn(null);
 
         Mail::fake();
 

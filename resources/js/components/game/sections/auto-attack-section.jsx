@@ -263,6 +263,7 @@ export default class AutoAttackSection extends React.Component {
       errorMessage: null,
       successMessage: null,
       isStarting: true,
+      attackMessages: [],
     }, () => {
       axios.post('/api/exploration/'+this.props.character.id+'/start', this.state.params).then((result) => {
         this.setState({
@@ -406,7 +407,7 @@ export default class AutoAttackSection extends React.Component {
                 </div>
                 <button className="btn btn-primary mt-3"
                         onClick={this.beginFight.bind(this)}
-                        disabled={this.state.isStarting || this.state.isStopping || this.props.attackAutomationIsRunning || this.props.character.isDead}
+                        disabled={this.state.isStarting || this.state.isStopping || this.props.attackAutomationIsRunning || this.props.isDead}
                 >
                   {this.state.isStarting ? <i className="fas fa-spinner fa-spin"></i> : null} Begin!
                 </button>
@@ -414,7 +415,7 @@ export default class AutoAttackSection extends React.Component {
                   this.props.attackAutomationIsRunning ?
                     <button className="btn btn-danger ml-2 mt-3"
                             onClick={this.stopAutomation.bind(this)}
-                            disabled={this.state.isLoading || this.state.isStopping || this.state.isStarting || this.props.character.isDead}
+                            disabled={this.state.isLoading || this.state.isStopping || this.state.isStarting || this.props.isDead}
                     >
                       {this.state.isStopping ? <i className="fas fa-spinner fa-spin"></i> : null} Stop!
                     </button>

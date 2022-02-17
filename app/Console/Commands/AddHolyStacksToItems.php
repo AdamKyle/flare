@@ -38,9 +38,7 @@ class AddHolyStacksToItems extends Command
      */
     public function handle()
     {
-        Item::whereNull('item_prefix_id')
-            ->whereNull('item_suffix_id')
-            ->whereNotIn('type', ['quest', 'alchemy'])
+        Item::whereNotIn('type', ['quest', 'alchemy'])
             ->chunkById(250, function($items) {
                 foreach ($items as $item) {
                     $maxLevel = $item->skill_level_trivial;

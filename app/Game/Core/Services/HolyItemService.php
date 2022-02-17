@@ -90,11 +90,15 @@ class HolyItemService {
 
             $itemSlot->delete();
 
+            $alchemyItemSlot->delete();
+
             return $inventory->slots()->create([
                 'inventory_id' => $inventory->id,
                 'item_id'      => $newItem->id,
             ]);
         }
+
+        $alchemyItemSlot->delete();
 
         $itemSlot->item->appliedHolyStacks()->create([
             'item_id'                  => $itemSlot->item->id,
@@ -113,7 +117,7 @@ class HolyItemService {
 
     protected function fetchValidItems(DBCollection $slots): Collection {
         return $slots->filter(function($slot) {
-            return $slot->item->holy_stacks > 0;
+            return ($slot->item->holy_stacks - $slot->item->holy_stacks_applied) > 0;
         });
     }
 

@@ -27,9 +27,6 @@ Route::group(['middleware' => ['auth', 'throttle:100,1', 'is.character.who.they.
 
     Route::group(['middleware' => ['is.character.dead', 'is.character.adventuring']], function() {
         Route::middleware(['is.character.exploring'])->group(function() {
-
-            Route::post('/character/{character}/inventory/destroy', ['uses' => 'Api\CharacterInventoryController@destroy']);
-
             Route::post('/character/{character}/inventory/save-equipped-as-set', ['uses' => 'Api\CharacterInventoryController@saveEquippedAsSet']);
             Route::post('/character/{character}/inventory/unequip', ['uses' => 'Api\CharacterInventoryController@unequipItem']);
             Route::post('/character/{character}/inventory/unequip-all', ['uses' => 'Api\CharacterInventoryController@unequipAll']);
@@ -46,6 +43,11 @@ Route::group(['middleware' => ['auth', 'throttle:100,1', 'is.character.who.they.
             Route::post('/character/{character}/smithy-workbench/apply', ['uses' => 'Api\HolyitemsController@apply']);
         });
 
+        Route::post('/character/{character}/inventory/destroy-all-alchemy-items', ['uses' => 'Api\CharacterInventoryController@destroyAllAlchemyItems']);
+        Route::post('/character/{character}/inventory/destroy-alchemy-item', ['uses' => 'Api\CharacterInventoryController@destroyAlchemyItem']);
+
+
+        Route::post('/character/{character}/inventory/destroy', ['uses' => 'Api\CharacterInventoryController@destroy']);
         Route::post('/character/{character}/inventory-set/remove', ['uses' => 'Api\CharacterInventoryController@removeFromSet']);
         Route::post('/character/{character}/inventory-set/{inventorySet}/remove-all', ['uses' => 'Api\CharacterInventoryController@emptySet']);
 

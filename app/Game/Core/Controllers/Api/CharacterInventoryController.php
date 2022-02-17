@@ -2,6 +2,7 @@
 
 namespace App\Game\Core\Controllers\Api;
 
+use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySet;
 use App\Flare\Models\Item;
 use App\Flare\Services\BuildCharacterAttackTypes;
@@ -501,6 +502,48 @@ class CharacterInventoryController extends Controller {
         UseMultipleItems::withChain($jobs)->dispatch($character, $slots->first()->id);
 
         return response()->json(['message' => 'Boons are being applied. You can check Active Boons tab to see them be applied or check chat to see boons being applied.'], 200);
+    }
+
+    public function destroyAlchemyItem(Request $request, Character $character) {
+        $slot = $character->inventory->slots->filter(function($slot) use($request) {
+            return $slot->id === $request->slot_id;
+        })->first();
+
+        if (is_null($slot)) {
+            return response()->json([
+                'message' => 'No item found.'
+            ]);
+        }
+
+        $name = $slot->item->affix_name;
+
+        $slot->delete();
+
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        event(new CharacterInventoryDetailsUpdate($character->user));
+
+        event(new UpdateTopBarEvent($character->refresh()));
+
+        return response()->json(['message' => 'Destroyed Alchemy Item: ' . $name . '.'], 200);
+    }
+
+    public function destroyAllAlchemyItems(Character $character) {
+        $slots = $character->inventory->slots->filter(function($slot) {
+            return $slot->item->type === 'alchemy';
+        });
+
+        foreach ($slots as $slot) {
+            $slot->delete();
+        }
+
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        event(new CharacterInventoryDetailsUpdate($character->user));
+
+        event(new UpdateTopBarEvent($character->refresh()));
+
+        return response()->json(['message' => 'Destroyed All Alchemy Items.'], 200);
     }
 
     /**

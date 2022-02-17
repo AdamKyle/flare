@@ -2,6 +2,10 @@
 
 namespace App\Game\Exploration\Services;
 
+use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Exploration\Events\ExplorationStatus;
+use App\Game\Exploration\Events\ExplorationTimeOut;
+use App\Game\Exploration\Events\UpdateAutomationsList;
 use Cache;
 use App\Game\Exploration\Events\ExplorationLogUpdate;
 use App\Flare\Models\Monster;
@@ -12,6 +16,7 @@ use App\Flare\Services\FightService;
 use App\Game\Exploration\Events\ExplorationAttackMessage;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Jobs\BattleAttackHandler;
+use Matrix\Exception;
 
 class ProcessExplorationFightService {
 
@@ -57,11 +62,13 @@ class ProcessExplorationFightService {
                 'class'   => 'enemy-action-fired',
             ];
 
+            $character = $character->refresh();
+
             event(new ExplorationAttackMessage($character->user, $battleMessages));
 
             event(new ExplorationLogUpdate($character->user, 'You and the enemy are just missing each other ...'));
 
-            return 0;
+            throw new Exception('battle took too long.');
         }
 
         if ($this->fightService->getCharacterHealth() <= 0) {
@@ -72,13 +79,15 @@ class ProcessExplorationFightService {
                 'class'   => 'enemy-action-fired',
             ];
 
+            $character = $character->refresh();
+
             event(new ExplorationAttackMessage($character->user, $battleMessages));
 
-            event(new ExplorationLogUpdate($character->user, 'Oh! Christ! You\'re dead.'));
+            event(new ExplorationLogUpdate($character->user, 'Oh! Christ! You\'re dead.', true));
 
             $this->battleEventHandler->processDeadCharacter($character);
 
-            return 0;
+            throw new Exception('Character is dead');
         }
 
 

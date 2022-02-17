@@ -436,6 +436,7 @@ export default class ActionsSection extends React.Component {
           <Tab eventKey="exploration" title={this.buildAutomationAttackTabTitle()} disabled={this.state.cannotAutoAttack || this.state.isAdventuring || this.state.isDead}>
             <AutoAttackSection
               character={this.state.character}
+              isDead={this.state.isDead}
               monsters={this.state.monsters}
               userId={this.props.userId}
               openTimeOutModal={this.props.openTimeOutModal}

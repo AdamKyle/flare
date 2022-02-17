@@ -107,6 +107,7 @@ export default class InventoryBase extends React.Component {
                   <UsableItemsSection
                     characterId={this.props.characterId}
                     usableItems={this.state.inventory.usable_items}
+                    getSlotId={this.getSlotId.bind(this)}
                   />
                 </Tab>
                 <Tab eventKey="quest-items" title="Quest Items">

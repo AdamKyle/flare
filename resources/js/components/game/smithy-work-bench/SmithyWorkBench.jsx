@@ -14,7 +14,7 @@ export default class SmithyWorkBench extends React.Component {
       canCraft: true,
       isDead: false,
       isAdventuring: false,
-      isCraftingFalse: false,
+      isCrafting: false,
       selectedItem: null,
       selectedAlchemyItem: null,
       errorMessage: null,
@@ -32,7 +32,6 @@ export default class SmithyWorkBench extends React.Component {
         items: result.data.items,
         alchemyItems: result.data.alchemy,
       })
-      console.log(result);
     }).catch((err) => {
       this.setState({
         loading: false
@@ -57,7 +56,7 @@ export default class SmithyWorkBench extends React.Component {
       return items.map((item) => {
         return {
           value: item.item.id,
-          label: item.item.name
+          label: item.item.affix_name
         }
       });
     }
@@ -85,6 +84,30 @@ export default class SmithyWorkBench extends React.Component {
         this.calculateCosts();
       });
     }
+  }
+
+  updateSelectedItems() {
+    let foundItemWithStacks = this.state.items.filter((i) => i.item.id === this.state.selectedItem.id);
+    let foundAlchemyItem    = this.state.alchemyItems.filter((i) => i.item.name === this.state.selectedAlchemyItem.name);
+
+    if (foundItemWithStacks.length === 0) {
+      foundItemWithStacks = null;
+    } else {
+      foundItemWithStacks = foundItemWithStacks[0].item;
+    }
+
+    if (foundAlchemyItem.length === 0) {
+      foundAlchemyItem = null;
+    } else {
+      foundAlchemyItem = foundAlchemyItem[0].item;
+    }
+
+    this.setState({
+      selectedItem: foundItemWithStacks,
+      selectedAlchemyItem: foundAlchemyItem,
+    }, () => {
+      this.calculateCosts();
+    })
   }
 
   calculateCosts() {
@@ -156,7 +179,7 @@ export default class SmithyWorkBench extends React.Component {
 
   applyOil() {
     this.setState({
-      isCraftingFalse: true
+      isCrafting: true
     });
 
     axios.post('/api/character/'+ this.props.characterId +'/smithy-workbench/apply', {
@@ -168,10 +191,12 @@ export default class SmithyWorkBench extends React.Component {
         isCrafting: false,
         items: result.data.items,
         alchemyItems: result.data.alchemy,
+      }, () => {
+        this.updateSelectedItems();
       });
     }).catch((err) => {
       this.setState({
-        isCraftingFalse: false
+        isCrafting: false
       });
 
       if (err.hasOwnProperty('response')) {
@@ -195,7 +220,6 @@ export default class SmithyWorkBench extends React.Component {
   }
 
   render() {
-
     if (this.state.loading) {
       return <p className="mt-2">One moment ...</p>
     }
@@ -265,10 +289,10 @@ export default class SmithyWorkBench extends React.Component {
               <Col xs={3}>
                 <button className="btn btn-primary mt-2"
                         type="button"
-                        disabled={this.state.isDead || !this.state.canCraft || this.props.isAdventuring || this.canNotApplyHolyOil() || this.state.isCraftingFalse}
+                        disabled={this.state.isDead || !this.state.canCraft || this.props.isAdventuring || this.canNotApplyHolyOil() || this.state.isCrafting}
                         onClick={this.applyOil.bind(this)}
                 >
-                  Apply Oil! {this.state.isCraftingFalse ? <i className="fas fa-spinner fa-spin"></i> : null}
+                  Apply! {this.state.isCrafting ? <i className="fas fa-spinner fa-spin"></i> : null}
                 </button>
               </Col>
               <Col xs={8}>

@@ -25,10 +25,12 @@ export default class AdditionalActionsDropDown extends React.Component {
       showCrafting: !this.state.showCrafting,
       showEnchanting: false,
       showAlchemy: false,
+      showSmithingBench: false,
     }, () => {
       this.props.updateShowCrafting(this.state.showCrafting);
       this.props.updateShowEnchanting(this.state.showEnchanting);
       this.props.updateShowAlchemy(this.state.showAlchemy);
+      this.props.updateShowSmithingBench(this.state.showSmithingBench);
     });
   }
 
@@ -41,10 +43,12 @@ export default class AdditionalActionsDropDown extends React.Component {
       showEnchanting: !this.state.showEnchanting,
       showCrafting: false,
       showAlchemy: false,
+      showSmithingBench: false,
     }, () => {
       this.props.updateShowCrafting(this.state.showCrafting);
       this.props.updateShowEnchanting(this.state.showEnchanting);
       this.props.updateShowAlchemy(this.state.showAlchemy);
+      this.props.updateShowSmithingBench(this.state.showSmithingBench);
     });
   }
 
@@ -57,10 +61,12 @@ export default class AdditionalActionsDropDown extends React.Component {
       showEnchanting: false,
       showCrafting: false,
       showAlchemy: !this.state.showAlchemy,
+      showSmithingBench: false,
     }, () => {
       this.props.updateShowCrafting(this.state.showCrafting);
       this.props.updateShowEnchanting(this.state.showEnchanting);
       this.props.updateShowAlchemy(this.state.showAlchemy);
+      this.props.updateShowSmithingBench(this.state.showSmithingBench);
     });
   }
 

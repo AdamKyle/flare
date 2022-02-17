@@ -86,9 +86,13 @@ class Exploration implements ShouldQueue
             return;
         }
 
-        event(new ExplorationLogUpdate($this->character->user, 'Next encounter will start in 10 minutes.'));
+        $character = $this->character->refresh();
 
-        Exploration::dispatch($this->character, $automation->id, $this->attackType)->delay(now()->addMinutes(10));
+        if (!$character->is_dead) {
+            event(new ExplorationLogUpdate($this->character->user, 'Next encounter will start in 10 minutes.'));
+
+            Exploration::dispatch($this->character, $automation->id, $this->attackType)->delay(now()->addMinutes(10));
+        }
     }
 
     protected function shouldBail(CharacterAutomation $automation = null): bool {
@@ -124,14 +128,14 @@ class Exploration implements ShouldQueue
 
             $rewardHandler->processRewardsForExplorationComplete($this->character);
 
-            event(new ExplorationLogUpdate($this->character->user, 'Exploration is now ending ....'));
+            event(new ExplorationLogUpdate($this->character->user, 'Exploration is now over, rewards may still be processing and will be with you shortly.'));
+
+            $character = $this->character->refresh();
+
+            event(new ExplorationTimeOut($character->user, 0));
+            event(new ExplorationStatus($character->user, false));
+            event(new UpdateTopBarEvent($character));
+            event(new UpdateAutomationsList($character->user, $character->currentAutomations));
         }
-
-        $character = $this->character->refresh();
-
-        event(new ExplorationTimeOut($character->user, 0));
-        event(new ExplorationStatus($character->user, false));
-        event(new UpdateTopBarEvent($character));
-        event(new UpdateAutomationsList($character->user, $character->currentAutomations));
     }
 }
