@@ -16,24 +16,14 @@ abstract class TestCase extends BaseTestCase
 
     public $baseUrl = 'http://localhost';
 
-    public $attackDataMock;
-
     public function setUp(): void {
 
         parent::setUp();
-
-        $app = $this->app;
-
-        $this->attackDataMock = new AttackDataCacheSetUp();
-
-        $this->attackDataMock->mockCacheBuilder($app);
 
     }
 
     public function tearDown(): void {
         parent::tearDown();
-
-        $this->attackDataMock = null;
     }
 }
 

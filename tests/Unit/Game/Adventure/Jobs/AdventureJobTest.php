@@ -46,26 +46,6 @@ class AdventureJobTest extends TestCase
 
         $character = $character->assignFactionSystem()->getCharacter(false);
 
-        $this->attackDataMock->mockAttackDataCache($this->app, $character);
-
-        Cache::shouldReceive('get')->with('character_'.$character->id.'_adventure_'.$adventure->id)->andReturn(
-            'Sample'
-        );
-
-        Cache::shouldReceive('forget')->andReturn(null);
-
-        $rewardBuilder = \Mockery::mock(RewardBuilder::class)->makePartial();
-
-        $this->app->instance(RewardBuilder::class, $rewardBuilder);
-
-        $rewardBuilder->shouldReceive('fetchDrops')->withAnyArgs()->andReturn(
-            $this->createItem()
-        );
-
-        $rewardBuilder->shouldReceive('fetchQuestItemFromMonster')->withAnyArgs()->andReturn(
-            $this->createItem(['type' => 'quest'])
-        );
-
         $character->adventureLogs()->create([
             'character_id'         => $character->id,
             'adventure_id'         => $adventure->id,

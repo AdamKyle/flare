@@ -509,10 +509,6 @@ class ShopControllerTest extends TestCase
 
         $character = $this->character->getCharacter(false);
 
-        $this->attackDataMock->mockAttackDataCache($this->app, $character);
-
-        Cache::shouldReceive('put')->withAnyArgs()->andReturn(null);
-
         $this->actingAs($user)->visitRoute('game.shop.buy', [
             'character' => $character
         ])->click('compare-item-' . $weapon->id)
