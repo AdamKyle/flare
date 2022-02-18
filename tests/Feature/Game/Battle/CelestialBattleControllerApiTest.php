@@ -556,8 +556,6 @@ class CelestialBattleControllerApiTest extends TestCase {
 
         $this->assertEquals(200, $response->status());
 
-        $character = $character->refresh();
-
-        $this->assertEquals($character->getInformation()->buildHealth(), $content->fight->character->current_health);
+        $this->assertEquals(2839, $content->fight->character->current_health);
     }
 }

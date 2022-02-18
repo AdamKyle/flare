@@ -44,7 +44,7 @@ class AdventureJobTest extends TestCase
 
         $adventure = $this->createNewAdventure();
 
-        $character = $character->assignFactionSystem()->getCharacter(false);
+        $character = $character->assignFactionSystem()->getCharacter(true);
 
         $character->adventureLogs()->create([
             'character_id'         => $character->id,
@@ -57,6 +57,8 @@ class AdventureJobTest extends TestCase
             'rewards'              => null,
             'created_at'           => null,
         ]);
+
+        Cache::put('character_'.$character->id.'_adventure_'.$adventure->id, 'Sample');
 
         AdventureJob::dispatch($character->refresh(), $adventure, 'attack', 'Sample', 1);
 

@@ -2,11 +2,6 @@
 
 namespace Tests;
 
-use App\Flare\Services\BuildCharacterAttackTypes;
-use App\Game\Exploration\Handlers\RewardHandler;
-use App\Game\Skills\Services\AlchemyService;
-use Database\Seeders\GameSkillsSeeder;
-use Illuminate\Support\Facades\Cache;
 use Laravel\BrowserKitTesting\TestCase as BaseTestCase;
 use Tests\Setup\AttackDataCacheSetUp;
 
@@ -16,10 +11,15 @@ abstract class TestCase extends BaseTestCase
 
     public $baseUrl = 'http://localhost';
 
+    public $attackDataCacheSetUp;
+
     public function setUp(): void {
 
         parent::setUp();
 
+        $this->attackDataCacheSetUp = new AttackDataCacheSetUp();
+
+        $this->attackDataCacheSetUp->mockCacheBuilder($this->app);
     }
 
     public function tearDown(): void {

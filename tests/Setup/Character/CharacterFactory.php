@@ -22,6 +22,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\User;
 use App\Game\Core\Services\CharacterService;
+use Tests\Setup\AttackDataCacheSetUp;
 use Tests\Traits\CreateCharacter;
 use Tests\Traits\CreateClass;
 use Tests\Traits\CreateGameMap;
@@ -93,6 +94,10 @@ class CharacterFactory {
         $this->assignBaseSkills();
 
         $this->assignPassiveSkills();
+
+        $character = $this->character->refresh();
+
+        Cache::put('character-attack-data-' . $character->id, (new AttackDataCacheSetUp())->getCacheObject());
 
         return $this;
     }
@@ -534,13 +539,9 @@ class CharacterFactory {
      *
      * @return Character
      */
-    public function getCharacter(bool $createAttackData = true): Character {
+    public function getCharacter(): Character {
 
         $character = $this->character->refresh();
-
-        if (!Cache::has('character-attack-data-' . $character->id) && $createAttackData) {
-            resolve(BuildCharacterAttackTypes::class)->buildCache($character);
-        }
 
         return $character;
     }

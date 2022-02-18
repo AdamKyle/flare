@@ -120,9 +120,12 @@ class FightService {
 
         $isCharacterVoided = $this->newAttackType === 'voided';
 
-        if (is_null($this->currentCharacterHealth)) {
+        if (is_null($this->currentCharacterHealth) || is_null($this->currentMonsterHealth)) {
             $characterInformation         = $this->characterInformationBuilder->setCharacter($attacker);
             $this->currentCharacterHealth = $characterInformation->buildHealth($isCharacterVoided);
+
+            $healthRange                = explode('-', $defender->health_range);
+            $this->currentMonsterHealth = rand($healthRange[0], $healthRange[1]);
         }
 
         return $this->fight($attacker, $defender, $attackType, $isCharacterVoided);
@@ -131,7 +134,6 @@ class FightService {
     public function fight($attacker, $defender, $attackType, bool $isDefenderVoided = false) {
 
         if ($attacker instanceof Character) {
-
             $this->characterAttackHandler->setHealth(
                 $this->currentCharacterHealth,
                 $this->currentMonsterHealth,
