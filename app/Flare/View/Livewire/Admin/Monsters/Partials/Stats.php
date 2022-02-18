@@ -46,6 +46,7 @@ class Stats extends Component
         'monster.max_affix_damage'    => 'nullable',
         'monster.entrancing_chance'   => 'nullable',
         'monster.devouring_light_chance' => 'nullable',
+        'monster.devouring_darkness_chance' => 'nullable',
         'monster.accuracy'               => 'nullable',
         'monster.casting_accuracy'       => 'nullable',
         'monster.dodge'                  => 'nullable',

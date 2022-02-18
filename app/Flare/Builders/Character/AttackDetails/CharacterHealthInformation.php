@@ -3,6 +3,7 @@
 namespace App\Flare\Builders\Character\AttackDetails;
 
 use App\Flare\Builders\Character\ClassDetails\ClassBonuses;
+use App\Flare\Builders\Character\ClassDetails\HolyStacks;
 use App\Flare\Builders\Character\Traits\FetchEquipped;
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Models\Character;
@@ -33,14 +34,17 @@ class CharacterHealthInformation {
      */
     private $character;
 
+    private $holyStacks;
+
 
     /**
      * @param CharacterInformationBuilder $characterInformationBuilder
      * @param ClassBonuses $classBonuses
      */
-    public function __construct(CharacterInformationBuilder $characterInformationBuilder, ClassBonuses $classBonuses) {
+    public function __construct(CharacterInformationBuilder $characterInformationBuilder, ClassBonuses $classBonuses, HolyStacks $holyStacks) {
         $this->characterInformationBuilder = $characterInformationBuilder;
         $this->classBonuses                = $classBonuses;
+        $this->holyStacks                  = $holyStacks;
     }
 
     /**
@@ -96,6 +100,8 @@ class CharacterHealthInformation {
         }
 
         $amount = round($healingAmount + ($healingAmount * ($this->fetchSkillHealingMod() + $classBonus)));
+
+        $amount + $amount * $this->holyStacks->fetchHealingBonus($this->character);
 
         if ($isPositional) {
             return $amount / 2;

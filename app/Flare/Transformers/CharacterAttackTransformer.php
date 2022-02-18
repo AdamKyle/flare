@@ -2,6 +2,7 @@
 
 namespace App\Flare\Transformers;
 
+use App\Flare\Builders\Character\ClassDetails\HolyStacks;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Skill;
@@ -13,7 +14,6 @@ use App\Flare\Models\Character;
 
 class CharacterAttackTransformer extends BaseTransformer {
 
-
     /**
      * creates response data for character attack data.
      *
@@ -23,6 +23,8 @@ class CharacterAttackTransformer extends BaseTransformer {
     public function transform(Character $character) {
 
         $gameClass = GameClass::find($character->game_class_id);
+
+        $holyStacks = resolve(HolyStacks::class);
 
         return [
             'id'                          => $character->id,
@@ -48,6 +50,8 @@ class CharacterAttackTransformer extends BaseTransformer {
             'is_dead'                     => $character->is_dead,
             'devouring_light'             => $this->fetchStats($character, 'devouring_light'),
             'devouring_darkness'          => $this->fetchStats($character, 'devouring_darkness'),
+            'devouring_light_res'         => $holyStacks->fetchDevouringResistanceBonus($character),
+            'devouring_darkness_res'      => $holyStacks->fetchDevouringResistanceBonus($character),
             'extra_action_chance'         => (new ClassAttackValue($character))->buildAttackData(),
             'is_alchemy_locked'           => $this->isAlchemyLocked($character),
             'stat_affixes'                => $this->fetchStatAffixes($character),

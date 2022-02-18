@@ -2,6 +2,7 @@
 
 namespace App\Flare\Builders\Character\AttackDetails\DamageDetails;
 
+use App\Flare\Builders\Character\ClassDetails\HolyStacks;
 use Illuminate\Database\Eloquent\Collection;
 use App\Flare\Builders\Character\BaseCharacterInfo;
 use App\Flare\Builders\Character\Traits\FetchEquipped;
@@ -18,6 +19,12 @@ class WeaponInformation {
      * @var BaseCharacterInfo $baseCharacterInfo
      */
     private $baseCharacterInfo;
+
+    private $holyStacks;
+
+    public function __construct(HolyStacks $holyStacks) {
+        $this->holyStacks = $holyStacks;
+    }
 
     /**
      * @param BaseCharacterInfo $baseCharacterInfo
@@ -126,6 +133,8 @@ class WeaponInformation {
         foreach ($skills as $skill) {
             $damage += $damage * $skill->base_damage_mod;
         }
+
+        $damage += $damage * $this->holyStacks->fetchAttackBonus($character);
 
         return ceil($damage);
     }

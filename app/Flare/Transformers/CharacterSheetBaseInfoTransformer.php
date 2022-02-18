@@ -3,6 +3,7 @@
 namespace App\Flare\Transformers;
 
 
+use App\Flare\Builders\Character\ClassDetails\HolyStacks;
 use Cache;
 use League\Fractal\TransformerAbstract;
 use App\Flare\Models\MaxLevelConfiguration;
@@ -34,6 +35,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
         $characterInformation       = resolve(CharacterInformationBuilder::class)->setCharacter($character);
         $characterHealthInformation = resolve(CharacterHealthInformation::class)->setCharacter($character);
         $characterAffixInformation  = resolve(CharacterAffixInformation::class)->setCharacter($character);
+        $holyStacks                 = resolve(HolyStacks::class);
 
         return [
             'id'                => $character->id,
@@ -44,10 +46,10 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
             'heal_for'          => number_format($characterHealthInformation->buildHealFor()),
             'damage_stat'       => $character->damage_stat,
             'to_hit_stat'       => $character->class->to_hit_stat,
-            'to_hit_base'        => $this->getToHitBase($character, $characterInformation),
-            'voided_to_hit_base' => $this->getToHitBase($character, $characterInformation, true),
-            'base_stat'          => $characterInformation->statMod($character->class->damage_stat),
-            'voided_base_stat'   => $character->{$character->class->damage_stat},
+            'to_hit_base'       => $this->getToHitBase($character, $characterInformation),
+            'voided_to_hit_base'=> $this->getToHitBase($character, $characterInformation, true),
+            'base_stat'         => $characterInformation->statMod($character->class->damage_stat),
+            'voided_base_stat'  => $character->{$character->class->damage_stat},
             'race'              => $character->race->name,
             'class'             => $character->class->name,
             'inventory_max'     => $character->inventory_max,
@@ -83,6 +85,13 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
             'devouring_darkness'  => $characterInformation->getDevouringDarkness(),
             'attack_stats'        => Cache::get('character-attack-data-' . $character->id)['attack_types'],
             'extra_action_chance' => (new ClassAttackValue($character))->buildAttackData(),
+            'holy_bonus'           => $holyStacks->fetchHolyBonus($character),
+            'devouring_resistance' => $holyStacks->fetchDevouringResistanceBonus($character),
+            'max_holy_stacks'      => $holyStacks->fetchTotalStacksForCharacter($character),
+            'current_stacks'       => $holyStacks->fetchTotalHolyStacks($character),
+            'holy_attack_bonus'    => $holyStacks->fetchAttackBonus($character),
+            'holy_ac_bonus'        => $holyStacks->fetchDefenceBonus($character),
+            'holy_healing_bonus'   => $holyStacks->fetchHealingBonus($character),
             'stat_affixes'        => [
                 'cant_be_resisted'   => $characterInformation->canAffixesBeResisted(),
                 'all_stat_reduction' => $characterAffixInformation->findPrefixStatReductionAffix(),

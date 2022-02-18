@@ -138,7 +138,12 @@ class MapController extends Controller {
             'map_name'         => $character->map->gameMap->name,
         ];
 
-        $needsRefresh = in_array($character->id, Cache::get('character-quest-reset'));
+        $cacheToReset = Cache::get('character-quest-reset');
+        $needsRefresh = false;
+
+        if (!is_null($cacheToReset)) {
+            $needsRefresh = in_array($character->id, $cacheToReset);
+        }
 
         if (!$request->completed_quests_only || $needsRefresh) {
             $data['all_quests'] = Cache::get('all-quests');

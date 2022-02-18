@@ -26,12 +26,38 @@ export default class Monster {
     return parseInt(health);
   }
 
-  canMonsterVoidPlayer() {
-    if (this.monster.devouring_light_chance > 1) {
+  canMonsterVoidPlayer(devouringLightResistance) {
+    let chance = this.monster.devouring_darkness_chance
+
+    if (devouringLightResistance > chance) {
+      return false;
+    }
+
+    chance -= devouringLightResistance;
+
+    if (chance > 1) {
       return true;
     }
 
-    const dc = 100 - 100 * this.monster.devouring_light_chance;
+    const dc = 100 - 100 * chance;
+
+    return random(1, 100) > dc;
+  }
+
+  canMonsterDevoidPlayer(devouringDarkResistance) {
+    let chance = this.monster.devouring_darkness_chance
+
+    if (devouringDarkResistance > chance) {
+      return false;
+    }
+
+    chance -= devouringDarkResistance;
+
+    if (chance > 1) {
+      return true;
+    }
+
+    const dc = 100 - 100 * chance;
 
     return random(1, 100) > dc;
   }

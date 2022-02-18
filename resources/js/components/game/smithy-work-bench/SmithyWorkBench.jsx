@@ -23,6 +23,8 @@ export default class SmithyWorkBench extends React.Component {
       alchemyItems: [],
       timeRemaining: 0,
     }
+
+    this.craftingTimeOut = Echo.private('show-crafting-timeout-bar-' + this.props.userId);
   }
 
   componentDidMount() {
@@ -48,6 +50,14 @@ export default class SmithyWorkBench extends React.Component {
           return this.props.openTimeOutModal()
         }
       }
+    });
+
+    this.craftingTimeOut.listen('Game.Core.Events.ShowCraftingTimeOutEvent', (event) => {
+      this.setState({
+        canCraft: event.canCraft,
+      }, () => {
+        this.props.updateCanCraft(event.canCraft);
+      });
     });
   }
 
@@ -87,7 +97,7 @@ export default class SmithyWorkBench extends React.Component {
   }
 
   updateSelectedItems() {
-    let foundItemWithStacks = this.state.items.filter((i) => i.item.id === this.state.selectedItem.id);
+    let foundItemWithStacks = this.state.items.filter((i) => i.item.affix_name === this.state.selectedItem.affix_name);
     let foundAlchemyItem    = this.state.alchemyItems.filter((i) => i.item.name === this.state.selectedAlchemyItem.name);
 
     if (foundItemWithStacks.length === 0) {

@@ -252,19 +252,19 @@ export default class CharacterDetails extends React.Component {
             <Tab eventKey="holy-bonus" title="Holy Bonuses">
               <dl className="mt-4">
                 <dt>Over All Holy Bonus:</dt>
-                <dd>100%</dd>
+                <dd>{(sheet.holy_bonus * 100).toFixed(2)}%</dd>
                 <dt>Holy Stacks</dt>
-                <dd>280/280</dd>
+                <dd>{sheet.current_stacks}/{sheet.max_holy_stacks}</dd>
                 <dt>Voidance Resistance Bonus:</dt>
-                <dd>100%</dd>
+                <dd>{(sheet.devouring_resistance * 100).toFixed(2)}%</dd>
                 <dt>Devoidance Resistance Bonus:</dt>
-                <dd>100%</dd>
+                <dd>{(sheet.devouring_resistance * 100).toFixed(2)}%</dd>
                 <dt>Bonus Attack %</dt>
-                <dd>100%</dd>
+                <dd>{(sheet.holy_attack_bonus * 100).toFixed(2)}%</dd>
                 <dt>Bonus AC %</dt>
-                <dd>100%</dd>
+                <dd>{(sheet.holy_ac_bonus * 100).toFixed(2)}%</dd>
                 <dt>Bonus Healing %</dt>
-                <dd>100%</dd>
+                <dd>{(sheet.holy_healing_bonus * 100).toFixed(2)}%</dd>
               </dl>
               <p className="mt-4">For more information, please see <a href="/information/holy-items">Holy Items help</a>. </p>
             </Tab>

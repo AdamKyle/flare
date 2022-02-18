@@ -59,6 +59,7 @@ use App\Flare\Transformers\UnitTransformer;
 use App\Flare\Values\BaseSkillValue;
 use App\Flare\View\Components\AdventureLogs;
 use App\Flare\View\Components\ItemDisplayColor;
+use App\Flare\Builders\Character\ClassDetails\HolyStacks;
 use App\Flare\View\Livewire\Admin\Items\Validators\ItemValidator;
 use Blade;
 use League\Fractal\Manager;
@@ -82,8 +83,12 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
-        $this->app->bind(WeaponInformation::class, function() {
-            return new WeaponInformation();
+        $this->app->bind(HolyStacks::class, function() {
+            return new HolyStacks();
+        });
+
+        $this->app->bind(WeaponInformation::class, function($app) {
+            return new WeaponInformation($app->make(HolyStacks::class));
         });
 
         $this->app->bind(DamageSpellInformation::class, function($app) {
@@ -151,7 +156,8 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(CharacterHealthInformation::class, function($app) {
             return new CharacterHealthInformation(
                 $app->make(CharacterInformationBuilder::class),
-                $app->make(ClassBonuses::class)
+                $app->make(ClassBonuses::class),
+                $app->make(HolyStacks::class)
             );
         });
 
@@ -159,7 +165,8 @@ class ServiceProvider extends ApplicationServiceProvider
             return new CharacterAttackBuilder(
                 $app->make(CharacterInformationBuilder::class),
                 $app->make(CharacterHealthInformation::class),
-                $app->make(CharacterAffixInformation::class)
+                $app->make(CharacterAffixInformation::class),
+                $app->make(HolyStacks::class)
             );
         });
 

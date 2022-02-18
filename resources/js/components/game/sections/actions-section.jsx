@@ -395,7 +395,7 @@ export default class ActionsSection extends React.Component {
                 }
                 {
                   this.state.showSmithingBench ?
-                    <SmithyWorkBench characterId={this.state.character.id} openTimeOutModal={this.props.openTimeOutModal} userId={this.props.userId}/>
+                    <SmithyWorkBench characterId={this.state.character.id} openTimeOutModal={this.props.openTimeOutModal} userId={this.props.userId} updateCanCraft={this.updateCanCraft.bind(this)}/>
                   : null
                 }
                 {

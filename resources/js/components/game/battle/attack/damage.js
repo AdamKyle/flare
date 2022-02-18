@@ -336,6 +336,10 @@ export default class Damage {
   }
 
   canUse(extraActionChance) {
+    if (extraActionChance >= 1.0) {
+      return true;
+    }
+
     const dc = Math.round(100 - (100 * extraActionChance));
 
     return random(1, 100) > dc;

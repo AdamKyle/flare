@@ -2,6 +2,7 @@
 
 namespace App\Flare\Builders\Character\AttackDetails;
 
+use App\Flare\Builders\Character\ClassDetails\HolyStacks;
 use App\Flare\Builders\Character\Traits\FetchEquipped;
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Models\Character;
@@ -29,13 +30,16 @@ class CharacterAttackBuilder {
 
     private $characterAffixReduction;
 
+    private $holyStacks;
+
     /**
      * @param CharacterInformationBuilder $characterInformationBuilder
      */
-    public function __construct(CharacterInformationBuilder $characterInformationBuilder, CharacterHealthInformation $characterHealthInformation, CharacterAffixInformation $characterAffixInformation) {
+    public function __construct(CharacterInformationBuilder $characterInformationBuilder, CharacterHealthInformation $characterHealthInformation, CharacterAffixInformation $characterAffixInformation, HolyStacks $holyStacks) {
         $this->characterInformationBuilder = $characterInformationBuilder;
         $this->characterHealthInformation  = $characterHealthInformation;
         $this->characterAffixReduction     = $characterAffixInformation;
+        $this->holyStacks                  = $holyStacks;
     }
 
     /**
@@ -134,6 +138,8 @@ class CharacterAttackBuilder {
         }
 
         $ac = ceil($ac + $ac * $str);
+
+        $ac += $ac * $this->holyStacks->fetchDefenceBonus($this->characterInformationBuilder->getCharacter());
 
         $baseAttack['defence'] = $ac;
 
@@ -258,6 +264,8 @@ class CharacterAttackBuilder {
                 $spellDamage = $this->characterInformationBuilder->calculateClassSpellDamage($spellDamage, $voided);
 
                 $spellDamage = $spellDamage + $spellDamage * $bonus;
+
+                $spellDamage = $spellDamage + $spellDamage * $this->holyStacks->fetchAttackBonus($this->character);
             }
 
             if ($spellSlotOne->item->type === 'spell-healing') {

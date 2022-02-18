@@ -41,6 +41,10 @@ class AttackExtraActionHandler {
         if ($classType->isThief()) {
             $chance = (new ClassAttackValue($characterInformationBuilder->getCharacter()))->buildAttackData()['chance'];
 
+            if ($chance >= 1.0) {
+                return true;
+            }
+
             $dc = 100 - 100 * $chance;
 
             return rand (1, 100) > $dc;

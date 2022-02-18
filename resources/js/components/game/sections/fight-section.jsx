@@ -93,6 +93,7 @@ export default class FightSection extends React.Component {
     this.isMonsterVoided           = false;
     this.isMonsterDevoided         = false;
     this.isCharacterVoided         = false;
+    this.isCharacterDevoided       = false;
   }
 
   componentDidMount() {
@@ -252,7 +253,16 @@ export default class FightSection extends React.Component {
     const voidance      = new Voidance();
     const character     = this.props.character;
 
-    if (voidance.canPlayerDevoidEnemy(this.props.character.devouring_darkness) && !this.isMonsterDevoided) {
+    if (monsterInfo.canMonsterDevoidPlayer(character.devouring_darkness_res)) {
+      this.battleMessagesBeforeFight.push({
+        message: this.props.monster.name + ' has devoided your voidance! You feel fear start to build.',
+        class: 'action-fired'
+      });
+
+      this.isCharacterDevoided = true;
+    }
+
+    if (voidance.canPlayerDevoidEnemy(this.props.character.devouring_darkness) && !this.isCharacterDevoided) {
       this.battleMessagesBeforeFight.push({
         message: 'Magic crackles in the air, the darkness consumes the enemy. They are devoided!',
         class: 'action-fired'
@@ -261,7 +271,16 @@ export default class FightSection extends React.Component {
       this.isMonsterDevoided = true;
     }
 
-    if (voidance.canVoidEnemy(this.props.character.devouring_light) && !this.isMonsterVoided) {
+    if (monsterInfo.canMonsterVoidPlayer(character.devouring_light_res) && !this.isMonsterDevoided) {
+      this.battleMessagesBeforeFight.push({
+        message: this.props.monster.name + ' has voided your enchantments! You feel much weaker!',
+        class: 'enemy-action-fired'
+      });
+
+      this.isCharacterVoided = true;
+    }
+
+    if (voidance.canVoidEnemy(this.props.character.devouring_light) && !this.isCharacterDevoided && !this.isCharacterVoided) {
       this.battleMessagesBeforeFight.push({
         message: 'The light of the heavens shines through this darkness. The enemy is voided!',
         class: 'action-fired'
@@ -270,15 +289,7 @@ export default class FightSection extends React.Component {
       this.isMonsterVoided = true;
     }
 
-    if (monsterInfo.canMonsterVoidPlayer() && !this.isCharacterVoided && !this.isMonsterDevoided) {
-      this.battleMessagesBeforeFight.push({
-        message: this.props.monster.name + ' has voided your enchantments! You feel much weaker!',
-        class: 'enemy-action-fired'
-      });
-
-      this.isCharacterVoided = true;
-
-    } else if (!this.isCharacterVoided) {
+    if (!this.isCharacterVoided && !this.isCharacterDevoided) {
 
       let messages = monsterInfo.reduceResistances(character.resistance_reduction);
 

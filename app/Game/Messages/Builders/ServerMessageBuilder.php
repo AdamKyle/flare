@@ -48,6 +48,8 @@ class ServerMessageBuilder {
             case 'cant_enchant':
             case 'cant_craft':
                 return 'You must wait for the timer (beside Craft/Enchant) to state: Ready!';
+            case 'cant_use_smithy_bench':
+                return 'No child! You are busy. Wait for the timer to finish.';
             case 'to_hard_to_craft':
                 return 'You are too low level and thus, you lost your investment and epically failed to craft this item!';
             case 'to_easy_to_craft':

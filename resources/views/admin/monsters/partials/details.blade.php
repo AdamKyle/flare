@@ -35,11 +35,11 @@
         <div class="col-md-4">
             <dl>
                 <dt>Health Range</dt>
-                <dd>{{$monster->health_range}}</dd>
+                <dd>{{number_format(explode('-', $monster->health_range)[0])}} - {{number_format(explode('-', $monster->health_range)[1])}}</dd>
                 <dt>Attack Range</dt>
-                <dd>{{$monster->attack_range}}</dd>
+                <dd>{{number_format(explode('-', $monster->attack_range)[0])}} - {{number_format(explode('-', $monster->attack_range)[1])}}</dd>
                 <dt>Drop Check</dt>
-                <dd>{{$monster->drop_check * 100}}% <sup>*</sup></dd>
+                <dd>{{$monster->drop_check * 100}}%</dd>
                 <dt>AC</dt>
                 <dd>{{number_format($monster->ac)}}</dd>
                 <dt>XP</dt>
@@ -49,7 +49,6 @@
                 <dt>Gold Reward</dt>
                 <dd>{{number_format($monster->gold)}}</dd>
             </dl>
-            <p class="tw-mt-6"><sup>*</sup> in special locations this increased by 10%</p>
         </div>
         <div class="col-md-4">
             <dl>
@@ -69,13 +68,16 @@
                 <p>There is a special quest item you can obtain to "devoid" their void, also known as: Devouring Darkness.
                     This has a chance starting at 50% to void out their chance to void you. You can upgrade this item to upgrade its chance.</p>
                 <p>
-                    If you fail to kill a celestial in one hit, it will have a "flee chance". Should it meet this chance, it will flee from battle
-                    to a new location.
+                    Monsters in purgatory have a Devouring Darkness chance, which means they can devoid you - you cannot void them. To get around this
+                    players will craft <a href="/information/holy-items">Holy Items</a> after completing a quest line. If a player becomes devoided,
+                    their void (Devouring light) will not fire, much like for enemies who you devoid.
                 </p>
             </x-core.alerts.info-alert>
             <dl>
                 <dt>Devouring Light Chance:</dt>
                 <dd>{{$monster->devouring_light_chance * 100}}%</dd>
+                <dt>Devouring Darkness Chance:</dt>
+                <dd>{{$monster->devouring_darkness_chance * 100}}%</dd>
             </dl>
         </div>
         <p class="ml-3 mt-3">
