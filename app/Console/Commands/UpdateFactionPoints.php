@@ -49,15 +49,27 @@ class UpdateFactionPoints extends Command
         });
     }
 
+    /**
+     * Update the characters Faction Points.
+     *
+     * @param Character $character
+     * @return void
+     */
     protected function updateFactions(Character $character) {
         foreach ($character->factions as $faction) {
             if (FactionLevel::isMaxLevel($faction->current_level)) {
                 continue;
             }
 
+            $currentPoints = $faction->current_points;
+
+            if (log10($currentPoints) < 3) {
+                $currentPoints *= 10;
+            }
+
             $faction->update([
-                'current_points' => $faction->current_points * 10,
-                'points_needed'  => FactionLevel::gatPointsPerLevel($faction->current_level)
+                'current_points' => $currentPoints,
+                'points_needed'  => FactionLevel::getPointsNeeded($faction->current_level)
             ]);
         }
     }

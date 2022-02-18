@@ -79,7 +79,6 @@ export default class Game extends React.Component {
     this.isDead            = Echo.private('character-is-dead-' + this.props.userId);
     this.npcComponent      = Echo.private('component-show-' + this.props.userId);
     this.attackAutomation  = Echo.private('exploration-status-' + this.props.userId);
-    this.clearQuestStorage = Echo.private('clear-quest-storage-' + this.props.userId);
   }
 
   updateDimensions() {
@@ -105,10 +104,6 @@ export default class Game extends React.Component {
       this.setState({
         attackAutomationIsRunning: event.isRunning
       });
-    });
-
-    this.clearQuestStorage.listen('Game.Core.Events.ResetQuestStorageBroadcastEvent', () => {
-      localforage.clear().catch((err) => console.err(err));
     });
 
     window.addEventListener('resize', this.updateDimensions.bind(this));

@@ -156,20 +156,22 @@ export default class CastAttack {
 
     let healFor = attackData.heal_for;
 
-    const dc = 100 - 100 * skillBonus;
+    if (healFor > 1) {
 
-    if (random(1, 100) > dc) {
-      this.addActionMessage('The heavens open and your wounds start to heal over (Critical heal!)')
+      const dc = 100 - 100 * skillBonus;
 
-      healFor *= 2;
+      if (random(1, 100) > dc) {
+        this.addActionMessage('The heavens open and your wounds start to heal over (Critical heal!)')
+
+        healFor *= 2;
+      }
+
+      this.characterCurrentHealth += healFor
+
+      this.addActionMessage('Your healing spell(s) heals you for: ' + this.formatNumber(healFor.toFixed(0)))
     }
 
-    this.characterCurrentHealth += healFor
-
-    this.addActionMessage('Your healing spell(s) heals you for: ' + this.formatNumber(healFor.toFixed(0)))
-
     this.extraHealing(attackData);
-
   }
 
   useItems(attackData, attackerClass) {

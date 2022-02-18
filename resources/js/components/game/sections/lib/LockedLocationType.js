@@ -14,23 +14,23 @@ export default class LockedLocationType {
         }
       case 2:
         return {
-          'devouring_darkness_range': '1-8%',
-          'stat_bonus_increase': '1-8%'
+          'devouring_darkness_range': '1-5%',
+          'stat_bonus_increase': '1-5%'
         }
       case 3:
         return {
-          'devouring_darkness_range': '1-15%',
-          'stat_bonus_increase': '1-15%'
+          'devouring_darkness_range': '1-8%',
+          'stat_bonus_increase': '1-8%'
         }
       case 4:
         return {
-          'devouring_darkness_range': '1-25%',
-          'stat_bonus_increase': '1-25%'
+          'devouring_darkness_range': '1-10%',
+          'stat_bonus_increase': '1-10%'
         }
       case 5:
         return {
-          'devouring_darkness_range': '1-35%',
-          'stat_bonus_increase': '1-35%'
+          'devouring_darkness_range': '1-15%',
+          'stat_bonus_increase': '1-15%'
         }
       default:
         return {
