@@ -93,11 +93,11 @@ class FactionHandler {
 
         if ($faction->current_points === $faction->points_needed && !FactionLevel::isMaxLevel($faction->current_level)) {
 
-            return $this->handleFactionLevelUp($character, $faction, $map->name);
+            return $this->handleFactionLevelUp($character, $faction, $gameMap->name);
 
         } else if (FactionLevel::isMaxLevel($faction->current_level) && !$faction->maxed) {
 
-            return $this->handleFactionMaxedOut($character, $faction, $map->name);
+            return $this->handleFactionMaxedOut($character, $faction, $gameMap->name);
         }
 
         $this->updateFactions($character);
