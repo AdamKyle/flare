@@ -120,10 +120,12 @@ class FightService {
 
         $isCharacterVoided = $this->newAttackType === 'voided';
 
-        if (is_null($this->currentCharacterHealth) || is_null($this->currentMonsterHealth)) {
+        if (is_null($this->currentCharacterHealth)) {
             $characterInformation         = $this->characterInformationBuilder->setCharacter($attacker);
             $this->currentCharacterHealth = $characterInformation->buildHealth($isCharacterVoided);
+        }
 
+        if (!$this->attackOnce) {
             $healthRange                = explode('-', $defender->health_range);
             $this->currentMonsterHealth = rand($healthRange[0], $healthRange[1]);
         }

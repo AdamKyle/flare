@@ -201,7 +201,16 @@ class MovementService {
 
         $this->traverseService->travel($mapId, $character);
 
-        return $this->successResult();
+        $character = $character->refresh();
+
+        $xPosition = $character->map->character_position_x;
+        $yPosition = $character->map->character_position_y;
+
+        $lockedLocation = Location::where('x', $xPosition)->where('y', $yPosition)->where('game_map_id', $character->map->game_map_id)->where('required_quest_item_id', true)->first();
+
+        return $this->successResult([
+            'lockedLocationType' => is_null($lockedLocation) ? null : $lockedLocation->type
+        ]);
     }
 
     /**

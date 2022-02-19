@@ -19,7 +19,16 @@ export default class SellItemModal extends React.Component {
       error_message: null,
       loading: false,
     }
+  }
 
+  componentDidMount() {
+    const minCost = parseInt(this.props.modalData.min_cost) || 0;
+
+    if (minCost !== 0) {
+      return this.setState({
+        list_for: minCost,
+      });
+    }
   }
 
   debouncedEvent = debounce((price) => {
@@ -100,7 +109,7 @@ export default class SellItemModal extends React.Component {
   buildListForLabel() {
     let label = 'List for ';
 
-    if (this.props.modalData.unique) {
+    if (this.props.modalData.min_cost) {
       label += '(Minimum selling price allowed: '+this.props.modalData.min_cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")+' Gold)';
     } else {
       label += '(Suggested selling price: '+this.props.modalData.cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")+' Gold)';
@@ -140,8 +149,12 @@ export default class SellItemModal extends React.Component {
               only, of the cost of the item plus cost of attached affixes. Use this as a guide only.
             </p>
             <p>
-              If the value in the input is supplied for you, the item cannot fall below tht minimum price. This will apply to special items like
-              <a href="/information/random-enchantments">uniques</a>. If there is no value (or 0) then you are free to enter any price you see fit.
+              If the value in the input is supplied for you, the item cannot fall below that minimum price. This will apply to special items like <a href="/information/random-enchantments">uniques</a>.
+              If there is no value (or 0) then you are free to enter any price you see fit.
+            </p>
+            <p>
+              If the item is a <a href="/information/holy-items">Holy item</a> there is additional cost added of 1 billion per stack on the item. This additional cost
+              will be applied to uniques that also have holy stacks.
             </p>
           </AlertInfo>
           <div className="form-group">
@@ -155,7 +168,7 @@ export default class SellItemModal extends React.Component {
                    onChange={this.salePrice.bind(this)}
                    value={this.state.list_for}
             />
-            <small id="listPriceHelp" className="form-text text-muted">There is a 5% sales tax for listing items.</small>
+            <small id="listPriceHelp" className="form-text text-muted">There is a 5% sales tax when this item sells.</small>
           </div>
           <MarketHistory type={this.props.modalData.type}/>
           {

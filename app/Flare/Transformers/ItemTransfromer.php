@@ -23,6 +23,7 @@ class ItemTransfromer extends TransformerAbstract {
         return [
             'id'                               => $item->id,
             'name'                             => $item->affix_name,
+            'description'                      => nl2br(e($item->description)),
             'base_damage'                      => $item->getTotalDamage(),
             'base_ac'                          => $item->getTotalDefence(),
             'base_healing'                     => $item->getTotalHealing(),
@@ -43,6 +44,7 @@ class ItemTransfromer extends TransformerAbstract {
             'item_prefix'                      => $item->itemPrefix,
             'item_suffix'                      => $item->itemSuffix,
             'usable'                           => $item->usable,
+            'can_use_on_other_items'           => $item->can_use_on_other_items,
             'crafting_type'                    => $item->crafting_type,
             'skill_level_req'                  => $item->skill_level_required,
             'skill_level_trivial'              => $item->skill_level_trivial,
@@ -65,9 +67,12 @@ class ItemTransfromer extends TransformerAbstract {
             'increase_skill_bonus_by'          => $item->increase_skill_bonus_by,
             'increase_skill_training_bonus_by' => $item->increase_skill_training_bonus_by,
             'unique'                           => $this->isUnique($item),
-            'min_cost'                         => SellItemCalculator::fetchMinimumSalePriceOfUnique($item),
-            'can_use_on_other_items'           => $item->can_use_on_other_items,
+            'min_cost'                         => SellItemCalculator::fetchMinPrice($item),
             'holy_level'                       => $item->holy_level,
+            'holy_stacks'                      => $item->holy_stacks,
+            'holy_stack_devouring_darkness'    => $item->holy_stack_devouring_darkness,
+            'holy_stack_stat_bonus'            => $item->holy_stack_stat_bonus,
+            'holy_stacks_applied'              => $item->holy_stacks_applied,
         ];
     }
 }

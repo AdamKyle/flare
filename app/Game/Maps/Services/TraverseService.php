@@ -2,32 +2,28 @@
 
 namespace App\Game\Maps\Services;
 
+use Illuminate\Support\Facades\Cache;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item;
+use Facades\App\Flare\Cache\CoordinatesCache;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Location;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
-use App\Game\Core\Events\UpdateAttackStats;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Events\UpdateGlobalCharacterCountBroadcast;
 use App\Game\Maps\Events\UpdateMonsterList;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Messages\Events\GlobalMessageEvent;
-use Illuminate\Support\Facades\Cache;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item;
-use Facades\App\Flare\Cache\CoordinatesCache;
+use App\Game\Messages\Events\ServerMessageEvent as GameServerMessageEvent;
 use App\Game\Maps\Events\UpdateMapBroadcast;
-use App\Game\Maps\Events\UpdateActionsBroadcast;
 use App\Flare\Events\ServerMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent as MessageEvent;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Character;
-use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\MonsterTransfromer;
 use App\Flare\Values\ItemEffectsValue;
-use App\Game\Messages\Events\ServerMessageEvent as GameServerMessageEvent;
-use League\Fractal\Resource\Item as ResourceItem;
 
 class TraverseService {
 
@@ -279,10 +275,12 @@ class TraverseService {
                                         ->where('game_map_id', $characterMap->game_map_id)
                                         ->first();
 
-        if ($gameMap->mapType()->isShadowPlane() || $gameMap->mapType()->isHell()) {
-            $this->updateActionTypeCache($character, $oldGameMap, $gameMap->enemy_stat_bonus);
-        } else {
-            $this->updateActionTypeCache($character, $oldGameMap, 0.0);
+        if ($gameMap->mapType()->isPurgatory() && $oldGameMap->mapType()->isHell()) {
+            $this->updateActionTypeCache($character, $gameMap->enemy_stat_bonus);
+        } else if ($gameMap->mapType()->isHell() && $oldGameMap->mapType()->isPurgatory() || ($gameMap->mapType()->isHell() && !$oldGameMap->mapType()->isPurgatory())) {
+            $this->updateActionTypeCache($character, $gameMap->enemy_stat_bonus);
+        } else if (!$gameMap->mapType()->isHell() && !$gameMap->mapType()->isPurgatory() && ($oldGameMap->mapType()->isHell() || $oldGameMap->mapType()->isPurgatory())) {
+            $this->updateActionTypeCache($character, 0.0);
         }
 
         $characterBaseStats = new Item($character, $this->characterSheetBaseInfoTransformer);
@@ -308,34 +306,21 @@ class TraverseService {
      * Update the actions cache.
      *
      * @param Character $character
-     * @param GameMap $oldMap
      * @param float $deduction
      * @return void
      */
-    protected function updateActionTypeCache(Character $character, GameMap $oldMap, float $deduction) {
+    protected function updateActionTypeCache(Character $character, float $deduction) {
 
-        if ($oldMap->mapType()->isHell()) {
-            event(new GameServerMessageEvent($character->user, 'One moment while we refresh your stats ...'));
+        event(new GameServerMessageEvent($character->user, 'One moment while we refresh your stats ...'));
 
-            resolve(BuildCharacterAttackTypes::class)->buildCache($character);
-        }
-
-        if ($character->map->gameMap->mapType()->isHell()) {
-            event(new GameServerMessageEvent($character->user, 'One moment while we refresh your stats ...'));
-
-            resolve(BuildCharacterAttackTypes::class)->buildCache($character);
-        }
+        resolve(BuildCharacterAttackTypes::class)->buildCache($character);
 
         $attackData = Cache::get('character-attack-data-' . $character->id);
 
-        if (is_null($attackData)) {
-            resolve(BuildCharacterAttackTypes::class)->buildCache($character);
-
-            $attackData = Cache::get('character-attack-data-' . $character->id);
-        }
-
-        foreach ($attackData as $key => $array) {
-            $attackData[$key]['damage_deduction'] = $deduction;
+        if ($deduction > 0.0) {
+            foreach ($attackData as $key => $array) {
+                $attackData[$key]['damage_deduction'] = $deduction;
+            }
         }
 
         Cache::put('character-attack-data-' . $character->id, $attackData);

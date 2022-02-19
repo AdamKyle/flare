@@ -613,7 +613,7 @@ export default class AutoAttackSection extends React.Component {
                     +100 FactionPoints (if you have a quest item you will get 1000 if you are above level 0. Else you will get 100)
                   </li>
                   <li>
-                    + 100,000 Gold
+                    +100,000 Gold
                   </li>
                 </ul>
                 <p>Should you die, this will end and we will show you, where the timer is, the result of the last battle message so you can see why you died. If you are logged out, you will not be able to

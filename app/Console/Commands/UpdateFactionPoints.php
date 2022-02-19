@@ -63,8 +63,10 @@ class UpdateFactionPoints extends Command
 
             $currentPoints = $faction->current_points;
 
-            if (log10($currentPoints) < 3) {
-                $currentPoints *= 10;
+            if (log10($faction->points_need) < 3) {
+                if (log10($currentPoints) < 3) {
+                    $currentPoints *= 10;
+                }
             }
 
             $faction->update([

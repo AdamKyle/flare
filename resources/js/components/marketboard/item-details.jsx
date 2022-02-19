@@ -72,6 +72,31 @@ export default class ItemDetails extends React.Component {
             </Card.Body>
           </Card>
         </Tab>
+        {!this.props.item.usable && !this.props.item.can_use_on_other_items ?
+          <Tab eventKey="holy" title="Holy Bonuses">
+            <Card>
+              <Card.Body>
+                <Row>
+                  <Col xs={12}>
+                    <dl>
+                      <dt>Holy Bonus</dt>
+                      <dd>{((this.props.item.holy_stacks_applied / this.props.item.holy_stacks) * 100).toFixed(2)}%</dd>
+                      <dt>Stacks Applied</dt>
+                      <dd>{this.props.item.holy_stacks_applied}</dd>
+                      <dt>Stacks Left</dt>
+                      <dd>{this.props.item.holy_stacks - this.props.item.holy_stacks_applied}</dd>
+                      <dt>Stat Bonus</dt>
+                      <dd>{(this.props.item.holy_stack_stat_bonus * 100).toFixed(2)}%</dd>
+                      <dt>Devouring Darkness Bonus:</dt>
+                      <dd>{(this.props.item.holy_stack_devouring_darkness * 100).toFixed(2)}%</dd>
+                    </dl>
+                  </Col>
+                </Row>
+              </Card.Body>
+            </Card>
+          </Tab>
+        : null
+        }
       </Tabs>
     );
   }

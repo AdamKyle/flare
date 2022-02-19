@@ -119,7 +119,7 @@ export default class AdditionalActionsDropDown extends React.Component {
             {
               this.props.lockedLocationType === LockedLocationType.PURGATORYSMITHSHOUSE ?
                 <Dropdown.Item
-                  onClick={this.addPurgatorySmithSection.bind(this)}>{this.state.showPurgatorySmithWorkBench ? 'Remove Work Bench' : 'Smiths Work Bench'}</Dropdown.Item>
+                  onClick={this.addPurgatorySmithSection.bind(this)}>{this.state.showSmithingBench ? 'Remove Work Bench' : 'Smiths Work Bench'}</Dropdown.Item>
               : null
             }
 

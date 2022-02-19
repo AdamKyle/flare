@@ -362,9 +362,9 @@ export default class Game extends React.Component {
       this.setState({
         showServerMessageUpdate: true
       });
-    } else if (!isServerMessage && !this.state.showExplorersLogUpdate && this.state.activeChatTab !== 'chat') {
+    } else if (!isServerMessage  && this.state.activeChatTab !== 'chat') {
       this.setState({
-        showExplorersLogUpdate: true,
+        showChatUpdate: true,
       });
     }
   }
@@ -508,6 +508,7 @@ export default class Game extends React.Component {
                       openTraverseSection={this.openTraverseDetails.bind(this)}
                       characterId={this.state.characterId}
                       openTimeOutModal={this.openTimeOutModal.bind(this)}
+                      updateLockedLocationType={this.updateLockedLocationType.bind(this)}
                     />
                     : null
                 }

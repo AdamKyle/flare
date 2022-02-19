@@ -64,19 +64,6 @@ class MapController extends Controller {
             }
         }
 
-        // Are we at a special location, trying to leave?
-        $location = Location::where('x', $character->x_position)
-            ->where('y', $character->y_position)
-            ->where('game_map_id', $character->map->game_map_id)
-            ->first();
-
-        if (!is_null($location)) {
-            if (!is_null($location->enemy_strength_type) && $character->currentAutomations()->where('type', AutomationType::EXPLORING)->get()->isNotEmpty()) {
-                event(new ServerMessageEvent($character->user, 'No. You are currently auto battling and the monsters here are different. Stop auto battling, then enter, then begin again.'));
-                return response()->json(['message' => 'You\'re too busy.'], 422);
-            }
-        }
-
         $response = $movementSevice->updateCharacterPosition($character, $request->all());
 
         $status = $response['status'];
@@ -143,11 +130,20 @@ class MapController extends Controller {
 
         if (!is_null($cacheToReset)) {
             $needsRefresh = in_array($character->id, $cacheToReset);
+            $index        = array_search($character->id, $cacheToReset);
+
+            if ($index !== false) {
+                unset($cacheToReset[$index]);
+            }
+
+            Cache::put('character-quest-reset', $cacheToReset);
         }
 
         if (!$request->completed_quests_only || $needsRefresh) {
             $data['all_quests'] = Cache::get('all-quests');
         }
+
+        $data['was_reset'] = (!$request->completed_quests_only || $needsRefresh);
 
         return response()->json($data);
     }

@@ -8,6 +8,7 @@ use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Services\CharacterRewardService;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
+use App\Flare\Transformers\CharacterTopBarTransformer;
 use App\Game\Battle\Console\Commands\ClearCelestials;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Handlers\FactionHandler;
@@ -37,7 +38,7 @@ class ServiceProvider extends ApplicationServiceProvider
             return new ConjureService(
                 $app->make(Manager::class),
                 $app->make(KingdomTransformer::class),
-                $app->make(CharacterSheetBaseInfoTransformer::class),
+                $app->make(CharacterTopBarTransformer::class),
                 $app->make(NpcServerMessageBuilder::class),
             );
         });

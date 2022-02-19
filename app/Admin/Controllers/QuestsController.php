@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use Cache;
 use App\Flare\Models\Character;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Controllers\Controller;

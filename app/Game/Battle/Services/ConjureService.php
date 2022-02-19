@@ -4,6 +4,7 @@ namespace App\Game\Battle\Services;
 
 use App\Flare\Models\GameMap;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
+use App\Flare\Transformers\CharacterTopBarTransformer;
 use App\Flare\Values\MapNameValue;
 use App\Game\Maps\Events\UpdateMapDetailsBroadcast;
 use App\Game\Maps\Services\MovementService;
@@ -37,7 +38,7 @@ class ConjureService {
 
     private $npcServerMessageBuilder;
 
-    public function __construct(Manager $manager, KingdomTransformer $kingdom, CharacterSheetBaseInfoTransformer $characterSheetTransformer, NpcServerMessageBuilder $npcServerMessageBuilder) {
+    public function __construct(Manager $manager, KingdomTransformer $kingdom, CharacterTopBarTransformer $characterSheetTransformer, NpcServerMessageBuilder $npcServerMessageBuilder) {
         $this->manager                 = $manager;
         $this->kingdomTransformer      = $kingdom;
         $this->characterTransformer    = $characterSheetTransformer;

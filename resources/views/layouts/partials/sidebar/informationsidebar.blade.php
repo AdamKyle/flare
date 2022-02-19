@@ -8,7 +8,6 @@
             <li><a href="{{route('info.page', ['pageName' => 'chat-commands'])}}">Chat Commands</a></li>
             <li><a href="{{route('info.page', ['pageName' => 'settings'])}}">Player Settings</a></li>
             <li><a href="{{route('info.page', ['pageName' => 'notifications'])}}">Notifications</a></li>
-            <li><a href="{{route('info.page', ['pageName' => 'tips'])}}">Tips for New Players</a></li>
         </ul>
     </li>
     <li class="nav-small-cap">Character Information</li>
@@ -24,7 +23,6 @@
             <li><a href="{{route('info.page', ['pageName' => 'combat'])}}">Combat</a></li>
             <li><a href="{{route('info.page', ['pageName' => 'factions'])}}">Factions</a></li>
             <li><a href="{{route('info.page', ['pageName' => 'voidance'])}}">Voidance / Devoidance</a></li>
-            <li><a href="{{route('info.page', ['pageName' => 'automation'])}}">Automation</a></li>
         </ul>
     </li>
     <li class="nav-small-cap">Map</li>
@@ -35,6 +33,7 @@
             <li><a href="{{route('info.page', ['pageName' => 'locations'])}}">Locations</a></li>
             <li><a href="{{route('info.page', ['pageName' => 'special-locations'])}}">Special Locations</a></li>
             <li><a href="{{route('info.page', ['pageName' => 'adventure'])}}">Adventuring</a></li>
+            <li><a href="{{route('info.page', ['pageName' => 'exploration'])}}">Exploration</a></li>
             <li><a href="{{route('info.page', ['pageName' => 'set-sail'])}}">Setting Sail</a></li>
             <li><a href="{{route('info.page', ['pageName' => 'teleport'])}}">Teleporting</a></li>
             <li><a href="{{route('info.page', ['pageName' => 'traverse'])}}">Traverse</a></li>
@@ -85,6 +84,9 @@
             </li>
             <li>
                 <a href="{{route('info.page', ['pageName' => 'random-enchants'])}}">Random Enchanted Items (Uniques)</a>
+            </li>
+            <li>
+                <a href="{{route('info.page', ['pageName' => 'holy-items'])}}">Holy Items</a>
             </li>
         </ul>
     </li>

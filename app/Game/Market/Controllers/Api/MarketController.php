@@ -99,7 +99,7 @@ class MarketController extends Controller {
 
             $slot->cost = SellItemCalculator::fetchSalePriceWithAffixes($slot->item);
 
-            $slot->min_cost = SellItemCalculator::fetchMinimumSalePriceOfUnique($slot->item);
+            $slot->min_cost = SellItemCalculator::fetchMinPrice($slot->item);
 
             $slot->item->unique = $this->isUnique($slot->item);
 
@@ -198,7 +198,8 @@ class MarketController extends Controller {
         }
 
         if ($this->isUnique($slot->item)) {
-            $minCost = SellItemCalculator::fetchMinimumSalePriceOfUnique($slot->item);
+            $minCost = SellItemCalculator::fetchMinPrice($slot->item);
+
             if ( $minCost > $request->list_for) {
                 return response()->json(['message' => 'No! The minimum selling price is: ' . number_format($minCost) . ' Gold.'], 422);
             }

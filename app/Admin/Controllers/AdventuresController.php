@@ -2,13 +2,13 @@
 
 namespace App\Admin\Controllers;
 
+use Cache;
 use App\Http\Controllers\Controller;
 use App\Admin\Requests\AdventureValidation;
 use App\Flare\Models\Adventure;
 use App\Flare\Models\Item;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
-use Cache;
 use Illuminate\Http\Request;
 
 class AdventuresController extends Controller {

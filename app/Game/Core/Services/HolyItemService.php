@@ -80,6 +80,10 @@ class HolyItemService {
         if ($itemSlot->item->appliedHolyStacks->isEmpty()) {
             $newItem = $itemSlot->item->duplicate();
 
+            $newItem->update([
+                'market_sellable' => true,
+            ]);
+
             $newItem->appliedHolyStacks()->create([
                 'item_id'                  => $newItem->id,
                 'devouring_darkness_bonus' => $holyItemEffect->getRandomDevoidanceIncrease() / 100,

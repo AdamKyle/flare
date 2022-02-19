@@ -11,6 +11,7 @@ import CelestialFightSection from "./celestial-fight-section";
 import AlchemyAction from "../alchemy/alchemy-action";
 import AutoAttackSection from "./auto-attack-section";
 import SmithyWorkBench from "../smithy-work-bench/SmithyWorkBench";
+import LockedLocationType from "./lib/LockedLocationType";
 
 export default class ActionsSection extends React.Component {
 
@@ -130,6 +131,12 @@ export default class ActionsSection extends React.Component {
     if (this.props.celestial !== prevProps.celestial && this.state.actionComponent !== 'battle-action') {
       this.setState({
         actionComponent: 'battle-action',
+      });
+    }
+
+    if (this.props.lockedLocationType !== LockedLocationType.PURGATORYSMITHSHOUSE && this.state.showSmithingBench) {
+      this.setState({
+        showSmithingBench: false,
       });
     }
   }
