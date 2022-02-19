@@ -2,8 +2,10 @@
 
 namespace App\Flare\View\Livewire\Admin\Locations\Partials;
 
+use App\Flare\Models\Item;
 use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Values\LocationEffectValue;
+use App\Flare\Values\LocationType;
 use Livewire\Component;
 use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\GameMap;
@@ -20,13 +22,15 @@ class Details extends Component
     public $locationEffects;
 
     protected $rules = [
-        'location.name'                => 'required',
-        'location.description'         => 'required',
-        'location.x'                   => 'required',
-        'location.y'                   => 'required',
-        'location.game_map_id'         => 'required',
-        'location.is_port'             => 'nullable',
-        'location.enemy_strength_type' => 'nullable',
+        'location.name'                   => 'required',
+        'location.description'            => 'required',
+        'location.x'                      => 'required',
+        'location.y'                      => 'required',
+        'location.game_map_id'            => 'required',
+        'location.is_port'                => 'nullable',
+        'location.enemy_strength_type'    => 'nullable',
+        'location.required_quest_item_id' => 'nullable',
+        'location.type'                   => 'nullable',
     ];
 
     protected $messages = [
@@ -35,10 +39,16 @@ class Details extends Component
 
     protected $listeners = ['validateInput'];
 
+    public $questItems = [];
+
+    public $locationTypes = [];
+
     public function mount(CoordinatesCache $coordinatesCache) {
         $this->maps            = GameMap::all()->pluck('name', 'id')->toArray();
         $this->coordinates     = $coordinatesCache->getFromCache();
         $this->locationEffects = LocationEffectValue::getNamedValues();
+        $this->questItems      = Item::where('type', 'quest')->pluck('name', 'id')->toArray();
+        $this->locationTypes   = LocationType::getNamedValues();
 
         if (is_null($this->location)) {
             $this->location = new Location;

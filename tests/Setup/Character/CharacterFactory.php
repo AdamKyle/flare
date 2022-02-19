@@ -9,7 +9,7 @@ use App\Flare\Models\MarketBoard;
 use App\Flare\Models\Quest;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Values\AttackTypeValue;
-use App\Game\Automation\Values\AutomationType;
+use App\Flare\Values\AutomationType;
 use App\Game\Core\Values\FactionLevel;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use App\Game\Skills\Values\SkillTypeValue;
@@ -22,6 +22,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\User;
 use App\Game\Core\Services\CharacterService;
+use Tests\Setup\AttackDataCacheSetUp;
 use Tests\Traits\CreateCharacter;
 use Tests\Traits\CreateClass;
 use Tests\Traits\CreateGameMap;
@@ -93,6 +94,10 @@ class CharacterFactory {
         $this->assignBaseSkills();
 
         $this->assignPassiveSkills();
+
+        $character = $this->character->refresh();
+
+        Cache::put('character-attack-data-' . $character->id, (new AttackDataCacheSetUp())->getCacheObject());
 
         return $this;
     }
@@ -169,7 +174,7 @@ class CharacterFactory {
         $this->character->currentAutomations()->create(array_merge([
             'character_id'                   => $this->character->id,
             'monster_id'                     => null,
-            'type'                           => AutomationType::ATTACK,
+            'type'                           => AutomationType::EXPLORING,
             'started_at'                     => now(),
             'completed_at'                   => now()->addHours(25),
             'attack_type'                    => AttackTypeValue::CAST,
@@ -365,7 +370,7 @@ class CharacterFactory {
      * @return CharacterFactory
      */
     public function givePlayerLocation(int $x = 16, int $y = 16): CharacterFactory {
-        $gameMap = GameMap::all();
+        $gameMap = GameMap::where('default', true)->get();
         $id      = 0;
 
         if ($gameMap->isNotEmpty()) {
@@ -534,15 +539,26 @@ class CharacterFactory {
      *
      * @return Character
      */
-    public function getCharacter(bool $createAttackData = true): Character {
+    public function getCharacter(): Character {
 
         $character = $this->character->refresh();
 
-        if (!Cache::has('character-attack-data-' . $character->id) && $createAttackData) {
+        return $character;
+    }
+
+    /**
+     * Builds the character cache data.
+     *
+     * @return $this
+     */
+    public function buildCharacterCacheData(): CharacterFactory {
+        $character = $this->character->Refresh();
+
+        if (!Cache::has('character-attack-data-' . $character->id)) {
             resolve(BuildCharacterAttackTypes::class)->buildCache($character);
         }
 
-        return $character;
+        return $this;
     }
 
     /**
@@ -588,15 +604,21 @@ class CharacterFactory {
      */
     protected function assignBaseSkills() {
         $accuracy        = $this->createGameSkill(['name' => 'Accuracy']);
+        $timeout         = $this->createGameSkill(['name' => 'Fighters Timeout', 'type' => SkillTypeValue::EFFECTS_BATTLE_TIMER]);
         $castingAccuracy = $this->createGameSkill(['name' => 'Casting Accuracy']);
         $criticality     = $this->createGameSkill(['name' => 'Criticality']);
         $dodge           = $this->createGameSkill(['name' => 'Dodge']);
         $looting         = $this->createGameSkill(['name' => 'Looting']);
-        $lustForGold     = $this->createGameSkill(['name' => 'Lust for Gold', 'type' => SkillTypeValue::EFFECTS_KINGDOM]);
+        $kingmanship     = $this->createGameSkill(['name' => 'Kingmanship', 'type' => SkillTypeValue::EFFECTS_KINGDOM]);
 
         $this->createSkill([
             'character_id'  => $this->character->id,
             'game_skill_id' => $accuracy->id,
+        ]);
+
+        $this->createSkill([
+            'character_id'  => $this->character->id,
+            'game_skill_id' => $timeout->id,
         ]);
 
         $this->createSkill([
@@ -621,7 +643,7 @@ class CharacterFactory {
 
         $this->createSkill([
             'character_id'  => $this->character->id,
-            'game_skill_id' => $lustForGold->id,
+            'game_skill_id' => $kingmanship->id,
         ]);
     }
 

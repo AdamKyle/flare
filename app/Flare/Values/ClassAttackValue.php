@@ -3,6 +3,10 @@
 namespace App\Flare\Values;
 
 use App\Flare\Builders\CharacterInformationBuilder;
+use App\Flare\Models\Inventory;
+use App\Flare\Models\InventorySet;
+use App\Flare\Models\InventorySlot;
+use App\Flare\Models\SetSlot;
 use Illuminate\Database\Eloquent\Collection;
 use App\Flare\Models\Character;
 
@@ -127,20 +131,25 @@ class ClassAttackValue {
     }
 
     private function getItemCollection(string $type): Collection {
-        $items = $this->character->inventory->slots->filter(function($slot) use($type) {
-            return $slot->item->type === $type && $slot->equipped;
-        });
 
-        if ($items->isEmpty()) {
+        $inventory = Inventory::where('character_id', $this->character->id)->first();
+
+        $slots     = InventorySlot::where('inventory_slots.inventory_id', $inventory->id)->where('inventory_slots.equipped', true)->join('items', function($join) use ($type) {
+            $join->on('items.id', '=', 'inventory_slots.item_id')
+                 ->where('items.type', '=', $type);
+        })->select('inventory_slots.*')->get();
+
+        if ($slots->isEmpty()) {
             $setEquipped = $this->character->inventorySets->where('is_equipped', true)->first();
 
             if (!is_null($setEquipped)) {
-                $items = $setEquipped->slots->filter(function($slot) use($type) {
-                    return $slot->item->type === $type && $slot->equipped;
-                });
+                $slots = SetSlot::where('set_slots.inventory_set_id', $setEquipped->id)->join('items', function($join) use ($type) {
+                    $join->on('items.id', '=', 'set_slots.item_id')
+                        ->where('items.type', '=', $type);
+                })->select('set_slots.*')->get();
             }
         }
 
-        return $items;
+        return $slots;
     }
 }

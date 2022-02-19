@@ -36,7 +36,6 @@ class NpcQuestsHandler {
         $finishedAtLeastOneQuest = false;
 
         foreach ($quests as $quest) {
-
             if ($this->shouldBailOnQuest($character, $npc, $quest, $completedQuests)) {
                 continue;
             }
@@ -105,11 +104,6 @@ class NpcQuestsHandler {
     }
 
     public function shouldBailOnQuest(Character $character, Npc $npc, Quest $quest, array $completedQuests) {
-        if (!$this->canHaveReward($character, $npc)) {
-            // Do not continue, it would be a waste.
-            return true;
-        }
-
         if (!$this->validateParentQuest($quest, $completedQuests)) {
             return true;
         }
@@ -239,15 +233,6 @@ class NpcQuestsHandler {
         broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build($type, $npc), true));
     }
 
-    public function canHaveReward(Character $character, Npc $npc): bool {
-        if ($character->isInventoryFull()) {
-            broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('inventory_full', $npc), true));
-            return false;
-        }
-
-        return true;
-    }
-
     public function alertAboutCurrencyCapped(Character $character, Npc $npc, Quest $quest) {
         $newGold          = $character->gold + $quest->reward_gold;
         $newGoldDust      = $character->gold_dust + $quest->reward_gold_dust;
@@ -273,16 +258,20 @@ class NpcQuestsHandler {
     public function canPay(Character $character, Quest $quest) : bool {
         $canPay = true;
 
-        if (!is_null($quest->gold_cost)) {
+        if ($quest->gold_cost > 0) {
             $canPay = $character->gold >= $quest->gold_cost;
         }
 
-        if (!is_null($quest->gold_dust_cost)) {
+        if ($quest->gold_dust_cost > 0) {
             $canPay = $character->gold_dust >= $quest->gold_dust_cost;
         }
 
-        if (!is_null($quest->shard_cost)) {
+        if ($quest->shard_cost > 0) {
             $canPay = $character->shards >= $quest->shard_cost;
+        }
+
+        if ($quest->copper_coin_cost > 0) {
+            $canPay = $character->copper_coins >= $quest->copper_coin_cost;
         }
 
         return $canPay;
@@ -291,9 +280,10 @@ class NpcQuestsHandler {
     public function payCurrencies(Character $character, Npc $npc, Quest $quest) {
         broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('take_currency', $npc), true));
 
-        $newGold     = $character->gold - $quest->gold_cost;
-        $newGoldDust = $character->gold_dust - $quest->gold_dust_cost;
-        $newShards   = $character->shards - $quest->shard_cost;
+        $newGold        = $character->gold - $quest->gold_cost;
+        $newGoldDust    = $character->gold_dust - $quest->gold_dust_cost;
+        $newShards      = $character->shards - $quest->shard_cost;
+        $newCopperCoins = $character->copper_coins - $quest->copper_coin_cost;
 
         if ($newGold <= 0) {
             $newGold = 0;
@@ -307,10 +297,15 @@ class NpcQuestsHandler {
             $newShards = 0;
         }
 
+        if ($newCopperCoins <= 0) {
+            $newCopperCoins = 0;
+        }
+
         $character->update([
             'gold' => !is_null($quest->gold_cost) ? $newGold : $character->gold,
             'gold_dust' => !is_null($quest->gold_dust_cost) ? $newGoldDust : $character->gold_dust,
-            'shards' => !is_null($quest->shards_cost) ? $newShards : $character->shards,
+            'shards' => !is_null($quest->shard_cost) ? $newShards : $character->shards,
+            'copper_coins' => !is_null($quest->copper_coin_cost) ? $newCopperCoins : $character->copper_coins,
         ]);
 
         event(new UpdateTopBarEvent($character->refresh()));

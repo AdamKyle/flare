@@ -49,8 +49,10 @@ export default class TraverseSection extends React.Component {
       }, () => {
         axios.post('/api/map/traverse/' + this.props.characterId, {
           map_id: this.state.selected_plane,
-        }).then(() => {
-          this.setState({loading: false});
+        }).then((result) => {
+          this.setState({loading: false}, () => {
+            this.props.updateLockedLocationType(result.data.lockedLocationType);
+          });
           this.hideTraverse();
         }).catch((err) => {
           this.setState({loading: false});

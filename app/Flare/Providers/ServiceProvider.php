@@ -4,8 +4,15 @@ namespace App\Flare\Providers;
 
 
 use App\Flare\Builders\AffixAttributeBuilder;
-use App\Flare\Builders\CharacterAttackBuilder;
-use App\Flare\Builders\CharacterAttackInformation;
+use App\Flare\Builders\Character\AttackDetails\CharacterAffixInformation;
+use App\Flare\Builders\Character\AttackDetails\CharacterHealthInformation;
+use App\Flare\Builders\Character\AttackDetails\CharacterLifeStealing;
+use App\Flare\Builders\Character\AttackDetails\DamageDetails\DamageSpellInformation;
+use App\Flare\Builders\Character\AttackDetails\DamageDetails\WeaponInformation;
+use App\Flare\Builders\Character\BaseCharacterInfo;
+use App\Flare\Builders\Character\AttackDetails\CharacterAttackBuilder;
+use App\Flare\Builders\Character\AttackDetails\CharacterAttackInformation;
+use App\Flare\Builders\Character\ClassDetails\ClassBonuses;
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Handlers\AttackExtraActionHandler;
 use App\Flare\Handlers\AttackHandlers\AttackAndCastHandler;
@@ -28,12 +35,14 @@ use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Services\CanUserEnterSiteService;
 use App\Flare\Services\CharacterXPService;
 use App\Flare\Services\DailyGoldDustService;
-use App\Flare\View\Components\EquipmentButtonForm;
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
+use App\Game\Core\Services\CharacterService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Flare\Values\BaseStatValue;
 use App\Flare\Builders\CharacterBuilder;
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Builders\RandomItemDropBuilder;
+use App\Flare\Builders\Character\AttackDetails\CharacterDamageInformation;
 use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Handlers\MessageThrottledHandler;
 use App\Flare\Middleware\IsCharacterDeadMiddleware;
@@ -42,7 +51,6 @@ use App\Flare\Services\CharacterRewardService;
 use App\Flare\Services\FightService;
 use App\Flare\Transformers\KingdomBuildingTransformer;
 use App\Flare\Transformers\CharacterAttackTransformer;
-use App\Flare\Transformers\CharacterSheetTransformer;
 use App\Flare\Transformers\ItemTransfromer;
 use App\Flare\Transformers\KingdomTransformer;
 use App\Flare\Transformers\MarketItemsTransfromer;
@@ -51,6 +59,7 @@ use App\Flare\Transformers\UnitTransformer;
 use App\Flare\Values\BaseSkillValue;
 use App\Flare\View\Components\AdventureLogs;
 use App\Flare\View\Components\ItemDisplayColor;
+use App\Flare\Builders\Character\ClassDetails\HolyStacks;
 use App\Flare\View\Livewire\Admin\Items\Validators\ItemValidator;
 use Blade;
 use League\Fractal\Manager;
@@ -64,16 +73,52 @@ class ServiceProvider extends ApplicationServiceProvider
      */
     public function register()
     {
-        $this->app->bind(BaseStatValue::class, function ($app) {
+        $this->app->bind(BaseStatValue::class, function () {
             return new BaseStatValue();
         });
 
         $this->app->bind(CharacterBuilder::class, function ($app) {
-            return new CharacterBuilder();
+            return new CharacterBuilder(
+                $app->make(BuildCharacterAttackTypes::class)
+            );
         });
 
-        $this->app->bind(CharacterAttackInformation::class, function() {
-            return new CharacterAttackInformation();
+        $this->app->bind(HolyStacks::class, function() {
+            return new HolyStacks();
+        });
+
+        $this->app->bind(WeaponInformation::class, function($app) {
+            return new WeaponInformation($app->make(HolyStacks::class));
+        });
+
+        $this->app->bind(DamageSpellInformation::class, function($app) {
+            return new DamageSpellInformation(
+                $app->make(ClassBonuses::class)
+            );
+        });
+
+        $this->app->bind(CharacterDamageInformation::class, function($app) {
+            return new CharacterDamageInformation(
+                $app->make(WeaponInformation::class),
+                $app->make(DamageSpellInformation::class)
+            );
+        });
+
+        $this->app->bind(CharacterLifeStealing::class, function() {
+            return new CharacterLifeStealing();
+        });
+
+        $this->app->bind(CharacterAffixInformation::class, function($app) {
+            return new CharacterAffixInformation(
+                $app->make(CharacterLifeStealing::class)
+            );
+        });
+
+        $this->app->bind(CharacterAttackInformation::class, function($app) {
+            return new CharacterAttackInformation(
+                $app->make(CharacterDamageInformation::class),
+                $app->make(CharacterAffixInformation::class)
+            );
         });
 
         $this->app->bind(AffixAttributeBuilder::class, function() {
@@ -91,14 +136,38 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
+        $this->app->bind(ClassBonuses::class, function($app) {
+            return new ClassBonuses();
+        });
+
+        $this->app->bind(BaseCharacterInfo::class, function($app) {
+            return new BaseCharacterInfo(
+                $app->make(ClassBonuses::class)
+            );
+        });
+
         $this->app->bind(CharacterInformationBuilder::class, function($app) {
             return new CharacterInformationBuilder(
-                $app->make(CharacterAttackInformation::class)
+                $app->make(BaseCharacterInfo::class),
+                $app->make(CharacterAttackInformation::class),
+            );
+        });
+
+        $this->app->bind(CharacterHealthInformation::class, function($app) {
+            return new CharacterHealthInformation(
+                $app->make(CharacterInformationBuilder::class),
+                $app->make(ClassBonuses::class),
+                $app->make(HolyStacks::class)
             );
         });
 
         $this->app->bind(CharacterAttackBuilder::class, function($app) {
-            return new CharacterAttackBuilder($app->make(CharacterInformationBuilder::class));
+            return new CharacterAttackBuilder(
+                $app->make(CharacterInformationBuilder::class),
+                $app->make(CharacterHealthInformation::class),
+                $app->make(CharacterAffixInformation::class),
+                $app->make(HolyStacks::class)
+            );
         });
 
 
@@ -110,8 +179,8 @@ class ServiceProvider extends ApplicationServiceProvider
             return new CharacterAttackTransformer();
         });
 
-        $this->app->bind(CharacterSheetTransformer::class, function($app){
-            return new CharacterSheetTransformer();
+        $this->app->bind(CharacterSheetBaseInfoTransformer::class, function() {
+            return new CharacterSheetBaseInfoTransformer();
         });
 
         $this->app->bind(KingdomTransformer::class, function($app){
@@ -150,8 +219,13 @@ class ServiceProvider extends ApplicationServiceProvider
             return new CharacterXPService();
         });
 
-        $this->app->bind(CharacterRewardService::class, function($app, $paramters) {
-            return new CharacterRewardService($paramters['character'], $app->make(CharacterXPService::class));
+        $this->app->bind(CharacterRewardService::class, function($app) {
+            return new CharacterRewardService(
+                $app->make(CharacterXPService::class),
+                $app->make(CharacterService::class),
+                $app->make(Manager::class),
+                $app->make(CharacterSheetBaseInfoTransformer::class)
+            );
 
         });
 
@@ -167,12 +241,6 @@ class ServiceProvider extends ApplicationServiceProvider
             return new SetupFightHandler(
                 $app->make(CharacterInformationBuilder::class),
                 $app->make(BuildMonsterCacheService::class)
-            );
-        });
-
-        $this->app->bind(CharacterAttackBuilder::class, function($app) {
-            return new CharacterAttackBuilder(
-                $app->make(CharacterInformationBuilder::class)
             );
         });
 
@@ -202,6 +270,7 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(MonsterAttackHandler::class, function($app) {
             return new MonsterAttackHandler(
                 $app->make(CharacterInformationBuilder::class),
+                $app->make(CharacterAffixInformation::class),
                 $app->make(EntrancingChanceHandler::class),
                 $app->make(ItemHandler::class),
                 $app->make(CanHitHandler::class),
@@ -296,7 +365,7 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(BuildCharacterAttackTypes::class, function($app) {
             return new BuildCharacterAttackTypes(
-                $app->make(CharacterAttackBuilder::class),
+                $app->make(CharacterAttackBuilder::class)
             );
         });
 

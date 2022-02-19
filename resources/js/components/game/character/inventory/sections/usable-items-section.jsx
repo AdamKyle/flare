@@ -3,6 +3,8 @@ import ItemName from "../../../../marketboard/components/item-name";
 import {Alert, Card} from "react-bootstrap";
 import ReactDatatable from "@ashvin27/react-datatable";
 import UseManyItemsModal from "../modals/use-many-items-modal";
+import DestroyUsableModal from "../modals/destroy-usable-modal";
+import DestroyAllUsableItemsModal from "../modals/destroy-all-usable-items-modal";
 
 export default class UsableItemsSection extends React.Component {
 
@@ -37,7 +39,8 @@ export default class UsableItemsSection extends React.Component {
         name: "actions",
         text: "Actions",
         cell: row => <Fragment>
-          <button className="btn btn-primary" onClick={() => this.manageUseItem(row)} disabled={this.state.loading || this.canUseItem(row)}>Use</button>
+          <button className="btn btn-primary mb-2 mr-2 float-left" onClick={() => this.manageUseItem(row)} disabled={this.state.loading || this.canUseItem(row)}>Use</button>
+          <button className="btn btn-danger" onClick={() => this.manageDestroy(row)} disabled={this.state.loading}>Destroy</button>
         </Fragment>
       },
     ];
@@ -45,7 +48,10 @@ export default class UsableItemsSection extends React.Component {
     this.state = {
       successMessage: null,
       errorMessage: null,
+      itemToDestroy: null,
       showUseMany: false,
+      showDestroyItem: false,
+      showDestroyAll: false,
       loading: false,
     }
   }
@@ -78,14 +84,37 @@ export default class UsableItemsSection extends React.Component {
     return this.props.usableItems.map((ui) => ui.item);
   }
 
+  getSlotId(itemId) {
+    const foundItem = this.props.usableItems.filter((ui) => ui.item_id === itemId);
+
+    if (foundItem.length > 0) {
+      return foundItem[0].id;
+    }
+
+    return null;
+  }
+
   manageUseMany() {
     this.setState({
       showUseMany: !this.state.showUseMany,
     })
   }
 
+  manageDestroy(item) {
+    this.setState({
+      showDestroyItem: !this.state.showDestroyItem,
+      itemToDestroy: item
+    })
+  }
+
+  manageDestroyAll() {
+    this.setState({
+      showDestroyAll: !this.state.showDestroyAll,
+    })
+  }
+
   canUseItem(item) {
-    return item.damages_kingdoms;
+    return item.damages_kingdoms || item.can_use_on_other_items;
   }
 
   manageUseItem(item) {
@@ -154,6 +183,12 @@ export default class UsableItemsSection extends React.Component {
           >
             Use Many
           </button>
+          <button className='btn btn-danger mr-2 mt-2'
+                  disabled={this.props.usableItems.length === 0}
+                  onClick={this.manageDestroyAll.bind(this)}
+          >
+            Destroy All
+          </button>
           <hr />
           {
             this.state.loading ?
@@ -176,6 +211,28 @@ export default class UsableItemsSection extends React.Component {
                 setSuccessMessage={this.setSuccessMessage.bind(this)}
                 open={this.state.showUseMany}
                 close={this.manageUseMany.bind(this)}
+              />
+            : null
+          }
+          {
+            this.state.showDestroyItem ?
+              <DestroyUsableModal
+                characterId={this.props.characterId}
+                item={this.state.itemToDestroy}
+                setSuccessMessage={this.setSuccessMessage.bind(this)}
+                open={this.state.showDestroyItem}
+                close={this.manageDestroy.bind(this)}
+                getSlotId={this.getSlotId.bind(this)}
+              />
+              : null
+          }
+          {
+            this.state.showDestroyAll ?
+              <DestroyAllUsableItemsModal
+                characterId={this.props.characterId}
+                setSuccessMessage={this.setSuccessMessage.bind(this)}
+                open={this.state.showDestroyAll}
+                close={this.manageDestroyAll.bind(this)}
               />
             : null
           }

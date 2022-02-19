@@ -5,6 +5,8 @@ namespace App\Game\PassiveSkills\Controllers\Api;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterPassiveSkill;
+use App\Game\Core\Services\CharacterPassiveSkills;
+use App\Game\PassiveSkills\Events\UpdatePassiveTree;
 use App\Game\PassiveSkills\Services\PassiveSkillTrainingService;
 use App\Http\Controllers\Controller;
 
@@ -24,7 +26,7 @@ class CharacterPassiveSkillController extends Controller {
         ]);
     }
 
-    public function stopTraining(CharacterPassiveSkill $characterPassiveSkill, Character $character) {
+    public function stopTraining(CharacterPassiveSkill $characterPassiveSkill, Character $character, CharacterPassiveSkills $characterPassiveSkills) {
         $characterPassiveSkill->update([
             'started_at' => null,
             'completed_at' => null
@@ -32,7 +34,11 @@ class CharacterPassiveSkillController extends Controller {
 
         $characterPassiveSkill = $characterPassiveSkill->refresh();
 
-        event(new UpdateTopBarEvent($character->refresh()));
+        $character = $character->refresh();
+
+        event(new UpdateTopBarEvent($character));
+
+        event(new UpdatePassiveTree($character->user, $characterPassiveSkills->getPassiveSkills($character)));
 
         return response()->json([
             'message' => 'Stopped training ' . $characterPassiveSkill->passiveSkill->name,

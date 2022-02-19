@@ -1,6 +1,7 @@
 import React from 'react';
 import {Dropdown} from 'react-bootstrap';
 import {getServerMessage} from '../../helpers/server_message';
+import LockedLocationType from "../lib/LockedLocationType";
 
 export default class AdditionalActionsDropDown extends React.Component {
 
@@ -11,6 +12,7 @@ export default class AdditionalActionsDropDown extends React.Component {
       showCrafting: false,
       showEnchanting: false,
       showAlchemy: false,
+      showSmithingBench: false,
     }
   }
 
@@ -23,10 +25,12 @@ export default class AdditionalActionsDropDown extends React.Component {
       showCrafting: !this.state.showCrafting,
       showEnchanting: false,
       showAlchemy: false,
+      showSmithingBench: false,
     }, () => {
       this.props.updateShowCrafting(this.state.showCrafting);
       this.props.updateShowEnchanting(this.state.showEnchanting);
       this.props.updateShowAlchemy(this.state.showAlchemy);
+      this.props.updateShowSmithingBench(this.state.showSmithingBench);
     });
   }
 
@@ -39,10 +43,12 @@ export default class AdditionalActionsDropDown extends React.Component {
       showEnchanting: !this.state.showEnchanting,
       showCrafting: false,
       showAlchemy: false,
+      showSmithingBench: false,
     }, () => {
       this.props.updateShowCrafting(this.state.showCrafting);
       this.props.updateShowEnchanting(this.state.showEnchanting);
       this.props.updateShowAlchemy(this.state.showAlchemy);
+      this.props.updateShowSmithingBench(this.state.showSmithingBench);
     });
   }
 
@@ -55,10 +61,30 @@ export default class AdditionalActionsDropDown extends React.Component {
       showEnchanting: false,
       showCrafting: false,
       showAlchemy: !this.state.showAlchemy,
+      showSmithingBench: false,
     }, () => {
       this.props.updateShowCrafting(this.state.showCrafting);
       this.props.updateShowEnchanting(this.state.showEnchanting);
       this.props.updateShowAlchemy(this.state.showAlchemy);
+      this.props.updateShowSmithingBench(this.state.showSmithingBench);
+    });
+  }
+
+  addPurgatorySmithSection() {
+    if (!this.props.canCraft) {
+      return getServerMessage('cant_use_smithy_bench');
+    }
+
+    this.setState({
+      showEnchanting: false,
+      showCrafting: false,
+      showAlchemy: false,
+      showSmithingBench: !this.state.showSmithingBench
+    }, () => {
+      this.props.updateShowCrafting(this.state.showCrafting);
+      this.props.updateShowEnchanting(this.state.showEnchanting);
+      this.props.updateShowAlchemy(this.state.showAlchemy);
+      this.props.updateShowSmithingBench(this.state.showSmithingBench);
     });
   }
 
@@ -88,6 +114,12 @@ export default class AdditionalActionsDropDown extends React.Component {
               !this.props.isAlchemyLocked ?
                 <Dropdown.Item
                   onClick={this.addAlchemySection.bind(this)}>{this.state.showAlchemy ? 'Remove Alchemy' : 'Alchemy'}</Dropdown.Item>
+              : null
+            }
+            {
+              this.props.lockedLocationType === LockedLocationType.PURGATORYSMITHSHOUSE ?
+                <Dropdown.Item
+                  onClick={this.addPurgatorySmithSection.bind(this)}>{this.state.showSmithingBench ? 'Remove Work Bench' : 'Smiths Work Bench'}</Dropdown.Item>
               : null
             }
 

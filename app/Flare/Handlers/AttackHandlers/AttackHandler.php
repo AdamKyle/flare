@@ -4,7 +4,7 @@ namespace App\Flare\Handlers\AttackHandlers;
 
 use App\Flare\Builders\CharacterInformationBuilder;
 use Cache;
-use App\Flare\Builders\CharacterAttackBuilder;
+use App\Flare\Builders\Character\AttackDetails\CharacterAttackBuilder;
 use App\Flare\Handlers\AttackExtraActionHandler;
 use App\Game\Adventures\Traits\CreateBattleMessages;
 
@@ -150,7 +150,7 @@ class AttackHandler {
     }
 
     protected function getAttackData(string $attackType, $attacker): array {
-        return Cache::get('character-attack-data-' . $attacker->id)[$attackType];
+        return Cache::get('character-attack-data-' . $attacker->id)['attack_types'][$attackType];
     }
 
     protected function isAttackVoided(string $attackType): bool {

@@ -310,8 +310,9 @@ export default class Move extends React.Component {
               Next you will select, once you select a unique, one or both of the enchantments.
             </p>
             <p>
-              Finally select an item to move one or both enchants to. This will <strong>replace</strong> and existing enchants.
+              Finally select an item to move one or both enchants to. This will <strong>replace</strong> any existing enchants.
               You cannot move crafted enchants, only unique (randomly generated) enchants. You can move them as many times as you can afford.
+              You also can move one unique, replacing one enchantment and still retain the other enchantment - This item would still be considered a unique.
             </p>
             <p>
               The cost break down is as such: Affix(es) cost (ie, 100 billion + 100 billion for a unique with two enchants at a valuation of 100 billion) for the gold. while the shard cost is 0.000002% of the total

@@ -58,6 +58,18 @@ export default class InventorySection extends React.Component {
         cell: row => <div>{row.base_healing !== null ? row.base_healing : 0}</div>
       },
       {
+        key: 'holy_stacks',
+        text: 'Holy Stacks',
+        sortable: true,
+        cell: row => <div>{row.holy_stacks !== null ? row.holy_stacks : 0}</div>
+      },
+      {
+        key: 'holy_stacks_left',
+        text: 'Holy Stacks Left',
+        sortable: true,
+        cell: row => <div>{row.holy_stacks - row.holy_stacks_applied}</div>
+      },
+      {
         name: "actions",
         text: "Actions",
         cell: row => <Fragment>

@@ -86,7 +86,7 @@ class CharacterAdventureController extends Controller {
 
         $rewards = AdventureCompletedRewards::CombineRewards($rewards, $character);
 
-        HandleAdventureRewards::dispatch($character, $adventureLog, $rewards)->delay(now()->addSeconds(10));
+        HandleAdventureRewards::dispatch($character, $adventureLog, $rewards)->delay(now()->addSeconds(10))->onConnection('long_running');
 
         return redirect()->to(route('game'))->with('success', 'Adventure Rewards are processing. Keep an eye on chat to see the rewards come through. 
         Once all currency, xp and skill xp rewards have been handed to you, you will be able to start a new adventure. Processing will begin in 10 seconds. You\'ll be able to embark on a new adventure when 

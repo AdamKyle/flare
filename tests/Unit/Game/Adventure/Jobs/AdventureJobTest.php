@@ -2,11 +2,11 @@
 
 namespace Tests\Unit\Game\Adventure\Jobs;
 
-use App\Game\Adventures\Jobs\AdventureJob;
+use App\Flare\Services\BuildCharacterAttackTypes;
+use App\Game\Adventures\Builders\RewardBuilder;
 use Cache;
+use App\Game\Adventures\Jobs\AdventureJob;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Event;
-use App\Game\Maps\Jobs\MoveTimeOutJob;
 use Tests\TestCase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Traits\CreateAdventure;
@@ -44,7 +44,7 @@ class AdventureJobTest extends TestCase
 
         $adventure = $this->createNewAdventure();
 
-        $character = $character->assignFactionSystem()->getCharacter(false);
+        $character = $character->assignFactionSystem()->getCharacter(true);
 
         $character->adventureLogs()->create([
             'character_id'         => $character->id,

@@ -66,7 +66,7 @@ class CelestialBattleControllerApiTest extends TestCase {
             'gold_dust_cost'      => 1000,
         ]);
 
-        $character = $this->character->getCharacter(false);
+        $character = $this->character->getCharacter(true);
 
         $response = $this->actingAs($character->user)
             ->json('POST', '/api/conjure/' . $character->id, [
@@ -519,9 +519,11 @@ class CelestialBattleControllerApiTest extends TestCase {
 
         resolve(BuildMonsterCacheService::class)->buildCache();
 
-        $character = $this->character->updateCharacter([
-            'is_dead' => true
-        ])->getCharacter(false);
+        $character = $this->character->getCharacter(true);
+
+        $character->update(['is_dead' => true]);
+
+        $character = $character->refresh();
 
         $celestialFight = $this->createCelestialFight([
             'monster_id'        => $monster->id,
@@ -554,8 +556,6 @@ class CelestialBattleControllerApiTest extends TestCase {
 
         $this->assertEquals(200, $response->status());
 
-        $character = $character->refresh();
-
-        $this->assertEquals($character->getInformation()->buildHealth(), $content->fight->character->current_health);
+        $this->assertEquals(2839, $content->fight->character->current_health);
     }
 }

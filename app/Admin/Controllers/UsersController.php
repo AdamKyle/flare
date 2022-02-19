@@ -2,16 +2,16 @@
 
 namespace App\Admin\Controllers;
 
+
+use App\Flare\Models\CharacterAutomation;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Admin\Events\ForceNameChangeEvent;
 use App\Admin\Mail\ResetPasswordEmail;
 use App\Admin\Services\UserService;
-use App\Flare\Jobs\UpdateSilencedUserJob;
 use App\Flare\Models\User;
-use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Mail\GenericMail;
 use App\Flare\Jobs\SendOffEmail;
+use App\Game\Messages\Events\ServerMessageEvent;
 
 class UsersController extends Controller {
 
@@ -138,5 +138,24 @@ class UsersController extends Controller {
         $this->userService->forceNameChange($user);
 
         return redirect()->back()->with('success', $user->character->name . ' forced to change their name.');
+    }
+
+    public function enableAutoBattle(Request $request, User $user) {
+
+        $character = $user->character;
+
+        foreach ($character->factions as $faction) {
+            $newPointsNeeded  = $faction->points_needed * 10;
+            $newCurrentPoints = $faction->current_points * 10;
+
+            $faction->update([
+                'current_points' => $newCurrentPoints,
+                'points_needed'  => $newPointsNeeded,
+            ]);
+        }
+
+        event(new ServerMessageEvent($user->refresh(), 'The Creator has enabled auto battle for you. Please refresh.'));
+
+        return redirect()->back()->with('success', $user->character->name . ' can now use auto battle.');
     }
 }

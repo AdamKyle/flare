@@ -4,7 +4,8 @@ namespace App\Game\Core\Listeners;
 
 use League\Fractal\Resource\Item;
 use League\Fractal\Manager;
-use App\Flare\Transformers\CharacterSheetTransformer;
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
+use App\Flare\Transformers\CharacterTopBarTransformer;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Game\Core\Events\UpdateTopBarBroadcastEvent;
 
@@ -17,20 +18,20 @@ class UpdateTopBarListener
     private $manager;
 
     /**
-     * @var CharacterSheetTransformer $characterSheetTransformer
+     * @var CharacterTopBarTransformer $characterTopBarTransformer
      */
-    private $characterSheetTransformer;
+    private $characterTopBarTransformer;
+
+    private $characterSheetBaseInfoTransformer;
 
     /**
-     * Constructor
-     * 
      * @param Manager $manager
-     * @param CharacterSheetTransformer $characterSheetTransformer
-     * @return void
+     * @param CharacterTopBarTransformer $characterTopBarTransformer
      */
-    public function __construct(Manager $manager, CharacterSheetTransformer $characterSheetTransformer) {
-        $this->manager                   = $manager;
-        $this->characterSheetTransformer = $characterSheetTransformer;
+    public function __construct(Manager $manager, CharacterTopBarTransformer $characterTopBarTransformer, CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer) {
+        $this->manager                           = $manager;
+        $this->characterTopBarTransformer        = $characterTopBarTransformer;
+        $this->characterSheetBaseInfoTransformer = $characterSheetBaseInfoTransformer;
     }
 
     /**
@@ -41,7 +42,7 @@ class UpdateTopBarListener
      */
     public function handle(UpdateTopBarEvent $event)
     {
-        $character = new Item($event->character, $this->characterSheetTransformer);
+        $character = new Item($event->character, $this->characterTopBarTransformer);
         $character = $this->manager->createData($character)->toArray();
 
         broadcast(new UpdateTopBarBroadcastEvent($character, $event->character->user));

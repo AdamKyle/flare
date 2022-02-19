@@ -80,6 +80,11 @@ class Item extends Model
         'devouring_light',
         'devouring_darkness',
         'parent_id',
+        'xp_bonus',
+        'ignores_caps',
+        'can_use_on_other_items',
+        'holy_level',
+        'holy_stacks',
     ];
 
     /**
@@ -95,6 +100,8 @@ class Item extends Model
         'gold_dust_cost'                   => 'integer',
         'shards_cost'                      => 'integer',
         'parent_id'                        => 'integer',
+        'holy_level'                       => 'integer',
+        'holy_stacks'                      => 'integer',
         'base_damage_mod'                  => 'float',
         'base_healing_mod'                 => 'float',
         'base_ac_mod'                      => 'float',
@@ -121,9 +128,11 @@ class Item extends Model
         'market_sellable'                  => 'boolean',
         'usable'                           => 'boolean',
         'damages_kingdoms'                 => 'boolean',
+        'ignores_caps'                     => 'boolean',
+        'stat_increase'                    => 'boolean',
+        'can_use_on_other_items'           => 'boolean',
         'kingdom_damage'                   => 'float',
         'lasts_for'                        => 'integer',
-        'stat_increase'                    => 'boolean',
         'increase_stat_by'                 => 'float',
         'affects_skill_type'               => 'integer',
         'increase_skill_bonus_by'          => 'float',
@@ -135,6 +144,7 @@ class Item extends Model
         'affix_damage_reduction'           => 'float',
         'devouring_light'                  => 'float',
         'devouring_darkness'               => 'float',
+        'xp_bonus'                         => 'float',
     ];
 
     protected $appends = [
@@ -142,8 +152,27 @@ class Item extends Model
         'required_monster',
         'required_quest',
         'locations',
-        'adventures'
+        'adventures',
+        'holy_stack_devouring_darkness',
+        'holy_stack_stat_bonus',
+        'holy_stacks_applied'
     ];
+
+    public function inventorySlots() {
+        return $this->hasMany(InventorySlot::class, 'item_id', 'id');
+    }
+
+    public function inventorySetSlots() {
+        return $this->hasMany(SetSlot::class, 'item_id', 'id');
+    }
+
+    public function marketListings() {
+        return $this->hasMany(MarketBoard::class, 'item_id', 'id');
+    }
+
+    public function marketHistory() {
+        return $this->hasMany(MarketHistory::class, 'item_id', 'id');
+    }
 
     public function itemSuffix() {
         return $this->hasOne(ItemAffix::class, 'id', 'item_suffix_id');
@@ -151,6 +180,10 @@ class Item extends Model
 
     public function itemPrefix() {
         return $this->hasOne(ItemAffix::class, 'id', 'item_prefix_id');
+    }
+
+    public function appliedHolyStacks() {
+        return $this->hasMany(HolyStack::class, 'item_id', 'id');
     }
 
     public function dropLocation() {
@@ -171,15 +204,27 @@ class Item extends Model
      * When calling affix_name on the item, it will return the name with all affixes applied.
      */
     public function getAffixNameAttribute() {
-        if (!is_null($this->item_suffix_id) && !is_null($this->item_prefix_id)) {
-            return '*' . $this->itemPrefix->name . '*' . ' ' . $this->name . ' ' .  '*' . $this->itemSuffix->name . '*';
-        } else if (!is_null($this->item_suffix_id)) {
-            return $this->name . ' ' .  '*' . $this->itemSuffix->name . '*';
-        } else if (!is_null($this->item_prefix_id)) {
-            return '*' . $this->itemPrefix->name . '*' . ' ' . $this->name;
+        $itemPrefix = ItemAffix::find($this->item_prefix_id);
+        $itemSuffix = ItemAffix::find($this->item_suffix_id);
+        $itemName   = '';
+
+        if (!is_null($itemPrefix)) {
+            $itemName = '*'.$itemPrefix->name.'* ' . $this->name;
         }
 
-        return $this->name;
+        if (!is_null($itemSuffix)) {
+            if ($itemName !== '') {
+                $itemName .= ' *'.$itemSuffix->name.'*';
+            } else {
+                $itemName = $this->name . ' *'.$itemSuffix->name.'*';
+            }
+        }
+
+        if ($itemName === '') {
+            return $this->name;
+        }
+
+        return $itemName;
     }
 
     public function getRequiredMonsterAttribute() {
@@ -214,11 +259,35 @@ class Item extends Model
         return [];
     }
 
+    public function getHolyStackDevouringDarknessAttribute() {
+        if ($this->appliedHolyStacks->isNotEmpty()) {
+            return $this->appliedHolyStacks->sum('devouring_darkness_bonus');
+        }
+
+        return 0.0;
+    }
+
+    public function getHolyStackStatBonusAttribute() {
+        if ($this->appliedHolyStacks->isNotEmpty()) {
+            return $this->appliedHolyStacks->sum('stat_increase_bonus');
+        }
+
+        return 0.0;
+    }
+
+    public function getHolyStacksAppliedAttribute() {
+        if ($this->appliedHolyStacks->isNotEmpty()) {
+            return $this->appliedHolyStacks->count();
+        }
+
+        return 0;
+    }
+
     /**
      * Gets the total damage value for the item.
      *
      * In some cases an item might not have a base_damage value.
-     * however might have either prefix or suffix or both.
+     * however, might have either prefix or suffix or both.
      *
      * In this case we will set the damage variable to one.
      * this will allow the damage modifiers to be applied to the item.
@@ -337,6 +406,10 @@ class Item extends Model
         if (!is_null($this->itemSuffix)) {
             $statBonus = $this->itemSuffix->{$stat . '_mod'};
             $baseStat += !is_null($statBonus) ? $statBonus : 0.0;
+        }
+
+        if ($this->holy_stack_stat_bonus > 0) {
+            $baseStat += $this->holy_stack_stat_bonus;
         }
 
         return number_format($baseStat, 2);

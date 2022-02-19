@@ -2,13 +2,12 @@
 
 namespace Tests\Feature\Game\Core;
 
-use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Core\Jobs\PurchaseItemsJob;
-use App\Game\Skills\Values\SkillTypeValue;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Facades\App\Flare\Calculators\SellItemCalculator;
+use App\Game\Shop\Jobs\PurchaseItemsJob;
+use App\Game\Skills\Values\SkillTypeValue;
 use App\Flare\Models\InventorySlot;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
@@ -351,10 +350,11 @@ class ShopControllerTest extends TestCase
         ]);
 
         $user      = $this->character->inventoryManagement()
-                                ->giveItem($item)
-                                ->giveItem($weapon)
-                                ->getCharacterFactory()
-                                ->getUser();
+                                     ->giveItem($item)
+                                     ->giveItem($weapon)
+                                     ->getCharacterFactory()
+                                     ->getUser();
+
         $character = $this->character->getCharacter(false);
 
 
@@ -365,41 +365,6 @@ class ShopControllerTest extends TestCase
         ])->response;
 
         $response->assertSessionHas('success', 'Sold selected items for: 10 gold.');
-    }
-
-    public function testFailToSellInBulkTooMuchGold() {
-        $item = $this->createItem([
-            'name'        => 'Rusty Dagger',
-            'type'        => 'quest',
-            'base_damage' => 6,
-            'cost'        => 10,
-        ]);
-
-        $weapon = $this->createItem([
-            'name'        => 'Rusty Dagger',
-            'type'        => 'weapon',
-            'base_damage' => 6,
-            'cost'        => 10,
-        ]);
-
-        $user      = $this->character->inventoryManagement()
-            ->giveItem($item)
-            ->giveItem($weapon)
-            ->getCharacterFactory()
-            ->updateCharacter([
-                'gold' => MaxCurrenciesValue::MAX_GOLD - 1,
-            ])
-            ->getUser();
-        $character = $this->character->getCharacter(false);
-
-
-        $response = $this->actingAs($user)->post(route('game.shop.sell.bulk', ['character' => $this->character->getCharacter(false)->id]), [
-            'slots' => $character->inventory->slots->filter(function($slot) {
-                return !$slot->equipped && $slot->item->type !== 'quest';
-            })->pluck('id')->toArray(),
-        ])->response;
-
-        $response->assertSessionHas('error', 'You don\'t seem to have enough room in your purse to sell me that. You\'re very rich though!');
     }
 
     public function testCannotBuyAndReplaceCraftOnly() {
@@ -543,7 +508,6 @@ class ShopControllerTest extends TestCase
         $user      = $this->character->getUser();
 
         $character = $this->character->getCharacter(false);
-
 
         $this->actingAs($user)->visitRoute('game.shop.buy', [
             'character' => $character

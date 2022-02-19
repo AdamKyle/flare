@@ -47,6 +47,12 @@ class Kernel extends ConsoleKernel {
         // Update kingdoms every hour.
         $schedule->command('update:kingdom')->hourly()->timezone(config('app.timezone'));
 
+        // Refresh the droppable items.
+        $schedule->command('cache:droppable-items')->everySixHours()->timezone(config('app.timezone'));
+
+        // Refresh the high-end droppable items.
+        $schedule->command('cache:highend-droppable-items')->everyThreeHours()->timezone(config('app.timezone'));
+
         // Give people a chance to win daily lottery for gold dust
         $schedule->command('daily:gold-dust')->dailyAt('12:00')->timezone(config('app.timezone'));
 
@@ -55,6 +61,9 @@ class Kernel extends ConsoleKernel {
 
         // Clear the celestials every hour.
         $schedule->command('clear:celestials')->hourly()->timezone(config('app.timezone'));
+
+        // Clean up enchanted items every week at 2am:
+        $schedule->command('clean:enchanted-items')->weeklyOn(7, '2:00')->timezone(config('app.timezone'));
 
         // Clean the market every three months starting at 2am.
         $schedule->command('clean:market-history')->cron('0 2 * */3 *')->timezone(config('app.timezone'));
@@ -71,8 +80,8 @@ class Kernel extends ConsoleKernel {
         // clean the adventure logs every week on monday at 2 am.
         $schedule->command('clean:adventure-logs')->weeklyOn(1, '2:00')->timezone(config('app.timezone'));
 
-        // Clears the auto attack time out on locked out players.
-        $schedule->command('clear:locked-auto-attack')->dailyAt('12:00')->timezone(config('app.timezone'));
+        // Clears the exploration time out on locked out players.
+        $schedule->command('clear:locked-exploration')->dailyAt('12:00')->timezone(config('app.timezone'));
     }
 
     /**

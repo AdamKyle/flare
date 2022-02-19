@@ -295,7 +295,9 @@ class KingdomResourcesService {
         $character = $this->kingdom->character;
 
         if (!is_null($character)) {
-            broadcast(new GameServerMessageEvent($character->user,'The Old Man stomps around! "You were warned! time to pay up!"'));
+            broadcast(new GameServerMessageEvent($character->user,'The Old Man stomps around! "You were warned! time to pay up!" 
+            The kingdom at (X/Y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position . ' on plane: ' . $this->kingdom->gameMap->name . ' 
+            is in trouble for being over populated.'));
         }
 
         $currentPop = $this->kingdom->current_population;

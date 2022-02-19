@@ -25,7 +25,7 @@ class SellItemCalculator {
      * @return int
      */
     public function fetchSalePriceWithAffixes(Item $item): int {
-        $cost = Item::find($item->id)->cost;
+        $cost = $item->cost;
 
         if (!is_null($item->item_suffix_id)) {
             $cost += $item->itemSuffix->cost;
@@ -38,7 +38,65 @@ class SellItemCalculator {
         return $cost;
     }
 
-    public function fetchMinimumSalePriceOfUnique(Item $item): int {
+    /**
+     * Fetch min sale price.
+     *
+     * @param Item $item
+     * @return int
+     */
+    public function fetchMinPrice(Item $item): int {
+        $minPrice = 0;
+
+        if ($this->isItemUnique($item)) {
+            $minPrice = $this->fetchMinimumSalePriceOfUnique($item);
+        }
+
+        if ($this->isItemHoly($item)) {
+            $minPrice += $item->appliedHolyStacks->count() * 1000000000;
+        }
+
+        return $minPrice;
+    }
+
+    /**
+     * Is the item considered unique?
+     *
+     * @param Item $item
+     * @return bool
+     */
+    protected function isItemUnique(Item $item): bool {
+        if (!is_null($item->item_suffix_id)) {
+            if ($item->itemSuffix->randomly_generated) {
+                return true;
+            }
+        }
+
+        if (!is_null($item->item_prefix_id)) {
+            if ($item->itemPrefix->randomly_generated) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Is the item considered holy?
+     *
+     * @param Item $item
+     * @return bool
+     */
+    protected function isItemHoly(Item $item): bool {
+        return $item->appliedHolyStacks->count() > 0;
+    }
+
+    /**
+     * Whats the minimum sale price of the unique?
+     *
+     * @param Item $item
+     * @return int
+     */
+    protected function fetchMinimumSalePriceOfUnique(Item $item): int {
         $cost = 0;
 
         if (!is_null($item->item_suffix_id)) {
@@ -57,6 +115,6 @@ class SellItemCalculator {
             return $cost;
         }
 
-        return $cost / 2;
+        return (int) floor($cost / 2);
     }
 }

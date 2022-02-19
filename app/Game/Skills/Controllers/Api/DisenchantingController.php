@@ -3,6 +3,9 @@
 namespace App\Game\Skills\Controllers\Api;
 
 use App\Flare\Events\UpdateTopBarEvent;
+use App\Flare\Models\Inventory;
+use App\Flare\Models\InventorySlot;
+use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Http\Controllers\Controller;
@@ -27,18 +30,18 @@ class DisenchantingController extends Controller {
     }
 
     public function disenchant(Item $item) {
-        $character = auth()->user()->character->refresh();
+        $character = auth()->user()->character;
 
-        $foundItem = $character->inventory->slots->filter(function($slot) use ($item) {
-            if (!$slot->equipped && $slot->item->type !== 'quest' && $slot->item_id === $item->id) {
-                return $slot;
-            }
-        })->first();
+        $inventory = Inventory::where('character_id', $character->id)->first();
+
+        $foundItem = InventorySlot::where('equipped', false)->where('item_id', $item->id)->where('inventory_id', $inventory->id)->first();
 
         if (!is_null($foundItem)) {
             $this->disenchantingService->disenchantWithSkill($character, $foundItem);
 
             event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+            event(new CharacterInventoryDetailsUpdate($character->user));
 
             event(new UpdateTopBarEvent($character->refresh()));
         } else {
@@ -49,9 +52,11 @@ class DisenchantingController extends Controller {
     }
 
     public function destroy(Item $item) {
-        $character = auth()->user()->character->refresh();
+        $character = auth()->user()->character;
 
-        $foundSlot = $character->inventory->slots()->where('item_id', $item->id)->first();
+        $inventory = Inventory::where('character_id', $character->id)->first();
+
+        $foundSlot = InventorySlot::where('item_id', $item->id)->where('inventory_id', $inventory->id)->first();
 
         if (!is_null($foundSlot)) {
             $name = $foundSlot->item->affix_name;
@@ -61,6 +66,8 @@ class DisenchantingController extends Controller {
             event(new ServerMessageEvent($character->user, 'Destroyed: ' . $name));
 
             event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+            event(new CharacterInventoryDetailsUpdate($character->user));
 
             event(new UpdateTopBarEvent($character->refresh()));
         } else {

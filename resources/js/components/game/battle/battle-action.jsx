@@ -19,6 +19,7 @@ export default class BattleAction extends React.Component {
       battleMessages: [],
       isLoading: true,
       canAttack: true,
+      isDead: false,
       showMessage: false,
       timeRemaining: null,
       disableAttack: false,
@@ -29,6 +30,8 @@ export default class BattleAction extends React.Component {
     this.attackStats = Echo.private('update-character-attack-' + this.props.userId);
     this.adventureLogs = Echo.private('update-adventure-logs-' + this.props.userId);
     this.canAttack = Echo.private('show-timeout-bar-' + this.props.userId);
+    this.updateCharacterStatus = Echo.private('update-character-status-' + this.props.userId);
+    this.updateMonstersList    = Echo.private('update-monsters-list-' + this.props.userId);
   }
 
   componentDidMount() {
@@ -38,14 +41,8 @@ export default class BattleAction extends React.Component {
       characterMaxHealth: this.props.character.health,
       characterCurrentHealth: this.props.character.health,
       isLoading: false,
-      canAttack: this.props.character.can_attack,
       timeRemaining: this.props.character.can_attack_again_at,
-      showMessage: this.props.character.show_message,
-      isAdventuring: !this.props.character.can_adventure,
-    }, () => {
-      this.props.isCharacterDead(this.props.character.is_dead);
-      this.props.isCharacterAdventuring(!this.props.character.can_adventure);
-      this.props.canAttack(this.state.canAttack);
+      isDead: this.props.character.is_dead,
     });
 
     this.attackStats.listen('Game.Core.Events.UpdateAttackStats', (event) => {
@@ -54,6 +51,31 @@ export default class BattleAction extends React.Component {
 
     this.canAttack.listen('Game.Core.Events.ShowTimeOutEvent', (event) => {
       this.setState({canAttack: event.canAttack});
+    });
+
+    this.updateCharacterStatus.listen('Game.Battle.Events.UpdateCharacterStatus', (event) => {
+      this.setState({
+        canAttack: event.data.can_attack,
+        showMessage: event.data.show_message,
+        isAdventuring: !event.data.can_adventure,
+        isDead: event.data.is_dead,
+      }, () => {
+        this.props.isCharacterDead(event.data.is_dead);
+        this.props.isCharacterAdventuring(!event.data.can_adventure);
+        this.props.canAttack(event.data.can_attack);
+
+        if (!event.is_dead) {
+          this.props.setMonster(this.state.monster !== 0  ? this.state.monster : null);
+        }
+      });
+    });
+
+    this.updateMonstersList.listen('Game.Maps.Events.UpdateMonsterList', (event) => {
+      this.setState({
+        monsters: event.monsters,
+      }, () => {
+        this.props.updateResetBattleAction(true);
+      });
     });
 
     this.adventureLogs.listen('Game.Adventures.Events.UpdateAdventureLogsBroadcastEvent', (event) => {
@@ -66,7 +88,7 @@ export default class BattleAction extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (this.props.isDead !== prevProps.isDead) {
+    if (this.state.isDead !== prevState.isDead) {
       let character = _.cloneDeep(this.state.character);
       character.is_dead = this.props.isDead;
 
@@ -116,7 +138,7 @@ export default class BattleAction extends React.Component {
   }
 
   monsterSelectDisabled() {
-    if (this.state.character.is_dead) {
+    if (this.state.isDead) {
       return true;
     }
 

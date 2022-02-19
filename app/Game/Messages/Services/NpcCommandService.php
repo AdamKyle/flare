@@ -9,7 +9,7 @@ use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\NpcCommandTypes;
 use App\Flare\Values\NpcComponentsValue;
 use App\Flare\Values\NpcTypes;
-use App\Game\Automation\Values\AutomationType;
+use App\Flare\Values\AutomationType;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -28,7 +28,7 @@ class NpcCommandService {
     }
 
     public function handleNPC(Character $character, Npc $npc, string $message) {
-        if ($character->currentAutomations()->where('type', AutomationType::ATTACK)->get()->isNotempty()) {
+        if ($character->currentAutomations()->where('type', AutomationType::EXPLORING)->get()->isNotempty()) {
             broadcast(new ServerMessageEvent($character->user, 'Child listen! You are so busy thrashing about that you can\'t even focus on this conversation. Stop the auto fighting and then talk to me. Got it? Clear enough? Christ child!', true));
 
             return;

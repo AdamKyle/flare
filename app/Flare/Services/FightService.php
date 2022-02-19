@@ -60,6 +60,12 @@ class FightService {
         return $this;
     }
 
+    public function setCelestialFightHealth(int $currentHealth): FightService {
+        $this->currentMonsterHealth = $currentHealth;
+
+        return $this;
+    }
+
     public function processFight($attacker, $defender, string $attackType) {
 
         if (!is_null($this->currentCharacterHealth) && !is_null($this->currentMonsterHealth)) {
@@ -112,15 +118,17 @@ class FightService {
             $defender = $this->setupFightHandler->getModifiedDefender();
         }
 
-        if (is_null($this->currentCharacterHealth) && is_null($this->currentMonsterHealth)) {
-            $characterInformation         = $this->characterInformationBuilder->setCharacter($attacker);
-            $this->currentCharacterHealth = $characterInformation->buildHealth(!is_null($this->newAttackType));
+        $isCharacterVoided = $this->newAttackType === 'voided';
 
+        if (is_null($this->currentCharacterHealth)) {
+            $characterInformation         = $this->characterInformationBuilder->setCharacter($attacker);
+            $this->currentCharacterHealth = $characterInformation->buildHealth($isCharacterVoided);
+        }
+
+        if (!$this->attackOnce && ($defender instanceof  Monster || $defender instanceof  \StdClass)) {
             $healthRange                = explode('-', $defender->health_range);
             $this->currentMonsterHealth = rand($healthRange[0], $healthRange[1]);
         }
-
-        $isCharacterVoided = ($this->newAttackType === 'voided' ? true : false);
 
         return $this->fight($attacker, $defender, $attackType, $isCharacterVoided);
     }
@@ -141,6 +149,7 @@ class FightService {
         }
 
         if ($attacker instanceof Monster) {
+
             $this->monsterAttackHandler->setHealth($this->currentMonsterHealth, $this->currentCharacterHealth)
                                        ->setMonsterVoided($this->isMonsterVoided)
                                        ->doAttack($attacker, $defender, $attackType, $isDefenderVoided);

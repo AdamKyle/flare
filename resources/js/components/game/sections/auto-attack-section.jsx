@@ -1,8 +1,7 @@
 import React from 'react';
 import {Col, Tab, Tabs} from "react-bootstrap";
 import AlertWarning from "../components/base/alert-warning";
-import AlertInfo from "../components/base/alert-info";
-import TimeOutBar from "../timeout/timeout-bar";
+import ExplorationTimeOutBar from "../timeout/exploration-timeout-bar";
 import AlertError from "../components/base/alert-error";
 import AttackType from "../battle/attack/attack-type";
 import AlertSuccess from "../components/base/alert-success";
@@ -21,7 +20,9 @@ export default class AutoAttackSection extends React.Component {
       errorMessage: null,
       successMessage: null,
       successTitle: null,
-      isLoading: false,
+      isLoading: true,
+      isStarting: false,
+      isStopping: false,
       timeRemaining: null,
       showSkillSection: false,
       showMoveDownTheList: false,
@@ -38,23 +39,27 @@ export default class AutoAttackSection extends React.Component {
       }
     }
 
-    this.automation               = Echo.private('automation-attack-timeout-' + this.props.userId);
-    this.automationAttackMessages = Echo.private('automation-attack-messages-' + this.props.userId);
-    this.automationAttackDetails  = Echo.private('automation-attack-details-' + this.props.userId);
+    this.automation               = Echo.private('exploration-timeout-' + this.props.userId);
+    this.automationAttackMessages = Echo.private('exploration-attack-messages-' + this.props.userId);
+    this.automationAttackDetails  = Echo.private('exploration-attack-details-' + this.props.userId);
     this.isDead                   = Echo.private('character-is-dead-' + this.props.userId);
   }
 
   componentDidMount() {
-    axios.get('/api/attack-automation/' + this.props.character.id).then((result) => {
+    axios.get('/api/exploration-automations/' + this.props.character.id).then((result) => {
+      this.setState({isLoading: false});
 
       const automation = result.data.automation;
 
       if (automation.hasOwnProperty('skill_id')) {
         this.setState({
-          params: result.data.automation
+          params: result.data.automation,
+          timeRemaining: result.data.automation.auto_attack_length
         });
       }
     }).catch((err) => {
+      this.setState({isLoading: false});
+
       if (err.hasOwnProperty('response')) {
         const response = err.response;
 
@@ -68,26 +73,30 @@ export default class AutoAttackSection extends React.Component {
       }
     });
 
-    this.automation.listen('Game.Automation.Events.AutomationAttackTimeOut', (event) => {
+    this.automation.listen('Game.Exploration.Events.ExplorationTimeOut', (event) => {
       this.setState({
+        errorMessage: null,
         timeRemaining: event.forLength,
       })
     });
 
-    this.automationAttackMessages.listen('Game.Automation.Events.AutomatedAttackMessage', (event) => {
+    this.automationAttackMessages.listen('Game.Exploration.Events.ExplorationAttackMessage', (event) => {
       this.setState({
+        errorMessage: null,
         attackMessages: event.messages,
       })
     });
-    
-    this.automationAttackDetails.listen('Game.Automation.Events.AutomatedAttackDetails', (event) => {
+
+    this.automationAttackDetails.listen('Game.Exploration.Events.ExplorationDetails', (event) => {
       this.setState({
+        errorMessage: null,
         params: event.details,
       })
     });
 
     this.isDead.listen('Game.Core.Events.CharacterIsDeadBroadcastEvent', (event) => {
       this.setState({
+        errorMessage: null,
         isDead: event.isDead,
       });
     });
@@ -236,7 +245,7 @@ export default class AutoAttackSection extends React.Component {
 
     if (this.state.params.auto_attack_length === null) {
       this.setState({
-        errorMessage: 'How long should this auto attack go for? Check Advanced tab and configure a length.'
+        errorMessage: 'How long should this exploration go for? Check Advanced tab and configure a length.'
       });
 
       return;
@@ -253,16 +262,19 @@ export default class AutoAttackSection extends React.Component {
     this.setState({
       errorMessage: null,
       successMessage: null,
-      isLoading: true,
+      isStarting: true,
+      attackMessages: [],
     }, () => {
-      axios.post('/api/attack-automation/'+this.props.character.id+'/start', this.state.params).then((result) => {
+      axios.post('/api/exploration/'+this.props.character.id+'/start', this.state.params).then((result) => {
         this.setState({
-          isLoading: false,
+          isStarting: false,
           successMessage: result.data.message,
           successTitle: 'It has begun!',
           params: {...this.state.params, ...{id: result.data.id}},
         });
       }).catch((err) => {
+        this.setState({isLoading: false});
+
         if (err.hasOwnProperty('response')) {
           const response = err.response;
 
@@ -273,6 +285,12 @@ export default class AutoAttackSection extends React.Component {
           if (response.status === 429) {
             return this.props.openTimeOutModal();
           }
+
+          if (response.status === 422) {
+            this.setState({
+              errorMessage: response.data.message,
+            });
+          }
         }
       });
     });
@@ -282,11 +300,11 @@ export default class AutoAttackSection extends React.Component {
     this.setState({
       errorMessage: null,
       successMessage: null,
-      isLoading: true,
+      isStopping: true,
     }, () => {
-      axios.post('/api/attack-automation/'+this.state.params.id+'/'+this.props.character.id+'/stop').then((result) => {
+      axios.post('/api/exploration/'+this.state.params.id+'/'+this.props.character.id+'/stop').then((result) => {
         this.setState({
-          isLoading: false,
+          isStopping: false,
           successMessage: result.data.message,
           successTitle: 'Stopping ...'
         });
@@ -301,12 +319,27 @@ export default class AutoAttackSection extends React.Component {
           if (response.status === 429) {
             return this.props.openTimeOutModal();
           }
+
+          if (response.status == 404) {
+            this.setState({
+              errorMessage: 'Exploration has stopped.'
+            })
+          }
         }
       });
     });
   }
 
   render() {
+    if (this.state.isLoading) {
+      return (
+        <div className="progress loading-progress mt-2 mb-2" style={{position: 'relative'}}>
+          <div className="progress-bar progress-bar-striped indeterminate">
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="mt-4">
         <Tabs defaultActiveKey="general" id="auto-general-config-tab-section">
@@ -326,7 +359,7 @@ export default class AutoAttackSection extends React.Component {
                   this.state.isDead ?
                     <AlertError icon={"fas fa-skull-crossbones"} title={'Uh... You died!'}>
                       <p>
-                        Automated attack has ended. Please revive.
+                        Exploration has been stopped. You died. Please revive.
                       </p>
                     </AlertError>
                     : null
@@ -374,17 +407,17 @@ export default class AutoAttackSection extends React.Component {
                 </div>
                 <button className="btn btn-primary mt-3"
                         onClick={this.beginFight.bind(this)}
-                        disabled={this.state.isLoading || this.props.attackAutomationIsRunning || this.props.character.isDead}
+                        disabled={this.state.isStarting || this.state.isStopping || this.props.attackAutomationIsRunning || this.props.isDead}
                 >
-                  {this.state.isLoading ? <i className="fas fa-spinner fa-spin"></i> : null} Begin!
+                  {this.state.isStarting ? <i className="fas fa-spinner fa-spin"></i> : null} Begin!
                 </button>
                 {
                   this.props.attackAutomationIsRunning ?
                     <button className="btn btn-danger ml-2 mt-3"
                             onClick={this.stopAutomation.bind(this)}
-                            disabled={this.state.isLoading || this.props.character.isDead}
+                            disabled={this.state.isLoading || this.state.isStopping || this.state.isStarting || this.props.isDead}
                     >
-                      {this.state.isLoading ? <i className="fas fa-spinner fa-spin"></i> : null} Stop!
+                      {this.state.isStopping ? <i className="fas fa-spinner fa-spin"></i> : null} Stop!
                     </button>
                   : null
                 }
@@ -392,13 +425,24 @@ export default class AutoAttackSection extends React.Component {
 
               <Col lg={12} xl={6}>
                 <div className="tw-text-center">
-                  <TimeOutBar
-                    innerTimerCss={'auto-attack'}
-                    readyCssClass={'character-ready'}
-                    timeRemaining={this.state.timeRemaining}
-                    channel={'automation-attack-timeout-' + this.props.userId}
-                    eventClass={'Game.Automation.Events.AutomationAttackTimeOut'}
-                  />
+                  {
+                    this.state.timeRemaining > 0 ?
+                      <ExplorationTimeOutBar
+                        innerTimerCss={'auto-attack'}
+                        readyCssClass={'character-ready'}
+                        timeRemaining={this.state.timeRemaining}
+                        channel={'exploration-timeout-' + this.props.userId}
+                        eventClass={'Game.Exploration.Events.ExplorationTimeOut'}
+                      />
+                    :
+                      <div className="character-ready">
+                        Ready!
+                      </div>
+                  }
+                  <div className="tw-mt-2">
+                    Every <strong>ten minutes</strong> the Exploration Log tab will update with results from the previous battle. Keep an eye on that for updates!
+                    The timer above is how long you have left on this current automation. <strong>You can log out and this will still process</strong>.
+                  </div>
                   <div className="tw-mt-2">
                     {
                       this.state.attackMessages.length > 0 ? this.displayAttackMessages() : null
@@ -458,10 +502,8 @@ export default class AutoAttackSection extends React.Component {
               <div className="form-group">
                 <AlertWarning icon={'fas fa-exclamation-triangle'} title={'Attn!'}>
                   <p>
-                    Should you choose the 8 hour mark, you will not be able to start another auto attack session after the full
-                    eight hours. You will need to refresh your screen every 45 minutes or so, so your session does not die.
-                    Most players will play with the character screen in one tab and the game in the other, allowing them to refresh the character sheet
-                    and not loose chat history in the game tab. You could do the same, and just refresh the character tab every so often.
+                    Should you choose the 8 hour mark, you will not be able to start another exploration session after the full
+                    eight hours until the next real world day at 12 pm GMT-7. <strong>You can log out and this will continue to run.</strong>
                   </p>
                   <p>The eight hour limit only applies if your auto attack is 8 full complete uninterrupted hours. If you do 2 here, 4 there and 6 over here
                   that will not count towards your total, it must be 8 continuous uninterrupted hours.</p>
@@ -493,7 +535,7 @@ export default class AutoAttackSection extends React.Component {
                 <div className="form-group">
                   <AlertWarning icon={'fas fa-exclamation-triangle'} title={'Attn!'}>
                     <p>
-                      Should you choose to move down the list and a monster kills you, the auto battle will stop.
+                      Should you choose to move down the list and a monster kills you, the exploration will stop.
                       New players are suggested to pick higher values to give more time between leveling.
                     </p>
                     <p>
@@ -523,42 +565,63 @@ export default class AutoAttackSection extends React.Component {
           <Tab eventKey="help" title="Help">
             <div className="mt-4">
               <div className="tw-overflow-y-auto tw-h-60">
-                <AlertWarning icon={'fas fa-exclamation-triangle'} title={"ATTN!"}>
-                  <p>If you log out or your session dies, <strong>this will stop</strong>. If you die, <strong>this will stop</strong>.</p>
-                  <p>Once you reach a total of 8 hours, at once (see below about refreshing) <strong>This will stop</strong> AND <strong>You wont be able
-                  to initiate another auto battle for the rest of the day.</strong></p>
-                </AlertWarning>
-                <p className="tw-text-red-700">
-                  This feature was designed for players who want to play with this game in a separate tab and check on it every once in a while. Not for
-                  players who want to set it and forget it. That is not Tlessa!
-                </p>
-                <h3>What can I do while this is running?</h3>
                 <p>
-                  While the auto attack runs, you can still craft, enchant, craft alchemical items, move around (but not traverse, teleport or set sail) and manage your kingdoms.
-                  You will not be able to traverse, go on adventures or take part in Celestial fights, including being able to instantly teleport to one.
-                  You will also not be able to complete quests or interact with NPC's. Quest drops are fine, but the interacting with NPC's,
-                  they will tell you "you are too busy". You will also not be able to use any items be it on your self or kingdoms and you cannot wage war.
+                  Exploration is similar to <a href="/information/adventure">Adventures</a>, with the exception that they
+                  do not lock you out of doing specific actions, but <strong>do let you log out</strong>.
                 </p>
-                <p>You also cannot manage your character in terms of equipping, changing sets or manging training based skills.</p>
-                <p><em>Don't look at me like that child, you can't be able to wage a war and fight a beast at the same time. You need to focus on one thing at a time.</em></p>
-                <h3>Why can't I just leave this running for ever?</h3>
                 <p>
-                  Planes of Tlessa is an active game. To keep you coming back, we limit the time frame this feature can run in.
-                  Your session also expires after 90 minutes of inactivity. Most players will come back before the session expires
-                  to refresh the page.
+                  while on a mission you can:
                 </p>
-                <h3>So I can just refresh every 85 minutes or so and go for ever?</h3>
+                <ul>
+                  <li>Move, but not teleport, set sail, traverse or use /PCT to move to and engage with celestials.</li>
+                  <li>Manage your kingdoms, but not: wage war or use items on other kingdoms</li>
+                  <li>Manage equipment, to an extent. You cannot equip items, but you can move items to other sets, destroy and disenchant items.</li>
+                  <li>Manage your Passive skills, Craft, Enchant but not: Switch which skill is in training.</li>
+                </ul>
+                <p>You cannot use the shop or visit the market. You cannot enter special locations while you are exploring.</p>
                 <p>
-                  Yes and no. If the auto attack has run for longer then 8 hours<sup>*</sup> it will cut out and you wont be able to
-                  set up auto attack for the rest of the day. Tlessa wants you engaged with the game and the community, this is just an
-                  additional part to take some of the strain of leveling out.
+                  Exploration works differently from adventures such that every 10 minutes your character will do 3 actions, all of them give you XP.
                 </p>
-                <p><sup>*</sup> That's 8 <strong>full uninterrupted hours</strong>. Doing it in pieces, 2 hours here, 4 hours there and 6 hours an hour later will <strong>NOT</strong>
-                count towards the 8 hour limit.</p>
-                <AlertInfo icon={'fas fa-question-circle'} title={"ATTN!"}>
-                  <p>Tlessa was never intended to be an idle game, and while idle features do make their way in, they come with limitations.</p>
-                  <p>The auto attack is the only automatic feature that will stop you from being able to set it up again after the max time has passed.</p>
-                </AlertInfo>
+                <p>While exploring, every ten minutes your character will:</p>
+                <ul>
+                  <li>Explore the area around them and engage in an encounter.</li>
+                  <li>Fight the creature you selected.</li>
+                  <li>Plunder fights the selected monster 1-6 times.</li>
+                </ul>
+                <p>
+                  At the end of the "encounter" we will reward bonus XP and Faction points:
+                </p>
+                <ul>
+                  <li>
+                    +200 XP (2 levels)
+                  </li>
+                  <li>
+                    +5 Faction Points (if you have a quest item you will get 50 if you are above level 0. Else you will get 5)
+                  </li>
+                  <li>
+                    +10,000 Gold
+                  </li>
+                </ul>
+                <p>
+                  Once Exploration timer is done we give you a total bonus reward:
+                </p>
+                <ul>
+                  <li>
+                    +1000 XP (10 levels)
+                  </li>
+                  <li>
+                    +100 FactionPoints (if you have a quest item you will get 1000 if you are above level 0. Else you will get 100)
+                  </li>
+                  <li>
+                    +100,000 Gold
+                  </li>
+                </ul>
+                <p>Should you die, this will end and we will show you, where the timer is, the result of the last battle message so you can see why you died. If you are logged out, you will not be able to
+                know what killed you as the Event Log tab below works like server messages, they are not saved.</p>
+                <p>Should you choose to do the 8 hour mark, you will be locked out of explorations till the next real world day at 12pm GMT -7</p>
+                <p>You can do Exploration in bits and pieces, such an hour here and a 4 over there and 6 an hour later, <strong>this will not count towards the 8 hour mark.</strong></p>
+                <p>Each action will spit out to the Event Logs tab down in the chat section, we will not show you the results of battles unless you die.</p>
+                <p>Finally, all rewards listed above will be given to you automatically and we do respect auto disenchanting <a href="/information/settings">settings</a>.</p>
               </div>
             </div>
           </Tab>

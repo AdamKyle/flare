@@ -11,7 +11,7 @@ Route::middleware(['auth', 'is.player.banned', 'is.character.dead', 'is.characte
     Route::get('/alchemy/{character}', ['uses' => 'Api\AlchemyController@alchemyItems']);
 
 
-    Route::middleware(['character.attack.automation'])->group(function() {
+    Route::middleware(['is.character.exploring'])->group(function() {
         // Handle Training a specific skill.
         Route::post('/skill/train/{character}', ['uses' => 'Api\SkillsController@train']);
 

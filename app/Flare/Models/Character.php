@@ -2,6 +2,7 @@
 
 namespace App\Flare\Models;
 
+use App\Flare\Builders\Character\AttackDetails\CharacterHealthInformation;
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Values\CharacterClassValue;
 use Illuminate\Database\Eloquent\Model;
@@ -58,6 +59,7 @@ class Character extends Model
         'gold',
         'gold_dust',
         'shards',
+        'copper_coins',
     ];
 
     /**
@@ -96,6 +98,7 @@ class Character extends Model
         'gold'                        => 'integer',
         'gold_dust'                   => 'integer',
         'shards'                      => 'integer',
+        'copper_coins'                => 'integer',
     ];
 
     public function race() {
@@ -201,6 +204,17 @@ class Character extends Model
     }
 
     /**
+     * Allows one to get health information about the character.
+     *
+     * @return CharacterHealthInformation
+     */
+    public function getHeathInformation(): CharacterHealthInformation {
+        $healthInfo = resolve(CharacterHealthInformation::class);
+
+        return $healthInfo->setCharacter($this);
+    }
+
+    /**
      * Returns the character class value.
      *
      * @return CharacterClassValue
@@ -218,9 +232,15 @@ class Character extends Model
      * @return int
      */
     public function getInventoryCount(): int {
-        return $this->inventory->slots->filter(function($slot) {
-            return $slot->item->type !== 'quest' && !$slot->equipped;
-        })->count();
+        $inventory = Inventory::where('character_id', $this->id)->first();
+
+        return InventorySlot::select('inventory_slots.*')
+                            ->where('inventory_slots.inventory_id', $inventory->id)
+                            ->where('inventory_slots.equipped', false)
+                            ->join('items', function($join) {
+                                $join->on('items.id', '=', 'inventory_slots.item_id')
+                                     ->where('items.type', '!=', 'quest');
+                           })->count();
     }
 
     /**

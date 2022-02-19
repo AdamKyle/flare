@@ -44,7 +44,7 @@
         <x-core.cards.card>
             <div class="row mb-3">
                 <div class="col-md-12">
-                    <strong>Attack</strong>: {{number_format($character->getInformation()->getTotalWeaponDamage())}} / <strong>AC</strong>: {{number_format($character->getInformation()->buildDefence())}} / <strong>Heal For</strong>: {{number_format($character->getInformation()->buildHealFor())}}
+                    <strong>Attack</strong>: {{number_format($character->getInformation()->getTotalWeaponDamage())}} / <strong>AC</strong>: {{number_format($character->getInformation()->buildDefence())}} / <strong>Heal For</strong>: {{number_format($character->getHeathInformation()->buildHealFor())}}
                     <hr />
                 </div>
             </div>

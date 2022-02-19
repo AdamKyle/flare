@@ -2,11 +2,11 @@
 
 namespace Tests\Unit\Game\Core\Jobs;
 
-use App\Game\Core\Events\BuyItemEvent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use App\Flare\Models\Item;
-use App\Game\Core\Jobs\PurchaseItemsJob;
+use App\Game\Shop\Events\BuyItemEvent;
+use App\Game\Shop\Jobs\PurchaseItemsJob;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Tests\TestCase;
 use Tests\Setup\Character\CharacterFactory;

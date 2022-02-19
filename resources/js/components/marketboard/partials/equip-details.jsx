@@ -10,7 +10,7 @@ export default class EquipDetails extends React.Component {
     return (
       <>
         <div className="alert alert-info mb-3">
-          Values include (any) attached affixes.
+          Values include (any) attached affixes and holy bonuses.
         </div>
         <div className="row">
           <div className="col-md-6">

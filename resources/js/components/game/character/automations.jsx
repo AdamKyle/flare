@@ -42,9 +42,40 @@ export default class Automations extends React.Component {
         </div>,
       },
     ];
+
+    this.updateAutomations = Echo.private('automations-list-' + this.props.userId);
   }
 
   componentDidMount() {
+    axios.get('/api/character-sheet/'+this.props.characterId+'/automations').then((result) => {
+      this.setState({
+        isLoading: false,
+        automations: result.data.automations
+      }, () => {
+        this.props.isAutomationRunning(result.data.automations.length > 0)
+      });
+    }).catch((err) => {
+      this.setState({loading: false});
+      if (err.hasOwnProperty('response')) {
+        const response = err.response;
+
+        if (response.status === 401) {
+          return location.reload()
+        }
+
+        if (response.status === 429) {
+          return this.props.openTimeOutModal()
+        }
+      }
+    });
+
+    this.updateAutomations.listen('Game.Exploration.Events.UpdateAutomationsList', (event) => {
+      this.setState({
+        automations: event.automations,
+      }, () => {
+        this.props.isAutomationRunning(event.automations.length > 0)
+      });
+    });
   }
 
   fetchTime(time) {
@@ -93,6 +124,15 @@ export default class Automations extends React.Component {
   }
 
   render() {
+    if (this.state.loading) {
+      return (
+        <div className="progress loading-progress mt-2 mb-2" style={{position: 'relative'}}>
+          <div className="progress-bar progress-bar-striped indeterminate">
+          </div>
+        </div>
+      );
+    }
+
     return (
       <Card>
         <AlertInfo icon={"fas fa-question-circle"} title={"Attn!"}>
@@ -103,7 +143,7 @@ export default class Automations extends React.Component {
         </AlertInfo>
         <ReactDatatable
           config={this.automationsConfig}
-          records={this.props.automations}
+          records={this.state.automations}
           columns={this.automationColumns}
         />
       </Card>

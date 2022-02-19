@@ -28,10 +28,6 @@ export default class CharacterInfoTopSection extends React.Component {
           isLoading: false,
           forceNameChange: result.data.sheet.force_name_change,
         }, () => {
-          if (result.data.sheet.timeout_until !== null) {
-            this.props.openTimeOutModal(result.data.sheet.timeout_until)
-          }
-
           this.props.updateCharacterGold(result.data.sheet.gold);
         });
       }).catch((err) => {
@@ -133,16 +129,22 @@ export default class CharacterInfoTopSection extends React.Component {
         </Row>
         <hr />
         <Row>
-          <Col md={12} lg={12} xl={6}>
+          <Col md={12} lg={12} xl={4}>
             <dl>
               <dt><strong>Gold Dust:</strong></dt>
               <dd>{sheet.gold_dust}</dd>
             </dl>
           </Col>
-          <Col md={12} lg={12} xl={6}>
+          <Col md={12} lg={12} xl={4}>
             <dl>
               <dt><strong>Cys. Shards:</strong></dt>
               <dd>{sheet.shards}</dd>
+            </dl>
+          </Col>
+          <Col md={12} lg={12} xl={4}>
+            <dl>
+              <dt><strong>Cpp. Coins:</strong></dt>
+              <dd>{sheet.copper_coins}</dd>
             </dl>
           </Col>
         </Row>

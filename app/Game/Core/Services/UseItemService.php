@@ -10,9 +10,11 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Transformers\CharacterAttackTransformer;
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Values\ItemUsabilityType;
 use App\Game\Core\Events\CharacterBoonsUpdateBroadcastEvent;
 use App\Game\Core\Events\UpdateAttackStats;
+use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Jobs\CharacterBoonJob;
 use App\Game\Messages\Events\ServerMessageEvent;
 use League\Fractal\Manager;
@@ -24,7 +26,7 @@ class UseItemService {
 
     private $manager;
 
-    public function __construct(Manager $manager, CharacterAttackTransformer $characterAttackTransformer) {
+    public function __construct(Manager $manager, CharacterSheetBaseInfoTransformer $characterAttackTransformer) {
         $this->manager                    = $manager;
         $this->characterAttackTransformer = $characterAttackTransformer;
     }
@@ -85,7 +87,7 @@ class UseItemService {
 
         $characterAttack = new ResourceItem($character, $this->characterAttackTransformer);
 
-        event(new UpdateAttackStats($this->manager->createData($characterAttack)->toArray(), $character->user));
+        event(new UpdateBaseCharacterInformation($character->user, $this->manager->createData($characterAttack)->toArray()));
         event(new UpdateTopBarEvent($character));
 
         if (!is_null($item)) {

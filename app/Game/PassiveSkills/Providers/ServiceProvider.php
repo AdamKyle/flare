@@ -4,6 +4,7 @@ namespace App\Game\PassiveSkills\Providers;
 
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Models\Skill;
+use App\Game\Core\Services\CharacterPassiveSkills;
 use App\Game\PassiveSkills\Services\PassiveSkillTrainingService;
 use App\Game\Skills\Services\AlchemyService;
 use App\Game\Skills\Services\CraftingService;
@@ -25,8 +26,8 @@ class ServiceProvider extends ApplicationServiceProvider
         // @codeCoverageIgnoreStart
         //
         // The test coverage never gets here.
-        $this->app->bind(PassiveSkillTrainingService::class, function() {
-            return new PassiveSkillTrainingService;
+        $this->app->bind(PassiveSkillTrainingService::class, function($app) {
+            return new PassiveSkillTrainingService($app->make(CharacterPassiveSkills::class));
         });
         // @codeCoverageIgnoreEnd
     }

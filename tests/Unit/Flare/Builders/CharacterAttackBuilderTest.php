@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Flare\Builders;
 
-use App\Flare\Builders\CharacterAttackBuilder;
+use App\Flare\Builders\Character\AttackDetails\CharacterAttackBuilder;
 use App\Flare\Models\Character;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;

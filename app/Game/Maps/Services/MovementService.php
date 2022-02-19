@@ -14,19 +14,23 @@ use App\Flare\Models\Location;
 use App\Flare\Models\Npc;
 use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Transformers\CharacterAttackTransformer;
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\NpcTypes;
 use App\Game\Battle\Services\ConjureService;
 use App\Game\Core\Events\UpdateAttackStats;
+use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Events\UpdateActionsBroadcast;
 use App\Game\Maps\Events\UpdateMapDetailsBroadcast;
+use App\Game\Maps\Events\UpdateMonsterList;
 use App\Game\Maps\Services\Common\CanPlayerMassEmbezzle;
 use App\Game\Maps\Services\Common\LiveCharacterCount;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Maps\Values\MapPositionValue;
 use App\Game\Messages\Events\GlobalMessageEvent;
+use App\Game\Messages\Events\ServerMessageEvent as GameServerMessageEvent;
 use Illuminate\Support\Facades\Cache;
 use League\Fractal\Manager;
 
@@ -108,7 +112,7 @@ class MovementService {
      */
     public function __construct(PortService $portService,
                                 MapTileValue $mapTile,
-                                CharacterAttackTransformer $characterAttackTransformer,
+                                CharacterSheetBaseInfoTransformer $characterAttackTransformer,
                                 CoordinatesCache $coordinatesCache,
                                 MapPositionValue $mapPositionValue,
                                 TraverseService $traverseService,
@@ -137,13 +141,14 @@ class MovementService {
      * @return array
      */
     public function updateCharacterPosition(Character $character, array $params): array {
-        $xPosition    = $params['character_position_x'];
-        $yPosition    = $params['character_position_y'];
-        $mapTileColor = $this->mapTile->getTileColor($character, $xPosition, $yPosition);
+        $xPosition      = $params['character_position_x'];
+        $yPosition      = $params['character_position_y'];
+        $mapTileColor   = $this->mapTile->getTileColor($character, $xPosition, $yPosition);
+        $lockedLocation = Location::where('x', $xPosition)->where('y', $yPosition)->where('game_map_id', $character->map->game_map_id)->where('required_quest_item_id', true)->first();
 
         if ($this->mapTile->isWaterTile((int) $mapTileColor)) {
             if ($this->mapTile->canWalkOnWater($character, $xPosition, $yPosition)) {
-                return $this->moveCharacter($character, $params);
+                return $this->moveCharacter($character, $params, $lockedLocation);
             } else {
                 return $this->errorResult('cannot walk on water.');
             }
@@ -152,7 +157,7 @@ class MovementService {
         if ($this->mapTile->isDeathWaterTile((int) $mapTileColor)) {
 
             if ($this->mapTile->canWalkOnDeathWater($character, $xPosition, $yPosition)) {
-                return $this->moveCharacter($character, $params);
+                return $this->moveCharacter($character, $params, $lockedLocation);
             } else {
                 return $this->errorResult('cannot walk on death water.');
             }
@@ -160,7 +165,7 @@ class MovementService {
 
         if ($this->mapTile->isMagma((int) $mapTileColor)) {
             if ($this->mapTile->canWalkOnMagma($character, $xPosition, $yPosition)) {
-                return $this->moveCharacter($character, $params);
+                return $this->moveCharacter($character, $params, $lockedLocation);
             } else {
                 return $this->errorResult('cannot walk on magma.');
             }
@@ -170,7 +175,16 @@ class MovementService {
             return $this->errorResult('You would slip away into the void if you tried to go that way child!');
         }
 
-        return $this->moveCharacter($character, $params);
+        if (!is_null($lockedLocation)) {
+            $item = Item::where('id', $lockedLocation->required_quest_item_id)->first();
+            $slot = $character->inventory->slots()->where('item_id', $item->id)->first();
+
+            if (is_null($slot)) {
+                return $this->errorResult('Cannot enter this location without a ' . $item->name);
+            }
+        }
+
+        return $this->moveCharacter($character, $params, $lockedLocation);
     }
 
     /**
@@ -187,7 +201,16 @@ class MovementService {
 
         $this->traverseService->travel($mapId, $character);
 
-        return $this->successResult();
+        $character = $character->refresh();
+
+        $xPosition = $character->map->character_position_x;
+        $yPosition = $character->map->character_position_y;
+
+        $lockedLocation = Location::where('x', $xPosition)->where('y', $yPosition)->where('game_map_id', $character->map->game_map_id)->where('required_quest_item_id', true)->first();
+
+        return $this->successResult([
+            'lockedLocationType' => is_null($lockedLocation) ? null : $lockedLocation->type
+        ]);
     }
 
     /**
@@ -211,6 +234,13 @@ class MovementService {
 
             if (!is_null($location->enemy_strength_type)) {
                 $this->updateActions($character, $location->name);
+
+                event(new GameServerMessageEvent($character->user, 'You have entered: ' . $location->name . '. Monsters here are much stronger.
+                Special location enemy strength is also effected by the planes monster strength if you on Shadow Planes or Lower.
+                Remember, if you are here to get quest items, they will not drop if you are auto battling. Gear will matter here.
+                There are quests you can do for Voidance and Devoidance Quest items which make your time here much easier.
+                Locations such as these can drop special quest items. Check your quest section under: Plane Quests (on the map) -> All quests.
+                If you need further help, click Help I\'m stuck at the top or the Discord button to join discord and ask for help in #help.'));
             }
         } else {
             $this->updateActions($character, null, $character->map->gameMap->name);
@@ -353,6 +383,7 @@ class MovementService {
         $canTeleportToWater      = $this->mapTile->canWalkOnWater($character, $x, $y);
         $canTeleportToDeathWater = $this->mapTile->canWalkOnDeathWater($character, $x, $y);
         $canTeleportToMagma      = $this->mapTile->canWalkOnMagma($character, $x, $y);
+        $lockedLocation          = Location::where('x', $x)->where('y', $y)->where('game_map_id', $character->map->game_map_id)->whereNotNull('required_quest_item_id')->first();
 
         if (!$canTeleportToWater && $this->mapTile->isWaterTile($this->mapTile->getTileColor($character, $x, $y))) {
             $item = Item::where('effect', ItemEffectsValue::WALK_ON_WATER)->first();
@@ -374,6 +405,15 @@ class MovementService {
 
         if ($this->mapTile->isPurgatoryWater($this->mapTile->getTileColor($character, $x, $y))) {
             return $this->errorResult('You would slip away into the void if you tried to go that way child!');
+        }
+
+        if (!is_null($lockedLocation)) {
+            $item = Item::where('id', $lockedLocation->required_quest_item_id)->first();
+            $slot = $character->inventory->slots()->where('item_id', $item->id)->first();
+
+            if (is_null($slot)) {
+                return $this->errorResult('Cannot enter this location without a ' . $item->name);
+            }
         }
 
         if ($character->gold < $cost) {
@@ -401,13 +441,15 @@ class MovementService {
 
         $this->teleportCharacter($character, $timeout, $cost, $pctCommand);
 
-        return $this->successResult();
+        return $this->successResult([
+            'lockedLocationType' => is_null($lockedLocation) ? null : $lockedLocation->type,
+        ]);
     }
 
     /**
      * Set sail.
      *
-     * Moves the character fro one port to another assuming they can.
+     * Moves the character from one port to another assuming they can.
      *
      * @param Character $character
      * @param Location $location
@@ -530,9 +572,9 @@ class MovementService {
 
         $character = $this->manager->createData($character)->toArray();
 
-        broadcast(new UpdateActionsBroadcast($character, $monsters, $user));
+        broadcast(new UpdateMonsterList($monsters, $user));
 
-        event(new UpdateAttackStats($character, $user));
+        event(new UpdateBaseCharacterInformation($user, $character));
     }
 
     /**
@@ -543,7 +585,7 @@ class MovementService {
      * @param array $params
      * @return array
      */
-    protected function moveCharacter(Character $character, array $params): array {
+    protected function moveCharacter(Character $character, array $params, ?Location $lockedLocation): array {
         $character->map->update($params);
 
         $character = $character->refresh();
@@ -562,12 +604,13 @@ class MovementService {
         }
 
         return $this->successResult([
-            'port_details'      => $this->portDetails(),
-            'adventure_details' => $this->adventureDetails(),
-            'kingdom_details'   => $kingdomDetails,
-            'celestials'        => $this->celestialEntities(),
-            'characters_on_map' => $this->getActiveUsersCountForMap($character),
-            'can_mass_embezzle' => $canEmbezzle
+            'port_details'       => $this->portDetails(),
+            'adventure_details'  => $this->adventureDetails(),
+            'kingdom_details'    => $kingdomDetails,
+            'celestials'         => $this->celestialEntities(),
+            'characters_on_map'  => $this->getActiveUsersCountForMap($character),
+            'can_mass_embezzle'  => $canEmbezzle,
+            'lockedLocationType' => is_null($lockedLocation) ? null : $lockedLocation->type,
         ]);
     }
 

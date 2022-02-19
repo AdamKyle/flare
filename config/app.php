@@ -207,7 +207,7 @@ return [
         /**
         * Game Related
         */
-        App\Game\Automation\Providers\ServiceProvider::class,
+        App\Game\Exploration\Providers\ServiceProvider::class,
         App\Game\Core\Providers\ServiceProvider::class,
         App\Game\Core\Providers\EventsProvider::class,
         App\Game\Battle\Providers\ServiceProvider::class,
@@ -220,6 +220,8 @@ return [
         App\Game\Kingdoms\Providers\ServiceProvider::class,
         App\Game\Skills\Providers\ServiceProvider::class,
         App\Game\Market\Providers\ServiceProvider::class,
+        App\Game\Shop\Providers\ServiceProvider::class,
+        App\Game\Shop\Providers\EventsProvider::class,
     ],
 
     /*

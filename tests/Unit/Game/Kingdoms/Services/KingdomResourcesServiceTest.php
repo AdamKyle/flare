@@ -21,7 +21,7 @@ class KingdomResourcesServiceTest extends TestCase {
 
     public function testKingdomGetsUpdated() {
         $kingdom = $this->createKingdom([
-            'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(false)->id,
+            'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(true)->id,
             'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
             'current_population' => 0,
@@ -79,7 +79,7 @@ class KingdomResourcesServiceTest extends TestCase {
 
     public function testKingdomGetsUpdatedTreasuryCannotGoPastMax() {
         $kingdom = $this->createKingdom([
-            'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(false)->id,
+            'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(true)->id,
             'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
             'current_population' => 0,
@@ -141,7 +141,7 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $this->createNpc();
 
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(false);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(true);
 
         $kingdom = $this->createKingdom([
             'character_id'       => $character->id,
@@ -165,7 +165,7 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $this->createNpc();
 
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(false);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(true);
 
         $kingdom = $this->createKingdom([
             'character_id'       => $character->id,
@@ -198,7 +198,7 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $this->createNpc();
 
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(false);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(true);
 
         $kingdom = $this->createKingdom([
             'character_id'       => $character->id,
@@ -222,7 +222,7 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $this->createNpc();
 
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(false);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(true);
 
         $kingdom = $this->createKingdom([
             'character_id'       => $character->id,
@@ -259,7 +259,7 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $this->createNpc();
 
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(false);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(true);
 
         $kingdom = $this->createKingdom([
             'character_id'       => $character->id,
@@ -327,7 +327,7 @@ class KingdomResourcesServiceTest extends TestCase {
         ]]);
 
         $kingdom = $this->createKingdom([
-            'character_id'       => $characterFactory->getCharacter(false)->id,
+            'character_id'       => $characterFactory->getCharacter(true)->id,
             'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
             'last_walked'        => now(),
@@ -389,7 +389,7 @@ class KingdomResourcesServiceTest extends TestCase {
 
     public function testKingdomMaxPopulationGetsSetAsCurrentPopulation() {
         $kingdom = $this->createKingdom([
-            'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(false)->id,
+            'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(true)->id,
             'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
             'current_population' => 0,
@@ -447,7 +447,7 @@ class KingdomResourcesServiceTest extends TestCase {
 
     public function testKingdomMaxPopulationGetsSetAsPartialCurrentPopulation() {
         $kingdom = $this->createKingdom([
-            'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(false)->id,
+            'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(true)->id,
             'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
             'current_population' => 0,
@@ -505,7 +505,7 @@ class KingdomResourcesServiceTest extends TestCase {
 
     public function testKingdomMaxPopulationGetsSetAsMaxCurrentPopulation() {
         $kingdom = $this->createKingdom([
-            'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(false)->id,
+            'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(true)->id,
             'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
             'current_population' => 0,
@@ -565,7 +565,7 @@ class KingdomResourcesServiceTest extends TestCase {
 
     public function testKingdomMaxResourceGetsSetAsCurrentResourse() {
         $kingdom = $this->createKingdom([
-            'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(false)->id,
+            'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(true)->id,
             'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 0,
             'max_wood'           => 1,
@@ -622,7 +622,7 @@ class KingdomResourcesServiceTest extends TestCase {
 
     public function testKingdomNoResourcesGetsSetAsCurrentResourse() {
         $kingdom = $this->createKingdom([
-            'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(false)->id,
+            'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(true)->id,
             'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 0,
             'max_wood'           => 1,
@@ -681,7 +681,7 @@ class KingdomResourcesServiceTest extends TestCase {
 
     public function testKingdomDecreasesMorale() {
         $kingdom = $this->createKingdom([
-            'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(false)->id,
+            'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(true)->id,
             'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
             'current_population' => 0,
@@ -739,7 +739,7 @@ class KingdomResourcesServiceTest extends TestCase {
 
     public function testKingdomAdjustMorale() {
         $kingdom = $this->createKingdom([
-            'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(false)->id,
+            'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(true)->id,
             'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
             'current_population' => 0,
@@ -797,7 +797,7 @@ class KingdomResourcesServiceTest extends TestCase {
 
     public function testKingdomDoNotAddMorale() {
         $kingdom = $this->createKingdom([
-            'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(false)->id,
+            'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(true)->id,
             'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
             'current_population' => 0,
@@ -860,7 +860,7 @@ class KingdomResourcesServiceTest extends TestCase {
 
     public function testKingdomSetMoraleToOne() {
         $kingdom = $this->createKingdom([
-            'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(false)->id,
+            'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(true)->id,
             'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
             'current_population' => 0,
@@ -924,7 +924,7 @@ class KingdomResourcesServiceTest extends TestCase {
 
     public function testKingdomDoNotReduceMorale() {
         $kingdom = $this->createKingdom([
-            'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(false)->id,
+            'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(true)->id,
             'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
             'current_population' => 0,
@@ -986,7 +986,7 @@ class KingdomResourcesServiceTest extends TestCase {
 
     public function testKingdomDoNotReduceMoraleBelowZero() {
         $kingdom = $this->createKingdom([
-            'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(false)->id,
+            'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(true)->id,
             'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
             'current_population' => 0,
@@ -1048,7 +1048,7 @@ class KingdomResourcesServiceTest extends TestCase {
 
     public function testKingdomDoNotAdjustMoraleBelowZero() {
         $kingdom = $this->createKingdom([
-            'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(false)->id,
+            'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(true)->id,
             'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
             'current_population' => 0,
@@ -1121,7 +1121,7 @@ class KingdomResourcesServiceTest extends TestCase {
         ]]);
 
         $kingdom = $this->createKingdom([
-            'character_id'       => $characterFactory->getCharacter(false)->id,
+            'character_id'       => $characterFactory->getCharacter(true)->id,
             'game_map_id'        => GameMap::first()->id,
             'current_wood'       => 500,
             'current_morale'     => 0,

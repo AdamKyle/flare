@@ -49,7 +49,7 @@ export default class QuestSection extends React.Component {
         map_name: result.data.map_name,
         allQuests: result.data.hasOwnProperty('all_quests') ? result.data.all_quests : this.state.allQuests,
       }, () => {
-        if (!fetchCompletedTasksOnly) {
+        if (result.data.was_reset) {
           localforage.setItem('all-quests', result.data.all_quests).catch((err) => {
             console.error('could not save data to local forage for all quests');
             console.error(err);

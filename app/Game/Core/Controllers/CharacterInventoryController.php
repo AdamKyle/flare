@@ -3,6 +3,9 @@
 namespace App\Game\Core\Controllers;
 
 use App\Flare\Services\BuildCharacterAttackTypes;
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
+use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
+use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Services\ComparisonService;
 use App\Game\Skills\Events\UpdateCharacterEnchantingList;
 use App\Game\Skills\Services\EnchantingService;
@@ -39,7 +42,7 @@ class CharacterInventoryController extends Controller {
     public function __construct(
         EquipItemService $equipItemService,
         BuildCharacterAttackTypes $buildCharacterAttackTypes,
-        CharacterAttackTransformer $characterTransformer,
+        CharacterSheetBaseInfoTransformer $characterTransformer,
         EnchantingService $enchantingService,
         Manager $manager
     ) {
@@ -107,9 +110,11 @@ class CharacterInventoryController extends Controller {
                                            ->setCharacter($character)
                                            ->replaceItem();
 
-            $this->updateCharacterAttakDataCache($character);
+            $this->updateCharacterAttackDataCache($character);
 
             event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+            event(new CharacterInventoryDetailsUpdate($character->user));
 
             $affixData = $this->enchantingService->fetchAffixes($character->refresh());
 
@@ -126,13 +131,13 @@ class CharacterInventoryController extends Controller {
         }
     }
 
-    protected function updateCharacterAttakDataCache(Character $character) {
+    protected function updateCharacterAttackDataCache(Character $character) {
         $this->buildCharacterAttackTypes->buildCache($character);
 
         $characterData = new ResourceItem($character->refresh(), $this->characterTransformer);
 
         $characterData = $this->manager->createData($characterData)->toArray();
 
-        event(new UpdateAttackStats($characterData, $character->user));
+        event(new UpdateBaseCharacterInformation($character->user, $characterData));
     }
 }

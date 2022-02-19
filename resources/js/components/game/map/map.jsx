@@ -120,6 +120,8 @@ export default class Map extends React.Component {
           can_mass_embezzle: result.data.can_mass_embezzle
         });
 
+        this.props.updateLockedLocationType(result.data.lockedLocationType);
+
         if (result.data.celestials.length > 0) {
           this.props.updateCelestial(result.data.celestials[0]);
         }
@@ -493,6 +495,8 @@ export default class Map extends React.Component {
         this.props.updateTeleportLocations(this.state.teleportLocations, this.state.characterPosition.x, this.state.characterPosition.y);
 
         this.props.updateAdventure(this.state.adventures, [], null);
+
+        this.props.updateLockedLocationType(result.data.lockedLocationType);
 
         if (this.state.currentPort == null) {
           this.props.openPortDetails(false);

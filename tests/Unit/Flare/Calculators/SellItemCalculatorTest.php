@@ -43,7 +43,7 @@ class SellItemCalculatorTest extends TestCase
     }
 
     public function testSellItemWithUniqueAffixes() {
-        $price = SellItemCalculator::fetchMinimumSalePriceOfUnique(
+        $price = SellItemCalculator::fetchMinPrice(
             $this->createItem([
                 'item_suffix_id' => $this->createItemAffix([
                     'type' => 'suffix',

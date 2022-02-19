@@ -2,7 +2,8 @@
 
 namespace Tests\Feature\Game\Battle;
 
-use App\Flare\Models\Character;
+use App\Flare\Values\ItemEffectsValue;
+use App\Flare\Values\MapNameValue;
 use App\Flare\Values\MaxCurrenciesValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
@@ -16,7 +17,6 @@ use App\Game\Core\Events\CharacterIsDeadBroadcastEvent;
 use App\Game\Core\Events\DropsCheckEvent;
 use App\Game\Core\Events\ShowTimeOutEvent;
 use App\Game\Core\Events\UpdateTopBarBroadcastEvent;
-use Illuminate\Support\Str;
 use Tests\TestCase;
 use Tests\Traits\CreateRace;
 use Tests\Traits\CreateClass;
@@ -49,8 +49,18 @@ class BattleControllerApiTest extends TestCase
 
     private $monster;
 
+    private $purgatory;
+
     public function setUp(): void {
         parent::setUp();
+
+        $this->purgatory = $this->createGameMap(['name' => MapNameValue::PURGATORY, 'default' => false]);
+
+        $this->createGameMap([
+            'name'    => 'Surface',
+            'path'    => 'path',
+            'default' => true,
+        ]);
 
         $this->character = (new CharacterFactory)->createBaseCharacter()
                                                  ->givePlayerLocation()
@@ -122,21 +132,6 @@ class BattleControllerApiTest extends TestCase
         $this->assertEquals($character->name, $content->character->name);
     }
 
-    public function testCannotGetActionsForAnotherPlayer() {
-
-
-        $user     = $this->character->getUser();
-        $secondCharacter = (new CharacterFactory())->createBaseCharacter()->getCharacter(false);
-
-        $response = $this->actingAs($user)
-            ->json('GET', '/api/actions', [
-                'user_id' => $secondCharacter->user->id
-            ])
-            ->response;
-
-        $this->assertEquals(422, $response->status());
-    }
-
     public function testCanGetActionsWithSkills() {
 
         $user     = $this->character->getUser();
@@ -203,6 +198,196 @@ class BattleControllerApiTest extends TestCase
         $this->assertEquals(200, $response->status());
 
         $this->assertTrue($currentGold !== $this->character->getCharacter(false)->gold);
+    }
+
+    public function testBattleResultsMonsterIsDeadPlayerGetsNoFactionPointsMaxed() {
+
+        $user      = $this->character->getUser();
+        $character = $this->character->getCharacter(false);
+        $monster   = $this->monster->getMonster();
+
+        $character->factions()->first()->update(['current_level' => 5, 'maxed' => true]);
+
+        $currentGold = $character->gold;
+
+        $response = $this->actingAs($user)
+            ->json('POST', '/api/battle-results/' . $character->id, [
+                'is_defender_dead' => true,
+                'defender_type'    => 'monster',
+                'monster_id'       => $monster->id,
+            ])
+            ->response;
+
+        $this->assertEquals(200, $response->status());
+
+        $character = $character->refresh();
+
+        $this->assertTrue($currentGold !== $character->gold);
+        $this->assertTrue($character->factions->first()->current_points === 0);
+    }
+
+    public function testBattleResultsMonsterIsDeadPlayerGetsTenFactionPointsWithQuestItem() {
+
+        $user      = $this->character->getUser();
+        $character = $this->character->getCharacter(false);
+        $monster   = $this->monster->getMonster();
+
+        $character->inventory->slots()->create([
+            'inventory_id' => $character->inventory->id,
+            'item_id'      => $this->createItem(['type' => 'quest', 'effect' => ItemEffectsValue::FACTION_POINTS])->id
+        ]);
+
+        $character->factions()->first()->update(['current_level' => 2]);
+
+        $currentGold = $character->gold;
+
+        $character = $character->refresh();
+
+        $response = $this->actingAs($user)
+            ->json('POST', '/api/battle-results/' . $character->id, [
+                'is_defender_dead' => true,
+                'defender_type'    => 'monster',
+                'monster_id'       => $monster->id,
+            ])
+            ->response;
+
+        $this->assertEquals(200, $response->status());
+
+        $character = $character->refresh();
+
+        $this->assertTrue($currentGold !== $character->gold);
+        $this->assertTrue($character->factions->first()->current_points === 10);
+    }
+
+    public function testBattleResultsMonsterIsDeadPlayerMaxesFaction() {
+
+        $user      = $this->character->getUser();
+        $character = $this->character->getCharacter(false);
+        $monster   = $this->monster->getMonster();
+
+        $character->inventory->slots()->create([
+            'inventory_id' => $character->inventory->id,
+            'item_id'      => $this->createItem(['type' => 'quest', 'effect' => ItemEffectsValue::FACTION_POINTS])->id
+        ]);
+
+        $character->factions()->first()->update(['current_level' => 4, 'current_points' => 8000, 'points_needed' => 8000]);
+
+        $currentGold = $character->gold;
+
+        $response = $this->actingAs($user)
+            ->json('POST', '/api/battle-results/' . $character->id, [
+                'is_defender_dead' => true,
+                'defender_type'    => 'monster',
+                'monster_id'       => $monster->id,
+            ])
+            ->response;
+
+        $this->assertEquals(200, $response->status());
+
+        $character = $character->refresh();
+
+        $this->assertTrue($currentGold !== $character->gold);
+        $this->assertTrue($character->factions->first()->maxed);
+    }
+
+    public function testBattleResultsMonsterIsDeadPlayerMaxesFactionButInventoryIsFull() {
+
+        $user      = $this->character->getUser();
+        $character = $this->character->getCharacter(false);
+        $monster   = $this->monster->getMonster();
+
+        $character->inventory->slots()->create([
+            'inventory_id' => $character->inventory->id,
+            'item_id'      => $this->createItem(['type' => 'quest', 'effect' => ItemEffectsValue::FACTION_POINTS])->id
+        ]);
+
+        $character->update(['max_inventory' => 1]);
+
+        $character->factions()->first()->update(['current_level' => 4, 'current_points' => 8000, 'points_needed' => 8000]);
+
+        $character = $character->refresh();
+
+        $currentGold = $character->gold;
+
+        $response = $this->actingAs($user)
+            ->json('POST', '/api/battle-results/' . $character->id, [
+                'is_defender_dead' => true,
+                'defender_type'    => 'monster',
+                'monster_id'       => $monster->id,
+            ])
+            ->response;
+
+        $this->assertEquals(200, $response->status());
+
+        $character = $character->refresh();
+
+        $this->assertTrue($currentGold !== $character->gold);
+        $this->assertTrue($character->factions->first()->maxed);
+    }
+
+    public function testBattleResultsMonsterIsDeadPlayerGetsCopperCoins() {
+
+        $user      = $this->character->getUser();
+        $character = $this->character->getCharacter(false);
+        $monster   = $this->createMonster(['game_map_id' => $this->purgatory->id]);
+
+        $character->inventory->slots()->create([
+            'inventory_id' => $character->inventory->id,
+            'item_id'      => $this->createItem(['type' => 'quest', 'effect' => ItemEffectsValue::GET_COPPER_COINS])->id
+        ]);
+
+        $character = $character->refresh();
+
+        $currentGold = $character->gold;
+
+        $response = $this->actingAs($user)
+            ->json('POST', '/api/battle-results/' . $character->id, [
+                'is_defender_dead' => true,
+                'defender_type'    => 'monster',
+                'monster_id'       => $monster->id,
+            ])
+            ->response;
+
+        $this->assertEquals(200, $response->status());
+
+        $character = $character->refresh();
+
+        $this->assertTrue($currentGold !== $character->gold);
+        $this->assertTrue($character->copper_coins > 0);
+    }
+
+    public function testBattleResultsMonsterIsDeadPlayerMaxesFactionAndGoldCaps() {
+
+        $user      = $this->character->getUser();
+        $character = $this->character->getCharacter(false);
+        $monster   = $this->monster->getMonster();
+
+        $character->inventory->slots()->create([
+            'inventory_id' => $character->inventory->id,
+            'item_id'      => $this->createItem(['type' => 'quest', 'effect' => ItemEffectsValue::FACTION_POINTS])->id
+        ]);
+
+        $character->update(['gold' => 1999999999999]);
+
+        $character->factions()->first()->update(['current_level' => 4, 'current_points' => 8000, 'points_needed' => 8000]);
+
+        $currentGold = $character->gold;
+
+        $response = $this->actingAs($user)
+            ->json('POST', '/api/battle-results/' . $character->id, [
+                'is_defender_dead' => true,
+                'defender_type'    => 'monster',
+                'monster_id'       => $monster->id,
+            ])
+            ->response;
+
+        $this->assertEquals(200, $response->status());
+
+        $character = $character->refresh();
+
+        $this->assertTrue($currentGold !== $character->gold);
+        $this->assertTrue($character->factions->first()->maxed);
+        $this->assertEquals(MaxCurrenciesValue::MAX_GOLD, $character->gold);
     }
 
     public function testBattleResultsMonsterIsDeadNoXpMaxLevel() {

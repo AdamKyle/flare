@@ -10,7 +10,10 @@ use App\Flare\Models\Monster;
 use App\Flare\Models\Skill;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Transformers\CharacterAttackTransformer;
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Core\Events\UpdateAttackStats;
+use App\Game\Core\Events\UpdateBaseCharacterInformation;
+use App\Game\Skills\Services\SkillService;
 use App\Game\Skills\Values\SkillTypeValue;
 use Facades\App\Flare\Calculators\SkillXPCalculator;
 use App\Flare\Events\UpdateSkillEvent;
@@ -21,14 +24,19 @@ use League\Fractal\Resource\Item as ResourceItem;
 class UpdateSkillListener
 {
 
+    private $skillService;
+
+    public function __construct(SkillService $skillService) {
+        $this->skillService = $skillService;
+    }
+
     /**
      * Handle the event.
      *
      * @param  UpdateSkillEvent $event
      * @return void
      */
-    public function handle(UpdateSkillEvent $event)
-    {
+    public function handle(UpdateSkillEvent $event) {
         if ($event->skill->max_level <= $event->skill->level) {
             return;
         }
@@ -88,21 +96,45 @@ class UpdateSkillListener
 
             event(new SkillLeveledUpServerMessageEvent($skill->character->user, $skill->refresh()));
 
-            if ($skill->can_train) {
-                event(new UpdateCharacterAttackEvent($character));
+            if ($this->shouldUpdateCharacterAttackData($skill->baseSkill)) {
+                $this->updateCharacterAttackDataCache($character);
             }
-
-            $this->updateCharacterAttakDataCache($character);
         }
+
+        $this->skillService->updateSkills($skill->character->refresh());
     }
 
-    protected function updateCharacterAttakDataCache(Character $character) {
+    protected function shouldUpdateCharacterAttackData(GameSkill $skill): bool {
+        if (!is_null($skill->base_damage_mod_bonus_per_level)) {
+            return false;
+        }
+
+        if (!is_null($skill->base_healing_mod_bonus_per_level)) {
+            return false;
+        }
+
+        if (!is_null($skill->base_ac_mod_bonus_per_level)) {
+            return false;
+        }
+
+        if (!is_null($skill->fight_time_out_mod_bonus_per_level)) {
+            return false;
+        }
+
+        if (!is_null($skill->move_time_out_mod_bonus_per_level)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    protected function updateCharacterAttackDataCache(Character $character) {
         resolve(BuildCharacterAttackTypes::class)->buildCache($character);
 
-        $characterData = new ResourceItem($character->refresh(), resolve(CharacterAttackTransformer::class));
+        $characterData = new ResourceItem($character->refresh(), resolve(CharacterSheetBaseInfoTransformer::class));
 
         $characterData = resolve(Manager::class)->createData($characterData)->toArray();
 
-        event(new UpdateAttackStats($characterData, $character->user));
+        event(new UpdateBaseCharacterInformation($character->user, $characterData));
     }
 }

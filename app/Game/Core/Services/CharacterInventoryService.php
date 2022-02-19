@@ -2,6 +2,8 @@
 
 namespace App\Game\Core\Services;
 
+use App\Flare\Models\Inventory;
+use App\Flare\Models\SetSlot;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use App\Flare\Models\Character;
@@ -70,7 +72,7 @@ class CharacterInventoryService {
             'usable_sets'  => $this->getUsableSets(),
             'savable_sets' => $this->getSaveableSets(),
             'equipped'     => !is_null($equipped) ? $equipped : [],
-            'sets'         => $this->character->inventorySets()->with(['slots', 'slots.item'])->get(),
+            'sets'         => $this->character->inventorySets()->with(['slots', 'slots.item', 'slots.item.itemPrefix', 'slots.item.itemSuffix'])->get(),
             'quest_items'  => $this->getQuestItems(),
             'usable_items' => $this->getUsableItems(),
         ];
@@ -83,8 +85,8 @@ class CharacterInventoryService {
      */
     public function getUsableItems(): Collection {
         return $this->character->inventory->slots->filter(function($slot) {
-            return $slot->item->usable;
-        })->values();
+            return $slot->item->usable || $slot->item->can_use_on_other_items;
+        })->load(['item.itemPrefix', 'item.itemSuffix'])->values();
     }
 
     /**
@@ -95,7 +97,7 @@ class CharacterInventoryService {
     public function getQuestItems(): Collection {
         return $this->character->inventory->slots->filter(function($slot) {
             return $slot->item->type === 'quest';
-        })->values();
+        })->load(['item.itemPrefix', 'item.itemSuffix'])->values();
     }
 
     /**
@@ -165,20 +167,32 @@ class CharacterInventoryService {
      */
     public function fetchCharacterInventory(): Collection {
         return $this->character->inventory->slots->filter(function($slot) {
-            return !$slot->equipped && !$slot->item->usable && $slot->item->type !== 'quest';
-        });
+            return !$slot->equipped && !$slot->item->usable && !$slot->item->can_use_on_other_items && $slot->item->type !== 'quest';
+        })->load(['item.itemSuffix', 'item.itemPrefix']);
     }
 
+    /**
+     * Fetch equipped items.
+     *
+     * @return Collection|InventorySet|null
+     */
     public function fetchEquipped(): Collection|InventorySet|null {
-        $inventory = $this->character->inventory->slots()->with('item')->get()->filter(function($slot) {
-            return $slot->equipped;
-        });
 
-        if ($inventory->isNotEmpty()) {
-            return $inventory->values();
+        $inventory = Inventory::where('character_id', $this->character->id)->first();
+
+        $slots     = InventorySlot::where('inventory_id', $inventory->id)->where('equipped', true)->with(['item', 'item.itemPrefix', 'item.itemSuffix'])->get();
+
+        if ($slots->isNotEmpty()) {
+            return $slots->values();
         }
 
-        return $this->character->inventorySets()->with(['slots', 'slots.item'])->where('is_equipped', true)->first();
+        $inventorySet = InventorySet::where('character_id', $this->character->id)->where('is_equipped', true)->first();
+
+        if (is_null($inventorySet)) {
+            return null;
+        }
+
+        return SetSlot::where('inventory_set_id', $inventorySet->id)->with(['item', 'item.itemPrefix', 'item.itemSuffix'])->get();
     }
 
     /**

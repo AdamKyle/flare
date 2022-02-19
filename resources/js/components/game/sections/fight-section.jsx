@@ -1,4 +1,4 @@
-import React, {Fragment} from 'react';
+ import React, {Fragment} from 'react';
 import {OverlayTrigger, Tooltip} from 'react-bootstrap';
 import { v4 as uuidv4 } from 'uuid';
 import Attack from '../battle/attack/attack';
@@ -73,26 +73,34 @@ export default class FightSection extends React.Component {
       monsterMaxHealth: null,
       characterMaxHealth: null,
       characterCurrentHealth: null,
-      canAttack: this.props.character.can_attack,
+      canAttack: true,
+      isDead: false,
       battleMessages: [],
       missCounter: 0,
       isCharacterVoided: false,
       isMonsterVoided: false,
       isMonsterDevoided: false,
+      resetMonster: false,
     }
 
     this.timeOut = Echo.private('show-timeout-bar-' + this.props.userId);
     this.attackUpdate = Echo.private('update-character-attack-' + this.props.userId);
     this.isDead = Echo.private('character-is-dead-' + this.props.userId);
-    this.attackStats = Echo.private('update-character-attack-' + this.props.userId);
+    this.attackStats = Echo.private('update-character-base-stats-' + this.props.userId);
+    this.updateCharacterStatus = Echo.private('update-character-status-' + this.props.userId);
 
     this.battleMessagesBeforeFight = [];
     this.isMonsterVoided           = false;
     this.isMonsterDevoided         = false;
     this.isCharacterVoided         = false;
+    this.isCharacterDevoided       = false;
   }
 
   componentDidMount() {
+    this.setState({
+      isDead: this.props.character.is_dead,
+    });
+
     this.attackUpdate.listen('Flare.Events.UpdateCharacterAttackBroadcastEvent', (event) => {
       this.setState({
         character: event.attack,
@@ -113,20 +121,85 @@ export default class FightSection extends React.Component {
       });
     });
 
-    this.attackStats.listen('Game.Core.Events.UpdateAttackStats', (event) => {
-      this.setState({character: event.character});
+    this.attackStats.listen('Game.Core.Events.UpdateBaseCharacterInformation', (event) => {
+
+      let baseStats = JSON.parse(JSON.stringify(event.baseStats));
+      let character = JSON.parse(JSON.stringify(this.state.character));
+
+      Object.keys(baseStats).forEach(function(el){
+        if (typeof baseStats[el] === 'string') {
+          if (baseStats[el].indexOf(',') !== -1) {
+            baseStats[el] = parseFloat(baseStats[el].replace(/,/g, ''))
+          }
+        } else {
+          baseStats[el] = parseFloat(baseStats[el]) || baseStats[el]
+        }
+
+        if (el === 'attack_stats') {
+          let attackTypes = baseStats[el];
+
+          if (attackTypes.hasOwnProperty('attack_types')) {
+            attackTypes = attackTypes.attack_types;
+          }
+
+          baseStats.attack_types = attackTypes;
+        }
+      });
+
+      Object.keys(baseStats).filter(key => key in character).forEach(key => {
+        character[key] = baseStats[key];
+      });
+
+      if (!character.hasOwnProperty('attack_types')) {
+        let attackTypes;
+
+        if (baseStats.hasOwnProperty('attack_stats')) {
+          attackTypes = baseStats.attack_stats;
+
+          if (attackTypes.hasOwnProperty('attack_types')) {
+            attackTypes = attackTypes.attack_types;
+          }
+        } else {
+          attackTypes = baseStats.attack_types;
+        }
+
+        character['attack_types'] = attackTypes;
+      }
+
+      this.setState({
+        character: character
+      });
     });
 
     this.timeOut.listen('Game.Core.Events.ShowTimeOutEvent', (event) => {
       this.setState({
         canAttack: event.canAttack,
       }, () => {
-        this.props.canAttack(this.state.canAttack);
+        this.props.canAttack(event.canAttack);
       });
+    });
+
+    this.updateCharacterStatus.listen('Game.Battle.Events.UpdateCharacterStatus', (event) => {
+
+      this.setState({isDead: event.data.is_dead});
+
+      if (!event.data.is_dead && this.props.monster !== null) {
+        this.setState({characterCurrentHealth: null});
+
+        this.setMonsterInfo(true);
+      }
     });
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps) {
+
+    if (this.props.resetBattleAction) {
+      this.setState({
+        monster: null
+      }, () => {
+        this.props.updateResetBattleAction(false);
+      });
+    }
 
     let stateMonster = this.state.monster;
     let propsMonster = this.props.monster;
@@ -137,7 +210,7 @@ export default class FightSection extends React.Component {
         this.setState({characterCurrentHealth: null});
       }
 
-      this.setMonsterInfo();
+      this.setMonsterInfo(false);
     } else if (propsMonster !== null && stateMonster !== null) {
 
       if (!stateMonster.hasOwnProperty('name')) {
@@ -158,24 +231,38 @@ export default class FightSection extends React.Component {
           characterMaxHealth: null,
           monsterMaxHealth: null,
         }, () => {
-          this.setMonsterInfo();
+          this.setMonsterInfo(false);
         })
       }
     }
   }
 
-  setMonsterInfo() {
+  setMonsterInfo(keepHealth) {
 
-    if (this.state.characterCurrentHealth !== null || this.state.monsterCurrentHealth !== null) {
-
+    if (this.state.characterCurrentHealth !== null) {
       return;
+    }
+
+    if (!keepHealth) {
+      this.setState({
+        monsterCurrentHealth: null,
+      })
     }
 
     const monsterInfo   = new Monster(this.props.monster);
     const voidance      = new Voidance();
     const character     = this.props.character;
 
-    if (voidance.canPlayerDevoidEnemy(this.props.character.devouring_darkness) && !this.isMonsterDevoided) {
+    if (monsterInfo.canMonsterDevoidPlayer(character.devouring_darkness_res)) {
+      this.battleMessagesBeforeFight.push({
+        message: this.props.monster.name + ' has devoided your voidance! You feel fear start to build.',
+        class: 'action-fired'
+      });
+
+      this.isCharacterDevoided = true;
+    }
+
+    if (voidance.canPlayerDevoidEnemy(this.props.character.devouring_darkness) && !this.isCharacterDevoided) {
       this.battleMessagesBeforeFight.push({
         message: 'Magic crackles in the air, the darkness consumes the enemy. They are devoided!',
         class: 'action-fired'
@@ -184,7 +271,16 @@ export default class FightSection extends React.Component {
       this.isMonsterDevoided = true;
     }
 
-    if (voidance.canVoidEnemy(this.props.character.devouring_light) && !this.isMonsterVoided) {
+    if (monsterInfo.canMonsterVoidPlayer(character.devouring_light_res) && !this.isMonsterDevoided) {
+      this.battleMessagesBeforeFight.push({
+        message: this.props.monster.name + ' has voided your enchantments! You feel much weaker!',
+        class: 'enemy-action-fired'
+      });
+
+      this.isCharacterVoided = true;
+    }
+
+    if (voidance.canVoidEnemy(this.props.character.devouring_light) && !this.isCharacterDevoided && !this.isCharacterVoided) {
       this.battleMessagesBeforeFight.push({
         message: 'The light of the heavens shines through this darkness. The enemy is voided!',
         class: 'action-fired'
@@ -193,15 +289,7 @@ export default class FightSection extends React.Component {
       this.isMonsterVoided = true;
     }
 
-    if (monsterInfo.canMonsterVoidPlayer() && !this.isCharacterVoided && !this.isMonsterDevoided) {
-      this.battleMessagesBeforeFight.push({
-        message: this.props.monster.name + ' has voided your enchantments! You feel much weaker!',
-        class: 'enemy-action-fired'
-      });
-
-      this.isCharacterVoided = true;
-
-    } else if (!this.isCharacterVoided) {
+    if (!this.isCharacterVoided && !this.isCharacterDevoided) {
 
       let messages = monsterInfo.reduceResistances(character.resistance_reduction);
 
@@ -222,21 +310,27 @@ export default class FightSection extends React.Component {
       }
     }
 
-    const health = monsterInfo.health();
-    let characterHealth = this.props.character.health;
+    let health    = monsterInfo.monsterHP();
+    const maxHealth = health;
+
+    if (keepHealth) {
+      health    = this.state.monsterCurrentHealth;
+    }
+
+    let characterMaxHealth = this.props.character.health;
 
     if (this.isCharacterVoided) {
-      characterHealth = this.props.character.voided_dur
+      characterMaxHealth = this.props.character.voided_dur
     }
 
     this.setState({
-      battleMessages: [],
+      battleMessages: keepHealth ? this.state.battleMessages : [],
       missCounter: 0,
       monster: monsterInfo,
+      characterCurrentHealth: characterMaxHealth,
+      characterMaxHealth: characterMaxHealth,
       monsterCurrentHealth: health,
-      characterCurrentHealth: characterHealth,
-      characterMaxHealth: characterHealth,
-      monsterMaxHealth: health,
+      monsterMaxHealth: maxHealth,
     }, () => {
       this.props.setMonster(null)
     });
@@ -252,6 +346,19 @@ export default class FightSection extends React.Component {
     this.setState({
       characterMaxHealth: data.character_health,
       characterCurrentHealth: data.character_health,
+    }, () => {
+      this.props.updateCharacterHealth(data.character_health)
+
+      this.battleMessagesBeforeFight = [];
+      this.isMonsterVoided           = false;
+      this.isMonsterDevoided         = false;
+      this.isCharacterVoided         = false;
+
+      this.setState({
+        battleMessages: [],
+      }, () => {
+        this.setMonsterInfo(true)
+      });
     });
   }
 
@@ -311,52 +418,52 @@ export default class FightSection extends React.Component {
     this.setState(state);
 
     if (state.monsterCurrentHealth <= 0 || state.characterCurrentHealth <= 0) {
-      axios.post('/api/battle-results/' + this.state.character.id, {
-        is_character_dead: state.characterCurrentHealth <= 0,
-        is_defender_dead: state.monsterCurrentHealth <= 0,
-        defender_type: 'monster',
-        monster_id: this.state.monster.monster.id,
-      }).then(() => {
-        let health = state.characterCurrentHealth;
-        let monster = this.state.monster;
+      let health      = state.characterCurrentHealth;
+      let monster     = this.state.monster;
+      const monsterId = monster.monster.id;
 
-        if (health >= 0 && state.monsterCurrentHealth >= 0) {
-          health = this.state.characterMaxHealth;
-        } else if (health <= 0 && state.monsterCurrentHealth >= 0) {
-          health = 0;
-        } else {
-          health = null;
-        }
+      if (health >= 0 && state.monsterCurrentHealth >= 0) {
+        health = this.state.characterMaxHealth;
+      } else if (health <= 0 && state.monsterCurrentHealth >= 0) {
+        health = 0;
+      } else {
+        health = null;
+      }
 
-        if (state.monsterCurrentHealth <= 0) {
-          monster = null;
+      if (state.monsterCurrentHealth <= 0) {
+        monster                = null;
+        this.isMonsterDevoided = false;
+        this.isMonsterVoided   = false;
+        this.isCharacterVoided = false;
+      }
 
-          this.isMonsterDevoided = false;
-          this.isMonsterVoided   = false;
-          this.isCharacterVoided = false;
-        }
+      this.setState({
+        characterCurrentHealth: health,
+        characterMaxHealth: health,
+        monsterCurrentHealth: monster !== null ? state.monsterCurrentHealth : null,
+        monsterMaxHealth: monster !== null ? this.state.monsterMaxHealth : null,
+        canAttack: false,
+        monster: monster,
+      }, () => {
+        axios.post('/api/battle-results/' + this.state.character.id, {
+          is_character_dead: state.characterCurrentHealth <= 0,
+          is_defender_dead: state.monsterCurrentHealth <= 0,
+          defender_type: 'monster',
+          monster_id: monsterId,
+        }).catch((err) => {
+          if (err.hasOwnProperty('response')) {
+            const response = err.response;
 
-        this.setState({
-          characterCurrentHealth: health,
-          characterMaxHealth: health,
-          monsterCurrentHealth: monster !== null ? state.monsterCurrentHealth : null,
-          monsterMaxHealth: monster !== null ? this.state.monsterMaxHealth : null,
-          canAttack: false,
-          monster: monster,
+            if (response.status === 429) {
+              // Reload to show them their notification.
+              return this.props.openTimeOutModal();
+            }
+
+            if (response.status === 401) {
+              return location.reload();
+            }
+          }
         });
-      }).catch((err) => {
-        if (err.hasOwnProperty('response')) {
-          const response = err.response;
-
-          if (response.status === 429) {
-            // Reload to show them their notification.
-            return this.props.openTimeOutModal();
-          }
-
-          if (response.status === 401) {
-            return location.reload();
-          }
-        }
       });
     }
   }
@@ -518,7 +625,7 @@ export default class FightSection extends React.Component {
               : null
           }
           {
-            this.state.character.is_dead ?
+            this.state.isDead ?
               <ReviveSection
                 characterId={this.state.character.id}
                 canAttack={this.state.canAttack}

@@ -2,6 +2,8 @@
 
 namespace App\Admin\Controllers;
 
+use Cache;
+use App\Flare\Models\Character;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Controllers\Controller;
 use App\Admin\Exports\Quests\QuestsExport;
@@ -66,6 +68,8 @@ class QuestsController extends Controller {
      */
     public function import(QuestsImportRequest $request) {
         Excel::import(new QuestsImport, $request->quests_import);
+
+        Cache::put('character-quest-reset', Character::all()->pluck('id')->toArray());
 
         return redirect()->back()->with('success', 'imported quest data.');
     }

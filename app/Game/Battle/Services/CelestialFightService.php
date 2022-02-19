@@ -2,6 +2,7 @@
 
 namespace App\Game\Battle\Services;
 
+use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use Facades\App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\CelestialFight;
 use App\Flare\Models\Character;
@@ -60,7 +61,7 @@ class CelestialFightService {
         $fightService = resolve(FightService::class, [
             'character' => $character,
             'monster'   => $celestialFight->monster,
-        ])->setAttackTimes(1);
+        ])->setAttackTimes(1)->setCelestialFightHealth($celestialFight->current_health);
 
         $fightService->processFight($character, $celestialFight->monster, $attackType);
 
@@ -118,7 +119,7 @@ class CelestialFightService {
                 'shards' => $newShards
             ]);
 
-            BattleAttackHandler::dispatch($character->refresh(), $celestialFight->monster_id)->onQueue('default_long');
+            BattleAttackHandler::dispatch($character->id, $celestialFight->monster_id)->onQueue('default_long');
 
             event(new GlobalMessageEvent($character->name . ' has slain the '.$celestialFight->monster->name.'! They have been rewarded with a godly gift!'));
 
@@ -133,6 +134,8 @@ class CelestialFightService {
             event(new UpdateCelestialFight(null, true));
 
             event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+            event(new CharacterInventoryDetailsUpdate($character->user));
 
             return $this->successResult([
                 'battle_over' => true,

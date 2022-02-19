@@ -3,6 +3,7 @@
 namespace App\Flare\Handlers;
 
 
+use App\Flare\Builders\Character\AttackDetails\CharacterAffixInformation;
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Handlers\AttackHandlers\CanHitHandler;
 use App\Flare\Handlers\AttackHandlers\EntrancingChanceHandler;
@@ -15,6 +16,8 @@ class MonsterAttackHandler {
     use CreateBattleMessages;
 
     private $characterInformationBuilder;
+
+    private $characterAffixInformation;
 
     private $entrancingChanceHandler;
 
@@ -32,11 +35,13 @@ class MonsterAttackHandler {
 
     public function __construct(
         CharacterInformationBuilder $characterInformationBuilder,
-        EntrancingChanceHandler $entrancingChanceHandler,
-        ItemHandler $itemHandler,
-        CanHitHandler $canHitHandler,
+        CharacterAffixInformation   $characterAffixInformation,
+        EntrancingChanceHandler     $entrancingChanceHandler,
+        ItemHandler                 $itemHandler,
+        CanHitHandler               $canHitHandler,
     ) {
         $this->characterInformationBuilder = $characterInformationBuilder;
+        $this->characterAffixInformation    = $characterAffixInformation;
         $this->entrancingChanceHandler     = $entrancingChanceHandler;
         $this->canHitHandler               = $canHitHandler;
         $this->itemHandler                 = $itemHandler;
@@ -119,19 +124,19 @@ class MonsterAttackHandler {
 
         $this->useItems($attacker, $defender, $attackType, $isDefenderVoided);
 
-        $this->defenderAttmptToHeal($defender, $attacker, $isDefenderVoided);
+        $this->defenderAttemptToHeal($defender, $attacker, $isDefenderVoided);
 
     }
 
-    protected function defenderAttmptToHeal($defender, $attacker, bool $isDefenderVoided = false) {
+    protected function defenderAttemptToHeal($defender, $attacker, bool $isDefenderVoided = false) {
         if ($this->characterHealth <= 0) {
-            $this->attemptToRessurect($defender, $attacker, $isDefenderVoided);
+            $this->attemptToResurrect($defender, $attacker, $isDefenderVoided);
         } else if (!$isDefenderVoided){
-            $this->useLifestealingAffixes($attacker, $defender);
+            $this->useLifeStealingAffixes($attacker, $defender);
         }
     }
 
-    private function attemptToRessurect($defender, $attacker, bool $isDefenderVoided = false) {
+    private function attemptToResurrect($defender, $attacker, bool $isDefenderVoided = false) {
         $resChance = $this->characterInformationBuilder->setCharacter($defender)->fetchResurrectionChance();
 
         $dc = 100 - 100 * $resChance;
@@ -143,17 +148,22 @@ class MonsterAttackHandler {
             $this->battleLogs = $this->addMessage($message, 'action-fired', $this->battleLogs);
 
             if (!$isDefenderVoided) {
-                $this->useLifestealingAffixes($attacker, $defender);
+                $this->useLifeStealingAffixes($attacker, $defender);
             }
         }
     }
 
-    private function useLifestealingAffixes($attacker, $defender) {
+    private function useLifeStealingAffixes($attacker, $defender) {
+        $affixes = $this->characterAffixInformation->setCharacter($defender);
         $handler = $this->itemHandler->setCharacterHealth($this->characterHealth)->setMonsterHealth($this->monsterHealth);
         $info    = $this->characterInformationBuilder->setCharacter($defender);
 
         $canResist  = $info->canAffixesBeResisted();
-        $damage     = $info->findLifeStealingAffixes(true);
+        $damage     = $affixes->findLifeStealingAffixes(true);
+
+        if ($damage > $this->characterHealth) {
+            $damage = $this->characterHealth;
+        }
 
         $handler->useLifeStealingAffixes($attacker, $damage, $canResist);
 
@@ -169,7 +179,7 @@ class MonsterAttackHandler {
 
         if (!$this->isMonsterVoided) {
             $itemHandler = $this->itemHandler->setCharacterHealth($this->characterHealth)
-                ->setMonsterHealth($this->monsterHealth);
+                                             ->setMonsterHealth($this->monsterHealth);
 
             $itemHandler->useArtifacts($attacker, $defender);
 
@@ -256,16 +266,21 @@ class MonsterAttackHandler {
             $healing            = $attacker->dur * $attacker->max_healing;
 
             if ($defenderReduction > 0) {
-                $message = 'Your rings negate some of the enemies healing power.';
-                $this->battleLogs = $this->addMessage($message, 'action-fired', $this->battleLogs);
-
                 $healing -= ceil($healing * $defenderReduction);
             }
 
-            $message = $attacker->name . '\'s healing spells wash over them for: ' . number_format($healing);
-            $this->battleLogs = $this->addMessage($message, 'action-fired', $this->battleLogs);
+            if ($healing >= 1) {
+                $message = 'Your rings negate some of the enemies healing power.';
+                $this->battleLogs = $this->addMessage($message, 'action-fired', $this->battleLogs);
 
-            $this->monsterHealth += $healing;
+                $message = $attacker->name . '\'s healing spells wash over them for: ' . number_format($healing);
+                $this->battleLogs = $this->addMessage($message, 'action-fired', $this->battleLogs);
+
+                $this->monsterHealth += $healing;
+            } else {
+                $message = 'Your rings negate all of the enemies healing power.';
+                $this->battleLogs = $this->addMessage($message, 'action-fired', $this->battleLogs);
+            }
         }
     }
 

@@ -8,10 +8,8 @@ export default class Factions extends React.Component {
     super(props);
 
     this.state = {
-      characterBoons: [],
-      boonToCancel: null,
-      showBoonModal: false,
-      showSuccess: false,
+      loading: true,
+      factions: [],
     }
 
     this.factionsConfig = {
@@ -59,9 +57,50 @@ export default class Factions extends React.Component {
         </div>,
       },
     ];
+
+    this.updateFactions = Echo.private('update-factions-' + this.props.userId);
+  }
+
+  componentDidMount() {
+    axios.get('/api/character-sheet/'+this.props.characterId+'/factions').then((result) => {
+      this.setState({
+        factions: result.data.factions,
+        loading: false
+      })
+    }).catch((err) => {
+      this.setState({loading: false});
+
+      if (err.hasOwnProperty('response')) {
+        const response = err.response;
+
+        if (response.status === 401) {
+          return location.reload()
+        }
+
+        if (response.status === 429) {
+          return this.props.openTimeOutModal()
+        }
+      }
+    });
+
+    this.updateFactions.listen('Game.Core.Events.UpdateCharacterFactions', (event) => {
+      this.setState({
+        factions: event.factions,
+      });
+    });
   }
 
   render() {
+
+    if (this.state.loading) {
+      return (
+        <div className="progress loading-progress mt-2 mb-2" style={{position: 'relative'}}>
+          <div className="progress-bar progress-bar-striped indeterminate">
+          </div>
+        </div>
+      );
+    }
+
     return (
       <Card>
         <AlertInfo icon={'fas fa-question-circle'} title={"Quick Tip"}>
@@ -75,11 +114,13 @@ export default class Factions extends React.Component {
             to the next level. For level 2 you need a 500 kills but need 1000 points (2 points) to get to level 3.
             See <a href={"/information/factions"}>Factions</a> in the help docs for more info.
           </p>
-          <p>Oh ya .... Use auto battle for this. Do not try and grind this out manually.</p>
+          <p>There is a quest you can do for the Helpless Goblin that will get you a quest item that gives you 10 points pr kill as opposed to 2, but only starting at level 1.</p>
+          <p>Players will want to use Exploration to gain these points. I would suggest you do that quest first.</p>
         </AlertInfo>
+
         <ReactDatatable
           config={this.factionsConfig}
-          records={this.props.factions}
+          records={this.state.factions}
           columns={this.factionColumns}
         />
       </Card>

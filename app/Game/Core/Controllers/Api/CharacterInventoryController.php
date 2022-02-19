@@ -2,10 +2,14 @@
 
 namespace App\Game\Core\Controllers\Api;
 
+use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySet;
 use App\Flare\Models\Item;
 use App\Flare\Services\BuildCharacterAttackTypes;
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Values\RandomAffixDetails;
+use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
+use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Jobs\UseMultipleItems;
 use App\Game\Core\Requests\RemoveItemRequest;
 use App\Game\Core\Requests\RenameSetRequest;
@@ -42,7 +46,7 @@ class CharacterInventoryController extends Controller {
     private $manager;
 
     public function __construct(CharacterInventoryService $characterInventoryService,
-                                CharacterAttackTransformer $characterTransformer,
+                                CharacterSheetBaseInfoTransformer $characterTransformer,
                                 BuildCharacterAttackTypes $buildCharacterAttackTypes,
                                 EnchantingService $enchantingService,
                                 Manager $manager) {
@@ -89,6 +93,8 @@ class CharacterInventoryController extends Controller {
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
+        event(new CharacterInventoryDetailsUpdate($character->user));
+
         event(new UpdateTopBarEvent($character->refresh()));
 
         return response()->json(['message' => 'Destroyed ' . $name . '.'], 200);
@@ -102,6 +108,8 @@ class CharacterInventoryController extends Controller {
         $character->inventory->slots()->whereIn('id', $slotIds)->delete();
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        event(new CharacterInventoryDetailsUpdate($character->user));
 
         event(new UpdateTopBarEvent($character->refresh()));
 
@@ -138,8 +146,8 @@ class CharacterInventoryController extends Controller {
 
             DisenchantItem::withChain($jobs)->onConnection('disenchanting')->dispatch($character, $slots->first()->id);
 
-            return response()->json(['message' => 'You can freely move about. 
-                Your inventory will update as items disenchant. Check chat to see 
+            return response()->json(['message' => 'You can freely move about.
+                Your inventory will update as items disenchant. Check chat to see
                 the total gold dust earned.'
             ]);
         }
@@ -164,6 +172,8 @@ class CharacterInventoryController extends Controller {
         $character = $character->refresh();
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        event(new CharacterInventoryDetailsUpdate($character->user));
 
         event(new UpdateTopBarEvent($character->refresh()));
 
@@ -205,6 +215,8 @@ class CharacterInventoryController extends Controller {
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
+        event(new CharacterInventoryDetailsUpdate($character->user));
+
         event(new UpdateTopBarEvent($character->refresh()));
 
         return response()->json([
@@ -237,9 +249,11 @@ class CharacterInventoryController extends Controller {
 
         event(new UpdateTopBarEvent($character));
 
-        $this->updateCharacterAttakDataCache($character);
+        $this->updateCharacterAttackDataCache($character);
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        event(new CharacterInventoryDetailsUpdate($character->user));
 
         return response()->json(['message' => 'Set ' . $setIndex + 1 . ' is now equipped (equipment has been moved to the set)']);
     }
@@ -271,6 +285,8 @@ class CharacterInventoryController extends Controller {
         });
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        event(new CharacterInventoryDetailsUpdate($character->user));
 
         event(new UpdateTopBarEvent($character->refresh()));
 
@@ -313,6 +329,8 @@ class CharacterInventoryController extends Controller {
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
+        event(new CharacterInventoryDetailsUpdate($character->user));
+
         event(new UpdateTopBarEvent($character->refresh()));
 
         $affixData = $this->enchantingService->fetchAffixes($character->refresh());
@@ -335,6 +353,8 @@ class CharacterInventoryController extends Controller {
 
             event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
+            event(new CharacterInventoryDetailsUpdate($character->user));
+
             return response()->json(['message' => 'Unequipped Set ' . $inventoryIndex + 1 . '.'], 200);
         }
 
@@ -351,9 +371,11 @@ class CharacterInventoryController extends Controller {
 
         event(new UpdateTopBarEvent($character->refresh()));
 
-        $this->updateCharacterAttakDataCache($character);
+        $this->updateCharacterAttackDataCache($character);
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        event(new CharacterInventoryDetailsUpdate($character->user));
 
         $affixData = $this->enchantingService->fetchAffixes($character->refresh());
 
@@ -367,6 +389,7 @@ class CharacterInventoryController extends Controller {
     }
 
     public function unequipAll(Request $request, Character $character, InventorySetService $inventorySetService) {
+
         if ($request->is_set_equipped) {
             $inventorySet = $character->inventorySets()->where('is_equipped', true)->first();
 
@@ -384,9 +407,11 @@ class CharacterInventoryController extends Controller {
 
         event(new UpdateTopBarEvent($character->refresh()));
 
-        $this->updateCharacterAttakDataCache($character);
+        $this->updateCharacterAttackDataCache($character);
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        event(new CharacterInventoryDetailsUpdate($character->user));
 
         $affixData = $this->enchantingService->fetchAffixes($character->refresh());
 
@@ -401,7 +426,7 @@ class CharacterInventoryController extends Controller {
 
     public function useItem(Character $character, Item $item, UseItemService $useItemService) {
         if ($character->boons->count() === 10) {
-            return response()->json(['message' => 'You can only have a max of ten boons applied. 
+            return response()->json(['message' => 'You can only have a max of ten boons applied.
             Check active boons to see which ones you have. You can always cancel one by clicking on the row.'], 422);
         }
 
@@ -417,7 +442,9 @@ class CharacterInventoryController extends Controller {
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
-        $this->updateCharacterAttakDataCache($character);
+        event(new CharacterInventoryDetailsUpdate($character->user));
+
+        $this->updateCharacterAttackDataCache($character);
 
         event(new UpdateTopBarEvent($character->refresh()));
 
@@ -441,16 +468,18 @@ class CharacterInventoryController extends Controller {
 
         event(new UpdateTopBarEvent($character));
 
-        $this->updateCharacterAttakDataCache($character);
+        $this->updateCharacterAttackDataCache($character);
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        event(new CharacterInventoryDetailsUpdate($character->user));
 
         return response()->json(['message' => 'Set ' . $setIndex + 1 . ' is now equipped']);
     }
 
     public function UseManyItems(UseManyItemsValidation $request, Character $character) {
         if ($character->boons->count() === 10) {
-            return response()->json(['message' => 'You can only have a max of ten boons applied. 
+            return response()->json(['message' => 'You can only have a max of ten boons applied.
             Check active boons to see which ones you have. You can always cancel one by clicking on the row.'], 422);
         }
 
@@ -475,13 +504,63 @@ class CharacterInventoryController extends Controller {
         return response()->json(['message' => 'Boons are being applied. You can check Active Boons tab to see them be applied or check chat to see boons being applied.'], 200);
     }
 
-    protected function updateCharacterAttakDataCache(Character $character) {
+    public function destroyAlchemyItem(Request $request, Character $character) {
+        $slot = $character->inventory->slots->filter(function($slot) use($request) {
+            return $slot->id === $request->slot_id;
+        })->first();
+
+        if (is_null($slot)) {
+            return response()->json([
+                'message' => 'No item found.'
+            ]);
+        }
+
+        $name = $slot->item->affix_name;
+
+        $slot->delete();
+
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        event(new CharacterInventoryDetailsUpdate($character->user));
+
+        event(new UpdateTopBarEvent($character->refresh()));
+
+        return response()->json(['message' => 'Destroyed Alchemy Item: ' . $name . '.'], 200);
+    }
+
+    public function destroyAllAlchemyItems(Character $character) {
+        $slots = $character->inventory->slots->filter(function($slot) {
+            return $slot->item->type === 'alchemy';
+        });
+
+        foreach ($slots as $slot) {
+            $slot->delete();
+        }
+
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        event(new CharacterInventoryDetailsUpdate($character->user));
+
+        event(new UpdateTopBarEvent($character->refresh()));
+
+        return response()->json(['message' => 'Destroyed All Alchemy Items.'], 200);
+    }
+
+    /**
+     * Updates the character stats.
+     *
+     * @param Character $character
+     * @return void
+     */
+    protected function updateCharacterAttackDataCache(Character $character) {
         $this->buildCharacterAttackTypes->buildCache($character);
 
         $characterData = new ResourceItem($character->refresh(), $this->characterTransformer);
 
         $characterData = $this->manager->createData($characterData)->toArray();
 
-        event(new UpdateAttackStats($characterData, $character->user));
+        event(new UpdateBaseCharacterInformation($character->user, $characterData));
+
+        event(new UpdateTopBarEvent($character));
     }
 }

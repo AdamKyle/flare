@@ -2,11 +2,13 @@
 
 namespace Tests\Feature\Game\Core;
 
+use App\Game\Adventures\View\AdventureCompletedRewards;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use App\Flare\Models\AdventureLog;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateItem;
@@ -187,6 +189,8 @@ class CharacterAdventureControllerTest extends TestCase
     }
 
     public function testDistributeRewards() {
+        Queue::fake();
+
         $user      = $this->character->getUser();
 
         $response = $this->actingAs($user)
@@ -195,12 +199,11 @@ class CharacterAdventureControllerTest extends TestCase
              ]))->response;
 
         $this->assertEquals(302, $response->status());
-
-        $response->assertSessionHas('success');
-
     }
 
     public function testDistributeRewardsWithMultipleLevelsGained() {
+        Queue::fake();
+
         $item = $this->createItem([
             'type' => 'quest'
         ]);
@@ -235,8 +238,6 @@ class CharacterAdventureControllerTest extends TestCase
                          ]))->response;
 
         $this->assertEquals(302, $response->status());
-
-        $response->assertSessionHas('success');
     }
 
     public function testDistributeRewardsWhenInventoryIsFull() {
@@ -265,6 +266,7 @@ class CharacterAdventureControllerTest extends TestCase
     }
 
     public function testShowDifferentSuccessWhenThereIsNoReward() {
+        Queue::fake();
 
         $user = $this->character->adventureManagement()->updateLog([
             'rewards' => [

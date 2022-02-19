@@ -11,7 +11,7 @@ Route::middleware(['auth', 'is.player.banned', 'is.character.who.they.say.they.a
         // Map Movement:
         Route::post('/move/{character}', ['uses' => 'Api\MapController@move']);
 
-        Route::middleware(['character.attack.automation'])->group(function() {
+        Route::middleware(['is.character.exploring'])->group(function() {
             // Set Sail:
             Route::post('/map/set-sail/{location}/{character}', ['uses' => 'Api\MapController@setSail']);
 

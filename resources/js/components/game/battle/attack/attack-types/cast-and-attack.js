@@ -34,7 +34,7 @@ export default class CastAndAttack {
 
     if (canEntrance) {
       if (attackData.spell_damage > 0) {
-        castAttack.attackWithSpells(attackData);
+        castAttack.attackWithSpells(attackData, canEntrance);
       }
 
       if (attackData.heal_for > 0) {
@@ -100,7 +100,7 @@ export default class CastAndAttack {
       const canCast           = canHitCheck.canCast(this.attacker, this.defender, this.battleMessages);
 
       if (canHitCheck.canAutomaticallyHit()) {
-        castAttack.attackWithSpells(attackData);
+        castAttack.attackWithSpells(attackData, false);
 
         if (attackData.heal_for > 0) {
           castAttack.healWithSpells(attackData);

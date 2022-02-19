@@ -5,6 +5,7 @@ namespace App\Game\Messages\Providers;
 
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Transformers\CharacterAttackTransformer;
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Transformers\MonsterTransfromer;
 use App\Game\Messages\Handlers\NpcKingdomHandler;
 use App\Game\Messages\Handlers\NpcQuestRewardHandler;
@@ -57,7 +58,7 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(NpcQuestRewardHandler::class, function($app) {
             return new NpcQuestRewardHandler(
                 $app->make(NpcServerMessageBuilder::class),
-                $app->make(CharacterAttackTransformer::class),
+                $app->make(CharacterSheetBaseInfoTransformer::class),
                 $app->make(BuildCharacterAttackTypes::class),
                 $app->make(Manager::class)
             );

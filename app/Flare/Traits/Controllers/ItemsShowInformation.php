@@ -43,7 +43,7 @@ trait ItemsShowInformation {
             $effect = new ItemEffectsValue($item->effect);
 
             if ($effect->walkOnWater()) {
-                $effects = 'Walk on water';
+                $effects = 'Walk on water (Surface and Labyrinth)';
             }
 
             if ($effect->labyrinth()) {
@@ -83,11 +83,19 @@ trait ItemsShowInformation {
             }
 
             if ($effect->walkOnDeathWater()) {
-                $effects = 'Walk on Water (Aka: Death Water) in Dungeons Plane';
+                $effects = 'Walk on Death Water in Dungeons Plane';
             }
 
             if ($effect->teleportToCelestial()) {
                 $effects = 'Use /pct to find and teleport/traverse to the public Celestial Entity';
+            }
+
+            if ($effect->effectsFactionPoints()) {
+                $effects = 'Instead of gaining 2 points, you will now gain 10 points per kill. This only applies starting at level one of the faction.';
+            }
+
+            if ($effect->getCopperCoins()) {
+                $effects = 'Enemies in Purgatory will now start dropping copper coins in relation to their gold amounts. These amounts are random between 5-20 per battle.';
             }
         }
 

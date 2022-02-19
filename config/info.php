@@ -18,10 +18,10 @@ return [
     'traverse'          => [],
     'teleport'          => [],
     'voidance'          => [],
-    'tips'              => [],
-    'automation'        => [],
+    'exploration'       => [],
     'factions'          => [],
     'random-enchants'   => [],
+    'holy-items'        => [],
     'special-locations' => [
         [
             'livewire'            => true,

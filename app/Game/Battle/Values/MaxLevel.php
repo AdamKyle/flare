@@ -37,18 +37,20 @@ class MaxLevel {
     /**
      * Returns the new xp amount based off where the character is in their leveling.
      *
+     * @param bool $ignoreCaps
+     * @param float $xpBonus
      * @return int
      */
-    public function fetchXP(): int {
-        if ($this->currentLevel >= self::HALF && $this->currentLevel < self::THREE_QUARTERS) {
+    public function fetchXP(bool $ignoreCaps = false, float $xpBonus = 0.0): int {
+        if ($this->currentLevel >= self::HALF && $this->currentLevel < self::THREE_QUARTERS && !$ignoreCaps) {
             return ceil($this->xp * self::HALF_PERCENT);
         }
 
-        if ($this->currentLevel >= self::THREE_QUARTERS && $this->currentLevel < self::LAST_LEG) {
+        if ($this->currentLevel >= self::THREE_QUARTERS && $this->currentLevel < self::LAST_LEG && !$ignoreCaps) {
             return ceil($this->xp * self::THREE_QUARTERS_PERCENT);
         }
 
-        if ($this->currentLevel >= self::LAST_LEG && $this->currentLevel < self::MAX_LEVEL) {
+        if ($this->currentLevel >= self::LAST_LEG && $this->currentLevel < self::MAX_LEVEL && !$ignoreCaps) {
             return ceil($this->xp * self::LAST_LEG_PERCENT);
         }
 
@@ -56,6 +58,6 @@ class MaxLevel {
             return 0;
         }
 
-        return $this->xp;
+        return $this->xp + $this->xp * $xpBonus;
     }
 }

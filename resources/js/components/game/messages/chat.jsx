@@ -79,7 +79,9 @@ export default class Chat extends React.Component {
       this.setState({
         messages: messages
       }, () => {
-        this.props.updateChatTabIcon(false);
+        if (!this.isGod(event.user)) {
+          this.props.updateChatTabIcon(false);
+        }
       });
     });
 
@@ -95,12 +97,14 @@ export default class Chat extends React.Component {
       this.setState({
         messages: messages,
       }, () => {
-        this.props.updateChatTabIcon(false);
+        if (!this.isGod(event.user)) {
+          this.props.updateChatTabIcon(false);
+        }
       });
     });
 
     this.serverMessages.listen('Game.Messages.Events.ServerMessageEvent', (event) => {
-      if (event.npc || event.isLink) {
+      if (event.npc) {
         const messages = cloneDeep(this.state.messages);
 
         const message = {
@@ -158,6 +162,14 @@ export default class Chat extends React.Component {
   }
 
   isGod(user) {
+    if (typeof user === 'undefined') {
+      return false;
+    }
+
+    if (!user.hasOwnProperty('roles')) {
+      return false;
+    }
+
     if (isEmpty(user.roles)) {
       return false;
     }
@@ -209,16 +221,7 @@ export default class Chat extends React.Component {
 
       this.state.messages.map((message) => {
         if (message.user_id === this.props.userId && message.type === 'server-message') {
-          if (message.isLink) {
-            elements.push(
-              <li key={message.id + '_server-message_link'}>
-                <div className="server-message">
-                  <a href={message.link} target="_blank">{message.message}</a>
-                  <button className="ml-1 btn btn-link btn-chat-action" onClick={() => this.destroy(message.event_id)}>Destroy</button> or <button className="btn btn-link btn-chat-action" onClick={() => this.disenchant(message.event_id)}>Disenchant</button>.
-                </div>
-              </li>
-            )
-          } else if (message.is_npc) {
+          if (message.is_npc) {
             elements.push(
               <li key={message.id + '_server-message'}>
                 <div className="npc-message">{message.message}</div>
@@ -392,29 +395,7 @@ export default class Chat extends React.Component {
     });
   }
 
-  disenchant(itemId) {
-    axios.post('/api/disenchant/' + itemId).catch((err) => {
-      if (err.hasOwnProperty('response')) {
-        const response = err.response;
 
-        if (response.status === 401) {
-           return location.reload;
-        }
-      }
-    });
-  }
-
-  destroy(itemId) {
-    axios.post('/api/destroy/' + itemId).catch((err) => {
-      if (err.hasOwnProperty('response')) {
-        const response = err.response;
-
-        if (response.status === 401) {
-          return location.reload;
-        }
-      }
-    });
-  }
 
   handleKeyPress(e) {
     if (e.key === 'Enter') {

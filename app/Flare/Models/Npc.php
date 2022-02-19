@@ -2,6 +2,7 @@
 
 namespace App\Flare\Models;
 
+use App\Flare\Values\NpcTypes;
 use Database\Factories\NpceFactory;
 use Database\Factories\NpcFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -36,7 +37,12 @@ class Npc extends Model {
         'must_be_at_same_location' => 'boolean',
         'x_position'               => 'integer',
         'x_position'               => 'integer',
+        'type'                     => 'integer',
     ];
+
+    public function type(): NpcTypes {
+        return (new NpcTypes($this->type));
+    }
 
     public function gameMap() {
         return $this->hasOne(GameMap::class, 'id', 'game_map_id');

@@ -4,6 +4,7 @@ namespace App\Game\Skills\Providers;
 
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Models\Skill;
+use App\Flare\Transformers\SkillsTransformer;
 use App\Game\Core\Services\RandomEnchantmentService;
 use App\Game\Skills\Services\AlchemyService;
 use App\Game\Skills\Services\CraftingService;
@@ -12,6 +13,7 @@ use App\Game\Skills\Services\EnchantingService;
 use App\Game\Skills\Services\EnchantItemService;
 use App\Game\Skills\Services\SkillService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
+use League\Fractal\Manager;
 
 class ServiceProvider extends ApplicationServiceProvider
 {
@@ -40,8 +42,11 @@ class ServiceProvider extends ApplicationServiceProvider
             return new DisenchantService();
         });
 
-        $this->app->bind(SkillService::class, function() {
-            return new SkillService();
+        $this->app->bind(SkillService::class, function($app) {
+            return new SkillService(
+                $app->make(Manager::class),
+                $app->make(SkillsTransformer::class)
+            );
         });
 
         $this->app->bind(EnchantingService::class, function($app) {

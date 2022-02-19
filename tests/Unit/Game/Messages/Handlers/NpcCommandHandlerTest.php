@@ -351,9 +351,9 @@ class NpcCommandHandlerTest extends TestCase {
         $character = $user->character;
 
         $character->factions()->where('game_map_id', $character->map->gameMap->id)->first()->update([
-            'current_level'  => 4,
+            'current_level'  => 5,
             'maxed'          => true,
-            'current_points' => 8000
+            'current_points' => 0
         ]);
 
         $this->quest->delete();
@@ -489,33 +489,6 @@ class NpcCommandHandlerTest extends TestCase {
         })->first();
 
         $this->assertNull($item);
-
-        $skill = $character->skills->filter(function($skill) {
-            return !$skill->is_locked && $skill->type()->isAlchemy();
-        })->first();
-
-        $this->assertNull($skill);
-    }
-
-
-    public function testCharacterHandlesQuestDoesntInventorySpace() {
-        $npcCommandHandler = resolve(NpcCommandHandler::class);
-
-        $user = $this->character->getCharacterFactory()->updateCharacter([
-            'inventory_max' => 0
-        ])->getUser();
-
-        $user = $user->refresh();
-
-        $npcCommandHandler->handleForType(NpcCommandTypes::QUEST, $this->questNpc, $user);
-
-        $this->assertCount(0, QuestsCompleted::all());
-
-        $character = $user->character->refresh();
-
-        $this->assertLessThan(100, $character->gold);
-        $this->assertLessThan(100, $character->gold_dust);
-        $this->assertLessThan(100, $character->shards);
 
         $skill = $character->skills->filter(function($skill) {
             return !$skill->is_locked && $skill->type()->isAlchemy();

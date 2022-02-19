@@ -4,6 +4,8 @@ namespace App\Game\Skills\Services;
 
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateSkillEvent;
+use App\Flare\Models\GameSkill;
+use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Events\UpdateQueenOfHeartsPanel;
 use App\Game\Core\Services\RandomEnchantmentService;
@@ -21,6 +23,9 @@ class CraftingService {
 
     use ResponseBuilder, SkillCheck, UpdateCharacterGold;
 
+    /**
+     * @var RandomEnchantmentService $randomEnchantmentService
+     */
     private $randomEnchantmentService;
 
     /**
@@ -58,7 +63,7 @@ class CraftingService {
      * @return void
      */
     public function craft(Character $character, array $params): void {
-        $item = Item::find($params['item_to_craft']);
+        $item  = Item::find($params['item_to_craft']);
         $skill = $this->fetchCraftingSkill($character, $params['type']);
 
         if (is_null($item)) {
@@ -81,9 +86,19 @@ class CraftingService {
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
+        event(new CharacterInventoryDetailsUpdate($character->user));
+
         event(new UpdateCharacterCraftingList($character->user, $this->getItems($params['type'], $skill)));
     }
 
+    /**
+     * Attempt to craft and pick up the item.
+     *
+     * @param Character $character
+     * @param Skill $skill
+     * @param Item $item
+     * @return void
+     */
     protected function attemptToCraftItem(Character $character, Skill $skill, Item $item) {
         if ($skill->level < $item->skill_level_required) {
             event(new ServerMessageEvent($character->user, 'to_hard_to_craft'));
@@ -113,10 +128,26 @@ class CraftingService {
         $this->updateCharacterGold($character, $item->cost, $skill);
     }
 
+    /**
+     * Fetch the crafting skill.
+     *
+     * @param Character $character
+     * @param string $craftingType
+     * @return Skill
+     */
     protected function fetchCraftingSkill(Character $character, string $craftingType): Skill {
-        return $character->skills->where('name', ucfirst($craftingType) . ' Crafting')->first();
+        $gameSkill = GameSkill::where('name', ucfirst($craftingType) . ' Crafting')->first();
+
+        return Skill::where('game_skill_id', $gameSkill->id)->where('character_id', $character->id)->first();
     }
 
+    /**
+     * Return a list of items the player can craft for the type.
+     *
+     * @param $craftingType
+     * @param Skill $skill
+     * @return Collection
+     */
     protected function getItems($craftingType, Skill $skill): Collection {
         return Item::where('can_craft', true)
                     ->where('crafting_type', strtolower($craftingType))
@@ -127,6 +158,15 @@ class CraftingService {
                     ->get();
     }
 
+    /**
+     * Handle picking up the item.
+     *
+     * @param Character $character
+     * @param Item $item
+     * @param Skill $skill
+     * @param bool $tooEasy
+     * @return void
+     */
     private function pickUpItem(Character $character, Item $item, Skill $skill, bool $tooEasy = false) {
         if ($this->attemptToPickUpItem($character, $item)) {
 
@@ -138,6 +178,13 @@ class CraftingService {
         }
     }
 
+    /**
+     * Attempt to pick up the item.
+     *
+     * @param Character $character
+     * @param Item $item
+     * @return bool
+     */
     private function attemptToPickUpItem(Character $character, Item $item): bool {
         if (!$character->isInventoryFull()) {
 
@@ -157,5 +204,4 @@ class CraftingService {
 
         return false;
     }
-
 }

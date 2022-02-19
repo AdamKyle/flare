@@ -21,7 +21,7 @@ class CharacterBoonJobTest extends TestCase {
     }
 
     public function testDeleteBoon() {
-        $character = $this->character->getCharacter(false);
+        $character = $this->character->getCharacter(true);
 
         $boon = $this->createCharacterBoon([
             'character_id' => $character->id,

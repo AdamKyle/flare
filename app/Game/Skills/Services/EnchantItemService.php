@@ -23,8 +23,13 @@ class EnchantItemService {
     private $dcIncrease = 0;
 
     /**
-     * Attach the affix to the item.
+     * Attach the affix to the item
      *
+     * @param Item $item
+     * @param ItemAffix $affix
+     * @param Skill $enchantingSkill
+     * @param bool $tooEasy
+     * @return bool
      */
     public function attachAffix(Item $item, ItemAffix $affix, Skill $enchantingSkill, bool $tooEasy = false) {
         if ($tooEasy) {
@@ -43,6 +48,12 @@ class EnchantItemService {
         return true;
     }
 
+    /**
+     * Update the slot.
+     *
+     * @param InventorySlot $slot
+     * @return void
+     */
     public function updateSlot(InventorySlot $slot) {
         if (!is_null($this->item)) {
 
@@ -58,6 +69,12 @@ class EnchantItemService {
         }
     }
 
+    /**
+     * Delete the slot.
+     *
+     * @param InventorySlot $slot
+     * @return void
+     */
     public function deleteSlot(InventorySlot $slot) {
         $slot->delete();
 
@@ -68,16 +85,34 @@ class EnchantItemService {
         }
     }
 
+    /**
+     * Set difficulty check increase.
+     *
+     * @param int $increaseBy
+     * @return $this
+     */
     public function setDcIncrease(int $increaseBy): EnchantItemService {
         $this->dcIncrease = $increaseBy;
 
         return $this;
     }
 
-    public function getItem() {
+    /**
+     * Get the item.
+     *
+     * @return Item|null
+     */
+    public function getItem(): ?Item {
         return $this->item;
     }
 
+    /**
+     * Enchant the item.
+     *
+     * @param Item $item
+     * @param ItemAffix $affix
+     * @return void
+     */
     protected function enchantItem(Item $item, ItemAffix $affix) {
         if (!is_null($this->item)) {
             $this->item->{'item_' . $affix->type . '_id'} = $affix->id;
@@ -90,21 +125,31 @@ class EnchantItemService {
         $clonedItem = $item->duplicate();
 
         $clonedItem->{'item_' . $affix->type . '_id'} = $affix->id;
-        $clonedItem->market_sellable = true;
-        $clonedItem->parent_id       = $item->id;
+        $clonedItem->market_sellable                  = true;
+        $clonedItem->parent_id                        = $item->id;
 
         $clonedItem->save();
 
-        $this->item = $clonedItem;
+        $this->item = $clonedItem->refresh();
     }
 
-    protected function getCountOfMatchingItems() {
+    /**
+     * Count the matching items.
+     *
+     * @return int
+     */
+    protected function getCountOfMatchingItems(): int {
         return Item::where('name', $this->item->name)
                         ->where('item_prefix_id', $this->item->item_prefix_id)
                         ->where('item_suffix_id', $this->item->item_suffix_id)
                         ->count();
     }
 
+    /**
+     * Fetch matching item id.
+     *
+     * @return int
+     */
     protected function findMatchingItemId(): int {
         $item = $this->item;
 

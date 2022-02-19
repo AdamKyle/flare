@@ -31,7 +31,7 @@ export default class CastAttack {
     this.battleMessages   = canEntranceEnemy.getBattleMessages();
 
     if (canEntrance) {
-      this.attackWithSpells(attackData);
+      this.attackWithSpells(attackData, canEntrance);
 
       if (attackData.heal_for > 0) {
         this.healWithSpells(attackData);
@@ -49,7 +49,7 @@ export default class CastAttack {
     this.battleMessages    = [...this.battleMessages, canHitCheck.getBattleMessages()]
 
     if (canHitCheck.getCanAutoHit()) {
-      this.attackWithSpells(attackData);
+      this.attackWithSpells(attackData, false);
       this.healWithSpells(attackData);
 
       this.useItems(attackData, this.attacker.class)
@@ -71,7 +71,7 @@ export default class CastAttack {
           return this.setState();
         }
 
-        this.attackWithSpells(attackData);
+        this.attackWithSpells(attackData, false);
         this.healWithSpells(attackData);
 
         this.useItems(attackData, this.attacker.class)
@@ -105,12 +105,12 @@ export default class CastAttack {
     return state;
   }
 
-  attackWithSpells(attackData) {
+  attackWithSpells(attackData, isEntranced) {
     const evasion = this.defender.spell_evasion;
     let dc        = 100;
     let roll      = random(1, 100);
 
-    if (evasion > 1.0) {
+    if (evasion > 1.0 && !isEntranced) {
       this.addEnemyActionMessage('The enemy evades your magic!')
 
       return;
@@ -123,16 +123,16 @@ export default class CastAttack {
       roll = roll - Math.ceil(roll * evasion);
     }
 
-    if (roll < dc && dc > 0) {
+    if (roll < dc && dc > 0 && !isEntranced) {
       this.addEnemyActionMessage('The enemy evades your magic!')
 
       return;
     }
 
-    const skillBonus      = this.attacker.skills.filter(s => s.name === 'Criticality')[0].skill_bonus;
-    const castingAccuracy = this.attacker.skills.filter(s => s.name === 'Casting Accuracy')[0].skill_bonus;
-    let damage            = attackData.spell_damage;
-    const critDc          = 100 - 100 * skillBonus;
+    const skillBonus = this.attacker.skills.filter(s => s.name === 'Criticality')[0].skill_bonus;
+    let damage       = attackData.spell_damage;
+
+    const critDc     = 100 - 100 * skillBonus;
 
     if (random(1, 100) > critDc) {
       this.addActionMessage('Your magic radiates across the plane. Even The Creator is terrified! (Critical strike!)')
@@ -156,20 +156,22 @@ export default class CastAttack {
 
     let healFor = attackData.heal_for;
 
-    const dc = 100 - 100 * skillBonus;
+    if (healFor > 1) {
 
-    if (random(1, 100) > dc) {
-      this.addActionMessage('The heavens open and your wounds start to heal over (Critical heal!)')
+      const dc = 100 - 100 * skillBonus;
 
-      healFor *= 2;
+      if (random(1, 100) > dc) {
+        this.addActionMessage('The heavens open and your wounds start to heal over (Critical heal!)')
+
+        healFor *= 2;
+      }
+
+      this.characterCurrentHealth += healFor
+
+      this.addActionMessage('Your healing spell(s) heals you for: ' + this.formatNumber(healFor.toFixed(0)))
     }
 
-    this.characterCurrentHealth += healFor
-
-    this.addActionMessage('Your healing spell(s) heals you for: ' + this.formatNumber(healFor.toFixed(0)))
-
     this.extraHealing(attackData);
-
   }
 
   useItems(attackData, attackerClass) {

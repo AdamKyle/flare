@@ -29,6 +29,20 @@
       }
     }
 
+    .exploration-message {
+      color: #a5c2b4;
+      font-weight: bold;
+    }
+
+    .make-italic {
+      font-style: italic;
+      color: #d0e7dd !important;
+    }
+
+    .bonus-reward {
+      color: #76a4f8 !important;
+    }
+
     .god-message {
       color: #f8e488;
       font-weight: bold;
@@ -71,6 +85,7 @@
 .chat-tab-icon {
   color: #eab308 !important;
 }
+
 
 .message-button {
   @media only screen and (max-width: 768px) {

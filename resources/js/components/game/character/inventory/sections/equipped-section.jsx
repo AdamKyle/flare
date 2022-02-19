@@ -62,6 +62,18 @@ export default class EquippedSection extends React.Component {
         cell: row => <div>{row.base_healing !== null ? row.base_healing : 0}</div>
       },
       {
+        key: 'holy_stacks',
+        text: 'Holy Stacks',
+        sortable: true,
+        cell: row => <div>{row.holy_stacks !== null ? row.holy_stacks : 0}</div>
+      },
+      {
+        key: 'holy_stacks_left',
+        text: 'Holy Stacks Left',
+        sortable: true,
+        cell: row => <div>{row.holy_stacks - row.holy_stacks_applied}</div>
+      },
+      {
         name: "actions",
         text: "Actions",
         cell: row => <Fragment>
@@ -73,6 +85,7 @@ export default class EquippedSection extends React.Component {
             setErrorMessage={this.setErrorMessage.bind(this)}
             hasSetEquipped={typeof this.props.equipped === 'object' && !Array.isArray(this.props.equipped)}
             loading={this.state.loading}
+            setLoading={this.setLoading.bind(this)}
           />
         </Fragment>
       },
@@ -131,6 +144,12 @@ export default class EquippedSection extends React.Component {
     })
   }
 
+  setLoading(loading) {
+    this.setState({
+      loading: loading
+    });
+  }
+
   formatDataForTable() {
     if (Array.isArray(this.props.equipped)) {
       return this.props.equipped.map((e) => {
@@ -173,7 +192,7 @@ export default class EquippedSection extends React.Component {
   unequipAll() {
     this.setState({loading: true, errorMessage: null, successMessage: null});
     axios.post('/api/character/'+this.props.characterId+'/inventory/unequip-all', {
-      is_set_equipped: typeof this.props.equipped === 'object' && !Array.isArray(this.props.equipped),
+      is_set_equipped: this.props.equipped[0].hasOwnProperty('inventory_set_id'),
     }).then((result) => {
       this.setState({loading: false});
       this.setSuccessMessage(result.data.message)

@@ -30,6 +30,14 @@
   }
 }
 
+.holy-item {
+  color: #5eb7e7;
+
+  &:hover, &:visited, &:focus {
+    color: #5eb7e7;
+  }
+}
+
 .artifact-item {
   color: #5b689a;
 

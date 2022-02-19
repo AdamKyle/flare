@@ -3,6 +3,7 @@
 namespace App\Flare\View\Livewire\Admin\Quests\Partials;
 
 use App\Admin\Jobs\ResetCharacterQuestStorage;
+use App\Flare\Models\Character;
 use Cache;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
@@ -21,6 +22,7 @@ class Details extends Component
         'quest.gold_dust_cost'     => 'nullable',
         'quest.shard_cost'         => 'nullable',
         'quest.gold_cost'          => 'nullable',
+        'quest.copper_coin_cost'   => 'nullable',
         'quest.reward_item'        => 'nullable',
         'quest.reward_gold_dust'   => 'nullable',
         'quest.reward_shards'      => 'nullable',
@@ -68,7 +70,7 @@ class Details extends Component
         Cache::delete('npc-quests');
         Cache::delete('all-quests');
 
-        ResetCharacterQuestStorage::dispatch();
+        Cache::put('character-quest-reset', Character::all()->pluck('id')->toArray());
 
         $this->emitTo('core.form-wizard', 'storeModel', $this->quest);
         $this->emitTo('core.form-wizard', $functionName, $index, true);

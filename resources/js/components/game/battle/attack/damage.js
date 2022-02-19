@@ -18,6 +18,10 @@ export default class Damage {
 
     let totalDamage   = monsterCurrentHealth * attacker[stacking ? 'stacking_life_stealing' : 'life_stealing'];
 
+    if (totalDamage > attacker.dur_modded) {
+      totalDamage = attacker.dur_modded;
+    }
+
     const cantResist  = attacker.cant_be_resisted;
 
     if (totalDamage <= 0 || totalDamage <= 0.0) {
@@ -70,10 +74,6 @@ export default class Damage {
     let totalDamage   = attacker.stacking_damage - attacker.stacking_damage * damageDeduction;
     const cantResist  = attacker.cant_be_resisted;
 
-    if (totalDamage <= 0.0) {
-      return monsterCurrentHealth;
-    }
-
     if (cantResist) {
       this.addMessage('The enemy cannot resist your enchantments! They are so glowy!');
 
@@ -88,6 +88,10 @@ export default class Damage {
           totalDamage += attacker.non_stacking_damage;
         }
       }
+    }
+
+    if (totalDamage <= 0.0) {
+      return monsterCurrentHealth;
     }
 
     if (totalDamage > 0) {
@@ -310,9 +314,13 @@ export default class Damage {
       if (extraActionChance.type === ExtraActionType.VAMPIRE_THIRST) {
         this.addMessage('There is a thirst child, its in your soul! Lash out and kill!');
 
-        let totalAttack = Math.round(attacker.dur + attacker.dur * 0.15);
+        let totalAttack = Math.round(attacker.dur_modded + attacker.dur_modded * 0.15);
 
         totalAttack     = totalAttack - totalAttack * damageDeduction;
+
+        if (totalAttack > attacker.dur_modded) {
+          totalAttack = attacker.dur_modded;
+        }
 
         monsterCurrentHealth   = monsterCurrentHealth - totalAttack;
         characterCurrentHealth = characterCurrentHealth + totalAttack
@@ -328,6 +336,10 @@ export default class Damage {
   }
 
   canUse(extraActionChance) {
+    if (extraActionChance >= 1.0) {
+      return true;
+    }
+
     const dc = Math.round(100 - (100 * extraActionChance));
 
     return random(1, 100) > dc;

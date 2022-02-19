@@ -7,10 +7,12 @@ class MaxCurrenciesValue {
     const MAX_GOLD      = 2000000000000;
     const MAX_GOLD_DUST = 2000000000;
     const MAX_SHARDS    = 2000000000;
+    const MAX_COPPER    = 100000;
 
     const GOLD      = 0;
     const GOLD_DUST = 1;
     const SHARDS    = 2;
+    const COPPER    = 3;
 
     private $value;
 
@@ -22,7 +24,8 @@ class MaxCurrenciesValue {
     protected static $values = [
         self::GOLD => 0,
         self::GOLD_DUST => 1,
-        Self::SHARDS => 2,
+        self::SHARDS => 2,
+        self::COPPER => 3
     ];
 
     /**
@@ -58,6 +61,10 @@ class MaxCurrenciesValue {
             return $this->amount >= self::MAX_SHARDS;
         }
 
+        if ($this->isCopper()) {
+            return $this->amount >= self::MAX_COPPER;
+        }
+
         // @codeCoverageIgnore
         return true;
     }
@@ -87,5 +94,14 @@ class MaxCurrenciesValue {
      */
     public function isShards(): bool {
         return $this->value === self::SHARDS;
+    }
+
+    /**
+     * Is Copper Coins?
+     *
+     * @return bool
+     */
+    public function isCopper(): bool {
+        return $this->value === self::COPPER;
     }
 }

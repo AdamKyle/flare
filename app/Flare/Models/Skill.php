@@ -208,11 +208,6 @@ class Skill extends Model
     }
 
     public function getSkillBonusAttribute() {
-        if (is_null($this->character)) {
-            // Monsters base skill:
-            return ($this->baseSkill->skill_bonus_per_level * $this->level);
-        }
-
         if (is_null($this->baseSkill->skill_bonus_per_level)) {
             return 0.0;
         }
@@ -278,37 +273,34 @@ class Skill extends Model
             }
         }
 
-        return empty($bonuses) ? 0.0 : max($bonuses);
+        return empty($bonuses) ? 0.0 : array_sum($bonuses);
     }
 
     protected function getCharacterBoonsBonus(string $skillBonusAttribute) {
         $newBonus = 0.0;
 
-        if ($this->character->boons->isNotEmpty()) {
-            $boons = $this->character->boons;
+        $boons = CharacterBoon::where('character_id', $this->character->id)->get();
 
-            if ($boons->isNotEmpty()) {
-                $newBonus += $boons->sum($skillBonusAttribute);
-            }
+        if ($boons->isNotEmpty()) {
+            $newBonus += $boons->sum($skillBonusAttribute);
         }
 
         return $newBonus;
     }
 
     private function fetchSlotsWithEquipment(): Collection  {
-        $slotsEquipped = $this->character->inventory->slots->filter(function($slot) {
-            return $slot->equipped;
-        });
+        $inventory = Inventory::where('character_id', $this->character->id)->first();
+        $slots     = InventorySlot::where('inventory_id', $inventory->id)->where('equipped', true)->get();
 
-        if ($slotsEquipped->isEmpty()) {
-            $equippedSet = $this->character->inventorySets()->where('is_equipped', true)->first();
+        if ($slots->isEmpty()) {
+            $equippedSet = $this->character->inventorySets->where('is_equipped', true)->first();
 
             if (!is_null($equippedSet)) {
-                return $equippedSet->slots;
+                $slots = $equippedSet->slots;
             }
         }
 
-        return $slotsEquipped;
+        return $slots;
     }
 
     protected static function newFactory() {

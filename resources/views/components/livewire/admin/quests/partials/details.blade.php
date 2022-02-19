@@ -67,21 +67,6 @@
     </div>
     <hr />
     <div class="row">
-        <div class="col-md-12">
-            <div class="form-group">
-                <label for="access_to_map_id">Must have access to</label>
-                <select wire:model="quest.access_to_map_id" class="form-control" id="access_to_map_id">
-                    <option>Please select</option>
-                    @foreach($gameMaps as $id => $name)
-                        <option value="{{$id}}">{{$name}}</option>
-                    @endforeach
-                </select>
-                @error('quest.access_to_map_id') <span class="text-danger">{{ $message }}</span> @enderror
-            </div>
-        </div>
-    </div>
-    <hr />
-    <div class="row">
         <div class="col-md-6">
             <div class="form-group">
                 <label for="faction_game_map_id">Faction Map Requirement</label>
@@ -104,25 +89,32 @@
     </div>
     <hr />
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="form-group">
                 <label for="gold_dust_cost">Gold Dust Cost: </label>
                 <input type="number" class="form-control" name="gold_dust_cost" value="" wire:model="quest.gold_dust_cost">
                 @error('quest.gold_dust_cost') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="form-group">
                 <label for="shard_cost">Shards Cost: </label>
                 <input type="number" class="form-control" name="shard_cost" value="" wire:model="quest.shard_cost">
                 @error('quest.shard_cost') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="form-group">
                 <label for="gold_cost">Gold Cost: </label>
                 <input type="number" class="form-control" name="gold_cost" value="" wire:model="quest.gold_cost">
                 @error('quest.gold_cost') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="copper_coin_cost">Copper Coin Cost: </label>
+                <input type="number" class="form-control" name="copper_coin_cost" value="" wire:model="quest.copper_coin_cost">
+                @error('quest.copper_coin_cost') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
     </div>

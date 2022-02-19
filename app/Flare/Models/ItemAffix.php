@@ -113,6 +113,14 @@ class ItemAffix extends Model
         'randomly_generated'               => 'boolean',
     ];
 
+    public function itemsWithPrefix() {
+        return $this->hasMany(Item::class, 'item_prefix_id', 'id');
+    }
+
+    public function itemsWithSuffix() {
+        return $this->hasMany(Item::class, 'item_suffix_id', 'id');
+    }
+
     protected static function newFactory() {
         return ItemAffixFactory::new();
     }

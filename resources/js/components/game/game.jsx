@@ -18,6 +18,8 @@ import NpcComponentWrapper from "./npc-components/npc-component-wrapper";
 import MassEmbezzle from "./sections/modals/mass-embezzle";
 import AbandonKingdom from "./sections/modals/abandon-kingdom";
 import ServerMessages from "./messages/server-messages";
+import CharacterSheet from "./character/character-sheet";
+import ExplorationMessages from "./messages/exploration-messages";
 
 export default class Game extends React.Component {
   constructor(props) {
@@ -70,12 +72,13 @@ export default class Game extends React.Component {
       activeChatTab: 'chat',
       showChatUpdate: false,
       showServerMessageUpdate: false,
+      showExplorersLogUpdate: false,
+      lockedLocationType: null,
     }
 
     this.isDead            = Echo.private('character-is-dead-' + this.props.userId);
     this.npcComponent      = Echo.private('component-show-' + this.props.userId);
-    this.attackAutomation  = Echo.private('attack-automation-status-' + this.props.userId);
-    this.clearQuestStorage = Echo.private('clear-quest-storage-' + this.props.userId);
+    this.attackAutomation  = Echo.private('exploration-status-' + this.props.userId);
   }
 
   updateDimensions() {
@@ -97,14 +100,10 @@ export default class Game extends React.Component {
       this.openNpcComponent(event.componentName);
     });
 
-    this.attackAutomation.listen('Game.Automation.Events.AutomatedAttackStatus', (event) => {
+    this.attackAutomation.listen('Game.Exploration.Events.ExplorationStatus', (event) => {
       this.setState({
         attackAutomationIsRunning: event.isRunning
       });
-    });
-
-    this.clearQuestStorage.listen('Game.Core.Events.ResetQuestStorageBroadcastEvent', () => {
-      localforage.clear().catch((err) => console.err(err));
     });
 
     window.addEventListener('resize', this.updateDimensions.bind(this));
@@ -121,7 +120,7 @@ export default class Game extends React.Component {
       adventureDetails: adventureDetails,
       adventureLogs: adventureLogs,
       canAdventureAgainAt: adventureAgainAt,
-      inventorySets: inventorySets,
+      inventorySets: typeof inventorySets === 'undefined' ? this.state.inventorySets : inventorySets,
     });
   }
 
@@ -251,6 +250,12 @@ export default class Game extends React.Component {
     });
   }
 
+  updateLockedLocationType(type) {
+    this.setState({
+      lockedLocationType: type
+    });
+  }
+
   openKingdomModal() {
     this.setState({
       openKingdomModal: true,
@@ -347,7 +352,8 @@ export default class Game extends React.Component {
     this.setState({
       activeChatTab: key,
       showServerMessageUpdate: (key === 'server-messages' && this.state.showServerMessageUpdate) ? false : this.state.showServerMessageUpdate,
-      showChatUpdate: (key === 'chat' && this.state.showChatUpdate) ? false :  this.state.showChatUpdate
+      showChatUpdate: (key === 'chat' && this.state.showChatUpdate) ? false :  this.state.showChatUpdate,
+      showExplorersLogUpdate: (key === 'explorer-messages' && this.state.showExplorersLogUpdate) ? false : this.state.showExplorersLogUpdate,
     })
   }
 
@@ -356,9 +362,17 @@ export default class Game extends React.Component {
       this.setState({
         showServerMessageUpdate: true
       });
-    } else if (!isServerMessage && this.state.activeChatTab !== 'chat') {
+    } else if (!isServerMessage  && this.state.activeChatTab !== 'chat') {
       this.setState({
         showChatUpdate: true,
+      });
+    }
+  }
+
+  updateExplorerTab() {
+    if (this.state.activeChatTab !== 'explorer-messages') {
+      this.setState({
+        showExplorersLogUpdate: true,
       });
     }
   }
@@ -397,131 +411,170 @@ export default class Game extends React.Component {
     )
   }
 
+  renderExplorationLogsNotificationIcon() {
+
+    if (this.state.showExplorersLogUpdate) {
+      return (
+        <Fragment>
+          Exploration Log <i className="fas fa-bell chat-tab-icon"></i>
+        </Fragment>
+      )
+    }
+
+    return (
+      <Fragment>
+        Exploration Log
+      </Fragment>
+    )
+  }
+
   render() {
     return (
       <>
-        <div className="row">
-          <div className={this.state.windowWidth <= 1900 ? "col-12" : "col-12 col-lg-9"}>
-            <CharacterInfoTopSection
-              characterId={this.props.characterId}
-              userId={this.props.userId}
-              openTimeOutModal={this.openTimeOutModal.bind(this)}
-              updateCharacterGold={this.updateCharacterGold.bind(this)}
-            />
-            <ActionsSection
-              userId={this.props.userId}
-              setCharacterId={this.setCharacterId.bind(this)}
-              canAttack={this.setCanAttack.bind(this)}
-              openKingdomManagement={this.openKingdomManagement.bind(this)}
-              openKingdomModal={this.openKingdomModal.bind(this)}
-              openKingdomAttackModal={this.openKingdomAttackModal.bind(this)}
-              openTimeOutModal={this.openTimeOutModal.bind(this)}
-              openMassEmbezzleModal={this.openMassEmbezzleModal.bind(this)}
-              updateCelestial={this.updateCelestial.bind(this)}
-              openAbandonKingdom={this.openAbandonKingdom.bind(this)}
-              celestial={this.state.celestial}
-              kingdomData={this.state.kingdomData}
-              character_x={this.state.current_x}
-              character_y={this.state.current_y}
-              attackAutomationIsRunning={this.state.attackAutomationIsRunning}
-            />
-
-            {
-              this.state.openPortDetails ?
-                <PortSection
-                  updateAdventure={this.updateAdventure.bind(this)}
-                  portDetails={this.state.portDetails}
-                  userId={this.props.userId}
-                  openPortDetails={this.openPortDetails.bind(this)}
-                  updatePlayerPosition={this.updatePlayerPosition.bind(this)}
-                  openTimeOutModal={this.openTimeOutModal.bind(this)}
-                  updateCelestial={this.updateCelestial.bind(this)}
-                />
-                : null
-            }
-            {
-              this.state.openAdventureDetails ?
-                <AdeventureActions
-                  canAdventure={this.canAdventure.bind(this)}
-                  updateAdventure={this.updateAdventure.bind(this)}
-                  adventureDetails={this.state.adventureDetails}
-                  userId={this.props.userId}
-                  characterId={this.state.characterId}
-                  openAdventureDetails={this.openAdventureDetails.bind(this)}
-                  adventureAgainAt={this.state.canAdventureAgainAt}
-                  adventureLogs={this.state.adventureLogs}
-                  inventorySets={this.state.inventorySets}
-                  openTimeOutModal={this.openTimeOutModal.bind(this)}
-                />
-                : null
-            }
-            {
-              this.state.openTeleportDetails ?
-                <Teleport
-                  teleportLocations={this.state.teleportLocations}
-                  openTeleportDetails={this.openTeleportDetails.bind(this)}
-                  currentX={this.state.current_x}
-                  currentY={this.state.current_y}
+        <Tabs defaultActiveKey="game" id="game-tabs">
+          <Tab eventKey="game" title="Game">
+            <div className="row mt-2">
+              <div className={this.state.windowWidth <= 1900 ? "col-12" : "col-12 col-lg-9"}>
+                <CharacterInfoTopSection
                   characterId={this.props.characterId}
-                  openTimeOutModal={this.openTimeOutModal.bind(this)}
-                />
-                : null
-            }
-            {
-              this.state.openTraverseDetails ?
-                <TraverseSection
-                  openTraverseSection={this.openTraverseDetails.bind(this)}
-                  characterId={this.state.characterId}
-                  openTimeOutModal={this.openTimeOutModal.bind(this)}
-                />
-                : null
-            }
-            {
-              this.state.npcComponentName !== null ?
-                <NpcComponentWrapper
                   userId={this.props.userId}
-                  npcComponentName={this.state.npcComponentName}
-                  close={this.closeNpcComponent.bind(this)}
                   openTimeOutModal={this.openTimeOutModal.bind(this)}
-                  characterId={this.state.characterId}
-                  isDead={this.state.isDead}
+                  updateCharacterGold={this.updateCharacterGold.bind(this)}
                 />
-                : null
-            }
-            {
-              this.state.openQuestDetails ?
-                <QuestSection openQuestDetails={this.openQuestDetails.bind(this)} characterId={this.state.characterId}/>
-              : null
-            }
-          </div>
-          <div
-            className={
-              this.state.windowWidth <= 1900 ?
-                'col-12 center-element'
-              : 'col-12 col-lg-3 move-map'
-            }
-          >
-            <Map
-              apiUrl={this.apiUrl}
-              userId={this.props.userId}
-              updatePort={this.updatePort.bind(this)}
-              position={this.state.position}
-              adventures={this.state.adventureDetails}
-              updatePlayerPosition={this.updatePlayerPosition.bind(this)}
-              openPortDetails={this.openPortDetails.bind(this)}
-              openAdventureDetails={this.openAdventureDetails.bind(this)}
-              openTraverserDetails={this.openTraverseDetails.bind(this)}
-              updateAdventure={this.updateAdventure.bind(this)}
-              updateTeleportLocations={this.updateTeleportLocations.bind(this)}
-              openTeleportDetails={this.openTeleportDetails.bind(this)}
-              openQuestDetails={this.openQuestDetails.bind(this)}
-              openTimeOutModal={this.openTimeOutModal.bind(this)}
-              updateKingdoms={this.updateKingdoms.bind(this)}
-              updateCelestial={this.updateCelestial.bind(this)}
-              attackAutomationIsRunning={this.state.attackAutomationIsRunning}
-            />
-          </div>
-        </div>
+                <ActionsSection
+                  userId={this.props.userId}
+                  setCharacterId={this.setCharacterId.bind(this)}
+                  canAttack={this.setCanAttack.bind(this)}
+                  openKingdomManagement={this.openKingdomManagement.bind(this)}
+                  openKingdomModal={this.openKingdomModal.bind(this)}
+                  openKingdomAttackModal={this.openKingdomAttackModal.bind(this)}
+                  openTimeOutModal={this.openTimeOutModal.bind(this)}
+                  openMassEmbezzleModal={this.openMassEmbezzleModal.bind(this)}
+                  updateCelestial={this.updateCelestial.bind(this)}
+                  openAbandonKingdom={this.openAbandonKingdom.bind(this)}
+                  celestial={this.state.celestial}
+                  kingdomData={this.state.kingdomData}
+                  character_x={this.state.current_x}
+                  character_y={this.state.current_y}
+                  lockedLocationType={this.state.lockedLocationType}
+                  attackAutomationIsRunning={this.state.attackAutomationIsRunning}
+                />
+
+                {
+                  this.state.openPortDetails ?
+                    <PortSection
+                      updateAdventure={this.updateAdventure.bind(this)}
+                      portDetails={this.state.portDetails}
+                      userId={this.props.userId}
+                      openPortDetails={this.openPortDetails.bind(this)}
+                      updatePlayerPosition={this.updatePlayerPosition.bind(this)}
+                      openTimeOutModal={this.openTimeOutModal.bind(this)}
+                      updateCelestial={this.updateCelestial.bind(this)}
+                    />
+                    : null
+                }
+                {
+                  this.state.openAdventureDetails ?
+                    <AdeventureActions
+                      canAdventure={this.canAdventure.bind(this)}
+                      updateAdventure={this.updateAdventure.bind(this)}
+                      adventureDetails={this.state.adventureDetails}
+                      userId={this.props.userId}
+                      characterId={this.state.characterId}
+                      openAdventureDetails={this.openAdventureDetails.bind(this)}
+                      adventureAgainAt={this.state.canAdventureAgainAt}
+                      adventureLogs={this.state.adventureLogs}
+                      inventorySets={this.state.inventorySets}
+                      openTimeOutModal={this.openTimeOutModal.bind(this)}
+                    />
+                    : null
+                }
+                {
+                  this.state.openTeleportDetails ?
+                    <Teleport
+                      teleportLocations={this.state.teleportLocations}
+                      openTeleportDetails={this.openTeleportDetails.bind(this)}
+                      currentX={this.state.current_x}
+                      currentY={this.state.current_y}
+                      characterId={this.props.characterId}
+                      openTimeOutModal={this.openTimeOutModal.bind(this)}
+                      updateLockedLocationType={this.updateLockedLocationType.bind(this)}
+                    />
+                    : null
+                }
+                {
+                  this.state.openTraverseDetails ?
+                    <TraverseSection
+                      openTraverseSection={this.openTraverseDetails.bind(this)}
+                      characterId={this.state.characterId}
+                      openTimeOutModal={this.openTimeOutModal.bind(this)}
+                      updateLockedLocationType={this.updateLockedLocationType.bind(this)}
+                    />
+                    : null
+                }
+                {
+                  this.state.npcComponentName !== null ?
+                    <NpcComponentWrapper
+                      userId={this.props.userId}
+                      npcComponentName={this.state.npcComponentName}
+                      close={this.closeNpcComponent.bind(this)}
+                      openTimeOutModal={this.openTimeOutModal.bind(this)}
+                      characterId={this.state.characterId}
+                      isDead={this.state.isDead}
+                    />
+                    : null
+                }
+                {
+                  this.state.openQuestDetails ?
+                    <QuestSection openQuestDetails={this.openQuestDetails.bind(this)} characterId={this.state.characterId}/>
+                  : null
+                }
+              </div>
+              <div
+                className={
+                  this.state.windowWidth <= 1900 ?
+                    'col-12 center-element'
+                  : 'col-12 col-lg-3 move-map'
+                }
+              >
+                <Map
+                  apiUrl={this.apiUrl}
+                  userId={this.props.userId}
+                  updatePort={this.updatePort.bind(this)}
+                  position={this.state.position}
+                  adventures={this.state.adventureDetails}
+                  updatePlayerPosition={this.updatePlayerPosition.bind(this)}
+                  openPortDetails={this.openPortDetails.bind(this)}
+                  openAdventureDetails={this.openAdventureDetails.bind(this)}
+                  openTraverserDetails={this.openTraverseDetails.bind(this)}
+                  updateAdventure={this.updateAdventure.bind(this)}
+                  updateTeleportLocations={this.updateTeleportLocations.bind(this)}
+                  openTeleportDetails={this.openTeleportDetails.bind(this)}
+                  openQuestDetails={this.openQuestDetails.bind(this)}
+                  openTimeOutModal={this.openTimeOutModal.bind(this)}
+                  updateKingdoms={this.updateKingdoms.bind(this)}
+                  updateCelestial={this.updateCelestial.bind(this)}
+                  updateLockedLocationType={this.updateLockedLocationType.bind(this)}
+                  attackAutomationIsRunning={this.state.attackAutomationIsRunning}
+                />
+              </div>
+            </div>
+          </Tab>
+          <Tab eventKey="character-sheet" title="Character Sheet">
+            <div className="mt-2">
+              {
+                this.state.characterId !== null ?
+                  <CharacterSheet userId={this.props.userId} characterId={this.state.characterId} />
+                :
+                  <div className="progress loading-progress mt-2 mb-2" style={{position: 'relative'}}>
+                    <div className="progress-bar progress-bar-striped indeterminate">
+                    </div>
+                  </div>
+              }
+
+            </div>
+          </Tab>
+        </Tabs>
         <Row>
           <Col xs={12}>
             <Tabs activeKey={this.state.activeChatTab} id="chat-tabs" onSelect={this.handleTabSwitch.bind(this)}>
@@ -530,6 +583,9 @@ export default class Game extends React.Component {
               </Tab>
               <Tab eventKey="server-messages" title={this.renderServerTabNotificationIcon()}>
                 <ServerMessages userId={this.props.userId} updateChatTabIcon={this.updateChatTabIcon.bind(this)} />
+              </Tab>
+              <Tab eventKey="explorer-messages" title={this.renderExplorationLogsNotificationIcon()}>
+                <ExplorationMessages userId={this.props.userId} updateChatTabIcon={this.updateExplorerTab.bind(this)} />
               </Tab>
             </Tabs>
           </Col>

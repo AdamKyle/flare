@@ -4,7 +4,12 @@ namespace App\Game\Core\Controllers\Api;
 
 use App\Admin\Events\UpdateAdminChatEvent;
 
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
+use App\Flare\Transformers\CharacterTopBarTransformer;
+use App\Flare\Transformers\SkillsTransformer;
+use App\Game\Core\Services\CharacterPassiveSkills;
 use Illuminate\Http\Request;
+use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
 use League\Fractal\Manager;
 use App\Http\Controllers\Controller;
@@ -13,7 +18,6 @@ use App\Flare\Models\GameSkill;
 use App\Flare\Models\User;
 use App\Flare\Values\ItemUsabilityType;
 use App\Flare\Models\Character;
-use App\Flare\Transformers\CharacterSheetTransformer;
 use App\Game\Core\Jobs\EndGlobalTimeOut;
 use App\Game\Core\Services\UseItemService;
 
@@ -21,20 +25,29 @@ class CharacterSheetController extends Controller {
 
     private $manager;
 
-    private $characterSheetTransformer;
+    private $characterTopBarTransformer;
 
-    public function __construct(Manager $manager, CharacterSheetTransformer $characterSheetTransformer) {
+    public function __construct(Manager $manager, CharacterTopBarTransformer $characterTopBarTransformer) {
 
-        $this->manager                   = $manager;
-        $this->characterSheetTransformer = $characterSheetTransformer;
+        $this->manager                    = $manager;
+        $this->characterTopBarTransformer = $characterTopBarTransformer;
     }
 
     public function sheet(Character $character) {
-        $character = new Item($character, $this->characterSheetTransformer);
+        $character = new Item($character, $this->characterTopBarTransformer);
         $sheet     = $this->manager->createData($character)->toArray();
 
         return response()->json([
             'sheet' => $sheet,
+        ], 200);
+    }
+
+    public function baseCharacterInformation(Character $character, CharacterSheetBaseInfoTransformer $characterBaseInfo) {
+        $character = new Item($character, $characterBaseInfo);
+        $details   = $this->manager->createData($character)->toArray();
+
+        return response()->json([
+            'base_info' => $details,
         ], 200);
     }
 
@@ -92,6 +105,49 @@ class CharacterSheetController extends Controller {
         return response()->json([
             'active_boons' => $boons,
         ]);
+    }
+
+    public function automations(Character $character) {
+        return response()->json([
+            'automations' => $character->currentAutomations
+        ], 200);
+    }
+
+    public function factions(Character $character) {
+        $factions = $character->factions->transform(function($faction) {
+            $faction->map_name = $faction->gameMap->name;
+
+            return $faction;
+        });
+
+        return response()->json([
+            'factions' => $factions,
+        ], 200);
+    }
+
+    public function skills(Character $character, CharacterPassiveSkills $characterPassiveSkills, SkillsTransformer $skillsTransformer) {
+
+        $skills = new Collection($character->skills, $skillsTransformer);
+        $skills = $this->manager->createData($skills)->toArray();
+
+        return response()->json([
+            'skills'   => $skills,
+            'passives' => $characterPassiveSkills->getPassiveSkills($character),
+        ], 200);
+    }
+
+    public function baseInventoryInfo(Character $character) {
+        return response()->json([
+            'inventory_info' => [
+                'gold'           => number_format($character->gold),
+                'gold_dust'      => number_format($character->gold_dust),
+                'shards'         => number_format($character->shards),
+                'inventory_used' => $character->getInventoryCount(),
+                'inventory_max'  => $character->inventory_max,
+                'damage_stat'    => $character->damage_stat,
+                'to_hit_stat'    => $character->class->to_hit_stat,
+            ],
+        ], 200);
     }
 
     public function cancelBoon(Character $character, CharacterBoon $boon, UseItemService $useItemService) {

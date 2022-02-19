@@ -2,14 +2,10 @@
 
 namespace App\Game\Battle\Handlers;
 
-use App\Flare\Builders\RandomAffixGenerator;
-use App\Flare\Models\Faction;
-use App\Game\Core\Values\FactionType;
-use App\Flare\Values\MaxCurrenciesValue;
-use App\Flare\Values\RandomAffixDetails;
-use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
-use App\Game\Core\Values\FactionLevel;
-use App\Game\Messages\Events\GlobalMessageEvent;
+use App\Flare\Services\BuildCharacterAttackTypes;
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
+use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use Illuminate\Support\Facades\Cache;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
@@ -17,17 +13,10 @@ use App\Game\Messages\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterInCelestialFight;
-use App\Flare\Models\GameMap;
 use App\Flare\Models\Monster;
-use App\Flare\Models\Item as ItemModel;
-use App\Flare\Transformers\CharacterAttackTransformer;
-use App\Game\Core\Events\DropsCheckEvent;
-use App\Game\Core\Events\GoldRushCheckEvent;
-use App\Game\Core\Events\UpdateCharacterEvent;
-use App\Game\Maps\Events\UpdateActionsBroadcast;
 use App\Game\Core\Events\AttackTimeOutEvent;
 use App\Game\Core\Events\CharacterIsDeadBroadcastEvent;
-use App\Game\Core\Events\UpdateAttackStats;
+use App\Game\Battle\Services\BattleRewardProcessing;
 
 class BattleEventHandler {
 
@@ -35,16 +24,16 @@ class BattleEventHandler {
 
     private $characterAttackTransformer;
 
-    private $randomAffixGenerator;
+    private $battleRewardProcessing;
 
     public function __construct(
         Manager $manager,
-        CharacterAttackTransformer $characterAttackTransformer,
-        RandomAffixGenerator $randomAffixGenerator,
+        CharacterSheetBaseInfoTransformer $characterAttackTransformer,
+        BattleRewardProcessing $battleRewardProcessing,
     ) {
         $this->manager                    = $manager;
         $this->characterAttackTransformer = $characterAttackTransformer;
-        $this->randomAffixGenerator       = $randomAffixGenerator;
+        $this->battleRewardProcessing     = $battleRewardProcessing;
     }
 
     public function processDeadCharacter(Character $character) {
@@ -56,27 +45,19 @@ class BattleEventHandler {
         event(new AttackTimeOutEvent($character));
         event(new CharacterIsDeadBroadcastEvent($character->user, true));
         event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterStatus($character));
 
         $characterData = new Item($character, $this->characterAttackTransformer);
-        event(new UpdateAttackStats($this->manager->createData($characterData)->toArray(), $character->user));
+        $characterData = $this->manager->createData($characterData)->toArray();
+
+        event(new UpdateBaseCharacterInformation($character->user, $characterData));
     }
 
-    public function processMonsterDeath(Character $character, int $monsterId) {
-        $monster = Monster::find($monsterId);
+    public function processMonsterDeath(int $characterId, int $monsterId, bool $isAutomation = false) {
+        $monster   = Monster::find($monsterId);
+        $character = Character::find($characterId);
 
-        if (!$character->map->gameMap->mapType()->isPurgatory()) {
-            $this->handleFactionPoints($character, $monster);
-        }
-
-        $character = $character->refresh();
-
-        event(new UpdateCharacterEvent($character, $monster));
-        event(new DropsCheckEvent($character, $monster));
-        event(new GoldRushCheckEvent($character, $monster));
-
-        $characterData = new Item($character, $this->characterAttackTransformer);
-
-        event(new UpdateAttackStats($this->manager->createData($characterData)->toArray(), $character->user));
+        $this->battleRewardProcessing->handleMonster($character, $monster, $isAutomation);
     }
 
     public function processRevive(Character $character): Character {
@@ -88,7 +69,7 @@ class BattleEventHandler {
 
         if (!is_null($characterInCelestialFight)) {
             $characterInCelestialFight->update([
-                'character_current_health' => $character->getInformation()->buildHealth(),
+                'character_current_health' => $this->fetchStatFromCache($character, 'health'),
             ]);
         }
 
@@ -96,149 +77,18 @@ class BattleEventHandler {
         event(new UpdateTopBarEvent($character));
 
         $character = $character->refresh();
-        $mapId     = $character->map->gameMap->id;
-        $user      = $character->user;
-
-        $monsters  = Cache::get('monsters')[GameMap::find($mapId)->name];
-
-        $characterData = new Item($character, $this->characterAttackTransformer);
-        $characterData = $this->manager->createData($characterData)->toArray();
-
-        broadcast(new UpdateActionsBroadcast($characterData, $monsters, $user));
+        broadcast(new UpdateCharacterStatus($character));
 
         return $character;
     }
 
-    protected function handleFactionPoints(Character $character, Monster $monster) {
-        $mapId   = $monster->gameMap->id;
-        $mapName = $monster->gameMap->name;
-
-        $faction = $character->factions()->where('game_map_id', $mapId)->first();
-
-        $faction->current_points += FactionLevel::gatPointsPerLevel($faction->current_level);
-
-        if ($faction->current_points > $faction->points_needed) {
-            $faction->current_points = $faction->points_needed;
+    public function fetchStatFromCache(Character $character, string $stat): mixed {
+        if (Cache::has('character-attack-data-' . $character->id)) {
+            return Cache::get('character-attack-data-' . $character->id)['character_data'][$stat];
         }
 
-        if ($faction->current_points === $faction->points_needed && !FactionLevel::isMaxLevel($faction->current_level, $faction->current_points)) {
-
-            event(new ServerMessageEvent($character->user, $mapName . ' faction has gained a new level!'));
-
-            $faction = $this->updateFaction($faction);
-
-            $this->rewardPlayer($character, $faction, $mapName, FactionType::getTitle($faction->current_level));
-
-            event(new ServerMessageEvent($character->user, 'Achieved title: ' . FactionType::getTitle($faction->current_level) . ' of ' . $mapName));
-
-            return;
-
-        } else if (FactionLevel::isMaxLevel($faction->current_level, $faction->current_points) && !$faction->maxed) {
-            event(new ServerMessageEvent($character->user, $mapName . ' faction has become maxed out!'));
-            event(new GlobalMessageEvent($character->name . 'Has maxed out the faction for: ' . $mapName . ' They are considered legendary among the people of this land.'));
-
-            $this->rewardPlayer($character, $faction, $mapName, FactionType::getTitle($faction->current_level));
-
-            $faction->update([
-                'maxed' => true,
-            ]);
-
-            return;
-        }
-
-        $faction->save();
+        return 0.0;
     }
 
-    protected function updateFaction(Faction $faction): Faction {
 
-        $newLevel = $faction->current_level + 1;
-
-        $faction->update([
-            'current_points' => 0,
-            'current_level'  => $newLevel,
-            'points_needed'  => FactionLevel::getPointsNeeded($newLevel),
-            'title'          => FactionType::getTitle($newLevel)
-        ]);
-
-        return $faction->refresh();
-    }
-
-    protected function rewardPlayer(Character $character, Faction $faction, string $mapName, ?string $title = null) {
-        $character = $this->giveCharacterGold($character, $faction->current_level);
-        $item      = $this->giveCharacterRandomItem($character);
-
-        event(new ServerMessageEvent($character->user, 'Achieved title: ' . $title . ' of ' . $mapName));
-
-        if ($character->isInventoryFull()) {
-
-            event(new ServerMessageEvent($character->user, 'You got no item as your inventory is full. Clear space for the next time!'));
-        } else {
-
-            $character->inventory->slots()->create([
-                'inventory_id' => $character->inventory->id,
-                'item_id'      => $item->id,
-            ]);
-
-            $character = $character->refresh();
-
-            event(new CharacterInventoryUpdateBroadCastEvent($character->user));
-
-            event(new ServerMessageEvent($character->user, 'Rewarded with (item with randomly generated affix(es)): ' . $item->affix_name));
-        }
-    }
-
-    protected function giveCharacterGold(Character $character, int $factionLevel) {
-        $gold = FactionLevel::getGoldReward($factionLevel);
-
-        $characterNewGold = $character->gold + $gold;
-
-        $cannotHave = (new MaxCurrenciesValue($characterNewGold, 0))->canNotGiveCurrency();
-
-        if ($cannotHave) {
-            $characterNewGold = MaxCurrenciesValue::MAX_GOLD;
-
-            $character->gold = $characterNewGold;
-            $character->save();
-
-            event(new ServerMessageEvent($character->user, 'Received faction gold reward: ' . number_format($gold) . ' gold. You are now gold capped.'));
-
-            return $character->refresh();
-        }
-
-        $character->gold += $gold;
-
-        event(new ServerMessageEvent($character->user, 'Received faction gold reward: ' . number_format($gold) . ' gold.'));
-
-        $character->save();
-
-        return $character->refresh();
-    }
-
-    protected function giveCharacterRandomItem(Character $character) {
-        $item = ItemModel::where('cost', '<=', RandomAffixDetails::BASIC)
-                         ->whereNull('item_prefix_id')
-                         ->whereNull('item_suffix_id')
-                         ->where('cost', '<=', 4000000000)
-                         ->inRandomOrder()
-                         ->first();
-
-
-        $randomAffix = $this->randomAffixGenerator
-                            ->setCharacter($character)
-                            ->setPaidAmount(RandomAffixDetails::BASIC);
-
-        $duplicateItem = $item->duplicate();
-
-        $duplicateItem->update([
-            'item_prefix_id' => $randomAffix->generateAffix('prefix')->id,
-        ]);
-
-        if (rand(1, 100) > 50) {
-            $duplicateItem->update([
-                'item_suffix_id' => $randomAffix->generateAffix('suffix')->id
-            ]);
-        }
-
-        return $duplicateItem;
-    }
 }

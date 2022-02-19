@@ -70,7 +70,7 @@ class NpcServerMessageBuilder {
             case 'quest_complete':
                 return '"Pleasure doing business with you child!"';
             case 'no_quests':
-                return '"Sorry child, no work for you today!"';
+                return '"Sorry child, no work for you today. I either have nothing or you have a quest, but you might be missing something maybe? Check the requirements in: Plane Quests (beside character count in the map area)"';
             case 'no_skill':
                 return '"Sorry child, I do not see a skill that needs unlocking."';
             case 'dont_own_skill':

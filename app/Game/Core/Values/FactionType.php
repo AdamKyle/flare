@@ -13,12 +13,14 @@ class FactionType {
     const SOLDIER          = 'Soldier';
     const SAVIOUR          = 'Saviour';
     const LEGENDARY_SLAYER = 'Legendary Slayer';
+    const MYTHIC_PROTECTOR = 'Mythic Protector';
 
     protected static $values = [
         'Mercenary'        => self::MERCENARY,
         'Soldier'          => self::SOLDIER,
         'Saviour'          => self::SAVIOUR,
         'Legendary Slayer' => self::LEGENDARY_SLAYER,
+        'Mythic Protector' => self::MYTHIC_PROTECTOR,
     ];
 
     /**
@@ -47,6 +49,8 @@ class FactionType {
                 return self::SAVIOUR;
             case 4:
                 return self::LEGENDARY_SLAYER;
+            case 5:
+                return self::MYTHIC_PROTECTOR;
             default:
                 return null;
         }
@@ -66,5 +70,9 @@ class FactionType {
 
     public function isLegendarySlayer(): bool {
         return $this->value === self::LEGENDARY_SLAYER;
+    }
+
+    public function isMythicProtector(): bool {
+        return $this->value === self::MYTHIC_PROTECTOR;
     }
 }

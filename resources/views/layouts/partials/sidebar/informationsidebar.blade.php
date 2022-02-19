@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!-- Menu Bar -->
 <aside class="menu-bar menu-sticky">
     <div class="menu-items">
@@ -122,6 +123,10 @@
                 <span class="fas fa-layer-group"></span>
                 Planes
             </a>
+            <a href="{{route('info.page', ['pageName' => 'exploration'])}}">
+                <span class="fas fa-map-signs"></span>
+                Exploration
+            </a>
             <a href="#no-link" class="active" data-toggle="collapse" data-target="#menuMapActions">
                 <span class="collapse-indicator la la-arrow-circle-down"></span>
                 The Map
@@ -231,6 +236,10 @@
                 <a href="{{route('info.page', ['pageName' => 'random-enchants'])}}">
                     <span class=" ra-fairy-wand"></span>
                     Random Enchantments (Uniques)
+                </a>
+                <a href="{{route('info.page', ['pageName' => 'holy-items'])}}">
+                    <span class="fas fa-cross"></span>
+                    Holy Items
                 </a>
             </div>
             <a href="#no-link" class="active" data-toggle="collapse" data-target="#menueLists">

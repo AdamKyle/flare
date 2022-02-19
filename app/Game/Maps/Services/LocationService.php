@@ -90,6 +90,12 @@ class LocationService {
 
         $this->kingdomManagement($character);
 
+        $lockedLocation = Location::where('x', $character->map->character_position_x)
+                                  ->where('y', $character->map->character_position_y)
+                                  ->where('game_map_id', $character->map->game_map_id)
+                                  ->whereNotNull('required_quest_item_id')
+                                  ->first();
+
         return [
             'map_url'                => Storage::disk('maps')->url($character->map_url),
             'character_map'          => $character->map,
@@ -115,6 +121,7 @@ class LocationService {
             'other_kingdoms'         => $this->getEnemyKingdoms($character),
             'characters_on_map'      => $this->getActiveUsersCountForMap($character),
             'can_mass_embezzle'      => $this->canMassEmbezzle($character, $this->canManage),
+            'lockedLocationType'     => is_null($lockedLocation) ? null : $lockedLocation->type,
         ];
     }
 

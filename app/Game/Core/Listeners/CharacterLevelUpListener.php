@@ -45,11 +45,14 @@ class CharacterLevelUpListener
 
             $character = $event->character->refresh();
 
-            $this->buildCharacterAttackTypes->buildCache($character);
-
             event(new ServerMessageEvent($character->user, 'level_up'));
-            event(new UpdateTopBarEvent($character));
-            event(new UpdateCharacterAttackEvent($character));
+
+            if ($event->shouldUpdateCache) {
+                $this->buildCharacterAttackTypes->buildCache($character);
+
+                event(new UpdateTopBarEvent($character));
+                event(new UpdateCharacterAttackEvent($character));
+            }
 
         } else {
             event(new UpdateTopBarEvent($event->character));

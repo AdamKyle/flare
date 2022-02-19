@@ -6,6 +6,53 @@ export default class CharacterDetails extends React.Component {
 
   constructor(props) {
     super(props);
+
+    this.state = {
+      loading: true,
+      baseData: {},
+    }
+
+    this.updateBaseDetails = Echo.private('update-character-base-stats-' + this.props.userId);
+    this.topBar            = Echo.private('update-top-bar-' + this.props.userId);
+  }
+
+  componentDidMount() {
+    axios.get('/api/character-base-data/' + this.props.characterId).then((result) => {
+      this.setState({
+        baseData: result.data.base_info,
+        loading: false,
+      });
+    }).catch((err) => {
+      this.setState({loading: false});
+      if (err.hasOwnProperty('response')) {
+        const response = err.response;
+
+        if (response.status === 401) {
+          return location.reload()
+        }
+
+        if (response.status === 429) {
+          return this.props.openTimeOutModal()
+        }
+      }
+    });
+
+    this.updateBaseDetails.listen('Game.Core.Events.UpdateBaseCharacterInformation', (event) => {
+      this.setState({
+        baseData: event.baseStats,
+      });
+    });
+
+    this.topBar.listen('Game.Core.Events.UpdateTopBarBroadcastEvent', (event) => {
+      let baseData = JSON.parse(JSON.stringify(this.state.baseData));
+
+      baseData.xp  = event.characterSheet.xp;
+      baseData.xp_next = event.characterSheet.xp_next;
+
+      this.setState({
+        baseData: baseData,
+      });
+    });
   }
 
   buildEachTab(attackData, voided) {
@@ -71,7 +118,16 @@ export default class CharacterDetails extends React.Component {
 
   render() {
 
-    const sheet = this.props.characterSheet;
+    if (this.state.loading) {
+      return (
+        <div className="progress loading-progress mt-2 mb-2" style={{position: 'relative'}}>
+          <div className="progress-bar progress-bar-striped indeterminate">
+          </div>
+        </div>
+      );
+    }
+
+    const sheet = this.state.baseData;
 
     const xpValue = sheet.xp / sheet.xp_next * 100;
 
@@ -192,6 +248,25 @@ export default class CharacterDetails extends React.Component {
                 <dd>{(sheet.devouring_darkness * 100).toFixed(0)}%</dd>
               </dl>
               <p className="mt-4">For more information, please see <a href="/information/voidance">Voidance help</a>. </p>
+            </Tab>
+            <Tab eventKey="holy-bonus" title="Holy Bonuses">
+              <dl className="mt-4">
+                <dt>Over All Holy Bonus:</dt>
+                <dd>{(sheet.holy_bonus * 100).toFixed(2)}%</dd>
+                <dt>Holy Stacks</dt>
+                <dd>{sheet.current_stacks}/{sheet.max_holy_stacks}</dd>
+                <dt>Voidance Resistance Bonus:</dt>
+                <dd>{(sheet.devouring_resistance * 100).toFixed(2)}%</dd>
+                <dt>Devoidance Resistance Bonus:</dt>
+                <dd>{(sheet.devouring_resistance * 100).toFixed(2)}%</dd>
+                <dt>Bonus Attack %</dt>
+                <dd>{(sheet.holy_attack_bonus * 100).toFixed(2)}%</dd>
+                <dt>Bonus AC %</dt>
+                <dd>{(sheet.holy_ac_bonus * 100).toFixed(2)}%</dd>
+                <dt>Bonus Healing %</dt>
+                <dd>{(sheet.holy_healing_bonus * 100).toFixed(2)}%</dd>
+              </dl>
+              <p className="mt-4">For more information, please see <a href="/information/holy-items">Holy Items help</a>. </p>
             </Tab>
           </Tabs>
           <hr />

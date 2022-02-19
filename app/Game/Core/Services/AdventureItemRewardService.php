@@ -15,6 +15,7 @@ use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Services\CharacterXPService;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\RandomAffixDetails;
+use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Jobs\AdventureItemDisenchantJob;
 use App\Game\Core\Traits\CanHaveQuestItem;
@@ -62,6 +63,10 @@ class AdventureItemRewardService {
         event(new UpdateTopBarEvent($character));
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        event(new CharacterInventoryDetailsUpdate($character->user));
+
+        event(new CharacterInventoryDetailsUpdate($character->user));
     }
 
     public function autoDisenchanted(Item $item, Character $character): bool {
@@ -80,7 +85,7 @@ class AdventureItemRewardService {
         if ($character->isInventoryFull() && !is_null($inventorySet) && $item->type !== 'quest') {
             $this->inventorySetService->putItemIntoSet($inventorySet, $item);
 
-            if (!is_null($characterSet->name)) {
+            if (!is_null($inventorySet->name)) {
                 $message = 'Item: '.$item->affix_name.' has been stored in Set: '.$inventorySet->name.' as your inventory is full';
 
                 event(new ServerMessageEvent($user, $message));
@@ -125,7 +130,13 @@ class AdventureItemRewardService {
 
                 event(new ServerMessageEvent($user, 'You gained the item: ' . $item->affix_name));
 
+                event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+                event(new CharacterInventoryDetailsUpdate($character->user));
+
                 return true;
+            } else {
+                event(new ServerMessageEvent($character->user, 'Cannot have Quest Item because: You already had this item or upgraded this item.'));
             }
         } else  {
             $character->inventory->slots()->create([
@@ -134,6 +145,10 @@ class AdventureItemRewardService {
             ]);
 
             event(new ServerMessageEvent($user, 'You gained the item: ' . $item->affix_name));
+
+            event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+            event(new CharacterInventoryDetailsUpdate($character->user));
 
             return true;
         }

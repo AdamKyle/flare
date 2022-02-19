@@ -2,16 +2,23 @@
 
 namespace App\Game\Core\Listeners;
 
+use App\Flare\Builders\Character\ClassDetails\ClassBonuses;
 use App\Flare\Models\Character;
-use App\Flare\Traits\ClassBasedBonuses;
+use App\Flare\Models\GameSkill;
+use App\Flare\Models\Skill;
 use App\Game\Core\Events\AttackTimeOutEvent;
 use App\Game\Core\Events\ShowTimeOutEvent;
 use App\Game\Core\Jobs\AttackTimeOutJob;
+use App\Game\Skills\Values\SkillTypeValue;
 
 class AttackTimeOutListener
 {
 
-    use ClassBasedBonuses;
+    private $classBonuses;
+
+    public function __construct(ClassBonuses $classBonuses) {
+        $this->classBonuses = $classBonuses;
+    }
 
     /**
      * Handle the event.
@@ -42,16 +49,15 @@ class AttackTimeOutListener
     }
 
     protected function findTimeReductions(Character $character) {
-        $skill = $character->skills->filter(function($skill) {
-            return ($skill->fight_time_out_mod > 0.0) && is_null($skill->baseSkill->game_class_id);
-        })->first();
 
+        $gameSkill = GameSkill::where('type', '=', SkillTypeValue::EFFECTS_BATTLE_TIMER)->first();
+        $skill     = Skill::where('character_id', $character->id)->where('game_skill_id', $gameSkill->id)->first();
 
         if (is_null($skill)) {
             return 0;
         }
 
-        $classBonus = $this->getThievesFightTimeout($character) + $this->getRangersFightTimeout($character);
+        $classBonus = $this->classBonuses->getThievesFightTimeout($character) + $this->classBonuses->getRangersFightTimeout($character);
 
         return $skill->fight_time_out_mod + $classBonus;
     }

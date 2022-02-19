@@ -9,10 +9,15 @@ use App\Flare\Models\Npc;
 use App\Flare\Models\Quest;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Transformers\CharacterAttackTransformer;
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
+use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Events\UpdateAttackStats;
+use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
+use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
@@ -28,7 +33,7 @@ class NpcQuestRewardHandler {
     private $manager;
 
     public function __construct(NpcServerMessageBuilder    $npcServerMessageBuilder,
-                                CharacterAttackTransformer $characterAttackTransformer,
+                                CharacterSheetBaseInfoTransformer $characterAttackTransformer,
                                 BuildCharacterAttackTypes  $buildCharacterAttackTypes,
                                 Manager                    $manager
     ) {
@@ -88,6 +93,17 @@ class NpcQuestRewardHandler {
     }
 
     public function giveItem(Character $character, Quest $quest, Npc $npc) {
+
+        if (!is_null($quest->rewardItem->effect)) {
+            $effectType = new ItemEffectsValue($quest->rewardItem->effect);
+
+            if ($effectType->getCopperCoins()) {
+                broadcast(new GlobalMessageEvent('Lighting streaks across the skies, blackness fills the skies. A thunderous roar is heard across the land.'));
+
+                broadcast(new ServerMessageEvent($character->user, 'Careful child. You seem to have angered The Creator. Are you prepared?', true));
+            }
+        }
+
         $character->inventory->slots()->create([
             'inventory_id' => $character->inventory->id,
             'item_id'      => $quest->reward_item,
@@ -180,7 +196,7 @@ class NpcQuestRewardHandler {
 
         $characterData = $this->manager->createData($characterData)->toArray();
 
-        event(new UpdateAttackStats($characterData, $character->user));
+        event(new UpdateBaseCharacterInformation($character->user, $characterData));
     }
 
     public function createQuestLog(Character $character, Quest $quest) {
@@ -196,5 +212,7 @@ class NpcQuestRewardHandler {
         event(new UpdateTopBarEvent($character));
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        event(new CharacterInventoryDetailsUpdate($character->user));
     }
 }

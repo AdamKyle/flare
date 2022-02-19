@@ -40,13 +40,15 @@ class ItemDisplayColor extends Component
         if ($isEitherRandomlyGenerated) {
             $this->color = 'unique-item';
         } else {
-            if (!is_null($this->item->itemSuffix) && !is_null($this->item->itemPrefix)) {
+            if ($this->item->appliedHolyStacks->isNotEmpty()) {
+                $this->color = 'holy-item';
+            } else if (!is_null($this->item->itemSuffix) && !is_null($this->item->itemPrefix)) {
                 $this->color = 'two-enchant';
             } else if (!is_null($this->item->itemSuffix) || !is_null($this->item->itemPrefix)) {
                 $this->color = 'one-enchant';
             } elseif ($this->item->type === 'quest') {
                 $this->color = 'quest-item';
-            } elseif ($this->item->usable) {
+            } elseif ($this->item->usable || $this->item->can_use_on_other_items) {
                 $this->color = 'usable-item';
             } else {
                 $this->color = 'normal-item';

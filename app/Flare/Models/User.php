@@ -95,10 +95,6 @@ class User extends Authenticatable
         return $this->hasMany(Message::class);
     }
 
-    public function securityQuestions() {
-        return $this->hasMany(SecurityQuestion::class);
-    }
-
     protected static function newFactory() {
         return UserFactory::new();
     }

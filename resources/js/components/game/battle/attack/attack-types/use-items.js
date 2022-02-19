@@ -15,7 +15,7 @@ export default class UseItems {
 
     if (!isVoided) {
       if (attackerClass === 'Vampire') {
-        this.lifeStealingAffixes(attackData, true);
+        this.lifeStealingAffixes(attackData, true, isVoided);
       }
 
       const damageAffixes = new DamageAffixes(this.characterCurrentHealth, this.monsterCurrentHealth);

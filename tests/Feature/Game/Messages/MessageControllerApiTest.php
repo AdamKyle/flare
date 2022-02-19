@@ -451,15 +451,15 @@ class MessageControllerApiTest extends TestCase
         $this->character->inventoryManagement()->giveItem($this->createItem([
             'type' => 'quest',
             'effect' => ItemEffectsValue::TELEPORT_TO_CELESTIAL
-        ]));
+        ]))->getCharacter();
 
         $this->actingAs($this->character->getUser());
 
         $this->createCelestialFight([
             'monster_id'      => $this->createMonster([
-                'game_map_id' => $this->character->getCharacter(false)->map->gameMap->id
+                'game_map_id' => $this->character->getCharacter(true)->map->gameMap->id
             ])->id,
-            'character_id'    => $this->character->getCharacter(false)->id,
+            'character_id'    => $this->character->getCharacter(true)->id,
             'conjured_at'     => now(),
             'x_position'      => 16,
             'y_position'      => 36,

@@ -20,7 +20,7 @@ class AdventureFightService {
      * @var CharacterInformationBuilder $characterInformation
      */
     private $characterInformation;
-    
+
     private $rewardBuilder;
 
     private $fightService;
@@ -40,7 +40,7 @@ class AdventureFightService {
     private $battleMessages = [];
 
     private $originalRewardData = [];
-    
+
     private $rewardData = [];
 
     private $rewardDataLogs = [];
@@ -63,7 +63,7 @@ class AdventureFightService {
      * @return void
      */
     public function __construct(
-        CharacterInformationBuilder $characterInformationBuilder, 
+        CharacterInformationBuilder $characterInformationBuilder,
         FightService $fightService,
         RewardBuilder $rewardBuilder,
     ) {
@@ -91,11 +91,11 @@ class AdventureFightService {
 
         return $this;
     }
-    
+
     public function setRewards(array $rewards): AdventureFightService {
         $this->rewardData         = $rewards;
         $this->originalRewardData = $rewards;
-        
+
         return $this;
     }
 
@@ -160,7 +160,7 @@ class AdventureFightService {
     protected function isAttackVoided(string $attackType): bool {
         return str_contains($attackType, 'voided');
     }
-    
+
     protected function processRewards(Monster $monster) {
         $rewardData = [];
 
@@ -175,7 +175,7 @@ class AdventureFightService {
 
         $this->rewardData = $this->originalRewardData;
     }
-    
+
     protected function handleXP(Monster $monster, GameMap $gameMap) {
         $xpReduction = 0.0;
 

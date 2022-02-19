@@ -8,7 +8,7 @@ export default class Monster {
     this.monster = monster;
   }
 
-  health() {
+  monsterHP() {
 
     if (typeof this.monster === 'undefined') {
       return  0;
@@ -16,15 +16,48 @@ export default class Monster {
 
     const healthRange = this.monster.health_range.split('-');
 
-    let health = randomNumber(healthRange[0], healthRange[1]) + this.monster.dur;
+    let health = randomNumber(healthRange[0], healthRange[1]);
 
-    health = health + health * this.monster.increases_damage_by;
+
+    if (this.monster.increases_damage_by !== null) {
+      health = health + health * this.monster.increases_damage_by;
+    }
 
     return parseInt(health);
   }
 
-  canMonsterVoidPlayer() {
-    const dc = 100 - 100 * this.monster.devouring_light_chance;
+  canMonsterVoidPlayer(devouringLightResistance) {
+    let chance = this.monster.devouring_darkness_chance
+
+    if (devouringLightResistance > chance) {
+      return false;
+    }
+
+    chance -= devouringLightResistance;
+
+    if (chance > 1) {
+      return true;
+    }
+
+    const dc = 100 - 100 * chance;
+
+    return random(1, 100) > dc;
+  }
+
+  canMonsterDevoidPlayer(devouringDarkResistance) {
+    let chance = this.monster.devouring_darkness_chance
+
+    if (devouringDarkResistance > chance) {
+      return false;
+    }
+
+    chance -= devouringDarkResistance;
+
+    if (chance > 1) {
+      return true;
+    }
+
+    const dc = 100 - 100 * chance;
 
     return random(1, 100) > dc;
   }

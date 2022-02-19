@@ -4,11 +4,25 @@ namespace App\Game\Skills\Services;
 
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
+use App\Flare\Transformers\SkillsTransformer;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Skills\Events\UpdateCharacterSkills;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Collection;
+use League\Fractal\Resource\Item;
 
 class SkillService {
 
     use ResponseBuilder;
+
+    private $manager;
+
+    private $skillsTransformer;
+
+    public function __construct(Manager $manager, SkillsTransformer $skillsTransformer) {
+        $this->manager           = $manager;
+        $this->skillsTransformer = $skillsTransformer;
+    }
 
     /**
      * Sets a skill to training.
@@ -48,10 +62,17 @@ class SkillService {
             'xp_max'             => is_null($skill->xp_max) ? rand(100, 150) : $skill->xp_max,
         ]);
 
-        event(new UpdateTopBarEvent($character));
+        $this->updateSkills($character->refresh());
 
         return $this->successResult([
             'message' => 'You are now training ' . $skill->name
         ]);
+    }
+
+    public function updateSkills(Character $character) {
+        $skillData = new Collection($character->skills, $this->skillsTransformer);
+        $skillData = $this->manager->createData($skillData)->toArray();
+
+        event(new UpdateCharacterSkills($character->user, $skillData));
     }
 }

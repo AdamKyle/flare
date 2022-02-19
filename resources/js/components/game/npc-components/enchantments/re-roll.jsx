@@ -34,7 +34,7 @@ export default class ReRoll extends React.Component {
 
   reRollEnchantment() {
     this.setState({
-      errormessage: null,
+      errorMessage: null,
       queenProcessing: true,
       successMessage: null,
     });

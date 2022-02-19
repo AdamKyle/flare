@@ -3,12 +3,16 @@
 namespace App\Game\Core\Providers;
 
 use App\Flare\Builders\RandomAffixGenerator;
-use App\Flare\Builders\RandomItemDropBuilder;
 use App\Flare\Services\BuildCharacterAttackTypes;
+use App\Flare\Services\CharacterRewardService;
 use App\Flare\Services\CharacterXPService;
 use App\Flare\Transformers\CharacterAttackTransformer;
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Transformers\Serializers\CoreSerializer;
+use App\Game\Battle\Services\BattleDrop;
+use App\Game\Core\Services\CharacterPassiveSkills;
 use App\Game\Core\Services\DropCheckService;
+use App\Game\Core\Services\HolyItemService;
 use App\Game\Core\Services\InventorySetService;
 use App\Game\Core\Services\RandomEnchantmentService;
 use App\Game\Core\Services\UseItemService;
@@ -48,10 +52,13 @@ class ServiceProvider extends ApplicationServiceProvider
             return new InventorySetService();
         });
 
+        $this->app->bind(CharacterPassiveSkills::class, function() {
+            return new CharacterPassiveSkills();
+        });
+
         $this->app->bind(DropCheckService::class, function($app) {
             return new DropCheckService(
-                $app->make(RandomItemDropBuilder::class),
-                $app->make(DisenchantService::class),
+                $app->make(BattleDrop::class),
             );
         });
 
@@ -66,6 +73,7 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(AdventureRewardService::class, function($app) {
             return new AdventureRewardService(
                 $app->make(CharacterService::class),
+                $app->make(CharacterRewardService::class),
                 $app->make(BuildCharacterAttackTypes::class),
                 $app->make(CharacterXPService::class),
                 $app->make(InventorySetService::class),
@@ -85,7 +93,7 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(UseItemService::class, function($app) {
             return new UseItemService(
                 $app->make(Manager::class),
-                $app->make(CharacterAttackTransformer::class),
+                $app->make(CharacterSheetBaseInfoTransformer::class),
             );
         });
 
@@ -93,6 +101,10 @@ class ServiceProvider extends ApplicationServiceProvider
             return new RandomEnchantmentService(
                 $app->make(RandomAffixGenerator::class)
             );
+        });
+
+        $this->app->bind(HolyItemService::class, function() {
+            return new HolyItemService();
         });
     }
 

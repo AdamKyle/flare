@@ -68,14 +68,40 @@
     <div class="row">
         <div class="col-md-6">
             <div class="form-group">
-                <label for="effect">Strength Addition: <span class="danger">*</span> </label>
-                <select class="custom-select form-control required" id="x-position" name="effect" wire:model="location.enemy_strength_type">
+                <label for="enemy_strength_type">Strength Addition: </label>
+                <select class="custom-select form-control required" id="enemy_strength_type" name="enemy_strength_type" wire:model="location.enemy_strength_type">
                     <option value="">Select Strength Type</option>
                     @foreach($locationEffects as $index => $locationEffect)
                         <option value="{{$index}}">{{$locationEffect}}</option>
                     @endforeach
                 </select>
                 @error('location.enemy_strength_type') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="required_quest_item_id">Quest item required to enter: </label>
+                <select class="custom-select form-control required" id="required_quest_item_id" name="required_quest_item_id" wire:model="location.required_quest_item_id">
+                    <option value="">Select Quest item</option>
+                    @foreach($questItems as $index => $itemName)
+                        <option value="{{$index}}">{{$itemName}}</option>
+                    @endforeach
+                </select>
+                @error('location.required_quest_item_id') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="type">Location Type: </label>
+                <select class="custom-select form-control required" id="type" name="type" wire:model="location.type">
+                    <option value="">Select Type</option>
+                    @foreach($locationTypes as $type => $typeName)
+                        <option value="{{$type}}">{{$typeName}}</option>
+                    @endforeach
+                </select>
+                @error('location.type') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
     </div>

@@ -19,7 +19,7 @@ class SkillsController extends Controller {
         ], $result['status']);
     }
 
-    public function cancelTrain(Character $character, Skill $skill) {
+    public function cancelTrain(Character $character, Skill $skill, SkillService $skillService) {
         if (is_null($character->skills()->find($skill->id))) {
             return response()->json(['message' => 'Nope. You cannot do that.'], 422);
         }
@@ -29,7 +29,7 @@ class SkillsController extends Controller {
             'xp_towards'         => 0.0,
         ]);
 
-        event(new UpdateTopBarEvent($character));
+        $skillService->updateSkills($character->refresh());
 
         return response()->json(['message' => 'You stopped training: ' . $skill->name], 200);
     }

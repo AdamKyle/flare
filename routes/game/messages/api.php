@@ -9,7 +9,7 @@ Route::group(['middleware' => 'auth'], function() {
         Route::post('/public-message', ['uses' => 'Api\MessageController@postPublicMessage']);
         Route::post('/private-message', ['uses' => 'Api\MessageController@sendPrivateMessage']);
 
-        Route::middleware(['character.attack.automation'])->group(function() {
+        Route::middleware(['is.character.exploring'])->group(function() {
             Route::post('/public-entity/', ['uses' => 'Api\MessageController@publicEntity']);
         });
     });

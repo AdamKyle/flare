@@ -7,15 +7,22 @@ use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Adventure;
 use App\Flare\Models\AdventureLog;
 use App\Flare\Models\Faction;
+use App\Flare\Models\GameSkill;
 use App\Flare\Models\InventorySet;
 use App\Flare\Models\Item as ItemModel;
 use App\Flare\Models\Skill;
 use App\Flare\Models\User;
 use App\Flare\Services\BuildCharacterAttackTypes;
+use App\Flare\Services\CharacterRewardService;
 use App\Flare\Services\CharacterXPService;
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
+use App\Flare\Transformers\SkillsTransformer;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\RandomAffixDetails;
+use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
+use App\Game\Core\Events\UpdateBaseCharacterInformation;
+use App\Game\Core\Events\UpdateCharacterFactions;
 use App\Game\Core\Jobs\AdventureItemDisenchantJob;
 use App\Game\Core\Jobs\HandleAdventureRewardItems;
 use App\Game\Core\Traits\CanHaveQuestItem;
@@ -25,7 +32,11 @@ use App\Game\Core\Values\FactionLevel;
 use App\Game\Core\Values\FactionType;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Skills\Events\UpdateCharacterSkills;
 use App\Game\Skills\Services\DisenchantService;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Collection;
+use League\Fractal\Resource\Item as ResourceItem;
 
 class AdventureRewardService {
 
@@ -35,6 +46,8 @@ class AdventureRewardService {
      * @var CharacterService $characterService
      */
     private $characterService;
+
+    private $characterRewardService;
 
     private $buildCharacterAttackTypes;
 
@@ -55,6 +68,7 @@ class AdventureRewardService {
      * @return void
      */
     public function __construct(CharacterService $characterService,
+                                CharacterRewardService $characterRewardService,
                                 BuildCharacterAttackTypes $buildCharacterAttackTypes,
                                 CharacterXPService $characterXPService,
                                 InventorySetService $inventorySetService,
@@ -63,6 +77,7 @@ class AdventureRewardService {
     ) {
 
         $this->characterService          = $characterService;
+        $this->characterRewardService    = $characterRewardService;
         $this->buildCharacterAttackTypes = $buildCharacterAttackTypes;
         $this->characterXPService        = $characterXPService;
         $this->inventorySetService       = $inventorySetService;
@@ -121,10 +136,12 @@ class AdventureRewardService {
                 event(new ServerMessageEvent($character->user,'You now are gold capped: ' . number_format($newAmount)));
             }
         }
+
+        event(new UpdateTopBarEvent($character->refresh()));
     }
 
     protected function handleFactionPoints(Character $character, Adventure $adventure, int $factionPoints) {
-        $faction   = $character->factions()->where('game_map_id', $adventure->location->map->id)->first();
+        $faction            = $character->factions()->where('game_map_id', $adventure->location->map->id)->first();
 
         $points    = $faction->current_points + $factionPoints;
 
@@ -135,14 +152,15 @@ class AdventureRewardService {
             $points    = $faction->points_needed;
         }
 
-        if ($points >= $faction->points_needed && !FactionLevel::isMaxLevel($faction->current_level, $points)) {
+        if ($points >= $faction->points_needed && !FactionLevel::isMaxLevel($faction->current_level)) {
             $newLevel = $faction->current_level + 1;
 
             $faction->update([
                 'current_level'  => $newLevel,
                 'current_points' => 0,
-                'points_needed'  => FactionLevel::gatPointsPerLevel($newLevel),
+                'points_needed'  => FactionLevel::getPointsNeeded($newLevel),
                 'title'          => FactionType::getTitle($newLevel),
+                'maxed'          => false,
             ]);
 
             $faction = $faction->refresh();
@@ -152,23 +170,29 @@ class AdventureRewardService {
             event(new UpdateTopBarEvent($character));
 
             $this->factionReward($character, $faction, $faction->gameMap->name, FactionType::getTitle($newLevel));
-        } else if ($points >= $faction->points_needed && FactionLevel::isMaxLevel($faction->current_level, $points) && !$faction->maxed) {
+
+            $this->updateFactions($character);
+        }
+
+        if (FactionLevel::isMaxLevel($faction->current_level) && !$faction->maxed) {
             event(new ServerMessageEvent($character->user,$faction->gameMap->name . ' faction has become maxed out!'));
 
             event(new UpdateTopBarEvent($character));
 
             event(new GlobalMessageEvent($character->name . 'Has maxed out the faction for: ' . $faction->gameMap->name . ' They are considered legendary among the people of this land.'));
 
-            $this->factionReward($character, $faction, $faction->gameMap->name, FactionType::getTitle($faction->current_level));
-
             $faction->update([
                 'maxed' => true,
             ]);
 
             $faction = $faction->refresh();
-        } else if (!$faction->maxed) {
+
+            $this->updateFactions($character);
+        }
+
+        if (!$faction->maxed) {
             $faction->update([
-                'current_points' => $factionPoints,
+                'current_points' => $points,
             ]);
 
             $faction = $faction->refresh();
@@ -176,6 +200,8 @@ class AdventureRewardService {
             event(new ServerMessageEvent($character->user,'Gained: ' . $factionPoints . ' Faction Points for: ' . $faction->gameMap->name));
 
             event(new UpdateTopBarEvent($character));
+
+            $this->updateFactions($character);
         }
 
         if ($spillOver > 0 && !$faction->maxed) {
@@ -190,6 +216,7 @@ class AdventureRewardService {
         if ($totalLevels > 0) {
 
             for ($i = 1; $i <= $totalLevels; $i++) {
+
                 $this->giveXP(100, $character);
 
                 $character = $character->refresh();
@@ -212,15 +239,13 @@ class AdventureRewardService {
         $character->xp += $xp;
         $character->save();
 
-        if ($character->xp >= $character->xp_next) {
-            $this->characterService->levelUpCharacter($character);
-
-            $character = $character->refresh();
-
-            $this->buildCharacterAttackTypes->buildCache($character);
-        }
-
         event(new ServerMessageEvent($character->user, 'Awarded XP from previous adventure'));
+
+        if ($character->xp >= $character->xp_next) {
+            $this->characterRewardService->setCharacter($character)->handleCharacterLevelUp();
+
+            event(new ServerMessageEvent($character->user, 'Gained new level, you are now: LV ' . $character->level));
+        }
 
         event(new UpdateTopBarEvent($character));
     }
@@ -272,6 +297,10 @@ class AdventureRewardService {
 
         $character = $skill->character;
 
+        event(new ServerMessageEvent($character->user, 'Awarded Skill XP from previous adventure'));
+
+        $this->updateSkills($character);
+
         if ($skill->xp >= $skill->xp_max) {
             if ($skill->level < $skill->max_level) {
                 $level      = $skill->level + 1;
@@ -288,20 +317,70 @@ class AdventureRewardService {
                     'xp'                 => 0,
                 ]);
 
+                $skill = $skill->refresh();
+
+                $this->updateSkills($character);
+
+                if ($this->shouldUpdateCharacterAttackData($skill->baseSkill)) {
+                    $this->updateCharacterAttackDataCache($character);
+                }
+
                 event(new ServerMessageEvent($character->user,'Your skill: ' . $skill->name . ' gained a level and is now level: ' . $skill->level));
             }
         }
 
-        event(new ServerMessageEvent($character->user, 'Awarded Skill XP from previous adventure'));
-
         event(new UpdateTopBarEvent($character));
+    }
+
+    public function updateSkills(Character $character) {
+        $manager           = resolve(Manager::class);
+        $skillsTransformer = resolve(SkillsTransformer::class);
+
+        $skillData         = new Collection($character->skills, $skillsTransformer);
+        $skillData         = $manager->createData($skillData)->toArray();
+
+        event(new UpdateCharacterSkills($character->user, $skillData));
+    }
+
+    protected function shouldUpdateCharacterAttackData(GameSkill $skill): bool {
+        if (!is_null($skill->base_damage_mod_bonus_per_level)) {
+            return false;
+        }
+
+        if (!is_null($skill->base_healing_mod_bonus_per_level)) {
+            return false;
+        }
+
+        if (!is_null($skill->base_ac_mod_bonus_per_level)) {
+            return false;
+        }
+
+        if (!is_null($skill->fight_time_out_mod_bonus_per_level)) {
+            return false;
+        }
+
+        if (!is_null($skill->move_time_out_mod_bonus_per_level)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    protected function updateCharacterAttackDataCache(Character $character) {
+        resolve(BuildCharacterAttackTypes::class)->buildCache($character);
+
+        $characterData = new ResourceItem($character->refresh(), resolve(CharacterSheetBaseInfoTransformer::class));
+
+        $characterData = resolve(Manager::class)->createData($characterData)->toArray();
+
+        event(new UpdateBaseCharacterInformation($character->user, $characterData));
     }
 
     protected function handleItems(array $items, Character $character, InventorySet $set = null): void {
         $character         = $character->refresh();
 
         if (!is_null($set)) {
-            $characterSet = $character->innventorySets()->find($setId);
+            $characterSet = $character->inventorySets()->find($set->id);
         } else {
             $characterSet = $character->inventorySets->filter(function($set) {
                 return $set->slots->isEmpty();
@@ -350,6 +429,8 @@ class AdventureRewardService {
             $character = $character->refresh();
 
             event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+            event(new CharacterInventoryDetailsUpdate($character->user));
 
             event(new ServerMessageEvent($character->user, 'Faction rewarded with (item with randomly generated affix(es)): ' . $item->affix_name));
         }
@@ -400,5 +481,28 @@ class AdventureRewardService {
         }
 
         return $item;
+    }
+
+    protected function updateFactions(Character $character) {
+        $character = $character->refresh();
+
+        $factions = $character->factions->transform(function($faction) {
+            $faction->map_name = $faction->gameMap->name;
+
+            return $faction;
+        });
+
+        event(new UpdateCharacterFactions($character->user, $factions));
+    }
+
+    protected function updateCharacterBaseStats(Character $character) {
+        $manager = resolve(Manager::class);
+        $characterBaseInfo = resolve(CharacterSheetBaseInfoTransformer::class);
+
+
+        $data = new ResourceItem($character, $characterBaseInfo);
+        $data = $manager->createData($data)->toArray();
+
+        event(new UpdateBaseCharacterInformation($character->user, $data));
     }
 }

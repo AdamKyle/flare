@@ -39,6 +39,10 @@ class IsCharacterWhoTheySayTheyAreMiddleware {
         $user      = $request->route('user');
         $canAccess = true;
 
+//        if (is_string($character)) {
+//            $character = Character::find($character);
+//        }
+
         if (!is_null($character)) {
             if (auth()->user()->character->id !== $character->id) {
                 $canAccess = false;

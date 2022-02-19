@@ -10,6 +10,8 @@ import FightSection from './fight-section';
 import CelestialFightSection from "./celestial-fight-section";
 import AlchemyAction from "../alchemy/alchemy-action";
 import AutoAttackSection from "./auto-attack-section";
+import SmithyWorkBench from "../smithy-work-bench/SmithyWorkBench";
+import LockedLocationType from "./lib/LockedLocationType";
 
 export default class ActionsSection extends React.Component {
 
@@ -24,6 +26,7 @@ export default class ActionsSection extends React.Component {
       showCrafting: false,
       showEnchanting: false,
       showAlchemy: false,
+      showSmithingBench: false,
       characterId: null,
       isLoading: true,
       character: null,
@@ -34,7 +37,9 @@ export default class ActionsSection extends React.Component {
       resetBattleAction: false
     };
 
-    this.updateActions = Echo.private('update-actions-' + this.props.userId);
+    this.updateMonstersList    = Echo.private('update-monsters-list-' + this.props.userId);
+    this.updateActions         = Echo.private('update-character-base-stats-' + this.props.userId);
+    this.updateCharacterStatus = Echo.private('update-character-status-' + this.props.userId);
   }
 
   componentDidMount() {
@@ -47,8 +52,6 @@ export default class ActionsSection extends React.Component {
         character: result.data.character,
         monsters: result.data.monsters,
         isLoading: false,
-        isDead: result.data.character.is_dead,
-        cannotAutoAttack: result.data.character.is_attack_automation_locked,
       }, () => {
         this.props.setCharacterId(this.state.character.id);
       });
@@ -66,7 +69,30 @@ export default class ActionsSection extends React.Component {
       }
     });
 
-    this.updateActions.listen('Game.Maps.Events.UpdateActionsBroadcast', (event) => {
+    this.updateActions.listen('Game.Core.Events.UpdateBaseCharacterInformation', (event) => {
+      let baseStats = JSON.parse(JSON.stringify(event.baseStats));
+      let character = JSON.parse(JSON.stringify(this.state.character));
+
+      Object.keys(baseStats).forEach(function(el){
+        if (typeof baseStats[el] === 'string') {
+          if (baseStats[el].indexOf(',') !== -1) {
+            baseStats[el] = parseFloat(baseStats[el].replace(/,/g, ''))
+          }
+        } else {
+          baseStats[el] = parseFloat(baseStats[el]) || baseStats[el]
+        }
+      });
+
+      Object.keys(baseStats).filter(key => key in character).forEach(key => {
+        character[key] = baseStats[key];
+      });
+
+      this.setState({
+        character: character
+      });
+    });
+
+    this.updateMonstersList.listen('Game.Maps.Events.UpdateMonsterList', (event) => {
       const oldFirstMonsterName = this.state.monsters[0].name;
       const newFirstMonsterName = event.monsters[0].name;
 
@@ -74,9 +100,7 @@ export default class ActionsSection extends React.Component {
       const newMonster = event.monsters[0];
 
       this.setState({
-        character: event.character,
         monsters: event.monsters,
-        isDead: event.character.is_dead,
       }, () => {
 
         // We are on a new plane.
@@ -94,6 +118,13 @@ export default class ActionsSection extends React.Component {
         }
       });
     });
+
+    this.updateCharacterStatus.listen('Game.Battle.Events.UpdateCharacterStatus', (event) => {
+      this.setState({
+        isDead: event.data.is_dead,
+        cannotAutoAttack: event.data.automation_locked,
+      })
+    });
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -102,12 +133,28 @@ export default class ActionsSection extends React.Component {
         actionComponent: 'battle-action',
       });
     }
+
+    if (this.props.lockedLocationType !== LockedLocationType.PURGATORYSMITHSHOUSE && this.state.showSmithingBench) {
+      this.setState({
+        showSmithingBench: false,
+      });
+    }
   }
 
   updateResetBattleAction() {
     this.setState({
       resetBattleAction: false,
     })
+  }
+
+  updateCharacterHealth(health) {
+    let character = this.state.character;
+
+    character.health = health;
+
+    this.setState({
+      character: character
+    });
   }
 
   characterIsDead(isDead, callback) {
@@ -150,6 +197,12 @@ export default class ActionsSection extends React.Component {
     });
   }
 
+  updateShowSmithingBench(show) {
+    this.setState({
+      showSmithingBench: show,
+    });
+  }
+
   updateCanCraft(can) {
     this.setState({
       canCraft: can,
@@ -176,13 +229,13 @@ export default class ActionsSection extends React.Component {
     if (this.props.attackAutomationIsRunning) {
       return (
         <span className="tw-text-green-600">
-          <i className="ra ra-muscle-fat"></i> Auto Attack
+          <i className="ra ra-muscle-fat"></i> Exploration
         </span>
       )
     }
 
     return (
-      <span>Auto Attack</span>
+      <span>Exploration</span>
     )
   }
 
@@ -206,6 +259,7 @@ export default class ActionsSection extends React.Component {
             <div className="row mt-4">
               <Col xs={12} sm={12} md={12} lg={12} xl={2}>
                 <AdditionalActionsDropDown
+                  lockedLocationType={this.props.lockedLocationType}
                   isDead={this.state.isDead}
                   isAdventuring={this.state.isAdventuring}
                   isAlchemyLocked={this.state.character.is_alchemy_locked}
@@ -213,6 +267,7 @@ export default class ActionsSection extends React.Component {
                   updateShowCrafting={this.updateShowCrafting.bind(this)}
                   updateShowEnchanting={this.updateShowEnchanting.bind(this)}
                   updateShowAlchemy={this.updateShowAlchemy.bind(this)}
+                  updateShowSmithingBench={this.updateShowSmithingBench.bind(this)}
                   canCraft={this.state.canCraft}
                 />
                 {
@@ -345,7 +400,11 @@ export default class ActionsSection extends React.Component {
                   />
                   : null
                 }
-
+                {
+                  this.state.showSmithingBench ?
+                    <SmithyWorkBench characterId={this.state.character.id} openTimeOutModal={this.props.openTimeOutModal} userId={this.props.userId} updateCanCraft={this.updateCanCraft.bind(this)}/>
+                  : null
+                }
                 {
                   this.state.actionComponent === 'battle-action' ?
                     <FightSection
@@ -353,11 +412,14 @@ export default class ActionsSection extends React.Component {
                       monster={this.state.monster}
                       userId={this.props.userId}
                       isCharacterDead={this.characterIsDead.bind(this)}
+                      isDead={this.state.isDead}
                       setMonster={this.setMonster.bind(this)}
                       canAttack={this.props.canAttack}
                       isAdventuring={this.state.isAdventuring}
                       openTimeOutModal={this.props.openTimeOutModal}
                       resetBattleAction={this.state.resetBattleAction}
+                      updateResetBattleAction={this.updateResetBattleAction.bind(this)}
+                      updateCharacterHealth={this.updateCharacterHealth.bind(this)}
                     />
                     :
                     this.props.celestial !== null ?
@@ -378,9 +440,10 @@ export default class ActionsSection extends React.Component {
               </Col>
             </div>
           </Tab>
-          <Tab eventKey="auto-attack" title={this.buildAutomationAttackTabTitle()} disabled={this.state.cannotAutoAttack || this.state.isAdventuring || this.state.isDead}>
+          <Tab eventKey="exploration" title={this.buildAutomationAttackTabTitle()} disabled={this.state.cannotAutoAttack || this.state.isAdventuring || this.state.isDead}>
             <AutoAttackSection
               character={this.state.character}
+              isDead={this.state.isDead}
               monsters={this.state.monsters}
               userId={this.props.userId}
               openTimeOutModal={this.props.openTimeOutModal}

@@ -7,6 +7,7 @@ use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Item as ItemModel;
 use App\Flare\Traits\IsItemUnique;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Events\UpdateMarketBoardBroadcastEvent;
 use Facades\App\Flare\Calculators\SellItemCalculator;
@@ -98,7 +99,7 @@ class MarketController extends Controller {
 
             $slot->cost = SellItemCalculator::fetchSalePriceWithAffixes($slot->item);
 
-            $slot->min_cost = SellItemCalculator::fetchMinimumSalePriceOfUnique($slot->item);
+            $slot->min_cost = SellItemCalculator::fetchMinPrice($slot->item);
 
             $slot->item->unique = $this->isUnique($slot->item);
 
@@ -197,7 +198,8 @@ class MarketController extends Controller {
         }
 
         if ($this->isUnique($slot->item)) {
-            $minCost = SellItemCalculator::fetchMinimumSalePriceOfUnique($slot->item);
+            $minCost = SellItemCalculator::fetchMinPrice($slot->item);
+
             if ( $minCost > $request->list_for) {
                 return response()->json(['message' => 'No! The minimum selling price is: ' . number_format($minCost) . ' Gold.'], 422);
             }
@@ -214,6 +216,8 @@ class MarketController extends Controller {
         $this->sendUpdate($this->transformer, $this->manager);
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+
+        event(new CharacterInventoryDetailsUpdate($character->user));
 
         return response()->json([], 200);
     }
@@ -272,6 +276,7 @@ class MarketController extends Controller {
         event(new UpdateTopBarEvent($listing->character->refresh()));
         event(new UpdateTopBarEvent($character->refresh()));
         event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+        event(new CharacterInventoryDetailsUpdate($character->user));
 
         $listing->delete();
 
