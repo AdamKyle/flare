@@ -86,7 +86,7 @@ class HolyItemService {
 
             $newItem->appliedHolyStacks()->create([
                 'item_id'                  => $newItem->id,
-                'devouring_darkness_bonus' => $holyItemEffect->getRandomDevoidanceIncrease() / 100,
+                'devouring_darkness_bonus' => $holyItemEffect->getRandomDevoidanceIncrease(),
                 'stat_increase_bonus'      => $holyItemEffect->getRandomStatIncrease() / 100,
             ]);
 
@@ -106,7 +106,7 @@ class HolyItemService {
 
         $itemSlot->item->appliedHolyStacks()->create([
             'item_id'                  => $itemSlot->item->id,
-            'devouring_darkness_bonus' => $holyItemEffect->getRandomDevoidanceIncrease() / 100,
+            'devouring_darkness_bonus' => $holyItemEffect->getRandomDevoidanceIncrease(),
             'stat_increase_bonus'      => $holyItemEffect->getRandomStatIncrease() / 100,
         ]);
 

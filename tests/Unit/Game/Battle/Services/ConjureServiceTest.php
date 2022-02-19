@@ -5,7 +5,7 @@ namespace Tests\Unit\Game\Battle\Services;
 use App\Flare\Models\CelestialFight;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
-use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
+use App\Flare\Transformers\CharacterTopBarTransformer;
 use App\Flare\Transformers\KingdomTransformer;
 use App\Flare\Values\NpcTypes;
 use App\Game\Battle\Services\ConjureService;
@@ -81,7 +81,7 @@ class ConjureServiceTest extends TestCase
         $conjure = \Mockery::mock(ConjureService::class, [
             resolve(Manager::class),
             resolve(KingdomTransformer::class),
-            resolve(CharacterSheetBaseInfoTransformer::class),
+            resolve(CharacterTopBarTransformer::class),
             resolve(NpcServerMessageBuilder::class),
         ])->makePartial();
 
@@ -123,7 +123,7 @@ class ConjureServiceTest extends TestCase
         $conjure = \Mockery::mock(ConjureService::class, [
             resolve(Manager::class),
             resolve(KingdomTransformer::class),
-            resolve(CharacterSheetBaseInfoTransformer::class),
+            resolve(CharacterTopBarTransformer::class),
             resolve(NpcServerMessageBuilder::class),
         ])->makePartial();
 
@@ -177,7 +177,7 @@ class ConjureServiceTest extends TestCase
         $conjure = \Mockery::mock(ConjureService::class, [
             resolve(Manager::class),
             resolve(KingdomTransformer::class),
-            resolve(CharacterSheetBaseInfoTransformer::class),
+            resolve(CharacterTopBarTransformer::class),
             resolve(NpcServerMessageBuilder::class),
         ])->makePartial();
 
@@ -218,7 +218,7 @@ class ConjureServiceTest extends TestCase
         $conjure = \Mockery::mock(ConjureService::class, [
             resolve(Manager::class),
             resolve(KingdomTransformer::class),
-            resolve(CharacterSheetBaseInfoTransformer::class),
+            resolve(CharacterTopBarTransformer::class),
             resolve(NpcServerMessageBuilder::class),
         ])->makePartial();
 
@@ -274,7 +274,7 @@ class ConjureServiceTest extends TestCase
         $conjure = \Mockery::mock(ConjureService::class, [
             resolve(Manager::class),
             resolve(KingdomTransformer::class),
-            resolve(CharacterSheetBaseInfoTransformer::class),
+            resolve(CharacterTopBarTransformer::class),
             resolve(NpcServerMessageBuilder::class),
         ])->makePartial();
 

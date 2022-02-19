@@ -97,7 +97,7 @@ export default class SmithyWorkBench extends React.Component {
   }
 
   updateSelectedItems() {
-    let foundItemWithStacks = this.state.items.filter((i) => i.item.affix_name === this.state.selectedItem.affix_name);
+    let foundItemWithStacks = this.state.items.filter((i) => i.item.id === this.state.selectedItem.id);
     let foundAlchemyItem    = this.state.alchemyItems.filter((i) => i.item.name === this.state.selectedAlchemyItem.name);
 
     if (foundItemWithStacks.length === 0) {
@@ -177,7 +177,7 @@ export default class SmithyWorkBench extends React.Component {
     }
 
     if (this.state.selectedItem === null) {
-      return 'You must select an item.'
+      return 'You must select an item (either you have no item selected, or the item was duplicated after the first holy oil and need to be re-selected).'
     }
 
     if (this.state.selectedAlchemyItem === null) {

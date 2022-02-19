@@ -18,7 +18,7 @@ class CreateHolyStacks extends Migration
             $table->unsignedBigInteger('item_id');
             $table->foreign('item_id')
                   ->references('id')->on('items');
-            $table->string('devouring_darkness_bonus', 8, 4)->nullable();
+            $table->decimal('devouring_darkness_bonus', 8, 4)->nullable();
             $table->decimal('stat_increase_bonus', 8, 4)->nullable();
             $table->timestamps();
         });

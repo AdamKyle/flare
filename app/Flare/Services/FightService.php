@@ -125,7 +125,7 @@ class FightService {
             $this->currentCharacterHealth = $characterInformation->buildHealth($isCharacterVoided);
         }
 
-        if (!$this->attackOnce) {
+        if (!$this->attackOnce && ($defender instanceof  Monster || $defender instanceof  \StdClass)) {
             $healthRange                = explode('-', $defender->health_range);
             $this->currentMonsterHealth = rand($healthRange[0], $healthRange[1]);
         }

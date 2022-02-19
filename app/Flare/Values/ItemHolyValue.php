@@ -76,24 +76,24 @@ class ItemHolyValue {
      *
      * @return int
      */
-    public function getRandomDevoidanceIncrease(): int {
+    public function getRandomDevoidanceIncrease(): float {
         if ($this->value === self::LEVEL_ONE) {
-            return rand (1, 3) / 10;
+            return rand (1, 3) / 1000;
         }
 
         if ($this->value === self::LEVEL_TWO) {
-            return rand (1, 5) / 10;
+            return rand (1, 5) / 1000;
         }
 
         if ($this->value === self::LEVEL_THREE) {
-            return rand (1, 8) / 10;
+            return rand (1, 8) / 1000;
         }
 
         if ($this->value === self::LEVEL_FOUR) {
-            return rand (1, 10) / 10;
+            return rand (1, 10) / 1000;
         }
 
         // Level 5
-        return rand (1, 15) / 10;
+        return rand (1, 15) / 1000;
     }
 }
