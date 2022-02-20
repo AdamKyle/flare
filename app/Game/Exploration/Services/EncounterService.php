@@ -44,6 +44,8 @@ class EncounterService {
             event(new ExplorationLogUpdate($character->user, 'Covered in blood, wreaking of death and justice for the land, you emerge victorious at the local INN. A busty large red headed Bar Maid comes up to you. With her cleavage on the table, she leans down and smiles with her rotten and missing teeth, "What can I get ya doll?" you shudder on the inside.', true));
 
             $this->rewardHandler->processRewardsForEncounter($character);
+
+            return true;
         } catch (\Exception $e) {
             $character = $character->refresh();
 
@@ -51,6 +53,8 @@ class EncounterService {
             event(new ExplorationStatus($character->user, false));
             event(new UpdateTopBarEvent($character));
             event(new UpdateAutomationsList($character->user, $character->currentAutomations));
+
+            return false;
         }
     }
 

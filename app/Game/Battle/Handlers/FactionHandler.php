@@ -47,19 +47,21 @@ class FactionHandler {
         if ($this->playerHasQuestItem($character) && $faction->current_level >= 1) {
             $faction->current_points += 10;
         } else {
+            dump('should be here ...');
             $faction->current_points += FactionLevel::gatPointsPerLevel($faction->current_level);
         }
+
+        dump('Has  ' . $faction->points . ' Needed: ' . $faction->points_needed);
 
         if ($faction->current_points > $faction->points_needed) {
             $faction->current_points = $faction->points_needed;
         }
 
         if ($faction->current_points === $faction->points_needed && !FactionLevel::isMaxLevel($faction->current_level)) {
-
+            dump('should be here ...');
             return $this->handleFactionLevelUp($character, $faction, $map->name);
 
         } else if (FactionLevel::isMaxLevel($faction->current_level) && !$faction->maxed) {
-
             return $this->handleFactionMaxedOut($character, $faction, $map->name);
         }
 
@@ -113,7 +115,7 @@ class FactionHandler {
         $this->updateFactions($character);
 
         $this->rewardPlayer($character, $faction, $mapName, FactionType::getTitle($faction->current_level));
-
+        dump('current level: ' . $faction->current_level);
         if (FactionLevel::isMaxLevel($faction->current_level)) {
             $this->handleFactionMaxedOut($character, $faction, $mapName);
         }
@@ -217,6 +219,7 @@ class FactionHandler {
         $item = ItemModel::where('cost', '<=', RandomAffixDetails::BASIC)
             ->whereNull('item_prefix_id')
             ->whereNull('item_suffix_id')
+            ->whereNotIn('type', ['alchemy', 'quest'])
             ->where('cost', '<=', 4000000000)
             ->inRandomOrder()
             ->first();
