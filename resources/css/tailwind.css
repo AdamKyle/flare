@@ -1,10 +1,5 @@
 @import "../vendor/theme/assets/css/style.css";
 
-a.tw-text-white {
-    &:hover {
-        color: #fff !important;
-    }
-}
 
 .glightbox {
     img {
@@ -26,4 +21,25 @@ blockquote {
     strong {
         @apply text-blue-800 !important;
     }
+}
+
+dl {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 0;
+    margin-bottom: -10px;
+}
+
+dt {
+    margin-left: auto;
+    width: 50%;
+    text-align: left;
+    font-weight: bolder;
+    margin-bottom: 4px;
+}
+
+dd {
+    margin-left: auto;
+    width: 50%;
+    margin-bottom: 4px;
 }
