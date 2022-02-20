@@ -57,10 +57,12 @@
         "react-content-loader": "^5.1.1",
         "react-countdown": "^2.3.1",
         "react-countdown-circle-timer": "^2.5.0",
+        "react-data-table-component": "^7.4.7",
         "react-draggable": "^4.1.0",
         "react-organizational-chart": "^2.1.0",
         "react-select": "^5.2.1",
         "rpg-awesome": "^0.2.0",
+        "styled-components": "^5.3.3",
         "uuid": "^8.3.2"
     }
 }
