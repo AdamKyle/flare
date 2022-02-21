@@ -55,11 +55,9 @@ class FactionHandler {
         }
 
         if ($faction->current_points === $faction->points_needed && !FactionLevel::isMaxLevel($faction->current_level)) {
-
             return $this->handleFactionLevelUp($character, $faction, $map->name);
 
         } else if (FactionLevel::isMaxLevel($faction->current_level) && !$faction->maxed) {
-
             return $this->handleFactionMaxedOut($character, $faction, $map->name);
         }
 
@@ -217,6 +215,7 @@ class FactionHandler {
         $item = ItemModel::where('cost', '<=', RandomAffixDetails::BASIC)
             ->whereNull('item_prefix_id')
             ->whereNull('item_suffix_id')
+            ->whereNotIn('type', ['alchemy', 'quest'])
             ->where('cost', '<=', 4000000000)
             ->inRandomOrder()
             ->first();

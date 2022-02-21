@@ -182,10 +182,8 @@ export default class QuestDetails extends React.Component {
                       <dl>
                         <dt>Name</dt>
                         <dd>{this.props.quest.npc.name}</dd>
-                        <dt>How to message</dt>
-                        <dd><code>{this.props.quest.npc.text_command_to_message}</code></dd>
-                        <dt>Available Commands</dt>
-                        <dd>{this.getNPCCommands(this.props.quest.npc)}</dd>
+                        <dt className="tw-text-green-700"><i className="fas fa-comment"></i> How to message</dt>
+                        <dd className="tw-text-green-700"><code>{this.props.quest.npc.text_command_to_message} {this.getNPCCommands(this.props.quest.npc)}</code></dd>
                         <dt>Coordinates (X/Y)</dt>
                         <dd>{this.props.quest.npc.x_position} / {this.props.quest.npc.y_position}</dd>
                         <dt>On Plane</dt>
@@ -195,13 +193,24 @@ export default class QuestDetails extends React.Component {
                       </dl>
                       <hr />
                       <h3 className="tw-font-light">Info</h3>
-                      <p>
-                        Use the chat box to communicate with the NPC by private messaging them. The Available Commands section outlines accepted commands you can
-                        message them. Some NPC's might require you to be at their location. This means you have to physically be at the same coordinates before
-                        you message the npc to complete the quest.
-                      </p>
+                      <AlertInfo icon={'fas fa-question-circle'} title={"How to chat with NPC's"}>
+                        <p>
+                          All quests require you to use the chat box to chat with the NPC to complete the quest. You do this by
+                        taking the <strong>How to message</strong> command, copy and paste it to the chat box and hit enter,
+                        make sure there are no spaces before the command.
+                        </p>
+                        <p>
+                          Some NPC's will require you to be at their location, check the <strong>Must be at same location?</strong> above to see if
+                          you must be at their coordinates on the map, which are also above.
+                        </p>
+                      </AlertInfo>
                     </div>
                     <div className={npcPLaneAccess !== null ? 'col-md-6' : 'hide'}>
+                      <AlertInfo icon={'fas fa-question-circle'} title={"How to access"}>
+                        <p>
+                          Looks like this NPC is on another plane. If you read down the list it literally tells you what to do.
+                        </p>
+                      </AlertInfo>
                       <h5 className="tw-font-light">How to access this NPC</h5>
                       <hr />
                       <dl>

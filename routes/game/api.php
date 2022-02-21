@@ -39,8 +39,8 @@ Route::group(['middleware' => ['auth', 'throttle:100,1', 'is.character.who.they.
             Route::post('/character/{character}/random-enchant/reroll', ['uses' => 'Api\RandomEnchantController@reRoll']);
             Route::post('/character/{character}/random-enchant/move', ['uses' => 'Api\RandomEnchantController@moveAffixes']);
 
-            Route::get('/character/{character}/inventory/smiths-workbench', ['uses' => 'Api\HolyitemsController@index']);
-            Route::post('/character/{character}/smithy-workbench/apply', ['uses' => 'Api\HolyitemsController@apply']);
+            Route::get('/character/{character}/inventory/smiths-workbench', ['uses' => 'Api\HolyItemsController@index']);
+            Route::post('/character/{character}/smithy-workbench/apply', ['uses' => 'Api\HolyItemsController@apply']);
         });
 
         Route::post('/character/{character}/inventory/destroy-all-alchemy-items', ['uses' => 'Api\CharacterInventoryController@destroyAllAlchemyItems']);

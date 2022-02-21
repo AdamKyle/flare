@@ -2,11 +2,13 @@
 
 namespace App\Flare\Handlers;
 
-use App\Flare\Builders\CharacterInformationBuilder;
+
 use App\Flare\Models\Character;
 use App\Flare\Models\ItemAffix;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
+use App\Flare\Builders\Character\ClassDetails\HolyStacks;
+use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Services\BuildMonsterCacheService;
 use App\Game\Adventures\Traits\CreateBattleMessages;
 
@@ -14,26 +16,29 @@ class SetupFightHandler {
 
     use CreateBattleMessages;
 
-    private $battleLogs = [];
+    private $battleLogs            = [];
 
-    private $attackType = null;
+    private $attackType            = null;
 
-    private $defender   = null;
+    private $defender              = null;
 
-    private $processed  = false;
+    private $processed             = false;
 
-    private $monsterDevoided = false;
+    private $monsterDevoided       = false;
 
-    private $monsterVoided   = false;
+    private $monsterVoided         = false;
 
     private $characterDmgDeduction = 0.0;
 
     private $characterInformationBuilder;
 
+    private $holyStacks;
+
     private $buildMonsterCacheService;
 
-    public function __construct(CharacterInformationBuilder $characterInformationBuilder, BuildMonsterCacheService $buildMonsterCacheService) {
+    public function __construct(CharacterInformationBuilder $characterInformationBuilder, HolyStacks $holyStacks, BuildMonsterCacheService $buildMonsterCacheService) {
         $this->characterInformationBuilder = $characterInformationBuilder;
+        $this->holyStacks                  = $holyStacks;
         $this->buildMonsterCacheService    = $buildMonsterCacheService;
     }
 
@@ -44,49 +49,52 @@ class SetupFightHandler {
         $defender  = $this->getDefenderFromSpecialLocation($attacker, $defender);
         $defender  = $this->applyEnemyStatIncrease($defender, $reduction);
 
-        if ($attacker instanceof Character) {
-            $this->characterInformationBuilder = $this->characterInformationBuilder->setCharacter($attacker);
+        $characterIsDevoided = false;
+        $monsterIsDevoided   = false;
 
-            if (!is_null($reduction)) {
-                $this->characterDmgDeduction = $reduction;
-            }
+        if ($this->canMonsterDevoidCharacter($defender, $attacker)) {
+            $message = $defender->name . ' has devoided your voidance! You feel fear start to build.';
 
-            if ($this->devoidEnemy($attacker)) {
-                $message = 'Magic crackles in the air, the darkness consumes the enemy. They are devoided!';
+            $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
 
-                $this->battleLogs = $this->addMessage($message, 'action-fired', $this->battleLogs);
-
-                $this->monsterDevoided = true;
-            }
-
-            if ($this->voidedEnemy($attacker)) {
-                $message = 'The light of the heavens shines through this darkness. The enemy is voided!';
-
-                $this->battleLogs = $this->addMessage($message, 'action-fired', $this->battleLogs);
-
-                $this->monsterVoided = true;
-            }
+            $characterIsDevoided = true;
         }
 
-        if ($defender instanceof Monster && !$this->monsterDevoided) {
-            if ($this->voidedEnemy($defender)) {
-                $message = $defender->name . ' has voided your enchantments! You feel much weaker!';
+        if ($this->canCharacterDevoidEnemy($attacker) && !$characterIsDevoided) {
+            $message           = 'Magic crackles in the air, the darkness consumes the enemy. They are devoided!';
 
-                $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
+            $this->battleLogs  = $this->addMessage($message, 'action-fired', $this->battleLogs);
 
-                $this->attackType = 'voided_';
-            }
+            $monsterIsDevoided = true;
+        }
+
+        if ($this->canMonsterVoidCharacter($defender, $attacker) && !$monsterIsDevoided) {
+            $message          = $defender->name . ' has voided your enchantments! You feel much weaker!';
+
+            $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
+
+            $this->attackType = 'voided_';
+        }
+
+        if ($this->canCharacterVoidEnemy($attacker) && $this->attackType !== '_voided') {
+            $message             = 'The light of the heavens shines through this darkness. The enemy is voided!';
+
+            $this->battleLogs    = $this->addMessage($message, 'action-fired', $this->battleLogs);
+
+            $this->monsterVoided = true;
+        }
+
+        if (!is_null($reduction)) {
+            $this->characterDmgDeduction = $reduction;
         }
 
         // Only do this once per fight and if you are not voided.
         if (is_null($this->attackType) && !$this->processed) {
-            if ($attacker instanceof Character && is_null($this->attackType)) {
-                $defender = $this->reduceEnemyStats($defender);
+            $defender = $this->reduceEnemyStats($defender);
 
-                $defender = $this->reduceEnemySkills($defender);
+            $defender = $this->reduceEnemySkills($defender);
 
-                $defender = $this->reduceEnemyResistances($defender);
-            }
+            $defender = $this->reduceEnemyResistances($defender);
         }
 
         $this->defender = $defender;
@@ -127,7 +135,37 @@ class SetupFightHandler {
         return $this->defender;
     }
 
-    protected function voidedEnemy($defender) {
+    protected function canMonsterVoidCharacter($defender, $attacker): bool {
+        $devouringLight = $defender->devouring_light_chance;
+        $resistance     = $this->holyStacks->fetchDevouringResistanceBonus($attacker);
+
+        $devouringLight -= $resistance;
+
+        if ($devouringLight > 1) {
+            return true;
+        }
+
+        $dc = 100 - (100 * $devouringLight);
+
+        return rand(1, 100) > $dc;
+    }
+
+    protected function canMonsterDevoidCharacter($defender, $attacker): bool {
+        $devouringDarkness = $defender->devouring_darkness_chance;
+        $resistance        = $this->holyStacks->fetchDevouringResistanceBonus($attacker);
+
+        $devouringDarkness -= $resistance;
+
+        if ($devouringDarkness > 1) {
+            return true;
+        }
+
+        $dc = 100 - (100 * $devouringDarkness);
+
+        return rand(1, 100) > $dc;
+    }
+
+    protected function canCharacterVoidEnemy($defender) {
 
         if ($defender instanceof Character) {
             $devouringLight = $this->characterInformationBuilder->setCharacter($defender)->getDevouringLight();
@@ -140,6 +178,19 @@ class SetupFightHandler {
         }
 
         $dc   = 100 - 100 * $devouringLight;
+        $roll = rand(1, 100);
+
+        return $roll > $dc;
+    }
+
+    protected function canCharacterDevoidEnemy($attacker) {
+        $devouringDarknessChance = $this->characterInformationBuilder->setCharacter($attacker)->getDevouringDarkness();
+
+        if ($devouringDarknessChance >= 1) {
+            return true;
+        }
+
+        $dc   = 100 - 100 * $devouringDarknessChance;
         $roll = rand(1, 100);
 
         return $roll > $dc;
@@ -160,18 +211,6 @@ class SetupFightHandler {
         return $defender;
     }
 
-    protected function devoidEnemy($attacker) {
-        $devouringDarknessChance = $this->characterInformationBuilder->setCharacter($attacker)->getDevouringDarkness();
-
-        if ($devouringDarknessChance >= 1) {
-            return true;
-        }
-
-        $dc   = 100 - 100 * $devouringDarknessChance;
-        $roll = rand(1, 100);
-
-        return $roll > $dc;
-    }
 
     protected function reduceEnemyStats($defender) {
         $prefix                 = $this->characterInformationBuilder->findPrefixStatReductionAffix();

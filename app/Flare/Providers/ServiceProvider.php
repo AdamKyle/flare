@@ -27,6 +27,7 @@ use App\Flare\Handlers\CharacterAttackHandler;
 use App\Flare\Handlers\HealingExtraActionHandler;
 use App\Flare\Handlers\MonsterAttackHandler;
 use App\Flare\Handlers\SetupFightHandler;
+use App\Flare\Handlers\WeaponAndMagicAttackBase;
 use App\Flare\Middleware\IsCharacterLoggedInMiddleware;
 use App\Flare\Middleware\IsCharacterWhoTheySayTheyAreMiddleware;
 use App\Flare\Middleware\IsGloballyTimedOut;
@@ -240,6 +241,7 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(SetupFightHandler::class, function($app) {
             return new SetupFightHandler(
                 $app->make(CharacterInformationBuilder::class),
+                $app->make(HolyStacks::class),
                 $app->make(BuildMonsterCacheService::class)
             );
         });

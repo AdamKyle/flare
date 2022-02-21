@@ -76,22 +76,22 @@ class Exploration implements ShouldQueue
             }
         }
 
-        $encounterService->processEncounter($this->character, $automation);
+        $succeeded = $encounterService->processEncounter($this->character, $automation);
 
-        $timeLeft = now()->diffInMinutes($automation->completed_at);
+        if ($succeeded) {
+            $timeLeft = now()->diffInMinutes($automation->completed_at);
 
-        if ($timeLeft < 10) {
-            $this->endAutomation($rewardHandler, $automation);
+            if ($timeLeft < 10) {
+                $this->endAutomation($rewardHandler, $automation);
 
-            return;
-        }
+                return;
+            }
 
-        $character = $this->character->refresh();
+            $character = $this->character->refresh();
 
-        if (!$character->is_dead) {
-            event(new ExplorationLogUpdate($this->character->user, 'Next encounter will start in 10 minutes.'));
+            event(new ExplorationLogUpdate($character->user, 'Next encounter will start in 10 minutes.'));
 
-            Exploration::dispatch($this->character, $automation->id, $this->attackType)->delay(now()->addMinutes(10));
+            Exploration::dispatch($character, $automation->id, $this->attackType)->delay(now()->addMinutes(10));
         }
     }
 
