@@ -119,19 +119,18 @@ export default class Damage {
 
   canAutoHit(attacker) {
     if (attacker.extra_action_chance.class_name === attacker.class) {
-
       const extraActionChance = attacker.extra_action_chance;
+
+      if (extraActionChance.type === ExtraActionType.THIEVES_SHADOW_DANCE && extraActionChance.has_item) {
+        this.addActionMessage('You dance along in the shadows, the enemy doesn\'t see you. Strike now!');
+
+        return true;
+      }
 
       if (!this.canUse(extraActionChance.chance)) {
         return false;
       }
 
-      if (extraActionChance.type === ExtraActionType.THIEVES_SHADOW_DANCE && extraActionChance.has_item) {
-
-        this.addActionMessage('You dance along in the shadows, the enemy doesn\'t see you. Strike now!');
-
-        return true;
-      }
     }
 
     return false;

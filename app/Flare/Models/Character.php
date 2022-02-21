@@ -85,7 +85,7 @@ class Character extends Model
         'can_adventure_again_at'      => 'datetime',
         'can_settle_again_at'         => 'datetime',
         'level'                       => 'integer',
-        'xp'                          => 'float',
+        'xp'                          => 'integer',
         'xp_next'                     => 'integer',
         'str'                         => 'integer',
         'dur'                         => 'integer',

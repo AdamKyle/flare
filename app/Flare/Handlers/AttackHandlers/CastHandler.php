@@ -95,7 +95,7 @@ class CastHandler {
         if ($this->attackExtraActionHandler->canAutoAttack($characterInfo)) {
             $message = 'You dance along in the shadows, the enemy doesn\'t see you. Strike now!';
 
-            $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
+            $this->battleLogs = $this->addMessage($message, 'action-fired', $this->battleLogs);
 
             $this->castDamageSpells($characterInfo, $defender, $voided);
             $this->fireOffHealingSpells($characterInfo, $voided);

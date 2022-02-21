@@ -51,6 +51,8 @@ export default class CanHitCheck {
       if (damage.canAutoHit(attacker)) {
         this.battleMessages = [...battleMessages, ...damage.getMessages()];
 
+        this.canAutoHit     = true;
+
         return true;
       }
 

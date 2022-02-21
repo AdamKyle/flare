@@ -83,7 +83,7 @@ class DefendHandler {
         if ($this->attackExtraActionHandler->canAutoAttack($characterInfo)) {
             $message          = 'You dance through out the shadows, weaving a web of deadly magics. The enemy is blind to you. (Auto Hit)';
 
-            $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
+            $this->battleLogs = $this->addMessage($message, 'action-fired', $this->battleLogs);
 
             $this->useItems($attacker, $defender, $voided);
 

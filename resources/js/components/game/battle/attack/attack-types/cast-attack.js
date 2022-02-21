@@ -28,9 +28,13 @@ export default class CastAttack {
 
     const canEntrance      = canEntranceEnemy.canEntranceEnemy(attackData, this.defender, 'player')
 
-    this.battleMessages   = canEntranceEnemy.getBattleMessages();
+    const canHitCheck      = new CanHitCheck();
 
-    if (canEntrance) {
+    const canHit           = canHitCheck.canCast(this.attacker, this.defender, this.battleMessages);
+
+    if (canHitCheck.getCanAutoHit()) {
+      this.battleMessages   = [...this.battleMessages, ...canHitCheck.getBattleMessages()];
+
       this.attackWithSpells(attackData, canEntrance);
 
       if (attackData.heal_for > 0) {
@@ -42,20 +46,21 @@ export default class CastAttack {
       return this.setState();
     }
 
-    const canHitCheck      = new CanHitCheck();
+    if (canEntrance) {
+      this.battleMessages   = [...this.battleMessages, ...canEntranceEnemy.getBattleMessages()];
 
-    const canHit           = canHitCheck.canCast(this.attacker, this.defender, this.battleMessages);
+      this.attackWithSpells(attackData, canEntrance);
 
-    this.battleMessages    = [...this.battleMessages, canHitCheck.getBattleMessages()]
+      if (attackData.heal_for > 0) {
+        this.healWithSpells(attackData);
+      }
 
-    if (canHitCheck.getCanAutoHit()) {
-      this.attackWithSpells(attackData, false);
-      this.healWithSpells(attackData);
-
-      this.useItems(attackData, this.attacker.class)
+      this.useItems(attackData, this.attacker.class);
 
       return this.setState();
     }
+
+    this.battleMessages    = [...this.battleMessages, canHitCheck.getBattleMessages()]
 
     if (attackData.spell_damage > 0) {
       if (canHit) {

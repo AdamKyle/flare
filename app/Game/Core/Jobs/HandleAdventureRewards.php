@@ -68,6 +68,6 @@ class HandleAdventureRewards implements ShouldQueue
 
         event(new UpdateTopBarEvent($character));
 
-        event(new ServerMessageEvent($character->user, 'Xp, Skill XP, Currencies have all been rewarded. You can start another adventure while we process your items or you can wait if you please. Keep an eye on chat for item updates.'));
+        event(new ServerMessageEvent($character->user, 'Xp, Skill XP, Currencies have all been rewarded. You can start another adventure while we process your items or you can wait if you please. Keep an eye on Server tab for item updates.'));
     }
 }

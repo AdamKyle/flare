@@ -23,35 +23,39 @@ export default class WeaponAttack {
   }
 
   doAttack() {
+
     const attackData       = this.attacker.attack_types[this.voided ? AttackType.VOIDED_ATTACK : AttackType.ATTACK];
 
     const canEntranceEnemy = new CanEntranceEnemy();
 
     const canEntrance      = canEntranceEnemy.canEntranceEnemy(attackData, this.defender, 'player')
 
-    this.battleMessages   = canEntranceEnemy.getBattleMessages();
-
-    if (canEntrance) {
-      this.attackWithWeapon(attackData);
-
-      this.useItems(attackData, this.attacker.class);
-
-      return this.setState();
-    }
-
     const canHitCheck      = new CanHitCheck();
 
     const canHit           = canHitCheck.canHit(this.attacker, this.defender, this.battleMessages);
 
-    this.battleMessages    = [...this.battleMessages, ...canHitCheck.getBattleMessages()]
-
     if (canHitCheck.getCanAutoHit()) {
+      this.battleMessages    = [...this.battleMessages, ...canHitCheck.getBattleMessages()]
+
       this.attackWithWeapon(attackData);
 
       this.useItems(attackData, this.attacker.class);
 
       return this.setState();
     }
+
+    if (canEntrance ) {
+      this.battleMessages    = [...this.battleMessages, ...canEntranceEnemy.getBattleMessages()];
+
+      this.attackWithWeapon(attackData);
+
+      this.useItems(attackData, this.attacker.class);
+
+      return this.setState();
+    }
+
+
+    this.battleMessages    = [...this.battleMessages, ...canHitCheck.getBattleMessages()]
 
     if (canHit) {
       if (this.canBlock(attackData.weapon_damage)) {

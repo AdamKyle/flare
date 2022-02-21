@@ -147,6 +147,8 @@ class CharacterRewardService {
             $xp = ($xp + $xp * $gameMap->xp_bonus);
         }
 
+        dump($this->character->xp, $xp);
+
         $xp = $this->character->xp + $xp;
 
         $this->character->update([
