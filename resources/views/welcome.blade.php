@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container mx-auto px-4">
+    <div class="container mx-auto px-4 mb-5">
         <div class="text-center mb-10">
             <h1 class="mb-5 font-thin text-7xl dark:text-gray-300 text-gray-800">Planes of Tlessa</h1>
             <p class="mb-10 dark:text-gray-300 text-gray-800 italic">A world full of mystery and exploration.</p>

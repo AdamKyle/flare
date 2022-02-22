@@ -184,7 +184,7 @@
                 NPC Kingdoms
             </a>
             <a href="{{route('info.page', ['pageName' => 'kingdom-passive-skills'])}}">
-                <span class="fas fas-site-map"></span>
+                <span class="fas fa-sitemap"></span>
                 Kingdom Passive Skills
             </a>
         </div>
@@ -233,7 +233,7 @@
                     Alchemy (Usable items)
                 </a>
                 <a href="{{route('info.page', ['pageName' => 'random-enchants'])}}">
-                    <span class=" ra-fairy-wand"></span>
+                    <span class="ra ra-fairy-wand"></span>
                     Random Enchantments (Uniques)
                 </a>
                 <a href="{{route('info.page', ['pageName' => 'holy-items'])}}">
