@@ -40,7 +40,7 @@ class Exploration implements ShouldQueue
 
     public function handle(EncounterService $encounterService, ExplorationAutomationService $explorationAutomationService, RewardHandler $rewardHandler) {
 
-        $automation = CharacterAutomation::find($this->automationId);
+        $automation = CharacterAutomation::where('character_id', $this->character->id)->where('id', $this->automationId)->first();
 
         if ($this->shouldBail($automation)) {
             $this->endAutomation($rewardHandler, $automation);
