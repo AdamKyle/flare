@@ -93,7 +93,7 @@ class ReRollEnchantmentService {
 
         $duplicateSecondaryItem = $secondarySlot->item->duplicate();
         $duplicateUnique        = $slot->item->duplicate();
-        $duplicateUnique        = $this->applyHolyStacks($slot->item, $duplicateUnique);
+        $duplicateSecondaryItem = $this->applyHolyStacks($slot->item, $duplicateSecondaryItem);
 
         $duplicateUnique->update([
             'market_sellable' => true,
@@ -211,9 +211,8 @@ class ReRollEnchantmentService {
      */
     protected function applyHolyStacks(Item $oldItem, Item $item): Item {
         if ($oldItem->appliedHolyStacks()->count() > 0) {
-            $holyStacks = $item->appliedHolyStacks();
 
-            foreach ($holyStacks as $stack) {
+            foreach ($oldItem->appliedHolyStacks as $stack) {
                 $stackAttributes = $stack->getAttributes();
 
                 $stackAttributes['item_id'] = $item->id;
