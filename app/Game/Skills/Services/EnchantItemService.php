@@ -130,7 +130,31 @@ class EnchantItemService {
 
         $clonedItem->save();
 
-        $this->item = $clonedItem->refresh();
+
+        $this->item = $this->applyHolyStacks($item, $clonedItem);
+    }
+
+    /**
+     * Apply the old items holy stacks to the new item.
+     *
+     * @param Item $oldItem
+     * @param Item $item
+     * @return Item
+     */
+    protected function applyHolyStacks(Item $oldItem, Item $item): Item {
+        if ($oldItem->appliedHolyStacks()->count() > 0) {
+            $holyStacks = $item->appliedHolyStacks();
+
+            foreach ($holyStacks as $stack) {
+                $stackAttributes = $stack->getAttributes();
+
+                $stackAttributes['item_id'] = $item->id;
+
+                $item->appliedHolyStacks()->create($stackAttributes);
+            }
+        }
+
+        return $item->refresh();
     }
 
     /**
