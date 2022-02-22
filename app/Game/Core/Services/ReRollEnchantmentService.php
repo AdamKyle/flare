@@ -56,18 +56,20 @@ class ReRollEnchantmentService {
             'shards'    => $character->shards - $shardCost,
         ]);
 
-        $dupliateItem   = $slot->item->duplicate();
+        $duplicateItem   = $slot->item->duplicate();
 
-        foreach ($this->fetchAffixesForReRoll($dupliateItem, $affixType) as $affix) {
-            $this->changeAffix($character, $dupliateItem, $affix, $reRollType);
+        $duplicateItem   = $this->applyHolyStacks($slot->item, $duplicateItem);
+
+        foreach ($this->fetchAffixesForReRoll($duplicateItem, $affixType) as $affix) {
+            $this->changeAffix($character, $duplicateItem, $affix, $reRollType);
         }
 
-        $dupliateItem->update([
+        $duplicateItem->update([
             'market_sellable' => true,
         ]);
 
         $slot->update([
-            'item_id' => $dupliateItem->id,
+            'item_id' => $duplicateItem->id,
         ]);
 
         $character = $character->refresh();
@@ -91,17 +93,18 @@ class ReRollEnchantmentService {
 
         $duplicateSecondaryItem = $secondarySlot->item->duplicate();
         $duplicateUnique        = $slot->item->duplicate();
+        $duplicateSecondaryItem = $this->applyHolyStacks($slot->item, $duplicateSecondaryItem);
 
         $duplicateUnique->update([
             'market_sellable' => true,
         ]);
 
-        $deletedAll = false;
+        $deletedAll  = false;
         $deletedSome = false;
         $deletedNone = false;
 
         if ($affixType === 'all-enchantments') {
-            $delectedOne = false;
+            $deletedOne  = false;
             $deletedTwo  = false;
 
 
@@ -197,6 +200,28 @@ class ReRollEnchantmentService {
         if ($deletedNone) {
             event(new GlobalMessageEvent($character->name . ' Makes the Queen of Hearts blush! She is attracted to them now.'));
         }
+    }
+
+    /**
+     * Apply the old items holy stacks to the new item.
+     *
+     * @param Item $oldItem
+     * @param Item $item
+     * @return Item
+     */
+    protected function applyHolyStacks(Item $oldItem, Item $item): Item {
+        if ($oldItem->appliedHolyStacks()->count() > 0) {
+
+            foreach ($oldItem->appliedHolyStacks as $stack) {
+                $stackAttributes = $stack->getAttributes();
+
+                $stackAttributes['item_id'] = $item->id;
+
+                $item->appliedHolyStacks()->create($stackAttributes);
+            }
+        }
+
+        return $item->refresh();
     }
 
     protected function fetchAffixesForReRoll(Item $item, string $affixType): array {
