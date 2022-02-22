@@ -4,6 +4,7 @@ namespace App\Game\Exploration\Controllers\Api;
 
 use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\CharacterAutomation;
+use App\Flare\Values\AttackTypeValue;
 use App\Game\Exploration\Events\ExplorationLogUpdate;
 use App\Game\Exploration\Events\ExplorationStatus;
 use App\Game\Exploration\Services\AttackAutomationService;
@@ -29,6 +30,13 @@ class ExplorationController extends Controller {
     }
 
     public function begin(ExplorationRequest $request, Character $character, ExplorationAutomationService $explorationAutomationService) {
+
+        if (!AttackTypeValue::attackTypeExists($request->attack_type)) {
+            return response()->json([
+                'message' => 'invalid attack type was selected. Please select from the drop down.'
+            ], 422);
+        }
+
         $response = $explorationAutomationService->beginAutomation($character, $request->all());
 
         return response()->json([

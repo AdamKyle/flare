@@ -15,7 +15,7 @@ class MonstersSheet implements FromView, WithTitle, ShouldAutoSize {
      */
     public function view(): View {
         return view('admin.exports.monsters.sheets.monsters', [
-            'monsters' => Monster::all(),
+            'monsters' => Monster::orderBy('game_map_id')->get(),
         ]);
     }
 

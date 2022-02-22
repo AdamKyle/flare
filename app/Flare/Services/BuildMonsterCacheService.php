@@ -32,7 +32,7 @@ class BuildMonsterCacheService {
                 Monster::where('published', true)
                     ->where('is_celestial_entity', false)
                     ->where('game_map_id', $gameMap->id)
-                    ->orderBy('max_level', 'asc')->get(),
+                    ->get(),
                 $this->monster
             );
 
@@ -42,8 +42,8 @@ class BuildMonsterCacheService {
         foreach (Location::whereNotNull('enemy_strength_type')->get() as $location) {
             $monsters = Monster::where('published', true)
                                ->where('is_celestial_entity', false)
-                               ->where('game_map_id', $location->map->id)
-                               ->orderBy('max_level', 'asc')->get();
+                               ->where('game_map_id', $location->game_map_id)
+                               ->get();
 
             switch ($location->enemy_strength_type) {
                 case LocationEffectValue::INCREASE_STATS_BY_HUNDRED_THOUSAND:
@@ -95,23 +95,24 @@ class BuildMonsterCacheService {
 
     protected function transformMonsterForLocation(DBCollection $monsters, int $increaseStatsBy, float $increasePercentageBy): IlluminateCollection {
         return $monsters->transform(function($monster) use ($increaseStatsBy, $increasePercentageBy) {
-            $monster->str                    += $increaseStatsBy;
-            $monster->dex                    += $increaseStatsBy;
-            $monster->agi                    += $increaseStatsBy;
-            $monster->dur                    += $increaseStatsBy;
-            $monster->chr                    += $increaseStatsBy;
-            $monster->int                    += $increaseStatsBy;
-            $monster->ac                     += $increaseStatsBy;
-            $monster->spell_evasion          += $increasePercentageBy;
-            $monster->artifact_annulment     += $increasePercentageBy;
-            $monster->affix_resistance       += $increasePercentageBy;
-            $monster->healing_percentage     += $increasePercentageBy;
-            $monster->entrancing_chance      += $increasePercentageBy;
-            $monster->devouring_light_chance += $increasePercentageBy;
-            $monster->accuracy               += $increasePercentageBy;
-            $monster->casting_accuracy       += $increasePercentageBy;
-            $monster->dodge                  += $increasePercentageBy;
-            $monster->criticality            += $increasePercentageBy;
+            $monster->str                       += $increaseStatsBy;
+            $monster->dex                       += $increaseStatsBy;
+            $monster->agi                       += $increaseStatsBy;
+            $monster->dur                       += $increaseStatsBy;
+            $monster->chr                       += $increaseStatsBy;
+            $monster->int                       += $increaseStatsBy;
+            $monster->ac                        += $increaseStatsBy;
+            $monster->spell_evasion             += $increasePercentageBy;
+            $monster->artifact_annulment        += $increasePercentageBy;
+            $monster->affix_resistance          += $increasePercentageBy;
+            $monster->healing_percentage        += $increasePercentageBy;
+            $monster->entrancing_chance         += $increasePercentageBy;
+            $monster->devouring_light_chance    += $increasePercentageBy;
+            $monster->devouring_darkness_chance += $increasePercentageBy;
+            $monster->accuracy                  += $increasePercentageBy;
+            $monster->casting_accuracy          += $increasePercentageBy;
+            $monster->dodge                     += $increasePercentageBy;
+            $monster->criticality               += $increasePercentageBy;
 
             return $monster;
         });

@@ -47,6 +47,8 @@ class EncounterService {
 
             return true;
         } catch (\Exception $e) {
+            $characterAutomation->delete();
+
             $character = $character->refresh();
 
             event(new ExplorationTimeOut($character->user, 0));

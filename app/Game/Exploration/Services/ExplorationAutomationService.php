@@ -48,7 +48,6 @@ class ExplorationAutomationService {
             $character = $result;
         }
 
-
         $automation = CharacterAutomation::create([
             'character_id'                  => $character->id,
             'monster_id'                    => $params['selected_monster_id'],
@@ -92,7 +91,7 @@ class ExplorationAutomationService {
                 'id'                       => $automation->id,
                 'skill_id'                 => !is_null($skillCurrentlyTraining) ? $skillCurrentlyTraining->id : null,
                 'xp_towards'               => !is_null($skillCurrentlyTraining) ? $skillCurrentlyTraining->xp_towards : null,
-                'auto_attack_length'       => $automation->completed_at->diffInSeconds(now()),
+                'auto_attack_length'       => $automation->completed_at->diffInMinutes(now()),
                 'move_down_the_list_every' => $automation->move_down_monster_list_every,
                 'selected_monster_id'      => $automation->monster_id,
                 'attack_type'              => $automation->attack_type,

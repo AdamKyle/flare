@@ -105,16 +105,6 @@ class Exploration implements ShouldQueue
             return true;
         }
 
-        if (now()->diffInHours($automation->started_at) >= 8) {
-            $automation->character->update([
-                'is_attack_automation_locked' => true,
-            ]);
-
-            event(new ServerMessageEvent($automation->character->user, 'Exploration suspended until tomorrow at 12pm GMT -7. You have reached the max time limit for today.'));
-
-            return true;
-        }
-
         return false;
     }
 

@@ -76,7 +76,7 @@ class SetupFightHandler {
             $this->attackType = 'voided_';
         }
 
-        if ($this->canCharacterVoidEnemy($attacker) && $this->attackType !== '_voided') {
+        if ($this->canCharacterVoidEnemy($attacker) && $this->attackType !== 'voided_') {
             $message             = 'The light of the heavens shines through this darkness. The enemy is voided!';
 
             $this->battleLogs    = $this->addMessage($message, 'action-fired', $this->battleLogs);
@@ -151,6 +151,7 @@ class SetupFightHandler {
     }
 
     protected function canMonsterDevoidCharacter($defender, $attacker): bool {
+
         $devouringDarkness = $defender->devouring_darkness_chance;
         $resistance        = $this->holyStacks->fetchDevouringResistanceBonus($attacker);
 
