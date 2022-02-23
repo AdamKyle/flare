@@ -153,6 +153,7 @@ class SetupFightHandler {
     protected function canMonsterDevoidCharacter($defender, $attacker): bool {
 
         $devouringDarkness = $defender->devouring_darkness_chance;
+
         $resistance        = $this->holyStacks->fetchDevouringResistanceBonus($attacker);
 
         $devouringDarkness -= $resistance;

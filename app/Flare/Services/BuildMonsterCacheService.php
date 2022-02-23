@@ -27,6 +27,8 @@ class BuildMonsterCacheService {
     public function buildCache() {
         $monstersCache = [];
 
+        Cache::delete('monsters');
+
         foreach (GameMap::all() as $gameMap) {
             $monsters =  new Collection(
                 Monster::where('published', true)
