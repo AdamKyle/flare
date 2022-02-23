@@ -79,6 +79,11 @@ class ExplorationAutomationService {
         ]);
     }
 
+    /**
+     * @param Character $character
+     * @param CharacterAutomation|null $automation
+     * @return array
+     */
     public function fetchData(Character $character, ?CharacterAutomation $automation = null): array {
         $skillCurrentlyTraining = $character->skills->filter(function ($skill) {
             return $skill->currently_training;
@@ -105,6 +110,12 @@ class ExplorationAutomationService {
         return $data;
     }
 
+    /**
+     * @param Character $character
+     * @param int $skillId
+     * @param float $xp
+     * @return Character|array
+     */
     protected function switchSkills(Character $character, int $skillId, float $xp): Character|array {
         $result = $this->skillService->trainSkill($character, $skillId, $xp);
 
