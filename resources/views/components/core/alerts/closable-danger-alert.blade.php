@@ -1,6 +1,6 @@
 @props([
-    'title' => 'Oh Christ Child!',
-    'icon'  => 'fas fa-exclamation-triangle',
+'title' => 'Oh Christ Child!',
+'icon'  => 'fas fa-exclamation-triangle',
 ])
 
 <div x-data="{ show: true }" x-show="show"
@@ -12,5 +12,10 @@
     <div>
         <p class="font-bold text-red-700 dark:text-red-800-800 mb-5"><i class="{{$icon}}"></i> {{$title}}</p>
         {{$slot}}
+    </div>
+    <div>
+        <button type="button" @click="show = false" class="text-gray-800">
+            <span class="text-2xl">&times;</span>
+        </button>
     </div>
 </div>

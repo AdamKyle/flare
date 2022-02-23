@@ -1,7 +1,6 @@
-
 @props([
-    'title' => 'Warning',
-    'icon'  => 'far fa-question-circle',
+'title' => 'Warning',
+'icon'  => 'far fa-question-circle',
 ])
 
 <div x-data="{ show: true }" x-show="show"
@@ -13,5 +12,10 @@
     <div>
         <p class="font-bold text-yellow-700 dark:text-yellow-800-800 mb-5"><i class="{{$icon}}"></i> {{$title}}</p>
         {{$slot}}
+    </div>
+    <div>
+        <button type="button" @click="show = false" class="text-gray-800">
+            <span class="text-2xl">&times;</span>
+        </button>
     </div>
 </div>

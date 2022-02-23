@@ -6,35 +6,22 @@
   <component name="ChangeListManager">
     <list default="true" id="b57f583e-608e-4ca2-947d-cf9ab46f7914" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Admin/Exports/Monsters/Sheets/MonstersSheet.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Admin/Exports/Monsters/Sheets/MonstersSheet.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Flare/Handlers/CharacterAttackHandler.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Handlers/CharacterAttackHandler.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Flare/Handlers/SetupFightHandler.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Handlers/SetupFightHandler.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Flare/Services/BuildMonsterCacheService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Services/BuildMonsterCacheService.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Flare/Services/FightService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Services/FightService.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Flare/Transformers/MonsterTransfromer.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Transformers/MonsterTransfromer.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Flare/Values/AttackTypeValue.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Values/AttackTypeValue.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Game/Exploration/Controllers/Api/ExplorationController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Exploration/Controllers/Api/ExplorationController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Game/Exploration/Jobs/Exploration.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Exploration/Jobs/Exploration.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Game/Exploration/Services/EncounterService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Exploration/Services/EncounterService.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Game/Exploration/Services/ExplorationAutomationService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Exploration/Services/ExplorationAutomationService.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Providers/AppServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Providers/AppServiceProvider.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/composer.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/composer.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/css/tailwind.css" beforeDir="false" afterPath="$PROJECT_DIR$/resources/css/tailwind.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/bootstrap.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/bootstrap.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/game/sections/auto-attack-section.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/sections/auto-attack-section.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/vendor/theme/assets/css/base.css" beforeDir="false" afterPath="$PROJECT_DIR$/resources/vendor/theme/assets/css/base.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/auth/login.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/auth/login.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/components/core/buttons/link-buttons/primary-button.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/components/core/buttons/link-buttons/primary-button.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/components/core/buttons/link-buttons/success-button.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/components/core/buttons/link-buttons/success-button.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/components/core/cards/card-with-title.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/components/core/cards/card-with-title.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/vendor/livewire/livewire.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/vendor/livewire/livewire.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/vendor/livewire/livewire.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/public/vendor/livewire/livewire.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/vendor/livewire/manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/vendor/livewire/manifest.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/vendor/theme/assets/css/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/resources/vendor/theme/assets/css/style.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/vendor/theme/assets/css/utilities.css" beforeDir="false" afterPath="$PROJECT_DIR$/resources/vendor/theme/assets/css/utilities.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/components/core/alerts/danger-alert.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/components/core/alerts/danger-alert.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/components/core/alerts/info-alert.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/components/core/alerts/info-alert.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/components/core/alerts/warning-alert.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/components/core/alerts/warning-alert.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/errors/404.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/errors/404.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/game/game.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/game/game.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/layouts/app.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layouts/app.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/layouts/information.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layouts/information.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/layouts/minimum-with-nav-bar.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layouts/minimum-with-nav-bar.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/layouts/partials/alerts.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layouts/partials/alerts.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/releases/list.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/releases/list.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/layouts/minimum.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layouts/minimum.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/welcome.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/welcome.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tailwind.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/tailwind.config.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -255,6 +242,8 @@
       <path value="$PROJECT_DIR$/vendor/symfony/polyfill-ctype" />
       <path value="$PROJECT_DIR$/vendor/symfony/polyfill-php81" />
       <path value="$PROJECT_DIR$/vendor/symfony/polyfill-php72" />
+      <path value="$PROJECT_DIR$/vendor/spatie/laravel-package-tools" />
+      <path value="$PROJECT_DIR$/vendor/rappasoft/laravel-livewire-tables" />
     </include_path>
   </component>
   <component name="ProjectId" id="1y74YHMKuHZ428N8k5rqo9nmnY6" />

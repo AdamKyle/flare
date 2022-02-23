@@ -1,16 +1,12 @@
-@extends('layouts.minimum')
+@extends('layouts.app')
 
 @section('content')
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-body">
-                        <h1 class="card-title">404</h1>
-                        <p>What you are looking for does not exist. Please try again.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="container justify-content-center">
+        <x-core.alerts.warning-alert title="Hmm....Not here...">
+            <p class="text-yellow-700 dark:text-gray-800 mb-5">Seems you are lost child! Let me guide you home.</p>
+            <x-core.buttons.link-buttons.primary-button href="/">
+                Take me home
+            </x-core.buttons.link-buttons.primary-button>
+        </x-core.alerts.warning-alert>
     </div>
 @endsection

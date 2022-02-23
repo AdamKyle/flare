@@ -151,7 +151,7 @@
     </header>
 
     <!-- Workspace -->
-    <main class="workspace dark:bg-gray-700">
+    <main class="workspace dark:bg-gray-900">
 
         @guest
             <div>

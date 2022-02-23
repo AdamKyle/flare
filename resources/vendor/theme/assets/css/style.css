@@ -24,3 +24,11 @@
 @import "components.css";
 @import "tailwindcss/utilities.css";
 @import "utilities.css";
+
+body {
+    font-size: 16px !important;
+}
+
+[x-cloak] {
+    display: none;
+}
