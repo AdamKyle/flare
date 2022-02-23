@@ -205,7 +205,7 @@ return [
     'crafting' => [
         [
             'livewire'            => true,
-            'view'                => 'admin.items.data-table',
+            'view'                => 'items',
             'only'                => null,
             'insert_before_table' => 'information.partials.crafting-section-one',
             'showSkillInfo'       => true,
@@ -215,7 +215,7 @@ return [
         ],
         [
             'livewire'            => true,
-            'view'                => 'admin.items.data-table',
+            'view'                => 'items',
             'only'                => 'quest-items-book',
             'insert_before_table' => null,
             'showSkillInfo'       => false,
@@ -225,7 +225,7 @@ return [
         ],
         [
             'livewire'            => true,
-            'view'                => 'admin.items.data-table',
+            'view'                => 'items',
             'only'                => null,
             'showSkillInfo'       => true,
             'showDropDown'        => true,

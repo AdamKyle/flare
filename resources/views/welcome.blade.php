@@ -16,8 +16,6 @@
             </x-core.buttons.link-buttons.success-button>
         </div>
 
-        @livewire('items')
-
         <img src="{{asset('promotion/game.png')}}" class="w-100 mb-10" />
 
         <div class="text-center w-1/3 mx-auto">

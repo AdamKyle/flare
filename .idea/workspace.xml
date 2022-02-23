@@ -6,22 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="b57f583e-608e-4ca2-947d-cf9ab46f7914" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/composer.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/composer.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/vendor/livewire/livewire.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/vendor/livewire/livewire.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/vendor/livewire/livewire.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/public/vendor/livewire/livewire.js.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/vendor/livewire/manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/vendor/livewire/manifest.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/vendor/theme/assets/css/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/resources/vendor/theme/assets/css/style.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/vendor/theme/assets/css/utilities.css" beforeDir="false" afterPath="$PROJECT_DIR$/resources/vendor/theme/assets/css/utilities.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/components/core/alerts/danger-alert.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/components/core/alerts/danger-alert.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/components/core/alerts/info-alert.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/components/core/alerts/info-alert.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/components/core/alerts/warning-alert.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/components/core/alerts/warning-alert.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/errors/404.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/errors/404.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/game/game.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/game/game.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/layouts/app.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layouts/app.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/layouts/minimum.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layouts/minimum.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/info.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/info.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/welcome.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/welcome.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tailwind.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/tailwind.config.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
