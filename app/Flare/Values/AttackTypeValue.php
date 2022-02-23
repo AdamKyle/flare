@@ -49,6 +49,10 @@ class AttackTypeValue {
         $this->value = $value;
     }
 
+    public static function attackTypeExists(string $value): bool {
+        return in_array($value, self::$values);
+    }
+
     public function isAttack(): bool {
         return $this->value === self::ATTACK;
     }

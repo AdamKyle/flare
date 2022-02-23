@@ -35,7 +35,7 @@ h3,
 
 h4,
 .h4 {
-  @apply font-heading font-bold text-primary;
+  @apply font-heading font-bold text-primary dark:text-primary-300;
 }
 
 h5,
@@ -49,10 +49,10 @@ h6,
 }
 
 a {
-  @apply text-primary;
+  @apply text-primary dark:text-primary-300 cursor-pointer;
 
   &:hover {
-    @apply text-primary-700;
+    @apply text-primary-700 dark:text-primary-500;
   }
 }
 

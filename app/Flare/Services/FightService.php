@@ -90,10 +90,6 @@ class FightService {
             }
         }
 
-        if (!is_null($this->newAttackType)) {
-            $attackType = $this->newAttackType . $attackType;
-        }
-
         if (!$this->fightSetUp) {
             $this->setupFightHandler->setUpFight($attacker, $defender);
 
@@ -103,9 +99,9 @@ class FightService {
 
             $this->chrDmgReduction = $this->setupFightHandler->getCharacterDamageReduction();
 
-            if (!is_null($this->newAttackType)) {
+            if (!is_null($this->newAttackType) && strpos($this->newAttackType, $attackType) === false) {
                 $attackType = $this->newAttackType . $attackType;
-            } else {
+            } else if (is_null($this->newAttackType)) {
                 $attackType = str_replace('voided_', '', $attackType);
             }
 
@@ -118,7 +114,7 @@ class FightService {
             $defender = $this->setupFightHandler->getModifiedDefender();
         }
 
-        $isCharacterVoided = $this->newAttackType === 'voided';
+        $isCharacterVoided = $this->newAttackType === 'voided_';
 
         if (is_null($this->currentCharacterHealth)) {
             $characterInformation         = $this->characterInformationBuilder->setCharacter($attacker);

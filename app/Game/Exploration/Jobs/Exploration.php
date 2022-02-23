@@ -40,7 +40,7 @@ class Exploration implements ShouldQueue
 
     public function handle(EncounterService $encounterService, ExplorationAutomationService $explorationAutomationService, RewardHandler $rewardHandler) {
 
-        $automation = CharacterAutomation::find($this->automationId);
+        $automation = CharacterAutomation::where('character_id', $this->character->id)->where('id', $this->automationId)->first();
 
         if ($this->shouldBail($automation)) {
             $this->endAutomation($rewardHandler, $automation);
@@ -102,16 +102,6 @@ class Exploration implements ShouldQueue
         }
 
         if (now()->greaterThanOrEqualTo($automation->completed_at)) {
-            return true;
-        }
-
-        if (now()->diffInHours($automation->started_at) >= 8) {
-            $automation->character->update([
-                'is_attack_automation_locked' => true,
-            ]);
-
-            event(new ServerMessageEvent($automation->character->user, 'Exploration suspended until tomorrow at 12pm GMT -7. You have reached the max time limit for today.'));
-
             return true;
         }
 

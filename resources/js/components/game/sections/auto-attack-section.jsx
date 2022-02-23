@@ -243,9 +243,11 @@ export default class AutoAttackSection extends React.Component {
       return;
     }
 
-    if (this.state.params.auto_attack_length === null) {
+
+
+    if (this.state.params.auto_attack_length === null || this.state.params.auto_attack_length > 8) {
       this.setState({
-        errorMessage: 'How long should this exploration go for? Check Advanced tab and configure a length.'
+        errorMessage: 'How long should this exploration go for? Check Advanced Options tab (beside this one) and configure a length.'
       });
 
       return;
@@ -500,14 +502,6 @@ export default class AutoAttackSection extends React.Component {
                 <hr />
               </div>
               <div className="form-group">
-                <AlertWarning icon={'fas fa-exclamation-triangle'} title={'Attn!'}>
-                  <p>
-                    Should you choose the 8 hour mark, you will not be able to start another exploration session after the full
-                    eight hours until the next real world day at 12 pm GMT-7. <strong>You can log out and this will continue to run.</strong>
-                  </p>
-                  <p>The eight hour limit only applies if your auto attack is 8 full complete uninterrupted hours. If you do 2 here, 4 there and 6 over here
-                  that will not count towards your total, it must be 8 continuous uninterrupted hours.</p>
-                </AlertWarning>
                 <label htmlFor="how-long">Select Length of Auto Attack</label>
                 <select className="form-control"
                         id="how-long"

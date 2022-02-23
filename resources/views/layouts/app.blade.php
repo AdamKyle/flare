@@ -49,7 +49,9 @@
     <header class="top-bar">
 
         <!-- Menu Toggler -->
-        <button type="button" class="menu-toggler la la-bars" data-toggle="menu"></button>
+        @auth
+            <button type="button" class="menu-toggler la la-bars" data-toggle="menu"></button>
+        @endauth
 
         <!-- Brand -->
         <span class="brand"><a href="/">Planes of Tlessa</a></span>
@@ -69,7 +71,7 @@
                 </label>
                 <span class="ml-4">Test Dark Mode</span>
 
-                <a href="" class="ml-6 mr-2 text-lg">Login</a> | <a href="{{route('register')}}" class="ml-2 mr-2 text-lg">Register</a>
+                <a href="{{route('login')}}" class="ml-6 mr-2 text-lg">Login</a> | <a href="{{route('register')}}" class="ml-2 mr-2 text-lg">Register</a>
             @endguest
 {{--            <!-- Notifications -->--}}
 {{--            <div class="dropdown self-stretch mr-3 ml-3">--}}

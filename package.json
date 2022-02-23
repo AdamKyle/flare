@@ -39,6 +39,7 @@
     },
     "dependencies": {
         "@ashvin27/react-datatable": "^1.5.3",
+        "alpinejs": "^3.9.0",
         "laravel-echo": "^1.6.1",
         "localforage": "^1.10.0",
         "luxon": "^1.26.0",

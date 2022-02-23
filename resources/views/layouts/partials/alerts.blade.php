@@ -8,21 +8,18 @@
 @endif
 
 @if (session('error'))
-    <div class="alert alert-danger alert-dismissible fade show mb-2 mt-2">
-        {{ session('error') }}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
+    <x-core.alerts.danger-alert>
+        <span class="font-semibold text-red-500 text-lg">Oh no !!!</span>
+        <p class="mt-3">{{ session('error') }}</p>
+    </x-core.alerts.danger-alert>
 @endif
 
 @if ($errors->any())
-    <div class="alert alert-danger alert-dismissible fade show mb-2 mt-2">
+    <x-core.alerts.danger-alert>
+        <span class="font-semibold text-red-500 text-lg">Christ Child !!!</span>
         @foreach($errors->all() as $error)
-            {{ $error }} <br />
+            <p class="mt-3">{{ $error }}</p>
         @endforeach
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
+    </x-core.alerts.danger-alert>
 @endif
+
