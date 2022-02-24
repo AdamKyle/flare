@@ -63,6 +63,7 @@ class ItemAffix extends Model
         'devouring_light',
         'can_drop',
         'randomly_generated',
+        'type',
     ];
 
     /**

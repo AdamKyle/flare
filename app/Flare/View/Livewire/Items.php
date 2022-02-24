@@ -11,6 +11,10 @@ use Rappasoft\LaravelLivewireTables\Views\Filter;
 class Items extends DataTableComponent
 {
 
+    protected string $pageName = 'items';
+
+    protected string $tableName = 'items';
+
     public function columns(): array
     {
         return [
@@ -50,6 +54,7 @@ class Items extends DataTableComponent
 
     public function query(): Builder
     {
+
         return Item::whereNotIn('type', ['quest', 'alchemy'])
                    ->whereNull('item_prefix_id')
                    ->whereNull('item_suffix_id')
