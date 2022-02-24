@@ -25,9 +25,7 @@ class Affixes extends DataTableComponent
         ];
 
         if (!is_null($this->getFilter('type')) && $this->getFilter('type') !== '') {
-            $columns[] = (new ItemAffixType($this->getFilter('type')))->getCustomColumn()->format(function ($value) {
-                return $value * 100 . '%';
-            });
+            $columns[] = (new ItemAffixType($this->getFilter('type')))->getCustomColumn();
         }
 
         $columns[] = Column::make('Cost')->sortable()->format(function ($value) {

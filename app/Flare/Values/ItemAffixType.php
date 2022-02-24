@@ -184,22 +184,36 @@ class ItemAffixType {
             case 'effects-focus':
                 $stat = explode('-', $this->value)[1];
 
-                return Column::make($stat . ' % Increase', $stat . '_mod')->sortable();
+                return Column::make($stat . ' % Increase', $stat . '_mod')->format(function ($value) {
+                    return $value * 100 . '%';
+                })->sortable();
             case 'skill-xp':
-                return Column::make('Skill XP Bonus %', 'skill_training_bonus')->sortable();
+                return Column::make('Skill XP Bonus %', 'skill_training_bonus')->format(function ($value) {
+                    return $value * 100 . '%';
+                })->sortable();
             case 'skill-bonus':
-                return Column::make('Skill Bonus %', 'skill_bonus')->sortable();
+                return Column::make('Skill Bonus %', 'skill_bonus')->format(function ($value) {
+                    return $value * 100 . '%';
+                })->sortable();
             case 'enemy-skill-reduction':
-                return Column::make('Enemy Skill Reduction %', 'skill_reduction')->sortable();
+                return Column::make('Enemy Skill Reduction %', 'skill_reduction')->format(function ($value) {
+                    return $value * 100 . '%';
+                })->sortable();
             case 'class-bonus':
-                return Column::make('Class Bonus %', 'class_bonus')->sortable();
+                return Column::make('Class Bonus %', 'class_bonus')->format(function ($value) {
+                    return $value * 100 . '%';
+                })->sortable();
             case 'base-damage':
             case 'base-healing':
             case 'base-ac':
-                return Column::make(ucfirst(str_replace('-', ' ', $this->value)) . ' Mod %', snake_case($this->value) . '_mod')->sortable();
+                return Column::make(ucfirst(str_replace('-', ' ', $this->value)) . ' Mod %', snake_case($this->value) . '_mod')->format(function ($value) {
+                    return $value * 100 . '%';
+                })->sortable();
             case 'fight-time-out':
             case 'movement-time-out':
-                return Column::make(ucfirst(str_replace('-', ' ', $this->value)) . ' Mod %', snake_case($this->value) . '_mod_bonus')->sortable();
+                return Column::make(ucfirst(str_replace('-', ' ', $this->value)) . ' Mod %', snake_case($this->value) . '_mod_bonus')->format(function ($value) {
+                    return $value * 100 . '%';
+                })->sortable();
             case 'reduce-enemy-str':
             case 'reduce-enemy-dex':
             case 'reduce-enemy-agi':
@@ -208,17 +222,29 @@ class ItemAffixType {
             case 'reduce-enemy-focus':
                 $stat = explode('-', $this->value)[2];
 
-                return Column::make('Enemy ' . $stat . ' % Decrease', $stat . '_mod')->sortable();
+                return Column::make('Enemy ' . $stat . ' % Decrease', $stat . '_mod')->format(function ($value) {
+                    return $value * 100 . '%';
+                })->sortable();
             case 'life-stealing':
-                return Column::make('Life Stealing %', 'steal_life_amount')->sortable();
+                return Column::make('Life Stealing %', 'steal_life_amount')->format(function ($value) {
+                    return $value * 100 . '%';
+                })->sortable();
             case 'irresistible-damage':
-                return Column::make('Irresistible Damage', 'damage')->sortable();
+                return Column::make('Irresistible Damage', 'damage')->format(function($value) {
+                    return number_format($value);
+                })->sortable();
             case 'resistible-damage':
-                return Column::make('Resistible Damage', 'damage')->sortable();
+                return Column::make('Resistible Damage', 'damage')->format(function($value) {
+                    return number_format($value);
+                })->sortable();
             case 'entrancing':
-                return Column::make('Entrancing', 'entrancing')->sortable();
+                return Column::make('Entrancing', 'entrancing')->format(function ($value) {
+                    return $value * 100 . '%';
+                })->sortable();
             case 'devouring-light':
-                return Column::make('Devouring Light %', 'devouring_light')->sortable();
+                return Column::make('Devouring Light %', 'devouring_light')->format(function ($value) {
+                    return $value * 100 . '%';
+                })->sortable();
             default:
                 return null;
         }
