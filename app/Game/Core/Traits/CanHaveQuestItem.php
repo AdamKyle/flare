@@ -26,7 +26,7 @@ Trait CanHaveQuestItem {
         })->first();
 
         if (is_null($foundItem)) {
-            $questThatNeedsThisItem = Quest::where('item_id', $item->id)->first();
+            $questThatNeedsThisItem = Quest::where('item_id', $item->id)->orWhere('secondary_required_item', $item->id)->first();
 
             if (!is_null($questThatNeedsThisItem)) {
                 $completedQuest = $character->questsCompleted()->where('quest_id', $questThatNeedsThisItem->id)->first();

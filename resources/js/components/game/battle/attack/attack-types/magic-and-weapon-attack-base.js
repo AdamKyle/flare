@@ -130,7 +130,7 @@ export default class MagicAndWeaponAttackBase {
     return this.setState();
   }
 
-  castAttack(attackData, castAttack, canCast) {
+  castAttack(attackData, castAttack, canHitCheck, canCast) {
     const spellDamage = attackData.spell_damage;
 
     if (spellDamage > 0) {
@@ -159,7 +159,7 @@ export default class MagicAndWeaponAttackBase {
     }
   }
 
-  weaponAttack(attackData, weaponAttack, canHit) {
+  weaponAttack(attackData, weaponAttack, canHitCheck, canHit) {
     if (canHit) {
       if (this.canBlock(attackData.weapon_damage)) {
         this.addEnemyActionMessage('Your weapon was blocked!')
