@@ -30,7 +30,7 @@ use App\Game\Market\Requests\ChangeItemTypeRequest;
 use App\Game\Market\Requests\ItemDetailsRequest;
 use League\Fractal\Resource\ResourceAbstract;
 
-class MarketController extends Controller {
+class  MarketController extends Controller {
 
     use UpdateMarketBoard, IsItemUnique;
 
@@ -264,11 +264,20 @@ class MarketController extends Controller {
 
             event(new ServerMessageEvent($listing->character->user, 'sold_item', $message));
         } else {
-            $listing->character->update([
-                'gold' => $listing->character->gold + ($listing->listed_price - ($listing->listed_price * 0.05)),
-            ]);
 
-            $message = 'Sold market listing: ' . $listing->item->affix_name . ' for: ' . ($listing->listed_price - ($listing->listed_price * 0.05)) . ' After fees (5% tax).';
+            $newGold = $listing->character->gold + ($listing->listed_price - ($listing->listed_price * 0.05));
+
+            if ((new MaxCurrenciesValue($newGold, MaxCurrenciesValue::GOLD))->canNotGiveCurrency()) {
+                $listing->character->update([
+                    'gold' => MaxCurrenciesValue::MAX_GOLD
+                ]);
+            } else {
+                $listing->character->update([
+                    'gold' => $newGold
+                ]);
+            }
+
+            $message = 'Sold market listing: ' . $listing->item->affix_name . ' for: ' . ($listing->listed_price - ($listing->listed_price * 0.05)) . ' After fees (5% tax). If you are or were close to being gold capped you were either capped or received no gold. if you received no gold - look at investing in to the Goblin Coin Bank in the Passive Skill tree to store excess gold.';
 
             event(new ServerMessageEvent($listing->character->user, 'sold_item', $message));
         }
