@@ -243,19 +243,35 @@ class InventorySetService {
             return $slot->item->type === 'bow';
         })->all());
 
+        $hammers = collect($inventorySet->slots->filter(function($slot) {
+            return $slot->item->type === 'hammer';
+        })->all());
+
+        $hasShield = $inventorySet->slots->filter(function($slot) {
+            return $slot->item->type === 'shield';
+        })->isNotEmpty();
+
         $hasBow = $inventorySet->slots->filter(function($slot) {
             return $slot->item->type === 'bow';
         })->isNotEmpty();
 
-        $hasShield = $inventorySet->slots->filter(function($slot) {
-            return $slot->item->type === 'shield';
+        $hasHammer = $inventorySet->slots->filter(function($slot) {
+            return $slot->item->type === 'hammer';
         })->isNotEmpty();
 
         if ($weapons->count() > 2) {
             return false;
         }
 
+        if ($hasHammer && $weapons->count() > 0) {
+            return false;
+        }
+
         if ($hasBow && $weapons->count() > 0) {
+            return false;
+        }
+
+        if ($hammers->count() > 1) {
             return false;
         }
 

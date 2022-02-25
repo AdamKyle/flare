@@ -146,23 +146,29 @@ class EquipItemService {
      * @param Collection $inventorySlots
      * @return bool
      */
-    public function isBowEquipped(Item $itemToEquip, Collection $inventorySlots): bool {
-        $validTypes = ['weapon', 'shield', 'bow'];
+    public function isTwoHandedItemEquipped(Item $itemToEquip, Collection $inventorySlots, string $type): bool {
+        $validTypes = ['weapon', 'shield', 'bow', 'hammer'];
 
         if (!in_array($itemToEquip->type, $validTypes)) {
              return false;
         }
 
-        return $inventorySlots->filter(function($slot) {
-            return $slot->item->type === 'bow' && $slot->equipped;
+        return $inventorySlots->filter(function($slot) use($type) {
+            return $slot->item->type === $type && $slot->equipped;
         })->isNotEmpty();
     }
 
     public function unequipSlot(InventorySlot $characterSlot, Inventory|InventorySet $inventory) {
         if ($characterSlot->item->type === 'bow') {
             $this->unequipBothHands();
-        } else {
-            if ($this->hasBowEquipped($inventory)) {
+        } else if ($characterSlot->item->Type === 'hammer'){
+            $this->unequipBothHands();
+        }  else {
+            if ($this->hasTwoHandedItemEquipped($inventory, 'bow')) {
+                $this->unequipBothHands();
+            }
+
+            if ($this->hasTwoHandedItemEquipped($inventory, 'hammer')) {
                 $this->unequipBothHands();
             }
 
@@ -183,23 +189,17 @@ class EquipItemService {
         }
     }
 
-    /**
-     * Check both hands to see if we have a bow equipped.
-     *
-     * @param Inventory|InventorySet $inventory
-     * @return bool
-     */
-    public function hasBowEquipped(Inventory|InventorySet $inventory): bool {
-        $position  = $this->request->position;
-        $bowInHand = null;
+    public function hasTwoHandedItemEquipped(Inventory|InventorySet $inventory, string $type): bool {
+        $position        = $this->request->position;
+        $twoHandedInHand = null;
 
         if ($position === 'left-hand' || $position === 'right-hand') {
-            $bowInHand = $inventory->slots->filter(function($slot) {
-                return $slot->equipped && $slot->item->type === 'bow';
+            $twoHandedInHand = $inventory->slots->filter(function($slot) use($type) {
+                return $slot->equipped && $slot->item->type === $type;
             })->first();
         }
 
-        return !is_null($bowInHand);
+        return !is_null($twoHandedInHand);
     }
 
     /**

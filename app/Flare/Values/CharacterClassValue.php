@@ -4,12 +4,13 @@ namespace App\Flare\Values;
 
 class CharacterClassValue {
 
-    const FIGHTER   = 'Fighter';
-    const HERETIC   = 'Heretic';
-    const PROPHET   = 'Prophet';
-    const RANGER    = 'Ranger';
-    const VAMPIRE   = 'Vampire';
-    const THIEF     = 'Thief';
+    const FIGHTER    = 'Fighter';
+    const HERETIC    = 'Heretic';
+    const PROPHET    = 'Prophet';
+    const RANGER     = 'Ranger';
+    const VAMPIRE    = 'Vampire';
+    const THIEF      = 'Thief';
+    const BLACKSMITH = 'Blacksmith';
 
     /**
      * @var string $value
@@ -20,12 +21,13 @@ class CharacterClassValue {
      * @var string[] $values
      */
     protected static $values = [
-        self::FIGHTER => 'Fighter',
-        self::HERETIC => 'Heretic',
-        self::PROPHET => 'Prophet',
-        self::RANGER  => 'Ranger',
-        self::THIEF   => 'Thief',
-        self::VAMPIRE => 'Vampire',
+        self::FIGHTER    => 'Fighter',
+        self::HERETIC    => 'Heretic',
+        self::PROPHET    => 'Prophet',
+        self::RANGER     => 'Ranger',
+        self::THIEF      => 'Thief',
+        self::VAMPIRE    => 'Vampire',
+        self::BLACKSMITH => 'Blacksmith',
     ];
 
     /**
@@ -94,5 +96,14 @@ class CharacterClassValue {
      */
     public function isThief(): bool {
         return $this->value === self::THIEF;
+    }
+
+    /**
+     * Are we a blacksmith?
+     *
+     * @return bool
+     */
+    public function isBlacksmith(): bool {
+        return $this->value === self::BLACKSMITH;
     }
 }

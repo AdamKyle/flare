@@ -18,6 +18,7 @@ class ClassAttackValue {
     const THIEVES_SHADOW_DANCE = 'thieves shadow dance';
     const HERETICS_DOUBLE_CAST = 'heretics double cast';
     const FIGHTERS_DOUBLE_DAMAGE = 'double damage';
+    const BLACKSMITHS_HAMMER_SMASH = 'hammer smash';
 
     private $classType;
 
@@ -72,6 +73,12 @@ class ClassAttackValue {
 
             return $this->chance;
         }
+
+        if ($this->classType->isBlacksmith()) {
+            $this->buildBlacksmithsChance();
+
+            return $this->chance;
+        }
     }
 
     public function buildFighterChance() {
@@ -119,6 +126,14 @@ class ClassAttackValue {
         $this->chance['type'] = Self::VAMPIRE_THIRST;
         $this->chance['class_name'] = 'Vampire';
         $this->chance['has_item'] = true;
+        $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
+    }
+
+    public function buildBlacksmithsChance() {
+        $this->chance['type'] = Self::BLACKSMITHS_HAMMER_SMASH;
+        $this->chance['only'] = 'hammer';
+        $this->chance['class_name'] = 'Blacksmith';
+        $this->chance['has_item'] = $this->hasItemTypeEquipped('hammer');
         $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
     }
 

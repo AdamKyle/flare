@@ -22,7 +22,7 @@
                     <dt>Looting Modifier</dt>
                     <dd>+ {{$class->looting_mod * 100}} %</dd>
                     <dt>Defense Modifier</dt>
-                    <dd>+ {{$class->deffense_mod * 100}} %</dd>
+                    <dd>+ {{$class->defense_mod * 100}} %</dd>
                 </dl>
             </div>
             <div class="tw-w-full md:tw-w-1/2 tw-px-2 tw-mb-4">
@@ -81,6 +81,10 @@
 
         @if ($class->type()->isVampire())
             @include('information.classes.partials.vampire')
+        @endif
+
+        @if ($class->type()->isBlackSmith())
+            @include('information.classes.partials.blacksmith')
         @endif
     </x-core.cards.card-with-title>
 @endsection

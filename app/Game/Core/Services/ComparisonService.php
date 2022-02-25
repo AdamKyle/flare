@@ -62,7 +62,8 @@ class ComparisonService {
                 'slotId'       => $itemToEquip->id,
                 'slotPosition' => $itemToEquip->position,
                 'characterId'  => $character->id,
-                'bowEquipped'  => $this->equipItemService->isBowEquipped($itemToEquip->item, $service->inventory()),
+                'bowEquipped'  => $this->equipItemService->isTwoHandedItemEquipped($itemToEquip->item, $service->inventory(), 'bow'),
+                'hammerEquipped' => $this->equipItemService->isTwoHandedItemEquipped($itemToEquip->item, $service->inventory(), 'hammer'),
                 'setEquipped'  => $hasSet,
                 'setIndex'     => $setIndex,
             ];
@@ -96,7 +97,8 @@ class ComparisonService {
             'slotId'       => $item->id,
             'slotPosition' => null,
             'characterId'  => $character->id,
-            'bowEquipped'  => $this->equipItemService->isBowEquipped($item, $service->inventory()),
+            'bowEquipped'  => $this->equipItemService->isTwoHandedItemEquipped($item, $service->inventory(), 'bow'),
+            'hammerEquipped' => $this->equipItemService->isTwoHandedItemEquipped($item, $service->inventory(), 'hammer'),
             'setEquipped'  => $hasSet,
             'setIndex'     => $setIndex,
         ];
