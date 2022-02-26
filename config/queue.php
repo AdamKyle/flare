@@ -101,7 +101,7 @@ return [
         'disenchanting' => [
             'driver' => 'redis',
             'connection' => 'disenchanting',
-            'queue' => env('REDIS_QUEUE', 'default'),
+            'queue' => 'default_long',
             'retry_after' => 1200,
             'block_for' => null,
         ],

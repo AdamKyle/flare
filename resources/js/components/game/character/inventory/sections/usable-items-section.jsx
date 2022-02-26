@@ -84,6 +84,10 @@ export default class UsableItemsSection extends React.Component {
     return this.props.usableItems.map((ui) => ui.item);
   }
 
+  hasUsableItems() {
+    return this.props.usableItems.filter((ui) => ui.item.usable).length > 0
+  }
+
   getSlotId(itemId) {
     const foundItem = this.props.usableItems.filter((ui) => ui.item_id === itemId);
 
@@ -178,7 +182,7 @@ export default class UsableItemsSection extends React.Component {
               : null
           }
           <button className='btn btn-primary mr-2 mt-2'
-                  disabled={this.props.usableItems.length === 0}
+                  disabled={!this.hasUsableItems()}
                   onClick={this.manageUseMany.bind(this)}
           >
             Use Many

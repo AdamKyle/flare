@@ -57,7 +57,7 @@ export default class UseManyItemsModal extends React.Component {
 
           if (response.data.hasOwnProperty('message')) {
             this.setState({
-              errorMessage: response.data.message
+              errorMessage: response.data.messagecan_use_on_other_items
             });
           }
 
@@ -71,7 +71,7 @@ export default class UseManyItemsModal extends React.Component {
   }
 
   setOptions() {
-    return this.props.usableItems.filter((ui) => !ui.item.damages_kingdoms).map((ui) => <option value={ui.id} key={ui.id}>
+    return this.props.usableItems.filter((ui) => !ui.item.damages_kingdoms && !ui.item.can_use_on_other_items).map((ui) => <option value={ui.id} key={ui.id}>
       {ui.item.name}
     </option>)
   }
