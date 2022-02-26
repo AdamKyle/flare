@@ -13,6 +13,7 @@ use App\Game\Core\Requests\PurchaseRandomEnchantment;
 use App\Game\Core\Requests\ReRollRandomEnchantment;
 use App\Game\Core\Services\RandomEnchantmentService;
 use App\Game\Core\Services\ReRollEnchantmentService;
+use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
@@ -92,6 +93,12 @@ class RandomEnchantController extends Controller {
             return response()->json(['message' => 'Where did you put that item child? Ooooh hooo hooo hooo! Are you playing hide and seek with it? (Unique does not exist.)'], 422);
         }
 
+        if (!$this->reRollEnchantmentService->doesReRollCostMatch($request->selected_reroll_type, $request->selected_affix, $request->gold_dust_cost, $request->shard_cost)) {
+            event (new GlobalMessageEvent($character->name . ' has pissed off the Queen of hearts with their cheating ways. Their shards and gold dust cost did not match! The Creator is watching you child!'));
+
+            return response()->json(['message' => 'No! You\'re a very bad person! (stop cheating)'], 422);
+        }
+
         if ($character->gold_dust < $request->gold_dust_cost || $character->shards < $request->shard_cost) {
             return response()->json(['message' => 'What! No! Child! I don\'t like poor people. I don\'t  even date poor men! Oh this is so saddening child! (You dont have enough currency, you made the Queen sad.)'], 422);
         }
@@ -126,6 +133,12 @@ class RandomEnchantController extends Controller {
 
         if (is_null($slot) || is_null($secondSlot)) {
             return response()->json(['message' => 'Where did you put those items child? Ooooh hooo hooo hooo! Are you playing hide and seek with it? (Either the unique or the requested item does not exist.)'], 422);
+        }
+
+        if (!$this->reRollEnchantmentService->doesMovementCostMatch($slot->item->id, $request->selected_affix, $request->gold_cost, $request->shard_cost)) {
+            event (new GlobalMessageEvent($character->name . ' has pissed off the Queen of hearts with their cheating ways. Their shards and gold dust cost did not match! The Creator is watching you child!'));
+
+            return response()->json(['message' => 'No! You\'re a very bad person! (stop cheating)'], 422);
         }
 
         if ($character->gold < $request->gold_cost || $character->shards < $request->shard_cost) {

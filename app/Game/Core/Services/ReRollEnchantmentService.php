@@ -50,6 +50,29 @@ class ReRollEnchantmentService {
         $this->randomEnchantmentService = $randomEnchantmentService;
     }
 
+    public function doesReRollCostMatch(string $type, string $selectedAffix, int $suppliedGoldDust, int $suppliedShards): bool {
+        $goldDust = 10000;
+        $shards   = 100;
+
+        if ($selectedAffix === 'all-enchantments') {
+            $goldDust *= 2;
+            $shards   *= 2;
+        }
+
+        if ($type === 'everything') {
+            $goldDust *= 2;
+            $shards   *= 2;
+        } else {
+            $goldDust += $goldDust * .166666;
+            $shards   += $shards * .166666;
+        }
+
+        $goldDust = (int) round($goldDust);
+        $shards   = (int) round($shards);
+
+        return $goldDust === $suppliedGoldDust && $shards === $suppliedShards;
+    }
+
     public function reRoll(Character $character, InventorySlot $slot, string $affixType, string $reRollType, int $goldDustCost, int $shardCost) {
         $character->update([
             'gold_dust' => $character->gold_dust - $goldDustCost,
@@ -83,6 +106,34 @@ class ReRollEnchantmentService {
         event(new UpdateQueenOfHeartsPanel($character->user, $this->randomEnchantmentService->fetchDataForApi($character)));
 
         event(new ServerMessageEvent($character->user, 'Ooooh hoo hoo hoo! I have done it child! I have made the modifications and I think you\'ll be happy! Oh child I am so happy! ooh hoo hoo hoo!', true));
+    }
+
+    public function doesMovementCostMatch(int $selectedItemToMoveId, string $selectedAffix, int $suppliedGold, int $suppliedShards): bool {
+        $cost = 0;
+
+        $item = Item::find($selectedItemToMoveId);
+
+        if (is_null($item)) {
+            return false;
+        }
+
+        if ($selectedAffix === 'all-enchantments') {
+            if (!is_null($item->item_prefix_id)) {
+                $cost += $item->itemPrefix->cost;
+            }
+
+            if (!is_null($item->item_suffix_id)) {
+                $cost += $item->itemSuffix->cost;
+            }
+        } else {
+            $cost += ItemAffix::find($item->{'item_' . $selectedAffix . '_id'})->cost;
+        }
+
+        $shardCost = $cost * .00000002;
+
+        $shardCost = (int) round($shardCost);
+
+        return $cost === $suppliedGold && $shardCost === $suppliedShards;
     }
 
     public function moveAffixes(Character $character, InventorySlot $slot, InventorySlot $secondarySlot, string $affixType, int $goldCost, int $shardCost) {

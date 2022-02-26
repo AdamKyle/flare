@@ -45,6 +45,7 @@ class ComparisonService {
             'characterId' => $character->id,
             'bowEquipped' => false,
             'setEquipped' => false,
+            'hammerEquipped' => false,
             'setIndex'    => 0,
         ];
 

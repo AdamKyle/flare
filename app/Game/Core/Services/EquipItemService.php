@@ -96,8 +96,15 @@ class EquipItemService {
 
         if (!is_null($equippedSet)) {
             if ($this->character->isInventoryFull()) {
-
                 throw new EquipItemException('Inventory is full. Cannot replace a set item. Please make some room.');
+            }
+
+            $uniqueSlot          = $this->getUniqueFromSet($equippedSet);
+            $isItemToEquipUnique = $this->isItemToEquipUnique($characterSlot->item);
+            $isItemToReplaceUnique = $this->isItemToBeReplacedUnique($equippedSet);
+
+            if (!is_null($uniqueSlot) && $isItemToEquipUnique && !$isItemToReplaceUnique) {
+                throw new EquipItemException('Cannot equip another unique.');
             }
 
 
@@ -113,6 +120,14 @@ class EquipItemService {
             $characterSlot->delete();
         } else {
 
+            $uniqueSlot          = $this->getUniqueFromSet($this->character->inventory);
+            $isItemToEquipUnique = $this->isItemToEquipUnique($characterSlot->item);
+            $isItemToReplaceUnique = $this->isItemToBeReplacedUnique($this->character->inventory);
+
+            if (!is_null($uniqueSlot) && $isItemToEquipUnique && !$isItemToReplaceUnique) {
+                throw new EquipItemException('Cannot equip another unique.');
+            }
+
             $this->unequipSlot($characterSlot, $this->character->inventory);
 
             $characterSlot->update([
@@ -126,6 +141,52 @@ class EquipItemService {
         event(new UpdateTopBarEvent($character));
 
         return $characterSlot->item;
+    }
+
+    public function getUniqueFromSet(Inventory|InventorySet $equipped): InventorySlot|SetSlot|null {
+        return $equipped->slots->filter(function($slot) {
+            if (!is_null($slot->item->item_prefix_id)) {
+                return $slot->item->itemPrefix->randomly_generated && $slot->equipped;
+            }
+
+            if (!is_null($slot->item->item_suffix_id)) {
+                return $slot->item->itemSuffix->randomly_generated && $slot->equipped;
+            }
+        })->first();
+    }
+
+    public function isItemToEquipUnique(Item $item): bool {
+        if (!is_null($item->item_prefix_id)) {
+            return $item->itemPrefix->randomly_generated;
+        }
+
+        if (!is_null($item->item_suffix_id)) {
+            return $item->itemSuffix->randomly_generated;
+        }
+
+        return false;
+    }
+
+    public function isItemToBeReplacedUnique(Inventory|InventorySet $inventory): bool {
+        $item = $inventory->slots->filter(function($slot) {
+            return $slot->position === $this->request->position && $slot->equipped;
+        })->first();
+
+        if (is_null($item)) {
+            return false;
+        }
+
+        $item = $item->item;
+
+        if (!is_null($item->item_prefix_id)) {
+            return $item->itemPrefix->randomly_generated;
+        }
+
+        if (!is_null($item->item_suffix_id)) {
+            return $item->itemSuffix->randomly_generated;
+        }
+
+        return false;
     }
 
     /**

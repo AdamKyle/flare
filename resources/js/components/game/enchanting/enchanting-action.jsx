@@ -221,7 +221,7 @@ export default class EnchantingAction extends React.Component {
         return cost;
       }
 
-      if (foundSlot[0].item.item_prefix !== null) {
+      if (foundSlot[0].item.item_prefix_id !== null) {
         cost += 1000
       }
     }
@@ -243,7 +243,7 @@ export default class EnchantingAction extends React.Component {
         return cost;
       }
 
-      if (foundSlot[0].item.item_suffix !== null) {
+      if (foundSlot[0].item.item_suffix_id !== null) {
         cost += 1000
       }
     }

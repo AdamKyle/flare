@@ -312,7 +312,7 @@ export default class ReRoll extends React.Component {
               <dd className={this.state.canAfford ? 'text-success' : 'text-danger'}>{this.formatNumber(this.state.formOptions.shard_cost)}</dd>
             </dl>
             <hr />
-            <button className="btn btn-primary" disabled={!this.canReRoll()} onClick={this.reRollEnchantment.bind(this)}>Reroll</button>
+            <button className="btn btn-primary" disabled={!this.canReRoll() || this.state.queenProcessing} onClick={this.reRollEnchantment.bind(this)}>Reroll</button>
           </div>
           <div className="col-md-6">
             <h3 className="tw-font-light">Help</h3>

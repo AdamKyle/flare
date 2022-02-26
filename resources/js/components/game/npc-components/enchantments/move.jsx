@@ -178,7 +178,7 @@ export default class Move extends React.Component {
       cost += item.item_prefix_id !== null ? item.item_prefix.cost : 0;
       cost += item.item_suffix_id !== null ? item.item_suffix.cost : 0;
     } else {
-      cost += item['item_' + formOptions.selected_affix + '_id'] !== null ? item['item_' + formOptions.selected_affix].cost : 0
+      cost += item['item_' + formOptions.selected_affix + '_id'] !== null ? item['item_' + formOptions.selected_affix + '_id'].cost : 0
     }
 
     let shardCost = cost * .00000002;
@@ -298,7 +298,7 @@ export default class Move extends React.Component {
               <dd className={this.state.canMove ? 'text-success' : 'text-danger'}>{this.formatNumber(this.state.formOptions.shard_cost)}</dd>
             </dl>
             <hr />
-            <button className="btn btn-primary" disabled={!this.canMove()} onClick={this.moveEnchantments.bind(this)}>Move</button>
+            <button className="btn btn-primary" disabled={!this.canMove() || this.state.queenProcessing} onClick={this.moveEnchantments.bind(this)}>Move</button>
           </div>
           <div className="col-md-6">
             <h3 className="tw-font-light">Help</h3>

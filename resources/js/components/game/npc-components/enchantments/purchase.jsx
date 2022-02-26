@@ -159,7 +159,7 @@ export default class Purchase extends React.Component {
               <dd>{this.formatNumber(this.props.currencies.gold)}</dd>
             </dl>
             <hr />
-            <button className="btn btn-primary" onClick={() => this.purchaseItem()} disabled={!this.state.canAfford}>Purchase</button>
+            <button className="btn btn-primary" onClick={() => this.purchaseItem()} disabled={!this.state.canAfford || this.state.queenProcessing}>Purchase</button>
           </div>
           <div className="col-md-6">
             <h3 className="tw-font-light">Help</h3>

@@ -26,7 +26,7 @@ class ReRollRandomEnchantment extends FormRequest
         return [
             'selected_slot_id'     => 'required|integer|exists:inventory_slots,id',
             'selected_affix'       => 'required|string|in:prefix,suffix,all-enchantments',
-            'selected_reroll_type' => 'required|string|in:base,stats,skills,damage,resistance,eveything',
+            'selected_reroll_type' => 'required|string|in:base,stats,skills,damage,resistance,everything',
             'shard_cost'           => 'required|integer|min:100',
             'gold_dust_cost'       => 'required|integer|min:1000'
         ];
