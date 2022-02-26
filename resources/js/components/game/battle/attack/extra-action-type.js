@@ -23,4 +23,8 @@ export default class ExtraActionType {
   static get PROPHET_HEALING() {
     return 'prophet healing';
   }
+
+  static get HAMMER_SMASH() {
+    return 'hammer smash';
+  }
 }

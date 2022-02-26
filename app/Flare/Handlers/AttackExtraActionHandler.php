@@ -180,7 +180,7 @@ class AttackExtraActionHandler {
             $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
 
             $rollForAfterShock = rand(1, 100);
-            $rollForAfterShock += $rollForAfterShock * .10;
+            $rollForAfterShock += $rollForAfterShock * .60;
 
             if ($rollForAfterShock > 99) {
                 $message = 'The enemy feels the after shocks of the Hammer Smash!';
@@ -191,7 +191,7 @@ class AttackExtraActionHandler {
 
                     $monsterCurrentHealth -= $initialDamage;
 
-                    $message = $characterInformationBuilder->getCharacter()->name . ' hit for (Hammer): ' . number_format($initialDamage);
+                    $message = 'Aftershock hit for: ' . number_format($initialDamage) . '!';
                     $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
                 }
             }

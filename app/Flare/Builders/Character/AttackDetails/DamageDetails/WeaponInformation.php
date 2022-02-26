@@ -2,6 +2,7 @@
 
 namespace App\Flare\Builders\Character\AttackDetails\DamageDetails;
 
+use App\Flare\Builders\Character\ClassDetails\ClassBonuses;
 use App\Flare\Builders\Character\ClassDetails\HolyStacks;
 use Illuminate\Database\Eloquent\Collection;
 use App\Flare\Builders\Character\BaseCharacterInfo;
@@ -56,6 +57,7 @@ class WeaponInformation {
 
         $damage = $this->damageModifiers($character, $totalWeaponDamage, $voided);
 
+
         return $this->calculateWeaponDamage($character, $damage, $voided);
     }
 
@@ -71,7 +73,7 @@ class WeaponInformation {
     public function damageModifiers(Character $character, int $damage, bool $voided): int {
         $class = GameClass::find($character->game_class_id);
 
-        if ($class->type()->isFighter()) {
+        if ($class->type()->isFighter() || $class->type()->isBlacksmith()) {
             if ($voided) {
                 $statIncrease = $character->str * .15;
             } else {
@@ -134,9 +136,17 @@ class WeaponInformation {
             $damage += $damage * $skill->base_damage_mod;
         }
 
-        $damage += $damage * $this->holyStacks->fetchAttackBonus($character);
+        $damage += $damage * ($this->holyStacks->fetchAttackBonus($character) + $this->fetchClassBonuses($character));
 
         return ceil($damage);
+    }
+
+    protected function fetchClassBonuses(Character $character): float {
+        return $this->baseCharacterInfo->getClassBonuses()->getFightersDamageBonus($character) +
+               $this->baseCharacterInfo->getClassBonuses()->getBlacksmithsDamageBonus($character) +
+               $this->baseCharacterInfo->getClassBonuses()->getRangersDamageBonus($character) +
+               $this->baseCharacterInfo->getClassBonuses()->getThievesDamageBonus($character) +
+               $this->baseCharacterInfo->getClassBonuses()->getVampiresDamageBonus($character);
     }
 
     /**

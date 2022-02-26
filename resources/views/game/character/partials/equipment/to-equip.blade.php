@@ -37,7 +37,7 @@
                 </x-core.alerts.warning-alert>
             @endif
 
-            @include('game.character.partials.equipment.sections.equip.' . ($itemToEquip->type === 'bow' ? 'weapon' : $type), [
+            @include('game.character.partials.equipment.sections.equip.' . (($itemToEquip->type === 'bow' || $itemToEquip->type === 'hammer') ? 'weapon' : $type), [
                 'slotId'      => $slotId,
                 'details'     => $details,
                 'itemToEquip' => $itemToEquip,

@@ -195,6 +195,49 @@ export default class Damage {
     this.addActionMessage('Your healing spell(s) heals for: ' + this.formatNumber(healFor.toFixed(0)))
   }
 
+  hammerSmash(attacker, monsterCurrentHealth, attackData) {
+    if (attacker.extra_action_chance.class_name === attacker.class) {
+      const extraActionChance = attacker.extra_action_chance;
+
+      if (!this.canUse(extraActionChance.chance)) {
+        return monsterCurrentHealth;
+      }
+
+      if (extraActionChance.type === ExtraActionType.HAMMER_SMASH && extraActionChance.has_item) {
+        this.addActionMessage('You raise your mighty hammer high above your head and bring it crashing down!');
+
+        let damage = attacker.str_modded * 0.30;
+
+        if (attackData.damage_reduction > 0.0) {
+          this.addActionMessage('The Plane weakens your ability to do full damage!');
+
+          damage -= damage * attackData.damage_reduction;
+        }
+
+        monsterCurrentHealth -= damage;
+
+        this.addMessage(attacker.name + ' hit for (Hammer): ' + this.formatNumber(damage));
+
+        let roll = random(1, 100);
+        roll += roll * 0.60;
+
+        if (roll > 99) {
+          this.addActionMessage('The enemy feels the after shocks of the Hammer Smash!');
+
+          for (let i = 3; i > 0; i--) {
+            damage -= damage * 0.15;
+
+            monsterCurrentHealth -= damage;
+
+            this.addActionMessage('Aftershock hit for: ' + this.formatNumber(damage));
+          }
+        }
+      }
+    }
+
+    return monsterCurrentHealth;
+  }
+
   tripleAttackChance(attacker, monsterCurrentHealth, attackData) {
     if (attacker.extra_action_chance.class_name === attacker.class) {
       const extraActionChance = attacker.extra_action_chance;

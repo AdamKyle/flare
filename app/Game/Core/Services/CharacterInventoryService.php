@@ -29,6 +29,11 @@ class CharacterInventoryService {
     private $positions;
 
     /**
+     * @var bool $isInventorySetIsEquipped
+     */
+    private bool $isInventorySetIsEquipped = false;
+
+    /**
      * Set the character
      *
      * @param Character $character
@@ -75,6 +80,7 @@ class CharacterInventoryService {
             'sets'         => $this->character->inventorySets()->with(['slots', 'slots.item', 'slots.item.itemPrefix', 'slots.item.itemSuffix'])->get(),
             'quest_items'  => $this->getQuestItems(),
             'usable_items' => $this->getUsableItems(),
+            'set_equipped' => $this->isInventorySetIsEquipped,
         ];
     }
 
@@ -191,6 +197,8 @@ class CharacterInventoryService {
         if (is_null($inventorySet)) {
             return null;
         }
+
+        $this->isInventorySetIsEquipped = true;
 
         return SetSlot::where('inventory_set_id', $inventorySet->id)->with(['item', 'item.itemPrefix', 'item.itemSuffix'])->get();
     }

@@ -222,7 +222,7 @@ class EquipItemService {
     public function unequipSlot(InventorySlot $characterSlot, Inventory|InventorySet $inventory) {
         if ($characterSlot->item->type === 'bow') {
             $this->unequipBothHands();
-        } else if ($characterSlot->item->Type === 'hammer'){
+        } else if ($characterSlot->item->type === 'hammer'){
             $this->unequipBothHands();
         }  else {
             if ($this->hasTwoHandedItemEquipped($inventory, 'bow')) {

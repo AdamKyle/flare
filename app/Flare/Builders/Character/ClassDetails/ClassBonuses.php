@@ -237,6 +237,31 @@ class ClassBonuses {
         return $classBonus;
     }
 
+    public function getBlacksmithsDamageBonus(Character $character) {
+        $class      = GameClass::find($character->game_class_id);
+        $classType  = new CharacterClassValue($class->name);
+        $classBonus = 0.0;
+
+        if ($classType->isBlackSmith()) {
+
+            $slots = $this->fetchEquipped($character);
+
+            if (is_null($slots)) {
+                return $classBonus;
+            }
+
+            $hasWeapon = $slots->filter(function($slot) {
+                return $slot->item->type === 'weapon';
+            })->first();
+
+            if (!is_null($hasWeapon)) {
+                $classBonus = $this->getClassBonus($character, $class, 'base_damage_mod') + $this->getClassBonus($character, $class, 'base_damage_mod_bonus_per_level', true);
+            }
+        }
+
+        return $classBonus;
+    }
+
     /**
      * Get thieves fight timeout mod.
      *
@@ -385,7 +410,7 @@ class ClassBonuses {
      * @param string $type
      * @return float
      */
-    private function getClassBonus(Character $character, GameClass $class, string $type): float {
+    private function getClassBonus(Character $character, GameClass $class, string $type, bool $multipleByLevel = false): float {
 
         $classSkillIds = GameSkill::where('game_class_id', $class->id)->pluck('id')->toArray();
         $skills        = Skill::where('character_id', $character->id)->whereIn('game_skill_id', $classSkillIds)->get();
@@ -393,7 +418,12 @@ class ClassBonuses {
         $classBonuses = [];
 
         foreach ($skills as $skill) {
-            $classBonuses[] = $skill->{$type};
+            if ($multipleByLevel) {
+                $classBonuses[] = $skill->{$type} * $skill->level;
+            } else {
+                $classBonuses[] = $skill->{$type};
+            }
+
         }
 
         return empty($classBonuses) ? 0.0 : max($classBonuses);
