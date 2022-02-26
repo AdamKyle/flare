@@ -37,6 +37,12 @@ class ExplorationController extends Controller {
             ], 422);
         }
 
+        if ($character->currentAutomations()->where('type', AutomationType::EXPLORING)->count() > 0) {
+            return response()->json([
+                'message' => 'Nope. You already have on in progress.'
+            ], 422);
+        }
+
         $response = $explorationAutomationService->beginAutomation($character, $request->all());
 
         return response()->json([
