@@ -19,7 +19,7 @@
     <li>Each After Shock takes the 30% of modded Strength and reduces the damage by 15% for each After Shock.</li>
 </ul>
 <p>
-    In the above list, lets give an example of an aftershock: Lets assume your 30% of STR was 1,000,000.
+    In the above list, let's give an example of an aftershock: Let's assume you're 30% of STR was 1,000,000.
     Your first aftershock would be 15% of 1,000,000,000 = 850000, your second is 850000 - 15% = 722500, your final would be:
     722500 - 15% = 614125
 </p>
