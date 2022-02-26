@@ -2,9 +2,9 @@
 
 namespace App\Console;
 
-use App\Console\Commands\CleanMarketHistory;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use App\Console\Commands\CleanMarketHistory;
 use App\Console\Commands\CleanNotifications;
 use App\Console\Commands\MoveInfoFiles;
 use App\Console\Commands\UpdateKingdom;
@@ -79,9 +79,6 @@ class Kernel extends ConsoleKernel {
 
         // clean the adventure logs every week on monday at 2 am.
         $schedule->command('clean:adventure-logs')->weeklyOn(1, '2:00')->timezone(config('app.timezone'));
-
-        // Clears the exploration time out on locked out players.
-        $schedule->command('clear:locked-exploration')->dailyAt('12:00')->timezone(config('app.timezone'));
     }
 
     /**

@@ -2,17 +2,13 @@
 
 namespace App\Game\Exploration\Providers;
 
-
-use App\Flare\Builders\Character\ClassDetails\ClassBonuses;
 use App\Flare\Services\FightService;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Handlers\FactionHandler;
-use App\Game\Exploration\Console\Commands\ClearExplorationTimeOuts;
 use App\Game\Exploration\Handlers\ExplorationHandler;
 use App\Game\Exploration\Handlers\FightHandler;
 use App\Game\Exploration\Handlers\PlunderHandler;
 use App\Game\Exploration\Handlers\RewardHandler;
-use App\Game\Exploration\Jobs\Exploration;
 use App\Game\Exploration\Middleware\IsCharacterExploring;
 use App\Game\Exploration\Services\EncounterService;
 use App\Game\Exploration\Services\ExplorationAutomationService;
@@ -72,8 +68,6 @@ class ServiceProvider extends ApplicationServiceProvider
                $app->make(RewardHandler::class)
            );
         });
-
-        $this->commands([ClearExplorationTimeOuts::class]);
     }
 
     /**

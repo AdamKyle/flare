@@ -214,10 +214,6 @@ class BaseCharacterInfo {
             }
         }
 
-        if ($defence !== 10) {
-            return $defence / 6;
-        }
-
         return $defence;
     }
 

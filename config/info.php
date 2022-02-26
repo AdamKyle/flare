@@ -22,6 +22,7 @@ return [
     'factions'          => [],
     'random-enchants'   => [],
     'holy-items'        => [],
+    'gear-progression'  => [],
     'special-locations' => [
         [
             'livewire'            => true,
