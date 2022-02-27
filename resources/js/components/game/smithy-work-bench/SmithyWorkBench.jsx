@@ -17,6 +17,7 @@ export default class SmithyWorkBench extends React.Component {
       isCrafting: false,
       selectedItem: null,
       selectedAlchemyItem: null,
+      lastUsedAlchemicalItem: null,
       errorMessage: null,
       totalGoldDustCost: 0,
       items: [],
@@ -64,41 +65,42 @@ export default class SmithyWorkBench extends React.Component {
   buildItemList(items) {
     if (items !== null) {
       return items.map((item) => {
-        return {
-          value: item.item.id,
-          label: item.item.affix_name
-        }
+        return <option value={item.item.id}>{item.item.affix_name} {item.item.can_use_on_other_items ? '' : ', Holy Stacks Applied: ' + item.item.holy_stacks_applied}</option>
       });
     }
   }
 
   setItemToApply(newValue) {
-    const foundSlot    = this.state.items.filter((i) => i.item.id === newValue.value);
+    const value        = parseInt(event.target.value);
+
+    const foundSlot    = this.state.items.filter((i) => i.item.id === value);
 
     if (foundSlot.length > 0) {
       this.setState({
-        selectedItem: foundSlot[0].item,
+        selectedItem: foundSlot[0].item.id,
       }, () => {
-        this.calculateCosts();
+        this.calculateCosts(foundSlot[0].item, null);
       });
     }
   }
 
-  setAlchemyItemToUse(newValue) {
-    const foundSlot    = this.state.alchemyItems.filter((i) => i.item.id === newValue.value);
+  setAlchemyItemToUse(event) {
+    const value        = parseInt(event.target.value);
+    const foundSlot    = this.state.alchemyItems.filter((i) => i.item.id === value);
+    const foundItem    = this.state.items.filter((i) => i.item.id === this.state.selectedItem);
 
     if (foundSlot.length > 0) {
       this.setState({
-        selectedAlchemyItem: foundSlot[0].item,
+        selectedAlchemyItem: foundSlot[0].item.id,
       }, () => {
-        this.calculateCosts();
+        this.calculateCosts(foundItem[0].item, foundSlot[0].item);
       });
     }
   }
 
   updateSelectedItems() {
-    let foundItemWithStacks = this.state.items.filter((i) => i.item.id === this.state.selectedItem.id);
-    let foundAlchemyItem    = this.state.alchemyItems.filter((i) => i.item.name === this.state.selectedAlchemyItem.name);
+    let foundItemWithStacks = this.state.items.filter((i) => i.item.id === this.state.selectedItem);
+    let foundAlchemyItem    = this.state.alchemyItems.filter((i) => i.item.name === this.state.lastUsedAlchemicalItem);
 
     if (foundItemWithStacks.length === 0) {
       foundItemWithStacks = null;
@@ -113,25 +115,25 @@ export default class SmithyWorkBench extends React.Component {
     }
 
     this.setState({
-      selectedItem: foundItemWithStacks,
-      selectedAlchemyItem: foundAlchemyItem,
+      selectedItem: foundItemWithStacks !== null ? foundItemWithStacks.id : null,
+      selectedAlchemyItem: foundAlchemyItem !== null ? foundAlchemyItem.id : null,
     }, () => {
-      this.calculateCosts();
+      this.calculateCosts(foundItemWithStacks, foundAlchemyItem);
     })
   }
 
-  calculateCosts() {
+  calculateCosts(item, alchemyItem) {
     if (this.state.selectedItem === null) {
       return this.setState({
         totalGoldDustCost: 0,
       });
     }
 
-    let goldDustCost = this.state.selectedItem.holy_stacks * 10000;
+    let goldDustCost = item.holy_stacks * 10000;
 
-    if (this.state.selectedAlchemyItem !== null) {
+    if (alchemyItem !== null) {
 
-      goldDustCost *= this.state.selectedAlchemyItem.holy_level;
+      goldDustCost *= alchemyItem.holy_level;
     }
 
     this.setState({
@@ -188,13 +190,19 @@ export default class SmithyWorkBench extends React.Component {
   }
 
   applyOil() {
+
+
+    let foundItemWithStacks = this.state.items.filter((i) => i.item.id === this.state.selectedItem);
+    let foundAlchemyItem    = this.state.alchemyItems.filter((i) => i.item.id === this.state.selectedAlchemyItem);
+
     this.setState({
-      isCrafting: true
+      isCrafting: true,
+      lastUsedAlchemicalItem: foundAlchemyItem[0].item.name,
     });
 
     axios.post('/api/character/'+ this.props.characterId +'/smithy-workbench/apply', {
-      item_id: this.state.selectedItem.id,
-      alchemy_item_id: this.state.selectedAlchemyItem.id,
+      item_id: foundItemWithStacks[0].item.id,
+      alchemy_item_id: foundAlchemyItem[0].item.id,
       gold_dust_cost: this.state.totalGoldDustCost,
     }).then((result) => {
       this.setState({
@@ -234,6 +242,9 @@ export default class SmithyWorkBench extends React.Component {
       return <p className="mt-2">One moment ...</p>
     }
 
+    const foundItem        = this.state.items.filter((i) => i.item.id === this.state.selectedItem);
+    const foundAlchemyItem = this.state.alchemyItems.filter((i) => i.item.id === this.state.selectedAlchemyItem);
+
     return  (
       <Fragment>
         {
@@ -247,7 +258,7 @@ export default class SmithyWorkBench extends React.Component {
           <Col xs={12} sm={12} md={8} lg={8} xl={6}>
             <div className="mt-2">
               <label>Item to enhance:</label>
-              <select className="form-control monster-select" id="monsters" name="monsters"
+              <select className="form-control monster-select"
                       value={this.state.selectedItem}
                       onChange={this.setItemToApply.bind(this)}
                       disabled={this.state.isDead || !this.state.canCraft || this.props.isAdventuring}>
@@ -257,22 +268,22 @@ export default class SmithyWorkBench extends React.Component {
             </div>
             <div className="mt-2">
               <label>Alchemical Item:</label>
-              <Select
-                isClearable
-                onChange={this.setAlchemyItemToUse.bind(this)}
-                onInputChange={this.handleInputChange}
-                options={this.buildItemList(this.state.alchemyItems)}
-                isDisabled={this.state.isDead || !this.state.canCraft || this.props.isAdventuring || this.state.selectedItem === null}
-              />
+              <select className="form-control monster-select"
+                      value={this.state.selectedAlchemyItem}
+                      onChange={this.setAlchemyItemToUse.bind(this)}
+                      disabled={this.state.isDead || !this.state.canCraft || this.props.isAdventuring || this.state.selectedItem === null}>
+                <option value="" key="">Please select an item</option>
+                {this.buildItemList(this.state.alchemyItems)}
+              </select>
             </div>
             <div className="mt-4">
               <dl>
                 <dt>Gold Dust Cost:</dt>
                 <dd>{this.state.totalGoldDustCost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</dd>
                 <dt>Max Holy Stacks:</dt>
-                <dd>{this.state.selectedItem !== null ? this.state.selectedItem.holy_stacks : 0}</dd>
+                <dd>{foundItem.length > 0 ? foundItem[0].item.holy_stacks : 0}</dd>
                 <dt>Holy Stacks Left:</dt>
-                <dd>{this.state.selectedItem !== null ? this.state.selectedItem.holy_stacks - this.state.selectedItem.holy_stacks_applied : 0}</dd>
+                <dd>{foundItem.length > 0 ? foundItem[0].item.holy_stacks - foundItem[0].item.holy_stacks_applied : 0}</dd>
                 {
                   this.cannotApplyReason() !== '' ?
                     <Fragment>
@@ -286,9 +297,9 @@ export default class SmithyWorkBench extends React.Component {
                 this.state.selectedAlchemyItem !== null ?
                   <dl className="mt-2">
                     <dt>Item Stat Increase:</dt>
-                    <dd>{LockedLocationType.getEffect(this.state.selectedAlchemyItem.holy_level).stat_bonus_increase}</dd>
+                    <dd>{LockedLocationType.getEffect(foundAlchemyItem[0].item.holy_level).stat_bonus_increase}</dd>
                     <dt>Devouring Darkness Increase:</dt>
-                    <dd>{LockedLocationType.getEffect(this.state.selectedAlchemyItem.holy_level).devouring_darkness_range}</dd>
+                    <dd>{LockedLocationType.getEffect(foundAlchemyItem[0].item.holy_level).devouring_darkness_range}</dd>
                   </dl>
                 : null
               }
