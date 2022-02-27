@@ -3,6 +3,7 @@
 namespace App\Game\Core\Services;
 
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
+use App\Game\Messages\Events\GlobalMessageEvent;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Collection as DBCollection;
 use App\Flare\Events\UpdateTopBarEvent;
@@ -37,6 +38,8 @@ class HolyItemService {
         $alchemySlot = InventorySlot::where('inventory_id', $inventory->id)->where('item_id', $params['alchemy_item_id'])->first();
 
         if (!$this->validateCost($itemSlot->item, $alchemySlot->item, $params['gold_dust_cost'])) {
+            event(new GlobalMessageEvent($character->name . ' has been caught cheating. The Purgatory Smith lets out a loud roar. Tell them to stop cheating!'));
+
             return $this->errorResult('Error: Cost does not match.');
         }
 
