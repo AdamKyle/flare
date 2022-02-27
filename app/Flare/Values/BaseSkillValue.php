@@ -11,7 +11,7 @@ class BaseSkillValue {
     /**
      * Get the base character skill value for a character.
      *
-     * @param Charcater $character
+     * @param Character $character
      * @param GameSkill $skill
      * @return array
      */
@@ -23,7 +23,7 @@ class BaseSkillValue {
             'currently_training' => false,
             'level'              => 1,
             'xp'                 => 0,
-            'xp_max'             => $skill->can_train ? rand(150, 350) : rand(100, 250),
+            'xp_max'             => $skill->can_train ? 100 : rand(100, 350),
             'is_locked'          => $skill->is_locked,
         ];
     }

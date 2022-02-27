@@ -247,13 +247,13 @@ export default class SmithyWorkBench extends React.Component {
           <Col xs={12} sm={12} md={8} lg={8} xl={6}>
             <div className="mt-2">
               <label>Item to enhance:</label>
-              <Select
-                isClearable
-                onChange={this.setItemToApply.bind(this)}
-                onInputChange={this.handleInputChange}
-                options={this.buildItemList(this.state.items)}
-                isDisabled={this.state.isDead || !this.state.canCraft || this.props.isAdventuring}
-              />
+              <select className="form-control monster-select" id="monsters" name="monsters"
+                      value={this.state.selectedItem}
+                      onChange={this.setItemToApply.bind(this)}
+                      disabled={this.state.isDead || !this.state.canCraft || this.props.isAdventuring}>
+                <option value="" key="">Please select an item</option>
+                {this.buildItemList(this.state.items)}
+              </select>
             </div>
             <div className="mt-2">
               <label>Alchemical Item:</label>

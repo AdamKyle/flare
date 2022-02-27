@@ -82,7 +82,7 @@ class UpdateSkillListener
 
             $skill->update([
                 'level'              => $level,
-                'xp_max'             => $skill->can_train ? rand(150, 350) : rand(100, 250),
+                'xp_max'             => $skill->can_train ? $skill->level * 100 : rand(100, 350),
                 'base_damage_mod'    => $skill->base_damage_mod + $skill->baseSkill->base_damage_mod_bonus_per_level,
                 'base_healing_mod'   => $skill->base_healing_mod + $skill->baseSkill->base_healing_mod_bonus_per_level,
                 'base_ac_mod'        => $skill->base_ac_mod + $skill->baseSkill->base_ac_mod_bonus_per_level,

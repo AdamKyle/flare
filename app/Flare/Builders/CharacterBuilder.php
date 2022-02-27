@@ -132,59 +132,6 @@ class CharacterBuilder {
     }
 
     /**
-     * Creates a test character with out a user.
-     *
-     * @param GameMap $map
-     * @param string $name
-     * @return $this
-     */
-    public function createTestCharacter(GameMap $map, string $name): CharacterBuilder {
-        $baseStat = resolve(BaseStatValue::class)->setRace($this->race)->setClass($this->class);
-
-        $this->character = Character::create([
-            'game_race_id'  => $this->race->id,
-            'game_class_id' => $this->class->id,
-            'name'          => $name,
-            'damage_stat'   => $this->class->damage_stat,
-            'xp'            => 0,
-            'xp_next'       => 100,
-            'str'           => $baseStat->str(),
-            'dur'           => $baseStat->dur(),
-            'dex'           => $baseStat->dex(),
-            'chr'           => $baseStat->chr(),
-            'int'           => $baseStat->int(),
-            'agi'           => $baseStat->agi(),
-            'focus'         => $baseStat->focus(),
-            'ac'            => $baseStat->ac(),
-        ]);
-
-        $this->character->inventory()->create([
-            'character_id' => $this->character->id
-        ]);
-
-        $this->character->inventory->slots()->create([
-            'inventory_id' => $this->character->inventory->id,
-            'item_id'      => Item::first()->id,
-            'equipped'     => true,
-            'position'     => 'left-hand',
-        ]);
-
-        for ($i = 1; $i <= 10; $i++) {
-            $this->character->inventorySets()->create([
-                'character_id'    => $this->character->id,
-                'can_be_equipped' => true,
-            ]);
-        }
-
-        $this->character->map()->create([
-            'character_id' => $this->character->id,
-            'game_map_id'  => $map->id,
-        ]);
-
-        return $this;
-    }
-
-    /**
      * Assign skills to the user.
      *
      * This assigns all skills in the database.
