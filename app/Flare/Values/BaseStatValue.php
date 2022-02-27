@@ -47,7 +47,9 @@ class BaseStatValue {
      * @return int
      */
     public function str(): int {
-        $modifier = $this->race->str_mod + $this->class->str_mod;
+        $classMod = $this->class->str_mod > 0 ? $this->class->str_mod : 0;
+
+        $modifier = $this->race->str_mod + $classMod;
 
         return round(10 + $modifier);
     }
@@ -58,7 +60,9 @@ class BaseStatValue {
      * @return int
      */
     public function dex(): int {
-        $modifier = $this->race->dex_mod + $this->class->dex_mod;
+        $classMod = $this->class->dex_mod > 0 ? $this->class->dex_mod : 0;
+
+        $modifier = $this->race->dex_mod + $classMod;
 
         return round(10 + $modifier);
     }
@@ -69,7 +73,9 @@ class BaseStatValue {
      * @return int
      */
     public function dur(): int {
-        $modifier = $this->race->dur_mod + $this->class->dur_mod;
+        $classMod = $this->class->dur_mod > 0 ? $this->class->dur_mod : 0;
+
+        $modifier = $this->race->dur_mod + $classMod;
 
         return round(10 + $modifier);
     }
@@ -80,7 +86,9 @@ class BaseStatValue {
      * @return int
      */
     public function chr(): int {
-        $modifier = $this->race->chr_mod + $this->class->chr_mod;
+        $classMod = $this->class->chr_mod > 0 ? $this->class->chr_mod : 0;
+
+        $modifier = $this->race->chr_mod + $classMod;
 
         return round(10 + $modifier);
     }
@@ -91,7 +99,9 @@ class BaseStatValue {
      * @return int
      */
     public function int(): int {
-        $modifier = $this->race->int_mod + $this->class->int_mod;
+        $classMod = $this->class->int_mod > 0 ? $this->class->int_mod : 0;
+
+        $modifier = $this->race->int_mod + $classMod;
 
         return round(10 + $modifier);
     }
@@ -102,7 +112,9 @@ class BaseStatValue {
      * @return int
      */
     public function agi(): int {
-        $modifier = $this->race->agi_mod + $this->class->agi_mod;
+        $classMod = $this->class->agi_mod > 0 ? $this->class->agi_mod : 0;
+
+        $modifier = $this->race->agi_mod + $classMod;
 
         return round(10 + $modifier);
     }
@@ -113,7 +125,9 @@ class BaseStatValue {
      * @return int
      */
     public function focus(): int {
-        $modifier = $this->race->agi_mod + $this->class->agi_mod;
+        $classMod = $this->class->focus_mod > 0 ? $this->class->focus_mod : 0;
+
+        $modifier = $this->race->focus_mod + $classMod;
 
         return round(10 + $modifier);
     }
@@ -126,8 +140,10 @@ class BaseStatValue {
      * @return int
      */
     public function ac(): int {
-        $modifier = $this->race->defense_mod + $this->class->defense_mod;
+        $classMod = $this->class->defense_mod > 0 ? $this->class->defense_mod : 0;
 
-        return round(10 * ($modifier < 1 ? (1 + $modifier) : $modifier ));
+        $modifier = $this->race->defense_mod + $classMod;
+
+        return (10 + 10 * $modifier);
     }
 }

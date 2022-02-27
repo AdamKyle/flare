@@ -6,15 +6,19 @@
             <div class="tw-w-full md:tw-w-1/2 tw-px-2 tw-mb-4">
                 <dl>
                     <dt>Strength Mofidfier</dt>
-                    <dd>+ {{$class->str_mod}} pts.</dd>
+                    <dd>+ {{$class->str_mod > 0 ? $class->str_mod : 0}} pts.</dd>
                     <dt>Durability Modifier</dt>
-                    <dd>+ {{$class->dur_mod}} pts.</dd>
+                    <dd>+ {{$class->dur_mod > 0 ? $class->dur_mod : 0}} pts.</dd>
                     <dt>Dexterity Modifier</dt>
-                    <dd>+ {{$class->dex_mod}} pts.</dd>
+                    <dd>+ {{$class->dex_mod > 0 ? $class->dex_mod : 0}} pts.</dd>
                     <dt>Intelligence Modifier</dt>
-                    <dd>+ {{$class->int_mod}} pts.</dd>
+                    <dd>+ {{$class->int_mod > 0 ? $class->int_mod : 0}} pts.</dd>
                     <dt>Charsima Modifier</dt>
-                    <dd>+ {{$class->chr_mod}} pts.</dd>
+                    <dd>+ {{$class->chr_mod > 0 ? $class->chr_mod : 0}} pts.</dd>
+                    <dt>Focus Modifier</dt>
+                    <dd>+ {{$class->focus_mod > 0 ? $class->focus_mod : 0}} pts.</dd>
+                    <dt>Agility Modifier</dt>
+                    <dd>+ {{$class->aglity_modifier > 0 ? $class->aglity_modifier : 0}} pts.</dd>
                     <dt>Accuracy Modifier</dt>
                     <dd>+ {{$class->accuracy_mod * 100}} %</dd>
                     <dt>Dodge Modifier</dt>
