@@ -125,7 +125,7 @@ export default class AdditionalActionsDropDown extends React.Component {
 
             {this.state.showCrafting
               ?
-              <Dropdown.Item onClick={this.changeType.bind(this)}>Change Type</Dropdown.Item>
+              <Dropdown.Item onClick={this.changeType.bind(this)}>Change Crafting Type</Dropdown.Item>
               : null
             }
           </Dropdown.Menu>

@@ -45,7 +45,14 @@ class CraftingService {
      * @return Collection
      */
     public function fetchCraftableItems(Character $character, array $params): Collection {
-        $skill = $this->fetchCraftingSkill($character, $params['crafting_type']);
+
+        $craftingType = $params['crafting_type'];
+
+        if ($craftingType == 'hammer' || $craftingType == 'bow') {
+            $craftingType = 'weapon';
+        }
+
+        $skill = $this->fetchCraftingSkill($character, $craftingType);
 
         return $this->getItems($params['crafting_type'], $skill);
     }
@@ -136,6 +143,11 @@ class CraftingService {
      * @return Skill
      */
     protected function fetchCraftingSkill(Character $character, string $craftingType): Skill {
+
+        if ($craftingType === 'hammer' || $craftingType === 'bow') {
+            $craftingType = 'weapon';
+        }
+
         $gameSkill = GameSkill::where('name', ucfirst($craftingType) . ' Crafting')->first();
 
         return Skill::where('game_skill_id', $gameSkill->id)->where('character_id', $character->id)->first();
@@ -151,6 +163,7 @@ class CraftingService {
     protected function getItems($craftingType, Skill $skill): Collection {
         return Item::where('can_craft', true)
                     ->where('crafting_type', strtolower($craftingType))
+                    ->orWhere('default_position', strtolower($craftingType))
                     ->where('skill_level_required', '<=', $skill->level)
                     ->where('item_prefix_id', null)
                     ->where('item_suffix_id', null)

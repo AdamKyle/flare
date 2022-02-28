@@ -68,7 +68,7 @@ export default class QuestTreeOverView extends React.Component {
         }
         {
           childQuests.length > 0 &&  singleQuests.length > 0 ?
-            <div className='col-md-6'>
+            <div className='col-md-2'>
               <h4 className="tw-font-light">One off quests</h4>
               <hr />
               {singleQuests}
@@ -88,7 +88,7 @@ export default class QuestTreeOverView extends React.Component {
 
         {
           singleQuests.length > 0 &&  childQuests.length > 0 ?
-            <div className='col-md-6'>
+            <div className='col-md-10'>
               <h4 className="tw-font-light">Quest chain</h4>
               <hr />
               {childQuests}
@@ -130,20 +130,7 @@ export default class QuestTreeOverView extends React.Component {
               access. All quests are broken down by the quest parents starting plane.
             </p>
             <hr />
-            <Tabs defaultActiveKey="all-quests" id="all-quests">
-              <Tab eventKey='all-quests' title='All Quests'>
-                <div className="mt-3">
-                  <div className="row">
-                    <div className="col-md-2">
-                      {this.renderAllQuestsWitOutChildren()}
-                    </div>
-                    <div className="col-md-10">
-                      {this.renderAllQuestsWithChildren()}
-                    </div>
-                  </div>
-
-                </div>
-              </Tab>
+            <Tabs defaultActiveKey="Surface" id="all-quests">
               {this.renderQuestTrees()}
             </Tabs>
 

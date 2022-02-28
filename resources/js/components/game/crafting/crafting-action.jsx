@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Fragment} from 'react';
 import {Row, Col} from 'react-bootstrap';
 import TimeOutBar from '../timeout/timeout-bar';
 import {getServerMessage} from '../helpers/server_message';
@@ -190,17 +190,22 @@ export default class CraftingAction extends React.Component {
     if (this.state.showCrafting) {
       if (this.state.craftingType === null) {
         return (
-          <select className="form-control mt-2" id="crafting-type" name="crafting-type"
-                  value={0}
-                  onChange={this.updateCraftingType.bind(this)}
-                  disabled={this.state.isDead}>
-            <option value="" key="0">Please select a crafting type</option>
-            <option value="weapon" key="weapon">Weapon</option>
-            <option value="armour" key="armour">Armour</option>
-            <option value="spell" key="spell">Spell</option>
-            <option value="ring" key="ring">Ring</option>
-            <option value="artifact" key="artifact">Artifact</option>
-          </select>
+          <Fragment>
+            <select className="form-control mt-2" id="crafting-type" name="crafting-type"
+                    value={0}
+                    onChange={this.updateCraftingType.bind(this)}
+                    disabled={this.state.isDead}>
+              <option value="" key="0">Please select a crafting type</option>
+              <option value="weapon" key="weapon">Weapons</option>
+              <option value="hammer" key="weapon">Hammers</option>
+              <option value="bow" key="weapon">Bows</option>
+              <option value="armour" key="armour">Armour</option>
+              <option value="spell" key="spell">Spells</option>
+              <option value="ring" key="ring">Rings</option>
+              <option value="artifact" key="artifact">Artifacts</option>
+            </select>
+            <p className="mt-2"><strong>Note:</strong> Weapons, Hammers and Bows all count toward Weapon Crafting, if you level one, you level all three types.</p>
+          </Fragment>
         );
       }
 
