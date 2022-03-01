@@ -58,7 +58,7 @@ class UseMultipleItems implements ShouldQueue
         if ($character->boons->count() < 11) {
             $useItemService->useItem($inventorySlot, $character, $inventorySlot->item);
 
-            event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+            event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'usable_items'));
 
             event(new CharacterInventoryDetailsUpdate($character->user));
 

@@ -62,7 +62,9 @@ class AdventureItemRewardService {
 
         event(new UpdateTopBarEvent($character));
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'quests'));
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'sets'));
 
         event(new CharacterInventoryDetailsUpdate($character->user));
 
@@ -130,7 +132,7 @@ class AdventureItemRewardService {
 
                 event(new ServerMessageEvent($user, 'You gained the item: ' . $item->affix_name));
 
-                event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+                event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'quest_items'));
 
                 event(new CharacterInventoryDetailsUpdate($character->user));
 
@@ -146,7 +148,7 @@ class AdventureItemRewardService {
 
             event(new ServerMessageEvent($user, 'You gained the item: ' . $item->affix_name));
 
-            event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+            event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
 
             event(new CharacterInventoryDetailsUpdate($character->user));
 

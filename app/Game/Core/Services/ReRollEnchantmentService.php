@@ -99,7 +99,7 @@ class ReRollEnchantmentService {
 
         event(new UpdateTopBarEvent($character));
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
 
         event(new CharacterInventoryDetailsUpdate($character->user));
 
@@ -232,7 +232,7 @@ class ReRollEnchantmentService {
 
         event(new UpdateTopBarEvent($character));
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
 
         event(new CharacterInventoryDetailsUpdate($character->user));
 

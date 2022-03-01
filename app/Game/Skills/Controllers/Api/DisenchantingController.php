@@ -39,7 +39,7 @@ class DisenchantingController extends Controller {
         if (!is_null($foundItem)) {
             $this->disenchantingService->disenchantWithSkill($character, $foundItem);
 
-            event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+            event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
 
             event(new CharacterInventoryDetailsUpdate($character->user));
 
@@ -65,7 +65,7 @@ class DisenchantingController extends Controller {
 
             event(new ServerMessageEvent($character->user, 'Destroyed: ' . $name));
 
-            event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+            event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
 
             event(new CharacterInventoryDetailsUpdate($character->user));
 

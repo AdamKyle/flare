@@ -215,7 +215,7 @@ class  MarketController extends Controller {
 
         $this->sendUpdate($this->transformer, $this->manager);
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
 
         event(new CharacterInventoryDetailsUpdate($character->user));
 
@@ -284,7 +284,7 @@ class  MarketController extends Controller {
 
         event(new UpdateTopBarEvent($listing->character->refresh()));
         event(new UpdateTopBarEvent($character->refresh()));
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
         event(new CharacterInventoryDetailsUpdate($character->user));
 
         $listing->delete();

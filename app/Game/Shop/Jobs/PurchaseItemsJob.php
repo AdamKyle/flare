@@ -58,7 +58,7 @@ class PurchaseItemsJob implements ShouldQueue
 
             event(new BuyItemEvent($item, $character));
 
-            event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+            event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
 
             event(new CharacterInventoryDetailsUpdate($character->user));
 

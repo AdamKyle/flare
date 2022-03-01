@@ -91,7 +91,7 @@ class CraftingService {
 
         $this->attemptToCraftItem($character, $skill, $item);
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
 
         event(new CharacterInventoryDetailsUpdate($character->user));
 
