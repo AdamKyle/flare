@@ -85,7 +85,11 @@ class CharacterInventoryService {
         ];
     }
 
-    public function getInventoryForType(string $type) {
+    /**
+     * @param string $type
+     * @return Collection|array
+     */
+    public function getInventoryForType(string $type): Collection|array {
         switch($type) {
             case 'inventory':
                 return $this->fetchCharacterInventory()->values();

@@ -71,6 +71,7 @@ class CraftingService {
      */
     public function craft(Character $character, array $params): void {
         $item  = Item::find($params['item_to_craft']);
+
         $skill = $this->fetchCraftingSkill($character, $params['type']);
 
         if (is_null($item)) {
@@ -161,14 +162,20 @@ class CraftingService {
      * @return Collection
      */
     protected function getItems($craftingType, Skill $skill): Collection {
-        return Item::where('can_craft', true)
-                    ->where('crafting_type', strtolower($craftingType))
-                    ->orWhere('default_position', strtolower($craftingType))
+        $items = Item::where('can_craft', true)
+
                     ->where('skill_level_required', '<=', $skill->level)
-                    ->where('item_prefix_id', null)
-                    ->where('item_suffix_id', null)
-                    ->orderBy('type', 'desc')
-                    ->get();
+                    ->whereNull('item_prefix_id')
+                    ->whereNull('item_suffix_id')
+                    ->orderBy('cost', 'asc');
+
+        if ($craftingType === 'bow' || $craftingType === 'hammer') {
+            $items->where('default_position', strtolower($craftingType));
+        } else {
+            $items->where('crafting_type', strtolower($craftingType));
+        }
+
+        return $items->get();
     }
 
     /**

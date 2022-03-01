@@ -179,8 +179,6 @@ class AdventureRewardService {
 
             event(new UpdateTopBarEvent($character));
 
-            event(new GlobalMessageEvent($character->name . 'Has maxed out the faction for: ' . $faction->gameMap->name . ' They are considered legendary among the people of this land.'));
-
             $faction->update([
                 'maxed' => true,
             ]);
