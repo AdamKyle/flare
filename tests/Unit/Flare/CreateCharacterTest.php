@@ -147,32 +147,6 @@ class CreateCharacterTest extends TestCase
         $this->assertNotNull($character->refresh()->skills()->where('game_skill_id', $gameSkill->id));
     }
 
-    public function testCreateTestCharacterWithOutUser() {
-        $race = $this->createRace([
-            'str_mod' => 3,
-            'accuracy_mod' => 2,
-            'dodge_mod' => 2
-        ]);
-
-        $class = $this->createClass([
-            'dex_mod'     => 3,
-            'damage_stat' => 'dex',
-            'accuracy_mod' => 0,
-            'dodge_mod' => 1,
-        ]);
-
-
-        $character = resolve(CharacterBuilder::class)->setRace($race)
-            ->setClass($class)
-            ->createTestCharacter($this->gameMap, 'sample')
-            ->assignSkills()
-            ->character();
-
-        $this->assertGreaterThan(0, number_format($this->fetchSkill('Accuracy', $character)->skill_bonus));
-        $this->assertGreaterThan(0, number_format($this->fetchSkill('Dodge', $character)->skill_bonus));
-        $this->assertNull($character->user);
-    }
-
     protected function fetchSkill(string $name, Character $character): Skill {
         return $character->skills()->join('game_skills', function($join) use($name){
             $join->on('game_skills.id', 'skills.game_skill_id')

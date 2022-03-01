@@ -120,18 +120,4 @@ class SettingsControllerTest extends TestCase
         $this->assertFalse($user->auto_disenchant);
         $this->assertNull($user->auto_disenchant_amount);
     }
-
-    public function testDisableAttackPopOvers() {
-        $user = $this->character->getUser();
-
-        $this->actingAs($user)->visitRoute('user.settings', [
-            'user' => $user,
-        ])->see('Account Settings')->submitForm('Update Attack Tool Tips', [
-            'disable_attack_type_popover' => true,
-        ]);
-
-        $user = $user->refresh();
-
-        $this->assertTrue($user->disable_attack_type_popover);
-    }
 }
