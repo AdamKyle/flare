@@ -133,10 +133,6 @@ class CelestialFightService {
 
             event(new UpdateCelestialFight(null, true));
 
-            event(new CharacterInventoryUpdateBroadCastEvent($character->user));
-
-            event(new CharacterInventoryDetailsUpdate($character->user));
-
             return $this->successResult([
                 'battle_over' => true,
                 'logs'        => $logInfo,

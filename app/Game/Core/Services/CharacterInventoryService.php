@@ -85,6 +85,31 @@ class CharacterInventoryService {
         ];
     }
 
+    public function getInventoryForType(string $type) {
+        switch($type) {
+            case 'inventory':
+                return $this->fetchCharacterInventory()->values();
+            case 'usable_sets':
+            case 'savable_sets':
+                return $this->getUsableSets();
+            case 'equipped':
+                $equipped   = $this->fetchEquipped();
+                return !is_null($equipped) ? $equipped : [];
+            case 'sets':
+                return [
+                    'sets' => $this->character->inventorySets()->with(['slots', 'slots.item', 'slots.item.itemPrefix', 'slots.item.itemSuffix'])->get(),
+                    'set_equipped' => $this->isInventorySetIsEquipped
+                ];
+            case 'quest_items':
+                return $this->getQuestItems();
+            case 'usable_items':
+                return $this->getUsableItems();
+            default:
+                return $this->getInventoryForApi();
+
+        }
+    }
+
     /**
      * Returns the usable items.
      *

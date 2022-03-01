@@ -91,7 +91,7 @@ class CharacterInventoryController extends Controller {
             $affixData['character_inventory'],
         ));
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
 
         event(new CharacterInventoryDetailsUpdate($character->user));
 
@@ -107,7 +107,7 @@ class CharacterInventoryController extends Controller {
 
         $character->inventory->slots()->whereIn('id', $slotIds)->delete();
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
 
         event(new CharacterInventoryDetailsUpdate($character->user));
 
@@ -171,7 +171,8 @@ class CharacterInventoryController extends Controller {
 
         $character = $character->refresh();
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'sets'));
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
 
         event(new CharacterInventoryDetailsUpdate($character->user));
 
@@ -213,7 +214,7 @@ class CharacterInventoryController extends Controller {
             'name' => $request->set_name
         ]);
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'sets'));
 
         event(new CharacterInventoryDetailsUpdate($character->user));
 
@@ -251,7 +252,7 @@ class CharacterInventoryController extends Controller {
 
         $this->updateCharacterAttackDataCache($character);
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'sets'));
 
         event(new CharacterInventoryDetailsUpdate($character->user));
 
@@ -284,7 +285,8 @@ class CharacterInventoryController extends Controller {
             return $set->id === $request->inventory_set_id;
         });
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'sets'));
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
 
         event(new CharacterInventoryDetailsUpdate($character->user));
 
@@ -327,7 +329,8 @@ class CharacterInventoryController extends Controller {
             return $set->id === $inventorySet->id;
         });
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'sets'));
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
 
         event(new CharacterInventoryDetailsUpdate($character->user));
 
@@ -353,7 +356,7 @@ class CharacterInventoryController extends Controller {
 
             $this->updateCharacterAttackDataCache($character);
 
-            event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+            event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'sets'));
 
             event(new CharacterInventoryDetailsUpdate($character->user));
 
@@ -375,7 +378,7 @@ class CharacterInventoryController extends Controller {
 
         $this->updateCharacterAttackDataCache($character);
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
 
         event(new CharacterInventoryDetailsUpdate($character->user));
 
@@ -396,6 +399,8 @@ class CharacterInventoryController extends Controller {
             $inventorySet = $character->inventorySets()->where('is_equipped', true)->first();
 
             $inventorySetService->unEquipInventorySet($inventorySet);
+
+            event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'sets'));
         } else {
             $character->inventory->slots->each(function($slot) {
                 $slot->update([
@@ -411,7 +416,7 @@ class CharacterInventoryController extends Controller {
 
         $this->updateCharacterAttackDataCache($character);
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
 
         event(new CharacterInventoryDetailsUpdate($character->user));
 
@@ -442,7 +447,7 @@ class CharacterInventoryController extends Controller {
 
         $useItemService->useItem($slot, $character, $item);
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'usable_items'));
 
         event(new CharacterInventoryDetailsUpdate($character->user));
 
@@ -472,7 +477,7 @@ class CharacterInventoryController extends Controller {
 
         $this->updateCharacterAttackDataCache($character);
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'sets'));
 
         event(new CharacterInventoryDetailsUpdate($character->user));
 
@@ -521,7 +526,7 @@ class CharacterInventoryController extends Controller {
 
         $slot->delete();
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'usable_items'));
 
         event(new CharacterInventoryDetailsUpdate($character->user));
 
@@ -539,7 +544,7 @@ class CharacterInventoryController extends Controller {
             $slot->delete();
         }
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'usable_items'));
 
         event(new CharacterInventoryDetailsUpdate($character->user));
 
