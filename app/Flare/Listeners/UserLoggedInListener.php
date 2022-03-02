@@ -51,7 +51,13 @@ class UserLoggedInListener {
 
             $invalidIps = $lastRecord->invalid_ips;
 
-            if (!in_array($event->user->ip_address, $invalidIps)) {
+            if (is_null($invalidIps)) {
+                UserSiteAccessStatistics::create([
+                    'amount_signed_in'  => $lastRecord->amount_signed_in + 1,
+                    'amount_registered' => $lastRecord->amount_registered,
+                    'invalid_ips'       => [$event->user->ip_address],
+                ]);
+            } else if (!in_array($event->user->ip_address, $invalidIps)) {
                 $invalidIps[] = $event->user->ip_address;
 
                 UserSiteAccessStatistics::create([
