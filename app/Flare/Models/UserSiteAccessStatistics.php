@@ -18,6 +18,7 @@ class UserSiteAccessStatistics extends Model {
     protected $fillable = [
         'amount_signed_in',
         'amount_registered',
+        'invalid_ips',
     ];
 
 
@@ -29,6 +30,7 @@ class UserSiteAccessStatistics extends Model {
     protected $casts = [
         'amount_signed_in'  => 'integer',
         'amount_registered' => 'integer',
+        'invalid_ips'       => 'array',
     ];
 
     protected static function newFactory() {
