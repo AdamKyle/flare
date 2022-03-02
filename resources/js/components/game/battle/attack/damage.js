@@ -103,7 +103,7 @@ export default class Damage {
         cowerMessage = 'cowers: ';
       }
 
-      cowerMessage = cowerMessage + this.formatNumber(totalDamage);
+      cowerMessage = cowerMessage + this.formatNumber(Math.ceil(totalDamage));
 
       this.addActionMessage('Your enchantments glow with rage. Your enemy ' + cowerMessage);
     }

@@ -163,6 +163,10 @@ export default class MonsterAttack {
         this.addMessage('Your rings negate some of the enemies enchantment damage.');
       }
 
+      if (damage <= 0.0) {
+        return;
+      }
+
       this.currentCharacterHealth = this.currentCharacterHealth - damage;
 
       this.addActionMessage(attacker.name + '\'s enchantments glow, lashing out for: ' + this.formatNumber(damage));
