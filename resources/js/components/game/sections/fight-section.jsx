@@ -199,40 +199,13 @@ export default class FightSection extends React.Component {
     const voidance      = new Voidance();
     const character     = this.props.character;
 
-    if (monsterInfo.canMonsterDevoidPlayer(character.devouring_darkness_res)) {
-      this.battleMessagesBeforeFight.push({
-        message: this.props.monster.name + ' has devoided your voidance! You feel fear start to build.',
-        class: 'action-fired'
-      });
-
-      this.isCharacterDevoided = true;
-    }
-
-    if (voidance.canPlayerDevoidEnemy(this.props.character.devouring_darkness) && !this.isCharacterDevoided) {
-      this.battleMessagesBeforeFight.push({
-        message: 'Magic crackles in the air, the darkness consumes the enemy. They are devoided!',
-        class: 'action-fired'
-      });
-
-      this.isMonsterDevoided = true;
-    }
-
-    if (monsterInfo.canMonsterVoidPlayer(character.devouring_light_res) && !this.isMonsterDevoided) {
-      this.battleMessagesBeforeFight.push({
-        message: this.props.monster.name + ' has voided your enchantments! You feel much weaker!',
-        class: 'enemy-action-fired'
-      });
-
-      this.isCharacterVoided = true;
-    }
-
-    if (voidance.canVoidEnemy(this.props.character.devouring_light) && !this.isCharacterDevoided && !this.isCharacterVoided) {
-      this.battleMessagesBeforeFight.push({
-        message: 'The light of the heavens shines through this darkness. The enemy is voided!',
-        class: 'action-fired'
-      });
-
-      this.isMonsterVoided = true;
+    switch (this.props.monster.map_name) {
+      case 'Hell':
+      case 'Purgatory':
+        this.monsterVoidance(monsterInfo, character, voidance);
+        break;
+      default :
+        this.playerVoidance(monsterInfo, character, voidance);
     }
 
     if (!this.isCharacterVoided && !this.isCharacterDevoided) {
@@ -280,6 +253,83 @@ export default class FightSection extends React.Component {
     }, () => {
       this.props.setMonster(null)
     });
+  }
+
+  monsterVoidance(monsterInfo, character, voidance) {
+    if (monsterInfo.canMonsterDevoidPlayer(character.devouring_darkness_res)) {
+      this.battleMessagesBeforeFight.push({
+        message: this.props.monster.name + ' has devoided your voidance! You feel fear start to build.',
+        class: 'action-fired'
+      });
+
+      this.isCharacterDevoided = true;
+    }
+
+    if (voidance.canPlayerDevoidEnemy(this.props.character.devouring_darkness) && !this.isCharacterDevoided) {
+      this.battleMessagesBeforeFight.push({
+        message: 'Magic crackles in the air, the darkness consumes the enemy. They are devoided!',
+        class: 'action-fired'
+      });
+
+      this.isMonsterDevoided = true;
+    }
+
+    if (monsterInfo.canMonsterVoidPlayer(character.devouring_light_res) && !this.isMonsterDevoided) {
+      this.battleMessagesBeforeFight.push({
+        message: this.props.monster.name + ' has voided your enchantments! You feel much weaker!',
+        class: 'enemy-action-fired'
+      });
+
+      this.isCharacterVoided = true;
+    }
+
+    if (voidance.canVoidEnemy(this.props.character.devouring_light) && !this.isCharacterDevoided && !this.isCharacterVoided) {
+      this.battleMessagesBeforeFight.push({
+        message: 'The light of the heavens shines through this darkness. The enemy is voided!',
+        class: 'action-fired'
+      });
+
+      this.isMonsterVoided = true;
+    }
+  }
+
+  playerVoidance(monsterInfo, character, voidance) {
+    if (voidance.canPlayerDevoidEnemy(this.props.character.devouring_darkness)) {
+      this.battleMessagesBeforeFight.push({
+        message: 'Magic crackles in the air, the darkness consumes the enemy. They are devoided!',
+        class: 'action-fired'
+      });
+
+      this.isMonsterDevoided = true;
+    }
+
+    if (monsterInfo.canMonsterDevoidPlayer(character.devouring_darkness_res) && this.isMonsterDevoided) {
+      this.battleMessagesBeforeFight.push({
+        message: this.props.monster.name + ' has devoided your voidance! You feel fear start to build.',
+        class: 'action-fired'
+      });
+
+      this.isCharacterDevoided = true;
+    }
+
+    if (voidance.canVoidEnemy(this.props.character.devouring_light) && !this.isCharacterDevoided) {
+      this.battleMessagesBeforeFight.push({
+        message: 'The light of the heavens shines through this darkness. The enemy is voided!',
+        class: 'action-fired'
+      });
+
+      this.isMonsterVoided = true;
+    }
+
+    if (monsterInfo.canMonsterVoidPlayer(character.devouring_light_res) && !this.isMonsterDevoided) {
+      this.battleMessagesBeforeFight.push({
+        message: this.props.monster.name + ' has voided your enchantments! You feel much weaker!',
+        class: 'enemy-action-fired'
+      });
+
+      this.isCharacterVoided = true;
+    }
+
   }
 
   battleMessages() {

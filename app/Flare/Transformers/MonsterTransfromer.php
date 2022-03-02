@@ -23,6 +23,7 @@ class MonsterTransfromer extends TransformerAbstract {
         return [
             'id'                        => $monster->id,
             'name'                      => $monster->name,
+            'map_name'                  => $monster->gameMap->name,
             'damage_stat'               => $monster->damage_stat,
             'str'                       => $shouldIncrease ? $this->increaseValue($monster->str, $increaseAmount) : $monster->str,
             'dur'                       => $shouldIncrease ? $this->increaseValue($monster->dur, $increaseAmount) : $monster->dur,

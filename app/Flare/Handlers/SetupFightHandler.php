@@ -49,6 +49,34 @@ class SetupFightHandler {
         $defender  = $this->getDefenderFromSpecialLocation($attacker, $defender);
         $defender  = $this->applyEnemyStatIncrease($defender, $reduction);
 
+        switch($defender->gameMap->name) {
+            case 'Hell':
+            case 'Purgatory':
+                $this->monsterVoidsPlayer($defender, $attacker);
+                break;
+            default:
+                $this->playerVoidsMonster($defender, $attacker);
+        }
+
+        if (!is_null($reduction)) {
+            $this->characterDmgDeduction = $reduction;
+        }
+
+        // Only do this once per fight and if you are not voided.
+        if (is_null($this->attackType) && !$this->processed) {
+            $defender = $this->reduceEnemyStats($defender);
+
+            $defender = $this->reduceEnemySkills($defender);
+
+            $defender = $this->reduceEnemyResistances($defender);
+        }
+
+        $this->defender = $defender;
+
+        $this->processed = true;
+    }
+
+    protected function monsterVoidsPlayer($defender, $attacker) {
         $characterIsDevoided = false;
         $monsterIsDevoided   = false;
 
@@ -83,23 +111,44 @@ class SetupFightHandler {
 
             $this->monsterVoided = true;
         }
+    }
 
-        if (!is_null($reduction)) {
-            $this->characterDmgDeduction = $reduction;
+    protected function playerVoidsMonster($defender, $attacker) {
+        $characterIsDevoided = false;
+        $monsterIsDevoided   = false;
+
+        if ($this->canCharacterDevoidEnemy($attacker)) {
+            $message           = 'Magic crackles in the air, the darkness consumes the enemy. They are devoided!';
+
+            $this->battleLogs  = $this->addMessage($message, 'action-fired', $this->battleLogs);
+
+            $monsterIsDevoided = true;
         }
 
-        // Only do this once per fight and if you are not voided.
-        if (is_null($this->attackType) && !$this->processed) {
-            $defender = $this->reduceEnemyStats($defender);
+        if ($this->canMonsterDevoidCharacter($defender, $attacker) && !$monsterIsDevoided) {
+            $message = $defender->name . ' has devoided your voidance! You feel fear start to build.';
 
-            $defender = $this->reduceEnemySkills($defender);
+            $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
 
-            $defender = $this->reduceEnemyResistances($defender);
+            $characterIsDevoided = true;
         }
 
-        $this->defender = $defender;
+        if ($this->canCharacterVoidEnemy($attacker) && !$characterIsDevoided) {
+            $message             = 'The light of the heavens shines through this darkness. The enemy is voided!';
 
-        $this->processed = true;
+            $this->battleLogs    = $this->addMessage($message, 'action-fired', $this->battleLogs);
+
+            $this->monsterVoided = true;
+        }
+
+        if ($this->canMonsterVoidCharacter($defender, $attacker) && !$monsterIsDevoided) {
+            $message          = $defender->name . ' has voided your enchantments! You feel much weaker!';
+
+            $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
+
+            $this->attackType = 'voided_';
+        }
+
     }
 
     public function getAttackType(): ?string {
