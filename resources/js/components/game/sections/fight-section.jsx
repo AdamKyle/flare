@@ -259,10 +259,15 @@ export default class FightSection extends React.Component {
     if (monsterInfo.canMonsterDevoidPlayer(character.devouring_darkness_res)) {
       this.battleMessagesBeforeFight.push({
         message: this.props.monster.name + ' has devoided your voidance! You feel fear start to build.',
-        class: 'action-fired'
+        class: 'enemy-action-fired'
       });
 
       this.isCharacterDevoided = true;
+    } else {
+      this.battleMessagesBeforeFight.push({
+        message: this.props.monster.name + ' fails to devoid you. They seem confused.',
+        class: 'action-fired'
+      });
     }
 
     if (voidance.canPlayerDevoidEnemy(this.props.character.devouring_darkness) && !this.isCharacterDevoided) {
@@ -281,6 +286,11 @@ export default class FightSection extends React.Component {
       });
 
       this.isCharacterVoided = true;
+    } else {
+      this.battleMessagesBeforeFight.push({
+        message: this.props.monster.name + ' fails to void you. They are terrified.',
+        class: 'action-fired'
+      });
     }
 
     if (voidance.canVoidEnemy(this.props.character.devouring_light) && !this.isCharacterDevoided && !this.isCharacterVoided) {

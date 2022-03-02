@@ -57,7 +57,7 @@
               >
                 @livewire('admin.monsters.data-table', [
                     'onlyMapName' => $gameMapName,
-                    'withCelestials' => true,
+                    'only' => 'celestials',
                 ])
               </x-tabs.tab-content-section>
             </x-tabs.tab-content>

@@ -14,7 +14,7 @@ class HolyStacks {
     }
 
     public function fetchDevouringResistanceBonus(Character $character): float {
-        return $this->fetchHolyBonus($character) / 2;
+        return $this->fetchHolyBonus($character);
     }
 
     public function fetchAttackBonus(Character $character): float {

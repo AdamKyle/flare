@@ -167,7 +167,7 @@ class BattleDrop {
 
                 $roll = $roll + $roll * $lootingChance;
 
-                if ($roll > $chance) {
+                if ($roll > $chance && $this->canHaveItem($character, $item)) {
                     $this->attemptToPickUpItem($character, $item);
 
                     event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'quest_items'));
