@@ -202,11 +202,13 @@ export default class UsableItemsSection extends React.Component {
               </div>
               : null
           }
-          <ReactDatatable
-            config={this.usable_config}
-            records={this.formatDataForTable()}
-            columns={this.usable_headers}
-          />
+          <div className="tw-overflow-x-auto">
+            <ReactDatatable
+              config={this.usable_config}
+              records={this.formatDataForTable()}
+              columns={this.usable_headers}
+            />
+          </div>
           {
             this.state.showUseMany ?
               <UseManyItemsModal

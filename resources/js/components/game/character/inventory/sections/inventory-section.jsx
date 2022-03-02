@@ -223,13 +223,13 @@ export default class InventorySection extends React.Component {
               Disenchant All
             </button>
           <hr />
-
-          <ReactDatatable
-            config={this.inventory_config}
-            records={this.formatDataForTable()}
-            columns={this.inventory_headers}
-          />
-
+          <div className="tw-overflow-x-auto">
+            <ReactDatatable
+              config={this.inventory_config}
+              records={this.formatDataForTable()}
+              columns={this.inventory_headers}
+            />
+          </div>
           {
             this.state.showDestroyModal && this.state.itemForDestroy !== null ?
               <DestroyModal

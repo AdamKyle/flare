@@ -357,11 +357,13 @@ export default class SetTabSection extends React.Component {
             </div>
             : null
         }
-        <ReactDatatable
-          config={this.set_config}
-          records={this.formatDataForTable()}
-          columns={this.set_headers}
-        />
+        <div className="tw-overflow-x-auto">
+          <ReactDatatable
+            config={this.set_config}
+            records={this.formatDataForTable()}
+            columns={this.set_headers}
+          />
+        </div>
       </div>
     );
   }

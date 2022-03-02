@@ -299,11 +299,13 @@ export default class EquippedSection extends React.Component {
               </div>
               : null
           }
-          <ReactDatatable
-            config={this.equipped_Config}
-            records={this.state.equippedItems}
-            columns={this.equipped_headers}
-          />
+          <div className="tw-overflow-x-auto">
+            <ReactDatatable
+              config={this.equipped_Config}
+              records={this.state.equippedItems}
+              columns={this.equipped_headers}
+            />
+          </div>
           {
             this.state.openSaveAsSet ?
               <SaveAsSetModal
