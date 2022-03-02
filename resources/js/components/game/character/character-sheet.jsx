@@ -81,7 +81,7 @@ export default class CharacterSheet extends React.Component {
             <>
               {
                 this.state.characterSheet.is_dead ?
-                  <AlertWarning icon={'fas fa-exclamation-triangle'} title={'Automation is running'}>
+                  <AlertWarning icon={'fas fa-exclamation-triangle'} title={'You are a bit dead friend ...'}>
                     <p>
                       You are dead. You will not be able to manage: Inventory, Skills or Boons. Please revive.
                       You can revive by heading to the game section and clicking revive.

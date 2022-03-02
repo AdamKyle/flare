@@ -43,7 +43,7 @@ class CharacterXPService {
                 return ceil($xp * MaxLevel::LAST_LEG_PERCENT);
             }
 
-            if ($character->level === $config->max_level) {
+            if ($character->level >= $config->max_level) {
                 return 0;
             } else {
                 return $xp + $xp * $xpBonus;
