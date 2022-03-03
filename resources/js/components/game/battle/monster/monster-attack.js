@@ -244,10 +244,10 @@ export default class MonsterAttack {
 
       if (defenderHealingReduction > 0) {
         healFor = healFor - healFor * defenderHealingReduction;
+        this.addMessage('Your rings negate some of the enemies healing power.');
       }
 
       if (healFor > 1) {
-        this.addMessage('Your rings negate some of the enemies healing power.');
         this.currentMonsterHealth = this.currentMonsterHealth + healFor;
         this.addHealingMessage(attacker.name + '\'s healing spells wash over them for: ' + this.formatNumber(healFor.toFixed(0)));
       } else {

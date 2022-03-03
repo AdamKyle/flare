@@ -29,7 +29,7 @@ class ClassBonuses {
         $classBonus = 0.0;
 
         if ($classType->isProphet()) {
-            if ($this->prophetHasHealingSpells($character)) {
+            if ($this->hasHealingSpells($character)) {
                 $classBonus = $this->getClassBonus($character, $class, 'base_healing_mod');
             }
         }
@@ -38,12 +38,12 @@ class ClassBonuses {
     }
 
     /**
-     * Does the prophet have healing spells equipped?
+     * Does the character have healing spells equipped?
      *
      * @param Character $character
      * @return bool
      */
-    public function prophetHasHealingSpells(Character $character): bool {
+    public function hasHealingSpells(Character $character): bool {
         $slots = $this->fetchEquipped($character);
 
         if (is_null($slots)) {
@@ -56,13 +56,31 @@ class ClassBonuses {
     }
 
     /**
+     * Does the arcane alchemist have a stave?
+     *
+     * @param Character $character
+     * @return bool
+     */
+    public function arcaneAlchemistHasStave(Character $character): bool {
+        $slots = $this->fetchEquipped($character);
+
+        if (is_null($slots)) {
+            return false;
+        }
+
+        return $slots->filter(function($slot) {
+            return $slot->item->type === 'stave';
+        })->isNotEmpty();
+    }
+
+    /**
      * Does the ranger have any healing spells?
      *
      * @param Character $character
      * @return bool
      */
     public function rangerHasHealingSpells(Character $character): bool {
-        return $this->prophetHasHealingSpells($character);
+        return $this->hasHealingSpells($character);
     }
 
     /**
@@ -251,7 +269,7 @@ class ClassBonuses {
             }
 
             $hasWeapon = $slots->filter(function($slot) {
-                return $slot->item->type === 'weapon';
+                return $slot->item->type === 'hammer';
             })->first();
 
             if (!is_null($hasWeapon)) {

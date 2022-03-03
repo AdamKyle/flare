@@ -349,11 +349,11 @@ export default class ActionsSection extends React.Component {
                       updateResetBattleAction={this.updateResetBattleAction.bind(this)}
                       attackAutomationIsRunning={this.props.attackAutomationIsRunning}
                     />
-                    : this.props.celestial !== null ?
+                  : this.props.celestial !== null ?
                       <div className="text-center mb-2">
                         <strong>{this.props.celestial.monster.name}</strong>
                       </div>
-                      : null
+                  : null
                 }
 
                 <CraftingAction
@@ -363,7 +363,7 @@ export default class ActionsSection extends React.Component {
                   shouldChangeCraftingType={this.state.changeCraftingType}
                   changeCraftingType={this.changeCraftingType.bind(this)}
                   userId={this.props.userId}
-                  characterGold={this.state.character.gold}
+                  characterGold={this.props.characterCurrencies.gold}
                   timeRemaining={this.state.character.can_craft_again_at}
                   updateCanCraft={this.updateCanCraft.bind(this)}
                   isAdventuring={this.state.isAdventuring}
@@ -376,8 +376,8 @@ export default class ActionsSection extends React.Component {
                       characterId={this.state.character.id}
                       showAlchemy={this.state.showAlchemy}
                       userId={this.props.userId}
-                      characterGoldDust={this.state.character.gold_dust}
-                      characterShards={this.state.character.shards}
+                      characterGoldDust={this.props.characterCurrencies.gold_dust}
+                      characterShards={this.props.characterCurrencies.shards}
                       timeRemaining={this.state.character.can_craft_again_at}
                       updateCanCraft={this.updateCanCraft.bind(this)}
                       isAdventuring={this.state.isAdventuring}
@@ -392,7 +392,7 @@ export default class ActionsSection extends React.Component {
                     shouldChangeCraftingType={this.state.changeCraftingType}
                     changeCraftingType={this.changeCraftingType.bind(this)}
                     userId={this.props.userId}
-                    characterGold={this.state.character.gold}
+                    characterGold={this.props.characterCurrencies.gold}
                     timeRemaining={this.state.character.can_craft_again_at}
                     updateCanCraft={this.updateCanCraft.bind(this)}
                     isAdventuring={this.state.isAdventuring}

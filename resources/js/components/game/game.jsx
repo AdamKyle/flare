@@ -86,8 +86,8 @@ export default class Game extends React.Component {
     this.setState({ windowWidth: window.innerWidth});
   }
 
-  updateCharacterGold(gold) {
-    this.setState({characterGold: gold});
+  updateCharacterCurrencies(currencies) {
+    this.setState({characterCurrencies: currencies});
   }
 
   componentDidMount() {
@@ -441,7 +441,7 @@ export default class Game extends React.Component {
                   characterId={this.props.characterId}
                   userId={this.props.userId}
                   openTimeOutModal={this.openTimeOutModal.bind(this)}
-                  updateCharacterGold={this.updateCharacterGold.bind(this)}
+                  updateCharacterCurrencies={this.updateCharacterCurrencies.bind(this)}
                 />
                 <ActionsSection
                   userId={this.props.userId}
@@ -461,6 +461,7 @@ export default class Game extends React.Component {
                   lockedLocationType={this.state.lockedLocationType}
                   attackAutomationIsRunning={this.state.attackAutomationIsRunning}
                   waitingOnAttackAutomationCheck={this.state.waitingOnAttackAutomationCheck}
+                  characterCurrencies={this.state.characterCurrencies}
                 />
 
                 {

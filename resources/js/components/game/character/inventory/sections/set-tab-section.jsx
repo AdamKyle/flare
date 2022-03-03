@@ -288,7 +288,7 @@ export default class SetTabSection extends React.Component {
             <AlertWarning icon={'fas fa-exclamation-triangle'} title={'Automation is running'}>
               <p>
                 This set cannot be equipped due to the items in it. Remember a set contains:
-                2 Weapons (or 1 Shield, 1 Weapon or 1 Bow), 1 of each piece of armour, 2 spells (either 2 healing or
+                2 Weapons (or 1 Shield and 1 Weapon or 1 Bow or 1 Hammer or 1 Stave), 1 of each piece of armour, 2 spells (either 2 healing or
                 2 damage or 1 of each), 2 artifacts and 2 rings. Sets can be incomplete and still be equipped.
               </p>
 

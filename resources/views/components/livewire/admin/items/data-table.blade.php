@@ -11,7 +11,8 @@
               <div class="dropdown-menu">
                 <a class="dropdown-item" href="#" wire:click="setType('weapon')">Weapon</a>
                 <a class="dropdown-item" href="#" wire:click="setType('bow')">Bow</a>
-                  <a class="dropdown-item" href="#" wire:click="setType('hammer')">Hammer</a>
+                <a class="dropdown-item" href="#" wire:click="setType('hammer')">Hammer</a>
+                <a class="dropdown-item" href="#" wire:click="setType('stave')">Stave</a>
                 <a class="dropdown-item" href="#" wire:click="setType('body')">Body</a>
                 <a class="dropdown-item" href="#" wire:click="setType('shield')">Shield</a>
                 <a class="dropdown-item" href="#" wire:click="setType('feet')">Feet</a>

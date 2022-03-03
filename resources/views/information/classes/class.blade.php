@@ -90,5 +90,9 @@
         @if ($class->type()->isBlackSmith())
             @include('information.classes.partials.blacksmith')
         @endif
+
+        @if ($class->type()->isArcaneAlchemist())
+            @include('information.classes.partials.arcane-alchemist')
+        @endif
     </x-core.cards.card-with-title>
 @endsection

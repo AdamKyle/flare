@@ -19,6 +19,7 @@ class ClassAttackValue {
     const HERETICS_DOUBLE_CAST = 'heretics double cast';
     const FIGHTERS_DOUBLE_DAMAGE = 'double damage';
     const BLACKSMITHS_HAMMER_SMASH = 'hammer smash';
+    const ARCANE_ALCHEMISTS_DREAMS    = 'alchemists ravenous dream';
 
     private $classType;
 
@@ -79,6 +80,12 @@ class ClassAttackValue {
 
             return $this->chance;
         }
+
+        if ($this->classType->isArcaneAlchemist()) {
+            $this->buildArcaneAlchemistChance();
+
+            return $this->chance;
+        }
     }
 
     public function buildFighterChance() {
@@ -107,7 +114,7 @@ class ClassAttackValue {
     }
 
     public function buildHereticChance() {
-        $this->chance['type'] = SELF::HERETICS_DOUBLE_CAST;
+        $this->chance['type'] = self::HERETICS_DOUBLE_CAST;
         $this->chance['only'] = 'spell-damage';
         $this->chance['class_name'] = 'Heretic';
         $this->chance['has_item'] = $this->hasItemTypeEquipped('spell-damage');
@@ -115,7 +122,7 @@ class ClassAttackValue {
     }
 
     public function buildRangersChance() {
-        $this->chance['type'] = Self::RANGER_TRIPLE_ATTACK;
+        $this->chance['type'] = self::RANGER_TRIPLE_ATTACK;
         $this->chance['only'] = 'bow';
         $this->chance['class_name'] = 'Ranger';
         $this->chance['has_item'] = $this->hasItemTypeEquipped('bow');
@@ -123,17 +130,25 @@ class ClassAttackValue {
     }
 
     public function buildVampiresChance() {
-        $this->chance['type'] = Self::VAMPIRE_THIRST;
+        $this->chance['type'] = self::VAMPIRE_THIRST;
         $this->chance['class_name'] = 'Vampire';
         $this->chance['has_item'] = true;
         $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
     }
 
     public function buildBlacksmithsChance() {
-        $this->chance['type'] = Self::BLACKSMITHS_HAMMER_SMASH;
+        $this->chance['type'] = self::BLACKSMITHS_HAMMER_SMASH;
         $this->chance['only'] = 'hammer';
         $this->chance['class_name'] = 'Blacksmith';
         $this->chance['has_item'] = $this->hasItemTypeEquipped('hammer');
+        $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
+    }
+
+    public function buildArcaneAlchemistChance() {
+        $this->chance['type'] = self::ARCANE_ALCHEMISTS_DREAMS;
+        $this->chance['only'] = 'stave';
+        $this->chance['class_name'] = 'Arcane Alchemist';
+        $this->chance['has_item'] = $this->hasItemTypeEquipped('stave');
         $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
     }
 

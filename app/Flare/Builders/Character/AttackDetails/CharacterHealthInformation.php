@@ -66,7 +66,7 @@ class CharacterHealthInformation {
      * @return int
      * @throws \Exception
      */
-    public function buildHealFor(bool $voided = false, bool $isPositional = false): int {
+    public function buildHealFor(bool $voided = false): int {
         $prophetBonus  = $this->characterInformationBuilder->getBaseCharacterInfo()->getClassBonuses()->prophetHealingBonus($this->character);
         $vampireBonus  = $this->characterInformationBuilder->getBaseCharacterInfo()->getClassBonuses()->getVampiresHealingBonus($this->character);
 
@@ -88,7 +88,7 @@ class CharacterHealthInformation {
         }
 
         if ($classType->isProphet()) {
-            $hasHealingSpells = $this->classBonuses->prophetHasHealingSpells($this->character);
+            $hasHealingSpells = $this->classBonuses->hasHealingSpells($this->character);
 
             if ($hasHealingSpells) {
                 if ($voided) {
@@ -99,13 +99,21 @@ class CharacterHealthInformation {
             }
         }
 
+        if ($classType->isArcaneAlchemist()) {
+            $hasHealingSpells = $this->classBonuses->hasHealingSpells($this->character);
+
+            if ($hasHealingSpells) {
+                if ($voided) {
+                    $healingAmount += $this->character->chr * 0.10;
+                } else {
+                    $healingAmount += $this->characterInformationBuilder->statMod('chr') * 0.10;
+                }
+            }
+        }
+
         $amount = round($healingAmount + ($healingAmount * ($this->fetchSkillHealingMod() + $classBonus)));
 
         $amount + $amount * $this->holyStacks->fetchHealingBonus($this->character);
-
-        if ($isPositional) {
-            return $amount / 2;
-        }
 
         return $amount;
     }

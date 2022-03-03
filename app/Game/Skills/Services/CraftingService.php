@@ -48,7 +48,7 @@ class CraftingService {
 
         $craftingType = $params['crafting_type'];
 
-        if ($craftingType == 'hammer' || $craftingType == 'bow') {
+        if ($craftingType == 'hammer' || $craftingType == 'bow' || $craftingType == 'stave') {
             $craftingType = 'weapon';
         }
 
@@ -145,7 +145,7 @@ class CraftingService {
      */
     protected function fetchCraftingSkill(Character $character, string $craftingType): Skill {
 
-        if ($craftingType === 'hammer' || $craftingType === 'bow') {
+        if ($craftingType === 'hammer' || $craftingType === 'bow' || $craftingType === 'stave') {
             $craftingType = 'weapon';
         }
 
@@ -169,7 +169,7 @@ class CraftingService {
                     ->whereNull('item_suffix_id')
                     ->orderBy('cost', 'asc');
 
-        if ($craftingType === 'bow' || $craftingType === 'hammer') {
+        if ($craftingType === 'bow' || $craftingType === 'hammer' || $craftingType === 'stave') {
             $items->where('default_position', strtolower($craftingType));
         } else {
             $items->where('crafting_type', strtolower($craftingType));

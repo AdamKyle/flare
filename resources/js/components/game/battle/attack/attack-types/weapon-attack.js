@@ -129,7 +129,8 @@ export default class WeaponAttack {
 
     this.monsterHealth = damage.tripleAttackChance(this.attacker, this.monsterHealth, attackData);
     this.monsterHealth = damage.doubleDamage(this.attacker, this.monsterHealth, attackData);
-    this.monsterHealth = damage.hammerSmash(this.attacker, this.monsterHealth, attackData)
+    this.monsterHealth = damage.hammerSmash(this.attacker, this.monsterHealth, attackData);
+    this.monsterHealth = damage.alchemistsRavenousDream(this.attacker, this.monsterHealth, attackData)
     const healthObject = damage.vampireThirstChance(this.attacker, this.monsterHealth, this.characterCurrentHealth, attackData.damage_deduction);
 
     this.monsterHealth          = healthObject.monster_hp;

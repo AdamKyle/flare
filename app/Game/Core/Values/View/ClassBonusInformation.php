@@ -81,6 +81,12 @@ class ClassBonusInformation {
             $details['description'] = 'Every time you attack you have chance, based on class bonus, to do whats called a Hammer Smash. This will will first do 30% of your modded Strength. You then have a 1/100 chance at 60% bonus to then do three additional attacks, called After Shocks. Each After Shock will reduce the previous damage by 15%.';
         }
 
+        if ($classAttackValue->isArcaneAlchemist()) {
+            $details['type'] = Str::ucfirst(ClassAttackValue::ARCANE_ALCHEMISTS_DREAMS);
+            $details['requires'] = 'Stave';
+            $details['description'] = 'Everytime you attack you have chance to, based on class bonus and with a stave equipped, to do Alchemists Ravenous Dream. This can do 10% of your int followed by an additional 3% for each additional attack between 2 and 6 times.';
+        }
+
         return $details;
     }
 }

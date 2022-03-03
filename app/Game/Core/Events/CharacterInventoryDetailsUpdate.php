@@ -58,6 +58,7 @@ class CharacterInventoryDetailsUpdate implements ShouldBroadcastNow
             'gold'           => number_format($character->gold),
             'gold_dust'      => number_format($character->gold_dust),
             'shards'         => number_format($character->shards),
+            'copper_coins'   => number_format($character->copper_coins),
             'inventory_used' => $character->getInventoryCount(),
             'inventory_max'  => $character->inventory_max,
             'damage_stat'    => $character->damage_stat,

@@ -92,7 +92,7 @@
                             <div class="col-md-6">
                                 <select class="form-control" id="races" name="race">
                                     @foreach($races as $id => $name)
-                                        <option value={{$id}}>{{$name}}</option>
+                                        <option value={{$id}} {{(int) old('race') === (int) $id ? 'selected' : ''}}>{{$name}}</option>
                                     @endforeach
                                 </select>
 
@@ -110,7 +110,7 @@
                             <div class="col-md-6">
                                 <select class="form-control" id="classes" name="class">
                                     @foreach($classes as $id => $name)
-                                        <option value={{$id}}>{{$name}}</option>
+                                        <option value="{{$id}}" {{(int) old('class') === (int) $id ? 'selected' : ''}}>{{$name}}</option>
                                     @endforeach
                                 </select>
 

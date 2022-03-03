@@ -198,13 +198,14 @@ export default class CraftingAction extends React.Component {
               <option value="" key="0">Please select a crafting type</option>
               <option value="weapon" key="weapon">Weapons</option>
               <option value="hammer" key="weapon">Hammers</option>
+              <option value="stave" key="weapon">Staves</option>
               <option value="bow" key="weapon">Bows</option>
               <option value="armour" key="armour">Armour</option>
               <option value="spell" key="spell">Spells</option>
               <option value="ring" key="ring">Rings</option>
               <option value="artifact" key="artifact">Artifacts</option>
             </select>
-            <p className="mt-2"><strong>Note:</strong> Weapons, Hammers and Bows all count toward Weapon Crafting, if you level one, you level all three types.</p>
+            <p className="mt-2"><strong>Note:</strong> Weapons, Hammers, Staves and Bows all count toward Weapon Crafting, if you level one, you level all four types.</p>
           </Fragment>
         );
       }

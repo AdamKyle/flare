@@ -203,8 +203,8 @@ class CharacterInformationBuilder {
      * @return int
      * @throws \Exception
      */
-    public function buildHealFor(bool $voided = false, bool $isPositional = false): int {
-        return $this->character->getHeathInformation()->buildHealFor($voided, $isPositional);
+    public function buildHealFor(bool $voided = false): int {
+        return $this->character->getHeathInformation()->buildHealFor($voided);
     }
 
     /**

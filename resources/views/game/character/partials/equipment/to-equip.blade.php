@@ -29,7 +29,7 @@
         <form class="mt-4" action="{{$route}}" method="POST">
             @csrf
 
-            @if ($bowEquipped || $hammerEquipped)
+            @if ($bowEquipped || $hammerEquipped || $staveEquipped)
                 <x-core.alerts.warning-alert title="ATTN!" icon="fas fa-exclamation">
                     <p>
                         <strong>Please note</strong>: You already have a two-handed weapon equipped. Equipping this item will replace that item.
@@ -37,7 +37,7 @@
                 </x-core.alerts.warning-alert>
             @endif
 
-            @include('game.character.partials.equipment.sections.equip.' . (($itemToEquip->type === 'bow' || $itemToEquip->type === 'hammer') ? 'weapon' : $type), [
+            @include('game.character.partials.equipment.sections.equip.' . (($itemToEquip->type === 'bow' || $itemToEquip->type === 'hammer' || $itemToEquip->type === 'stave') ? 'weapon' : $type), [
                 'slotId'      => $slotId,
                 'details'     => $details,
                 'itemToEquip' => $itemToEquip,

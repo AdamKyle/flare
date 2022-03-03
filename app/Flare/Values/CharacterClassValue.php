@@ -4,13 +4,14 @@ namespace App\Flare\Values;
 
 class CharacterClassValue {
 
-    const FIGHTER    = 'Fighter';
-    const HERETIC    = 'Heretic';
-    const PROPHET    = 'Prophet';
-    const RANGER     = 'Ranger';
-    const VAMPIRE    = 'Vampire';
-    const THIEF      = 'Thief';
-    const BLACKSMITH = 'Blacksmith';
+    const FIGHTER          = 'Fighter';
+    const HERETIC          = 'Heretic';
+    const PROPHET          = 'Prophet';
+    const RANGER           = 'Ranger';
+    const VAMPIRE          = 'Vampire';
+    const THIEF            = 'Thief';
+    const BLACKSMITH       = 'Blacksmith';
+    const ARCANE_ALCHEMIST = 'Arcane Alchemist';
 
     /**
      * @var string $value
@@ -21,13 +22,14 @@ class CharacterClassValue {
      * @var string[] $values
      */
     protected static $values = [
-        self::FIGHTER    => 'Fighter',
-        self::HERETIC    => 'Heretic',
-        self::PROPHET    => 'Prophet',
-        self::RANGER     => 'Ranger',
-        self::THIEF      => 'Thief',
-        self::VAMPIRE    => 'Vampire',
-        self::BLACKSMITH => 'Blacksmith',
+        self::FIGHTER          => 'Fighter',
+        self::HERETIC          => 'Heretic',
+        self::PROPHET          => 'Prophet',
+        self::RANGER           => 'Ranger',
+        self::THIEF            => 'Thief',
+        self::VAMPIRE          => 'Vampire',
+        self::BLACKSMITH       => 'Blacksmith',
+        self::ARCANE_ALCHEMIST => 'Arcane Alchemist',
     ];
 
     /**
@@ -105,5 +107,14 @@ class CharacterClassValue {
      */
     public function isBlacksmith(): bool {
         return $this->value === self::BLACKSMITH;
+    }
+
+    /**
+     * Are we an arcane alchemist?
+     *
+     * @return bool
+     */
+    public function isArcaneAlchemist(): bool {
+        return $this->value === self::ARCANE_ALCHEMIST;
     }
 }

@@ -247,6 +247,10 @@ class InventorySetService {
             return $slot->item->type === 'hammer';
         })->all());
 
+        $staves = collect($inventorySet->slots->filter(function($slot) {
+            return $slot->item->type === 'stave';
+        })->all());
+
         $hasShield = $inventorySet->slots->filter(function($slot) {
             return $slot->item->type === 'shield';
         })->isNotEmpty();
@@ -257,6 +261,10 @@ class InventorySetService {
 
         $hasHammer = $inventorySet->slots->filter(function($slot) {
             return $slot->item->type === 'hammer';
+        })->isNotEmpty();
+
+        $hasStave = $inventorySet->slots->filter(function($slot) {
+            return $slot->item->type === 'stave';
         })->isNotEmpty();
 
         if ($weapons->count() > 2) {
@@ -271,6 +279,10 @@ class InventorySetService {
             return false;
         }
 
+        if ($hasStave && $weapons->count() > 0) {
+            return false;
+        }
+
         if ($hammers->count() > 1) {
             return false;
         }
@@ -279,7 +291,31 @@ class InventorySetService {
             return false;
         }
 
+        if ($staves->count() > 1) {
+            return false;
+        }
+
         if ($hasShield && $hasBow) {
+            return false;
+        }
+
+        if ($hasShield && $hasHammer) {
+            return false;
+        }
+
+        if ($hasShield && $hasStave) {
+            return false;
+        }
+
+        if ($hasHammer && $hasBow) {
+            return false;
+        }
+
+        if ($hasStave && $hasBow) {
+            return false;
+        }
+
+        if ($hasHammer && $hasStave) {
             return false;
         }
 
