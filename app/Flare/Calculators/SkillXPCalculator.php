@@ -24,7 +24,11 @@ class SkillXPCalculator {
         $xpTowards      = $this->getXpTowards($skill, $monster);
         $totalBonus     = $skill->skill_training_bonus + $adventureBonus;
 
-        $base = (10 + $xpTowards);
+        if ($skill->can_train) {
+            $base = (25 + $xpTowards);
+        } else {
+            $base = 10;
+        }
 
         return $base + $base * $totalBonus;
     }
