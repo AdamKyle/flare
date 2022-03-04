@@ -49,7 +49,7 @@ export default class GoblinCoinBank extends React.Component {
 
   fetchMaxAmountOfBars(isAtaMaxCheck) {
     let amount          = 0;
-    const characterGold = parseInt(this.props.characterGold.replace(/,/g, ''));
+    const characterGold = this.props.characterGold;
     const costPerBar    = 2000000000;
 
     if (this.props.kingdom.gold_bars === 1000 && isAtaMaxCheck) {
@@ -68,7 +68,7 @@ export default class GoblinCoinBank extends React.Component {
   }
 
   fetchMaxWithDraw() {
-    const characterGold = parseInt(this.props.characterGold.replace(/,/g, ''));
+    const characterGold = this.props.characterGold;
     const costPerBar    = 2000000000;
     let maxWithdrawl    = 0;
 
@@ -128,7 +128,7 @@ export default class GoblinCoinBank extends React.Component {
   }
 
   goldIncrease() {
-    const characterGold = parseInt(this.props.characterGold.replace(/,/g, ''));
+    const characterGold = this.props.characterGold;
 
     const newGold       = this.state.amountToTakeOut * 2000000000;
 

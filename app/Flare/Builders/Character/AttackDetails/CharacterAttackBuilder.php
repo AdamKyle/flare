@@ -281,6 +281,10 @@ class CharacterAttackBuilder {
     protected function fetchSlot(string $position): InventorySlot|SetSlot|null {
         $slots = $this->fetchEquipped($this->character);
 
+        if (is_null($slots)) {
+            return null;
+        }
+
         return $slots->filter(function($slot) use($position) {
             return $slot->position === $position;
         })->first();

@@ -381,6 +381,7 @@ class CharacterInventoryController extends Controller {
         $this->updateCharacterAttackDataCache($character);
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'equipped'));
 
         event(new CharacterInventoryDetailsUpdate($character->user));
 
@@ -404,6 +405,7 @@ class CharacterInventoryController extends Controller {
 
             event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'sets'));
             event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'equipped'));
+            event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
         } else {
             $character->inventory->slots->each(function($slot) {
                 $slot->update([
@@ -483,6 +485,7 @@ class CharacterInventoryController extends Controller {
 
         event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'sets'));
         event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'equipped'));
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
 
         event(new CharacterInventoryDetailsUpdate($character->user));
 

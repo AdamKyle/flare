@@ -29,9 +29,9 @@ export default class CharacterInfoTopSection extends React.Component {
           forceNameChange: result.data.sheet.force_name_change,
         }, () => {
           this.props.updateCharacterCurrencies({
-            gold: parseInt(result.data.sheet.gold),
-            gold_dust: parseInt(result.data.sheet.gold_dust),
-            shards: parseInt(result.data.sheet.shards),
+            gold: parseInt(result.data.sheet.gold.replace(/,/g, '')),
+            gold_dust: parseInt(result.data.sheet.gold_dust.replace(/,/g, '')),
+            shards: parseInt(result.data.sheet.shards.replace(/,/g, '')),
           });
         });
       }).catch((err) => {
@@ -49,13 +49,14 @@ export default class CharacterInfoTopSection extends React.Component {
       });
 
     this.topBar.listen('Game.Core.Events.UpdateTopBarBroadcastEvent', (event) => {
+      console.log(event);
       this.setState({
         characterSheet: event.characterSheet,
       }, () => {
         this.props.updateCharacterCurrencies({
-          gold: parseInt(event.characterSheet.gold),
-          gold_dust: parseInt(event.characterSheet.gold_dust),
-          shards: parseInt(event.characterSheet.shards),
+          gold: parseInt(event.characterSheet.gold.replace(/,/g, '')),
+          gold_dust: parseInt(event.characterSheet.gold_dust.replace(/,/g, '')),
+          shards: parseInt(event.characterSheet.shards.replace(/,/g, '')),
         });
       });
     });

@@ -162,6 +162,9 @@ class CraftingService {
      * @return Collection
      */
     protected function getItems($craftingType, Skill $skill): Collection {
+        $twoHandedWeapons = ['bow', 'hammer', 'stave'];
+        $craftingTypes    = ['armour', 'ring', 'spell', 'artifact'];
+
         $items = Item::where('can_craft', true)
 
                     ->where('skill_level_required', '<=', $skill->level)
@@ -169,10 +172,12 @@ class CraftingService {
                     ->whereNull('item_suffix_id')
                     ->orderBy('cost', 'asc');
 
-        if ($craftingType === 'bow' || $craftingType === 'hammer' || $craftingType === 'stave') {
+        if (in_array($craftingType, $twoHandedWeapons)) {
             $items->where('default_position', strtolower($craftingType));
-        } else {
+        } else if (in_array($craftingType, $craftingTypes)) {
             $items->where('crafting_type', strtolower($craftingType));
+        }else {
+            $items->where('type', strtolower($craftingType));
         }
 
         return $items->get();

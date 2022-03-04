@@ -255,7 +255,7 @@ export default class BuildingManagementModal extends React.Component {
     }
 
     let goldCost        = levelForGoldCost * this.props.building.upgrade_cost;
-    const characterGold = parseInt(this.props.characterGold.replace(/,/g, ''));
+    const characterGold = this.props.characterGold;
     let hasGold         = characterGold >= goldCost;
 
     let time = 0;

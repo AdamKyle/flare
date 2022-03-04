@@ -102,6 +102,7 @@ class CharacterInventoryController extends Controller {
             $this->updateCharacterAttackDataCache($character);
 
             event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
+            event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'equipped'));
             event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'sets'));
 
             event(new CharacterInventoryDetailsUpdate($character->user));

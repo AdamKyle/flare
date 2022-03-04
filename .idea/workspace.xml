@@ -4,7 +4,27 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b57f583e-608e-4ca2-947d-cf9ab46f7914" name="Changes" comment="" />
+    <list default="true" id="b57f583e-608e-4ca2-947d-cf9ab46f7914" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Builders/Character/AttackDetails/CharacterAttackBuilder.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Builders/Character/AttackDetails/CharacterAttackBuilder.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Calculators/SkillXPCalculator.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Calculators/SkillXPCalculator.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Listeners/UpdateSkillListener.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Listeners/UpdateSkillListener.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Core/Controllers/Api/CharacterInventoryController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Core/Controllers/Api/CharacterInventoryController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Core/Controllers/CharacterInventoryController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Core/Controllers/CharacterInventoryController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Core/Services/InventorySetService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Core/Services/InventorySetService.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Skills/Services/CraftingService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Skills/Services/CraftingService.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/composer.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/data-imports/monsters.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/data-imports/monsters.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/game.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/game.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/building-management-modal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/building-management-modal.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/goblin-coin-bank.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/goblin-coin-bank.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/population.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/population.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/recruit.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/recruit.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/sections/character-info-section.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/sections/character-info-section.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/game.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/game.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/layouts/partials/sidebar/playersidebar.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layouts/partials/sidebar/playersidebar.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -224,8 +244,8 @@
       <path value="$PROJECT_DIR$/vendor/symfony/polyfill-ctype" />
       <path value="$PROJECT_DIR$/vendor/symfony/polyfill-php81" />
       <path value="$PROJECT_DIR$/vendor/symfony/polyfill-php72" />
-      <path value="$PROJECT_DIR$/vendor/spatie/laravel-package-tools" />
       <path value="$PROJECT_DIR$/vendor/rappasoft/laravel-livewire-tables" />
+      <path value="$PROJECT_DIR$/vendor/spatie/laravel-package-tools" />
     </include_path>
   </component>
   <component name="ProjectId" id="1y74YHMKuHZ428N8k5rqo9nmnY6" />
@@ -248,7 +268,7 @@
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="nodejs_package_manager_path" value="yarn" />
-    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
     <property name="ts.external.directory.path" value="$PROJECT_DIR$/node_modules/typescript/lib" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
@@ -318,6 +338,7 @@
       <workItem from="1644095989150" duration="434000" />
       <workItem from="1644096439311" duration="104203000" />
       <workItem from="1644529738352" duration="194376000" />
+      <workItem from="1646428181614" duration="2759000" />
     </task>
     <servers />
   </component>
