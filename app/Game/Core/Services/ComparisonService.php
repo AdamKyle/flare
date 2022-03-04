@@ -94,16 +94,17 @@ class ComparisonService {
         $setIndex = !is_null($setEquipped) ? $character->inventorySets->search(function($set) {return $set->is_equipped; }) + 1 : 0;
 
         return [
-            'details'      => $this->equipItemService->getItemStats($item, $service->inventory(), $character),
-            'itemToEquip'  => $item,
-            'type'         => $service->getType($item, $type),
-            'slotId'       => $item->id,
-            'slotPosition' => null,
-            'characterId'  => $character->id,
-            'bowEquipped'  => $this->equipItemService->isTwoHandedItemEquipped($item, $service->inventory(), 'bow'),
+            'details'        => $this->equipItemService->getItemStats($item, $service->inventory(), $character),
+            'itemToEquip'    => $item,
+            'type'           => $service->getType($item, $type),
+            'slotId'         => $item->id,
+            'slotPosition'   => null,
+            'characterId'    => $character->id,
+            'bowEquipped'    => $this->equipItemService->isTwoHandedItemEquipped($item, $service->inventory(), 'bow'),
             'hammerEquipped' => $this->equipItemService->isTwoHandedItemEquipped($item, $service->inventory(), 'hammer'),
-            'setEquipped'  => $hasSet,
-            'setIndex'     => $setIndex,
+            'staveEquipped'  => $this->equipItemService->isTwoHandedItemEquipped($item, $service->inventory(), 'stave'),
+            'setEquipped'    => $hasSet,
+            'setIndex'       => $setIndex,
         ];
     }
 

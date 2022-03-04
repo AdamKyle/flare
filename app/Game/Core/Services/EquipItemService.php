@@ -208,7 +208,7 @@ class EquipItemService {
      * @return bool
      */
     public function isTwoHandedItemEquipped(Item $itemToEquip, Collection $inventorySlots, string $type): bool {
-        $validTypes = ['weapon', 'shield', 'bow', 'hammer', 'stave'];
+        $validTypes = ['bow', 'hammer', 'stave'];
 
         if (!in_array($itemToEquip->type, $validTypes)) {
              return false;

@@ -28,7 +28,7 @@
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
             @if (empty($details))
                 <div class="alert alert-info">
-                    You have nothing equipped for this item type. Anything is better then nothing.
+                    You have nothing equipped for this item type. Anything is better than nothing.
                 </div>
             @else
                 @foreach($details as $key => $value)
@@ -38,14 +38,16 @@
         </div>
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-6">
             @include('game.character.partials.equipment.to-equip', [
-                'item'        => $itemToEquip,
-                'details'     => $details,
-                'slotId'      => $slotId,
-                'details'     => $details,
-                'itemToEquip' => $itemToEquip,
-                'type'        => $type,
-                'bowEquipped' => $bowEquipped,
-                'isShop'      => isset($isShop) ? $isShop : false,
+                'item'           => $itemToEquip,
+                'details'        => $details,
+                'slotId'         => $slotId,
+                'details'        => $details,
+                'itemToEquip'    => $itemToEquip,
+                'type'           => $type,
+                'bowEquipped'    => $bowEquipped,
+                'staveEquipped'  => $staveEquipped,
+                'hammerEquipped' => $hammerEquipped,
+                'isShop'         => isset($isShop) ? $isShop : false,
             ])
         </div>
     </div>
