@@ -65,6 +65,11 @@ export default class Game extends React.Component {
         kingdom_to_attack: [],
         is_mine: false,
       },
+      characterCurrencies: {
+        gold: 0,
+        gold_dust: 0,
+        shards: 0,
+      },
       kingdom: null,
       isDead: false,
       windowWidth: window.innerWidth,
@@ -431,6 +436,7 @@ export default class Game extends React.Component {
   }
 
   render() {
+
     return (
       <>
         <Tabs defaultActiveKey="game" id="game-tabs">
@@ -616,7 +622,7 @@ export default class Game extends React.Component {
               characterId={this.state.characterId}
               userId={this.props.userId}
               openTimeOutModal={this.openTimeOutModal.bind(this)}
-              characterGold={this.state.characterGold}
+              characterGold={this.state.characterCurrencies.gold}
             />
             : null
         }

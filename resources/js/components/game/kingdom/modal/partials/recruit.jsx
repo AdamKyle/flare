@@ -31,7 +31,7 @@ export default class Recruit extends React.Component {
 
   setMax() {
 
-    const characterGold = parseInt(this.props.characterGold.replace(/,/g, ''));
+    const characterGold = this.props.characterGold;
 
     const amountCanAfford = Math.floor( characterGold / this.props.unit.cost_per_unit);
 
@@ -199,7 +199,7 @@ export default class Recruit extends React.Component {
 
     cost = cost - Math.floor(cost * costReduction);
 
-    const characterGold = parseInt(this.props.characterGold.replace(/,/g, ''));
+    const characterGold = this.props.characterGold;
 
     return characterGold >= cost;
   }

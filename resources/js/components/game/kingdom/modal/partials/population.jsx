@@ -29,7 +29,7 @@ export default class Population extends React.Component {
         });
       }
 
-      const characterGold = parseInt(this.props.characterGold.replace(/,/g, ''));
+      const characterGold = this.props.characterGold;
       const cost          = 5 * this.state.toPurchase;
 
       if (characterGold < cost) {
