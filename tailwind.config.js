@@ -87,6 +87,18 @@ module.exports = {
           ...colors.green,
           DEFAULT: "#28a745",
         },
+        fuchsia: {
+          ...colors.fuchsia,
+          DEFAULT: "#E879BA",
+        },
+        neutral: {
+          ...colors.neutral,
+          DEFAULT: "#fafafa",
+        },
+        slate: {
+          ...colors.slate,
+          DEFAULT: "#f8fafc",
+        },
         red: {
           ...colors.red,
           DEFAULT: "#dc3545",

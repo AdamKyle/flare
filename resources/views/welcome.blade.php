@@ -15,10 +15,23 @@
                 Releases
             </x-core.buttons.link-buttons.success-button>
         </div>
+        <div class="flex items-center mr-2 justify-center mb-5 lg:hidden">
+            @guest
+                <label class="switch switch_outlined" data-toggle="tooltip" data-tippy-content="Toggle Dark Mode">
+                    <input id="darkModeToggler" type="checkbox">
+                    <span></span>
+                </label>
+                <span class="ml-4 mr-4 dark:text-white">Test Dark Mode</span>
+                <x-core.buttons.link-buttons.login-button href="{{route('login')}}">
+                    Login
+                </x-core.buttons.link-buttons.login-button>
+            @endguest
+
+        </div>
 
         <img src="{{asset('promotion/game.png')}}" class="w-100 mb-10" />
 
-        <div class="text-center w-1/3 mx-auto">
+        <div class="text-center w-full lg:w-1/3 mx-auto">
             <h2 class="mb-5 font-thin text-5xl dark:text-gray-300 text-gray-800">Stay logged in!</h2>
             <p class="mb-10 dark:text-gray-300 text-gray-800">
                 There is no set it and forget it. This game requires you be engaged.
@@ -98,7 +111,7 @@
             </div>
         </div>
 
-        <div class="text-center w-2/4 mx-auto mt-20">
+        <div class="text-center w-full lg:w-2/4 mx-auto mt-20">
             <h2 class="mb-5 font-thin text-5xl dark:text-gray-300 text-gray-800">
                 <span class="fa-stack">
                             <i class="far fa-credit-card fa-stack-1x"></i>

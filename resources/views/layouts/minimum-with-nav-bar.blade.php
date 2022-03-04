@@ -34,11 +34,6 @@
     <script src={{mix('js/manifest.js')}} type="text/javascript"></script>
     <script src={{mix('js/vendor.js')}} type="text/javascript"></script>
 
-    <script src={{mix('js/kingdom-unit-movement.js')}} type="text/javascript"></script>
-    <script src={{mix('js/character-boons.js')}} type="text/javascript"></script>
-    <script src={{mix('js/character-inventory.js')}} type="text/javascript"></script>
-    <script src={{mix('js/character-sheet.js')}} type="text/javascript"></script>
-
     @stack('head')
 </head>
 @php
@@ -66,14 +61,16 @@
 
             <!-- Dark Mode -->
             @guest
-                <label class="switch switch_outlined" data-toggle="tooltip" data-tippy-content="Toggle Dark Mode">
-                    <input id="darkModeToggler" type="checkbox">
-                    <span></span>
-                </label>
-                <span class="ml-4">Test Dark Mode</span>
+                <div class="hidden  lg:contents">
+                    <label class="switch switch_outlined" data-toggle="tooltip" data-tippy-content="Toggle Dark Mode">
+                        <input id="darkModeToggler" type="checkbox">
+                        <span></span>
+                    </label>
+                    <span class="ml-4">Test Dark Mode</span>
 
-                <a href="{{route('login')}}" class="ml-6 mr-2 text-lg">Login</a> | <a href="{{route('register')}}" class="ml-2 mr-2 text-lg">Register</a>
-        @endguest
+                    <a href="{{route('login')}}" class="ml-6 mr-2 text-lg">Login</a> | <a href="{{route('register')}}" class="ml-2 mr-2 text-lg">Register</a>
+                </div>
+            @endguest
         {{--            <!-- Notifications -->--}}
         {{--            <div class="dropdown self-stretch mr-3 ml-3">--}}
         {{--                <button type="button"--}}

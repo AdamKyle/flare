@@ -8,15 +8,13 @@
 @endif
 
 @if (session('error'))
-    <x-core.alerts.danger-alert>
-        <span class="font-semibold text-red-500 text-lg">Oh no !!!</span>
+    <x-core.alerts.danger-alert title="Oh No!!">
         <p class="mt-3">{{ session('error') }}</p>
     </x-core.alerts.danger-alert>
 @endif
 
 @if ($errors->any())
     <x-core.alerts.danger-alert>
-        <span class="font-semibold text-red-500 text-lg">Christ Child !!!</span>
         @foreach($errors->all() as $error)
             <p class="mt-3">{{ $error }}</p>
         @endforeach

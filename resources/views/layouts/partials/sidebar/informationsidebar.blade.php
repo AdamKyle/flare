@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <!-- Menu Bar -->
 <aside class="menu-bar menu-sticky">
     <div class="menu-items">
