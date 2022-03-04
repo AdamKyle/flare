@@ -109,6 +109,8 @@ class InventorySetService {
         if (!is_null($equippedInventorySet)) {
             $equippedInventorySet->slots()->update(['equipped' => false]);
             $equippedInventorySet->update(['is_equipped' => false]);
+        } else {
+            $character->inventory->slots()->where('equipped', true)->update(['equipped' => false]);
         }
 
         $data = [];
