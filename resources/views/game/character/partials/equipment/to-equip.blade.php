@@ -29,14 +29,15 @@
         <form class="mt-4" action="{{$route}}" method="POST">
             @csrf
 
-            @if ($bowEquipped)
-                <div class="alert alert-warning mt-2 mb-3">
-                    You already have a bow equipped, remember you cannot duel wield bows with any weapon or shield. Equipping this item
-                    will replace the currently equipped bow.
-                </div>
+            @if ($bowEquipped || $hammerEquipped)
+                <x-core.alerts.warning-alert title="ATTN!" icon="fas fa-exclamation">
+                    <p>
+                        <strong>Please note</strong>: You already have a two-handed weapon equipped. Equipping this item will replace that item.
+                    </p>
+                </x-core.alerts.warning-alert>
             @endif
 
-            @include('game.character.partials.equipment.sections.equip.' . ($itemToEquip->type === 'bow' ? 'weapon' : $type), [
+            @include('game.character.partials.equipment.sections.equip.' . (($itemToEquip->type === 'bow' || $itemToEquip->type === 'hammer') ? 'weapon' : $type), [
                 'slotId'      => $slotId,
                 'details'     => $details,
                 'itemToEquip' => $itemToEquip,

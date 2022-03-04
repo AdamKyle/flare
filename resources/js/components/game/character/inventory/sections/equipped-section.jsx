@@ -36,6 +36,7 @@ export default class EquippedSection extends React.Component {
         key: "type",
         text: "Type",
         sortable: true,
+        cell: row => <div>{this.getType(row)}</div>
       },
       {
         key: 'position',
@@ -83,7 +84,7 @@ export default class EquippedSection extends React.Component {
             findEquippedSlotId={this.findEquippedSlotId.bind(this)}
             setSuccessMessage={this.setSuccessMessage.bind(this)}
             setErrorMessage={this.setErrorMessage.bind(this)}
-            hasSetEquipped={typeof this.props.equipped === 'object' && !Array.isArray(this.props.equipped)}
+            hasSetEquipped={this.props.setEquipped}
             loading={this.state.loading}
             setLoading={this.setLoading.bind(this)}
           />
@@ -100,10 +101,6 @@ export default class EquippedSection extends React.Component {
     }
   }
 
-  seeRow(row) {
-    console.log(row);
-  }
-
   componentDidMount() {
     this.setState({
       equippedItems: this.formatDataForTable()
@@ -118,6 +115,16 @@ export default class EquippedSection extends React.Component {
         equippedItems: equippedItems,
       });
     }
+  }
+
+  getType(row) {
+    if (row.type === 'weapon') {
+      if (row.default_position !== null) {
+        return row.default_position
+      }
+    }
+
+    return row.type
   }
 
   clearSuccessMessage() {
@@ -292,11 +299,13 @@ export default class EquippedSection extends React.Component {
               </div>
               : null
           }
-          <ReactDatatable
-            config={this.equipped_Config}
-            records={this.state.equippedItems}
-            columns={this.equipped_headers}
-          />
+          <div className="tw-overflow-x-auto">
+            <ReactDatatable
+              config={this.equipped_Config}
+              records={this.state.equippedItems}
+              columns={this.equipped_headers}
+            />
+          </div>
           {
             this.state.openSaveAsSet ?
               <SaveAsSetModal

@@ -93,6 +93,37 @@ class EnchantingService {
     }
 
     /**
+     * Does the cost supplied actually match the actual cost?
+     *
+     * @param array $enchantmentIds
+     * @param int $itemId
+     * @param int $suppliedCost
+     * @return bool
+     */
+    public function doesCostMatchForEnchanting(array $enchantmentIds, int $itemId, int $suppliedCost): bool {
+        $itemAffixes   = ItemAffix::findMany($enchantmentIds);
+        $itemToEnchant = Item::find($itemId);
+
+        if (is_null($itemAffixes)) {
+            return false;
+        }
+
+        if (is_null($itemToEnchant)) {
+            return false;
+        }
+
+        $cost = $itemAffixes->sum('cost');
+
+        foreach ($itemAffixes as $itemAffix) {
+            if (!is_null($itemToEnchant->{'item_' . $itemAffix->type . '_id'})) {
+                $cost += 1000;
+            }
+        }
+
+        return $cost === $suppliedCost;
+    }
+
+    /**
      * Enchant an item.
      *
      * Attamepts to enchant an item with the supplied afixes and slot.

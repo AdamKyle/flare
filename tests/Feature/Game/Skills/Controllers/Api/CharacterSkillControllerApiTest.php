@@ -191,7 +191,7 @@ class CharacterSkillControllerApiTest extends TestCase {
         ]);
 
         $character = $this->character->updateCharacter([
-            'gold' => 10000,
+            'gold' => 500,
         ])->assignSkill($skill, 400)
           ->trainSkill($skill->name)
           ->inventoryManagement()
@@ -215,7 +215,7 @@ class CharacterSkillControllerApiTest extends TestCase {
                          ->json('POST', '/api/enchant/' . $character->id, [
                             'slot_id'   => $slot->id,
                             'affix_ids' => [ItemAffix::first()->id],
-                            'cost'      => 1000,
+                            'cost'      => 500,
                          ])->response;
 
         $this->assertEquals(200, $response->status());
@@ -269,7 +269,7 @@ class CharacterSkillControllerApiTest extends TestCase {
         ]);
 
         $character = $this->character->updateCharacter([
-            'gold' => 10000,
+            'gold' => 1500,
         ])->assignSkill($skill, 400)
           ->trainSkill($skill->name)
           ->inventoryManagement()
@@ -297,7 +297,7 @@ class CharacterSkillControllerApiTest extends TestCase {
                          ->json('POST', '/api/enchant/' . $character->id, [
                             'slot_id'   => $slot->id,
                             'affix_ids' => [ItemAffix::first()->id],
-                            'cost'      => 1000,
+                            'cost'      => 1500,
                          ])->response;
 
 
@@ -347,7 +347,7 @@ class CharacterSkillControllerApiTest extends TestCase {
                                 ItemAffix::where('name', 'Demonic Prefix')->first()->id,
                                 ItemAffix::where('name', 'Demonic Suffix')->first()->id,
                             ],
-                            'cost'      => 1000,
+                            'cost'      => 3000,
                          ])->response;
 
         $this->assertEquals(200, $response->status());
@@ -362,7 +362,7 @@ class CharacterSkillControllerApiTest extends TestCase {
             'name' => 'Enchanting'
         ]);
 
-        $character = $this->character->updateCharacter(['gold' => 10000])
+        $character = $this->character->updateCharacter(['gold' => 200000000000])
                                      ->assignSkill($skill)
                                      ->inventoryManagement()
                                      ->giveItem($this->createItem([
@@ -390,7 +390,7 @@ class CharacterSkillControllerApiTest extends TestCase {
                          ->json('POST', '/api/enchant/' . $character->id, [
                             'slot_id'   => $slot->id,
                             'affix_ids' => [ItemAffix::first()->id],
-                            'cost'      => 1000
+                            'cost'      => 500
                          ])->response;
 
         $character = $this->character->getCharacter(false);
@@ -428,7 +428,7 @@ class CharacterSkillControllerApiTest extends TestCase {
                          ->json('POST', '/api/enchant/' . $character->id, [
                             'slot_id'   => $character->inventory->slots->first()->id,
                             'affix_ids' => [ItemAffix::first()->id],
-                            'cost'      => 1000,
+                            'cost'      => 500,
                             'extraTime' => 'double'
                          ])->response;
 
@@ -570,7 +570,7 @@ class CharacterSkillControllerApiTest extends TestCase {
                          ->json('POST', '/api/enchant/' . $character->id, [
                             'slot_id'   => $character->inventory->slots->first()->id,
                             'affix_ids' => [ItemAffix::first()->id],
-                            'cost'      => 1000,
+                            'cost'      => 500,
                          ])->response;
 
         $item = $this->character->getCharacter()->inventory->slots->first()->item;
@@ -657,7 +657,7 @@ class CharacterSkillControllerApiTest extends TestCase {
                          ->json('POST', '/api/enchant/' . $character->id, [
                             'slot_id'   => $character->inventory->slots->first()->id,
                             'affix_ids' => [$affix->id],
-                            'cost'      => 1000,
+                            'cost'      => 500,
                             'extraTime' => 'double'
                          ])->response;
 
@@ -727,7 +727,7 @@ class CharacterSkillControllerApiTest extends TestCase {
                          ->json('POST', '/api/enchant/' . $character->id, [
                             'slot_id'   => $character->inventory->slots->first()->id,
                             'affix_ids' => [ItemAffix::first()->id],
-                            'cost'      => 1000,
+                            'cost'      => 500,
                             'extraTime' => 'double'
                          ])->response;
 

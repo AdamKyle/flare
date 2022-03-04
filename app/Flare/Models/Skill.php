@@ -239,6 +239,8 @@ class Skill extends Model
             return 1.0;
         }
 
+        $totalBonus += $this->getClassSpecificTrainingBonus($this->character);
+
         return $totalBonus;
     }
 
@@ -247,6 +249,7 @@ class Skill extends Model
 
         $bonus += $this->getItemBonuses($this->baseSkill, 'skill_training_bonus');
         $bonus += $this->getCharacterBoonsBonus('skill_training_bonus');
+        $bonus += $this->getClassSpecificTrainingBonus($this->character);
 
         return $bonus;
     }
@@ -255,7 +258,24 @@ class Skill extends Model
         $raceSkillBonusValue  = $character->race->{Str::snake($name . '_mod')};
         $classSkillBonusValue = $character->class->{Str::snake($name . '_mod')};
 
+
         return $raceSkillBonusValue + $classSkillBonusValue;
+    }
+
+    /**
+     * Handle class specific bonuses towards specific skills.
+     * 
+     * @param Character $character
+     * @return float
+     */
+    protected function getClassSpecificTrainingBonus(Character $character): float {
+        $class = GameClass::find($character->game_class_id);
+
+        if ($class->type()->isBlacksmith() && ($this->baseSkill->name === 'Weapon Crafting' || $this->baseSkill->name === 'Armour Crafting' || $this->baseSkill->name === 'Ring Crafting')) {
+            return 0.15;
+        }
+
+        return 0.0;
     }
 
     protected function getItemBonuses(GameSkill $skill, string $skillAttribute = 'skill_bonus', bool $equippedOnly = false): float {

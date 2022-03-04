@@ -2,6 +2,8 @@ import React from 'react';
 import {Modal, Button, Alert} from 'react-bootstrap';
 import ItemDetails from './item-details';
 import UsableItemDetails from "./usable-item-details";
+import ItemName from "./components/item-name";
+import LoadingModal from "../game/components/loading/loading-modal";
 
 export default class PurchaseModal extends React.Component {
 
@@ -90,16 +92,29 @@ export default class PurchaseModal extends React.Component {
       return 0.0;
     }
 
+    if (this.state.item.min_cost > 0) {
+      return this.props.modalData.listed_price / this.state.item.min_cost;
+    }
+
     return (this.props.modalData.listed_price / this.state.item.cost);
   }
 
   render() {
+    if (this.state.loading) {
+      return (
+        <LoadingModal
+          loadingText="Fetching Kingdom Data ..."
+          show={this.props.show}
+          close={this.props.close}
+        />
+      );
+    }
+
     let percentage = 0.0;
     let text = '';
 
     if (!this.state.loading) {
       percentage = this.getCostPercentage();
-
     }
 
     if (percentage > 1.0) {
@@ -112,9 +127,9 @@ export default class PurchaseModal extends React.Component {
       percentage = 100 - 100 * percentage.toFixed(2);
 
       if (percentage === 0.0) {
-        text = 'far below'
+        text = 'At Base/Min Cost'
       } else {
-        text = 'below'
+        text = 'Below'
       }
     }
 
@@ -129,18 +144,15 @@ export default class PurchaseModal extends React.Component {
       >
         <Modal.Header closeButton>
           <Modal.Title>
-            {this.props.modalData.name}
-            {this.state.loading ?
-              <span className={'ml-2'} style={{fontSize: '16px', position: 'realitive', top: '-10px'}}>calculating ...</span> :
-              <span className={percentage > 100.00 ? 'text-danger' : 'text-success' + " ml-2"} style={{fontSize: '16px', position: 'relative', top: '-2px', left: '5px'}}>
-                {
-                  percentage === 0 ?
-                    <>{text}</>
+            <ItemName item={this.state.item}></ItemName>
+            <span className={percentage > 100.00 ? 'text-danger' : 'text-success' + " ml-4"} style={{fontSize: '16px', position: 'relative', top: '-2px', left: '5px'}}>
+              {
+                percentage === 0 ?
+                  <>{text}</>
                   :
-                    <>{percentage}% {text} base cost</>
-                }
-              </span>
-            }
+                  <>{percentage}% {text} base/min cost</>
+              }
+            </span>
 
           </Modal.Title>
         </Modal.Header>
@@ -169,6 +181,8 @@ export default class PurchaseModal extends React.Component {
 
             <p>Base cost is the item cost + cost of attached affixes. This is handy to know if the item is more expensive then making it your self, or significantly cheaper. Most items will be listed for higher,
               due to the inherit risk in crafting and enchanting.</p>
+            <p>Min Cost comes from special items like Uniques and Holy items. These special items apply what is called a min cost, that is the item cannot be sold for less the
+            min cost of the item. This only applies to the market and not the shop.</p>
           </> }
           { this.state.loading ?
             'Loading please wait ...' :

@@ -30,6 +30,7 @@ class CharacterAttackTransformer extends BaseTransformer {
             'id'                          => $character->id,
             'name'                        => $character->name,
             'class'                       => $gameClass->name,
+            'str_modded'                  => $this->fetchStats($character, 'str_modded'),
             'dex_modded'                  => $this->fetchStats($character, 'dex_modded'),
             'dur_modded'                  => $this->fetchStats($character, 'dur_modded'),
             'focus'                       => $this->fetchStats($character, 'focus_modded'),

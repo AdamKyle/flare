@@ -44,11 +44,13 @@ export default class QuestSection extends React.Component {
     return(
       <Card>
         <Card.Body>
-          <ReactDatatable
-            config={this.quest_items_config}
-            records={this.formatDataForTable()}
-            columns={this.quest_items_headers}
-          />
+          <div className="tw-overflow-x-auto">
+            <ReactDatatable
+              config={this.quest_items_config}
+              records={this.formatDataForTable()}
+              columns={this.quest_items_headers}
+            />
+          </div>
         </Card.Body>
       </Card>
     )

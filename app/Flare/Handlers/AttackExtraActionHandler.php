@@ -31,6 +31,7 @@ class AttackExtraActionHandler {
         $monsterCurrentHealth = $this->weaponAttack($characterInformationBuilder, $monsterCurrentHealth, $voided, $dmgReduction);
         $monsterCurrentHealth = $this->tripleAttackChance($characterInformationBuilder, $monsterCurrentHealth, $voided, $dmgReduction);
         $monsterCurrentHealth = $this->doubleAttackChance($characterInformationBuilder, $monsterCurrentHealth, $voided, $dmgReduction);
+        $monsterCurrentHealth = $this->hammerSmashAttack($characterInformationBuilder, $monsterCurrentHealth, $voided, $dmgReduction);
 
         return $this->vampireThirst($characterInformationBuilder, $monsterCurrentHealth, $voided);
     }
@@ -145,6 +146,54 @@ class AttackExtraActionHandler {
                 $message = $character->name . ' hit for (weapon): ' . number_format($damage);
 
                 $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
+            }
+        }
+
+        return $monsterCurrentHealth;
+    }
+
+    protected function hammerSmashAttack(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth, bool $voided = false, float $dmgReduction = 0.0): int {
+        $classType = new CharacterClassValue($characterInformationBuilder->getCharacter()->class->name);
+
+        if ($classType->isBlacksmith() && !$voided) {
+            $attackerInfo = (new ClassAttackValue($characterInformationBuilder->getCharacter()))->buildAttackData();
+
+            if (!($this->canUse($attackerInfo['chance']) && $attackerInfo['has_item'])) {
+                return $monsterCurrentHealth;
+            }
+
+            $message = 'You raise your mighty hammer high above your head and bring it crashing down!';
+            $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
+
+            $initialDamage = $characterInformationBuilder->statMod('str') * 0.30;
+
+            if ($dmgReduction > 0.0) {
+                $message        = 'The Plane weakens your ability to do full damage!';
+                $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
+
+                $initialDamage -= $initialDamage * $dmgReduction;
+            }
+
+            $monsterCurrentHealth -= $initialDamage;
+
+            $message = $characterInformationBuilder->getCharacter()->name . ' hit for (Hammer): ' . number_format($initialDamage);
+            $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
+
+            $rollForAfterShock = rand(1, 100);
+            $rollForAfterShock += $rollForAfterShock * .60;
+
+            if ($rollForAfterShock > 99) {
+                $message = 'The enemy feels the after shocks of the Hammer Smash!';
+                $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
+
+                for ($i = 3; $i > 0; $i--) {
+                    $initialDamage -= $initialDamage * 0.15;
+
+                    $monsterCurrentHealth -= $initialDamage;
+
+                    $message = 'Aftershock hit for: ' . number_format($initialDamage) . '!';
+                    $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
+                }
             }
         }
 

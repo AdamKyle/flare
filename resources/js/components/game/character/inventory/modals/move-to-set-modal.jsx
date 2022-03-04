@@ -139,10 +139,10 @@ export default class MoveToSetModal extends React.Component {
           }
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={this.props.close}>
+          <Button variant="secondary" onClick={this.props.close} disabled={this.state.loading}>
             Close
           </Button>
-          <Button variant="success" onClick={this.destroyAll.bind(this)}>
+          <Button variant="success" onClick={this.destroyAll.bind(this)} disabled={this.state.loading}>
             Move to set.
           </Button>
         </Modal.Footer>

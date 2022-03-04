@@ -9,6 +9,7 @@ export default class EquippedSectionButton extends React.Component {
 
   unequipItem() {
     this.props.setLoading(true);
+
     axios.post('/api/character/'+this.props.characterId+'/inventory/unequip', {
       inventory_set_equipped: this.props.hasSetEquipped,
       item_to_remove: this.props.findEquippedSlotId(this.props.item.id)

@@ -75,6 +75,12 @@ class ClassBonusInformation {
             $details['description'] = 'Everytime you attack, you have a chance to fire off the thirst which can steal 15% of your dur from the enemy as both attack and healing.';
         }
 
+        if ($classAttackValue->isBlacksmith()) {
+            $details['type'] = Str::ucfirst(ClassAttackValue::BLACKSMITHS_HAMMER_SMASH);
+            $details['requires'] = 'Hammer';
+            $details['description'] = 'Every time you attack you have chance, based on class bonus, to do whats called a Hammer Smash. This will will first do 30% of your modded Strength. You then have a 1/100 chance at 60% bonus to then do three additional attacks, called After Shocks. Each After Shock will reduce the previous damage by 15%.';
+        }
+
         return $details;
     }
 }

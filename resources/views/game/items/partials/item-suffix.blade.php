@@ -11,7 +11,7 @@
   <x-tabs.tab tab="suffix-stats-{{$statsId}}" title="Stats" selected="false" active="false" />
   <x-tabs.tab tab="suffix-skills-{{$skillsId}}" title="Skills" selected="false" active="false" />
   <x-tabs.tab tab="suffix-damage-{{$damageId}}" title="Damage" selected="false" active="false" />
-  <x-tabs.tab tab="suffix-resistance-{{$resistanceId}}" title="Resiatance" selected="false" active="false" />
+  <x-tabs.tab tab="suffix-resistance-{{$resistanceId}}" title="Resistance" selected="false" active="false" />
 </x-tabs.pill-tabs-container>
 <x-tabs.tab-content>
   <x-tabs.tab-content-section tab="suffix-base-info-{{$baseInfoId}}" active="true">

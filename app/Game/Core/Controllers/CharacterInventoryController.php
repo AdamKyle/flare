@@ -2,6 +2,11 @@
 
 namespace App\Game\Core\Controllers;
 
+use Cache;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item as ResourceItem;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
@@ -9,25 +14,14 @@ use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Services\ComparisonService;
 use App\Game\Skills\Events\UpdateCharacterEnchantingList;
 use App\Game\Skills\Services\EnchantingService;
-use Cache;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item as ResourceItem;
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Flare\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\User;
-use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
-use App\Game\Core\Events\UpdateAttackStats;
-use App\Game\Core\Services\InventorySetService;
 use App\Game\Core\Services\EquipItemService;
 use App\Game\Core\Exceptions\EquipItemException;
 use App\Game\Core\Requests\ComparisonValidation;
 use App\Game\Core\Requests\EquipItemValidation;
-use App\Game\Core\Services\CharacterInventoryService;
-use App\Game\Core\Values\ValidEquipPositionsValue;
 
 class CharacterInventoryController extends Controller {
 
@@ -72,12 +66,6 @@ class CharacterInventoryController extends Controller {
             return redirect()->back()->with('error', 'Item not found in your inventory.');
         }
 
-        if ($comparisonService->isItemUnique($itemToEquip)) {
-            if ($comparisonService->characterHasUniqueEquipped($character)) {
-                return redirect()->back()->with('error', 'You cannot equip anymore unique items.');
-            }
-        }
-
         $type = $request->item_to_equip_type;
 
         if ($type === 'spell-healing' || $type === 'spell-damage') {
@@ -106,6 +94,7 @@ class CharacterInventoryController extends Controller {
 
     public function equipItem(EquipItemValidation $request, Character $character) {
         try {
+
             $item = $this->equipItemService->setRequest($request)
                                            ->setCharacter($character)
                                            ->replaceItem();

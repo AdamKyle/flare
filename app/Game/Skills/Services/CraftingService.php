@@ -154,7 +154,7 @@ class CraftingService {
                     ->where('skill_level_required', '<=', $skill->level)
                     ->where('item_prefix_id', null)
                     ->where('item_suffix_id', null)
-                    ->orderBy('cost', 'asc')
+                    ->orderBy('type', 'desc')
                     ->get();
     }
 

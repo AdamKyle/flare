@@ -3,6 +3,7 @@
 namespace App\Game\Skills\Controllers\Api;
 
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
+use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Skills\Jobs\ProcessEnchant;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
@@ -18,7 +19,7 @@ class EnchantingController extends Controller {
 
     /**
      * Constructor
-     * 
+     *
      * @param EnchantingService $enchantingService
      * @return void
      */
@@ -39,6 +40,13 @@ class EnchantingController extends Controller {
 
         if (is_null($slot)) {
             return response()->json(['message' => 'invalid input.'], 422);
+        }
+
+        if (!$this->enchantingService->doesCostMatchForEnchanting($request->affix_ids, $slot->item->id, $request->cost)) {
+
+            event(new GlobalMessageEvent($character->name . ' Was caught cheating. The value of their enchant was off. The Creator is watching you closely.'));
+
+            return response()->json(['message' => 'You cannot do that.'], 422);
         }
 
         $timeOut = $this->enchantingService->timeForEnchanting($slot->item);

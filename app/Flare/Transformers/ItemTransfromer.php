@@ -38,6 +38,7 @@ class ItemTransfromer extends TransformerAbstract {
             'agi_modifier'                     => $item->getTotalPercentageForStat('agi'),
             'focus_modifier'                   => $item->getTotalPercentageForStat('focus'),
             'type'                             => $item->type,
+            'default_position'                 => $item->default_position,
             'skill_name'                       => $item->skill_training_name,
             'skill_training_bonus'             => $item->skill_training_bonus,
             'skill_bonus'                      => $item->skill_bonus,

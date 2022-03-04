@@ -68,6 +68,7 @@ export default class Game extends React.Component {
       kingdom: null,
       isDead: false,
       windowWidth: window.innerWidth,
+      waitingOnAttackAutomationCheck: true,
       attackAutomationIsRunning: false,
       activeChatTab: 'chat',
       showChatUpdate: false,
@@ -102,7 +103,8 @@ export default class Game extends React.Component {
 
     this.attackAutomation.listen('Game.Exploration.Events.ExplorationStatus', (event) => {
       this.setState({
-        attackAutomationIsRunning: event.isRunning
+        attackAutomationIsRunning: event.isRunning,
+        waitingOnAttackAutomationCheck: false,
       });
     });
 
@@ -458,6 +460,7 @@ export default class Game extends React.Component {
                   character_y={this.state.current_y}
                   lockedLocationType={this.state.lockedLocationType}
                   attackAutomationIsRunning={this.state.attackAutomationIsRunning}
+                  waitingOnAttackAutomationCheck={this.state.waitingOnAttackAutomationCheck}
                 />
 
                 {

@@ -148,8 +148,8 @@ class RandomEnchantControllerTest extends TestCase
                 'selected_slot_id'     => $slotId,
                 'selected_affix'       => 'all-enchantments',
                 'selected_reroll_type' => 'stats',
-                'gold_dust_cost'       => 150000,
-                'shard_cost'           => 500,
+                'gold_dust_cost'       => 23333,
+                'shard_cost'           => 233,
             ])
             ->response;
 
@@ -252,7 +252,7 @@ class RandomEnchantControllerTest extends TestCase
         $character = $character->getCharacter();
 
         $character->update([
-            'gold'      => 2000000000000,
+            'gold'      => 1000000000000,
             'shards'    => 2000000000000
         ]);
 
@@ -265,8 +265,8 @@ class RandomEnchantControllerTest extends TestCase
                 'selected_slot_id'           => $slotId,
                 'selected_secondary_slot_id' => $itemSlotid,
                 'selected_affix'             => 'all-enchantments',
-                'shard_cost'                 => 150000,
-                'gold_cost'                  => 10000000000.,
+                'shard_cost'                 => 2000,
+                'gold_cost'                  => 100000000000,
             ])
             ->response;
 

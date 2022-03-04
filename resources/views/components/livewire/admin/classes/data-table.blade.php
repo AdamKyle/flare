@@ -112,13 +112,13 @@
           </td>
           <td>{{$class->damage_stat}}</td>
           <td>{{$class->to_hit_stat}}</td>
-          <td>{{$class->str_mod}} pts. </td>
-          <td>{{$class->dur_mod}} pts. </td>
-          <td>{{$class->dex_mod}} pts. </td>
-          <td>{{$class->chr_mod}} pts. </td>
-          <td>{{$class->int_mod}} pts. </td>
-          <td>{{$class->agi_mod}} pts. </td>
-          <td>{{$class->focus_mod}} pts. </td>
+          <td>{{$class->str_mod > 0  ? $class->str_mod : 0}} pts. </td>
+          <td>{{$class->dur_mod > 0 ? $class->dur_mod : 0}} pts. </td>
+          <td>{{$class->dex_mod > 0 ? $class->dex_mod : 0}} pts. </td>
+          <td>{{$class->chr_mod > 0 ? $class->chr_mod : 0}} pts. </td>
+          <td>{{$class->int_mod > 0 ? $class->int_mod : 0}} pts. </td>
+          <td>{{$class->agi_mod > 0 ? $class->agi_mod : 0}} pts. </td>
+          <td>{{$class->focus_mod > 0 ? $class->focus_mod : 0}} pts. </td>
           @guest
           @else
             @if (auth()->user()->hasRole('Admin'))

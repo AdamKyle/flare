@@ -351,6 +351,8 @@ class CharacterInventoryController extends Controller {
 
             $inventorySetService->unEquipInventorySet($inventorySet);
 
+            $this->updateCharacterAttackDataCache($character);
+
             event(new CharacterInventoryUpdateBroadCastEvent($character->user));
 
             event(new CharacterInventoryDetailsUpdate($character->user));

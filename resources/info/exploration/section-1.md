@@ -39,7 +39,7 @@ You might think, so I fight the same monster once every 10 minutes? no no, we go
     </a>
 </div>
 
-here you can see we have three seperate tabs. One is for general chat. Chatting with others. The other is for server mesages, such as disenchanting, aining levels and so on.
+Here you can see we have three separate tabs. One is for general chat. Chatting with others. The other is for server messages, such as disenchanting, gaining levels and so on.
 
 The new one:
 
@@ -49,7 +49,7 @@ The new one:
     </a>
 </div>
 
-will show you, while you are logged in, a log of your exploration.
+Will show you, while you are logged in, a log of your exploration.
 
 When a chat tab updates there is a bell notification that pops up beside it:
 
@@ -102,4 +102,11 @@ After the exploration is over the player will the receive:
 - 100 (1000 if you have the quest item) faction points
 - 100,000 gold.
 
-That's all there is to it.
+That's all there is to it. Oh, one last thing: Explorations can be run over and over again, but you won't get far if that's all you do. Tlessa has [quests](/information/quests) and a Gear progression
+that will require you to interact with the game and its aspects outside just idle fighting. Should you choose to never do any quests, never [craft](/information/crafting), never [enchant](/information/enchanting), you will not get anywhere
+other than level 1000 and top shop gear, which is just the start of the game, to be honest.
+
+[Special locations](/information/special-locations), for example will not let you use automation to farm the drops.
+
+[Celestials](/information/celestials) are another example, which will not let you use automation to fight them. These creatures drop valuable shards used in [Alchemy](/information/usable-items).
+

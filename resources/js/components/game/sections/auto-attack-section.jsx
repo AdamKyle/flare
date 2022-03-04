@@ -333,7 +333,7 @@ export default class AutoAttackSection extends React.Component {
   }
 
   render() {
-    if (this.state.isLoading) {
+    if (this.state.isLoading || this.props.waitingOnAttackAutomationCheck) {
       return (
         <div className="progress loading-progress mt-2 mb-2" style={{position: 'relative'}}>
           <div className="progress-bar progress-bar-striped indeterminate">
@@ -406,6 +406,9 @@ export default class AutoAttackSection extends React.Component {
                   <small id="attack-type-help" className="form-text text-muted">
                     Each attack type corresponds to the attack button from drop down critters.
                   </small>
+                </div>
+                <div className="form-group">
+                  <p>Make sure to head to the <strong>Advanced Options</strong> tab beside this one to select a skill to train if you wish, the <strong>Length of time which is required</strong> and if you wish to move down the list or not.</p>
                 </div>
                 <button className="btn btn-primary mt-3"
                         onClick={this.beginFight.bind(this)}
@@ -612,8 +615,6 @@ export default class AutoAttackSection extends React.Component {
                 </ul>
                 <p>Should you die, this will end and we will show you, where the timer is, the result of the last battle message so you can see why you died. If you are logged out, you will not be able to
                 know what killed you as the Event Log tab below works like server messages, they are not saved.</p>
-                <p>Should you choose to do the 8 hour mark, you will be locked out of explorations till the next real world day at 12pm GMT -7</p>
-                <p>You can do Exploration in bits and pieces, such an hour here and a 4 over there and 6 an hour later, <strong>this will not count towards the 8 hour mark.</strong></p>
                 <p>Each action will spit out to the Event Logs tab down in the chat section, we will not show you the results of battles unless you die.</p>
                 <p>Finally, all rewards listed above will be given to you automatically and we do respect auto disenchanting <a href="/information/settings">settings</a>.</p>
               </div>

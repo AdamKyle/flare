@@ -166,6 +166,7 @@ export default class AlchemyAction extends React.Component {
 
     this.setState({
       showSuccess: false,
+      canCraft: false,
     }, () => {
       axios.post('/api/transmute/' + this.props.characterId, {
         item_to_craft: this.state.itemToCraft,
@@ -173,7 +174,6 @@ export default class AlchemyAction extends React.Component {
         if (!_.isEmpty(result.data.items)) {
           this.setState({
             itemsToCraft: result.data.items,
-            canCraft: false,
           }, () =>  {
             this.props.updateCanCraft(false);
           });

@@ -448,6 +448,7 @@ export default class ActionsSection extends React.Component {
               userId={this.props.userId}
               openTimeOutModal={this.props.openTimeOutModal}
               attackAutomationIsRunning={this.props.attackAutomationIsRunning}
+              waitingOnAttackAutomationCheck={this.props.waitingOnAttackAutomationCheck}
             />
           </Tab>
         </Tabs>

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!-- Menu Bar -->
 <aside class="menu-bar menu-sticky">
     <div class="menu-items">
@@ -86,6 +87,10 @@
                 <a href="{{route('info.page', ['pageName' => 'equipment'])}}">
                     <span class="ra ra-axe"></span>
                     Equipment
+                </a>
+                <a href="{{route('info.page', ['pageName' => 'gear-progression'])}}">
+                    <span class="fas fa-level-up-alt"></span>
+                    Gear Progression
                 </a>
                 <a href="{{route('info.page', ['pageName' => 'equipment-sets'])}}">
                     <span class="ra ra-battered-axe"></span>

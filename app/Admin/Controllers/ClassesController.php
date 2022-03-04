@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Game\Core\Values\View\ClassBonusInformation;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\GameClass;
 
@@ -14,6 +15,7 @@ class ClassesController extends Controller {
     public function show(GameClass $class) {
         return view('admin.classes.class', [
             'class' => $class,
+            'classBonus' => (new ClassBonusInformation())->buildClassBonusDetailsForInfo($class->name),
         ]);
     }
 

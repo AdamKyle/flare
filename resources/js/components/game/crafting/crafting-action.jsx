@@ -131,12 +131,11 @@ export default class CraftingAction extends React.Component {
   }
 
   buildCraftableItemsOptions() {
-
     if (this.state.itemsToCraft !== null) {
       return this.state.itemsToCraft.map((item) => {
         return {
           value: item.id,
-          label: item.name + ' --> Cost to craft: ' + item.cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + ' Gold'
+          label: item.name + ', Type: ' + item.type  + ', Cost to craft: ' + item.cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + ' Gold'
         }
       });
     }

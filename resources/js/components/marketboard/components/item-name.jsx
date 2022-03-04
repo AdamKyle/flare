@@ -8,6 +8,10 @@ export default class ItemName extends React.Component {
 
   getClass() {
 
+    if (this.props.item.usable || this.props.item.can_use_on_other_items) {
+      return 'usable-item';
+    }
+
     const isUnique = this.isUnique();
 
     if (isUnique) {
@@ -16,10 +20,6 @@ export default class ItemName extends React.Component {
 
     if (this.props.item.holy_stacks_applied > 0) {
       return 'holy-item';
-    }
-
-    if (this.props.item.usable || this.props.item.can_use_on_other_items) {
-      return 'usable-item';
     }
 
     if (this.props.item.type === 'quest') {

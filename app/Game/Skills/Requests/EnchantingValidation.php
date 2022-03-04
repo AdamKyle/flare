@@ -32,7 +32,7 @@ class EnchantingValidation extends FormRequest
 
     public function messages() {
         return [
-            'slot_id.required'    => 'What item are you tryig to enchant?',
+            'slot_id.required'    => 'What item are you trying to enchant?',
             'affix_ids.required'  => 'What enchantment(s) are you trying to attach?',
             'cost.required'       => 'Error. Invalid Input.',
         ];

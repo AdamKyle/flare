@@ -5,11 +5,11 @@
     <input type="hidden" name="item_id_to_buy" value={{$item->id}} />
 @endif
 
-@if ($item->type === 'bow')
-    <div class="alert alert-info mt-2 mb-3">
-        You can choose what ever hand to hold the bow in, however you fire the bow with both hands. You cannot dual wield bows or bows with other weapons.
-        Any other weapons you have equipped, including shields, will be replaced by this bow.
-    </div>
+@if ($item->type === 'bow' || $item->type === 'hammer')
+    <x-core.alerts.info-alert title="ATTN!">
+        You can choose what ever hand to hold this item in , but you <strong>cannot</strong> duel wield two of these items, because they are two-handed items.
+        When using Cast and Attack or Attack and Cast, this weapon will be used regardless of hand.
+    </x-core.alerts.info-alert>
 @endif
 
 <fieldset class="form-group row">

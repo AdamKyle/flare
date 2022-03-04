@@ -2,6 +2,7 @@
 
 namespace App\Game\Skills\Controllers\Api;
 
+use App\Flare\Models\Item;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Skills\Jobs\ProcessCraft;
 use Composer\XdebugHandler\Process;
@@ -20,7 +21,7 @@ class CraftingController extends Controller {
 
     /**
      * Constructor
-     * 
+     *
      * @param CraftingService $craftingService
      * @return void
      */
@@ -38,6 +39,8 @@ class CraftingController extends Controller {
         if (!$character->can_craft) {
             return response()->json(['message' => 'invalid input.'], 429);
         }
+
+        $item = Item::find($request->item_to_craft);
 
         event(new CraftedItemTimeOutEvent($character));
 
