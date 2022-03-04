@@ -6,6 +6,8 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomLog;
 use App\Flare\Values\KingdomLogStatusValue;
+use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
+use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Events\UpdateNotificationsBroadcastEvent;
 use App\Game\Kingdoms\Events\UpdateKingdomLogs;
 use App\Game\Kingdoms\Handlers\KingdomHandler;
@@ -45,12 +47,17 @@ class UseItemsService  {
 
         if (!is_null($this->defender)) {
             $this->createAttackLog($defendingKingdom);
-        } else {
-            $message = $character->name . ' Has caused the earth to shake, the buildings to crumble and the units to slaughtered at: ' .
-                $defendingKingdom->name . ' (kingdom) doing: '.($this->damageToKingdom * 100).'% damage to units and buildings, on the ' . $defendingKingdom->gameMap->name . ' plane. Even The Creator trembles in fear.';
-
-            broadcast(new GlobalMessageEvent($message));
         }
+
+        if ($this->damageToKingdom > 0.0) {
+            $message = $character->name . ' Has caused the earth to shake, the buildings to crumble and the units to slaughtered at: ' .
+                $defendingKingdom->name . ' (kingdom) doing: ' . ($this->damageToKingdom * 100) . '% damage to units and buildings, on the ' . $defendingKingdom->gameMap->name . ' plane. Even The Creator trembles in fear.';
+        } else {
+            $message = 'The defender of: ' . $defendingKingdom->name . ' (kingdom) on the ' . $defendingKingdom->gameMap->name .
+                ' plane laughs at the attempts of ' . $character->name . ' to rain down death and devastation. Even the people openly mock them in the streets!';
+        }
+
+        broadcast(new GlobalMessageEvent($message));
     }
 
     protected function removeItemsFromCharacter(Character $character, array $slotIds) {
@@ -61,6 +68,10 @@ class UseItemsService  {
 
             $slot->delete();
         }
+
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'usable_items'));
+
+        event(new CharacterInventoryDetailsUpdate($character->user));
     }
 
     protected function setKingdomDefence(Kingdom $defendingKingdom) {
@@ -68,7 +79,12 @@ class UseItemsService  {
     }
 
     protected function setDamageToKingdom() {
-        $this->damageToKingdom -= $this->damageToKingdom * $this->kingdomDefence;
+
+        if ($this->kingdomDefence > $this->damageToKingdom) {
+            $this->damageToKingdom = 0.0;
+        } else {
+            $this->damageToKingdom -= $this->kingdomDefence;
+        }
     }
 
     protected function setDefender(Kingdom $defendingKingdom) {

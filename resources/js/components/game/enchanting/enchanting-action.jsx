@@ -272,6 +272,7 @@ export default class EnchantingAction extends React.Component {
     this.setState({
       prefixId: value,
       cost: cost
+
     });
   }
 

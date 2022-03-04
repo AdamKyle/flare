@@ -218,6 +218,10 @@ class ItemComparison {
         }
     }
 
+    protected function isItemTwoHanded(Item $item): bool {
+        return in_array($item->type, ['bow', 'hammer', 'stave']);
+    }
+
     protected function isItemBetter(Item $toCompare, Item $equipped): bool {
         $totalDamageForEquipped = $equipped->getTotalDamage();
         $totalDamageForCompare  = $toCompare->getTotalDamage();

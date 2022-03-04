@@ -176,7 +176,7 @@ class FactionHandler {
 
             $character = $character->refresh();
 
-            event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+            event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
 
             event(new CharacterInventoryDetailsUpdate($character->user));
 

@@ -87,7 +87,7 @@ export default class UseItems {
 
       this.monsterCurrentHealth = this.monsterCurrentHealth - totalDamage;
 
-      this.addActionMessage(attacker.name + '\'s artifacts hit for: ' + this.formatNumber(totalDamage));
+      this.addActionMessage(attacker.name + '\'s artifacts hit for: ' + this.formatNumber(Math.ceil(totalDamage)));
     }
 
     if (type === 'monster') {
@@ -112,7 +112,7 @@ export default class UseItems {
 
       this.monsterCurrentHealth = this.monsterCurrentHealth - totalDamage;
 
-      this.addMessage('Your rings hit for: ' + this.formatNumber(totalDamage));
+      this.addMessage('Your rings hit for: ' + this.formatNumber(Math.ceil(totalDamage)));
     }
   }
 

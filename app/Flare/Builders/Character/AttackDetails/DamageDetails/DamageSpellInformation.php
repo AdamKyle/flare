@@ -87,7 +87,7 @@ class DamageSpellInformation {
             }
         }
 
-        if ($classType->isHeretic()) {
+        if ($classType->isHeretic() || $classType->isArcaneAlchemist()) {
             if ($voided) {
                 $damage += $character->int * 0.30;
             } else {

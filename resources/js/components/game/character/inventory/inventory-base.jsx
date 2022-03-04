@@ -52,9 +52,25 @@ export default class InventoryBase extends React.Component {
       });
 
     this.updateInventory.listen('Game.Core.Events.CharacterInventoryUpdateBroadCastEvent', (event) => {
-      this.setState({
-        inventory: event.inventory,
-      });
+      if (this.state.inventory.hasOwnProperty(event.type)) {
+
+        let inventory = JSON.parse(JSON.stringify(this.state.inventory));
+
+        if (event.type === 'sets') {
+          inventory[event.type]  = event.inventory.sets;
+          inventory.set_equipped = event.inventory.set_equipped
+        } else {
+          inventory[event.type] = event.inventory;
+        }
+
+        this.setState({
+          inventory: inventory
+        });
+      } else {
+        this.setState({
+          inventory: event.inventory,
+        });
+      }
     });
   }
 

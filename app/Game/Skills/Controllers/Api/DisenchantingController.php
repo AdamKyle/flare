@@ -37,15 +37,18 @@ class DisenchantingController extends Controller {
         $foundItem = InventorySlot::where('equipped', false)->where('item_id', $item->id)->where('inventory_id', $inventory->id)->first();
 
         if (!is_null($foundItem)) {
+            if ($foundItem->item->type === 'quest') {
+                event(new ServerMessageEvent($character->user, 'Item cannot be destroyed or does not exist. (Quest items cannot be destroyed or disenchanted)'));
+                return response()->json([], 200);
+            }
+
             $this->disenchantingService->disenchantWithSkill($character, $foundItem);
 
-            event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+            event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
 
             event(new CharacterInventoryDetailsUpdate($character->user));
 
             event(new UpdateTopBarEvent($character->refresh()));
-        } else {
-            event(new ServerMessageEvent($character->user, 'Item cannot be destroyed or does not exist. (Quest items cannot be destroyed or disenchanted)'));
         }
 
         return response()->json([], 200);
@@ -59,19 +62,22 @@ class DisenchantingController extends Controller {
         $foundSlot = InventorySlot::where('item_id', $item->id)->where('inventory_id', $inventory->id)->first();
 
         if (!is_null($foundSlot)) {
+            if ($foundSlot->item->type === 'quest') {
+                event(new ServerMessageEvent($character->user, 'Item cannot be destroyed or does not exist. (Quest items cannot be destroyed or disenchanted)'));
+                return response()->json([], 200);
+            }
+
             $name = $foundSlot->item->affix_name;
 
             $foundSlot->delete();
 
             event(new ServerMessageEvent($character->user, 'Destroyed: ' . $name));
 
-            event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+            event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
 
             event(new CharacterInventoryDetailsUpdate($character->user));
 
             event(new UpdateTopBarEvent($character->refresh()));
-        } else {
-            event(new ServerMessageEvent($character->user, 'Item cannot be destroyed or does not exist. (Quest items cannot be destroyed or disenchanted)'));
         }
 
         return response()->json([], 200);

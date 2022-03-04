@@ -45,8 +45,6 @@ class WeaponInformation {
      * @throws \Exception
      */
     public function getWeaponDamage(Character $character, bool $voided = false): int {
-        $damage = [];
-
         $slots = $this->fetchEquipped($character);
 
         if (is_null($slots)) {
@@ -99,6 +97,28 @@ class WeaponInformation {
                     $statIncrease = $character->chr * .10;
                 } else {
                     $statIncrease = $this->baseCharacterInfo->statMod($character, 'chr') * 0.10;
+                }
+
+                $damage += $statIncrease;
+            }
+        }
+
+        if ($class->type()->isArcaneAlchemist()) {
+            if ($this->baseCharacterInfo->getClassBonuses()->hasHealingSpells($character)) {
+                if ($voided) {
+                    $statIncrease = $character->chr * .10;
+                } else {
+                    $statIncrease = $this->baseCharacterInfo->statMod($character, 'chr') * 0.10;
+                }
+
+                $damage += $statIncrease;
+            }
+
+            if ($this->baseCharacterInfo->getClassBonuses()->arcaneAlchemistHasStave($character)) {
+                if ($voided) {
+                    $statIncrease = $character->chr * .15;
+                } else {
+                    $statIncrease = $this->baseCharacterInfo->statMod($character, 'chr') * 0.15;
                 }
 
                 $damage += $statIncrease;
@@ -158,19 +178,14 @@ class WeaponInformation {
      */
     protected function fetchTotalWeaponDamage(Collection $slots, bool $voided = false): int {
         $damage = 0;
+        $validWeapons = ['weapon', 'stave', 'bow', 'hammer'];
 
         foreach ($slots as $slot) {
-            if ($slot->item->type === 'weapon') {
+            if (in_array($slot->item->type, $validWeapons)) {
                 if (!$voided) {
                     $damage += $slot->item->getTotalDamage();
                 } else {
-                    $damage +=  $slot->item->base_damage;
-                }
-            } else if ($slot->item->type === 'bow') {
-                if (!$voided) {
-                    $damage += $slot->item->getTotalDamage();
-                } else {
-                    $damage +=  $slot->item->base_damage;
+                    $damage += $slot->item->base_damage;
                 }
             }
         }

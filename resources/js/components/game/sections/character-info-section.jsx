@@ -28,7 +28,11 @@ export default class CharacterInfoTopSection extends React.Component {
           isLoading: false,
           forceNameChange: result.data.sheet.force_name_change,
         }, () => {
-          this.props.updateCharacterGold(result.data.sheet.gold);
+          this.props.updateCharacterCurrencies({
+            gold: parseInt(result.data.sheet.gold),
+            gold_dust: parseInt(result.data.sheet.gold_dust),
+            shards: parseInt(result.data.sheet.shards),
+          });
         });
       }).catch((err) => {
         if (err.hasOwnProperty('response')) {
@@ -48,7 +52,11 @@ export default class CharacterInfoTopSection extends React.Component {
       this.setState({
         characterSheet: event.characterSheet,
       }, () => {
-        this.props.updateCharacterGold(event.characterSheet.gold);
+        this.props.updateCharacterCurrencies({
+          gold: parseInt(event.characterSheet.gold),
+          gold_dust: parseInt(event.characterSheet.gold_dust),
+          shards: parseInt(event.characterSheet.shards),
+        });
       });
     });
 

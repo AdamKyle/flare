@@ -110,7 +110,7 @@ export default class MoveToSetModal extends React.Component {
           </p>
           <p>
             <ul>
-              <li>1 Weapon, 1 Shield or 2 Weapons or 1 Bow</li>
+              <li>1 Weapon and 1 Shield or 2 Weapons or 1 Bow or 1 Hammer or 1 Stave</li>
               <li>1 Of each armour (Body, Leggings, Sleeves, Feet, Gloves and Helmet)</li>
               <li>2 Rings</li>
               <li>2 Spells (1 Healing, 1 Damage or 2 Healing or 2 Damage)</li>

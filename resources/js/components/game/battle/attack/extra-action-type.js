@@ -27,4 +27,8 @@ export default class ExtraActionType {
   static get HAMMER_SMASH() {
     return 'hammer smash';
   }
+
+  static get ARCANE_ALCHEMISTS_DREAMS() {
+    return 'alchemists ravenous dream';
+  }
 }

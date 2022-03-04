@@ -32,6 +32,7 @@ class AttackExtraActionHandler {
         $monsterCurrentHealth = $this->tripleAttackChance($characterInformationBuilder, $monsterCurrentHealth, $voided, $dmgReduction);
         $monsterCurrentHealth = $this->doubleAttackChance($characterInformationBuilder, $monsterCurrentHealth, $voided, $dmgReduction);
         $monsterCurrentHealth = $this->hammerSmashAttack($characterInformationBuilder, $monsterCurrentHealth, $voided, $dmgReduction);
+        $monsterCurrentHealth = $this->alchemistsRavenousDream($characterInformationBuilder, $monsterCurrentHealth, $voided, $dmgReduction);
 
         return $this->vampireThirst($characterInformationBuilder, $monsterCurrentHealth, $voided);
     }
@@ -194,6 +195,67 @@ class AttackExtraActionHandler {
                     $message = 'Aftershock hit for: ' . number_format($initialDamage) . '!';
                     $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
                 }
+            }
+        }
+
+        return $monsterCurrentHealth;
+    }
+
+    protected function alchemistsRavenousDream(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth, bool $voided = false, float $dmgReduction = 0.0): int {
+        $classType = new CharacterClassValue($characterInformationBuilder->getCharacter()->class->name);
+
+        if ($classType->isArcaneAlchemist() && !$voided) {
+            $attackerInfo = (new ClassAttackValue($characterInformationBuilder->getCharacter()))->buildAttackData();
+
+            if (!($this->canUse($attackerInfo['chance']) && $attackerInfo['has_item'])) {
+                return $monsterCurrentHealth;
+            }
+
+            $message = 'The world around you fades to blackness, your eyes glow red with rage. The enemy trembles.';
+            $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
+
+            $initialDamage = $characterInformationBuilder->statMod('int') * 0.10;
+
+            if ($dmgReduction > 0.0) {
+                $message        = 'The Plane weakens your ability to do full damage!';
+                $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
+
+                $initialDamage -= $initialDamage * $dmgReduction;
+            }
+
+            $monsterCurrentHealth -= $initialDamage;
+
+            $message = $characterInformationBuilder->getCharacter()->name . ' hit for (Arcane Alchemist Ravenous Dream): ' . number_format($initialDamage);
+            $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
+
+            $times                = rand(2, 6);
+            $originalTimes        = $times;
+            $additionalPercentage = 0.13;
+
+            $message = 'The earth shakes as you cause a multitude of explosions to engulf the enemy.';
+            $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
+
+            while ($times > 0) {
+                if ($times === $originalTimes) {
+                    $monsterCurrentHealth -= $initialDamage;
+
+                    $message = $characterInformationBuilder->getCharacter()->name . ' hit for (Arcane Alchemist Ravenous Dream): ' . number_format($initialDamage);
+                    $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
+                } else {
+                    $initialDamage = $characterInformationBuilder->statMod('int') * $additionalPercentage;
+
+                    if ($dmgReduction > 0.0) {
+                        $message        = 'The Plane weakens your ability to do full damage!';
+                        $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
+
+                        $initialDamage -= $initialDamage * $dmgReduction;
+                    }
+
+                    $monsterCurrentHealth -= $initialDamage;
+                    $additionalPercentage += 0.03;
+                }
+
+                $times--;
             }
         }
 

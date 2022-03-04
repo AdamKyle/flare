@@ -264,7 +264,7 @@ class Skill extends Model
 
     /**
      * Handle class specific bonuses towards specific skills.
-     * 
+     *
      * @param Character $character
      * @return float
      */
@@ -272,6 +272,10 @@ class Skill extends Model
         $class = GameClass::find($character->game_class_id);
 
         if ($class->type()->isBlacksmith() && ($this->baseSkill->name === 'Weapon Crafting' || $this->baseSkill->name === 'Armour Crafting' || $this->baseSkill->name === 'Ring Crafting')) {
+            return 0.15;
+        }
+
+        if ($class->type()->isArcaneAlchemist() && ($this->baseSkill->name === 'Spell Crafting' || $this->baseSkill->name === 'Alchemy')) {
             return 0.15;
         }
 

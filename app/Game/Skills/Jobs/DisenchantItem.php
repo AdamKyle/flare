@@ -73,7 +73,7 @@ class DisenchantItem implements ShouldQueue
             event(new ServerMessageEvent($this->character->user, 'You gained a total of: ' . $goldDust . ' Gold Dust from disenchanting. This does not include Gold Dust Rushes.'));
         }
 
-        event(new CharacterInventoryUpdateBroadCastEvent($this->character->user));
+        event(new CharacterInventoryUpdateBroadCastEvent($this->character->user, 'inventory'));
 
         event(new UpdateTopBarEvent($this->character->refresh()));
     }

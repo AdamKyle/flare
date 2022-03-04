@@ -24,19 +24,25 @@ class CharacterInventoryUpdateBroadCastEvent implements ShouldBroadcastNow
     /**
      * @var User $users
      */
-    public $user;
+    private $user;
+
+    /**
+     * @var string $type
+     */
+    public $type;
 
     /**
      * Create a new event instance.
      *
      * @param User $user
-     * @param array $boons
+     * @param string $type
      */
-    public function __construct(User $user) {
+    public function __construct(User $user, string $type) {
         $this->user      = $user;
         $this->inventory = resolve(CharacterInventoryService::class)
             ->setCharacter($user->character->refresh())
-            ->getInventoryForApi();
+            ->getInventoryForType($type);
+        $this->type      = $type;
     }
 
     /**

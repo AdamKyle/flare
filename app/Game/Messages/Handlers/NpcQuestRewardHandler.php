@@ -211,7 +211,7 @@ class NpcQuestRewardHandler {
 
         event(new UpdateTopBarEvent($character));
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'quest_items'));
 
         event(new CharacterInventoryDetailsUpdate($character->user));
     }

@@ -99,7 +99,7 @@ class ShopController extends Controller {
 
         $character = $character->refresh();
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
 
         event(new CharacterInventoryDetailsUpdate($character->user));
 
@@ -182,7 +182,7 @@ class ShopController extends Controller {
 
         event(new SellItemEvent($inventorySlot, $character));
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
 
         event(new CharacterInventoryDetailsUpdate($character->user));
 
@@ -215,7 +215,7 @@ class ShopController extends Controller {
 
         $character = $character->refresh();
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
 
         event(new CharacterInventoryDetailsUpdate($character->user));
 
@@ -277,7 +277,8 @@ class ShopController extends Controller {
 
         $this->updateCharacterAttackDataCache($character);
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'equipped'));
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'sets'));
 
         event(new CharacterInventoryDetailsUpdate($character->user));
 

@@ -33,13 +33,13 @@ class CharacterInventoryControllerTest extends TestCase
         parent::setUp();
 
         $this->character = (new CharacterFactory)
-                                                 ->createBaseCharacter()
-                                                 ->givePlayerLocation()
-                                                 ->assignSkill($this->createGameSkill([
-                                                     'name' => 'something',
-                                                     'type' => SkillTypeValue::ENCHANTING
-                                                 ]))
-                                                 ->equipStartingEquipment();
+                             ->createBaseCharacter()
+                             ->givePlayerLocation()
+                             ->assignSkill($this->createGameSkill([
+                                 'name' => 'something',
+                                 'type' => SkillTypeValue::ENCHANTING
+                             ]))
+                             ->equipStartingEquipment();
     }
 
     public function tearDown(): void {
@@ -358,7 +358,7 @@ class CharacterInventoryControllerTest extends TestCase
             'item_to_equip_type' => 'weapon',
             'slot_id'            => InventorySlot::first()->id,
             'character'          => $this->character->getCharacter(false)->id
-        ])->see('Equipped')->see('You have nothing equipped for this item type. Anything is better then nothing.');
+        ])->see('Equipped')->see('You have nothing equipped for this item type. Anything is better than nothing.');
     }
 
     public function testCannotSeeComparePageWithItemNotInYourInventory() {

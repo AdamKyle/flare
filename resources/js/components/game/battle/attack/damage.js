@@ -103,7 +103,7 @@ export default class Damage {
         cowerMessage = 'cowers: ';
       }
 
-      cowerMessage = cowerMessage + this.formatNumber(totalDamage);
+      cowerMessage = cowerMessage + this.formatNumber(Math.ceil(totalDamage));
 
       this.addActionMessage('Your enchantments glow with rage. Your enemy ' + cowerMessage);
     }
@@ -231,6 +231,63 @@ export default class Damage {
 
             this.addActionMessage('Aftershock hit for: ' + this.formatNumber(damage));
           }
+        }
+      }
+    }
+
+    return monsterCurrentHealth;
+  }
+
+  alchemistsRavenousDream(attacker, monsterCurrentHealth, attackData) {
+    if (attacker.extra_action_chance.class_name === attacker.class) {
+      const extraActionChance = attacker.extra_action_chance;
+
+      if (!this.canUse(extraActionChance.chance)) {
+        return monsterCurrentHealth;
+      }
+
+      if (extraActionChance.type === ExtraActionType.ARCANE_ALCHEMISTS_DREAMS && extraActionChance.has_item) {
+        this.addActionMessage('The world around you fades to blackness, your eyes glow red with rage. The enemy trembles.');
+
+        let damage = attacker.int_modded * 0.10;
+
+        if (attackData.damage_reduction > 0.0) {
+          this.addActionMessage('The Plane weakens your ability to do full damage!');
+
+          damage -= damage * attackData.damage_reduction;
+        }
+
+        monsterCurrentHealth -= damage;
+
+        this.addMessage(attacker.name + ' hit for (Arcane Alchemist Ravenous Dream):: ' + this.formatNumber(damage));
+
+        let times = random(2, 6);
+        const originalTimes = times;
+
+        this.addActionMessage('The earth shakes as you cause a multitude of explosions to engulf the enemy.');
+
+        while (times > 0) {
+
+          if (times === originalTimes) {
+            monsterCurrentHealth -= damage;
+
+            this.addMessage(attacker.name + ' hit for (Arcane Alchemist Ravenous Dream):: ' + this.formatNumber(damage));
+          } else {
+            let damage = attacker.int_modded * 0.10;
+
+            if (attackData.damage_reduction > 0.0) {
+              this.addActionMessage('The Plane weakens your ability to do full damage!');
+
+              damage -= damage * attackData.damage_reduction;
+            }
+
+            monsterCurrentHealth -= damage;
+
+            this.addMessage(attacker.name + ' hit for (Arcane Alchemist Ravenous Dream):: ' + this.formatNumber(damage));
+          }
+
+          times--;
+
         }
       }
     }

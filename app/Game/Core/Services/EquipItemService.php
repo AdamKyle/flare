@@ -208,7 +208,7 @@ class EquipItemService {
      * @return bool
      */
     public function isTwoHandedItemEquipped(Item $itemToEquip, Collection $inventorySlots, string $type): bool {
-        $validTypes = ['weapon', 'shield', 'bow', 'hammer'];
+        $validTypes = ['bow', 'hammer', 'stave'];
 
         if (!in_array($itemToEquip->type, $validTypes)) {
              return false;
@@ -222,14 +222,20 @@ class EquipItemService {
     public function unequipSlot(InventorySlot $characterSlot, Inventory|InventorySet $inventory) {
         if ($characterSlot->item->type === 'bow') {
             $this->unequipBothHands();
-        } else if ($characterSlot->item->type === 'hammer'){
+        } else if ($characterSlot->item->type === 'hammer') {
             $this->unequipBothHands();
-        }  else {
+        } else if ($characterSlot->item->type === 'stave') {
+            $this->unequipBothHands();
+        } else {
             if ($this->hasTwoHandedItemEquipped($inventory, 'bow')) {
                 $this->unequipBothHands();
             }
 
             if ($this->hasTwoHandedItemEquipped($inventory, 'hammer')) {
+                $this->unequipBothHands();
+            }
+
+            if ($this->hasTwoHandedItemEquipped($inventory, 'stave')) {
                 $this->unequipBothHands();
             }
 

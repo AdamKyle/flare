@@ -349,11 +349,11 @@ export default class ActionsSection extends React.Component {
                       updateResetBattleAction={this.updateResetBattleAction.bind(this)}
                       attackAutomationIsRunning={this.props.attackAutomationIsRunning}
                     />
-                    : this.props.celestial !== null ?
+                  : this.props.celestial !== null ?
                       <div className="text-center mb-2">
                         <strong>{this.props.celestial.monster.name}</strong>
                       </div>
-                      : null
+                  : null
                 }
 
                 <CraftingAction
@@ -363,7 +363,7 @@ export default class ActionsSection extends React.Component {
                   shouldChangeCraftingType={this.state.changeCraftingType}
                   changeCraftingType={this.changeCraftingType.bind(this)}
                   userId={this.props.userId}
-                  characterGold={this.state.character.gold}
+                  characterGold={this.props.characterCurrencies.gold}
                   timeRemaining={this.state.character.can_craft_again_at}
                   updateCanCraft={this.updateCanCraft.bind(this)}
                   isAdventuring={this.state.isAdventuring}
@@ -376,8 +376,8 @@ export default class ActionsSection extends React.Component {
                       characterId={this.state.character.id}
                       showAlchemy={this.state.showAlchemy}
                       userId={this.props.userId}
-                      characterGoldDust={this.state.character.gold_dust}
-                      characterShards={this.state.character.shards}
+                      characterGoldDust={this.props.characterCurrencies.gold_dust}
+                      characterShards={this.props.characterCurrencies.shards}
                       timeRemaining={this.state.character.can_craft_again_at}
                       updateCanCraft={this.updateCanCraft.bind(this)}
                       isAdventuring={this.state.isAdventuring}
@@ -392,7 +392,7 @@ export default class ActionsSection extends React.Component {
                     shouldChangeCraftingType={this.state.changeCraftingType}
                     changeCraftingType={this.changeCraftingType.bind(this)}
                     userId={this.props.userId}
-                    characterGold={this.state.character.gold}
+                    characterGold={this.props.characterCurrencies.gold}
                     timeRemaining={this.state.character.can_craft_again_at}
                     updateCanCraft={this.updateCanCraft.bind(this)}
                     isAdventuring={this.state.isAdventuring}
@@ -450,6 +450,41 @@ export default class ActionsSection extends React.Component {
               attackAutomationIsRunning={this.props.attackAutomationIsRunning}
               waitingOnAttackAutomationCheck={this.props.waitingOnAttackAutomationCheck}
             />
+          </Tab>
+          <Tab eventKey="help" title={"Help"}>
+            <p class="mb-2 mt-4">
+              The first tab is your "Actions tab" this is where you select a monster to kill, or begin crafting/enchanting from the
+              crafting/enchanting drop down list.
+            </p>
+            <p>
+              You can fight monsters manually - through selecting a monster, clicking again and clicking on the of the five attack buttons or you can do
+              Exploration, which allows you to automate the fighting process, while you do other things like craft and enchant.
+            </p>
+            <p>
+              Exploration can be set up on the exploration tab, while this is running you cannot manually fight monsters.
+            </p>
+            <p>
+              You should probably head to the shop, anvil icon in the side bar, and spend some of that 1000 gold to buy better equipment before attempting to fight.
+              Anything that is more expensive is better for you. If you are not a Ranger or a Blacksmith you do not need a bow or hammer.
+            </p>
+            <h4>Essential links</h4>
+            <ul>
+              <li>
+                <a href="/information/equipment" target="_blank">Equipment help <i className="fas fa-external-link-alt"></i></a>
+              </li>
+              <li>
+                <a href="/information/combat" target="_blank">Combat help <i class="fas fa-external-link-alt"></i></a>
+              </li>
+              <li>
+                <a href="/information/crafting" target="_blank">Crafting help <i class="fas fa-external-link-alt"></i></a>
+              </li>
+              <li>
+                <a href="/information/enchanting" target="_blank">Enchanting help <i class="fas fa-external-link-alt"></i></a>
+              </li>
+              <li>
+                <a href="/information/exploration" target="_blank">Exploration help <i class="fas fa-external-link-alt"></i></a>
+              </li>
+            </ul>
           </Tab>
         </Tabs>
       </Card>

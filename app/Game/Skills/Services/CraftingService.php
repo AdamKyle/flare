@@ -45,7 +45,14 @@ class CraftingService {
      * @return Collection
      */
     public function fetchCraftableItems(Character $character, array $params): Collection {
-        $skill = $this->fetchCraftingSkill($character, $params['crafting_type']);
+
+        $craftingType = $params['crafting_type'];
+
+        if ($craftingType == 'hammer' || $craftingType == 'bow' || $craftingType == 'stave') {
+            $craftingType = 'weapon';
+        }
+
+        $skill = $this->fetchCraftingSkill($character, $craftingType);
 
         return $this->getItems($params['crafting_type'], $skill);
     }
@@ -64,6 +71,7 @@ class CraftingService {
      */
     public function craft(Character $character, array $params): void {
         $item  = Item::find($params['item_to_craft']);
+
         $skill = $this->fetchCraftingSkill($character, $params['type']);
 
         if (is_null($item)) {
@@ -84,7 +92,7 @@ class CraftingService {
 
         $this->attemptToCraftItem($character, $skill, $item);
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
 
         event(new CharacterInventoryDetailsUpdate($character->user));
 
@@ -136,6 +144,11 @@ class CraftingService {
      * @return Skill
      */
     protected function fetchCraftingSkill(Character $character, string $craftingType): Skill {
+
+        if ($craftingType === 'hammer' || $craftingType === 'bow' || $craftingType === 'stave') {
+            $craftingType = 'weapon';
+        }
+
         $gameSkill = GameSkill::where('name', ucfirst($craftingType) . ' Crafting')->first();
 
         return Skill::where('game_skill_id', $gameSkill->id)->where('character_id', $character->id)->first();
@@ -149,13 +162,20 @@ class CraftingService {
      * @return Collection
      */
     protected function getItems($craftingType, Skill $skill): Collection {
-        return Item::where('can_craft', true)
-                    ->where('crafting_type', strtolower($craftingType))
+        $items = Item::where('can_craft', true)
+
                     ->where('skill_level_required', '<=', $skill->level)
-                    ->where('item_prefix_id', null)
-                    ->where('item_suffix_id', null)
-                    ->orderBy('type', 'desc')
-                    ->get();
+                    ->whereNull('item_prefix_id')
+                    ->whereNull('item_suffix_id')
+                    ->orderBy('cost', 'asc');
+
+        if ($craftingType === 'bow' || $craftingType === 'hammer' || $craftingType === 'stave') {
+            $items->where('default_position', strtolower($craftingType));
+        } else {
+            $items->where('crafting_type', strtolower($craftingType));
+        }
+
+        return $items->get();
     }
 
     /**

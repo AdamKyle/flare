@@ -70,7 +70,7 @@ class AlchemyService {
 
             $this->pickUpItem($character, $item, $skill, true);
 
-            event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+            event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'usable_items'));
 
             event(new CharacterInventoryDetailsUpdate($character->user));
 
@@ -87,7 +87,7 @@ class AlchemyService {
 
             $this->pickUpItem($character, $item, $skill, true);
 
-            event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+            event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'usable_items'));
 
             event(new CharacterInventoryDetailsUpdate($character->user));
 
@@ -106,7 +106,7 @@ class AlchemyService {
 
             event(new UpdateCharacterAlchemyList($character->user, $this->fetchAlchemistItems($character)));
 
-            event(new CharacterInventoryUpdateBroadCastEvent($character->user));
+            event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'usable_items'));
 
             event(new CharacterInventoryDetailsUpdate($character->user));
 

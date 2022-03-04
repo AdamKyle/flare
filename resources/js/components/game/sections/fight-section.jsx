@@ -7,60 +7,6 @@ import {getServerMessage} from '../helpers/server_message';
 import ReviveSection from "./revive-section";
 import Voidance from "../battle/attack/voidance";
 
-const renderAttackToolTip = (props) => (
-  <Tooltip id="button-tooltip" {...props}>
-    Attack.
-
-    If you are a Fighter or Thief, you will attack with both weapons if you have them equipped.
-    If you are not a Fighter or Thief, you will attack with the best weapon.
-    If you have no weapon equipped, you will attack with 2% of your primary damage stat.
-    Fighters will use 15% of their strength for weapons, 5% with out weapons. Where as Thieves and Rangers
-    will use 5% of their primary damage stat and only 2% (including other classes) when attacking with no weapons.
-  </Tooltip>
-);
-
-const renderCastingToolTip = (props) => (
-  <Tooltip id="button-tooltip" {...props}>
-    Cast.
-
-    We will attack with both spells. Heretics get an additional 30% of their primary damage stat as attack. Heretics can also cast with no
-    spells equipped at 2% of their primary damage attack. Rangers, for healing, get 15% of their Chr while Prophets get 30% of their chr.
-    If a prophet has no healing spell equipped, they still do their % of healing, how ever prophets special Double Heal will not fire
-    with no healing spells equipped. Rangers can also heal for 15% of their chr with no healing spells equipped.
-  </Tooltip>
-);
-
-const renderCastAndAttackToolTip = (props) => (
-  <Tooltip id="button-tooltip" {...props}>
-    Cast and Attack.
-
-    Will attack with spell in spell slot one and weapon in left hand as well as rings, artifacts and affixes.
-    Uses Casting Accuracy for the spell and Accuracy for the weapon. If you have a bow equipped, we will use that
-    as opposed to left/right hand. If you have no weapon equipped, we use 2% of your primary damage stat. If you are blocked at any time, both spell and
-    weapon will be blocked.
-  </Tooltip>
-);
-
-const renderAttackAndCastToolTip = (props) => (
-  <Tooltip id="button-tooltip" {...props}>
-    Attack and Cast.
-
-    Will attack with weapon in right hand and spell in spell slot two as well as rings, artifacts and affixes.
-    Uses Accuracy for the weapon and then Casting Accuracy for the spell. If you have a bow equipped, we will use that
-    as opposed to left/right hand. If you have no weapon equipped, we use 2% of your primary damage stat. If you are blocked at any time, both spell and
-    weapon will be blocked.
-  </Tooltip>
-);
-
-const renderDefendToolTip = (props) => (
-  <Tooltip id="button-tooltip" {...props}>
-    Defend.
-
-    Will use your armour class plus 5% of your strength. If you are a fighter and have at least one shield equipped
-    you will add your class bonus to your defence. If you are not, we use your combined armour.
-  </Tooltip>
-);
-
 export default class FightSection extends React.Component {
 
   constructor(props) {
@@ -253,40 +199,13 @@ export default class FightSection extends React.Component {
     const voidance      = new Voidance();
     const character     = this.props.character;
 
-    if (monsterInfo.canMonsterDevoidPlayer(character.devouring_darkness_res)) {
-      this.battleMessagesBeforeFight.push({
-        message: this.props.monster.name + ' has devoided your voidance! You feel fear start to build.',
-        class: 'action-fired'
-      });
-
-      this.isCharacterDevoided = true;
-    }
-
-    if (voidance.canPlayerDevoidEnemy(this.props.character.devouring_darkness) && !this.isCharacterDevoided) {
-      this.battleMessagesBeforeFight.push({
-        message: 'Magic crackles in the air, the darkness consumes the enemy. They are devoided!',
-        class: 'action-fired'
-      });
-
-      this.isMonsterDevoided = true;
-    }
-
-    if (monsterInfo.canMonsterVoidPlayer(character.devouring_light_res) && !this.isMonsterDevoided) {
-      this.battleMessagesBeforeFight.push({
-        message: this.props.monster.name + ' has voided your enchantments! You feel much weaker!',
-        class: 'enemy-action-fired'
-      });
-
-      this.isCharacterVoided = true;
-    }
-
-    if (voidance.canVoidEnemy(this.props.character.devouring_light) && !this.isCharacterDevoided && !this.isCharacterVoided) {
-      this.battleMessagesBeforeFight.push({
-        message: 'The light of the heavens shines through this darkness. The enemy is voided!',
-        class: 'action-fired'
-      });
-
-      this.isMonsterVoided = true;
+    switch (this.props.monster.map_name) {
+      case 'Hell':
+      case 'Purgatory':
+        this.monsterVoidance(monsterInfo, character, voidance);
+        break;
+      default :
+        this.playerVoidance(monsterInfo, character, voidance);
     }
 
     if (!this.isCharacterVoided && !this.isCharacterDevoided) {
@@ -334,6 +253,93 @@ export default class FightSection extends React.Component {
     }, () => {
       this.props.setMonster(null)
     });
+  }
+
+  monsterVoidance(monsterInfo, character, voidance) {
+    if (monsterInfo.canMonsterDevoidPlayer(character.devouring_darkness_res)) {
+      this.battleMessagesBeforeFight.push({
+        message: this.props.monster.name + ' has devoided your voidance! You feel fear start to build.',
+        class: 'enemy-action-fired'
+      });
+
+      this.isCharacterDevoided = true;
+    } else {
+      this.battleMessagesBeforeFight.push({
+        message: this.props.monster.name + ' fails to devoid you. They seem confused.',
+        class: 'action-fired'
+      });
+    }
+
+    if (voidance.canPlayerDevoidEnemy(this.props.character.devouring_darkness) && !this.isCharacterDevoided) {
+      this.battleMessagesBeforeFight.push({
+        message: 'Magic crackles in the air, the darkness consumes the enemy. They are devoided!',
+        class: 'action-fired'
+      });
+
+      this.isMonsterDevoided = true;
+    }
+
+    if (monsterInfo.canMonsterVoidPlayer(character.devouring_light_res) && !this.isMonsterDevoided) {
+      this.battleMessagesBeforeFight.push({
+        message: this.props.monster.name + ' has voided your enchantments! You feel much weaker!',
+        class: 'enemy-action-fired'
+      });
+
+      this.isCharacterVoided = true;
+    } else {
+      this.battleMessagesBeforeFight.push({
+        message: this.props.monster.name + ' fails to void you. They are terrified.',
+        class: 'action-fired'
+      });
+    }
+
+    if (voidance.canVoidEnemy(this.props.character.devouring_light) && !this.isCharacterDevoided && !this.isCharacterVoided) {
+      this.battleMessagesBeforeFight.push({
+        message: 'The light of the heavens shines through this darkness. The enemy is voided!',
+        class: 'action-fired'
+      });
+
+      this.isMonsterVoided = true;
+    }
+  }
+
+  playerVoidance(monsterInfo, character, voidance) {
+    if (voidance.canPlayerDevoidEnemy(this.props.character.devouring_darkness)) {
+      this.battleMessagesBeforeFight.push({
+        message: 'Magic crackles in the air, the darkness consumes the enemy. They are devoided!',
+        class: 'action-fired'
+      });
+
+      this.isMonsterDevoided = true;
+    }
+
+    if (monsterInfo.canMonsterDevoidPlayer(character.devouring_darkness_res) && this.isMonsterDevoided) {
+      this.battleMessagesBeforeFight.push({
+        message: this.props.monster.name + ' has devoided your voidance! You feel fear start to build.',
+        class: 'action-fired'
+      });
+
+      this.isCharacterDevoided = true;
+    }
+
+    if (voidance.canVoidEnemy(this.props.character.devouring_light) && !this.isCharacterDevoided) {
+      this.battleMessagesBeforeFight.push({
+        message: 'The light of the heavens shines through this darkness. The enemy is voided!',
+        class: 'action-fired'
+      });
+
+      this.isMonsterVoided = true;
+    }
+
+    if (monsterInfo.canMonsterVoidPlayer(character.devouring_light_res) && !this.isMonsterDevoided) {
+      this.battleMessagesBeforeFight.push({
+        message: this.props.monster.name + ' has voided your enchantments! You feel much weaker!',
+        class: 'enemy-action-fired'
+      });
+
+      this.isCharacterVoided = true;
+    }
+
   }
 
   battleMessages() {
@@ -519,110 +525,40 @@ export default class FightSection extends React.Component {
         <div className="battle-section text-center">
           {
             this.state.monsterCurrentHealth > 0 && this.state.monster !== null ?
-              <>
-                {
-                  !this.state.character.disable_pop_overs ?
-                    <Fragment>
-                      <OverlayTrigger
-                        placement="right"
-                        delay={{ show: 250, hide: 400 }}
-                        overlay={renderAttackToolTip}
-                      >
-                        <button className="btn btn-attack mr-2"
-                                disabled={this.props.isAdventuring || this.state.characterCurrentHealth === 0}
-                                onClick={() => this.attack('attack')}
-                        >
-                          <i className="ra ra-sword"></i>
-                        </button>
-                      </OverlayTrigger>
-                      <OverlayTrigger
-                        placement="right"
-                        delay={{ show: 250, hide: 400 }}
-                        overlay={renderCastingToolTip}
-                      >
-                        <button className="btn btn-cast mr-2"
-                                disabled={this.props.isAdventuring || this.state.characterCurrentHealth === 0}
-                                onClick={() => this.attack('cast')}
-                        >
-                          <i className="ra ra-burning-book"></i>
-                        </button>
-                      </OverlayTrigger>
-                      <OverlayTrigger
-                        placement="right"
-                        delay={{ show: 250, hide: 400 }}
-                        overlay={renderCastAndAttackToolTip}
-                      >
-                        <button className="btn btn-cast-attack mr-2"
-                                disabled={this.props.isAdventuring || this.state.characterCurrentHealth === 0}
-                                onClick={() => this.attack('cast_and_attack')}
-                        >
-                          <i className="ra ra-lightning-sword"></i>
-                        </button>
-                      </OverlayTrigger>
-                      <OverlayTrigger
-                        placement="right"
-                        delay={{ show: 250, hide: 400 }}
-                        overlay={renderAttackAndCastToolTip}
-                      >
-                        <button className="btn btn-attack-cast mr-2"
-                                disabled={this.props.isAdventuring || this.state.characterCurrentHealth === 0}
-                                onClick={() => this.attack('attack_and_cast')}
-                        >
-                          <i className="ra ra-lightning-sword"></i>
-                        </button>
-                      </OverlayTrigger>
-                      <OverlayTrigger
-                        placement="right"
-                        delay={{ show: 250, hide: 400 }}
-                        overlay={renderDefendToolTip}
-                      >
-                        <button className="btn btn-defend"
-                                disabled={this.props.isAdventuring || this.state.characterCurrentHealth === 0}
-                                onClick={() => this.attack('defend')}
-                        >
-                          <i className="ra ra-round-shield"></i>
-                        </button>
-                      </OverlayTrigger>
-                      {this.healthMeters()}
-                    </Fragment>
-                  :
-                    <Fragment>
-                      <button className="btn btn-attack mr-2"
-                              disabled={this.props.isAdventuring || this.state.characterCurrentHealth === 0}
-                              onClick={() => this.attack('attack')}
-                      >
-                        <i className="ra ra-sword"></i>
-                      </button>
-                      <button className="btn btn-cast mr-2"
-                              disabled={this.props.isAdventuring || this.state.characterCurrentHealth === 0}
-                              onClick={() => this.attack('cast')}
-                      >
-                        <i className="ra ra-burning-book"></i>
-                      </button>
-                      <button className="btn btn-cast-attack mr-2"
-                              disabled={this.props.isAdventuring || this.state.characterCurrentHealth === 0}
-                              onClick={() => this.attack('cast_and_attack')}
-                      >
-                        <i className="ra ra-lightning-sword"></i>
-                      </button>
-                      <button className="btn btn-attack-cast mr-2"
-                              disabled={this.props.isAdventuring || this.state.characterCurrentHealth === 0}
-                              onClick={() => this.attack('attack_and_cast')}
-                      >
-                        <i className="ra ra-lightning-sword"></i>
-                      </button>
-                      <button className="btn btn-defend"
-                              disabled={this.props.isAdventuring || this.state.characterCurrentHealth === 0}
-                              onClick={() => this.attack('defend')}
-                      >
-                        <i className="ra ra-round-shield"></i>
-                      </button>
-                      {this.healthMeters()}
-                    </Fragment>
-                }
-
-              </>
-              : null
+              <Fragment>
+                <button className="btn btn-attack mr-2"
+                        disabled={this.props.isAdventuring || this.state.characterCurrentHealth === 0}
+                        onClick={() => this.attack('attack')}
+                >
+                  <i className="ra ra-sword"></i>
+                </button>
+                <button className="btn btn-cast mr-2"
+                        disabled={this.props.isAdventuring || this.state.characterCurrentHealth === 0}
+                        onClick={() => this.attack('cast')}
+                >
+                  <i className="ra ra-burning-book"></i>
+                </button>
+                <button className="btn btn-cast-attack mr-2"
+                        disabled={this.props.isAdventuring || this.state.characterCurrentHealth === 0}
+                        onClick={() => this.attack('cast_and_attack')}
+                >
+                  <i className="ra ra-lightning-sword"></i>
+                </button>
+                <button className="btn btn-attack-cast mr-2"
+                        disabled={this.props.isAdventuring || this.state.characterCurrentHealth === 0}
+                        onClick={() => this.attack('attack_and_cast')}
+                >
+                  <i className="ra ra-lightning-sword"></i>
+                </button>
+                <button className="btn btn-defend"
+                        disabled={this.props.isAdventuring || this.state.characterCurrentHealth === 0}
+                        onClick={() => this.attack('defend')}
+                >
+                  <i className="ra ra-round-shield"></i>
+                </button>
+                {this.healthMeters()}
+              </Fragment>
+            : null
           }
           {
             this.state.isDead ?

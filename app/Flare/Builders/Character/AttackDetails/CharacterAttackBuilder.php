@@ -227,29 +227,9 @@ class CharacterAttackBuilder {
      * @throws \Exception
      */
     protected function castAndAttackPositionalDamage(string $spellPosition, string $weaponPosition, bool $voided = false, bool $isPositional = false): array {
-        $attack = $this->baseAttack($voided, $isPositional);
-
+        $attack        = $this->baseAttack($voided, $isPositional);
         $spellSlotOne  = $this->fetchSlot($spellPosition);
-        $weaponSlotOne = $this->fetchSlot($weaponPosition);
-
-        $weaponDamage = 0;
-        $spellDamage = 0;
-
-        if (!is_null($weaponSlotOne)) {
-            if (!$voided) {
-                $weaponDamage = $weaponSlotOne->item->getTotalDamage();
-            } else {
-                $weaponDamage = $weaponSlotOne->item->base_damage;
-            }
-        }
-
-        if (is_null($weaponDamage)) {
-            $weaponDamage = 0;
-        } else {
-            $weaponDamage = $this->characterInformationBuilder->damageModifiers($weaponDamage, $voided);
-        }
-
-        $weaponDamage = $this->characterInformationBuilder->calculateWeaponDamage($weaponDamage, $voided);
+        $spellDamage   = 0;
 
         if (!is_null($spellSlotOne)) {
             if ($spellSlotOne->item->type === 'spell-damage') {
@@ -269,11 +249,11 @@ class CharacterAttackBuilder {
             }
 
             if ($spellSlotOne->item->type === 'spell-healing') {
-                $spellDamage = $this->characterInformationBuilder->buildHealFor($voided, true);
+                $spellDamage = $this->characterInformationBuilder->buildHealFor($voided);
             }
 
             if ($spellSlotOne->item->type === 'spell-damage') {
-                $attack['spell_damage'] = (int) ($spellDamage / 2);
+                $attack['spell_damage'] = $spellDamage;
                 $attack['heal_for']     = 0;
             } else {
                 $attack['heal_for']     = $spellDamage;
@@ -284,7 +264,7 @@ class CharacterAttackBuilder {
             $attack['heal_for']      = 0;
         }
 
-        $attack['weapon_damage'] = $weaponDamage;
+        $attack['weapon_damage'] = $this->characterInformationBuilder->getTotalWeaponDamage($voided);;
 
         return $attack;
     }
@@ -300,23 +280,10 @@ class CharacterAttackBuilder {
      */
     protected function fetchSlot(string $position): InventorySlot|SetSlot|null {
         $slots = $this->fetchEquipped($this->character);
-        $slot  = null;
 
-        // Check to see if the user is holding a bow.
-        if (!is_null($slots) && ($position === 'left-hand' || $position === 'right-hand')) {
-            $slot = $slots->filter(function($slot) use($position) {
-                return $slot->item->type === 'bow';
-            })->first();
-
-        }
-
-        if (!is_null($slots)) {
-            $slot = $slots->filter(function($slot) use($position) {
-                return $slot->position === $position;
-            })->first();
-        }
-
-        return $slot;
+        return $slots->filter(function($slot) use($position) {
+            return $slot->position === $position;
+        })->first();
     }
 
 }

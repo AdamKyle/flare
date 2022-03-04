@@ -21,8 +21,9 @@ class UserRegisteredListener {
         if (is_null(UserSiteAccessStatistics::first())) {
 
             UserSiteAccessStatistics::create([
-                'amount_signed_in'  => 0,
+                'amount_signed_in'  => 1,
                 'amount_registered' => 1,
+                'invalid_ips'       => [$event->user->ip_address],
             ]);
 
             $adminUser = User::with('roles')->whereHas('roles', function($q) { $q->where('name', 'Admin'); })->first();
@@ -38,16 +39,31 @@ class UserRegisteredListener {
 
         if ($lastRecord->created_at->lt(Carbon::today(config('app.timezone')))) {
             UserSiteAccessStatistics::create([
-                'amount_signed_in'  => 0,
+                'amount_signed_in'  => 1,
                 'amount_registered' => 1,
+                'invalid_ips'       => [$event->user->ip_address]
             ]);
         } else {
-            UserSiteAccessStatistics::create([
-                'amount_signed_in'  => $lastRecord->amount_signed_in,
-                'amount_registered' => $lastRecord->amount_registered + 1,
-            ]);
-        }
 
+            $invalidIps = $lastRecord->invalid_ips;
+
+            if (is_null($invalidIps)) {
+
+                UserSiteAccessStatistics::create([
+                    'amount_signed_in'  => $lastRecord->amount_signed_in + 1,
+                    'amount_registered' => $lastRecord->amount_registered + 1,
+                    'invalid_ips'       => [$event->user->ip_address]
+                ]);
+            } else if (!in_array($event->user->ip_address, $invalidIps)) {
+                $invalidIps[] = $event->user->ip_address;
+
+                UserSiteAccessStatistics::create([
+                    'amount_signed_in'  => $lastRecord->amount_signed_in + 1,
+                    'amount_registered' => $lastRecord->amount_registered + 1,
+                    'invalid_ips'       => $invalidIps,
+                ]);
+            }
+        }
 
         $adminUser = User::with('roles')->whereHas('roles', function ($q) {
             $q->where('name', 'Admin');
