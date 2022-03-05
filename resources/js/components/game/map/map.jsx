@@ -550,7 +550,7 @@ export default class Map extends React.Component {
           <div className="map-body">
             <Draggable
               position={this.state.controlledPosition}
-              bounds={{top: -160, left: this.getMaxLeft(), right: this.state.rightBounds, bottom: this.state.bottomBounds}}
+              bounds={{top: -160, left: -110, right: this.state.rightBounds, bottom: this.state.bottomBounds}}
               handle=".handle"
               defaultPosition={{x: 0, y: 0}}
               grid={[16, 16]}

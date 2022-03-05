@@ -2,7 +2,7 @@
 
 Route::middleware(['auth', 'is.player.banned', 'is.character.who.they.say.they.are'])->group(function() {
     // Map related info:
-    Route::get('/map/{user}', ['uses' => 'Api\MapController@mapInformation']);
+    Route::get('/map/{character}', ['uses' => 'Api\MapController@mapInformation']);
 
     // Fetch Quests for map:
     Route::get('/map/quests/{character}', ['uses' => 'Api\MapController@fetchQuests']);

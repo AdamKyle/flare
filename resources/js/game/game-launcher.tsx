@@ -1,7 +1,7 @@
 import ReactDOM from "react-dom";
 import React from "react";
 import Game from './game';
-import GameProps from "./lib/game/types/GameProps";
+import GameProps from "./lib/game/types/game-props";
 
 const game = document.getElementById('game');
 

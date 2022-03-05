@@ -6,24 +6,18 @@
   <component name="ChangeListManager">
     <list default="true" id="b57f583e-608e-4ca2-947d-cf9ab46f7914" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Flare/Builders/Character/AttackDetails/CharacterAttackBuilder.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Builders/Character/AttackDetails/CharacterAttackBuilder.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Flare/Calculators/SkillXPCalculator.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Calculators/SkillXPCalculator.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Flare/Listeners/UpdateSkillListener.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Listeners/UpdateSkillListener.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Game/Core/Controllers/Api/CharacterInventoryController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Core/Controllers/Api/CharacterInventoryController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Game/Core/Controllers/CharacterInventoryController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Core/Controllers/CharacterInventoryController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Game/Core/Services/InventorySetService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Core/Services/InventorySetService.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Game/Skills/Services/CraftingService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Skills/Services/CraftingService.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/composer.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/data-imports/monsters.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/data-imports/monsters.xlsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/game/game.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/game.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/building-management-modal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/building-management-modal.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/goblin-coin-bank.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/goblin-coin-bank.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/population.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/population.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/recruit.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/recruit.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/game/sections/character-info-section.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/sections/character-info-section.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Maps/Controllers/Api/MapController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Maps/Controllers/Api/MapController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Maps/Services/LocationService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Maps/Services/LocationService.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/css/tailwind.css" beforeDir="false" afterPath="$PROJECT_DIR$/resources/css/tailwind.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/map/map.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/map/map.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/components/ui/cards/basic-card.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/components/ui/cards/basic-card.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/components/ui/tabs/tabs.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/components/ui/tabs/tabs.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/game-launcher.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/game-launcher.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/game/game.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/game.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/layouts/partials/sidebar/playersidebar.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layouts/partials/sidebar/playersidebar.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/game/types/GameProps.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/game/types/game-props.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/layouts/app.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layouts/app.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/game/maps/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/game/maps/api.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tailwind.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/tailwind.config.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -281,11 +275,11 @@
       <recent name="$PROJECT_DIR$/resources/js/components/game/timeout" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/resources/js/game/sections/components/location-pins" />
       <recent name="$PROJECT_DIR$/app/Flare/Values" />
       <recent name="$PROJECT_DIR$/app/Game/Exploration/Controllers" />
       <recent name="$PROJECT_DIR$/app/Game/Exploration" />
       <recent name="$PROJECT_DIR$/app/Flare/Builders/Character/AttackDetails" />
-      <recent name="$PROJECT_DIR$/app/Flare/Builders/Character/ClassDetails" />
     </key>
   </component>
   <component name="RunManager">
@@ -338,7 +332,7 @@
       <workItem from="1644095989150" duration="434000" />
       <workItem from="1644096439311" duration="104203000" />
       <workItem from="1644529738352" duration="194376000" />
-      <workItem from="1646428181614" duration="2759000" />
+      <workItem from="1646428181614" duration="20699000" />
     </task>
     <servers />
   </component>

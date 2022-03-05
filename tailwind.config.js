@@ -59,17 +59,6 @@ module.exports = {
         800: "#242526",
         900: "#151515",
       },
-      screens: {
-        'sm': '640px',
-
-        'md': '1024px',
-
-        'lg': '1600px',
-
-        'xl': '1920px',
-
-        '2xl': '2600px',
-      },
     },
     extend: {
       fontSize: {
@@ -81,6 +70,21 @@ module.exports = {
       },
       boxShadow: {
         DEFAULT: "1px 1px 5px 0 rgba(0, 0, 0, 0.16)",
+      },
+      screens: {
+        'sm': '640px',
+
+        'md': '1024px',
+
+        'md-lg': '1280px',
+
+        '1376': '1376px',
+
+        'lg': '1600px',
+
+        'xl': '1920px',
+
+        '2xl': '2600px',
       },
       colors: {
         green: {

@@ -40,8 +40,8 @@ class MapController extends Controller {
         $this->middleware('is.character.dead')->except(['mapInformation']);
     }
 
-    public function mapInformation(User $user, LocationService $locationService) {
-        return response()->json($locationService->getLocationData($user->character), 200);
+    public function mapInformation(Character $character, LocationService $locationService) {
+        return response()->json($locationService->getLocationData($character), 200);
     }
 
     public function move(MoveRequest $request, Character $character, MovementService $movementSevice) {

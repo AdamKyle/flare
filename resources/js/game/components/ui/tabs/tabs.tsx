@@ -15,10 +15,10 @@ export default class Tabs extends React.Component<TabProperties, {}> {
                 <Tab key={tab.key}
                      className={({selected}) => classNames(
                          'w-full py-2.5 text-sm font-medium',
-                         'focus:outline-none text-slate-800',
+                         'focus:outline-none text-slate-800 dark:text-slate-200',
                          selected
-                             ? 'border-b-2 border-blue-500'
-                             : 'hover:border-blue-500 hover:border-b-2'
+                             ? 'border-b-2 border-blue-500 dark:border-blue-400'
+                             : 'hover:border-blue-500 hover:border-b-2 dark:hover:border-blue-400'
                      )}
                 >{tab.name}</Tab>
             )

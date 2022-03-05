@@ -1,0 +1,54 @@
+.game-map {
+    .map-x-pin, .location-x-pin, .port-x-pin, .kingdom-x-pin {
+        background-color: black; /* So we can see where the pixel is */
+        height: 1px;
+        position: absolute;
+        width: 1px;
+        cursor: pointer;
+
+        &:after {
+             bottom: 100%;
+             content: "";
+             font-family: 'RPGAwesome';
+             display: block;
+             left: -6px;
+             top: -18px;
+             position: absolute;
+             font-weight: 900;
+             font-size: 16px;
+             color: #d69c44;
+         }
+    }
+
+    .location-x-pin {
+        &:after {
+             font-family: 'Font Awesome\ 5 Free';
+             content: '\f6d9';
+             font-size: 16px;
+             color: #d9a29e;
+             top: -18px;
+             left: -6px;
+         }
+    }
+
+    .kingdom-x-pin {
+        &:after {
+             font-family: 'RPGAwesome';
+             content: '\e95d';
+             font-size: 16px;
+             color: var(--kingdom-color);
+             top: -18px;
+             left: -6px;
+         }
+    }
+
+    .port-x-pin {
+        &:after {
+             font-family: 'Font Awesome\ 5 Free';
+             content: '\f21a';
+             font-size: 16px;
+             color: #2097ec;
+             left: -8px;
+         }
+    }
+}
