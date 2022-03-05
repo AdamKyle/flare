@@ -6,18 +6,13 @@
   <component name="ChangeListManager">
     <list default="true" id="b57f583e-608e-4ca2-947d-cf9ab46f7914" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Game/Maps/Controllers/Api/MapController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Maps/Controllers/Api/MapController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Game/Maps/Services/LocationService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Maps/Services/LocationService.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/css/tailwind.css" beforeDir="false" afterPath="$PROJECT_DIR$/resources/css/tailwind.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/game/map/map.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/map/map.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/components/ui/cards/basic-card.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/components/ui/cards/basic-card.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/components/ui/tabs/tabs.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/components/ui/tabs/tabs.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/game-launcher.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/game-launcher.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/game/game.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/game.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/game/types/GameProps.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/game/types/game-props.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/game/types/map/map-state.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/game/types/map/map-state.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/components/actions/map/map-actions.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/components/actions/map/map-actions.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/components/locations/location.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/components/locations/location.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/map/map-section.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/map/map-section.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/layouts/app.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layouts/app.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/game/maps/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/game/maps/api.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tailwind.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/tailwind.config.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -332,7 +327,7 @@
       <workItem from="1644095989150" duration="434000" />
       <workItem from="1644096439311" duration="104203000" />
       <workItem from="1644529738352" duration="194376000" />
-      <workItem from="1646428181614" duration="20699000" />
+      <workItem from="1646428181614" duration="29861000" />
     </task>
     <servers />
   </component>

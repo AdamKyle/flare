@@ -7,6 +7,8 @@ import MapProps from '../../lib/game/types/map/map-props';
 import Ajax from "../../lib/ajax/ajax";
 import Location from "../components/locations/location";
 import MapActions from "../components/actions/map/map-actions";
+import Kingdoms from "../components/kingdoms/kingdoms";
+import ProgressBar from "../../components/ui/progress-bars/progress-bar";
 
 export default class MapSection extends React.Component<MapProps, MapState> {
 
@@ -25,6 +27,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
             right_bounds: 0,
             locations: null,
             loading: true,
+            player_kingdoms: null,
         }
     }
 
@@ -39,6 +42,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                     x: result.data.character_map.character_position_x,
                     y: result.data.character_map.character_position_y,
                 },
+                player_kingdoms: result.data.my_kingdoms,
             });
         }, (err: AxiosError) => {
 
@@ -46,9 +50,19 @@ export default class MapSection extends React.Component<MapProps, MapState> {
     }
 
     fetchLeftBounds(): number {
+
+        if (this.props.view_port >= 1920) {
+            return 0;
+        }
+
+        if (this.props.view_port < 400) {
+            return -260;
+        }
+
         if (this.props.view_port < 600) {
             return -210;
         }
+
 
         if (this.props.view_port < 990) {
             return -110;
@@ -74,12 +88,12 @@ export default class MapSection extends React.Component<MapProps, MapState> {
         }
     }
 
-    getStyle(): { backgroundImage: string, height: number, width?: number } {
-        if (this.props.view_port > 770 && this.props.view_port < 1600) {
-            return {backgroundImage: `url("${this.state.map_url}")`, height: 500};
+    getStyle(): { backgroundImage: string, height: number, backgroundRepeat: string, width?: number } {
+        if ((this.props.view_port > 770 && this.props.view_port < 1600) || this.props.view_port >= 1920) {
+            return {backgroundImage: `url("${this.state.map_url}")`, backgroundRepeat: 'no-repeat', height: 500};
         }
 
-        return {backgroundImage: `url("${this.state.map_url}")`, height: 500, width: 500};
+        return {backgroundImage: `url("${this.state.map_url}")`, backgroundRepeat: 'no-repeat', height: 500, width: 500};
     }
 
     render() {
@@ -94,7 +108,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
 
         return(
             <Fragment>
-                <div className='overflow-hidden max-h-[350px]'>
+                <div className='overflow-hidden max-h-[350px] md:ml-[20px]'>
                     <Draggable
                         position={this.state.map_position}
                         bounds={{top: -160, left: this.fetchLeftBounds(), right: this.state.right_bounds, bottom: this.state.bottom_bounds}}
@@ -110,6 +124,8 @@ export default class MapSection extends React.Component<MapProps, MapState> {
 
                                 <Location locations={this.state.locations}/>
 
+                                <Kingdoms kingdoms={this.state.player_kingdoms} />
+
                                 <div className="map-x-pin" style={this.playerIcon()}></div>
                             </div>
                         </div>
@@ -117,6 +133,9 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                 </div>
                 <div className='mt-4'>
                     <MapActions />
+                </div>
+                <div className={'mt-3'}>
+                    <ProgressBar timeLeft={10} />
                 </div>
             </Fragment>
         )

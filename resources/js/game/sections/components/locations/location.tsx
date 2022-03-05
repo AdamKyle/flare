@@ -23,7 +23,6 @@ export default class Location extends React.Component<LocationProps, LocationSta
         let location = this.props.locations.filter((location) => location.id === locationId);
 
         if (location.length > 0) {
-            console.log(location[0]);
             this.setState({
                 open_location_modal: true,
                 location: location[0],

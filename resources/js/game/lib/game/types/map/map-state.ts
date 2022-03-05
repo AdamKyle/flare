@@ -12,4 +12,6 @@ export default interface MapState {
     locations: { id: number, is_port: boolean, x: number, y: number, name: string }[] | null;
 
     loading: boolean;
+
+    player_kingdoms: {id: number, x_position: number, y_position: number, color: string}[] | null;
 }

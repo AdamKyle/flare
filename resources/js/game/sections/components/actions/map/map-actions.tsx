@@ -1,6 +1,7 @@
 import React, {Fragment} from "react";
 import MapActionsProps from "../../../../lib/game/types/map/map-actions-props";
 import PrimaryButton from "../../../../components/ui/buttons/primary-button";
+import SuccessOutlineButton from "../../../../components/ui/buttons/success-outline-button";
 
 export default class MapActions extends React.Component<MapActionsProps, any> {
 
@@ -11,6 +12,18 @@ export default class MapActions extends React.Component<MapActionsProps, any> {
     move(direction: string) {
     }
 
+    adventure() {
+
+    }
+
+    setSail() {
+
+    }
+
+    teleport() {
+
+    }
+
     render() {
         return (
             <Fragment>
@@ -18,9 +31,9 @@ export default class MapActions extends React.Component<MapActionsProps, any> {
                     <span>X/Y: 0/0</span>
                     <div className="mt-4 xl:mt-0">
                         <div className='grid grid-cols-3 gap-1'>
-                            <span>Adventure</span>
-                            <span className='text-center'>Set Sail</span>
-                            <span>Teleport</span>
+                            <SuccessOutlineButton additional_css={'text-center'} button_label={'Adventure'} on_click={this.adventure.bind(this)} />
+                            <SuccessOutlineButton additional_css={'text-center'} button_label={'Set Sail'} on_click={this.setSail.bind(this)} />
+                            <SuccessOutlineButton additional_css={'text-center'} button_label={'Teleport'} on_click={this.teleport.bind(this)} />
                         </div>
                     </div>
                 </div>

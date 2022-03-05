@@ -51,6 +51,7 @@ export default class Game extends React.Component<GameProps, GameState> {
     }
 
     render() {
+        console.log(this.state.view_port);
         return (
             <div className="md:container">
                 { this.state.view_port < 1280 && this.state.show_size_message ?

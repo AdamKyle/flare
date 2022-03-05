@@ -116,7 +116,7 @@ class LocationService {
 //            'can_attack_kingdom'     => $this->canAttack,
 //            'can_manage_kingdom'     => $this->canManage,
 //            'kingdom_to_attack'      => $this->kingdomToAttack,
-//            'my_kingdoms'            => $this->getKingdoms($character),
+            'my_kingdoms'            => $this->getKingdoms($character),
 //            'npc_kingdoms'           => Kingdom::select('x_position', 'y_position', 'npc_owned')->whereNull('character_id')->where('game_map_id', $character->map->game_map_id)->where('npc_owned', true)->get(),
 //            'other_kingdoms'         => $this->getEnemyKingdoms($character),
 //            'characters_on_map'      => $this->getActiveUsersCountForMap($character),
