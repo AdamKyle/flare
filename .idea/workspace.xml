@@ -6,9 +6,14 @@
   <component name="ChangeListManager">
     <list default="true" id="b57f583e-608e-4ca2-947d-cf9ab46f7914" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/components/ui/buttons/primary-outline-button.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/components/ui/buttons/primary-outline-button.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/components/ui/buttons/success-outline-button.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/components/ui/buttons/success-outline-button.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/components/ui/buttons/primary-button.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/components/ui/buttons/primary-button.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/components/ui/cards/basic-card.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/components/ui/cards/basic-card.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/game.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/game.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/game/types/game-state.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/game/types/game-state.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/game/sections/components/actions/map/map-actions.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/components/actions/map/map-actions.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/map/map-section.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/map/map-section.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/vendor/theme/assets/css/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/resources/vendor/theme/assets/css/style.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tailwind.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/tailwind.config.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

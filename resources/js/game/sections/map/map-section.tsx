@@ -13,6 +13,7 @@ import EnemyKingdoms from "../components/kingdoms/enemy-kingdoms";
 import MovePlayer from "../../lib/game/map/ajax/move-player";
 import MapStateManager from "../../lib/game/map/state/map-state-manager";
 import NpcKingdoms from "../components/kingdoms/npc-kingdoms";
+import ComponentLoading from "../../components/ui/loading/component-loading";
 
 export default class MapSection extends React.Component<MapProps, MapState> {
 
@@ -119,11 +120,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
 
     render() {
         if (this.state.loading) {
-            return (
-                <Fragment>
-                    <p>One Moment ... </p>
-                </Fragment>
-            );
+            return <ComponentLoading />
         }
 
         return(

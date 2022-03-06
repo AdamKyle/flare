@@ -16,7 +16,7 @@ export default class BasicCard extends React.Component<BasicCardProperties, any>
 
     render() {
         return (
-            <div className={'bg-white rounded-sm drop-shadow-sm p-6 overflow-x-auto dark:bg-gray-800 dark:text-white ' + this.appendAdditionalClasses()}>
+            <div className={'bg-white rounded-sm drop-shadow-sm p-6 overflow-x-auto dark:bg-gray-800 dark:text-gray-400 ' + this.appendAdditionalClasses()}>
                 {this.props.children}
             </div>
         );

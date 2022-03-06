@@ -87,6 +87,10 @@ module.exports = {
         '2xl': '2600px',
       },
       colors: {
+        orange: {
+          ...colors.orange,
+          DEFAULT: "#fff7ed"
+        },
         green: {
           ...colors.green,
           DEFAULT: "#28a745",

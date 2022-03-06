@@ -65,7 +65,7 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                 <div className='text-left mt-4 mb-3'>
                     Characters On Map: {this.props.players_on_map} | <PrimaryOutlineButton additional_css={'text-center'} button_label={'Plane Quests'} on_click={this.openPlaneQuests.bind(this)} />
                 </div>
-                <div className='mt-4 mb-4 border-b-2 border-b-gray-600 dark:border-b-gray-300'></div>
+                <div className='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 hidden sm:block'></div>
                 <div className='grid gap-2 lg:grid-cols-4 lg:gap-4'>
                     <PrimaryButton disabled={this.state.is_movement_disabled} button_label={'North'} on_click={() => this.move('north')} />
                     <PrimaryButton disabled={this.state.is_movement_disabled} button_label={'South'} on_click={() => this.move('south')} />
