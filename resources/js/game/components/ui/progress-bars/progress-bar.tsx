@@ -105,9 +105,6 @@ export default class ProgressBar extends React.Component<ProgressBarProps, Progr
     }
 
     render() {
-
-        console.log(this.state);
-
         if ((this.state.percentage_left <= 0 && this.state.time_left <= 0) || this.props.time_remaining === 0) {
             return null;
         }

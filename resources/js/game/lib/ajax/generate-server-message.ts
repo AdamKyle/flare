@@ -9,7 +9,7 @@ import {AxiosError, AxiosResponse} from "axios";
  * @type [{type: string, customMessage?: string}]
  */
 export const generateServerMessage = (type: string, customMessage?: string) => {
-    (new Ajax()).setRoute('/server-message').setParameters({
+    (new Ajax()).setRoute('server-message').setParameters({
         params: {
             type: type,
             custom_message: customMessage

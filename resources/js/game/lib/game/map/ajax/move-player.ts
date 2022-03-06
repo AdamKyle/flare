@@ -3,6 +3,7 @@ import {movePlayer} from "../move-player";
 import {generateServerMessage} from "../../../ajax/generate-server-message";
 import Ajax from "../../../ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
+import MapStateManager from "../state/map-state-manager";
 
 export default class MovePlayer {
 
@@ -50,7 +51,7 @@ export default class MovePlayer {
             character_position_x: playerPosition.x,
             character_position_y: playerPosition.y,
         }).doAjaxCall('post', (result: AxiosResponse) => {
-            console.log(result);
+            this.component.setState({...MapStateManager.setState(result.data), ...this.component.state});
         }, (error: AxiosError) => {
 
         })

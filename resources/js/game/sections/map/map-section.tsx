@@ -11,6 +11,7 @@ import Kingdoms from "../components/kingdoms/kingdoms";
 import ProgressBar from "../../components/ui/progress-bars/progress-bar";
 import EnemyKingdoms from "../components/kingdoms/enemy-kingdoms";
 import MovePlayer from "../../lib/game/map/ajax/move-player";
+import MapStateManager from "../../lib/game/map/state/map-state-manager";
 
 export default class MapSection extends React.Component<MapProps, MapState> {
 
@@ -43,17 +44,9 @@ export default class MapSection extends React.Component<MapProps, MapState> {
     componentDidMount() {
         (new Ajax()).setRoute('map/' + this.props.character_id)
                     .doAjaxCall('get', (result: AxiosResponse) => {
-            this.setState({
-                loading: false,
-                map_url: result.data.map_url,
-                locations: result.data.locations,
-                character_position: {
-                    x: result.data.character_map.character_position_x,
-                    y: result.data.character_map.character_position_y,
-                },
-                player_kingdoms: result.data.my_kingdoms,
-                enemy_kingdoms: result.data.other_kingdoms,
-            });
+            let state = {...MapStateManager.setState(result.data), ...{loading: false}};
+
+            this.setState(state);
         }, (err: AxiosError) => {
 
         });
