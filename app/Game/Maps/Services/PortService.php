@@ -99,6 +99,13 @@ class PortService {
         return $character->refresh();
     }
 
+    /**
+     * Fetch other ports that you are not currently at.
+     *
+     * @param Character $character
+     * @param Location $location
+     * @return Collection
+     */
     protected function fetchOtherPorts(Character $character, Location $location): Collection {
         $locations = Location::where('id', '!=', $location->id)->where('is_port', true)->where('game_map_id', $character->map->game_map_id)->get();
 

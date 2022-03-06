@@ -17,5 +17,11 @@ export default interface MapState {
 
     enemy_kingdoms: {id: number, x_position: number, y_position: number, color: string, character_id: number}[] | null;
 
+    npc_kingdoms: {id: number, x_position: number, y_position: number, npc_owned: boolean}[] | null;
+
     time_left: number,
+
+    can_player_move: boolean,
+
+    characters_on_map: number,
 }

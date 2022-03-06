@@ -189,6 +189,7 @@ module.exports = {
   },
   plugins: [tailWindPros, aspectRatio, tailwindcssDir],
   variants: {
+    backgroundColor: ({ after }) => after(['disabled']),
     extend: {
       inset: ["direction"],
       float: ["direction"],

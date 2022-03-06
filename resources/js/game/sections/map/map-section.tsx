@@ -12,6 +12,7 @@ import ProgressBar from "../../components/ui/progress-bars/progress-bar";
 import EnemyKingdoms from "../components/kingdoms/enemy-kingdoms";
 import MovePlayer from "../../lib/game/map/ajax/move-player";
 import MapStateManager from "../../lib/game/map/state/map-state-manager";
+import NpcKingdoms from "../components/kingdoms/npc-kingdoms";
 
 export default class MapSection extends React.Component<MapProps, MapState> {
 
@@ -34,6 +35,9 @@ export default class MapSection extends React.Component<MapProps, MapState> {
             loading: true,
             player_kingdoms: null,
             enemy_kingdoms: null,
+            npc_kingdoms: null,
+            can_player_move: true,
+            characters_on_map: 0,
             time_left: 0,
         }
 
@@ -44,6 +48,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
     componentDidMount() {
         (new Ajax()).setRoute('map/' + this.props.character_id)
                     .doAjaxCall('get', (result: AxiosResponse) => {
+
             let state = {...MapStateManager.setState(result.data), ...{loading: false}};
 
             this.setState(state);
@@ -54,6 +59,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
         this.mapTimeOut.listen('Game.Maps.Events.ShowTimeOutEvent', (event: any) => {
             this.setState({
                 time_left: event.forLength,
+                can_player_move: event.canMove,
             });
         });
     }
@@ -142,13 +148,15 @@ export default class MapSection extends React.Component<MapProps, MapState> {
 
                                 <EnemyKingdoms kingdoms={this.state.enemy_kingdoms} character_id={this.props.character_id}/>
 
+                                <NpcKingdoms kingdoms={this.state.npc_kingdoms}/>
+
                                 <div className="map-x-pin" style={this.playerIcon()}></div>
                             </div>
                         </div>
                     </Draggable>
                 </div>
                 <div className='mt-4'>
-                    <MapActions move_player={this.handleMovePlayer.bind(this)}/>
+                    <MapActions move_player={this.handleMovePlayer.bind(this)} can_player_move={this.state.can_player_move} players_on_map={this.state.characters_on_map}/>
                 </div>
                 <div className={'mt-3'}>
                     <ProgressBar time_remaining={this.state.time_left} />

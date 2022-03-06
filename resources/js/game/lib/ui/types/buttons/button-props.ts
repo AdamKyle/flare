@@ -2,10 +2,9 @@ export default interface ButtonProps {
 
     additional_css?: string
 
+    disabled?: boolean,
+
     button_label: string,
 
-    /**
-     * This should be the function to be called when the button is clicked.
-     */
-    on_click: any,
+    on_click: () => void;
 }

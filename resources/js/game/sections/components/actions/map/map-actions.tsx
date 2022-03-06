@@ -2,15 +2,35 @@ import React, {Fragment} from "react";
 import MapActionsProps from "../../../../lib/game/types/map/map-actions-props";
 import PrimaryButton from "../../../../components/ui/buttons/primary-button";
 import SuccessOutlineButton from "../../../../components/ui/buttons/success-outline-button";
+import MapActionsState from "../../../../lib/game/types/map/map-actions-state";
+import PrimaryOutlineButton from "../../../../components/ui/buttons/primary-outline-button";
 
-export default class MapActions extends React.Component<MapActionsProps, any> {
+export default class MapActions extends React.Component<MapActionsProps, MapActionsState> {
 
     constructor(props: MapActionsProps) {
         super(props);
+
+        this.state = {
+            is_movement_disabled: false,
+        }
+    }
+
+    componentDidUpdate(prevProps: Readonly<MapActionsProps>, prevState: Readonly<MapActionsState>, snapshot?: any) {
+        if (this.props.can_player_move && this.state.is_movement_disabled) {
+            this.setState({is_movement_disabled: false});
+        }
+
+        if (!this.props.can_player_move && !this.state.is_movement_disabled) {
+            this.setState({is_movement_disabled: true});
+        }
     }
 
     move(direction: string) {
-        this.props.move_player(direction);
+        this.setState({
+            is_movement_disabled: true,
+        }, () => {
+            this.props.move_player(direction);
+        })
     }
 
     adventure() {
@@ -22,6 +42,10 @@ export default class MapActions extends React.Component<MapActionsProps, any> {
     }
 
     teleport() {
+
+    }
+
+    openPlaneQuests() {
 
     }
 
@@ -39,14 +63,14 @@ export default class MapActions extends React.Component<MapActionsProps, any> {
                     </div>
                 </div>
                 <div className='text-left mt-4 mb-3'>
-                    Characters On Map: X | Plane Quests
+                    Characters On Map: {this.props.players_on_map} | <PrimaryOutlineButton additional_css={'text-center'} button_label={'Plane Quests'} on_click={this.openPlaneQuests.bind(this)} />
                 </div>
                 <div className='mt-4 mb-4 border-b-2 border-b-gray-600 dark:border-b-gray-300'></div>
                 <div className='grid gap-2 lg:grid-cols-4 lg:gap-4'>
-                    <PrimaryButton button_label={'North'} on_click={() => this.move('north')} />
-                    <PrimaryButton button_label={'South'} on_click={() => this.move('south')} />
-                    <PrimaryButton button_label={'West'} on_click={() => this.move('west')} />
-                    <PrimaryButton button_label={'East'} on_click={() => this.move('east')} />
+                    <PrimaryButton disabled={this.state.is_movement_disabled} button_label={'North'} on_click={() => this.move('north')} />
+                    <PrimaryButton disabled={this.state.is_movement_disabled} button_label={'South'} on_click={() => this.move('south')} />
+                    <PrimaryButton disabled={this.state.is_movement_disabled} button_label={'West'} on_click={() => this.move('west')} />
+                    <PrimaryButton disabled={this.state.is_movement_disabled} button_label={'East'} on_click={() => this.move('east')} />
                 </div>
             </Fragment>
         )

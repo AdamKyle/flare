@@ -18,7 +18,7 @@ trait LiveCharacterCount {
             $query->on('characters.id', 'maps.character_id')->where('game_map_id', $mapId);
         })->join('sessions', function($join) {
             $join->on('sessions.user_id', 'characters.user_id')
-                ->where('last_activity', '<', now()->addHours()->timestamp);
+                ->where('last_activity', '<', now()->addMinutes(5)->timestamp);
         })->count();
     }
 }

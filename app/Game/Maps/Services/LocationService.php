@@ -26,11 +26,6 @@ class LocationService {
     private $portService;
 
     /**
-     * @var \Illuminate\Support\Collection $adventureDetails | null
-     */
-    private $adventureDetails;
-
-    /**
      * @var CoordinatesCache $coordinatesCache
      */
     private $coordinatesCache;
@@ -101,12 +96,10 @@ class LocationService {
             'character_map'          => $character->map,
 //            'character_id'           => $character->id,
             'locations'              => $this->fetchLocationData($character),
-//            'can_move'               => $character->can_move,
-//            'timeout'                => $character->can_move_again_at,
+            'can_move'               => $character->can_move,
+            'can_move_again_at'      => $character->can_move_again_at,
 //            'port_details'           => $this->portDetails,
 //            'map_name'               => $character->map->gameMap->name,
-//            'adventure_details'      => $this->adventureDetails,
-//            'adventure_logs'         => $character->adventureLogs,
 //            'adventure_completed_at' => $character->can_adventure_again_at,
 //            'inventory_sets'         => $this->getSets($character),
 //            'is_dead'                => $character->is_dead,
@@ -117,9 +110,9 @@ class LocationService {
 //            'can_manage_kingdom'     => $this->canManage,
 //            'kingdom_to_attack'      => $this->kingdomToAttack,
             'my_kingdoms'            => $this->getKingdoms($character),
-//            'npc_kingdoms'           => Kingdom::select('x_position', 'y_position', 'npc_owned')->whereNull('character_id')->where('game_map_id', $character->map->game_map_id)->where('npc_owned', true)->get(),
+            'npc_kingdoms'           => Kingdom::select('id', 'x_position', 'y_position', 'npc_owned')->whereNull('character_id')->where('game_map_id', $character->map->game_map_id)->where('npc_owned', true)->get(),
             'other_kingdoms'         => $this->getEnemyKingdoms($character),
-//            'characters_on_map'      => $this->getActiveUsersCountForMap($character),
+            'characters_on_map'      => $this->getActiveUsersCountForMap($character),
 //            'can_mass_embezzle'      => $this->canMassEmbezzle($character, $this->canManage),
 //            'lockedLocationType'     => is_null($lockedLocation) ? null : $lockedLocation->type,
         ];
@@ -198,8 +191,6 @@ class LocationService {
             if ($this->location->is_port) {
                 $this->portDetails = $this->portService->getPortDetails($character, $this->location);
             }
-
-            $this->adventureDetails = $this->location->adventures()->where('published', true)->get();
         }
     }
 
