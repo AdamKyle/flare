@@ -56,7 +56,7 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                     <span>X/Y: 0/0</span>
                     <div className="mt-4 xl:mr-[20px] xl:mt-0">
                         <div className='grid grid-cols-3 gap-1'>
-                            <SuccessOutlineButton additional_css={'text-center'} button_label={'Adventure'} on_click={this.adventure.bind(this)} />
+                            <SuccessOutlineButton additional_css={'text-center px-0'} button_label={'Adventure'} on_click={this.adventure.bind(this)} />
                             <SuccessOutlineButton additional_css={'text-center'} button_label={'Set Sail'} on_click={this.setSail.bind(this)} />
                             <SuccessOutlineButton additional_css={'text-center'} button_label={'Teleport'} on_click={this.teleport.bind(this)} />
                         </div>
