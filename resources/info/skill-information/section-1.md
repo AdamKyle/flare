@@ -2,7 +2,9 @@
 
 -------------------
 
-When creating your character you are given the skills below. Your race and class will always affect your accuracy, your dodge and looting skill.
+When creating your character you are given the skills below. Your race and class can affect your accuracy, your dodge and looting skill.
+
+Players will only be given one class skill which is assigned to their [class](/information/races-and-classes).
 
 **All skills start at level 0 and can to either level 999 or 400 if it's a crafting skill.** 
 

@@ -122,6 +122,20 @@ of drops and thus a lot of Gold Dust.
 
 This will also level, albeit at half the XP, your enchanting skill making it easier to enchant higher end enchantments on to gear.
 
+### XP and Training Skills
+
+As we learned, training skills are skills which you sacrifice some of your Xp towards to level. The difference between Crafting Skills and Training skills is that
+with training skills the XP needed to get to the next level increases over time.
+
+The formula for this growth is simple: Skill level * 100 = xp needed for next level. For example, at level 10 you need 1000 XP.
+
+To help with leveling skills, there are [Enchantments](/information/enchanting) and other items that have boosts towards skill XP including quests that you can do from an [NPC](/information/npcs) called
+The Helpless Goblin that can upgrade found items to better ones giving more XP per kill.
+
+Next, to help, we increase the XP given at specific stages: 25 as a base for levels 1-10, 100 as a base for levels 10-100, 500 for levels 100-500 and finally 750 for levels 500-999.
+
+Add your bonuses on top of this, and you can easily get ~6k XP per kill starting at level 500. Which is still a grind, but not a bad one if you do it with [Exploration](/information/exploration).
+
 > ### ATTN!
 >
 > When you are training a skill, you are effectively using that skill. However, when it comes to skills that are affecting things like looting or 
@@ -141,10 +155,8 @@ For adventures, their skill XP and XP will overflow. So you could gain multiple 
 
 [Learn more about adventuring](/information/adventure).
 
-## Skill XP
+## XP and Crafting skills
 
-When a skill levels there are two ways the next level xp is calculated. That is the xp needed to go from level 2-3 for example.
-
-- **For skills that can be trained**: This value is between 100 and 350 xp needed to level the skill.
-- **For crafting skills**: This value is between 100 and 250xp needed to level that skill.
+As we saw with training skills, the xp and the xp you are rewarded will scale with you as you level. However, crafting XP is different. This is a random number between 100 and 350
+and without bonuses from gear, your base is 20 XP per successful craft, enchant (doubled if you do two and are successful) or use alchemy or disenchant.
 
