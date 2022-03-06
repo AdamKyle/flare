@@ -1,8 +1,8 @@
 import React from "react";
+import EnemyKingdomPin from "./enemy-kingdom-pin";
 import KingdomProps from "../../../lib/game/types/map/kingdom-pins/kingdom-props";
-import KingdomPin from "./kingdom-pin";
 
-export default class Kingdoms extends React.Component<KingdomProps, any> {
+export default class EnemyKingdoms extends React.Component<KingdomProps, any> {
 
     constructor(props: KingdomProps) {
         super(props);
@@ -14,8 +14,10 @@ export default class Kingdoms extends React.Component<KingdomProps, any> {
         }
 
         return this.props.kingdoms.map((kingdom) => {
-            return <KingdomPin kingdom={kingdom}/>
-        })
+            if (this.props.character_id !== kingdom.character_id) {
+                return <EnemyKingdomPin kingdom={kingdom} color={'#e82b13'}/>
+            }
+        });
     }
 
     render() {

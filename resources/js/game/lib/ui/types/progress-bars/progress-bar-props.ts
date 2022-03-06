@@ -1,3 +1,3 @@
 export default interface ProgressBarProps {
-    timeLeft: number;
+    time_remaining: number;
 }

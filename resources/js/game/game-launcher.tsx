@@ -16,7 +16,7 @@ if (game !== null) {
     }
 
     ReactDOM.render(
-        <Game characterId={props.characterId} userId={props.characterId} />,
+        <Game characterId={props.characterId} userId={props.userId} />,
         game
     );
 }

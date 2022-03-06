@@ -1,9 +1,9 @@
 import React from "react";
-import KingdomPinProps from "../../../lib/game/types/map/kingdom-pins/kingdom-pin-props";
+import EnemyKingdomPinProps from "../../../lib/game/types/map/kingdom-pins/enemy-kingdom-pin-props";
 
-export default class KingdomPin extends React.Component<KingdomPinProps, any> {
+export default class EnemyKingdomPin extends React.Component<EnemyKingdomPinProps, {}> {
 
-    constructor(props: KingdomPinProps) {
+    constructor(props: EnemyKingdomPinProps) {
         super(props);
     }
 
@@ -11,7 +11,7 @@ export default class KingdomPin extends React.Component<KingdomPinProps, any> {
         return {
             top: this.props.kingdom.y_position,
             left: this.props.kingdom.x_position,
-            '--kingdom-color': this.props.kingdom.color
+            '--kingdom-color': this.props.color
         };
     }
 
@@ -29,6 +29,6 @@ export default class KingdomPin extends React.Component<KingdomPinProps, any> {
                 onClick={this.openKingdomModal.bind(this)}
             >
             </div>
-       );
+        );
     }
 }

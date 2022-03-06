@@ -9,8 +9,12 @@ import Location from "../components/locations/location";
 import MapActions from "../components/actions/map/map-actions";
 import Kingdoms from "../components/kingdoms/kingdoms";
 import ProgressBar from "../../components/ui/progress-bars/progress-bar";
+import EnemyKingdoms from "../components/kingdoms/enemy-kingdoms";
+import MovePlayer from "../../lib/game/map/ajax/move-player";
 
 export default class MapSection extends React.Component<MapProps, MapState> {
+
+    private mapTimeOut: any;
 
     constructor(props: MapProps) {
         super(props);
@@ -28,11 +32,16 @@ export default class MapSection extends React.Component<MapProps, MapState> {
             locations: null,
             loading: true,
             player_kingdoms: null,
+            enemy_kingdoms: null,
+            time_left: 0,
         }
+
+        // @ts-ignore
+        this.mapTimeOut = Echo.private('show-timeout-move-' + this.props.user_id);
     }
 
     componentDidMount() {
-        (new Ajax()).setRoute('map/' + this.props.characterId)
+        (new Ajax()).setRoute('map/' + this.props.character_id)
                     .doAjaxCall('get', (result: AxiosResponse) => {
             this.setState({
                 loading: false,
@@ -43,9 +52,16 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                     y: result.data.character_map.character_position_y,
                 },
                 player_kingdoms: result.data.my_kingdoms,
+                enemy_kingdoms: result.data.other_kingdoms,
             });
         }, (err: AxiosError) => {
 
+        });
+
+        this.mapTimeOut.listen('Game.Maps.Events.ShowTimeOutEvent', (event: any) => {
+            this.setState({
+                time_left: event.forLength,
+            });
         });
     }
 
@@ -96,8 +112,13 @@ export default class MapSection extends React.Component<MapProps, MapState> {
         return {backgroundImage: `url("${this.state.map_url}")`, backgroundRepeat: 'no-repeat', height: 500, width: 500};
     }
 
-    render() {
+    handleMovePlayer(direction: string) {
+        (new MovePlayer(this)).setCharacterPosition(this.state.character_position)
+                              .setMapPosition(this.state.map_position)
+                              .movePlayer(this.props.character_id, direction);
+    }
 
+    render() {
         if (this.state.loading) {
             return (
                 <Fragment>
@@ -124,7 +145,9 @@ export default class MapSection extends React.Component<MapProps, MapState> {
 
                                 <Location locations={this.state.locations}/>
 
-                                <Kingdoms kingdoms={this.state.player_kingdoms} />
+                                <Kingdoms kingdoms={this.state.player_kingdoms} character_id={this.props.character_id}/>
+
+                                <EnemyKingdoms kingdoms={this.state.enemy_kingdoms} character_id={this.props.character_id}/>
 
                                 <div className="map-x-pin" style={this.playerIcon()}></div>
                             </div>
@@ -132,10 +155,10 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                     </Draggable>
                 </div>
                 <div className='mt-4'>
-                    <MapActions />
+                    <MapActions move_player={this.handleMovePlayer.bind(this)}/>
                 </div>
                 <div className={'mt-3'}>
-                    <ProgressBar timeLeft={10} />
+                    <ProgressBar time_remaining={this.state.time_left} />
                 </div>
             </Fragment>
         )

@@ -61,6 +61,13 @@ class ServiceProvider extends ApplicationServiceProvider
            );
         });
 
+        $this->app->bind(LocationService::class, function($app) {
+            return new LocationService(
+                $app->make(PortService::class),
+                $app->make(CoordinatesCache::class)
+            );
+        });
+
         $this->app->bind(MovementService::class, function($app) {
             return new MovementService(
                 $app->make(PortService::class),
@@ -71,14 +78,8 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(TraverseService::class),
                 $app->make(ConjureService::class),
                 $app->make(BuildMonsterCacheService::class),
+                $app->make(LocationService::class),
                 $app->make(Manager::class),
-            );
-        });
-
-        $this->app->bind(LocationService::class, function($app) {
-            return new LocationService(
-                $app->make(PortService::class),
-                $app->make(CoordinatesCache::class)
             );
         });
 

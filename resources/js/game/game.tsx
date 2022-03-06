@@ -51,7 +51,6 @@ export default class Game extends React.Component<GameProps, GameState> {
     }
 
     render() {
-        console.log(this.state.view_port);
         return (
             <div className="md:container">
                 { this.state.view_port < 1280 && this.state.show_size_message ?
@@ -74,7 +73,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                                 </BasicCard>
                             </div>
                             <BasicCard additionalClasses={'col-start-2 col-end-2 mt-5 md:mt-0 lg:col-start-3 lg:col-end-3'}>
-                                <MapSection characterId={this.props.characterId} view_port={this.state.view_port}/>
+                                <MapSection user_id={this.props.userId} character_id={this.props.characterId} view_port={this.state.view_port}/>
                             </BasicCard>
                         </div>
                     </TabPanel>

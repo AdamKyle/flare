@@ -10,8 +10,6 @@ use App\Game\Maps\Jobs\MoveTimeOutJob;
 class MoveTimeOutListener
 {
 
-    private $time;
-
     /**
      * Handle the event.
      *
@@ -21,7 +19,6 @@ class MoveTimeOutListener
     public function handle(MoveTimeOutEvent $event)
     {
         $character = $event->character;
-        $this->time = $event->timeOut;
 
         if ($event->timeOut !== 0) {
             $time = $event->timeOut - ($event->timeOut * $this->findMovementMinuteTimeReduction($character));
@@ -43,11 +40,11 @@ class MoveTimeOutListener
 
             MoveTimeOutJob::dispatch($character->id)->delay($timeOut);
         } else {
-            $time = 10 - (10 * $this->findMovementTimeReductions($character));
+            $time = 10; //- (10 * $this->findMovementTimeReductions($character));
 
-            if ($time < 1) {
-                $time = 1;
-            }
+//            if ($time < 1) {
+//                $time = 1;
+//            }
 
             $timeOut = now()->addSeconds($time);
 
@@ -61,7 +58,7 @@ class MoveTimeOutListener
             MoveTimeOutJob::dispatch($character->id)->delay($timeOut);
         }
 
-        broadcast(new ShowTimeOutEvent($event->character->user, true, false, $this->time, $event->setSail));
+        broadcast(new ShowTimeOutEvent($event->character->user, true, false, $time, $event->setSail));
     }
 
     protected function findMovementTimeReductions(Character $character) {

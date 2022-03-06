@@ -97,6 +97,8 @@ class MovementService {
      */
     private $buildMonsterCacheService;
 
+    private $locationService;
+
     /**
      * @var Manager $manager
      */
@@ -118,6 +120,7 @@ class MovementService {
                                 TraverseService $traverseService,
                                 ConjureService $conjureService,
                                 BuildMonsterCacheService $buildMonsterCacheService,
+                                LocationService $locationService,
                                 Manager $manager)
     {
         $this->portService                = $portService;
@@ -129,6 +132,7 @@ class MovementService {
         $this->conjureService             = $conjureService;
         $this->buildMonsterCacheService   = $buildMonsterCacheService;
         $this->manager                    = $manager;
+        $this->locationService            = $locationService;
     }
 
     /**
@@ -592,26 +596,9 @@ class MovementService {
 
         $this->attemptConjure($character);
 
-        $this->processArea($character);
-
         $this->updateCharacterMovementTimeOut($character);
 
-        $kingdomDetails = $this->kingdomDetails();
-        $canEmbezzle    = false;
-
-        if (isset($kingdomDetails['can_manage'])) {
-            $canEmbezzle = $this->canMassEmbezzle($character, $kingdomDetails['can_manage']);
-        }
-
-        return $this->successResult([
-            'port_details'       => $this->portDetails(),
-            'adventure_details'  => $this->adventureDetails(),
-            'kingdom_details'    => $kingdomDetails,
-            'celestials'         => $this->celestialEntities(),
-            'characters_on_map'  => $this->getActiveUsersCountForMap($character),
-            'can_mass_embezzle'  => $canEmbezzle,
-            'lockedLocationType' => is_null($lockedLocation) ? null : $lockedLocation->type,
-        ]);
+        return $this->successResult($this->locationService->getLocationData($character));
     }
 
 
