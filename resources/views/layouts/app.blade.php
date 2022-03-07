@@ -108,6 +108,14 @@
 {{--            </div>--}}
 
             @auth
+                <div>
+                    <label class="switch switch_outlined" data-toggle="tooltip" data-tippy-content="Toggle Dark Mode">
+                        <input id="darkModeToggler" type="checkbox">
+                        <span></span>
+                    </label>
+                    <span class="ml-4">Test Dark Mode</span>
+                </div>
+
                 <!-- User Menu -->
                 <div class="dropdown">
                     <button class="flex items-center ltr:ml-4 rtl:mr-4 text-gray-700" data-toggle="custom-dropdown-menu"

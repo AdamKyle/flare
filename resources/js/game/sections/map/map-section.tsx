@@ -40,6 +40,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
             player_kingdoms: null,
             enemy_kingdoms: null,
             npc_kingdoms: null,
+            coordinates: null,
             can_player_move: true,
             characters_on_map: 0,
             time_left: 0,
@@ -174,6 +175,9 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                                 location_with_adventures={this.state.location_with_adventures}
                                 port_location={this.state.port_location}
                                 ports={this.fetchPorts()}
+                                coordinates={this.state.coordinates}
+                                character_position={this.state.character_position}
+                                currencies={this.props.currencies}
                     />
                 </div>
                 <div className={'mt-3'}>

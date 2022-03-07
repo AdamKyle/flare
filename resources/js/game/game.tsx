@@ -120,7 +120,12 @@ export default class Game extends React.Component<GameProps, GameState> {
                                                         : null
                                                 }
 
-                                                <MapSection user_id={this.props.userId} character_id={this.props.characterId} view_port={this.state.view_port}/>
+                                                <MapSection
+                                                    user_id={this.props.userId}
+                                                    character_id={this.props.characterId}
+                                                    view_port={this.state.view_port}
+                                                    currencies={this.state.character_currencies}
+                                                />
                                             </Fragment>
                                     }
                                 </Fragment>

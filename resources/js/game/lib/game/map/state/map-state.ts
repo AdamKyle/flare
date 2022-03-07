@@ -18,6 +18,8 @@ export default interface MapState {
 
     npc_kingdoms: {id: number, x_position: number, y_position: number, npc_owned: boolean}[] | null;
 
+    coordinates: {x: number[], y: number[]} | null;
+
     can_player_move: boolean,
 
     time_left: number,

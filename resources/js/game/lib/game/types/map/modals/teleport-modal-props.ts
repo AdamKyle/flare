@@ -2,5 +2,14 @@ import DialogueTypes from "../../../../ui/types/dialogue/dialogue-types";
 
 export default interface TeleportModalProps extends DialogueTypes {
 
-    ports: { id: number, is_port: boolean, x: number, y: number, name: string, adventures: {name: string, id: number}[]}[] | null;
+    coordinates: {x: number[], y: number[]} | null;
+
+    character_position: { x: number, y: number },
+
+    currencies: {
+        gold: number,
+        shards: number,
+        gold_dust: number,
+        copper_coins: number,
+    } | null;
 }

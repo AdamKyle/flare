@@ -103,7 +103,7 @@ class LocationService {
 //            'adventure_completed_at' => $character->can_adventure_again_at,
 //            'inventory_sets'         => $this->getSets($character),
 //            'is_dead'                => $character->is_dead,
-//            'teleport'               => $this->coordinatesCache->getFromCache(),
+            'coordinates'             => $this->coordinatesCache->getFromCache(),
 //            'celestials'             => $this->getCelestialEntity($character),
 //            'can_settle_kingdom'     => $this->canSettle,
 //            'can_attack_kingdom'     => $this->canAttack,

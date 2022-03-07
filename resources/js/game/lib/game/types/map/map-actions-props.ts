@@ -11,4 +11,15 @@ export default interface MapActionsProps {
     port_location: { id: number, is_port: boolean, x: number, y: number, name: string, adventures: {id: number, name:string}[] } | null;
 
     ports: { id: number, is_port: boolean, x: number, y: number, name: string, adventures: {id: number, name:string}[] }[] | null;
+
+    coordinates: {x: number[], y: number[]} | null;
+
+    character_position: {x: number, y: number};
+
+    currencies: {
+        gold: number,
+        shards: number,
+        gold_dust: number,
+        copper_coins: number,
+    } | null;
 }

@@ -26,6 +26,7 @@ export default class MapStateManager {
             characters_on_map: data.characters_on_map,
             location_with_adventures: null,
             port_location: null,
+            coordinates: data.coordinates,
         }
     }
 

@@ -1,6 +1,7 @@
 import React, {Fragment} from "react";
 import { Dialog, Transition } from '@headlessui/react'
 import DialogueTypes from "../../../lib/ui/types/dialogue/dialogue-types";
+import DangerButton from "../buttons/danger-button";
 
 export default class Dialogue extends React.Component<DialogueTypes, any> {
     constructor(props: DialogueTypes) {
@@ -11,14 +12,18 @@ export default class Dialogue extends React.Component<DialogueTypes, any> {
         this.props.handle_close();
     }
 
+    emptyClose(){}
+
     render() {
         return (
             <Transition appear show={this.props.is_open} as={Fragment}>
                 <Dialog
                     as="div"
                     className="fixed inset-0 z-10 overflow-y-auto"
-                    onClose={this.closeModal.bind(this)}
+                    onClose={this.emptyClose.bind(this)}
                 >
+                    <Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
+
                     <div className="min-h-screen px-4 text-center">
                         <Transition.Child
                             as={Fragment}
@@ -48,25 +53,22 @@ export default class Dialogue extends React.Component<DialogueTypes, any> {
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <div className="inline-block w-full max-w-lg p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-gray-200 dark:bg-gray-700 drop-shadow-2xl rounded-md">
+                            <div className="inline-block w-full max-w-3xl p-6 my-8 overflow text-left align-middle transition-all transform bg-white dark:bg-gray-700 drop-shadow-2xl rounded-md">
                                 <Dialog.Title
                                     as="h3"
-                                    className="text-lg font-medium leading-6 text-gray-900"
+                                    className="flex items-center text-lg font-medium leading-6 text-gray-700 dark:text-gray-500 relative mb-5"
                                 >
                                     {this.props.title}
+                                    <button className='flex items-center absolute right-[20px] cursor-pointer hover:text-gray-800 dark:hover:text-gray-600' onClick={this.closeModal.bind(this)}><i className="fas fa-times "></i></button>
                                 </Dialog.Title>
                                 <div className="mt-2">
+                                    <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                                     {this.props.children}
                                 </div>
-
+                                <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                                 <div className="mt-4">
-                                    <button
-                                        type="button"
-                                        className="inline-flex justify-center px-4 py-2 text-sm font-medium text-blue-900 bg-blue-100 border border-transparent rounded-md hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
-                                        onClick={this.closeModal.bind(this)}
-                                    >
-                                        Got it, thanks!
-                                    </button>
+
+                                    <DangerButton button_label={'Cancel'} on_click={this.closeModal.bind(this)} />
                                 </div>
                             </div>
                         </Transition.Child>

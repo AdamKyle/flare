@@ -99,7 +99,12 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
 
                 {
                     this.state.open_teleport_modal ?
-                        <TeleportModal is_open={this.state.open_teleport_modal} handle_close={this.manageTeleportModal.bind(this)} title={'Teleport'} ports={this.props.ports} />
+                        <TeleportModal is_open={this.state.open_teleport_modal}
+                                       handle_close={this.manageTeleportModal.bind(this)}
+                                       title={'Teleport'} coordinates={this.props.coordinates}
+                                       character_position={this.props.character_position}
+                                       currencies={this.props.currencies}
+                        />
                     : null
                 }
             </Fragment>
