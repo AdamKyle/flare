@@ -4,6 +4,8 @@ import PrimaryButton from "../../../../components/ui/buttons/primary-button";
 import SuccessOutlineButton from "../../../../components/ui/buttons/success-outline-button";
 import MapActionsState from "../../../../lib/game/types/map/map-actions-state";
 import PrimaryOutlineButton from "../../../../components/ui/buttons/primary-outline-button";
+import clsx from 'clsx';
+import TeleportModal from "../modals/teleport-modal";
 
 export default class MapActions extends React.Component<MapActionsProps, MapActionsState> {
 
@@ -12,6 +14,7 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
 
         this.state = {
             is_movement_disabled: false,
+            open_teleport_modal: false,
         }
     }
 
@@ -33,6 +36,12 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
         })
     }
 
+    manageTeleportModal() {
+        this.setState({
+            open_teleport_modal: !this.state.open_teleport_modal,
+        });
+    }
+
     adventure() {
 
     }
@@ -42,7 +51,7 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
     }
 
     teleport() {
-
+        this.manageTeleportModal()
     }
 
     openPlaneQuests() {
@@ -59,10 +68,20 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                 <div className='grid xl:grid-cols-2'>
                     <span>X/Y: 0/0</span>
                     <div className='xl:mr-[24px]'>
-                        <div className='grid grid-cols-3 gap-1'>
-                            <SuccessOutlineButton additional_css={'text-center px-0'} button_label={'Adventure'} on_click={this.adventure.bind(this)} />
-                            <SuccessOutlineButton additional_css={'text-center'} button_label={'Set Sail'} on_click={this.setSail.bind(this)} />
-                            <SuccessOutlineButton additional_css={'text-center'} button_label={'Teleport'} on_click={this.teleport.bind(this)} />
+                        <div className={'grid grid-cols-3 gap-1'}>
+                            {
+                                this.props.location_with_adventures !== null ?
+                                    <SuccessOutlineButton additional_css={'text-center px-0'} button_label={'Adventure'} on_click={this.adventure.bind(this)} />
+                                : null
+                            }
+
+                            {
+                                this.props.port_location !== null ?
+                                    <SuccessOutlineButton additional_css={'text-center'} button_label={'Set Sail'} on_click={this.setSail.bind(this)} />
+                                    : null
+                            }
+
+                            <SuccessOutlineButton additional_css={clsx('text-center', {'col-start-3 col-end-3': this.props.location_with_adventures === null && this.props.port_location === null }, {'col-start-3 col-end-3': this.props.location_with_adventures !== null || this.props.port_location !== null })} button_label={'Teleport'} on_click={this.teleport.bind(this)} />
                         </div>
                     </div>
                 </div>
@@ -77,6 +96,12 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                     <PrimaryButton disabled={this.state.is_movement_disabled} button_label={'East'} on_click={() => this.move('east')} />
                     <PrimaryButton disabled={this.state.is_movement_disabled} button_label={'Traverse'} on_click={() => this.traverse()} />
                 </div>
+
+                {
+                    this.state.open_teleport_modal ?
+                        <TeleportModal is_open={this.state.open_teleport_modal} handle_close={this.manageTeleportModal.bind(this)} title={'Teleport'} ports={this.props.ports} />
+                    : null
+                }
             </Fragment>
         )
     }

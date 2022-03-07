@@ -23,7 +23,9 @@ export default class MapStateManager {
             npc_kingdoms: data.npc_kingdoms,
             can_player_move: data.can_move,
             time_left: this.getTimeLeftInSeconds(data).toFixed(0),
-            characters_on_map: data.characters_on_map
+            characters_on_map: data.characters_on_map,
+            location_with_adventures: null,
+            port_location: null,
         }
     }
 

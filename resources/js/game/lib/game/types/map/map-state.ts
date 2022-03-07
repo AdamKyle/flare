@@ -9,7 +9,11 @@ export default interface MapState {
 
     right_bounds:  number,
 
-    locations: { id: number, is_port: boolean, x: number, y: number, name: string }[] | null;
+    locations: { id: number, is_port: boolean, x: number, y: number, name: string, adventures: {name: string, id: number}[]}[] | null;
+
+    location_with_adventures: { id: number, is_port: boolean, x: number, y: number, name: string, adventures: {id: number, name:string}[] } | null;
+
+    port_location: { id: number, is_port: boolean, x: number, y: number, name: string, adventures: {id: number, name:string}[] } | null;
 
     loading: boolean;
 

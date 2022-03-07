@@ -14,6 +14,7 @@ import MovePlayer from "../../lib/game/map/ajax/move-player";
 import MapStateManager from "../../lib/game/map/state/map-state-manager";
 import NpcKingdoms from "../components/kingdoms/npc-kingdoms";
 import ComponentLoading from "../../components/ui/loading/component-loading";
+import {getLocationWithAdventures, getPortLocation} from "../../lib/game/map/location-helpers";
 
 export default class MapSection extends React.Component<MapProps, MapState> {
 
@@ -33,6 +34,8 @@ export default class MapSection extends React.Component<MapProps, MapState> {
             bottom_bounds: 0,
             right_bounds: 0,
             locations: null,
+            location_with_adventures: null,
+            port_location: null,
             loading: true,
             player_kingdoms: null,
             enemy_kingdoms: null,
@@ -51,6 +54,9 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                     .doAjaxCall('get', (result: AxiosResponse) => {
 
             let state = {...MapStateManager.setState(result.data), ...{loading: false}};
+
+            state.location_with_adventures = getLocationWithAdventures(state);
+            state.port_location = getPortLocation(state);
 
             this.setState(state);
         }, (err: AxiosError) => {
@@ -89,6 +95,15 @@ export default class MapSection extends React.Component<MapProps, MapState> {
         }
 
         return -110
+    }
+
+    fetchPorts() {
+
+        if (this.state.locations === null) {
+            return null;
+        }
+
+        return this.state.locations.filter((location) => location.is_port && location.x !== this.state.character_position.x && location.y !== this.state.character_position.y);
     }
 
     handleDrag(e: any, position: {x: number, y: number}) {
@@ -153,7 +168,13 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                     </Draggable>
                 </div>
                 <div className='mt-4'>
-                    <MapActions move_player={this.handleMovePlayer.bind(this)} can_player_move={this.state.can_player_move} players_on_map={this.state.characters_on_map}/>
+                    <MapActions move_player={this.handleMovePlayer.bind(this)}
+                                can_player_move={this.state.can_player_move}
+                                players_on_map={this.state.characters_on_map}
+                                location_with_adventures={this.state.location_with_adventures}
+                                port_location={this.state.port_location}
+                                ports={this.fetchPorts()}
+                    />
                 </div>
                 <div className={'mt-3'}>
                     <ProgressBar time_remaining={this.state.time_left} />

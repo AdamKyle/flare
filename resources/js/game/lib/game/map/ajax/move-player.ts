@@ -4,6 +4,7 @@ import {generateServerMessage} from "../../../ajax/generate-server-message";
 import Ajax from "../../../ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
 import MapStateManager from "../state/map-state-manager";
+import {getLocationWithAdventures, getPortLocation} from "../location-helpers";
 
 export default class MovePlayer {
 
@@ -61,6 +62,9 @@ export default class MovePlayer {
             state.character_position.x = playerPosition.x;
             state.character_position.y = playerPosition.y;
 
+            state.location_with_adventures = getLocationWithAdventures(state);
+            state.port_location = getPortLocation(state);
+
             this.component.setState(state);
         }, (error: AxiosError) => {
             const response = error.response;
@@ -77,3 +81,4 @@ export default class MovePlayer {
         })
     }
 }
+
