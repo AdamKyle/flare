@@ -10,7 +10,7 @@ export default class PrimaryOutlineButton extends React.Component<ButtonProps, {
 
     render() {
         return (
-          <button className={'border-b-2 border-b-blue-500 hover:border-2 hover:rounded-sm hover:border-blue-600 hover:bg-blue-500 hover:cursor-pointer hover:text-white px-2 ' + this.props.additional_css}
+          <button className={'py-2 px-3 text-xs border-blue-800 border-2 font-medium text-center text-gray-900 dark:text-gray-200 hover:text-gray-200 dark:hover:text-gray-300 hover:bg-blue-900 rounded-sm focus:ring-4 focus:ring-blue-300 dark:hover:bg-blue-600 dark:focus:ring-blue-800 ' + this.props.additional_css}
                onClick={this.props.on_click}
           >
               {this.props.button_label}
