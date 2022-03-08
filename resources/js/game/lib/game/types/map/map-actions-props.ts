@@ -1,16 +1,20 @@
+import LocationDetails from "../../map/types/location-details";
+
 export default interface MapActionsProps {
 
     move_player: (direction: string) => void,
+
+    teleport_player: (data: {x: number, y: number, cost: number, timeout: number}) => void
 
     can_player_move: boolean,
 
     players_on_map: number,
 
-    location_with_adventures: { id: number, is_port: boolean, x: number, y: number, name: string, adventures: {id: number, name:string}[] } | null;
+    location_with_adventures: LocationDetails | null;
 
-    port_location: { id: number, is_port: boolean, x: number, y: number, name: string, adventures: {id: number, name:string}[] } | null;
+    port_location: LocationDetails| null;
 
-    ports: { id: number, is_port: boolean, x: number, y: number, name: string, adventures: {id: number, name:string}[] }[] | null;
+    ports: LocationDetails[] | null;
 
     coordinates: {x: number[], y: number[]} | null;
 

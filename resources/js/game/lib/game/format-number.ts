@@ -5,6 +5,17 @@
  * @return number
  * @type [{number: string}]
  */
-export const formatNumber = (number: string): number => {
+export const removeCommas = (number: string): number => {
     return parseInt(number.replace(/,/g, ''));
+}
+
+/**
+ * Turns a number into a comma serpeated string.
+ *
+ * @param number
+ * @return string
+ * @type [{number: number}]
+ */
+export const formatNumber = (number: number): string => {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }

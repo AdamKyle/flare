@@ -1,6 +1,17 @@
 import DialogueTypes from "../../../../ui/types/dialogue/dialogue-types";
+import {ClassArray, ClassDictionary} from "clsx";
 
-export default interface TeleportModalProps extends DialogueTypes {
+export type ClassValue = ClassArray | ClassDictionary | string | number | null | boolean | undefined;
+
+export default interface TeleportModalProps  {
+
+    is_open: boolean;
+
+    handle_close: () => void;
+
+    handle_action: (args: any) => void;
+
+    title: string;
 
     coordinates: {x: number[], y: number[]} | null;
 
@@ -12,4 +23,6 @@ export default interface TeleportModalProps extends DialogueTypes {
         gold_dust: number,
         copper_coins: number,
     } | null;
+
+    teleport_player: (data: {x: number, y: number, cost: number, timeout: number}) => void
 }

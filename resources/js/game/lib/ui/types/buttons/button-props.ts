@@ -6,5 +6,5 @@ export default interface ButtonProps {
 
     button_label: string,
 
-    on_click: () => void;
+    on_click: (args: any) => void;
 }

@@ -2,6 +2,7 @@ import React, {Fragment, SyntheticEvent} from "react";
 import LocationProps from "../../../lib/game/types/map/location-pins/location-props";
 import LocationPin from "./location-pin";
 import LocationState from "../../../lib/game/types/map/location-pins/location-state";
+import LocationModal from "./modals/location-modal";
 
 export default class Location extends React.Component<LocationProps, LocationState> {
 
@@ -13,6 +14,13 @@ export default class Location extends React.Component<LocationProps, LocationSta
             location: null,
         }
 
+    }
+
+    closeLocationDetails() {
+        this.setState({
+            open_location_modal: false,
+            location: null,
+        });
     }
 
     openLocationDetails(locationId: number) {
@@ -57,6 +65,22 @@ export default class Location extends React.Component<LocationProps, LocationSta
     }
 
     render() {
-        return this.renderLocationPins();
+        return (
+            <Fragment>
+                {this.renderLocationPins()}
+                {
+                    this.state.open_location_modal && typeof this.state.location !== 'undefined' && this.state.location !== null ?
+                        <LocationModal is_open={this.state.open_location_modal}
+                                       handle_close={this.closeLocationDetails.bind(this)}
+                                       title={this.state.location.name}
+                                       location={this.state.location}
+                                       character_position={this.props.character_position}
+                                       currencies={this.props.currencies}
+                        />
+                    : null
+                }
+
+            </Fragment>
+        );
     }
 }

@@ -67,18 +67,39 @@ export default class MovePlayer {
 
             this.component.setState(state);
         }, (error: AxiosError) => {
-            const response = error.response;
-
-            if (typeof response === 'undefined') {
-                return;
-            }
-
-            if (response.status === 401) {
-                return location.reload();
-            }
-
-            return generateServerMessage('cannot_walk_on_water', response.data.message);
+            this.handleErrors(error);
         })
+    }
+
+    teleportPlayer(data: {x: number, y: number, cost: number, timeout: number}, characterId: number) {
+        (new Ajax()).setRoute('map/teleport/' + characterId).setParameters(data)
+            .doAjaxCall('post', (result: AxiosResponse) => {
+                let state = {...MapStateManager.setState(result.data), ...this.component.state};
+
+                state.character_position.x = data.x;
+                state.character_position.y = data.y;
+
+                state.location_with_adventures = getLocationWithAdventures(state);
+                state.port_location = getPortLocation(state);
+
+                this.component.setState(state);
+            }, (error: AxiosError) => {
+                this.handleErrors(error);
+            });
+    }
+
+    handleErrors(error: AxiosError) {
+        const response = error.response;
+
+        if (typeof response === 'undefined') {
+            return;
+        }
+
+        if (response.status === 401) {
+            return location.reload();
+        }
+
+        return generateServerMessage('cannot_walk_on_water', response.data.message);
     }
 }
 

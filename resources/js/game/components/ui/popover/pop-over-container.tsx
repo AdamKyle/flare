@@ -18,6 +18,7 @@ export default class PopOverContainer extends React.Component<PopOverContainerPr
                             <Popover.Button className='text-blue-500 dark:text-blue-300'>
                                 <i className={this.props.icon}></i> {this.props.icon_label}
                             </Popover.Button>
+                            <Popover.Overlay className="bg-black opacity-30 fixed inset-0" />
                             <Transition
                                 as={Fragment}
                                 enter="transition ease-out duration-200"
@@ -28,7 +29,7 @@ export default class PopOverContainer extends React.Component<PopOverContainerPr
                                 leaveTo="opacity-0 translate-y-1"
                             >
                                 <Popover.Panel
-                                    className="absolute z-50 w-screen max-w-sm px-4 mt-3 transform -translate-x-3/4 md:-translate-x-1/2 left-1/2 sm:px-0 lg:max-w-3xl">
+                                    className={'absolute z-50 w-screen max-w-sm px-4 mt-3 transform -translate-x-3/4 md:-translate-x-1/2 left-1/2 sm:px-0 lg:max-w-3xl ' + this.props.additional_css}>
                                     <div
                                         className="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
                                         <div className="relative bg-white dark:bg-gray-700 p-7">

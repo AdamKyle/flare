@@ -66,7 +66,7 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
         return (
             <Fragment>
                 <div className='grid xl:grid-cols-2'>
-                    <span>X/Y: 0/0</span>
+                    <span>X/Y: {this.props.character_position.x}/{this.props.character_position.y}</span>
                     <div className='xl:mr-[24px]'>
                         <div className={'grid grid-cols-3 gap-1'}>
                             {
@@ -100,7 +100,9 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                 {
                     this.state.open_teleport_modal ?
                         <TeleportModal is_open={this.state.open_teleport_modal}
+                                       teleport_player={this.props.teleport_player}
                                        handle_close={this.manageTeleportModal.bind(this)}
+                                       handle_action={this.props.teleport_player}
                                        title={'Teleport'} coordinates={this.props.coordinates}
                                        character_position={this.props.character_position}
                                        currencies={this.props.currencies}

@@ -4,6 +4,8 @@ import TeleportModalProps from "../../../../lib/game/types/map/modals/teleport-m
 import Select from "react-select";
 import clsx from "clsx";
 import PopOverContainer from "../../../../components/ui/popover/pop-over-container";
+import {fetchCost} from "../../../../lib/game/map/teleportion-costs";
+import {formatNumber} from "../../../../lib/game/format-number";
 
 
 export default class TeleportModal extends React.Component<TeleportModalProps, any> {
@@ -12,13 +14,13 @@ export default class TeleportModal extends React.Component<TeleportModalProps, a
         super(props);
 
         this.state = {
-            x_position: 0,
-            y_position: 0,
+            x_position: this.props.character_position.x,
+            y_position: this.props.character_position.y,
             character_position: {
                 x: this.props.character_position.x, y: this.props.character_position.y
             },
             cost: 0,
-            can_afford: true,
+            can_afford: false,
             distance: 0,
             time_out: 0,
         }
@@ -28,58 +30,22 @@ export default class TeleportModal extends React.Component<TeleportModalProps, a
         this.setState({
             x_position: data.value,
         }, () => {
-            this.fetchCost();
+            let state = fetchCost(this.state.x_position, this.state.y_position, this.state.character_position, this.props.currencies);
+
+            console.log(state);
+            this.setState(state);
         });
     }
 
     setYPosition(data: any) {
         this.setState({
             y_position: data.value,
-            cost: this.calculateDistance() * 1000,
         }, () => {
-            this.fetchCost();
+            this.setState(fetchCost(this.state.x_position, this.state.y_positon, this.state.character_position, this.props.currencies));
         });
     }
 
-    fetchCost() {
-        const distance = this.calculateDistance();
-        const time     = Math.round(distance / 60);
-        const cost     = time * 1000;
-        let canAfford  = true;
 
-        if (this.props.currencies == null) {
-            canAfford = false;
-        } else {
-            if (cost > this.props.currencies.gold) {
-                canAfford = false;
-            }
-        }
-
-        this.setState({
-            can_afford: canAfford,
-            distance: distance,
-            cost: cost,
-            time_out: time,
-        });
-    }
-
-    calculateDistance(): number {
-        if (this.state.x_position === 0 && this.state.y_position === 0) {
-            return 0;
-        }
-
-        const distanceX = Math.pow((this.state.x_position - this.state.character_position.x), 2);
-        const distanceY = Math.pow((this.state.y_position - this.state.character_position.y), 2);
-
-        let distance = distanceX + distanceY;
-        distance = Math.sqrt(distance);
-
-        if (isNaN(distance)) {
-            return 0;
-        }
-
-        return Math.round(distance);
-    }
 
     buildCoordinates(type: string): {value: number, label: string}[]|[] {
         if (this.props.coordinates !== null) {
@@ -102,9 +68,26 @@ export default class TeleportModal extends React.Component<TeleportModalProps, a
         });
     }
 
+    teleportPlayer() {
+        this.props.teleport_player({
+            x: this.state.x_position,
+            y: this.state.y_position,
+            cost: this.state.cost,
+            timeout: this.state.time_out
+        });
+    }
+
     render() {
         return (
-            <Dialogue is_open={this.props.is_open} handle_close={this.props.handle_close} title={this.props.title}>
+            <Dialogue is_open={this.props.is_open}
+                      handle_close={this.props.handle_close}
+                      title={this.props.title}
+                      secondary_actions={{
+                          handle_action: this.teleportPlayer.bind(this),
+                          secondary_button_disabled: !this.state.can_afford,
+                          secondary_button_label: 'Teleport',
+                      }}
+            >
                 <div className='grid grid-cols-2'>
                     <div className='flex items-center'>
                         <label className='w-[20px]'>X</label>
@@ -116,6 +99,7 @@ export default class TeleportModal extends React.Component<TeleportModalProps, a
                                 menuPlacement={'bottom'}
                                 styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999, color: '#000000' }) }}
                                 menuPortalTarget={document.body}
+                                defaultValue={{label: this.state.x_position, value: this.state.x_position}}
                             />
                         </div>
                     </div>
@@ -130,6 +114,7 @@ export default class TeleportModal extends React.Component<TeleportModalProps, a
                                 menuPlacement={'bottom'}
                                 styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999, color: '#000000' }) }}
                                 menuPortalTarget={document.body}
+                                defaultValue={{label: this.state.y_position, value: this.state.y_position}}
                             />
                         </div>
                     </div>
@@ -141,11 +126,12 @@ export default class TeleportModal extends React.Component<TeleportModalProps, a
                 <dl>
                     <dt>Cost in Gold:</dt>
                     <dd className={clsx(
-                        {'text-green-600' : this.state.can_afford},
-                        {'text-red-600': !this.state.ca_afford}
-                    )}>{this.state.cost}</dd>
+                        {'text-gray-700': this.state.cost === 0},
+                        {'text-green-600' : this.state.can_afford && this.state.cost > 0},
+                        {'text-red-600': !this.state.ca_afford && this.state.cost > 0}
+                    )}>{formatNumber(this.state.cost)}</dd>
                     <dt>Distance:</dt>
-                    <dd>{this.state.distance}</dd>
+                    <dd>{this.state.distance} Miles</dd>
                     <dt>Timeout for:</dt>
                     <dd className='flex items-center'>
                         <span>{this.state.time_out} Minutes</span>

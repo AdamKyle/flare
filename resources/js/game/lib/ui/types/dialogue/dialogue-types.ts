@@ -4,5 +4,12 @@ export default interface DialogueTypes {
 
     handle_close: () => void;
 
+
+    secondary_actions?: {
+        secondary_button_disabled: boolean;
+        secondary_button_label: string;
+        handle_action: (args: any) => void;
+    }
+
     title: string;
 }

@@ -2,6 +2,7 @@ import React, {Fragment} from "react";
 import { Dialog, Transition } from '@headlessui/react'
 import DialogueTypes from "../../../lib/ui/types/dialogue/dialogue-types";
 import DangerButton from "../buttons/danger-button";
+import PrimaryButton from "../buttons/primary-button";
 
 export default class Dialogue extends React.Component<DialogueTypes, any> {
     constructor(props: DialogueTypes) {
@@ -69,6 +70,13 @@ export default class Dialogue extends React.Component<DialogueTypes, any> {
                                 <div className="mt-4">
 
                                     <DangerButton button_label={'Cancel'} on_click={this.closeModal.bind(this)} />
+
+                                    {
+                                        typeof this.props.secondary_actions !== 'undefined' ?
+                                         <PrimaryButton additional_css={'ml-2'} button_label={this.props.secondary_actions.secondary_button_label} on_click={this.props.secondary_actions.handle_action} disabled={this.props.secondary_actions.secondary_button_disabled}/>
+                                        : null
+                                    }
+
                                 </div>
                             </div>
                         </Transition.Child>

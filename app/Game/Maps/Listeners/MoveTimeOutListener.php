@@ -25,10 +25,10 @@ class MoveTimeOutListener
 
             if ($time < 1) {
                 $timeOut    = now()->addMinute();
-                $this->time = 1;
+                $time = 1 * 60;
             } else {
                 $timeOut    = now()->addMinutes($time);
-                $this->time = $time;
+                $time = $time * 60;
             }
 
             $character->update([
@@ -40,11 +40,11 @@ class MoveTimeOutListener
 
             MoveTimeOutJob::dispatch($character->id)->delay($timeOut);
         } else {
-            $time = 10; //- (10 * $this->findMovementTimeReductions($character));
+            $time = (10 * $this->findMovementTimeReductions($character));
 
-//            if ($time < 1) {
-//                $time = 1;
-//            }
+            if ($time < 1) {
+                $time = 1;
+            }
 
             $timeOut = now()->addSeconds($time);
 

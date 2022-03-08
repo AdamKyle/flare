@@ -441,13 +441,9 @@ class MovementService {
 
         $character = $character->refresh();
 
-        $this->processArea($character);
-
         $this->teleportCharacter($character, $timeout, $cost, $pctCommand);
 
-        return $this->successResult([
-            'lockedLocationType' => is_null($lockedLocation) ? null : $lockedLocation->type,
-        ]);
+        return $this->successResult($this->locationService->getLocationData($character));
     }
 
     /**

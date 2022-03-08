@@ -1,4 +1,10 @@
+import LocationDetails from "../../../map/types/location-details";
+
 export default interface LocationProps {
 
-    locations: { id: number, is_port: boolean, x: number, y: number, name: string }[] | null;
+    locations: LocationDetails[] | null;
+
+    character_position: {x: number, y: number};
+
+    currencies: {gold: number, gold_dust: number, shards: number, copper_coins: number} | null
 }

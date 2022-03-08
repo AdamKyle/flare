@@ -4,7 +4,7 @@ import CharacterTopSectionState from "../../lib/game/character-top-section/chara
 import ComponentLoading from "../../components/ui/loading/component-loading";
 import Ajax from "../../lib/ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
-import {formatNumber} from "../../lib/game/format-number";
+import {removeCommas} from "../../lib/game/format-number";
 
 export default class CharacterTopSection extends React.Component<CharacterTopSectionProps, CharacterTopSectionState> {
     constructor(props: CharacterTopSectionProps) {
@@ -37,10 +37,10 @@ export default class CharacterTopSection extends React.Component<CharacterTopSec
                 });
 
                this.props.update_character_currencies({
-                   gold: formatNumber(result.data.sheet.gold),
-                   gold_dust: formatNumber(result.data.sheet.gold_dust),
-                   shards: formatNumber(result.data.sheet.shards),
-                   copper_coins: formatNumber(result.data.sheet.copper_coins),
+                   gold: removeCommas(result.data.sheet.gold),
+                   gold_dust: removeCommas(result.data.sheet.gold_dust),
+                   shards: removeCommas(result.data.sheet.shards),
+                   copper_coins: removeCommas(result.data.sheet.copper_coins),
                });
            });
         }, (err: AxiosError) => {
@@ -155,7 +155,7 @@ export default class CharacterTopSection extends React.Component<CharacterTopSec
                                 <div className='py-1'><strong>Focus</strong>: {this.abbreviateNumber(this.state.character?.focus_modded)}</div>
                             </div>
                             <div>
-                                <div className='py-1'><strong>Agility</strong>:{this.abbreviateNumber(this.state.character?.agi_modded)}</div>
+                                <div className='py-1'><strong>Agility</strong>: {this.abbreviateNumber(this.state.character?.agi_modded)}</div>
                             </div>
                         </div>
                     </div>

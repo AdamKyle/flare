@@ -1,5 +1,6 @@
 import MapState from "../types/map/map-state";
 import MapStateManager from './state/map-state';
+import LocationDetails from "./types/location-details";
 
 /**
  * Gets a location that contains adventures based on the characters current position.
@@ -8,7 +9,7 @@ import MapStateManager from './state/map-state';
  * @return location or null
  * @type [{mapState: MapState}]
  */
-export const getLocationWithAdventures = (mapState: MapState | MapStateManager): {id: number, is_port: boolean, x: number, y: number, name: string, adventures: {name: string, id: number}[]} | null => {
+export const getLocationWithAdventures = (mapState: MapState | MapStateManager): LocationDetails | null => {
 
     if (mapState.locations === null) {
         return null;
@@ -30,7 +31,7 @@ export const getLocationWithAdventures = (mapState: MapState | MapStateManager):
  * @return location or null
  * @type [{mapState: MapState}]
  */
-export const getPortLocation = (mapState: MapState | MapStateManager): {id: number, is_port: boolean, x: number, y: number, name: string, adventures: {name: string, id: number}[]} | null => {
+export const getPortLocation = (mapState: MapState | MapStateManager): LocationDetails | null => {
 
     if (mapState.locations === null) {
         return null;

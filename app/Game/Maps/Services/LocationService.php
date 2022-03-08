@@ -151,7 +151,7 @@ class LocationService {
         return $locations->transform(function($location) {
 
             $location->increases_enemy_stats_by      = null;
-            $location->increase_enemty_percentage_by = null;
+            $location->increase_enemy_percentage_by  = null;
 
             if (!is_null($location->enemy_strength_type)) {
                 $location->increases_enemy_stats_by     = LocationEffectValue::getIncreaseByAmount($location->enemy_strength_type);

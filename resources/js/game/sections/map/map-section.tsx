@@ -134,6 +134,10 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                               .movePlayer(this.props.character_id, direction);
     }
 
+    handleTeleportPlayer(data: {x: number, y: number, cost: number, timeout: number}) {
+        (new MovePlayer(this)).teleportPlayer(data, this.props.character_id);
+    }
+
     render() {
         if (this.state.loading) {
             return <ComponentLoading />
@@ -155,7 +159,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                             <div className='handle game-map'
                                  style={this.getStyle()}>
 
-                                <Location locations={this.state.locations}/>
+                                <Location locations={this.state.locations} character_position={this.state.character_position} currencies={this.props.currencies} />
 
                                 <Kingdoms kingdoms={this.state.player_kingdoms} character_id={this.props.character_id}/>
 
@@ -170,6 +174,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                 </div>
                 <div className='mt-4'>
                     <MapActions move_player={this.handleMovePlayer.bind(this)}
+                                teleport_player={this.handleTeleportPlayer.bind(this)}
                                 can_player_move={this.state.can_player_move}
                                 players_on_map={this.state.characters_on_map}
                                 location_with_adventures={this.state.location_with_adventures}

@@ -1,4 +1,4 @@
-import React, {Fragment} from "react";
+ import React, {Fragment} from "react";
 import ProgressBarProps from "../../../lib/ui/types/progress-bars/progress-bar-props";
 import ProgressBarState from "../../../lib/ui/types/progress-bars/progress-bar-state";
 
@@ -83,9 +83,9 @@ export default class ProgressBar extends React.Component<ProgressBarProps, Progr
             time = newTime;
         }
 
-        if (time / 3600 > 1) {
+        if (time / 3600 >= 1) {
             label = 'hour(s)'
-        } else if (time / 60 > 1) {
+        } else if (time / 60 >= 1) {
             label = 'minute(s)';
         }
 
@@ -95,9 +95,9 @@ export default class ProgressBar extends React.Component<ProgressBarProps, Progr
     getTimeLabel(newTime: number): number {
         let timeLeftLabel = newTime;
 
-        if (newTime / 3600 > 1) {
+        if (newTime / 3600 >= 1) {
             timeLeftLabel = parseInt((newTime / 3600).toFixed(0));
-        } else if (newTime / 60 > 1) {
+        } else if (newTime / 60 >= 1) {
             timeLeftLabel = parseInt((newTime / 60).toFixed(0));
         }
 
