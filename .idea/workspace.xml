@@ -1,31 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="AutoImportSettings">
-    <option name="autoReloadType" value="SELECTIVE" />
-  </component>
   <component name="ChangeListManager">
-    <list default="true" id="b57f583e-608e-4ca2-947d-cf9ab46f7914" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="f574dce8-e67f-47ee-8bb6-fe6b7dafab2a" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/composer.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ComposerSettings" doNotAsk="true" synchronizationState="DONT_SYNCHRONIZE">
-    <pharConfigPath>$PROJECT_DIR$/composer.json</pharConfigPath>
+  <component name="ComposerSettings">
     <execution />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-  </component>
-  <component name="GitSEFilterConfiguration">
-    <file-type-list>
-      <filtered-out-file-type name="LOCAL_BRANCH" />
-      <filtered-out-file-type name="REMOTE_BRANCH" />
-      <filtered-out-file-type name="TAG" />
-      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
-    </file-type-list>
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/app/Game/Kingdoms/Controllers/Api/KingdomUnitMovementController.php" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" />
@@ -35,9 +24,6 @@
     <setting file="file://$PROJECT_DIR$/tests/Unit/Game/Kingdoms/Handlers/TakeKingdomHandlerTest.php" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/app/Game/Kingdoms/Handlers/TakeKingdomHandler.php" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/app/Game/Kingdoms/Service/KingdomsAttackService.php" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" />
-  </component>
-  <component name="MarkdownSettingsMigration">
-    <option name="stateVersion" value="1" />
   </component>
   <component name="PackageJsonUpdateNotifier">
     <dismissed value="$PROJECT_DIR$/package.json" />
@@ -226,120 +212,27 @@
       <path value="$PROJECT_DIR$/vendor/symfony/polyfill-ctype" />
       <path value="$PROJECT_DIR$/vendor/symfony/polyfill-php81" />
       <path value="$PROJECT_DIR$/vendor/symfony/polyfill-php72" />
-      <path value="$PROJECT_DIR$/vendor/spatie/laravel-package-tools" />
-      <path value="$PROJECT_DIR$/vendor/rappasoft/laravel-livewire-tables" />
     </include_path>
   </component>
-  <component name="ProjectId" id="1y74YHMKuHZ428N8k5rqo9nmnY6" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="1" id="Add" />
   </component>
-  <component name="ProjectViewState">
-    <option name="hideEmptyMiddlePackages" value="true" />
-    <option name="showLibraryContents" value="true" />
-    <option name="showMembers" value="true" />
-  </component>
   <component name="PropertiesComponent">
-    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
-    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
-    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources/js/game/components/ui/buttons" />
-    <property name="node.js.detected.package.eslint" value="true" />
-    <property name="node.js.detected.package.tslint" value="true" />
-    <property name="node.js.selected.package.eslint" value="(autodetect)" />
-    <property name="node.js.selected.package.tslint" value="(autodetect)" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/public/storage" />
     <property name="nodejs_package_manager_path" value="yarn" />
-    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
-    <property name="ts.external.directory.path" value="$PROJECT_DIR$/node_modules/typescript/lib" />
-    <property name="vue.rearranger.settings.migration" value="true" />
+    <property name="ts.external.directory.path" value="$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/jsLanguageServicesImpl/external" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/resources/js/game/components/ui/buttons" />
-      <recent name="$PROJECT_DIR$/resources/js/game/lib/game/types/map/kingdom-pins" />
-      <recent name="$PROJECT_DIR$/resources/js/game/sections/components/kingdoms" />
       <recent name="$PROJECT_DIR$/public/storage" />
-      <recent name="$PROJECT_DIR$/resources/views/components/core/buttons/link-buttons" />
-    </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/resources/js/game/sections/components/location-pins" />
-      <recent name="$PROJECT_DIR$/app/Flare/Values" />
-      <recent name="$PROJECT_DIR$/app/Game/Exploration/Controllers" />
-      <recent name="$PROJECT_DIR$/app/Game/Exploration" />
-      <recent name="$PROJECT_DIR$/app/Flare/Builders/Character/AttackDetails" />
     </key>
   </component>
   <component name="RunManager">
-    <configuration name="phpunit.xml" type="PHPUnitRunConfigurationType" factoryName="PHPUnit">
-      <TestRunner scope="XML" />
+    <configuration default="true" type="ComposerRunConfigurationType" factoryName="Composer Script">
       <method v="2" />
     </configuration>
   </component>
-  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
-    <task active="true" id="Default" summary="Default task">
-      <changelist id="b57f583e-608e-4ca2-947d-cf9ab46f7914" name="Changes" comment="" />
-      <created>1631589340088</created>
-      <option name="number" value="Default" />
-      <option name="presentableId" value="Default" />
-      <updated>1631589340088</updated>
-      <workItem from="1631589361751" duration="139484000" />
-      <workItem from="1632451625722" duration="199808000" />
-      <workItem from="1634152136990" duration="126052000" />
-      <workItem from="1634861003611" duration="284000" />
-      <workItem from="1634861336878" duration="231000" />
-      <workItem from="1634861621423" duration="182000" />
-      <workItem from="1634863603465" duration="129000" />
-      <workItem from="1634863812369" duration="230314000" />
-      <workItem from="1635898406001" duration="97346000" />
-      <workItem from="1636319967303" duration="107000" />
-      <workItem from="1636339178758" duration="164221000" />
-      <workItem from="1637454911431" duration="4161000" />
-      <workItem from="1637534279552" duration="98461000" />
-      <workItem from="1637987846971" duration="97627000" />
-      <workItem from="1638742605719" duration="143782000" />
-      <workItem from="1639855536792" duration="90254000" />
-      <workItem from="1640321467322" duration="2512000" />
-      <workItem from="1640325325653" duration="177771000" />
-      <workItem from="1641317459003" duration="135639000" />
-      <workItem from="1642127902017" duration="9421000" />
-      <workItem from="1642211803360" duration="167000" />
-      <workItem from="1642212025385" duration="159000" />
-      <workItem from="1642212211874" duration="484000" />
-      <workItem from="1642217356132" duration="15817000" />
-      <workItem from="1643306290179" duration="24259000" />
-      <workItem from="1643754844461" duration="95619000" />
-      <workItem from="1644091064933" duration="537000" />
-      <workItem from="1644091649054" duration="1253000" />
-      <workItem from="1644093386475" duration="136000" />
-      <workItem from="1644093545588" duration="137000" />
-      <workItem from="1644093706214" duration="29000" />
-      <workItem from="1644094059103" duration="294000" />
-      <workItem from="1644094357190" duration="290000" />
-      <workItem from="1644095989150" duration="434000" />
-      <workItem from="1644096439311" duration="104203000" />
-      <workItem from="1644529738352" duration="194376000" />
-      <workItem from="1646428181614" duration="45279000" />
-      <workItem from="1646688138751" duration="12698000" />
-    </task>
     <servers />
-  </component>
-  <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="3" />
-  </component>
-  <component name="Vcs.Log.Tabs.Properties">
-    <option name="TAB_STATES">
-      <map>
-        <entry key="MAIN">
-          <value>
-            <State />
-          </value>
-        </entry>
-      </map>
-    </option>
-  </component>
-  <component name="VcsManagerConfiguration">
-    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
   </component>
 </project>
