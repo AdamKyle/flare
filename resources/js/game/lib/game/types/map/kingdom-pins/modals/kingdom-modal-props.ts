@@ -1,13 +1,13 @@
 import LocationDetails from "../../../../map/types/location-details";
 
-export interface LocationModalPros {
+export default interface KingdomModalProps {
     is_open: boolean;
 
     handle_close: () => void;
 
-    title: string;
+    kingdom_id: number;
 
-    location: LocationDetails;
+    character_id: number;
 
     character_position: {x: number, y: number};
 

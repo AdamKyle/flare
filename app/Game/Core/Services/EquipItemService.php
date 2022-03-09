@@ -5,6 +5,7 @@ namespace App\Game\Core\Services;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySet;
 use App\Flare\Models\InventorySlot;
+use App\Flare\Models\SetSlot;
 use App\Game\Core\Events\UpdateAttackStats;
 use League\Fractal\Manager;
 

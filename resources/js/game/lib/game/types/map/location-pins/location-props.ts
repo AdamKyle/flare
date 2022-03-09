@@ -6,5 +6,8 @@ export default interface LocationProps {
 
     character_position: {x: number, y: number};
 
-    currencies: {gold: number, gold_dust: number, shards: number, copper_coins: number} | null
+    currencies: {gold: number, gold_dust: number, shards: number, copper_coins: number} | null;
+
+    teleport_player: (data: {x: number, y: number, cost: number, timeout: number}) => void;
+
 }

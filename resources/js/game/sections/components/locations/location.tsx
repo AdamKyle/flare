@@ -76,6 +76,7 @@ export default class Location extends React.Component<LocationProps, LocationSta
                                        location={this.state.location}
                                        character_position={this.props.character_position}
                                        currencies={this.props.currencies}
+                                       teleport_player={this.props.teleport_player}
                         />
                     : null
                 }

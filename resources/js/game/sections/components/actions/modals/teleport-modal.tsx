@@ -75,6 +75,8 @@ export default class TeleportModal extends React.Component<TeleportModalProps, a
             cost: this.state.cost,
             timeout: this.state.time_out
         });
+
+         this.props.handle_close();
     }
 
     render() {
@@ -145,7 +147,7 @@ export default class TeleportModal extends React.Component<TeleportModalProps, a
                                 </p>
                                 <p>
                                     You can find this on your character sheet, under Skills. You can sacrifice a % of your XP from monsters
-                                    in order to level the skill over time, bly clicking train on Quick Feet and then selecting the amount of XP to sacrifice between 10-100%.
+                                    in order to level the skill over time, by clicking train on Quick Feet and then selecting the amount of XP to sacrifice between 10-100%.
                                 </p>
                             </PopOverContainer>
                         </div>

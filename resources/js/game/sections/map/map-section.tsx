@@ -159,11 +159,11 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                             <div className='handle game-map'
                                  style={this.getStyle()}>
 
-                                <Location locations={this.state.locations} character_position={this.state.character_position} currencies={this.props.currencies} />
+                                <Location locations={this.state.locations} character_position={this.state.character_position} currencies={this.props.currencies} teleport_player={this.handleTeleportPlayer.bind(this)} />
 
-                                <Kingdoms kingdoms={this.state.player_kingdoms} character_id={this.props.character_id}/>
+                                <Kingdoms kingdoms={this.state.player_kingdoms} character_id={this.props.character_id} character_position={this.state.character_position} currencies={this.props.currencies} teleport_player={this.handleTeleportPlayer.bind(this)}/>
 
-                                <EnemyKingdoms kingdoms={this.state.enemy_kingdoms} character_id={this.props.character_id}/>
+                                <EnemyKingdoms kingdoms={this.state.enemy_kingdoms} character_id={this.props.character_id} character_position={this.state.character_position} currencies={this.props.currencies} teleport_player={this.handleTeleportPlayer.bind(this)}/>
 
                                 <NpcKingdoms kingdoms={this.state.npc_kingdoms}/>
 

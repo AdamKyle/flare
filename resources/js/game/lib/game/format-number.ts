@@ -14,8 +14,36 @@ export const removeCommas = (number: string): number => {
  *
  * @param number
  * @return string
- * @type [{number: number}]
+ * @type [{number: number | null | undefined}]
  */
-export const formatNumber = (number: number): string => {
+export const formatNumber = (number: number | null | undefined): string => {
+
+    if (number === null) {
+        return '0';
+    }
+
+    if (typeof number === 'undefined') {
+        return '0';
+    }
+
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+/**
+ * Takes floats and makes them into percentages.
+ *
+ * @param number
+ * @return number
+ * @type [{number: number | null | undefined}]
+ */
+export const percent = (number: number | null | undefined): number => {
+    if (number === null) {
+        return 0.0;
+    }
+
+    if (typeof number === 'undefined') {
+        return 0.0;
+    }
+
+    return parseInt((number * 100).toFixed(2));
 }

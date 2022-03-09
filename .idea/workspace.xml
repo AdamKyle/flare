@@ -2,7 +2,25 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f574dce8-e67f-47ee-8bb6-fe6b7dafab2a" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/composer.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Providers/ServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Providers/ServiceProvider.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Core/Services/EquipItemService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Core/Services/EquipItemService.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Kingdoms/Controllers/Api/KingdomsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Kingdoms/Controllers/Api/KingdomsController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/components/ui/alerts/simple-alerts/warning-alert.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/components/ui/alerts/simple-alerts/warning-alert.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/game/format-number.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/game/format-number.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/game/types/map/kingdom-pins/kingdom-pin-props.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/game/types/map/kingdom-pins/kingdom-pin-props.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/game/types/map/kingdom-pins/kingdom-props.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/game/types/map/kingdom-pins/kingdom-props.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/game/types/map/location-pins/location-props.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/game/types/map/location-pins/location-props.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/game/types/map/location-pins/modals/location-modal-pros.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/game/types/map/location-pins/modals/location-modal-pros.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/ui/types/alerts/alert-props.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/ui/types/alerts/alert-props.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/components/actions/map/map-actions.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/components/actions/map/map-actions.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/components/actions/modals/teleport-modal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/components/actions/modals/teleport-modal.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/components/kingdoms/kingdom-pin.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/components/kingdoms/kingdom-pin.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/components/kingdoms/kingdoms.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/components/kingdoms/kingdoms.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/components/locations/location.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/components/locations/location.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/components/locations/modals/location-modal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/components/locations/modals/location-modal.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/map/map-section.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/map/map-section.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/game/kingdoms/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/game/kingdoms/api.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -212,6 +230,8 @@
       <path value="$PROJECT_DIR$/vendor/symfony/polyfill-ctype" />
       <path value="$PROJECT_DIR$/vendor/symfony/polyfill-php81" />
       <path value="$PROJECT_DIR$/vendor/symfony/polyfill-php72" />
+      <path value="$PROJECT_DIR$/vendor/rappasoft/laravel-livewire-tables" />
+      <path value="$PROJECT_DIR$/vendor/spatie/laravel-package-tools" />
     </include_path>
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
@@ -220,7 +240,7 @@
   <component name="PropertiesComponent">
     <property name="last_opened_file_path" value="$PROJECT_DIR$/public/storage" />
     <property name="nodejs_package_manager_path" value="yarn" />
-    <property name="ts.external.directory.path" value="$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/jsLanguageServicesImpl/external" />
+    <property name="ts.external.directory.path" value="$PROJECT_DIR$/node_modules/typescript/lib" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">

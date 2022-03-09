@@ -62,6 +62,18 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
 
     }
 
+    renderAdventureButton() {
+        if (this.props.location_with_adventures !== null) {
+            if (this.props.location_with_adventures.adventures !== null) {
+                if (this.props.location_with_adventures.adventures.length > 0) {
+                    return <SuccessOutlineButton additional_css={clsx('text-center px-0', {
+                        'col-start-2 col-end-2': this.props.port_location === null
+                    })} button_label={'Adventure'} on_click={this.adventure.bind(this)} />
+                }
+            }
+        }
+    }
+
     render() {
         return (
             <Fragment>
@@ -70,9 +82,7 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                     <div className='xl:mr-[24px]'>
                         <div className={'grid grid-cols-3 gap-1'}>
                             {
-                                this.props.location_with_adventures !== null ?
-                                    <SuccessOutlineButton additional_css={'text-center px-0'} button_label={'Adventure'} on_click={this.adventure.bind(this)} />
-                                : null
+                                this.renderAdventureButton()
                             }
 
                             {

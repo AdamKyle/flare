@@ -14,7 +14,12 @@ export default class WarningAlert extends React.Component<AlertProps, {}> {
                 >
                     <span className="self-center">{this.props.children}</span>
 
-                    <strong className="text-xl align-center cursor-pointer text-yellow-500" onClick={this.props.close_alert}>&times;</strong>
+                    {
+                        typeof this.props.close_alert !== 'undefined' ?
+                            <strong className="text-xl align-center cursor-pointer text-yellow-500" onClick={this.props.close_alert}>&times;</strong>
+                        : null
+                    }
+
                 </div>
             </div>
         )
