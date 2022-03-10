@@ -204,7 +204,7 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                 if (this.props.location_with_adventures.adventures.length > 0) {
                     return <SuccessOutlineButton additional_css={clsx('text-center px-0', {
                         'col-start-2 col-end-2': this.props.port_location === null
-                    })} button_label={'Adventure'} on_click={this.adventure.bind(this)} />
+                    })} button_label={'Adventure'} on_click={this.adventure.bind(this)} disabled={this.state.is_movement_disabled} />
                 }
             }
         }
@@ -229,11 +229,15 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
 
                             {
                                 this.props.port_location !== null ?
-                                    <SuccessOutlineButton additional_css={'text-center'} button_label={'Set Sail'} on_click={this.setSail.bind(this)} />
+                                    <SuccessOutlineButton additional_css={'text-center'} button_label={'Set Sail'} on_click={this.setSail.bind(this)} disabled={this.state.is_movement_disabled}/>
                                     : null
                             }
 
-                            <SuccessOutlineButton additional_css={clsx('text-center', {'col-start-3 col-end-3': this.props.location_with_adventures === null && this.props.port_location === null }, {'col-start-3 col-end-3': this.props.location_with_adventures !== null || this.props.port_location !== null })} button_label={'Teleport'} on_click={this.teleport.bind(this)} />
+                            <SuccessOutlineButton additional_css={clsx('text-center', {'col-start-3 col-end-3': this.props.location_with_adventures === null && this.props.port_location === null }, {'col-start-3 col-end-3': this.props.location_with_adventures !== null || this.props.port_location !== null })}
+                                                  button_label={'Teleport'}
+                                                  on_click={this.teleport.bind(this)}
+                                                  disabled={this.state.is_movement_disabled}
+                            />
                         </div>
                     </div>
                 </div>

@@ -3,16 +3,13 @@
   <component name="ChangeListManager">
     <list default="true" id="f574dce8-e67f-47ee-8bb6-fe6b7dafab2a" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/game/map/state/map-state.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/game/map/state/map-state.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/game/types/map/map-actions-props.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/game/types/map/map-actions-props.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/game/types/map/map-actions-state.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/game/types/map/map-actions-state.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/game/types/map/map-state.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/game/types/map/map-state.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/game/types/map/modals/teleport-modal-props.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/game/types/map/modals/teleport-modal-props.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/game/types/map/modals/view-location-details-modal-props.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/game/types/map/modals/view-location-details-modal-props.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/components/ui/buttons/success-outline-button.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/components/ui/buttons/success-outline-button.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/game/map/ajax/move-player.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/game/map/ajax/move-player.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/game/map/map-position.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/game/map/map-position.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/game/map/state/map-state-manager.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/game/map/state/map-state-manager.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/game/map/teleportion-costs.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/game/map/teleportion-costs.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/character-top-section/character-top-section.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/character-top-section/character-top-section.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/game/sections/components/actions/map/map-actions.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/components/actions/map/map-actions.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/components/actions/modals/teleport-modal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/components/actions/modals/teleport-modal.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/components/actions/modals/view-location-details-modal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/components/actions/modals/view-location-details-modal.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/components/kingdoms/modals/other-kingdom-modal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/components/kingdoms/modals/other-kingdom-modal.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/game/sections/map/map-section.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/map/map-section.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

@@ -50,12 +50,16 @@ export const fetchCost = (xPosition: number, yPosition: number, characterPositio
     };
 }
 
+/**
+ * Calculate the distance between where the player is and where they are going.
+ *
+ * @param xPosition
+ * @param yPosition
+ * @param characterPosition
+ * @return number
+ * @type [{xPosition: number, yPosition: number, characterPosition: {x: number, y: number}}]
+ */
 const calculateDistance = (xPosition: number, yPosition: number, characterPosition: {x: number, y: number}): number =>  {
-
-    if (xPosition === 0 && yPosition) {
-        return 0;
-    }
-
     const distanceX = Math.pow((xPosition - characterPosition.x), 2);
     const distanceY = Math.pow((yPosition - characterPosition.y), 2);
 

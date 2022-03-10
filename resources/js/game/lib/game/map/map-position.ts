@@ -5,7 +5,8 @@
  * @param mapPositionY
  * @type [{characterY: number, mapPositionY: number}]
  */
-export const getNewYPosition = (characterY: number, mapPositionY: number): number => {
+export const getNewYPosition = (characterY: number, mapPositionY: number, viewPort: number): number => {
+
     if (characterY < 320) {
         return 0;
     }
@@ -24,12 +25,21 @@ export const getNewYPosition = (characterY: number, mapPositionY: number): numbe
  * @param mapPositionX
  * @type [{characterX: number, mapPositionX: number}]
  */
-export const getNewXPosition = (characterX: number, mapPositionX: number): number => {
+export const getNewXPosition = (characterX: number, mapPositionX: number, viewPort: number): number => {
     if (characterX <= 368) {
         return 0;
     }
 
     if (characterX > 368) {
+
+        if (viewPort >= 1920) {
+            return 0;
+        }
+
+        if (viewPort <= 1024) {
+            return -150;
+        }
+
         return -100;
     }
 

@@ -1,7 +1,7 @@
 import React, {Fragment} from "react";
 import {AxiosError, AxiosResponse} from "axios";
 import Draggable from 'react-draggable';
-import {dragMap} from "../../lib/game/map/map-position";
+import {dragMap, getNewXPosition, getNewYPosition} from "../../lib/game/map/map-position";
 import MapState from "../../lib/game/types/map/map-state";
 import MapProps from '../../lib/game/types/map/map-props';
 import Ajax from "../../lib/ajax/ajax";
@@ -58,6 +58,16 @@ export default class MapSection extends React.Component<MapProps, MapState> {
 
             state.location_with_adventures = getLocationWithAdventures(state);
             state.port_location = getPortLocation(state);
+            state.map_position = {
+                x: getNewXPosition(state.character_position.x, state.map_position.x, this.props.view_port),
+                y: getNewYPosition(state.character_position.y, state.map_position.y, this.props.view_port),
+            }
+
+            console.log(state)
+
+            if (state.time_left !== 0) {
+                state.can_player_move = false;
+            }
 
             this.setState(state);
         }, (err: AxiosError) => {
@@ -131,18 +141,18 @@ export default class MapSection extends React.Component<MapProps, MapState> {
     handleMovePlayer(direction: string) {
         (new MovePlayer(this)).setCharacterPosition(this.state.character_position)
                               .setMapPosition(this.state.map_position)
-                              .movePlayer(this.props.character_id, direction);
+                              .movePlayer(this.props.character_id, direction, this.props.view_port);
     }
 
     handleTeleportPlayer(data: {x: number, y: number, cost: number, timeout: number}) {
-        (new MovePlayer(this)).teleportPlayer(data, this.props.character_id);
+        (new MovePlayer(this)).teleportPlayer(data, this.props.character_id, this.props.view_port);
     }
 
     render() {
         if (this.state.loading) {
             return <ComponentLoading />
         }
-
+``
         return(
             <Fragment>
                 <div className='overflow-hidden max-h-[350px] md:ml-[20px]'>
