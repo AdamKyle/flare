@@ -16,7 +16,7 @@ export default class EnemyKingdomPin extends React.Component<EnemyKingdomPinProp
     }
 
     openKingdomModal(e: any) {
-        console.log(parseInt(e.target.getAttribute('data-location-id')))
+        this.props.open_kingdom_modal(parseInt(e.target.getAttribute('data-kingdom-id')));
     }
 
     render() {

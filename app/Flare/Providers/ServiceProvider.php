@@ -38,6 +38,7 @@ use App\Flare\Services\CharacterXPService;
 use App\Flare\Services\DailyGoldDustService;
 use App\Flare\Transformers\BasicKingdomTransformer;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
+use App\Flare\Transformers\OtherKingdomTransformer;
 use App\Game\Core\Services\CharacterService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Flare\Values\BaseStatValue;
@@ -183,6 +184,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(CharacterSheetBaseInfoTransformer::class, function() {
             return new CharacterSheetBaseInfoTransformer();
+        });
+
+        $this->app->bind(OtherKingdomTransformer::class, function($app){
+            return new OtherKingdomTransformer();
         });
 
         $this->app->bind(BasicKingdomTransformer::class, function($app){

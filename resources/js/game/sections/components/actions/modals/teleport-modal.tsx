@@ -32,7 +32,6 @@ export default class TeleportModal extends React.Component<TeleportModalProps, a
         }, () => {
             let state = fetchCost(this.state.x_position, this.state.y_position, this.state.character_position, this.props.currencies);
 
-            console.log(state);
             this.setState(state);
         });
     }

@@ -11,10 +11,10 @@ export default interface GameState {
         can_adventure: boolean,
     } | null;
 
-    character_currencies: {
+    character_currencies?: {
         gold: number,
         shards: number,
         gold_dust: number,
         copper_coins: number,
-    } | null;
+    };
 }

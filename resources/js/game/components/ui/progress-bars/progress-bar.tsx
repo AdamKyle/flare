@@ -113,7 +113,7 @@ export default class ProgressBar extends React.Component<ProgressBarProps, Progr
             <Fragment>
                 <div className="flex justify-between mb-1">
                     <span className="text-base font-medium text-gray-800 dark:text-white">
-                        Timeout
+                        {this.props.time_out_label}
                         <i className="ml-2 fas fa-spinner fa-pulse"></i>
                     </span>
                     <span className="text-sm font-medium text-gray-800 dark:text-white">{this.state.time_left_label} {this.state.label} left</span>

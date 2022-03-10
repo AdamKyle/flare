@@ -6,6 +6,9 @@ import MapActionsState from "../../../../lib/game/types/map/map-actions-state";
 import PrimaryOutlineButton from "../../../../components/ui/buttons/primary-outline-button";
 import clsx from 'clsx';
 import TeleportModal from "../modals/teleport-modal";
+import OrangeButton from "../../../../components/ui/buttons/orange-button";
+import ViewLocationDetailsModal from "../modals/view-location-details-modal";
+import LocationDetails from "../../../../lib/game/map/types/location-details";
 
 export default class MapActions extends React.Component<MapActionsProps, MapActionsState> {
 
@@ -15,6 +18,15 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
         this.state = {
             is_movement_disabled: false,
             open_teleport_modal: false,
+            location: null,
+            show_location_details: false,
+            player_kingdom_id: 0,
+        }
+    }
+
+    componentDidMount() {
+        if (this.props.locations !== null) {
+            this.updateViewLocationData();
         }
     }
 
@@ -26,6 +38,84 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
         if (!this.props.can_player_move && !this.state.is_movement_disabled) {
             this.setState({is_movement_disabled: true});
         }
+
+        if (this.props.locations !== null && (this.state.location === null && this.state.player_kingdom_id === 0)) {
+            this.updateViewLocationData()
+        } else if (this.props.locations === null && this.state.location !== null) {
+            this.setState({
+                location: null,
+            });
+        } else if (this.state.player_kingdom_id !== 0) {
+            this.handlePlayerKingdomChange();
+        } else if (this.state.location !== null) {
+            this.handleLocationChange();
+        }
+    }
+
+    handlePlayerKingdomChange() {
+        if (this.props.player_kingdoms === null) {
+            return this.setState({player_kingdom_id: 0});
+        }
+
+        const kingdom = this.props.player_kingdoms.filter((kingdom) => kingdom.x_position === this.props.character_position.x && kingdom.y_position === this.props.character_position.y);
+
+        if (kingdom.length > 0) {
+            if (kingdom[0].id !== this.state.player_kingdom_id) {
+                return this.setState({player_kingdom_id: 0});
+            }
+        } else {
+            return this.setState({player_kingdom_id: 0});
+        }
+    }
+
+    handleLocationChange() {
+        if (this.state.location === null) {
+            return;
+        }
+
+        if (this.props.locations === null) {
+            return this.setState({ location: null });
+        }
+
+        const foundLocation      = this.props.locations.filter((location) => location.x === this.props.character_position.x && location.y === this.props.character_position.y);
+
+        if (foundLocation.length > 0) {
+            if (foundLocation[0].id !== this.state.location.id) {
+                return this.setState({ location: null });
+            }
+        } else {
+            return this.setState({ location: null });
+        }
+    }
+
+    updateViewLocationData() {
+
+        if (this.props.locations == null || this.props.player_kingdoms === null) {
+            return;
+        }
+
+        const foundLocation      = this.props.locations.filter((location) => location.x === this.props.character_position.x && location.y === this.props.character_position.y);
+        const foundPlayerKingdom = this.props.player_kingdoms.filter((kingdom) => kingdom.x_position === this.props.character_position.x && kingdom.y_position === this.props.character_position.y);
+
+        let state = {
+            location: null,
+            player_kingdom_id: 0,
+        }
+
+        if (foundLocation.length > 0) {
+            // @ts-ignore
+            state.location = foundLocation[0];
+        }
+
+        if (foundPlayerKingdom.length > 0) {
+            state.player_kingdom_id = foundPlayerKingdom[0].id;
+        }
+
+        if (state.location === null && state.player_kingdom_id === 0) {
+            return;
+        }
+
+        this.setState(state);
     }
 
     move(direction: string) {
@@ -62,6 +152,18 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
 
     }
 
+    viewLocation() {
+        this.setState({
+            show_location_details: true,
+        });
+    }
+
+    closeViewLocation() {
+        this.setState({
+            show_location_details: false,
+        });
+    }
+
     renderAdventureButton() {
         if (this.props.location_with_adventures !== null) {
             if (this.props.location_with_adventures.adventures !== null) {
@@ -71,6 +173,12 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                     })} button_label={'Adventure'} on_click={this.adventure.bind(this)} />
                 }
             }
+        }
+    }
+
+    renderViewDetailsButton() {
+        if (this.state.location !== null || this.state.player_kingdom_id !== 0) {
+            return <OrangeButton additional_css={'block lg:hidden'} button_label={'View Location Details'} on_click={() => this.viewLocation()} />;
         }
     }
 
@@ -105,6 +213,7 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                     <PrimaryButton disabled={this.state.is_movement_disabled} button_label={'West'} on_click={() => this.move('west')} />
                     <PrimaryButton disabled={this.state.is_movement_disabled} button_label={'East'} on_click={() => this.move('east')} />
                     <PrimaryButton disabled={this.state.is_movement_disabled} button_label={'Traverse'} on_click={() => this.traverse()} />
+                    {this.renderViewDetailsButton()}
                 </div>
 
                 {
@@ -118,6 +227,15 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                                        currencies={this.props.currencies}
                         />
                     : null
+                }
+
+                {
+                     this.state.show_location_details ?
+                         <ViewLocationDetailsModal location={this.state.location}
+                                                   close_modal={this.closeViewLocation.bind(this)}
+                                                   character_id={this.props.character_id}
+                                                   kingdom_id={this.state.player_kingdom_id} />
+                     : null
                 }
             </Fragment>
         )

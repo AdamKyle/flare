@@ -77,6 +77,7 @@ export default class Location extends React.Component<LocationProps, LocationSta
                                        character_position={this.props.character_position}
                                        currencies={this.props.currencies}
                                        teleport_player={this.props.teleport_player}
+                                       hide_secondary_button={false}
                         />
                     : null
                 }

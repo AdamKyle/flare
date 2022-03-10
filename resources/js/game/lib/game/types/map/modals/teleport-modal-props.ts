@@ -17,12 +17,12 @@ export default interface TeleportModalProps  {
 
     character_position: { x: number, y: number },
 
-    currencies: {
+    currencies?: {
         gold: number,
         shards: number,
         gold_dust: number,
         copper_coins: number,
-    } | null;
+    };
 
     teleport_player: (data: {x: number, y: number, cost: number, timeout: number}) => void
 }

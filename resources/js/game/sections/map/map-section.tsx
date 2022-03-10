@@ -183,10 +183,13 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                                 coordinates={this.state.coordinates}
                                 character_position={this.state.character_position}
                                 currencies={this.props.currencies}
+                                locations={this.state.locations}
+                                player_kingdoms={this.state.player_kingdoms}
+                                character_id={this.props.character_id}
                     />
                 </div>
                 <div className={'mt-3'}>
-                    <ProgressBar time_remaining={this.state.time_left} />
+                    <ProgressBar time_remaining={this.state.time_left} time_out_label={'Movement Timeout'}/>
                 </div>
             </Fragment>
         )

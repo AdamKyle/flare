@@ -1,11 +1,35 @@
-import React from "react";
+import React, {Fragment} from "react";
 import EnemyKingdomPin from "./enemy-kingdom-pin";
 import KingdomProps from "../../../lib/game/types/map/kingdom-pins/kingdom-props";
+import OtherKingdomModal from "./modals/other-kingdom-modal";
 
 export default class EnemyKingdoms extends React.Component<KingdomProps, any> {
 
     constructor(props: KingdomProps) {
         super(props);
+
+        this.state = {
+            open_kingdom_modal: false,
+            kingdom_id: 0,
+        }
+    }
+
+    openKingdomModal(kingdomId: number) {
+        this.setState({
+            open_kingdom_modal: true,
+            kingdomId: kingdomId,
+        });
+    }
+
+    closeKingdomModal() {
+        this.setState({
+            open_kingdom_modal: false,
+            kingdom_id: 0,
+        });
+    }
+
+    teleportPlayer(data: {x: number, y: number, cost: number, timeout: number}) {
+        this.props.teleport_player(data);
     }
 
     renderKingdomPins() {
@@ -15,12 +39,31 @@ export default class EnemyKingdoms extends React.Component<KingdomProps, any> {
 
         return this.props.kingdoms.map((kingdom) => {
             if (this.props.character_id !== kingdom.character_id) {
-                return <EnemyKingdomPin kingdom={kingdom} color={'#e82b13'}/>
+                return <EnemyKingdomPin kingdom={kingdom} color={'#e82b13'} open_kingdom_modal={this.openKingdomModal.bind(this)}/>
             }
         });
     }
 
     render() {
-        return this.renderKingdomPins();
+        return (
+            <Fragment>
+                {this.renderKingdomPins()}
+
+                {
+                    this.state.open_kingdom_modal ?
+                        <OtherKingdomModal is_open={this.state.open_kingdom_modal}
+                                           kingdom_id={this.state.kingdomId}
+                                           character_id={this.props.character_id}
+                                           currencies={this.props.currencies}
+                                           character_position={this.props.character_position}
+                                           teleport_player={this.teleportPlayer.bind(this)}
+                                           handle_close={this.closeKingdomModal.bind(this)}
+                                           is_enemy_kingdom={true}
+                                           hide_secondary={false}
+                        />
+                        : null
+                }
+            </Fragment>
+        );
     }
 }

@@ -4,6 +4,7 @@ namespace App\Game\Kingdoms\Controllers\Api;
 
 use App\Flare\Models\UnitMovementQueue;
 use App\Flare\Transformers\BasicKingdomTransformer;
+use App\Flare\Transformers\OtherKingdomTransformer;
 use App\Game\Kingdoms\Service\KingdomResourcesService;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use Illuminate\Http\Request;
@@ -52,7 +53,7 @@ class KingdomsController extends Controller
 
     public function __construct(Manager $manager, KingdomTransformer $kingdom, KingdomService $kingdomService)
     {
-        $this->middleware('is.character.dead')->except('getAttackLogs');
+        $this->middleware('is.character.dead')->except(['getAttackLogs', 'getCharacterInfoForKingdom', 'getOtherKingdomInfo']);
 
         $this->manager = $manager;
         $this->kingdom = $kingdom;
@@ -67,6 +68,13 @@ class KingdomsController extends Controller
         }
 
         $kingdom = new Item($kingdom, $basicKingdomTransformer);
+        $kingdom = $this->manager->createData($kingdom)->toArray();
+
+        return response()->json($kingdom);
+    }
+
+    public function getOtherKingdomInfo(Kingdom $kingdom, OtherKingdomTransformer $otherKingdomTransformer) {
+        $kingdom = new Item($kingdom, $otherKingdomTransformer);
         $kingdom = $this->manager->createData($kingdom)->toArray();
 
         return response()->json($kingdom);

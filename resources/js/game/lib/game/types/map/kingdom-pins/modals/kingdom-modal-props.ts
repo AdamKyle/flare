@@ -1,5 +1,3 @@
-import LocationDetails from "../../../../map/types/location-details";
-
 export default interface KingdomModalProps {
     is_open: boolean;
 
@@ -9,9 +7,11 @@ export default interface KingdomModalProps {
 
     character_id: number;
 
-    character_position: {x: number, y: number};
+    character_position?: {x: number, y: number};
 
-    currencies: {gold: number, gold_dust: number, shards: number, copper_coins: number} | null;
+    currencies?: {gold: number, gold_dust: number, shards: number, copper_coins: number};
 
-    teleport_player: (data: {x: number, y: number, cost: number, timeout: number}) => void;
+    teleport_player?: (data: {x: number, y: number, cost: number, timeout: number}) => void;
+
+    hide_secondary: boolean;
 }

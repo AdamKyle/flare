@@ -3,6 +3,7 @@
 Route::middleware(['auth'])->group(function() {
     Route::get('/kingdoms/{user}/attack-logs', ['as' => 'kingdom.attack-logs', 'uses' => 'Api\KingdomsController@getAttackLogs']);
 
+    Route::get('/kingdoms/other/{kingdom}', ['as' => 'kingdom.other', 'uses' => 'Api\KingdomsController@getOtherKingdomInfo']);
 
     Route::middleware(['is.character.who.they.say.they.are', 'character.owns.kingdom', 'throttle:500,1'])->group(function() {
         Route::get('/kingdom/{kingdom}/{character}', ['as' => 'kingdom.character.info', 'uses' => 'Api\KingdomsController@getCharacterInfoForKingdom']);

@@ -12,6 +12,10 @@ export default interface MapActionsProps {
 
     location_with_adventures: LocationDetails | null;
 
+    locations: LocationDetails[] | null;
+
+    player_kingdoms: {id: number, x_position: number, y_position: number, color: string, character_id: number}[] | null;
+
     port_location: LocationDetails| null;
 
     ports: LocationDetails[] | null;
@@ -20,10 +24,12 @@ export default interface MapActionsProps {
 
     character_position: {x: number, y: number};
 
-    currencies: {
+    character_id: number;
+
+    currencies?: {
         gold: number,
         shards: number,
         gold_dust: number,
         copper_coins: number,
-    } | null;
+    };
 }

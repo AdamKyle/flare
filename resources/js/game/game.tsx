@@ -31,7 +31,7 @@ export default class Game extends React.Component<GameProps, GameState> {
             show_size_message: true,
             hide_map: false,
             character_status: null,
-            character_currencies: null,
+            character_currencies: undefined,
         }
 
     }

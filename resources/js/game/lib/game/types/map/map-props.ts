@@ -6,10 +6,10 @@ export default interface MapProps {
 
     view_port: number,
 
-    currencies: {
+    currencies?: {
         gold: number,
         shards: number,
         gold_dust: number,
         copper_coins: number,
-    } | null;
+    };
 }

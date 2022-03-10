@@ -21,14 +21,15 @@ export default class KingdomPin extends React.Component<KingdomPinProps, any> {
 
     render() {
         return (
-            <div
+            <button
+                role='button'
                 key={Math.random().toString(36).substring(7) + '-' + this.props.kingdom.id}
                 data-kingdom-id={this.props.kingdom.id}
                 className="kingdom-x-pin"
                 style={this.kingdomStyle()}
                 onClick={this.openKingdomModal.bind(this)}
             >
-            </div>
+            </button>
        );
     }
 }
