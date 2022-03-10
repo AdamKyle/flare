@@ -8,7 +8,9 @@ export default interface MapActionsState {
 
     location: LocationDetails | null;
 
-    player_kingdom_id: number;
+    player_kingdom_id: number | null;
+
+    enemy_kingdom_id: number | null;
 
     show_location_details: boolean;
 }

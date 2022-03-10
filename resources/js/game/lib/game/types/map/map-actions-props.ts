@@ -14,7 +14,9 @@ export default interface MapActionsProps {
 
     locations: LocationDetails[] | null;
 
-    player_kingdoms: {id: number, x_position: number, y_position: number, color: string, character_id: number}[] | null;
+    player_kingdoms: {id: number, x_position: number, y_position: number, color: string, character_id: number, name: string}[] | null;
+
+    enemy_kingdoms: {id: number, x_position: number, y_position: number, color: string, character_id: number}[] | null;
 
     port_location: LocationDetails| null;
 
@@ -25,6 +27,8 @@ export default interface MapActionsProps {
     character_position: {x: number, y: number};
 
     character_id: number;
+
+    view_port: number,
 
     currencies?: {
         gold: number,

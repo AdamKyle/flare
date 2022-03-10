@@ -1,5 +1,5 @@
-import DialogueTypes from "../../../../ui/types/dialogue/dialogue-types";
 import {ClassArray, ClassDictionary} from "clsx";
+import LocationDetails from "../../../map/types/location-details";
 
 export type ClassValue = ClassArray | ClassDictionary | string | number | null | boolean | undefined;
 
@@ -23,6 +23,12 @@ export default interface TeleportModalProps  {
         gold_dust: number,
         copper_coins: number,
     };
+
+    view_port: number;
+
+    locations: LocationDetails[] | null;
+
+    player_kingdoms: {id: number, x_position: number, y_position: number, color: string, character_id: number, name: string}[] | null;
 
     teleport_player: (data: {x: number, y: number, cost: number, timeout: number}) => void
 }

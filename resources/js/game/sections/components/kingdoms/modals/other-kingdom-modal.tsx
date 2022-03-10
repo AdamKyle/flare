@@ -76,7 +76,7 @@ export default class OtherKingdomModal extends React.Component<OtherKingdomModal
             <Dialogue is_open={this.props.is_open}
                       handle_close={this.props.handle_close}
                       title={this.state.loading ? 'One moment ...' : this.buildTitle()}
-                      secondary_actions={{
+                      secondary_actions={ this.props.hide_secondary ? null : {
                           secondary_button_disabled: this.teleportDisabled(),
                           secondary_button_label: 'Teleport',
                           handle_action: this.handleTeleport.bind(this),
@@ -180,45 +180,50 @@ export default class OtherKingdomModal extends React.Component<OtherKingdomModal
                                         </dl>
                                     </div>
                                 </div>
-                                <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                                <div>
-                                    {
-                                        this.state.cost > 0 ?
-                                            <Fragment>
-                                                <div className='flex items-center mb-4'>
-                                                    <h4>Teleport Details</h4>
-                                                    <div>
-                                                        <PopOverContainer icon={'fas fa-info-circle'} icon_label={'Help'} additional_css={'left-[150px] md:left-0'}>
-                                                            <h3>Teleportation</h3>
-                                                            <p className='my-2'>
-                                                                This location will let you teleport to it for a fee and a timeout in minutes. If you have trained the skill <a href='/information/skill-information' target='_blank'>
-                                                                Quick Feet <i className="fas fa-external-link-alt"></i></a> to a high enough level then the timer will reduce the time before you can move again by a % down to a maximum of 1 minute.
-                                                                If the teleport button is disabled, you cannot afford to travel.
-                                                            </p>
-                                                        </PopOverContainer>
-                                                    </div>
-                                                </div>
-                                                <dl>
-                                                    <dt>Cost to teleport (gold):</dt>
-                                                    <dd className={clsx(
-                                                        {'text-gray-700': this.state.cost === 0},
-                                                        {'text-green-600' : this.state.can_afford && this.state.cost > 0},
-                                                        {'text-red-600': !this.state.can_afford && this.state.cost > 0}
-                                                    )}>{formatNumber(this.state.cost)}</dd>
-                                                    <dt>Can afford to teleport:</dt>
-                                                    <dd>{this.state.can_afford ? 'Yes' : 'No'}</dd>
-                                                    <dt>Distance (miles):</dt>
-                                                    <dd>{this.state.distance}</dd>
-                                                    <dt>Timeout (minutes):</dt>
-                                                    <dd>{this.state.time_out}</dd>
-                                                </dl>
-                                            </Fragment>
-                                            : <WarningAlert>
-                                                You are too close to the location to be able to teleport.
-                                            </WarningAlert>
-                                    }
-                                </div>
-
+                                {
+                                    !this.props.hide_secondary ?
+                                        <Fragment>
+                                            <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                                            <div>
+                                                {
+                                                    this.state.cost > 0 ?
+                                                        <Fragment>
+                                                            <div className='flex items-center mb-4'>
+                                                                <h4>Teleport Details</h4>
+                                                                <div>
+                                                                    <PopOverContainer icon={'fas fa-info-circle'} icon_label={'Help'} additional_css={'left-[150px] md:left-0'}>
+                                                                        <h3>Teleportation</h3>
+                                                                        <p className='my-2'>
+                                                                            This location will let you teleport to it for a fee and a timeout in minutes. If you have trained the skill <a href='/information/skill-information' target='_blank'>
+                                                                            Quick Feet <i className="fas fa-external-link-alt"></i></a> to a high enough level then the timer will reduce the time before you can move again by a % down to a maximum of 1 minute.
+                                                                            If the teleport button is disabled, you cannot afford to travel.
+                                                                        </p>
+                                                                    </PopOverContainer>
+                                                                </div>
+                                                            </div>
+                                                            <dl>
+                                                                <dt>Cost to teleport (gold):</dt>
+                                                                <dd className={clsx(
+                                                                    {'text-gray-700': this.state.cost === 0},
+                                                                    {'text-green-600' : this.state.can_afford && this.state.cost > 0},
+                                                                    {'text-red-600': !this.state.can_afford && this.state.cost > 0}
+                                                                )}>{formatNumber(this.state.cost)}</dd>
+                                                                <dt>Can afford to teleport:</dt>
+                                                                <dd>{this.state.can_afford ? 'Yes' : 'No'}</dd>
+                                                                <dt>Distance (miles):</dt>
+                                                                <dd>{this.state.distance}</dd>
+                                                                <dt>Timeout (minutes):</dt>
+                                                                <dd>{this.state.time_out}</dd>
+                                                            </dl>
+                                                        </Fragment>
+                                                        : <WarningAlert>
+                                                            You are too close to the location to be able to teleport.
+                                                        </WarningAlert>
+                                                }
+                                            </div>
+                                        </Fragment>
+                                    : null
+                                }
                             </div>
                         </Fragment>
                 }

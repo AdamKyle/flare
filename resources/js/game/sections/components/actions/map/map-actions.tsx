@@ -8,7 +8,6 @@ import clsx from 'clsx';
 import TeleportModal from "../modals/teleport-modal";
 import OrangeButton from "../../../../components/ui/buttons/orange-button";
 import ViewLocationDetailsModal from "../modals/view-location-details-modal";
-import LocationDetails from "../../../../lib/game/map/types/location-details";
 
 export default class MapActions extends React.Component<MapActionsProps, MapActionsState> {
 
@@ -20,7 +19,8 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
             open_teleport_modal: false,
             location: null,
             show_location_details: false,
-            player_kingdom_id: 0,
+            player_kingdom_id: null,
+            enemy_kingdom_id: null,
         }
     }
 
@@ -39,32 +39,38 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
             this.setState({is_movement_disabled: true});
         }
 
-        if (this.props.locations !== null && (this.state.location === null && this.state.player_kingdom_id === 0)) {
+        if (this.props.locations !== null && (this.state.location === null && this.state.player_kingdom_id === null && this.state.enemy_kingdom_id === null)) {
             this.updateViewLocationData()
         } else if (this.props.locations === null && this.state.location !== null) {
             this.setState({
                 location: null,
             });
-        } else if (this.state.player_kingdom_id !== 0) {
+        } else if (this.state.player_kingdom_id !== null) {
             this.handlePlayerKingdomChange();
         } else if (this.state.location !== null) {
             this.handleLocationChange();
+        } else if (this.state.enemy_kingdom_id !== null) {
+            this.handleEnemyKingdomChange();
         }
     }
 
     handlePlayerKingdomChange() {
+        if (this.state.player_kingdom_id === null) {
+            return;
+        }
+
         if (this.props.player_kingdoms === null) {
-            return this.setState({player_kingdom_id: 0});
+            return this.setState({player_kingdom_id: null});
         }
 
         const kingdom = this.props.player_kingdoms.filter((kingdom) => kingdom.x_position === this.props.character_position.x && kingdom.y_position === this.props.character_position.y);
 
         if (kingdom.length > 0) {
             if (kingdom[0].id !== this.state.player_kingdom_id) {
-                return this.setState({player_kingdom_id: 0});
+                return this.setState({player_kingdom_id: null});
             }
         } else {
-            return this.setState({player_kingdom_id: 0});
+            return this.setState({player_kingdom_id: null});
         }
     }
 
@@ -88,18 +94,40 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
         }
     }
 
+    handleEnemyKingdomChange() {
+        if (this.state.enemy_kingdom_id === 0) {
+            return;
+        }
+
+        if (this.props.enemy_kingdoms === null) {
+            return this.setState({ enemy_kingdom_id: 0 });
+        }
+
+        const foundEnemyKingdom      = this.props.enemy_kingdoms.filter((kingdom) => kingdom.x_position === this.props.character_position.x && kingdom.y_position === this.props.character_position.y);
+
+        if (foundEnemyKingdom.length > 0) {
+            if (foundEnemyKingdom[0].id !== this.state.enemy_kingdom_id) {
+                return this.setState({ enemy_kingdom_id: null });
+            }
+        } else {
+            return this.setState({ enemy_kingdom_id: null });
+        }
+    }
+
     updateViewLocationData() {
 
-        if (this.props.locations == null || this.props.player_kingdoms === null) {
+        if (this.props.locations == null || this.props.player_kingdoms === null || this.props.enemy_kingdoms === null) {
             return;
         }
 
         const foundLocation      = this.props.locations.filter((location) => location.x === this.props.character_position.x && location.y === this.props.character_position.y);
         const foundPlayerKingdom = this.props.player_kingdoms.filter((kingdom) => kingdom.x_position === this.props.character_position.x && kingdom.y_position === this.props.character_position.y);
+        const foundEnemyKingdom  = this.props.enemy_kingdoms.filter((kingdom) => kingdom.x_position === this.props.character_position.x && kingdom.y_position === this.props.character_position.y);
 
         let state = {
             location: null,
-            player_kingdom_id: 0,
+            player_kingdom_id: null,
+            enemy_kingdom_id: null,
         }
 
         if (foundLocation.length > 0) {
@@ -108,10 +136,16 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
         }
 
         if (foundPlayerKingdom.length > 0) {
+            // @ts-ignore
             state.player_kingdom_id = foundPlayerKingdom[0].id;
         }
 
-        if (state.location === null && state.player_kingdom_id === 0) {
+        if (foundEnemyKingdom.length > 0) {
+            // @ts-ignore
+            state.enemy_kingdom_id = foundEnemyKingdom[0].id;
+        }
+
+        if (state.location === null && state.player_kingdom_id === null && state.enemy_kingdom_id === null) {
             return;
         }
 
@@ -177,7 +211,7 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
     }
 
     renderViewDetailsButton() {
-        if (this.state.location !== null || this.state.player_kingdom_id !== 0) {
+        if (this.state.location !== null || this.state.player_kingdom_id !== 0 || this.state.enemy_kingdom_id !== 0) {
             return <OrangeButton additional_css={'block lg:hidden'} button_label={'View Location Details'} on_click={() => this.viewLocation()} />;
         }
     }
@@ -225,6 +259,9 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                                        title={'Teleport'} coordinates={this.props.coordinates}
                                        character_position={this.props.character_position}
                                        currencies={this.props.currencies}
+                                       view_port={this.props.view_port}
+                                       locations={this.props.locations}
+                                       player_kingdoms={this.props.player_kingdoms}
                         />
                     : null
                 }
@@ -234,7 +271,9 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                          <ViewLocationDetailsModal location={this.state.location}
                                                    close_modal={this.closeViewLocation.bind(this)}
                                                    character_id={this.props.character_id}
-                                                   kingdom_id={this.state.player_kingdom_id} />
+                                                   kingdom_id={this.state.player_kingdom_id}
+                                                   enemy_kingdom_id={this.state.enemy_kingdom_id}
+                         />
                      : null
                 }
             </Fragment>

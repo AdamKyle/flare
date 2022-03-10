@@ -19,7 +19,7 @@ export default interface MapState {
 
     loading: boolean;
 
-    player_kingdoms: {id: number, x_position: number, y_position: number, color: string, character_id: number}[] | null;
+    player_kingdoms: {id: number, x_position: number, y_position: number, color: string, character_id: number, name: string}[] | null;
 
     enemy_kingdoms: {id: number, x_position: number, y_position: number, color: string, character_id: number}[] | null;
 
