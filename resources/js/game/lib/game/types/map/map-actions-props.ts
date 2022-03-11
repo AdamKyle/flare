@@ -2,13 +2,15 @@ import LocationDetails from "../../map/types/location-details";
 
 export default interface MapActionsProps {
 
-    move_player: (direction: string) => void,
+    move_player: (direction: string) => void;
 
-    teleport_player: (data: {x: number, y: number, cost: number, timeout: number}) => void
+    teleport_player: (data: {x: number, y: number, cost: number, timeout: number}) => void;
 
-    can_player_move: boolean,
+    set_sail: (data: {x: number, y: number, cost: number, timeout: number}) => void;
 
-    players_on_map: number,
+    can_player_move: boolean;
+
+    players_on_map: number;
 
     location_with_adventures: LocationDetails | null;
 
@@ -28,7 +30,7 @@ export default interface MapActionsProps {
 
     character_id: number;
 
-    view_port: number,
+    view_port: number;
 
     currencies?: {
         gold: number,

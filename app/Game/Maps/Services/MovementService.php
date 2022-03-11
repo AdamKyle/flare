@@ -451,8 +451,13 @@ class MovementService {
      * @param array $params
      * @return array
      */
-    public function setSail(Character $character, Location $location, array $params): array {
-        $fromPort = Location::where('id', $params['current_port_id'])->where('is_port', true)->first();
+    public function setSail(Character $character, array $params): array {
+        $toPort   = Location::where('x', $params['x'])->where('y', $params['y'])->where('is_port', true)->where('game_map_id', $character->map->game_map_id)->first();
+        $fromPort = Location::where('x', $character->map->character_position_x)->where('y', $character->map->character_position_y)->where('is_port', true)->where('game_map_id', $character->map->game_map_id)->first();
+
+        if (is_null($toPort)) {
+            return $this->errorResult('Invalid port to set sail to.');
+        }
 
         if (is_null($fromPort)) {
             return $this->errorResult('Invalid port to set sail from.');
@@ -462,29 +467,19 @@ class MovementService {
             return $this->errorResult('You don\'t have the gold');
         }
 
-        $matches = $this->portService->doesMatch($character, $fromPort, $location, $params['time_out_value'], $params['cost']);
+        $matches = $this->portService->doesMatch($character, $fromPort, $toPort, $params['timeout'], $params['cost']);
 
         if (!$matches) {
             return $this->errorResult('The port you are trying to go doesn\'t exist.');
         }
 
-        $this->moveCharacterToNewPort($character, $location, $params['time_out_value']);
+        $this->moveCharacterToNewPort($character, $toPort, $params['timeout']);
 
         $character = $character->refresh();
 
         $this->attemptConjure($character);
 
-        $celestialEntity = CelestialFight::with('monster')->where('x_position', $character->x_position)
-            ->where('y_position', $character->y_position)
-            ->first();
-
-
-        return $this->successResult([
-            'character_position_details' => $character->map,
-            'port_details'               => $this->portService->getPortDetails($character, $location),
-            'adventure_details'          => $location->adventures->isNotEmpty() ? $location->adventures : [],
-            'celestial_entities'         => !is_null($celestialEntity) ? [$celestialEntity] : [],
-        ]);
+        return $this->successResult($this->locationService->getLocationData($character));
     }
 
     /**

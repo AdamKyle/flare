@@ -24,17 +24,19 @@ class SetSailValidation extends FormRequest
     public function rules()
     {
         return [
-            'current_port_id' => 'required|integer',
-            'cost'            => 'required|integer',
-            'time_out_value'  => 'required|integer',
+            'x'       => 'required',
+            'y'       => 'required',
+            'cost'    => 'required',
+            'timeout' => 'required',
         ];
     }
 
     public function messages() {
         return [
-            'current_port_id.required' => 'Current Port Is required.',
-            'cost.required'            => 'Cost is required.',
-            'time_out_value.required'  => 'Time out value is required.',
+            'x.required'       => 'X position is required.',
+            'y.required'       => 'Y position is required.',
+            'cost.required'    => 'Cost is required.',
+            'timeout.required' => 'Timeout is required.'
         ];
     }
 }

@@ -1,6 +1,4 @@
 import React from "react";
-import EnemyKingdomPinProps from "../../../lib/game/types/map/kingdom-pins/enemy-kingdom-pin-props";
-import NpcKingdomProps from "../../../lib/game/types/map/kingdom-pins/npc-kingdom-props";
 import NpcKingdomPinProps from "../../../lib/game/types/map/kingdom-pins/npc-kingdom-pin-props";
 
 export default class NpcKingdomPin extends React.Component<NpcKingdomPinProps, {}> {

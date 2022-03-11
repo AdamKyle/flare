@@ -112,7 +112,7 @@ class PortService {
         $locationData = $locations->transform(function($portLocation) use($character, $location) {
             $distance = $this->distanceCalculator->calculatePixel($portLocation->x, $portLocation->y, $location->x, $location->y);
             $time     = $this->distanceCalculator->calculateMinutes($distance);
-            $cost     = ($time * 100);
+            $cost     = ($time * 1000);
 
             $portLocation->distance   = $distance;
             $portLocation->time       = $time;

@@ -101,12 +101,12 @@ class MapController extends Controller {
         return response()->json($response, $status);
     }
 
-    public function setSail(SetSailValidation $request, Location $location, Character $character, MovementService $movementService) {
+    public function setSail(SetSailValidation $request, Character $character, MovementService $movementService) {
         if (!$character->can_move) {
             return response()->json(['invalid input'], 429);
         }
 
-        $response = $movementService->setSail($character, $location, $request->all());
+        $response = $movementService->setSail($character, $request->all());
 
         $status = $response['status'];
 

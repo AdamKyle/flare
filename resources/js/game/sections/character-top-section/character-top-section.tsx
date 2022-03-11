@@ -25,7 +25,6 @@ export default class CharacterTopSection extends React.Component<CharacterTopSec
 
     componentDidMount() {
         (new Ajax()).setRoute('character-sheet/' + this.props.character_id).doAjaxCall('get', (result: AxiosResponse) => {
-           console.log(result);
 
            this.setState({
                loading: false,

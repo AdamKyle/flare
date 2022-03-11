@@ -8,6 +8,7 @@ import clsx from 'clsx';
 import TeleportModal from "../modals/teleport-modal";
 import OrangeButton from "../../../../components/ui/buttons/orange-button";
 import ViewLocationDetailsModal from "../modals/view-location-details-modal";
+import SetSailModal from "../modals/set-sail-modal";
 
 export default class MapActions extends React.Component<MapActionsProps, MapActionsState> {
 
@@ -21,6 +22,7 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
             show_location_details: false,
             player_kingdom_id: null,
             enemy_kingdom_id: null,
+            open_set_sail_modal: false,
         }
     }
 
@@ -166,12 +168,18 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
         });
     }
 
+    manageSetSailModal() {
+        this.setState({
+            open_set_sail_modal: !this.state.open_set_sail_modal,
+        });
+    }
+
     adventure() {
 
     }
 
     setSail() {
-
+        this.manageSetSailModal();
     }
 
     teleport() {
@@ -210,6 +218,22 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
         }
     }
 
+    adventureButtonIsHidden() {
+        if (this.props.location_with_adventures === null) {
+            return true;
+        }
+
+        if (this.props.location_with_adventures.adventures === null) {
+            return true;
+        }
+
+        if (this.props.location_with_adventures.adventures.length === 0) {
+            return true;
+        }
+
+        return false;
+    }
+
     renderViewDetailsButton() {
         if (this.state.location !== null || this.state.player_kingdom_id !== 0 || this.state.enemy_kingdom_id !== 0) {
             return <OrangeButton additional_css={'block lg:hidden'} button_label={'View Location Details'} on_click={() => this.viewLocation()} />;
@@ -229,7 +253,9 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
 
                             {
                                 this.props.port_location !== null ?
-                                    <SuccessOutlineButton additional_css={'text-center'} button_label={'Set Sail'} on_click={this.setSail.bind(this)} disabled={this.state.is_movement_disabled}/>
+                                    <SuccessOutlineButton additional_css={clsx('text-center', {
+                                        'col-start-2 col-end-2': this.adventureButtonIsHidden(),
+                                    })} button_label={'Set Sail'} on_click={this.setSail.bind(this)} disabled={this.state.is_movement_disabled}/>
                                     : null
                             }
 
@@ -269,6 +295,20 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                                        enemy_kingdoms={this.props.enemy_kingdoms}
                         />
                     : null
+                }
+
+                {
+                    this.state.open_set_sail_modal ?
+                        <SetSailModal  is_open={this.state.open_set_sail_modal}
+                                       set_sail={this.props.set_sail}
+                                       handle_close={this.manageSetSailModal.bind(this)}
+                                       handle_action={this.props.set_sail}
+                                       title={'Set Sail'}
+                                       character_position={this.props.character_position}
+                                       currencies={this.props.currencies}
+                                       ports={this.props.ports}
+                        />
+                        : null
                 }
 
                 {

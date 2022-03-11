@@ -63,8 +63,6 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                 y: getNewYPosition(state.character_position.y, state.map_position.y, this.props.view_port),
             }
 
-            console.log(state)
-
             if (state.time_left !== 0) {
                 state.can_player_move = false;
             }
@@ -114,7 +112,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
             return null;
         }
 
-        return this.state.locations.filter((location) => location.is_port && location.x !== this.state.character_position.x && location.y !== this.state.character_position.y);
+        return this.state.locations.filter((location) => location.is_port);
     }
 
     handleDrag(e: any, position: {x: number, y: number}) {
@@ -146,6 +144,10 @@ export default class MapSection extends React.Component<MapProps, MapState> {
 
     handleTeleportPlayer(data: {x: number, y: number, cost: number, timeout: number}) {
         (new MovePlayer(this)).teleportPlayer(data, this.props.character_id, this.props.view_port);
+    }
+
+    handleSetSail(data: {x: number, y: number, cost: number, timeout: number}) {
+        (new MovePlayer(this)).setSail(data, this.props.character_id, this.props.view_port);
     }
 
     render() {
@@ -185,6 +187,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                 <div className='mt-4'>
                     <MapActions move_player={this.handleMovePlayer.bind(this)}
                                 teleport_player={this.handleTeleportPlayer.bind(this)}
+                                set_sail={this.handleSetSail.bind(this)}
                                 can_player_move={this.state.can_player_move}
                                 players_on_map={this.state.characters_on_map}
                                 location_with_adventures={this.state.location_with_adventures}
