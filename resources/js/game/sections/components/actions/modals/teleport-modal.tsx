@@ -25,6 +25,7 @@ export default class TeleportModal extends React.Component<TeleportModalProps, a
             time_out: 0,
             current_location: null,
             current_player_kingdom: null,
+            current_enemy_kingdom: null
         }
     }
 
@@ -45,6 +46,16 @@ export default class TeleportModal extends React.Component<TeleportModalProps, a
             if (foundKingdom.length > 0) {
                 this.setState({
                     current_player_kingdom: foundKingdom[0],
+                });
+            }
+        }
+
+        if (this.props.enemy_kingdoms !== null) {
+            const foundKingdom = this.props.enemy_kingdoms.filter((kingdom) => kingdom.x_position === this.props.character_position.x && kingdom.y_position === this.props.character_position.y);
+
+            if (foundKingdom.length > 0) {
+                this.setState({
+                    current_enemy_kingdom: foundKingdom[0],
                 });
             }
         }
@@ -74,6 +85,16 @@ export default class TeleportModal extends React.Component<TeleportModalProps, a
                 });
             }
         }
+
+        if (this.state.current_enemy_kingdom === null && this.props.enemy_kingdoms !== null) {
+            const foundKingdom = this.props.enemy_kingdoms.filter((kingdom) => kingdom.x_position === this.props.character_position.x && kingdom.y_position === this.props.character_position.y);
+
+            if (foundKingdom.length > 0) {
+                this.setState({
+                    current_enemy_kingdom: foundKingdom[0],
+                });
+            }
+        }
     }
 
     getDefaultLocationValue() {
@@ -92,11 +113,20 @@ export default class TeleportModal extends React.Component<TeleportModalProps, a
         return  {value: 0, label: ''};
     }
 
+    getDefaultEnemyKingdomValue() {
+        if (this.state.current_enemy_kingdom !== null) {
+            return {label: this.state.current_enemy_kingdom.name + ' (X/Y): ' + this.state.current_enemy_kingdom.x_position + '/' + this.state.current_enemy_kingdom.y_position, value: this.state.current_enemy_kingdom.id}
+        }
+
+        return  {value: 0, label: ''};
+    }
+
     setXPosition(data: any) {
         this.setState({
             x_position: data.value,
             current_location: null,
             current_player_kingdom: null,
+            current_enemy_kingdom: null,
         }, () => {
             let state = fetchCost(this.state.x_position, this.state.y_position, this.state.character_position, this.props.currencies);
 
@@ -113,7 +143,8 @@ export default class TeleportModal extends React.Component<TeleportModalProps, a
                     x_position: foundLocation[0].x,
                     y_position: foundLocation[0].y,
                     current_location: foundLocation[0],
-                    current_player_kingdom: null
+                    current_player_kingdom: null,
+                    current_enemy_kingdom: null
                 }, () => {
                     this.setState(fetchCost(this.state.x_position, this.state.y_position, this.state.character_position, this.props.currencies));
                 });
@@ -131,6 +162,25 @@ export default class TeleportModal extends React.Component<TeleportModalProps, a
                     y_position: foundKingdom[0].y_position,
                     current_player_kingdom: foundKingdom[0],
                     current_location: null,
+                    current_enemy_kingdom: null,
+                }, () => {
+                    this.setState(fetchCost(this.state.x_position, this.state.y_position, this.state.character_position, this.props.currencies));
+                });
+            }
+        }
+    }
+
+    setEnemyKingdomData(data: any) {
+        if (this.props.enemy_kingdoms !== null) {
+            const foundKingdom = this.props.enemy_kingdoms.filter((location) => location.id === data.value);
+
+            if (foundKingdom.length > 0) {
+                this.setState({
+                    x_position: foundKingdom[0].x_position,
+                    y_position: foundKingdom[0].y_position,
+                    current_player_kingdom: null,
+                    current_location: null,
+                    current_enemy_kingdom: foundKingdom[0]
                 }, () => {
                     this.setState(fetchCost(this.state.x_position, this.state.y_position, this.state.character_position, this.props.currencies));
                 });
@@ -185,6 +235,16 @@ export default class TeleportModal extends React.Component<TeleportModalProps, a
         return [];
     }
 
+    buildEnemyKingdomOptions(): {value: number, label: string}[]|[] {
+        if (this.props.enemy_kingdoms !== null) {
+            return this.props.enemy_kingdoms.map((kingdom) => {
+                return {label: kingdom.name + ' (X/Y): ' + kingdom.x_position + '/' + kingdom.y_position, value: kingdom.id}
+            });
+        }
+
+        return [];
+    }
+
     convertToSelectable(data: number[]): {value: number, label: string}[] {
         return data.map((d) => {
             return {value: d, label: d.toString()}
@@ -200,6 +260,15 @@ export default class TeleportModal extends React.Component<TeleportModalProps, a
         });
 
          this.props.handle_close();
+    }
+
+    showMyKingdomSelect() {
+
+        if (this.props.player_kingdoms === null) {
+            return false
+        }
+
+        return this.props.player_kingdoms.length > 0;
     }
 
     render() {
@@ -245,40 +314,57 @@ export default class TeleportModal extends React.Component<TeleportModalProps, a
                     </div>
                 </div>
                 <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                    <div className='grid gap-2 md:grid-cols-2'>
-                        <div className='flex items-center'>
-                            <label className='w-[100px]'>Locations:</label>
-                            <div className='w-2/3'>
-                                <Select
-                                    onChange={this.setLocationData.bind(this)}
-                                    options={this.buildLocationOptions()}
-                                    menuPosition={'absolute'}
-                                    menuPlacement={'bottom'}
-                                    styles={{menuPortal: (base) => ({...base, zIndex: 9999, color: '#000000'})}}
-                                    menuPortalTarget={document.body}
-                                    value={this.getDefaultLocationValue()}
-                                />
-                            </div>
+                <div className='grid gap-2 md:grid-cols-2'>
+                    <div className={clsx('flex items-center', {
+                        'col-start-1 col-span-2': !this.showMyKingdomSelect()
+                    })}>
+                        <label className='w-[100px]'>Locations:</label>
+                        <div className='w-2/3'>
+                            <Select
+                                onChange={this.setLocationData.bind(this)}
+                                options={this.buildLocationOptions()}
+                                menuPosition={'absolute'}
+                                menuPlacement={'bottom'}
+                                styles={{menuPortal: (base) => ({...base, zIndex: 9999, color: '#000000'})}}
+                                menuPortalTarget={document.body}
+                                value={this.getDefaultLocationValue()}
+                            />
                         </div>
-                        {
-                            this.props.player_kingdoms !== null ?
-                                <div className='flex items-center'>
-                                    <label className='w-[100px]'>My Kingdoms:</label>
-                                    <div className='w-2/3'>
-                                        <Select
-                                            onChange={this.setMyKingdomData.bind(this)}
-                                            options={this.buildMyKingdomsOptions()}
-                                            menuPosition={'absolute'}
-                                            menuPlacement={'bottom'}
-                                            styles={{menuPortal: (base) => ({...base, zIndex: 9999, color: '#000000'})}}
-                                            menuPortalTarget={document.body}
-                                            value={this.getDefaultPlayerKingdomValue()}
-                                        />
-                                    </div>
-                                </div>
-                            : null
-                        }
                     </div>
+                    {
+                        this.showMyKingdomSelect() ?
+                            <div className='flex items-center'>
+                                <label className='w-[100px]'>My Kingdoms:</label>
+                                <div className='w-2/3'>
+                                    <Select
+                                        onChange={this.setMyKingdomData.bind(this)}
+                                        options={this.buildMyKingdomsOptions()}
+                                        menuPosition={'absolute'}
+                                        menuPlacement={'bottom'}
+                                        styles={{menuPortal: (base) => ({...base, zIndex: 9999, color: '#000000'})}}
+                                        menuPortalTarget={document.body}
+                                        value={this.getDefaultPlayerKingdomValue()}
+                                    />
+                                </div>
+                            </div>
+                        : null
+                    }
+                </div>
+                <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                <div className='flex items-center'>
+                    <label className='w-[100px]'>Enemy Kingdoms</label>
+                    <div className='w-2/3'>
+                        <Select
+                            onChange={this.setEnemyKingdomData.bind(this)}
+                            options={this.buildEnemyKingdomOptions()}
+                            menuPosition={'absolute'}
+                            menuPlacement={'bottom'}
+                            styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999, color: '#000000' }) }}
+                            menuPortalTarget={document.body}
+                            value={this.getDefaultEnemyKingdomValue()}
+                        />
+                    </div>
+                </div>
                 <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                 <dl>
                     <dt>Cost in Gold:</dt>
@@ -287,6 +373,8 @@ export default class TeleportModal extends React.Component<TeleportModalProps, a
                         {'text-green-600' : this.state.can_afford && this.state.cost > 0},
                         {'text-red-600': !this.state.ca_afford && this.state.cost > 0}
                     )}>{formatNumber(this.state.cost)}</dd>
+                    <dt>Can Afford:</dt>
+                    <dd>{this.state.can_afford ? 'Yes' : 'No'}</dd>
                     <dt>Distance:</dt>
                     <dd>{this.state.distance} Miles</dd>
                     <dt>Timeout for:</dt>

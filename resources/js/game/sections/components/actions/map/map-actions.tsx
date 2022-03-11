@@ -266,6 +266,7 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                                        view_port={this.props.view_port}
                                        locations={this.props.locations}
                                        player_kingdoms={this.props.player_kingdoms}
+                                       enemy_kingdoms={this.props.enemy_kingdoms}
                         />
                     : null
                 }

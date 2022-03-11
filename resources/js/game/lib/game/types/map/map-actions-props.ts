@@ -16,7 +16,7 @@ export default interface MapActionsProps {
 
     player_kingdoms: {id: number, x_position: number, y_position: number, color: string, character_id: number, name: string}[] | null;
 
-    enemy_kingdoms: {id: number, x_position: number, y_position: number, color: string, character_id: number}[] | null;
+    enemy_kingdoms: {id: number, x_position: number, y_position: number, color: string, character_id: number, name: string}[] | null;
 
     port_location: LocationDetails| null;
 

@@ -21,7 +21,7 @@ class MoveTimeOutListener
         $character = $event->character;
 
         if ($event->timeOut !== 0) {
-            $time = $event->timeOut - ($event->timeOut * $this->findMovementMinuteTimeReduction($character));
+            $time = round($event->timeOut - ($event->timeOut * $this->findMovementMinuteTimeReduction($character)));
 
             if ($time < 1) {
                 $timeOut    = now()->addMinute();
@@ -40,7 +40,7 @@ class MoveTimeOutListener
 
             MoveTimeOutJob::dispatch($character->id)->delay($timeOut);
         } else {
-            $time = (10 * $this->findMovementTimeReductions($character));
+            $time = round(10 - (10 * $this->findMovementTimeReductions($character)));
 
             if ($time < 1) {
                 $time = 1;

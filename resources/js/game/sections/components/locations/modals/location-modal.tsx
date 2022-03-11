@@ -58,7 +58,7 @@ export default class LocationModal extends React.Component<LocationModalPros, an
     }
 
     teleportDisabled(): boolean {
-        return this.state.cost === 0;
+        return this.state.cost === 0 || !this.state.can_afford;
     }
 
     render() {
@@ -73,11 +73,11 @@ export default class LocationModal extends React.Component<LocationModalPros, an
                       }}
             >
                 <p className='my-3'>{this.props.location.description}</p>
-                <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                 {
                     this.props.location.increase_enemy_percentage_by !== null &&
                     this.props.location.increase_enemy_percentage_by !== null ?
                         <Fragment>
+                            <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                             <div className='flex items-center mb-4'>
                                 <h4>Special Location Details</h4>
                                 <div>
@@ -85,7 +85,7 @@ export default class LocationModal extends React.Component<LocationModalPros, an
                                     <h3>Special Locations</h3>
                                     <p className='my-2'>
                                         This is a special location which contains the same monsters you have been fighting but they are much stronger here.
-                                        Players will want to have <a href={"/information/voidance"} target='_blank'>Devouring Darkness and Light<i className="fas fa-external-link-alt"></i></a> <a href={"/information/quest-items"} target='_blank'>Quest items <i className="fas fa-external-link-alt"></i> </a>
+                                        Players will want to have <a href={"/information/voidance"} target='_blank'>Devouring Darkness and Light <i className="fas fa-external-link-alt"></i></a> <a href={"/information/quest-items"} target='_blank'>Quest items <i className="fas fa-external-link-alt"></i> </a>
                                         Which you can get from completing various: <a href={"/information/quests"} target='_blank'>Quests <i className="fas fa-external-link-alt"></i></a> with in the game.
                                     </p>
                                     <p>

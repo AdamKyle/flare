@@ -32,7 +32,7 @@ export default class PopOverContainer extends React.Component<PopOverContainerPr
                                     className={'absolute z-50 w-screen max-w-sm px-4 mt-3 transform -translate-x-3/4 md:-translate-x-1/2 left-1/2 sm:px-0 lg:max-w-3xl ' + this.props.additional_css}>
                                     <div
                                         className="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
-                                        <div className="relative bg-white dark:bg-gray-700 p-7">
+                                        <div className="relative bg-white dark:bg-gray-700 p-7 font-thin">
                                             {this.props.children}
                                         </div>
                                     </div>

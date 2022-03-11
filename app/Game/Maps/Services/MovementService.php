@@ -362,11 +362,6 @@ class MovementService {
      * @return void
      */
     public function updateCharacterMovementTimeOut(Character $character) {
-        $character->update([
-            'can_move'          => false,
-            'can_move_again_at' => now()->addSeconds(10),
-        ]);
-
         event(new MoveTimeOutEvent($character));
     }
 
