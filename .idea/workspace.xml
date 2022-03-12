@@ -3,15 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="f574dce8-e67f-47ee-8bb6-fe6b7dafab2a" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Flare/Models/Quest.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Models/Quest.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Flare/Providers/ServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Providers/ServiceProvider.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Providers/RouteServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Providers/RouteServiceProvider.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/game/components/ui/dialogue/dialogue.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/components/ui/dialogue/dialogue.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/components/ui/tabs/tabs.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/components/ui/tabs/tabs.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/game.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/game.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/game/lib/ui/types/dialogue/dialogue-types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/ui/types/dialogue/dialogue-types.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/ui/types/tabs/tabs-properties.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/ui/types/tabs/tabs-properties.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/components/actions/map/map-actions.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/components/actions/map/map-actions.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/components/quests/modals/quest-details-modal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/components/quests/modals/quest-details-modal.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
