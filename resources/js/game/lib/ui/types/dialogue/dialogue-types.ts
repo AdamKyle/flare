@@ -12,4 +12,6 @@ export default interface DialogueTypes {
     } | null
 
     title: string;
+
+    large_modal?: boolean;
 }

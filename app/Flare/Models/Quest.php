@@ -63,25 +63,38 @@ class Quest extends Model {
     ];
 
     protected $appends = [
-        'required_item_monster',
-        'unlocks_skill_name',
+        // 'required_item_monster',
+        // 'unlocks_skill_name',
         'belongs_to_map_name',
-        'secondary_required_quest_item',
+        // 'secondary_required_quest_item',
     ];
 
     public function childQuests() {
         return $this->hasMany($this, 'parent_quest_id')
                     ->with(
-                'childQuests',
-                        'rewardItem',
-                        'item',
-                        'factionMap',
-                        'item.dropLocation',
-                        'requiredPlane',
-                        'npc',
-                        'npc.commands',
-                        'npc.gameMap',
-                    );
+                'childQuests'
+//                        'rewardItem',
+//                        'item',
+//                        'factionMap',
+//                        'item.dropLocation',
+//                        'requiredPlane',
+//                        'npc',
+//                        'npc.commands',
+//                        'npc.gameMap',
+                    )->without('npc');
+    }
+
+    public function loadRelations() {
+        return $this->load(
+    'rewardItem',
+            'item',
+            'factionMap',
+            'item.dropLocation',
+            'requiredPlane',
+            'npc',
+            'npc.commands',
+            'npc.gameMap',
+        );
     }
 
     public function parent() {

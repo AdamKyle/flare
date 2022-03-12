@@ -3,6 +3,7 @@ import { Dialog, Transition } from '@headlessui/react'
 import DialogueTypes from "../../../lib/ui/types/dialogue/dialogue-types";
 import DangerButton from "../buttons/danger-button";
 import PrimaryButton from "../buttons/primary-button";
+import clsx from "clsx";
 
 export default class Dialogue extends React.Component<DialogueTypes, any> {
     constructor(props: DialogueTypes) {
@@ -54,7 +55,7 @@ export default class Dialogue extends React.Component<DialogueTypes, any> {
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <div className="inline-block w-full max-w-3xl p-6 my-8 overflow text-left align-middle transition-all transform bg-white dark:bg-gray-700 drop-shadow-2xl rounded-md">
+                            <div className={clsx("inline-block w-full p-6 my-8 overflow text-left align-middle transition-all transform bg-white dark:bg-gray-700 drop-shadow-2xl rounded-md", {'max-w-7xl': this.props.large_modal}, {'max-w-3xl': !this.props.large_modal})}>
                                 <Dialog.Title
                                     as="h3"
                                     className="flex items-center text-lg font-medium leading-6 text-gray-700 dark:text-gray-500 relative mb-5"

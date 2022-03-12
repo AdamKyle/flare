@@ -3,7 +3,6 @@ import MapActionsProps from "../../../../lib/game/types/map/map-actions-props";
 import PrimaryButton from "../../../../components/ui/buttons/primary-button";
 import SuccessOutlineButton from "../../../../components/ui/buttons/success-outline-button";
 import MapActionsState from "../../../../lib/game/types/map/map-actions-state";
-import PrimaryOutlineButton from "../../../../components/ui/buttons/primary-outline-button";
 import clsx from 'clsx';
 import TeleportModal from "../modals/teleport-modal";
 import OrangeButton from "../../../../components/ui/buttons/orange-button";
@@ -186,10 +185,6 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
         this.manageTeleportModal()
     }
 
-    openPlaneQuests() {
-
-    }
-
     traverse() {
 
     }
@@ -268,7 +263,7 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                     </div>
                 </div>
                 <div className='text-left mt-4 mb-3'>
-                    Characters On Map: {this.props.players_on_map} | <PrimaryOutlineButton additional_css={'text-center'} button_label={'Quests'} on_click={this.openPlaneQuests.bind(this)} />
+                    Characters On Map: {this.props.players_on_map}
                 </div>
                 <div className='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 hidden sm:block'></div>
                 <div className='grid gap-2 lg:grid-cols-5 lg:gap-4'>

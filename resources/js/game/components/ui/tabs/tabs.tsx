@@ -2,6 +2,7 @@ import React from "react";
 import {Tab} from "@headlessui/react";
 import {classNames} from '../../../lib/ui/css-class-helper';
 import TabProperties from "../../../lib/ui/types/tabs/tabs-properties";
+import clsx from "clsx";
 
 export default class Tabs extends React.Component<TabProperties, {}> {
 
@@ -28,7 +29,7 @@ export default class Tabs extends React.Component<TabProperties, {}> {
     render() {
         return(
             <Tab.Group>
-                <Tab.List className="w-full md:w-1/3 grid grid-cols-3 gap-2 content-center">
+                <Tab.List className={clsx("w-full grid grid-cols-4 gap-2 content-center", {'md:w-1/3': !this.props.full_width})}>
                     {this.renderEachTab()}
                 </Tab.List>
                 <Tab.Panels className="mt-5">

@@ -27,7 +27,6 @@ use App\Flare\Handlers\CharacterAttackHandler;
 use App\Flare\Handlers\HealingExtraActionHandler;
 use App\Flare\Handlers\MonsterAttackHandler;
 use App\Flare\Handlers\SetupFightHandler;
-use App\Flare\Handlers\WeaponAndMagicAttackBase;
 use App\Flare\Middleware\IsCharacterLoggedInMiddleware;
 use App\Flare\Middleware\IsCharacterWhoTheySayTheyAreMiddleware;
 use App\Flare\Middleware\IsGloballyTimedOut;
