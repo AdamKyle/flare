@@ -5,5 +5,7 @@ export default interface QuestNodeProps {
 
     quest: QuestDetails | ChildQuestDetails | null;
 
+    completed_quests: number[] | [];
+
     character_id: number;
 }

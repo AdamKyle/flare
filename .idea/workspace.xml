@@ -3,9 +3,17 @@
   <component name="ChangeListManager">
     <list default="true" id="f574dce8-e67f-47ee-8bb6-fe6b7dafab2a" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/components/ui/dialogue/dialogue.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/components/ui/dialogue/dialogue.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/ui/types/dialogue/dialogue-types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/ui/types/dialogue/dialogue-types.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Models/Quest.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Models/Quest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Quests/Controllers/Api/QuestsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Quests/Controllers/Api/QuestsController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/components/ui/buttons/success-outline-button.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/components/ui/buttons/success-outline-button.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/game.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/game.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/game/types/map/quests/quest-node-props.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/game/types/map/quests/quest-node-props.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/game/types/map/quests/quest-state.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/game/types/map/quests/quest-state.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/game/types/map/quests/quest-tree-props.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/game/types/map/quests/quest-tree-props.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/components/quests/components/quest-node.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/components/quests/components/quest-node.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/components/quests/components/quest-tree.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/components/quests/components/quest-tree.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/game/sections/components/quests/modals/quest-details-modal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/components/quests/modals/quest-details-modal.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/components/quests/quests.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/components/quests/quests.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -14,6 +22,13 @@
   </component>
   <component name="ComposerSettings">
     <execution />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="TypeScript File" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />

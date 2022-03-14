@@ -11,6 +11,8 @@ export  default class QuestTree extends React.Component<QuestTreeProps, any> {
 
     private tabs: {key: string, name: string}[];
 
+    private invalid_planes: string[];
+
     constructor(props: QuestTreeProps) {
         super(props);
 
@@ -21,6 +23,8 @@ export  default class QuestTree extends React.Component<QuestTreeProps, any> {
             key: 'one-off-quests',
             name: 'One Off Quests',
         }];
+
+        this.invalid_planes = ['Dungeon', 'Shadow Plane', 'Purgatory']
     }
 
     renderQuestTree(parentQuest: QuestDetails | ChildQuestDetails | null) {
@@ -31,7 +35,7 @@ export  default class QuestTree extends React.Component<QuestTreeProps, any> {
 
         return parentQuest.child_quests.map((quest) => {
             return (
-                <TreeNode label={<QuestNode quest={quest} character_id={this.props.character_id} />}>
+                <TreeNode label={<QuestNode quest={quest} character_id={this.props.character_id} completed_quests={this.props.completed_quests}/>}>
                     {this.renderQuestTree(quest)}
                 </TreeNode>
             )
@@ -39,7 +43,10 @@ export  default class QuestTree extends React.Component<QuestTreeProps, any> {
     }
 
     fetchParentQuestChain(): QuestDetails | null {
-        const questChain = this.props.quests.filter((quest) => quest.child_quests.length > 0);
+
+        const plane = this.fetchPlane();
+
+        const questChain = this.props.quests.filter((quest) => quest.child_quests.length > 0 && quest.belongs_to_map_name === plane);
 
         if (questChain.length > 0) {
             return questChain[0];
@@ -49,13 +56,25 @@ export  default class QuestTree extends React.Component<QuestTreeProps, any> {
     }
 
     fetchSingleQuests(): QuestDetails[] | [] {
-        const quests = this.props.quests.filter((quest) => quest.child_quests.length === 0);
+        const plane = this.fetchPlane();
+
+        const quests = this.props.quests.filter((quest) => quest.child_quests.length === 0 && quest.belongs_to_map_name === plane);
 
         if (quests.length > 0) {
             return quests;
         }
 
         return []
+    }
+
+    fetchPlane() {
+        let plane = this.props.plane;
+
+        if (this.invalid_planes.indexOf(plane) !== -1) {
+            plane = 'Surface'
+        }
+
+        return plane;
     }
 
     renderSingleQuests() {
@@ -65,7 +84,7 @@ export  default class QuestTree extends React.Component<QuestTreeProps, any> {
                     lineWidth={'2px'}
                     lineColor={'#0ea5e9'}
                     lineBorderRadius={'10px'}
-                    label={<QuestNode quest={quest} character_id={this.props.character_id} />}
+                    label={<QuestNode quest={quest} character_id={this.props.character_id} completed_quests={this.props.completed_quests}/>}
                 >
                     {this.renderQuestTree(quest)}
                 </Tree>
@@ -81,7 +100,7 @@ export  default class QuestTree extends React.Component<QuestTreeProps, any> {
                         lineWidth={'2px'}
                         lineColor={'#0ea5e9'}
                         lineBorderRadius={'10px'}
-                        label={<QuestNode quest={this.fetchParentQuestChain()} character_id={this.props.character_id}/>}
+                        label={<QuestNode quest={this.fetchParentQuestChain()} character_id={this.props.character_id} completed_quests={this.props.completed_quests}/>}
                     >
                         {this.renderQuestTree(this.fetchParentQuestChain())}
                     </Tree>

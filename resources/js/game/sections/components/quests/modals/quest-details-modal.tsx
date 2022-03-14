@@ -8,6 +8,8 @@ import TabPanel from "../../../../components/ui/tabs/tab-panel";
 import PopOverContainer from "../../../../components/ui/popover/pop-over-container";
 import clsx from "clsx";
 import InfoAlert from "../../../../components/ui/alerts/simple-alerts/info-alert";
+import CurrencyRequirement from "./components/currency-requirement";
+import Reward from "./components/reward";
 
 export default class QuestDetailsModal extends React.Component<any, any> {
 
@@ -100,8 +102,110 @@ export default class QuestDetailsModal extends React.Component<any, any> {
         }
 
         return null;
+    }
 
-        return null;
+    renderLocations(locations: any) {
+        return locations.map((location: any) => {
+            return  <Fragment>
+                <dl>
+                    <dt>By Going to</dt>
+                    <dd>{location.name}</dd>
+                    <dt>Which is at (X/Y)</dt>
+                    <dd>{location.x}/{location.y}</dd>
+                    <dt>On Plane</dt>
+                    <dd>{location.map.name}</dd>
+                    {this.renderPlaneAccessRequirements(location.map)}
+                </dl>
+            </Fragment>
+        });
+    }
+
+    renderItem(item: any) {
+        return (
+            <Fragment>
+                {
+                    item.drop_location_id !== null ?
+                        <InfoAlert>
+                            <p>Some items, such as this one, only drop when you are at a special location. These locations
+                                increase enemy strength making them more of a challenge.</p>
+                            <p>These items have a 1/1,000,000 chance to drop. Your looting skill is capped at 45% here.</p>
+                            <p>
+                                <strong>These items will not drop if you are using Exploration. You must manually farm these quest items.</strong>
+                            </p>
+                        </InfoAlert>
+                        : null
+                }
+                {
+                    item.required_monster !== null ?
+                        item.required_monster.is_celestial_entity ?
+                            <InfoAlert>
+                                <p>
+                                    Some quests such as this one may have you fighting a Celestial entity. You can check the <a href="/information/npcs" target="_blank">help docs (NPC's)</a> to find out, based on which plane,
+                                    which Summoning NPC you ned to speak to inorder to conjure the entity, there is only one per plane.
+                                </p>
+                                <p>
+                                    Celestial Entities below Dungeons plane, will not be included in the weekly spawn.
+                                </p>
+                            </InfoAlert>
+                            : null
+                        : null
+                }
+                <dl>
+                    {
+                        item.required_monster !== null ?
+                            <Fragment>
+                                <dt>Obtained by killing</dt>
+                                <dd>{item.required_monster.name} {item.required_monster.is_celestial_entity ? "(Celestial)" : "(Regular Monster)"}</dd>
+                                <dt>Resides on plane</dt>
+                                <dd>{item.required_monster.game_map.name}</dd>
+                                {this.renderPlaneAccessRequirements(item.required_monster.game_map)}
+                            </Fragment>
+                            : null
+                    }
+
+                    {
+                        item.required_quest !== null ?
+                            <Fragment>
+                                <dt>Obtained by completing</dt>
+                                <dd>{item.required_quest.name}</dd>
+                                <dt>Which belongs to (NPC)</dt>
+                                <dd>{item.required_quest.npc.real_name}</dd>
+                                <dt>Who is on the plane of</dt>
+                                <dd>{item.required_quest.npc.game_map.name}</dd>
+                                <dt>At coordinates (X/Y)</dt>
+                                <dd>{item.required_quest.npc.x_position} / {item.required_quest.npc.y_position}</dd>
+                                {this.renderPlaneAccessRequirements(item.required_quest.npc.game_map)}
+                            </Fragment>
+                            : null
+                    }
+
+                    {
+                        item.drop_location_id !== null ?
+                            <Fragment>
+                                <dt>By Visiting (Fighting monsters for it to drop)</dt>
+                                <dd>{item.drop_location.name}</dd>
+                                <dt>At coordinates (X/Y)</dt>
+                                <dd>{item.drop_location.x} / {item.drop_location.y}</dd>
+                                <dt>Which is on the plane</dt>
+                                <dd>{item.drop_location.map.name}</dd>
+                                {this.renderPlaneAccessRequirements(item.drop_location.map)}
+                            </Fragment>
+                            : null
+                    }
+                </dl>
+                {
+                    item.locations.length > 0 ?
+                        <Fragment>
+                            <hr />
+                            <h3 className="tw-font-light">Locations</h3>
+                            <p>Locations that will give you the item, just for visiting.</p>
+                            <hr />
+                            {this.renderLocations(item.locations)}
+                        </Fragment>
+                        : null
+                }
+            </Fragment>
+        )
     }
 
     fetchNpcPlaneAccess() {
@@ -173,10 +277,10 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                                     </div>
                                 </TabPanel>
                                 <TabPanel key={'required-to-complete'}>
-                                    Required
+                                    <CurrencyRequirement quest={this.state.quest_details} item_requirements={this.renderItem.bind(this)}/>
                                 </TabPanel>
                                 <TabPanel key={'quest-reward'}>
-                                    Reward
+                                    <Reward quest={this.state.quest_details} />
                                 </TabPanel>
                             </Tabs>
                         </Fragment>

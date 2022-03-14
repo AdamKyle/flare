@@ -63,25 +63,14 @@ class Quest extends Model {
     ];
 
     protected $appends = [
-        // 'required_item_monster',
-        // 'unlocks_skill_name',
         'belongs_to_map_name',
-        // 'secondary_required_quest_item',
     ];
 
     public function childQuests() {
         return $this->hasMany($this, 'parent_quest_id')
                     ->with(
                 'childQuests'
-//                        'rewardItem',
-//                        'item',
-//                        'factionMap',
-//                        'item.dropLocation',
-//                        'requiredPlane',
-//                        'npc',
-//                        'npc.commands',
-//                        'npc.gameMap',
-                    )->without('npc');
+                    );
     }
 
     public function loadRelations() {
@@ -90,6 +79,8 @@ class Quest extends Model {
             'item',
             'factionMap',
             'item.dropLocation',
+            'secondaryItem',
+            'secondaryItem.dropLocation',
             'requiredPlane',
             'npc',
             'npc.commands',
@@ -107,10 +98,6 @@ class Quest extends Model {
 
     public function secondaryItem() {
         return $this->belongsTo(Item::class, 'secondary_required_item', 'id');
-    }
-
-    public function getSecondaryRequiredQuestItemAttribute() {
-        return Item::with('dropLocation')->find($this->secondary_required_item);
     }
 
     public function rewardItem() {

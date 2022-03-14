@@ -1,6 +1,7 @@
 import React from "react";
 import QuestNodeProps from "../../../../lib/game/types/map/quests/quest-node-props";
 import QuestDetailsModal from "../modals/quest-details-modal";
+import clsx from "clsx";
 
 export default class QuestNode extends React.Component<QuestNodeProps, any> {
 
@@ -18,10 +19,39 @@ export default class QuestNode extends React.Component<QuestNodeProps, any> {
         });
     }
 
+    isQuestCompleted() {
+        if (this.props.quest !== null) {
+            // @ts-ignore
+            return this.props.completed_quests.includes(this.props.quest.id)
+        }
+
+        return false
+    }
+
+    isParentQuestComplete() {
+        if (this.props.quest !== null) {
+
+            if (this.props.quest.is_parent) {
+                return this.isQuestCompleted();
+            }
+
+            // @ts-ignore
+            return this.props.completed_quests.includes(this.props.quest.parent_quest_id)
+        }
+
+        return false
+    }
+
     render() {
         return (
             <div>
-                <button type='button' role='button' className={'text-blue-500 dark:text-blue-400'} onClick={this.showQuestDetails.bind(this)}>{this.props.quest?.name}</button>
+                <button type='button' role='button' className={clsx({
+                    'text-blue-500 dark:text-blue-400': !this.isQuestCompleted() && this.isParentQuestComplete()
+                }, {
+                    'text-green-700 dark:text-green-600': this.isQuestCompleted()
+                }, {
+                    'text-red-500 dark:text-red-400': !this.isParentQuestComplete()
+                })} onClick={this.showQuestDetails.bind(this)}>{this.props.quest?.name}</button>
 
                 {
                     this.state.open_quest_modal ?
