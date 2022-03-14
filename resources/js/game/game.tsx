@@ -10,6 +10,7 @@ import CharacterTopSection from "./sections/character-top-section/character-top-
 import Quests from "./sections/components/quests/quests";
 import InfoAlert from "./components/ui/alerts/simple-alerts/info-alert";
 import DropDown from "./components/ui/drop-down/drop-down";
+import Actions from "./sections/game-actions-section/actions";
 
 export default class Game extends React.Component<GameProps, GameState> {
 
@@ -102,8 +103,8 @@ export default class Game extends React.Component<GameProps, GameState> {
                                                          update_character_currencies={this.updateCharacterCurrencies.bind(this)}
                                     />
                                 </BasicCard>
-                                <BasicCard>
-                                    <p>Actions</p>
+                                <BasicCard additionalClasses={'h-60'}>
+                                    <Actions character_id={this.props.characterId} />
                                 </BasicCard>
                             </div>
                             <BasicCard additionalClasses={'col-start-2 col-end-2 mt-5 md:mt-0 lg:col-start-3 lg:col-end-3'}>

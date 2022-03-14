@@ -40,9 +40,7 @@ class BattleController extends Controller {
         $this->battleEventHandler = $battleEventHandler;
     }
 
-    public function index() {
-        $character          = auth()->user()->character;
-
+    public function index(Character $character) {
         $characterMap       = $character->map;
 
         $locationWithEffect = Location::whereNotNull('enemy_strength_type')
