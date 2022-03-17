@@ -86,9 +86,11 @@ export default class Game extends React.Component<GameProps, GameState> {
             <div className="md:container">
                 { this.state.view_port < 1280 && this.state.show_size_message ?
                     <WarningAlert additional_css={'mb-5'} close_alert={this.hideDeviceSizeMessage.bind(this)}>
-                        You are currently on a device size lower then desktop. If you are on a mobile device you cannot click on locations (on the map) to
-                        view their details. Instead click on "View Location" which will appear under the directional buttons when you are on a location
-                        (blue port icon, pink arches or red/yellow kingdoms)
+                        Your devices screen size is too small to properly display the map. As a result, some basic map actions have been given to you such
+                        as teleport, adventure and traverse. With teleport you can teleport to any location you wish so long as you have the gold.
+                        Two additional teleport options has been added: Adventure Locations and Npc Locations. This allows you to teleport to locations with adventures and to
+                        select a location with an NPC. Finally, players on smaller screen sizes, can click on quests to open the window and click "complete" which will only be
+                        available if you have met all the requirements of the quest.
                     </WarningAlert>
                     : null
                 }
@@ -103,11 +105,11 @@ export default class Game extends React.Component<GameProps, GameState> {
                                                          update_character_currencies={this.updateCharacterCurrencies.bind(this)}
                                     />
                                 </BasicCard>
-                                <BasicCard additionalClasses={'h-60'}>
+                                <BasicCard additionalClasses={'min-h-60'}>
                                     <Actions character_id={this.props.characterId} />
                                 </BasicCard>
                             </div>
-                            <BasicCard additionalClasses={'col-start-2 col-end-2 mt-5 md:mt-0 lg:col-start-3 lg:col-end-3'}>
+                            <BasicCard additionalClasses={'hidden lg:block md:mt-0 lg:col-start-3 lg:col-end-3'}>
                                 <Fragment>
                                     {
                                         this.state.hide_map ?

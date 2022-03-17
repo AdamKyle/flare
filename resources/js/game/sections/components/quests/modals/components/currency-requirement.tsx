@@ -58,7 +58,11 @@ export default class CurrencyRequirement extends React.Component<any, any> {
                                         <h3 className='text-gray-700 dark:text-gray-200'>How to get: Shards</h3>
                                         <p className='my-2 text-gray-700 dark:text-gray-200'>
                                             Shards drop from Celestial Entities, which can be conjured for a cost in Gold and Gold Dust, or
-                                            through Hunting them on Wednesdays when they ave a 80% chance to spawn by you just moving.
+                                            through Hunting them on Wednesdays when they ave a 80% chance to spawn by you just moving. Some quests also reward shards.
+                                        </p>
+                                        <p>
+                                            Players use shards and Gold Dust in Alchemy to create powerful potions for short term boons or to create
+                                            Holy Oils for late game gear upgrades.
                                         </p>
                                     </PopOverContainer>
                                 </div>

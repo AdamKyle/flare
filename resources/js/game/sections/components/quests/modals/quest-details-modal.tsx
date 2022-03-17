@@ -237,9 +237,9 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                                             <dl>
                                                 <dt>Name</dt>
                                                 <dd>{this.state.quest_details.npc.name}</dd>
-                                                <dt className="text-green-700"><i className="fas fa-comment"></i> How to message</dt>
-                                                <dd className='flex items-center text-green-700'>
-                                                    <span><code>{this.state.quest_details.npc.text_command_to_message} {this.getNPCCommands(this.state.quest_details.npc)}</code></span>
+                                                <dt className="text-green-700 dark:text-green-600"><i className="fas fa-comment"></i> How to message</dt>
+                                                <dd className='flex items-center'>
+                                                    <span className='text-green-700 dark:text-green-600'><code>{this.state.quest_details.npc.text_command_to_message} {this.getNPCCommands(this.state.quest_details.npc)}</code></span>
                                                     <div>
                                                         <PopOverContainer icon={'fas fa-info-circle'} icon_label={'Help'}>
                                                             <h3 className='text-gray-700 dark:text-gray-200'>How to message</h3>

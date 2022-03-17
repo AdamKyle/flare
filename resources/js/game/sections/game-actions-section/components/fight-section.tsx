@@ -1,6 +1,7 @@
 import React from "react";
 import Select from "react-select";
 import PopOverContainer from "../../../components/ui/popover/pop-over-container";
+import PrimaryButton from "../../../components/ui/buttons/primary-button";
 
 export default class FightSection extends React.Component<any, any> {
 
@@ -20,13 +21,23 @@ export default class FightSection extends React.Component<any, any> {
             this.setState({
                 selected_monster: foundMonster[0],
             });
+        } else {
+            this.setState({
+                selected_monster: null,
+            });
         }
     }
 
     buildMonsters() {
-        return this.props.monsters.map((monster: any) => {
+        let monsters = this.props.monsters.map((monster: any) => {
             return {label: monster.name, value: monster.id};
-        })
+        });
+
+        monsters.unshift({
+            label: 'Please Select', value: 0,
+        });
+
+        return monsters;
     }
 
     defaultMonster() {
@@ -44,11 +55,15 @@ export default class FightSection extends React.Component<any, any> {
         }
     }
 
+    attack() {
+
+    }
+
     render() {
         return (
             <div className='mt-2'>
-                <div className='flex items-center'>
-                    <div className='grow w-14'>
+                <div className='grid grid-cols-3 gap-2'>
+                    <div className='cols-start-1 col-span-2'>
                         <Select
                             onChange={this.setMonsterToFight.bind(this)}
                             options={this.buildMonsters()}
@@ -59,8 +74,10 @@ export default class FightSection extends React.Component<any, any> {
                             value={this.defaultMonster()}
                         />
                     </div>
+                    <div className='cols-start-3 cols-end-3'>
+                        <PrimaryButton button_label={'Attack'} on_click={this.attack.bind(this)} />
+                    </div>
                 </div>
-
             </div>
         )
     }

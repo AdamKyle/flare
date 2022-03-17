@@ -3,16 +3,20 @@
   <component name="ChangeListManager">
     <list default="true" id="f574dce8-e67f-47ee-8bb6-fe6b7dafab2a" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Game/Battle/Controllers/Api/BattleController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Battle/Controllers/Api/BattleController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/components/ui/cards/basic-card.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/components/ui/cards/basic-card.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/game/game.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/game.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/game/battle/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/game/battle/api.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/components/quests/modals/components/currency-requirement.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/components/quests/modals/components/currency-requirement.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/components/quests/modals/quest-details-modal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/components/quests/modals/quest-details-modal.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/game-actions-section/actions.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/game-actions-section/actions.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/game-actions-section/components/fight-section.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/game-actions-section/components/fight-section.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ComposerSettings">
+  <component name="ComposerSettings" synchronizationState="DONT_SYNCHRONIZE">
+    <pharConfigPath>$PROJECT_DIR$/composer.json</pharConfigPath>
     <execution />
   </component>
   <component name="FileTemplateManagerImpl">
@@ -33,6 +37,9 @@
     <setting file="file://$PROJECT_DIR$/tests/Unit/Game/Kingdoms/Handlers/TakeKingdomHandlerTest.php" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/app/Game/Kingdoms/Handlers/TakeKingdomHandler.php" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/app/Game/Kingdoms/Service/KingdomsAttackService.php" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
   </component>
   <component name="PackageJsonUpdateNotifier">
     <dismissed value="$PROJECT_DIR$/package.json" />
@@ -225,21 +232,30 @@
       <path value="$PROJECT_DIR$/vendor/spatie/laravel-package-tools" />
     </include_path>
   </component>
+  <component name="ProjectId" id="26Os24VJuQPjPcoTPfjSRbTvCm2" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="1" id="Add" />
   </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
   <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources/js/game/components/ui/alerts/simple-alerts" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources/js/game/sections/game-actions-section/components" />
     <property name="nodejs_package_manager_path" value="yarn" />
     <property name="ts.external.directory.path" value="$PROJECT_DIR$/node_modules/typescript/lib" />
+    <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/resources/js/game/sections/game-actions-section/components" />
       <recent name="$PROJECT_DIR$/resources/js/game/components/ui/alerts/simple-alerts" />
       <recent name="$PROJECT_DIR$/resources/js/game/components/ui/buttons" />
       <recent name="$PROJECT_DIR$/resources/js/game/lib/game/types/map/modals" />
       <recent name="$PROJECT_DIR$/resources/js/game/sections/components/actions/modals" />
-      <recent name="$PROJECT_DIR$/resources/js/game/lib/game/types/map/kingdom-pins/modals" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/resources/js/game/lib/game/types/map/quests" />
@@ -248,10 +264,23 @@
   </component>
   <component name="RunManager">
     <configuration default="true" type="ComposerRunConfigurationType" factoryName="Composer Script">
+      <option name="pathToComposerJson" value="$PROJECT_DIR$/composer.json" />
       <method v="2" />
     </configuration>
   </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="f574dce8-e67f-47ee-8bb6-fe6b7dafab2a" name="Changes" comment="" />
+      <created>1647305789305</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1647305789305</updated>
+      <workItem from="1647305795431" duration="7549000" />
+    </task>
     <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
   </component>
 </project>
