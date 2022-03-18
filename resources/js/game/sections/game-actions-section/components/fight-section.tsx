@@ -1,84 +1,100 @@
-import React from "react";
-import Select from "react-select";
-import PopOverContainer from "../../../components/ui/popover/pop-over-container";
-import PrimaryButton from "../../../components/ui/buttons/primary-button";
+import React, {Fragment} from "react";
+import AttackButton from "../../../components/ui/buttons/attack-button";
+import BattleSetUp from "../../../lib/game/actions/battle/battle-setup";
+import {BattleMessage} from "../../../lib/game/actions/battle/types/battle-message-type";
+import clsx from "clsx";
+import HealthMeters from "./health-meters";
+import FightSectionProps from "../../../lib/game/actions/types/fight-section-props";
 
-export default class FightSection extends React.Component<any, any> {
+export default class FightSection extends React.Component<FightSectionProps, any> {
 
-    constructor(props: any) {
+    constructor(props: FightSectionProps) {
         super(props);
 
         this.state = {
-            selected_monster: null,
-        }
-
-    }
-
-    setMonsterToFight(data: any) {
-        const foundMonster = this.props.monsters.filter((monster: any) => monster.id === parseInt(data.value));
-
-        if (foundMonster.length > 0) {
-            this.setState({
-                selected_monster: foundMonster[0],
-            });
-        } else {
-            this.setState({
-                selected_monster: null,
-            });
+            battle_messages: [],
+            character_current_health: 0,
+            character_max_health: 0,
+            monster_current_health: 0,
+            monster_max_health: 0,
+            monster_to_fight_id: 0,
         }
     }
 
-    buildMonsters() {
-        let monsters = this.props.monsters.map((monster: any) => {
-            return {label: monster.name, value: monster.id};
+    componentDidMount() {
+        this.setUpBattle();
+    }
+
+    componentDidUpdate() {
+        if (this.props.monster_to_fight.id !== this.state.monster_to_fight_id) {
+            this.setUpBattle();
+        }
+    }
+
+    setUpBattle() {
+
+        if (this.props.character == null) {
+            return;
+        }
+
+        const battleSetUp = new BattleSetUp(this.props.character, this.props.monster_to_fight);
+
+        battleSetUp.setUp();
+
+        const monsterHealth = battleSetUp.getMonsterHealth();
+
+        this.setState({
+            battle_messages: battleSetUp.getMessages(),
+            monster_current_health: monsterHealth,
+            monster_max_health: monsterHealth,
+            character_current_health: this.props.character.health,
+            character_max_health: this.props.character.health,
+            monster_to_fight_id: this.props.monster_to_fight.id,
         });
+    }
 
-        monsters.unshift({
-            label: 'Please Select', value: 0,
+    typeCheck(battleType: 'regular' | 'player-action' | 'enemy-action', type: 'regular' | 'player-action' | 'enemy-action'): boolean {
+        return battleType === type;
+    }
+
+    renderBattleMessages() {
+        return this.state.battle_messages.map((battleMessage: BattleMessage) => {
+            return <p className={clsx(
+                {
+                    'text-green-500 dark:text-green-400': this.typeCheck(battleMessage.type, 'player-action')
+                }, {
+                    'text-red-500 dark:text-red-400': this.typeCheck(battleMessage.type, 'enemy-action')
+                }, {
+                    'text-blue-500 dark:text-blue-400': this.typeCheck(battleMessage.type, 'regular')
+                }
+            )}>
+                {battleMessage.message}
+            </p>
         });
-
-        return monsters;
-    }
-
-    defaultMonster() {
-
-        if (this.state.selected_monster !== null) {
-            return {
-                label: this.state.selected_monster.name,
-                value: this.state.selected_monster.id,
-            }
-        }
-
-        return {
-            label: this.props.monsters[0].name,
-            value: this.props.monsters[0].id,
-        }
-    }
-
-    attack() {
-
     }
 
     render() {
         return (
-            <div className='mt-2'>
-                <div className='grid grid-cols-3 gap-2'>
-                    <div className='cols-start-1 col-span-2'>
-                        <Select
-                            onChange={this.setMonsterToFight.bind(this)}
-                            options={this.buildMonsters()}
-                            menuPosition={'absolute'}
-                            menuPlacement={'bottom'}
-                            styles={{menuPortal: (base) => ({...base, zIndex: 9999, color: '#000000'})}}
-                            menuPortalTarget={document.body}
-                            value={this.defaultMonster()}
-                        />
-                    </div>
-                    <div className='cols-start-3 cols-end-3'>
-                        <PrimaryButton button_label={'Attack'} on_click={this.attack.bind(this)} />
-                    </div>
+            <Fragment>
+                <div className='my-4 text-xs text-center lg:text-left lg:pl-16'>
+                    <AttackButton additional_css={'btn-attack'} icon_class={'ra ra-sword'}/>
+                    <AttackButton additional_css={'btn-cast'} icon_class={'ra ra-burning-book'}/>
+                    <AttackButton additional_css={'btn-cast-attack'} icon_class={'ra ra-lightning-sword'}/>
+                    <AttackButton additional_css={'btn-attack-cast'} icon_class={'ra ra-lightning-sword'}/>
+                    <AttackButton additional_css={'btn-defend'} icon_class={'ra ra-round-shield'}/>
                 </div>
-            </div>
+                {
+                    this.state.monster_max_health > 0 && this.props.character !== null ?
+                        <div className='mb-8 max-w-md'>
+                            <HealthMeters is_enemy={true} name={this.props.monster_to_fight.name} current_health={this.state.monster_current_health} max_health={this.state.monster_max_health} />
+                            <HealthMeters is_enemy={false} name={this.props.character.name} current_health={this.state.character_current_health} max_health={this.state.character_max_health} />
+                        </div>
+                    : null
+                }
+                <div className='font-italic text-center lg:pr-36'>
+                    {this.renderBattleMessages()}
+                </div>
+            </Fragment>
         )
     }
 

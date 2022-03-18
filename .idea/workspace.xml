@@ -3,12 +3,13 @@
   <component name="ChangeListManager">
     <list default="true" id="f574dce8-e67f-47ee-8bb6-fe6b7dafab2a" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/components/ui/cards/basic-card.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/components/ui/cards/basic-card.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/game.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/game.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/components/quests/modals/components/currency-requirement.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/components/quests/modals/components/currency-requirement.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/components/quests/modals/quest-details-modal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/components/quests/modals/quest-details-modal.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Builders/CharacterInformationBuilder.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Builders/CharacterInformationBuilder.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/css/tailwind.css" beforeDir="false" afterPath="$PROJECT_DIR$/resources/css/tailwind.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/components/ui/buttons/attack-button.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/components/ui/buttons/attack-button.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/game/sections/game-actions-section/actions.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/game-actions-section/actions.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/game-actions-section/components/fight-section.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/game-actions-section/components/fight-section.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/game-actions-section/components/fight-section.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/game-actions-section/components/monster-selection.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -276,11 +277,22 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1647305789305</updated>
-      <workItem from="1647305795431" duration="7549000" />
+      <workItem from="1647305795431" duration="24475000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>

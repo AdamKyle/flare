@@ -228,7 +228,7 @@ class CharacterInformationBuilder {
      */
     public function canAffixesBeResisted(): bool {
         if ($this->character->map->gameMap->mapType()->isHell() || $this->character->map->gameMap->mapType()->isPurgatory()) {
-          return false;
+            return false;
         }
 
         return $this->character->inventory->slots->filter(function($slot) {

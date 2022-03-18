@@ -1,5 +1,6 @@
 @import "../vendor/theme/assets/css/style.css";
 @import "./map.css";
+@import "./fight-buttons.css";
 
 .glightbox {
     img {
