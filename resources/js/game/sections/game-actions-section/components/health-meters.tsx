@@ -14,14 +14,14 @@ export default class HealthMeters extends React.Component<HealthMeterProps, any>
             <div className='mb-2'>
                 <div className="flex justify-between mb-1">
                     <span className={clsx("font-medium dark:text-white text-xs", {
-                        'text-red-600': this.props.is_enemy
+                        'text-red-600 dark:text-red-400': this.props.is_enemy
                     },{
-                        'text-green-600': !this.props.is_enemy
+                        'text-green-700 dark:text-green-500': !this.props.is_enemy
                     })}>{this.props.name}</span>
                     <span className={clsx("font-medium dark:text-white text-xs", {
-                        'text-red-600': this.props.is_enemy
+                        'text-red-600 dark:text-red-400': this.props.is_enemy
                     },{
-                        'text-green-600': !this.props.is_enemy
+                        'text-green-700 dark:text-green-500': !this.props.is_enemy
                     })}>{formatNumber(this.props.current_health)} / {formatNumber(this.props.max_health)}</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-1.5 dark:bg-gray-700">

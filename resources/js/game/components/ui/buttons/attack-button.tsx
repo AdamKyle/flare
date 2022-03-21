@@ -9,7 +9,7 @@ export default class AttackButton extends React.Component<any, any> {
 
     render() {
         return (
-            <button type='button' className={'rounded-full w-10 h-10 mx-2 ' + this.props.additional_css}>
+            <button type='button' className={'rounded-full w-10 h-10 mx-2 ' + this.props.additional_css} onClick={this.props.on_click}>
                 <i className={this.props.icon_class}></i>
             </button>
         )

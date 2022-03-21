@@ -32,7 +32,7 @@ export default class Voidance extends BattleBase {
 
     playerVoidsMonster(): VoidanceResultType {
         if (this.canPlayerDevoidEnemy(this.character.devouring_darkness)) {
-            this.addMessage('Magic crackles in the air, the darkness consumes the enemy. They are devoided!', 'player-action');
+            this.addMessage('Magic crackles in the air, the darkness consumes the enemy. They are devoided!', 'regular');
 
             this.voidanceResult.is_monster_devoided = true;
         }
@@ -44,7 +44,7 @@ export default class Voidance extends BattleBase {
         }
 
         if (this.canPlayerVoidEnemy(this.character.devouring_light) && !this.voidanceResult.is_character_devoided) {
-            this.addMessage('The light of the heavens shines through this darkness. The enemy is voided!', 'player-action');
+            this.addMessage('The light of the heavens shines through this darkness. The enemy is voided!', 'regular');
 
             this.voidanceResult.is_monster_voided = true;
         }

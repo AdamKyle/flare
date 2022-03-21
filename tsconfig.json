@@ -12,7 +12,8 @@
         "skipLibCheck": false,          // Skip type checking of declaration files
         "noImplicitAny": true,
         // Bypass raising errors on `any` type
-        "allowSyntheticDefaultImports": true
+        "allowSyntheticDefaultImports": true,
+        "allowJs": true,
     },
     "include": ["resources/js/**/*"]  // Frontend paths pattern
 }

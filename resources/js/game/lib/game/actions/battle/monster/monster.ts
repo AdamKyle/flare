@@ -44,6 +44,17 @@ export default class Monster extends BattleBase {
         return health;
     }
 
+    attack(): number {
+
+        const attackRange = this.monster.attack_range.split('-');
+
+        let attack = random(attackRange[0], attackRange[1]) + (this.monster[this.monster.damage_stat] * .25);
+
+        attack = attack + attack * this.monster.increases_damage_by;
+
+        return parseInt(attack.toFixed(0));
+    }
+
     canMonsterDevoidPlayer(devouringDarkResistance: number): boolean {
         let chance = this.monster.devouring_darkness_chance
 

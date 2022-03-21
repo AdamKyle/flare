@@ -22,4 +22,8 @@ export default class BattleBase {
             type: type,
         })
     }
+
+    mergeMessages(messagesToMerge: BattleMessage[]) {
+        this.battle_messages = [...this.battle_messages, ...messagesToMerge];
+    }
 }

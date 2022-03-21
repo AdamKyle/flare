@@ -3,20 +3,192 @@
   <component name="ChangeListManager">
     <list default="true" id="f574dce8-e67f-47ee-8bb6-fe6b7dafab2a" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Flare/Builders/CharacterInformationBuilder.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Builders/CharacterInformationBuilder.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/css/tailwind.css" beforeDir="false" afterPath="$PROJECT_DIR$/resources/css/tailwind.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/admin-chat.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/admin/ChatMessages.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/admin/RegisterChart.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/admin/SignInChart.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/admin/modal/ChatMessageActions.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/admin/statistics/site-accessed-all-time.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/adventure-menue.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/data-tables/DataTable.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/data-tables/info-tables/skills/Skill.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/alchemy/alchemy-action.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/battle/attack/attack-type.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/battle/attack/attack-types/attack-and-cast.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/battle/attack/attack-types/can-hit-check.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/battle/attack/attack-types/cast-and-attack.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/battle/attack/attack-types/cast-attack.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/battle/attack/attack-types/defend.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/battle/attack/attack-types/enchantments/can-entrance-enemy.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/battle/attack/attack-types/enchantments/damage-affixes.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/battle/attack/attack-types/enchantments/life-stealing-affixes.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/battle/attack/attack-types/magic-and-weapon-attack-base.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/battle/attack/attack-types/use-items.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/battle/attack/attack-types/weapon-attack.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/battle/attack/attack.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/battle/attack/damage.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/battle/attack/extra-action-type.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/battle/attack/healing.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/battle/attack/voidance.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/battle/battle-action.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/battle/monster/monster-attack.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/battle/monster/monster.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/character/automations.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/character/boons.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/character/character-sheet.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/character/factions.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/character/inventory/inventory-base.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/character/inventory/modals/destroy-all-modal.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/character/inventory/modals/destroy-all-usable-items-modal.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/character/inventory/modals/destroy-modal.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/character/inventory/modals/destroy-usable-modal.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/character/inventory/modals/disenchant-modal.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/character/inventory/modals/move-to-set-modal.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/character/inventory/modals/save-as-set-modal.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/character/inventory/modals/use-many-items-modal.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/character/inventory/sections/equipped-section-button.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/character/inventory/sections/equipped-section.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/character/inventory/sections/inventory-section-drop-downs.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/character/inventory/sections/inventory-section.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/character/inventory/sections/quest-section.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/character/inventory/sections/set-tab-section.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/character/inventory/sections/sets-section.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/character/inventory/sections/usable-items-section.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/character/modals/boon-modal.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/character/modals/train-passive-skill-modal.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/character/modals/train-skill-modal.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/character/sheet/Inventory-details.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/character/sheet/character-details.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/character/sheet/skill-details.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/character/sheet/skill-trees/partials/skill-node.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/character/sheet/skill-trees/passive-skill-tree.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/components/base/alert-error.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/components/base/alert-info.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/components/base/alert-success.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/components/base/alert-warning.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/components/loading/card-loading.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/components/loading/loading-modal.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/components/menu/adventure-menu.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/components/menu/kingdoms-menu.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/components/modals/forced-name-change.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/components/nav-bar/notification-center.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/components/refresh-component.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/components/templates/card.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/crafting/crafting-action.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/enchanting/enchanting-action.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/game.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/helpers/distance_calculations.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/helpers/random_number.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/helpers/server_message.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/kingdom-unit-movement.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/building-management-modal.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/kingdom-attack-modal.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/kingdom-management-modal.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/kingdom-raname-modal.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/kingdom-settlement-modal.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/kingdom-unit-recall.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/attack-sections/item-selection.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/attack-sections/kingdom-selection.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/attack-sections/unit-selection.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/building-management/building-cost-section.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/building-management/upgrade-section.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/building-queue.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/color-picker.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/deposit.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/embezzle.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/goblin-coin-bank.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/kingdom-building-queue.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/kingdom-buildings.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/kingdom-info.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/kingdom-units.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/population.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/recruit.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/unit-data.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/unit-queue.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/partials/unit-recruitment-queue.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/queue-modal.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/kingdom/modal/recruit-unit.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/map/components/locations.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/map/components/map-actions.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/map/components/map-movement-actions.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/map/components/modals/enemy-kingdom-modal.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/map/components/modals/kingdom-modal.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/map/components/modals/location-info-modal.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/map/components/modals/location-info.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/map/components/pins/enemy-kingdom-pin.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/map/components/pins/kingdom-pin.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/map/components/pins/location-pin.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/map/components/pins/npc-kingdom-pin.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/map/components/pins/port-pin.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/map/helpers/map_position.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/map/helpers/movement.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/map/map.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/messages/chat.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/messages/exploration-messages.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/messages/server-messages.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/npc-components/conjure-component.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/npc-components/enchantments/move.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/npc-components/enchantments/purchase.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/npc-components/enchantments/re-roll.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/npc-components/modals/conjure-modal.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/npc-components/npc-component-wrapper.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/npc-components/random-affix-section.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/sections/actions-section.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/sections/adventure-section.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/sections/auto-attack-section.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/sections/celestial-fight-section.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/sections/character-info-section.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/sections/components/additional-actions-drop-down.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/sections/components/set-sail.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/sections/components/teleport.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/sections/fight-section.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/sections/lib/LockedLocationType.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/sections/modals/abandon-kingdom.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/sections/modals/adventure-embark.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/sections/modals/forced-name-change.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/sections/modals/mass-embezzle.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/sections/modals/quest-details.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/sections/modals/quest-tree-over-view.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/sections/port-section.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/sections/quest-section.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/sections/revive-section.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/sections/traverse-section.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/sections/trees/quest-node.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/sections/trees/quest-tree.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/smithy-work-bench/SmithyWorkBench.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/timeout/exploration-timeout-bar.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/timeout/modal/timeout-dialogue.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/timeout/timeout-bar.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/kingdom-menue.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/marketboard/board.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/marketboard/components/item-name.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/marketboard/item-details.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/marketboard/listing/character-items.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/marketboard/listing/sell-item-modal.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/marketboard/market-history.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/marketboard/partials/affix-data.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/marketboard/partials/base-details.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/marketboard/partials/equip-details.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/marketboard/purchase-modal.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/marketboard/usable-item-details.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/notification-center.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/refresh.jsx" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/game/components/ui/buttons/attack-button.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/components/ui/buttons/attack-button.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/game-actions-section/actions.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/game-actions-section/actions.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/game-actions-section/components/fight-section.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/game-actions-section/components/monster-selection.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/game/actions/battle/battle-base.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/game/actions/battle/battle-base.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/game/actions/battle/battle-setup.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/game/actions/battle/battle-setup.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/game/actions/battle/monster/monster.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/game/actions/battle/monster/monster.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/game/actions/battle/voidance/voidance.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/game/actions/battle/voidance/voidance.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/game-actions-section/components/fight-section.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/game-actions-section/components/fight-section.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/game-actions-section/components/health-meters.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/game-actions-section/components/health-meters.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/tsconfig.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ComposerSettings" synchronizationState="DONT_SYNCHRONIZE">
+  <component name="ComposerSettings" doNotAsk="true" synchronizationState="DONT_SYNCHRONIZE">
     <pharConfigPath>$PROJECT_DIR$/composer.json</pharConfigPath>
     <execution />
   </component>
@@ -245,29 +417,23 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources/js/game/sections/game-actions-section/components" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources/js/game/lib/game/actions/battle/attack" />
     <property name="nodejs_package_manager_path" value="yarn" />
     <property name="ts.external.directory.path" value="$PROJECT_DIR$/node_modules/typescript/lib" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/resources/js/game/lib/game/actions/battle/attack" />
       <recent name="$PROJECT_DIR$/resources/js/game/sections/game-actions-section/components" />
       <recent name="$PROJECT_DIR$/resources/js/game/components/ui/alerts/simple-alerts" />
       <recent name="$PROJECT_DIR$/resources/js/game/components/ui/buttons" />
       <recent name="$PROJECT_DIR$/resources/js/game/lib/game/types/map/modals" />
-      <recent name="$PROJECT_DIR$/resources/js/game/sections/components/actions/modals" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/resources/js/game/lib/game/types/map/quests" />
       <recent name="$PROJECT_DIR$/resources/js/game/sections/components/quests" />
     </key>
-  </component>
-  <component name="RunManager">
-    <configuration default="true" type="ComposerRunConfigurationType" factoryName="Composer Script">
-      <option name="pathToComposerJson" value="$PROJECT_DIR$/composer.json" />
-      <method v="2" />
-    </configuration>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -277,7 +443,8 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1647305789305</updated>
-      <workItem from="1647305795431" duration="24475000" />
+      <workItem from="1647305795431" duration="28156000" />
+      <workItem from="1647878167958" duration="9017000" />
     </task>
     <servers />
   </component>

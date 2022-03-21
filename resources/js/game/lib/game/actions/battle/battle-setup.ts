@@ -63,8 +63,16 @@ export default class BattleSetUp {
         }
     }
 
+    getVoidanceResult(): VoidanceResultType {
+        return this.voidanceResult;
+    }
+
     getMessages(): BattleMessage[] {
         return this.battleMessages;
+    }
+
+    getMonster() {
+        return this.modified_monster?.getMonster();
     }
 
     getMonsterHealth(): number {
