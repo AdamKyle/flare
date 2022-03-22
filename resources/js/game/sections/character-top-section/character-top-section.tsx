@@ -53,6 +53,12 @@ export default class CharacterTopSection extends React.Component<CharacterTopSec
                 hide_top_bar: false
             });
         }
+
+        if (this.props.view_port < 1024 && !this.state.hide_top_bar) {
+            this.setState({
+                hide_top_bar: true
+            });
+        }
     }
 
     getXpPercentage(xp: number|undefined): number {

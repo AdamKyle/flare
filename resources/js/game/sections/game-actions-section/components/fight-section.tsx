@@ -35,6 +35,10 @@ export default class FightSection extends React.Component<FightSectionProps, any
 
     componentDidUpdate() {
         if (this.props.monster_to_fight.id !== this.state.monster_to_fight_id) {
+            this.setState({
+                battle_messages: [],
+            });
+            
             this.setUpBattle();
         }
     }
@@ -108,7 +112,7 @@ export default class FightSection extends React.Component<FightSectionProps, any
     render() {
         return (
             <Fragment>
-                <div className='my-4 text-xs text-center lg:text-left lg:pl-16'>
+                <div className='mt-4 mb-4 text-xs text-center'>
                     <AttackButton additional_css={'btn-attack'} icon_class={'ra ra-sword'} on_click={() => this.attack('attack')}/>
                     <AttackButton additional_css={'btn-cast'} icon_class={'ra ra-burning-book'} on_click={() => this.attack('cast')}/>
                     <AttackButton additional_css={'btn-cast-attack'} icon_class={'ra ra-lightning-sword'} on_click={() => this.attack('cast_and_attack')}/>
@@ -117,13 +121,13 @@ export default class FightSection extends React.Component<FightSectionProps, any
                 </div>
                 {
                     this.state.monster_max_health > 0 && this.props.character !== null ?
-                        <div className='mb-8 max-w-md'>
+                        <div className='mb-8 max-w-md m-auto'>
                             <HealthMeters is_enemy={true} name={this.props.monster_to_fight.name} current_health={this.state.monster_current_health} max_health={this.state.monster_max_health} />
                             <HealthMeters is_enemy={false} name={this.props.character.name} current_health={this.state.character_current_health} max_health={this.state.character_max_health} />
                         </div>
                     : null
                 }
-                <div className='font-italic text-center lg:pr-36'>
+                <div className='italic text-center'>
                     {this.renderBattleMessages()}
                 </div>
             </Fragment>

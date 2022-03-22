@@ -4,7 +4,6 @@ export default interface GameState {
 
     show_size_message: boolean,
 
-    hide_map: boolean,
 
     character_status: {
         is_dead: boolean,

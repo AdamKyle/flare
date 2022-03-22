@@ -8,8 +8,6 @@ import GameState from "./lib/game/types/game-state";
 import WarningAlert from "./components/ui/alerts/simple-alerts/warning-alert";
 import CharacterTopSection from "./sections/character-top-section/character-top-section";
 import Quests from "./sections/components/quests/quests";
-import InfoAlert from "./components/ui/alerts/simple-alerts/info-alert";
-import DropDown from "./components/ui/drop-down/drop-down";
 import Actions from "./sections/game-actions-section/actions";
 
 export default class Game extends React.Component<GameProps, GameState> {
@@ -36,7 +34,6 @@ export default class Game extends React.Component<GameProps, GameState> {
         this.state = {
             view_port: 0,
             show_size_message: true,
-            hide_map: false,
             character_status: null,
             character_currencies: undefined,
         }
@@ -55,21 +52,9 @@ export default class Game extends React.Component<GameProps, GameState> {
         });
     }
 
-    componentDidUpdate(prevProps: Readonly<GameProps>, prevState: Readonly<GameState>, snapshot?: any) {
-        if (this.state.view_port > 1024 && this.state.hide_map) {
-            this.setState({hide_map: false});
-        }
-    }
-
     hideDeviceSizeMessage(): void {
         this.setState({
             show_size_message: false,
-        });
-    }
-
-    hideMap(): void {
-        this.setState({
-            hide_map: !this.state.hide_map
         });
     }
 
@@ -109,36 +94,13 @@ export default class Game extends React.Component<GameProps, GameState> {
                                     <Actions character_id={this.props.characterId} />
                                 </BasicCard>
                             </div>
-                            <BasicCard additionalClasses={'hidden lg:block md:mt-0 lg:col-start-3 lg:col-end-3'}>
-                                <Fragment>
-                                    {
-                                        this.state.hide_map ?
-                                            <div className='grid grid-cols-2'>
-                                                <span><strong>Game Map</strong></span>
-                                                <div className='text-right cursor-pointer text-blue-500'>
-                                                    <button onClick={this.hideMap.bind(this)}><i className="fas fa-plus-circle"></i></button>
-                                                </div>
-                                            </div>
-                                        :
-                                            <Fragment>
-                                                {
-                                                    this.state.view_port < 1024 ?
-                                                        <div className='text-right cursor-pointer text-red-500 block sm:hidden pb-2'>
-                                                            <button onClick={this.hideMap.bind(this)}><i className="fas fa-minus-circle"></i></button>
-                                                        </div>
-                                                        : null
-                                                }
-
-                                                <MapSection
-                                                    user_id={this.props.userId}
-                                                    character_id={this.props.characterId}
-                                                    view_port={this.state.view_port}
-                                                    currencies={this.state.character_currencies}
-                                                />
-                                            </Fragment>
-                                    }
-                                </Fragment>
-
+                            <BasicCard additionalClasses={'hidden lg:block md:mt-0 lg:col-start-3 lg:col-end-3 max-h-[550px]'}>
+                                <MapSection
+                                    user_id={this.props.userId}
+                                    character_id={this.props.characterId}
+                                    view_port={this.state.view_port}
+                                    currencies={this.state.character_currencies}
+                                />
                             </BasicCard>
                         </div>
                     </TabPanel>

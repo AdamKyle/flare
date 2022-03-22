@@ -41,7 +41,7 @@ export default class CraftingSection extends React.Component<any, any> {
 
     render() {
         return (
-            <div className='mt-2 grid grid-cols-3 gap-2'>
+            <div className='mt-2 grid grid-cols-3 gap-2 md:ml-[120px]'>
                 <div className='cols-start-1 col-span-2'>
                     <Select
                         onChange={this.setItemToCraft.bind(this)}

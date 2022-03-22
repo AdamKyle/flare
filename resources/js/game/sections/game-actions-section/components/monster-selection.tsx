@@ -65,7 +65,7 @@ export default class MonsterSelection extends React.Component<any, any> {
 
     render() {
         return (
-            <div className='mt-2'>
+            <div className='mt-2 md:ml-[120px]'>
                 <div className='grid grid-cols-3 gap-2'>
                     <div className='cols-start-1 col-span-2'>
                         <Select

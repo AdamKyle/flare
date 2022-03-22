@@ -80,7 +80,7 @@ export default class Actions extends React.Component<any, ActionsState> {
                                 <DangerButton button_label={'Attack Kingdom'} on_click={this.attackKingdom.bind(this)} />
                             </div>
                             <div className='border-b-2 block border-b-gray-300 dark:border-b-gray-600 my-3 md:hidden'></div>
-                            <div className='md:col-start-2 md:col-span-2'>
+                            <div className='md:col-start-2 md:col-span-3 mt-1'>
                                 <MonsterSelection monsters={this.state.monsters} update_monster={this.setSelectedMonster.bind(this)} />
                                 <CraftingSection />
 
