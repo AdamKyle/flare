@@ -1,17 +1,41 @@
 export interface CharacterType {
     affix_damage_reduction:  number;
 
-    agi_modded: number;
+    agi_modded: string;
+
+    chr_modded: string;
+
+    dex_modded: string;
+
+    dur_modded: string;
+
+    str_modded: string;
+
+    focus_modded: string;
+
+    int_modded: string;
 
     artifact_annulment: number;
 
     attack_types: any;
 
-    base_stat: number;
+    base_stat: string;
+
+    attack: string;
+
+    ac: string;
+
+    gold: string;
+
+    copper_coins: string;
+
+    gold_dust: string;
+
+    shards: string;
 
     can_attack_again_at: string|null;
 
-    chr_modded: number;
+    race: string;
 
     class: string;
 
@@ -23,19 +47,11 @@ export interface CharacterType {
 
     devouring_light_res: number;
 
-    dex_modded: number;
-
-    dur_modded: number;
-
     extra_action_chance: any;
-
-    focus_modded: number;
 
     healing_reduction: number;
 
-    health: number;
-
-    int_modded: number;
+    health: string;
 
     is_alchemy_locked: boolean;
 
@@ -55,8 +71,6 @@ export interface CharacterType {
 
     stat_affixes: any;
 
-    str_modded: number;
-
     to_hit_base: number;
 
     voided_base_stat: number;
@@ -70,4 +84,13 @@ export interface CharacterType {
     voided_health: number;
 
     voided_to_hit_base: number;
+
+    xp: number,
+
+    xp_next: number,
+
+    level: number;
+
+    max_level: number;
+
 }

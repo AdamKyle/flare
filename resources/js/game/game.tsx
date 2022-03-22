@@ -9,6 +9,8 @@ import WarningAlert from "./components/ui/alerts/simple-alerts/warning-alert";
 import CharacterTopSection from "./sections/character-top-section/character-top-section";
 import Quests from "./sections/components/quests/quests";
 import Actions from "./sections/game-actions-section/actions";
+import ManualProgressBar from "./components/ui/progress-bars/manual-progress-bar";
+import FetchGameData from "./lib/game/ajax/FetchGameData";
 
 export default class Game extends React.Component<GameProps, GameState> {
 
@@ -35,7 +37,13 @@ export default class Game extends React.Component<GameProps, GameState> {
             view_port: 0,
             show_size_message: true,
             character_status: null,
+            loading: true,
             character_currencies: undefined,
+            secondary_loading_title: 'Fetching character sheet ...',
+            percentage_loaded: 0,
+            character: null,
+            kingdoms: [],
+            quests: null,
         }
 
     }
@@ -50,6 +58,12 @@ export default class Game extends React.Component<GameProps, GameState> {
                 view_port: window.innerWidth || document.documentElement.clientWidth
             });
         });
+
+        (new FetchGameData(this)).setUrls([
+            {url: 'character-sheet/' +this.props.characterId, name: 'character-sheet'},
+            {url: 'quests/' + this.props.characterId, name: 'quests'},
+            {url: 'player-kingdoms/' + this.props.characterId, name: 'kingdoms'},
+        ]).doAjaxCalls();
     }
 
     hideDeviceSizeMessage(): void {
@@ -66,7 +80,26 @@ export default class Game extends React.Component<GameProps, GameState> {
         this.setState({character_currencies: currencies});
     }
 
+    renderLoading() {
+        return  (
+            <div className='flex h-screen justify-center items-center max-w-md m-auto mt-[-150px]'>
+                <div className='w-full'>
+                    <ManualProgressBar label={'Loading game ...'} secondary_label={this.state.secondary_loading_title} percentage_left={this.state.percentage_loaded} />
+                </div>
+            </div>
+        );
+    }
+
     render() {
+
+        if (this.state.loading) {
+            return this.renderLoading();
+        }
+
+        if (this.state.quests === null) {
+            return null;
+        }
+
         return (
             <div className="md:container">
                 { this.state.view_port < 1280 && this.state.show_size_message ?
@@ -84,7 +117,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                         <div className="grid lg:grid-cols-3 gap-3">
                             <div className="w-full col-span-3 lg:col-span-2">
                                 <BasicCard additionalClasses={'mb-10'}>
-                                    <CharacterTopSection character_id={this.props.characterId}
+                                    <CharacterTopSection character={this.state.character}
                                                          view_port={this.state.view_port}
                                                          update_character_status={this.updateCharacterStatus.bind(this)}
                                                          update_character_currencies={this.updateCharacterCurrencies.bind(this)}
@@ -111,8 +144,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                     </TabPanel>
                     <TabPanel key={'quests'}>
                         <BasicCard>
-
-                            <Quests character_id={this.props.characterId} />
+                            <Quests quest_details={this.state.quests} character_id={this.props.characterId} />
                         </BasicCard>
                     </TabPanel>
                     <TabPanel key={'kingdoms'}>

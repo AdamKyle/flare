@@ -33,8 +33,8 @@ class CharacterSheetController extends Controller {
         $this->characterTopBarTransformer = $characterTopBarTransformer;
     }
 
-    public function sheet(Character $character) {
-        $character = new Item($character, $this->characterTopBarTransformer);
+    public function sheet(Character $character, CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer) {
+        $character = new Item($character, $characterSheetBaseInfoTransformer);
         $sheet     = $this->manager->createData($character)->toArray();
 
         return response()->json([

@@ -1,10 +1,7 @@
 import React, {Fragment} from "react";
-import Dialogue from "../../../components/ui/dialogue/dialogue";
 import QuestsProps from "../../../lib/game/types/map/quests/quests-props";
 import QuestState from "../../../lib/game/types/map/quests/quest-state";
 import ComponentLoading from "../../../components/ui/loading/component-loading";
-import Ajax from "../../../lib/ajax/ajax";
-import {AxiosError, AxiosResponse} from "axios";
 import QuestTree from "./components/quest-tree";
 import InfoAlert from "../../../components/ui/alerts/simple-alerts/info-alert";
 import DropDown from "../../../components/ui/drop-down/drop-down";
@@ -16,24 +13,15 @@ export default class Quests extends React.Component<QuestsProps, QuestState> {
         super(props);
 
         this.state = {
-            quests: [],
-            completed_quests: [],
-            current_plane: '',
-            loading: true,
+            quests: this.props.quest_details.quests,
+            completed_quests: this.props.quest_details.completed_quests,
+            current_plane: this.props.quest_details.player_plane,
+            loading: false,
         }
     }
 
     componentDidMount() {
-        (new Ajax()).setRoute('quests/' + this.props.character_id).doAjaxCall('get', (result: AxiosResponse) => {
-            this.setState({
-                quests: result.data.quests,
-                completed_quests: result.data.completed_quests,
-                current_plane: result.data.player_plane,
-                loading: false,
-            });
-        }, (error: AxiosError) => {
 
-        });
     }
 
 

@@ -1,0 +1,67 @@
+import Game from "../../../game";
+import Ajax from "../../ajax/ajax";
+import {AxiosResponse} from "axios";
+
+export default class FetchGameData {
+
+    private component: Game;
+
+    private urls?: {url: string, name: string}[];
+
+    constructor(component: Game) {
+        this.component   = component;
+    }
+
+    setUrls(urls: {url: string, name: string}[]): FetchGameData {
+        this.urls = urls;
+
+        return this;
+    }
+
+    doAjaxCalls() {
+
+        if (typeof this.urls === 'undefined') {
+            return;
+        }
+
+        this.urls.forEach((url) => {
+            (new Ajax()).setRoute(url.url).doAjaxCall('get', (result: AxiosResponse) => {
+                switch(url.name) {
+                    case 'character-sheet':
+                        return this.setCharacterSheet(result);
+                    case 'quests':
+                        return this.setQuestData(result);
+                    case 'kingdoms':
+                        return this.setKingdomsData(result);
+                    default:
+                        break;
+                }
+            }, (error: AxiosResponse) => {
+                console.error(error);
+            });
+        });
+    }
+
+    setCharacterSheet(result: AxiosResponse)  {
+        this.component.setState({
+            character: result.data.sheet,
+            percentage_loaded: .33,
+            secondary_loading_title: 'Fetching Quest Data ...',
+        });
+    }
+
+    setQuestData(result: AxiosResponse)  {
+        this.component.setState({
+            quests: result.data,
+            percentage_loaded: this.component.state.percentage_loaded + .33,
+            secondary_loading_title: 'Fetching Kingdom Data ...',
+        });
+    }
+
+    setKingdomsData(result: AxiosResponse)  {
+        this.component.setState({
+            kingdoms: result.data,
+            loading: false,
+        });
+    }
+}

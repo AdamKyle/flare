@@ -9,6 +9,7 @@ use App\Game\Kingdoms\Service\KingdomResourcesService;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use Illuminate\Http\Request;
 use League\Fractal\Manager;
+use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
 use Facades\App\Game\Kingdoms\Validation\ResourceValidation;
 use App\Http\Controllers\Controller;
@@ -80,6 +81,14 @@ class KingdomsController extends Controller
         return response()->json($kingdom);
     }
 
+    public function getKingdomsList(Character $character, KingdomTransformer $kingdomTransformer) {
+        $kingdoms = new Collection($character->kingdoms, $kingdomTransformer);
+
+        return response()->json(
+            $this->manager->createData($kingdoms)->toArray()
+        );
+    }
+
     public function getLocationData(Character $character, Kingdom $kingdom)
     {
         $kingdom = new Item($kingdom, $this->kingdom);
@@ -89,7 +98,6 @@ class KingdomsController extends Controller
             200
         );
     }
-
 
     public function getAttackLogs(User $user)
     {

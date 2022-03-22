@@ -38,7 +38,7 @@ export default class FightSection extends React.Component<FightSectionProps, any
             this.setState({
                 battle_messages: [],
             });
-            
+
             this.setUpBattle();
         }
     }

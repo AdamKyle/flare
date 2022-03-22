@@ -92,6 +92,12 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
             'holy_attack_bonus'    => $holyStacks->fetchAttackBonus($character),
             'holy_ac_bonus'        => $holyStacks->fetchDefenceBonus($character),
             'holy_healing_bonus'   => $holyStacks->fetchHealingBonus($character),
+            'gold'                 => number_format($character->gold),
+            'gold_dust'            => number_format($character->gold_dust),
+            'shards'               => number_format($character->shards),
+            'copper_coins'         => number_format($character->copper_coins),
+            'is_dead'              => $character->is_dead,
+            'can_adventure'        => $character->can_adventure,
             'stat_affixes'        => [
                 'cant_be_resisted'   => $characterInformation->canAffixesBeResisted(),
                 'all_stat_reduction' => $characterAffixInformation->findPrefixStatReductionAffix(),

@@ -8,7 +8,7 @@ import Ajax from "../../lib/ajax/ajax";
 import Location from "../components/locations/location";
 import MapActions from "../components/actions/map/map-actions";
 import Kingdoms from "../components/kingdoms/kingdoms";
-import ProgressBar from "../../components/ui/progress-bars/progress-bar";
+import TimerProgressBar from "../../components/ui/progress-bars/timer-progress-bar";
 import EnemyKingdoms from "../components/kingdoms/enemy-kingdoms";
 import MovePlayer from "../../lib/game/map/ajax/move-player";
 import MapStateManager from "../../lib/game/map/state/map-state-manager";
@@ -204,7 +204,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                     />
                 </div>
                 <div className={'mt-3'}>
-                    <ProgressBar time_remaining={this.state.time_left} time_out_label={'Movement Timeout'}/>
+                    <TimerProgressBar time_remaining={this.state.time_left} time_out_label={'Movement Timeout'}/>
                 </div>
             </Fragment>
         )

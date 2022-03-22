@@ -1,4 +1,4 @@
-export default interface ProgressBarState {
+export default interface TimerProgressBarState {
 
     time_left: number
 

@@ -16,10 +16,6 @@ use Illuminate\Support\Collection;
 
 class KingdomTransformer extends TransformerAbstract {
 
-    protected $defaultIncludes = [
-        'buildings', 'recruitable_units'
-    ];
-
     /**
      * Gets the response data for the character sheet
      *
@@ -67,49 +63,6 @@ class KingdomTransformer extends TransformerAbstract {
             'unit_time_reduction'       => $this->fetchTimeReductionBonus($kingdom, 'unit_time_reduction'),
             'building_time_reduction'   => $this->fetchTimeReductionBonus($kingdom, 'building_time_reduction'),
         ];
-    }
-
-    protected function includeBuildings(Kingdom $kingdom) {
-        return $this->collection($kingdom->buildings, resolve(KingdomBuildingTransformer::class));
-    }
-
-    protected function includeRecruitableUnits(Kingdom $kingdom) {
-        $buildings = $kingdom->buildings()->whereHas('gameBuilding', function($query) {
-            return $query->where('trains_units', true);
-        })->get();
-
-        $collection = new Collection;
-
-        foreach($buildings as $building) {
-            if ($building->is_locked) {
-                continue;
-            }
-
-            $units = GameBuildingUnit::where('game_building_id', $building->gameBuilding->id)
-                                     ->where('required_level', '<=', $building->level)
-                                     ->get();
-
-
-            foreach($units as $unit) {
-                $unit = GameUnit::find($unit->game_unit_id);
-
-                $collection->push($unit);
-            }
-        }
-
-        $collection = $collection->transform(function($unit) use($kingdom) {
-            $kingdomUnitInfo = $kingdom->units()->where('game_unit_id', $unit->id)->first();
-
-            $unit->kingdom_current_amount = !is_null($kingdomUnitInfo) ? $kingdomUnitInfo->amount : 0;
-            $unit->kingdom_max_amount     = $kingdom->max_population;
-            $unit->max_recruitable        = number_format(KingdomMaxValue::MAX_UNIT);
-            $unit->can_recruit_more       = is_null($kingdomUnitInfo) || $kingdomUnitInfo->amount < KingdomMaxValue::MAX_UNIT;
-            $unit->cost_per_unit          = (new UnitCosts($unit->name))->fetchCost();
-
-            return $unit;
-        });
-
-        return $this->collection($collection, resolve(UnitTransformer::class));
     }
 
     protected function canAccessGoblinCoinBank(Kingdom $kingdom): bool {

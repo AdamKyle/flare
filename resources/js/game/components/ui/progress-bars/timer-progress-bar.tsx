@@ -1,12 +1,12 @@
  import React, {Fragment} from "react";
-import ProgressBarProps from "../../../lib/ui/types/progress-bars/progress-bar-props";
-import ProgressBarState from "../../../lib/ui/types/progress-bars/progress-bar-state";
+import TimerProgressBarProps from "../../../lib/ui/types/progress-bars/timer-progress-bar-props";
+import TimerProgressBarState from "../../../lib/ui/types/progress-bars/timer-progress-bar-state";
 
-export default class ProgressBar extends React.Component<ProgressBarProps, ProgressBarState> {
+export default class TimerProgressBar extends React.Component<TimerProgressBarProps, TimerProgressBarState> {
 
     private interval: any;
 
-    constructor(props: ProgressBarProps) {
+    constructor(props: TimerProgressBarProps) {
         super(props);
 
         this.state = {
@@ -23,7 +23,7 @@ export default class ProgressBar extends React.Component<ProgressBarProps, Progr
         this.initializeTimer();
     }
 
-    componentDidUpdate(prevProps: Readonly<ProgressBarProps>, prevState: Readonly<ProgressBarState>, snapshot?: any) {
+    componentDidUpdate(prevProps: Readonly<TimerProgressBarProps>, prevState: Readonly<TimerProgressBarState>, snapshot?: any) {
         if (prevProps.time_remaining != this.props.time_remaining) {
             clearInterval(this.interval);
 
