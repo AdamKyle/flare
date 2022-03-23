@@ -1,5 +1,7 @@
 import React from "react";
 import Table from "../../../../../components/ui/data-tables/table";
+import Ajax from "../../../../../lib/ajax/ajax";
+import {AxiosError, AxiosResponse} from "axios";
 
 const columns = [
     {

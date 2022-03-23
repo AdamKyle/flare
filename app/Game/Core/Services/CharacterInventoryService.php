@@ -2,14 +2,18 @@
 
 namespace App\Game\Core\Services;
 
+use League\Fractal\Resource\Collection as LeagueCollection;
+use League\Fractal\Resource\Item as LeagueItem;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\SetSlot;
+use App\Flare\Transformers\InventoryTransformer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySet;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
+use League\Fractal\Manager;
 
 class CharacterInventoryService {
 
@@ -32,6 +36,21 @@ class CharacterInventoryService {
      * @var bool $isInventorySetIsEquipped
      */
     private bool $isInventorySetIsEquipped = false;
+
+    /**
+     * @var InventoryTransformer $inventoryTransformer
+     */
+    private $inventoryTransformer;
+
+    /**
+     * @var Manager $manager
+     */
+    private $manager;
+
+    public function __construct(InventoryTransformer $inventoryTransformer, Manager $manager) {
+        $this->inventoryTransformer = $inventoryTransformer;
+        $this->manager              = $manager;
+    }
 
     /**
      * Set the character
@@ -74,11 +93,11 @@ class CharacterInventoryService {
         $usableSets = $this->getUsableSets();
 
         return [
-            'inventory'    => $this->fetchCharacterInventory()->values(),
+            'inventory'    => $this->fetchCharacterInventory(),
             'usable_sets'  => $usableSets,
             'savable_sets' => $usableSets,
             'equipped'     => !is_null($equipped) ? $equipped : [],
-            'sets'         => $this->character->inventorySets()->with(['slots', 'slots.item', 'slots.item.itemPrefix', 'slots.item.itemSuffix'])->get(),
+            'sets'         => $this->getCharacterInventorySets(),
             'quest_items'  => $this->getQuestItems(),
             'usable_items' => $this->getUsableItems(),
             'set_equipped' => $this->isInventorySetIsEquipped,
@@ -114,12 +133,29 @@ class CharacterInventoryService {
         }
     }
 
+    public function getCharacterInventorySets(): array {
+        $sets = [];
+
+        foreach($this->character->inventorySets as $index => $inventorySet) {
+
+            $slots = new LeagueCollection($inventorySet->slots, $this->inventoryTransformer);
+
+            if (is_null($inventorySet->name)) {
+                $sets['Set ' . $index + 1] = $this->manager->createData($slots)->toArray();
+            } else {
+                $sets[$inventorySet->name] = $this->manager->createData($slots)->toArray();
+            }
+        }
+
+        return $sets;
+    }
+
     /**
      * Returns the usable items.
      *
-     * @return Collection
+     * @return array
      */
-    public function getUsableItems(): Collection {
+    public function getUsableItems(): array {
         $inventory = Inventory::where('character_id', $this->character->id)->first();
 
         $slots = InventorySlot::where('inventory_slots.inventory_id', $inventory->id)->join('items', function($join) {
@@ -127,15 +163,17 @@ class CharacterInventoryService {
                 ->where('items.type', 'alchemy');
         })->select('inventory_slots.*')->get();
 
-        return $slots->load('item');
+        $slots = new LeagueCollection($slots, $this->inventoryTransformer);
+
+        return $this->manager->createData($slots)->toArray();
     }
 
     /**
      * Returns the quest items.
      *
-     * @return Collection
+     * @return array
      */
-    public function getQuestItems(): Collection {
+    public function getQuestItems(): array {
         $inventory = Inventory::where('character_id', $this->character->id)->first();
 
         $slots = InventorySlot::where('inventory_slots.inventory_id', $inventory->id)->join('items', function($join) {
@@ -143,7 +181,9 @@ class CharacterInventoryService {
                 ->where('items.type', 'quest');
         })->select('inventory_slots.*')->get();
 
-        return $slots->load('item');
+        $slots = new LeagueCollection($slots, $this->inventoryTransformer);
+
+        return $this->manager->createData($slots)->toArray();
     }
 
     /**
@@ -178,9 +218,9 @@ class CharacterInventoryService {
      * - Does not include equipped, usable or quest items.
      * - Only comes from inventory, does not include sets.
      *
-     * @return Collection
+     * @return array
      */
-    public function fetchCharacterInventory(): Collection {
+    public function fetchCharacterInventory(): array {
 
         $inventory = Inventory::where('character_id', $this->character->id)->first();
 
@@ -189,22 +229,26 @@ class CharacterInventoryService {
                  ->whereNotIn('items.type', ['quest', 'alchemy']);
         })->where('inventory_slots.equipped', false)->select('inventory_slots.*')->get();
 
-        return $slots->load(['item', 'item.itemSuffix', 'item.itemPrefix']);
+        $slots = new LeagueCollection($slots, $this->inventoryTransformer);
+
+        return $this->manager->createData($slots)->toArray();
     }
 
     /**
      * Fetch equipped items.
      *
-     * @return Collection|InventorySet|null
+     * @return array|null
      */
-    public function fetchEquipped(): Collection|InventorySet|null {
+    public function fetchEquipped(): array|null {
 
         $inventory = Inventory::where('character_id', $this->character->id)->first();
 
-        $slots     = InventorySlot::where('inventory_id', $inventory->id)->where('equipped', true)->with(['item', 'item.itemPrefix', 'item.itemSuffix'])->get();
+        $slots     = InventorySlot::where('inventory_id', $inventory->id)->where('equipped', true)->get();
 
         if ($slots->isNotEmpty()) {
-            return $slots->values();
+            $slots = new LeagueCollection($slots, $this->inventoryTransformer);
+
+            return $this->manager->createData($slots)->toArray();
         }
 
         $inventorySet = InventorySet::where('character_id', $this->character->id)->where('is_equipped', true)->first();
@@ -215,7 +259,11 @@ class CharacterInventoryService {
 
         $this->isInventorySetIsEquipped = true;
 
-        return SetSlot::where('inventory_set_id', $inventorySet->id)->with(['item', 'item.itemPrefix', 'item.itemSuffix'])->get();
+        $slots = SetSlot::where('inventory_set_id', $inventorySet->id)->get();
+
+        $slots = new LeagueCollection($slots, $this->inventoryTransformer);
+
+        return $this->manager->createData($slots)->toArray();
     }
 
     /**

@@ -37,6 +37,7 @@ use App\Flare\Services\CharacterXPService;
 use App\Flare\Services\DailyGoldDustService;
 use App\Flare\Transformers\BasicKingdomTransformer;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
+use App\Flare\Transformers\InventoryTransformer;
 use App\Flare\Transformers\OtherKingdomTransformer;
 use App\Game\Core\Services\CharacterService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
@@ -215,6 +216,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(ItemTransfromer::class, function($app) {
             return new ItemTransfromer();
+        });
+
+        $this->app->bind(InventoryTransformer::class, function() {
+            return new InventoryTransformer();
         });
 
         $this->app->bind(BaseSkillValue::class, function($app) {

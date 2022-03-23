@@ -3,18 +3,13 @@
   <component name="ChangeListManager">
     <list default="true" id="f574dce8-e67f-47ee-8bb6-fe6b7dafab2a" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/components/ui/drop-down/drop-down.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/components/ui/drop-down/drop-down.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/components/ui/progress-bars/manual-progress-bar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/components/ui/progress-bars/manual-progress-bar.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/components/ui/tabs/tabs.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/components/ui/tabs/tabs.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Providers/ServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Providers/ServiceProvider.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Core/Providers/ServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Core/Providers/ServiceProvider.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Core/Services/CharacterInventoryService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Core/Services/CharacterInventoryService.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/game/game.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/game.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/game/ajax/FetchGameData.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/game/ajax/FetchGameData.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/game/map/teleportion-costs.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/game/map/teleportion-costs.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/ui/types/drop-down/drop-down-props.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/ui/types/drop-down/drop-down-props.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/ui/types/progress-bars/manual-progress-bar-props.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/ui/types/progress-bars/manual-progress-bar-props.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/character-top-section/character-top-section.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/character-top-section/character-top-section.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/components/kingdoms/modals/other-kingdom-modal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/components/kingdoms/modals/other-kingdom-modal.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/character-sheet/character-sheet.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/character-sheet/character-sheet.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/character-sheet/components/character-inventory-tabs.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/character-sheet/components/character-inventory-tabs.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/character-sheet/components/tabs/inventory-tabs/inventory-table.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/character-sheet/components/tabs/inventory-tabs/inventory-table.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -277,7 +272,7 @@
       <option name="presentableId" value="Default" />
       <updated>1647305789305</updated>
       <workItem from="1647305795431" duration="28156000" />
-      <workItem from="1647878167958" duration="28559000" />
+      <workItem from="1647878167958" duration="31768000" />
     </task>
     <servers />
   </component>

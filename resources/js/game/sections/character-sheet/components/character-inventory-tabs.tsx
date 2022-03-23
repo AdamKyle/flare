@@ -8,6 +8,9 @@ import EquippedTable from "./tabs/inventory-tabs/equipped-table";
 import SetsTable from "./tabs/inventory-tabs/sets-table";
 import QuestItemsTable from "./tabs/inventory-tabs/quest-items-table";
 import {watchForDarkModeInventoryChange} from "../../../lib/game/dark-mode-watcher";
+import Ajax from "../../../lib/ajax/ajax";
+import {AxiosError, AxiosResponse} from "axios";
+import ComponentLoading from "../../../components/ui/loading/component-loading";
 
 export default class CharacterInventoryTabs extends React.Component<any, any> {
 
@@ -33,11 +36,22 @@ export default class CharacterInventoryTabs extends React.Component<any, any> {
         this.state = {
             table: 'Inventory',
             dark_tables: false,
+            loading: true,
         }
     }
 
     componentDidMount() {
         watchForDarkModeInventoryChange(this);
+
+        (new Ajax()).setRoute('character/'+this.props.character_id+'/inventory').doAjaxCall('get', (result: AxiosResponse) => {
+            console.log(result.data);
+
+            this.setState({
+                loading: false,
+            });
+        }, (error: AxiosError) => {
+            console.log(error);
+        })
     }
 
     switchTable(type: string) {
@@ -47,6 +61,10 @@ export default class CharacterInventoryTabs extends React.Component<any, any> {
     }
 
     render() {
+        if (this.state.loading) {
+            return <ComponentLoading />
+        }
+        
         return (
             <Tabs tabs={this.tabs} full_width={true}>
                 <TabPanel key={'inventory'}>
@@ -65,7 +83,7 @@ export default class CharacterInventoryTabs extends React.Component<any, any> {
 
                     {
                         this.state.table === 'Inventory' ?
-                            <InventoryTable dark_table={this.state.dark_tables} />
+                            <InventoryTable dark_table={this.state.dark_tables} character_id={this.props.character_id}/>
                         :
                             <UsableItemsTable dark_table={this.state.dark_tables} />
                     }

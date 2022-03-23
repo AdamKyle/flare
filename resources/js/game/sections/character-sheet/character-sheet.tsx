@@ -61,7 +61,7 @@ export default class CharacterSheet extends React.Component<any, any> {
                         <CharacterSkillsTabs />
                     </BasicCard>
                     <BasicCard>
-                        <CharacterInventoryTabs />
+                        <CharacterInventoryTabs character_id={this.props.character_id}/>
                     </BasicCard>
                 </div>
             </div>
