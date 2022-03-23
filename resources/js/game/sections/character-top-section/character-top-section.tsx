@@ -7,7 +7,7 @@ export default class CharacterTopSection extends React.Component<CharacterTopSec
         super(props);
 
         this.state = {
-            hide_top_bar: false,
+            hide_top_bar: true,
         }
     }
 
@@ -18,19 +18,12 @@ export default class CharacterTopSection extends React.Component<CharacterTopSec
     }
 
     componentDidMount() {
-        console.log(this.props.character);
     }
 
     componentDidUpdate(prevProps: CharacterTopSectionProps, prevState: CharacterTopSectionState) {
         if (this.props.view_port >= 1024 && this.state.hide_top_bar) {
             this.setState({
                 hide_top_bar: false
-            });
-        }
-
-        if (this.props.view_port < 1024 && !this.state.hide_top_bar) {
-            this.setState({
-                hide_top_bar: true
             });
         }
     }
@@ -76,7 +69,7 @@ export default class CharacterTopSection extends React.Component<CharacterTopSec
             return null;
         }
 
-        if (this.state.hide_top_bar) {
+        if (this.state.hide_top_bar && this.props.view_port < 1024) {
             return (
                 <Fragment>
                     <div className='grid grid-cols-2'>

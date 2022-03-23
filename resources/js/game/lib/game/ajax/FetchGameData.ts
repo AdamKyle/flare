@@ -47,6 +47,12 @@ export default class FetchGameData {
             character: result.data.sheet,
             percentage_loaded: .33,
             secondary_loading_title: 'Fetching Quest Data ...',
+            character_currencies: {
+                gold: result.data.sheet.gold,
+                gold_dust: result.data.sheet.gold_dust,
+                shards: result.data.sheet.shards,
+                copper_coins: result.data.sheet.copper_coins,
+            }
         });
     }
 

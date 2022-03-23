@@ -39,7 +39,7 @@ export default class OtherKingdomModal extends React.Component<OtherKingdomModal
             this.setState(state);
 
         }, (error: AxiosError) => {
-
+            console.log(error);
         });
     }
 

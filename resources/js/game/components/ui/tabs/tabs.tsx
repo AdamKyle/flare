@@ -3,6 +3,7 @@ import {Tab} from "@headlessui/react";
 import {classNames} from '../../../lib/ui/css-class-helper';
 import TabProperties from "../../../lib/ui/types/tabs/tabs-properties";
 import clsx from "clsx";
+import PopOverContainer from "../popover/pop-over-container";
 
 export default class Tabs extends React.Component<TabProperties, {}> {
 

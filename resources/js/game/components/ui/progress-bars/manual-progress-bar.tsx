@@ -13,7 +13,11 @@ export default class ManualProgressBar extends React.Component<ManualProgressBar
                 <div className="flex justify-between mb-1">
                         <span className="text-base font-medium text-gray-800 dark:text-white">
                             {this.props.label}
-                            <i className="ml-2 fas fa-spinner fa-pulse"></i>
+                            {
+                                this.props.show_loading_icon ?
+                                    <i className="ml-2 fas fa-spinner fa-pulse"></i>
+                                : null
+                            }
                         </span>
                     <span className="text-sm font-medium text-gray-800 dark:text-white">{this.props.secondary_label}</span>
                 </div>

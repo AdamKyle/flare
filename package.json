@@ -58,6 +58,7 @@
         "postcss-nested": "^5.0.5",
         "postcss-nesting": "^8.0.1",
         "pusher-js": "^5.0.3",
+        "react-data-table-component": "^7.4.7",
         "react-draggable": "^4.1.0",
         "react-organizational-chart": "^2.1.0",
         "react-select": "^5.2.1",

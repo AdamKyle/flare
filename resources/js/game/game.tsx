@@ -1,4 +1,4 @@
-import React, {Fragment} from 'react';
+import React from 'react';
 import GameProps from './lib/game/types/game-props';
 import Tabs from './components/ui/tabs/tabs';
 import TabPanel from "./components/ui/tabs/tab-panel";
@@ -11,6 +11,7 @@ import Quests from "./sections/components/quests/quests";
 import Actions from "./sections/game-actions-section/actions";
 import ManualProgressBar from "./components/ui/progress-bars/manual-progress-bar";
 import FetchGameData from "./lib/game/ajax/FetchGameData";
+import CharacterSheet from "./sections/character-sheet/character-sheet";
 
 export default class Game extends React.Component<GameProps, GameState> {
 
@@ -84,7 +85,7 @@ export default class Game extends React.Component<GameProps, GameState> {
         return  (
             <div className='flex h-screen justify-center items-center max-w-md m-auto mt-[-150px]'>
                 <div className='w-full'>
-                    <ManualProgressBar label={'Loading game ...'} secondary_label={this.state.secondary_loading_title} percentage_left={this.state.percentage_loaded} />
+                    <ManualProgressBar label={'Loading game ...'} secondary_label={this.state.secondary_loading_title} percentage_left={this.state.percentage_loaded} show_loading_icon={true} />
                 </div>
             </div>
         );
@@ -127,7 +128,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                                     <Actions character_id={this.props.characterId} />
                                 </BasicCard>
                             </div>
-                            <BasicCard additionalClasses={'hidden lg:block md:mt-0 lg:col-start-3 lg:col-end-3 max-h-[550px]'}>
+                            <BasicCard additionalClasses={'hidden lg:block md:mt-0 lg:col-start-3 lg:col-end-3 max-h-[575px]'}>
                                 <MapSection
                                     user_id={this.props.userId}
                                     character_id={this.props.characterId}
@@ -138,9 +139,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                         </div>
                     </TabPanel>
                     <TabPanel key={'character-sheet'}>
-                        <BasicCard>
-                            <p>Character Sheet</p>
-                        </BasicCard>
+                        <CharacterSheet />
                     </TabPanel>
                     <TabPanel key={'quests'}>
                         <BasicCard>

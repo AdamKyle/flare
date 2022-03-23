@@ -4,4 +4,6 @@ export default interface ManualProgressBarProps {
     secondary_label: string;
 
     percentage_left: number;
+
+    show_loading_icon: boolean;
 }

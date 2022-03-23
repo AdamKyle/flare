@@ -19,7 +19,6 @@ export const fetchCost = (xPosition: number, yPosition: number, characterPositio
     cost: number,
     time_out: number,
 } =>  {
-
     if (typeof characterPosition === 'undefined' || typeof currencies === 'undefined') {
         return {
             can_afford: true,

@@ -20,6 +20,8 @@ export default class DropDown extends React.Component<DropDownProps, any> {
                             }, {
                                 'text-gray-900 dark:text-white' : !active
                             }, {
+                                'bg-blue-500 dark:bg-blue-600 text-white': this.props.selected_name === menuItem.name
+                            }, {
                                 'px-4': !menuItem.hasOwnProperty('icon_class')
                             }, {
                                 'px-2': menuItem.hasOwnProperty('icon_class')
