@@ -1,42 +1,17 @@
 import React from "react";
 import Table from "../../../../../components/ui/data-tables/table";
-import Ajax from "../../../../../lib/ajax/ajax";
-import {AxiosError, AxiosResponse} from "axios";
+import InventoryTabProps from "../../../../../lib/game/character-sheet/types/inventory-tab-props";
+import {BuildInventoryTableColumns} from "../../../../../lib/game/character-sheet/helpers/inventory/build-inventory-table-columns";
 
-const columns = [
-    {
-        name: 'Title',
-        selector: (row: { title: any; }) => row.title,
-        sortable: true,
-    },
-    {
-        name: 'Year',
-        selector: (row: { year: any; }) => row.year,
-        sortable: true,
-    },
-];
 
-const data = [
-    {
-        id: 1,
-        title: 'Beetlejuice',
-        year: '1988',
-    },
-    {
-        id: 2,
-        title: 'Ghostbusters',
-        year: '1984',
-    },
-]
-
-export default class InventoryTable extends React.Component<any, any> {
-    constructor(props: any) {
+export default class InventoryTable extends React.Component<InventoryTabProps, any> {
+    constructor(props: InventoryTabProps) {
         super(props);
     }
 
     render() {
         return (
-            <Table data={data} columns={columns} dark_table={this.props.dark_table}/>
+            <Table data={this.props.inventory} columns={BuildInventoryTableColumns()} dark_table={this.props.dark_table}/>
         );
     }
 }

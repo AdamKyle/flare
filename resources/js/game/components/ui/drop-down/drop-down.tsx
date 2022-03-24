@@ -18,7 +18,7 @@ export default class DropDown extends React.Component<DropDownProps, any> {
                             className={clsx('group flex rounded-sm items-center w-full py-2 text-sm', {
                                 'bg-blue-500 dark:bg-blue-600 text-white' : active
                             }, {
-                                'text-gray-900 dark:text-white' : !active
+                                'text-gray-900 dark:text-white' : !active && this.props.selected_name !== menuItem.name
                             }, {
                                 'bg-blue-500 dark:bg-blue-600 text-white': this.props.selected_name === menuItem.name
                             }, {

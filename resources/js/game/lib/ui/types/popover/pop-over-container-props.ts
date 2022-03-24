@@ -5,4 +5,6 @@ export default interface PopOverContainerProps {
     icon_label: string;
 
     additional_css?: string;
+
+    make_small? : boolean;
 }

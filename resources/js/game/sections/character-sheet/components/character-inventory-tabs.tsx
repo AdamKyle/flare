@@ -11,8 +11,11 @@ import {watchForDarkModeInventoryChange} from "../../../lib/game/dark-mode-watch
 import Ajax from "../../../lib/ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
 import ComponentLoading from "../../../components/ui/loading/component-loading";
+import CharacterInventoryTabsState from "../../../lib/game/character-sheet/types/character-inventory-tabs-state";
+import Inventory from "resources/js/game/lib/game/character-sheet/types/inventory/inventory";
+import InventoryTabSection from "./tabs/inventory-tab-section";
 
-export default class CharacterInventoryTabs extends React.Component<any, any> {
+export default class CharacterInventoryTabs extends React.Component<any, CharacterInventoryTabsState> {
 
     private tabs: {name: string, key: string}[];
 
@@ -37,6 +40,7 @@ export default class CharacterInventoryTabs extends React.Component<any, any> {
             table: 'Inventory',
             dark_tables: false,
             loading: true,
+            inventory: null,
         }
     }
 
@@ -44,10 +48,9 @@ export default class CharacterInventoryTabs extends React.Component<any, any> {
         watchForDarkModeInventoryChange(this);
 
         (new Ajax()).setRoute('character/'+this.props.character_id+'/inventory').doAjaxCall('get', (result: AxiosResponse) => {
-            console.log(result.data);
-
             this.setState({
                 loading: false,
+                inventory: result.data,
             });
         }, (error: AxiosError) => {
             console.log(error);
@@ -61,42 +64,23 @@ export default class CharacterInventoryTabs extends React.Component<any, any> {
     }
 
     render() {
-        if (this.state.loading) {
+        if (this.state.loading || this.state.inventory === null) {
             return <ComponentLoading />
         }
-        
+
         return (
             <Tabs tabs={this.tabs} full_width={true}>
                 <TabPanel key={'inventory'}>
-                    <DropDown menu_items={[
-                        {
-                            name: 'Inventory',
-                            icon_class: 'fas fa-shopping-bag',
-                            on_click: () => this.switchTable('Inventory')
-                        },
-                        {
-                            name: 'Usable',
-                            icon_class: 'ra  ra-bubbling-potion',
-                            on_click: () => this.switchTable('Usable')
-                        },
-                    ]} button_title={'Type'} selected_name={this.state.table} />
-
-                    {
-                        this.state.table === 'Inventory' ?
-                            <InventoryTable dark_table={this.state.dark_tables} character_id={this.props.character_id}/>
-                        :
-                            <UsableItemsTable dark_table={this.state.dark_tables} />
-                    }
-
+                    <InventoryTabSection dark_tables={this.state.dark_tables} character_id={this.props.character_id} inventory={this.state.inventory.inventory} usable_items={this.state.inventory.usable_items} />
                 </TabPanel>
                 <TabPanel key={'equipped'}>
-                    <EquippedTable dark_table={this.state.dark_tables} />
+                    <EquippedTable dark_table={this.state.dark_tables} equipped_items={this.state.inventory.equipped} />
                 </TabPanel>
                 <TabPanel key={'sets'}>
-                    <SetsTable dark_table={this.state.dark_tables} />
+                    <SetsTable dark_table={this.state.dark_tables} sets={this.state.inventory.sets} />
                 </TabPanel>
                 <TabPanel key={'quest'}>
-                    <QuestItemsTable dark_table={this.state.dark_tables} />
+                    <QuestItemsTable dark_table={this.state.dark_tables} quest_items={this.state.inventory.quest_items} />
                 </TabPanel>
             </Tabs>
         )

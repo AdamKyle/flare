@@ -20,7 +20,7 @@ export default class PrimaryOutlineButtonWithPopOver extends React.Component<Pri
                     {this.props.button_label}
                 </button>
                 <div>
-                    <PopOverContainer icon={'fas fa-info-circle'} icon_label={'Help'}>
+                    <PopOverContainer icon={'fas fa-info-circle'} icon_label={'Help'} make_small={this.props.make_popover_small}>
                         {this.props.children}
                     </PopOverContainer>
                 </div>

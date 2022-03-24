@@ -119,6 +119,14 @@ module.exports = {
           ...colors.blue,
           DEFAULT: "#17a2b8",
         },
+        sky: {
+          ...colors.sky,
+          DEFAULT: '#f0f9ff'
+        },
+        pink: {
+          ...colors.pink,
+          DEFAULT: '#fdf2f8'
+        },
         social: {
           facebook: "#3b5998",
           twitter: "#1da1f2",
