@@ -71,10 +71,7 @@ mix.webpackConfig({
   )
   .copy(
     [
-      "node_modules/chart.js/dist/Chart.min.js",
-      "node_modules/sortablejs/Sortable.min.js",
       "node_modules/@glidejs/glide/dist/glide.min.js",
-      "node_modules/@ckeditor/ckeditor5-build-classic/build/ckeditor.js",
     ],
     "public/js/"
   )

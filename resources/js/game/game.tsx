@@ -103,7 +103,7 @@ export default class Game extends React.Component<GameProps, GameState> {
 
         return (
             <div className="md:container">
-                { this.state.view_port < 1280 && this.state.show_size_message ?
+                { this.state.view_port < 1600 && this.state.show_size_message ?
                     <WarningAlert additional_css={'mb-5'} close_alert={this.hideDeviceSizeMessage.bind(this)}>
                         Your devices screen size is too small to properly display the map. As a result, some basic map actions have been given to you such
                         as teleport, adventure and traverse. With teleport you can teleport to any location you wish so long as you have the gold.

@@ -1,9 +1,10 @@
-import React from "react";
+import React, {Component} from "react";
 import ItemNameColoration from "../../../../../components/ui/item-name-coloration";
 import { formatNumber } from "../../../format-number";
+import ActionsInterface from "./actions-interface";
 
-export const BuildInventoryTableColumns = () => {
-    return [
+export const BuildInventoryTableColumns = (component?: ActionsInterface) => {
+    const columns = [
         {
             name: 'Name',
             selector: (row: { item_name: string; }) => row.item_name,
@@ -28,10 +29,21 @@ export const BuildInventoryTableColumns = () => {
             format: (row: any) => formatNumber(row.ac)
         },
     ];
+
+    if (typeof component !== 'undefined') {
+        columns.push({
+            name: 'Actions',
+            selector: (row: any) => '',
+            sortable: true,
+            cell: (row: any) => component.actions(row)
+        });
+    }
+
+    return columns;
 }
 
-export const buildLimitedColumns = () => {
-        return [
+export const buildLimitedColumns = (component?: ActionsInterface) => {
+        const columns = [
             {
                 name: 'Name',
                 selector: (row: { item_name: string; }) => row.item_name,
@@ -45,4 +57,15 @@ export const buildLimitedColumns = () => {
                 cell: (row: any) => row.description
             },
         ];
+
+        if (typeof component !== 'undefined') {
+            columns.push({
+                name: 'Actions',
+                selector: (row: any) => '',
+                sortable: true,
+                cell: (row: any) => component.actions(row)
+            });
+        }
+
+        return columns
 }

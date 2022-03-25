@@ -3,19 +3,20 @@
   <component name="ChangeListManager">
     <list default="true" id="f574dce8-e67f-47ee-8bb6-fe6b7dafab2a" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Flare/Transformers/InventoryTransformer.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Transformers/InventoryTransformer.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/components/ui/buttons/primary-outline-button-with-pop-over.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/components/ui/buttons/primary-outline-button-with-pop-over.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/components/ui/drop-down/drop-down.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/components/ui/drop-down/drop-down.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/components/ui/popover/pop-over-container.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/components/ui/popover/pop-over-container.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/ui/types/buttons/primary-out-line-button-with-pop-over-props.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/ui/types/buttons/primary-out-line-button-with-pop-over-props.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/ui/types/popover/pop-over-container-props.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/ui/types/popover/pop-over-container-props.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/character-sheet/components/character-inventory-tabs.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/character-sheet/components/character-inventory-tabs.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Transformers/SkillsTransformer.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Transformers/SkillsTransformer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Core/Services/CharacterInventoryService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Core/Services/CharacterInventoryService.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Skills/Controllers/Api/SkillsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Skills/Controllers/Api/SkillsController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Skills/Services/SkillService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Skills/Services/SkillService.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/game.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/game.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/game/character-sheet/helpers/inventory/build-inventory-table-columns.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/game/character-sheet/helpers/inventory/build-inventory-table-columns.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/character-sheet/character-sheet.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/character-sheet/character-sheet.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/character-sheet/components/character-skills-tabs.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/character-sheet/components/character-skills-tabs.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/character-sheet/components/tabs/inventory-tab-section.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/character-sheet/components/tabs/inventory-tab-section.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/game/sections/character-sheet/components/tabs/inventory-tabs/equipped-table.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/character-sheet/components/tabs/inventory-tabs/equipped-table.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/character-sheet/components/tabs/inventory-tabs/inventory-table.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/character-sheet/components/tabs/inventory-tabs/inventory-table.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/game/sections/character-sheet/components/tabs/inventory-tabs/quest-items-table.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/character-sheet/components/tabs/inventory-tabs/quest-items-table.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/game/sections/character-sheet/components/tabs/inventory-tabs/sets-table.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/character-sheet/components/tabs/inventory-tabs/sets-table.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/game/sections/character-sheet/components/tabs/inventory-tabs/usable-items-table.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/character-sheet/components/tabs/inventory-tabs/usable-items-table.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tailwind.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/tailwind.config.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/game/skills/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/game/skills/api.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -251,7 +252,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources/js/game/sections/character-sheet/components/tabs/inventory-tabs" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources/js/game/lib/game/character-sheet/types/skills/tables" />
     <property name="nodejs_package_manager_path" value="yarn" />
     <property name="ts.external.directory.path" value="$PROJECT_DIR$/node_modules/typescript/lib" />
     <property name="ts.rename.search.for.dynamic.occurrences" value="true" />
@@ -259,11 +260,11 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/resources/js/game/lib/game/character-sheet/types/skills/tables" />
+      <recent name="$PROJECT_DIR$/resources/js/game/sections/character-sheet/components/tabs/skill-tabs" />
       <recent name="$PROJECT_DIR$/resources/js/game/sections/character-sheet/components/tabs/inventory-tabs" />
       <recent name="$PROJECT_DIR$/resources/js/game/lib/game/actions/battle/attack" />
       <recent name="$PROJECT_DIR$/resources/js/game/sections/game-actions-section/components" />
-      <recent name="$PROJECT_DIR$/resources/js/game/components/ui/alerts/simple-alerts" />
-      <recent name="$PROJECT_DIR$/resources/js/game/components/ui/buttons" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/resources/js/game/sections/character-sheet/components/tabs" />
@@ -281,7 +282,7 @@
       <option name="presentableId" value="Default" />
       <updated>1647305789305</updated>
       <workItem from="1647305795431" duration="28156000" />
-      <workItem from="1647878167958" duration="52422000" />
+      <workItem from="1647878167958" duration="68418000" />
     </task>
     <servers />
   </component>

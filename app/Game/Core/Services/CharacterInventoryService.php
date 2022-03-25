@@ -38,6 +38,11 @@ class CharacterInventoryService {
     private bool $isInventorySetIsEquipped = false;
 
     /**
+     * @var string $inventorySetEquippedName
+     */
+    private string $inventorySetEquippedName = '';
+
+    /**
      * @var InventoryTransformer $inventoryTransformer
      */
     private $inventoryTransformer;
@@ -93,14 +98,15 @@ class CharacterInventoryService {
         $usableSets = $this->getUsableSets();
 
         return [
-            'inventory'    => $this->fetchCharacterInventory(),
-            'usable_sets'  => $usableSets,
-            'savable_sets' => $usableSets,
-            'equipped'     => !is_null($equipped) ? $equipped : [],
-            'sets'         => $this->getCharacterInventorySets(),
-            'quest_items'  => $this->getQuestItems(),
-            'usable_items' => $this->getUsableItems(),
-            'set_equipped' => $this->isInventorySetIsEquipped,
+            'inventory'         => $this->fetchCharacterInventory(),
+            'usable_sets'       => $usableSets,
+            'savable_sets'      => $usableSets,
+            'equipped'          => !is_null($equipped) ? $equipped : [],
+            'sets'              => $this->getCharacterInventorySets(),
+            'quest_items'       => $this->getQuestItems(),
+            'usable_items'      => $this->getUsableItems(),
+            'set_is_equipped'   => $this->isInventorySetIsEquipped,
+            'set_name_equipped' => $this->inventorySetEquippedName,
         ];
     }
 
@@ -258,6 +264,18 @@ class CharacterInventoryService {
         }
 
         $this->isInventorySetIsEquipped = true;
+
+        if (!is_null($inventorySet->name)) {
+            $this->inventorySetEquippedName = $inventorySet->name;
+        } else {
+            $index = $this->character->inventorySets->search(function ($set) use($inventorySet) {
+                return $set->id === $inventorySet->id;
+            });
+
+            if ($index !== false) {
+                $this->inventorySetEquippedName = 'Set ' . $index + 1;
+            }
+        }
 
         $slots = SetSlot::where('inventory_set_id', $inventorySet->id)->get();
 

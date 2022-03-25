@@ -33,7 +33,7 @@ export default class QuestItemsTable extends React.Component<any, any> {
                             <label className="label block mb-2 mr-3" htmlFor="search">Search</label>
                         </div>
                         <div>
-                            <input type='text' name='search' className='form-control' onChange={this.search.bind(this)}/>
+                            <input type='text' name='search' className='form-control' onChange={this.search.bind(this)} />
                         </div>
                     </div>
                 </div>

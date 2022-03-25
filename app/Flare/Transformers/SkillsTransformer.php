@@ -9,7 +9,7 @@ class SkillsTransformer extends TransformerAbstract {
 
     /**
      * Fetches skill data for a response.
-     * 
+     *
      * @param Skill $skill
      */
     public function transform(Skill $skill) {
@@ -21,7 +21,6 @@ class SkillsTransformer extends TransformerAbstract {
             'skill_type'      => $skill->baseSkill->skillType()->getNamedValue(),
             'xp'              => $skill->xp,
             'xp_max'          => $skill->xp_max,
-            'current_xp'      => !is_null($skill->xp_max) ? ($skill->xp / $skill->xp_max) * 100 : 0,
             'level'           => $skill->level,
             'max_level'       => $skill->baseSkill->max_level,
             'can_train'       => $skill->baseSkill->can_train,

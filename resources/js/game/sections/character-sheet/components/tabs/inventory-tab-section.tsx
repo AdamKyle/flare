@@ -4,6 +4,7 @@ import InventoryTable from "./inventory-tabs/inventory-table";
 import UsableItemsTable from "./inventory-tabs/usable-items-table";
 import PopOverContainer from "../../../../components/ui/popover/pop-over-container";
 import InventoryDetails from "../../../../lib/game/character-sheet/types/inventory/inventory-details";
+import DangerButton from "../../../../components/ui/buttons/danger-button";
 
 export default class InventoryTabSection extends React.Component<any, any> {
 
@@ -41,28 +42,50 @@ export default class InventoryTabSection extends React.Component<any, any> {
         }
     }
 
+    disenchantAll() {
+
+    }
+
+    destroyAll() {
+
+    }
+
     render() {
         return (
             <Fragment>
                 <div className='flex items-center'>
                     <div>
-                    <DropDown menu_items={[
-                        {
-                            name: 'Inventory',
-                            icon_class: 'fas fa-shopping-bag',
-                            on_click: () => this.switchTable('Inventory')
-                        },
-                        {
-                            name: 'Usable',
-                            icon_class: 'ra ra-bubbling-potion',
-                            on_click: () => this.switchTable('Usable')
-                        },
-                    ]} button_title={'Type'} selected_name={this.state.table} />
+                        <DropDown menu_items={[
+                            {
+                                name: 'Inventory',
+                                icon_class: 'fas fa-shopping-bag',
+                                on_click: () => this.switchTable('Inventory')
+                            },
+                            {
+                                name: 'Usable',
+                                icon_class: 'ra ra-bubbling-potion',
+                                on_click: () => this.switchTable('Usable')
+                            },
+                        ]} button_title={'Type'} selected_name={this.state.table} />
+                    </div>
+                    <div className='ml-2'>
+                        <DropDown menu_items={[
+                            {
+                                name: 'Destroy All',
+                                icon_class: 'fas fa-shopping-bag',
+                                on_click: () => this.disenchantAll()
+                            },
+                            {
+                                name: 'Disenchant All',
+                                icon_class: 'ra ra-bubbling-potion',
+                                on_click: () => this.destroyAll()
+                            },
+                        ]} button_title={'Actions'} selected_name={this.state.table} />
                     </div>
                     <div className='ml-4 md:ml-0 my-4 md:my-0 md:absolute md:right-0'>
                         <div className='flex items-center'>
                             <div>
-                                <input type='text' name='search' className='form-control' onChange={this.search.bind(this)}/>
+                                <input type='text' name='search' className='form-control' onChange={this.search.bind(this)} placeholder={'Search'}/>
                             </div>
                             <div className='mt-2'>
                                 <PopOverContainer icon={'fas fa-info-circle'} icon_label={'Help'} additional_css={'left-[14px] md:left-0'} make_small={true} >

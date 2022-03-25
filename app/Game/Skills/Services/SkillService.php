@@ -25,6 +25,21 @@ class SkillService {
     }
 
     /**
+     * Gets the skills for a player.
+     *
+     * @param Character $character
+     * @param array $gameSkillIds
+     * @return array
+     */
+    public function getSkills(Character $character, array $gameSkillIds): array {
+        $skills = $character->skills()->whereIn('game_skill_id', $gameSkillIds)->get();
+
+        $skills = new Collection($skills, $this->skillsTransformer);
+
+        return $this->manager->createData($skills)->toArray();
+    }
+
+    /**
      * Sets a skill to training.
      *
      * If a skill is in training, remove it from training.

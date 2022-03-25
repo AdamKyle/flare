@@ -9,8 +9,10 @@ import PrimaryButton from "../../../../../components/ui/buttons/primary-button";
 import PrimaryOutlineButtonWithPopOver from "../../../../../components/ui/buttons/primary-outline-button-with-pop-over";
 import PopOverContainer from "../../../../../components/ui/popover/pop-over-container";
 import InventoryDetails from "../../../../../lib/game/character-sheet/types/inventory/inventory-details";
+import ActionsInterface from "../../../../../lib/game/character-sheet/helpers/inventory/actions-interface";
+import DangerButton from "../../../../../components/ui/buttons/danger-button";
 
-export default class SetsTable extends React.Component<any, any> {
+export default class SetsTable extends React.Component<any, any> implements ActionsInterface {
     constructor(props: any) {
         super(props);
 
@@ -58,6 +60,18 @@ export default class SetsTable extends React.Component<any, any> {
         });
     }
 
+    actions(row: InventoryDetails): JSX.Element {
+        return <DangerButton button_label={'Remove'} on_click={() => this.removeFromSet(row.id)} />
+    }
+
+    emptySet() {
+
+    }
+
+    removeFromSet(id: number) {
+
+    }
+
     render() {
         return (
             <Fragment>
@@ -65,10 +79,13 @@ export default class SetsTable extends React.Component<any, any> {
                     <div>
                         <DropDown menu_items={this.buildMenuItems()} button_title={'Set'} selected_name={this.state.selected_set} />
                     </div>
+                    <div className='ml-2'>
+                        <DangerButton button_label={'Empty Set'} on_click={this.emptySet.bind(this)} />
+                    </div>
                     <div className='ml-4 md:ml-0 my-4 md:my-0 md:absolute md:right-0'>
                         <div className='flex items-center'>
                             <div>
-                                <input type='text' name='search' className='form-control' onChange={this.search.bind(this)}/>
+                                <input type='text' name='search' className='form-control' onChange={this.search.bind(this)} placeholder={'Search'}/>
                             </div>
                             <div className='mt-2'>
                                 <PopOverContainer icon={'fas fa-info-circle'} icon_label={'Help'} additional_css={'left-[14px] md:left-0'} make_small={true} >
@@ -82,7 +99,7 @@ export default class SetsTable extends React.Component<any, any> {
                     </div>
                 </div>
 
-                <Table data={this.state.data} columns={BuildInventoryTableColumns()} dark_table={this.props.dark_table}/>
+                <Table data={this.state.data} columns={BuildInventoryTableColumns(this)} dark_table={this.props.dark_table}/>
             </Fragment>
         );
     }

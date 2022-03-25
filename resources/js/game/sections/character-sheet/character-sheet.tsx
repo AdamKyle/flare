@@ -1,7 +1,6 @@
 import React from "react";
 import BasicCard from "../../components/ui/cards/basic-card";
 import CharacterTabs from "./components/character-tabs";
-import InfoAlert from "../../components/ui/alerts/simple-alerts/info-alert";
 import CharacterSkillsTabs from "./components/character-skills-tabs";
 import CharacterInventoryTabs from "./components/character-inventory-tabs";
 
@@ -14,12 +13,12 @@ export default class CharacterSheet extends React.Component<any, any> {
     render() {
         return(
             <div>
-                <div className='grid md:grid-cols-2 gap-2'>
-                    <BasicCard additionalClasses={'md:max-h-[225px]'}>
+                <div className='flex flex-col lg:flex-row w-full gap-2'>
+                    <BasicCard additionalClasses={'overflow-x-auto lg:w-1/2'}>
                         <CharacterTabs />
                     </BasicCard>
-                    <BasicCard additionalClasses={'md:max-h-[225px]'}>
-                        <div className='grid md:grid-cols-2 gap-2'>
+                    <BasicCard additionalClasses={'overflow-x-auto lg:w-1/2'}>
+                        <div className='grid lg:grid-cols-2 gap-2'>
                             <div>
                                 <dl>
                                     <dt>Gold:</dt>
@@ -32,7 +31,7 @@ export default class CharacterSheet extends React.Component<any, any> {
                                     <dd>100,000</dd>
                                 </dl>
                             </div>
-                            <div className='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                            <div className='border-b-2 block lg:hidden border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                             <div>
                                 <dl>
                                     <dt>Inventory Max:</dt>
@@ -40,7 +39,7 @@ export default class CharacterSheet extends React.Component<any, any> {
                                     <dt>Inventory Count:</dt>
                                     <dd>50</dd>
                                 </dl>
-                                <div className='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                                <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                                 <dl>
                                     <dt>Damage Stat:</dt>
                                     <dd>Str</dd>
@@ -49,18 +48,13 @@ export default class CharacterSheet extends React.Component<any, any> {
                                 </dl>
                             </div>
                         </div>
-                        <InfoAlert additional_css={'my-5'}>
-                            <strong>Inventory Count</strong> does not apply to your sets, equipped items or quest items. It only counts the amount of usable item slots and inventory slots you have used.<br />
-                            <strong>Damage Stat</strong> refers to the stat you use to do damage with, the higher the stat the more damage.<br />
-                            <strong>To Hit</strong> refers to both the skill and stat in which is used to determine if you can hit anything or not.<br />
-                        </InfoAlert>
                     </BasicCard>
                 </div>
-                <div className='mt-2 grid md:grid-cols-2 gap-2'>
-                    <BasicCard>
-                        <CharacterSkillsTabs />
+                <div className='flex flex-col lg:flex-row gap-2 w-full mt-2'>
+                    <BasicCard additionalClasses={'overflow-x-auto lg:w-1/2 lg:h-fit'}>
+                        <CharacterSkillsTabs character_id={this.props.character_id}/>
                     </BasicCard>
-                    <BasicCard>
+                    <BasicCard additionalClasses={'overflow-x-auto lg:w-1/2 lg:h-fit'}>
                         <CharacterInventoryTabs character_id={this.props.character_id}/>
                     </BasicCard>
                 </div>
