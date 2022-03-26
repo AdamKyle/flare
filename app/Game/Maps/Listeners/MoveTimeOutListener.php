@@ -58,6 +58,10 @@ class MoveTimeOutListener
 
             $character = $character->refresh();
 
+            if ($event->traverse) {
+                $timeOut = 10;
+            }
+
             MoveTimeOutJob::dispatch($character->id)->delay($timeOut);
         }
 

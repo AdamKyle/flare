@@ -136,6 +136,8 @@ class TraverseService {
      * @param Character $character
      */
     public function travel(int $mapId, Character $character) {
+        $this->updateCharacterTimeOut($character);
+
         $oldMap = $character->map->gameMap;
 
         $character->map()->update([
@@ -170,7 +172,6 @@ class TraverseService {
         $this->updateGlobalCharacterMapCount($oldMap->id);
         $this->updateMap($character);
         $this->updateActions($mapId, $character, $oldMap);
-        $this->updateCharacterTimeOut($character);
 
         $message = 'You have traveled to: ' . $character->map->gameMap->name;
 
@@ -255,7 +256,7 @@ class TraverseService {
             'can_move_again_at' => now()->addSeconds(10),
         ]);
 
-        event(new MoveTimeOutEvent($character));
+        event(new MoveTimeOutEvent($character, 0, false, true));
     }
 
     /**

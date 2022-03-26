@@ -59,6 +59,7 @@ export default class Card extends React.Component {
                 <button
                   className="float-right btn btn-sm btn-danger"
                   onClick={this.props.close}
+                  disabled={this.props.disabled}
                 >
                   Close
                 </button>

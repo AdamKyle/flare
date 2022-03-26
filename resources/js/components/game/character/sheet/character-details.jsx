@@ -176,109 +176,114 @@ export default class CharacterDetails extends React.Component {
           <hr />
           <Tabs defaultActiveKey="stats" id="character-stats">
             <Tab eventKey="stats" title="Stats">
-              <dl className="mt-4">
-                <dt>Strength:</dt>
-                <dd>{sheet.str}</dd>
-                <dt>Durability:</dt>
-                <dd>{sheet.dur}</dd>
-                <dt>Dexterity:</dt>
-                <dd>{sheet.dex}</dd>
-                <dt>Charisma:</dt>
-                <dd>{sheet.chr}</dd>
-                <dt>Intelligence:</dt>
-                <dd>{sheet.int}</dd>
-                <dt>Agility:</dt>
-                <dd>{sheet.agi}</dd>
-                <dt>Focus:</dt>
-                <dd>{sheet.focus}</dd>
-              </dl>
+              <Row>
+                <Col xs={12} sm={12} md={12} lg={6} xl={6}>
+                  <h4 className='mt-4'>Raw Stats</h4>
+                  <hr />
+                  <dl className="mt-4">
+                    <dt>Strength:</dt>
+                    <dd>{sheet.str}</dd>
+                    <dt>Durability:</dt>
+                    <dd>{sheet.dur}</dd>
+                    <dt>Dexterity:</dt>
+                    <dd>{sheet.dex}</dd>
+                    <dt>Charisma:</dt>
+                    <dd>{sheet.chr}</dd>
+                    <dt>Intelligence:</dt>
+                    <dd>{sheet.int}</dd>
+                    <dt>Agility:</dt>
+                    <dd>{sheet.agi}</dd>
+                    <dt>Focus:</dt>
+                    <dd>{sheet.focus}</dd>
+                  </dl>
+                </Col>
+                <Col xs={12} sm={12} md={12} lg={6} xl={6}>
+                  <h4 className='mt-4'>Modded Stats</h4>
+                  <hr />
+                  <dl className="mt-4">
+                    <dt>Strength:</dt>
+                    <dd>{sheet.str_modded}</dd>
+                    <dt>Durability:</dt>
+                    <dd>{sheet.dur_modded}</dd>
+                    <dt>Dexterity:</dt>
+                    <dd>{sheet.dex_modded}</dd>
+                    <dt>Charisma:</dt>
+                    <dd>{sheet.chr_modded}</dd>
+                    <dt>Intelligence:</dt>
+                    <dd>{sheet.int_modded}</dd>
+                    <dt>Agility:</dt>
+                    <dd>{sheet.agi_modded}</dd>
+                    <dt>Focus:</dt>
+                    <dd>{sheet.focus_modded}</dd>
+                  </dl>
+                </Col>
+              </Row>
+
             </Tab>
-            <Tab eventKey="stats-modded" title="Stats Modded">
-              <div className="mt-4">
-                <AlertInfo icon={"fas fa-question-circle"} title={"Info"}>
-                  <p>
-                    Modded stats are stats that are effected by gear and the enchantments on said gear.
-                    These stats are shown to you in the top bar on the game section.
-                  </p>
-                  <p>
-                    Better gear, levels and the appropriate enchantments can push these well into the trillions,
-                    especially around late game.
-                  </p>
-                </AlertInfo>
-              </div>
-              <dl className="mt-4">
-                <dt>Strength Modded:</dt>
-                <dd>{sheet.str_modded}</dd>
-                <dt>Durability Modded:</dt>
-                <dd>{sheet.dur_modded}</dd>
-                <dt>Dexterity Modded:</dt>
-                <dd>{sheet.dex_modded}</dd>
-                <dt>Charisma Modded:</dt>
-                <dd>{sheet.chr_modded}</dd>
-                <dt>Intelligence Modded:</dt>
-                <dd>{sheet.int_modded}</dd>
-                <dt>Agility Modded:</dt>
-                <dd>{sheet.agi_modded}</dd>
-                <dt>Focus Modded:</dt>
-                <dd>{sheet.focus_modded}</dd>
-              </dl>
-            </Tab>
-            <Tab eventKey="resistances-and-reductions" title="Resistances and Deductions">
-              <dl className="mt-4">
-                <dt>Spell Evasion<sup>**</sup>:</dt>
-                <dd>{(sheet.spell_evasion * 100).toFixed(2)}%</dd>
-                <dt>Artifact Annulment<sup>**</sup>:</dt>
-                <dd>{(sheet.artifact_anull * 100).toFixed(2)}%</dd>
-                <dt>Enchantment Reduction Amount<sup>**</sup>:</dt>
-                <dd>{(sheet.affix_damage_red * 100).toFixed(2)}%</dd>
-                <dt>Healing Reduction Amount<sup>**</sup>:</dt>
-                <dd>{(sheet.affix_damage_red * 100).toFixed(2)}%</dd>
-                <dt>Resurrection Chance<sup>*</sup>:</dt>
-                <dd>{(sheet.res_chance * 100).toFixed(2)}%</dd>
-              </dl>
-              <p className="mt-4"><sup>*</sup> Only healing spells can affect this.</p>
-              <p className="mt-2"><sup>**</sup> Only affects enemies at the beginning of battle.</p>
-            </Tab>
-            <Tab eventKey="voidance" title="Devouring Light/Darkness">
-              <dl className="mt-4">
-                <dt>Devouring Light:</dt>
-                <dd>{(sheet.devouring_light * 100).toFixed(0)}%</dd>
-                <dt>Devouring Darkness:</dt>
-                <dd>{(sheet.devouring_darkness * 100).toFixed(0)}%</dd>
-              </dl>
-              <p className="mt-4">For more information, please see <a href="/information/voidance">Voidance help</a>. </p>
-            </Tab>
-            <Tab eventKey="holy-bonus" title="Holy Bonuses">
-              <dl className="mt-4">
-                <dt>Over All Holy Bonus:</dt>
-                <dd>{(sheet.holy_bonus * 100).toFixed(2)}%</dd>
-                <dt>Holy Stacks</dt>
-                <dd>{sheet.current_stacks}/{sheet.max_holy_stacks}</dd>
-                <dt>Voidance Resistance Bonus:</dt>
-                <dd>{(sheet.devouring_resistance * 100).toFixed(2)}%</dd>
-                <dt>Devoidance Resistance Bonus:</dt>
-                <dd>{(sheet.devouring_resistance * 100).toFixed(2)}%</dd>
-                <dt>Bonus Attack %</dt>
-                <dd>{(sheet.holy_attack_bonus * 100).toFixed(2)}%</dd>
-                <dt>Bonus AC %</dt>
-                <dd>{(sheet.holy_ac_bonus * 100).toFixed(2)}%</dd>
-                <dt>Bonus Healing %</dt>
-                <dd>{(sheet.holy_healing_bonus * 100).toFixed(2)}%</dd>
-              </dl>
-              <p className="mt-4">For more information, please see <a href="/information/holy-items">Holy Items help</a>. </p>
+            <Tab eventKey="misc-modifiers" title="Misc Modifiers">
+              <Row>
+                <Col xs={12} sm={12} md={12} lg={4} xl={4}>
+                  <h4 className='mt-4'>Resist./Reduce./Res. %</h4>
+                  <hr />
+                  <dl className="mt-4">
+                    <dt>Spell Evasion<sup>**</sup>:</dt>
+                    <dd>{(sheet.spell_evasion * 100).toFixed(2)}%</dd>
+                    <dt>Artifact Annulment<sup>**</sup>:</dt>
+                    <dd>{(sheet.artifact_anull * 100).toFixed(2)}%</dd>
+                    <dt>Enchantment Reduction Amount<sup>**</sup>:</dt>
+                    <dd>{(sheet.affix_damage_red * 100).toFixed(2)}%</dd>
+                    <dt>Healing Reduction Amount<sup>**</sup>:</dt>
+                    <dd>{(sheet.affix_damage_red * 100).toFixed(2)}%</dd>
+                    <dt>Resurrection Chance<sup>*</sup>:</dt>
+                    <dd>{(sheet.res_chance * 100).toFixed(2)}%</dd>
+                  </dl>
+                  <p className="mt-4"><sup>*</sup> Only healing spells can affect this.</p>
+                  <p className="mt-2"><sup>**</sup> Only affects enemies.</p>
+                </Col>
+                <Col xs={12} sm={12} md={12} lg={4} xl={4}>
+                  <h4 className='mt-4'>Devouring %</h4>
+                  <hr />
+                  <dl className="mt-4">
+                    <dt>Devouring Light:</dt>
+                    <dd>{(sheet.devouring_light * 100).toFixed(0)}%</dd>
+                    <dt>Devouring Darkness:</dt>
+                    <dd>{(sheet.devouring_darkness * 100).toFixed(0)}%</dd>
+                  </dl>
+                  <p className="mt-4">For more information, please see <a href="/information/voidance">Voidance help</a>. </p>
+                </Col>
+                <Col xs={12} sm={12} md={12} lg={4} xl={4}>
+                  <h4 className='mt-4'>Holy Bonuses</h4>
+                  <hr />
+                  <dl className="mt-4">
+                    <dt>Over All Holy Bonus:</dt>
+                    <dd>{(sheet.holy_bonus * 100).toFixed(2)}%</dd>
+                    <dt>Holy Stacks</dt>
+                    <dd>{sheet.current_stacks}/{sheet.max_holy_stacks}</dd>
+                    <dt>Voidance Resistance Bonus:</dt>
+                    <dd>{(sheet.devouring_resistance * 100).toFixed(2)}%</dd>
+                    <dt>Devoidance Resistance Bonus:</dt>
+                    <dd>{(sheet.devouring_resistance * 100).toFixed(2)}%</dd>
+                    <dt>Bonus Attack %</dt>
+                    <dd>{(sheet.holy_attack_bonus * 100).toFixed(2)}%</dd>
+                    <dt>Bonus AC %</dt>
+                    <dd>{(sheet.holy_ac_bonus * 100).toFixed(2)}%</dd>
+                    <dt>Bonus Healing %</dt>
+                    <dd>{(sheet.holy_healing_bonus * 100).toFixed(2)}%</dd>
+                  </dl>
+                  <p className="mt-4">For more information, please see <a href="/information/holy-items">Holy Items help</a>. </p>
+                </Col>
+              </Row>
+
             </Tab>
           </Tabs>
           <hr />
           <Row>
             <Col xs={12}>
-              <h5>Attack Break Down</h5>
-              <p className="mt-2">
-                These include any attached affixes and skill bonuses:
-              </p>
-              <hr/>
-              <Tabs defaultActiveKey="class-bonus" id="character-attack-info">
-                <Tab eventKey="class-bonus" title="Class Bonus">
-                  <p className="mt-4">
+              <Row>
+                <Col xs={12} sm={12} md={12} lg={6} xl={6}>
+                  <h4>Class Bonus</h4>
+                  <hr />
+                  <p>
                     {sheet.class_bonus.description}
                   </p>
 
@@ -290,8 +295,10 @@ export default class CharacterDetails extends React.Component {
                     <dt>Requirements:</dt>
                     <dd>{sheet.class_bonus.requires}</dd>
                   </dl>
-                </Tab>
-                <Tab eventKey="basic-attack" title="Basic Attack Info">
+                </Col>
+                <Col xs={12} sm={12} md={12} lg={6} xl={6}>
+                  <h4 className='mr-4'>Attack Info</h4>
+                  <hr />
                   <dl className="mt-4">
                     <dt>Weapon Attack:</dt>
                     <dd>{sheet.weapon_attack}</dd>
@@ -304,36 +311,8 @@ export default class CharacterDetails extends React.Component {
                     <dt>Heal For:</dt>
                     <dd>{sheet.heal_for}</dd>
                   </dl>
-                </Tab>
-                <Tab eventKey="attack-break-down" title="Attack Break Down">
-                  <Tabs defaultActiveKey="regular-attack" id="character-attack-break-down">
-                    <Tab eventKey="regular-attack" title="Regular Attacks" tabClassName="mt-4">
-                      <div className="mt-4">
-                        <AlertInfo icon={"fas fa-question-circle"} title={"Info"}>
-                          <p>This is your attack normally. Because there are five different attack types, each tab
-                            reflects the attack button on the game tab.</p>
-                        </AlertInfo>
-                      </div>
-
-                      <Tabs defaultActiveKey="attack" id="character-regular-attack-break-down">
-                        {this.buildEachTab(sheet.attack_stats, true)}
-                      </Tabs>
-                    </Tab>
-                    <Tab eventKey="voided-attack" title="Voided Attacks" tabClassName="mt-4">
-                      <div className="mt-4">
-                        <AlertInfo icon={"fas fa-question-circle"} title={"Info"}>
-                          <p>This is your voided attack. Some enemies can <a href="/information/voidance">void</a> you. When that happens
-                            your attacks will drop. You can see what that would look like here.</p>
-                        </AlertInfo>
-                      </div>
-
-                      <Tabs defaultActiveKey="voided_attack" id="character-voided-attack-break-down">
-                        {this.buildEachTab(sheet.attack_stats, false)}
-                      </Tabs>
-                    </Tab>
-                  </Tabs>
-                </Tab>
-              </Tabs>
+                </Col>
+              </Row>
             </Col>
           </Row>
         </Card.Body>

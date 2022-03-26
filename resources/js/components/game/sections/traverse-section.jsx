@@ -104,6 +104,7 @@ export default class TraverseSection extends React.Component {
         OtherCss="p-3"
         cardTitle="Traverse"
         close={this.hideTraverse.bind(this)}
+        disabled={this.state.loading}
       >
         {
           this.state.loading ?

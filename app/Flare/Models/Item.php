@@ -85,6 +85,10 @@ class Item extends Model
         'can_use_on_other_items',
         'holy_level',
         'holy_stacks',
+        'ambush_chance',
+        'ambush_resistance',
+        'counter_chance',
+        'counter_resistance',
     ];
 
     /**
@@ -145,6 +149,10 @@ class Item extends Model
         'devouring_light'                  => 'float',
         'devouring_darkness'               => 'float',
         'xp_bonus'                         => 'float',
+        'ambush_chance'                    => 'float',
+        'ambush_resistance'                => 'float',
+        'counter_chance'                   => 'float',
+        'counter_resistance'               => 'float',
     ];
 
     protected $appends = [

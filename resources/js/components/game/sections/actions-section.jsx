@@ -12,6 +12,7 @@ import AlchemyAction from "../alchemy/alchemy-action";
 import AutoAttackSection from "./auto-attack-section";
 import SmithyWorkBench from "../smithy-work-bench/SmithyWorkBench";
 import LockedLocationType from "./lib/LockedLocationType";
+import TrinketCraftingAction from "../trinket-crafting/trinket-crafting-action";
 
 export default class ActionsSection extends React.Component {
 
@@ -27,6 +28,7 @@ export default class ActionsSection extends React.Component {
       showEnchanting: false,
       showAlchemy: false,
       showSmithingBench: false,
+      showTrinketCrafting: false,
       characterId: null,
       isLoading: true,
       character: null,
@@ -203,6 +205,12 @@ export default class ActionsSection extends React.Component {
     });
   }
 
+  updateShowTrinketCrafting(show) {
+    this.setState({
+      showTrinketCrafting: show,
+    })
+  }
+
   updateCanCraft(can) {
     this.setState({
       canCraft: can,
@@ -268,6 +276,7 @@ export default class ActionsSection extends React.Component {
                   updateShowEnchanting={this.updateShowEnchanting.bind(this)}
                   updateShowAlchemy={this.updateShowAlchemy.bind(this)}
                   updateShowSmithingBench={this.updateShowSmithingBench.bind(this)}
+                  updateShowTrinketCrafting={this.updateShowTrinketCrafting.bind(this)}
                   canCraft={this.state.canCraft}
                 />
                 {
@@ -398,6 +407,24 @@ export default class ActionsSection extends React.Component {
                     isAdventuring={this.state.isAdventuring}
                     openTimeOutModal={this.props.openTimeOutModal}
                   />
+                  : null
+                }
+                {
+                  this.state.showTrinketCrafting ?
+                    <TrinketCraftingAction
+                      isDead={this.state.isDead}
+                      characterId={this.state.character.id}
+                      showCrafting={this.state.showTrinketCrafting}
+                      shouldChangeCraftingType={this.state.changeCraftingType}
+                      changeCraftingType={this.changeCraftingType.bind(this)}
+                      userId={this.props.userId}
+                      copperCoins={this.props.characterCurrencies.copper_coins}
+                      goldDust={this.props.characterCurrencies.gold_dust}
+                      timeRemaining={this.state.character.can_craft_again_at}
+                      updateCanCraft={this.updateCanCraft.bind(this)}
+                      isAdventuring={this.state.isAdventuring}
+                      openTimeOutModal={this.props.openTimeOutModal}
+                    />
                   : null
                 }
                 {

@@ -229,7 +229,7 @@ export default class CraftingAction extends React.Component {
       return (
         <button className="btn btn-primary mt-2"
                 type="button"
-                disabled={this.state.isDead || !this.state.canCraft || this.props.isAdventuring}
+                disabled={this.state.isDead || !this.state.canCraft || this.props.isAdventuring || this.state.itemToCraft === 0}
                 onClick={this.craft.bind(this)}
         >
           Craft!
