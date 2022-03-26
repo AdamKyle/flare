@@ -117,7 +117,18 @@ class BaseCharacterInfo {
      * @throws \Exception
      */
     public function buildDefence(Character $character, bool $voided = false) {
-        return round((10 + $this->getDefence($character, $voided)) * (1 + $this->fetchSkillACMod($character) + $this->classBonuses->getFightersDefence($character)));
+
+        $ac = 10 + $this->getDefence($character, $voided);
+
+        $ac += $ac * ($this->fetchSkillACMod($character) + $this->classBonuses->getFightersDefence($character));
+
+        $strBonus = $this->statMod($character,'str') * 0.02;
+
+        if ($voided) {
+            $strBonus * $character->str * 0.02;
+        }
+
+        return $ac + $strBonus;
     }
 
     /**

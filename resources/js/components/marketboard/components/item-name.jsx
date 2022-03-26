@@ -18,6 +18,10 @@ export default class ItemName extends React.Component {
       return 'unique-item';
     }
 
+    if (this.props.item.type === 'trinket') {
+      return 'trinket';
+    }
+
     if (this.props.item.holy_stacks_applied > 0) {
       return 'holy-item';
     }

@@ -29,6 +29,10 @@ class ItemsSheet implements ToCollection {
 
                 $itemData = $this->returnCleanItem($item);
 
+                if (!isset($itemData['name'])) {
+                    continue;
+                }
+
                 $item = Item::where('name', $itemData['name'])
                     ->where('item_suffix_id', $itemData['item_suffix_id'])
                     ->where('item_prefix_id', $itemData['item_prefix_id'])

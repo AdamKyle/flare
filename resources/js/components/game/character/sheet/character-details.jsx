@@ -222,7 +222,7 @@ export default class CharacterDetails extends React.Component {
             </Tab>
             <Tab eventKey="misc-modifiers" title="Misc Modifiers">
               <Row>
-                <Col xs={12} sm={12} md={12} lg={4} xl={4}>
+                <Col xs={12} sm={12} md={12} lg={4} xl={6}>
                   <h4 className='mt-4'>Resist./Reduce./Res. %</h4>
                   <hr />
                   <dl className="mt-4">
@@ -240,7 +240,7 @@ export default class CharacterDetails extends React.Component {
                   <p className="mt-4"><sup>*</sup> Only healing spells can affect this.</p>
                   <p className="mt-2"><sup>**</sup> Only affects enemies.</p>
                 </Col>
-                <Col xs={12} sm={12} md={12} lg={4} xl={4}>
+                <Col xs={12} sm={12} md={12} lg={4} xl={6}>
                   <h4 className='mt-4'>Devouring %</h4>
                   <hr />
                   <dl className="mt-4">
@@ -251,7 +251,10 @@ export default class CharacterDetails extends React.Component {
                   </dl>
                   <p className="mt-4">For more information, please see <a href="/information/voidance">Voidance help</a>. </p>
                 </Col>
-                <Col xs={12} sm={12} md={12} lg={4} xl={4}>
+              </Row>
+              <hr />
+              <Row>
+                <Col xs={12}>
                   <h4 className='mt-4'>Holy Bonuses</h4>
                   <hr />
                   <dl className="mt-4">
@@ -273,7 +276,6 @@ export default class CharacterDetails extends React.Component {
                   <p className="mt-4">For more information, please see <a href="/information/holy-items">Holy Items help</a>. </p>
                 </Col>
               </Row>
-
             </Tab>
           </Tabs>
           <hr />

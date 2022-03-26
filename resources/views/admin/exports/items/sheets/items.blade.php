@@ -14,6 +14,7 @@
         <th>cost</th>
         <th>gold_dust_cost</th>
         <th>shards_cost</th>
+        <th>copper_coin_cost</th>
         <th>base_damage_mod</th>
         <th>base_healing_mod</th>
         <th>base_ac_mod</th>
@@ -62,6 +63,10 @@
         <th>can_use_on_other_items</th>
         <th>holy_level</th>
         <th>holy_stacks</th>
+        <td>ambush_chance</td>
+        <td>ambush_resistance</td>
+        <td>counter_chance</td>
+        <td>counter_resistance</td>
     </tr>
     </thead>
     <tbody>
@@ -80,6 +85,7 @@
             <td>{{$item->cost}}</td>
             <td>{{$item->gold_dust_cost}}</td>
             <td>{{$item->shards_cost}}</td>
+            <td>{{$item->copper_coin_cost}}</td>
             <td>{{$item->base_damage_mod}}</td>
             <td>{{$item->base_healing_mod}}</td>
             <td>{{$item->base_ac_mod}}</td>
@@ -128,6 +134,10 @@
             <td>{{$item->can_use_on_other_items}}</td>
             <td>{{$item->holy_level}}</td>
             <td>{{$item->holy_stacks}}</td>
+            <td>{{$item->ambush_chance}}</td>
+            <td>{{$item->ambush_resistance}}</td>
+            <td>{{$item->counter_chance}}</td>
+            <td>{{$item->counter_resistance}}</td>
         </tr>
     @endforeach
     </tbody>

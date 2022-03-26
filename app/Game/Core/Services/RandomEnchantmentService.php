@@ -44,7 +44,7 @@ class RandomEnchantmentService {
 
     public function fetchUniquesFromCharactersInventory(Character $character): Collection {
         return $character->inventory->slots->filter(function($slot) {
-            if (!$slot->equipped && ($slot->item->type !== 'quest' && $slot->item->type !== 'alchemy')) {
+            if (!$slot->equipped && ($slot->item->type !== 'quest' && $slot->item->type !== 'alchemy' && $slot->item->type !== 'trinket')) {
                 if (!is_null($slot->item->itemPrefix)) {
                     if ($slot->item->itemPrefix->randomly_generated) {
                         return $slot;
@@ -52,7 +52,7 @@ class RandomEnchantmentService {
                 }
             }
 
-            if (!$slot->equipped && ($slot->item->type !== 'quest' && $slot->item->type !== 'alchemy')) {
+            if (!$slot->equipped && ($slot->item->type !== 'quest' && $slot->item->type !== 'alchemy' && $slot->item->type !== 'trinket')) {
                 if (!is_null($slot->item->itemSuffix)) {
                     if ($slot->item->itemSuffix->randomly_generated) {
                         return $slot;
@@ -96,7 +96,7 @@ class RandomEnchantmentService {
 
     public function fetchNonUniqueItems(Character $character): Collection {
         return $character->inventory->slots->filter(function($slot) {
-            if (!$slot->equipped && $slot->item->type !== 'quest' && $slot->item->type !== 'alchemy') {
+            if (!$slot->equipped && $slot->item->type !== 'quest' && $slot->item->type !== 'alchemy' && $slot->item->type !== 'trinket') {
                 if (!is_null($slot->item->itemPrefix)) {
                     if (!$slot->item->itemPrefix->randomly_generated) {
                         return $slot;
@@ -117,7 +117,7 @@ class RandomEnchantmentService {
     protected function generateRandomAffixForRandom(Character $character, int $amount): Item {
         $item = ItemModel::whereNull('item_prefix_id')
             ->whereNull('item_suffix_id')
-            ->whereNotIn('type', ['alchemy', 'quest'])
+            ->whereNotIn('type', ['alchemy', 'quest', 'trinket'])
             ->where('cost', '<=', 4000000000)
             ->inRandomOrder()
             ->first();

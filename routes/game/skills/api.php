@@ -28,6 +28,11 @@ Route::middleware(['auth', 'is.player.banned', 'is.character.dead', 'is.characte
         Route::post('/craft/{character}', ['uses' => 'Api\CraftingController@craft']);
     });
 
+    Route::group(['middleware' => 'throttle:crafting'], function() {
+        // Craft Item
+        Route::post('/trinket-crafting/craft/{character}/{item}', ['uses' => 'Api\TrinketCraftingController@craftTrinket']);
+    });
+
     Route::group(['middleware' => 'throttle:enchanting'], function() {
         // Enchant Item
         Route::post('/enchant/{character}', ['uses' => 'Api\EnchantingController@enchant']);

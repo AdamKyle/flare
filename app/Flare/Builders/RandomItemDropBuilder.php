@@ -110,7 +110,7 @@ class RandomItemDropBuilder {
     protected function getItem(): Item {
         $query =  Item::inRandomOrder()->doesntHave('itemSuffix')
                                        ->doesntHave('itemPrefix')
-                                       ->whereNotIn('type', ['artifact', 'quest', 'alchemy']);
+                                       ->whereNotIn('type', ['artifact', 'quest', 'alchemy', 'trinket']);
 
 
 

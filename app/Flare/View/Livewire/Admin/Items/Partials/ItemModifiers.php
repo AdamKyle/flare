@@ -49,6 +49,10 @@ class ItemModifiers extends Component
         'item.base_healing_mod_bonus'   => 'nullable',
         'item.base_ac_mod_bonus'        => 'nullable',
         'item.move_time_out_mod_bonus'  => 'nullable',
+        'item.ambush_chance'            => 'nullable',
+        'item.ambush_resistance'        => 'nullable',
+        'item.counter_chance'           => 'nullable',
+        'item.counter_resistance'       => 'nullable',
     ];
 
     protected $listeners = ['validateInput', 'update'];

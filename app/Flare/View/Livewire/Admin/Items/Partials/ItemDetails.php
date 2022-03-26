@@ -106,6 +106,7 @@ class ItemDetails extends Component
         'item.cost'                             => 'nullable',
         'item.gold_dust_cost'                   => 'nullable',
         'item.shards_cost'                      => 'nullable',
+        'item.copper_coin_cost'                 => 'nullable',
         'item.skill_level_required'             => 'nullable',
         'item.skill_level_trivial'              => 'nullable',
         'item.skill_name'                       => 'nullable',
