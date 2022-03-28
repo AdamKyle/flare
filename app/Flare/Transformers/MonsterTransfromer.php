@@ -54,6 +54,10 @@ class MonsterTransfromer extends TransformerAbstract {
             'entrancing_chance'         => $shouldIncrease ? $this->increaseValue($monster->entrancing_chance, $increaseAmount) : $monster->entrancing_chance,
             'devouring_light_chance'    => $shouldIncrease ? $this->increaseValue($monster->devouring_light_chance, $increaseAmount) : $monster->devouring_light_chance,
             'devouring_darkness_chance' => $shouldIncrease ? $this->increaseValue($monster->devouring_darkness_chance, $increaseAmount) : $monster->devouring_darkness_chance,
+            'ambush_chance'             => $shouldIncrease ? $this->increaseValue($monster->ambush_chance, $increaseAmount) : $monster->ambush_chance,
+            'ambush_resistance_chance'  => $shouldIncrease ? $this->increaseValue($monster->ambush_resistance, $increaseAmount) : $monster->ambush_resistance,
+            'counter_chance'            => $shouldIncrease ? $this->increaseValue($monster->counter_chance, $increaseAmount) : $monster->counter_chance,
+            'counter_resistance_chance' => $shouldIncrease ? $this->increaseValue($monster->counter_resistance, $increaseAmount) : $monster->counter_resistance,
             'increases_damage_by'       => $monster->gameMap->enemy_stat_bonus,
         ];
     }

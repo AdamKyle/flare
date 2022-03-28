@@ -6,13 +6,16 @@ Gold dust and Copper coins.
 
 Trinkets add Ambush Chance and Resistance and Counter Chance and Resistance.
 
-Ambush will give you up to 75% chance to completely bypass the enemies chance to dodge or block, while resistance will help you fight off the enemies ambush attempt.
+This is the only item, aside from [Alchemy items](/information/usable-items) that requires you to craft them. These are more late game items that help you with fighting creatures in 
+purgatory.
 
-Ambush will also do up to 2x the weapon damage or spell damage (for cast and attack and attack and cast, this will do 1.75X for each)
+Players can have two equipped and can sell these to the shop, but not buy them from the shop at 100x LESS than the cost of gold dust plus taxes.
 
-Counter will allow you to counter with your weapon attack at +50% after the enemy has attack with their weapon, only if you have not been killed in the process.
+When selling these on the market they are sold for 100x MORE than the gold dust cost.
 
-These are late game items that are crucial for being able to take on stronger purgatory creatures.
+These items cannot have [Enchantments](/information/enchanting) and cannot have [Holy Oils](/information/holy-items) applied.
+
+You can read more about how ambush and counter works in the [combat section](/information/combat).
 
 ## Regarding Crafting Trinkets
 

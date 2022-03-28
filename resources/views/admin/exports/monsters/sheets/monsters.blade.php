@@ -37,6 +37,10 @@
         <th>entrancing_chance</th>
         <th>devouring_light_chance</th>
         <th>devouring_darkness_chance</th>
+        <th>ambush_chance</th>
+        <th>ambush_resistance</th>
+        <th>counter_chance</th>
+        <th>counter_resistance</th>
         <th>published</th>
         <th>quest_item_id</th>
         <th>quest_item_drop_chance</th>
@@ -83,6 +87,10 @@
             <td>{{$monster->entrancing_chance}}</td>
             <td>{{$monster->devouring_light_chance}}</td>
             <td>{{$monster->devouring_darkness_chance}}</td>
+            <td>{{$monster->ambush_chance}}</td>
+            <td>{{$monster->ambush_resistance}}</td>
+            <td>{{$monster->counter_chance}}</td>
+            <td>{{$monster->counter_resistance}}</td>
             <td>{{$monster->published}}</td>
             <td>{{(!is_null($monster->questItem)) ? $monster->questItem->name : null}}</td>
             <td>{{$monster->quest_item_drop_chance}}</td>

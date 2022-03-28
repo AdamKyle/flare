@@ -195,24 +195,20 @@ These items, to which you can equip two of, introduce four new stats:
 
 Ambush is similar to [Thieves](/information/races-and-classes) [Shadows Dance](/information/skills-information) in which you can bypass the enemy dodge and block and attack out right.
 
-You can have a max of 75% Ambush Chance and Resistance. Only enemies in Purgatory have an Ambush Resistance and Chance as well as all Celestials. If you manage to ambush an enemy, they cannot counter your attack, the same applies if
-a Thieves Shadow Dance triggers.
+You can have a max of 75% Ambush Chance and Resistance. Only enemies in Purgatory have an Ambush Resistance and Chance, while most [Celestials](/information/celestials) have just resistances to both going to a max of 60%. 
+If you manage to ambush an enemy, they cannot counter your attack, the same applies if a Thieves Shadow Dance triggers.
 
-- Ambush will do 2X the weapon damage to enemies if you attack with Attack or Cast.
-- Ambush will only do 1.75X the weapon damage to the enemies for Cast and Attack and Attack and cast.
+- Ambush will do 2x the weapon damage to enemies if you attack with Attack or Cast.
+- Ambush will only do 1.75x the weapon damage to the enemies for Cast and Attack and Attack and cast.
 - Ambush will not fire for Defend.
 
-Ambush, for cast and attack and attack and cast will do 1.75 for each (1.75 for cast and 1.75 for attack, regardless of order).
+Ambush, for cast and attack and attack and cast will do 1.75x for each (1.75x for cast and 1.75x for attack, regardless of order).
 
 Counter allows you to counter the enemy's weapon attack at +5% to your weapon attack. If you manage to counter the enemy then has a 2% chance to counter your counter at +5% of their attack.
 
 If the enemy counters your attack you have a 2% chance to counter their counter at +2.5% of your weapon attack.
 
 You cannot counter a countered counter, that is:
-
-If the enemy counters you, and you manage to counter them (at 2%) they cannot then re-counter you, it is not an endless loop.
-
-At most, it will be:
 
 - Enemy hits
 - You counter - You must be alive after the initial attack for this to happen.
@@ -224,14 +220,13 @@ At most, it will be:
 > It does not matter what action you used to attack with: Attack, Cast, Cast and Attack or Attack and Cast. We will always use your weapon or a % of your strength
 > to do damage.
 > 
-> Counters will only trigger if you or the enemy A) are alive and B) pass the difficulty check (out of 100).
+> If you attack with defend, you cannot counter.
 > 
-> Celestials have a 50% Counter Resist and a 60% Ambush resists. These are the only creatures to have Resistance to your trinkets outside of purgatory. Plane effects, such as
-> increasing or decreasing stats applies to enemies resistances and can be raised over 100%. There are enchantments that reduce enemy resistances - they are vital here to not only reduce the enemies
-> Ambush and Counter Resistance but also to get your own ambush and counter in.
+> Counters will only trigger if you or the enemy A) are alive and B) pass the difficulty check (out of 100).
 > 
 > When fighting monsters in Purgatory: Enemies will attempt to ambush FIRST. Whereas fighting creatures outside of purgatory, you will attempt to ambush first.
 > 
 > Finally, Ambushing takes place AFTER all reductions and [voidances](/information/voidance) are done, again at the beginning of the battle. This means if you were voided
-> your **ambush will fail**, but not your chance to counter, you will just counter at lower damage. Being devoided will not affect your ambush or counter chances or resistances.
-> Purgatory will not reduce or lower, nor will other planes or special locations, your ambush or counter chance.
+> your **ambush will fail** however, your ambush resistance **will** still let you resist an ambush, but not your chance to counter, you will just counter at lower damage. 
+> Being devoided will not affect your ambush or counter chances or resistances.
+> Purgatory will not reduce or lower, nor will other planes or special locations, your ambush or counter chance or the enemies chances or resistances.

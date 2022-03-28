@@ -72,6 +72,8 @@
         <dd>{{$item->skill_level_trivial}}</dd>
         <dt>Gold Cost:</dt>
         <dd>{{number_format($item->cost)}}</dd>
+        <dt>Copper Coin Coin:</dt>
+        <dd>{{!is_null($item->copper_coin_cost) ? number_format($item->copper_coin_cost) : 0}}</dd>
         <dt>Gold Dust Cost:</dt>
         <dd>{{!is_null($item->gold_dust_cost) ? number_format($item->gold_dust_cost) : 0}}</dd>
         <dt>Shards Cost:</dt>

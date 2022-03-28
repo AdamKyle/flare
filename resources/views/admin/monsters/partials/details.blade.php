@@ -155,6 +155,31 @@
         <dd>{{$monster->entrancing_chance * 100}}%</dd>
     </dl>
 </x-core.cards.card-with-title>
+<hr />
+<x-core.cards.card-with-title title="Ambush & Counter">
+    <x-core.alerts.info-alert>
+        <p>
+            Some monsters, specifically those who live in Purgatory, will have what is known as Ambush and Counter Stats.
+            Ambush allows the enemy to attempt to get the jump on you doing 2x their normal weapon attack. Counter allows the enemy to counter
+            your attack at +50% to their weapon attack.
+        </p>
+        <p>
+            Players can also get Ambush and Counter stats on gear such as Trinkets which can be crafted only when you have access to Purgatory and copper coins.
+            For more info, it is suggested players read the <a href="/information/combat">Combat docs</a> and <a href="/information/crafting">Crafting guide</a> as
+            Trinkets can only be crafted.
+        </p>
+    </x-core.alerts.info-alert>
+    <dl class="mt-3">
+        <dt>Ambush Chance</dt>
+        <dd>{{$monster->ambush_chance * 100}}%</dd>
+        <dt>Ambush Resistance Chance</dt>
+        <dd>{{$monster->ambush_resistance * 100}}%</dd>
+        <dt>Counter Chance</dt>
+        <dd>{{$monster->counter_chance * 100}}%</dd>
+        <dt>Counter Resistance Chance</dt>
+        <dd>{{$monster->counter_resistance * 100}}%</dd>
+    </dl>
+</x-core.cards.card-with-title>
 
 @if ($monster->is_celestial_entity)
     <hr />
