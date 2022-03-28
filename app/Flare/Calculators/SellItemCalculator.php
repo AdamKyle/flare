@@ -55,6 +55,10 @@ class SellItemCalculator {
             $minPrice += $item->appliedHolyStacks->count() * 1000000000;
         }
 
+        if ($item->type === 'trinket') {
+            $minPrice = $item->gold_dust_cost * 100;
+        }
+
         return $minPrice;
     }
 

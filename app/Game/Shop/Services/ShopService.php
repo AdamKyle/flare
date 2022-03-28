@@ -24,8 +24,17 @@ class ShopService {
                 $slot->item->type !== 'alchemy';
         });
 
+
         if ($itemsToSell->isEmpty()) {
             return 0;
+        }
+
+        $trinketCost = 0;
+
+        foreach ($itemsToSell as $slot) {
+            if ($slot->item->type === 'trinket') {
+                $trinketCost += round($slot->item->gold_dust_cost / 100);
+            }
         }
 
         $cost = $itemsToSell->sum('item.cost');
@@ -33,6 +42,8 @@ class ShopService {
         $ids = $itemsToSell->pluck('id');
 
         $character->inventory->slots()->whereIn('id', $ids)->delete();
+
+        $cost = $cost + $trinketCost;
 
         return round($cost - ($cost * 0.05));
     }

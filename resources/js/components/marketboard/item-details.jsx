@@ -17,8 +17,10 @@ export default class ItemDetails extends React.Component {
   renderAffixes() {
     if (this.props.item.item_prefix === null && this.props.item.item_suffix === null) {
       return (
-        <div className="alert alert-info">
-          There are no affixes on this this.props.item.
+        <div className='col-sm-12'>
+          <div className="alert alert-info">
+            There are no affixes on this {this.props.item.name}
+          </div>
         </div>
       );
     }
@@ -80,7 +82,7 @@ export default class ItemDetails extends React.Component {
                   <Col xs={12}>
                     <dl>
                       <dt>Holy Bonus</dt>
-                      <dd>{((this.props.item.holy_stacks_applied / this.props.item.holy_stacks) * 100).toFixed(2)}%</dd>
+                      <dd>{this.props.item.holy_stacks_applied > 0 ? ((this.props.item.holy_stacks_applied / this.props.item.holy_stacks) * 100).toFixed(2) : 0.0}%</dd>
                       <dt>Stacks Applied</dt>
                       <dd>{this.props.item.holy_stacks_applied}</dd>
                       <dt>Stacks Left</dt>

@@ -24,7 +24,9 @@
                 <a class="dropdown-item" href="#" wire:click="setType('spell-damage')">Spells Damage</a>
                 <a class="dropdown-item" href="#" wire:click="setType('ring')">Ring</a>
                 <a class="dropdown-item" href="#" wire:click="setType('artifact')">Artifact</a>
-                  <a class="dropdown-item" href="#" wire:click="setType('trinket')">Trinkets</a>
+                @if ($showOtherCurrencyCost)
+                    <a class="dropdown-item" href="#" wire:click="setType('trinket')">Trinkets</a>
+                @endif
                 @auth
                   @if (auth()->user()->hasRole('Admin'))
                     <a class="dropdown-item" href="#" wire:click="setType('alchemy')">Alchemy</a>
@@ -254,7 +256,9 @@
               <td>{{is_null($item->base_damage) ? 0 : $item->base_damage}}</td>
               <td>{{is_null($item->base_ac) ? 0 : $item->base_ac}}</td>
               <td>{{is_null($item->base_healing) ? 0 : $item->base_healing}}</td>
-              <td>{{is_null($item->cost) ? 0 : number_format($item->cost)}}</td>
+              <td>
+                  {{is_null($item->cost) ? 0 : number_format($item->cost)}}
+              </td>
 
               @if ($showOtherCurrencyCost)
                 <td>{{is_null($item->gold_dust_cost) ? 0 : number_format($item->gold_dust_cost)}}</td>

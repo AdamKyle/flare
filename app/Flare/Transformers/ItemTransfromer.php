@@ -74,6 +74,10 @@ class ItemTransfromer extends TransformerAbstract {
             'holy_stack_devouring_darkness'    => $item->holy_stack_devouring_darkness,
             'holy_stack_stat_bonus'            => $item->holy_stack_stat_bonus,
             'holy_stacks_applied'              => $item->holy_stacks_applied,
+            'ambush_chance'                    => $item->ambush_chance,
+            'ambush_resistance_chance'         => $item->ambush_resistance,
+            'counter_chance'                   => $item->counter_chance,
+            'counter_resistance_chance'        => $item->counter_resistance,
         ];
     }
 }
