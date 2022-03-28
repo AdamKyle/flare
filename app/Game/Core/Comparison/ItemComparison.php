@@ -185,6 +185,10 @@ class ItemComparison {
                 'int_adjustment'                => $this->getStatIncrease($toCompare, $foundPosition->item, 'int'),
                 'agi_adjustment'                => $this->getStatIncrease($toCompare, $foundPosition->item, 'agi'),
                 'focus_adjustment'              => $this->getStatIncrease($toCompare, $foundPosition->item, 'focus'),
+                'ambush_chance_adjustment'      => $toCompare->ambush_chance - $foundPosition->item->ambush_chance,
+                'ambush_resistance_adjustment'  => $toCompare->ambush_resistance - $foundPosition->item->ambush_resistance,
+                'counter_chance_adjustment'     => $toCompare->counter_chance - $foundPosition->item->counter_chance,
+                'counter_resistance_adjustment' => $toCompare->counter_resistance - $foundPosition->item->counter_resistance,
             ];
         } else {
             $baseDamageAdjustment  = $toCompare->base_damage_mod < $foundPosition->item->base_damage_mod ? $toCompare->base_damage_mod - $foundPosition->item->base_damage_mod : $toCompare->base_damage_mod;
@@ -214,6 +218,10 @@ class ItemComparison {
                 'base_ac_adjustment'            => $baseAcAdjustment,
                 'fight_timeout_mod_adjustment'  => $toCompare->getTotalFightTimeOutMod() - $foundPosition->item->getTotalFightTimeOutMod(),
                 'base_damage_mod_adjustment'    => $toCompare->getTotalBaseDamageMod() - $foundPosition->item->getTotalBaseDamageMod(),
+                'ambush_chance_adjustment'      => $toCompare->ambush_chance - $foundPosition->item->ambush_chance,
+                'ambush_resistance_adjustment'  => $toCompare->ambush_resistance - $foundPosition->item->ambush_resistance,
+                'counter_chance_adjustment'     => $toCompare->counter_chance - $foundPosition->item->counter_chance,
+                'counter_resistance_adjustment' => $toCompare->counter_resistance - $foundPosition->item->counter_resistance,
             ];
         }
     }

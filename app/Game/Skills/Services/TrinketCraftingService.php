@@ -91,8 +91,6 @@ class TrinketCraftingService {
         }
 
         if (!$this->canCraft($character, $item, $trinkentrySkill)) {
-            return $this->fetchItemsToCraft($character);
-        } else {
             event(new ServerMessageEvent($character->user, 'You failed to craft the trinket. All your efforts fall apart before your eyes!'));
 
             return $this->fetchItemsToCraft($character);
@@ -148,8 +146,6 @@ class TrinketCraftingService {
      * @return bool
      */
     protected function canCraft(Character $character, Item $item, Skill $trinketSkill): bool {
-
-
         return $this->characterRoll($trinketSkill) > $this->getDCCheck($trinketSkill);
     }
 }

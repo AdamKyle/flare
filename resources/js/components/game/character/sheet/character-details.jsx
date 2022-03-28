@@ -222,7 +222,7 @@ export default class CharacterDetails extends React.Component {
             </Tab>
             <Tab eventKey="misc-modifiers" title="Misc Modifiers">
               <Row>
-                <Col xs={12} sm={12} md={12} lg={4} xl={6}>
+                <Col xs={12} sm={12} md={12} lg={6} xl={6}>
                   <h4 className='mt-4'>Resist./Reduce./Res. %</h4>
                   <hr />
                   <dl className="mt-4">
@@ -240,7 +240,7 @@ export default class CharacterDetails extends React.Component {
                   <p className="mt-4"><sup>*</sup> Only healing spells can affect this.</p>
                   <p className="mt-2"><sup>**</sup> Only affects enemies.</p>
                 </Col>
-                <Col xs={12} sm={12} md={12} lg={4} xl={6}>
+                <Col xs={12} sm={12} md={12} lg={6} xl={6}>
                   <h4 className='mt-4'>Devouring %</h4>
                   <hr />
                   <dl className="mt-4">
@@ -254,7 +254,7 @@ export default class CharacterDetails extends React.Component {
               </Row>
               <hr />
               <Row>
-                <Col xs={12}>
+                <Col xs={12} sm={12} md={12} lg={6} xl={6}>
                   <h4 className='mt-4'>Holy Bonuses</h4>
                   <hr />
                   <dl className="mt-4">
@@ -274,6 +274,21 @@ export default class CharacterDetails extends React.Component {
                     <dd>{(sheet.holy_healing_bonus * 100).toFixed(2)}%</dd>
                   </dl>
                   <p className="mt-4">For more information, please see <a href="/information/holy-items">Holy Items help</a>. </p>
+                </Col>
+                <Col xs={12} sm={12} md={12} lg={6} xl={6}>
+                  <h4 className='mt-4'>Ambush & Counter</h4>
+                  <hr />
+                  <dl className="mt-4">
+                    <dt>Ambush Chance %</dt>
+                    <dd>{(sheet.ambush_chance * 100).toFixed(2)}%</dd>
+                    <dt>Ambush Resistance Chance %</dt>
+                    <dd>{(sheet.ambush_resistance_chance * 100).toFixed(2)}%</dd>
+                    <dt>Counter Chance %</dt>
+                    <dd>{(sheet.counter_chance * 100).toFixed(2)}%</dd>
+                    <dt>Counter Resistance Chance %</dt>
+                    <dd>{(sheet.counter_resistance_chance * 100).toFixed(2)}%</dd>
+                  </dl>
+                  <p className="mt-4">For more information, please see <a href="/information/combat">Combat Help</a>. </p>
                 </Col>
               </Row>
             </Tab>

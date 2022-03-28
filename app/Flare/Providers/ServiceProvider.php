@@ -7,6 +7,7 @@ use App\Flare\Builders\AffixAttributeBuilder;
 use App\Flare\Builders\Character\AttackDetails\CharacterAffixInformation;
 use App\Flare\Builders\Character\AttackDetails\CharacterHealthInformation;
 use App\Flare\Builders\Character\AttackDetails\CharacterLifeStealing;
+use App\Flare\Builders\Character\AttackDetails\CharacterTrinketsInformation;
 use App\Flare\Builders\Character\AttackDetails\DamageDetails\DamageSpellInformation;
 use App\Flare\Builders\Character\AttackDetails\DamageDetails\WeaponInformation;
 use App\Flare\Builders\Character\BaseCharacterInfo;
@@ -122,6 +123,10 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
+        $this->app->bind(CharacterTrinketsInformation::class, function() {
+            return new CharacterTrinketsInformation();
+        });
+
         $this->app->bind(AffixAttributeBuilder::class, function() {
             return new AffixAttributeBuilder();
         });
@@ -167,7 +172,8 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CharacterInformationBuilder::class),
                 $app->make(CharacterHealthInformation::class),
                 $app->make(CharacterAffixInformation::class),
-                $app->make(HolyStacks::class)
+                $app->make(HolyStacks::class),
+                $app->make(CharacterTrinketsInformation::class)
             );
         });
 
