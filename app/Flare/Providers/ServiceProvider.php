@@ -15,6 +15,7 @@ use App\Flare\Builders\Character\AttackDetails\CharacterAttackBuilder;
 use App\Flare\Builders\Character\AttackDetails\CharacterAttackInformation;
 use App\Flare\Builders\Character\ClassDetails\ClassBonuses;
 use App\Flare\Builders\RandomAffixGenerator;
+use App\Flare\Handlers\AmbushHandler;
 use App\Flare\Handlers\AttackExtraActionHandler;
 use App\Flare\Handlers\AttackHandlers\AttackAndCastHandler;
 use App\Flare\Handlers\AttackHandlers\AttackHandler;
@@ -285,6 +286,10 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
+        $this->app->bind(AmbushHandler::class, function($app) {
+            return new AmbushHandler($app->make(CharacterInformationBuilder::class));
+        });
+
         $this->app->bind(HealingExtraActionHandler::class, function($app) {
             return new HealingExtraActionHandler();
         });
@@ -361,6 +366,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CharacterInformationBuilder::class),
                 $app->make(CharacterAttackHandler::class),
                 $app->make(MonsterAttackHandler::class),
+                $app->make(AmbushHandler::class)
             );
         });
 
