@@ -6,6 +6,7 @@ import Monster from '../battle/monster/monster';
 import {getServerMessage} from '../helpers/server_message';
 import ReviveSection from "./revive-section";
 import Voidance from "../battle/attack/voidance";
+ import {canAmbush, canEnemyAmbush} from "../battle/attack/attack-types/ambush-and-counter/can-ambush-enemy";
 
 export default class FightSection extends React.Component {
 
@@ -229,7 +230,7 @@ export default class FightSection extends React.Component {
       }
     }
 
-    let health    = monsterInfo.monsterHP();
+    let health      = monsterInfo.monsterHP();
     const maxHealth = health;
 
     if (keepHealth) {
@@ -242,16 +243,49 @@ export default class FightSection extends React.Component {
       characterMaxHealth = this.props.character.voided_dur
     }
 
+    let healthObject = {
+      character_health: characterMaxHealth,
+      monster_health: health,
+    };
+
+    if (!keepHealth) {
+
+      switch (this.props.monster.map_name) {
+        case 'Hell':
+        case 'Purgatory':
+          healthObject = this.monsterAmbush(character, health, characterMaxHealth);
+          break;
+        default :
+          healthObject = this.playerAmbush(character, health, characterMaxHealth);
+      }
+    }
+
+    if (healthObject.monster_health <= 0) {
+      this.battleMessagesBeforeFight.push({
+        message: this.props.monster.name + ' has been slaughtered by your ambush!',
+        class: 'enemy-action-fired'
+      });
+    }
+
     this.setState({
-      battleMessages: keepHealth ? this.state.battleMessages : [],
+      battleMessages: keepHealth ? this.state.battleMessages : this.battleMessagesBeforeFight,
       missCounter: 0,
-      monster: monsterInfo,
-      characterCurrentHealth: characterMaxHealth,
-      characterMaxHealth: characterMaxHealth,
-      monsterCurrentHealth: health,
-      monsterMaxHealth: maxHealth,
+      monster: healthObject.monster_health > 0 ? monsterInfo : null,
+      characterCurrentHealth: healthObject.character_health,
+      characterMaxHealth: healthObject.character_health,
+      monsterCurrentHealth: healthObject.monster_health,
+      monsterMaxHealth: healthObject.monster_health,
     }, () => {
-      this.props.setMonster(null)
+
+      const monsterId = this.props.monster.id;
+
+      this.props.setMonster(null);
+
+      if (healthObject.monster_health <= 0) {
+        this.battleMessagesBeforeFight = [];
+
+        this.postBattleResults(this.state, monsterId);
+      }
     });
   }
 
@@ -303,6 +337,78 @@ export default class FightSection extends React.Component {
     }
   }
 
+  monsterAmbush(character, monsterHealth, characterHealth) {
+    if (canEnemyAmbush(this.props.monster, character)) {
+      characterHealth = this.enemyAmbushesPlayer(characterHealth);
+    } else if (characterHealth > 0 && canAmbush(character, this.props.monster)) {
+      monsterHealth = this.playerAmbushesEnemy(character, monsterHealth);
+    }
+
+    return {
+      monster_health: monsterHealth,
+      character_health: characterHealth,
+    }
+  }
+
+  playerAmbush(character, monsterHealth, characterHealth) {
+    if (canAmbush(character, this.props.monster)) {
+      monsterHealth = this.playerAmbushesEnemy(character, monsterHealth);
+    } else if (monsterHealth > 0 && canEnemyAmbush(this.props.monster, character)) {
+      characterHealth = this.enemyAmbushesPlayer(characterHealth);
+    }
+
+    return {
+      monster_health: monsterHealth,
+      character_health: characterHealth,
+    }
+  }
+
+  enemyAmbushesPlayer(characterHealth) {
+    this.battleMessagesBeforeFight.push({
+      message: 'The enemy sneaks through the shadows plotting and planning!',
+      class: 'enemy-action-fired'
+    });
+
+    const total = this.props.monster.base_stat * 2;
+
+    characterHealth = characterHealth - total;
+
+    this.battleMessagesBeforeFight.push({
+      message: 'Look out child! It\'s an ambush! Enemy ambushes you for: ' + this.formatNumber(total),
+      class: 'enemy-action-fired'
+    });
+
+    return characterHealth;
+  }
+
+  playerAmbushesEnemy(character, monsterHealth) {
+    this.battleMessagesBeforeFight.push({
+      message: 'Plotting and scheming, you manage to get the jump on the enemy!',
+      class: 'action-fired'
+    });
+
+    let total = 0;
+
+    if (this.isCharacterVoided) {
+      total = character.voided_base_stat * 2;
+    } else {
+      total = character.base_stat * 2;
+    }
+
+    monsterHealth -= total;
+
+    this.battleMessagesBeforeFight.push({
+      message: 'You catch the enemy by surprise dealing: ' + this.formatNumber(total),
+      class: 'action-fired'
+    });
+
+    return monsterHealth;
+  }
+
+  formatNumber(number) {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+
   playerVoidance(monsterInfo, character, voidance) {
     if (voidance.canPlayerDevoidEnemy(this.props.character.devouring_darkness)) {
       this.battleMessagesBeforeFight.push({
@@ -344,7 +450,10 @@ export default class FightSection extends React.Component {
 
   battleMessages() {
     return this.state.battleMessages.map((message) => {
-      return <div key={uuidv4()}><span className={'battle-message ' + message.class}>{message.message}</span> <br/></div>
+      if (typeof message.class !== 'undefined') {
+        return <div key={uuidv4()}><span className={'battle-message ' + message.class}>{message.message}</span> <br/>
+        </div>
+      }
     });
   }
 
@@ -451,27 +560,31 @@ export default class FightSection extends React.Component {
         canAttack: false,
         monster: monster,
       }, () => {
-        axios.post('/api/battle-results/' + this.state.character.id, {
-          is_character_dead: state.characterCurrentHealth <= 0,
-          is_defender_dead: state.monsterCurrentHealth <= 0,
-          defender_type: 'monster',
-          monster_id: monsterId,
-        }).catch((err) => {
-          if (err.hasOwnProperty('response')) {
-            const response = err.response;
-
-            if (response.status === 429) {
-              // Reload to show them their notification.
-              return this.props.openTimeOutModal();
-            }
-
-            if (response.status === 401) {
-              return location.reload();
-            }
-          }
-        });
+        this.postBattleResults(state, this.props.monster.id)
       });
     }
+  }
+
+  postBattleResults(state, monsterId) {
+    axios.post('/api/battle-results/' + this.state.character.id, {
+      is_character_dead: state.characterCurrentHealth <= 0,
+      is_defender_dead: state.monsterCurrentHealth <= 0,
+      defender_type: 'monster',
+      monster_id: monsterId,
+    }).catch((err) => {
+      if (err.hasOwnProperty('response')) {
+        const response = err.response;
+
+        if (response.status === 429) {
+          // Reload to show them their notification.
+          return this.props.openTimeOutModal();
+        }
+
+        if (response.status === 401) {
+          return location.reload();
+        }
+      }
+    });
   }
 
   revive(data, callback) {

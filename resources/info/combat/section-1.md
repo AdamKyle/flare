@@ -198,11 +198,9 @@ Ambush is similar to [Thieves](/information/races-and-classes) [Shadows Dance](/
 You can have a max of 75% Ambush Chance and Resistance. Only enemies in Purgatory have an Ambush Resistance and Chance, while most [Celestials](/information/celestials) have just resistances to both going to a max of 60%. 
 If you manage to ambush an enemy, they cannot counter your attack, the same applies if a Thieves Shadow Dance triggers.
 
-- Ambush will do 2x the weapon damage to enemies if you attack with Attack or Cast.
-- Ambush will only do 1.75x the weapon damage to the enemies for Cast and Attack and Attack and cast.
-- Ambush will not fire for Defend.
-
-Ambush, for cast and attack and attack and cast will do 1.75x for each (1.75x for cast and 1.75x for attack, regardless of order).
+- Ambush will do 2x your modded damage stat and fires AFTER [voidance and devoidance](/information/voidance) and all reductions to the enemy BEFORE you get chance to click the attack buttons.
+  - This does mean that Ambush can kill before you even get a chance to hit any attack button. 
+  - If you die in battle and Ambush has initially fired, it will not fire again upon resurrection.
 
 Counter allows you to counter the enemy's weapon attack at +5% to your weapon attack. If you manage to counter the enemy then has a 2% chance to counter your counter at +5% of their attack.
 

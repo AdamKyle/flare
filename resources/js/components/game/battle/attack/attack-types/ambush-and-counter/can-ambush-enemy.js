@@ -7,7 +7,7 @@ export const canAmbush = (attackType, defender) => {
     return false;
   }
 
-  const roll         = random(0, 100);
+  const roll         = random(1, 100);
 
   return (roll + roll * ambushChance) > 99;
 }
@@ -19,7 +19,7 @@ export const canEnemyAmbush = (attacker, defender) => {
     return false;
   }
 
-  const roll         = random(0, 100);
+  const roll         = random(1, 100);
 
   return (roll + roll * ambushChance) > 99;
 
