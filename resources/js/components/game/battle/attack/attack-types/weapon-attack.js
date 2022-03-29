@@ -4,6 +4,7 @@ import CanEntranceEnemy from "./enchantments/can-entrance-enemy";
 import UseItems from "./use-items";
 import Damage from "../damage";
 import {random} from "lodash";
+import CounterHandler from "./ambush-and-counter/counter-handler";
 
 export default class WeaponAttack {
 
@@ -37,7 +38,7 @@ export default class WeaponAttack {
     if (canHitCheck.getCanAutoHit()) {
       this.battleMessages    = [...this.battleMessages, ...canHitCheck.getBattleMessages()]
 
-      this.attackWithWeapon(attackData);
+      this.attackWithWeapon(attackData, false, canHitCheck.getCanAutoHit());
 
       this.useItems(attackData, this.attacker.class);
 
@@ -47,7 +48,7 @@ export default class WeaponAttack {
     if (canEntrance ) {
       this.battleMessages    = [...this.battleMessages, ...canEntranceEnemy.getBattleMessages()];
 
-      this.attackWithWeapon(attackData);
+      this.attackWithWeapon(attackData, canEntrance, false);
 
       this.useItems(attackData, this.attacker.class);
 
@@ -66,7 +67,32 @@ export default class WeaponAttack {
         return this.setState();
       }
 
-      this.attackWithWeapon(attackData);
+      this.attackWithWeapon(attackData, false, false);
+
+      if (this.monsterHealth > 0) {
+        const counterHandler = new CounterHandler();
+
+        const healthObject = counterHandler.enemyCounter(this.defender, this.attacker, this.voided, this.monsterHealth, this.characterCurrentHealth);
+
+        this.characterCurrentHealth = healthObject.character_health;
+        this.monsterHealth = healthObject.monster_health;
+
+        this.battleMessages = [...this.battleMessages, ...counterHandler.getMessages()];
+
+        counterHandler.resetMessages();
+
+        if (this.monsterHealth <= 0) {
+          this.addEnemyActionMessage('Your counter of their counter has slaughtered the enemy!');
+
+          return this.setState();
+        }
+
+        if (this.characterCurrentHealth <= 0) {
+          this.addEnemyActionMessage('the enemies counter has slaughtered you!');
+
+          return this.setState();
+        }
+      }
 
       this.useItems(attackData, this.attacker.class)
     } else {
@@ -90,7 +116,7 @@ export default class WeaponAttack {
     return state;
   }
 
-  attackWithWeapon(attackData) {
+  attackWithWeapon(attackData, isEntranced, canAutoHit) {
 
     const skillBonus = this.attacker.skills.filter(s => s.name === 'Criticality')[0].skill_bonus;
 
@@ -110,8 +136,43 @@ export default class WeaponAttack {
 
     this.addMessage('Your weapon hits ' + this.defender.name + ' for: ' + this.formatNumber(totalDamage))
 
+    if (!isEntranced && !canAutoHit) {
+      this.enemyCounterAttack();
+
+      if (this.characterCurrentHealth <= 0 || this.monsterHealth <= 0) {
+        return this.setState();
+      }
+    }
+
     this.extraAttacks(attackData);
 
+  }
+
+  enemyCounterAttack() {
+    if (this.monsterHealth > 0) {
+      const counterHandler = new CounterHandler();
+
+      const healthObject = counterHandler.enemyCounter(this.defender, this.attacker, this.voided, this.monsterHealth, this.characterCurrentHealth);
+
+      this.characterCurrentHealth = healthObject.character_health;
+      this.monsterHealth = healthObject.monster_health;
+
+      this.battleMessages = [...this.battleMessages, ...counterHandler.getMessages()];
+
+      counterHandler.resetMessages();
+
+      if (this.monsterHealth <= 0) {
+        this.addEnemyActionMessage('Your counter of their counter has slaughtered the enemy!');
+
+        return;
+      }
+
+      if (this.characterCurrentHealth <= 0) {
+        this.addEnemyActionMessage('the enemies counter has slaughtered you!');
+
+        return;
+      }
+    }
   }
 
   useItems(attackData, attackerClass) {

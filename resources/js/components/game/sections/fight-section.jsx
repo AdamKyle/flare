@@ -560,7 +560,7 @@ export default class FightSection extends React.Component {
         canAttack: false,
         monster: monster,
       }, () => {
-        this.postBattleResults(state, this.props.monster.id)
+        this.postBattleResults(state, monsterId)
       });
     }
   }

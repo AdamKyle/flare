@@ -4,6 +4,7 @@ import CanEntranceEnemy from "./enchantments/can-entrance-enemy";
 import UseItems from "./use-items";
 import Damage from "../damage";
 import {random} from "lodash";
+import CounterHandler from "./ambush-and-counter/counter-handler";
 
 export default class CastAttack {
 
@@ -35,7 +36,7 @@ export default class CastAttack {
     if (canHitCheck.getCanAutoHit()) {
       this.battleMessages   = [...this.battleMessages, ...canHitCheck.getBattleMessages()];
 
-      this.attackWithSpells(attackData, canEntrance);
+      this.attackWithSpells(attackData, false, true);
 
       if (attackData.heal_for > 0) {
         this.healWithSpells(attackData);
@@ -49,7 +50,7 @@ export default class CastAttack {
     if (canEntrance) {
       this.battleMessages   = [...this.battleMessages, ...canEntranceEnemy.getBattleMessages()];
 
-      this.attackWithSpells(attackData, canEntrance);
+      this.attackWithSpells(attackData, true, false);
 
       if (attackData.heal_for > 0) {
         this.healWithSpells(attackData);
@@ -76,7 +77,8 @@ export default class CastAttack {
           return this.setState();
         }
 
-        this.attackWithSpells(attackData, false);
+        this.attackWithSpells(attackData, false, false);
+
         this.healWithSpells(attackData);
 
         this.useItems(attackData, this.attacker.class)
@@ -110,7 +112,7 @@ export default class CastAttack {
     return state;
   }
 
-  attackWithSpells(attackData, isEntranced) {
+  attackWithSpells(attackData, isEntranced, canAutoHit) {
     const evasion = this.defender.spell_evasion;
     let dc        = 100;
     let roll      = random(1, 100);
@@ -149,10 +151,44 @@ export default class CastAttack {
 
     this.monsterHealth -= damage;
 
-    this.addMessage('Your damage spell(s) hits ' + this.defender.name + ' for: ' + this.formatNumber(damage.toFixed(0)))
+    this.addMessage('Your damage spell(s) hits ' + this.defender.name + ' for: ' + this.formatNumber(damage.toFixed(0)));
+
+    if (!isEntranced && !canAutoHit) {
+      this.enemyCounterCastAttack();
+
+      if (this.characterCurrentHealth <= 0 || this.monsterHealth <= 0) {
+        return this.setState();
+      }
+    }
 
     this.extraAttacks(attackData);
+  }
 
+  enemyCounterCastAttack() {
+    if (this.monsterHealth > 0) {
+      const counterHandler = new CounterHandler();
+
+      const healthObject = counterHandler.enemyCounter(this.defender, this.attacker, this.voided, this.monsterHealth, this.characterCurrentHealth);
+
+      this.characterCurrentHealth = healthObject.character_health;
+      this.monsterHealth = healthObject.monster_health;
+
+      this.battleMessages = [...this.battleMessages, ...counterHandler.getMessages()];
+
+      counterHandler.resetMessages();
+
+      if (this.monsterHealth <= 0) {
+        this.addEnemyActionMessage('Your counter of their counter has slaughtered the enemy!');
+
+        return;
+      }
+
+      if (this.characterCurrentHealth <= 0) {
+        this.addEnemyActionMessage('the enemies counter has slaughtered you!');
+
+        return;
+      }
+    }
   }
 
   healWithSpells(attackData) {

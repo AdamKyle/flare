@@ -3,6 +3,7 @@ import CanHitCheck from "../attack/attack-types/can-hit-check";
 import AttackType from "../attack/attack-type";
 import UseItems from "../attack/attack-types/use-items";
 import {random} from "lodash";
+import CounterHandler from "../attack/attack-types/ambush-and-counter/counter-handler";
 
 export default class MonsterAttack {
 
@@ -17,6 +18,8 @@ export default class MonsterAttack {
   doAttack(previousAttackType, isCharacterVoided, isMonsterVoided) {
     const monster = this.attacker.getMonster();
     let damage    = this.attacker.attack();
+
+    const counterHandler = new CounterHandler();
 
     if (this.entrancesEnemy(monster, this.defender, isCharacterVoided, isMonsterVoided)) {
       if (this.canDoCritical(monster)) {
@@ -54,6 +57,29 @@ export default class MonsterAttack {
         }
 
         this.currentCharacterHealth = this.currentCharacterHealth - damage;
+
+        if (this.currentCharacterHealth > 0) {
+          const healthObject = counterHandler.playerCounter(this.defender, this.attacker, isCharacterVoided, this.currentMonsterHealth, this.currentCharacterHealth);
+
+          this.currentCharacterHealth = healthObject.character_health;
+          this.currentMonsterHealth   = healthObject.monster_health;
+
+          this.battleMessages = [...this.battleMessages, ...counterHandler.getMessages()];
+
+          counterHandler.resetMessages();
+
+          if (this.currentMonsterHealth <= 0) {
+            this.addActionMessage('Your counter slaughtered the enemy!');
+
+            return this.setState();
+          }
+
+          if (this.currentCharacterHealth <= 0) {
+            this.addActionMessage('You were countered and died!');
+
+            return this.setState();
+          }
+        }
 
         this.addActionMessage(monster.name + ' hit for: ' + this.formatNumber(damage));
 

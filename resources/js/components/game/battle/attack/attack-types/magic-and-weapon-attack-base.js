@@ -1,6 +1,7 @@
 import WeaponAttack from "./weapon-attack";
 import UseItems from "./use-items";
 import CastAttack from "./cast-attack";
+import CounterHandler from "./ambush-and-counter/counter-handler";
 
 
 export default class MagicAndWeaponAttackBase {
@@ -49,7 +50,7 @@ export default class MagicAndWeaponAttackBase {
     this.battleMessages = [...this.battleMessages, ...canHitCheck.getBattleMessages()];
 
     if (attackData.spell_damage > 0) {
-      castAttack.attackWithSpells(attackData, canEntrance);
+      castAttack.attackWithSpells(attackData, false, true);
     }
 
     if (attackData.heal_for > 0) {
@@ -60,7 +61,7 @@ export default class MagicAndWeaponAttackBase {
 
     const weaponAttack     = new WeaponAttack(this.attacker, this.defender, this.characterCurrentHealth, this.monsterHealth, this.voided);
 
-    weaponAttack.attackWithWeapon(attackData);
+    weaponAttack.attackWithWeapon(attackData, false, true);
 
     this.setStateInfo(weaponAttack);
 
@@ -79,7 +80,7 @@ export default class MagicAndWeaponAttackBase {
     this.battleMessages    = [...this.battleMessages, ...canEntranceEnemy.getBattleMessages()];
 
     if (attackData.spell_damage > 0) {
-      castAttack.attackWithSpells(attackData, canEntrance);
+      castAttack.attackWithSpells(attackData, true, false);
     }
 
     if (attackData.heal_for > 0) {
@@ -90,7 +91,7 @@ export default class MagicAndWeaponAttackBase {
 
     const weaponAttack     = new WeaponAttack(this.attacker, this.defender, this.characterCurrentHealth, this.monsterHealth, this.voided);
 
-    weaponAttack.attackWithWeapon(attackData);
+    weaponAttack.attackWithWeapon(attackData, true, false);
 
     this.setStateInfo(weaponAttack);
 
@@ -109,14 +110,14 @@ export default class MagicAndWeaponAttackBase {
   doWeaponCastAttack(attackData, canEntrance) {
     const weaponAttack     = new WeaponAttack(this.attacker, this.defender, this.characterCurrentHealth, this.monsterHealth, this.voided);
 
-    weaponAttack.attackWithWeapon(attackData);
+    weaponAttack.attackWithWeapon(attackData, false, false);
 
     this.setStateInfo(weaponAttack);
 
     const castAttack       = new CastAttack(this.attacker, this.defender, this.characterCurrentHealth, this.monsterHealth, this.voided);
 
     if (attackData.spell_damage > 0) {
-      castAttack.attackWithSpells(attackData, canEntrance);
+      castAttack.attackWithSpells(attackData, false, false);
     }
 
     if (attackData.heal_for > 0) {
@@ -144,7 +145,7 @@ export default class MagicAndWeaponAttackBase {
           }
         } else {
           if (attackData.spell_damage > 0) {
-            castAttack.attackWithSpells(attackData);
+            castAttack.attackWithSpells(attackData, false, false);
           } else if (attackData.heal_for > 0) {
             castAttack.healWithSpells(attackData);
           }
@@ -164,7 +165,8 @@ export default class MagicAndWeaponAttackBase {
       if (this.canBlock(attackData.weapon_damage)) {
         this.addEnemyActionMessage('Your weapon was blocked!')
       } else {
-        weaponAttack.attackWithWeapon(attackData);
+        weaponAttack.attackWithWeapon(attackData, false, false);
+
       }
     } else {
       this.addEnemyActionMessage('Your weapon missed!');
