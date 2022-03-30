@@ -46,6 +46,27 @@
                         'item'   => $item,
                     ])
                 </div>
+            @elseif ($item->type === 'trinket')
+                <div class="col-md-6">
+                    <x-core.cards.card-with-title title="Trinket Details" css="tw-mt-4">
+                        <x-core.alerts.info-alert>
+                            <p>
+                                Trinkets cannot have Holy Stacks Applied and cannot they have Enchantments applied.
+                                Trinkets can be sold on the market for 100X their Gold Dust cost in Gold.
+                            </p>
+                        </x-core.alerts.info-alert>
+                        <dl>
+                            <dt>Ambush Chance %</dt>
+                            <dd>{{$item->ambush_chance * 100}}%</dd>
+                            <dt>Ambush Resist %</dt>
+                            <dd>{{$item->ambush_resistance * 100}}%</dd>
+                            <dt>Counter Chance %</dt>
+                            <dd>{{$item->counter_chance * 100}}%</dd>
+                            <dt>Counter Resist %</dt>
+                            <dd>{{$item->counter_resistance * 100}}%</dd>
+                        </dl>
+                    </x-core.cards.card-with-title>
+                </div>
             @else
                 <div class="col-md-6">
                     <x-core.cards.card-with-title title="Base Equip Stats">

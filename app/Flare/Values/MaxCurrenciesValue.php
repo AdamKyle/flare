@@ -7,7 +7,7 @@ class MaxCurrenciesValue {
     const MAX_GOLD      = 2000000000000;
     const MAX_GOLD_DUST = 2000000000;
     const MAX_SHARDS    = 2000000000;
-    const MAX_COPPER    = 100000;
+    const MAX_COPPER    = 1000000;
 
     const GOLD      = 0;
     const GOLD_DUST = 1;

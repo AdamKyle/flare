@@ -42,6 +42,16 @@
   }
 }
 
+.trinket-crafting-timeout {
+  position: relative;
+  top: 5px;
+  left: 0px;
+
+  .timer {
+    font-size: 12px;
+  }
+}
+
 .transmute-timeout {
   position: relative;
   top: 5px;
@@ -72,6 +82,12 @@
   position: relative;
   top: 15px;
   left: -45px;
+}
+
+.trinket-crafting-ready {
+  position: relative;
+  top: 15px;
+  left: 0px;
 }
 
 .character-map-timeout {

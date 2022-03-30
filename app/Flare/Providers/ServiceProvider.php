@@ -7,6 +7,7 @@ use App\Flare\Builders\AffixAttributeBuilder;
 use App\Flare\Builders\Character\AttackDetails\CharacterAffixInformation;
 use App\Flare\Builders\Character\AttackDetails\CharacterHealthInformation;
 use App\Flare\Builders\Character\AttackDetails\CharacterLifeStealing;
+use App\Flare\Builders\Character\AttackDetails\CharacterTrinketsInformation;
 use App\Flare\Builders\Character\AttackDetails\DamageDetails\DamageSpellInformation;
 use App\Flare\Builders\Character\AttackDetails\DamageDetails\WeaponInformation;
 use App\Flare\Builders\Character\BaseCharacterInfo;
@@ -14,6 +15,7 @@ use App\Flare\Builders\Character\AttackDetails\CharacterAttackBuilder;
 use App\Flare\Builders\Character\AttackDetails\CharacterAttackInformation;
 use App\Flare\Builders\Character\ClassDetails\ClassBonuses;
 use App\Flare\Builders\RandomAffixGenerator;
+use App\Flare\Handlers\AmbushHandler;
 use App\Flare\Handlers\AttackExtraActionHandler;
 use App\Flare\Handlers\AttackHandlers\AttackAndCastHandler;
 use App\Flare\Handlers\AttackHandlers\AttackHandler;
@@ -24,6 +26,7 @@ use App\Flare\Handlers\AttackHandlers\DefendHandler;
 use App\Flare\Handlers\AttackHandlers\EntrancingChanceHandler;
 use App\Flare\Handlers\AttackHandlers\ItemHandler;
 use App\Flare\Handlers\CharacterAttackHandler;
+use App\Flare\Handlers\CounterHandler;
 use App\Flare\Handlers\HealingExtraActionHandler;
 use App\Flare\Handlers\MonsterAttackHandler;
 use App\Flare\Handlers\SetupFightHandler;
@@ -124,6 +127,10 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
+        $this->app->bind(CharacterTrinketsInformation::class, function() {
+            return new CharacterTrinketsInformation();
+        });
+
         $this->app->bind(AffixAttributeBuilder::class, function() {
             return new AffixAttributeBuilder();
         });
@@ -169,7 +176,8 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CharacterInformationBuilder::class),
                 $app->make(CharacterHealthInformation::class),
                 $app->make(CharacterAffixInformation::class),
-                $app->make(HolyStacks::class)
+                $app->make(HolyStacks::class),
+                $app->make(CharacterTrinketsInformation::class)
             );
         });
 
@@ -276,6 +284,13 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
+        $this->app->bind(CounterHandler::class, function($app) {
+            return new CounterHandler(
+                $app->make(CharacterTrinketsInformation::class),
+                $app->make(CharacterInformationBuilder::class)
+            );
+        });
+
         $this->app->bind(CanHitHandler::class, function($app) {
             return new CanHitHandler(
                 $app->make(AttackExtraActionHandler::class),
@@ -293,12 +308,18 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
+        $this->app->bind(AmbushHandler::class, function($app) {
+            return new AmbushHandler($app->make(CharacterInformationBuilder::class));
+        });
+
         $this->app->bind(HealingExtraActionHandler::class, function($app) {
             return new HealingExtraActionHandler();
         });
 
         $this->app->bind(AttackExtraActionHandler::class, function($app) {
-            return new AttackExtraActionHandler();
+            return new AttackExtraActionHandler(
+                $app->make(CounterHandler::class),
+            );
         });
 
         $this->app->bind(AttackHandler::class, function($app) {
@@ -369,6 +390,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CharacterInformationBuilder::class),
                 $app->make(CharacterAttackHandler::class),
                 $app->make(MonsterAttackHandler::class),
+                $app->make(AmbushHandler::class)
             );
         });
 

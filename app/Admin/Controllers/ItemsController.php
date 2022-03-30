@@ -74,6 +74,9 @@ class ItemsController extends Controller {
             ],
             'artifacts' => [
                 'artifact'
+            ],
+            'trinket' => [
+                'trinket'
             ]
         ];
 

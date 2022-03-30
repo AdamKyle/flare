@@ -38,6 +38,14 @@
   }
 }
 
+.trinket {
+  color: #82444a;
+
+  &:hover, &:visited, &:focus {
+    color: #9a5158;
+  }
+}
+
 .artifact-item {
   color: #5b689a;
 

@@ -54,6 +54,10 @@ class Monster extends Model
         'entrancing_chance',
         'devouring_light_chance',
         'devouring_darkness_chance',
+        'ambush_chance',
+        'ambush_resistance',
+        'counter_chance',
+        'counter_resistance',
         'accuracy',
         'casting_accuracy',
         'dodge',
@@ -99,6 +103,10 @@ class Monster extends Model
         'casting_accuracy'          => 'float',
         'dodge'                     => 'float',
         'criticality'               => 'float',
+        'ambush_chance'             => 'float',
+        'ambush_resistance'         => 'float',
+        'counter_chance'            => 'float',
+        'counter_resistance'        => 'float',
     ];
 
     public function questItem() {

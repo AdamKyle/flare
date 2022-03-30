@@ -35,6 +35,7 @@ class Item extends Model
         'cost',
         'gold_dust_cost',
         'shards_cost',
+        'copper_coin_cost',
         'base_damage_mod',
         'description',
         'base_healing_mod',
@@ -85,6 +86,10 @@ class Item extends Model
         'can_use_on_other_items',
         'holy_level',
         'holy_stacks',
+        'ambush_chance',
+        'ambush_resistance',
+        'counter_chance',
+        'counter_resistance',
     ];
 
     /**
@@ -99,6 +104,7 @@ class Item extends Model
         'cost'                             => 'integer',
         'gold_dust_cost'                   => 'integer',
         'shards_cost'                      => 'integer',
+        'copper_coin_cost'                 => 'integer',
         'parent_id'                        => 'integer',
         'holy_level'                       => 'integer',
         'holy_stacks'                      => 'integer',
@@ -145,6 +151,10 @@ class Item extends Model
         'devouring_light'                  => 'float',
         'devouring_darkness'               => 'float',
         'xp_bonus'                         => 'float',
+        'ambush_chance'                    => 'float',
+        'ambush_resistance'                => 'float',
+        'counter_chance'                   => 'float',
+        'counter_resistance'               => 'float',
     ];
 
     protected $appends = [
@@ -335,12 +345,14 @@ class Item extends Model
         $ac     = $baseAc;
 
         if (!is_null($this->itemPrefix)) {
-            $ac = ($ac * (1 + $this->itemPrefix->base_ac_mod));
+            $ac += $ac * $this->itemPrefix->base_ac_mod;
         }
 
         if (!is_null($this->itemSuffix)) {
-            $ac = ($ac * (1 + $this->itemSuffix->base_ac_mod));
+            $ac += $ac * $this->itemSuffix->base_ac_mod;
         }
+
+        $ac += $ac * $this->base_ac_mod;
 
         return ceil($ac);
     }

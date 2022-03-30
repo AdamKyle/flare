@@ -199,7 +199,7 @@ class EnchantingService {
 
     protected function fetchCharacterInventory(Character $character): array {
         return $character->refresh()->inventory->slots->filter(function($slot) {
-            if ($slot->item->type !== 'quest' && $slot->item->type !== 'alchemy' && !$slot->equipped) {
+            if ($slot->item->type !== 'quest' && $slot->item->type !== 'alchemy' && $slot->item->type !== 'trinket' && !$slot->equipped) {
                 if (!is_null($slot->item->item_prefix_id)) {
                     if (!$slot->item->itemPrefix->randomly_generated) {
                         return $slot->item->load('itemSuffix', 'itemPrefix')->toArray();

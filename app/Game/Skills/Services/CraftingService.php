@@ -192,7 +192,7 @@ class CraftingService {
      * @param bool $tooEasy
      * @return void
      */
-    private function pickUpItem(Character $character, Item $item, Skill $skill, bool $tooEasy = false) {
+    public function pickUpItem(Character $character, Item $item, Skill $skill, bool $tooEasy = false) {
         if ($this->attemptToPickUpItem($character, $item)) {
 
             if (!$tooEasy) {

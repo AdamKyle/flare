@@ -15,6 +15,13 @@ class SellItemCalculator {
      * @return int
      */
     public function fetchTotalSalePrice(Item $item): int {
+
+        if ($item->type === 'trinket') {
+            $cost = round(($item->gold_dust_cost / 100));
+
+            return round($cost - $cost * 0.05);
+        }
+
         return round(($item->cost - ($item->cost * 0.05)));
     }
 
@@ -53,6 +60,10 @@ class SellItemCalculator {
 
         if ($this->isItemHoly($item)) {
             $minPrice += $item->appliedHolyStacks->count() * 1000000000;
+        }
+
+        if ($item->type === 'trinket') {
+            $minPrice = $item->gold_dust_cost * 100;
         }
 
         return $minPrice;

@@ -2,6 +2,7 @@
 namespace App\Flare\Services;
 
 use App\Flare\Builders\CharacterInformationBuilder;
+use App\Flare\Handlers\AmbushHandler;
 use App\Flare\Handlers\CharacterAttackHandler;
 use App\Flare\Handlers\MonsterAttackHandler;
 use App\Flare\Handlers\SetupFightHandler;
@@ -26,6 +27,8 @@ class FightService {
 
     private $monsterAttackHandler;
 
+    private $ambushHandler;
+
     private $isMonsterVoided = false;
 
     private $battleLogs = [];
@@ -42,16 +45,19 @@ class FightService {
 
     private $newAttackType = null;
 
+
     public function __construct(
         SetupFightHandler $setupFightHandler,
         CharacterInformationBuilder $characterInformationBuilder,
         CharacterAttackHandler $characterAttackHandler,
-        MonsterAttackHandler $monsterAttackHandler
+        MonsterAttackHandler $monsterAttackHandler,
+        AmbushHandler $ambushHandler,
     ) {
         $this->setupFightHandler           = $setupFightHandler;
         $this->characterInformationBuilder = $characterInformationBuilder;
         $this->characterAttackHandler      = $characterAttackHandler;
         $this->monsterAttackHandler        = $monsterAttackHandler;
+        $this->ambushHandler               = $ambushHandler;
     }
 
     public function setAttackTimes(bool $attackOnce): FightService {
@@ -126,6 +132,33 @@ class FightService {
             $this->currentMonsterHealth = rand($healthRange[0], $healthRange[1]);
         }
 
+        if ($defender instanceof  Monster || $defender instanceof \Std) {
+            $healthObject = $this->ambushHandler->ambush($defender, $attacker, $this->currentMonsterHealth, $this->currentCharacterHealth, $isCharacterVoided);
+        } else {
+            $healthObject = $this->ambushHandler->ambush($attacker, $defender, $this->currentMonsterHealth, $this->currentCharacterHealth, $isCharacterVoided);
+        }
+
+
+        $this->battleLogs = [...$this->battleLogs, ...$this->ambushHandler->getMessages()];
+
+        $this->ambushHandler->clearMessages();
+
+        if ($healthObject['monster_health'] <= 0 ) {
+            $this->battleLogs = $this->addMessage('The enemy has been slaughtered by your ambush!', 'enemy-action-fired', $this->battleLogs);
+
+            $this->currentMonsterHealth = $healthObject['monster_health'];
+
+            return true;
+        }
+
+        if ($healthObject['character_health'] <= 0) {
+            $this->battleLogs = $this->addMessage('You have been slaughtered by the ambush!', 'enemy-action-fired', $this->battleLogs);
+
+            $this->currentCharacterHealth = $healthObject['character_health'];
+
+            return false;
+        }
+
         return $this->fight($attacker, $defender, $attackType, $isCharacterVoided);
     }
 
@@ -144,7 +177,7 @@ class FightService {
             $this->characterAttackHandler->resetLogs();
         }
 
-        if ($attacker instanceof Monster) {
+        if ($attacker instanceof Monster && $this->currentMonsterHealth > 0) {
 
             $this->monsterAttackHandler->setHealth($this->currentMonsterHealth, $this->currentCharacterHealth)
                                        ->setMonsterVoided($this->isMonsterVoided)

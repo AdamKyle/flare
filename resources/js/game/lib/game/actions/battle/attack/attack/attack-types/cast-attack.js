@@ -4,8 +4,12 @@ import CanEntranceEnemy from "./enchantments/can-entrance-enemy";
 import UseItems from "./use-items";
 import Damage from "../damage";
 import {random} from "lodash";
+<<<<<<< HEAD:resources/js/game/lib/game/actions/battle/attack/attack/attack-types/cast-attack.js
 import BattleBase from "../../../battle-base";
 import {formatNumber} from "../../../../../format-number";
+=======
+import CounterHandler from "./ambush-and-counter/counter-handler";
+>>>>>>> 1.1.10.7:resources/js/components/game/battle/attack/attack-types/cast-attack.js
 
 export default class CastAttack extends BattleBase {
 
@@ -39,7 +43,7 @@ export default class CastAttack extends BattleBase {
     if (canHitCheck.getCanAutoHit()) {
       this.mergeMessages(canHitCheck.getBattleMessages());
 
-      this.attackWithSpells(attackData, canEntrance);
+      this.attackWithSpells(attackData, false, true);
 
       if (attackData.heal_for > 0) {
         this.healWithSpells(attackData);
@@ -53,7 +57,7 @@ export default class CastAttack extends BattleBase {
     if (canEntrance) {
       this.mergeMessages(canEntranceEnemy.getBattleMessages());
 
-      this.attackWithSpells(attackData, canEntrance);
+      this.attackWithSpells(attackData, true, false);
 
       if (attackData.heal_for > 0) {
         this.healWithSpells(attackData);
@@ -80,7 +84,8 @@ export default class CastAttack extends BattleBase {
           return this.setState();
         }
 
-        this.attackWithSpells(attackData, false);
+        this.attackWithSpells(attackData, false, false);
+
         this.healWithSpells(attackData);
 
         this.useItems(attackData, this.attacker.class)
@@ -114,7 +119,7 @@ export default class CastAttack extends BattleBase {
     return state;
   }
 
-  attackWithSpells(attackData, isEntranced) {
+  attackWithSpells(attackData, isEntranced, canAutoHit) {
     const evasion = this.defender.spell_evasion;
     let dc        = 100;
     let roll      = random(1, 100);
@@ -153,10 +158,48 @@ export default class CastAttack extends BattleBase {
 
     this.monsterHealth -= damage;
 
+<<<<<<< HEAD:resources/js/game/lib/game/actions/battle/attack/attack/attack-types/cast-attack.js
     this.addMessage('Your damage spell(s) hits ' + this.defender.name + ' for: ' + formatNumber(damage.toFixed(0)), 'player-action');
+=======
+    this.addMessage('Your damage spell(s) hits ' + this.defender.name + ' for: ' + this.formatNumber(damage.toFixed(0)));
+
+    if (!isEntranced && !canAutoHit) {
+      this.enemyCounterCastAttack();
+
+      if (this.characterCurrentHealth <= 0 || this.monsterHealth <= 0) {
+        return this.setState();
+      }
+    }
+>>>>>>> 1.1.10.7:resources/js/components/game/battle/attack/attack-types/cast-attack.js
 
     this.extraAttacks(attackData);
+  }
 
+  enemyCounterCastAttack() {
+    if (this.monsterHealth > 0) {
+      const counterHandler = new CounterHandler();
+
+      const healthObject = counterHandler.enemyCounter(this.defender, this.attacker, this.voided, this.monsterHealth, this.characterCurrentHealth);
+
+      this.characterCurrentHealth = healthObject.character_health;
+      this.monsterHealth = healthObject.monster_health;
+
+      this.battleMessages = [...this.battleMessages, ...counterHandler.getMessages()];
+
+      counterHandler.resetMessages();
+
+      if (this.monsterHealth <= 0) {
+        this.addEnemyActionMessage('Your counter of their counter has slaughtered the enemy!');
+
+        return;
+      }
+
+      if (this.characterCurrentHealth <= 0) {
+        this.addEnemyActionMessage('The enemies counter has slaughtered you!');
+
+        return;
+      }
+    }
   }
 
   healWithSpells(attackData) {

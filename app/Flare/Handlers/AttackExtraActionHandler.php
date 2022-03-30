@@ -3,6 +3,7 @@
 namespace App\Flare\Handlers;
 
 use App\Flare\Builders\CharacterInformationBuilder;
+use App\Flare\Handlers\Values\CounterDeathValue;
 use App\Flare\Models\Character;
 use App\Flare\Values\CharacterClassValue;
 use App\Flare\Values\ClassAttackValue;
@@ -12,9 +13,15 @@ class AttackExtraActionHandler {
 
     use CreateBattleMessages;
 
+    private $counterHandler;
+
     private array $messages = [];
 
     private $characterHealth = null;
+
+    public function __construct(CounterHandler $counterHandler) {
+        $this->counterHandler = $counterHandler;
+    }
 
     public function setCharacterhealth(int $characterhealth): AttackExtraActionHandler {
         $this->characterHealth = $characterhealth;
@@ -55,13 +62,40 @@ class AttackExtraActionHandler {
         return false;
     }
 
-    public function castSpells(CharacterInformationBuilder $characterInformationBuilder, $defender, int $monsterCurrentHealth, bool $voided = false, float $dmgReduction = 0.0): int {
+    public function castSpells(CharacterInformationBuilder $characterInformationBuilder, $defender, int $monsterCurrentHealth, bool $voided = false, float $dmgReduction = 0.0): array {
 
         $spellDamage = $characterInformationBuilder->getTotalSpellDamage($voided);
 
         $monsterCurrentHealth = $this->spellDamage($spellDamage, $monsterCurrentHealth, $defender, $characterInformationBuilder->getCharacter(), $voided, false, $dmgReduction);
 
-        return $this->doubleCastChance($characterInformationBuilder, $monsterCurrentHealth, $defender, $voided, $dmgReduction);
+        if ($spellDamage > 0.0) {
+            $healthObject = $this->counterHandler->enemyCountersPlayer($defender, $characterInformationBuilder->getCharacter(), $monsterCurrentHealth, $this->characterHealth, $voided);
+
+            $this->characterHealth = $healthObject['character_health'];
+            $monsterCurrentHealth  = $healthObject['monster_health'];
+
+            $this->messages = [...$this->messages, ...$this->counterHandler->getMessages()];
+
+            if ($monsterCurrentHealth <= 0) {
+
+                return [
+                    'status'         => CounterDeathValue::MONSTER_DIED,
+                    'monster_health' => $monsterCurrentHealth,
+                ];
+            }
+
+            if ($this->characterHealth <= 0) {
+                return [
+                    'status'         => CounterDeathValue::CHARACTER_DIED,
+                    'monster_health' => $monsterCurrentHealth,
+                ];
+            }
+        }
+
+        return [
+            'status' => 0,
+            'monster_health' => $this->doubleCastChance($characterInformationBuilder, $monsterCurrentHealth, $defender, $voided, $dmgReduction),
+        ];
     }
 
     public function positionalWeaponAttack(CharacterInformationBuilder $characterInformationBuilder, int $monsterCurrentHealth, int $damage): int {

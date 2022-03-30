@@ -1,7 +1,11 @@
 import WeaponAttack from "./weapon-attack";
 import UseItems from "./use-items";
 import CastAttack from "./cast-attack";
+<<<<<<< HEAD:resources/js/game/lib/game/actions/battle/attack/attack/attack-types/magic-and-weapon-attack-base.js
 import BattleBase from "../../../battle-base";
+=======
+import CounterHandler from "./ambush-and-counter/counter-handler";
+>>>>>>> 1.1.10.7:resources/js/components/game/battle/attack/attack-types/magic-and-weapon-attack-base.js
 
 
 export default class MagicAndWeaponAttackBase extends BattleBase {
@@ -46,7 +50,7 @@ export default class MagicAndWeaponAttackBase extends BattleBase {
     this.mergeMessages(canHitCheck.getBattleMessages());
 
     if (attackData.spell_damage > 0) {
-      castAttack.attackWithSpells(attackData, canEntrance);
+      castAttack.attackWithSpells(attackData, false, true);
     }
 
     if (attackData.heal_for > 0) {
@@ -57,7 +61,7 @@ export default class MagicAndWeaponAttackBase extends BattleBase {
 
     const weaponAttack     = new WeaponAttack(this.attacker, this.defender, this.characterCurrentHealth, this.monsterHealth, this.voided);
 
-    weaponAttack.attackWithWeapon(attackData);
+    weaponAttack.attackWithWeapon(attackData, false, true);
 
     this.setStateInfo(weaponAttack);
 
@@ -76,7 +80,7 @@ export default class MagicAndWeaponAttackBase extends BattleBase {
     this.mergeMessages(canEntranceEnemy.getBattleMessages());
 
     if (attackData.spell_damage > 0) {
-      castAttack.attackWithSpells(attackData, canEntrance);
+      castAttack.attackWithSpells(attackData, true, false);
     }
 
     if (attackData.heal_for > 0) {
@@ -87,7 +91,7 @@ export default class MagicAndWeaponAttackBase extends BattleBase {
 
     const weaponAttack     = new WeaponAttack(this.attacker, this.defender, this.characterCurrentHealth, this.monsterHealth, this.voided);
 
-    weaponAttack.attackWithWeapon(attackData);
+    weaponAttack.attackWithWeapon(attackData, true, false);
 
     this.setStateInfo(weaponAttack);
 
@@ -106,14 +110,14 @@ export default class MagicAndWeaponAttackBase extends BattleBase {
   doWeaponCastAttack(attackData, canEntrance) {
     const weaponAttack     = new WeaponAttack(this.attacker, this.defender, this.characterCurrentHealth, this.monsterHealth, this.voided);
 
-    weaponAttack.attackWithWeapon(attackData);
+    weaponAttack.attackWithWeapon(attackData, false, false);
 
     this.setStateInfo(weaponAttack);
 
     const castAttack       = new CastAttack(this.attacker, this.defender, this.characterCurrentHealth, this.monsterHealth, this.voided);
 
     if (attackData.spell_damage > 0) {
-      castAttack.attackWithSpells(attackData, canEntrance);
+      castAttack.attackWithSpells(attackData, false, false);
     }
 
     if (attackData.heal_for > 0) {
@@ -141,7 +145,7 @@ export default class MagicAndWeaponAttackBase extends BattleBase {
           }
         } else {
           if (attackData.spell_damage > 0) {
-            castAttack.attackWithSpells(attackData);
+            castAttack.attackWithSpells(attackData, false, false);
           } else if (attackData.heal_for > 0) {
             castAttack.healWithSpells(attackData);
           }
@@ -161,7 +165,8 @@ export default class MagicAndWeaponAttackBase extends BattleBase {
       if (this.canBlock(attackData.weapon_damage)) {
         this.addMessage('Your weapon was blocked!', 'enemy-action')
       } else {
-        weaponAttack.attackWithWeapon(attackData);
+        weaponAttack.attackWithWeapon(attackData, false, false);
+
       }
     } else {
       this.addMessage('Your weapon missed!', 'enemy-action');

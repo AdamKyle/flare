@@ -44,10 +44,11 @@ class SetupFightHandler {
 
     public function setUpFight($attacker, $defender) {
 
-        $reduction = $attacker->map->gameMap->enemy_stat_bonus;
+        $enemyStateBonus = $attacker->map->gameMap->enemy_stat_bonus;
+        $damageReduction = $attacker->map->gameMap->character_attack_reduction;
 
         $defender  = $this->getDefenderFromSpecialLocation($attacker, $defender);
-        $defender  = $this->applyEnemyStatIncrease($defender, $reduction);
+        $defender  = $this->applyEnemyStatIncrease($defender, $enemyStateBonus);
 
         switch($defender->gameMap->name) {
             case 'Hell':
@@ -58,8 +59,8 @@ class SetupFightHandler {
                 $this->playerVoidsMonster($defender, $attacker);
         }
 
-        if (!is_null($reduction)) {
-            $this->characterDmgDeduction = $reduction;
+        if (!is_null($damageReduction)) {
+            $this->characterDmgDeduction = $damageReduction;
         }
 
         // Only do this once per fight and if you are not voided.

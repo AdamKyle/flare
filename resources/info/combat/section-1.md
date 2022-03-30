@@ -181,3 +181,65 @@ Each class skill for each character now can modify your base damage, so you will
 Focus on either Accuracy or Casting Accuracy for the first 100 or so skill levels to make sure you can hit something.
 
 Then do your class skill followed by your Criticality for a chance to do double damage.
+
+## Regarding Trinkets (Late Game)
+
+*Trinkets fire automatically like other gear, such as affixes that do damage or rings that reduce resistances and so on ... These trigger at the start of the battle.*
+
+Trinkets can be [crafted](/information/crafting) only when you have access to [Purgatory](/information/planes), which has creatures that drop copper coins.
+
+These items, to which you can equip two of, introduce four new stats:
+
+- Ambush Chance and Ambush Resistance %
+- Counter Chance and Counter Resistance %
+
+Ambush is similar to [Thieves](/information/races-and-classes) [Shadows Dance](/information/skills-information) in which you can bypass the enemy dodge and block and attack out right.
+
+You can have a max of 75% Ambush Chance and Resistance. Only enemies in Purgatory have an Ambush Resistance and Chance, while most [Celestials](/information/celestials) have just resistances to both going to a max of 60%. 
+If you manage to ambush an enemy, they cannot counter your attack, the same applies if a Thieves Shadow Dance triggers.
+
+- Ambush will do 2x your modded damage stat and fires AFTER [voidance and devoidance](/information/voidance) and all reductions to the enemy BEFORE you get chance to click the attack buttons.
+  - This does mean that Ambush can kill before you even get a chance to hit any attack button. 
+  - If you die in battle and Ambush has initially fired, it will not fire again upon resurrection.
+
+Counter allows you to counter the enemy's weapon attack at +5% to your weapon attack. 
+
+If you or the enemy entrances, then the defender cannot counter. That is if you entrance the enemy, they cannot counter your attack, while the opposite is true.
+That is, if you are entranced, you cannot counter.
+
+If you manage to counter the enemy then has a 2% chance to counter your counter at +2.5% of their attack.
+
+If the enemy counters your attack you have a 2% chance to counter their counter at +2.5% of your weapon attack.
+
+You cannot counter a countered counter, that is:
+
+- Enemy hits
+- You counter (at your counter chance) - You must be alive after the initial attack for this to happen. (5%)
+- Enemy Counters your counter (at 2% chance) - The enemy must be alive after your counter for this to happen. (2.5%)
+- Other enemy actions such as spells, affixes and so on. (only if the enemy lives after your counter)
+
+Player hits:
+
+- player Hits
+- Enemy Counters (with their counter chance) - they must be alive (5%)
+- You counter their counter (at 2% chance) - you must be alive (2.5%)
+- your other actions such as healing, affixes and so on.
+
+When it comes to be [voided](/information/voidance), you will use either 5/2.5% of your raw attack, which does not take into account stat modifications.
+
+> ### ATTN!
+> 
+> It does not matter what action you used to attack with: Attack, Cast, Cast and Attack or Attack and Cast. We will always use your weapon or a % of your strength
+> to do damage.
+> 
+> If you attack with defend, you cannot counter.
+> 
+> Counters will only trigger if you or the enemy A) are alive and B) pass the difficulty check (out of 100).
+> 
+> When fighting monsters in Purgatory: Enemies will attempt to ambush FIRST. Whereas fighting creatures outside of purgatory, you will attempt to ambush first.
+> 
+> Ambushing takes place AFTER all reductions and [voidances](/information/voidance) are done.
+> 
+> Purgatory will not reduce or lower, nor will other planes or special locations, your ambush or counter chance or the enemies chances or resistances.
+> 
+> Counters can trigger for defend, but only on your side and only if the enemy is not blocked.

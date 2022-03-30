@@ -7,19 +7,21 @@
             'details'      => $details,
         ])
 
-        <p class="mt-3 mb-3">
-            <sup>*</sup> Attack includes Base Attack Modifier applied automatically, rounded to the nearest whole number.
-        </p>
-        <p>
-            <sup>**</sup> Applies to all skills that increase this modifier.
-        </p>
-        <p>
-            <sup>***</sup> Either voids (Devouring light) or devoids (Devouring Darkness) the enemy. See <a href="/information/voidance" target="_blank">Voidance</a> for more info.
-        </p>
-        @if ($itemToEquip->can_resurrect)
-            <p>
-                <sup>rc</sup> Used to determine, upon death in either battle or adventure, if your character can automatically resurrect and heal.
+        @if ($itemToEquip->type !== 'trinket')
+            <p class="mt-3 mb-3">
+                <sup>*</sup> Attack includes Base Attack Modifier applied automatically, rounded to the nearest whole number.
             </p>
+            <p>
+                <sup>**</sup> Applies to all skills that increase this modifier.
+            </p>
+            <p>
+                <sup>***</sup> Either voids (Devouring light) or devoids (Devouring Darkness) the enemy. See <a href="/information/voidance" target="_blank">Voidance</a> for more info.
+            </p>
+            @if ($itemToEquip->can_resurrect)
+                <p>
+                    <sup>rc</sup> Used to determine, upon death in either battle or adventure, if your character can automatically resurrect and heal.
+                </p>
+            @endif
         @endif
 
         @php
@@ -37,11 +39,19 @@
                 </x-core.alerts.warning-alert>
             @endif
 
-            @include('game.character.partials.equipment.sections.equip.' . (($itemToEquip->type === 'bow' || $itemToEquip->type === 'hammer' || $itemToEquip->type === 'stave') ? 'weapon' : $type), [
+            @php
+                $itemType = $itemToEquip->type;
+
+                if ($itemType === 'bow' || $itemType === 'hammer' || $itemType === 'stave') {
+                    $itemType = 'weapon';
+                }
+            @endphp
+
+            @include('game.character.partials.equipment.sections.equip.' . $itemType, [
                 'slotId'      => $slotId,
                 'details'     => $details,
                 'itemToEquip' => $itemToEquip,
-                'type'        => $itemToEquip->type,
+                'type'        => $itemType,
                 'item'        => $itemToEquip,
                 'isShop'      => $isShop,
             ])

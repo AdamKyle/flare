@@ -114,28 +114,54 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-3">
             <div class="form-group">
                 <label for="item-int-mod">Int Mod: </label>
                 <input type="number" steps="0.01" class="form-control" id="item-int-mod" name="item-int-mod" wire:model="item.int_mod">
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-3">
             <div class="form-group">
                 <label for="item-chr-mod">Chr Mod: </label>
                 <input type="number" steps="0.01" class="form-control" id="item-chr-mod" name="item-chr-mod" wire:model="item.chr_mod">
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-3">
             <div class="form-group">
                 <label for="item-agi-mod">Agi Mod: </label>
                 <input type="number" steps="0.01" class="form-control" id="item-agi-mod" name="item-agi-mod" wire:model="item.agi_mod">
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-3">
             <div class="form-group">
                 <label for="item-focus-mod">Focus Mod: </label>
                 <input type="number" steps="0.01" class="form-control" id="item-focus-mod" name="item-focus-mod" wire:model="item.focus_mod">
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="ambush_chance">Ambush Chance %: </label>
+                <input type="number" steps="0.01" class="form-control" id="ambush_chance" name="ambush_chance" wire:model="item.ambush_chance">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="ambush_resistance">Ambush Resistance %: </label>
+                <input type="number" steps="0.01" class="form-control" id="ambush_resistance" name="ambush_resistance" wire:model="item.ambush_resistance">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="counter_chance">Counter Chance %: </label>
+                <input type="number" steps="0.01" class="form-control" id="counter_chance" name="counter_chance" wire:model="item.counter_chance">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="counter_resistance">Counter Resistance %: </label>
+                <input type="number" steps="0.01" class="form-control" id="counter_resistance" name="counter_resistance" wire:model="item.counter_resistance">
             </div>
         </div>
     </div>

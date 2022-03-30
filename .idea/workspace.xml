@@ -2,21 +2,101 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f574dce8-e67f-47ee-8bb6-fe6b7dafab2a" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Flare/Transformers/SkillsTransformer.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Transformers/SkillsTransformer.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Game/Core/Services/CharacterInventoryService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Core/Services/CharacterInventoryService.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Game/Skills/Controllers/Api/SkillsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Skills/Controllers/Api/SkillsController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Game/Skills/Services/SkillService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Skills/Services/SkillService.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/game.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/game.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/game/character-sheet/helpers/inventory/build-inventory-table-columns.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/game/character-sheet/helpers/inventory/build-inventory-table-columns.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/character-sheet/character-sheet.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/character-sheet/character-sheet.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/character-sheet/components/character-skills-tabs.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/character-sheet/components/character-skills-tabs.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/character-sheet/components/tabs/inventory-tab-section.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/character-sheet/components/tabs/inventory-tab-section.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/character-sheet/components/tabs/inventory-tabs/equipped-table.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/character-sheet/components/tabs/inventory-tabs/equipped-table.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/character-sheet/components/tabs/inventory-tabs/quest-items-table.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/character-sheet/components/tabs/inventory-tabs/quest-items-table.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/character-sheet/components/tabs/inventory-tabs/sets-table.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/character-sheet/components/tabs/inventory-tabs/sets-table.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/character-sheet/components/tabs/inventory-tabs/usable-items-table.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/character-sheet/components/tabs/inventory-tabs/usable-items-table.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Console/Commands/AssignNewSkillsToPlayers.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Flare/Builders/Character/AttackDetails/CharacterTrinketsInformation.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Flare/Handlers/AmbushHandler.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Flare/Handlers/CounterHandler.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Flare/Handlers/Values/CounterDeathValue.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Game/Skills/Controllers/Api/TrinketCraftingController.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Game/Skills/Services/TrinketCraftingService.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database/migrations/2022_03_25_205939_add_additional_info_to_items.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database/migrations/2022_03_28_114204_add_ambush_and_counter_chance_and_resistance_to_monsters.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/data-imports/items/trinkets.xlsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/js/components/game/battle/attack/attack-types/ambush-and-counter/can-ambush-enemy.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/js/components/game/battle/attack/attack-types/ambush-and-counter/can-counter.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/js/components/game/battle/attack/attack-types/ambush-and-counter/counter-handler.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/js/components/game/trinket-crafting/trinket-crafting-action.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/game/character/partials/equipment/sections/equip/trinket.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Admin/Controllers/ItemsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Admin/Controllers/ItemsController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Admin/Import/Items/Sheets/ItemsSheet.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Admin/Import/Items/Sheets/ItemsSheet.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Builders/Character/AttackDetails/CharacterAttackBuilder.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Builders/Character/AttackDetails/CharacterAttackBuilder.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Builders/Character/BaseCharacterInfo.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Builders/Character/BaseCharacterInfo.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Builders/CharacterBuilder.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Builders/CharacterBuilder.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Builders/RandomItemDropBuilder.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Builders/RandomItemDropBuilder.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Calculators/SellItemCalculator.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Calculators/SellItemCalculator.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Handlers/AttackExtraActionHandler.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Handlers/AttackExtraActionHandler.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Handlers/AttackHandlers/CastHandler.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Handlers/AttackHandlers/CastHandler.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Handlers/SetupFightHandler.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Handlers/SetupFightHandler.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Models/Item.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Models/Item.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Models/Monster.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Models/Monster.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Providers/ServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Providers/ServiceProvider.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Services/FightService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Services/FightService.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Transformers/CharacterAttackTransformer.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Transformers/CharacterAttackTransformer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Transformers/CharacterSheetBaseInfoTransformer.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Transformers/CharacterSheetBaseInfoTransformer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Transformers/ItemTransfromer.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Transformers/ItemTransfromer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Transformers/MonsterTransfromer.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Transformers/MonsterTransfromer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/Values/MaxCurrenciesValue.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Values/MaxCurrenciesValue.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/View/Components/ItemDisplayColor.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/View/Components/ItemDisplayColor.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/View/Livewire/Admin/Items/Partials/ItemDetails.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/View/Livewire/Admin/Items/Partials/ItemDetails.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Flare/View/Livewire/Admin/Items/Partials/ItemModifiers.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/View/Livewire/Admin/Items/Partials/ItemModifiers.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Battle/Handlers/FactionHandler.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Battle/Handlers/FactionHandler.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Core/Comparison/ItemComparison.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Core/Comparison/ItemComparison.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Core/Requests/ComparisonValidation.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Core/Requests/ComparisonValidation.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Core/Requests/EquipItemValidation.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Core/Requests/EquipItemValidation.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Core/Services/InventorySetService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Core/Services/InventorySetService.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Core/Services/RandomEnchantmentService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Core/Services/RandomEnchantmentService.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Maps/Events/MoveTimeOutEvent.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Maps/Events/MoveTimeOutEvent.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Maps/Listeners/MoveTimeOutListener.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Maps/Listeners/MoveTimeOutListener.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Maps/Services/TraverseService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Maps/Services/TraverseService.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Shop/Services/ShopService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Shop/Services/ShopService.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Skills/Providers/ServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Skills/Providers/ServiceProvider.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Skills/Services/CraftingService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Skills/Services/CraftingService.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Skills/Services/EnchantingService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Skills/Services/EnchantingService.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/composer.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/data-imports/items/Armour.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/data-imports/items/Armour.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/info/combat/section-1.md" beforeDir="false" afterPath="$PROJECT_DIR$/resources/info/combat/section-1.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/info/crafting/section-2.md" beforeDir="false" afterPath="$PROJECT_DIR$/resources/info/crafting/section-2.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/info/currencies/section-1.md" beforeDir="false" afterPath="$PROJECT_DIR$/resources/info/currencies/section-1.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/info/gear-progression/section-1.md" beforeDir="false" afterPath="$PROJECT_DIR$/resources/info/gear-progression/section-1.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/character/sheet/character-details.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/character/sheet/character-details.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/components/templates/card.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/components/templates/card.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/crafting/crafting-action.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/crafting/crafting-action.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/sections/actions-section.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/sections/actions-section.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/sections/character-info-section.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/sections/character-info-section.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/sections/components/additional-actions-drop-down.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/sections/components/additional-actions-drop-down.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/sections/fight-section.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/sections/fight-section.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/game/sections/traverse-section.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/game/sections/traverse-section.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/marketboard/components/item-name.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/marketboard/components/item-name.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/marketboard/item-details.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/marketboard/item-details.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/marketboard/partials/equip-details.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/marketboard/partials/equip-details.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/game/actions/battle/attack/attack/attack-types/cast-attack.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/game/actions/battle/attack/attack/attack-types/cast-attack.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/game/actions/battle/attack/attack/attack-types/magic-and-weapon-attack-base.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/game/actions/battle/attack/attack/attack-types/magic-and-weapon-attack-base.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/game/actions/battle/attack/attack/attack-types/weapon-attack.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/game/actions/battle/attack/attack/attack-types/weapon-attack.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/game/actions/battle/attack/monster/monster-attack.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/game/actions/battle/attack/monster/monster-attack.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/sass/game/actions.scss" beforeDir="false" afterPath="$PROJECT_DIR$/resources/sass/game/actions.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/sass/game/inventory.scss" beforeDir="false" afterPath="$PROJECT_DIR$/resources/sass/game/inventory.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/admin/exports/items/sheets/items.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/admin/exports/items/sheets/items.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/admin/exports/monsters/sheets/monsters.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/admin/exports/monsters/sheets/monsters.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/admin/items/export.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/admin/items/export.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/admin/monsters/partials/details.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/admin/monsters/partials/details.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/components/livewire/admin/items/data-table.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/components/livewire/admin/items/data-table.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/components/livewire/admin/items/partials/item-details.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/components/livewire/admin/items/partials/item-details.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/components/livewire/admin/items/partials/item-modifiers.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/components/livewire/admin/items/partials/item-modifiers.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/components/livewire/character/inventory/data-table.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/components/livewire/character/inventory/data-table.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/game/character/partials/equipment/equipped.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/game/character/partials/equipment/equipped.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/game/character/partials/equipment/sections/equip/artifact.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/game/character/partials/equipment/sections/equip/artifact.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/game/character/partials/equipment/sections/equip/details/item-stat-details.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/game/character/partials/equipment/sections/equip/details/item-stat-details.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/game/character/partials/equipment/sections/equip/details/stat-details.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/game/character/partials/equipment/sections/equip/details/stat-details.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/game/character/partials/equipment/sections/equip/ring.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/game/character/partials/equipment/sections/equip/ring.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/game/character/partials/equipment/sections/equip/shield.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/game/character/partials/equipment/sections/equip/shield.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/game/character/partials/equipment/sections/equip/spell.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/game/character/partials/equipment/sections/equip/spell.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/game/character/partials/equipment/sections/item-stat-details.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/game/character/partials/equipment/sections/item-stat-details.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/game/character/partials/equipment/to-equip.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/game/character/partials/equipment/to-equip.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/game/items/partials/item-details.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/game/items/partials/item-details.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/game/items/partials/item.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/game/items/partials/item.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/information/partials/crafting-section-one.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/information/partials/crafting-section-one.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/game/skills/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/game/skills/api.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

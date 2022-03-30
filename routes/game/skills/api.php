@@ -13,6 +13,9 @@ Route::middleware(['auth', 'is.player.banned', 'is.character.dead', 'is.characte
     // Fetch Alchemy Items
     Route::get('/alchemy/{character}', ['uses' => 'Api\AlchemyController@alchemyItems']);
 
+    // Fetch Trinkets
+    Route::get('/trinket-crafting/{character}', ['uses' => 'Api\TrinketCraftingController@fetchItemsToCraft']);
+
 
     Route::middleware(['is.character.exploring'])->group(function() {
         // Handle Training a specific skill.
@@ -26,6 +29,11 @@ Route::middleware(['auth', 'is.player.banned', 'is.character.dead', 'is.characte
     Route::group(['middleware' => 'throttle:crafting'], function() {
         // Craft Item
         Route::post('/craft/{character}', ['uses' => 'Api\CraftingController@craft']);
+    });
+
+    Route::group(['middleware' => 'throttle:crafting'], function() {
+        // Craft Item
+        Route::post('/trinket-crafting/craft/{character}/{item}', ['uses' => 'Api\TrinketCraftingController@craftTrinket']);
     });
 
     Route::group(['middleware' => 'throttle:enchanting'], function() {
@@ -42,5 +50,10 @@ Route::middleware(['auth', 'is.player.banned', 'is.character.dead', 'is.characte
     Route::group(['middleware' => 'throttle:25,1'], function() {
         // Alchemy
         Route::post('/transmute/{character}', ['uses' => 'Api\AlchemyController@transmute']);
+    });
+
+    Route::group(['middleware' => 'throttle:25,1'], function() {
+        // Trinket Crafting
+        Route::post('/trinket-craft/{character}/{item}', ['uses' => 'Api\TrinketCraftingController@craftTrinket']);
     });
 });

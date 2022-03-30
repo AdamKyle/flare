@@ -112,6 +112,14 @@
               sort-field="{{$sortField}}"
               field="shards_cost"
             />
+
+          <x-data-tables.header-row
+              wire:click.prevent="sortBy('copper_coin_cost')"
+              header-text="Copper Coin Cost"
+              sort-by="{{$sortBy}}"
+              sort-field="{{$sortField}}"
+              field="copper_coin_cost"
+          />
           @endif
 
           @if ($showSkillInfo)
@@ -205,11 +213,14 @@
               <td>{{is_null($item->base_damage) ? 0 : $item->base_damage}}</td>
               <td>{{is_null($item->base_ac) ? 0 : $item->base_ac}}</td>
               <td>{{is_null($item->base_healing) ? 0 : $item->base_healing}}</td>
-              <td>{{is_null($item->cost) ? 0 : number_format($item->cost)}}</td>
+              <td>
+                  {{is_null($item->cost) ? 0 : number_format($item->cost)}}
+              </td>
 
               @if ($showOtherCurrencyCost)
                 <td>{{is_null($item->gold_dust_cost) ? 0 : number_format($item->gold_dust_cost)}}</td>
                 <td>{{is_null($item->shards_cost) ? 0 : number_format($item->shards_cost)}}</td>
+                <td>{{is_null($item->copper_coin_cost) ? 0 : number_format($item->copper_coin_cost)}}</td>
               @endif
 
               @if ($showSkillInfo)

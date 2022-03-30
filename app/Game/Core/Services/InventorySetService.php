@@ -194,6 +194,11 @@ class InventorySetService {
             }
         }
 
+        // Bail if we have more then two trinkets
+        if (!$this->hasTrinkets($inventorySet)) {
+            return false;
+        }
+
         // Bail if we have more than two rings.
         if (!$this->hasRings($inventorySet)) {
             return false;
@@ -369,6 +374,24 @@ class InventorySetService {
         }));
 
         if ($rings->count() > 2) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Do you only have two trinkets?
+     *
+     * @param InventorySet $inventorySet
+     * @return bool
+     */
+    protected function hasTrinkets(InventorySet $inventorySet): bool {
+        $trinkets = collect($inventorySet->slots->filter(function($slot) {
+            return $slot->item->type === 'trinket';
+        }));
+
+        if ($trinkets->count() > 2) {
             return false;
         }
 

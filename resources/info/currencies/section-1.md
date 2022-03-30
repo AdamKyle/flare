@@ -58,5 +58,5 @@ to Hell which has a quest chain to unlock Copper Coins currency which can only b
 
 All monsters, in relation to their gold, will also drop 5-20 copper coins. Players may only have 100,000 of these coins.
 
-Copper coins will be used for the new Purgatory smith, which will allow players to upgrade their high-end crafted gear to a new set of gear.
+Copper coins are used in the crafting of [trinkets](/crafting) which is done more late game to let you fight stronger opponents in Purgatory.
 

@@ -40,7 +40,9 @@ class ItemDisplayColor extends Component
         if ($isEitherRandomlyGenerated) {
             $this->color = 'unique-item';
         } else {
-            if ($this->item->appliedHolyStacks->isNotEmpty()) {
+            if ($this->item->type === 'trinket') {
+                $this->color = 'trinket';
+            } else if ($this->item->appliedHolyStacks->isNotEmpty()) {
                 $this->color = 'holy-item';
             } else if (!is_null($this->item->itemSuffix) && !is_null($this->item->itemPrefix)) {
                 $this->color = 'two-enchant';

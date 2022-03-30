@@ -3,25 +3,16 @@
 namespace App\Flare\Transformers;
 
 
-use App\Flare\Builders\Character\ClassDetails\HolyStacks;
+
 use Cache;
-use League\Fractal\TransformerAbstract;
-use App\Flare\Models\MaxLevelConfiguration;
-use App\Flare\Values\ItemEffectsValue;
-use App\Game\Battle\Values\MaxLevel;
 use App\Game\Core\Values\View\ClassBonusInformation;
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Models\Character;
-use App\Flare\Transformers\Traits\SkillsTransformerTrait;
 use App\Flare\Builders\Character\AttackDetails\CharacterAffixInformation;
 use App\Flare\Builders\Character\AttackDetails\CharacterHealthInformation;
-use App\Flare\Models\GameSkill;
-use App\Flare\Models\Inventory;
-use App\Flare\Models\InventorySlot;
-use App\Flare\Models\Item;
-use App\Flare\Models\Skill;
+use App\Flare\Builders\Character\ClassDetails\HolyStacks;
+use App\Flare\Builders\Character\AttackDetails\CharacterTrinketsInformation;
 use App\Flare\Values\ClassAttackValue;
-use App\Game\Skills\Values\SkillTypeValue;
 
 class CharacterSheetBaseInfoTransformer extends BaseTransformer {
 
@@ -32,10 +23,11 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
      * @return mixed
      */
     public function transform(Character $character) {
-        $characterInformation       = resolve(CharacterInformationBuilder::class)->setCharacter($character);
-        $characterHealthInformation = resolve(CharacterHealthInformation::class)->setCharacter($character);
-        $characterAffixInformation  = resolve(CharacterAffixInformation::class)->setCharacter($character);
-        $holyStacks                 = resolve(HolyStacks::class);
+        $characterInformation         = resolve(CharacterInformationBuilder::class)->setCharacter($character);
+        $characterHealthInformation   = resolve(CharacterHealthInformation::class)->setCharacter($character);
+        $characterAffixInformation    = resolve(CharacterAffixInformation::class)->setCharacter($character);
+        $holyStacks                   = resolve(HolyStacks::class);
+        $characterTrinketsInformation = resolve(CharacterTrinketsInformation::class);
 
         return [
             'id'                => $character->id,
@@ -98,6 +90,10 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
             'copper_coins'         => number_format($character->copper_coins),
             'is_dead'              => $character->is_dead,
             'can_adventure'        => $character->can_adventure,
+            'ambush_chance'             => $characterTrinketsInformation->getAmbushChance($character),
+            'ambush_resistance_chance'  => $characterTrinketsInformation->getAmbushResistanceChance($character),
+            'counter_chance'            => $characterTrinketsInformation->getCounterChance($character),
+            'counter_resistance_chance' => $characterTrinketsInformation->getCounterResistanceChance($character),
             'stat_affixes'        => [
                 'cant_be_resisted'   => $characterInformation->canAffixesBeResisted(),
                 'all_stat_reduction' => $characterAffixInformation->findPrefixStatReductionAffix(),

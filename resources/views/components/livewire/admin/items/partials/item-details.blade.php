@@ -250,25 +250,32 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="form-group">
                 <label for="item-cost">Cost: </label>
                 <input type="number" class="form-control" id="item-cost" name="item-cost" wire:model="item.cost" {{$item->type !== 'quest' ? '' : 'disabled'}}>
                 @error('item.cost') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="form-group">
                 <label for="gold_dust_cost">Gold Dust Cost: </label>
                 <input type="number" class="form-control" id="gold_dust_cost" name="gold_dust_cost" wire:model="item.gold_dust_cost" {{$item->type === 'alchemy' ? '' : 'disabled'}}>
                 @error('item.gold_dust_cost') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="form-group">
                 <label for="shard_cost">Shard Cost: </label>
                 <input type="number" class="form-control" id="shards_cost" name="shards_cost" wire:model="item.shards_cost" {{$item->type === 'alchemy' ? '' : 'disabled'}}>
                 @error('item.shards_cost') <span class="text-danger">{{ $message }}</span> @enderror
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="copper_coin_cost">Copper Coin Cost: </label>
+                <input type="number" class="form-control" id="copper_coin_cost" name="copper_coin_cost" wire:model="item.copper_coin_cost" {{$item->type === 'alchemy' ? '' : 'disabled'}}>
+                @error('item.copper_coin_cost') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
     </div>

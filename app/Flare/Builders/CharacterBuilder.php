@@ -69,6 +69,18 @@ class CharacterBuilder {
     }
 
     /**
+     * Set the character for assigning new skills.
+     *
+     * @param Character $character
+     * @return $this
+     */
+    public function setCharacter(Character $character): CharacterBuilder {
+        $this->character = $character;
+
+        return $this;
+    }
+
+    /**
      * Create the character.
      *
      * This includes the inventory, a basic weapon that is then equipped
@@ -140,18 +152,27 @@ class CharacterBuilder {
      */
     public function assignSkills(): CharacterBuilder {
         foreach (GameSkill::whereNull('game_class_id')->get() as $skill) {
-            $this->character->skills()->create(
-                resolve(BaseSkillValue::class)->getBaseCharacterSkillValue($this->character, $skill)
-            );
+
+            $existingSkill = $this->character->skills()->where('game_skill_id', $skill->id)->first();
+
+            if (is_null($existingSkill)) {
+                $this->character->skills()->create(
+                    resolve(BaseSkillValue::class)->getBaseCharacterSkillValue($this->character, $skill)
+                );
+            }
         }
 
         /**
          * Assign the skills assigned to this character's class.
          */
         foreach ($this->character->class->gameSkills as $skill) {
-            $this->character->skills()->create(
-                resolve(BaseSkillValue::class)->getBaseCharacterSkillValue($this->character, $skill)
-            );
+            $existingSkill = $this->character->skills()->where('game_skill_id', $skill->id)->first();
+
+            if (is_null($existingSkill)) {
+                $this->character->skills()->create(
+                    resolve(BaseSkillValue::class)->getBaseCharacterSkillValue($this->character, $skill)
+                );
+            }
         }
 
         return $this;

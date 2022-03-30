@@ -44,6 +44,38 @@ You will then take your Tier Two Crafted items and your Unique and Apply 20 stac
 
 Once done, you should have 100% Holy Bonus. You are now ready to farm [Copper Coins](/information/currencies) for future content and gear progression.
 
+## Tier Four: Trinkets
+
+By now you have been fighting in purgatory and farming copper coins. But what do you do with these? As of 1.1.10.7 you can use them to craft Trinkets. Players may have two trinkets equipped
+any time and may only have two per set.
+
+Trinkets, when combined can give you:
+
+- 75% towards Ambush Chance and Resistance
+- 75% towards Counter Chance and Resistance
+
+Ambush allows you to bypass the enemies defences, dodge attempts and evasions and do 2x the weapon or cast damage, but only 1.75X the weapon and cast (or) cast and weapon attack.
+
+**Note**: [Thieves](/races-and-classes) will do either ambush or [Shadow Dance](/skill-information), not both. Ambush is like Shadow Dance for other classes, 
+but is late game and less effective than Shadow Dance which can trigger every hit.
+
+Creatures later down the list in Purgatory have a ambush chance that can climb as high as 65%. Creatures do not have an ambush resistance.
+
+Counter-attacks will allow you to counter the enemies' weapon attack with your own at +50%, the catch is: You have to survive their weapon attack.
+
+Creatures later down the list in Purgatory have a counter chance, but not resistance, these creatures can counter after your weapon OR cast attack.
+
+> ### ATTN!!
+> 
+> Regarding Counter and Attack and Cast or Cast and Attack, enemies will counter after your Weapon attack for Attack and Cast, 
+> and after your cast attack for Cast and Attack.
+
+There is a small chance (2%) that you will counter their counter, or they can counter your counter, again assuming either survives the initial attack and possible subsequent counter.
+If you manage to counter again, it will be at +25% damage as opposed to +50%.
+
+Heretics, Prophets and Arcane Alchemists can counter an enemies spells and their attack.
+
+
 ## This all takes time.
 
 This can take months to complete. You have to craft, enchant, level your character, complete quests, unlock new features, level skills and play the game.

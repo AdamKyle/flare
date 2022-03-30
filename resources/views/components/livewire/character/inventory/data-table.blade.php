@@ -198,7 +198,11 @@
                                 <td>{{ucfirst(implode(' ', explode('-', $slot->position)))}}</td>
                             @endif
                             @if (!$marketBoard && $batchSell)
-                                <td>{{is_null($slot->item->cost) ? 'N/A' : number_format($slot->item->cost)}}</td>
+                                @if ($slot->item->type === 'trinket')
+                                    <td>{{round($slot->item->gold_dust_cost / 100)}}</td>
+                                @else
+                                    <td>{{is_null($slot->item->cost) ? 'N/A' : number_format($slot->item->cost)}}</td>
+                                @endif
                             @endif
                             <td>
                                 @if ($allowInventoryManagement && $slot->item->type !== 'quest' && !$slot->item->damages_kingdoms)

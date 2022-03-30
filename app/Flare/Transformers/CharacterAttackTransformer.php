@@ -2,7 +2,9 @@
 
 namespace App\Flare\Transformers;
 
+use App\Flare\Builders\Character\AttackDetails\CharacterTrinketsInformation;
 use App\Flare\Builders\Character\ClassDetails\HolyStacks;
+use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Skill;
@@ -24,7 +26,11 @@ class CharacterAttackTransformer extends BaseTransformer {
 
         $gameClass = GameClass::find($character->game_class_id);
 
-        $holyStacks = resolve(HolyStacks::class);
+        $holyStacks           = resolve(HolyStacks::class);
+        $characterTrinketInfo = resolve(CharacterTrinketsInformation::class);
+        $characterInformation = resolve(CharacterInformationBuilder::class);
+
+        $characterInformation->setCharacter($character);
 
         return [
             'id'                          => $character->id,
@@ -65,6 +71,12 @@ class CharacterAttackTransformer extends BaseTransformer {
             'disable_pop_overs'           => $character->user->disable_attack_type_popover,
             'is_attack_automation_locked' => $character->is_attack_automation_locked,
             'can_attack_again_at'         => $character->can_attack_again_at,
+            'ambush_resistance_chance'    => $characterTrinketInfo->getAmbushResistanceChance($character),
+            'counter_resistance_chance'   => $characterTrinketInfo->getCounterResistanceChance($character),
+            'ambush_chance'               => $characterTrinketInfo->getAmbushChance($character),
+            'counter_chance'              => $characterTrinketInfo->getCounterChance($character),
+            'weapon_attack'               => $characterInformation->getTotalWeaponDamage(false),
+            'voided_weapon_attack'        => $characterInformation->getTotalWeaponDamage(false),
         ];
     }
 }
