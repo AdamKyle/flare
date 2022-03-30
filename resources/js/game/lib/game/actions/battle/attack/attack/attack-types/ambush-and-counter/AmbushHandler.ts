@@ -93,7 +93,6 @@ export default class AmbushHandler extends BattleBase {
     }
 
     canPlayerAmbush(character: any, monster: Monster): boolean {
-        return true;
         const chance = character.ambush_chance - monster.ambushResistance();
 
         return random(1, 100) > (100 - 100 * chance);
