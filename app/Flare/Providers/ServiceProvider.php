@@ -26,6 +26,7 @@ use App\Flare\Handlers\AttackHandlers\DefendHandler;
 use App\Flare\Handlers\AttackHandlers\EntrancingChanceHandler;
 use App\Flare\Handlers\AttackHandlers\ItemHandler;
 use App\Flare\Handlers\CharacterAttackHandler;
+use App\Flare\Handlers\CounterHandler;
 use App\Flare\Handlers\HealingExtraActionHandler;
 use App\Flare\Handlers\MonsterAttackHandler;
 use App\Flare\Handlers\SetupFightHandler;
@@ -269,6 +270,13 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
+        $this->app->bind(CounterHandler::class, function($app) {
+            return new CounterHandler(
+                $app->make(CharacterTrinketsInformation::class),
+                $app->make(CharacterInformationBuilder::class)
+            );
+        });
+
         $this->app->bind(CanHitHandler::class, function($app) {
             return new CanHitHandler(
                 $app->make(AttackExtraActionHandler::class),
@@ -295,7 +303,9 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
         $this->app->bind(AttackExtraActionHandler::class, function($app) {
-            return new AttackExtraActionHandler();
+            return new AttackExtraActionHandler(
+                $app->make(CounterHandler::class),
+            );
         });
 
         $this->app->bind(AttackHandler::class, function($app) {

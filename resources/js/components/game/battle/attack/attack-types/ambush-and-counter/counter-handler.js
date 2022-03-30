@@ -40,7 +40,7 @@ export default class CounterHandler {
   }
 
   playerCounterAttack(character, monsterHealth, isAttackVoided) {
-    this.addMessage('You manage to lash out the enemy in a counter move with your weapon!');
+    this.addMessage('You manage to lash out the enemy in a counter move!');
 
     let damage = (character.weapon_attack * 0.05).toFixed(0);
 
@@ -72,7 +72,7 @@ export default class CounterHandler {
 
     let damage = (this.monsterAttack(monster) * 0.05).toFixed(0);
 
-    this.addEnemyActionMessage('Lashing out the enemy does ' + this.formatNumber(damage));
+    this.addEnemyActionMessage('Lashing out the enemy does: ' + this.formatNumber(damage));
 
     return monsterHealth - parseInt(damage);
   }

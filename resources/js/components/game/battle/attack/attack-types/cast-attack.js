@@ -184,7 +184,7 @@ export default class CastAttack {
       }
 
       if (this.characterCurrentHealth <= 0) {
-        this.addEnemyActionMessage('the enemies counter has slaughtered you!');
+        this.addEnemyActionMessage('The enemies counter has slaughtered you!');
 
         return;
       }

@@ -132,7 +132,12 @@ class FightService {
             $this->currentMonsterHealth = rand($healthRange[0], $healthRange[1]);
         }
 
-        $healthObject = $this->ambushHandler->ambush($defender, $attacker, $this->currentMonsterHealth, $this->currentCharacterHealth, $isCharacterVoided);
+        if ($defender instanceof  Monster || $defender instanceof \Std) {
+            $healthObject = $this->ambushHandler->ambush($defender, $attacker, $this->currentMonsterHealth, $this->currentCharacterHealth, $isCharacterVoided);
+        } else {
+            $healthObject = $this->ambushHandler->ambush($attacker, $defender, $this->currentMonsterHealth, $this->currentCharacterHealth, $isCharacterVoided);
+        }
+
 
         $this->battleLogs = [...$this->battleLogs, ...$this->ambushHandler->getMessages()];
 
@@ -172,7 +177,7 @@ class FightService {
             $this->characterAttackHandler->resetLogs();
         }
 
-        if ($attacker instanceof Monster) {
+        if ($attacker instanceof Monster && $this->currentMonsterHealth > 0) {
 
             $this->monsterAttackHandler->setHealth($this->currentMonsterHealth, $this->currentCharacterHealth)
                                        ->setMonsterVoided($this->isMonsterVoided)

@@ -2,6 +2,7 @@
 
 namespace App\Flare\Handlers\AttackHandlers;
 
+use App\Flare\Handlers\Values\CounterDeathValue;
 use Cache;
 use App\Flare\Builders\Character\AttackDetails\CharacterAttackBuilder;
 use App\Flare\Builders\CharacterInformationBuilder;
@@ -97,7 +98,12 @@ class CastHandler {
 
             $this->battleLogs = $this->addMessage($message, 'action-fired', $this->battleLogs);
 
-            $this->castDamageSpells($characterInfo, $defender, $voided);
+            $canContinue = $this->castDamageSpells($characterInfo, $defender, $voided);
+
+            if (!$canContinue) {
+                return;
+            }
+
             $this->fireOffHealingSpells($characterInfo, $voided);
             $this->useItems($attacker, $defender, $voided);
 
@@ -158,8 +164,30 @@ class CastHandler {
         $this->fireOffVampireThirst($characterInfo, $voided);
     }
 
-    public function castDamageSpells(CharacterInformationBuilder $characterInfo, $defender, bool $voided = false) {
-        $this->monsterHealth   = $this->attackExtraActionHandler->castSpells($characterInfo, $defender, $this->monsterHealth, $voided, $this->dmgReduction);
+    public function castDamageSpells(CharacterInformationBuilder $characterInfo, $defender, bool $voided = false): bool {
+        $result   = $this->attackExtraActionHandler->setCharacterHealth($this->characterHealth)->castSpells($characterInfo, $defender, $this->monsterHealth, $voided, $this->dmgReduction);
+
+        $this->monsterHealth   = $result['monster_health'];
+
+        if ($result['status'] === CounterDeathValue::CHARACTER_DIED) {
+
+            $this->battleLogs      = [...$this->battleLogs, ...$this->attackExtraActionHandler->getMessages()];
+
+            $this->battleLogs      = $this->addMessage('The enemies counter has slaughtered you!', 'enemy-action-fired', $this->battleLogs);
+            $this->characterHealth = $this->attackExtraActionHandler->getCharacterHealth();
+
+            return false;
+        }
+
+        if ($result['status'] === CounterDeathValue::MONSTER_DIED) {
+
+            $this->battleLogs      = [...$this->battleLogs, ...$this->attackExtraActionHandler->getMessages()];
+
+            $this->battleLogs = $this->addMessage('Your counter of their counter has slaughtered the enemy!', 'enemy-action-fired', $this->battleLogs);
+
+            return false;
+        }
+
         $this->monsterHealth   = $this->attackExtraActionHandler->setCharacterhealth($this->characterHealth)->vampireThirst($characterInfo, $this->monsterHealth, $voided, $this->dmgReduction);
         $this->characterHealth = $this->attackExtraActionHandler->getCharacterHealth();
 
