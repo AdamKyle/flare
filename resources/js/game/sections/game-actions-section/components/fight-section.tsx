@@ -85,6 +85,7 @@ export default class FightSection extends React.Component<FightSectionProps, any
                 monster_to_fight_id: this.props.monster_to_fight.id,
                 is_character_voided: battleSetUp.getVoidanceResult().is_character_voided,
                 is_monster_voided: battleSetUp.getVoidanceResult().is_monster_voided,
+                battle_messages: this.battle_messages,
                 monster_to_fight: battleSetUp.getMonster(),
             });
         }
@@ -122,7 +123,7 @@ export default class FightSection extends React.Component<FightSectionProps, any
         const attackState = attack.getState();
 
         this.setState({
-            battle_messages: [...this.battle_messages, ...attackState.battleMessages],
+            battle_messages: [...this.battle_messages, ...attackState.battle_messages],
             monster_current_health: attackState.monsterCurrentHealth,
             character_current_health: attackState.characterCurrentHealth,
         });

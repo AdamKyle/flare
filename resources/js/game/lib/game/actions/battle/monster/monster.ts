@@ -52,7 +52,7 @@ export default class Monster extends BattleBase {
             health = health + health * this.monster.increases_damage_by;
         }
 
-        return health;
+        return round(health);
     }
 
     getBaseDamageStat(percentage?: number): number {

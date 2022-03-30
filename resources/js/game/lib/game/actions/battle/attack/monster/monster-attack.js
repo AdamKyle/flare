@@ -5,6 +5,7 @@ import UseItems from "../attack/attack-types/use-items";
 import {random} from "lodash";
 import BattleBase from "../../battle-base";
 import {formatNumber} from "../../../../format-number";
+import Monster from "../../monster/monster";
 
 export default class MonsterAttack extends BattleBase {
 
@@ -18,10 +19,8 @@ export default class MonsterAttack extends BattleBase {
   }
 
   doAttack(previousAttackType, isCharacterVoided, isMonsterVoided) {
-    const monster = this.attacker.getMonster();
-    let damage    = this.attacker.attack();
-
-    const counterHandler = new CounterHandler();
+    const monster = this.attacker;
+    let damage    = (new Monster(this.attacker)).attack();
 
     if (this.entrancesEnemy(monster, this.defender, isCharacterVoided, isMonsterVoided)) {
       if (this.canDoCritical(monster)) {

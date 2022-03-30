@@ -19,25 +19,27 @@ export default class Attack extends BattleBase {
     this.monsterCurrentHealth   = monsterCurrentHealth;
     this.isVoided               = voided;
     this.isMonsterVoided        = monsterVoided;
-    this.battleMessages         = [];
+    this.battle_messages        = [];
     this.attackerName           = '';
     this.missed                 = 0;
 
     this.state                  = {
       characterCurrentHealth: characterCurrentHealth,
       monsterCurrentHealth: monsterCurrentHealth,
-      battleMessages: [],
+      battle_messages: [],
     };
   }
 
   attack(attacker, defender, attackAgain, type, attackType) {
     if (this.isMonsterDead()) {
 
-      this.addMessage(defender.name + ' has been defeated!', 'enemy-action');
+      if (type === 'monster') {
+        this.addMessage(attacker.name + ' has been defeated!', 'enemy-action');
+      }
 
       this.state.monsterCurrentHealth = 0;
 
-      this.state.battleMessages = [...this.state.battleMessages, ...this.getMessages()]
+      this.battle_messages = [...this.battle_messages, ...this.getMessages()]
 
       return this;
     }
@@ -51,24 +53,23 @@ export default class Attack extends BattleBase {
     }
 
     if (type === 'monster') {
-
       const monsterAttack = new MonsterAttack(attacker, defender, this.characterCurrentHealth, this.monsterCurrentHealth);
       const state = monsterAttack.doAttack(attackType, this.isVoided, this.isMonsterVoided);
 
-      this.state.characterCurrentHealth = state.characterCurrentHealth;
-      this.state.monsterCurrentHealth   = state.monsterCurrentHealth;
+      this.characterCurrentHealth = state.characterCurrentHealth;
+      this.monsterCurrentHealth   = state.monsterCurrentHealth;
 
-      this.state.battleMessages         = [...this.state.battleMessages, ...state.battleMessages];
+      this.battle_messages         = [...this.battle_messages, ...state.battleMessages];
 
-      if (this.state.characterCurrentHealth <= 0) {
+      if (this.characterCurrentHealth <= 0) {
         this.resurrectCharacter(defender, attackType)
 
-        if (!attackType.includes('voided') && this.state.characterCurrentHealth >= 1) {
+        if (!attackType.includes('voided') && this.characterCurrentHealth >= 1) {
           const attackData = defender.attack_types[attackType];
 
           this.lifeSteal(defender, attacker, attackData);
         }
-      } else if (this.state.characterCurrentHealth > 0) {
+      } else if (this.characterCurrentHealth > 0) {
         if (!attackType.includes('voided')) {
           const attackData = defender.attack_types[attackType];
 
@@ -76,10 +77,22 @@ export default class Attack extends BattleBase {
         }
       }
 
-      if (this.isMonsterDead()) {
-        this.addMessage(attacker.getMonster().name + ' has been defeated!', 'enemy-action');
+      if (this.monsterCurrentHealth <= 0 ) {
+        this.addMessage(attacker.name + ' has been defeated!', 'enemy-action');
 
         this.monsterCurrentHealth = 0;
+      }
+
+      if (this.characterCurrentHealth <= 0) {
+        this.addMessage('You were slaughtered! You must resurrect first!', 'enemy-action');
+
+        this.characterCurrentHealth = 0;
+      }
+
+      this.state = {
+        characterCurrentHealth: this.characterCurrentHealth,
+        monsterCurrentHealth: this.monsterCurrentHealth,
+        battle_messages: this.battle_messages,
       }
 
       return this;
@@ -149,7 +162,7 @@ export default class Attack extends BattleBase {
       useItems.lifeStealingAffixes(attackData, false);
     }
 
-    this.state.battleMessages         = [...this.state.battleMessages, ...useItems.getBattleMessage()];
+    this.battle_messages         = [...this.battle_messages, ...useItems.getBattleMessage()];
 
     this.state.characterCurrentHealth = useItems.getCharacterCurrentHealth();
     this.state.monsterCurrentHealth   = useItems.getMonsterCurrentHealth();
@@ -160,10 +173,10 @@ export default class Attack extends BattleBase {
   }
 
   isMonsterDead() {
-    return this.state.monsterCurrentHealth <= 0;
+    return this.monsterCurrentHealth <= 0;
   }
 
   isCharacterDead() {
-    return this.state.characterCurrentHealth <= 0;
+    return this.characterCurrentHealth <= 0;
   }
 }
