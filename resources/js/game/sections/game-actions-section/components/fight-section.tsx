@@ -6,6 +6,9 @@ import clsx from "clsx";
 import HealthMeters from "./health-meters";
 import FightSectionProps from "../../../lib/game/actions/types/fight-section-props";
 import Attack from '../../../lib/game/actions/battle/attack/attack/attack';
+import AmbushChance from "../../../lib/game/actions/battle/attack/attack/attack-types/ambush-and-counter/AmbushHandler";
+import AmbushHandler
+    from "../../../lib/game/actions/battle/attack/attack/attack-types/ambush-and-counter/AmbushHandler";
 
 export default class FightSection extends React.Component<FightSectionProps, any> {
 
@@ -57,16 +60,34 @@ export default class FightSection extends React.Component<FightSectionProps, any
 
         this.battle_messages = battleSetUp.getMessages();
 
-        this.setState({
-            monster_current_health: monsterHealth,
-            monster_max_health: monsterHealth,
-            character_current_health: this.props.character.health,
-            character_max_health: this.props.character.health,
-            monster_to_fight_id: this.props.monster_to_fight.id,
-            is_character_voided: battleSetUp.getVoidanceResult().is_character_voided,
-            is_monster_voided: battleSetUp.getVoidanceResult().is_monster_voided,
-            monster_to_fight: battleSetUp.getMonster(),
-        });
+        const ambush        = new AmbushHandler();
+
+        const healthObject = ambush.handleAmbush(this.props.character, battleSetUp.getMonsterObject(), parseInt(this.props.character.health), monsterHealth, battleSetUp.getVoidanceResult().is_character_voided);
+
+        this.battle_messages = [...this.battle_messages, ...ambush.getMessages()];
+
+        if (healthObject.monster_health <= 0 || healthObject.character_health <= 0) {
+            this.setState({
+                monster_current_health: healthObject.monster_health <= 0 ? 0 : healthObject.monster_health,
+                monster_max_health: monsterHealth,
+                character_current_health: healthObject.character_health <= 0 ? 0 : healthObject.character_health,
+                character_max_health: this.props.character.health,
+                monster_to_fight_id: this.props.monster_to_fight.id,
+                battle_messages: this.battle_messages,
+                monster_to_fight: battleSetUp.getMonster(),
+            });
+        } else {
+            this.setState({
+                monster_current_health: healthObject.monster_health,
+                monster_max_health: monsterHealth,
+                character_current_health: healthObject.character_health,
+                character_max_health: this.props.character.health,
+                monster_to_fight_id: this.props.monster_to_fight.id,
+                is_character_voided: battleSetUp.getVoidanceResult().is_character_voided,
+                is_monster_voided: battleSetUp.getVoidanceResult().is_monster_voided,
+                monster_to_fight: battleSetUp.getMonster(),
+            });
+        }
     }
 
     typeCheck(battleType: 'regular' | 'player-action' | 'enemy-action', type: 'regular' | 'player-action' | 'enemy-action'): boolean {
@@ -113,11 +134,11 @@ export default class FightSection extends React.Component<FightSectionProps, any
         return (
             <Fragment>
                 <div className='mt-4 mb-4 text-xs text-center'>
-                    <AttackButton additional_css={'btn-attack'} icon_class={'ra ra-sword'} on_click={() => this.attack('attack')}/>
-                    <AttackButton additional_css={'btn-cast'} icon_class={'ra ra-burning-book'} on_click={() => this.attack('cast')}/>
-                    <AttackButton additional_css={'btn-cast-attack'} icon_class={'ra ra-lightning-sword'} on_click={() => this.attack('cast_and_attack')}/>
-                    <AttackButton additional_css={'btn-attack-cast'} icon_class={'ra ra-lightning-sword'} on_click={() => this.attack('attack_and_cast')}/>
-                    <AttackButton additional_css={'btn-defend'} icon_class={'ra ra-round-shield'} on_click={() => this.attack('defend')}/>
+                    <AttackButton additional_css={'btn-attack'} icon_class={'ra ra-sword'} on_click={() => this.attack('attack')} disabled={this.state.monster_current_health <= 0 || this.state.character_current_health <= 0}/>
+                    <AttackButton additional_css={'btn-cast'} icon_class={'ra ra-burning-book'} on_click={() => this.attack('cast')} disabled={this.state.monster_current_health <= 0 || this.state.character_current_health <= 0}/>
+                    <AttackButton additional_css={'btn-cast-attack'} icon_class={'ra ra-lightning-sword'} on_click={() => this.attack('cast_and_attack')} disabled={this.state.monster_current_health <= 0 || this.state.character_current_health <= 0}/>
+                    <AttackButton additional_css={'btn-attack-cast'} icon_class={'ra ra-lightning-sword'} on_click={() => this.attack('attack_and_cast')} disabled={this.state.monster_current_health <= 0 || this.state.character_current_health <= 0}/>
+                    <AttackButton additional_css={'btn-defend'} icon_class={'ra ra-round-shield'} on_click={() => this.attack('defend')} disabled={this.state.monster_current_health <= 0 || this.state.character_current_health <= 0}/>
                 </div>
                 {
                     this.state.monster_max_health > 0 && this.props.character !== null ?

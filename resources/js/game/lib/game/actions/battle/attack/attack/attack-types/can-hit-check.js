@@ -2,8 +2,6 @@ import Damage from "../damage";
 import {random} from "lodash";
 import BattleBase from "../../../battle-base";
 
-const battleMessages = [];
-
 export default class CanHitCheck extends BattleBase {
 
   constructor() {

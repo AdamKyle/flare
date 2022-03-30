@@ -4,12 +4,8 @@ import CanEntranceEnemy from "./enchantments/can-entrance-enemy";
 import UseItems from "./use-items";
 import Damage from "../damage";
 import {random} from "lodash";
-<<<<<<< HEAD:resources/js/game/lib/game/actions/battle/attack/attack/attack-types/cast-attack.js
 import BattleBase from "../../../battle-base";
 import {formatNumber} from "../../../../../format-number";
-=======
-import CounterHandler from "./ambush-and-counter/counter-handler";
->>>>>>> 1.1.10.7:resources/js/components/game/battle/attack/attack-types/cast-attack.js
 
 export default class CastAttack extends BattleBase {
 
@@ -158,19 +154,7 @@ export default class CastAttack extends BattleBase {
 
     this.monsterHealth -= damage;
 
-<<<<<<< HEAD:resources/js/game/lib/game/actions/battle/attack/attack/attack-types/cast-attack.js
     this.addMessage('Your damage spell(s) hits ' + this.defender.name + ' for: ' + formatNumber(damage.toFixed(0)), 'player-action');
-=======
-    this.addMessage('Your damage spell(s) hits ' + this.defender.name + ' for: ' + this.formatNumber(damage.toFixed(0)));
-
-    if (!isEntranced && !canAutoHit) {
-      this.enemyCounterCastAttack();
-
-      if (this.characterCurrentHealth <= 0 || this.monsterHealth <= 0) {
-        return this.setState();
-      }
-    }
->>>>>>> 1.1.10.7:resources/js/components/game/battle/attack/attack-types/cast-attack.js
 
     this.extraAttacks(attackData);
   }

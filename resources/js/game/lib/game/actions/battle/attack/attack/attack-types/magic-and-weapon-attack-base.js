@@ -1,11 +1,7 @@
 import WeaponAttack from "./weapon-attack";
 import UseItems from "./use-items";
 import CastAttack from "./cast-attack";
-<<<<<<< HEAD:resources/js/game/lib/game/actions/battle/attack/attack/attack-types/magic-and-weapon-attack-base.js
 import BattleBase from "../../../battle-base";
-=======
-import CounterHandler from "./ambush-and-counter/counter-handler";
->>>>>>> 1.1.10.7:resources/js/components/game/battle/attack/attack-types/magic-and-weapon-attack-base.js
 
 
 export default class MagicAndWeaponAttackBase extends BattleBase {

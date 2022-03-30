@@ -71,6 +71,10 @@ export default class BattleSetUp {
         return this.battleMessages;
     }
 
+    getMonsterObject(): Monster {
+        return new Monster(this.monster);
+    }
+
     getMonster() {
         return this.modified_monster?.getMonster();
     }

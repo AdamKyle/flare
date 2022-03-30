@@ -1,5 +1,4 @@
-import {maxBy, random, sumBy} from "lodash";
-import {BattleMessage} from "../types/battle-message-type";
+import {maxBy, random, round, sumBy} from "lodash";
 import BattleBase from "../battle-base";
 
 export default class Monster extends BattleBase {
@@ -28,6 +27,18 @@ export default class Monster extends BattleBase {
         return this.monster.devouring_light_chance
     }
 
+    ambushChance(): number {
+        return this.monster.ambush_chance
+    }
+
+    ambushResistance(): number {
+        return this.monster.ambush_resistance;
+    }
+
+    counterChance(): number {
+        return this.monster.counter_chance;
+    }
+
     plane(): string {
         return this.monster.map_name;
     }
@@ -42,6 +53,14 @@ export default class Monster extends BattleBase {
         }
 
         return health;
+    }
+
+    getBaseDamageStat(percentage?: number): number {
+        if (typeof percentage !== 'undefined') {
+            return round(this.monster[this.monster.damage_stat] * percentage)
+        }
+
+        return this.monster[this.monster.damage_stat];
     }
 
     attack(): number {

@@ -4,12 +4,8 @@ import CanEntranceEnemy from "./enchantments/can-entrance-enemy";
 import UseItems from "./use-items";
 import Damage from "../damage";
 import {random} from "lodash";
-<<<<<<< HEAD:resources/js/game/lib/game/actions/battle/attack/attack/attack-types/weapon-attack.js
 import BattleBase from "../../../battle-base";
 import {formatNumber} from "../../../../../format-number";
-=======
-import CounterHandler from "./ambush-and-counter/counter-handler";
->>>>>>> 1.1.10.7:resources/js/components/game/battle/attack/attack-types/weapon-attack.js
 
 export default class WeaponAttack extends BattleBase {
 

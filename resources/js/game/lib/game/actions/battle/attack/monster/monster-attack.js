@@ -3,12 +3,8 @@ import CanHitCheck from "../attack/attack-types/can-hit-check";
 import AttackType from "../attack/attack-type";
 import UseItems from "../attack/attack-types/use-items";
 import {random} from "lodash";
-<<<<<<< HEAD:resources/js/game/lib/game/actions/battle/attack/monster/monster-attack.js
 import BattleBase from "../../battle-base";
 import {formatNumber} from "../../../../format-number";
-=======
-import CounterHandler from "../attack/attack-types/ambush-and-counter/counter-handler";
->>>>>>> 1.1.10.7:resources/js/components/game/battle/monster/monster-attack.js
 
 export default class MonsterAttack extends BattleBase {
 
@@ -64,34 +60,7 @@ export default class MonsterAttack extends BattleBase {
 
         this.currentCharacterHealth = this.currentCharacterHealth - damage;
 
-<<<<<<< HEAD:resources/js/game/lib/game/actions/battle/attack/monster/monster-attack.js
         this.addMessage(monster.name + ' hit for: ' + formatNumber(damage), 'enemy-action');
-=======
-        if (this.currentCharacterHealth > 0) {
-          const healthObject = counterHandler.playerCounter(this.defender, this.attacker, isCharacterVoided, this.currentMonsterHealth, this.currentCharacterHealth);
-
-          this.currentCharacterHealth = healthObject.character_health;
-          this.currentMonsterHealth   = healthObject.monster_health;
-
-          this.battleMessages = [...this.battleMessages, ...counterHandler.getMessages()];
-
-          counterHandler.resetMessages();
-
-          if (this.currentMonsterHealth <= 0) {
-            this.addActionMessage('Your counter slaughtered the enemy!');
-
-            return this.setState();
-          }
-
-          if (this.currentCharacterHealth <= 0) {
-            this.addActionMessage('You were countered and died!');
-
-            return this.setState();
-          }
-        }
-
-        this.addActionMessage(monster.name + ' hit for: ' + this.formatNumber(damage));
->>>>>>> 1.1.10.7:resources/js/components/game/battle/monster/monster-attack.js
 
         this.useItems(monster, isCharacterVoided, isMonsterVoided, previousAttackType);
 

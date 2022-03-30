@@ -33,7 +33,7 @@ export default class Attack extends BattleBase {
   attack(attacker, defender, attackAgain, type, attackType) {
     if (this.isMonsterDead()) {
 
-      this.addMessage(attacker.name + ' has been defeated!', 'enemy-action');
+      this.addMessage(defender.name + ' has been defeated!', 'enemy-action');
 
       this.state.monsterCurrentHealth = 0;
 

@@ -1,7 +1,6 @@
 import CanHitCheck from "./can-hit-check";
 import AttackType from "../attack-type";
 import CanEntranceEnemy from "./enchantments/can-entrance-enemy";
-import UseItems from "./use-items";
 import WeaponAttack from "./weapon-attack";
 import CastAttack from "./cast-attack";
 import MagicAndWeaponAttackBase from "./magic-and-weapon-attack-base";
