@@ -23,3 +23,4 @@ yarn-error.log
 **/.DS_Store
 deploy.yaml
 .idea
+.idea/workspace.xml
