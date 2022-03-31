@@ -24,3 +24,4 @@ yarn-error.log
 deploy.yaml
 .idea
 .idea/workspace.xml
+.idea/
