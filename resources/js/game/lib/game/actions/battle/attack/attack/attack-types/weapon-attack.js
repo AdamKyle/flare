@@ -117,7 +117,7 @@ export default class WeaponAttack extends BattleBase {
 
     this.addMessage('Your weapon hits ' + this.defender.name + ' for: ' + formatNumber(totalDamage), 'player-action');
 
-    if (this.monsterHealth > 0 && !isEntranced && !canAutoHit) {
+    if (this.monsterHealth > 0 && !isEntranced) {
       const healthObject = this.handleCounter(this.attacker, this.defender, this.characterCurrentHealth, this.monsterHealth, 'enemy', this.voided);
 
       this.characterCurrentHealth = healthObject.character_health;
