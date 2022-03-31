@@ -24,22 +24,25 @@ use App\Flare\Transformers\MonsterTransfromer;
 
 class BattleController extends Controller {
 
-    private $manager;
+    /**
+     * @var BattleEventHandler $battleEventHandler
+     */
+    private BattleEventHandler $battleEventHandler;
 
-    private $character;
-
-    private $monster;
-
-    public function __construct(Manager $manager, CharacterAttackTransformer $character, MonsterTransfromer $monster, BattleEventHandler $battleEventHandler) {
+    /**
+     * @param BattleEventHandler $battleEventHandler
+     */
+    public function __construct(BattleEventHandler $battleEventHandler) {
         $this->middleware('is.character.dead')->except(['revive', 'index']);
         $this->middleware('is.character.adventuring')->except(['index']);
 
-        $this->manager            = $manager;
-        $this->character          = $character;
-        $this->monster            = $monster;
         $this->battleEventHandler = $battleEventHandler;
     }
 
+    /**
+     * @param Character $character
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function index(Character $character) {
         $characterMap       = $character->map;
 
@@ -59,15 +62,16 @@ class BattleController extends Controller {
             $monsters = Cache::get('monsters')[$character->map->gameMap->name];
         }
 
-        $characterData = new Item($character, $this->character);
-        $characterData = $this->manager->createData($characterData)->toArray();
-
         return response()->json([
             'monsters'  => $monsters,
-            'character' => $characterData,
         ]);
     }
 
+    /**
+     * @param Request $request
+     * @param Character $character
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function battleResults(Request $request, Character $character) {
         if (!$character->can_attack) {
             return response()->json(['message' => 'invalid input.'], 429);
@@ -97,6 +101,10 @@ class BattleController extends Controller {
         return response()->json([], 200);
     }
 
+    /**
+     * @param Character $character
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function revive(Character $character) {
         $character = $this->battleEventHandler->processRevive($character);
 

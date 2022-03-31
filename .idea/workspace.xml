@@ -3,13 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="f574dce8-e67f-47ee-8bb6-fe6b7dafab2a" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Flare/Transformers/CharacterSheetBaseInfoTransformer.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Flare/Transformers/CharacterSheetBaseInfoTransformer.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/game.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/game.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/game/actions/battle/attack/monster/monster.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/lib/game/actions/types/character/character-type.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/lib/game/actions/types/character/character-type.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/character-top-section/character-top-section.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/character-top-section/character-top-section.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/game-actions-section/actions.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/game-actions-section/actions.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/game/sections/game-actions-section/components/fight-section.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/game/sections/game-actions-section/components/fight-section.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Game/Battle/Controllers/Api/BattleController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Game/Battle/Controllers/Api/BattleController.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
