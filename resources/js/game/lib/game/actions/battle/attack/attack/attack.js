@@ -77,22 +77,21 @@ export default class Attack extends BattleBase {
         }
       }
 
-      if (this.monsterCurrentHealth <= 0 ) {
-        this.addMessage(attacker.name + ' has been defeated!', 'enemy-action');
-
-        this.monsterCurrentHealth = 0;
-      }
-
-      if (this.characterCurrentHealth <= 0) {
-        this.addMessage('You were slaughtered! You must resurrect first!', 'enemy-action');
-
-        this.characterCurrentHealth = 0;
-      }
-
       this.state = {
         characterCurrentHealth: this.characterCurrentHealth,
         monsterCurrentHealth: this.monsterCurrentHealth,
         battle_messages: this.battle_messages,
+      }
+
+      if (this.isCharacterDead()) {
+
+        this.addMessage('You must resurrect first!', 'enemy-action');
+
+        this.state.battle_messages = [...this.state.battle_messages, ...this.battle_messages];
+
+        this.state.characterCurrentHealth = 0;
+
+        return this;
       }
 
       return this;
@@ -124,9 +123,35 @@ export default class Attack extends BattleBase {
         break;
     }
 
-
     this.characterCurrentHealth = this.state.characterCurrentHealth;
     this.monsterCurrentHealth   = this.state.monsterCurrentHealth;
+
+    if (this.isMonsterDead()) {
+      if (type === 'player') {
+        this.addMessage(defender.name + ' has been defeated!', 'enemy-action');
+      }
+
+      if (type === 'monster') {
+        this.addMessage(attacker.name + ' has been defeated!', 'enemy-action');
+      }
+
+      this.state.battle_messages = [...this.state.battle_messages, ...this.battle_messages];
+
+      this.state.monsterCurrentHealth = 0;
+
+      return this;
+    }
+
+    if (this.isCharacterDead()) {
+
+      this.addMessage('You must resurrect first!', 'enemy-action');
+
+      this.state.battle_messages = [...this.state.battle_messages, ...this.battle_messages];
+
+      this.state.characterCurrentHealth = 0;
+
+      return this;
+    }
 
     return this.attack(defender, attacker, false, 'monster', attackType)
   }

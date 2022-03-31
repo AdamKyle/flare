@@ -71,29 +71,8 @@ export default class WeaponAttack extends BattleBase {
 
       this.attackWithWeapon(attackData, false, false);
 
-      if (this.monsterHealth > 0) {
-        const counterHandler = new CounterHandler();
-
-        const healthObject = counterHandler.enemyCounter(this.defender, this.attacker, this.voided, this.monsterHealth, this.characterCurrentHealth);
-
-        this.characterCurrentHealth = healthObject.character_health;
-        this.monsterHealth = healthObject.monster_health;
-
-        this.battleMessages = [...this.battleMessages, ...counterHandler.getMessages()];
-
-        counterHandler.resetMessages();
-
-        if (this.monsterHealth <= 0) {
-          this.addEnemyActionMessage('Your counter of their counter has slaughtered the enemy!');
-
-          return this.setState();
-        }
-
-        if (this.characterCurrentHealth <= 0) {
-          this.addEnemyActionMessage('the enemies counter has slaughtered you!');
-
-          return this.setState();
-        }
+      if (this.monster_is_dead || this.character_is_dead) {
+        return this.setState();
       }
 
       this.useItems(attackData, this.attacker.class)
@@ -138,42 +117,18 @@ export default class WeaponAttack extends BattleBase {
 
     this.addMessage('Your weapon hits ' + this.defender.name + ' for: ' + formatNumber(totalDamage), 'player-action');
 
-    if (!isEntranced && !canAutoHit) {
-      this.enemyCounterAttack();
-
-      if (this.characterCurrentHealth <= 0 || this.monsterHealth <= 0) {
-        return this.setState();
-      }
-    }
-
-    this.extraAttacks(attackData);
-  }
-
-  enemyCounterAttack() {
-    if (this.monsterHealth > 0) {
-      const counterHandler = new CounterHandler();
-
-      const healthObject = counterHandler.enemyCounter(this.defender, this.attacker, this.voided, this.monsterHealth, this.characterCurrentHealth);
+    if (this.monsterHealth > 0 && !isEntranced && !canAutoHit) {
+      const healthObject = this.handleCounter(this.attacker, this.defender, this.characterCurrentHealth, this.monsterHealth, 'enemy', this.voided);
 
       this.characterCurrentHealth = healthObject.character_health;
       this.monsterHealth = healthObject.monster_health;
 
-      this.battleMessages = [...this.battleMessages, ...counterHandler.getMessages()];
-
-      counterHandler.resetMessages();
-
-      if (this.monsterHealth <= 0) {
-        this.addEnemyActionMessage('Your counter of their counter has slaughtered the enemy!');
-
-        return;
-      }
-
-      if (this.characterCurrentHealth <= 0) {
-        this.addEnemyActionMessage('the enemies counter has slaughtered you!');
-
+      if (this.characterCurrentHealth <= 0  || this.monsterHealth <= 0) {
         return;
       }
     }
+
+    this.extraAttacks(attackData);
   }
 
   useItems(attackData, attackerClass) {

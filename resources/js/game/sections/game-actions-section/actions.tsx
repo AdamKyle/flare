@@ -16,6 +16,7 @@ export default class Actions extends React.Component<any, ActionsState> {
 
         this.state = {
             loading: true,
+            is_same_monster: false,
             character: null,
             monsters: [],
             monster_to_fight: null,
@@ -41,8 +42,21 @@ export default class Actions extends React.Component<any, ActionsState> {
     }
 
     setSelectedMonster(monster: any) {
+        let isSameMonster = false;
+
+        if (monster.id === this.state.monster_to_fight?.id) {
+            isSameMonster = true;
+        }
+
         this.setState({
             monster_to_fight: monster,
+            is_same_monster: isSameMonster,
+        });
+    }
+
+    resetSameMonster() {
+        this.setState({
+            is_same_monster: false,
         });
     }
 
@@ -86,7 +100,12 @@ export default class Actions extends React.Component<any, ActionsState> {
 
                                 {
                                     this.state.monster_to_fight !== null ?
-                                        <FightSection monster_to_fight={this.state.monster_to_fight} character={this.state.character} />
+                                        <FightSection
+                                            monster_to_fight={this.state.monster_to_fight}
+                                            character={this.state.character}
+                                            is_same_monster={this.state.is_same_monster}
+                                            reset_same_monster={this.resetSameMonster.bind(this)}
+                                        />
                                     : null
                                 }
 

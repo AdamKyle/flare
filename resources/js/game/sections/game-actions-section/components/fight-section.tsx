@@ -6,7 +6,6 @@ import clsx from "clsx";
 import HealthMeters from "./health-meters";
 import FightSectionProps from "../../../lib/game/actions/types/fight-section-props";
 import Attack from '../../../lib/game/actions/battle/attack/attack/attack';
-import AmbushChance from "../../../lib/game/actions/battle/attack/attack/attack-types/ambush-and-counter/AmbushHandler";
 import AmbushHandler
     from "../../../lib/game/actions/battle/attack/attack/attack-types/ambush-and-counter/AmbushHandler";
 
@@ -43,6 +42,16 @@ export default class FightSection extends React.Component<FightSectionProps, any
             });
 
             this.setUpBattle();
+        }
+
+        if (this.props.is_same_monster) {
+            this.setState({
+                battle_messages: [],
+            });
+
+            this.setUpBattle();
+
+            this.props.reset_same_monster();
         }
     }
 

@@ -156,6 +156,17 @@ export default class CastAttack extends BattleBase {
 
     this.addMessage('Your damage spell(s) hits ' + this.defender.name + ' for: ' + formatNumber(damage.toFixed(0)), 'player-action');
 
+    if (this.monsterHealth > 0 && !isEntranced && !canAutoHit) {
+      const healthObject = this.handleCounter(this.attacker, this.defender, this.characterCurrentHealth, this.monsterHealth, 'enemy', this.voided);
+
+      this.characterCurrentHealth = healthObject.character_health;
+      this.monsterHealth = healthObject.monster_health;
+
+      if (this.characterCurrentHealth <= 0 || this.monsterHealth <= 0) {
+        return;
+      }
+    }
+
     this.extraAttacks(attackData);
   }
 

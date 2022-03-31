@@ -29,6 +29,8 @@ export default class MagicAndWeaponAttackBase extends BattleBase {
     this.characterCurrentHealth = state.characterCurrentHealth;
 
     this.mergeMessages(state.battle_messages)
+
+    return state;
   }
 
   setState() {

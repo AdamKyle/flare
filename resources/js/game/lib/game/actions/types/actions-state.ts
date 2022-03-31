@@ -10,4 +10,6 @@ export default interface ActionsState {
     monster_to_fight: MonsterType|null;
 
     loading: boolean;
+
+    is_same_monster: boolean;
 }
