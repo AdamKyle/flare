@@ -71,7 +71,7 @@ export default class FightSection extends React.Component<FightSectionProps, any
 
         const ambush        = new AmbushHandler();
 
-        const healthObject = ambush.handleAmbush(this.props.character, battleSetUp.getMonsterObject(), parseInt(this.props.character.health), monsterHealth, battleSetUp.getVoidanceResult().is_character_voided);
+        const healthObject = ambush.handleAmbush(this.props.character, battleSetUp.getMonsterObject(), this.props.character.health, monsterHealth, battleSetUp.getVoidanceResult().is_character_voided);
 
         this.battle_messages = [...this.battle_messages, ...ambush.getMessages()];
 

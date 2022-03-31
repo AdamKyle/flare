@@ -37,13 +37,13 @@ export default class CharacterTopSection extends React.Component<CharacterTopSec
         return 0;
     }
 
-    abbreviateNumber(stat: string|undefined): string|number {
+    abbreviateNumber(stat: number|undefined): string|number {
 
         if (typeof stat === 'undefined') {
             return 0;
         }
 
-        let statNumber = parseInt(stat.replace(/,/g, ''))
+        let statNumber = stat;
 
         const symbol = ["", "k", "M", "B", "T", "Quad.", "Qunit."];
 

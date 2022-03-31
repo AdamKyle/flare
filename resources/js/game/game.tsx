@@ -101,15 +101,13 @@ export default class Game extends React.Component<GameProps, GameState> {
             return null;
         }
 
+        console.log(this.state.character);
+
         return (
             <div className="md:container">
                 { this.state.view_port < 1600 && this.state.show_size_message ?
                     <WarningAlert additional_css={'mb-5'} close_alert={this.hideDeviceSizeMessage.bind(this)}>
-                        Your devices screen size is too small to properly display the map. As a result, some basic map actions have been given to you such
-                        as teleport, adventure and traverse. With teleport you can teleport to any location you wish so long as you have the gold.
-                        Two additional teleport options has been added: Adventure Locations and Npc Locations. This allows you to teleport to locations with adventures and to
-                        select a location with an NPC. Finally, players on smaller screen sizes, can click on quests to open the window and click "complete" which will only be
-                        available if you have met all the requirements of the quest.
+                        Your devices screen size is too small to properly display the map.
                     </WarningAlert>
                     : null
                 }
@@ -125,7 +123,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                                     />
                                 </BasicCard>
                                 <BasicCard additionalClasses={'min-h-60'}>
-                                    <Actions character_id={this.props.characterId} />
+                                    <Actions character_id={this.props.characterId} character={this.state.character} />
                                 </BasicCard>
                             </div>
                             <BasicCard additionalClasses={'hidden lg:block md:mt-0 lg:col-start-3 lg:col-end-3 max-h-[575px]'}>

@@ -1,29 +1,29 @@
 export interface CharacterType {
     affix_damage_reduction:  number;
 
-    agi_modded: string;
+    agi_modded: number;
 
-    chr_modded: string;
+    chr_modded: number;
 
-    dex_modded: string;
+    dex_modded: number;
 
-    dur_modded: string;
+    dur_modded: number;
 
-    str_modded: string;
+    str_modded: number;
 
-    focus_modded: string;
+    focus_modded: number;
 
-    int_modded: string;
+    int_modded: number;
 
     artifact_annulment: number;
 
     attack_types: any;
 
-    base_stat: string;
+    base_stat: number;
 
-    attack: string;
+    attack: number;
 
-    ac: string;
+    ac: number;
 
     gold: string;
 
@@ -51,7 +51,7 @@ export interface CharacterType {
 
     healing_reduction: number;
 
-    health: string;
+    health: number;
 
     is_alchemy_locked: boolean;
 

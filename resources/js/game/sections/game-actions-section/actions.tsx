@@ -26,7 +26,7 @@ export default class Actions extends React.Component<any, ActionsState> {
     componentDidMount() {
         (new Ajax()).setRoute('actions/' + this.props.character_id).doAjaxCall('get', (result: AxiosResponse) => {
             this.setState({
-                character: result.data.character,
+                character: this.props.character,
                 monsters: result.data.monsters,
                 loading: false,
             })
