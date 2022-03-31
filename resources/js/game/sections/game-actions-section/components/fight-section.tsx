@@ -96,7 +96,11 @@ export default class FightSection extends React.Component<FightSectionProps, any
     }
 
     renderBattleMessages() {
-        return this.state.battle_messages.map((battleMessage: BattleMessage) => {
+        return this.state.battle_messages.filter((value: BattleMessage, index: number, self: BattleMessage[]) => {
+            return index === self.findIndex((t: BattleMessage) => {
+                return t.message === value.message && t.type === value.type;
+            });
+        }).map((battleMessage: BattleMessage) => {
             return <p className={clsx(
                 {
                     'text-green-700 dark:text-green-400': this.typeCheck(battleMessage.type, 'player-action')

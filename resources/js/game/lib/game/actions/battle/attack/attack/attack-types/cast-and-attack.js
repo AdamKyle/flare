@@ -26,10 +26,15 @@ export default class CastAndAttack extends MagicAndWeaponAttackBase {
     const canHit            = canHitCheck.canHit(this.attacker, this.defender, this.battleMessages);
 
     if (canHitCheck.getCanAutoHit()) {
+      this.mergeMessages(canHitCheck.getBattleMessages());
+
       return this.autoCastAndAttack(attackData, castAttack, canHitCheck, canEntrance)
     }
 
     if (canEntrance) {
+
+      this.mergeMessages(canEntranceEnemy.getBattleMessages());
+
       return this.entrancedCastThenAttack(attackData, castAttack, canEntranceEnemy, canEntrance)
     }
 

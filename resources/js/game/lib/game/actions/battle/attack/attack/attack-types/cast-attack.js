@@ -107,7 +107,7 @@ export default class CastAttack extends BattleBase {
     const state = {
       characterCurrentHealth: this.characterCurrentHealth,
       monsterCurrentHealth: this.monsterHealth,
-      battleMessages: this.getMessages(),
+      battle_messages: this.getMessages(),
     }
 
     this.resetMessages();

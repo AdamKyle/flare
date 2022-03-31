@@ -50,7 +50,7 @@ export default class Defend {
     const state = {
       characterCurrentHealth: this.characterCurrentHealth,
       monsterCurrentHealth: this.monsterHealth,
-      battleMessages: this.battleMessages,
+      battle_messages: this.battleMessages,
     }
 
     this.battleMessages = [];

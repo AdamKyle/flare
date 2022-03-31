@@ -28,7 +28,7 @@ export default class MagicAndWeaponAttackBase extends BattleBase {
     this.monsterHealth          = state.monsterCurrentHealth;
     this.characterCurrentHealth = state.characterCurrentHealth;
 
-    this.mergeMessages(state.battleMessages);
+    this.mergeMessages(state.battle_messages)
   }
 
   setState() {
@@ -36,7 +36,7 @@ export default class MagicAndWeaponAttackBase extends BattleBase {
     const state = {
       characterCurrentHealth: this.characterCurrentHealth,
       monsterCurrentHealth: this.monsterHealth,
-      battleMessages: this.getMessages(),
+      battle_messages: this.getMessages(),
     }
 
     return state;
@@ -73,7 +73,7 @@ export default class MagicAndWeaponAttackBase extends BattleBase {
   }
 
   entrancedCastThenAttack(attackData, castAttack, canEntranceEnemy, canEntrance) {
-    this.mergeMessages(canEntranceEnemy.getBattleMessages());
+    this.battle_messages.push(...canEntranceEnemy.getBattleMessages())
 
     if (attackData.spell_damage > 0) {
       castAttack.attackWithSpells(attackData, true, false);
@@ -90,6 +90,7 @@ export default class MagicAndWeaponAttackBase extends BattleBase {
     weaponAttack.attackWithWeapon(attackData, true, false);
 
     this.setStateInfo(weaponAttack);
+
 
     this.useItems(attackData, this.attacker.class);
 
@@ -150,7 +151,7 @@ export default class MagicAndWeaponAttackBase extends BattleBase {
         this.addMessage('Your damage spell missed', 'enemy-action');
       }
 
-      this.battleMessages    = [...this.battleMessages, canHitCheck.getBattleMessages()]
+      this.battle_messages    = [...this.battle_messages, canHitCheck.getBattleMessages()]
     } else {
       castAttack.healWithSpells(attackData);
     }

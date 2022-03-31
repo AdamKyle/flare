@@ -33,19 +33,19 @@ export default class Attack extends BattleBase {
   attack(attacker, defender, attackAgain, type, attackType) {
     if (this.isMonsterDead()) {
 
-      if (type === 'monster') {
-        this.addMessage(attacker.name + ' has been defeated!', 'enemy-action');
-      }
+      this.addMessage(attacker.name + ' has been defeated!', 'enemy-action');
+
+      this.state.battle_messages = [...this.state.battle_messages, ...this.battle_messages];
 
       this.state.monsterCurrentHealth = 0;
-
-      this.battle_messages = [...this.battle_messages, ...this.getMessages()]
 
       return this;
     }
 
     if (this.isCharacterDead()) {
       this.addMessage('You must resurrect first!', 'enemy-action');
+
+      this.state.battle_messages = [...this.state.battle_messages, ...this.battle_messages];
 
       this.state.characterCurrentHealth = 0;
 
