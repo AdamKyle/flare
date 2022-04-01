@@ -60,7 +60,7 @@ export default class Skills extends React.Component<SkillsProps, any> {
 
     render() {
         return(
-            <Table columns={this.buildColumns()} data={this.props.trainable_skills} dark_table={true} />
+            <Table columns={this.buildColumns()} data={this.props.trainable_skills} dark_table={this.props.dark_table} />
         )
     }
 

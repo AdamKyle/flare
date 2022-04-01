@@ -1,4 +1,6 @@
 export interface CharacterType {
+    id: number;
+
     affix_damage_reduction:  number;
 
     agi_modded: number;
@@ -15,7 +17,39 @@ export interface CharacterType {
 
     int_modded: number;
 
+    agi: number;
+
+    chr: number;
+
+    dex: number;
+
+    dur: number;
+
+    str: number;
+
+    focus: number;
+
+    int: number;
+
+    holy_bonus: number;
+
+    current_stacks: number;
+
+    max_holy_stacks: number;
+
+    holy_attack_bonus: number;
+
+    holy_ac_bonus: number;
+
+    holy_healing_bonus: number;
+
+    inventory_max: number;
+
+    inventory_count: number;
+
     artifact_annulment: number;
+
+    heal_for: number;
 
     attack_types: any;
 
@@ -32,6 +66,10 @@ export interface CharacterType {
     gold_dust: string;
 
     shards: string;
+
+    damage_stat: string;
+
+    to_hit_stat: string;
 
     can_attack_again_at: string|null;
 
@@ -93,4 +131,11 @@ export interface CharacterType {
 
     max_level: number;
 
+    ambush_chance: number;
+
+    ambush_resistance: number;
+
+    counter_chance: number;
+
+    counter_resistance: number;
 }

@@ -118,8 +118,8 @@ export default class TimerProgressBar extends React.Component<TimerProgressBarPr
                     </span>
                     <span className="text-sm font-medium text-gray-800 dark:text-white">{this.state.time_left_label} {this.state.label} left</span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                    <div className={'h-2.5 rounded-full ' + (
+                <div className="w-full bg-gray-200 rounded-full h-1.5 dark:bg-gray-700">
+                    <div className={'h-1.5 rounded-full ' + (
                         this.state.percentage_left >= 0.75 ? 'bg-fuchsia-600 dark:bg-fuchsia-700' :
                         this.state.percentage_left < 0.75 && this.state.percentage_left >= 0.50 ? 'bg-fuchsia-500 dark:bg-fuchsia-600' :
                         this.state.percentage_left >= 0.25 && this.state.percentage_left < 0.50 ? 'bg-fuchsia-400 dark:bg-fuchsia-500' :

@@ -112,8 +112,8 @@
                     <label class="switch switch_outlined" data-toggle="tooltip" data-tippy-content="Toggle Dark Mode">
                         <input id="darkModeToggler" type="checkbox">
                         <span></span>
+                        <i class="fas fa-adjust pl-2"></i>
                     </label>
-                    <span class="ml-4">Test Dark Mode</span>
                 </div>
 
                 <!-- User Menu -->
@@ -147,7 +147,7 @@
                                 Settings
                             </a>
                             <a href="/information/home"
-                               class="flex items-center text-gray-700 dark:text-gray-500 hover:text-primary dark:hover:text-primary mt-5">
+                               class="flex items-center text-gray-700 dark:text-gray-500 hover:text-primary dark:hover:text-primary mt-5" target="_blank">
                                 <span class="la la-key text-2xl leading-none ltr:mr-2 rtl:ml-2"></span>
                                 Help I am stuck!
                             </a>

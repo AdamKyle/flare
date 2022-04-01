@@ -3,48 +3,54 @@ import BasicCard from "../../components/ui/cards/basic-card";
 import CharacterTabs from "./components/character-tabs";
 import CharacterSkillsTabs from "./components/character-skills-tabs";
 import CharacterInventoryTabs from "./components/character-inventory-tabs";
+import CharacterSheetProps from "../../lib/game/character-sheet/types/character-sheet-props";
 
-export default class CharacterSheet extends React.Component<any, any> {
+export default class CharacterSheet extends React.Component<CharacterSheetProps, any> {
 
-    constructor(props: any) {
+    constructor(props: CharacterSheetProps) {
         super(props);
     }
 
     render() {
+
+        if (this.props.character === null) {
+            return null;
+        }
+
         return(
             <div>
                 <div className='flex flex-col lg:flex-row w-full gap-2'>
                     <BasicCard additionalClasses={'overflow-x-auto lg:w-1/2'}>
-                        <CharacterTabs />
+                        <CharacterTabs  character={this.props.character} />
                     </BasicCard>
                     <BasicCard additionalClasses={'overflow-x-auto lg:w-1/2'}>
                         <div className='grid lg:grid-cols-2 gap-2'>
                             <div>
                                 <dl>
                                     <dt>Gold:</dt>
-                                    <dd>2,000,000,000,000</dd>
+                                    <dd>{this.props.character.gold}</dd>
                                     <dt>Gold Dust:</dt>
-                                    <dd>2,000,000,000</dd>
+                                    <dd>{this.props.character.gold_dust}</dd>
                                     <dt>Shards:</dt>
-                                    <dd>2,000,000,000</dd>
+                                    <dd>{this.props.character.shards}</dd>
                                     <dt>Copper Coins:</dt>
-                                    <dd>100,000</dd>
+                                    <dd>{this.props.character.copper_coins}</dd>
                                 </dl>
                             </div>
                             <div className='border-b-2 block lg:hidden border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                             <div>
                                 <dl>
                                     <dt>Inventory Max:</dt>
-                                    <dd>75</dd>
+                                    <dd>{this.props.character.inventory_max}</dd>
                                     <dt>Inventory Count:</dt>
-                                    <dd>50</dd>
+                                    <dd>{this.props.character.inventory_count}</dd>
                                 </dl>
                                 <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                                 <dl>
                                     <dt>Damage Stat:</dt>
-                                    <dd>Str</dd>
+                                    <dd>{this.props.character.damage_stat}</dd>
                                     <dt>To Hit:</dt>
-                                    <dd>Accuracy, Dex</dd>
+                                    <dd>Accuracy, {this.props.character.to_hit_stat}</dd>
                                 </dl>
                             </div>
                         </div>
@@ -52,10 +58,10 @@ export default class CharacterSheet extends React.Component<any, any> {
                 </div>
                 <div className='flex flex-col lg:flex-row gap-2 w-full mt-2'>
                     <BasicCard additionalClasses={'overflow-x-auto lg:w-1/2 lg:h-fit'}>
-                        <CharacterSkillsTabs character_id={this.props.character_id}/>
+                        <CharacterSkillsTabs character_id={this.props.character.id}/>
                     </BasicCard>
                     <BasicCard additionalClasses={'overflow-x-auto lg:w-1/2 lg:h-fit'}>
-                        <CharacterInventoryTabs character_id={this.props.character_id}/>
+                        <CharacterInventoryTabs character_id={this.props.character.id}/>
                     </BasicCard>
                 </div>
             </div>

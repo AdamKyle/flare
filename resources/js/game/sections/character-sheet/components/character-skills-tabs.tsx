@@ -9,6 +9,7 @@ import Ajax from "../../../lib/ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
 import ComponentLoading from "../../../components/ui/loading/component-loading";
 import CharacterSkillTabsState from "../../../lib/game/character-sheet/types/skills/character-skill-tabs-state";
+import {watchForDarkModeInventoryChange, watchForDarkModeSkillsChange} from "../../../lib/game/dark-mode-watcher";
 
 export default class CharacterSkillsTabs extends React.Component<any, CharacterSkillTabsState> {
 
@@ -30,11 +31,14 @@ export default class CharacterSkillsTabs extends React.Component<any, CharacterS
 
         this.state = {
             loading: true,
+            dark_tables: false,
             skills: null,
         }
     }
 
     componentDidMount() {
+        watchForDarkModeSkillsChange(this);
+
         (new Ajax()).setRoute('character/skills/' + this.props.character_id).doAjaxCall('get', (result: AxiosResponse) => {
             this.setState({
                 skills: result.data,
@@ -54,10 +58,10 @@ export default class CharacterSkillsTabs extends React.Component<any, CharacterS
         return (
             <Tabs tabs={this.tabs} full_width={true}>
                 <TabPanel key={'skills'}>
-                    <Skills trainable_skills={this.state.skills.training_skills} />
+                    <Skills trainable_skills={this.state.skills.training_skills} dark_table={this.state.dark_tables}/>
                 </TabPanel>
                 <TabPanel key={'crafting'}>
-                    <CraftingSkills crafting_skills={this.state.skills.crafting_skills} />
+                    <CraftingSkills crafting_skills={this.state.skills.crafting_skills} dark_table={this.state.dark_tables}/>
                 </TabPanel>
                 <TabPanel key={'kingdom-passives'}>
                     <KingdomPassives />

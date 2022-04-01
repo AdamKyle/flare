@@ -8,4 +8,6 @@ export default interface CharacterSkillTabsState {
         crafting_skills: SkillType[] | [];
         training_skills: SkillType[] | [];
     } | null;
+
+    dark_tables: boolean;
 }

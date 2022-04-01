@@ -8,6 +8,8 @@ import MonsterSelection from "./components/monster-selection";
 import CraftingSection from "./components/crafting-section";
 import FightSection from "./components/fight-section";
 import ActionsState from "../../lib/game/actions/types/actions-state";
+import TimerProgressBar from "../../components/ui/progress-bars/timer-progress-bar";
+import PrimaryButton from "../../components/ui/buttons/primary-button";
 
 export default class Actions extends React.Component<any, ActionsState> {
 
@@ -60,6 +62,10 @@ export default class Actions extends React.Component<any, ActionsState> {
         });
     }
 
+    revive() {
+
+    }
+
     render() {
         return (
             <div className='px-4'>
@@ -99,6 +105,17 @@ export default class Actions extends React.Component<any, ActionsState> {
                                 <CraftingSection />
 
                                 {
+                                    this.state.character?.is_dead ?
+                                        <div className='text-center my-4'>
+                                            <PrimaryButton button_label={'Revive'} on_click={this.revive.bind(this)} additional_css={'mb-4'} />
+                                            <p>
+                                                You are dead. Please Revive.
+                                            </p>
+                                        </div>
+                                    : null
+                                }
+
+                                {
                                     this.state.monster_to_fight !== null ?
                                         <FightSection
                                             monster_to_fight={this.state.monster_to_fight}
@@ -112,6 +129,10 @@ export default class Actions extends React.Component<any, ActionsState> {
                             </div>
                         </div>
                 }
+
+                <div className='relative top-[24px]'>
+                    <TimerProgressBar time_remaining={10} time_out_label={'Attack Timeout'} />
+                </div>
             </div>
         )
     }

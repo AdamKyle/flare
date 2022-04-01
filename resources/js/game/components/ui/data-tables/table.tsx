@@ -9,13 +9,15 @@ export default class Table extends React.Component<any, any> {
 
     render() {
         return (
-            <DataTable
-                columns={this.props.columns}
-                data={this.props.data}
-                theme={this.props.dark_table ? 'dark' : 'default'}
-                pagination
-                responsive
-            />
+            <div className={'w-[400px] sm:w-full'}>
+                <DataTable
+                    columns={this.props.columns}
+                    data={this.props.data}
+                    theme={this.props.dark_table ? 'dark' : 'default'}
+                    pagination
+                    responsive
+                />
+            </div>
         )
     }
 }

@@ -1,15 +1,16 @@
-import React from "react";
+import React, {Fragment} from "react";
 import Tabs from "../../../components/ui/tabs/tabs";
 import TabPanel from "../../../components/ui/tabs/tab-panel";
 import BasicCard from "../../../components/ui/cards/basic-card";
 import PopOverContainer from "../../../components/ui/popover/pop-over-container";
 import InfoTab from "./tabs/info-tab";
+import CharacterTabsProps from "../../../lib/game/character-sheet/types/character-tabs-props";
 
-export default class CharacterTabs extends React.Component<any, any> {
+export default class CharacterTabs extends React.Component<CharacterTabsProps, any> {
 
     private tabs: {name: string, key: string}[];
 
-    constructor(props: any) {
+    constructor(props: CharacterTabsProps) {
         super(props);
 
         this.tabs = [{
@@ -19,9 +20,6 @@ export default class CharacterTabs extends React.Component<any, any> {
             key: 'active-boons',
             name: 'Active Boons',
         }, {
-            key: 'automations',
-            name: 'Automations'
-        }, {
             key: 'factions',
             name: 'Factions'
         }];
@@ -29,20 +27,19 @@ export default class CharacterTabs extends React.Component<any, any> {
 
     render() {
         return (
-            <Tabs tabs={this.tabs} full_width={true}>
-                <TabPanel key={'info'}>
-                    <InfoTab />
-                </TabPanel>
-                <TabPanel key={'active-boons'}>
-                    Active Boons
-                </TabPanel>
-                <TabPanel key={'automations'}>
-                    Automations
-                </TabPanel>
-                <TabPanel key={'factions'}>
-                    Factions
-                </TabPanel>
-            </Tabs>
+            <Fragment>
+                <Tabs tabs={this.tabs} full_width={true}>
+                    <TabPanel key={'info'}>
+                        <InfoTab character={this.props.character} />
+                    </TabPanel>
+                    <TabPanel key={'active-boons'}>
+                        Active Boons
+                    </TabPanel>
+                    <TabPanel key={'factions'}>
+                        Factions
+                    </TabPanel>
+                </Tabs>
+            </Fragment>
         );
     }
 }

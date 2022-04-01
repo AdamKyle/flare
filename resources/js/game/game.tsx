@@ -137,7 +137,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                         </div>
                     </TabPanel>
                     <TabPanel key={'character-sheet'}>
-                        <CharacterSheet character_id={this.props.characterId} />
+                        <CharacterSheet character={this.state.character} />
                     </TabPanel>
                     <TabPanel key={'quests'}>
                         <BasicCard>

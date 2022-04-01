@@ -35,7 +35,7 @@ export default class CraftingSkills extends React.Component<CraftingSkillsProps,
 
     render() {
         return(
-            <Table columns={this.buildColumns()} data={this.props.crafting_skills} dark_table={true} />
+            <Table columns={this.buildColumns()} data={this.props.crafting_skills} dark_table={this.props.dark_table} />
         )
     }
 
