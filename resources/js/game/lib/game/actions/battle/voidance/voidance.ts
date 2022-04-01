@@ -27,6 +27,31 @@ export default class Voidance extends BattleBase {
     }
 
     monsterVoidsCharacter() {
+
+        if (this.monster.canMonsterDevoidPlayer(this.character.devouring_darkness_res)) {
+            this.addMessage(this.monster.name() + ' has devoided your voidance! You feel fear start to build.', 'enemy-action');
+
+            this.voidanceResult.is_character_devoided = true;
+        }
+
+        if (this.canPlayerDevoidEnemy(this.character.devouring_darkness) && !this.voidanceResult.is_character_devoided) {
+            this.addMessage('Magic crackles in the air, the darkness consumes the enemy. They are devoided!', 'regular');
+
+            this.voidanceResult.is_monster_devoided = true;
+        }
+
+        if (this.monster.canMonsterVoidPlayer(this.character.devouring_light_res) && !this.voidanceResult.is_monster_devoided) {
+            this.addMessage(this.monster.name() + ' has voided your enchantments! You feel much weaker!','enemy-action');
+
+            this.voidanceResult.is_character_voided = true;
+        }
+
+        if (this.canPlayerVoidEnemy(this.character.devouring_light) && !this.voidanceResult.is_character_devoided) {
+            this.addMessage('The light of the heavens shines through this darkness. The enemy is voided!', 'regular');
+
+            this.voidanceResult.is_monster_voided = true;
+        }
+
         return this.voidanceResult;
     }
 

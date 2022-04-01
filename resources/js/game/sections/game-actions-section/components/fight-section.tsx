@@ -8,6 +8,8 @@ import FightSectionProps from "../../../lib/game/actions/types/fight-section-pro
 import Attack from '../../../lib/game/actions/battle/attack/attack/attack';
 import AmbushHandler
     from "../../../lib/game/actions/battle/attack/attack/attack-types/ambush-and-counter/AmbushHandler";
+import Ajax from "../../../lib/ajax/ajax";
+import {AxiosError, AxiosResponse} from "axios";
 
 export default class FightSection extends React.Component<FightSectionProps, any> {
 
@@ -142,6 +144,16 @@ export default class FightSection extends React.Component<FightSectionProps, any
         });
 
         this.battle_messages = [];
+
+        (new Ajax()).setRoute('battle-results/' + this.props.character?.id).setParameters({
+            is_character_dead: attackState.characterCurrentHealth <= 0,
+            is_defender_dead: attackState.monsterCurrentHealth <= 0,
+            monster_id: this.state.monster_to_fight_id,
+        }).doAjaxCall('post', (result: AxiosResponse) => {
+            this.props.set_attack_time_out(result.data.time_out);
+        }, (error: AxiosError) => {
+            console.log(error);
+        })
     }
 
     render() {
@@ -156,7 +168,7 @@ export default class FightSection extends React.Component<FightSectionProps, any
                 </div>
                 {
                     this.state.monster_max_health > 0 && this.props.character !== null ?
-                        <div className='mb-8 max-w-md m-auto'>
+                        <div className='mb-4 max-w-md m-auto'>
                             <HealthMeters is_enemy={true} name={this.props.monster_to_fight.name} current_health={this.state.monster_current_health} max_health={this.state.monster_max_health} />
                             <HealthMeters is_enemy={false} name={this.props.character.name} current_health={this.state.character_current_health} max_health={this.state.character_max_health} />
                         </div>

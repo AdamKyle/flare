@@ -79,26 +79,23 @@ class BattleController extends Controller {
 
         if ($request->is_character_dead) {
 
-            $this->battleEventHandler->processDeadCharacter($character);
+            //$this->battleEventHandler->processDeadCharacter($character);
 
-            return response()->json([], 200);
+            return response()->json([
+                'time_out' => 20,
+            ], 200);
         }
 
         if ($request->is_defender_dead) {
 
-            switch ($request->defender_type) {
-                case 'monster':
-                    event(new AttackTimeOutEvent($character));
-                    BattleAttackHandler::dispatch($character->id, $request->monster_id)->onQueue('default_long');
-                    break;
-                default:
-                    return response()->json([
-                        'message' => 'Could not find type of defender.'
-                    ], 422);
-            }
+            //event(new AttackTimeOutEvent($character));
+
+            BattleAttackHandler::dispatch($character->id, $request->monster_id)->onQueue('default_long');
         }
 
-        return response()->json([], 200);
+        return response()->json([
+            'time_out' => 10,
+        ], 200);
     }
 
     /**

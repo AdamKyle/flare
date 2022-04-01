@@ -47,6 +47,10 @@ class Skill extends Model
         'xp_towards'            => 'float',
     ];
 
+    protected $appends = [
+        'name',
+    ];
+
     public function type(): SkillTypeValue {
         return $this->baseSkill->skillType();
     }

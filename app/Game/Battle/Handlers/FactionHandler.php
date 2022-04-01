@@ -16,9 +16,6 @@ use App\Flare\Models\Monster;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\RandomAffixDetails;
-use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
-use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
-use App\Game\Core\Events\UpdateCharacterFactions;
 use App\Game\Core\Values\FactionLevel;
 use App\Game\Core\Values\FactionType;
 use App\Game\Messages\Events\GlobalMessageEvent;
@@ -36,7 +33,7 @@ class FactionHandler {
         $this->handleFactionPoints($character, $monster);
     }
 
-    protected function handleFactionPoints(Character $character, Monster $monster) {
+    protected function handleFactionPoints(Character $character, Monster $monster): void {
         $map     = GameMap::find($monster->game_map_id);
         $faction = Faction::where('character_id', $character->id)->where('game_map_id', $map->id)->first();
 
@@ -55,18 +52,20 @@ class FactionHandler {
         }
 
         if ($faction->current_points === $faction->points_needed && !FactionLevel::isMaxLevel($faction->current_level)) {
-            return $this->handleFactionLevelUp($character, $faction, $map->name);
+            $this->handleFactionLevelUp($character, $faction, $map->name);
+
+            return;
 
         } else if (FactionLevel::isMaxLevel($faction->current_level) && !$faction->maxed) {
-            return $this->handleFactionMaxedOut($character, $faction, $map->name);
+            $this->handleFactionMaxedOut($character, $faction, $map->name);
+
+            return;
         }
 
         $faction->save();
-
-        $this->updateFactions($character);
     }
 
-    public function handleCustomFactionAmount(Character $character, int $amount) {
+    public function handleCustomFactionAmount(Character $character, int $amount): void {
         $map     = Map::where('character_id', $character->id)->first();
         $gameMap = GameMap::find($map->game_map_id);
         $faction = Faction::where('character_id', $character->id)->where('game_map_id', $gameMap->id)->first();
@@ -91,24 +90,20 @@ class FactionHandler {
 
         if ($faction->current_points === $faction->points_needed && !FactionLevel::isMaxLevel($faction->current_level)) {
 
-            return $this->handleFactionLevelUp($character, $faction, $gameMap->name);
+            $this->handleFactionLevelUp($character, $faction, $gameMap->name);
 
         } else if (FactionLevel::isMaxLevel($faction->current_level) && !$faction->maxed) {
 
-            return $this->handleFactionMaxedOut($character, $faction, $gameMap->name);
+            $this->handleFactionMaxedOut($character, $faction, $gameMap->name);
         }
-
-        $this->updateFactions($character);
 
     }
 
-    protected function handleFactionLevelUp(Character $character, Faction $faction, string $mapName) {
+    protected function handleFactionLevelUp(Character $character, Faction $faction, string $mapName): void {
         event(new ServerMessageEvent($character->user, $mapName . ' faction has gained a new level!'));
 
         $faction   = $this->updateFaction($faction);
         $character = $character->refresh();
-
-        $this->updateFactions($character);
 
         $this->rewardPlayer($character, $faction, $mapName, FactionType::getTitle($faction->current_level));
 
@@ -117,7 +112,7 @@ class FactionHandler {
         }
     }
 
-    protected function handleFactionMaxedOut(Character $character, Faction $faction, string $mapName) {
+    protected function handleFactionMaxedOut(Character $character, Faction $faction, string $mapName): void {
         event(new ServerMessageEvent($character->user, $mapName . ' faction has become maxed out!'));
         event(new GlobalMessageEvent($character->name . ' Has maxed out the faction for: ' . $mapName . ' They are considered legendary among the people of this land.'));
 
@@ -126,20 +121,6 @@ class FactionHandler {
         $faction->update([
             'maxed' => true,
         ]);
-
-        $this->updateFactions($character);
-    }
-
-    protected function updateFactions(Character $character) {
-        $character = $character->refresh();
-
-        $factions = Faction::where('character_id', $character->id)->get()->transform(function($faction) {
-            $faction->map_name = $faction->gameMap->name;
-
-            return $faction;
-        });
-
-        event(new UpdateCharacterFactions($character->user, $factions));
     }
 
     protected function updateFaction(Faction $faction): Faction {
@@ -158,7 +139,7 @@ class FactionHandler {
         return $faction->refresh();
     }
 
-    protected function rewardPlayer(Character $character, Faction $faction, string $mapName, ?string $title = null) {
+    protected function rewardPlayer(Character $character, Faction $faction, string $mapName, ?string $title = null): void {
         $character = $this->giveCharacterGold($character, $faction->current_level);
         $item      = $this->giveCharacterRandomItem($character);
 
@@ -174,17 +155,11 @@ class FactionHandler {
                 'item_id'      => $item->id,
             ]);
 
-            $character = $character->refresh();
-
-            event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
-
-            event(new CharacterInventoryDetailsUpdate($character->user));
-
             event(new ServerMessageEvent($character->user, 'Rewarded with (item with randomly generated affix(es)): ' . $item->affix_name));
         }
     }
 
-    protected function giveCharacterGold(Character $character, int $factionLevel) {
+    protected function giveCharacterGold(Character $character, int $factionLevel): Character {
         $gold = FactionLevel::getGoldReward($factionLevel);
 
         $characterNewGold = $character->gold + $gold;
@@ -211,7 +186,7 @@ class FactionHandler {
         return $character->refresh();
     }
 
-    protected function giveCharacterRandomItem(Character $character) {
+    protected function giveCharacterRandomItem(Character $character): Item {
         $item = ItemModel::where('cost', '<=', RandomAffixDetails::BASIC)
             ->whereNull('item_prefix_id')
             ->whereNull('item_suffix_id')

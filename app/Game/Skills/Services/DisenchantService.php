@@ -86,6 +86,7 @@ class DisenchantService {
                 } else {
                     event(new ServerMessageEvent($character->user, 'disenchanted', $goldDust));
                 }
+
                 event(new UpdateSkillEvent($disenchantSkill));
 
             } else {

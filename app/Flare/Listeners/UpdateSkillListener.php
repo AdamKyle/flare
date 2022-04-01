@@ -100,8 +100,6 @@ class UpdateSkillListener
                 $this->updateCharacterAttackDataCache($character);
             }
         }
-
-        $this->skillService->updateSkills($skill->character->refresh());
     }
 
     protected function shouldUpdateCharacterAttackData(GameSkill $skill): bool {

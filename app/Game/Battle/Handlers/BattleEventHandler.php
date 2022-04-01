@@ -26,14 +26,8 @@ class BattleEventHandler {
 
     private $battleRewardProcessing;
 
-    public function __construct(
-        Manager $manager,
-        CharacterSheetBaseInfoTransformer $characterAttackTransformer,
-        BattleRewardProcessing $battleRewardProcessing,
-    ) {
-        $this->manager                    = $manager;
-        $this->characterAttackTransformer = $characterAttackTransformer;
-        $this->battleRewardProcessing     = $battleRewardProcessing;
+    public function __construct(BattleRewardProcessing $battleRewardProcessing) {
+        $this->battleRewardProcessing = $battleRewardProcessing;
     }
 
     public function processDeadCharacter(Character $character) {
@@ -42,15 +36,8 @@ class BattleEventHandler {
         $character = $character->refresh();
 
         event(new ServerMessageEvent($character->user, 'You are dead. Please revive your self by clicking revive.'));
-        event(new AttackTimeOutEvent($character));
-        event(new CharacterIsDeadBroadcastEvent($character->user, true));
         event(new UpdateTopBarEvent($character));
         event(new UpdateCharacterStatus($character));
-
-        $characterData = new Item($character, $this->characterAttackTransformer);
-        $characterData = $this->manager->createData($characterData)->toArray();
-
-        event(new UpdateBaseCharacterInformation($character->user, $characterData));
     }
 
     public function processMonsterDeath(int $characterId, int $monsterId, bool $isAutomation = false) {

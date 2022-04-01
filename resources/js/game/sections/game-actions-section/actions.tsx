@@ -22,6 +22,7 @@ export default class Actions extends React.Component<any, ActionsState> {
             character: null,
             monsters: [],
             monster_to_fight: null,
+            attack_time_out: 0,
         }
     }
 
@@ -64,6 +65,18 @@ export default class Actions extends React.Component<any, ActionsState> {
 
     revive() {
 
+    }
+
+    setAttackTimeOut(attack_time_out: number) {
+        this.setState({
+            attack_time_out: attack_time_out
+        });
+    }
+
+    updateTimer() {
+        this.setState({
+            attack_time_out: 0,
+        })
     }
 
     render() {
@@ -118,6 +131,7 @@ export default class Actions extends React.Component<any, ActionsState> {
                                 {
                                     this.state.monster_to_fight !== null ?
                                         <FightSection
+                                            set_attack_time_out={this.setAttackTimeOut.bind(this)}
                                             monster_to_fight={this.state.monster_to_fight}
                                             character={this.state.character}
                                             is_same_monster={this.state.is_same_monster}
@@ -131,7 +145,7 @@ export default class Actions extends React.Component<any, ActionsState> {
                 }
 
                 <div className='relative top-[24px]'>
-                    <TimerProgressBar time_remaining={10} time_out_label={'Attack Timeout'} />
+                    <TimerProgressBar time_remaining={this.state.attack_time_out} time_out_label={'Attack Timeout'} update_time_remaining={this.updateTimer.bind(this)} />
                 </div>
             </div>
         )

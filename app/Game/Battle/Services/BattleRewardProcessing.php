@@ -39,7 +39,7 @@ class BattleRewardProcessing {
 
         $character = $this->characterRewardService->getCharacter();
 
-        BattleItemHandler::dispatch($character, $monster)->delay(now()->addSeconds(10));
+        BattleItemHandler::dispatch($character, $monster);
 
         $this->goldRushService->processPotentialGoldRush($character, $monster);
 

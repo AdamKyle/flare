@@ -95,10 +95,6 @@ class BattleDrop {
             if (!is_null($drop)) {
                 if ((!is_null($drop->itemSuffix) || !is_null($drop->itemPrefix))  && !$returnItem) {
                     $this->attemptToPickUpItem($character, $drop);
-
-                    event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
-
-                    event(new CharacterInventoryDetailsUpdate($character->user));
                 } else {
                     return $drop;
                 }
@@ -123,9 +119,6 @@ class BattleDrop {
             if ($canGetQuestItem && !$returnItem) {
                 $this->attemptToPickUpItem($character, $this->monster->questItem);
 
-                event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'quest_items'));
-
-                event(new CharacterInventoryDetailsUpdate($character->user));
             } else if ($canGetQuestItem && $returnItem) {
                 return $this->monster->questItem;
             }
@@ -169,10 +162,6 @@ class BattleDrop {
 
                 if ($roll > $chance && $this->canHaveItem($character, $item)) {
                     $this->attemptToPickUpItem($character, $item);
-
-                    event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'quest_items'));
-
-                    event(new CharacterInventoryDetailsUpdate($character->user));
 
                     return;
                 }

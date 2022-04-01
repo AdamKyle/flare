@@ -83,11 +83,4 @@ class SkillService {
             'message' => 'You are now training ' . $skill->name
         ]);
     }
-
-    public function updateSkills(Character $character) {
-        $skillData = new Collection($character->skills, $this->skillsTransformer);
-        $skillData = $this->manager->createData($skillData)->toArray();
-
-        event(new UpdateCharacterSkills($character->user, $skillData));
-    }
 }

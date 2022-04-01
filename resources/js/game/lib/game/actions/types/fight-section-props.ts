@@ -10,4 +10,6 @@ export default interface FightSectionProps {
     is_same_monster: boolean;
 
     reset_same_monster: () => void;
+
+    set_attack_time_out: (attack_time_out: number) => void;
 }

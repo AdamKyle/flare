@@ -12,4 +12,6 @@ export default interface ActionsState {
     loading: boolean;
 
     is_same_monster: boolean;
+
+    attack_time_out: number;
 }

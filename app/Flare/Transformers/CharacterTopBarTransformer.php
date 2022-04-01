@@ -2,6 +2,7 @@
 
 namespace App\Flare\Transformers;
 
+use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
@@ -21,31 +22,28 @@ class CharacterTopBarTransformer extends BaseTransformer {
      * @return mixed
      */
     public function transform(Character $character) {
+
+        $characterInformation = resolve(CharacterInformationBuilder::class)->setCharacter($character);
+
         return [
-            'id'                => $character->id,
-            'name'              => $character->name,
-            'attack'            => number_format($this->fetchStats($character, 'attack')),
-            'health'            => number_format($this->fetchStats($character, 'health')),
-            'ac'                => number_format($this->fetchStats($character, 'ac')),
-            'race'              => $character->race->name,
-            'class'             => $character->class->name,
+            'attack'            => $characterInformation->buildTotalAttack(),
+            'health'            => $characterInformation->buildHealth(),
+            'ac'                => $characterInformation->buildDefence(),
             'level'             => number_format($character->level),
             'max_level'         => number_format($this->getMaxLevel($character)),
             'xp'                => (int) $character->xp,
             'xp_next'           => (int) $character->xp_next,
-            'str_modded'        => number_format($this->fetchStats($character, 'str_modded')),
-            'dur_modded'        => number_format($this->fetchStats($character, 'dur_modded')),
-            'dex_modded'        => number_format($this->fetchStats($character, 'dex_modded')),
-            'chr_modded'        => number_format($this->fetchStats($character, 'chr_modded')),
-            'int_modded'        => number_format($this->fetchStats($character, 'int_modded')),
-            'agi_modded'        => number_format($this->fetchStats($character, 'agi_modded')),
-            'focus_modded'      => number_format($this->fetchStats($character, 'focus_modded')),
+            'str_modded'        => round($characterInformation->statMod('str')),
+            'dur_modded'        => round($characterInformation->statMod('dur')),
+            'dex_modded'        => round($characterInformation->statMod('dex')),
+            'chr_modded'        => round($characterInformation->statMod('chr')),
+            'int_modded'        => round($characterInformation->statMod('int')),
+            'agi_modded'        => round($characterInformation->statMod('agi')),
+            'focus_modded'      => round($characterInformation->statMod('focus')),
             'gold'              => number_format($character->gold),
             'gold_dust'         => number_format($character->gold_dust),
             'shards'            => number_format($character->shards),
             'copper_coins'      => number_format($character->copper_coins),
-            'is_dead'           => $character->is_dead,
-            'can_adventure'     => $character->can_adventure,
         ];
     }
 }
