@@ -10,6 +10,7 @@ import FightSection from "./components/fight-section";
 import ActionsState from "../../lib/game/actions/types/actions-state";
 import TimerProgressBar from "../../components/ui/progress-bars/timer-progress-bar";
 import PrimaryButton from "../../components/ui/buttons/primary-button";
+import {isEqual} from "lodash";
 
 export default class Actions extends React.Component<any, ActionsState> {
 
@@ -25,6 +26,7 @@ export default class Actions extends React.Component<any, ActionsState> {
             monsters: [],
             monster_to_fight: null,
             attack_time_out: 0,
+            character_revived: false,
         }
 
         // @ts-ignore
@@ -46,13 +48,25 @@ export default class Actions extends React.Component<any, ActionsState> {
 
         // @ts-ignore
         this.attackTimeOut.listen('Game.Core.Events.ShowTimeOutEvent', (event: any) => {
-            console.log(event);
             this.setState({
                 attack_time_out: event.forLength,
             });
         });
+    }
 
-        console.log(this.attackTimeOut);
+    componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<ActionsState>, snapshot?: any) {
+
+        if (this.state.character?.is_dead && !this.props.character.is_dead) {
+            this.setState({
+                character_revived: true,
+            })
+        }
+
+        if (!isEqual(this.props.character, this.state.character)) {
+            this.setState({
+                character: this.props.character
+            });
+        }
     }
 
     openCrafting() {
@@ -81,7 +95,11 @@ export default class Actions extends React.Component<any, ActionsState> {
     }
 
     revive() {
+        (new Ajax()).setRoute('battle-revive/' + this.props.character?.id).doAjaxCall('post', (result: AxiosResponse) => {
 
+        }, (error: AxiosError) => {
+
+        });
     }
 
     setAttackTimeOut(attack_time_out: number) {
@@ -96,7 +114,14 @@ export default class Actions extends React.Component<any, ActionsState> {
         })
     }
 
+    resetRevived() {
+        this.setState({
+            character_revived: false
+        });
+    }
+
     render() {
+
         return (
             <div className='px-4'>
                 {
@@ -131,7 +156,7 @@ export default class Actions extends React.Component<any, ActionsState> {
                             </div>
                             <div className='border-b-2 block border-b-gray-300 dark:border-b-gray-600 my-3 md:hidden'></div>
                             <div className='md:col-start-2 md:col-span-3 mt-1'>
-                                <MonsterSelection monsters={this.state.monsters} update_monster={this.setSelectedMonster.bind(this)} timer_running={this.state.attack_time_out > 0} />
+                                <MonsterSelection monsters={this.state.monsters} update_monster={this.setSelectedMonster.bind(this)} timer_running={this.state.attack_time_out > 0} character={this.state.character}/>
                                 <CraftingSection />
 
                                 {
@@ -153,6 +178,8 @@ export default class Actions extends React.Component<any, ActionsState> {
                                             character={this.state.character}
                                             is_same_monster={this.state.is_same_monster}
                                             reset_same_monster={this.resetSameMonster.bind(this)}
+                                            character_revived={this.state.character_revived}
+                                            reset_revived={this.resetRevived.bind(this)}
                                         />
                                     : null
                                 }

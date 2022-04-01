@@ -2,27 +2,17 @@
 
 namespace App\Game\Battle\Handlers;
 
-use App\Flare\Services\BuildCharacterAttackTypes;
-use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Battle\Events\UpdateCharacterStatus;
-use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use Illuminate\Support\Facades\Cache;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterInCelestialFight;
 use App\Flare\Models\Monster;
-use App\Game\Core\Events\AttackTimeOutEvent;
 use App\Game\Core\Events\CharacterIsDeadBroadcastEvent;
 use App\Game\Battle\Services\BattleRewardProcessing;
 
 class BattleEventHandler {
-
-    private $manager;
-
-    private $characterAttackTransformer;
 
     private $battleRewardProcessing;
 
@@ -36,7 +26,6 @@ class BattleEventHandler {
         $character = $character->refresh();
 
         event(new ServerMessageEvent($character->user, 'You are dead. Please revive your self by clicking revive.'));
-        event(new UpdateTopBarEvent($character));
         event(new UpdateCharacterStatus($character));
     }
 
@@ -60,10 +49,8 @@ class BattleEventHandler {
             ]);
         }
 
-        event(new CharacterIsDeadBroadcastEvent($character->user));
-        event(new UpdateTopBarEvent($character));
-
         $character = $character->refresh();
+
         broadcast(new UpdateCharacterStatus($character));
 
         return $character;

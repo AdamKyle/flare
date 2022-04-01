@@ -63,6 +63,10 @@ export default class MonsterSelection extends React.Component<any, any> {
         this.props.update_monster(this.state.selected_monster);
     }
 
+    attackDisabled() {
+        return this.state.attack_disabled || this.props.timer_running || this.props.character.is_dead || !this.props.character.can_attack
+    }
+
     render() {
         return (
             <div className='mt-2 md:ml-[120px]'>
@@ -79,7 +83,7 @@ export default class MonsterSelection extends React.Component<any, any> {
                         />
                     </div>
                     <div className='cols-start-3 cols-end-3'>
-                        <PrimaryButton button_label={'Attack'} on_click={this.attack.bind(this)} disabled={this.state.attack_disabled || this.props.timer_running}/>
+                        <PrimaryButton button_label={'Attack'} on_click={this.attack.bind(this)} disabled={this.attackDisabled()}/>
                     </div>
                 </div>
             </div>

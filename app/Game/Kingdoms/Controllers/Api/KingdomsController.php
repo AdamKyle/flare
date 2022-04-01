@@ -54,7 +54,7 @@ class KingdomsController extends Controller
 
     public function __construct(Manager $manager, KingdomTransformer $kingdom, KingdomService $kingdomService)
     {
-        $this->middleware('is.character.dead')->except(['getAttackLogs', 'getCharacterInfoForKingdom', 'getOtherKingdomInfo']);
+        $this->middleware('is.character.dead')->except(['getAttackLogs', 'getCharacterInfoForKingdom', 'getOtherKingdomInfo', 'getKingdomsList']);
 
         $this->manager = $manager;
         $this->kingdom = $kingdom;

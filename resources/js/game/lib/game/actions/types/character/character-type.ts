@@ -99,6 +99,8 @@ export interface CharacterType {
 
     is_dead: boolean;
 
+    can_attack: boolean;
+
     name: string;
 
     resistance_reduction: number;

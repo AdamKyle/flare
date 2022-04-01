@@ -12,4 +12,8 @@ export default interface FightSectionProps {
     reset_same_monster: () => void;
 
     set_attack_time_out: (attack_time_out: number) => void;
+
+    reset_revived: () => void;
+
+    character_revived: boolean;
 }

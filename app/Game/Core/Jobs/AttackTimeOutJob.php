@@ -2,6 +2,7 @@
 
 namespace App\Game\Core\Jobs;
 
+use App\Game\Battle\Events\UpdateCharacterStatus;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -42,6 +43,8 @@ class AttackTimeOutJob implements ShouldQueue
             'can_attack'          => true,
             'can_attack_again_at' => null,
         ]);
+
+        event(new UpdateCharacterStatus($this->character->refresh()));
 
         broadcast(new ShowTimeOutEvent($this->character->user, 0));
     }

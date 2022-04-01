@@ -55,6 +55,18 @@ export default class FightSection extends React.Component<FightSectionProps, any
 
             this.props.reset_same_monster();
         }
+
+        if (this.props.character_revived) {
+            this.setState({
+                character_current_health: this.props.character?.health,
+                character_max_health: this.props.character?.health,
+                battle_messages: [],
+            }, () => {
+                this.props.reset_revived();
+            });
+
+            this.battle_messages = [];
+        }
     }
 
     setUpBattle() {
@@ -156,15 +168,19 @@ export default class FightSection extends React.Component<FightSectionProps, any
         })
     }
 
+    attackButtonDisabled() {
+        return this.state.monster_current_health <= 0 || this.state.character_current_health <= 0 || this.props.character?.is_dead || !this.props.character?.can_attack
+    }
+
     render() {
         return (
             <Fragment>
                 <div className='mt-4 mb-4 text-xs text-center'>
-                    <AttackButton additional_css={'btn-attack'} icon_class={'ra ra-sword'} on_click={() => this.attack('attack')} disabled={this.state.monster_current_health <= 0 || this.state.character_current_health <= 0}/>
-                    <AttackButton additional_css={'btn-cast'} icon_class={'ra ra-burning-book'} on_click={() => this.attack('cast')} disabled={this.state.monster_current_health <= 0 || this.state.character_current_health <= 0}/>
-                    <AttackButton additional_css={'btn-cast-attack'} icon_class={'ra ra-lightning-sword'} on_click={() => this.attack('cast_and_attack')} disabled={this.state.monster_current_health <= 0 || this.state.character_current_health <= 0}/>
-                    <AttackButton additional_css={'btn-attack-cast'} icon_class={'ra ra-lightning-sword'} on_click={() => this.attack('attack_and_cast')} disabled={this.state.monster_current_health <= 0 || this.state.character_current_health <= 0}/>
-                    <AttackButton additional_css={'btn-defend'} icon_class={'ra ra-round-shield'} on_click={() => this.attack('defend')} disabled={this.state.monster_current_health <= 0 || this.state.character_current_health <= 0}/>
+                    <AttackButton additional_css={'btn-attack'} icon_class={'ra ra-sword'} on_click={() => this.attack('attack')} disabled={this.attackButtonDisabled()}/>
+                    <AttackButton additional_css={'btn-cast'} icon_class={'ra ra-burning-book'} on_click={() => this.attack('cast')} disabled={this.attackButtonDisabled()}/>
+                    <AttackButton additional_css={'btn-cast-attack'} icon_class={'ra ra-lightning-sword'} on_click={() => this.attack('cast_and_attack')} disabled={this.attackButtonDisabled()}/>
+                    <AttackButton additional_css={'btn-attack-cast'} icon_class={'ra ra-lightning-sword'} on_click={() => this.attack('attack_and_cast')} disabled={this.attackButtonDisabled()}/>
+                    <AttackButton additional_css={'btn-defend'} icon_class={'ra ra-round-shield'} on_click={() => this.attack('defend')} disabled={this.attackButtonDisabled()}/>
                 </div>
                 {
                     this.state.monster_max_health > 0 && this.props.character !== null ?

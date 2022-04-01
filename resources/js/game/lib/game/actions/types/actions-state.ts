@@ -14,4 +14,6 @@ export default interface ActionsState {
     is_same_monster: boolean;
 
     attack_time_out: number;
+
+    character_revived: boolean;
 }

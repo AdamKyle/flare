@@ -19,6 +19,10 @@ export default class Game extends React.Component<GameProps, GameState> {
 
     private characterTopBar: any;
 
+    private characterAttacks: any;
+
+    private characterStatus: any;
+
     constructor(props: GameProps) {
         super(props)
 
@@ -52,6 +56,12 @@ export default class Game extends React.Component<GameProps, GameState> {
 
         // @ts-ignore
         this.characterTopBar = Echo.private('update-top-bar-' + this.props.userId);
+
+        // @ts-ignore
+        this.characterAttacks = Echo.private('update-character-attacks-' + this.props.userId);
+
+        // @ts-ignore
+        this.characterStatus = Echo.private('update-character-status-' + this.props.userId);
     }
 
     componentDidMount() {
@@ -73,9 +83,22 @@ export default class Game extends React.Component<GameProps, GameState> {
 
         // @ts-ignore
         this.characterTopBar.listen('Game.Core.Events.UpdateTopBarBroadcastEvent', (event: any) => {
-            console.log(event.characterSheet);
             this.setState({
                 character: {...this.state.character, ...event.characterSheet}
+            });
+        });
+
+        // @ts-ignore
+        this.characterAttacks.listen('Game.Core.Events.UpdateCharacterAttacks', (event: any) => {
+            this.setState({
+                character: {...this.state.character, ...event.characterAttacks}
+            });
+        });
+
+        // @ts-ignore
+        this.characterStatus.listen('Game.Battle.Events.UpdateCharacterStatus', (event: any) => {
+            this.setState({
+                character: {...this.state.character, ...event.characterStatuses}
             });
         });
     }

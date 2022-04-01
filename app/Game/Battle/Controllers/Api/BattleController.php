@@ -79,7 +79,7 @@ class BattleController extends Controller {
 
         if ($request->is_character_dead) {
 
-            //$this->battleEventHandler->processDeadCharacter($character);
+            $this->battleEventHandler->processDeadCharacter($character);
 
             return response()->json([
                 'time_out' => 20,
@@ -101,11 +101,9 @@ class BattleController extends Controller {
      * @return \Illuminate\Http\JsonResponse
      */
     public function revive(Character $character) {
-        $character = $this->battleEventHandler->processRevive($character);
+        $this->battleEventHandler->processRevive($character);
 
-        return response()->json([
-            'character_health' => $this->battleEventHandler->fetchStatFromCache($character, 'health'),
-        ], 200);
+        return response()->json([]);
     }
 
 }

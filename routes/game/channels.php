@@ -80,5 +80,10 @@ Broadcast::channel('update-factions-{userId}', function ($user, $userId) {
     return $user->id === (int) $userId;
 });
 
+// When the character attacks update.
+Broadcast::channel('update-character-attacks-{userId}', function ($user, $userId) {
+    return $user->id === (int) $userId;
+});
+
 
 
