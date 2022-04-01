@@ -3,7 +3,7 @@
 namespace App\Game\Market\Controllers\Api;
 
 use App\Flare\Events\ServerMessageEvent;
-use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Item as ItemModel;
 use App\Flare\Traits\IsItemUnique;
 use App\Flare\Values\MaxCurrenciesValue;

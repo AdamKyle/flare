@@ -22,7 +22,7 @@ class UpdateTopBarBroadcastEvent implements ShouldBroadcastNow
     /**
      * @var User $user
      */
-    public $user;
+    private $user;
 
     /**
      * Create a new event instance.

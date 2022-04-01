@@ -2,7 +2,7 @@
 
 namespace App\Game\Kingdoms\Jobs;
 
-use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;

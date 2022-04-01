@@ -43,6 +43,6 @@ class AttackTimeOutJob implements ShouldQueue
             'can_attack_again_at' => null,
         ]);
 
-        broadcast(new ShowTimeOutEvent($this->character->user, false, true));
+        broadcast(new ShowTimeOutEvent($this->character->user, 0));
     }
 }

@@ -6,7 +6,7 @@ use League\Fractal\Resource\Item;
 use League\Fractal\Manager;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Transformers\CharacterTopBarTransformer;
-use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Events\UpdateTopBarBroadcastEvent;
 
 class UpdateTopBarListener

@@ -13,7 +13,7 @@ use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
 use Facades\App\Game\Kingdoms\Validation\ResourceValidation;
 use App\Http\Controllers\Controller;
-use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\KingdomBuilding;
 use App\Flare\Models\Character;

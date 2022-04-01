@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\AdventureLog;
-use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Adventures\View\AdventureCompletedRewards;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Services\AdventureRewardService;
@@ -88,8 +88,8 @@ class CharacterAdventureController extends Controller {
 
         HandleAdventureRewards::dispatch($character, $adventureLog, $rewards)->delay(now()->addSeconds(10))->onConnection('long_running');
 
-        return redirect()->to(route('game'))->with('success', 'Adventure Rewards are processing. Keep an eye on chat to see the rewards come through. 
-        Once all currency, xp and skill xp rewards have been handed to you, you will be able to start a new adventure. Processing will begin in 10 seconds. You\'ll be able to embark on a new adventure when 
+        return redirect()->to(route('game'))->with('success', 'Adventure Rewards are processing. Keep an eye on chat to see the rewards come through.
+        Once all currency, xp and skill xp rewards have been handed to you, you will be able to start a new adventure. Processing will begin in 10 seconds. You\'ll be able to embark on a new adventure when
         the menu icon stops bouncing. You do not need to re-collect rewards - everything will update for you in real time. Auto Disenchanting is respected and players can embark on another adventure while their items are being processed.');
     }
 

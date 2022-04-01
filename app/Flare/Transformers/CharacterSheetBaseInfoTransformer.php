@@ -30,6 +30,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
 
         return [
             'id'                          => $character->id,
+            'user_id'                     => $character->user_id,
             'name'                        => $character->name,
             'class'                       => $gameClass->name,
             'attack'                      => $characterInformation->buildTotalAttack(),
@@ -80,7 +81,11 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
             'shards'                      => number_format($character->shards),
             'copper_coins'                => number_format($character->copper_coins),
             'is_dead'                     => $character->is_dead,
+            'can_craft'                   => $character->can_craft,
             'can_adventure'               => $character->can_adventure,
+            'can_attack_again_at'         => now()->diffInSeconds($character->can_attack_again_at),
+            'can_craft_again_at'          => now()->diffInSeconds($character->can_craft_again_at),
+            'can_adventure_again_at'      => now()->diffInSeconds($character->can_adventure_again_at),
             'ambush_chance'               => $characterTrinketsInformation->getAmbushChance($character),
             'ambush_resistance_chance'    => $characterTrinketsInformation->getAmbushResistanceChance($character),
             'counter_chance'              => $characterTrinketsInformation->getCounterChance($character),

@@ -6,7 +6,7 @@ use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Collection as DBCollection;
-use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;

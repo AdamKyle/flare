@@ -1,6 +1,8 @@
 export interface CharacterType {
     id: number;
 
+    user_id: number;
+
     affix_damage_reduction:  number;
 
     agi_modded: number;
@@ -71,7 +73,7 @@ export interface CharacterType {
 
     to_hit_stat: string;
 
-    can_attack_again_at: string|null;
+    can_attack_again_at: number|null;
 
     race: string;
 
@@ -138,4 +140,12 @@ export interface CharacterType {
     counter_chance: number;
 
     counter_resistance: number;
+
+    can_craft: boolean;
+
+    can_adventure: boolean;
+
+    can_craft_again_at: number|null;
+
+    can_adventure_again_at: number|null;
 }

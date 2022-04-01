@@ -2,7 +2,7 @@
 
 namespace App\Game\Kingdoms\Service;
 
-use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\KingdomBuilding;
@@ -295,8 +295,8 @@ class KingdomResourcesService {
         $character = $this->kingdom->character;
 
         if (!is_null($character)) {
-            broadcast(new GameServerMessageEvent($character->user,'The Old Man stomps around! "You were warned! time to pay up!" 
-            The kingdom at (X/Y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position . ' on plane: ' . $this->kingdom->gameMap->name . ' 
+            broadcast(new GameServerMessageEvent($character->user,'The Old Man stomps around! "You were warned! time to pay up!"
+            The kingdom at (X/Y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position . ' on plane: ' . $this->kingdom->gameMap->name . '
             is in trouble for being over populated.'));
         }
 

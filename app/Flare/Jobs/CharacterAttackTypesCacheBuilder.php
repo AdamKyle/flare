@@ -2,7 +2,7 @@
 
 namespace App\Flare\Jobs;
 
-use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Exploration\Events\ExplorationLogUpdate;

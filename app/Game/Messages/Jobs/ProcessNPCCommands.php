@@ -2,7 +2,7 @@
 
 namespace App\Game\Messages\Jobs;
 
-use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Npc;

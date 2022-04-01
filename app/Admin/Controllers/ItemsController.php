@@ -13,7 +13,7 @@ use App\Admin\Requests\ItemsImport as ItemsImportRequest;
 use App\Admin\Exports\Items\QuestsExport;
 use App\Admin\Import\Items\QuestsImport;
 use App\Flare\Events\ServerMessageEvent;
-use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Traits\Controllers\ItemsShowInformation;

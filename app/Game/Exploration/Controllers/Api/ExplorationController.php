@@ -2,7 +2,7 @@
 
 namespace App\Game\Exploration\Controllers\Api;
 
-use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Values\AttackTypeValue;
 use App\Game\Exploration\Events\ExplorationLogUpdate;

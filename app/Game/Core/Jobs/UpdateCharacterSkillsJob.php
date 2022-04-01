@@ -3,7 +3,7 @@
 namespace App\Game\Core\Jobs;
 
 use App\Flare\Events\SkillLeveledUpServerMessageEvent;
-use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Skill;

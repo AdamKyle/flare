@@ -23,7 +23,7 @@ use League\Fractal\Manager;
 use League\Fractal\Resource\Item as ResourceItem;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Models\Character;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;

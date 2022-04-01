@@ -2,7 +2,7 @@
 
 namespace App\Game\PassiveSkills\Controllers\Api;
 
-use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterPassiveSkill;
 use App\Game\Core\Services\CharacterPassiveSkills;

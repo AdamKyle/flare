@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Collection;
 use League\Fractal\Resource\Item as ResourceItem;
 use App\Flare\Models\Item;
 use App\Flare\Models\Character;
-use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Game\Core\Comparison\ItemComparison;
 use App\Game\Core\Exceptions\EquipItemException;

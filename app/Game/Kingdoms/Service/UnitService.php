@@ -2,7 +2,7 @@
 
 namespace App\Game\Kingdoms\Service;
 
-use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\Skill;
 use App\Game\Kingdoms\Events\UpdateKingdom;

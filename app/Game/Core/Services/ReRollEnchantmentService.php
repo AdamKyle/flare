@@ -3,7 +3,7 @@
 namespace App\Game\Core\Services;
 
 use App\Flare\Builders\AffixAttributeBuilder;
-use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;

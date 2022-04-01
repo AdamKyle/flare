@@ -3,7 +3,7 @@
 namespace App\Flare\Services;
 
 use App\Flare\Events\ServerMessageEvent;
-use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Flare\Models\Adventure;
 use App\Flare\Models\Character;

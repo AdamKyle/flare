@@ -5,7 +5,7 @@ namespace App\Game\Adventures\Controllers\Api;
 use App\Game\Adventures\Requests\AdventureEmbarkRequest;
 use Cache;
 use App\Http\Controllers\Controller;
-use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Adventure;
 use App\Flare\Models\Character;
 use App\Game\Adventures\Events\EmbarkOnAdventureEvent;

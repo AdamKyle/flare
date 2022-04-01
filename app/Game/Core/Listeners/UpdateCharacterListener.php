@@ -3,7 +3,7 @@
 namespace App\Game\Core\Listeners;
 
 use App\Flare\Events\ServerMessageEvent;
-use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Events\UpdateCharacterAttackEvent;
 use App\Flare\Services\CharacterRewardService;
 use App\Game\Core\Events\CharacterLevelUpEvent;

@@ -17,6 +17,8 @@ export default class Game extends React.Component<GameProps, GameState> {
 
     private tabs: {name: string, key: string}[];
 
+    private characterTopBar: any;
+
     constructor(props: GameProps) {
         super(props)
 
@@ -47,6 +49,9 @@ export default class Game extends React.Component<GameProps, GameState> {
             quests: null,
         }
 
+
+        // @ts-ignore
+        this.characterTopBar = Echo.private('update-top-bar-' + this.props.userId);
     }
 
     componentDidMount() {
@@ -65,6 +70,14 @@ export default class Game extends React.Component<GameProps, GameState> {
             {url: 'quests/' + this.props.characterId, name: 'quests'},
             {url: 'player-kingdoms/' + this.props.characterId, name: 'kingdoms'},
         ]).doAjaxCalls();
+
+        // @ts-ignore
+        this.characterTopBar.listen('Game.Core.Events.UpdateTopBarBroadcastEvent', (event: any) => {
+            console.log(event.characterSheet);
+            this.setState({
+                character: {...this.state.character, ...event.characterSheet}
+            });
+        });
     }
 
     hideDeviceSizeMessage(): void {

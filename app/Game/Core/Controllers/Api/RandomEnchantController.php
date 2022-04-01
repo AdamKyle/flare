@@ -3,7 +3,7 @@
 namespace App\Game\Core\Controllers\Api;
 
 use App\Flare\Builders\RandomAffixGenerator;
-use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Values\RandomAffixDetails;
 use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;

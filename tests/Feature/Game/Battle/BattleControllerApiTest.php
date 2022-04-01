@@ -8,7 +8,7 @@ use App\Flare\Values\MaxCurrenciesValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use App\Flare\Events\ServerMessageEvent;
-use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Services\BuildMonsterCacheService;
 use App\Game\Battle\Values\MaxLevel;
 use App\Game\Core\Events\GoldRushCheckEvent;

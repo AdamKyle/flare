@@ -79,7 +79,7 @@ export default class MonsterSelection extends React.Component<any, any> {
                         />
                     </div>
                     <div className='cols-start-3 cols-end-3'>
-                        <PrimaryButton button_label={'Attack'} on_click={this.attack.bind(this)} disabled={this.state.attack_disabled}/>
+                        <PrimaryButton button_label={'Attack'} on_click={this.attack.bind(this)} disabled={this.state.attack_disabled || this.props.timer_running}/>
                     </div>
                 </div>
             </div>

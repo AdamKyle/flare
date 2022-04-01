@@ -9,7 +9,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use App\Flare\Models\Character;
-use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\AdventureLog;
 use App\Game\Adventures\Events\UpdateAdventureLogsBroadcastEvent;
 use App\Game\Core\Services\AdventureRewardService;

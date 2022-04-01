@@ -2,7 +2,7 @@
 
 namespace App\Game\Skills\Controllers\Api;
 
-use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
 use App\Game\Core\Events\CharacterInventoryDetailsUpdate;

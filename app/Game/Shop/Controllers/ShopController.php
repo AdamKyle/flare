@@ -11,7 +11,7 @@ use Facades\App\Flare\Calculators\SellItemCalculator;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Models\Location;
-use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Services\BuildCharacterAttackTypes;

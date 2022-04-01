@@ -2,7 +2,7 @@
 
 namespace App\Game\Adventures\Jobs;
 
-use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Mail\GenericMail;
 use App\Flare\Models\Adventure;
 use Illuminate\Bus\Queueable;

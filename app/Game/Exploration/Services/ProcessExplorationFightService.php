@@ -2,7 +2,7 @@
 
 namespace App\Game\Exploration\Services;
 
-use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Exploration\Events\ExplorationStatus;
 use App\Game\Exploration\Events\ExplorationTimeOut;
 use App\Game\Exploration\Events\UpdateAutomationsList;

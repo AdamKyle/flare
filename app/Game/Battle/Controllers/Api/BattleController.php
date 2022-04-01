@@ -15,7 +15,7 @@ use App\Http\Controllers\Controller;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Core\Events\CharacterIsDeadBroadcastEvent;
 use App\Flare\Handlers\CheatingCheck;
-use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\Monster;
 use App\Flare\Transformers\CharacterAttackTransformer;
@@ -83,19 +83,17 @@ class BattleController extends Controller {
 
             return response()->json([
                 'time_out' => 20,
-            ], 200);
+            ]);
         }
 
         if ($request->is_defender_dead) {
 
-            //event(new AttackTimeOutEvent($character));
+            event(new AttackTimeOutEvent($character));
 
             BattleAttackHandler::dispatch($character->id, $request->monster_id)->onQueue('default_long');
         }
 
-        return response()->json([
-            'time_out' => 10,
-        ], 200);
+        return response()->json([]);
     }
 
     /**

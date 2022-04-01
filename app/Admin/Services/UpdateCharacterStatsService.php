@@ -8,7 +8,7 @@ use App\Admin\Jobs\LevelTestCharacter;
 use Facades\App\Flare\Values\UserOnlineValue;
 use App\Flare\Mail\GenericMail;
 use App\Flare\Events\ServerMessageEvent;
-use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameRace;

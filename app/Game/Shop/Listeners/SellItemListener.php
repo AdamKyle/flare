@@ -3,7 +3,7 @@
 namespace App\Game\Shop\Listeners;
 
 use App\Flare\Models\Item;
-use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Shop\Events\SellItemEvent;
 use App\Game\Skills\Events\UpdateCharacterEnchantingList;
 use App\Game\Skills\Services\EnchantingService;

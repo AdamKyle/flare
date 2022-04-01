@@ -2,7 +2,7 @@
 
 namespace App\Game\Exploration\Jobs;
 
-use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Monster;
 use App\Game\Exploration\Events\ExplorationDetails;
 use App\Game\Exploration\Events\ExplorationStatus;

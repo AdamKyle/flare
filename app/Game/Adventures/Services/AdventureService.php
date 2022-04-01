@@ -9,7 +9,7 @@ use Cache;
 use App\Flare\Models\Adventure;
 use App\Flare\Models\Character;
 use App\Flare\Events\ServerMessageEvent;
-use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\AdventureLog;
 use App\Flare\Services\FightService;
 use Facades\App\Flare\Values\UserOnlineValue;

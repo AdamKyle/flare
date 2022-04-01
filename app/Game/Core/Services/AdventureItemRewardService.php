@@ -3,7 +3,7 @@
 namespace App\Game\Core\Services;
 
 use App\Flare\Builders\RandomAffixGenerator;
-use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Adventure;
 use App\Flare\Models\AdventureLog;
 use App\Flare\Models\Faction;

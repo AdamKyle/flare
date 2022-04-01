@@ -9,7 +9,7 @@ use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use Exception;
 use Illuminate\Broadcasting\PendingBroadcast;
 use App\Flare\Events\NpcComponentShowEvent;
-use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\Npc;
 use App\Flare\Models\User;

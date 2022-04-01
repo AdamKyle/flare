@@ -5,7 +5,7 @@ namespace App\Game\Core\Listeners;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\GoldRushCheckEvent;
 use App\Flare\Events\ServerMessageEvent;
-use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use Facades\App\Flare\Calculators\GoldRushCheckCalculator;
 
 class GoldRushCheckListener

@@ -2,7 +2,7 @@
 
 namespace App\Game\Exploration\Handlers;
 
-use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;

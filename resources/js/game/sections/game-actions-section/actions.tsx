@@ -13,6 +13,8 @@ import PrimaryButton from "../../components/ui/buttons/primary-button";
 
 export default class Actions extends React.Component<any, ActionsState> {
 
+    private attackTimeOut: any;
+
     constructor(props: any) {
         super(props);
 
@@ -24,18 +26,33 @@ export default class Actions extends React.Component<any, ActionsState> {
             monster_to_fight: null,
             attack_time_out: 0,
         }
+
+        // @ts-ignore
+        this.attackTimeOut = Echo.private('show-timeout-bar-' + this.props.character.user_id);
     }
 
     componentDidMount() {
+
         (new Ajax()).setRoute('actions/' + this.props.character_id).doAjaxCall('get', (result: AxiosResponse) => {
             this.setState({
                 character: this.props.character,
                 monsters: result.data.monsters,
+                attack_time_out: this.props.character.can_attack_again_at !== null ? this.props.character.can_attack_again_at : 0,
                 loading: false,
             })
         }, (error: AxiosError) => {
 
         });
+
+        // @ts-ignore
+        this.attackTimeOut.listen('Game.Core.Events.ShowTimeOutEvent', (event: any) => {
+            console.log(event);
+            this.setState({
+                attack_time_out: event.forLength,
+            });
+        });
+
+        console.log(this.attackTimeOut);
     }
 
     openCrafting() {
@@ -114,7 +131,7 @@ export default class Actions extends React.Component<any, ActionsState> {
                             </div>
                             <div className='border-b-2 block border-b-gray-300 dark:border-b-gray-600 my-3 md:hidden'></div>
                             <div className='md:col-start-2 md:col-span-3 mt-1'>
-                                <MonsterSelection monsters={this.state.monsters} update_monster={this.setSelectedMonster.bind(this)} />
+                                <MonsterSelection monsters={this.state.monsters} update_monster={this.setSelectedMonster.bind(this)} timer_running={this.state.attack_time_out > 0} />
                                 <CraftingSection />
 
                                 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Flare\Events;
+namespace App\Game\Core\Events;
 
 use Illuminate\Queue\SerializesModels;
 use App\Flare\Models\Character;

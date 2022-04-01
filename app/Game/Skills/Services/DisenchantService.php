@@ -7,7 +7,7 @@ use App\Flare\Models\Item;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Messages\Events\ServerMessageEvent as MessageEvent;
 use App\Flare\Events\UpdateSkillEvent;
-use App\Flare\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Skill;

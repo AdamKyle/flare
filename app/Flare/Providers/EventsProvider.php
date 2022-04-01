@@ -28,16 +28,6 @@ class EventsProvider extends ServiceProvider {
             CreateCharacterListener::class,
         ],
 
-        // When a character sheet should update.
-        UpdateCharacterSheetEvent::class => [
-            UpdateCharacterSheetListener::class,
-        ],
-
-        // When a characetr inventory updates:
-        UpdateCharacterInventoryEvent::class => [
-            UpdateCharacterInventoryListener::class,
-        ],
-
         // When a characters inventory or anything else changes:
         UpdateCharacterAttackEvent::class => [
             UpdateCharacterAttackListener::class,
