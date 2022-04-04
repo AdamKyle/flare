@@ -1,15 +1,16 @@
-import React, {Component} from "react";
-import ItemNameColoration from "../../../../../components/ui/item-name-coloration";
+import React, {Component, MouseEventHandler} from "react";
+import ItemNameColorationButton from "../../../../../components/ui/item-name-coloration-button";
 import { formatNumber } from "../../../format-number";
 import ActionsInterface from "./actions-interface";
+import InventoryDetails from "../../types/inventory/inventory-details";
 
-export const BuildInventoryTableColumns = (component?: ActionsInterface) => {
+export const BuildInventoryTableColumns = (component?: ActionsInterface, clickAction?: (item: InventoryDetails) => any) => {
     const columns = [
         {
             name: 'Name',
             selector: (row: { item_name: string; }) => row.item_name,
             sortable: true,
-            cell: (row: any) => <ItemNameColoration item={row} />
+            cell: (row: any) => <ItemNameColorationButton item={row} on_click={clickAction} />
         },
         {
             name: 'Type',
@@ -48,7 +49,7 @@ export const buildLimitedColumns = (component?: ActionsInterface) => {
                 name: 'Name',
                 selector: (row: { item_name: string; }) => row.item_name,
                 sortable: true,
-                cell: (row: any) => <ItemNameColoration item={row} />
+                cell: (row: any) => <ItemNameColorationButton item={row} />
             },
             {
                 name: 'Description',

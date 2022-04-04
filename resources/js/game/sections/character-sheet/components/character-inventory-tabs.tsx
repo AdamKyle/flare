@@ -71,16 +71,16 @@ export default class CharacterInventoryTabs extends React.Component<any, Charact
         return (
             <Tabs tabs={this.tabs} full_width={true}>
                 <TabPanel key={'inventory'}>
-                    <InventoryTabSection dark_tables={this.state.dark_tables} character_id={this.props.character_id} inventory={this.state.inventory.inventory} usable_items={this.state.inventory.usable_items} />
+                    <InventoryTabSection dark_tables={this.state.dark_tables} character_id={this.props.character_id} inventory={this.state.inventory.inventory} usable_items={this.state.inventory.usable_items} is_dead={this.props.is_dead} />
                 </TabPanel>
                 <TabPanel key={'equipped'}>
-                    <EquippedTable dark_table={this.state.dark_tables} equipped_items={this.state.inventory.equipped} />
+                    <EquippedTable dark_table={this.state.dark_tables} equipped_items={this.state.inventory.equipped} is_dead={this.props.is_dead} />
                 </TabPanel>
                 <TabPanel key={'sets'}>
-                    <SetsTable dark_table={this.state.dark_tables} sets={this.state.inventory.sets} />
+                    <SetsTable dark_table={this.state.dark_tables} sets={this.state.inventory.sets} is_dead={this.props.is_dead} />
                 </TabPanel>
                 <TabPanel key={'quest'}>
-                    <QuestItemsTable dark_table={this.state.dark_tables} quest_items={this.state.inventory.quest_items} />
+                    <QuestItemsTable dark_table={this.state.dark_tables} quest_items={this.state.inventory.quest_items} is_dead={this.props.is_dead} />
                 </TabPanel>
             </Tabs>
         )

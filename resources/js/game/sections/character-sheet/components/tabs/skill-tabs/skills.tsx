@@ -49,9 +49,9 @@ export default class Skills extends React.Component<SkillsProps, any> {
                 cell: (row: SkillType) => <span key={row.id + '-' + (Math.random() + 1).toString(36).substring(7)}>
                     {
                         row.is_training ?
-                            <DangerButton button_label={'Stop Training'} on_click={() => this.stopTraining(row.id)} />
+                            <DangerButton button_label={'Stop Training'} on_click={() => this.stopTraining(row.id)} disabled={this.props.is_dead} />
                         :
-                            <PrimaryButton button_label={'Train'} on_click={() => this.trainSkill(row.id)} />
+                            <PrimaryButton button_label={'Train'} on_click={() => this.trainSkill(row.id)} disabled={this.props.is_dead} />
                     }
                 </span>
             },

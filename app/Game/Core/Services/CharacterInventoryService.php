@@ -364,7 +364,7 @@ class CharacterInventoryService {
 
     protected function fetchType(string $type): string {
         $acceptedTypes = [
-            'weapon', 'ring', 'shield', 'artifact', 'spell', 'armour'
+            'weapon', 'ring', 'shield', 'artifact', 'spell', 'armour', 'trinket', 'stave', 'hammer'
         ];
 
         return in_array($type, $acceptedTypes) ? $type : 'armour';

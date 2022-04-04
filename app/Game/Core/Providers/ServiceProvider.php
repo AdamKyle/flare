@@ -12,6 +12,7 @@ use App\Flare\Transformers\InventoryTransformer;
 use App\Flare\Transformers\Serializers\CoreSerializer;
 use App\Game\Battle\Services\BattleDrop;
 use App\Game\Core\Services\CharacterPassiveSkills;
+use App\Game\Core\Services\ComparisonService;
 use App\Game\Core\Services\DropCheckService;
 use App\Game\Core\Services\HolyItemService;
 use App\Game\Core\Services\InventorySetService;

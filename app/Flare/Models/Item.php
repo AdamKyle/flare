@@ -159,13 +159,15 @@ class Item extends Model
 
     protected $appends = [
         'affix_name',
+        'affix_count',
         'required_monster',
         'required_quest',
         'locations',
         'adventures',
         'holy_stack_devouring_darkness',
         'holy_stack_stat_bonus',
-        'holy_stacks_applied'
+        'holy_stacks_applied',
+        'is_unique',
     ];
 
     public function inventorySlots() {
@@ -235,6 +237,35 @@ class Item extends Model
         }
 
         return $itemName;
+    }
+
+    public function getAffixCountAttribute() {
+        if (!is_null($this->item_prefix_id) && !is_null($this->item_suffix_id)) {
+            return 2;
+        }
+
+        if (is_null($this->item_prefix_id) && !is_null($this->item_suffix_id)) {
+            return 1;
+        }
+
+        if (!is_null($this->item_prefix_id) && is_null($this->item_suffix_id)) {
+            return 1;
+        }
+
+        return 0;
+    }
+
+    public function getIsUniqueAttribute() {
+
+        if (!is_null($this->item_suffix_id)) {
+            return $this->itemSuffix->randomly_generated;
+        }
+
+        if (!is_null($this->item_prefix_id)) {
+            return $this->itemPrefix->randomly_generated;
+        }
+
+        return false;
     }
 
     public function getRequiredMonsterAttribute() {

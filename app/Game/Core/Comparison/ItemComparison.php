@@ -10,11 +10,22 @@ class ItemComparison {
 
     private $character;
 
+    private $coreStats = [
+        'str',
+        'dur',
+        'dex',
+        'chr',
+        'int',
+        'agi',
+        'focus',
+    ];
+
     /**
      * Fetch Comparison Details for an item of the same type currently equipped.
      *
      * @param Item $toCompare
      * @param Collection $inventorySlots
+     * @param Character $character
      * @return array
      */
     public function fetchDetails(Item $toCompare, Collection $inventorySlots, Character $character): array {
@@ -24,134 +35,94 @@ class ItemComparison {
 
         foreach($inventorySlots as $slot) {
             if ($slot->position !== null) {
-                $comparison[$slot->position] = $this->fetchHandComparison($toCompare, $inventorySlots, $slot->position);
+                $result = $this->fetchHandComparison($toCompare, $inventorySlots, $slot->position);
+
+                if (!empty($result)) {
+
+                    $result['position'] = $slot->position;
+
+                    $comparison[] = $result;
+                }
             }
         }
 
         return $comparison;
     }
 
-    /**
-     * Get Total Damage Increase
-     *
-     * @param Item $toCompare
-     * @param Item $equipped
-     * @return int
-     */
-    public function getDamageIncrease(Item $toCompare, Item $equipped): int {
+    public function getDamageAdjustment(Item $toCompare, Item $equipped): int {
         $totalDamageForEquipped = $equipped->getTotalDamage();
         $totalDamageForCompare  = $toCompare->getTotalDamage();
 
         return $totalDamageForCompare - $totalDamageForEquipped;
     }
 
-    /**
-     * Get Total Damage Decrease
-     *
-     * @param Item $toCompare
-     * @param Item $equipped
-     * @return int
-     */
-    public function getDamageDecrease(Item $toCompare, Item $equipped): int {
-        $totalDamageForEquipped = $equipped->getTotalDamage();
-        $totalDamageForCompare  = $toCompare->getTotalDamage();
-
-        if ($totalDamageForCompare < $totalDamageForEquipped) {
-            return $totalDamageForCompare - $totalDamageForEquipped;
-        }
-
-        return 0;
-    }
-
-    /**
-     * Get Total Ac Increase
-     *
-     * @param Item $toCompare
-     * @param Item $equipped
-     * @return int
-     */
-    public function getAcIncrease(Item $toCompare, Item $equipped): int {
-        $totalDefenceForEquipped = $equipped->getTotalDefence();
-        $totalDefenceForCompare  = $toCompare->getTotalDefence();
-
-        if ($totalDefenceForEquipped === 0.0) {
-            return 0;
-        }
-
-        return $totalDefenceForCompare - $totalDefenceForEquipped;
-    }
-
-    /**
-     * Get Total Ac Decrease
-     *
-     * @param Item $toCompare
-     * @param Item $equipped
-     * @return int
-     */
-    public function getAcDecrease(Item $toCompare, Item $equipped): int {
+    public function getAcAdjustment(Item $toCompare, Item $equipped): int {
         $totalDefenceForEquipped = $equipped->getTotalDefence();
         $totalDefenceForCompare  = $toCompare->getTotalDefence();
 
         return $totalDefenceForCompare - $totalDefenceForEquipped;
     }
 
-    /**
-     * Get Total Heal Increase
-     *
-     * @param Item $toCompare
-     * @param Item $equipped
-     * @return int
-     */
-    public function getHealIncrease(Item $toCompare, Item $equipped): int {
+    public function getHealingAdjustment(Item $toCompare, Item $equipped): int {
         $totalHealForEquipped = $equipped->getTotalHealing();
         $totalHealForCompare  = $toCompare->getTotalHealing();
 
         return $totalHealForCompare - $totalHealForEquipped;
     }
 
-    /**
-     * Get Total Heal Decrease
-     *
-     * @param Item $toCompare
-     * @param Item $equipped
-     * @return int
-     */
-    public function getHealDecrease(Item $toCompare, Item $equipped): int {
-        $totalHealForEquipped = $equipped->getTotalHealing();
-        $totalHealForCompare  = $toCompare->getTotalHealing();
-
-        return $totalHealForCompare - $totalHealForEquipped;
-    }
-
-    /**
-     * Get Total Stat Increase
-     *
-     * @param Item $toCompare
-     * @param Item $equipped
-     * @param string $stat
-     * @return int
-     */
-    public function getStatIncrease(Item $toCompare, Item $equipped, string $stat): float {
+    public function getStatAdjustment(Item $toCompare, Item $equipped, string $stat): int {
         $totalPercentageForEquipped = $equipped->getTotalPercentageForStat($stat);
         $totalPercentageForCompare  = $toCompare->getTotalPercentageForStat($stat);
 
         return $totalPercentageForCompare - $totalPercentageForEquipped;
     }
 
+    public function getResChanceAdjustment(Item $toCompare, Item $equipped): int {
+        return $toCompare->resurrection_chance - $equipped->resurrection_chance;
+    }
 
-    /**
-     * Get Total Stat Decrease
-     *
-     * @param Item $toCompare
-     * @param Item $equipped
-     * @param string $stat
-     * @return int
-     */
-    public function getStatDecrease(Item $toCompare, Item $equipped, string $stat): float {
-        $totalPercentageForEquipped = $equipped->getTotalPercentageForStat($stat);
-        $totalPercentageForCompare  = $toCompare->getTotalPercentageForStat($stat);
+    public function getBaseDamageAdjustment(Item $toCompare, Item $equipped): int {
+        return $toCompare->base_damage_mod - $equipped->base_damage_mod;
+    }
 
-        return $totalPercentageForCompare - $totalPercentageForEquipped;
+    public function getBaseHealingAdjustment(Item $toCompare, Item $equipped): int  {
+        return $toCompare->base_healing_mod - $equipped->base_healing_mod;
+    }
+
+    public function getBaseAcAdjustment(Item $toCompare, Item $equipped): int  {
+        return $toCompare->base_ac_mod - $equipped->base_ac_mod;
+    }
+
+    public function getFightTimeOutModAdjustment(Item $toCompare, Item $equipped): int {
+        return $toCompare->getTotalFightTimeOutMod() - $equipped->getTotalFightTimeOutMod();
+    }
+
+    public function getBaseDamageModAdjustment(Item $toCompare, Item $equipped): int {
+        return $toCompare->getTotalBaseDamageMod() - $equipped->getTotalBaseDamageMod();
+    }
+
+    public function getSpellEvasionAdjustment(Item $toCompare, Item $equipped): int {
+        return $toCompare->spell_evasion - $equipped->spell_evasion;
+    }
+
+    public function getArtifactAnnulmentAdjustment(Item $toCompare, Item $equipped): int {
+        return $toCompare->artifact_annulment - $equipped->artifact_annulment;
+    }
+
+    public function getAmbushChanceAdjustment(Item $toCompare, Item $equipped): int {
+        return $toCompare->ambush_chance - $equipped->ambush_chance;
+    }
+
+    public function getAmbushResistanceAdjustment(Item $toCompare, Item $equipped): int {
+        return $toCompare->ambush_resistance - $equipped->ambush_resistance;
+    }
+
+    public function getCounterChanceAdjustment(Item $toCompare, Item $equipped): int {
+        return $toCompare->counter_chance - $equipped->counter_chance;
+    }
+
+    public function getCounterResistanceAdjustment(Item $toCompare, Item $equipped): int {
+        return $toCompare->counter_resistance - $equipped->counter_resistance;
     }
 
     protected function fetchHandComparison(Item $toCompare, Collection $inventorySlots, string $hand): array {
@@ -160,71 +131,56 @@ class ItemComparison {
             return $slot->position === $hand;
         })->first();
 
-        if ($this->isItemBetter($toCompare, $foundPosition->item)) {
-            return [
-                'is_better'                     => true,
-                'replaces_item'                 => $foundPosition->item,
-                'slot'                          => $foundPosition,
-                'position'                      => $foundPosition->position,
-                'damage_adjustment'             => $this->getDamageIncrease($toCompare, $foundPosition->item),
-                'ac_adjustment'                 => $this->getAcIncrease($toCompare, $foundPosition->item),
-                'healing_adjustment'            => $this->getHealIncrease($toCompare, $foundPosition->item),
-                'spell_evasion_adjustment'      => $toCompare->spell_evasion - $foundPosition->item->spell_evasion,
-                'artifact_annulment_adjustment' => $toCompare->artifact_annulment - $foundPosition->item->artifact_annulment,
-                'res_chance_adjustment'         => $toCompare->resurrection_chance - $foundPosition->item->resurrection_chance,
-                'base_damage_adjustment'        => $toCompare->base_damage_mod - $foundPosition->item->base_damage_mod,
-                'base_healing_adjustment'       => $toCompare->base_healing_mod - $foundPosition->item->base_healing_mod,
-                'base_ac_adjustment'            => $toCompare->base_ac_mod - $foundPosition->item->base_ac_mod,
-                'fight_timeout_mod_adjustment'  => $toCompare->getTotalFightTimeOutMod() - $foundPosition->item->getTotalFightTimeOutMod(),
-                'base_damage_mod_adjustment'    => $toCompare->getTotalBaseDamageMod() - $foundPosition->item->getTotalBaseDamageMod(),
-                'base_damage_mod_adjustment'    => $toCompare->getTotalBaseDamageMod() - $foundPosition->item->getTotalBaseDamageMod(),
-                'str_adjustment'                => $this->getStatIncrease($toCompare, $foundPosition->item, 'str'),
-                'dur_adjustment'                => $this->getStatIncrease($toCompare, $foundPosition->item, 'dur'),
-                'dex_adjustment'                => $this->getStatIncrease($toCompare, $foundPosition->item, 'dex'),
-                'chr_adjustment'                => $this->getStatIncrease($toCompare, $foundPosition->item, 'chr'),
-                'int_adjustment'                => $this->getStatIncrease($toCompare, $foundPosition->item, 'int'),
-                'agi_adjustment'                => $this->getStatIncrease($toCompare, $foundPosition->item, 'agi'),
-                'focus_adjustment'              => $this->getStatIncrease($toCompare, $foundPosition->item, 'focus'),
-                'ambush_chance_adjustment'      => $toCompare->ambush_chance - $foundPosition->item->ambush_chance,
-                'ambush_resistance_adjustment'  => $toCompare->ambush_resistance - $foundPosition->item->ambush_resistance,
-                'counter_chance_adjustment'     => $toCompare->counter_chance - $foundPosition->item->counter_chance,
-                'counter_resistance_adjustment' => $toCompare->counter_resistance - $foundPosition->item->counter_resistance,
-            ];
-        } else {
-            $baseDamageAdjustment  = $toCompare->base_damage_mod < $foundPosition->item->base_damage_mod ? $toCompare->base_damage_mod - $foundPosition->item->base_damage_mod : $toCompare->base_damage_mod;
-            $baseHealingAdjustment = $toCompare->base_healing_mod < $foundPosition->item->base_healing_mod ? $toCompare->base_healing_mod - $foundPosition->item->base_healing_mod : $toCompare->base_healing_mod;
-            $baseAcAdjustment     = $toCompare->base_ac_mod < $foundPosition->item->base_ac_mod ? $toCompare->base_ac_mod - $foundPosition->item->base_ac_mod : $toCompare->base_ac_mod;
-
-            return [
-                'is_better'                     => false,
-                'replaces_item'                 => null,
-                'slot'                          => $foundPosition,
-                'position'                      => $foundPosition->position,
-                'damage_adjustment'             => $this->getDamageDecrease($toCompare, $foundPosition->item),
-                'ac_adjustment'                 => $this->getAcDecrease($toCompare, $foundPosition->item),
-                'healing_adjustment'            => $this->getHealDecrease($toCompare, $foundPosition->item),
-                'spell_evasion_adjustment'      => $toCompare->spell_evasion - $foundPosition->item->spell_evasion,
-                'artifact_annulment_adjustment' => $toCompare->artifact_annulment - $foundPosition->item->artifact_annulment,
-                'res_chance_adjustment'         => $toCompare->resurrection_chance - $foundPosition->item->resurrection_chance,
-                'str_adjustment'                => $this->getStatDecrease($toCompare, $foundPosition->item, 'str'),
-                'dur_adjustment'                => $this->getStatDecrease($toCompare, $foundPosition->item, 'dur'),
-                'dex_adjustment'                => $this->getStatDecrease($toCompare, $foundPosition->item, 'dex'),
-                'chr_adjustment'                => $this->getStatDecrease($toCompare, $foundPosition->item, 'chr'),
-                'int_adjustment'                => $this->getStatDecrease($toCompare, $foundPosition->item, 'int'),
-                'agi_adjustment'                => $this->getStatIncrease($toCompare, $foundPosition->item, 'agi'),
-                'focus_adjustment'              => $this->getStatIncrease($toCompare, $foundPosition->item, 'focus'),
-                'base_damage_adjustment'        => $baseDamageAdjustment,
-                'base_healing_adjustment'       => $baseHealingAdjustment,
-                'base_ac_adjustment'            => $baseAcAdjustment,
-                'fight_timeout_mod_adjustment'  => $toCompare->getTotalFightTimeOutMod() - $foundPosition->item->getTotalFightTimeOutMod(),
-                'base_damage_mod_adjustment'    => $toCompare->getTotalBaseDamageMod() - $foundPosition->item->getTotalBaseDamageMod(),
-                'ambush_chance_adjustment'      => $toCompare->ambush_chance - $foundPosition->item->ambush_chance,
-                'ambush_resistance_adjustment'  => $toCompare->ambush_resistance - $foundPosition->item->ambush_resistance,
-                'counter_chance_adjustment'     => $toCompare->counter_chance - $foundPosition->item->counter_chance,
-                'counter_resistance_adjustment' => $toCompare->counter_resistance - $foundPosition->item->counter_resistance,
-            ];
+        if (is_null($foundPosition)) {
+            return [];
         }
+
+        $adjustments = [
+            'damage_adjustment',
+            'ac_adjustment',
+            'healing_adjustment',
+            'spell_evasion_adjustment',
+            'artifact_annulment_adjustment',
+            'res_chance_adjustment',
+            'base_damage_adjustment',
+            'base_healing_adjustment',
+            'base_ac_adjustment',
+            'fight_time_out_mod_adjustment',
+            'base_damage_mod_adjustment',
+            'str_adjustment',
+            'dur_adjustment',
+            'dex_adjustment',
+            'chr_adjustment',
+            'int_adjustment',
+            'agi_adjustment',
+            'focus_adjustment',
+            'ambush_chance_adjustment',
+            'ambush_resistance_adjustment',
+            'counter_chance_adjustment',
+            'counter_resistance_adjustment',
+        ];
+
+        $result = [];
+
+        foreach ($adjustments as $adjustmentType) {
+            $parts = explode('_', $adjustmentType);
+
+            if (in_array($parts[0], $this->coreStats)) {
+                $adjustment = $this->getStatAdjustment($toCompare, $foundPosition->item, $parts[0]);
+
+                $result[$adjustmentType] = $adjustment;
+            } else {
+                $function   = 'get' . ucfirst(camel_case($adjustmentType));
+
+                $adjustment = $this->{$function}($toCompare, $foundPosition->item);
+
+                $result[$adjustmentType] = $adjustment;
+            }
+        }
+
+        return $result;
     }
+
 
     protected function isItemTwoHanded(Item $item): bool {
         return in_array($item->type, ['bow', 'hammer', 'stave']);

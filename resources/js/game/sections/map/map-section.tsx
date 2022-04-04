@@ -201,6 +201,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                                 character_id={this.props.character_id}
                                 enemy_kingdoms={this.state.enemy_kingdoms}
                                 view_port={this.props.view_port}
+                                is_dead={this.props.is_dead}
                     />
                 </div>
                 <div className={'mt-3'}>

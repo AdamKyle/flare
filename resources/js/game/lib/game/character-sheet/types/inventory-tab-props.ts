@@ -7,4 +7,6 @@ export default interface InventoryTabProps {
     character_id: number;
 
     dark_table: boolean;
+
+    is_dead: boolean;
 }

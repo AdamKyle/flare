@@ -5,4 +5,6 @@ export default interface DropDownProps {
     selected_name?: string;
 
     button_title: string;
+
+    disabled?: boolean;
 }

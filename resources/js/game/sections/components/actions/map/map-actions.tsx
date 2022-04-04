@@ -207,7 +207,7 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                 if (this.props.location_with_adventures.adventures.length > 0) {
                     return <SuccessOutlineButton additional_css={clsx('text-center px-0', {
                         'col-start-2 col-end-2': this.props.port_location === null
-                    })} button_label={'Adventure'} on_click={this.adventure.bind(this)} disabled={this.state.is_movement_disabled} />
+                    })} button_label={'Adventure'} on_click={this.adventure.bind(this)} disabled={this.state.is_movement_disabled || this.props.is_dead} />
                 }
             }
         }
@@ -231,7 +231,7 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
 
     renderViewDetailsButton() {
         if (this.state.location !== null || this.state.player_kingdom_id !== 0 || this.state.enemy_kingdom_id !== 0) {
-            return <OrangeButton additional_css={'block lg:hidden'} button_label={'View Location Details'} on_click={() => this.viewLocation()} />;
+            return <OrangeButton additional_css={'block lg:hidden'} button_label={'View Location Details'} on_click={() => this.viewLocation()} disabled={this.props.is_dead} />;
         }
     }
 
@@ -250,14 +250,14 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                                 this.props.port_location !== null ?
                                     <SuccessOutlineButton additional_css={clsx('text-center', {
                                         'col-start-2 col-end-2': this.adventureButtonIsHidden(),
-                                    })} button_label={'Set Sail'} on_click={this.setSail.bind(this)} disabled={this.state.is_movement_disabled}/>
+                                    })} button_label={'Set Sail'} on_click={this.setSail.bind(this)} disabled={this.state.is_movement_disabled || this.props.is_dead}/>
                                     : null
                             }
 
                             <SuccessOutlineButton additional_css={clsx('text-center', {'col-start-3 col-end-3': this.props.location_with_adventures === null && this.props.port_location === null }, {'col-start-3 col-end-3': this.props.location_with_adventures !== null || this.props.port_location !== null })}
                                                   button_label={'Teleport'}
                                                   on_click={this.teleport.bind(this)}
-                                                  disabled={this.state.is_movement_disabled}
+                                                  disabled={this.state.is_movement_disabled || this.props.is_dead}
                             />
                         </div>
                     </div>
@@ -267,13 +267,19 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                 </div>
                 <div className='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 hidden sm:block'></div>
                 <div className='grid gap-2 lg:grid-cols-5 lg:gap-4'>
-                    <PrimaryButton disabled={this.state.is_movement_disabled} button_label={'North'} on_click={() => this.move('north')} />
-                    <PrimaryButton disabled={this.state.is_movement_disabled} button_label={'South'} on_click={() => this.move('south')} />
-                    <PrimaryButton disabled={this.state.is_movement_disabled} button_label={'West'} on_click={() => this.move('west')} />
-                    <PrimaryButton disabled={this.state.is_movement_disabled} button_label={'East'} on_click={() => this.move('east')} />
-                    <PrimaryButton disabled={this.state.is_movement_disabled} button_label={'Traverse'} on_click={() => this.traverse()} />
+                    <PrimaryButton disabled={this.state.is_movement_disabled || this.props.is_dead} button_label={'North'} on_click={() => this.move('north')} />
+                    <PrimaryButton disabled={this.state.is_movement_disabled || this.props.is_dead} button_label={'South'} on_click={() => this.move('south')} />
+                    <PrimaryButton disabled={this.state.is_movement_disabled || this.props.is_dead} button_label={'West'} on_click={() => this.move('west')} />
+                    <PrimaryButton disabled={this.state.is_movement_disabled || this.props.is_dead} button_label={'East'} on_click={() => this.move('east')} />
+                    <PrimaryButton disabled={this.state.is_movement_disabled || this.props.is_dead} button_label={'Traverse'} on_click={() => this.traverse()} />
                     {this.renderViewDetailsButton()}
                 </div>
+
+                {
+                    this.props.is_dead ?
+                        <p className='mt-5 text-red-600 dark:text-red-400'>You are dead. Dead people cannot do things. Click revive to live again!</p>
+                    : null
+                }
 
                 {
                     this.state.open_teleport_modal ?

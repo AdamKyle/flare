@@ -3,6 +3,7 @@ import PrimaryButton from "../../../../components/ui/buttons/primary-button";
 import AdditionalInfoModal from "../modals/additional-info-modal";
 import InfoTabProps from "../../../../lib/game/character-sheet/types/tabs/info-tab-props";
 import {formatNumber} from "../../../../lib/game/format-number";
+import OrangeButton from "../../../../components/ui/buttons/orange-button";
 
 export default class InfoTab extends React.Component<InfoTabProps, any> {
 
@@ -55,7 +56,7 @@ export default class InfoTab extends React.Component<InfoTabProps, any> {
                     </div>
                 </div>
                 <div className='mt-4'>
-                    <PrimaryButton button_label={'Additional Information'} on_click={this.manageInfoDialogue.bind(this)} />
+                    <OrangeButton button_label={'Additional Information'} on_click={this.manageInfoDialogue.bind(this)} />
                 </div>
                 <div className='relative top-[24px]'>
                     <div className="flex justify-between mb-1">

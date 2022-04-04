@@ -151,8 +151,8 @@ export default class Actions extends React.Component<any, ActionsState> {
                                         icon_class: 'ra ra-anvil',
                                         on_click: this.openCrafting.bind(this)
                                     }
-                                ]} button_title={'Craft/Enchant'} />
-                                <DangerButton button_label={'Attack Kingdom'} on_click={this.attackKingdom.bind(this)} />
+                                ]} button_title={'Craft/Enchant'} disabled={this.state.character?.is_dead} />
+                                <DangerButton button_label={'Attack Kingdom'} on_click={this.attackKingdom.bind(this)} disabled={this.state.character?.is_dead} />
                             </div>
                             <div className='border-b-2 block border-b-gray-300 dark:border-b-gray-600 my-3 md:hidden'></div>
                             <div className='md:col-start-2 md:col-span-3 mt-1'>

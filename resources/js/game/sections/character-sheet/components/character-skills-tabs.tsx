@@ -58,13 +58,13 @@ export default class CharacterSkillsTabs extends React.Component<any, CharacterS
         return (
             <Tabs tabs={this.tabs} full_width={true}>
                 <TabPanel key={'skills'}>
-                    <Skills trainable_skills={this.state.skills.training_skills} dark_table={this.state.dark_tables}/>
+                    <Skills trainable_skills={this.state.skills.training_skills} dark_table={this.state.dark_tables} is_dead={this.props.is_dead} />
                 </TabPanel>
                 <TabPanel key={'crafting'}>
-                    <CraftingSkills crafting_skills={this.state.skills.crafting_skills} dark_table={this.state.dark_tables}/>
+                    <CraftingSkills crafting_skills={this.state.skills.crafting_skills} dark_table={this.state.dark_tables} />
                 </TabPanel>
                 <TabPanel key={'kingdom-passives'}>
-                    <KingdomPassives />
+                    <KingdomPassives is_dead={this.props.is_dead} />
                 </TabPanel>
             </Tabs>
         )

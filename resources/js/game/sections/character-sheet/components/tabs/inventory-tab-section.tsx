@@ -5,6 +5,9 @@ import UsableItemsTable from "./inventory-tabs/usable-items-table";
 import PopOverContainer from "../../../../components/ui/popover/pop-over-container";
 import InventoryDetails from "../../../../lib/game/character-sheet/types/inventory/inventory-details";
 import DangerButton from "../../../../components/ui/buttons/danger-button";
+import ActionsInterface from "../../../../lib/game/character-sheet/helpers/inventory/actions-interface";
+import PrimaryButton from "../../../../components/ui/buttons/primary-button";
+import OrangeButton from "../../../../components/ui/buttons/orange-button";
 
 export default class InventoryTabSection extends React.Component<any, any> {
 
@@ -66,7 +69,7 @@ export default class InventoryTabSection extends React.Component<any, any> {
                                 icon_class: 'ra ra-bubbling-potion',
                                 on_click: () => this.switchTable('Usable')
                             },
-                        ]} button_title={'Type'} selected_name={this.state.table} />
+                        ]} button_title={'Type'} selected_name={this.state.table} disabled={this.props.is_dead} />
                     </div>
                     <div className='ml-2'>
                         <DropDown menu_items={[
@@ -80,7 +83,7 @@ export default class InventoryTabSection extends React.Component<any, any> {
                                 icon_class: 'ra ra-bubbling-potion',
                                 on_click: () => this.destroyAll()
                             },
-                        ]} button_title={'Actions'} selected_name={this.state.table} />
+                        ]} button_title={'Actions'} selected_name={this.state.table} disabled={this.props.is_dead} />
                     </div>
                     <div className='ml-4 md:ml-0 my-4 md:my-0 md:absolute md:right-0'>
                         <div className='flex items-center'>
@@ -101,9 +104,9 @@ export default class InventoryTabSection extends React.Component<any, any> {
 
                 {
                     this.state.table === 'Inventory' ?
-                        <InventoryTable dark_table={this.props.dark_tables} character_id={this.props.character_id} inventory={this.state.data} />
+                        <InventoryTable dark_table={this.props.dark_tables} character_id={this.props.character_id} inventory={this.state.data} is_dead={this.props.is_dead} />
                         :
-                        <UsableItemsTable dark_table={this.props.dark_tables} usable_items={this.state.data} />
+                        <UsableItemsTable dark_table={this.props.dark_tables} usable_items={this.state.data} is_dead={this.props.is_dead} />
                 }
             </Fragment>
         )

@@ -12,7 +12,7 @@ export default class DropDown extends React.Component<DropDownProps, any> {
     renderMenuItems() {
         return this.props.menu_items.map((menuItem) => {
             return (
-                <Menu.Item>
+                <Menu.Item disabled={this.props.disabled}>
                     {({ active }) => (
                         <button
                             className={clsx('group flex rounded-sm items-center w-full py-2 text-sm', {

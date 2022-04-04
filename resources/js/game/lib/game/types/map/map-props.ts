@@ -12,4 +12,6 @@ export default interface MapProps {
         gold_dust: number,
         copper_coins: number,
     };
+
+    is_dead?: boolean;
 }

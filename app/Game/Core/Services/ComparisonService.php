@@ -2,10 +2,15 @@
 
 namespace App\Game\Core\Services;
 
-use App\Flare\Models\Item;
+
 use Cache;
+
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item as FractalItem;
+use App\Flare\Models\Item;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
+use App\Flare\Transformers\ItemComparisonTransfromer;
 use App\Game\Core\Values\ValidEquipPositionsValue;
 
 class ComparisonService {
@@ -19,8 +24,8 @@ class ComparisonService {
     public function __construct(
         ValidEquipPositionsValue $validEquipPositionsValue,
         CharacterInventoryService $characterInventoryService,
-        EquipItemService $equipItemService)
-    {
+        EquipItemService $equipItemService,
+    ) {
         $this->validEquipPositionsValue  = $validEquipPositionsValue;
         $this->characterInventoryService = $characterInventoryService;
         $this->equipItemService          = $equipItemService;
@@ -39,7 +44,7 @@ class ComparisonService {
 
         $viewData = [
             'details'     => [],
-            'itemToEquip' => $itemToEquip->item,
+            'itemToEquip' => $this->buildItemDetails($itemToEquip->item),
             'type'        => $service->getType($itemToEquip->item, $type),
             'slotId'      => $itemToEquip->id,
             'characterId' => $character->id,
@@ -57,22 +62,23 @@ class ComparisonService {
             $hasSet   = !is_null($setEquipped);
             $setIndex = !is_null($setEquipped) ? $character->inventorySets->search(function($set) {return $set->is_equipped; }) + 1 : 0;
 
+
             $viewData = [
-                'details'      => $this->equipItemService->getItemStats($itemToEquip->item, $service->inventory(), $character),
-                'itemToEquip'  => $itemToEquip->item,
-                'type'         => $service->getType($itemToEquip->item, $type),
-                'slotId'       => $itemToEquip->id,
-                'slotPosition' => $itemToEquip->position,
-                'characterId'  => $character->id,
-                'bowEquipped'  => $this->equipItemService->isTwoHandedItemEquipped($itemToEquip->item, $service->inventory(), 'bow'),
+                'details'        => $this->equipItemService->getItemStats($itemToEquip->item, $service->inventory(), $character),
+                'itemToEquip'    => $this->buildItemDetails($itemToEquip->item),
+                'type'           => $service->getType($itemToEquip->item, $type),
+                'slotId'         => $itemToEquip->id,
+                'slotPosition'   => $itemToEquip->position,
+                'characterId'    => $character->id,
+                'bowEquipped'    => $this->equipItemService->isTwoHandedItemEquipped($itemToEquip->item, $service->inventory(), 'bow'),
                 'hammerEquipped' => $this->equipItemService->isTwoHandedItemEquipped($itemToEquip->item, $service->inventory(), 'hammer'),
-                'staveEquipped' => $this->equipItemService->isTwoHandedItemEquipped($itemToEquip->item, $service->inventory(), 'stave'),
-                'setEquipped'  => $hasSet,
-                'setIndex'     => $setIndex,
+                'staveEquipped'  => $this->equipItemService->isTwoHandedItemEquipped($itemToEquip->item, $service->inventory(), 'stave'),
+                'setEquipped'    => $hasSet,
+                'setIndex'       => $setIndex,
             ];
         }
 
-        Cache::put($character->user->id . '-compareItemDetails' . $itemToEquip->id, $viewData, now()->addMinutes(10));
+        return $viewData;
     }
 
     public function buildShopData(Character $character, Item $item, string $type = null) {
@@ -95,7 +101,7 @@ class ComparisonService {
 
         return [
             'details'        => $this->equipItemService->getItemStats($item, $service->inventory(), $character),
-            'itemToEquip'    => $item,
+            'itemToEquip'    => $this->buildItemDetails($itemToEquip->item),
             'type'           => $service->getType($item, $type),
             'slotId'         => $item->id,
             'slotPosition'   => null,
@@ -138,5 +144,11 @@ class ComparisonService {
                 }
             }
         })->isNotEmpty();
+    }
+
+    protected function buildItemDetails(Item $item): array {
+        $item = new FractalItem($item, new ItemComparisonTransfromer);
+
+        return (new Manager())->createData($item)->toArray()['data'];
     }
 }

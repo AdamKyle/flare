@@ -134,7 +134,11 @@ export default class Game extends React.Component<GameProps, GameState> {
         }
 
         if (this.state.quests === null) {
-            return null;
+            return this.renderLoading();
+        }
+
+        if (this.state.character === null) {
+            return this.renderLoading();
         }
 
         return (
@@ -166,6 +170,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                                     character_id={this.props.characterId}
                                     view_port={this.state.view_port}
                                     currencies={this.state.character_currencies}
+                                    is_dead={this.state.character?.is_dead}
                                 />
                             </BasicCard>
                         </div>

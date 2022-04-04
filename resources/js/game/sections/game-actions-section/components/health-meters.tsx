@@ -9,6 +9,33 @@ export default class HealthMeters extends React.Component<HealthMeterProps, any>
         super(props);
     }
 
+    abbreviateNumber(stat: number|undefined): string|number {
+
+        if (typeof stat === 'undefined') {
+            return 0;
+        }
+
+        let statNumber = stat;
+
+        const symbol = ["", "k", "M", "B", "T", "Quad.", "Qunit."];
+
+        // what tier? (determines SI symbol)
+        var tier = Math.log10(Math.abs(statNumber)) / 3 | 0;
+
+        // if zero, we don't need a suffix
+        if(tier == 0) return statNumber;
+
+        // get suffix and determine scale
+        var suffix = symbol[tier];
+        var scale = Math.pow(10, tier * 3);
+
+        // scale the number
+        var scaled = statNumber / scale;
+
+        // format number and add suffix
+        return scaled.toFixed(1) + suffix;
+    }
+
     render() {
         return(
             <div className='mb-2'>
@@ -22,7 +49,7 @@ export default class HealthMeters extends React.Component<HealthMeterProps, any>
                         'text-red-600 dark:text-red-400': this.props.is_enemy
                     },{
                         'text-green-700 dark:text-green-500': !this.props.is_enemy
-                    })}>{formatNumber(this.props.current_health)} / {formatNumber(this.props.max_health)}</span>
+                    })}>{this.abbreviateNumber(this.props.current_health)} / {this.abbreviateNumber(this.props.max_health)}</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-1.5 dark:bg-gray-700">
                     <div className={clsx("h-1.5 rounded-full", {

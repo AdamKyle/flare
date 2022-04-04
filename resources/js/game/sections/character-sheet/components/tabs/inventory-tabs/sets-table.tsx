@@ -61,7 +61,7 @@ export default class SetsTable extends React.Component<any, any> implements Acti
     }
 
     actions(row: InventoryDetails): JSX.Element {
-        return <DangerButton button_label={'Remove'} on_click={() => this.removeFromSet(row.id)} />
+        return <DangerButton button_label={'Remove'} on_click={() => this.removeFromSet(row.id)} disabled={this.props.is_dead} />
     }
 
     emptySet() {
@@ -77,10 +77,10 @@ export default class SetsTable extends React.Component<any, any> implements Acti
             <Fragment>
                 <div className='flex items-center'>
                     <div>
-                        <DropDown menu_items={this.buildMenuItems()} button_title={'Set'} selected_name={this.state.selected_set} />
+                        <DropDown menu_items={this.buildMenuItems()} button_title={'Set'} selected_name={this.state.selected_set} disabled={this.props.is_dead} />
                     </div>
                     <div className='ml-2'>
-                        <DangerButton button_label={'Empty Set'} on_click={this.emptySet.bind(this)} />
+                        <DangerButton button_label={'Empty Set'} on_click={this.emptySet.bind(this)} disabled={this.props.is_dead} />
                     </div>
                     <div className='ml-4 md:ml-0 my-4 md:my-0 md:absolute md:right-0'>
                         <div className='flex items-center'>

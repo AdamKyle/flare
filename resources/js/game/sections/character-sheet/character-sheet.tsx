@@ -4,6 +4,7 @@ import CharacterTabs from "./components/character-tabs";
 import CharacterSkillsTabs from "./components/character-skills-tabs";
 import CharacterInventoryTabs from "./components/character-inventory-tabs";
 import CharacterSheetProps from "../../lib/game/character-sheet/types/character-sheet-props";
+import DangerAlert from "../../components/ui/alerts/simple-alerts/danger-alert";
 
 export default class CharacterSheet extends React.Component<CharacterSheetProps, any> {
 
@@ -19,6 +20,15 @@ export default class CharacterSheet extends React.Component<CharacterSheetProps,
 
         return(
             <div>
+                {
+                    this.props.character.is_dead ?
+                        <DangerAlert additional_css={'mb-4'}>
+                            <p className='p-3'>Christ child! You are dead. Dead people cannot do a lot of things including: Manage inventory, Manage Skills - including passives, Manage Boons
+                                or even use items. Go resurrect child!</p>
+                        </DangerAlert>
+                    : null
+                }
+
                 <div className='flex flex-col lg:flex-row w-full gap-2'>
                     <BasicCard additionalClasses={'overflow-x-auto lg:w-1/2'}>
                         <CharacterTabs  character={this.props.character} />
@@ -58,10 +68,10 @@ export default class CharacterSheet extends React.Component<CharacterSheetProps,
                 </div>
                 <div className='flex flex-col lg:flex-row gap-2 w-full mt-2'>
                     <BasicCard additionalClasses={'overflow-x-auto lg:w-1/2 lg:h-fit'}>
-                        <CharacterSkillsTabs character_id={this.props.character.id}/>
+                        <CharacterSkillsTabs character_id={this.props.character.id} is_dead={this.props.character.is_dead}/>
                     </BasicCard>
                     <BasicCard additionalClasses={'overflow-x-auto lg:w-1/2 lg:h-fit'}>
-                        <CharacterInventoryTabs character_id={this.props.character.id}/>
+                        <CharacterInventoryTabs character_id={this.props.character.id} is_dead={this.props.character.is_dead}/>
                     </BasicCard>
                 </div>
             </div>

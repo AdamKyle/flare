@@ -27,7 +27,7 @@ export default class EquippedTable extends React.Component<any, any> implements 
     }
 
     actions(row: InventoryDetails): JSX.Element {
-        return <DangerButton button_label={'Unequip'} on_click={() => this.unequip(row.id)} />
+        return <DangerButton button_label={'Unequip'} on_click={() => this.unequip(row.id)} disabled={this.props.is_dead} />
     }
 
     unequipAll() {
@@ -54,10 +54,10 @@ export default class EquippedTable extends React.Component<any, any> implements 
                             <input type='text' name='search' className='form-control' onChange={this.search.bind(this)} placeholder={'search'}/>
                         </div>
                         <div className='ml-2'>
-                            <DangerButton button_label={'Unequip All'} on_click={this.unequipAll.bind(this)} />
+                            <DangerButton button_label={'Unequip All'} on_click={this.unequipAll.bind(this)} disabled={this.props.is_dead} />
                         </div>
                         <div className='ml-2'>
-                            <PrimaryButton button_label={'Save as Set'} on_click={this.saveAsSet.bind(this)} />
+                            <PrimaryButton button_label={'Save as Set'} on_click={this.saveAsSet.bind(this)} disabled={this.props.is_dead} />
                         </div>
                     </div>
                 </div>

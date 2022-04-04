@@ -11,7 +11,7 @@ export default interface DialogueTypes {
         handle_action: (args: any) => void;
     } | null
 
-    title: string;
+    title: string | JSX.Element;
 
     large_modal?: boolean;
 
