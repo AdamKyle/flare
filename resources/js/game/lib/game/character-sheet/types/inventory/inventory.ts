@@ -17,5 +17,7 @@ export default interface Inventory {
 
     sets: {[key: string]: InventoryDetails[] | []}
 
-    set_equipped: boolean;
+    set_is_equipped: boolean;
+
+    set_name_equipped: string;
 }

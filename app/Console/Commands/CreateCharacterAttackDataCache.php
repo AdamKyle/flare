@@ -4,11 +4,7 @@ namespace App\Console\Commands;
 
 use App\Flare\Jobs\CreateCharacterAttackData;
 use App\Flare\Models\Character;
-use App\Flare\Transformers\CharacterAttackTransformer;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Cache;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item as ResourceItem;
 
 class CreateCharacterAttackDataCache extends Command
 {

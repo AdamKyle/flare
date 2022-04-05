@@ -20,6 +20,10 @@ class CharacterTrinketsInformation {
 
         $ambushChance = 0.0;
 
+        if (is_null($equipped)) {
+            return $ambushChance;
+        }
+
         foreach ($equipped as $slot) {
             $ambushChance += $slot->item->ambush_chance;
         }
@@ -37,6 +41,10 @@ class CharacterTrinketsInformation {
         $equipped = $this->fetchEquipped($character);
 
         $ambushResistance = 0.0;
+
+        if (is_null($equipped)) {
+            return $ambushResistance;
+        }
 
         foreach ($equipped as $slot) {
             $ambushResistance += $slot->item->ambush_resistance;
@@ -56,6 +64,10 @@ class CharacterTrinketsInformation {
 
         $counterChance = 0.0;
 
+        if (is_null($equipped)) {
+            return $counterChance;
+        }
+
         foreach ($equipped as $slot) {
             $counterChance += $slot->item->counter_chance;
         }
@@ -73,6 +85,10 @@ class CharacterTrinketsInformation {
         $equipped = $this->fetchEquipped($character);
 
         $counterResistance = 0.0;
+
+        if (is_null($equipped)) {
+            return $counterResistance;
+        }
 
         foreach ($equipped as $slot) {
             $counterResistance += $slot->item->counter_resistance;

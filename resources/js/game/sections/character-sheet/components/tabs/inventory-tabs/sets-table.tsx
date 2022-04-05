@@ -2,24 +2,27 @@ import React, {Fragment} from "react";
 import Table from "../../../../../components/ui/data-tables/table";
 import {
     BuildInventoryTableColumns,
-    buildLimitedColumns
 } from "../../../../../lib/game/character-sheet/helpers/inventory/build-inventory-table-columns";
 import DropDown from "../../../../../components/ui/drop-down/drop-down";
 import PrimaryButton from "../../../../../components/ui/buttons/primary-button";
-import PrimaryOutlineButtonWithPopOver from "../../../../../components/ui/buttons/primary-outline-button-with-pop-over";
 import PopOverContainer from "../../../../../components/ui/popover/pop-over-container";
 import InventoryDetails from "../../../../../lib/game/character-sheet/types/inventory/inventory-details";
 import ActionsInterface from "../../../../../lib/game/character-sheet/helpers/inventory/actions-interface";
 import DangerButton from "../../../../../components/ui/buttons/danger-button";
+import SetsTableProps from "../../../../../lib/game/character-sheet/types/tabs/sets-table-props";
+import LoadingProgressBar from "../../../../../components/ui/progress-bars/loading-progress-bar";
+import {AxiosError, AxiosResponse} from "axios";
+import Ajax from "../../../../../lib/ajax/ajax";
 
-export default class SetsTable extends React.Component<any, any> implements ActionsInterface {
-    constructor(props: any) {
+export default class SetsTable extends React.Component<SetsTableProps, any> implements ActionsInterface {
+    constructor(props: SetsTableProps) {
         super(props);
 
         this.state = {
             data: [],
             drop_down_labels: [],
             selected_set: null,
+            loading: false,
         }
     }
 
@@ -68,6 +71,30 @@ export default class SetsTable extends React.Component<any, any> implements Acti
 
     }
 
+    equipSet() {
+        let setId: any = this.props.savable_sets.filter((set) => {
+            return set.name === this.state.selected_set;
+        });
+
+        if (setId.length > 0) {
+            setId = setId[0].id;
+        }
+
+        this.setState({
+            loading: true
+        }, () => {
+            (new Ajax()).setRoute('character/'+this.props.character_id+'/inventory-set/equip/' + setId).doAjaxCall('post', (result: AxiosResponse) => {
+                this.setState({
+                    loading: false
+                }, () => {
+                    this.props.update_inventory(result.data.inventory);
+                });
+            }, (error: AxiosError) => {
+
+            })
+        })
+    }
+
     removeFromSet(id: number) {
 
     }
@@ -77,10 +104,18 @@ export default class SetsTable extends React.Component<any, any> implements Acti
             <Fragment>
                 <div className='flex items-center'>
                     <div>
-                        <DropDown menu_items={this.buildMenuItems()} button_title={'Set'} selected_name={this.state.selected_set} disabled={this.props.is_dead} />
+                        <DropDown menu_items={this.buildMenuItems()} button_title={'Set'} selected_name={this.state.selected_set} secondary_selected={this.props.set_name_equipped} disabled={this.props.is_dead} />
                     </div>
                     <div className='ml-2'>
                         <DangerButton button_label={'Empty Set'} on_click={this.emptySet.bind(this)} disabled={this.props.is_dead} />
+                    </div>
+                    <div className='ml-2'>
+                        {
+                            this.state.selected_set === this.props.set_name_equipped ?
+                                <span className={'text-green-600 dark:text-green-700'}>Equipped!</span>
+                            :
+                                <PrimaryButton button_label={'Equip Set'} on_click={this.equipSet.bind(this)} disabled={this.props.is_dead} />
+                        }
                     </div>
                     <div className='ml-4 md:ml-0 my-4 md:my-0 md:absolute md:right-0'>
                         <div className='flex items-center'>
@@ -98,6 +133,12 @@ export default class SetsTable extends React.Component<any, any> implements Acti
                         </div>
                     </div>
                 </div>
+
+                {
+                    this.state.loading ?
+                        <LoadingProgressBar />
+                        : null
+                }
 
                 <Table data={this.state.data} columns={BuildInventoryTableColumns(this)} dark_table={this.props.dark_table}/>
             </Fragment>

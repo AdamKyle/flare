@@ -10,7 +10,6 @@ export default class Ajax implements AjaxInterface {
     private route: string = '';
 
     doAjaxCall(method: Method, successCallBack: (result: AxiosResponse) => void, errorCallBack: (error: AxiosError) => void): void {
-
         if (method === 'get') {
             this.getRequest(this.route, this.params).then((result: AxiosResponse) => {
                 return successCallBack(result);
@@ -45,7 +44,7 @@ export default class Ajax implements AjaxInterface {
     }
 
     postRequest(url: string, params?: any): Promise<AxiosResponse<any>> {
-        return axios.get('/api/' + url, params);
+        return axios.post('/api/' + url, params);
     }
 
 }

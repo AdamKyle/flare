@@ -2,16 +2,12 @@
 
 namespace App\Flare\Transformers;
 
+use App\Flare\Builders\Character\AttackDetails\CharacterHealthInformation;
 use App\Flare\Builders\Character\AttackDetails\CharacterTrinketsInformation;
 use App\Flare\Builders\Character\ClassDetails\HolyStacks;
 use App\Flare\Builders\CharacterInformationBuilder;
-use App\Flare\Models\GameClass;
 use App\Flare\Models\GameSkill;
-use App\Flare\Models\Skill;
 use App\Flare\Values\ClassAttackValue;
-use App\Game\Skills\Values\SkillTypeValue;
-use Illuminate\Support\Facades\Cache;
-use League\Fractal\TransformerAbstract;
 use App\Flare\Models\Character;
 
 class CharacterAttackTransformer extends BaseTransformer {
@@ -24,59 +20,63 @@ class CharacterAttackTransformer extends BaseTransformer {
      */
     public function transform(Character $character) {
 
-        $gameClass = GameClass::find($character->game_class_id);
-
-        $holyStacks           = resolve(HolyStacks::class);
-        $characterTrinketInfo = resolve(CharacterTrinketsInformation::class);
-        $characterInformation = resolve(CharacterInformationBuilder::class);
-
-        $characterInformation->setCharacter($character);
+        $characterInformation         = resolve(CharacterInformationBuilder::class)->setCharacter($character);
+        $characterHealthInformation   = resolve(CharacterHealthInformation::class)->setCharacter($character);
+        $holyStacks                   = resolve(HolyStacks::class);
+        $characterTrinketsInformation = resolve(CharacterTrinketsInformation::class);
 
         return [
-            'id'                          => $character->id,
-            'name'                        => $character->name,
-            'class'                       => $gameClass->name,
-            'str_modded'                  => $this->fetchStats($character, 'str_modded'),
-            'dur_modded'                  => $this->fetchStats($character, 'dur_modded'),
-            'dex_modded'                  => $this->fetchStats($character, 'dex_modded'),
-            'chr_modded'                  => $this->fetchStats($character, 'chr_modded'),
-            'int_modded'                  => $this->fetchStats($character, 'int_modded'),
-            'agi_modded'                  => $this->fetchStats($character, 'agi_modded'),
-            'focus_modded'                => $this->fetchStats($character, 'focus_modded'),
-            'voided_dex'                  => $character->dex,
-            'voided_dur'                  => $character->dur,
-            'voided_focus'                => $character->focus,
-            'to_hit_base'                 => $this->fetchStats($character, 'to_hit_base'),
-            'voided_to_hit_base'          => $this->fetchStats($character, 'voided_to_hit_base'),
-            'base_stat'                   => $this->fetchStats($character, $gameClass->damage_stat . '_modded'),
-            'voided_base_stat'            => $character->{$gameClass->damage_stat},
-            'health'                      => $this->fetchStats($character, 'health'),
-            'voided_health'               => $character->dur,
-            'artifact_annulment'          => $this->fetchStats($character, 'artifact_annulment'),
-            'spell_evasion'               => $this->fetchStats($character, 'spell_evasion'),
-            'affix_damage_reduction'      => $this->fetchStats($character, 'affix_damage_reduction'),
-            'healing_reduction'           => $this->fetchStats($character, 'healing_reduction'),
-            'skills'                      => $this->fetchSkills($character),
-            'is_dead'                     => $character->is_dead,
-            'devouring_light'             => $this->fetchStats($character, 'devouring_light'),
-            'devouring_darkness'          => $this->fetchStats($character, 'devouring_darkness'),
+            'inventory_max'               => $character->inventory_max,
+            'inventory_count'             => $character->getInventoryCount(),
+            'attack'                      => $characterInformation->buildTotalAttack(),
+            'health'                      => $characterInformation->buildHealth(),
+            'ac'                          => $characterInformation->buildDefence(),
+            'heal_for'                    => $characterHealthInformation->buildHealFor(),
+            'damage_stat'                 => $character->damage_stat,
+            'to_hit_stat'                 => $character->class->to_hit_stat,
+            'to_hit_base'                 => $this->getToHitBase($character, $characterInformation),
+            'voided_to_hit_base'          => $this->getToHitBase($character, $characterInformation, true),
+            'base_stat'                   => $characterInformation->statMod($character->class->damage_stat),
+            'voided_base_stat'            => $character->{$character->class->damage_stat},
+            'str_modded'                  => round($characterInformation->statMod('str')),
+            'dur_modded'                  => round($characterInformation->statMod('dur')),
+            'dex_modded'                  => round($characterInformation->statMod('dex')),
+            'chr_modded'                  => round($characterInformation->statMod('chr')),
+            'int_modded'                  => round($characterInformation->statMod('int')),
+            'agi_modded'                  => round($characterInformation->statMod('agi')),
+            'focus_modded'                => round($characterInformation->statMod('focus')),
+            'weapon_attack'               => round($characterInformation->getTotalWeaponDamage()),
+            'devouring_light'             => round($characterInformation->getDevouringLight()),
+            'devouring_darkness'          => round($characterInformation->getDevouringDarkness()),
+            'extra_action_chance'         => (new ClassAttackValue($character))->buildAttackData(),
+            'holy_bonus'                  => $holyStacks->fetchHolyBonus($character),
+            'devouring_resistance'        => $holyStacks->fetchDevouringResistanceBonus($character),
+            'max_holy_stacks'             => $holyStacks->fetchTotalStacksForCharacter($character),
+            'current_stacks'              => $holyStacks->fetchTotalHolyStacks($character),
+            'holy_attack_bonus'           => $holyStacks->fetchAttackBonus($character),
+            'holy_ac_bonus'               => $holyStacks->fetchDefenceBonus($character),
+            'holy_healing_bonus'          => $holyStacks->fetchHealingBonus($character),
+            'ambush_chance'               => $characterTrinketsInformation->getAmbushChance($character),
+            'ambush_resistance_chance'    => $characterTrinketsInformation->getAmbushResistanceChance($character),
+            'counter_chance'              => $characterTrinketsInformation->getCounterChance($character),
+            'counter_resistance_chance'   => $characterTrinketsInformation->getCounterResistanceChance($character),
+            'skills'                      => $character->skills()->whereIn('game_skill_id', GameSkill::whereIn('name', ['Accuracy', 'Dodge', 'Casting Accuracy', 'Criticality'])->pluck('id')->toArray())->get(),
             'devouring_light_res'         => $holyStacks->fetchDevouringResistanceBonus($character),
             'devouring_darkness_res'      => $holyStacks->fetchDevouringResistanceBonus($character),
-            'extra_action_chance'         => (new ClassAttackValue($character))->buildAttackData(),
-            'is_alchemy_locked'           => $this->isAlchemyLocked($character),
-            'stat_affixes'                => $this->fetchStatAffixes($character),
-            'skill_reduction'             => $this->fetchStats($character, 'skill_reduction'),
-            'resistance_reduction'        => $this->fetchStats($character, 'resistance_reduction'),
-            'attack_types'                => $this->fetchAttackTypes($character),
-            'disable_pop_overs'           => $character->user->disable_attack_type_popover,
-            'is_attack_automation_locked' => $character->is_attack_automation_locked,
-            'can_attack_again_at'         => $character->can_attack_again_at,
-            'ambush_resistance'           => $characterTrinketInfo->getAmbushResistanceChance($character),
-            'counter_resistance'          => $characterTrinketInfo->getCounterResistanceChance($character),
-            'ambush_chance'               => $characterTrinketInfo->getAmbushChance($character),
-            'counter_chance'              => $characterTrinketInfo->getCounterChance($character),
-            'weapon_attack'               => $characterInformation->getTotalWeaponDamage(false),
+            'ambush_resistance'           => $characterTrinketsInformation->getAmbushResistanceChance($character),
+            'counter_resistance'          => $characterTrinketsInformation->getCounterResistanceChance($character),
             'voided_weapon_attack'        => $characterInformation->getTotalWeaponDamage(false),
+            'artifact_annulment'          => $characterInformation->getTotalDeduction('artifact_annulment'),
+            'spell_evasion'               => $characterInformation->getTotalDeduction('spell_evasion'),
+            'affix_damage_reduction'      => $characterInformation->getTotalDeduction('affix_damage_reduction'),
+            'healing_reduction'           => $characterInformation->getTotalDeduction('healing_reduction'),
+            'skill_reduction'             => $characterInformation->getBestSkillReduction(),
+            'resistance_reduction'        => $characterInformation->getBestResistanceReduction(),
+            'stat_affixes'                => [
+                'cant_be_resisted'   => $characterInformation->canAffixesBeResisted(),
+                'all_stat_reduction' => $characterInformation->findPrefixStatReductionAffix(),
+                'stat_reduction'     => $characterInformation->findSuffixStatReductionAffixes(),
+            ],
         ];
     }
 }

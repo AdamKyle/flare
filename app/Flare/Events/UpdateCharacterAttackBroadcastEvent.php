@@ -25,7 +25,7 @@ class UpdateCharacterAttackBroadcastEvent implements ShouldBroadcastNow
     /**
      * @var User $users
      */
-    public $user;
+    private $user;
 
     /**
      * Create a new event instance.

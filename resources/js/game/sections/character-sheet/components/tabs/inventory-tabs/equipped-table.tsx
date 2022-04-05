@@ -1,18 +1,31 @@
 import React, {Fragment} from "react";
 import Table from "../../../../../components/ui/data-tables/table";
 import {BuildInventoryTableColumns} from "../../../../../lib/game/character-sheet/helpers/inventory/build-inventory-table-columns";
-import PopOverContainer from "../../../../../components/ui/popover/pop-over-container";
 import InventoryDetails from "../../../../../lib/game/character-sheet/types/inventory/inventory-details";
-import PrimaryButton from "../../../../../components/ui/buttons/primary-button";
 import ActionsInterface from "../../../../../lib/game/character-sheet/helpers/inventory/actions-interface";
 import DangerButton from "../../../../../components/ui/buttons/danger-button";
+import DropDown from "../../../../../components/ui/drop-down/drop-down";
+import LoadingProgressBar from "../../../../../components/ui/progress-bars/loading-progress-bar";
+import EquippedTableProps from "../../../../../lib/game/character-sheet/types/tabs/equipped-table-props";
+import Ajax from "../../../../../lib/ajax/ajax";
+import {AxiosError, AxiosResponse} from "axios";
+import {isEqual} from "lodash";
 
-export default class EquippedTable extends React.Component<any, any> implements ActionsInterface  {
-    constructor(props: any) {
+export default class EquippedTable extends React.Component<EquippedTableProps, any> implements ActionsInterface  {
+    constructor(props: EquippedTableProps) {
         super(props);
 
         this.state = {
             data: this.props.equipped_items,
+            loading: false,
+        }
+    }
+
+    componentDidUpdate(prevProps: Readonly<EquippedTableProps>, prevState: Readonly<any>, snapshot?: any) {
+        if (!isEqual(prevState.data, this.props.equipped_items)) {
+            this.setState({
+                data: this.props.equipped_items
+            });
         }
     }
 
@@ -30,8 +43,44 @@ export default class EquippedTable extends React.Component<any, any> implements 
         return <DangerButton button_label={'Unequip'} on_click={() => this.unequip(row.id)} disabled={this.props.is_dead} />
     }
 
-    unequipAll() {
+    assignToSet(label: string) {
 
+    }
+
+    hasEmptySet() {
+        const dropDownLabels = Object.keys(this.props.sets);
+
+        return dropDownLabels.filter((key) => this.props.sets[key].length === 0).length > 0;
+    }
+
+    buildMenuItems() {
+        const dropDownLabels = Object.keys(this.props.sets);
+
+        return dropDownLabels.map((label: string) => {
+            return {
+                name: label,
+                icon_class: 'ra ra-crossed-swords',
+                on_click: () => this.assignToSet(label)
+            }
+        });
+    }
+
+    unequipAll() {
+        this.setState({
+            loading: true,
+        }, () => {
+            (new Ajax()).setRoute('character/'+this.props.character_id+'/inventory/unequip-all').setParameters({
+                is_set_equipped: this.props.is_set_equipped,
+            }).doAjaxCall('post', (result: AxiosResponse) => {
+                this.setState({
+                    loading: false
+                }, () => {
+                    this.props.update_inventory(result.data.inventory);
+                });
+            }, (error: AxiosError) => {
+
+            });
+        })
     }
 
     unequip(id: number) {
@@ -56,10 +105,19 @@ export default class EquippedTable extends React.Component<any, any> implements 
                         <div className='ml-2'>
                             <DangerButton button_label={'Unequip All'} on_click={this.unequipAll.bind(this)} disabled={this.props.is_dead} />
                         </div>
-                        <div className='ml-2'>
-                            <PrimaryButton button_label={'Save as Set'} on_click={this.saveAsSet.bind(this)} disabled={this.props.is_dead} />
-                        </div>
+                        {
+                            this.hasEmptySet() ?
+                                <div className='ml-2'>
+                                    <DropDown menu_items={this.buildMenuItems()} button_title={'Assign to Set'} disabled={this.props.is_dead} />
+                                </div>
+                            : null
+                        }
                     </div>
+                    {
+                        this.state.loading ?
+                            <LoadingProgressBar />
+                        : null
+                    }
                 </div>
                 <Table data={this.state.data} columns={BuildInventoryTableColumns(this)} dark_table={this.props.dark_table}/>
             </Fragment>

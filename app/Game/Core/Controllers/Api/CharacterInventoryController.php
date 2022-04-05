@@ -2,6 +2,8 @@
 
 namespace App\Game\Core\Controllers\Api;
 
+use App\Flare\Events\UpdateCharacterAttackEvent;
+use App\Flare\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySet;
 use App\Flare\Models\Item;
@@ -402,10 +404,6 @@ class CharacterInventoryController extends Controller {
             $inventorySet = $character->inventorySets()->where('is_equipped', true)->first();
 
             $inventorySetService->unEquipInventorySet($inventorySet);
-
-            event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'sets'));
-            event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'equipped'));
-            event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
         } else {
             $character->inventory->slots->each(function($slot) {
                 $slot->update([
@@ -417,24 +415,19 @@ class CharacterInventoryController extends Controller {
 
         $character = $character->refresh();
 
-        event(new UpdateTopBarEvent($character->refresh()));
-
         $this->updateCharacterAttackDataCache($character);
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'equipped'));
+        $characterInventoryService = $this->characterInventoryService->setCharacter($character);
 
-        event(new CharacterInventoryDetailsUpdate($character->user));
-
-        $affixData = $this->enchantingService->fetchAffixes($character->refresh());
-
-        event(new UpdateCharacterEnchantingList(
-            $character->user,
-            $affixData['affixes'],
-            $affixData['character_inventory'],
-        ));
-
-        return response()->json(['message' => 'All items have been removed.'], 200);
+        return response()->json([
+            'message' => 'All items have been removed.',
+            'inventory' => [
+                'inventory'         => $characterInventoryService->getInventoryForType('inventory'),
+                'equipped'          => $characterInventoryService->getInventoryForType('equipped'),
+                'set_is_equipped'   => false,
+                'set_name_equipped' => $characterInventoryService->getEquippedInventorySetName(),
+            ]
+        ], 200);
     }
 
     public function useItem(Character $character, Item $item, UseItemService $useItemService) {
@@ -479,17 +472,18 @@ class CharacterInventoryController extends Controller {
 
         $character = $character->refresh();
 
-        event(new UpdateTopBarEvent($character));
-
         $this->updateCharacterAttackDataCache($character);
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'sets'));
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'equipped'));
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
+        $characterInventoryService = $this->characterInventoryService->setCharacter($character);
 
-        event(new CharacterInventoryDetailsUpdate($character->user));
-
-        return response()->json(['message' => 'Set ' . $setIndex + 1 . ' is now equipped']);
+        return response()->json([
+            'message' => 'Set ' . $setIndex + 1 . ' is now equipped',
+            'inventory' => [
+                'equipped'          => $characterInventoryService->getInventoryForType('equipped'),
+                'set_is_equipped'   => true,
+                'set_name_equipped' => $characterInventoryService->getEquippedInventorySetName(),
+            ]
+        ]);
     }
 
     public function UseManyItems(UseManyItemsValidation $request, Character $character) {
@@ -568,14 +562,9 @@ class CharacterInventoryController extends Controller {
      * @return void
      */
     protected function updateCharacterAttackDataCache(Character $character) {
-        $this->buildCharacterAttackTypes->buildCache($character);
 
-        $characterData = new ResourceItem($character->refresh(), $this->characterTransformer);
+        CharacterAttackTypesCacheBuilder::dispatch($character);
 
-        $characterData = $this->manager->createData($characterData)->toArray();
-
-        event(new UpdateBaseCharacterInformation($character->user, $characterData));
-
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterAttackEvent($character));
     }
 }

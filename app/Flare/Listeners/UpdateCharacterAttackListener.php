@@ -24,7 +24,7 @@ class UpdateCharacterAttackListener
 
     /**
      * Constructor
-     * 
+     *
      * @param Manager $manager
      * @param CharacterAttackTransformer $characterAttackTransformer
      * @return void
@@ -35,9 +35,7 @@ class UpdateCharacterAttackListener
     }
 
     /**
-     * Handle the event.
-     *
-     * @param  \App\Flare\Events\UpdateCharacterSheetEvent $event
+     * @param UpdateCharacterAttackEvent $event
      * @return void
      */
     public function handle(UpdateCharacterAttackEvent $event)

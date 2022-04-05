@@ -117,7 +117,7 @@ class CharacterInventoryService {
     public function getInventoryForType(string $type): Collection|array {
         switch($type) {
             case 'inventory':
-                return $this->fetchCharacterInventory()->values();
+                return $this->fetchCharacterInventory();
             case 'usable_sets':
             case 'savable_sets':
                 return $this->getUsableSets();
@@ -154,6 +154,22 @@ class CharacterInventoryService {
         }
 
         return $sets;
+    }
+
+    public function getEquippedInventorySetName(): string|null {
+        $equippedSet = $this->character->inventorySets()->where('is_equipped', true)->first();
+
+        if (is_null($equippedSet)) {
+            return null;
+        }
+
+        if (!is_null($equippedSet->name)) {
+            return $equippedSet->name;
+        }
+
+        return 'Set ' . $this->character->inventorySets->search(function ($set) use ($equippedSet) {
+            return $set->id === $equippedSet->id;
+        });
     }
 
     /**

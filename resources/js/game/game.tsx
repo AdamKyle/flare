@@ -23,6 +23,8 @@ export default class Game extends React.Component<GameProps, GameState> {
 
     private characterStatus: any;
 
+    private characterAttackData: any;
+
     constructor(props: GameProps) {
         super(props)
 
@@ -62,6 +64,9 @@ export default class Game extends React.Component<GameProps, GameState> {
 
         // @ts-ignore
         this.characterStatus = Echo.private('update-character-status-' + this.props.userId);
+
+        // @ts-ignore
+        this.characterAttackData = Echo.private('update-character-attack-' + this.props.userId);
     }
 
     componentDidMount() {
@@ -99,6 +104,13 @@ export default class Game extends React.Component<GameProps, GameState> {
         this.characterStatus.listen('Game.Battle.Events.UpdateCharacterStatus', (event: any) => {
             this.setState({
                 character: {...this.state.character, ...event.characterStatuses}
+            });
+        });
+
+        // @ts-ignore
+        this.characterAttackData.listen('Flare.Events.UpdateCharacterAttackBroadcastEvent', (event: any) => {
+            this.setState({
+                character: {...this.state.character, ...event.attack}
             });
         });
     }
