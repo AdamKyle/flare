@@ -4,6 +4,7 @@ export default interface DialogueTypes {
 
     handle_close: () => void;
 
+    primary_button_disabled?: boolean;
 
     secondary_actions: {
         secondary_button_disabled: boolean;

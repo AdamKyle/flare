@@ -256,6 +256,15 @@ class CharacterInventoryService {
         return $this->manager->createData($slots)->toArray();
     }
 
+    public function findCharacterInventorySlotIds(): array {
+        $inventory = Inventory::where('character_id', $this->character->id)->first();
+
+        return InventorySlot::where('inventory_slots.inventory_id', $inventory->id)->join('items', function($join) {
+            $join->on('inventory_slots.item_id', '=', 'items.id')
+                ->whereNotIn('items.type', ['quest', 'alchemy']);
+        })->where('inventory_slots.equipped', false)->select('inventory_slots.*')->pluck('inventory_slots.id')->toArray();
+    }
+
     /**
      * Fetch equipped items.
      *

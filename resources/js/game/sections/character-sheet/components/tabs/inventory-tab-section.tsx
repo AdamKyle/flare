@@ -4,10 +4,7 @@ import InventoryTable from "./inventory-tabs/inventory-table";
 import UsableItemsTable from "./inventory-tabs/usable-items-table";
 import PopOverContainer from "../../../../components/ui/popover/pop-over-container";
 import InventoryDetails from "../../../../lib/game/character-sheet/types/inventory/inventory-details";
-import DangerButton from "../../../../components/ui/buttons/danger-button";
-import ActionsInterface from "../../../../lib/game/character-sheet/helpers/inventory/actions-interface";
-import PrimaryButton from "../../../../components/ui/buttons/primary-button";
-import OrangeButton from "../../../../components/ui/buttons/orange-button";
+import InventoryActionConfirmationModal from "../modals/inventory-action-confirmation-modal";
 
 export default class InventoryTabSection extends React.Component<any, any> {
 
@@ -17,6 +14,8 @@ export default class InventoryTabSection extends React.Component<any, any> {
         this.state = {
             table: 'Inventory',
             data: this.props.inventory,
+            show_destroy_all: false,
+            show_disenchant_all: false,
         }
     }
 
@@ -45,12 +44,16 @@ export default class InventoryTabSection extends React.Component<any, any> {
         }
     }
 
-    disenchantAll() {
-
+    manageDisenchantAll() {
+        this.setState({
+            show_disenchant_all: !this.state.show_disenchant_all,
+        })
     }
 
-    destroyAll() {
-
+    manageDestroyAll() {
+        this.setState({
+            show_destroy_all: !this.state.show_destroy_all,
+        })
     }
 
     render() {
@@ -76,12 +79,12 @@ export default class InventoryTabSection extends React.Component<any, any> {
                             {
                                 name: 'Destroy All',
                                 icon_class: 'fas fa-shopping-bag',
-                                on_click: () => this.disenchantAll()
+                                on_click: () => this.manageDestroyAll()
                             },
                             {
                                 name: 'Disenchant All',
                                 icon_class: 'ra ra-bubbling-potion',
-                                on_click: () => this.destroyAll()
+                                on_click: () => this.manageDisenchantAll()
                             },
                         ]} button_title={'Actions'} selected_name={this.state.table} disabled={this.props.is_dead} />
                     </div>
@@ -107,6 +110,42 @@ export default class InventoryTabSection extends React.Component<any, any> {
                         <InventoryTable dark_table={this.props.dark_tables} character_id={this.props.character_id} inventory={this.state.data} is_dead={this.props.is_dead} />
                         :
                         <UsableItemsTable dark_table={this.props.dark_tables} usable_items={this.state.data} is_dead={this.props.is_dead} />
+                }
+
+                {
+                    this.state.show_destroy_all ?
+                        <InventoryActionConfirmationModal is_open={this.state.show_destroy_all} manage_modal={this.manageDestroyAll.bind(this)} title={'Destroy all'} url={'character/'+this.props.character_id+'/inventory/destroy-all'} update_inventory={this.props.update_inventory}>
+                            <p>
+                                Are you sure you want to do this? This action will destroy all items in your inventory. You cannot undo this action.
+                            </p>
+                            <p className='mt-2'>
+                                Make sure you move any items you want to a set or equip the items you want, before destroying all.
+                            </p>
+                            <p className='mt-2'>
+                                It is advised that players do not destroy enchanted items (names with *'s) or uniques (green items), but instead sell them on the market or <a href={'/information/skill-information'} target='_blank'>disenchant <i className="fas fa-external-link-alt"></i></a> them to
+                                make <a href={'/information/currencies'} target='_blank'>Gold Dust <i className="fas fa-external-link-alt"></i></a>.
+                            </p>
+                        </InventoryActionConfirmationModal>
+                    : null
+                }
+
+                {
+                    this.state.show_disenchant_all ?
+                        <InventoryActionConfirmationModal is_open={this.state.show_disenchant_all} manage_modal={this.manageDisenchantAll.bind(this)} title={'Disenchant all'} url={'character/'+this.props.character_id+'/inventory/disenchant-all'} update_inventory={this.props.update_inventory}>
+                            <p>
+                                Are you sure you want to do this? This action will disenchant all items in your inventory. You cannot undo this action.
+                            </p>
+                            <p className='mt-2'>
+                                When you disenchant items you will get some <a href={'/information/currencies'} target='_blank'>Gold Dust <i className="fas fa-external-link-alt"></i></a> and
+                                experience towards <a href={'/information/skill-information'} target='_blank'>Disenchanting <i className="fas fa-external-link-alt"></i></a> and half XP towards Enchanting.
+                            </p>
+                            <p className='mt-2'>
+                                Tip for crafters/enchanters: Equip a set that's full enchanting when doing your mass disenchanting, because the XP you get,
+                                while only half, can be boosted. For new players, you should be crafting and enchanting and then disenchanting or selling your equipment
+                                on the market, if it is not viable for you.
+                            </p>
+                        </InventoryActionConfirmationModal>
+                        : null
                 }
             </Fragment>
         )

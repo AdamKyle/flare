@@ -16,4 +16,6 @@ export default interface ActionsState {
     attack_time_out: number;
 
     character_revived: boolean;
+
+    crafting_type: 'craft' | 'enchant' | 'alchemy' | 'workbench' | 'trinketry' | null;
 }

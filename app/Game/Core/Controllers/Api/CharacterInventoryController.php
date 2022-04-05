@@ -105,25 +105,16 @@ class CharacterInventoryController extends Controller {
     public function destroyAll(Character $character) {
         $inventory = $this->characterInventoryService->setCharacter($character);
 
-        $slotIds   = $inventory->fetchCharacterInventory()->pluck('id');
+        $slotIds   = $inventory->findCharacterInventorySlotIds();
 
         $character->inventory->slots()->whereIn('id', $slotIds)->delete();
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
-
-        event(new CharacterInventoryDetailsUpdate($character->user));
-
-        event(new UpdateTopBarEvent($character->refresh()));
-
-        $affixData = $this->enchantingService->fetchAffixes($character->refresh());
-
-        event(new UpdateCharacterEnchantingList(
-            $character->user,
-            $affixData['affixes'],
-            $affixData['character_inventory'],
-        ));
-
-        return response()->json(['message' => 'Destroyed All Items.'], 200);
+        return response()->json([
+            'message' => 'Destroyed All Items.',
+            'inventory' => [
+                'inventory' => $inventory->getInventoryForType('inventory'),
+            ]
+        ], 200);
     }
 
     public function disenchantAll(Character $character) {

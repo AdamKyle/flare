@@ -16,6 +16,7 @@ import {capitalize} from "lodash";
 import PrimaryOutlineButton from "../../../../components/ui/buttons/primary-outline-button";
 import SuccessOutlineButton from "../../../../components/ui/buttons/success-outline-button";
 import DangerOutlineButton from "../../../../components/ui/buttons/danger-outline-button";
+import clsx from "clsx";
 
 export default class InventoryItemComparison extends React.Component<any, InventoryItemComparisonState> {
 
@@ -82,8 +83,6 @@ export default class InventoryItemComparison extends React.Component<any, Invent
             }
         }).filter((e: any) => typeof e !== 'undefined');
 
-        console.log(elements);
-
         if (elements.length === 0 && typeof itemToEquip !== 'undefined') {
             return (
                 <Fragment>
@@ -111,6 +110,32 @@ export default class InventoryItemComparison extends React.Component<any, Invent
         return formatNumber(value);
     }
 
+    renderItemToEquip(itemToEquip: InventoryComparisonAdjustment) {
+        const invalidFields = ['id', 'min_cost', 'skill_level_req', 'skill_level_trivial', 'holy_level', 'holy_stack_devouring_darkness', 'holy_stack_stat_bonus', 'holy_stacks', 'holy_stacks_applied', 'cost'];
+
+        return Object.keys(itemToEquip).map((key) => {
+            if (!invalidFields.includes(key)) {
+                if (itemToEquip[key] > 0) {
+                    return (
+                        <Fragment>
+                            <dt>{capitalize(key.split('_').join(' '))}</dt>
+                            <dd>{this.renderPercent(itemToEquip[key])}</dd>
+                        </Fragment>
+                    );
+                }
+            }
+        });
+    }
+
+    isLargeModal() {
+
+        if (this.state.comparison_details !== null) {
+            return this.state.comparison_details.details.length === 2;
+        }
+
+        return false;
+    }
+
     stubbedClick(){}
 
     render() {
@@ -120,24 +145,38 @@ export default class InventoryItemComparison extends React.Component<any, Invent
                       handle_close={this.props.manage_modal}
                       title={this.buildTitle()}
                       secondary_actions={null}
-                      large_modal={true}
+                      large_modal={this.isLargeModal()}
             >
                 {
                     this.state.loading || this.state.comparison_details === null ?
                         <div className='p-5 mb-2'><ComponentLoading /></div>
                     :
                         <div className='p-5'>
-                            <div className='grid w-full md:grid-cols-2 md:w-3/4 md:m-auto'>
-                                <div>
-                                    {this.renderChange(this.state.comparison_details.details[0], this.state.comparison_details.itemToEquip)}
-                                </div>
-                                <div className='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-3 mt-6'></div>
-                                <div>
-                                    {this.renderChange(this.state.comparison_details.details[1], this.state.comparison_details.itemToEquip)}
-                                </div>
-                            </div>
+                            {
+                                this.state.comparison_details.details.length > 0 ?
+                                    <div className='grid w-full md:grid-cols-2 md:w-3/4 md:m-auto'>
+                                        <div>
+                                            {this.renderChange(this.state.comparison_details.details[0], this.state.comparison_details.itemToEquip)}
+                                        </div>
+                                        <div className='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-3 mt-6'></div>
+                                        <div>
+                                            {this.renderChange(this.state.comparison_details.details[1], this.state.comparison_details.itemToEquip)}
+                                        </div>
+                                    </div>
+                                :
+                                    <div>
+                                        <dl>
+                                            {this.renderItemToEquip(this.state.comparison_details.itemToEquip)}
+                                        </dl>
+                                    </div>
+                            }
                             <div className='border-b-2 mt-6 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                            <div className='mt-6 grid grid-cols-1 w-full md:grid-cols-6 gap-2 md:m-auto md:w-3/4'>
+                            <div className={clsx(
+                                'mt-6 grid grid-cols-1 w-full md:grid-cols-6 gap-2 md:m-auto',
+                                {
+                                    'md:w-3/4': this.isLargeModal()
+                                }
+                            )}>
                                 <PrimaryOutlineButton button_label={'Equip'} on_click={this.stubbedClick.bind(this)} />
                                 <PrimaryOutlineButton button_label={'Move'} on_click={this.stubbedClick.bind(this)} />
                                 <SuccessOutlineButton button_label={'Sell'} on_click={this.stubbedClick.bind(this)} />

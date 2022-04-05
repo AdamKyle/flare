@@ -180,7 +180,7 @@ class CraftingService {
             $items->where('type', strtolower($craftingType));
         }
 
-        return $items->get();
+        return $items->select('name', 'cost', 'type', 'id')->get();
     }
 
     /**
