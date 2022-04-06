@@ -2,6 +2,7 @@
 
 namespace App\Game\Core\Jobs;
 
+use App\Game\Battle\Events\UpdateCharacterStatus;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -43,8 +44,8 @@ class CraftTimeOutJob implements ShouldQueue
             'can_craft_again_at' => null,
         ]);
 
-        $this->character->refresh();
+        broadcast(new UpdateCharacterStatus($this->character->refresh()));
 
-        broadcast(new ShowCraftingTimeOutEvent($this->character->user, false, true));
+        broadcast(new ShowCraftingTimeOutEvent($this->character->user, 0));
     }
 }

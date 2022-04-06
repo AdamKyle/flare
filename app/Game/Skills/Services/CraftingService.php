@@ -67,9 +67,9 @@ class CraftingService {
      *
      * @param Character $character
      * @param array params
-     * @return void
+     * @return bool
      */
-    public function craft(Character $character, array $params): void {
+    public function craft(Character $character, array $params): bool {
         $item  = Item::find($params['item_to_craft']);
 
         $skill = $this->fetchCraftingSkill($character, $params['type']);
@@ -77,26 +77,16 @@ class CraftingService {
         if (is_null($item)) {
             event(new GameServerMessageEvent($character->user, 'Invalid Item'));
 
-            event(new UpdateCharacterCraftingList($character->user, $this->getItems($params['type'], $skill)));
-
-            return;
+            return false;
         }
 
         if ($item->cost > $character->gold) {
             event(new ServerMessageEvent($character->user, 'not_enough_gold'));
 
-            event(new UpdateCharacterCraftingList($character->user, $this->getItems($params['type'], $skill)));
-
-            return;
+            return false;
         }
 
-        $this->attemptToCraftItem($character, $skill, $item);
-
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
-
-        event(new CharacterInventoryDetailsUpdate($character->user));
-
-        event(new UpdateCharacterCraftingList($character->user, $this->getItems($params['type'], $skill)));
+        return $this->attemptToCraftItem($character, $skill, $item);
     }
 
     /**
@@ -105,13 +95,13 @@ class CraftingService {
      * @param Character $character
      * @param Skill $skill
      * @param Item $item
-     * @return void
+     * @return bool
      */
-    protected function attemptToCraftItem(Character $character, Skill $skill, Item $item) {
+    protected function attemptToCraftItem(Character $character, Skill $skill, Item $item): bool {
         if ($skill->level < $item->skill_level_required) {
             event(new ServerMessageEvent($character->user, 'to_hard_to_craft'));
 
-            return;
+            return false;
         }
 
         if ($skill->level >= $item->skill_level_trivial) {
@@ -119,7 +109,7 @@ class CraftingService {
 
             $this->pickUpItem($character, $item, $skill, true);
 
-            return;
+            return true;
         }
 
         $characterRoll = $this->characterRoll($skill);
@@ -128,12 +118,14 @@ class CraftingService {
         if ($dcCheck < $characterRoll) {
             $this->pickUpItem($character, $item, $skill);
 
-            return;
+            return true;
         }
 
         event(new ServerMessageEvent($character->user, 'failed_to_craft'));
 
         $this->updateCharacterGold($character, $item->cost, $skill);
+
+        return false;
     }
 
     /**
@@ -219,8 +211,6 @@ class CraftingService {
             ]);
 
             event(new ServerMessageEvent($character->user, 'crafted', $item->name));
-
-            event(new UpdateQueenOfHeartsPanel($character->user, $this->randomEnchantmentService->fetchDataForApi($character)));
 
             return true;
         }

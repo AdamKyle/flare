@@ -18,39 +18,22 @@ class ShowCraftingTimeOutEvent implements ShouldBroadcast
     /**
      * @var User $user
      */
-    public $user;
-
-    /**
-     * @var bool $activateBar
-     */
-    public $activatebar;
-
-    /**
-     * @var bool $canCraft
-     */
-    public $canCraft;
+    private $user;
 
     /**
      * @var int $timeout
      */
     public $timeout;
 
-
     /**
      * Create a new event instance.
      *
      * @param User $user
-     * @param bool $activateBar
-     * @param bool $canCraft
-     * @param int  $timeout
-     * @return void
+     * @param int|null $timeout
      */
-    public function __construct(User $user, bool $activatebar, bool $canCraft, int $timeout = null)
-    {
-        $this->user        = $user;
-        $this->activatebar = $activatebar;
-        $this->canCraft    = $canCraft;
-        $this->timeout     = $timeout;
+    public function __construct(User $user, int $timeout = null) {
+        $this->user    = $user;
+        $this->timeout = $timeout;
     }
 
     /**

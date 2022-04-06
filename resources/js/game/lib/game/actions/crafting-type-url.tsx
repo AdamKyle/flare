@@ -24,3 +24,30 @@ export const craftingGetEndPoints = (type: 'craft' | 'enchant' | 'alchemy' | 'wo
             return '';
     }
 }
+
+/**
+ * Fetch the url for posting crafting.
+ *
+ * @param type
+ * @param characterId
+ */
+export const craftingPostEndPoints = (type: 'craft' | 'enchant' | 'alchemy' | 'workbench' | 'trinketry' | null, characterId: number): string => {
+
+    if (type === null) {
+        return '';
+    }
+
+    switch(type) {
+        case 'craft':
+            return 'craft/' + characterId;
+        case 'enchant':
+            return 'enchanting/' + characterId;
+        case 'alchemy':
+            return 'alchemy/' + characterId;
+        case 'trinketry':
+            return 'trinket-crafting/' + characterId;
+        case 'workbench':
+        default:
+            return '';
+    }
+}

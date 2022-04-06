@@ -52,6 +52,15 @@ export default class FetchGameData {
                 gold_dust: result.data.sheet.gold_dust,
                 shards: result.data.sheet.shards,
                 copper_coins: result.data.sheet.copper_coins,
+            },
+            character_status: {
+                can_attack: result.data.sheet.can_attack,
+                can_attack_again_at: result.data.sheet.can_attack_again_at,
+                can_craft: result.data.sheet.can_craft,
+                can_craft_again_at: result.data.sheet.can_craft_again_at,
+                can_adventure: result.data.sheet.can_adventure,
+                is_dead: result.data.sheetis_dead,
+                automation_locked: result.data.sheet.automation_locked,
             }
         });
     }

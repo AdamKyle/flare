@@ -121,7 +121,7 @@ export default class Game extends React.Component<GameProps, GameState> {
         });
     }
 
-    updateCharacterStatus(characterStatus: {is_dead: boolean, can_adventure: boolean}): void {
+    updateCharacterStatus(characterStatus: any): void {
         this.setState({character_status: characterStatus});
     }
 
@@ -173,7 +173,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                                     />
                                 </BasicCard>
                                 <BasicCard additionalClasses={'min-h-60'}>
-                                    <Actions character_id={this.props.characterId} character={this.state.character} />
+                                    <Actions character_id={this.props.characterId} character={this.state.character} character_statuses={this.state.character_status} />
                                 </BasicCard>
                             </div>
                             <BasicCard additionalClasses={'hidden lg:block md:mt-0 lg:col-start-3 lg:col-end-3 max-h-[575px]'}>

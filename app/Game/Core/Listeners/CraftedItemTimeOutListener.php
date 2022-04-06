@@ -2,6 +2,7 @@
 
 namespace App\Game\Core\Listeners;
 
+use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Core\Events\ShowCraftingTimeOutEvent;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Core\Jobs\CraftTimeOutJob;
@@ -29,7 +30,9 @@ class CraftedItemTimeOutListener
             'can_craft_again_at' => now()->addSeconds($timeOut),
         ]);
 
-        broadcast(new ShowCraftingTimeOutEvent($event->character->user, true, false, $timeOut));
+        broadcast(new ShowCraftingTimeOutEvent($event->character->user, $timeOut));
+
+        broadcast(new UpdateCharacterStatus($event->character->refresh()));
 
         CraftTimeOutJob::dispatch($event->character)->delay(now()->addSeconds($timeOut));
     }

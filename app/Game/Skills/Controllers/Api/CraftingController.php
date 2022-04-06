@@ -35,15 +35,17 @@ class CraftingController extends Controller {
         ], 200);
     }
 
-    public function craft(CraftingValidation $request, Character $character) {
+    public function craft(CraftingValidation $request, Character $character, CraftingService $craftingService) {
         if (!$character->can_craft) {
             return response()->json(['message' => 'invalid input.'], 429);
         }
 
         event(new CraftedItemTimeOutEvent($character));
 
-        ProcessCraft::dispatch($character, $request->all());
+        $craftingService->craft($character, $request->all());
 
-        return response()->json([], 200);
+        return response()->json([
+            'items' => $this->craftingService->fetchCraftableItems($character->refresh(), ['crafting_type' => $request->type]),
+        ], 200);
     }
 }
