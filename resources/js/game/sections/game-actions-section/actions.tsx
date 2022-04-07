@@ -159,7 +159,7 @@ export default class Actions extends React.Component<any, ActionsState> {
     }
 
     cannotCraft() {
-        return this.state.crafting_time_out > 0 && !this.props.character_statuses.can_craft
+        return this.state.crafting_time_out > 0 || !this.props.character_statuses.can_craft
     }
 
     render() {

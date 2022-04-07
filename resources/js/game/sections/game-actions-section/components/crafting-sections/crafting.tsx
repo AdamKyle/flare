@@ -5,9 +5,9 @@ import {AxiosError, AxiosResponse} from "axios";
 import {formatNumber} from "../../../../lib/game/format-number";
 import Select from "react-select";
 import LoadingProgressBar from "../../../../components/ui/progress-bars/loading-progress-bar";
-import clsx from "clsx";
 import PrimaryButton from "../../../../components/ui/buttons/primary-button";
 import DangerButton from "../../../../components/ui/buttons/danger-button";
+import {getCraftingType} from "../../../../lib/game/actions/crafting-types";
 
 export default class Crafting extends React.Component<any, any> {
 
@@ -91,7 +91,7 @@ export default class Crafting extends React.Component<any, any> {
 
             (new Ajax()).setRoute(url).setParameters({
                 item_to_craft: this.state.selected_item.id,
-                type: this.state.selected_item.type,
+                type: getCraftingType(this.state.selected_item.type),
             }).doAjaxCall('post', (result: AxiosResponse) => {
                this.setState({
                    loading: false,

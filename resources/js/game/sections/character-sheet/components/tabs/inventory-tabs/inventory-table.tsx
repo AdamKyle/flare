@@ -53,6 +53,7 @@ export default class InventoryTable extends React.Component<InventoryTabProps, a
                             slot_id={this.state.slot_id}
                             item_type={this.state.item_type}
                             character_id={this.props.character_id}
+                            update_inventory={this.props.update_inventory}
                         />
                     : null
                 }

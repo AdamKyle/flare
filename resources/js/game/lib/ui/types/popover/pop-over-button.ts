@@ -9,6 +9,4 @@ export default interface PopOverButtonProps {
     additional_css?: string;
 
     make_small?: boolean;
-
-    on_click: () => void;
 }

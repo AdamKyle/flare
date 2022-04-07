@@ -6,6 +6,7 @@ use App\Flare\Models\Inventory;
 use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Events\UpdateQueenOfHeartsPanel;
+use App\Game\Core\Services\CharacterInventoryService;
 use App\Game\Core\Services\RandomEnchantmentService;
 use App\Game\Skills\Events\UpdateCharacterEnchantingList;
 use App\Game\Skills\Values\SkillTypeValue;
@@ -34,6 +35,11 @@ class EnchantingService {
      * @var CharacterInformationBuilder $characterInformationBuilder;
      */
     private $characterInformationBuilder;
+
+    /**
+     * @var CharacterInventoryService $characterInventoryService
+     */
+    private $characterInventoryService;
 
     /**
      * @var EnchantItemService $enchantItemService
@@ -65,11 +71,13 @@ class EnchantingService {
      * @return void
      */
     public function __construct(CharacterInformationBuilder $characterInformationBuilder,
+                                CharacterInventoryService $characterInventoryService,
                                 EnchantItemService $enchantItemService,
                                 RandomEnchantmentService $randomEnchantmentService)
     {
 
         $this->characterInformationBuilder = $characterInformationBuilder;
+        $this->characterInventoryService   = $characterInventoryService;
         $this->enchantItemService          = $enchantItemService;
         $this->randomEnchantmentService    = $randomEnchantmentService;
     }
@@ -86,9 +94,11 @@ class EnchantingService {
         $characterInfo   = $this->characterInformationBuilder->setCharacter($character);;
         $enchantingSkill = $this->getEnchantingSkill($character);
 
+        $characterInventoryService = $this->characterInventoryService->setCharacter($character);
+
         return [
             'affixes'             => $this->getAvailableAffixes($characterInfo, $enchantingSkill),
-            'character_inventory' => array_values($this->fetchCharacterInventory($character)),
+            'character_inventory' => $characterInventoryService->getInventoryForType('inventory'),
         ];
     }
 
@@ -156,12 +166,6 @@ class EnchantingService {
         $this->attachAffixes($params['affix_ids'], $slot, $enchantingSkill, $character);
 
         $this->enchantItemService->updateSlot($slot);
-
-        $this->updateCharacterAffixList($character, $characterInfo, $enchantingSkill);
-
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
-
-        event(new CharacterInventoryDetailsUpdate($character->user));
     }
 
     public function timeForEnchanting(Item $item) {
@@ -183,40 +187,10 @@ class EnchantingService {
         return InventorySlot::where('id', $slotId)->where('inventory_id', $inventory->id)->where('equipped', false)->first();
     }
 
-    protected function updateCharacterAffixList(Character $character, CharacterInformationBuilder $characterInfo, Skill $enchantingSkill) {
-        $user             = $character->user;
-        $availableAffixes = $this->getAvailableAffixes($characterInfo, $enchantingSkill);
-        $inventory        = $this->fetchCharacterInventory($character);
-
-        event(new UpdateCharacterEnchantingList($user, $availableAffixes, $inventory));
-    }
-
     protected function getEnchantingSkill(Character $character): Skill {
         $gameSkill = GameSkill::where('type', SkillTypeValue::ENCHANTING)->first();
 
         return Skill::where('character_id', $character->id)->where('game_skill_id', $gameSkill->id)->first();
-    }
-
-    protected function fetchCharacterInventory(Character $character): array {
-        return $character->refresh()->inventory->slots->filter(function($slot) {
-            if ($slot->item->type !== 'quest' && $slot->item->type !== 'alchemy' && $slot->item->type !== 'trinket' && !$slot->equipped) {
-                if (!is_null($slot->item->item_prefix_id)) {
-                    if (!$slot->item->itemPrefix->randomly_generated) {
-                        return $slot->item->load('itemSuffix', 'itemPrefix')->toArray();
-                    }
-                } else {
-                    return $slot;
-                }
-
-                if (!is_null($slot->item->item_suffix_id)) {
-                    if (!$slot->item->itemSuffix->randomly_generated) {
-                        return $slot->item->load('itemSuffix', 'itemPrefix')->toArray();
-                    }
-                } else {
-                    return $slot;
-                }
-            }
-        })->values()->toArray();
     }
 
     protected function getAvailableAffixes(CharacterInformationBuilder $builder, Skill $enchantingSkill): Collection {

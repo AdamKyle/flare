@@ -178,6 +178,10 @@ class ItemComparison {
             }
         }
 
+        if (!empty($result)) {
+            $result['name'] = $foundPosition->item->affix_name;
+        }
+
         return $result;
     }
 

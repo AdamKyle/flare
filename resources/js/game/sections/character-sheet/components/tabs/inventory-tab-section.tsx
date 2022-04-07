@@ -5,6 +5,7 @@ import UsableItemsTable from "./inventory-tabs/usable-items-table";
 import PopOverContainer from "../../../../components/ui/popover/pop-over-container";
 import InventoryDetails from "../../../../lib/game/character-sheet/types/inventory/inventory-details";
 import InventoryActionConfirmationModal from "../modals/inventory-action-confirmation-modal";
+import {isEqual} from "lodash";
 
 export default class InventoryTabSection extends React.Component<any, any> {
 
@@ -16,6 +17,14 @@ export default class InventoryTabSection extends React.Component<any, any> {
             data: this.props.inventory,
             show_destroy_all: false,
             show_disenchant_all: false,
+        }
+    }
+
+    componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any) {
+        if (!isEqual(this.state.data, this.props.inventory)) {
+            this.setState({
+                data: this.props.inventory
+            });
         }
     }
 
@@ -107,7 +116,7 @@ export default class InventoryTabSection extends React.Component<any, any> {
 
                 {
                     this.state.table === 'Inventory' ?
-                        <InventoryTable dark_table={this.props.dark_tables} character_id={this.props.character_id} inventory={this.state.data} is_dead={this.props.is_dead} />
+                        <InventoryTable dark_table={this.props.dark_tables} character_id={this.props.character_id} inventory={this.state.data} is_dead={this.props.is_dead} update_inventory={this.props.update_inventory}/>
                         :
                         <UsableItemsTable dark_table={this.props.dark_tables} usable_items={this.state.data} is_dead={this.props.is_dead} />
                 }

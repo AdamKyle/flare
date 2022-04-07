@@ -103,7 +103,7 @@ export default class Game extends React.Component<GameProps, GameState> {
         // @ts-ignore
         this.characterStatus.listen('Game.Battle.Events.UpdateCharacterStatus', (event: any) => {
             this.setState({
-                character: {...this.state.character, ...event.characterStatuses}
+                character_status: event.characterStatuses
             });
         });
 

@@ -44,7 +44,7 @@ class ComparisonService {
 
         $viewData = [
             'details'     => [],
-            'itemToEquip' => $this->buildItemDetails($itemToEquip->item),
+            'itemToEquip' => $this->buildItemDetails($itemToEquip),
             'type'        => $service->getType($itemToEquip->item, $type),
             'slotId'      => $itemToEquip->id,
             'characterId' => $character->id,
@@ -65,7 +65,7 @@ class ComparisonService {
 
             $viewData = [
                 'details'        => $this->equipItemService->getItemStats($itemToEquip->item, $service->inventory(), $character),
-                'itemToEquip'    => $this->buildItemDetails($itemToEquip->item),
+                'itemToEquip'    => $this->buildItemDetails($itemToEquip),
                 'type'           => $service->getType($itemToEquip->item, $type),
                 'slotId'         => $itemToEquip->id,
                 'slotPosition'   => $itemToEquip->position,
@@ -101,7 +101,7 @@ class ComparisonService {
 
         return [
             'details'        => $this->equipItemService->getItemStats($item, $service->inventory(), $character),
-            'itemToEquip'    => $this->buildItemDetails($itemToEquip->item),
+            'itemToEquip'    => $this->buildItemDetails($itemToEquip),
             'type'           => $service->getType($item, $type),
             'slotId'         => $item->id,
             'slotPosition'   => null,
@@ -146,9 +146,13 @@ class ComparisonService {
         })->isNotEmpty();
     }
 
-    protected function buildItemDetails(Item $item): array {
-        $item = new FractalItem($item, new ItemComparisonTransfromer);
+    protected function buildItemDetails(InventorySlot $slot): array {
+        $item = new FractalItem($slot->item, new ItemComparisonTransfromer);
 
-        return (new Manager())->createData($item)->toArray()['data'];
+        $item = (new Manager())->createData($item)->toArray()['data'];
+
+        $item['slot_id'] = $slot->id;
+
+        return $item;
     }
 }

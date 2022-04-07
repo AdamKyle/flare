@@ -24,7 +24,11 @@ export default interface InventoryItemComparisonState {
         itemToEquip: InventoryComparisonAdjustment;
 
         details: InventoryComparisonAdjustment[] | [];
-    } | null
+    } | null;
+
+    show_equip_modal: boolean;
+
+    is_equipping: boolean;
 
     loading: boolean;
 }

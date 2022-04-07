@@ -9,4 +9,6 @@ export default interface InventoryTabProps {
     dark_table: boolean;
 
     is_dead: boolean;
+
+    update_inventory: (inventory: {[key: string]: InventoryDetails[]}) => void
 }

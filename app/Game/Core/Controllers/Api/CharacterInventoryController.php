@@ -12,11 +12,14 @@ use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Values\RandomAffixDetails;
 use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
+use App\Game\Core\Exceptions\EquipItemException;
 use App\Game\Core\Jobs\UseMultipleItems;
+use App\Game\Core\Requests\EquipItemValidation;
 use App\Game\Core\Requests\RemoveItemRequest;
 use App\Game\Core\Requests\RenameSetRequest;
 use App\Game\Core\Requests\SaveEquipmentAsSet;
 use App\Game\Core\Requests\UseManyItemsValidation;
+use App\Game\Core\Services\EquipItemService;
 use App\Game\Core\Services\UseItemService;
 use App\Game\Skills\Events\UpdateCharacterEnchantingList;
 use App\Game\Skills\Services\EnchantingService;
@@ -338,6 +341,32 @@ class CharacterInventoryController extends Controller {
         ));
 
         return response()->json(['message' => 'Removed ' . $itemsRemoved . ' of ' . $originalInventorySetCount . ' items from Set ' . $setIndex + 1], 200);
+    }
+
+    public function equipItem(EquipItemValidation $request, Character $character, EquipItemService $equipItemService) {
+        try {
+
+            $equipItemService->setRequest($request)
+                             ->setCharacter($character)
+                             ->replaceItem();
+
+            $this->updateCharacterAttackDataCache($character);
+
+            $characterInventoryService = $this->characterInventoryService->setCharacter($character);
+
+            return response()->json([
+                'inventory' => [
+                    'inventory' => $characterInventoryService->fetchCharacterInventory(),
+                    'equipped'  => $characterInventoryService->fetchEquipped(),
+                    'sets'      => $characterInventoryService->getCharacterInventorySets(),
+                ]
+            ]);
+
+        } catch(EquipItemException $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 
     public function unequipItem(Request $request, Character $character, InventorySetService $inventorySetService) {
