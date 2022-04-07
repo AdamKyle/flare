@@ -67,7 +67,7 @@ export default class Enchanting extends React.Component<any, any> {
                     }
                 </div>
                 <div className={'text-center md:ml-[-100px] mt-3 mb-3'}>
-                    <PrimaryButton button_label={'Craft'} on_click={this.craft.bind(this)} disabled={this.cannotCraft()} />
+                    <PrimaryButton button_label={'Enchant'} on_click={this.craft.bind(this)} disabled={this.cannotCraft()} />
                     <DangerButton button_label={'Remove'}
                                   on_click={this.clearCrafting.bind(this)}
                                   additional_css={'ml-2'}

@@ -40,6 +40,8 @@ class CharacterTopBarTransformer extends BaseTransformer {
             'int_modded'        => round($characterInformation->statMod('int')),
             'agi_modded'        => round($characterInformation->statMod('agi')),
             'focus_modded'      => round($characterInformation->statMod('focus')),
+            'inventory_max'     => $character->inventory_max,
+            'inventory_count'   => $character->getInventoryCount(),
             'gold'              => number_format($character->gold),
             'gold_dust'         => number_format($character->gold_dust),
             'shards'            => number_format($character->shards),
