@@ -8,6 +8,7 @@ import DestroyAllModal from "../modals/destroy-all-modal";
 import DisenchantModal from "../modals/disenchant-modal";
 import MoveToSetModal from "../modals/move-to-set-modal";
 import AlertInfo from "../../../components/base/alert-info";
+import DisenchantItemModal from "../modals/disenchant-item-modal";
 
 export default class InventorySection extends React.Component {
 
@@ -79,6 +80,7 @@ export default class InventorySection extends React.Component {
             getSlotId={this.props.getSlotId}
             manageDestroyModal={this.manageDestroyModal.bind(this)}
             manageSetModal={this.manageSetModal.bind(this)}
+            manageDisenchantItemModal={this.manageDisenchantItemModal.bind(this)}
             manageMoveItemToSetModal={this.manageMoveItemToSetModal.bind(this)}
           />
         </Fragment>
@@ -88,12 +90,14 @@ export default class InventorySection extends React.Component {
     this.state = {
       successMessage: null,
       itemForDestroy: null,
+      itemToDisenchant: null,
       itemToMove: null,
       showDestroyModal: false,
       showSetModal: false,
       showDestroyAllModal: false,
       showDisenchantModal: false,
       showMoveItemModal: false,
+      showDisenchantItemModal: false,
       inventoryItems: [],
     }
   }
@@ -132,6 +136,14 @@ export default class InventorySection extends React.Component {
       this.setState({
         successMessage: typeof successMessage !== 'undefined' ? successMessage : null,
       })
+    });
+  }
+
+  manageDisenchantItemModal(item, successMessage) {
+    this.setState({
+      showDisenchantItemModal: !this.state.showDisenchantItemModal,
+      itemToDisenchant: typeof item !== 'undefined' ? item : null,
+      successMessage: typeof successMessage !== 'undefined' ? successMessage : null,
     });
   }
 
@@ -258,6 +270,17 @@ export default class InventorySection extends React.Component {
                 characterId={this.props.characterId}
                 open={this.state.showDisenchantModal}
                 close={this.manageDisenchantModal.bind(this)}
+              />
+              : null
+          }
+
+          {
+            this.state.showDisenchantItemModal ?
+              <DisenchantItemModal
+                characterId={this.props.characterId}
+                item={this.state.itemToDisenchant}
+                open={this.state.showDisenchantItemModal}
+                close={this.manageDisenchantItemModal.bind(this)}
               />
               : null
           }

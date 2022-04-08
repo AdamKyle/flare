@@ -4,6 +4,7 @@ namespace App\Game\Core\Controllers\Api;
 
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySet;
+use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
