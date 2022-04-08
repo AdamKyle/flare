@@ -229,7 +229,7 @@ class ShopControllerTest extends TestCase
 
         $response = $this->actingAs($user)->post(route('game.shop.sell.all', ['character' => $this->character->getCharacter(false)->id]))->response;
 
-        $response->assertSessionHas('success', 'Sold all your unequipped items for a total of: 10 gold.');
+        $response->assertSessionHas('success', 'Sold all your unequipped items for a total of: 9 gold.');
     }
 
     public function testSellAllItemsButQuestItems() {
@@ -256,7 +256,7 @@ class ShopControllerTest extends TestCase
 
         $response = $this->actingAs($user)->post(route('game.shop.sell.all', ['character' => $this->character->getCharacter(false)->id]))->response;
 
-        $response->assertSessionHas('success', 'Sold all your unequipped items for a total of: 10 gold.');
+        $response->assertSessionHas('success', 'Sold all your unequipped items for a total of: 9 gold.');
 
         $questItems = $this->character->getCharacter(false)->inventory->slots->filter(function($slot) {
             return $slot->item->type === 'quest';
@@ -364,7 +364,7 @@ class ShopControllerTest extends TestCase
             })->pluck('id')->toArray(),
         ])->response;
 
-        $response->assertSessionHas('success', 'Sold selected items for: 10 gold.');
+        $response->assertSessionHas('success', 'Sold selected items for: 9 gold.');
     }
 
     public function testCannotBuyAndReplaceCraftOnly() {
