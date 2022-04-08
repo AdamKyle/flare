@@ -15,7 +15,7 @@ class SellItemCalculator {
      * @return int
      */
     public function fetchTotalSalePrice(Item $item): int {
-        return round(($item->cost - ($item->cost * 0.05)));
+        return floor(($item->cost - ($item->cost * 0.05)));
     }
 
     /**

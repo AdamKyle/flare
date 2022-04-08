@@ -163,28 +163,10 @@ class ShopController extends Controller {
             return redirect()->back()->with('error', 'Item not found.');
         }
 
-        $item = $inventorySlot->item;
-
+        $item         = $inventorySlot->item;
         $totalSoldFor = SellItemCalculator::fetchTotalSalePrice($item);
-        $totalNewGold = $character->gold + $totalSoldFor;
-
-        $maxCurrencies = new MaxCurrenciesValue($totalNewGold, MaxCurrenciesValue::GOLD);
-
-        if ($maxCurrencies->canNotGiveCurrency()) {
-            $character->update([
-                'gold' => MaxCurrenciesValue::MAX_GOLD,
-            ]);
-        } else {
-            $character->update([
-                'gold' => $character->gold + $totalSoldFor,
-            ]);
-        }
 
         event(new SellItemEvent($inventorySlot, $character));
-
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
-
-        event(new CharacterInventoryDetailsUpdate($character->user));
 
         return redirect()->back()->with('success', 'Sold: ' . $item->affix_name . ' for: ' . $totalSoldFor . ' gold.');
     }

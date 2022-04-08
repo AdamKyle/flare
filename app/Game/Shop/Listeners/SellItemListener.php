@@ -4,6 +4,7 @@ namespace App\Game\Shop\Listeners;
 
 use App\Flare\Models\Item;
 use App\Flare\Events\UpdateTopBarEvent;
+use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Shop\Events\SellItemEvent;
 use App\Game\Skills\Events\UpdateCharacterEnchantingList;
 use App\Game\Skills\Services\EnchantingService;
@@ -22,20 +23,21 @@ class SellItemListener
     {
         $item = $event->inventorySlot->item;
 
-        $event->character->gold += SellItemCalculator::fetchTotalSalePrice($item);
-        $event->character->save();
+        $totalNewGold = $event->character->gold + SellItemCalculator::fetchTotalSalePrice($item);
+
+        $maxCurrencies = new MaxCurrenciesValue($totalNewGold, MaxCurrenciesValue::GOLD);
+
+        if ($maxCurrencies->canNotGiveCurrency()) {
+            $event->character->update([
+                'gold' => MaxCurrenciesValue::MAX_GOLD,
+            ]);
+        } else {
+            $event->character->update([
+                'gold' => $totalNewGold,
+            ]);
+        }
 
         $event->inventorySlot->delete();
-
-        $character = $event->character->refresh();
-
-        $affixData = $this->enchantingService->fetchAffixes($character);
-
-        event(new UpdateCharacterEnchantingList(
-            $character->user,
-            $affixData['affixes'],
-            $affixData['character_inventory'],
-        ));
 
         event(new UpdateTopBarEvent($event->character->refresh()));
     }

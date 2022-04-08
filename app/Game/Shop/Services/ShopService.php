@@ -34,7 +34,7 @@ class ShopService {
 
         $character->inventory->slots()->whereIn('id', $ids)->delete();
 
-        return round($cost - ($cost * 0.05));
+        return floor($cost - ($cost * 0.05));
     }
 
     /**
