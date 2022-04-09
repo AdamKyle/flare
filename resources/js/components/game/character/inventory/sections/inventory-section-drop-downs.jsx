@@ -25,7 +25,12 @@ export default class InventorySectionDropDowns extends React.Component {
       this.props.getSlotId(this.props.item.id)
   }
 
+  canDisenchant() {
+    return this.props.item.item_suffix_id !== null && this.props.item.item_prefix_id !== null
+  }
+
   render() {
+    console.log(this.props.item);
     return (
       <>
         <Dropdown>
@@ -36,7 +41,11 @@ export default class InventorySectionDropDowns extends React.Component {
           <Dropdown.Menu>
             <Dropdown.Item href={this.buildHref()} target="_blank">Equip</Dropdown.Item>
             <Dropdown.Item onClick={() => this.props.manageDestroyModal(this.props.item)}>Destroy</Dropdown.Item>
-            <Dropdown.Item onClick={() => this.props.manageDisenchantItemModal(this.props.item)}>Disenchant</Dropdown.Item>
+            {
+              this.canDisenchant() ?
+                <Dropdown.Item onClick={() => this.props.manageDisenchantItemModal(this.props.item)}>Disenchant</Dropdown.Item>
+              : null
+            }
             <Dropdown.Item onClick={() => this.props.manageMoveItemToSetModal(this.props.item)}>Assign to Set</Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
