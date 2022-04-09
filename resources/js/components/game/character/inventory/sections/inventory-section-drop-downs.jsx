@@ -26,7 +26,7 @@ export default class InventorySectionDropDowns extends React.Component {
   }
 
   canDisenchant() {
-    return this.props.item.item_suffix_id !== null && this.props.item.item_prefix_id !== null
+    return this.props.item.item_suffix_id !== null || this.props.item.item_prefix_id !== null
   }
 
   render() {
