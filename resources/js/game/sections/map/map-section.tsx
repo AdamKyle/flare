@@ -1,6 +1,5 @@
 import React, {Fragment} from "react";
 import {AxiosError, AxiosResponse} from "axios";
-import Draggable from 'react-draggable';
 import {dragMap, getNewXPosition, getNewYPosition} from "../../lib/game/map/map-position";
 import MapState from "../../lib/game/types/map/map-state";
 import MapProps from '../../lib/game/types/map/map-props';
@@ -15,6 +14,8 @@ import MapStateManager from "../../lib/game/map/state/map-state-manager";
 import NpcKingdoms from "../components/kingdoms/npc-kingdoms";
 import ComponentLoading from "../../components/ui/loading/component-loading";
 import {getLocationWithAdventures, getPortLocation} from "../../lib/game/map/location-helpers";
+// @ts-ignore
+import Draggable from 'react-draggable/build/web/react-draggable.min';
 
 export default class MapSection extends React.Component<MapProps, MapState> {
 

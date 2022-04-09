@@ -1,7 +1,7 @@
 import React from "react";
 import AlertProps from "../../../../lib/ui/types/alerts/alert-props";
 
-export default class InfoAlert extends React.Component<AlertProps, {}> {
+export default class SuccessAlert extends React.Component<AlertProps, {}> {
 
     constructor(props: AlertProps) {
         super(props);
@@ -9,14 +9,14 @@ export default class InfoAlert extends React.Component<AlertProps, {}> {
 
     render() {
         return  (
-            <div className={'border-l-2 border-l-blue-500 px-4 pl-[10px] ' + this.props.additional_css}>
+            <div className={'border-l-2 border-l-green-500 px-4 pl-[10px] ' + this.props.additional_css}>
                 <div className="flex justify-between"
                 >
                     <span className="self-center">{this.props.children}</span>
 
                     {
                         typeof this.props.close_alert !== 'undefined' ?
-                            <strong className="text-xl align-center cursor-pointer text-blue-500" onClick={this.props.close_alert}>&times;</strong>
+                            <strong className="text-xl align-center cursor-pointer text-green-500" onClick={this.props.close_alert}>&times;</strong>
                         : null
                     }
 

@@ -9,7 +9,7 @@ export default class WarningAlert extends React.Component<AlertProps, {}> {
 
     render() {
         return  (
-            <div className={'border-l-2 border-l-yellow-500 px-4 ' + this.props.additional_css}>
+            <div className={'border-l-2 border-l-yellow-500 px-4 pl-[10px] ' + this.props.additional_css}>
                 <div className="flex justify-between"
                 >
                     <span className="self-center">{this.props.children}</span>

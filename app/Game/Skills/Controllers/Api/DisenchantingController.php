@@ -36,6 +36,10 @@ class DisenchantingController extends Controller {
 
         $foundItem = InventorySlot::where('equipped', false)->where('item_id', $item->id)->where('inventory_id', $inventory->id)->first();
 
+        if (is_null($foundItem->item->item_suffix_id) && is_null($foundItem->item->item_prefix_id)) {
+            return response()->json(['message' => 'This item cannot be disenchanted!'], 422);
+        }
+
         if (!is_null($foundItem)) {
             if ($foundItem->item->type === 'quest') {
                 event(new ServerMessageEvent($character->user, 'Item cannot be destroyed or does not exist. (Quest items cannot be destroyed or disenchanted)'));

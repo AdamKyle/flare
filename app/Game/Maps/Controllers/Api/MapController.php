@@ -36,8 +36,8 @@ class MapController extends Controller {
     public function __construct(MapTileValue $mapTile) {
         $this->mapTile = $mapTile;
 
-        $this->middleware('is.character.adventuring')->except(['mapInformation']);
-        $this->middleware('is.character.dead')->except(['mapInformation']);
+        $this->middleware('is.character.adventuring')->except(['mapInformation', 'fetchQuests']);
+        $this->middleware('is.character.dead')->except(['mapInformation', 'fetchQuests']);
     }
 
     public function mapInformation(Character $character, LocationService $locationService) {

@@ -16,8 +16,12 @@ export default class UsableItemsTable extends React.Component<any, any> implemen
         console.log('use item: ' + id);
     }
 
-    useMany(ids: number[]) {
-        console.log('Use many: ' + ids.join(','));
+    list() {
+
+    }
+
+    destroy() {
+
     }
 
     actions(row: InventoryDetails): JSX.Element {
@@ -29,9 +33,14 @@ export default class UsableItemsTable extends React.Component<any, any> implemen
                     on_click: () => this.useItem.bind(this)
                 },
                 {
-                    name: 'Use Many Items',
+                    name: 'List',
+                    icon_class: 'ra ra-wooden-sign',
+                    on_click: () => this.list.bind(this)
+                },
+                {
+                    name: 'Destroy',
                     icon_class: 'ra ra-bubbling-potion',
-                    on_click: () => this.useMany.bind(this)
+                    on_click: () => this.destroy.bind(this)
                 },
             ]} button_title={'Use Options'} />
         )

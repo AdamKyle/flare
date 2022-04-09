@@ -26,7 +26,6 @@ class EnchantingValidation extends FormRequest
         return [
             'slot_id'   => 'required',
             'affix_ids' => 'required',
-            'cost'      => 'required',
         ];
     }
 
@@ -34,7 +33,6 @@ class EnchantingValidation extends FormRequest
         return [
             'slot_id.required'    => 'What item are you trying to enchant?',
             'affix_ids.required'  => 'What enchantment(s) are you trying to attach?',
-            'cost.required'       => 'Error. Invalid Input.',
         ];
     }
 }

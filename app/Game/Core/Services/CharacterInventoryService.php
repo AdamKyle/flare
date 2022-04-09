@@ -234,6 +234,15 @@ class CharacterInventoryService {
         return $indexes;
     }
 
+    public function getInventoryCollection(): Collection {
+        $inventory = Inventory::where('character_id', $this->character->id)->first();
+
+        return InventorySlot::where('inventory_slots.inventory_id', $inventory->id)->join('items', function($join) {
+            $join->on('inventory_slots.item_id', '=', 'items.id')
+                ->whereNotIn('items.type', ['quest', 'alchemy']);
+        })->where('inventory_slots.equipped', false)->select('inventory_slots.*')->get();
+    }
+
     /**
      * Fetches the characters inventory.
      *
@@ -244,12 +253,7 @@ class CharacterInventoryService {
      */
     public function fetchCharacterInventory(): array {
 
-        $inventory = Inventory::where('character_id', $this->character->id)->first();
-
-        $slots = InventorySlot::where('inventory_slots.inventory_id', $inventory->id)->join('items', function($join) {
-            $join->on('inventory_slots.item_id', '=', 'items.id')
-                 ->whereNotIn('items.type', ['quest', 'alchemy']);
-        })->where('inventory_slots.equipped', false)->select('inventory_slots.*')->get();
+        $slots = $this->getInventoryCollection();
 
         $slots = new LeagueCollection($slots, $this->inventoryTransformer);
 

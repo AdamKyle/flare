@@ -17,6 +17,8 @@ export default class CharacterInventoryTabs extends React.Component<any, Charact
 
     private tabs: {name: string, key: string}[];
 
+    private updateInventoryListener: any;
+
     constructor(props: any) {
         super(props);
 
@@ -40,6 +42,9 @@ export default class CharacterInventoryTabs extends React.Component<any, Charact
             loading: true,
             inventory: null,
         }
+
+        // @ts-ignore
+        this.updateInventoryListener = Echo.private('update-inventory-' + this.props.user_id);
     }
 
     componentDidMount() {
@@ -53,6 +58,17 @@ export default class CharacterInventoryTabs extends React.Component<any, Charact
         }, (error: AxiosError) => {
             console.log(error);
         })
+
+        // @ts-ignore
+        this.updateInventoryListener.listen('Game.Core.Events.CharacterInventoryUpdateBroadCastEvent', (event: any) => {
+            const inventoryState = JSON.parse(JSON.stringify(this.state.inventory));
+
+            inventoryState.inventory = event.inventory;
+
+            this.setState({
+                inventory: inventoryState
+            });
+        });
     }
 
     switchTable(type: string) {

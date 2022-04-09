@@ -45,7 +45,7 @@ class ShopService {
 
         $cost = $cost + $trinketCost;
 
-        return round($cost - ($cost * 0.05));
+        return floor($cost - ($cost * 0.05));
     }
 
     /**

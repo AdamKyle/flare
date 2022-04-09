@@ -7,6 +7,8 @@ export default interface InventoryActionConfirmationModalProps {
 
     update_inventory: (inventory: {[key: string]: InventoryDetails[]}) => void;
 
+    set_success_message: (message: string) => void;
+
     title: string;
 
     url: string;

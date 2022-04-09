@@ -41,11 +41,11 @@ export const craftingPostEndPoints = (type: 'craft' | 'enchant' | 'alchemy' | 'w
         case 'craft':
             return 'craft/' + characterId;
         case 'enchant':
-            return 'enchanting/' + characterId;
+            return 'enchant/' + characterId;
         case 'alchemy':
-            return 'alchemy/' + characterId;
+            return 'transmute/' + characterId;
         case 'trinketry':
-            return 'trinket-crafting/' + characterId;
+            return 'trinket-craft/' + characterId;
         case 'workbench':
         default:
             return '';

@@ -70,12 +70,6 @@ class AlchemyService {
 
             $this->pickUpItem($character, $item, $skill, true);
 
-            event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'usable_items'));
-
-            event(new CharacterInventoryDetailsUpdate($character->user));
-
-            event(new UpdateCharacterAlchemyList($character->user, $this->fetchAlchemistItems($character)));
-
             event(new UpdateTopBarEvent($character->refresh()));
 
             return;
@@ -87,11 +81,6 @@ class AlchemyService {
 
             $this->pickUpItem($character, $item, $skill, true);
 
-            event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'usable_items'));
-
-            event(new CharacterInventoryDetailsUpdate($character->user));
-
-            event(new UpdateCharacterAlchemyList($character->user, $this->fetchAlchemistItems($character)));
 
             event(new UpdateTopBarEvent($character->refresh()));
 
@@ -104,11 +93,6 @@ class AlchemyService {
         if ($dcCheck < $characterRoll) {
             $this->pickUpItem($character, $item, $skill);
 
-            event(new UpdateCharacterAlchemyList($character->user, $this->fetchAlchemistItems($character)));
-
-            event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'usable_items'));
-
-            event(new CharacterInventoryDetailsUpdate($character->user));
 
             event(new UpdateTopBarEvent($character->refresh()));
 
@@ -116,8 +100,6 @@ class AlchemyService {
         }
 
         event(new ServerMessageEvent($character->user, 'failed_to_transmute'));
-
-        event(new UpdateCharacterAlchemyList($character->user, $this->fetchAlchemistItems($character)));
 
         event(new UpdateTopBarEvent($character->refresh()));
     }

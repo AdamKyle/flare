@@ -6,6 +6,7 @@ import PopOverContainer from "../../../../components/ui/popover/pop-over-contain
 import InventoryDetails from "../../../../lib/game/character-sheet/types/inventory/inventory-details";
 import InventoryActionConfirmationModal from "../modals/inventory-action-confirmation-modal";
 import {isEqual} from "lodash";
+import SuccessAlert from "../../../../components/ui/alerts/simple-alerts/success-alert";
 
 export default class InventoryTabSection extends React.Component<any, any> {
 
@@ -17,6 +18,7 @@ export default class InventoryTabSection extends React.Component<any, any> {
             data: this.props.inventory,
             show_destroy_all: false,
             show_disenchant_all: false,
+            success_message: null,
         }
     }
 
@@ -26,6 +28,12 @@ export default class InventoryTabSection extends React.Component<any, any> {
                 data: this.props.inventory
             });
         }
+    }
+
+    setSuccessMessage(message: string) {
+        this.setState({
+            success_message: message,
+        })
     }
 
     switchTable(type: string) {
@@ -65,9 +73,53 @@ export default class InventoryTabSection extends React.Component<any, any> {
         })
     }
 
+    closeSuccess(){
+        this.setState({
+            success_message: null
+        })
+    }
+
+    createActionsDropDown() {
+        if (this.state.table === 'Inventory') {
+            return [
+                {
+                    name: 'Destroy All',
+                    icon_class: 'fas fa-shopping-bag',
+                    on_click: () => this.manageDestroyAll()
+                },
+                {
+                    name: 'Disenchant All',
+                    icon_class: 'ra ra-bubbling-potion',
+                    on_click: () => this.manageDisenchantAll()
+                },
+            ]
+        }
+
+        return [
+            {
+                name: 'Use many',
+                icon_class: 'fas fa-shopping-bag',
+                on_click: () => this.manageDestroyAll()
+            },
+            {
+                name: 'Destroy All',
+                icon_class: 'fas fa-shopping-bag',
+                on_click: () => this.manageDestroyAll()
+            },
+        ]
+    }
+
     render() {
         return (
             <Fragment>
+                {
+                    this.state.success_message !== null ?
+                        <SuccessAlert close_alert={this.closeSuccess.bind(this)} additional_css={'mt-4 mb-4'}>
+                            {this.state.success_message}
+                        </SuccessAlert>
+                    : null
+                }
+
                 <div className='flex items-center'>
                     <div>
                         <DropDown menu_items={[
@@ -84,18 +136,7 @@ export default class InventoryTabSection extends React.Component<any, any> {
                         ]} button_title={'Type'} selected_name={this.state.table} disabled={this.props.is_dead} />
                     </div>
                     <div className='ml-2'>
-                        <DropDown menu_items={[
-                            {
-                                name: 'Destroy All',
-                                icon_class: 'fas fa-shopping-bag',
-                                on_click: () => this.manageDestroyAll()
-                            },
-                            {
-                                name: 'Disenchant All',
-                                icon_class: 'ra ra-bubbling-potion',
-                                on_click: () => this.manageDisenchantAll()
-                            },
-                        ]} button_title={'Actions'} selected_name={this.state.table} disabled={this.props.is_dead} />
+                        <DropDown menu_items={this.createActionsDropDown()} button_title={'Actions'} selected_name={this.state.table} disabled={this.props.is_dead} />
                     </div>
                     <div className='ml-4 md:ml-0 my-4 md:my-0 md:absolute md:right-0'>
                         <div className='flex items-center'>
@@ -118,12 +159,18 @@ export default class InventoryTabSection extends React.Component<any, any> {
                     this.state.table === 'Inventory' ?
                         <InventoryTable dark_table={this.props.dark_tables} character_id={this.props.character_id} inventory={this.state.data} is_dead={this.props.is_dead} update_inventory={this.props.update_inventory}/>
                         :
-                        <UsableItemsTable dark_table={this.props.dark_tables} usable_items={this.state.data} is_dead={this.props.is_dead} />
+                        <UsableItemsTable dark_table={this.props.dark_tables} usable_items={this.props.usable_items} is_dead={this.props.is_dead} />
                 }
 
                 {
                     this.state.show_destroy_all ?
-                        <InventoryActionConfirmationModal is_open={this.state.show_destroy_all} manage_modal={this.manageDestroyAll.bind(this)} title={'Destroy all'} url={'character/'+this.props.character_id+'/inventory/destroy-all'} update_inventory={this.props.update_inventory}>
+                        <InventoryActionConfirmationModal
+                            is_open={this.state.show_destroy_all}
+                            manage_modal={this.manageDestroyAll.bind(this)}
+                            title={'Destroy all'} url={'character/'+this.props.character_id+'/inventory/destroy-all'}
+                            update_inventory={this.props.update_inventory}
+                            set_success_message={this.setSuccessMessage.bind(this)}
+                        >
                             <p>
                                 Are you sure you want to do this? This action will destroy all items in your inventory. You cannot undo this action.
                             </p>
@@ -140,7 +187,14 @@ export default class InventoryTabSection extends React.Component<any, any> {
 
                 {
                     this.state.show_disenchant_all ?
-                        <InventoryActionConfirmationModal is_open={this.state.show_disenchant_all} manage_modal={this.manageDisenchantAll.bind(this)} title={'Disenchant all'} url={'character/'+this.props.character_id+'/inventory/disenchant-all'} update_inventory={this.props.update_inventory}>
+                        <InventoryActionConfirmationModal
+                            is_open={this.state.show_disenchant_all}
+                            manage_modal={this.manageDisenchantAll.bind(this)}
+                            title={'Disenchant all'}
+                            url={'character/'+this.props.character_id+'/inventory/disenchant-all'}
+                            update_inventory={this.props.update_inventory}
+                            set_success_message={this.setSuccessMessage.bind(this)}
+                        >
                             <p>
                                 Are you sure you want to do this? This action will disenchant all items in your inventory. You cannot undo this action.
                             </p>
@@ -154,7 +208,7 @@ export default class InventoryTabSection extends React.Component<any, any> {
                                 on the market, if it is not viable for you.
                             </p>
                         </InventoryActionConfirmationModal>
-                        : null
+                    : null
                 }
             </Fragment>
         )

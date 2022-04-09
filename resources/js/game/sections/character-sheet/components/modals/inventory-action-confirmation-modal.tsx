@@ -39,7 +39,13 @@ export default class InventoryActionConfirmationModal extends React.Component<In
                 this.setState({
                     loading: false,
                 }, () => {
-                    this.props.update_inventory(result.data.inventory);
+
+                    if (result.data.hasOwnProperty('inventory')) {
+                        this.props.update_inventory(result.data.inventory);
+                    }
+
+                    this.props.set_success_message(result.data.message);
+
                     this.props.manage_modal();
                 });
             }, (error: AxiosError) => {

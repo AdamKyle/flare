@@ -6,6 +6,7 @@ use App\Flare\Events\UpdateCharacterAttackEvent;
 use App\Flare\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySet;
+use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
@@ -123,7 +124,7 @@ class CharacterInventoryController extends Controller {
     public function disenchantAll(Character $character) {
         $inventory = $this->characterInventoryService->setCharacter($character);
 
-        $slots   = $inventory->fetchCharacterInventory()->filter(function($slot) {
+        $slots   = $inventory->getInventoryCollection()->filter(function($slot) {
             return (!is_null($slot->item->item_prefix_id) || !is_null($slot->item->item_suffix_id));
         })->values();
 

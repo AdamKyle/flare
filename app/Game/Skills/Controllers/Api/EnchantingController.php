@@ -4,13 +4,14 @@ namespace App\Game\Skills\Controllers\Api;
 
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Messages\Events\GlobalMessageEvent;
+use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Jobs\ProcessEnchant;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
 use App\Game\Skills\Requests\EnchantingValidation;
 use App\Game\Skills\Services\EnchantingService;
 
-class EnchantingController extends Controller {
+class  EnchantingController extends Controller {
 
     /**
      * @var EnchantingService $enchantingService
@@ -42,19 +43,21 @@ class EnchantingController extends Controller {
             return response()->json(['message' => 'invalid input.'], 422);
         }
 
-        if (!$this->enchantingService->doesCostMatchForEnchanting($request->affix_ids, $slot->item->id, $request->cost)) {
+        $cost = $this->enchantingService->getCostOfEnchantment($request->affix_ids, $slot->item->id);
 
-            event(new GlobalMessageEvent($character->name . ' Was caught cheating. The value of their enchant was off. The Creator is watching you closely.'));
+        if ($cost > $character->gold) {
 
-            return response()->json(['message' => 'You cannot do that.'], 422);
+            event(new ServerMessageEvent($character->user, 'Not enough gold to enchant that.'));
+
+            return response()->json();
         }
 
         $timeOut = $this->enchantingService->timeForEnchanting($slot->item);
 
         event(new CraftedItemTimeOutEvent($character->refresh(), $timeOut));
 
-        ProcessEnchant::dispatch($character, $slot, $request->all());
+        $this->enchantingService->enchant($character, $request->all(), $slot, $cost);
 
-        return response()->json([], 200);
+        return response()->json($this->enchantingService->fetchAffixes($character->refresh()));
     }
 }

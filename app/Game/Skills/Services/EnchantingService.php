@@ -110,7 +110,7 @@ class EnchantingService {
      * @param int $suppliedCost
      * @return bool
      */
-    public function doesCostMatchForEnchanting(array $enchantmentIds, int $itemId, int $suppliedCost): bool {
+    public function getCostOfEnchantment(array $enchantmentIds, int $itemId): bool {
         $itemAffixes   = ItemAffix::findMany($enchantmentIds);
         $itemToEnchant = Item::find($itemId);
 
@@ -130,17 +130,17 @@ class EnchantingService {
             }
         }
 
-        return $cost === $suppliedCost;
+        return $cost;
     }
 
     /**
      * Enchant an item.
      *
-     * Attamepts to enchant an item with the supplied afixes and slot.
+     * Attempts to enchant an item with the supplied affixes and slot.
      *
      * The params passed in must be the request params coming back from the request.
      *
-     * The array returned contains the the status and the details, either a list of
+     * The array returned contains the status and the details, either a list of
      * the characters inventory and their affixes they can enchant or a error message.
      *
      * eg, ['message' => '', 'status' => 422] or
@@ -151,17 +151,10 @@ class EnchantingService {
      * @param InventorySlot $slot
      * @return array
      */
-    public function enchant(Character $character, array $params, InventorySlot $slot): void {
-        $characterInfo   = $this->characterInformationBuilder->setCharacter($character);
+    public function enchant(Character $character, array $params, InventorySlot $slot, int $cost): void {
         $enchantingSkill = $this->getEnchantingSkill($character);
 
-        if ($params['cost'] > $character->gold) {
-            new GameServerMessageEvent($character->user, 'Not Enough Gold.');
-
-            return;
-        }
-
-        $this->updateCharacterGold($character, $params['cost']);
+        $this->updateCharacterGold($character, $cost);
 
         $this->attachAffixes($params['affix_ids'], $slot, $enchantingSkill, $character);
 
@@ -267,8 +260,6 @@ class EnchantingService {
         $message = 'Applied enchantment: '.$affix->name.' to: ' . $slot->item->refresh()->affix_name;
 
         event(new ServerMessageEvent($character->user, 'enchanted', $message));
-
-        event(new UpdateQueenOfHeartsPanel($character->user, $this->randomEnchantmentService->fetchDataForApi($character)));
 
         if (!$tooEasy) {
             event(new UpdateSkillEvent($enchantingSkill));

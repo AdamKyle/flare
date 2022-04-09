@@ -71,7 +71,7 @@ export default class CharacterSheet extends React.Component<CharacterSheetProps,
                         <CharacterSkillsTabs character_id={this.props.character.id} is_dead={this.props.character.is_dead}/>
                     </BasicCard>
                     <BasicCard additionalClasses={'overflow-x-auto lg:w-1/2 lg:h-fit'}>
-                        <CharacterInventoryTabs character_id={this.props.character.id} is_dead={this.props.character.is_dead}/>
+                        <CharacterInventoryTabs character_id={this.props.character.id} is_dead={this.props.character.is_dead} user_id={this.props.character.user_id} />
                     </BasicCard>
                 </div>
             </div>

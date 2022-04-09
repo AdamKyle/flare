@@ -15,14 +15,13 @@ class SellItemCalculator {
      * @return int
      */
     public function fetchTotalSalePrice(Item $item): int {
-
         if ($item->type === 'trinket') {
             $cost = round(($item->gold_dust_cost / 100));
 
             return round($cost - $cost * 0.05);
         }
 
-        return round(($item->cost - ($item->cost * 0.05)));
+        return floor(($item->cost - ($item->cost * 0.05)));
     }
 
     /**

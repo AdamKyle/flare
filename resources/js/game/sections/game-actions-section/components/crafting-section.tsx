@@ -1,6 +1,7 @@
 import React, {Fragment} from "react";
 import Crafting from "./crafting-sections/crafting";
 import Enchanting from "./crafting-sections/enchanting";
+import Alchemy from "./crafting-sections/alchemy";
 
 export default class CraftingSection extends React.Component<any, any> {
 
@@ -14,6 +15,8 @@ export default class CraftingSection extends React.Component<any, any> {
                 return <Crafting character_id={this.props.character_id} remove_crafting={this.props.remove_crafting} cannot_craft={this.props.cannot_craft} />
             case 'enchant':
                 return <Enchanting character_id={this.props.character_id} remove_crafting={this.props.remove_crafting} cannot_craft={this.props.cannot_craft} />
+            case 'alchemy':
+                return <Alchemy character_id={this.props.character_id} remove_crafting={this.props.remove_crafting} cannot_craft={this.props.cannot_craft} />
             default:
                 null;
         }

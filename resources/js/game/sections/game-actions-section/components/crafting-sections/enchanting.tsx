@@ -1,10 +1,12 @@
 import React, {Fragment} from "react";
 import PrimaryButton from "../../../../components/ui/buttons/primary-button";
 import DangerButton from "../../../../components/ui/buttons/danger-button";
-import {craftingGetEndPoints} from "../../../../lib/game/actions/crafting-type-url";
+import {craftingGetEndPoints, craftingPostEndPoints} from "../../../../lib/game/actions/crafting-type-url";
 import Ajax from "../../../../lib/ajax/ajax";
-import {AxiosResponse} from "axios";
+import {AxiosError, AxiosResponse} from "axios";
 import LoadingProgressBar from "../../../../components/ui/progress-bars/loading-progress-bar";
+import Select from "react-select";
+import {formatNumber} from "../../../../lib/game/format-number";
 
 export default class Enchanting extends React.Component<any, any> {
 
@@ -27,8 +29,8 @@ export default class Enchanting extends React.Component<any, any> {
         (new Ajax()).setRoute(url).doAjaxCall('get', (result: AxiosResponse) => {
             this.setState({
                 loading: false,
-                enchantable_items: result.data.affixes,
-                enchantments: result.data.character_inventory,
+                enchantable_items: result.data.character_inventory,
+                enchantments: result.data.affixes,
             });
         });
     }
@@ -37,8 +39,119 @@ export default class Enchanting extends React.Component<any, any> {
         this.props.remove_crafting();
     }
 
-    craft() {
+    enchant() {
+        this.setState({
+            loading: true,
+        }, () => {
+            const url = craftingPostEndPoints('enchant', this.props.character_id);
 
+            (new Ajax()).setRoute(url).setParameters({
+                slot_id: this.state.selected_item,
+                affix_ids: [this.state.selected_prefix, this.state.selected_suffix]
+            }).doAjaxCall('post', (result: AxiosResponse) => {
+                this.setState({
+                    loading: false,
+                    enchantable_items: result.data.character_inventory,
+                    enchantments: result.data.affixes,
+                }, () => {
+                    // Select the next item in the list.
+                    const foundIndex = result.data.character_inventory.findIndex((item: any) => {
+                        return item.id === this.state.selected_item
+                    });
+
+                    if (foundIndex !== -1) {
+                        const newIndex = foundIndex + 1;
+
+                        if (typeof result.data.character_inventory[newIndex] != 'undefined') {
+                            this.setState({
+                                selected_item: result.data.character_inventory[newIndex].id
+                            });
+                        }
+                    }
+                });
+            }, (error: AxiosError) => {
+
+            })
+        })
+    }
+
+    setSelectedItem(data: any) {
+        this.setState({
+            selected_item: parseInt(data.value)
+        })
+    }
+
+    setPrefix(data: any) {
+        this.setState({
+            selected_prefix: parseInt(data.value)
+        })
+    }
+
+    setSuffix(data: any) {
+        this.setState({
+            selected_suffix: parseInt(data.value)
+        })
+    }
+
+    renderItemsToEnchantSelection() {
+        return this.state.enchantable_items.map((item: any) => {
+            return {
+                label: item.item_name,
+                value: item.id,
+            }
+        });
+    }
+
+    renderTypeOfEnchant(type: 'prefix' | 'suffix') {
+        return this.state.enchantments.map((enchantment: any) => {
+            if (enchantment.type === type) {
+                return {
+                    label: enchantment.name + ' Cost: ' + formatNumber(enchantment.cost),
+                    value: enchantment.id,
+                }
+            }
+        }).filter((element: any) => typeof element !== 'undefined');
+    }
+
+    selectedItemToEnchant() {
+        if (this.state.selected_item !== null) {
+            const foundItem = this.state.enchantable_items.filter((item: any) => {
+                return item.id === this.state.selected_item;
+            });
+
+            if (foundItem.length > 0) {
+                return {
+                    label: foundItem[0].item_name,
+                    value: this.state.selected_item
+                }
+            }
+        }
+
+        return {
+            label: 'Please select item.',
+            value: 0,
+        }
+    }
+
+    selectedEnchantment(type: 'prefix' | 'suffix') {
+        if (this.state['selected_' + type] !== null) {
+
+            const foundEnchantment = this.state.enchantments.filter((item: any) => {
+                return item.id === this.state['selected_' + type];
+            });
+
+            if (foundEnchantment.length > 0) {
+                return {
+                    label: foundEnchantment[0].name + ' Cost: ' + foundEnchantment[0].cost,
+                    value: this.state['selected_' + type]
+                }
+            }
+        }
+
+        return {
+            label: 'Please select item.',
+            value: 0,
+        }
     }
 
     cannotCraft() {
@@ -50,13 +163,37 @@ export default class Enchanting extends React.Component<any, any> {
             <Fragment>
                 <div className='mt-2 grid md:grid-cols-3 gap-2 md:ml-[120px]'>
                     <div>
-                        Items
+                        <Select
+                            onChange={this.setSelectedItem.bind(this)}
+                            options={this.renderItemsToEnchantSelection()}
+                            menuPosition={'absolute'}
+                            menuPlacement={'bottom'}
+                            styles={{menuPortal: (base: any) => ({...base, zIndex: 9999, color: '#000000'})}}
+                            menuPortalTarget={document.body}
+                            value={this.selectedItemToEnchant()}
+                        />
                     </div>
                     <div>
-                        Prefix
+                        <Select
+                            onChange={this.setPrefix.bind(this)}
+                            options={this.renderTypeOfEnchant('prefix')}
+                            menuPosition={'absolute'}
+                            menuPlacement={'bottom'}
+                            styles={{menuPortal: (base: any) => ({...base, zIndex: 9999, color: '#000000'})}}
+                            menuPortalTarget={document.body}
+                            value={this.selectedEnchantment('prefix')}
+                        />
                     </div>
                     <div>
-                        Suffix
+                        <Select
+                            onChange={this.setSuffix.bind(this)}
+                            options={this.renderTypeOfEnchant('suffix')}
+                            menuPosition={'absolute'}
+                            menuPlacement={'bottom'}
+                            styles={{menuPortal: (base: any) => ({...base, zIndex: 9999, color: '#000000'})}}
+                            menuPortalTarget={document.body}
+                            value={this.selectedEnchantment('suffix')}
+                        />
                     </div>
                 </div>
                 <div className='m-auto w-1/2 md:relative left-[-20px]'>
@@ -67,7 +204,7 @@ export default class Enchanting extends React.Component<any, any> {
                     }
                 </div>
                 <div className={'text-center md:ml-[-100px] mt-3 mb-3'}>
-                    <PrimaryButton button_label={'Enchant'} on_click={this.craft.bind(this)} disabled={this.cannotCraft()} />
+                    <PrimaryButton button_label={'Enchant'} on_click={this.enchant.bind(this)} disabled={this.cannotCraft()} />
                     <DangerButton button_label={'Remove'}
                                   on_click={this.clearCrafting.bind(this)}
                                   additional_css={'ml-2'}

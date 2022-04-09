@@ -30,8 +30,10 @@ class AlchemyController extends Controller {
 
         event(new CraftedItemTimeOutEvent($character));
 
-        ProcessAlchemy::dispatch($character, $request->item_to_craft);
+        $this->alchemyService->transmute($character, $request->item_to_craft);
 
-        return response()->json([], 200);
+        return response()->json([
+            'items' => $this->alchemyService->fetchAlchemistItems($character),
+        ]);
     }
 }
