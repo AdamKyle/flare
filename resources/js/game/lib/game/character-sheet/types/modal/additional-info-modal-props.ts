@@ -1,5 +1,5 @@
 import CharacterSheetProps from "../character-sheet-props";
-import {CharacterType} from "../../../actions/types/character/character-type";
+import {CharacterType} from "../../../character/character-type";
 
 export interface AdditionalInfoModalProps extends CharacterSheetProps {
 

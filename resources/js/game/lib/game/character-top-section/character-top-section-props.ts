@@ -1,4 +1,4 @@
-import {CharacterType} from "../actions/types/character/character-type";
+import {CharacterType} from "../character/character-type";
 
 export default interface CharacterTopSectionProps {
 

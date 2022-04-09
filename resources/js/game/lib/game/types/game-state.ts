@@ -1,6 +1,8 @@
-import {CharacterType} from "../actions/types/character/character-type";
+import {CharacterType} from "../character/character-type";
 import KingdomDetails from "../map/types/kingdom-details";
 import {QuestDetails} from "../map/types/quest-details";
+import CharacterCurrenciesType from "../character/character-currencies-type";
+import CharacterStatusType from "../character/character-status-type";
 
 export default interface GameState {
 
@@ -8,29 +10,9 @@ export default interface GameState {
 
     show_size_message: boolean,
 
-    character_status: {
-        can_attack: boolean;
+    character_status: CharacterStatusType | null;
 
-        can_attack_again_at: number;
-
-        can_craft: boolean;
-
-        can_craft_again_at: number;
-
-        can_adventure: boolean;
-
-        is_dead: boolean;
-
-        automation_locked: boolean;
-
-    } | null;
-
-    character_currencies?: {
-        gold: number,
-        shards: number,
-        gold_dust: number,
-        copper_coins: number,
-    };
+    character_currencies?: CharacterCurrenciesType;
 
     loading: boolean;
 

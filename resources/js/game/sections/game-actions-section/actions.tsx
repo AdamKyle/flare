@@ -12,14 +12,15 @@ import TimerProgressBar from "../../components/ui/progress-bars/timer-progress-b
 import PrimaryButton from "../../components/ui/buttons/primary-button";
 import {capitalize, isEqual} from "lodash";
 import clsx from "clsx";
+import ActionsProps from "../../lib/game/actions/types/actions-props";
 
-export default class Actions extends React.Component<any, ActionsState> {
+export default class Actions extends React.Component<ActionsProps, ActionsState> {
 
     private attackTimeOut: any;
 
     private craftingTimeOut: any;
 
-    constructor(props: any) {
+    constructor(props: ActionsProps) {
         super(props);
 
         this.state = {
@@ -159,7 +160,7 @@ export default class Actions extends React.Component<any, ActionsState> {
     }
 
     cannotCraft() {
-        return this.state.crafting_time_out > 0 || !this.props.character_statuses.can_craft
+        return this.state.crafting_time_out > 0 || !this.props.character_statuses?.can_craft
     }
 
     render() {
