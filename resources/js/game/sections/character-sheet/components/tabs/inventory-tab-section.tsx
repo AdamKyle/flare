@@ -8,8 +8,9 @@ import InventoryActionConfirmationModal from "../modals/inventory-action-confirm
 import {isEqual} from "lodash";
 import SuccessAlert from "../../../../components/ui/alerts/simple-alerts/success-alert";
 import InventoryTabSectionProps from "../../../../lib/game/character-sheet/types/tabs/inventory-tab-section-props";
+import InventoryTabSectionState from "../../../../lib/game/character-sheet/types/tabs/inventory-tab-section-state";
 
-export default class InventoryTabSection extends React.Component<InventoryTabSectionProps, any> {
+export default class InventoryTabSection extends React.Component<InventoryTabSectionProps, InventoryTabSectionState> {
 
     constructor(props: InventoryTabSectionProps) {
         super(props);

@@ -48,7 +48,7 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
         })
     }
 
-    equipItem(type: string, position: string) {
+    equipItem(type: string, position?: string) {
 
         this.setState({
             is_equipping: true
@@ -69,8 +69,6 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
         }, (error: AxiosError) => {
 
         });
-
-        console.log(type, position, this.props.slot_id, this.props.character_id);
     }
 
     buildTitle() {
@@ -250,6 +248,10 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
 
     render() {
 
+        if (this.state.comparison_details === null) {
+            return;
+        }
+
         return (
             <Dialogue is_open={this.props.is_open}
                       handle_close={this.props.manage_modal}
@@ -303,7 +305,7 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
                     this.state.show_equip_modal ?
                         <EquipModal is_open={this.state.show_equip_modal}
                                     manage_modal={this.manageEquipModal.bind(this)}
-                                    item_to_equip={this.state.comparison_details?.itemToEquip}
+                                    item_to_equip={this.state.comparison_details.itemToEquip}
                                     equip_item={this.equipItem.bind(this)}
                         />
                     : null

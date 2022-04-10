@@ -6,8 +6,9 @@ import {
 import InventoryDetails from "../../../../../lib/game/character-sheet/types/inventory/inventory-details";
 import QuestItemsInventoryTabProps
     from "../../../../../lib/game/character-sheet/types/tabs/quest-items-inventory-tab-props";
+import QuestItemsTableState from "../../../../../lib/game/character-sheet/types/tables/quest-items-table-state";
 
-export default class QuestItemsTable extends React.Component<QuestItemsInventoryTabProps, any> {
+export default class QuestItemsTable extends React.Component<QuestItemsInventoryTabProps, QuestItemsTableState> {
     constructor(props: QuestItemsInventoryTabProps) {
         super(props);
 

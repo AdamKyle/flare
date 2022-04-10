@@ -3,10 +3,11 @@ import Dialogue from "../../../../../../components/ui/dialogue/dialogue";
 import {EquipPositions} from "../../../../../../lib/game/character-sheet/helpers/inventory/equip-positions";
 import PrimaryButton from "../../../../../../components/ui/buttons/primary-button";
 import {capitalize} from "lodash";
+import EquipModalProps from "../../../../../../lib/game/character-sheet/types/modal/equip-modal-props";
 
-export default class EquipModal extends React.Component<any, any> {
+export default class EquipModal extends React.Component<EquipModalProps, any> {
 
-    constructor(props: any) {
+    constructor(props: EquipModalProps) {
         super(props);
     }
 

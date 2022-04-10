@@ -10,8 +10,9 @@ import Ajax from "../../../../../lib/ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
 import {isEqual} from "lodash";
 import EquippedInventoryTabProps from "../../../../../lib/game/character-sheet/types/tabs/equipped-inventory-tab-props";
+import EquippedTableState from "../../../../../lib/game/character-sheet/types/tables/equipped-table-state";
 
-export default class EquippedTable extends React.Component<EquippedInventoryTabProps, any> implements ActionsInterface  {
+export default class EquippedTable extends React.Component<EquippedInventoryTabProps, EquippedTableState> implements ActionsInterface  {
     constructor(props: EquippedInventoryTabProps) {
         super(props);
 

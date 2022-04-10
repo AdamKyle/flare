@@ -20,7 +20,7 @@ export default class ItemNameColorationButton extends React.Component<ItemNameCo
     render() {
         return (
             <button className={clsx({
-                'text-red-700 dark:text-red-600': this.props.item.type === 'trinket'
+                'text-red-700 dark:text-red-500': this.props.item.type === 'trinket'
             }, {
                 'text-green-700 dark:text-green-600': this.props.item.is_unique && this.props.item.type !== 'trinket'
             },{
@@ -30,7 +30,7 @@ export default class ItemNameColorationButton extends React.Component<ItemNameCo
             },{
                 'text-pink-500 dark:text-pink-300': this.props.item.type === 'alchemy' && !this.props.item.is_unique
             },{
-                'text-gray-600': this.props.item.attached_affixes_count === 0 && !this.props.item.is_unique && this.props.item.type !== 'alchemy' && this.props.item.type !== 'quest' && this.props.item.has_holy_stacks_applied === 0 && this.props.item.type !== 'trinket'
+                'text-gray-600 dark:text-gray-300': this.props.item.attached_affixes_count === 0 && !this.props.item.is_unique && this.props.item.type !== 'alchemy' && this.props.item.type !== 'quest' && this.props.item.has_holy_stacks_applied === 0 && this.props.item.type !== 'trinket'
             },{
                 'text-blue-500': this.props.item.attached_affixes_count === 1 && !this.props.item.is_unique && this.props.item.type !== 'alchemy' && this.props.item.type !== 'quest' && this.props.item.has_holy_stacks_applied === 0 && this.props.item.type !== 'trinket'
             },{
