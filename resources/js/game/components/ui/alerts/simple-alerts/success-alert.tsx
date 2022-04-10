@@ -1,7 +1,7 @@
 import React from "react";
 import AlertProps from "../../../../lib/ui/types/alerts/alert-props";
 
-export default class SuccessAlert extends React.Component<AlertProps, {}> {
+export default class SuccessAlert extends React.Component<AlertProps, any> {
 
     constructor(props: AlertProps) {
         super(props);

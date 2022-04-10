@@ -1,17 +1,12 @@
-import React, {Fragment, MouseEventHandler} from "react";
+import React, {Fragment} from "react";
 import Table from "../../../../../components/ui/data-tables/table";
 import InventoryTabProps from "../../../../../lib/game/character-sheet/types/inventory-tab-props";
 import {BuildInventoryTableColumns} from "../../../../../lib/game/character-sheet/helpers/inventory/build-inventory-table-columns";
-import ActionsInterface from "../../../../../lib/game/character-sheet/helpers/inventory/actions-interface";
 import InventoryDetails from "../../../../../lib/game/character-sheet/types/inventory/inventory-details";
-import PrimaryButton from "../../../../../components/ui/buttons/primary-button";
-import DangerButton from "../../../../../components/ui/buttons/danger-button";
-import OrangeButton from "../../../../../components/ui/buttons/orange-button";
-import DropDown from "../../../../../components/ui/drop-down/drop-down";
 import InventoryItemComparison from "../../modals/inventory-item-comparison";
+import InventoryItemsTableState from "../../../../../lib/game/character-sheet/types/tables/inventory-items-table-state";
 
-
-export default class InventoryTable extends React.Component<InventoryTabProps, any> {
+export default class InventoryTable extends React.Component<InventoryTabProps, InventoryItemsTableState> {
 
     constructor(props: InventoryTabProps) {
         super(props);
@@ -55,7 +50,7 @@ export default class InventoryTable extends React.Component<InventoryTabProps, a
                             character_id={this.props.character_id}
                             update_inventory={this.props.update_inventory}
                         />
-                    : null
+                        : null
                 }
             </Fragment>
         );

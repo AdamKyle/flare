@@ -20,8 +20,10 @@ import clsx from "clsx";
 import InventoryActionConfirmationModalProps
     from "../../../../lib/game/character-sheet/types/modal/inventory-action-confirmation-modal-props";
 import LoadingProgressBar from "../../../../components/ui/progress-bars/loading-progress-bar";
+import InventoryActionConfirmationModalState
+    from "../../../../lib/game/character-sheet/types/modal/inventory-action-confirmation-modal-state";
 
-export default class InventoryActionConfirmationModal extends React.Component<InventoryActionConfirmationModalProps, any> {
+export default class InventoryActionConfirmationModal extends React.Component<InventoryActionConfirmationModalProps, InventoryActionConfirmationModalState> {
 
     constructor(props: InventoryActionConfirmationModalProps) {
         super(props);

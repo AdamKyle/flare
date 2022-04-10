@@ -4,12 +4,11 @@ import TabPanel from "../../../components/ui/tabs/tab-panel";
 import Skills from "./tabs/skill-tabs/skills";
 import KingdomPassives from "./tabs/skill-tabs/kingdom-passives";
 import CraftingSkills from "./tabs/skill-tabs/crafting-skills";
-import MiscSkills from "./tabs/skill-tabs/misc-skills";
 import Ajax from "../../../lib/ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
 import ComponentLoading from "../../../components/ui/loading/component-loading";
 import CharacterSkillTabsState from "../../../lib/game/character-sheet/types/skills/character-skill-tabs-state";
-import {watchForDarkModeInventoryChange, watchForDarkModeSkillsChange} from "../../../lib/game/dark-mode-watcher";
+import {watchForDarkModeSkillsChange} from "../../../lib/game/dark-mode-watcher";
 import CharacterSkillTabsProps from "../../../lib/game/character-sheet/types/skills/character-skill-tabs-props";
 
 export default class CharacterSkillsTabs extends React.Component<CharacterSkillTabsProps, CharacterSkillTabsState> {

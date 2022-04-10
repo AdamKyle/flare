@@ -13,8 +13,9 @@ import LoadingProgressBar from "../../../../../components/ui/progress-bars/loadi
 import {AxiosError, AxiosResponse} from "axios";
 import Ajax from "../../../../../lib/ajax/ajax";
 import SetsInventoryTabProps from "../../../../../lib/game/character-sheet/types/tabs/sets-inventory-tab-props";
+import SetsTableState from "../../../../../lib/game/character-sheet/types/tables/sets-table-state";
 
-export default class SetsTable extends React.Component<SetsInventoryTabProps, any> implements ActionsInterface {
+export default class SetsTable extends React.Component<SetsInventoryTabProps, SetsTableState> implements ActionsInterface {
     constructor(props: SetsInventoryTabProps) {
         super(props);
 

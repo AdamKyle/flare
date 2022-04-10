@@ -16,10 +16,12 @@ import clsx from "clsx";
 import {formatNumber} from "../../../../lib/game/format-number";
 import EquipModal from "./components/inventory-comparison/equip-modal";
 import LoadingProgressBar from "../../../../components/ui/progress-bars/loading-progress-bar";
+import InventoryItemComparisonProps
+    from "../../../../lib/game/character-sheet/types/modal/inventory-item-comparison-props";
 
-export default class InventoryItemComparison extends React.Component<any, InventoryItemComparisonState> {
+export default class InventoryItemComparison extends React.Component<InventoryItemComparisonProps, InventoryItemComparisonState> {
 
-    constructor(props: any) {
+    constructor(props: InventoryItemComparisonProps) {
         super(props);
 
         this.state = {
