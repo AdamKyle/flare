@@ -12,14 +12,15 @@ import CharacterInventoryTabsState from "../../../lib/game/character-sheet/types
 import Inventory from "resources/js/game/lib/game/character-sheet/types/inventory/inventory";
 import InventoryTabSection from "./tabs/inventory-tab-section";
 import InventoryDetails from "../../../lib/game/character-sheet/types/inventory/inventory-details";
+import CharacterInventoryTabsProps from "../../../lib/game/character-sheet/types/character-inventory-tabs-props";
 
-export default class CharacterInventoryTabs extends React.Component<any, CharacterInventoryTabsState> {
+export default class CharacterInventoryTabs extends React.Component<CharacterInventoryTabsProps, CharacterInventoryTabsState> {
 
     private tabs: {name: string, key: string}[];
 
     private updateInventoryListener: any;
 
-    constructor(props: any) {
+    constructor(props: CharacterInventoryTabsProps) {
         super(props);
 
         this.tabs = [{

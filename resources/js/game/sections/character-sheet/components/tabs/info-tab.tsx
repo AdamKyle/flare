@@ -4,8 +4,9 @@ import AdditionalInfoModal from "../modals/additional-info-modal";
 import InfoTabProps from "../../../../lib/game/character-sheet/types/tabs/info-tab-props";
 import {formatNumber} from "../../../../lib/game/format-number";
 import OrangeButton from "../../../../components/ui/buttons/orange-button";
+import InfoTabState from "../../../../lib/game/character-sheet/types/tabs/info-tab-state";
 
-export default class InfoTab extends React.Component<InfoTabProps, any> {
+export default class InfoTab extends React.Component<InfoTabProps, InfoTabState> {
 
     constructor(props: InfoTabProps) {
         super(props);

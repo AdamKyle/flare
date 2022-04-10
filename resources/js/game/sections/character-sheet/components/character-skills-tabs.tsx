@@ -10,12 +10,13 @@ import {AxiosError, AxiosResponse} from "axios";
 import ComponentLoading from "../../../components/ui/loading/component-loading";
 import CharacterSkillTabsState from "../../../lib/game/character-sheet/types/skills/character-skill-tabs-state";
 import {watchForDarkModeInventoryChange, watchForDarkModeSkillsChange} from "../../../lib/game/dark-mode-watcher";
+import CharacterSkillTabsProps from "../../../lib/game/character-sheet/types/skills/character-skill-tabs-props";
 
-export default class CharacterSkillsTabs extends React.Component<any, CharacterSkillTabsState> {
+export default class CharacterSkillsTabs extends React.Component<CharacterSkillTabsProps, CharacterSkillTabsState> {
 
     private tabs: {name: string, key: string}[];
 
-    constructor(props: any) {
+    constructor(props: CharacterSkillTabsProps) {
         super(props);
 
         this.tabs = [{
