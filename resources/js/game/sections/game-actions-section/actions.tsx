@@ -7,12 +7,12 @@ import DangerButton from "../../components/ui/buttons/danger-button";
 import MonsterSelection from "./components/monster-selection";
 import CraftingSection from "./components/crafting-section";
 import FightSection from "./components/fight-section";
-import ActionsState from "../../lib/game/actions/types/actions-state";
+import ActionsState from "../../lib/game/types/actions/actions-state";
 import TimerProgressBar from "../../components/ui/progress-bars/timer-progress-bar";
 import PrimaryButton from "../../components/ui/buttons/primary-button";
 import {capitalize, isEqual} from "lodash";
 import clsx from "clsx";
-import ActionsProps from "../../lib/game/actions/types/actions-props";
+import ActionsProps from "../../lib/game/types/actions/actions-props";
 
 export default class Actions extends React.Component<ActionsProps, ActionsState> {
 

@@ -4,7 +4,7 @@ import BattleSetUp from "../../../lib/game/actions/battle/battle-setup";
 import {BattleMessage} from "../../../lib/game/actions/battle/types/battle-message-type";
 import clsx from "clsx";
 import HealthMeters from "./health-meters";
-import FightSectionProps from "../../../lib/game/actions/types/fight-section-props";
+import FightSectionProps from "../../../lib/game/types/actions/fight-section-props";
 import Attack from '../../../lib/game/actions/battle/attack/attack/attack';
 import AmbushHandler
     from "../../../lib/game/actions/battle/attack/attack/attack-types/ambush-and-counter/AmbushHandler";

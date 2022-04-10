@@ -1,6 +1,6 @@
 import React from "react";
 import clsx from "clsx";
-import HealthMeterProps from "../../../lib/game/actions/types/health-meter-props";
+import HealthMeterProps from "../../../lib/game/types/actions/health-meter-props";
 import { formatNumber } from "../../../lib/game/format-number";
 
 export default class HealthMeters extends React.Component<HealthMeterProps, any> {
