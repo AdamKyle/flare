@@ -1,18 +1,7 @@
 import KingdomDetails from "../../../../map/types/kingdom-details";
+import LocationModalState from "../../location-pins/modals/location-modal-state";
 
-export default interface KingdomModalState {
-
-    can_afford: boolean;
-
-    distance: number;
-
-    cost: number;
-
-    time_out: number;
-
-    x: number;
-
-    y: number;
+export default interface KingdomModalState extends LocationModalState {
 
     loading: boolean;
 

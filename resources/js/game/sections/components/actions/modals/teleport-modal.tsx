@@ -6,9 +6,10 @@ import clsx from "clsx";
 import PopOverContainer from "../../../../components/ui/popover/pop-over-container";
 import {fetchCost} from "../../../../lib/game/map/teleportion-costs";
 import {formatNumber} from "../../../../lib/game/format-number";
+import TeleportModalState from "../../../../lib/game/types/map/modals/teleport-modal-state";
 
 
-export default class TeleportModal extends React.Component<TeleportModalProps, any> {
+export default class TeleportModal extends React.Component<TeleportModalProps, TeleportModalState> {
 
     constructor(props: TeleportModalProps) {
         super(props);
@@ -198,23 +199,6 @@ export default class TeleportModal extends React.Component<TeleportModalProps, a
         });
     }
 
-
-
-    buildCoordinates(type: string): {value: number, label: string}[]|[] {
-        if (this.props.coordinates !== null) {
-            switch(type) {
-                case 'x':
-                    return this.convertToSelectable(this.props.coordinates.x);
-                case 'y':
-                    return this.convertToSelectable(this.props.coordinates.y);
-                default:
-                    return [];
-            }
-        }
-
-        return [];
-    }
-
     buildLocationOptions(): {value: number, label: string}[]|[] {
         if (this.props.locations !== null) {
             return this.props.locations.map((location) => {
@@ -245,9 +229,9 @@ export default class TeleportModal extends React.Component<TeleportModalProps, a
         return [];
     }
 
-    convertToSelectable(data: number[]): {value: number, label: string}[] {
+    convertToSelectable(data: number[]): any {
         return data.map((d) => {
-            return {value: d, label: d.toString()}
+            return {label: d.toString(), value: d}
         });
     }
 
@@ -272,6 +256,11 @@ export default class TeleportModal extends React.Component<TeleportModalProps, a
     }
 
     render() {
+
+        if (this.props.coordinates === null) {
+            return null;
+        }
+
         return (
             <Dialogue is_open={this.props.is_open}
                       handle_close={this.props.handle_close}
@@ -288,7 +277,7 @@ export default class TeleportModal extends React.Component<TeleportModalProps, a
                         <div className='w-2/3'>
                             <Select
                                 onChange={this.setXPosition.bind(this)}
-                                options={this.buildCoordinates('x')}
+                                options={this.convertToSelectable(this.props.coordinates.x)}
                                 menuPosition={'absolute'}
                                 menuPlacement={'bottom'}
                                 styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999, color: '#000000' }) }}
@@ -303,7 +292,7 @@ export default class TeleportModal extends React.Component<TeleportModalProps, a
                         <div className='w-2/3'>
                             <Select
                                 onChange={this.setYPosition.bind(this)}
-                                options={this.buildCoordinates('y')}
+                                options={this.convertToSelectable(this.props.coordinates.y)}
                                 menuPosition={'absolute'}
                                 menuPlacement={'bottom'}
                                 styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999, color: '#000000' }) }}
@@ -371,7 +360,7 @@ export default class TeleportModal extends React.Component<TeleportModalProps, a
                     <dd className={clsx(
                         {'text-gray-700': this.state.cost === 0},
                         {'text-green-600' : this.state.can_afford && this.state.cost > 0},
-                        {'text-red-600': !this.state.ca_afford && this.state.cost > 0}
+                        {'text-red-600': !this.state.can_afford && this.state.cost > 0}
                     )}>{formatNumber(this.state.cost)}</dd>
                     <dt>Can Afford:</dt>
                     <dd>{this.state.can_afford ? 'Yes' : 'No'}</dd>

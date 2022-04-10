@@ -2,8 +2,9 @@ import React, {Fragment} from "react";
 import EnemyKingdomPin from "./enemy-kingdom-pin";
 import KingdomProps from "../../../lib/game/types/map/kingdom-pins/kingdom-props";
 import OtherKingdomModal from "./modals/other-kingdom-modal";
+import KingdomState from "../../../lib/game/types/map/kingdom-pins/kingdom-state";
 
-export default class EnemyKingdoms extends React.Component<KingdomProps, any> {
+export default class EnemyKingdoms extends React.Component<KingdomProps, KingdomState> {
 
     constructor(props: KingdomProps) {
         super(props);
@@ -17,7 +18,7 @@ export default class EnemyKingdoms extends React.Component<KingdomProps, any> {
     openKingdomModal(kingdomId: number) {
         this.setState({
             open_kingdom_modal: true,
-            kingdomId: kingdomId,
+            kingdom_id: kingdomId,
         });
     }
 
@@ -52,7 +53,7 @@ export default class EnemyKingdoms extends React.Component<KingdomProps, any> {
                 {
                     this.state.open_kingdom_modal ?
                         <OtherKingdomModal is_open={this.state.open_kingdom_modal}
-                                           kingdom_id={this.state.kingdomId}
+                                           kingdom_id={this.state.kingdom_id}
                                            character_id={this.props.character_id}
                                            currencies={this.props.currencies}
                                            character_position={this.props.character_position}

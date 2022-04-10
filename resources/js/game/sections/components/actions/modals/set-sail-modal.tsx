@@ -6,9 +6,10 @@ import PopOverContainer from "../../../../components/ui/popover/pop-over-contain
 import {fetchCost} from "../../../../lib/game/map/teleportion-costs";
 import {formatNumber} from "../../../../lib/game/format-number";
 import SetSailModalProps from "../../../../lib/game/types/map/modals/set-sail-modal-props";
+import SetSailModalState from "../../../../lib/game/types/map/modals/set-sail-modal-state";
 
 
-export default class TeleportModal extends React.Component<SetSailModalProps, any> {
+export default class TeleportModal extends React.Component<SetSailModalProps, SetSailModalState> {
 
     constructor(props: SetSailModalProps) {
         super(props);
@@ -24,6 +25,9 @@ export default class TeleportModal extends React.Component<SetSailModalProps, an
             distance: 0,
             time_out: 0,
             current_port: null,
+            current_location: null,
+            current_player_kingdom: null,
+            current_enemy_kingdom: null,
         }
     }
 
@@ -133,7 +137,7 @@ export default class TeleportModal extends React.Component<SetSailModalProps, an
                     <dd className={clsx(
                         {'text-gray-700': this.state.cost === 0},
                         {'text-green-600' : this.state.can_afford && this.state.cost > 0},
-                        {'text-red-600': !this.state.ca_afford && this.state.cost > 0}
+                        {'text-red-600': !this.state.can_afford && this.state.cost > 0}
                     )}>{formatNumber(this.state.cost)}</dd>
                     <dt>Can Afford:</dt>
                     <dd>{this.state.can_afford ? 'Yes' : 'No'}</dd>

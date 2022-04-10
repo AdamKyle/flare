@@ -6,8 +6,9 @@ import {fetchCost} from "../../../../lib/game/map/teleportion-costs";
 import {formatNumber} from "../../../../lib/game/format-number";
 import clsx from "clsx";
 import WarningAlert from "../../../../components/ui/alerts/simple-alerts/warning-alert";
+import LocationModalState from "../../../../lib/game/types/map/location-pins/modals/location-modal-state";
 
-export default class LocationModal extends React.Component<LocationModalPros, any> {
+export default class LocationModal extends React.Component<LocationModalPros, LocationModalState> {
 
     constructor(props: LocationModalPros) {
         super(props);
@@ -173,7 +174,7 @@ export default class LocationModal extends React.Component<LocationModalPros, an
                                                             <dd className={clsx(
                                                                 {'text-gray-700': this.state.cost === 0},
                                                                 {'text-green-600': this.state.can_afford && this.state.cost > 0},
-                                                                {'text-red-600': !this.state.ca_afford && this.state.cost > 0}
+                                                                {'text-red-600': !this.state.can_afford && this.state.cost > 0}
                                                             )}>{formatNumber(this.state.cost)}</dd>
                                                             <dt>Can afford to teleport:</dt>
                                                             <dd>{this.state.can_afford ? 'Yes' : 'No'}</dd>

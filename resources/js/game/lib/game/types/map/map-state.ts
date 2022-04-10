@@ -1,4 +1,6 @@
 import LocationDetails from "../../map/types/location-details";
+import PlayerKingdomsDetails from "./player-kingdoms-details";
+import NpcKingdomsDetails from "./npc-kingdoms-details";
 
 export default interface MapState {
     map_url: string;
@@ -19,11 +21,11 @@ export default interface MapState {
 
     loading: boolean;
 
-    player_kingdoms: {id: number, x_position: number, y_position: number, color: string, character_id: number, name: string}[] | null;
+    player_kingdoms: PlayerKingdomsDetails[] | null;
 
-    enemy_kingdoms: {id: number, x_position: number, y_position: number, color: string, character_id: number, name: string}[] | null;
+    enemy_kingdoms: PlayerKingdomsDetails[] | null;
 
-    npc_kingdoms: {id: number, x_position: number, y_position: number, npc_owned: boolean}[] | null;
+    npc_kingdoms: NpcKingdomsDetails[] | null;
 
     coordinates: {x: number[], y: number[]} | null;
 

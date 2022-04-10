@@ -1,5 +1,7 @@
 import {ClassArray, ClassDictionary} from "clsx";
 import LocationDetails from "../../../map/types/location-details";
+import PlayerKingdomsDetails from "../player-kingdoms-details";
+import CharacterCurrenciesType from "../../../character/character-currencies-type";
 
 export default interface TeleportModalProps  {
 
@@ -15,20 +17,15 @@ export default interface TeleportModalProps  {
 
     character_position: { x: number, y: number },
 
-    currencies?: {
-        gold: number,
-        shards: number,
-        gold_dust: number,
-        copper_coins: number,
-    };
+    currencies?: CharacterCurrenciesType;
 
     view_port: number;
 
     locations: LocationDetails[] | null;
 
-    player_kingdoms: {id: number, x_position: number, y_position: number, color: string, character_id: number, name: string}[] | null;
+    player_kingdoms: PlayerKingdomsDetails[] | null;
 
-    enemy_kingdoms: {id: number, x_position: number, y_position: number, color: string, character_id: number, name: string}[] | null;
+    enemy_kingdoms: PlayerKingdomsDetails[] | null;
 
     teleport_player: (data: {x: number, y: number, cost: number, timeout: number}) => void
 }
