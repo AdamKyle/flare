@@ -4,9 +4,11 @@ import {
     buildLimitedColumns
 } from "../../../../../lib/game/character-sheet/helpers/inventory/build-inventory-table-columns";
 import InventoryDetails from "../../../../../lib/game/character-sheet/types/inventory/inventory-details";
+import QuestItemsInventoryTabProps
+    from "../../../../../lib/game/character-sheet/types/tabs/quest-items-inventory-tab-props";
 
-export default class QuestItemsTable extends React.Component<any, any> {
-    constructor(props: any) {
+export default class QuestItemsTable extends React.Component<QuestItemsInventoryTabProps, any> {
+    constructor(props: QuestItemsInventoryTabProps) {
         super(props);
 
         this.state = {

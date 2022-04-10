@@ -9,13 +9,13 @@ import PopOverContainer from "../../../../../components/ui/popover/pop-over-cont
 import InventoryDetails from "../../../../../lib/game/character-sheet/types/inventory/inventory-details";
 import ActionsInterface from "../../../../../lib/game/character-sheet/helpers/inventory/actions-interface";
 import DangerButton from "../../../../../components/ui/buttons/danger-button";
-import SetsTableProps from "../../../../../lib/game/character-sheet/types/tabs/sets-table-props";
 import LoadingProgressBar from "../../../../../components/ui/progress-bars/loading-progress-bar";
 import {AxiosError, AxiosResponse} from "axios";
 import Ajax from "../../../../../lib/ajax/ajax";
+import SetsInventoryTabProps from "../../../../../lib/game/character-sheet/types/tabs/sets-inventory-tab-props";
 
-export default class SetsTable extends React.Component<SetsTableProps, any> implements ActionsInterface {
-    constructor(props: SetsTableProps) {
+export default class SetsTable extends React.Component<SetsInventoryTabProps, any> implements ActionsInterface {
+    constructor(props: SetsInventoryTabProps) {
         super(props);
 
         this.state = {
@@ -29,16 +29,23 @@ export default class SetsTable extends React.Component<SetsTableProps, any> impl
     componentDidMount() {
         const sets = Object.keys(this.props.sets);
 
+        // @ts-ignore
+        const data = this.props.sets[sets[0]];
+
         this.setState({
-            data: this.props.sets[sets[0]],
+            data: data,
             drop_down_labels: sets,
             selected_set: sets[0],
         })
     }
 
     switchTable(set: string) {
+
+        // @ts-ignore
+        const data = this.props.sets[set];
+
         this.setState({
-            data: this.props.sets[set],
+            data: data,
             selected_set: set,
         });
     }
@@ -56,10 +63,13 @@ export default class SetsTable extends React.Component<SetsTableProps, any> impl
     search(e: React.ChangeEvent<HTMLInputElement>) {
         const value = e.target.value;
 
+        // @ts-ignore
+        const data = this.props.sets[this.state.selected_set].filter((item: InventoryDetails) => {
+            return item.item_name.includes(value)
+        });
+
         this.setState({
-            data: this.props.sets[this.state.selected_set].filter((item: InventoryDetails) => {
-                return item.item_name.includes(value)
-            })
+            data: data
         });
     }
 
@@ -140,7 +150,7 @@ export default class SetsTable extends React.Component<SetsTableProps, any> impl
                         : null
                 }
 
-                <Table data={this.state.data} columns={BuildInventoryTableColumns(this)} dark_table={this.props.dark_table}/>
+                <Table data={this.state.data} columns={BuildInventoryTableColumns(this)} dark_table={this.props.dark_tables}/>
             </Fragment>
         );
     }

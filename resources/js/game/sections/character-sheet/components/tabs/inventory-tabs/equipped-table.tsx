@@ -6,13 +6,13 @@ import ActionsInterface from "../../../../../lib/game/character-sheet/helpers/in
 import DangerButton from "../../../../../components/ui/buttons/danger-button";
 import DropDown from "../../../../../components/ui/drop-down/drop-down";
 import LoadingProgressBar from "../../../../../components/ui/progress-bars/loading-progress-bar";
-import EquippedTableProps from "../../../../../lib/game/character-sheet/types/tabs/equipped-table-props";
 import Ajax from "../../../../../lib/ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
 import {isEqual} from "lodash";
+import EquippedInventoryTabProps from "../../../../../lib/game/character-sheet/types/tabs/equipped-inventory-tab-props";
 
-export default class EquippedTable extends React.Component<EquippedTableProps, any> implements ActionsInterface  {
-    constructor(props: EquippedTableProps) {
+export default class EquippedTable extends React.Component<EquippedInventoryTabProps, any> implements ActionsInterface  {
+    constructor(props: EquippedInventoryTabProps) {
         super(props);
 
         this.state = {
@@ -21,7 +21,7 @@ export default class EquippedTable extends React.Component<EquippedTableProps, a
         }
     }
 
-    componentDidUpdate(prevProps: Readonly<EquippedTableProps>, prevState: Readonly<any>, snapshot?: any) {
+    componentDidUpdate(prevProps: Readonly<EquippedInventoryTabProps>, prevState: Readonly<any>, snapshot?: any) {
         if (!isEqual(prevState.data, this.props.equipped_items)) {
             this.setState({
                 data: this.props.equipped_items
@@ -50,6 +50,7 @@ export default class EquippedTable extends React.Component<EquippedTableProps, a
     hasEmptySet() {
         const dropDownLabels = Object.keys(this.props.sets);
 
+        // @ts-ignore
         return dropDownLabels.filter((key) => this.props.sets[key].length === 0).length > 0;
     }
 
@@ -119,7 +120,7 @@ export default class EquippedTable extends React.Component<EquippedTableProps, a
                         : null
                     }
                 </div>
-                <Table data={this.state.data} columns={BuildInventoryTableColumns(this)} dark_table={this.props.dark_table}/>
+                <Table data={this.state.data} columns={BuildInventoryTableColumns(this)} dark_table={this.props.dark_tables}/>
             </Fragment>
         );
     }

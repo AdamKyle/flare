@@ -6,9 +6,10 @@ import {
 import DropDown from "../../../../../components/ui/drop-down/drop-down";
 import ActionsInterface from "../../../../../lib/game/character-sheet/helpers/inventory/actions-interface";
 import InventoryDetails from "../../../../../lib/game/character-sheet/types/inventory/inventory-details";
+import UsableItemTable from "../../../../../lib/game/character-sheet/types/tables/usable-items-table-props";
 
-export default class UsableItemsTable extends React.Component<any, any> implements ActionsInterface {
-    constructor(props: any) {
+export default class UsableItemsTable extends React.Component<UsableItemTable, any> implements ActionsInterface {
+    constructor(props: UsableItemTable) {
         super(props);
     }
 
