@@ -18,11 +18,23 @@ import EquipModal from "./components/inventory-comparison/equip-modal";
 import LoadingProgressBar from "../../../../components/ui/progress-bars/loading-progress-bar";
 import InventoryItemComparisonProps
     from "../../../../lib/game/character-sheet/types/modal/inventory-item-comparison-props";
+import Tabs from '../../../../components/ui/tabs/tabs';
+import TabPanel from "../../../../components/ui/tabs/tab-panel";
 
 export default class InventoryItemComparison extends React.Component<InventoryItemComparisonProps, InventoryItemComparisonState> {
 
+    private tabs: {name: string, key: string}[];
+
     constructor(props: InventoryItemComparisonProps) {
         super(props);
+
+        this.tabs = [{
+            key: 'general',
+            name: 'General'
+        }, {
+            key: 'comparison',
+            name: 'Comparison',
+        }]
 
         this.state = {
             loading: true,
@@ -97,7 +109,6 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
         let elements = Object.keys(details).map((key) => {
             if (!invalidFields.includes(key)) {
                 if (typeof details[key] === 'number' && details[key] !== 0) {
-                    console.log(key);
                     return (
                         <Fragment>
                             <dt>{capitalize(key.split('_').join(' '))}</dt>
@@ -146,29 +157,9 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
         )
     }
 
-    formatPosition(position: string|number|boolean) {
-        if (typeof position === 'string') {
-            return capitalize(position.split('-').join(' '));
-        }
-
-        return position;
-    }
-
-    formatWholeNumber(value: string|number|boolean) {
-        if (typeof value === 'number') {
-            return formatNumber(value);
-        }
-
-        return value;
-    }
-
-    renderPercent(value: any) {
-        return (value * 100).toFixed(2) + '%'
-    }
-
     renderItemToEquip(itemToEquip: InventoryComparisonAdjustment) {
-        const invalidFields     = ['id', 'min_cost', 'skill_level_req', 'skill_level_trivial', 'holy_level', 'holy_stack_devouring_darkness', 'holy_stack_stat_bonus', 'holy_stacks', 'holy_stacks_applied', 'cost', 'slot_id'];
-        const wholeNumberValues = ['damage_adjustment', 'ac_adjustment', 'healing_adjustment', 'base_damage'];
+        const invalidFields     = ['id', 'min_cost', 'skill_level_req', 'skill_level_trivial', 'cost', 'slot_id', 'holy_level'];
+        const wholeNumberValues = ['damage_adjustment', 'ac_adjustment', 'healing_adjustment', 'base_damage', 'holy_stacks', 'holy_stacks_applied'];
 
         return Object.keys(itemToEquip).map((key) => {
             if (!invalidFields.includes(key)) {
@@ -230,6 +221,60 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
         return null;
     }
 
+    renderSingleItem() {
+        if (this.state.comparison_details === null) {
+            return null;
+        }
+
+        return (
+            <div>
+                <dl>
+                    {this.renderItemToEquip(this.state.comparison_details.itemToEquip)}
+                </dl>
+            </div>
+        )
+    }
+
+    renderTabs(double: boolean) {
+        return (
+            <Tabs tabs={this.tabs}>
+                <TabPanel key={'general'}>
+                    <div className='mb-10'>
+                        {this.renderSingleItem()}
+                    </div>
+                </TabPanel>
+                <TabPanel key={'comparison'}>
+                    {
+                        double ?
+                            this.renderTwoComparisons()
+                        :
+                            this.renderSingleComparison()
+                    }
+                </TabPanel>
+            </Tabs>
+        )
+    }
+
+    formatPosition(position: string|number|boolean) {
+        if (typeof position === 'string') {
+            return capitalize(position.split('-').join(' '));
+        }
+
+        return position;
+    }
+
+    formatWholeNumber(value: string|number|boolean) {
+        if (typeof value === 'number') {
+            return formatNumber(value);
+        }
+
+        return value;
+    }
+
+    renderPercent(value: any) {
+        return (value * 100).toFixed(2) + '%'
+    }
+
     isLargeModal() {
 
         if (this.state.comparison_details !== null) {
@@ -265,28 +310,41 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
                             {
                                 this.state.comparison_details.details.length > 0 ?
                                     this.state.comparison_details.details.length === 2 ?
-                                        this.renderTwoComparisons()
+                                        this.renderTabs(true)
                                     :
-                                        this.renderSingleComparison()
+                                        this.renderTabs(false)
                                 :
-                                    <div>
-                                        <dl>
-                                            {this.renderItemToEquip(this.state.comparison_details.itemToEquip)}
-                                        </dl>
-                                    </div>
+                                    this.renderSingleItem()
                             }
                             <div className='border-b-2 mt-6 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                             <div className={clsx(
-                                'mt-6 grid grid-cols-1 w-full md:grid-cols-6 gap-2 md:m-auto',
+                                'mt-6 grid grid-cols-1 w-full gap-2 md:m-auto',
                                 {
                                     'md:w-3/4': this.isLargeModal()
+                                }, {
+                                    'md:grid-cols-6': this.state.comparison_details.itemToEquip.affix_count > 0 && this.state.comparison_details.itemToEquip.holy_stacks_applied > 0,
+                                    'md:grid-cols-5': (this.state.comparison_details.itemToEquip.affix_count > 0 && this.state.comparison_details.itemToEquip.holy_stacks_applied === 0) || (this.state.comparison_details.itemToEquip.affix_count === 0 && this.state.comparison_details.itemToEquip.holy_stacks_applied > 0),
+                                    'md:grid-cols-4': this.state.comparison_details.itemToEquip.affix_count === 0 && this.state.comparison_details.itemToEquip.holy_stacks_applied === 0,
                                 }
                             )}>
                                 <PrimaryOutlineButton button_label={'Equip'} on_click={this.manageEquipModal.bind(this)} disabled={this.state.is_equipping}/>
                                 <PrimaryOutlineButton button_label={'Move'} on_click={this.stubbedClick.bind(this)} disabled={this.state.is_equipping}/>
                                 <SuccessOutlineButton button_label={'Sell'} on_click={this.stubbedClick.bind(this)} disabled={this.state.is_equipping}/>
-                                <SuccessOutlineButton button_label={'List'} on_click={this.stubbedClick.bind(this)} disabled={this.state.is_equipping}/>
-                                <DangerOutlineButton button_label={'Disenchant'} on_click={this.stubbedClick.bind(this)} disabled={this.state.is_equipping}/>
+
+                                {
+                                    this.state.comparison_details.itemToEquip.affix_count > 0 || this.state.comparison_details.itemToEquip.holy_stacks_applied > 0 ?
+                                        <SuccessOutlineButton button_label={'List'}
+                                                              on_click={this.stubbedClick.bind(this)}
+                                                              disabled={this.state.is_equipping}/>
+                                        : null
+                                }
+
+                                {
+                                    this.state.comparison_details.itemToEquip.affix_count > 0 ?
+                                        <DangerOutlineButton button_label={'Disenchant'} on_click={this.stubbedClick.bind(this)} disabled={this.state.is_equipping}/>
+                                    : null
+                                }
+
                                 <DangerOutlineButton button_label={'Destroy'} on_click={this.stubbedClick.bind(this)} disabled={this.state.is_equipping}/>
                             </div>
 
@@ -296,17 +354,15 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
                                     : null
                             }
 
-                            <Fragment>
-                                {
-                                    this.state.show_equip_modal ?
-                                        <EquipModal is_open={this.state.show_equip_modal}
-                                                    manage_modal={this.manageEquipModal.bind(this)}
-                                                    item_to_equip={this.state.comparison_details.itemToEquip}
-                                                    equip_item={this.equipItem.bind(this)}
-                                        />
-                                        : null
-                                }
-                            </Fragment>
+                            {
+                                this.state.show_equip_modal ?
+                                    <EquipModal is_open={this.state.show_equip_modal}
+                                                manage_modal={this.manageEquipModal.bind(this)}
+                                                item_to_equip={this.state.comparison_details.itemToEquip}
+                                                equip_item={this.equipItem.bind(this)}
+                                    />
+                                    : null
+                            }
                         </div>
                 }
             </Dialogue>

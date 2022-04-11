@@ -75,7 +75,7 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
     }
 
     actions(row: InventoryDetails): JSX.Element {
-        return <DangerButton button_label={'Remove'} on_click={() => this.removeFromSet(row.id)} disabled={this.props.is_dead} />
+        return <DangerButton button_label={'Remove'} on_click={() => this.removeFromSet(row.id)} disabled={this.buttonsDisabled()} />
     }
 
     emptySet() {
@@ -106,6 +106,10 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
         })
     }
 
+    buttonsDisabled() {
+        return this.state.selected_set === this.props.set_name_equipped || this.props.is_dead
+    }
+
     removeFromSet(id: number) {
 
     }
@@ -115,17 +119,17 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
             <Fragment>
                 <div className='flex items-center'>
                     <div>
-                        <DropDown menu_items={this.buildMenuItems()} button_title={'Set'} selected_name={this.state.selected_set} secondary_selected={this.props.set_name_equipped} disabled={this.props.is_dead} />
+                        <DropDown menu_items={this.buildMenuItems()} button_title={'Set'} selected_name={this.state.selected_set} secondary_selected={this.props.set_name_equipped} disabled={this.props.is_dead}  />
                     </div>
                     <div className='ml-2'>
-                        <DangerButton button_label={'Empty Set'} on_click={this.emptySet.bind(this)} disabled={this.props.is_dead} />
+                        <DangerButton button_label={'Empty Set'} on_click={this.emptySet.bind(this)} disabled={this.buttonsDisabled()}/>
                     </div>
                     <div className='ml-2'>
                         {
                             this.state.selected_set === this.props.set_name_equipped ?
                                 <span className={'text-green-600 dark:text-green-700'}>Equipped!</span>
                             :
-                                <PrimaryButton button_label={'Equip Set'} on_click={this.equipSet.bind(this)} disabled={this.props.is_dead} />
+                                <PrimaryButton button_label={'Equip Set'} on_click={this.equipSet.bind(this)} disabled={this.props.is_dead}  />
                         }
                     </div>
                     <div className='ml-4 md:ml-0 my-4 md:my-0 md:absolute md:right-0'>
