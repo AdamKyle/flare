@@ -3,6 +3,7 @@
 namespace App\Game\Skills\Controllers\Api;
 
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
+use App\Game\Skills\Requests\TrinketCraftingValidation;
 use App\Game\Skills\Services\TrinketCraftingService;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
@@ -18,12 +19,14 @@ class TrinketCraftingController extends Controller {
 
     public function fetchItemsToCraft(Character $character) {
 
-        return response()->json($this->trinketCraftingService->fetchItemsToCraft($character));
+        return response()->json(['items' => $this->trinketCraftingService->fetchItemsToCraft($character)]);
     }
 
-    public function craftTrinket(Character $character, Item $item) {
+    public function craftTrinket(TrinketCraftingValidation $request, Character $character) {
         event(new CraftedItemTimeOutEvent($character));
 
-        return response()->json($this->trinketCraftingService->craft($character, $item));
+        $item = Item::find($request->item_to_craft);
+
+        return response()->json(['items' => $this->trinketCraftingService->craft($character, $item)]);
     }
 }

@@ -55,7 +55,7 @@ Route::middleware(['auth', 'is.player.banned', 'is.character.who.they.say.they.a
 
         Route::group(['middleware' => 'throttle:25,1'], function() {
             // Trinket Crafting
-            Route::post('/trinket-craft/{character}/{item}', ['uses' => 'Api\TrinketCraftingController@craftTrinket']);
+            Route::post('/trinket-craft/{character}', ['uses' => 'Api\TrinketCraftingController@craftTrinket']);
         });
     });
 
