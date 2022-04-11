@@ -26,7 +26,6 @@ class ApplyHolyOilRequest extends FormRequest
         return [
             'item_id'         => 'required|integer',
             'alchemy_item_id' => 'required|integer',
-            'gold_dust_cost'  => 'required|integer',
         ];
     }
 
@@ -34,7 +33,6 @@ class ApplyHolyOilRequest extends FormRequest
         return [
             'item_id.required'         => 'Error. Invalid Input.',
             'alchemy_item_id.required' => 'Error. Invalid Input.',
-            'gold_dust_cost.required'  => 'Error. Invalid Input.',
         ];
     }
 }

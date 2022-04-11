@@ -96,7 +96,7 @@ export default class Alchemy extends React.Component<any, any> {
         return (
             <Fragment>
                 <div className='mt-2 grid md:grid-cols-3 gap-2 md:ml-[120px]'>
-                    <div className='cols-start-1 col-span-2'>
+                    <div className='cols-start-1 col-span-3'>
                         <Select
                             onChange={this.setItemToCraft.bind(this)}
                             options={this.buildItems()}

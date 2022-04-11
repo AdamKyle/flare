@@ -4,6 +4,7 @@ namespace App\Game\Core\Services;
 
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Messages\Events\GlobalMessageEvent;
+use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Collection as DBCollection;
 use App\Game\Core\Events\UpdateTopBarEvent;
@@ -24,23 +25,24 @@ class HolyItemService {
         $slots = $this->getSlots($character);
 
         return $this->successResult([
-            'items'   => $this->fetchValidItems($slots)->values(),
-            'alchemy' => $this->fetchAlchemyItems($slots)->values(),
+            'items'         => $this->fetchValidItems($slots)->values(),
+            'alchemy_items' => $this->fetchAlchemyItems($slots)->values(),
         ]);
     }
 
     public function applyOil(Character $character, array $params): array {
         event(new CraftedItemTimeOutEvent($character));
 
-        $inventory = Inventory::where('character_id', $character->id)->first();
-
+        $inventory   = Inventory::where('character_id', $character->id)->first();
         $itemSlot    = InventorySlot::where('inventory_id', $inventory->id)->where('item_id', $params['item_id'])->first();
         $alchemySlot = InventorySlot::where('inventory_id', $inventory->id)->where('item_id', $params['alchemy_item_id'])->first();
 
-        if (!$this->validateCost($itemSlot->item, $alchemySlot->item, $params['gold_dust_cost'])) {
-            event(new GlobalMessageEvent($character->name . ' has been caught cheating. The Purgatory Smith lets out a loud roar. Tell them to stop cheating!'));
+        $cost = $this->getCost($itemSlot->item, $alchemySlot->item);
 
-            return $this->errorResult('Error: Cost does not match.');
+        if ($cost > $character->gold_dust) {
+            event(new ServerMessageEvent($character->user, 'Not enough gold dust to apply this oil.'));
+
+            return $this->successResult();
         }
 
         if (!$this->canApplyAdditionalStacks($itemSlot->item)) {
@@ -48,7 +50,7 @@ class HolyItemService {
         }
 
         $character->update([
-            'gold_dust' => $character->gold_dust - $params['gold_dust_cost'],
+            'gold_dust' => $character->gold_dust - $cost,
         ]);
 
         $this->applyStack($itemSlot, $alchemySlot);
@@ -57,18 +59,14 @@ class HolyItemService {
 
         event(new UpdateTopBarEvent($character));
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
-
-        event(new CharacterInventoryDetailsUpdate($character->user));
-
         return $this->fetchSmithingItems($character);
     }
 
-    protected function validateCost(Item $item, Item $alchemyItem, int $originalAmount): bool {
+    protected function getCost(Item $item, Item $alchemyItem): int {
         $baseCost  = $item->holy_stacks * 10000;
         $totalCost = $baseCost * $alchemyItem->holy_level;
 
-        return $totalCost === $originalAmount;
+        return $totalCost;
     }
 
     protected function canApplyAdditionalStacks(Item $item): bool {

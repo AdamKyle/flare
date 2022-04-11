@@ -149,7 +149,7 @@ export default class Enchanting extends React.Component<any, any> {
         }
 
         return {
-            label: 'Please select item.',
+            label: 'Please select enchantment.',
             value: 0,
         }
     }
@@ -162,7 +162,7 @@ export default class Enchanting extends React.Component<any, any> {
         return (
             <Fragment>
                 <div className='mt-2 grid md:grid-cols-3 gap-2 md:ml-[120px]'>
-                    <div>
+                    <div className='col-start-1 col-span-2'>
                         <Select
                             onChange={this.setSelectedItem.bind(this)}
                             options={this.renderItemsToEnchantSelection()}
@@ -173,7 +173,7 @@ export default class Enchanting extends React.Component<any, any> {
                             value={this.selectedItemToEnchant()}
                         />
                     </div>
-                    <div>
+                    <div className='col-start-1 col-span-2'>
                         <Select
                             onChange={this.setPrefix.bind(this)}
                             options={this.renderTypeOfEnchant('prefix')}
@@ -184,7 +184,7 @@ export default class Enchanting extends React.Component<any, any> {
                             value={this.selectedEnchantment('prefix')}
                         />
                     </div>
-                    <div>
+                    <div className='col-start-1 col-span-2'>
                         <Select
                             onChange={this.setSuffix.bind(this)}
                             options={this.renderTypeOfEnchant('suffix')}

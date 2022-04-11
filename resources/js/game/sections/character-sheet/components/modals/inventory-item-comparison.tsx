@@ -39,6 +39,7 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
                 item_to_equip_type: this.props.item_type,
             }
         }).doAjaxCall('get', (result: AxiosResponse) => {
+            console.log(result.data);
             this.setState({
                 loading: false,
                 comparison_details: result.data,
@@ -248,10 +249,6 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
 
     render() {
 
-        if (this.state.comparison_details === null) {
-            return;
-        }
-
         return (
             <Dialogue is_open={this.props.is_open}
                       handle_close={this.props.manage_modal}
@@ -298,17 +295,19 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
                                     <LoadingProgressBar />
                                     : null
                             }
-                        </div>
-                }
 
-                {
-                    this.state.show_equip_modal ?
-                        <EquipModal is_open={this.state.show_equip_modal}
-                                    manage_modal={this.manageEquipModal.bind(this)}
-                                    item_to_equip={this.state.comparison_details.itemToEquip}
-                                    equip_item={this.equipItem.bind(this)}
-                        />
-                    : null
+                            <Fragment>
+                                {
+                                    this.state.show_equip_modal ?
+                                        <EquipModal is_open={this.state.show_equip_modal}
+                                                    manage_modal={this.manageEquipModal.bind(this)}
+                                                    item_to_equip={this.state.comparison_details.itemToEquip}
+                                                    equip_item={this.equipItem.bind(this)}
+                                        />
+                                        : null
+                                }
+                            </Fragment>
+                        </div>
                 }
             </Dialogue>
         );

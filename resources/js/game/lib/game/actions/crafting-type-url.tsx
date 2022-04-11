@@ -20,6 +20,7 @@ export const craftingGetEndPoints = (type: 'craft' | 'enchant' | 'alchemy' | 'wo
         case 'trinketry':
             return 'trinket-crafting/' + characterId;
         case 'workbench':
+            return 'character/'+characterId+'/inventory/smiths-workbench'
         default:
             return '';
     }
@@ -47,6 +48,7 @@ export const craftingPostEndPoints = (type: 'craft' | 'enchant' | 'alchemy' | 'w
         case 'trinketry':
             return 'trinket-craft/' + characterId;
         case 'workbench':
+            return 'character/'+characterId+'/smithy-workbench/apply';
         default:
             return '';
     }
