@@ -168,20 +168,9 @@ class CharacterInventoryController extends Controller {
 
         $character = $character->refresh();
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'sets'));
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
+        event(new UpdateTopBarEvent($character));
 
-        event(new CharacterInventoryDetailsUpdate($character->user));
-
-        event(new UpdateTopBarEvent($character->refresh()));
-
-        $affixData = $this->enchantingService->fetchAffixes($character->refresh());
-
-        event(new UpdateCharacterEnchantingList(
-            $character->user,
-            $affixData['affixes'],
-            $affixData['character_inventory'],
-        ));
+        $characterInventoryService = $this->characterInventoryService->setCharacter($character);
 
         if (is_null($inventorySet->name)) {
             $index     = $character->inventorySets->search(function($set) use ($request) {
@@ -189,12 +178,20 @@ class CharacterInventoryController extends Controller {
             });
 
             return response()->json([
-                'message' => $itemName . ' Has been moved to: Set ' . $index + 1,
+                'message'   => $itemName . ' Has been moved to: Set ' . $index + 1,
+                'inventory' => [
+                    'inventory' => $characterInventoryService->getInventoryForType('inventory'),
+                    'sets'      => $characterInventoryService->getInventoryForType('sets')['sets']
+                ]
             ]);
         }
 
         return response()->json([
-            'message' => $itemName . ' Has been moved to: ' . $inventorySet->name,
+            'message'   => $itemName . ' Has been moved to: ' . $inventorySet->name,
+            'inventory' => [
+                'inventory' => $characterInventoryService->getInventoryForType('inventory'),
+                'sets'      => $characterInventoryService->getInventoryForType('sets')['sets']
+            ]
         ]);
     }
 
@@ -278,26 +275,31 @@ class CharacterInventoryController extends Controller {
 
         $character = $character->refresh();
 
-        $index     = $character->inventorySets->search(function($set) use ($request) {
-            return $set->id === $request->inventory_set_id;
-        });
+        $set  = InventorySet::find($request->inventory_set_id);
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'sets'));
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
+        if (!is_null($set->name)) {
+            $setName = $set->name;
+        } else {
+            $index     = $character->inventorySets->search(function($set) use ($request) {
+                return $set->id === $request->inventory_set_id;
+            });
 
-        event(new CharacterInventoryDetailsUpdate($character->user));
+            $setName = 'Set ' . $index + 1;
+        }
 
-        event(new UpdateTopBarEvent($character->refresh()));
+        event(new UpdateTopBarEvent($character));
 
-        $affixData = $this->enchantingService->fetchAffixes($character->refresh());
+        $characterInventoryService = $this->characterInventoryService->setCharacter($character);
 
-        event(new UpdateCharacterEnchantingList(
-            $character->user,
-            $affixData['affixes'],
-            $affixData['character_inventory'],
-        ));
+        $sets = $characterInventoryService->getInventoryForType('sets');
 
-        return response()->json(['message' => $itemName . ' Has been removed from Set ' . $index + 1 . ' and placed back into your inventory.'], 200);
+        return response()->json([
+            'message' => $itemName . ' Has been removed from '.$setName.' and placed back into your inventory.',
+            'inventory' => [
+                'inventory' => $characterInventoryService->getInventoryForType('inventory'),
+                'sets'      => $sets['sets'],
+            ]
+        ]);
     }
 
     public function emptySet(Character $character, InventorySet $inventorySet, InventorySetService $inventorySetService) {

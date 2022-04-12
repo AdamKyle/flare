@@ -28,7 +28,9 @@ export default interface InventoryItemComparisonState {
 
     show_equip_modal: boolean;
 
-    is_equipping: boolean;
+    show_move_modal: boolean;
+
+    action_loading: boolean;
 
     loading: boolean;
 }

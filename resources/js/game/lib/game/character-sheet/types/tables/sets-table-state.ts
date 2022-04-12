@@ -7,5 +7,7 @@ export default interface SetsTableState {
 
     selected_set: string | null;
 
+    success_message: string | null;
+
     loading: boolean;
 }

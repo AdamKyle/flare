@@ -126,7 +126,7 @@ class CharacterInventoryService {
                 return !is_null($equipped) ? $equipped : [];
             case 'sets':
                 return [
-                    'sets' => $this->character->inventorySets()->with(['slots', 'slots.item', 'slots.item.itemPrefix', 'slots.item.itemSuffix'])->get(),
+                    'sets'         => $this->getCharacterInventorySets(),
                     'set_equipped' => $this->isInventorySetIsEquipped
                 ];
             case 'quest_items':
@@ -147,9 +147,15 @@ class CharacterInventoryService {
             $slots = new LeagueCollection($inventorySet->slots, $this->inventoryTransformer);
 
             if (is_null($inventorySet->name)) {
-                $sets['Set ' . $index + 1] = $this->manager->createData($slots)->toArray();
+                $sets['Set ' . $index + 1] = [
+                    'items' => $this->manager->createData($slots)->toArray(),
+                    'equippable' => $inventorySet->can_be_equipped,
+                ];
             } else {
-                $sets[$inventorySet->name] = $this->manager->createData($slots)->toArray();
+                $sets[$inventorySet->name] = [
+                    'items' => $this->manager->createData($slots)->toArray(),
+                    'equippable' => $inventorySet->can_be_equipped,
+                ];
             }
         }
 

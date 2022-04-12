@@ -89,7 +89,9 @@ class InventorySetService {
             'can_be_equipped' => $this->isSetEquippable($inventorySet),
         ]);
 
-        return $this->successResult(['Removed items']);
+        return $this->successResult([
+            'message' => 'Removed ' . $item->affix_name . ' from Set.',
+        ]);
     }
 
     /**

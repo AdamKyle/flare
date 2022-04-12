@@ -1,4 +1,5 @@
 import InventoryDetails from "../inventory/inventory-details";
+import SetDetails from "../inventory/set-details";
 
 export default interface InventoryItemComparisonProps {
     is_open: boolean;
@@ -13,5 +14,9 @@ export default interface InventoryItemComparisonProps {
 
     character_id: number;
 
-    update_inventory: (inventory: {[key: string]: InventoryDetails[]}) => void
+    usable_sets: SetDetails[] | [];
+
+    update_inventory: (inventory: {[key: string]: InventoryDetails[]}) => void;
+
+    set_success_message: (message: string) => void;
 }

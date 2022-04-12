@@ -52,7 +52,7 @@ export default class EquippedTable extends React.Component<EquippedInventoryTabP
         const dropDownLabels = Object.keys(this.props.sets);
 
         // @ts-ignore
-        return dropDownLabels.filter((key) => this.props.sets[key].length === 0).length > 0;
+        return dropDownLabels.filter((key) => this.props.sets[key].items.length === 0).length > 0;
     }
 
     buildMenuItems() {
