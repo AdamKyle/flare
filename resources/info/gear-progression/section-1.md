@@ -10,21 +10,21 @@ Let's go through how this progression works.
 
 First you start with Shop gear and drops from the enemy. This is your first tier.
 
-It is suggested players also [craft](/information/crafting) and [enchant](/information/enchanting) while doing their [exploration](/infomration/exploration).
+It is suggested players also [craft](/information/crafting) and [enchant](/information/enchanting) while doing their [exploration](/information/exploration).
 
 You start with crafting shop gear and enchanting that with the same enchants you find on enemies.
 
 However, you will quickly surpass this.
 
-To level enchanting faster, head to [settings](/infromation/settings) and set Auto Disenchant to all.  As you disenchant you get half the XP for enchanting.
+To level enchanting faster, head to [settings](/information/settings) and set Auto Disenchant to all.  As you disenchant you get half the XP for enchanting.
 
-You finish this ter when you are crafting gear that is 36 billion or there abouts in gold. This is far above the 2 billion limit in the shop.
+You finish this ter when you are crafting gear that is 36 billion or thereabouts in gold. This is far above the 2 billion limit in the shop.
 
 Enchantments will also get very pricey and quite quickly.
 
 ## Tier Two: Uniques
 
-As you have been playing, especially if you are [exploring](/infomration/exploration), you will get what's called [uniques](/information/random-enchants).
+As you have been playing, especially if you are [exploring](/information/exploration), you will get what's called [uniques](/information/random-enchants).
 
 Tier two can start as early as your first few hours, but the items you get are low valuation and won't do much till you raise your level to properly take advantage of their stat increases.
 

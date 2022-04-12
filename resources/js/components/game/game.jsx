@@ -7,7 +7,7 @@ import Teleport from './sections/components/teleport';
 import CharacterInfoTopSection from './sections/character-info-section';
 import ActionsSection from './sections/actions-section';
 import PortSection from './sections/port-section';
-import AdeventureActions from './sections/adventure-section';
+import AdventureActions from './sections/adventure-section';
 import TraverseSection from "./sections/traverse-section";
 import QuestSection from "./sections/quest-section";
 import KingdomManagementModal from './kingdom/modal/kingdom-management-modal';
@@ -485,7 +485,7 @@ export default class Game extends React.Component {
                 }
                 {
                   this.state.openAdventureDetails ?
-                    <AdeventureActions
+                    <AdventureActions
                       canAdventure={this.canAdventure.bind(this)}
                       updateAdventure={this.updateAdventure.bind(this)}
                       adventureDetails={this.state.adventureDetails}
@@ -636,7 +636,7 @@ export default class Game extends React.Component {
               y={this.state.current_y}
               close={this.closeKingdomModal.bind(this)}
               openKingdomManagement={this.openKingdomManagement.bind(this)}
-              myKingomsCount={this.state.kingdomData.my_kingdoms.length}
+              myKingdomsCount={this.state.kingdomData.my_kingdoms.length}
               openTimeOutModal={this.openTimeOutModal.bind(this)}
             />
             : null

@@ -94,8 +94,8 @@ export default class QuestDetails extends React.Component {
             item.required_monster.is_celestial_entity ?
               <AlertInfo icon={'fas fa-question-circle'} title={"Celestial Fight is required"}>
                 <p>
-                  Some quests such as this one may have you fighting a Celestial entity. You can check the <a href="/information/npcs" target="_blank">help docs (NPC's)</a> to find out, based on which plane,
-                  which Summoning NPC you ned to speak to inorder to conjure the entity, there is only one per plane.
+                  Some quests such as this one may have you fighting a Celestial entity. You can check the <a href="/information/npcs" target="_blank">help docs (NPCs)</a> to find out, based on which plane,
+                  which Summoning NPC you need to speak to in order to conjure the entity, there is only one per plane.
                 </p>
                 <p>
                   Celestial Entities below Dungeons plane, will not be included in the weekly spawn.
@@ -193,14 +193,14 @@ export default class QuestDetails extends React.Component {
                       </dl>
                       <hr />
                       <h3 className="tw-font-light">Info</h3>
-                      <AlertInfo icon={'fas fa-question-circle'} title={"How to chat with NPC's"}>
+                      <AlertInfo icon={'fas fa-question-circle'} title={"How to chat with NPCs"}>
                         <p>
                           All quests require you to use the chat box to chat with the NPC to complete the quest. You do this by
                         taking the <strong>How to message</strong> command, copy and paste it to the chat box and hit enter,
                         make sure there are no spaces before the command.
                         </p>
                         <p>
-                          Some NPC's will require you to be at their location, check the <strong>Must be at same location?</strong> above to see if
+                          Some NPCs will require you to be at their location, check the <strong>Must be at same location?</strong> above to see if
                           you must be at their coordinates on the map, which are also above.
                         </p>
                       </AlertInfo>

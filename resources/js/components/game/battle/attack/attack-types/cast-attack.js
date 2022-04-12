@@ -65,7 +65,7 @@ export default class CastAttack {
     if (attackData.spell_damage > 0) {
       if (canHit) {
         if (this.canBlock()) {
-          this.addEnemyActionMessage(this.defender.name + ' Blocked your damaging spell!');
+          this.addEnemyActionMessage(this.defender.name + ' blocked your damaging spell!');
 
           if (attackData.heal_for > 0) {
             this.healWithSpells(attackData);

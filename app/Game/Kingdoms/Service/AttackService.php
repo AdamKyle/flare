@@ -27,7 +27,7 @@ use App\Game\Messages\Events\GlobalMessageEvent;
 class AttackService {
 
     /**
-     * @var SiegeHandler $seigeHandler
+     * @var SiegeHandler $siegeHandler
      */
     private $siegeHandler;
 
@@ -378,7 +378,7 @@ class AttackService {
             return null;
         }
 
-        // If there is only one unit and it's a setler
+        // If there is only one unit and it's a settler
         // Then it dies.
         if (count($this->newRegularUnits) === 1) {
             return null;
@@ -408,7 +408,7 @@ class AttackService {
     }
 
     /**
-     * Get the return time based on surving units.
+     * Get the return time based on surviving units.
      *
      * @param array $units
      * @return int|mixed

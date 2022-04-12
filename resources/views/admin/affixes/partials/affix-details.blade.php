@@ -196,7 +196,7 @@
         <div class="card-body">
           <p>
             These Affixes do not stack. You have a percentage chance to void the enemy of using their affixes. Some higher level critters
-            have a small chance to void you, while Celestials have a much higher chance. If you are voided, you loose all enchantments, no life stealing,
+            have a small chance to void you, while Celestials have a much higher chance. If you are voided, you lose all enchantments, no life stealing,
             no modded stats and no boons.
           </p>
           <dl>

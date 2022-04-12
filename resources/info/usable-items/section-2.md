@@ -52,8 +52,8 @@ You will also see:
 We can see the boon that was applied. At any point you can click on the boon to see more info or to cancel the boon.
 
 <div class="mb-4">
-    <a href="/storage/info/usable-items/images/boon-cancelation.png" class="glightbox">
-        <img src="/storage/info/usable-items/images/boon-cancelation.png" class="img-fluid" />
+    <a href="/storage/info/usable-items/images/boon-cancellation.png" class="glightbox">
+        <img src="/storage/info/usable-items/images/boon-cancellation.png" class="img-fluid" />
     </a>
 </div>
 

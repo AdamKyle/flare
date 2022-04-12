@@ -55,7 +55,7 @@
         <div class="col-md-2">
             <div class="form-group form-check-inline">
                 <input type="checkbox" class="form-check-input" id="gameUnit-siege-weapon" wire:model="gameUnit.siege_weapon">
-                <label class="form-check-label" for="gameUnit-siege-weapon">Is this a seige weapon?</label>
+                <label class="form-check-label" for="gameUnit-siege-weapon">Is this a siege weapon?</label>
             </div>
         </div>
         <div class="col-md-2">

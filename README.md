@@ -146,7 +146,7 @@ The next set of steps requires you to use the excel sheets in resources/data-imp
 - import quests
 - import monsters
 
-There is no location export data, so your maps won't have locations or ports, you are free to set this up your self. However, in the QuestItems excel there are specific locations
+There is no location export data, so your maps won't have locations or ports, you are free to set this up yourself. However, in the QuestItems excel there are specific locations
 for some quest items to drop. You can create locations with the same name before importing the quest items.
 
 ## Caching Things

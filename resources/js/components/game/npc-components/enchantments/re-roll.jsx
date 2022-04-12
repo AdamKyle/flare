@@ -229,7 +229,7 @@ export default class ReRoll extends React.Component {
       this.setState({
         formOptions: formOptions,
         cantAfford: false,
-        errorMessage: 'Child .... child .... I am tiring of these games child. Is there anything you can buy that will make me love you? ooooh hoo hoo hoo!'
+        errorMessage: 'Child... child... I am tiring of these games child. Is there anything you can buy that will make me love you? Ooooh hoo hoo hoo!'
       })
     }
   }

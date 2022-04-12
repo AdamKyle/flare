@@ -220,7 +220,7 @@
                         </dd>
                         <dt>Are they're factions/guilds/clans?</dt>
                         <dd>
-                            No. In Tlessa, it's every person for them selves. There is no guild or clan system in Tlessa.
+                            No. In Tlessa, it's every person for themselves. There is no guild or clan system in Tlessa.
                         </dd>
                     </dl>
                 </div>

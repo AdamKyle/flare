@@ -17,7 +17,7 @@ export default class ConjureModal extends React.Component {
   }
 
   getErrorMessage() {
-    if (this.props.celestial.gold_cost > this.props.gold && this.props.celestial.gold_dust_cost) {
+    if (this.props.celestial.gold_cost > this.props.gold && this.props.celestial.gold_dust_cost > this.props.goldDust) {
       return 'You do not have either the gold or the gold dust.';
     }
 

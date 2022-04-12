@@ -40,7 +40,7 @@ class SelectedKingdom extends TransformerAbstract {
                 'defence'              => $unit->gameUnit->defence,
                 'can_heal'             => $unit->gameUnit->can_heal,
                 'heal_amount'          => $unit->gameUnit->heal_amount,
-                'siege_weapon'         => $unit->gameUnit->seige_weapon,
+                'siege_weapon'         => $unit->gameUnit->siege_weapon,
                 'travel_time'          => $unit->gameUnit->travel_time,
                 'primary_attack'       => $unit->gameUnit->primary_attack,
                 'fall_back'            => $unit->gameUnit->fall_back,

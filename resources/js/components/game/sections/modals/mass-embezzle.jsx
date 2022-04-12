@@ -95,7 +95,7 @@ export default class MassEmbezzle extends React.Component {
                   <strong>Stopping</strong>: We have to stop, you are gold capped or would be.
                 </li>
                 <li>
-                  <strong>Embezzled</strong>: We have embezzled the money requested. You will loose 15% morale.
+                  <strong>Embezzled</strong>: We have embezzled the money requested. You will lose 15% morale.
                 </li>
                 <li>
                   <strong>Skipping</strong>: We have to skip as the morale is too low.

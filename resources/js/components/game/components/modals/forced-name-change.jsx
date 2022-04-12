@@ -82,7 +82,7 @@ export default class ForcedNameChange extends React.Component {
             <div className="alert alert-info" role="alert">
               <h4 className="alert-heading">You are being forced to change your name.</h4>
               <p>
-                Your name violates the <a href="/information/rules">rules</a> pretaining to character creation.
+                Your name violates the <a href="/information/rules">rules</a> pertaining to character creation.
               </p>
               <p>
                 Any attempts to circumvent changing your character name is a bannable offense. Once your name has been

@@ -43,7 +43,7 @@ When viewing your character sheet, you will see a list of skills. Each one of th
 ## Class Skills
 
 There are some skills that are class based only. Some might have restrictions like a Prophet needing Healing spells equipped in order to get their bonus.
-These skills mostly increase the damage, the fight timout, the healing and/or the armour class bonus.
+These skills mostly increase the damage, the fight timeout, the healing and/or the armour class bonus.
 
 Each class has one, and you can see what your class skill is by visiting the [Races and Classes](/information/races-and-classes) documentation and viewing your selected class.
 This will tell you what your class skill is.

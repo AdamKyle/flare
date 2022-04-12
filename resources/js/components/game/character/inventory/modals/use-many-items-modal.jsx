@@ -57,7 +57,7 @@ export default class UseManyItemsModal extends React.Component {
 
           if (response.data.hasOwnProperty('message')) {
             this.setState({
-              errorMessage: response.data.messagecan_use_on_other_items
+              errorMessage: response.data.message
             });
           }
 

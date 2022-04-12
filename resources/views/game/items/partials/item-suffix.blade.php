@@ -131,7 +131,7 @@
   <x-tabs.tab-content-section tab="suffix-resistance-{{$resistanceId}}" active="false">
     <dl>
       <dt>Resistance Reduction:</dt>
-      <dd class="{{$item->itemSuffix->resiatance_reduction > 0.0 ? 'text-danger' : ''}}">{{$item->itemSuffix->resistance_reduction * 100}}%</dd>
+      <dd class="{{$item->itemSuffix->resistance_reduction > 0.0 ? 'text-danger' : ''}}">{{$item->itemSuffix->resistance_reduction * 100}}%</dd>
       <p class="mt-2 text-info">Affects enemies only. Affects their: Spell Evasion, Artifact Annulment and Affix Resistance.</p>
     </dl>
   </x-tabs.tab-content-section>

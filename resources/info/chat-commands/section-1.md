@@ -12,7 +12,7 @@ When a player types `/m` they can follow that by the players name they wish to p
 
 You can also click on the character name in chat to message them, it will auto populate the chat bar.
 
-You can also use this command to message [NPC's](/information/npcs) to do [Quests](/information/quests) or find their location
+You can also use this command to message [NPCs](/information/npcs) to do [Quests](/information/quests) or find their location
 
 ## Public Celestial
 

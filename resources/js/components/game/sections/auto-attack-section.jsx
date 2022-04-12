@@ -570,7 +570,7 @@ export default class AutoAttackSection extends React.Component {
                   while on a mission you can:
                 </p>
                 <ul>
-                  <li>Move, but not teleport, set sail, traverse or use /PCT to move to and engage with celestials.</li>
+                  <li>Move, but not teleport, set sail, traverse or use /PCT to move to and engage with Celestials.</li>
                   <li>Manage your kingdoms, but not: wage war or use items on other kingdoms</li>
                   <li>Manage equipment, to an extent. You cannot equip items, but you can move items to other sets, destroy and disenchant items.</li>
                   <li>Manage your Passive skills, Craft, Enchant but not: Switch which skill is in training.</li>

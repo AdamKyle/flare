@@ -52,9 +52,9 @@
             <li><a href="{{route('info.page', ['pageName' => 'kingdom-passive-skills'])}}">Kingdom Passive Skills</a></li>
         </ul>
     </li>
-    <li class="nav-small-cap">Npc's and Quests</li>
+    <li class="nav-small-cap">NPCs and Quests</li>
     <li>
-        <a class="has-arrow" href="#" aria-expanded="false"><i class="ra ra-pawn"></i><span class="hide-menu">NPC's & Quests</span></a>
+        <a class="has-arrow" href="#" aria-expanded="false"><i class="ra ra-pawn"></i><span class="hide-menu">NPCs & Quests</span></a>
         <ul aria-expanded="false" class="collapse">
             <li><a href="{{route('info.page', ['pageName' => 'npcs'])}}">NPCs</a></li>
             <li><a href="{{route('info.page', ['pageName' => 'quests'])}}">Quests</a></li>

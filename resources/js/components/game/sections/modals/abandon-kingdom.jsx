@@ -48,9 +48,9 @@ export default class AbandonKingdom extends React.Component {
             <p>Are you sure you want to do this?</p>
             <p>There are the consequences for just abandoning your kingdoms. There are no consequences for letting a kingdom all to dust.</p>
             <ul>
-              <li>Kingdom will loose 100% of it's Treasury.</li>
-              <li>Kingdom will loose 75% of it's units and population</li>
-              <li>Kingdom buildings will loose 35% of durability</li>
+              <li>Kingdom will lose 100% of it's Treasury.</li>
+              <li>Kingdom will lose 75% of it's units and population</li>
+              <li>Kingdom buildings will lose 35% of durability</li>
               <li>Kingdom morale will fall to 50%.</li>
               <li><strong>You will not be allowed to settle another kingdom for 30 minutes as punishment.</strong></li>
               <li className="text-danger"><strong>You cannot abandon a kingdom that has Gold Bars.</strong></li>

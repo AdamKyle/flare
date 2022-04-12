@@ -111,7 +111,7 @@ export default class AdventureEmbark extends React.Component {
             </ul>
             <hr/>
             <p>Should you need additional help, please consider this resource on <a
-              href="/information/adventure" target="_blank">adventureing</a>.</p>
+              href="/information/adventure" target="_blank">adventuring</a>.</p>
             <p> You are free to logout. Any relevant details will be
               emailed to you should you have those settings enabled.</p>
             <p>

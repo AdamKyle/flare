@@ -46,7 +46,7 @@ By completing a small quest chain that involves Gold Dust and the starter item y
   - Makes your affixes irresistible. You can still be voided though, thus even with this item it won&#39;t help much against being voided
 - Shadow Plane Grimoire – Buy from the Wondering Merchant (Requires Creepy Baby Doll and 30,000 Gold Dust)
     - Your affixes are still irresistible, but now you have a 50% to void the enemy and a 15% to devoid them
-- Eye of the Beholder – Buy from the Wondering Merchant (Requires Shadow Plane Grimore and 50k Gold Dust)
+- Eye of the Beholder – Buy from the Wondering Merchant (Requires Shadow Plane Grimoire and 50k Gold Dust)
     - Your affixes are still irresistible, but now you have a 75% to void the enemy and a 50% chance to devoid them
 - Dead Kings Crown – Buy from the Wondering Merchant (Requires Eye of the Beholder and 75k Gold dust)
     - Your affixes are still irresistible, but now you have a 100% chance to void your enemy and 85% chance to devoid them.
@@ -78,4 +78,4 @@ There are expensive enchantments that can add a small chance to void enemies (De
 
 > ### ATTN!!
 > 
-> Most players won't need to grind for the Gold Dust unless they are looking to fight celestials.
+> Most players won't need to grind for the Gold Dust unless they are looking to fight Celestials.

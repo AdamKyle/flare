@@ -55,7 +55,7 @@ export default class KingdomSettlementModal extends React.Component {
       name: this.state.kingdom_name,
       x_position: this.props.x,
       y_position: this.props.y,
-      kingdom_amount: this.props.myKingomsCount,
+      kingdom_amount: this.props.myKingdomsCount,
     }
 
     axios.post('/api/kingdoms/' + this.props.characterId + '/settle', params).then((result) => {
@@ -112,9 +112,9 @@ export default class KingdomSettlementModal extends React.Component {
                          value={this.state.kingdom_name} onChange={this.handleNameChange.bind(this)}/>
                 </div>
                 {
-                  this.props.myKingomsCount > 0 ?
+                  this.props.myKingdomsCount > 0 ?
                     <p className="mt-2">
-                      <i className="fas fa-exclamation-triangle text-warning"></i> You currently have: {this.props.myKingomsCount} kingdoms. This kingdom will cost you: {(this.props.myKingomsCount * 10000).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} gold.
+                      <i className="fas fa-exclamation-triangle text-warning"></i> You currently have: {this.props.myKingdomsCount} kingdoms. This kingdom will cost you: {(this.props.myKingdomsCount * 10000).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} gold.
                     </p>
                     : null
                 }

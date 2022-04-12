@@ -45,13 +45,13 @@ export default class KingdomRenameModal extends React.Component {
 
     if (kingdomName.length < 5) {
       this.setState({
-        errorMessage: 'Kingdom name must be minum of 5 characters.'
+        errorMessage: 'Kingdom name must be a minimum of 5 characters.'
       })
     }
 
     if (kingdomName.length > 30) {
       this.setState({
-        errorMessage: 'Kingdom name can only be maximum of 30 characters.'
+        errorMessage: 'Kingdom name can only be a maximum of 30 characters.'
       });
     }
 

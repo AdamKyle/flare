@@ -70,7 +70,7 @@ export default class GoblinCoinBank extends React.Component {
   fetchMaxWithDraw() {
     const characterGold = this.props.characterGold;
     const costPerBar    = 2000000000;
-    let maxWithdrawl    = 0;
+    let maxWithdraw    = 0;
 
     if (characterGold === 2000000000000) {
       return 0;
@@ -81,11 +81,11 @@ export default class GoblinCoinBank extends React.Component {
     if (gold < costPerBar) {
       return 0;
     } else if (gold > costPerBar) {
-      maxWithdrawl = Math.floor(gold/costPerBar);
+      maxWithdraw = Math.floor(gold/costPerBar);
     }
 
-    if (maxWithdrawl < this.props.kingdom.gold_bars) {
-      return maxWithdrawl
+    if (maxWithdraw < this.props.kingdom.gold_bars) {
+      return maxWithdraw
     }
 
     return this.props.kingdom.gold_bars
@@ -240,7 +240,7 @@ export default class GoblinCoinBank extends React.Component {
               </p>
               <AlertInfo icon={'fas fa-question-circle'} title="Info">
                 <p>
-                  Each gold bar costs 2 billion gold. Your kingdom may hold a total of 1000 (2 trillion gold) bars. Should your kingdom fall you will loose all
+                  Each gold bar costs 2 billion gold. Your kingdom may hold a total of 1000 (2 trillion gold) bars. Should your kingdom fall you will lose all
                 these bars and the player who takes the kingdom gets your vast wealth!
                 </p>
                 <p>

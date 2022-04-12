@@ -17,7 +17,7 @@
                         <dt>Location Y Coordinate:</dt>
                         <dd>{{$location->y}}</dd>
                         <dt>On Map:</dt>
-                        <dd>{{$location->map->name}}}</dd>
+                        <dd>{{$location->map->name}}</dd>
                         <dt>Is Port:</dt>
                         <dd>{{$location->is_port ? 'Yes' : 'No'}}</dd>
                         <dt>Increases Enemy Strength By:</dt>
