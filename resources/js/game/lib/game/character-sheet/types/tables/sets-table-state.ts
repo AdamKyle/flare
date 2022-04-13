@@ -9,5 +9,7 @@ export default interface SetsTableState {
 
     success_message: string | null;
 
+    show_rename_set: boolean;
+
     loading: boolean;
 }

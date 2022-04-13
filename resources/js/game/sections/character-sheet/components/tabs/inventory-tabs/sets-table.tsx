@@ -17,6 +17,7 @@ import SetsTableState from "../../../../../lib/game/character-sheet/types/tables
 import SuccessAlert from "../../../../../components/ui/alerts/simple-alerts/success-alert";
 import {isEqual} from "lodash";
 import WarningAlert from "../../../../../components/ui/alerts/simple-alerts/warning-alert";
+import RenameSetModal from "../../modals/rename-set-modal";
 
 export default class SetsTable extends React.Component<SetsInventoryTabProps, SetsTableState> implements ActionsInterface {
     constructor(props: SetsInventoryTabProps) {
@@ -28,20 +29,12 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
             selected_set: null,
             loading: false,
             success_message: null,
+            show_rename_set: false,
         }
     }
 
     componentDidMount() {
-        const sets = Object.keys(this.props.sets);
-
-        // @ts-ignore
-        const data = this.props.sets[sets[0]].items;
-
-        this.setState({
-            data: data,
-            drop_down_labels: sets,
-            selected_set: sets[0],
-        })
+        this.setSetData(this.props.sets);
     }
 
     componentDidUpdate(prevProps: Readonly<SetsInventoryTabProps>, prevState: Readonly<SetsTableState>, snapshot?: any) {
@@ -54,47 +47,46 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
         }
     }
 
-    switchTable(set: string) {
+    setSetData(sets: {[key: string]: { equippable: boolean; items: InventoryDetails[] | [] }}) {
+        const setKeys = Object.keys(sets);
 
         // @ts-ignore
-        const data = this.props.sets[set].items;
+        const data = sets[setKeys[0]].items;
 
         this.setState({
             data: data,
-            selected_set: set,
-        });
-    }
-
-    buildMenuItems() {
-        return this.state.drop_down_labels.map((label: string) => {
-            return {
-                name: label,
-                icon_class: 'ra ra-crossed-swords',
-                on_click: () => this.switchTable(label)
-            }
-        });
-    }
-
-    search(e: React.ChangeEvent<HTMLInputElement>) {
-        const value = e.target.value;
-
-        // @ts-ignore
-        const data = this.props.sets[this.state.selected_set].filter((item: InventoryDetails) => {
-            return item.item_name.includes(value)
-        });
-
-        this.setState({
-            data: data
-        });
+            drop_down_labels: setKeys,
+            selected_set: setKeys[0],
+        })
     }
 
     actions(row: InventoryDetails): JSX.Element {
-        console.log(row);
         return <DangerButton button_label={'Remove'} on_click={() => this.removeFromSet(row.id)} disabled={this.buttonsDisabled()} />
     }
 
     emptySet() {
+        let setId: any = this.props.savable_sets.filter((set) => {
+            return set.name === this.state.selected_set;
+        });
 
+        if (setId.length > 0) {
+            setId = setId[0].id;
+        }
+
+        this.setState({
+            loading: true
+        }, () => {
+            (new Ajax()).setRoute('character/'+this.props.character_id+'/inventory-set/' + setId + '/remove-all').doAjaxCall('post', (result: AxiosResponse) => {
+                this.setState({
+                    loading: false,
+                    success_message: result.data.message,
+                }, () => {
+                    this.props.update_inventory(result.data.inventory);
+                });
+            }, (error: AxiosError) => {
+
+            })
+        })
     }
 
     equipSet() {
@@ -111,18 +103,15 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
         }, () => {
             (new Ajax()).setRoute('character/'+this.props.character_id+'/inventory-set/equip/' + setId).doAjaxCall('post', (result: AxiosResponse) => {
                 this.setState({
-                    loading: false
+                    loading: false,
+                    success_message: result.data.message,
                 }, () => {
                     this.props.update_inventory(result.data.inventory);
                 });
             }, (error: AxiosError) => {
 
-            })
-        })
-    }
-
-    buttonsDisabled() {
-        return this.state.selected_set === this.props.set_name_equipped || this.props.is_dead
+            });
+        });
     }
 
     removeFromSet(id: number) {
@@ -151,6 +140,108 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
 
             })
         })
+    }
+
+    renameSet(name: string) {
+        let setId: any = this.props.savable_sets.filter((set) => {
+            return set.name === this.state.selected_set;
+        });
+
+        if (setId.length > 0) {
+            setId = setId[0].id;
+        }
+
+        this.setState({
+            loading: true
+        }, () => {
+            (new Ajax()).setRoute('character/'+this.props.character_id+'/inventory-set/rename-set').setParameters({
+                set_id: setId,
+                set_name: name
+            }).doAjaxCall('post', (result: AxiosResponse) => {
+                this.setState({
+                    loading: false,
+                    success_message: result.data.message,
+                }, () => {
+                    this.setSetData(result.data.inventory.sets);
+
+                    this.props.update_inventory(result.data.inventory);
+                });
+            }, (error: AxiosError) => {
+
+            })
+        })
+    }
+
+    switchTable(set: string) {
+
+        // @ts-ignore
+        const data = this.props.sets[set].items;
+
+        this.setState({
+            data: data,
+            selected_set: set,
+        });
+    }
+
+    buildMenuItems() {
+        return this.state.drop_down_labels.map((label: string) => {
+            return {
+                name: label,
+                icon_class: 'ra ra-crossed-swords',
+                on_click: () => this.switchTable(label)
+            }
+        });
+    }
+
+    manageRenameSet() {
+        this.setState({
+            show_rename_set: !this.state.show_rename_set
+        })
+    }
+
+    buildActionsDropDown() {
+        const actions = [];
+
+        actions.push({
+            name: 'Rename set',
+            icon_class: 'ra ra-crossed-swords',
+            on_click: () => this.manageRenameSet()
+        })
+
+        if (this.state.selected_set !== null) {
+            if (this.state.selected_set !== this.props.set_name_equipped) {
+                actions.push({
+                    name: 'Empty set',
+                    icon_class: 'ra ra-crossed-swords',
+                    on_click: () => this.emptySet()
+                });
+
+                actions.push({
+                    name: 'Equip set',
+                    icon_class: 'ra ra-crossed-swords',
+                    on_click: () => this.equipSet()
+                });
+            }
+        }
+
+        return actions;
+    }
+
+    search(e: React.ChangeEvent<HTMLInputElement>) {
+        const value = e.target.value;
+
+        // @ts-ignore
+        const data = this.props.sets[this.state.selected_set].filter((item: InventoryDetails) => {
+            return item.item_name.includes(value)
+        });
+
+        this.setState({
+            data: data
+        });
+    }
+
+    buttonsDisabled() {
+        return this.state.selected_set === this.props.set_name_equipped || this.props.is_dead
     }
 
     cannotEquip() {
@@ -198,14 +289,14 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
                         <DropDown menu_items={this.buildMenuItems()} button_title={'Set'} selected_name={this.state.selected_set} secondary_selected={this.props.set_name_equipped} disabled={this.props.is_dead}  />
                     </div>
                     <div className='ml-2'>
-                        <DangerButton button_label={'Empty Set'} on_click={this.emptySet.bind(this)} disabled={this.buttonsDisabled()}/>
+                        <DropDown menu_items={this.buildActionsDropDown()} button_title={'Actions'} disabled={this.props.is_dead}  />
                     </div>
                     <div className='ml-2'>
                         {
                             this.state.selected_set === this.props.set_name_equipped ?
-                                <span className={'text-green-600 dark:text-green-700'}>Equipped!</span>
+                                <span className={'text-green-600 dark:text-green-700'}>set is Equipped!</span>
                             :
-                                <PrimaryButton button_label={'Equip Set'} on_click={this.equipSet.bind(this)} disabled={this.cannotEquip()}  />
+                                null
                         }
                     </div>
                     <div className='ml-4 md:ml-0 my-4 md:my-0 md:absolute md:right-0'>
@@ -229,6 +320,13 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
                     this.state.loading ?
                         <LoadingProgressBar />
                         : null
+                }
+
+
+                {
+                    this.state.show_rename_set && this.state.selected_set !== null ?
+                        <RenameSetModal is_open={this.state.show_rename_set} manage_modal={this.manageRenameSet.bind(this)} title={'Rename Set'} current_set_name={this.state.selected_set} rename_set={this.renameSet.bind(this)}/>
+                    : null
                 }
 
                 <Table data={this.state.data} columns={BuildInventoryTableColumns(this)} dark_table={this.props.dark_tables}/>

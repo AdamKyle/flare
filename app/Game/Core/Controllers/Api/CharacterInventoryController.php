@@ -208,14 +208,15 @@ class CharacterInventoryController extends Controller {
             'name' => $request->set_name
         ]);
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'sets'));
-
-        event(new CharacterInventoryDetailsUpdate($character->user));
-
-        event(new UpdateTopBarEvent($character->refresh()));
+        $inventory = $this->characterInventoryService->setCharacter($character->refresh());
 
         return response()->json([
             'message' => 'Renamed set to: ' . $request->set_name,
+            'inventory' => [
+                'sets'         => $inventory->getInventoryForType('sets')['sets'],
+                'usable_sets'  => $inventory->getInventoryForType('usable_sets'),
+                'savable_sets' => $inventory->getInventoryForType('savable_sets'),
+            ]
         ]);
     }
 
@@ -328,22 +329,25 @@ class CharacterInventoryController extends Controller {
             return $set->id === $inventorySet->id;
         });
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'sets'));
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
+        if (is_null($inventorySet->name)) {
+            $setName = 'Set ' . $setIndex + 1;
+        } else {
+            $setName = $inventorySet->name;
+        }
 
-        event(new CharacterInventoryDetailsUpdate($character->user));
+        $character = $character->refresh();
 
         event(new UpdateTopBarEvent($character->refresh()));
 
-        $affixData = $this->enchantingService->fetchAffixes($character->refresh());
+        $inventory = $this->characterInventoryService->setCharacter($character);
 
-        event(new UpdateCharacterEnchantingList(
-            $character->user,
-            $affixData['affixes'],
-            $affixData['character_inventory'],
-        ));
-
-        return response()->json(['message' => 'Removed ' . $itemsRemoved . ' of ' . $originalInventorySetCount . ' items from Set ' . $setIndex + 1], 200);
+        return response()->json([
+            'message' => 'Removed ' . $itemsRemoved . ' of ' . $originalInventorySetCount . ' items from ' . $setName,
+            'inventory' => [
+                'inventory' => $inventory->getInventoryForType('inventory'),
+                'sets' => $inventory->getInventoryForType('sets')['sets'],
+            ]
+        ]);
     }
 
     public function equipItem(EquipItemValidation $request, Character $character, EquipItemService $equipItemService) {

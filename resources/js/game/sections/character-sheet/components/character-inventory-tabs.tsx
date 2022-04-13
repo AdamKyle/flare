@@ -96,7 +96,7 @@ export default class CharacterInventoryTabs extends React.Component<CharacterInv
         if (this.state.loading || this.state.inventory === null) {
             return <ComponentLoading />
         }
-
+        console.log(this.state.inventory.sets);
         return (
             <Tabs tabs={this.tabs} full_width={true}>
                 <TabPanel key={'inventory'}>

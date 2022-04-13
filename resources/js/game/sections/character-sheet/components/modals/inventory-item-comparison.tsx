@@ -156,7 +156,7 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
                       handle_close={this.props.manage_modal}
                       title={this.buildTitle()}
                       secondary_actions={null}
-                      large_modal={this.isLargeModal()}
+                      large_modal={true}
                       primary_button_disabled={this.state.action_loading}
             >
                 {
