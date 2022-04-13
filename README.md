@@ -14,7 +14,10 @@ If you have ideas for the game please, open a ticket with the appropriate templa
 ## Features
 
 - Crafting/Enchanting
-- Fighting Monsters
+- Uniques
+- Faction Farming
+- Kingdom Passive Skill Tree, Various Trainable Skills
+- Fighting Monsters including automation (Exploration)
 - Adventuring
 - Kingdom Management
 - Market (Player Trade)
@@ -39,7 +42,8 @@ No. It's every person for themselves. There are also no resets.
 
 - Are there energy systems or ways to slow the player down?
 
-No and yes. There are no energy systems, that is there is no feature in game to prevent you from being as active as you want to be. How ever we do make use of timers, these can range from 10 seconds for successfully killing a monster to a few minutes for an adventure to (at most) a couple hours for upgrading buildings (at higher levels) for your kingdom.
+No and yes. There are no energy systems, that is there is no feature in game to prevent you from being as active as you want to be. 
+However, we do make use of timers, these can range from 10 seconds for successfully killing a monster to a few minutes for an adventure to (at most) a couple of hours for upgrading buildings (at higher levels) for your kingdom.
 
 The idea is to keep you engaged and playing.
 
@@ -49,7 +53,7 @@ There are many ways you can catch up. You could be the type of player who runs a
 
 # Development and Testing
 
-Planes of Tlessa does not use Docker or Vagrant. We run off the metal. This means you will need a few tabs open:
+Planes of Tlessa does not use Docker or Vagrant. I run off the metal. This means you will need a few tabs open:
 
 - php artisan serve
 - php artisan websockets:serve
@@ -58,6 +62,9 @@ Planes of Tlessa does not use Docker or Vagrant. We run off the metal. This mean
 
 These are all run through supervisor jobs (except the last one) on production. If you choose to docker-ize the app then you will need to make
 sure that these also run. Yarn watch should be converted to some command that refreshes the browser from docker.
+
+If you are not running docker, you need a Separate tab for each of these commands to be running, 
+not to mention you need redis running for websockets and horizon.
 
 ## Getting started with Development:
 
@@ -137,7 +144,7 @@ When setting up the databsse you need to things in order, or you can get unexpec
 
 The next set of steps requires you to use the excel sheets in resources/data-imports:
 
-- Next import passive skills
+- import passive skills
 - import skills
 - import kingdoms
 - import affixes

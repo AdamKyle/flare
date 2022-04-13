@@ -37,7 +37,7 @@ class PassiveSkillSheet implements ToCollection {
                 $cleanData[$key] = $value;
             } else {
                 if ($key === 'parent_skill_id') {
-                    $passiveSkill = PassiveSkill::find($value)->first();
+                    $passiveSkill = PassiveSkill::find($value);
 
                     if (is_null($passiveSkill)) {
                         $value = null;

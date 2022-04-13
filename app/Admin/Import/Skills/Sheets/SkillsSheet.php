@@ -37,7 +37,7 @@ class SkillsSheet implements ToCollection {
                     }
                 }
 
-                $foundSkill = GameSkill::find($skill['id'])->first();
+                $foundSkill = GameSkill::find($skill['id']);
 
                 if (is_null($foundSkill)) {
                     GameSkill::create($skill);
