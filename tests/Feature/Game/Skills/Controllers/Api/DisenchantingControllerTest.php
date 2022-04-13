@@ -68,7 +68,7 @@ class DisenchantingControllerTest extends TestCase
 
         $response = $this->actingAs($character->user)->json('POST', '/api/disenchant/' . $this->item->id)->response;
 
-        $this->assertEquals(200, $response->status());
+        $this->assertEquals(422, $response->status());
     }
 
     public function testCanDestroyItem() {

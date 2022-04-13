@@ -1,6 +1,7 @@
 <table>
     <thead>
     <tr>
+        <th>id</th>
         <th>name</th>
         <th>type</th>
         <th>description</th>
@@ -20,6 +21,7 @@
     <tbody>
     @foreach($skills as $skill)
         <tr>
+            <td>{{$skill->id}}</td>
             <td>{{$skill->name}}</td>
             <td>{{$skill->type}}</td>
             <td>{!! nl2br(e($skill->description)) !!}</td>
@@ -32,7 +34,7 @@
             <td>{{$skill->can_monsters_have_skill}}</td>
             <td>{{$skill->can_train}}</td>
             <td>{{$skill->skill_bonus_per_level}}</td>
-            <td>{{!is_null($skill->gameClass) ? $skill->gameClass->name : null}}</td>
+            <td>{{!is_null($skill->gameClass) ? $skill->gameClass->id : null}}</td>
             <td>{{$skill->is_locked}}</td>
         </tr>
     @endforeach

@@ -19,7 +19,7 @@ class AffixesSheet implements ToCollection {
                 if (is_null($affixData)) {
                     continue;
                 } else {
-                    $foundAffix = ItemAffix::where('name', $affixData['name'])->first();
+                    $foundAffix = ItemAffix::find($affixData['id']);
 
                     if (!is_null($foundAffix)) {
                         $foundAffix->update($affixData);

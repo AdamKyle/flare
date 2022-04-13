@@ -1,8 +1,7 @@
 <table>
     <thead>
     <tr>
-        <th>item_suffix_id</th>
-        <th>item_prefix_id</th>
+        <th>id</th>
         <th>market_sellable</th>
         <th>name</th>
         <th>type</th>
@@ -67,8 +66,7 @@
     <tbody>
     @foreach($items as $item)
         <tr>
-            <td>{{is_null($item->itemSuffix) ? null :$item->itemSuffix->name}}</td>
-            <td>{{is_null($item->itemPrefix) ? null :$item->itemPrefix->name}}</td>
+            <td>{{$item->id}}</td>
             <td>{{$item->market_sellable}}</td>
             <td>{{$item->name}}</td>
             <td>{{$item->type}}</td>
@@ -122,7 +120,7 @@
             <td>{{$item->affix_damage_reduction}}</td>
             <td>{{$item->devouring_light}}</td>
             <td>{{$item->devouring_darkness}}</td>
-            <td>{{!is_null($item->dropLocation) ? $item->dropLocation->name : null}}</td>
+            <td>{{!is_null($item->dropLocation) ? $item->dropLocation->id : null}}</td>
             <td>{{$item->xp_bonus}}</td>
             <td>{{$item->ignores_caps}}</td>
             <td>{{$item->can_use_on_other_items}}</td>

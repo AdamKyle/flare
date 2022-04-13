@@ -20,7 +20,7 @@ class QuestsSheet implements ToCollection {
                 $questData = $this->returnCleanItem($quest);
 
                 if (!empty($questData)) {
-                    Quest::updateOrCreate(['name' => $questData['name']], $questData);
+                    Quest::updateOrCreate(['id' => $questData['id']], $questData);
                 }
             }
         }
@@ -36,7 +36,7 @@ class QuestsSheet implements ToCollection {
         $quest['npc_id'] = $npc->id;
 
         if (isset($quest['item_id'])) {
-            $requiredItem = Item::where('name', $quest['item_id'])->first();
+            $requiredItem = Item::find($quest['item_id']);
 
             if (is_null($requiredItem)) {
                 $quest['item_id'] = null;
@@ -48,7 +48,7 @@ class QuestsSheet implements ToCollection {
         }
 
         if (isset($quest['secondary_required_item'])) {
-            $requiredItem = Item::where('name', $quest['secondary_required_item'])->first();
+            $requiredItem = Item::find($quest['secondary_required_item']);
 
             if (is_null($requiredItem)) {
                 $quest['secondary_required_item'] = null;
@@ -61,7 +61,7 @@ class QuestsSheet implements ToCollection {
 
 
         if (isset($quest['reward_item'])) {
-            $item = Item::where('name', $quest['reward_item'])->first();
+            $item = Item::find($quest['reward_item']);
 
             if (is_null($item)) {
                 $quest['reward_item'] = null;
@@ -87,7 +87,7 @@ class QuestsSheet implements ToCollection {
         if (!isset($quest['parent_quest_id'])) {
             $quest['parent_quest_id'] = null;
         } else {
-            $foundQuest = Quest::where('name', $quest['parent_quest_id'])->first();
+            $foundQuest = Quest::find($quest['parent_quest_id']);
 
             if (is_null($foundQuest)) {
                 $quest['parent_quest_id'] = null;
@@ -99,7 +99,7 @@ class QuestsSheet implements ToCollection {
         if (!isset($quest['faction_game_map_id'])) {
             $quest['faction_game_map_id'] = null;
         } else {
-            $map = GameMap::where('name', $quest['faction_game_map_id'])->first();
+            $map = GameMap::find($quest['faction_game_map_id']);
 
             if (is_null($quest)) {
                 $quest['faction_game_map_id'] = null;

@@ -1,6 +1,7 @@
 <table>
     <thead>
         <tr>
+            <th>id</th>
             <th>name</th>
             <th>description</th>
             <th>max_level</th>
@@ -16,6 +17,7 @@
     <tbody>
     @foreach($passiveSkills as $passiveSkill)
         <tr>
+            <td>{{$passiveSkill->id}}</td>
             <td>{{$passiveSkill->name}}</td>
             <td>{{$passiveSkill->description}}</td>
             <td>{{$passiveSkill->max_level}}</td>
@@ -24,7 +26,7 @@
             <td>{{$passiveSkill->effect_type}}</td>
             <td>
                 @if (!is_null($passiveSkill->parent_skill_id))
-                    {{$passiveSkill->parent->name}}
+                    {{$passiveSkill->parent->id}}
                 @endif
             </td>
             <td>{{$passiveSkill->unlocks_at_level}}</td>

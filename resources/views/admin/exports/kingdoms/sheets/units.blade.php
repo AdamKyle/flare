@@ -1,6 +1,7 @@
 <table>
     <thead>
     <tr>
+        <th>id</th>
         <th>name</th>
         <th>description</th>
         <th>attack</th>
@@ -29,6 +30,7 @@
     <tbody>
     @foreach($units as $unit)
         <tr>
+            <td>{{$unit->id}}</td>
             <td>{{$unit->name}}</td>
             <td>{{$unit->description}}</td>
             <td>{{$unit->attack}}</td>

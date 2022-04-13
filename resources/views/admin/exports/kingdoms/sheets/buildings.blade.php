@@ -1,6 +1,7 @@
 <table>
     <thead>
     <tr>
+        <th>id</th>
         <th>name</th>
         <th>description</th>
         <th>max_level</th>
@@ -37,6 +38,7 @@
     <tbody>
     @foreach($buildings as $building)
         <tr>
+            <td>{{$building->id}}</td>
             <td>{{$building->name}}</td>
             <td>{{$building->description}}</td>
             <td>{{$building->max_level}}</td>
@@ -68,7 +70,7 @@
             <td>{{$building->is_locked}}</td>
             <td>
                 @if (!is_null($building->passive_skill_id))
-                    {{$building->passive->name}}
+                    {{$building->passive_skill_id}}
                 @endif
             </td>
             <td>{{$building->level_required}}</td>
