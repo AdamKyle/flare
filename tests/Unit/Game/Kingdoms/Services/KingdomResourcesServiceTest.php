@@ -218,7 +218,7 @@ class KingdomResourcesServiceTest extends TestCase {
         $this->assertTrue($kingdom->npc_owned);
     }
 
-    public function testKingdomLoosesMoraleForNotBeingWalked() {
+    public function testKingdomLosesMoraleForNotBeingWalked() {
 
         $this->createNpc();
 
@@ -255,7 +255,7 @@ class KingdomResourcesServiceTest extends TestCase {
         $this->assertEquals(.90, $kingdom->current_morale);
     }
 
-    public function testKingdomLoosesMoraleForNotBeingWalkedAndIsGivenToNPC() {
+    public function testKingdomLosesMoraleForNotBeingWalkedAndIsGivenToNPC() {
 
         $this->createNpc();
 

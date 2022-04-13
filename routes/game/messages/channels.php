@@ -10,7 +10,7 @@ Broadcast::channel('server-message-{userId}', function ($user, $userId) {
 	return $user->id === (int) $userId;
 });
 
-// When recieiving a private message.
+// When receiving a private message.
 Broadcast::channel('private-message-{userId}', function ($user, $userId) {
 	return $user->id === (int) $userId;
 });

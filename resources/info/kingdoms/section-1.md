@@ -89,7 +89,7 @@ Under that information, there are two tabs: Buildings and Units.
 
 You can click on the row in the table to see the details of what it costs to upgrade a building as well as what you’ll gain from upgrading that building including time to upgrade the building. The higher the level the more time it takes as well as resources.
 
-Some buildings such as keep, walls, farm and barracks will cause your kingdom to loose morale per hour if they fall to a durability of zero.
+Some buildings such as keep, walls, farm and barracks will cause your kingdom to lose morale per hour if they fall to a durability of zero.
 
 For example, lets upgrade our Keep (you can scroll the modal down, as not all the details may fit o the screen):
 
@@ -168,7 +168,7 @@ When we enter a level:
 </div>
 
 You can see the values change, and we tell you what level the building will go to. You might also see the warning about population, this is an additional
-cost that can be applied and is not given back, should you choose to cancel the building upgrade, nore is the population given back to you.
+cost that can be applied and is not given back, should you choose to cancel the building upgrade, nor is the population given back to you.
 
 This only holds true for gold related upgrades, if you use resources and cancel you will get some population back.
 

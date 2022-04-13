@@ -14,9 +14,9 @@ const renderDeposit = (props) => (
   </Tooltip>
 );
 
-const renderWithdrawl = (props) => (
+const renderWithdraw = (props) => (
   <Tooltip id="button-tooltip" {...props}>
-    By removing any amount of gold you will loose 15% morale each time you embezzle. Your kingdom will also loose the added defence
+    By removing any amount of gold you will lose 15% morale each time you embezzle. Your kingdom will also lose the added defence
     bonus by the amount of gold you embezzle. Remember having gold increases defence.
   </Tooltip>
 );
@@ -32,7 +32,7 @@ const renderHelp = (props) => (
 const renderPopulation = (props) => (
   <Tooltip id="button-tooltip" {...props}>
     A kingdom can buy more people. These people will show up instantly. How ever, be cautioned. If you have more people then you are allowed at the
-    Hourly reset, your kingdom treasury will loose 10,000 gold PER person over the cap. Buying people is only done to increase your military.
+    Hourly reset, your kingdom treasury will lose 10,000 gold PER person over the cap. Buying people is only done to increase your military.
   </Tooltip>
 );
 
@@ -127,7 +127,7 @@ export default class KingdomInfo extends React.Component {
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
 
-  embezzleedSuccess(amount) {
+  embezzledSuccess(amount) {
     this.setState({
       showSuccess: true,
       successMessage: 'Embezzled ' + this.formatNumber(amount) + ' gold from kingdom. The kingdoms morale has dropped by 15%.',
@@ -213,7 +213,7 @@ export default class KingdomInfo extends React.Component {
                     <OverlayTrigger
                       placement="bottom"
                       delay={{ show: 250, hide: 400 }}
-                      overlay={renderWithdrawl}
+                      overlay={renderWithdraw}
                     >
                       <button className="btn btn-danger btn-sm" onClick={this.showEmbezzle.bind(this)}>
                         <i className="ra ra-gold-bar"></i>
@@ -371,7 +371,7 @@ export default class KingdomInfo extends React.Component {
           morale={this.props.kingdom.current_morale}
           treasury={this.props.kingdom.treasury}
           kingdomId={this.props.kingdom.id}
-          embezzleedSuccess={this.embezzleedSuccess.bind(this)}
+          embezzledSuccess={this.embezzledSuccess.bind(this)}
         />
         <Deposit
           show={this.state.showDeposit}

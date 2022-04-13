@@ -27,7 +27,7 @@ export default class MonsterAttack {
 
       this.currentCharacterHealth = this.currentCharacterHealth - damage;
 
-      this.addActionMessage(monster.name + ' hit for: ' + this.formatNumber(damage));
+      this.addActionMessage(monster.name + ' hits for: ' + this.formatNumber(damage));
 
       this.useItems(monster, isCharacterVoided, isMonsterVoided);
 
@@ -55,7 +55,7 @@ export default class MonsterAttack {
 
         this.currentCharacterHealth = this.currentCharacterHealth - damage;
 
-        this.addActionMessage(monster.name + ' hit for: ' + this.formatNumber(damage));
+        this.addActionMessage(monster.name + ' hits for: ' + this.formatNumber(damage));
 
         this.useItems(monster, isCharacterVoided, isMonsterVoided, previousAttackType);
 

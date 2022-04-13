@@ -22,7 +22,7 @@ export default class KingdomBuildings extends React.Component {
       },
       {
         key: "max-amount",
-        text: "Max Recuitable Amount",
+        text: "Max Recruitable Amount",
         cell: row => <div data-tag="allowRowEvents">
           <div key={row.id}>{this.props.kingdom.current_population.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</div>
         </div>,

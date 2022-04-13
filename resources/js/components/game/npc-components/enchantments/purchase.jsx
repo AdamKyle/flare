@@ -61,7 +61,7 @@ export default class Purchase extends React.Component {
       });
     } else {
       this.setState({
-        errorMessage: 'ooooooh hoo hooo hooo child! You cannot trick me, you must spend your coin on me for me to love you. Do you want me to love you? THEN PICK ONE!'
+        errorMessage: 'Ooooooh hoo hooo hooo child! You cannot trick me, you must spend your coin on me for me to love you. Do you want me to love you? THEN PICK ONE!'
       });
     }
   }
@@ -86,7 +86,7 @@ export default class Purchase extends React.Component {
 
     if (cost > this.props.currencies.gold) {
       this.setState({
-        errorMessage: 'No no child. You are too poor for such luxuries. Sigh, and all I ever wanted was a rich handsome ..... what ever you are. Please, sigh, pick another one.',
+        errorMessage: 'No... no.. child. You are too poor for such luxuries. Sigh, and all I ever wanted was a rich handsome... what ever you are. Please, sigh, pick another one.',
         canAfford: false,
       });
     } else {
@@ -141,7 +141,7 @@ export default class Purchase extends React.Component {
             {
               this.state.successMessage !== null ?
                 <AlertSuccess icon={"fas fa-check-circle"} title={'Look at you beautiful!'}>
-                  <p><em>oooooh hooo hooo hooo! Look at you my beautiful child. Look at that big powerful enchanted item! Ooooooh hooo hoo hoo!</em></p>
+                  <p><em>Oooooh hooo hooo hooo! Look at you my beautiful child. Look at that big powerful enchanted item! Ooooooh hooo hoo hoo!</em></p>
                   <p>{this.state.successMessage}</p>
                 </AlertSuccess>
                 : null
@@ -173,7 +173,7 @@ export default class Purchase extends React.Component {
             </p>
             <p>
               There are three parts to each valuation: Cost, Damage Range (dr) and Percentage Range (pr). Damage Range (or dr) is how much damage a
-              randomly generate affix can do. Weather or not it is stackable/irresistible is up to lady luck her self. <br />
+              randomly generate affix can do. Weather or not it is stackable/irresistible is up to lady luck her self.<br />
               Percentage Range (or pr) is applied to all aspects of the affix that is a percentage based value, from enemy stat reductions, player stat increases, skills,
               and so on.
             </p>

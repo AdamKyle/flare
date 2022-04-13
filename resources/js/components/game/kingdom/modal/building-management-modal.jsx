@@ -496,7 +496,7 @@ export default class BuildingManagementModal extends React.Component {
                 {
                   this.props.kingdom.current_population < this.state.populationRequired && this.state.populationRequired !== 0 ?
                     <div className="alert alert-warning mt-2 mt-3">
-                      You're population requirement is greater then amount of population you have. You can continue, but
+                      Your population requirement is greater than the amount of population you have. You can continue, but
                       it will cost an additional: {this.populationCost()} Gold on top of the cost to upgrade. Canceling the upgrade will <strong>
                       not give you the gold for the population or the population back.
                     </strong>

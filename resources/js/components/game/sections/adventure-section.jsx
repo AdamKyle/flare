@@ -5,7 +5,7 @@ import TimeOutBar from '../timeout/timeout-bar';
 import Card from '../components/templates/card';
 import ContentLoader, {Facebook} from 'react-content-loader';
 
-export default class AdeventureActions extends React.Component {
+export default class AdventureActions extends React.Component {
 
   constructor(props) {
     super(props);

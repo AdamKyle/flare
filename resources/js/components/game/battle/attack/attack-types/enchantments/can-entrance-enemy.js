@@ -45,7 +45,7 @@ export default class CanEntranceEnemy {
     if (dc > chance) {
       this.addMessage('You resist the alluring entrancing enchantments on your enemy!');
     } else {
-      this.addMessage(attacker.name + ' has trapped you in a trance like state with their enchantments!');
+      this.addMessage(attacker.name + ' has trapped you in a trance-like state with their enchantments!');
 
       canEntrance = true;
     }

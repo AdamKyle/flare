@@ -58,7 +58,7 @@ export default class Map extends React.Component {
     this.isDead = Echo.private('character-is-dead-' + this.props.userId);
     this.adventureLogs = Echo.private('update-adventure-logs-' + this.props.userId);
     this.updateMap = Echo.private('update-map-' + this.props.userId);
-    this.addKingomToMap = Echo.private('add-kingdom-to-map-' + this.props.userId);
+    this.addKingdomToMap = Echo.private('add-kingdom-to-map-' + this.props.userId);
     this.updateMapPlane = Echo.private('update-map-plane-' + this.props.userId);
     this.globalCharacterCount = Echo.join('global-character-count-plane');
     this.globalMapUpdate = Echo.join('global-map-update');
@@ -265,7 +265,7 @@ export default class Map extends React.Component {
       });
     });
 
-    this.addKingomToMap.listen('Game.Kingdoms.Events.AddKingdomToMap', (event) => {
+    this.addKingdomToMap.listen('Game.Kingdoms.Events.AddKingdomToMap', (event) => {
       this.setState({
         kingdoms: event.kingdoms,
         npcKingdoms: event.npcKingdoms,

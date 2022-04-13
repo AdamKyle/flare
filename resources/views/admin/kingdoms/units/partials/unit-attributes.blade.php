@@ -54,7 +54,7 @@
         <x-core.tabs.tab-content active="false" id="unit-attack-info">
             <dl>
                 <dd><strong>Is Attacker?</strong>:</dd>
-                <dd>{{$unit->atacker ? 'Yes' : 'No'}}</dd>
+                <dd>{{$unit->attacker ? 'Yes' : 'No'}}</dd>
                 <dd><strong>Is Defender?</strong>:</dd>
                 <dd>{{$unit->defender ? 'Yes' : 'No'}}</dd>
                 <dd><strong>Attack</strong>:</dd>
@@ -62,7 +62,7 @@
                 <dd><strong>Defence</strong>:</dd>
                 <dd>{{$unit->defence}}</dd>
                 <dd><strong>Is Siege Weapon?</strong>:</dd>
-                <dd>{{$unit->seige_weapon ? 'Yes' : 'No'}}</dd>
+                <dd>{{$unit->siege_weapon ? 'Yes' : 'No'}}</dd>
                 <dd><strong>Can Heal?</strong>:</dd>
                 <dd>{{$unit->can_heal ? 'Yes' : 'No'}}</dd>
             </dl>

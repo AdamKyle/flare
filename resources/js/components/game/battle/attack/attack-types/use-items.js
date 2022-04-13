@@ -65,7 +65,7 @@ export default class UseItems {
       }
     } else {
       if (attacker.artifact_damage !== 0) {
-        this.addMessage('The enemies artifacts glow brightly!');
+        this.addMessage('The enemy\'s artifacts glow brightly!');
 
         this.artifactDamage(attacker, defender, type);
       }

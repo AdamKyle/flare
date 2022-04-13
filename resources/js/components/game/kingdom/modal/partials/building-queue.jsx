@@ -144,7 +144,7 @@ export default class BuildingQueue extends React.Component {
         {this.upgradeDetails()}
         <hr/>
         <div className="alert alert-warning">
-          If you cancel this upgrade, you'll get a perentage of the materials and population back based on
+          If you cancel this upgrade, you'll get a percentage of the materials and population back based on
           the amount of time left. If the resources you would get back are less then 10%, you wont be able to
           cancel the building upgrade.
         </div>

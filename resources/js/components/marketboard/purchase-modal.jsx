@@ -179,7 +179,7 @@ export default class PurchaseModal extends React.Component {
           {this.state.loading ? 'Loading please wait ...' : <>
             <p><strong> Base cost</strong>: {this.state.item.cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} Gold</p>
 
-            <p>Base cost is the item cost + cost of attached affixes. This is handy to know if the item is more expensive then making it your self, or significantly cheaper. Most items will be listed for higher,
+            <p>Base cost is the item cost + cost of attached affixes. This is handy to know if the item is more expensive then making it yourself, or significantly cheaper. Most items will be listed for higher,
               due to the inherit risk in crafting and enchanting.</p>
             <p>Min Cost comes from special items like Uniques and Holy items. These special items apply what is called a min cost, that is the item cannot be sold for less the
             min cost of the item. This only applies to the market and not the shop.</p>

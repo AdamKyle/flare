@@ -6,7 +6,7 @@ In Tlessa there are three types of [skills](/information/skill-information).
 - Crafting based
 - Passives
 
-As you saw in the skills documentation, trainable skills are those that you sacrafice a bit of your XP from fighting monsters
+As you saw in the skills documentation, trainable skills are those that you sacrifice a bit of your XP from fighting monsters
 and going on adventures, to level the skill over time.
 
 As you saw in [Crafting](/information/crafting) documentation, there are skills which require you to craft an item to level 

@@ -70,7 +70,7 @@ class CreatePortLocationsSeeder extends Seeder
             ],
             [
                 'name'        => 'Karth',
-                'description' => 'The port of Karth is a majour trading port.',
+                'description' => 'The port of Karth is a major trading port.',
                 'is_port'     => true,
                 'game_map_id' => $gameMap->id,
                 'x'           => 32,

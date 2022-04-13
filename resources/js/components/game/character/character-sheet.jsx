@@ -97,14 +97,14 @@ export default class CharacterSheet extends React.Component {
                     <p>
                       You are currently in the process of automation. As a result, you cannot switch skills to train,
                       equip items or sets - but you can move items around, disenchant and destroy. You cannot sell to the shop,
-                      the market board (or buy from either), set sail, teleport, traverse .... <em>Deep breath!</em> ... use /pct chat command
-                      (to travel to celestials, and no you cannot engage them either),
-                      engage with NPC's, settle kingdoms, Use items on your self (or other kingdoms) or wage war.
+                      the market board (or buy from either), set sail, teleport, traverse... <em>Deep breath!</em>... use /pct chat command
+                      (to travel to Celestials, and no you cannot engage them either),
+                      engage with NPCs, settle kingdoms, Use items on yourself (or other kingdoms) or wage war.
                       But you CAN move (You cannot enter special locations while auto battling)
                       and you can manage your own kingdoms. Got it? Good! I can breathe again.
                     </p>
                     <p>
-                      Oh and child ... Don't log out or die, or that's it for automation.
+                      Oh and child... Don't log out or die, or that's it for automation.
                     </p>
                   </AlertWarning>
                   : null

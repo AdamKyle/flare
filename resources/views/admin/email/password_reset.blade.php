@@ -15,7 +15,7 @@
         </mj-text>
 
         <mj-text color="#dedede">
-            If you did not personally request this. You may safley ignore it.
+            If you did not personally request this. You may safely ignore it.
         </mj-text>
 
         <mj-button background-color="#388a2d"

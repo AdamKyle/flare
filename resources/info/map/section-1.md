@@ -46,7 +46,7 @@ here you can see the adventure section. You can embark:
 
 ![adventuring-image](/storage/info/map/images/adventuring-modal.png)
 
-Which tells you how long the adventure will take in minutes to complete from start to finish and how mahy floors along with information about embarking.
+Which tells you how long the adventure will take in minutes to complete from start to finish and how many floors along with information about embarking.
 
 You will see this modal every time you go to embark.
 

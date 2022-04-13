@@ -273,7 +273,7 @@ export default class Move extends React.Component {
                 <option key={'move-both-affixes'} value={'all-enchantments'}>Both</option>
               </select>
               <p className="mt-2">
-                You cannot move no unique affixes fro items, selecting both on an item that has one unique and one normal, will only move the unique over.
+                You cannot move non-unique affixes from items, selecting both on an item that has one unique and one normal affix, will only move the unique one over.
               </p>
             </div>
             <div className={this.state.formOptions.selected_affix === 0 ? 'hide' : "form-group"}>

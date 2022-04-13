@@ -68,18 +68,18 @@ export default class KingdomSelection extends React.Component {
                 You may only select 10 kingdoms at a time to attack from.
               </div>
               <div className="form-group mt-2">
-                <label htmlFor="kingom-select">Select Kingdoms</label>
+                <label htmlFor="kingdom-select">Select Kingdoms</label>
                 <select
                   multiple={true}
                   value={this.kingdoms_selected}
                   onChange={this.handleChange.bind(this)}
                   className="form-control"
-                  id="kingom-select"
+                  id="kingdom-select"
                   style={{height: '220px'}}
                 >
                   {this.renderSelectOptions()}
                 </select>
-                <small id="kingom-select" className="form-text text-muted">
+                <small id="kingdom-select" className="form-text text-muted">
                   You can use CTRL/CMD and SHIFT for selections.
                 </small>
               </div>

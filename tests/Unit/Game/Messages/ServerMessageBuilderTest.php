@@ -56,7 +56,7 @@ class ServerMessageBuilderTest extends TestCase
     {
         $message = resolve(ServerMessageBuilder::class)->build('dead_character');
 
-        $this->assertEquals('You are dead. Please revive your self by clicking revive.', $message);
+        $this->assertEquals('You are dead. Please revive yourself by clicking revive.', $message);
     }
 
     public function testGetMessageFullInventory()

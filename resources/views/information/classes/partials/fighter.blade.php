@@ -15,7 +15,7 @@
   <li>Attack will use the full force of your attack.</li>
   <li>Cast and Attack or Attack and Cast can be used if you have a healing spell.</li>
   <li>Cast is useless to you because you won't have the intelligence. Technically you could go this route if you wanted to balance
-    Your strength, Dexterity and Intelligence/Focus plus Casting Accuracy skill to become a "Battle Mage". But now you are stretching your self too far.</li>
+    Your strength, Dexterity and Intelligence/Focus plus Casting Accuracy skill to become a "Battle Mage". But now you are stretching yourself too far.</li>
   <li>
     Defend is only useful if the enemy is about to kill you and you have some health left over as Fighters can have the greatest AC when it comes to defending.
     because you use your class bonus as a bonus towards your AC.

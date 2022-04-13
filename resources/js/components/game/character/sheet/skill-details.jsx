@@ -410,7 +410,7 @@ export default class SkillDetails extends React.Component {
               <div className="character-skill-info">
                 <p className="mt-4">
                   These are all your training skills. To train a skill simply click train beside the skill you want to
-                  train. Then you will select a specific amount of XP to sacrifice from killing monsters, celestials and adventures
+                  train. Then you will select a specific amount of XP to sacrifice from killing monsters, Celestials and adventures
                   that will go towards leveling this skill.
                 </p>
                 <p>

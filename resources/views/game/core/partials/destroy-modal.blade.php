@@ -8,7 +8,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <p>Are you sure you weant to do this? This action cannot be undone. You will lose the item.</p>
+                <p>Are you sure you want to do this? This action cannot be undone. You will lose the item.</p>
 
 
                 <form id="destroy-item-{{$slot->id}}" action="{{route('game.destroy.item', ['character' => $character])}}" method="POST">

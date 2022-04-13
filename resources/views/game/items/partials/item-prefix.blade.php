@@ -3,7 +3,7 @@
   $statsId        = Str::random(10);
   $skillsId       = Str::random(10);
   $damageId       = Str::random(10);
-  $resiatnceId    = Str::random(10);
+  $resistanceId    = Str::random(10);
 @endphp
 
 <x-tabs.pill-tabs-container>
@@ -11,7 +11,7 @@
   <x-tabs.tab tab="prefix-stats-{{$statsId}}" title="Stats" selected="false" active="false" />
   <x-tabs.tab tab="prefix-skills-{{$skillsId}}" title="Skills" selected="false" active="false" />
   <x-tabs.tab tab="prefix-damage-{{$damageId}}" title="Damage" selected="false" active="false" />
-  <x-tabs.tab tab="prefix-resistance-{{$resiatnceId}}" title="Resiatance" selected="false" active="false" />
+  <x-tabs.tab tab="prefix-resistance-{{$resistanceId}}" title="Resistance" selected="false" active="false" />
 </x-tabs.pill-tabs-container>
 <x-tabs.tab-content>
   <x-tabs.tab-content-section tab="prefix-base-info-{{$baseInfoId}}" active="true">
@@ -132,10 +132,10 @@
       </dl>
     @endif
   </x-tabs.tab-content-section>
-  <x-tabs.tab-content-section tab="prefix-resistance-{{$resiatnceId}}" active="false">
+  <x-tabs.tab-content-section tab="prefix-resistance-{{$resistanceId}}" active="false">
     <dl>
       <dt>Resistance Reduction:</dt>
-      <dd class="{{$item->itemPrefix->resiatance_reduction > 0.0 ? 'text-danger' : ''}}">{{$item->itemPrefix->resistance_reduction * 100}}%</dd>
+      <dd class="{{$item->itemPrefix->resistance_reduction > 0.0 ? 'text-danger' : ''}}">{{$item->itemPrefix->resistance_reduction * 100}}%</dd>
       <p class="mt-2 text-info">Affects enemies only. Affects their: Spell Evasion, Artifact Annulment and Affix Resistance.</p>
     </dl>
   </x-tabs.tab-content-section>

@@ -50,8 +50,8 @@
                 the attacker might have sent a settler to reduce the morale.
             </p>
             <p class="mt-3">
-                <span class="text-success">Your kingdom morale, and it's hourly increase are fine.</span><br />
-                <span class="text-warning">Careful your morale is getting low and/or your morale increase per hour is very low.</span><br />
+                <span class="text-success">Your kingdom morale, and its hourly increase are fine.</span><br />
+                <span class="text-warning">Careful, your morale is getting low and/or your morale increase per hour is very low.</span><br />
                 <span class="text-danger">Your kingdom is in danger of falling or losing morale per hour.</span><br />
             </p>
         </div>

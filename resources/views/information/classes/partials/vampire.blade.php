@@ -2,7 +2,7 @@
   Focus on Durability followed by Accuracy and Criticality.
 </p>
 <p>It is suggested you do not equip weapons, but instead two shields with additional durability mods on them.</p>
-<p>Load your self up with <a href="/information/enchanting">life stealing affixes</a> and <a href="/information/enchanting">durability affixes</a>,
+<p>Load yourself up with <a href="/information/enchanting">life stealing affixes</a> and <a href="/information/enchanting">durability affixes</a>,
 along with <a href="/information/enchanting">Class based affix</a> and <a href="/information/enchanting">Damage based affix</a></p>
 <p>
   There are two attack types you could do. One that involves purely attacking or one that involves purely casting. For vampires it is recommended you go with attacking.
@@ -30,5 +30,5 @@ affixes alone to kill the enemy, this is where you could cast or could use attac
 <p class="mt-4">
   Upgrade your equipment with the gold you have. By at least two shields that increase your durability, then get two rings for damage and finally focus on armour.
   For the first little while all you want to do is focus on upgrading your armour from the shop. Once you have at least 1000 gold, enchant some of your gear with
-  a <a href="/information/echanting">Life stealing</a> enchantments.
+  a <a href="/information/enchanting">Life stealing</a> enchantments.
 </p>

@@ -144,7 +144,7 @@ export default class UnitData extends React.Component {
                 </OverlayTrigger>
               </dd>
               <dd><strong>Is Siege Weapon?</strong>:</dd>
-              <dd>{this.props.unit.seige_weapon ? 'Yes' : 'No'}</dd>
+              <dd>{this.props.unit.siege_weapon ? 'Yes' : 'No'}</dd>
               <dd><strong>Can Heal?</strong>:</dd>
               <dd>{this.props.unit.can_heal ? 'Yes' : 'No'}</dd>
             </dl>

@@ -22,7 +22,7 @@
                             </div>
                         @endforeach
                     </div>
-                    <div class="p-2 clearfix acions">
+                    <div class="p-2 clearfix actions">
                         @if (count($steps) === 1)
                             <button class="btn btn-success float-right" wire:click="finish({{ $currentStep }})">Finish</button>
                         @elseif ($currentStep == 0)

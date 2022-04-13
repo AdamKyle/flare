@@ -10,7 +10,7 @@
 
 > ### ATTN!
 >
-> This document makes use of example images from development and may not reflect actual locations of NPC’s or items names. Consult the appropriate links in this document, for correct info on NPC’s and where they are located.
+> This document makes use of example images from development and may not reflect actual locations of NPCs or items names. Consult the appropriate links in this document, for correct info on NPCs and where they are located.
 
 Planes of Tlessa has what are called quests which are nothing more than you making sure you have a quest item and/or the currency.
 

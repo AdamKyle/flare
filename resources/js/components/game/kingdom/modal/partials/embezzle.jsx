@@ -28,16 +28,16 @@ export default class Embezzle extends React.Component {
         });
       }
 
-      axios.post('/api/kingdoms/embezel/' + this.props.kingdomId, {
+      axios.post('/api/kingdoms/embezzle/' + this.props.kingdomId, {
         embezzle_amount: this.state.totalToEmbezzle
       }).then((result) => {
-        const amountEmbzzeled = this.state.totalToEmbezzle;
+        const amountEmbezzled = this.state.totalToEmbezzle;
 
         this.setState({
           totalToEmbezzle: 0,
           loading: false,
         }, () => {
-          this.props.embezzleedSuccess(amountEmbzzeled);
+          this.props.embezzledSuccess(amountEmbezzled);
           this.props.close();
         });
       }).catch((err) => {
@@ -70,7 +70,7 @@ export default class Embezzle extends React.Component {
     });
   }
 
-  disableEmbezel() {
+  disableEmbezzle() {
     if (this.props.morale <= 0.15) {
       return true;
     }
@@ -136,7 +136,7 @@ export default class Embezzle extends React.Component {
           <Button variant="danger" onClick={this.props.close}>
             Close
           </Button>
-          <Button variant="primary" onClick={this.embezzle.bind(this)} disabled={this.disableEmbezel()}>
+          <Button variant="primary" onClick={this.embezzle.bind(this)} disabled={this.disableEmbezzle()}>
             Embezzle
           </Button>
         </Modal.Footer>

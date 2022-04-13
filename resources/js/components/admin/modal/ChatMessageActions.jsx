@@ -40,7 +40,7 @@ export default class ChatMessageActions extends React.Component {
   banUser() {
     if (this.props.message.character_name === 'Admin') {
       return this.setState({
-        errorMessage: 'Cannot ban your self.',
+        errorMessage: 'Cannot ban yourself.',
       });
     }
 

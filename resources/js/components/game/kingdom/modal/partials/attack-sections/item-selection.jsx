@@ -91,18 +91,18 @@ export default class ItemSelection extends React.Component {
           </p>
         </div>
         <div className="form-group mt-2">
-          <label htmlFor="kingom-select">Select items to use</label>
+          <label htmlFor="kingdom-select">Select items to use</label>
           <select
             multiple={true}
             value={this.kingdoms_selected}
             onChange={this.handleChange.bind(this)}
             className="form-control"
-            id="kingom-select"
+            id="kingdom-select"
             style={{height: '220px'}}
           >
             {this.renderSelectOptions()}
           </select>
-          <small id="kingom-select" className="form-text text-muted">
+          <small id="kingdom-select" className="form-text text-muted">
             You can use CTRL/CMD and SHIFT for selections.
           </small>
         </div>
