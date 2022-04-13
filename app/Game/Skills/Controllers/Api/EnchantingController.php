@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
 use App\Game\Skills\Requests\EnchantingValidation;
 use App\Game\Skills\Services\EnchantingService;
+use Illuminate\Support\Facades\Log;
 
 class EnchantingController extends Controller {
 
@@ -41,6 +42,9 @@ class EnchantingController extends Controller {
         if (is_null($slot)) {
             return response()->json(['message' => 'invalid input.'], 422);
         }
+
+        Log::info('Character: ' . $character->name . ' is enchanting ....' );
+        Log::info($request->all());
 
         if (!$this->enchantingService->doesCostMatchForEnchanting($request->affix_ids, $slot->item->id, $request->cost)) {
 

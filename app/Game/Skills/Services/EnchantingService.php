@@ -104,7 +104,11 @@ class EnchantingService {
         $itemAffixes   = ItemAffix::findMany($enchantmentIds);
         $itemToEnchant = Item::find($itemId);
 
-        if (is_null($itemAffixes)) {
+        Log::info('cost checking ...');
+        Log::info($itemAffixes);
+        Log::info($itemToEnchant);
+
+        if ($itemAffixes->isEmpty()) {
             return false;
         }
 
