@@ -12,4 +12,6 @@ export default interface SetsTableState {
     show_rename_set: boolean;
 
     loading: boolean;
+
+    search_string: string;
 }

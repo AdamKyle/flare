@@ -4,4 +4,6 @@ export default interface EquippedTableState {
     data: InventoryDetails[] | [];
 
     loading: boolean;
+
+    search_string: string;
 }

@@ -30,6 +30,7 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
             loading: false,
             success_message: null,
             show_rename_set: false,
+            search_string: '',
         }
     }
 
@@ -38,7 +39,7 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
     }
 
     componentDidUpdate(prevProps: Readonly<SetsInventoryTabProps>, prevState: Readonly<SetsTableState>, snapshot?: any) {
-        if (this.state.selected_set !== null) {
+        if (this.state.selected_set !== null && this.state.search_string.length === 0) {
             if (!isEqual(this.props.sets[this.state.selected_set].items, this.state.data)) {
                 this.setState({
                     data: this.props.sets[this.state.selected_set].items
@@ -231,12 +232,13 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
         const value = e.target.value;
 
         // @ts-ignore
-        const data = this.props.sets[this.state.selected_set].filter((item: InventoryDetails) => {
-            return item.item_name.includes(value)
+        const data = this.props.sets[this.state.selected_set].items.filter((item: InventoryDetails) => {
+            return item.item_name.includes(value) || item.type.includes(value)
         });
 
         this.setState({
-            data: data
+            data: data,
+            search_string: value,
         });
     }
 

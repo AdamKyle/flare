@@ -17,6 +17,8 @@ import InventoryItemComparisonProps
     from "../../../../lib/game/character-sheet/types/modal/inventory-item-comparison-props";
 import ItemComparisonSection from "./components/item-comparison-section";
 import MoveItemModal from "./components/inventory-comparison/move-item-modal";
+import InventoryComparisonAdjustment
+    from "../../../../lib/game/character-sheet/types/modal/inventory-comparison-adjustment";
 
 export default class InventoryItemComparison extends React.Component<InventoryItemComparisonProps, InventoryItemComparisonState> {
 
@@ -149,6 +151,17 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
 
     stubbedClick(){}
 
+    isGridSize(size: number, itemToEquip: InventoryComparisonAdjustment) {
+        switch(size) {
+            case 4 :
+                return itemToEquip.affix_count === 0 && itemToEquip.holy_stacks_applied === 0 && !itemToEquip.is_unique
+            case 6 :
+                return itemToEquip.affix_count > 0 || itemToEquip.holy_stacks_applied > 0 || itemToEquip.is_unique
+            default:
+                return false;
+        }
+    }
+
     render() {
 
         return (
@@ -167,9 +180,11 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
                             <ItemComparisonSection comparison_details={this.state.comparison_details} />
                             <div className='border-b-2 mt-6 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                             <div className={clsx(
-                                'mt-6 grid grid-cols-1 w-full gap-2 md:m-auto md:grid-cols-6',
+                                'mt-6 grid grid-cols-1 w-full gap-2 md:m-auto',
                                 {
-                                    'md:w-3/4': this.isLargeModal()
+                                    'md:w-3/4': this.isLargeModal(),
+                                    'md:grid-cols-6': this.isGridSize(6, this.state.comparison_details.itemToEquip),
+                                    'md:grid-cols-4': this.isGridSize(4, this.state.comparison_details.itemToEquip),
                                 }
                             )}>
                                 <PrimaryOutlineButton button_label={'Equip'} on_click={this.manageEquipModal.bind(this)} disabled={this.state.action_loading}/>

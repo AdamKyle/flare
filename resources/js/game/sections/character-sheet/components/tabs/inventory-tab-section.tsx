@@ -21,11 +21,12 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
             show_destroy_all: false,
             show_disenchant_all: false,
             success_message: null,
+            search_string: '',
         }
     }
 
     componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any) {
-        if (!isEqual(this.state.data, this.props.inventory)) {
+        if (!isEqual(this.state.data, this.props.inventory) && this.state.search_string.length === 0) {
             this.setState({
                 data: this.props.inventory
             });
@@ -53,12 +54,14 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
                 data: this.props.inventory.filter((item: InventoryDetails) => {
                     return item.item_name.includes(value) || item.type.includes(value);
                 }),
+                search_string: value,
             });
         } else {
             this.setState({
                 data: this.props.usable_items.filter((item: InventoryDetails) => {
                     return item.item_name.includes(value) || item.description.includes(value);
                 }),
+                search_string: value,
             });
         }
     }

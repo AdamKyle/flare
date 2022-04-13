@@ -10,4 +10,6 @@ export default interface InventoryTabSectionState {
     show_disenchant_all: boolean;
 
     success_message: string | null;
+
+    search_string: string;
 }

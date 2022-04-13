@@ -19,11 +19,12 @@ export default class EquippedTable extends React.Component<EquippedInventoryTabP
         this.state = {
             data: this.props.equipped_items,
             loading: false,
+            search_string: '',
         }
     }
 
     componentDidUpdate(prevProps: Readonly<EquippedInventoryTabProps>, prevState: Readonly<any>, snapshot?: any) {
-        if (!isEqual(prevState.data, this.props.equipped_items)) {
+        if (!isEqual(prevState.data, this.props.equipped_items) && this.state.search_string.length === 0) {
             this.setState({
                 data: this.props.equipped_items
             });
@@ -37,6 +38,7 @@ export default class EquippedTable extends React.Component<EquippedInventoryTabP
             data: this.props.equipped_items.filter((item: InventoryDetails) => {
                 return item.item_name.includes(value) || item.type.includes(value);
             }),
+            search_string: value,
         });
     }
 
