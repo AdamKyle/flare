@@ -19,6 +19,7 @@ import ItemComparisonSection from "./components/item-comparison-section";
 import MoveItemModal from "./components/inventory-comparison/move-item-modal";
 import InventoryComparisonAdjustment
     from "../../../../lib/game/character-sheet/types/modal/inventory-comparison-adjustment";
+import SellItemModal from "./components/inventory-comparison/sell-item-modal";
 
 export default class InventoryItemComparison extends React.Component<InventoryItemComparisonProps, InventoryItemComparisonState> {
 
@@ -41,6 +42,8 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
             comparison_details: null,
             show_equip_modal: false,
             show_move_modal: false,
+            show_sell_modal: false,
+            item_to_sell: null,
         }
     }
 
@@ -110,6 +113,10 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
         });
     }
 
+    sellItem() {
+
+    }
+
     buildTitle() {
         if (this.state.comparison_details === null) {
             return 'Loading comparison data ...';
@@ -146,6 +153,13 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
     manageMoveModalModal() {
         this.setState({
             show_move_modal: !this.state.show_move_modal
+        })
+    }
+
+    manageSellModal(item?: InventoryComparisonAdjustment) {
+        this.setState({
+            show_sell_modal: !this.state.show_sell_modal,
+            item_to_sell: typeof item === 'undefined' ? null : item,
         })
     }
 
@@ -189,7 +203,7 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
                             )}>
                                 <PrimaryOutlineButton button_label={'Equip'} on_click={this.manageEquipModal.bind(this)} disabled={this.state.action_loading}/>
                                 <PrimaryOutlineButton button_label={'Move'} on_click={this.manageMoveModalModal.bind(this)} disabled={this.state.action_loading}/>
-                                <SuccessOutlineButton button_label={'Sell'} on_click={this.stubbedClick.bind(this)} disabled={this.state.action_loading}/>
+                                <SuccessOutlineButton button_label={'Sell'} on_click={() => this.manageSellModal(this.state.comparison_details?.itemToEquip)} disabled={this.state.action_loading}/>
 
                                 {
                                     this.state.comparison_details.itemToEquip.affix_count > 0 || this.state.comparison_details.itemToEquip.holy_stacks_applied > 0 ?
@@ -230,6 +244,16 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
                                                    manage_modal={this.manageMoveModalModal.bind(this)}
                                                    usable_sets={this.props.usable_sets}
                                                    move_item={this.moveItem.bind(this)}
+                                    />
+                                    : null
+                            }
+
+                            {
+                                this.state.show_sell_modal && this.state.item_to_sell !== null ?
+                                    <SellItemModal is_open={this.state.show_sell_modal}
+                                                   manage_modal={this.manageSellModal.bind(this)}
+                                                   sell_item={this.sellItem.bind(this)}
+                                                   item={this.state.item_to_sell}
                                     />
                                     : null
                             }

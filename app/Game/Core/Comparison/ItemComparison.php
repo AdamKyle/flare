@@ -4,9 +4,12 @@ namespace App\Game\Core\Comparison;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
+use App\Flare\Traits\IsItemUnique;
 use Illuminate\Database\Eloquent\Collection;
 
 class ItemComparison {
+
+    use IsItemUnique;
 
     private $character;
 
@@ -39,7 +42,10 @@ class ItemComparison {
 
                 if (!empty($result)) {
 
-                    $result['position'] = $slot->position;
+                    $result['position']            = $slot->position;
+                    $result['is_unique']           = $this->isUnique($slot->item);
+                    $result['affix_count']         = $slot->item->affix_count;
+                    $result['holy_stacks_applied'] = $slot->item->holy_stacks_applied;
 
                     $comparison[] = $result;
                 }
@@ -137,16 +143,12 @@ class ItemComparison {
 
         $adjustments = [
             'damage_adjustment',
-            'ac_adjustment',
-            'healing_adjustment',
-            'spell_evasion_adjustment',
-            'artifact_annulment_adjustment',
-            'res_chance_adjustment',
             'base_damage_adjustment',
-            'base_healing_adjustment',
-            'base_ac_adjustment',
-            'fight_time_out_mod_adjustment',
             'base_damage_mod_adjustment',
+            'ac_adjustment',
+            'base_ac_adjustment',
+            'healing_adjustment',
+            'base_healing_adjustment',
             'str_adjustment',
             'dur_adjustment',
             'dex_adjustment',
@@ -154,6 +156,10 @@ class ItemComparison {
             'int_adjustment',
             'agi_adjustment',
             'focus_adjustment',
+            'fight_time_out_mod_adjustment',
+            'spell_evasion_adjustment',
+            'artifact_annulment_adjustment',
+            'res_chance_adjustment',
             'ambush_chance_adjustment',
             'ambush_resistance_adjustment',
             'counter_chance_adjustment',

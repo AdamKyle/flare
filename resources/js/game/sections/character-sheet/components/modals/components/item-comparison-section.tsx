@@ -6,6 +6,7 @@ import clsx from "clsx";
 import Tabs from "../../../../../components/ui/tabs/tabs";
 import TabPanel from "../../../../../components/ui/tabs/tab-panel";
 import {formatNumber} from "../../../../../lib/game/format-number";
+import ItemNameColorationText from "../../../../../components/ui/item-name-coloration-text";
 
 export default class ItemComparisonSection extends React.Component<any, any> {
 
@@ -24,7 +25,7 @@ export default class ItemComparisonSection extends React.Component<any, any> {
     }
 
     renderChange(details: InventoryComparisonAdjustment, itemToEquip?: InventoryComparisonAdjustment) {
-        const invalidFields     = ['id', 'min_cost', 'skill_level_req', 'skill_level_trivial', 'holy_level', 'holy_stack_devouring_darkness', 'holy_stack_stat_bonus', 'holy_stacks', 'holy_stacks_applied', 'cost', 'slot_id'];
+        const invalidFields     = ['id', 'min_cost', 'skill_level_req', 'skill_level_trivial', 'holy_level', 'holy_stack_devouring_darkness', 'holy_stack_stat_bonus', 'holy_stacks', 'holy_stacks_applied', 'cost', 'slot_id', 'affix_count'];
         const wholeNumberValues = ['damage_adjustment', 'ac_adjustment', 'healing_adjustment', 'base_damage'];
 
         let elements = Object.keys(details).map((key) => {
@@ -79,7 +80,7 @@ export default class ItemComparisonSection extends React.Component<any, any> {
     }
 
     renderItemToEquip(itemToEquip: InventoryComparisonAdjustment) {
-        const invalidFields     = ['id', 'min_cost', 'skill_level_req', 'skill_level_trivial', 'cost', 'slot_id', 'holy_level'];
+        const invalidFields     = ['id', 'min_cost', 'skill_level_req', 'skill_level_trivial', 'cost', 'slot_id', 'holy_level', 'affix_count'];
         const wholeNumberValues = ['damage_adjustment', 'ac_adjustment', 'healing_adjustment', 'base_damage', 'holy_stacks', 'holy_stacks_applied'];
 
         return Object.keys(itemToEquip).map((key) => {
@@ -113,13 +114,17 @@ export default class ItemComparisonSection extends React.Component<any, any> {
             return (
                 <div className='grid w-full md:grid-cols-2 md:m-auto'>
                     <div>
-                        <div className={'font-light pb-3'}>{this.props.comparison_details.details[0].name}</div>
+                        <div className={'font-light pb-3'}>
+                            <ItemNameColorationText item={this.props.comparison_details.details[0]} />
+                        </div>
                         {this.renderChange(this.props.comparison_details.details[0], this.props.comparison_details.itemToEquip)}
                     </div>
                     <div
                         className='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-3 mt-6'></div>
                     <div>
-                        <div className={'font-light mb-3'}>{this.props.comparison_details.details[1].name}</div>
+                        <div className={'font-light mb-3'}>
+                            <ItemNameColorationText item={this.props.comparison_details.details[1]} />
+                        </div>
                         {this.renderChange(this.props.comparison_details.details[1], this.props.comparison_details.itemToEquip)}
                     </div>
                 </div>
@@ -133,7 +138,9 @@ export default class ItemComparisonSection extends React.Component<any, any> {
         if (this.props.comparison_details !== null) {
             return (
                 <div>
-                    <div className={'font-light pb-3'}>{this.props.comparison_details.details[0].name}</div>
+                    <div className={'font-light pb-3'}>
+                        <ItemNameColorationText item={this.props.comparison_details.details[0]} />
+                    </div>
                     {this.renderChange(this.props.comparison_details.details[0], this.props.comparison_details.itemToEquip)}
                 </div>
             );

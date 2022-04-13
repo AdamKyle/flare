@@ -32,5 +32,9 @@ export default interface InventoryItemComparisonState {
 
     action_loading: boolean;
 
+    show_sell_modal: boolean;
+
+    item_to_sell: InventoryComparisonAdjustment | null;
+
     loading: boolean;
 }

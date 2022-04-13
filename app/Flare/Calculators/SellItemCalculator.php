@@ -3,8 +3,11 @@
 namespace App\Flare\Calculators;
 
 use App\Flare\Models\Item;
+use App\Flare\Traits\IsItemUnique;
 
 class SellItemCalculator {
+
+    use IsItemUnique;
 
     /**
      * Fetches the item total sale price.
@@ -32,6 +35,14 @@ class SellItemCalculator {
      */
     public function fetchSalePriceWithAffixes(Item $item): int {
         $cost = $item->cost;
+
+        if ($this->isItemUnique($item)) {
+            return $cost;
+        }
+
+        if ($this->isItemHoly($item)) {
+            return $cost;
+        }
 
         if (!is_null($item->item_suffix_id)) {
             $cost += $item->itemSuffix->cost;

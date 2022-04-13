@@ -55,4 +55,6 @@ export default interface InventoryComparisonAdjustment {
     counter_chance_adjustment: number;
 
     counter_resistance_adjustment: number;
+
+    cost: number;
 }
