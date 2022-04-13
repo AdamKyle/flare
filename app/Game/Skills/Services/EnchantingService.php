@@ -208,6 +208,10 @@ class EnchantingService {
         foreach ($affixes as $affixId) {
             $affix = ItemAffix::find($affixId);
 
+            if (is_null($affix)) {
+                continue;
+            }
+
             // Reset.
             $this->wasTooEasy = false;
 

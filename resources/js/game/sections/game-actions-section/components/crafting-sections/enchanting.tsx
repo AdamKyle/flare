@@ -155,7 +155,7 @@ export default class Enchanting extends React.Component<any, any> {
     }
 
     cannotCraft() {
-        return this.state.loading || this.state.selected_item === null || this.props.cannot_craft || this.state.selected_prefix == null || this.state.selected_suffix === null;
+        return this.state.loading || this.state.selected_item === null || this.props.cannot_craft || (this.state.selected_prefix === null && this.state.selected_suffix === null);
     }
 
     render() {
