@@ -2,7 +2,7 @@
     <div class="col-md-12">
         <x-core.cards.card css="mt-5 w-full lg:w-3/4 m-auto">
             <div class="row pb-2 ml-2 text-muted">
-                This table may not reflect the marketboard at all times as it is not live updated.
+                This table may not reflect the market board at all times as it is not live updated.
             </div>
             <x-data-tables.table :collection="$items">
                 <x-data-tables.header>

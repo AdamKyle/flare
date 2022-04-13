@@ -14,16 +14,15 @@ class NpcCommandsSheet implements ToCollection {
         foreach ($rows as $index => $row) {
             if ($index !== 0) {
 
-                $npc = Npc::where('real_name', $row[0])->first();
+                $commandData = [
+                    'id'           => $row[0],
+                    'npc_id'       => $row[1],
+                    'command'      => $row[2],
+                    'command_type' => $row[3],
+                ];
 
-                if (!is_null($npc)) {
-                    $commandData = [
-                        'npc_id' => $npc->id,
-                        'command' => $row[1],
-                        'command_type' => $row[2],
-                    ];
-
-                    NpcCommand::UpdateOrCreate(['npc_id' => $commandData['npc_id']], $commandData);
+                if (!is_null(Npc::find($commandData['npc_id']))) {
+                    NpcCommand::UpdateOrCreate(['id' => $commandData['id']], $commandData);
                 }
             }
         }

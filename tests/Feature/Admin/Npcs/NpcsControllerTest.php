@@ -47,7 +47,7 @@ class NpcsControllerTest extends TestCase
     }
 
     public function testCanSeeIndex() {
-        $this->actingAs($this->user)->visit(route('npcs.index'))->see('NPC\'s');
+        $this->actingAs($this->user)->visit(route('npcs.index'))->see('NPCs');
     }
 
     public function testCanSeeShow() {

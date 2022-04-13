@@ -1,6 +1,7 @@
 <table>
     <thead>
         <tr>
+            <th>id</th>
             <th>name</th>
             <th>description</th>
             <th>base_damage_mod</th>
@@ -50,6 +51,7 @@
     <tbody>
     @foreach($affixes as $affix)
         <tr>
+            <td>{{$affix->id}}</td>
             <td>{{$affix->name}}</td>
             <td>{{$affix->description}}</td>
             <td>{{$affix->base_damage_mod}}</td>

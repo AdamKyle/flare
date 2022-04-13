@@ -28,16 +28,16 @@ class SkillsSheet implements ToCollection {
                 }
 
                 if (!is_null($skill['game_class_id'])) {
-                    $class = GameClass::where('name', $skill['game_class_id'])->first();
+                    $class = GameClass::find($skill['game_class_id']);
 
                     if (!is_null($class)) {
-                        $skill['game_class_id'] = GameClass::where('name', $skill['game_class_id'])->first()->id;
+                        $skill['game_class_id'] = $class->id;
                     } else {
                         unset($skill['game_class_id']);
                     }
                 }
 
-                $foundSkill = GameSkill::where('name', $skill['name'])->first();
+                $foundSkill = GameSkill::find($skill['id']);
 
                 if (is_null($foundSkill)) {
                     GameSkill::create($skill);

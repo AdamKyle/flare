@@ -176,7 +176,7 @@
 @if (!is_null($item->devouring_light) || !is_null($item->devouring_darkness))
     <x-cards.card-with-title title="Voidance and Devoid">
       <x-core.alerts.info-alert>
-        <p>Voidance and Devoidance come in two forms: Devouring Light and Devouring Darkness.</p>
+        <p>Voidance and Devoidance comes in two forms: Devouring Light and Devouring Darkness.</p>
         <p>Devouring Light on enemies will give them a chance to void you of your enchantments and artifacts and boons,
         making you use raw unmodified stats and damage to strike the enemy.</p>
         <p>Devouring Light on the player will void the enemy of their enchantment damage and artifacts.</p>

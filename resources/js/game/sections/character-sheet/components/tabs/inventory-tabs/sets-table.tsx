@@ -16,6 +16,7 @@ import SetsInventoryTabProps from "../../../../../lib/game/character-sheet/types
 import SetsTableState from "../../../../../lib/game/character-sheet/types/tables/sets-table-state";
 import SuccessAlert from "../../../../../components/ui/alerts/simple-alerts/success-alert";
 import {isEqual} from "lodash";
+import WarningAlert from "../../../../../components/ui/alerts/simple-alerts/warning-alert";
 
 export default class SetsTable extends React.Component<SetsInventoryTabProps, SetsTableState> implements ActionsInterface {
     constructor(props: SetsInventoryTabProps) {
@@ -160,6 +161,14 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
         return this.props.is_dead;
     }
 
+    showCannotEquipMessage() {
+        if (this.state.selected_set !== null) {
+            return !this.props.sets[this.state.selected_set].equippable
+        }
+
+        return false;
+    }
+
     clearSuccessMessage() {
         this.setState({
             success_message: null,
@@ -174,6 +183,14 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
                         <SuccessAlert close_alert={this.clearSuccessMessage.bind(this)} additional_css={'mt-4 mb-4'}>
                             {this.state.success_message}
                         </SuccessAlert>
+                    : null
+                }
+                {
+                    this.showCannotEquipMessage() ?
+                        <WarningAlert additional_css={'mb-4'}>
+                            Cannot equip set because it violates the <a href={'/information/equipment-sets'} target='_blank'>set <i className="fas fa-external-link-alt"></i></a> rules.
+                            You can still treat this set like a stash tab.
+                        </WarningAlert>
                     : null
                 }
                 <div className='flex items-center'>

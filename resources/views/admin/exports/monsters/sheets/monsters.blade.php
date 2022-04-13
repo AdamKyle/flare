@@ -1,6 +1,7 @@
 <table>
     <thead>
     <tr>
+        <th>id</th>
         <th>name</th>
         <th>str</th>
         <th>dur</th>
@@ -51,6 +52,7 @@
     <tbody>
     @foreach($monsters as $monster)
         <tr>
+            <td>{{$monster->id}}</td>
             <td>{{$monster->name}}</td>
             <td>{{$monster->str}}</td>
             <td>{{$monster->dur}}</td>
@@ -92,9 +94,9 @@
             <td>{{$monster->counter_chance}}</td>
             <td>{{$monster->counter_resistance}}</td>
             <td>{{$monster->published}}</td>
-            <td>{{(!is_null($monster->questItem)) ? $monster->questItem->name : null}}</td>
+            <td>{{(!is_null($monster->questItem)) ? $monster->questItem->id : null}}</td>
             <td>{{$monster->quest_item_drop_chance}}</td>
-            <td>{{$monster->gameMap->name}}</td>
+            <td>{{$monster->game_map_id}}</td>
         </tr>
     @endforeach
     </tbody>

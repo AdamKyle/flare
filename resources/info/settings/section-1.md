@@ -49,7 +49,7 @@ You are of course welcome to come back at anytime.
 
 ## Email Settings
 
-There are some email settings that you can enable or disable. For your convience the game has opted you out of some of the more annoying emails,
+There are some email settings that you can enable or disable. For your convenience the game has opted you out of some of the more annoying emails,
 that you can enable if you wish.
 
 *The image below is only some of the options*
@@ -123,4 +123,4 @@ This will prevent tool tips when hovering over the attack types when attacking.
 
 > ### ATTN New Players
 >
-> Do not enable this at the start. Familiarize your self with how combat works first.
+> Do not enable this at the start. Familiarize yourself with how combat works first.

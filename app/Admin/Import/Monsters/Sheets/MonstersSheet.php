@@ -22,14 +22,12 @@ class MonstersSheet implements ToCollection {
                     continue;
                 }
 
-                if (isset($monster['name'])) {
-                    $foundMonster = Monster::where('name', $monster['name'])->first();
+                $foundMonster = Monster::find($monster['id']);
 
-                    if (is_null($foundMonster)) {
-                        Monster::create($monster);
-                    } else {
-                        $foundMonster->update($monster);
-                    }
+                if (is_null($foundMonster)) {
+                    Monster::create($monster);
+                } else {
+                    $foundMonster->update($monster);
                 }
             }
         }
@@ -48,7 +46,7 @@ class MonstersSheet implements ToCollection {
             if (!is_null($value)) {
 
                 if ($key === 'quest_item_id') {
-                    $questItem = Item::where('name', $value)->first();
+                    $questItem = Item::find($value);
 
                     if (is_null($questItem)) {
                         return null;
@@ -56,7 +54,7 @@ class MonstersSheet implements ToCollection {
                         $value = $questItem->id;
                     }
                 } else if ($key === 'game_map_id') {
-                    $gameMap = GameMap::where('name', $value)->first();
+                    $gameMap = GameMap::find($value);
 
                     if (is_null($gameMap)) {
                         return null;

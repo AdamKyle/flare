@@ -167,13 +167,9 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
                             <ItemComparisonSection comparison_details={this.state.comparison_details} />
                             <div className='border-b-2 mt-6 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                             <div className={clsx(
-                                'mt-6 grid grid-cols-1 w-full gap-2 md:m-auto',
+                                'mt-6 grid grid-cols-1 w-full gap-2 md:m-auto md:grid-cols-6',
                                 {
                                     'md:w-3/4': this.isLargeModal()
-                                }, {
-                                    'md:grid-cols-6': this.state.comparison_details.itemToEquip.affix_count > 0 && this.state.comparison_details.itemToEquip.holy_stacks_applied > 0,
-                                    'md:grid-cols-5': (this.state.comparison_details.itemToEquip.affix_count > 0 && this.state.comparison_details.itemToEquip.holy_stacks_applied === 0) || (this.state.comparison_details.itemToEquip.affix_count === 0 && this.state.comparison_details.itemToEquip.holy_stacks_applied > 0),
-                                    'md:grid-cols-4': this.state.comparison_details.itemToEquip.affix_count === 0 && this.state.comparison_details.itemToEquip.holy_stacks_applied === 0,
                                 }
                             )}>
                                 <PrimaryOutlineButton button_label={'Equip'} on_click={this.manageEquipModal.bind(this)} disabled={this.state.action_loading}/>

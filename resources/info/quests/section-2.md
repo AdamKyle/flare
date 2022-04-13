@@ -76,7 +76,7 @@ Any quest that is marked as green is done, any quest marked as blue you can do, 
 Some quests, on the left-hand side, show as a list - these are considered: one off quests. They can be done in **any** order.
 
 You might see that only two planes exists in the "All Quests" section, and there are 6 planes of existence. Surface has a lot of quests
-that take you over various planes of existence, talking to many NPC's. 
+that take you over various planes of existence, talking to many NPCs. 
 
 As you can see (first image above, not the modal) Surface has two parent quests: I dream of Alchemy (can be done any time)
 and Hunting Expedition, which then unlocks a whole mess of quests that start you on your way to unlocking Purgatory - which holds some of the 
@@ -144,4 +144,4 @@ the player clear your browser cache or reinstall your OS.
 
 > ## ATTN!!
 > 
-> No you cannot use real world money to bypass these quests. All quests are designed to unlock features, plane access, access to npcs or other features of the game.
+> No you cannot use real world money to bypass these quests. All quests are designed to unlock features, plane access, access to NPCs or other features of the game.

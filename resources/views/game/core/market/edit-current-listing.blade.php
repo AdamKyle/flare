@@ -19,7 +19,7 @@
                     @csrf
 
                     <div class="alert alert-warning">
-                        <p>While you are editing your items listed price, your item will not appear on the market board. Once you are done, the item will be relisted.</p>
+                        <p>While you are editing your item's listed price, your item will not appear on the market board. Once you are done, the item will be relisted.</p>
                     </div>
 
                     <div class="row">

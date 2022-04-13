@@ -23,7 +23,7 @@ class ServerMessageBuilder {
             case 'no_monster':
                 return 'No monster selected. Please select one.';
             case 'dead_character':
-                return 'You are dead. Please revive your self by clicking revive.';
+                return 'You are dead. Please revive yourself by clicking revive.';
             case 'inventory_full':
                 return 'Your inventory is full, you cannot pick up this item!';
             case 'cant_attack':
@@ -40,11 +40,11 @@ class ServerMessageBuilder {
             case 'cannot_walk_on_water':
                 return 'You cannot move that way, you are missing the appropriate quest item.';
             case 'not_enough_gold':
-                return 'You dont have enough Gold for that.';
+                return 'You don\'t have enough Gold for that.';
             case 'not_enough_gold_dust':
-                return 'You dont have enough Gold Dust for that.';
+                return 'You don\'t have enough Gold Dust for that.';
             case 'not_enough_shards':
-                return 'You dont have enough Shards for that.';
+                return 'You don\'t have enough Shards for that.';
             case 'cant_enchant':
             case 'cant_craft':
                 return 'You must wait for the timer (beside Craft/Enchant) to state: Ready!';

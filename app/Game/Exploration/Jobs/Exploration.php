@@ -113,7 +113,7 @@ class Exploration implements ShouldQueue
             $automation->delete();
 
             event(new ExplorationLogUpdate($this->character->user, 'Phew child! I did not think we would survive all of your shenanigans.
-                So many times I could have died! Do you ever think about anyone other than your self? No? Didn\'t think so. Either way, I am off.
+                So many times I could have died! Do you ever think about anyone other than yourself? No? Didn\'t think so. Either way, I am off.
                 Let me know when we go our next adventure.', true));
 
             $rewardHandler->processRewardsForExplorationComplete($this->character);

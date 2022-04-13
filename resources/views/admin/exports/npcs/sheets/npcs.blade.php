@@ -1,6 +1,7 @@
 <table>
     <thead>
     <tr>
+        <th>id</th>
         <th>name</th>
         <th>real_name</th>
         <th>type</th>
@@ -15,10 +16,11 @@
     <tbody>
     @foreach($npcs as $npc)
         <tr>
+            <td>{{$npc->id}}</td>
             <td>{{$npc->name}}</td>
             <td>{{$npc->real_name}}</td>
             <td>{{$npc->type}}</td>
-            <td>{{$npc->gameMap->name}}</td>
+            <td>{{$npc->game_map_id}}</td>
             <td>{{$npc->moves_around_map}}</td>
             <td>{{$npc->must_be_at_same_location}}</td>
             <td>{{$npc->text_command_to_message}}</td>

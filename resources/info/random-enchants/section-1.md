@@ -62,14 +62,14 @@ For example, lets look at the cost to percentage range:
   ie, some aspects may only take 70% if you manage a perfect 700% for the percentage range.
 - Damage Range - the range in damage, the stacking or irresistible aspect is random.
 
-When doing [Factions](/infromation/factions) you can get any item (up to a total cost of 4 billion gold - that's beyond shop gear!) with one or two randomly generated
+When doing [Factions](/information/factions) you can get any item (up to a total cost of 4 billion gold - that's beyond shop gear!) with one or two randomly generated
 affixes on them. These will be green in your inventory.
 
 **Players may only equip one of these at a time, and sets may also only contain one, or the set will not be equippable**.
 
 A unique item, is any item that has one (or two) unique enchantments on it. These will be green in your inventory.
 
-These are unique such that they do not, cannot - drop from anywhere, except two: **The Queen of Hearts in Hell** (See [npcs](/information/npcs)). You can pay the cost to have her create one of these.
+These are unique such that they do not, cannot - drop from anywhere, except two: **The Queen of Hearts in Hell** (See [NPCs](/information/npcs)). You can pay the cost to have her create one of these.
 which is paid in Gold and then re-roll them and move them to other items using Shards, Gold Dust and Gold.
 
 When a player levels a Faction from 0-1, for example, they will get a randomly generated unique (10 Billion Valuation). There are a series of [quests](/information/quests) that you can do to access her
@@ -77,9 +77,9 @@ as a player. Not only do you need a quest item to get into Hell, where she is lo
 
 ## Queen of Hearts
 
-The Queen of Hearts is inspired by a character off another game, called Disgea 5. There is a character named is Seraphina, a bubbly character that might be able to have a crush on you.
+The Queen of Hearts is inspired by a character off another game, called Disgaea 5. There is a character named is Seraphina, a bubbly character that might be able to have a crush on you.
 
-Players, who are familiar with Disgea will recognize this, while others who are not, will see her as a fun NPC to interact with.
+Players who are familiar with Disgaea will recognize this, while others who are not, will see her as a fun NPC to interact with.
 
 - **To Speak with her**: Players must finish the **Queens Decision** Quest
 - **To Access her**: Players must finish the **Hells Gates** Quest
@@ -101,7 +101,7 @@ This one, below, will show up if you have no uniques in your inventory:
 This one, below, will show up if you have uniques in your inventory you will see the following:
 
 <div class="mb-4">
-    <a href="/storage/info/random-enchants/images/purcahse.png" class="glightbox">
+    <a href="/storage/info/random-enchants/images/purchase.png" class="glightbox">
         <img src="/storage/info/random-enchants/images/purchase.png" class="img-fluid" />
     </a>
 </div>
@@ -119,7 +119,7 @@ an item with one or two affixes.
 All stats are randomly generated.
 
 <div class="mb-4">
-    <a href="/storage/info/random-enchants/images/purcahsed.png" class="glightbox">
+    <a href="/storage/info/random-enchants/images/purchased.png" class="glightbox">
         <img src="/storage/info/random-enchants/images/purchased.png" class="img-fluid" />
     </a>
 </div>
@@ -221,7 +221,7 @@ Do note, that since we are re-rolling our stats, all stats including enemy stat 
 > ### ATTN!!
 > 
 > If you have the item, that you purchased or re-rolled open in a new tab, you cannot refresh that tab and see the new stats, instead you must go to your inventory, find the item and open it
-> again, why? because everytime you re-roll we generate a new item and give it to you, this prevents other players who have (which is very rare) the same affix
+> again, why? because every time you re-roll we generate a new item and give it to you, this prevents other players who have (which is very rare) the same affix
 > or item combination from having their stuff overwritten as well.
 > 
 > Remember, all items that you are holding or have equipped are just references to the items and affix combinations already in game.

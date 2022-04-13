@@ -10,7 +10,7 @@
       tab="damage-dealing-irresistible"
       selected="false"
       active="false"
-      title="Damage Dealing Resitable"
+      title="Damage Dealing Resistable"
     />
   </x-tabs.pill-tabs-container>
   <x-tabs.tab-content>

@@ -1,6 +1,7 @@
 <table>
     <thead>
     <tr>
+        <th>id</th>
         <th>npc_id</th>
         <th>command</th>
         <th>command_type</th>
@@ -9,7 +10,8 @@
     <tbody>
     @foreach($commands as $command)
         <tr>
-            <td>{{$command->npc->real_name}}</td>
+            <td>{{$command->id}}</td>
+            <td>{{$command->npc_id}}</td>
             <td>{{$command->command}}</td>
             <td>{{$command->command_type}}</td>
         </tr>

@@ -181,7 +181,7 @@
             <dl class="mt-3">
                 <dt>Are there Adds?</dt>
                 <dd>
-                    No. There are no adds what so ever.
+                    No. There are no adds whatsoever.
                 </dd>
                 <dt>Is it persistent?</dt>
                 <dd>
@@ -197,11 +197,11 @@
                 </dd>
                 <dt>Does it use energy systems?</dt>
                 <dd>
-                    No. Tlessa uses what's called: <a href="/information/time-gates" class="dark:text-primary-300 dark:hover:text-primary-600">Time Gates</a>. These apply to actions you do and time you out
+                    No. Tlessa uses what's called: <a href="/information/time-gates" class="dark:text-primary-300 dark:hover:text-primary-600">Time Gates</a>. These apply to action you do and time you out
                     from doing that action again for a matter of seconds or minutes. However, the goal of Tlessa is
                     not to keep you engaged, so for example you could: Fight, Craft, Move and then wait for their respective timers
-                    to end before doing the same thing. In the aforementioned example: Killing a monster gates you a 10 second time
-                    out before being able to kill the monster again, but being killed by said monster, gives you a 20 second time out before being able
+                    to end before doing the same thing. In the aforementioned example: Killing a monster gates you a 10-second time
+                    out before being able to kill the monster again, but being killed by said monster, gives you a 20-second time out before being able
                     to revive.
                 </dd>
                 <dt>Are they're guilds?</dt>

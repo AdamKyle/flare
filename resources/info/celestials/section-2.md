@@ -1,4 +1,4 @@
-From here you can see the list of NPC's and their commands to conjure the Entity. 
+From here you can see the list of NPCs and their commands to conjure the Entity. 
 
 The creatures get harder and thus give more rewards on various planes. For example:
 

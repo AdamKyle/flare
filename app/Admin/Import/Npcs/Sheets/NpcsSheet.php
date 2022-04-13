@@ -16,7 +16,7 @@ class NpcsSheet implements ToCollection {
                 $data = $this->returnCleanData($data);
 
                 if (!empty($data)) {
-                    Npc::updateOrCreate(['real_name' => $data['real_name']], $data);
+                    Npc::updateOrCreate(['id' => $data['id']], $data);
                 }
             }
         }
@@ -28,7 +28,7 @@ class NpcsSheet implements ToCollection {
         foreach ($buildingData as $key => $value) {
             if (!is_null($value)) {
                 if ($key === 'game_map_id') {
-                    $gameMap = GameMap::where('name', $value)->first();
+                    $gameMap = GameMap::find($value);
 
                     if (is_null($gameMap)) {
                         return []; // Map does not exist: Bail.

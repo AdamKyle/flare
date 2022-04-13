@@ -29,7 +29,7 @@
                     If you cannot collect anymore items, you can come back after you have made some room in your inventory and collect the remaining items.
                   </p>
                   <p>
-                    If the XP/Skill XP go above 100, you will get whats called: Spill over. This means youll get the total levels of the XP / 100 with the remaining amount
+                    If the XP/Skill XP go above 100, you will get whats called: Spill over. This means you'll get the total levels of the XP / 100 with the remaining amount
                     that cannot be divided by 100 on top of the existing xp you have. Ie: 250 XP Reward while you have 60 XP, gets you 3 total levels.
                   </p>
                 </x-core.alerts.info-alert>

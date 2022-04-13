@@ -15,7 +15,7 @@
                 @if ($isLocation)
                     <p>
                         You enter the old and musty shop. Along the walls you an see various weapons, armor
-                        and other types of items that might benifit you on your journies.
+                        and other types of items that might benefit you on your journeys.
                     </p>
                     <p>
                         Counting your gold, you walk in with confidence, knowing you will walk out with
@@ -27,7 +27,7 @@
 
                     <p><strong>Shop Keeper</strong>: <em>Hello! welcome! what can I get for you?</em></p>
                 @else
-                    <p>On your journey you come across a merhant on the road. He is carrying his bag full of trinkets and goodies.</p>
+                    <p>On your journey you come across a merchant on the road. He is carrying his bag full of trinkets and goodies.</p>
                     <p>As you approach, he takes off his backpack and warmly greets you:</p>
                     <p><strong>Shop Keeper</strong>: <em>These roads are dangerous my friend! What can I get you?</em></p>
                 @endif

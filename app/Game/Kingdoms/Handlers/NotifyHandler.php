@@ -174,7 +174,7 @@ class NotifyHandler {
         '/' . $defender->y_position . ' on the ' .
         $defender->gameMap->name . ' plane, was attacked.';
 
-        $this->createNotificationEvent($this->defendingCharacter, $attackLog, $message, 'failed', 'Kingom Attacked!');
+        $this->createNotificationEvent($this->defendingCharacter, $attackLog, $message, 'failed', 'Kingdom Attacked!');
 
         $message = '';
         $type    = '';

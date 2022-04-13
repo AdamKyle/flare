@@ -48,7 +48,8 @@ export default class CanEntranceEnemy extends BattleBase {
     if (dc > chance) {
       this.addMessage('You resist the alluring entrancing enchantments on your enemy!', 'player-action');
     } else {
-      this.addMessage(attacker.name + ' has trapped you in a trance like state with their enchantments!', 'enemy-action');
+
+      this.addMessage(attacker.name + ' has trapped you in a trance-like state with their enchantments!', 'enemy-action');
 
       canEntrance = true;
     }

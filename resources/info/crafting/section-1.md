@@ -65,7 +65,7 @@ Think of the cost as the "materials needed" cost.
 
 ## Crafted items are useless without enchanting them
 
-The whole point of crafting items is to then enchant them. Sure you can craft your self a new suit of armour and a new weapon, but you can't then sell that on the market board. There's money to be made in enchanting gear.
+The whole point of crafting items is to then enchant them. Sure you can craft yourself a new suit of armour and a new weapon, but you can't then sell that on the market board. There's money to be made in enchanting gear.
 
 Enchantments are what make gear unique, you can enchant gear to your specific needs. More on that in [Enchanting](/information/enchanting)
 

@@ -31,7 +31,7 @@ export default class MonsterAttack extends BattleBase {
 
       this.currentCharacterHealth = this.currentCharacterHealth - damage;
 
-      this.addMessage(monster.name + ' hit for: ' + formatNumber(damage), 'enemy-action');
+      this.addMessage(monster.name + ' hits for: ' + formatNumber(damage), 'enemy-action');
 
       this.useItems(monster, isCharacterVoided, isMonsterVoided);
 
@@ -59,7 +59,7 @@ export default class MonsterAttack extends BattleBase {
 
         this.currentCharacterHealth = this.currentCharacterHealth - damage;
 
-        this.addMessage(monster.name + ' hit for: ' + formatNumber(damage), 'enemy-action');
+        this.addMessage(monster.name + ' hits for: ' + formatNumber(damage), 'enemy-action');
 
         this.useItems(monster, isCharacterVoided, isMonsterVoided, previousAttackType);
 

@@ -15,7 +15,7 @@ class UnitsSheet implements ToCollection {
 
                 $cleanData = $this->returnCleanUnitData($unitData);
 
-                GameUnit::updateOrCreate(['name' => $cleanData['name']], $cleanData);
+                GameUnit::updateOrCreate(['id' => $cleanData['id']], $cleanData);
             }
         }
     }

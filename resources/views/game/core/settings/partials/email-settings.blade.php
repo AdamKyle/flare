@@ -45,7 +45,7 @@
                         </div>
                     </div>
                     <div class="col-md-8 move-down-30 alert alert-info">
-                        By Selecting this, you are saying that, when a building is rebuilt you would like to recieve an email.
+                        By Selecting this, you are saying that, when a building is rebuilt you would like to receive an email.
                         <p class="mt-2"><strong>Note</strong>: Multiple buildings in queue? You'll get multiple emails, one for each.</p>
                     </div>
                 </div>

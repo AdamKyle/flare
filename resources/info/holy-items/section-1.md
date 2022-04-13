@@ -6,7 +6,7 @@ As you play the game you move through the shop gear that you can purchase with g
 
 This is where the beginning of progression starts.
 
-At this stage you will need to have your [Crafting](/infromation/crafting) and [Enchanting](/infromation/enchanting) to roughly level 200 or so. This is where the second phase begins, you craft the rest of your
+At this stage you will need to have your [Crafting](/information/crafting) and [Enchanting](/information/enchanting) to roughly level 200 or so. This is where the second phase begins, you craft the rest of your
 gear and enchant it, selling what you don't need and working down that list. Along the way you will do [Factions](/information/factions) which give you [Randomly Enchanted Uniques](/information/random-enchants).
 
 This is the start of Phase three, the receiving of those Uniques. Once you do the appropriate [quests](/information/quests) to get into Hell and speak to the Queen of Hearts - you won't be able to
@@ -144,4 +144,4 @@ Players cannot change the stack once it is applied. If you apply a bunch of low 
 
 Once the item has its stacks maxed, the only way to re-roll them is to re-create the item and do the process again.
 
-Everytime a character applies a stack they will see the stack's left go down. Once this reaches 0, the item is removed from the list, and you can no longer apply stacks to the item.
+Every time a character applies a stack they will see the stack's left go down. Once this reaches 0, the item is removed from the list, and you can no longer apply stacks to the item.

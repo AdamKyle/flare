@@ -16,12 +16,7 @@ class ItemsSheet implements ToCollection {
             if ($index !== 0) {
                 $item = array_combine($rows[0]->toArray(), $row->toArray());
 
-                $affixes   = ItemAffix::whereIn('name', [$item['item_suffix_id'], $item['item_prefix_id']])->get();
                 $skill     = GameSkill::where('name', $item['skill_name'])->first();
-
-                if ($affixes->isEmpty() && (!is_null($item['item_suffix_id']) || !is_null($item['item_prefix_id']))) {
-                    continue;
-                }
 
                 if (is_null($skill) && !is_null($item['skill_name'])) {
                     continue;
@@ -29,14 +24,7 @@ class ItemsSheet implements ToCollection {
 
                 $itemData = $this->returnCleanItem($item);
 
-                if (!isset($itemData['name'])) {
-                    continue;
-                }
-
-                $item = Item::where('name', $itemData['name'])
-                    ->where('item_suffix_id', $itemData['item_suffix_id'])
-                    ->where('item_prefix_id', $itemData['item_prefix_id'])
-                    ->first();
+                $item = Item::find($itemData['id']);
 
                 if (!is_null($item)) {
                     $item->update($itemData);
@@ -92,31 +80,13 @@ class ItemsSheet implements ToCollection {
         }
 
         foreach ($item as $key => $value) {
-            if (!is_null($value) || ($key === 'item_suffix_id' || $key === 'item_prefix_id')) {
-
-                if ($key === 'item_suffix_id') {
-                    $foundSuffix = ItemAffix::where('name', $value)->first();
-
-                    if (is_null($foundSuffix)) {
-                        $value = null;
-                    } else {
-                        $value = $foundSuffix->id;
-                    }
-
-                } else if ($key === 'item_prefix_id') {
-                    $foundPrefix = ItemAffix::where('name', $value)->first();
-
-                    if (is_null($foundPrefix)) {
-                        $value = null;
-                    } else {
-                        $value = $foundPrefix->id;
-                    }
-                } else if ($key === 'can_drop') {
+            if (!is_null($value)) {
+                if ($key === 'can_drop') {
                     if (is_null($value)) {
                         $value = false;
                     }
                 } else if ($key === 'drop_location_id') {
-                    $foundLocation = Location::where('name', $value)->first();
+                    $foundLocation = Location::find($value);
 
                     if (is_null($foundLocation)) {
                         $value = null;

@@ -109,4 +109,4 @@ In this case you can replace one of the items and see which one might be better 
 > The item to equip is much weaker than the item equipped and would drag your stats way down, but is a good example of where crafting 
 > gear can, in the case of weapon crafting, be better than powerful god killing gear.
 >
-> The point here is to pay attention to your gear, what it is you are trying to do and what you need to effectivly do it.
+> The point here is to pay attention to your gear, what it is you are trying to do and what you need to effectively do it.

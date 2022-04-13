@@ -69,7 +69,8 @@ export default class UseItems extends BattleBase {
       }
     } else {
       if (attacker.artifact_damage !== 0) {
-        this.addMessage('The enemies artifacts glow brightly!', 'enemy-action');
+
+        this.addMessage('The enemy\'s artifacts glow brightly!');
 
         this.artifactDamage(attacker, defender, type);
       }

@@ -35,7 +35,7 @@ Gold dust is gained by [disenchanting](/information/disenchanting) items and com
 
 Gold dust is used for conjuring, be it public or private, [celestial entities](/information/celestials). Gold dust is also used in creating alchemical items.
 
-You can have Two Billion Gold Dust at any one time. If you have over you won't be able to do quests and celestials that are killed will not give you gold dust.
+You can have Two Billion Gold Dust at any one time. If you have over you won't be able to do quests and Celestials that are killed will not give you gold dust.
 
 NPC Quests will never allow you to go over the cap, even if you just a bit under.
 

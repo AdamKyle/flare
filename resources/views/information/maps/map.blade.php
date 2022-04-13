@@ -120,7 +120,7 @@
                     'onlyMapName' => $map->name,
                     'only' => 'celestials',
                 ])
-                <h3 class="mt-5">NPC's</h3>
+                <h3 class="tw-mt-5">NPCs</h3>
                 <hr />
                 @livewire('admin.npcs.data-table', [
                     'forMap' => $map->id,

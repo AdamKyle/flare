@@ -13,7 +13,7 @@
         <hr />
         <x-core.cards.card>
             <dl>
-                <dt>Strength Mofidfier</dt>
+                <dt>Strength Modifier</dt>
                 <dd>+ {{$race->str_mod}} pts.</dd>
                 <dt>Durability Modifier</dt>
                 <dd>+ {{$race->dur_mod}} pts.</dd>
@@ -21,7 +21,7 @@
                 <dd>+ {{$race->dex_mod}} pts.</dd>
                 <dt>Intelligence Modifier</dt>
                 <dd>+ {{$race->int_mod}} pts.</dd>
-                <dt>Charsima Modifier</dt>
+                <dt>Charisma Modifier</dt>
                 <dd>+ {{$race->chr_mod}} pts.</dd>
                 <dt>Accuracy Modifier</dt>
                 <dd>+ {{$race->accuracy_mod * 100}} %</dd>

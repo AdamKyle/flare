@@ -16,9 +16,7 @@ class BuildingsSheet implements ToCollection {
 
                 $cleanData    = $this->returnCleanBuildingData($buildingData);
 
-                if (isset($cleanData['name'])) {
-                    GameBuilding::updateOrCreate(['name' => $cleanData['name']], $cleanData);
-                }
+                GameBuilding::updateOrCreate(['id' => $cleanData['id']], $cleanData);
             }
         }
     }
@@ -30,7 +28,7 @@ class BuildingsSheet implements ToCollection {
             if (!is_null($value)) {
 
                 if ($key === 'passive_skill_id') {
-                    $passive = PassiveSkill::where('name', $value)->first();
+                    $passive = PassiveSkill::find($value);
 
                     if (!is_null($passive)) {
                         $value = $passive->id;

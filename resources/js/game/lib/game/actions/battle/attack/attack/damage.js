@@ -46,7 +46,7 @@ export default class Damage extends BattleBase {
 
         totalDamage = totalDamage - totalDamage * damageDeduction;
 
-        this.addMessage('The enemies blood flows through the air and gives you life: ' + formatNumber(Math.ceil(totalDamage)), 'player-action');
+        this.addActionMessage('The enemy\'s blood flows through the air and gives you life: ' + this.formatNumber(Math.ceil(totalDamage)));
 
         monsterCurrentHealth -= totalDamage;
         characterCurrentHealth += totalDamage;
@@ -60,7 +60,7 @@ export default class Damage extends BattleBase {
           this.addMessage('The enemy resists your attempt to steal it\'s life.');
         } else {
 
-          this.addMessage('The enemies blood flows through the air and gives you life: ' + formatNumber(Math.ceil(totalDamage)), 'player-action');
+          this.addActionMessage('The enemy\'s blood flows through the air and gives you life: ' + this.formatNumber(Math.ceil(totalDamage)));
 
           monsterCurrentHealth -= totalDamage;
           characterCurrentHealth += totalDamage;
@@ -214,20 +214,20 @@ export default class Damage extends BattleBase {
 
         monsterCurrentHealth -= damage;
 
-        this.addMessage(attacker.name + ' hit for (Hammer): ' + formatNumber(damage), 'player-action');
+        this.addMessage(attacker.name + ' hits for (Hammer): ' + this.formatNumber(damage));
 
         let roll = random(1, 100);
         roll += roll * 0.60;
 
         if (roll > 99) {
-          this.addMessage('The enemy feels the after shocks of the Hammer Smash!', 'regular');
+          this.addActionMessage('The enemy feels the aftershocks of the Hammer Smash!');
 
           for (let i = 3; i > 0; i--) {
             damage -= damage * 0.15;
 
             monsterCurrentHealth -= damage;
 
-            this.addMessage('Aftershock hit for: ' + formatNumber(damage), 'player-action');
+            this.addActionMessage('Aftershock hits for: ' + this.formatNumber(damage));
           }
         }
       }
@@ -257,7 +257,7 @@ export default class Damage extends BattleBase {
 
         monsterCurrentHealth -= damage;
 
-        this.addMessage(attacker.name + ' hit for (Arcane Alchemist Ravenous Dream): ' + formatNumber(damage), 'player-action');
+        this.addMessage(attacker.name + ' hits for (Arcane Alchemist Ravenous Dream):: ' + this.formatNumber(damage));
 
         let times = random(2, 6);
         const originalTimes = times;
@@ -269,7 +269,8 @@ export default class Damage extends BattleBase {
           if (times === originalTimes) {
             monsterCurrentHealth -= damage;
 
-            this.addMessage(attacker.name + ' hit for (Arcane Alchemist Ravenous Dream):: ' + formatNumber(damage), 'player-action');
+
+            this.addMessage(attacker.name + ' hits for (Arcane Alchemist Ravenous Dream):: ' + this.formatNumber(damage));
           } else {
             let damage = attacker.int_modded * 0.10;
 
@@ -281,7 +282,7 @@ export default class Damage extends BattleBase {
 
             monsterCurrentHealth -= damage;
 
-            this.addMessage(attacker.name + ' hit for (Arcane Alchemist Ravenous Dream):: ' + formatNumber(damage), 'player-action');
+            this.addMessage(attacker.name + ' hits for (Arcane Alchemist Ravenous Dream):: ' + this.formatNumber(damage));
           }
 
           times--;
@@ -302,13 +303,13 @@ export default class Damage extends BattleBase {
       }
 
       if (extraActionChance.type === ExtraActionType.RANGER_TRIPLE_ATTACK && extraActionChance.has_item) {
-        this.addMessage('A fury takes over you. You notch the arrows thrice at the enemies direction', 'regular');
+        this.addActionMessage('A fury takes over you. You notch the arrows thrice at the enemy\'s direction');
 
         for (let i = 1; i <= 3; i++) {
           const totalDamage    = (attackData.weapon_damage + attackData.weapon_damage * .15).toFixed(0);
           monsterCurrentHealth = monsterCurrentHealth - totalDamage;
 
-          this.addMessage(attacker.name + ' hit for (weapon - triple attack) ' + formatNumber(totalDamage), 'player-action');
+          this.addMessage(attacker.name + ' hits for (weapon - triple attack) ' + this.formatNumber(totalDamage));
         }
       }
     }
@@ -333,7 +334,7 @@ export default class Damage extends BattleBase {
 
           monsterCurrentHealth = monsterCurrentHealth - totalDamage;
 
-          this.addMessage(attacker.name + ' hit for (weapon - double attack) ' + formatNumber(totalDamage), 'player-action');
+          this.addMessage(attacker.name + ' hitw for (weapon - double attack) ' + formatNumber(totalDamage), 'player-action');
         }
       }
     }
@@ -356,7 +357,7 @@ export default class Damage extends BattleBase {
 
         monsterCurrentHealth -= totalDamage;
 
-        this.addMessage('Your spell(s) hit for: ' +  formatNumber(totalDamage), 'player-action');
+        this.addMessage('Your spell(s) hits for: ' +  formatNumber(totalDamage), 'player-action');
       }
     }
 
@@ -372,7 +373,8 @@ export default class Damage extends BattleBase {
       }
 
       if (extraActionChance.type === ExtraActionType.PROPHET_HEALING && extraActionChance.has_item) {
-        this.addMessage('Your prayers are heard by The Creator and he grants you extra life!', 'regular');
+
+        this.addMessage('Your prayers were heard by The Creator and he grants you extra life!', 'regular');
 
         characterCurrentHealth = this.calculateHealingTotal(attacker, attackData, extraHealing);
       }
@@ -407,7 +409,7 @@ export default class Damage extends BattleBase {
         monsterCurrentHealth   = monsterCurrentHealth - totalAttack;
         characterCurrentHealth = characterCurrentHealth + totalAttack
 
-        this.addMessage(attacker.name + ' hit for (thirst!) (and healed for) ' + formatNumber(totalAttack));
+        this.addMessage(attacker.name + ' hits for (thirst!) (and healed for) ' + formatNumber(totalAttack), 'player-action');
       }
     }
 

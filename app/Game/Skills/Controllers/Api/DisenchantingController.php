@@ -36,6 +36,10 @@ class DisenchantingController extends Controller {
 
         $foundItem = InventorySlot::where('equipped', false)->where('item_id', $item->id)->where('inventory_id', $inventory->id)->first();
 
+        if (is_null($foundItem)) {
+            return response()->json(['message' => 'This item cannot be disenchanted!'], 422);
+        }
+
         if (is_null($foundItem->item->item_suffix_id) && is_null($foundItem->item->item_prefix_id)) {
             return response()->json(['message' => 'This item cannot be disenchanted!'], 422);
         }

@@ -25,7 +25,7 @@ class BattleEventHandler {
 
         $character = $character->refresh();
 
-        event(new ServerMessageEvent($character->user, 'You are dead. Please revive your self by clicking revive.'));
+        event(new ServerMessageEvent($character->user, 'You are dead. Please revive yourself by clicking revive.'));
         event(new UpdateCharacterStatus($character));
     }
 
