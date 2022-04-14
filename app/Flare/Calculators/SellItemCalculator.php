@@ -4,10 +4,13 @@ namespace App\Flare\Calculators;
 
 use App\Flare\Models\Item;
 use App\Flare\Traits\IsItemUnique;
+use App\Flare\Values\MaxCurrenciesValue;
 
 class SellItemCalculator {
 
     use IsItemUnique;
+
+    const MAX_AFFIX_COST = 2000000000; // 2 billion gold.
 
     /**
      * Fetches the item total sale price.
@@ -45,14 +48,28 @@ class SellItemCalculator {
         }
 
         if (!is_null($item->item_suffix_id)) {
-            $cost += $item->itemSuffix->cost;
+            $suffixCost = $item->itemSuffix->cost;
+
+            if ($suffixCost >= self::MAX_AFFIX_COST) {
+                $cost += self::MAX_AFFIX_COST;
+            } else {
+                $cost += $item->itemSuffix->cost;
+            }
+
         }
 
         if (!is_null($item->item_prefix_id)) {
-            $cost += $item->itemPrefix->cost;
+
+            $prefixCost = $item->itemPrefix->cost;
+
+            if ($prefixCost >= self::MAX_AFFIX_COST) {
+                $cost += self::MAX_AFFIX_COST;
+            } else {
+                $cost += $item->itemPrefix->cost;
+            }
         }
 
-        return $cost;
+        return floor($cost - ($cost * 0.05));
     }
 
     /**

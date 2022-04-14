@@ -22,6 +22,10 @@ export default class SellItemModal extends React.Component<SellModalProps, any> 
         this.props.manage_modal();
     }
 
+    getCost() {
+        return formatNumber(this.props.item.cost)
+    }
+
     render() {
         return (
             <Dialogue is_open={this.props.is_open}
@@ -43,13 +47,16 @@ export default class SellItemModal extends React.Component<SellModalProps, any> 
                 }} />
                 </h3>
 
-                <p className='mb-4 mt-4 text-orange-700 dark:text-orange-500'>Item will sell for: {formatNumber(Math.floor(this.props.item.cost * 0.05))} gold, after 5% tax (rounded down).</p>
+                <p className='mb-4 mt-4 text-orange-700 dark:text-orange-500'>Item will sell for: {this.getCost()} gold, after 5% tax (rounded down).</p>
 
                 <p className='mb-4 mt-4'><strong>Note</strong>: This will not take into account prices for Holy Items and Uniques.
                     In those cases you only get the base item cost, even in the case of holy items, if there are affixes attached.
                     These items are best sold on the market to make your gold invested and time invested worth it.
                 </p>
-
+                <p className='mb-4'>
+                    Finally, if the either affix cost attached the item is greater then 2 Billion gold, you will only get 2 billion gold for that affix.
+                    For example, on a 10 gold item that has two 12 billion enchants on it, you would only make 4,000,000,010 gold before taxes.
+                </p>
             </Dialogue>
         );
     }

@@ -93,6 +93,7 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapGameKingdomApiRoutes();
         $this->mapGamePassiveSkillApiRoutes();
         $this->mapQuestApiRoutes();
+        $this->mapShopApiRoutes();
     }
 
     /**
@@ -147,6 +148,13 @@ class RouteServiceProvider extends ServiceProvider
         Route::middleware('web')
              ->namespace('App\Game\Adventures\Controllers')
              ->group(base_path('routes/game/adventures/web.php'));
+    }
+
+    protected function mapShopApiRoutes() {
+        Route::prefix('api')
+            ->middleware('web')
+            ->namespace('App\Game\Shop\Controllers')
+            ->group(base_path('routes/game/shop/api.php'));
     }
 
     protected function mapAdminRoutes() {

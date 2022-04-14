@@ -21,7 +21,7 @@ class SellItemListener
     {
         $item = $event->inventorySlot->item;
 
-        $totalNewGold = $event->character->gold + SellItemCalculator::fetchTotalSalePrice($item);
+        $totalNewGold = $event->character->gold + SellItemCalculator::fetchSalePriceWithAffixes($item);
 
         $maxCurrencies = new MaxCurrenciesValue($totalNewGold, MaxCurrenciesValue::GOLD);
 

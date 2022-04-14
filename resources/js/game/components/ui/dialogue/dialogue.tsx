@@ -70,13 +70,13 @@ export default class Dialogue extends React.Component<DialogueTypes, any> {
                                 <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                                 <div className="mt-4">
 
-                                    <DangerButton button_label={'Cancel'} on_click={this.closeModal.bind(this)} disabled={this.props.primary_button_disabled} />
-
                                     {
                                        this.props.secondary_actions !== null ?
-                                         <PrimaryButton additional_css={'ml-2'} button_label={this.props.secondary_actions.secondary_button_label} on_click={this.props.secondary_actions.handle_action} disabled={this.props.secondary_actions.secondary_button_disabled}/>
+                                         <PrimaryButton additional_css={'mr-2'} button_label={this.props.secondary_actions.secondary_button_label} on_click={this.props.secondary_actions.handle_action} disabled={this.props.secondary_actions.secondary_button_disabled}/>
                                         : null
                                     }
+
+                                    <DangerButton button_label={'Cancel'} on_click={this.closeModal.bind(this)} disabled={this.props.primary_button_disabled} />
 
                                 </div>
                             </div>
