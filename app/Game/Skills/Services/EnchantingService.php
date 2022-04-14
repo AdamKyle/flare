@@ -97,18 +97,13 @@ class EnchantingService {
      *
      * @param array $enchantmentIds
      * @param int $itemId
-     * @param int $suppliedCost
      * @return bool
      */
-    public function doesCostMatchForEnchanting(array $enchantmentIds, int $itemId, int $suppliedCost): bool {
+    public function getCostOfEnchantment(array $enchantmentIds, int $itemId): bool {
         $itemAffixes   = ItemAffix::findMany($enchantmentIds);
         $itemToEnchant = Item::find($itemId);
 
-        Log::info('cost checking ...');
-        Log::info($itemAffixes);
-        Log::info($itemToEnchant);
-
-        if ($itemAffixes->isEmpty()) {
+        if (is_null($itemAffixes)) {
             return false;
         }
 
@@ -124,10 +119,7 @@ class EnchantingService {
             }
         }
 
-        Log::info('Cost: ' . $cost);
-        Log::info('supplied Cost: ' . $suppliedCost);
-
-        return $cost === $suppliedCost;
+        return $cost;
     }
 
     /**
