@@ -124,6 +124,9 @@ class EnchantingService {
             }
         }
 
+        Log::info('Cost: ' . $cost);
+        Log::info('supplied Cost: ' . $suppliedCost);
+
         return $cost === $suppliedCost;
     }
 
