@@ -107,7 +107,6 @@ class EnchantingService {
      *
      * @param array $enchantmentIds
      * @param int $itemId
-     * @param int $suppliedCost
      * @return bool
      */
     public function getCostOfEnchantment(array $enchantmentIds, int $itemId): bool {
