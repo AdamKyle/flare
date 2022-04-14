@@ -296,6 +296,7 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
                                         manage_modal={this.manageListItemModal.bind(this)}
                                         list_item={this.listItem.bind(this)}
                                         item={this.state.item_to_sell}
+                                        dark_charts={this.props.dark_charts}
                                     />
                                     : null
                             }

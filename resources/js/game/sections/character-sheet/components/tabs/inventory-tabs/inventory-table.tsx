@@ -51,6 +51,7 @@ export default class InventoryTable extends React.Component<InventoryTabProps, I
                             update_inventory={this.props.update_inventory}
                             usable_sets={this.props.usable_sets}
                             set_success_message={this.props.set_success_message}
+                            dark_charts={this.props.dark_table}
                         />
                         : null
                 }

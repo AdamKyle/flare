@@ -46,7 +46,7 @@ const data: Series[] = [
     },
 ]
 
-export const LineChart = () => {
+export const LineChart = (props: {dark_chart: boolean}) => {
     const primaryAxis = React.useMemo(
         (): AxisOptions<DailyStars> => ({
             getValue: datum => datum.date,
@@ -72,7 +72,7 @@ export const LineChart = () => {
 
     return (
         <ResizableBox height={300} width={720} style={{
-            background: "rgba(0, 27, 45, 0.9)",
+            background: props.dark_chart ? "rgba(0, 27, 45, 0.9)" : "rgba(255,255,255,0.9)",
             padding: ".5rem",
             borderRadius: "5px",
         }}>

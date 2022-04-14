@@ -4,6 +4,8 @@ import SetDetails from "../inventory/set-details";
 export default interface InventoryItemComparisonProps {
     is_open: boolean;
 
+    dark_charts: boolean;
+
     manage_modal: () => void;
 
     title: string;
