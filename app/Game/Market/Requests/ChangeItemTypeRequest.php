@@ -22,7 +22,8 @@ class ChangeItemTypeRequest extends FormRequest {
      */
     public function rules() {
         return [
-            'type' => 'string|nullable',
+            'type'    => 'string|nullable',
+            'item_id' => 'integer|nullable',
         ];
     }
 }

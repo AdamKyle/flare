@@ -27,6 +27,7 @@ class MarketItemsTransfromer extends TransformerAbstract {
             'character_name' => $marketListing->character->name,
             'type'           => $marketListing->item->type,
             'unique'         => $this->isUnique($marketListing->item),
+            'listed_at'      => $marketListing->created_at,
         ];
     }
 
