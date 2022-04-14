@@ -19,9 +19,7 @@ class ShopService {
      */
     public function sellAllItemsInInventory(Character $character): int {
         $itemsToSell = $character->inventory->slots()->with('item')->get()->filter(function($slot) {
-            return !$slot->equipped && $slot->item->type !== 'quest' &&
-                (is_null($slot->item->itemPrefix) && is_null($slot->item->itemSuffix)) &&
-                $slot->item->type !== 'alchemy';
+            return !$slot->equipped && $slot->item->type !== 'quest' && $slot->item->type !== 'alchemy';
         });
 
 

@@ -9,6 +9,7 @@ import {isEqual} from "lodash";
 import SuccessAlert from "../../../../components/ui/alerts/simple-alerts/success-alert";
 import InventoryTabSectionProps from "../../../../lib/game/character-sheet/types/tabs/inventory-tab-section-props";
 import InventoryTabSectionState from "../../../../lib/game/character-sheet/types/tabs/inventory-tab-section-state";
+import clsx from "clsx";
 
 export default class InventoryTabSection extends React.Component<InventoryTabSectionProps, InventoryTabSectionState> {
 
@@ -20,6 +21,7 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
             data: this.props.inventory,
             show_destroy_all: false,
             show_disenchant_all: false,
+            show_sell_all: false,
             success_message: null,
             search_string: '',
         }
@@ -78,6 +80,12 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
         })
     }
 
+    manageSellAll() {
+        this.setState({
+            show_sell_all: !this.state.show_sell_all,
+        })
+    }
+
     closeSuccess(){
         this.setState({
             success_message: null
@@ -97,6 +105,11 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
                     icon_class: 'ra ra-bubbling-potion',
                     on_click: () => this.manageDisenchantAll()
                 },
+                {
+                    name: 'Sell All',
+                    icon_class: 'ra ra-bubbling-potion',
+                    on_click: () => this.manageSellAll()
+                },
             ]
         }
 
@@ -112,6 +125,14 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
                 on_click: () => this.manageDestroyAll()
             },
         ]
+    }
+
+    isDropDownHidden() {
+        if (this.state.table === 'Inventory') {
+            return this.state.data.length === 0;
+        } else {
+            return this.props.usable_items.length === 0;
+        }
     }
 
     render() {
@@ -140,7 +161,7 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
                             },
                         ]} button_title={'Type'} selected_name={this.state.table} disabled={this.props.is_dead} />
                     </div>
-                    <div className='ml-2'>
+                    <div className={clsx('ml-2', {'hidden': this.isDropDownHidden()})}>
                         <DropDown menu_items={this.createActionsDropDown()} button_title={'Actions'} selected_name={this.state.table} disabled={this.props.is_dead} />
                     </div>
                     <div className='ml-4 md:ml-0 my-4 md:my-0 md:absolute md:right-0'>
@@ -214,6 +235,32 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
                             </p>
                         </InventoryActionConfirmationModal>
                     : null
+                }
+
+                {
+                    this.state.show_sell_all ?
+                        <InventoryActionConfirmationModal
+                            is_open={this.state.show_sell_all}
+                            manage_modal={this.manageSellAll.bind(this)}
+                            title={'Sell all'}
+                            url={'character/'+this.props.character_id+'/inventory/sell-all'}
+                            update_inventory={this.props.update_inventory}
+                            set_success_message={this.setSuccessMessage.bind(this)}
+                        >
+                            <p>
+                                Are you sure? You are about to sell all items in your inventory (this does not effect Alchemy, Quest items, Sets or Equipped items). This action cannot be undone.
+                            </p>
+                            <p className='mt-2'>
+                                <strong>Note</strong>: This will not take into account prices for Holy Items and Uniques.
+                                In those cases you only get the base item cost, even in the case of holy items, if there are affixes attached.
+                                These items are best sold on the market to make your gold invested and time invested worth it.
+                            </p>
+                            <p className='mt-2'>
+                                Finally, if the either affix cost attached the item is greater then 2 Billion gold, you will only get 2 billion gold for that affix.
+                                For example, on a 10 gold item that has two 12 billion enchants on it, you would only make 4,000,000,010 gold before taxes.
+                            </p>
+                        </InventoryActionConfirmationModal>
+                        : null
                 }
             </Fragment>
         )

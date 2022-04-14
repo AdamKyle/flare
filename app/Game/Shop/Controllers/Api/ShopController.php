@@ -2,6 +2,11 @@
 
 namespace App\Game\Shop\Controllers\Api;
 
+use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
+use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Shop\Services\ShopService;
 use App\Http\Controllers\Controller;
 use Facades\App\Flare\Calculators\SellItemCalculator;
 use App\Game\Shop\Requests\ShopSellValidation;
@@ -30,12 +35,53 @@ class ShopController extends Controller {
         $item         = $inventorySlot->item;
         $totalSoldFor = SellItemCalculator::fetchSalePriceWithAffixes($item);
 
+        $character = $character->refresh();
+
         event(new SellItemEvent($inventorySlot, $character));
 
-        $inventory = $this->characterInventoryService->setCharacter($character->refresh());
+        $inventory = $this->characterInventoryService->setCharacter($character);
 
         return response([
             'message' => 'Sold: ' . $item->affix_name . ' for: ' . number_format($totalSoldFor) . ' gold.',
+            'inventory' => [
+                'inventory' => $inventory->getInventoryForType('inventory'),
+            ]
+        ]);
+    }
+
+    public function sellAll(Character $character, ShopService $service) {
+
+        $totalSoldFor = $service->sellAllItemsInInventory($character);
+
+        $maxCurrencies = new MaxCurrenciesValue($character->gold + $totalSoldFor, MaxCurrenciesValue::GOLD);
+
+        if ($maxCurrencies->canNotGiveCurrency()) {
+            $character->update([
+                'gold' => MaxCurrenciesValue::MAX_GOLD,
+            ]);
+        } else {
+            $character->update([
+                'gold' => $character->gold + $totalSoldFor,
+            ]);
+        }
+
+        $character = $character->refresh();
+
+        $inventory = $this->characterInventoryService->setCharacter($character);
+
+        if ($totalSoldFor === 0) {
+            return response([
+                'message' => 'Could not sell any items ...',
+                'inventory' => [
+                    'inventory' => $inventory->getInventoryForType('inventory'),
+                ]
+            ], 422);
+        }
+        
+        event(new UpdateTopBarEvent($character));
+
+        return response([
+            'message' => 'Sold all your items for a total of: ' . number_format($totalSoldFor) . ' gold.',
             'inventory' => [
                 'inventory' => $inventory->getInventoryForType('inventory'),
             ]
