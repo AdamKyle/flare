@@ -56,7 +56,6 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
                 item_to_equip_type: this.props.item_type,
             }
         }).doAjaxCall('get', (result: AxiosResponse) => {
-            console.log(result.data);
             this.setState({
                 loading: false,
                 comparison_details: result.data,

@@ -72,7 +72,7 @@ export const LineChart = (props: {dark_chart: boolean}) => {
 
     return (
         <ResizableBox height={300} width={720} style={{
-            background: props.dark_chart ? "rgba(0, 27, 45, 0.9)" : "rgba(255,255,255,0.9)",
+            background: props.dark_chart ? "#1e293b" : "#475569",
             padding: ".5rem",
             borderRadius: "5px",
         }}>
