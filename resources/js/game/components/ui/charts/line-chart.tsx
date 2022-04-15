@@ -3,61 +3,23 @@ import React from "react";
 import ResizableBox from "../resizable-box";
 import {SeriesFocusStatus, SeriesStyles} from "react-charts/types/types";
 import {DateTime} from "luxon";
+import MarketBoardLineChartProps from "../../../lib/ui/types/charts/market-board-line-chart-props";
+import MarketChartData from "../../../lib/game/character-sheet/types/charts/market-chart-data";
 
-type DailyStars = {
-    date: Date,
-    stars: number,
-}
 
-type Series = {
-    label: string,
-    color: string,
-    data: DailyStars[]
-}
-
-let dateOne: any = DateTime.now();
-dateOne = dateOne.toJSDate();
-
-let dateTwo: any = DateTime.now().plus({ days: 1 });
-dateTwo = dateTwo.toJSDate();
-
-let dateThree: any = DateTime.now().plus({ days: 5 });
-dateThree = dateThree.toJSDate();
-
-const data: Series[] = [
-    {
-        label: 'React Charts',
-        color: 'rgb(19,133,133)',
-        data: [
-            {
-                date: dateOne,
-                stars: 234324,
-            },
-            {
-                date: dateTwo,
-                stars: 2342,
-            },
-            {
-                date: dateThree,
-                stars: 24234234,
-            }
-            // ...
-        ]
-    },
-]
-
-export const LineChart = (props: {dark_chart: boolean}) => {
+export const MarketBoardLineChart = (props: MarketBoardLineChartProps) => {
     const primaryAxis = React.useMemo(
-        (): AxisOptions<DailyStars> => ({
+        (): AxisOptions<MarketChartData> => ({
             getValue: datum => datum.date,
         }),
         []
     )
 
     const secondaryAxes = React.useMemo(
-        (): AxisOptions<DailyStars>[] => [
+        (): AxisOptions<MarketChartData>[] => [
             {
-                getValue: datum => datum.stars,
+                getValue: datum => datum[props.key_for_value],
+                elementType: 'line'
             },
         ],
         []
@@ -69,6 +31,8 @@ export const LineChart = (props: {dark_chart: boolean}) => {
             stroke: '#5597e2',
         };
     }, []);
+
+    const data = props.data;
 
     return (
         <ResizableBox height={300} width={720} style={{

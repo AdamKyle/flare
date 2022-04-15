@@ -136,8 +136,27 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
         });
     }
 
-    listItem() {
+    listItem(price: number) {
+        this.setState({
+            action_loading: true
+        });
 
+        (new Ajax()).setRoute('market-board/sell-item/' + this.props.character_id).setParameters({
+            list_for: price,
+            slot_id: this.state.comparison_details?.itemToEquip.slot_id,
+        }).doAjaxCall('post', (result: AxiosResponse) => {
+            this.setState({
+                action_loading: false,
+            }, () => {
+                this.props.update_inventory(result.data.inventory);
+
+                this.props.set_success_message(result.data.message);
+
+                this.props.manage_modal();
+            })
+        }, (error: AxiosError) => {
+
+        });
     }
 
     buildTitle() {

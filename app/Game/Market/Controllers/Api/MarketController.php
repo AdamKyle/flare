@@ -4,12 +4,12 @@ namespace App\Game\Market\Controllers\Api;
 
 use App\Flare\Events\ServerMessageEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
-use App\Flare\Models\Item as ItemModel;
 use App\Flare\Traits\IsItemUnique;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Events\UpdateMarketBoardBroadcastEvent;
+use App\Game\Core\Services\CharacterInventoryService;
 use Facades\App\Flare\Calculators\SellItemCalculator;
 use App\Flare\Models\MarketBoard;
 use App\Flare\Models\MarketHistory;
@@ -38,9 +38,12 @@ class  MarketController extends Controller {
 
     private $transformer;
 
-    public function __construct(Manager $manager, MarketItemsTransfromer $transformer) {
-        $this->manager     = $manager;
-        $this->transformer = $transformer;
+    private $characterInventoryService;
+
+    public function __construct(Manager $manager, MarketItemsTransfromer $transformer, CharacterInventoryService $characterInventoryService) {
+        $this->manager                   = $manager;
+        $this->transformer               = $transformer;
+        $this->characterInventoryService = $characterInventoryService;
     }
 
     public function marketItems(ChangeItemTypeRequest $request) {
@@ -211,15 +214,20 @@ class  MarketController extends Controller {
             'listed_price' => $request->list_for,
         ]);
 
+        $itemName = $slot->item->affix_name;
+
         $slot->delete();
 
         $this->sendUpdate($this->transformer, $this->manager);
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
+        $inventory = $this->characterInventoryService->setCharacter($character->refresh());
 
-        event(new CharacterInventoryDetailsUpdate($character->user));
-
-        return response()->json([], 200);
+        return response()->json([
+            'message'   => 'Listed: ' . $itemName . ' For: ' . number_format($request->list_for) . ' Gold.',
+            'inventory' => [
+                'inventory' => $inventory->getInventoryForType('inventory')
+            ]
+        ]);
     }
 
     public function purchase(Request $request, Character $character) {
