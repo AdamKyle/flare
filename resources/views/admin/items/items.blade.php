@@ -1,5 +1,5 @@
 @extends('layouts.app')
 
 @section('content')
-    @livewire('items')
+    @livewire('admin.items.items-table')
 @endsection
