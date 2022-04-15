@@ -7,7 +7,6 @@ module.exports = {
   mode: 'jit',
   purge: [
     './resources/**/*.{js,vue,blade.php,jsx,tsx}',
-    './vendor/rappasoft/laravel-livewire-tables/resources/views/tailwind/**/*.blade.php',
   ],
   darkMode: "class",
   theme: {
