@@ -7,6 +7,7 @@ use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
 use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
+use App\Game\Core\Services\CharacterInventoryService;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Item;
@@ -20,13 +21,16 @@ class DisenchantingController extends Controller {
      */
     private $disenchantingService;
 
+    private $characterInventoryService;
+
     /**
      * Constructor
      *
      * @param DisenchantService $disenchantService
      */
-    public function __construct(DisenchantService $disenchantService) {
-        $this->disenchantingService = $disenchantService;
+    public function __construct(DisenchantService $disenchantService, CharacterInventoryService $characterInventoryService) {
+        $this->disenchantingService      = $disenchantService;
+        $this->characterInventoryService = $characterInventoryService;
     }
 
     public function disenchant(Item $item) {
@@ -37,11 +41,13 @@ class DisenchantingController extends Controller {
         $foundItem = InventorySlot::where('equipped', false)->where('item_id', $item->id)->where('inventory_id', $inventory->id)->first();
 
         if (is_null($foundItem)) {
-            return response()->json(['message' => 'This item cannot be disenchanted!'], 422);
+            event(new ServerMessageEvent($character->user,  'Item cannot be disenchanted.'));
+            return response()->json([]);
         }
 
         if (is_null($foundItem->item->item_suffix_id) && is_null($foundItem->item->item_prefix_id)) {
-            return response()->json(['message' => 'This item cannot be disenchanted!'], 422);
+            event(new ServerMessageEvent($character->user,  'Item cannot be disenchanted.'));
+            return response()->json([]);
         }
 
         if (!is_null($foundItem)) {
@@ -52,14 +58,17 @@ class DisenchantingController extends Controller {
 
             $this->disenchantingService->disenchantWithSkill($character, $foundItem);
 
-            event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
-
-            event(new CharacterInventoryDetailsUpdate($character->user));
-
             event(new UpdateTopBarEvent($character->refresh()));
         }
 
-        return response()->json([], 200);
+        $inventory = $this->characterInventoryService->setCharacter($character->refresh());
+
+        return response()->json([
+            'message'   => 'Disenchanted item ' . $item->affix_name . ' Check server message tab for Gold Dust output.',
+            'inventory' => [
+                'inventory' => $inventory->getInventoryForType('inventory')
+            ]
+        ], 200);
     }
 
     public function destroy(Item $item) {

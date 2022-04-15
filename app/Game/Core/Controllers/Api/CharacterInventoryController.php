@@ -89,21 +89,14 @@ class CharacterInventoryController extends Controller {
 
         $slot->delete();
 
-        $affixData = $this->enchantingService->fetchAffixes($character->refresh());
+        $inventory = $this->characterInventoryService->setCharacter($character->refresh());
 
-        event(new UpdateCharacterEnchantingList(
-            $character->user,
-            $affixData['affixes'],
-            $affixData['character_inventory'],
-        ));
-
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
-
-        event(new CharacterInventoryDetailsUpdate($character->user));
-
-        event(new UpdateTopBarEvent($character->refresh()));
-
-        return response()->json(['message' => 'Destroyed ' . $name . '.'], 200);
+        return response()->json([
+            'message' => 'Destroyed ' . $name . '.',
+            'inventory' => [
+                'inventory' => $inventory->getInventoryForType('inventory'),
+            ]
+        ]);
     }
 
     public function destroyAll(Character $character) {

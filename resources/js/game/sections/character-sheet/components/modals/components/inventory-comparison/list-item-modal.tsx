@@ -32,15 +32,25 @@ export default class ListItemModal extends React.Component<any, any> {
                         month: 'short',
                         day: '2-digit',
                         hour: '2-digit',
-                        minute: '2-digit'
+                        minute: '2-digit',
+                        second: '2-digit'
                     }).toString(),
                     price: item.listed_price
                 }
             });
 
+            const now = DateTime.now().toLocaleString({
+                weekday: 'short',
+                month: 'short',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            }).toString();
+
             if (data.length === 0) {
                 data.push({
-                    date: (DateTime.now()).toJSDate(),
+                    date: now,
                     price: 0
                 });
             }
@@ -91,6 +101,7 @@ export default class ListItemModal extends React.Component<any, any> {
                         <Fragment>
                             <h3 className='mb-4 mt-4'><ItemNameColorationText item={{...this.props.item, ['name']: this.props.item.affix_name}} /></h3>
                             <MarketBoardLineChart dark_chart={this.props.dark_charts} data={this.state.data} key_for_value={'price'} />
+                            <p className='text-xs text-gray-700 dark:text-gray-500'>If the chart above states 0, then this item has never been listed before or there is no current listing for it.</p>
                             <div className="mb-5 mt-5">
                                 <label className="label block mb-2" htmlFor="list-for">List For</label>
                                 <input id="list-for" type="number" className="form-control" name="list-for" value={this.state.listed_value} autoFocus onChange={this.setListedPrice.bind(this)}/>

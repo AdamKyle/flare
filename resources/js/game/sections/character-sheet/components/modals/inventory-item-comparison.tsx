@@ -159,6 +159,51 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
         });
     }
 
+
+    disenchantItem() {
+        this.setState({
+            action_loading: true
+        });
+
+        (new Ajax()).setRoute('disenchant/' + this.state.comparison_details?.itemToEquip.id).doAjaxCall('post', (result: AxiosResponse) => {
+            this.setState({
+                action_loading: false,
+            }, () => {
+                this.props.update_inventory(result.data.inventory);
+
+                this.props.set_success_message(result.data.message);
+
+                this.props.manage_modal();
+            })
+        }, (error: AxiosError) => {
+
+        });
+    }
+
+    destroyItem() {
+
+
+        this.setState({
+            action_loading: true
+        });
+
+        (new Ajax()).setRoute('character/'+this.props.character_id+'/inventory/destroy').setParameters({
+            slot_id: this.state.comparison_details?.itemToEquip.slot_id
+        }).doAjaxCall('post', (result: AxiosResponse) => {
+            this.setState({
+                action_loading: false,
+            }, () => {
+                this.props.update_inventory(result.data.inventory);
+
+                this.props.set_success_message(result.data.message);
+
+                this.props.manage_modal();
+            })
+        }, (error: AxiosError) => {
+
+        });
+    }
+
     buildTitle() {
         if (this.state.comparison_details === null) {
             return 'Loading comparison data ...';
@@ -264,11 +309,11 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
 
                                 {
                                     this.state.comparison_details.itemToEquip.affix_count > 0 ?
-                                        <DangerOutlineButton button_label={'Disenchant'} on_click={this.stubbedClick.bind(this)} disabled={this.state.action_loading}/>
+                                        <DangerOutlineButton button_label={'Disenchant'} on_click={this.disenchantItem.bind(this)} disabled={this.state.action_loading}/>
                                     : null
                                 }
 
-                                <DangerOutlineButton button_label={'Destroy'} on_click={this.stubbedClick.bind(this)} disabled={this.state.action_loading}/>
+                                <DangerOutlineButton button_label={'Destroy'} on_click={this.destroyItem.bind(this)} disabled={this.state.action_loading}/>
                             </div>
 
                             {
