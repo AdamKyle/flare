@@ -8,6 +8,6 @@
           link="Home"
           color="success"
         ></x-core.page-title>
-        @livewire('admin.users.data-table')
+        @livewire('admin.users.user-table')
     </div>
 @endsection
