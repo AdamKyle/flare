@@ -28,7 +28,7 @@ class BattleDrop {
 
     const GENERATE_RANDOM_ITEM = 999999999;
 
-    private $randomeItemDropBuilder;
+    private $randomItemDropBuilder;
 
     private $disenchantService;
 
@@ -80,7 +80,7 @@ class BattleDrop {
     /**
      * Handles fetching the drop for the player.
      *
-     * If the player can get the drop we will handle all spects including
+     * If the player can get the drop we will handle all aspects including
      * attempting to pick up the drop.
      *
      * @param Character $character

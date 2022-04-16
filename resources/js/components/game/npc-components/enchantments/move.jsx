@@ -192,7 +192,7 @@ export default class Move extends React.Component {
 
     if (cost > this.props.currencies.gold) {
       return this.setState({
-        errorMessage: 'No no no! I wont play these poor people games with you child! (not enough gold).',
+        errorMessage: 'No no no! I wont play these poor people games with you, child! (not enough gold).',
         canMove: false,
         formOptions: formOptions,
       });
@@ -200,7 +200,7 @@ export default class Move extends React.Component {
 
     if (shardCost > this.props.currencies.shards) {
       return this.setState({
-        errorMessage: 'So close child. You seem to be missing something though... (not enough shards).',
+        errorMessage: 'So close, child. You seem to be missing something though... (not enough shards).',
         canMove: false,
         formOptions: formOptions,
       });
@@ -250,7 +250,7 @@ export default class Move extends React.Component {
             {
               this.state.successMessage !== null ?
                 <AlertSuccess icon={"fas fa-check-circle"} title={'Look at you beautiful!'}>
-                  <p><em>Oooooh hooo hoo hoo!</em> The queen looks very pleased with her self. She is beaming with joy! <em>Here ya go child! ooooh hooo hoo hoo!</em></p>
+                  <p><em>Oooooh hooo hoo hoo!</em> The Queen looks very pleased with herself. She is beaming with joy! <em>Here ya go, child! Ooooh hooo hoo hoo!</em></p>
                   <p>{this.state.successMessage}</p>
                   <p className="mt-2">
                     <strong>Note</strong>: If you have the item open in a new tab, refreshing that tab will not show you the new details. We have essentially generated a new item.

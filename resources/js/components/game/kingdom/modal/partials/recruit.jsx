@@ -340,12 +340,12 @@ export default class Recruit extends React.Component {
                       <strong>
                         You only need to pay attention to Required Population on the right hand side when recruiting with gold.
                         Other resources may go red, indicating you do not have enough,
-                        how ever you only care about Required Population when purchasing with gold.
+                        however you only care about Required Population when purchasing with gold.
                       </strong>
                     </p>
                     <p>You can pay gold instead of resources to recruit units.</p>
-                    <p>You cannot buy more units then your population allows. You also cannot buy
-                    more units then you have gold. Each unit has a cost per unit.</p>
+                    <p>You cannot buy more units than your population allows. You also cannot buy
+                    more units than you have gold. Each unit has a cost per unit.</p>
                     <p>Recruitment time still counts. The more you recruit the more time it takes.</p>
                     <p>When recruiting with gold, you do not need to worry about the resource cost section, this is just an idea of how many resources it would take
                     to recruit the units you wanted, if you were using resources.</p>

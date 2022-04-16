@@ -1,8 +1,8 @@
 # Rules of Tlessa
 
-The rules are simple and straight forward. You can either follow them or suffer the consequences.
+The rules are simple and straightforward. You can either follow them or suffer the consequences.
 
-There are two forms of punishment in game. One is being silenced, and the other is being banned.
+There are two forms of punishment in the game. One is being silenced, and the other is being banned.
 
 A player can be silenced for 10, 20 or 30 minutes. If the player is not online, and they will be emailed that they can speak again (assuming they have those settings enabled).
 
@@ -17,7 +17,7 @@ Once the player fills out the form, any future requests will be ignored by the s
 
 **All decisions are final**.
 
-With that out of the way lets go over some rules of Tlessa.
+With that out of the way let's go over some rules of Tlessa.
 
 ## Chat
 
@@ -30,13 +30,13 @@ Will not be tolerated and will result in the appropriate punishment.
 
 **Do not post your personal information in chat**. This includes but **not limited to**: Email, address, real name, phone number, credit card or any other identifiable information about you.
 
-With that said your location in game is shown in chat as X,Y coordinates.
+With that said your location in-game is shown in chat as X,Y coordinates.
 
-Last but not least, no auction in chat. If you want to sell something go to the [market board](/information/market-bnoard). Failure to head this rule can result in being silenced and then, for repeat offenders, banned.
+Last but not least, no auction in chat. If you want to sell something go to the [market board](/information/market-board). Failure to head this rule can result in being silenced and then, for repeat offenders, banned.
 
 ## "Free" Speech
 
-Just because chat is self moderated for the most part, does not mean The Creator will allow for hate speech, racism or wild conspiracies or the posting of "fake news." These are bannable offenses and will result in a silence, followed by an appropriate ban for repeatable offences.
+Just because chat is self moderated for the most part, does not mean The Creator will allow for hate speech, racism or wild conspiracies or the posting of "fake news". These are bannable offenses and will result in a silence, followed by an appropriate ban for repeatable offenses.
 
 The Creator suggests, you leave religion and politics out of the general chat discussion. While I will not go and silence or ban someone for talking about current world events, if things do get out of hand appropriate measures will be taken.
 
@@ -53,7 +53,7 @@ You may sometimes see me, The Creator, in chat. You will see messages such as:
 ## Global Messages
 
 Global messages are ones shown to all players. These can include a player finding an item (quest items), being attacked by another players kingdom or even being banned. Global messages are the same size as chat messages, with the exception of banned messages,
-which only show up if the player has banned for ever:
+which only show up if the player has banned forever:
 
 <div class="mb-4">
     <a href="/storage/info/rules/images/creator-perma-ban.png" class="glightbox">
@@ -76,7 +76,7 @@ If a character name is deemed to be offensive, that is it contains a racial slur
     </a>
 </div>
 
-Any attempt to circumvent changing your name including scripts, third party tools or hacks will get your account banned for ever.
+Any attempt to circumvent changing your name including scripts, third party tools or hacks will get your account banned forever.
 
 Once this popup shows up, even if you log out and back in or refresh the page, this popup will stay.
 
@@ -86,12 +86,12 @@ A player may only send 25 messages every 1 minutes. Failure to heed this, and th
 
 ## Core Rules
 
-1. There is to be no RMT (Real Money Trade) of any kind in game. This includes but not limited to: Items, characters, kingdoms, playing your character, managing your kingdoms.
+1. There is to be no RMT (Real Money Trade) of any kind in-game. This includes but not limited to: Items, characters, kingdoms, playing your character, managing your kingdoms.
 2. Taking advantage of game bugs, including accessing parts of the game you are not allowed to, and failure to report said bugs can and will get you banned.
 3. Hacking, Cheating, Scripting bots to play for you will also get you banned.
 4. Third party tools of any kind will also get you banned.
 5. Accessing other characters information and not reporting it as a security flaw will get you banned.
-6. No racial slurs or other attacks on anyone for any reason other than playful banter in game (see Free speech above)
+6. No racial slurs or other attacks on anyone for any reason other than playful banter in-game (see Free speech above)
 
 ## Being Banned and Multiple Accounts
 

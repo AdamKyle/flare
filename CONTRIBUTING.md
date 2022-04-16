@@ -7,11 +7,11 @@ When contributing to Flare you must take care of the following:
 - PR's should add meaningful content to the game, not just for you but for other players as well. Think about how this would affect the larger player base at hand.
 - No PR will be accepted if it adds unfavorable advantage to a specific group of players, for example if Dwarves get 50% XP bonus but all other races do not.
 
-I, The Creator have all rights to reject any and all PR's and feature requests for any reason. While this would not generally happen some instances where it could, not excluding those listd above
+I, The Creator, have all rights to reject any and all PR's and feature requests for any reason. While this would not generally happen some instances where it could, not excluding those listed above
 are:
 
 - Adds a cash shop or any way for the player or players to spend money.
-- Adds ability for players to access aspects of the game they are not allowed too, ie, adding ways to access the various UI APi's used in game.
+- Adds ability for players to access aspects of the game they are not allowed too, ie, adding ways to access the various UI APi's used in-game.
 - Violates the rules of the game.
 - Is inherently hard or not easy to understand via the UI.
 - Is not documented both in the help section and or code wise.

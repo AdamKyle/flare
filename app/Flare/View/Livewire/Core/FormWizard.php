@@ -22,7 +22,7 @@ class FormWizard extends Component
 
     public $finishRoute     = '';
 
-    public $flasMessageType = '';
+    public $flashMessageType = '';
 
     public $flashMessage    = '';
 
@@ -63,7 +63,7 @@ class FormWizard extends Component
     }
 
     public function sessionMessage(string $type, string $message) {
-        $this->flasMessageType = $type;
+        $this->flashMessageType = $type;
         $this->flashMessage    = $message;
     }
 

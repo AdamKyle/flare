@@ -110,7 +110,7 @@ export default class KingdomModal extends React.Component {
     if (this.state.loading) {
       return (
         <LoadingModal
-          loadingText="Fetching location data ..."
+          loadingText="Fetching location data..."
           show={this.props.show}
           close={this.props.close}
         />

@@ -6,7 +6,7 @@ use League\Fractal\TransformerAbstract;
 use App\Flare\Models\Monster;
 use App\Flare\Transformers\Traits\SkillsTransformerTrait;
 
-class MonsterTransfromer extends TransformerAbstract {
+class MonsterTransformer extends TransformerAbstract {
 
     use SkillsTransformerTrait;
 

@@ -66,7 +66,7 @@ Buying an item will alert the seller via the chat box:
 
 ## Listing an Item
 
-Let&#39;s discuss listing an item and head over to Sell Items. See image below:
+Let's discuss listing an item and head over to Sell Items. See image below:
 
 <div class="mb-4">
     <a href="/storage/info/market-board/images/market-menu.png" class="glightbox">

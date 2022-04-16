@@ -167,7 +167,7 @@ export default class QuestSection extends React.Component {
             <Fragment>
               <AlertInfo icon={'fas fa-question-circle'} title={"Caution"}>
                 <p>
-                  This can take a moment or two to load. We are currently fetching a lot of data. How ever in the future, when you close and re open this, we simply
+                  This can take a moment or two to load. We are currently fetching a lot of data. However in the future, when you close and re-open this, we simply
                   fetch this data from the browser cache. Sometimes The Creator might update quests and you will see this message again.
                   <strong>This data is stored in YOUR browser cache between logins and contains no sensitive information about your account</strong>.
                 </p>
@@ -186,15 +186,15 @@ export default class QuestSection extends React.Component {
                   </strong>
                 </p>
                 <p>
-                  Here you can see all the quests for the plane you are currently on. Some planes do not have quests "on their own", as their quests are apart of a larger
-                  quest line you can see while standing on surface.
+                  Here you can see all the quests for the plane you are currently on. Some planes do not have quests "on their own", as their quests are a part of a larger
+                  quest line you can see while standing on the surface.
                 </p>
                 <p>
-                  Each quest will tell you EXACTLY where to go, what to do, where to get what you need, what you get, how to access the NPC if it's not on surface. Everything.
+                  Each quest will tell you EXACTLY where to go, what to do, where to get what you need, what you get, how to access the NPC if it's not on the surface. Everything.
                   All you have to do is click on the quest name.
                 </p>
                 <p>
-                  Clicking All Quests at the top will open a modal that shows you exactly what it states. Here you can see a massive break down of all the quests. Again clicking their name opens
+                  Clicking All Quests at the top will open a modal that shows you exactly what it states. Here you can see a massive breakdown of all the quests. Again, clicking their name opens
                   an appropriate modal to show you everything you need to complete that quest.
                 </p>
                 <p>

@@ -97,7 +97,7 @@ class UserService {
     /**
      * Send the banned mail to the user.
      *
-     * This allerts the user they have been banned.
+     * This alerts the user they have been banned.
      *
      * @param user $user
      * @param Carbon | null $unBanAt
@@ -106,7 +106,7 @@ class UserService {
     public function sendUserMail(User $user, $unBanAt): void {
         event(new RefreshUserScreenEvent($user));
 
-        $unBannedAt = !is_null($unBanAt) ? $unBanAt->format('l jS \\of F Y h:i:s A') . ' ' . $unBanAt->timezoneName . '.' : 'For ever.';
+        $unBannedAt = !is_null($unBanAt) ? $unBanAt->format('l jS \\of F Y h:i:s A') . ' ' . $unBanAt->timezoneName . '.' : 'Forever.';
         $message    = 'You have been banned until: ' . $unBannedAt . ' For the reason of: ' . $user->banned_reason;
 
         BanEmail::dispatch($user, $message)->delay(now()->addMinutes(1));

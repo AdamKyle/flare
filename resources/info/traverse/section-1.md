@@ -2,9 +2,9 @@
 
 Traversing, assuming you have the quest item and are not dead, allows you to travel from one plane of existence to the next.
 
-For example, for any where, if you click traverse, a new section will popup allowing you to select the plane of existence you wish to go to.
+For example, wherever you are, if you click traverse, a new section will popup allowing you to select the plane of existence you wish to go to.
 
-If you then select the location and click traverse, you will be taken directly to that plane with a 10 second time out.
+If you then select the location and click traverse, you will be taken directly to that plane with a 10 seconds timeout.
 
 <div class="mb-4">
     <a href="/storage/info/traverse/images/traverse.png" class="glightbox">
@@ -20,7 +20,7 @@ If you do not have the appropriate item, you will be told you cannot traverse
     </a>
 </div>
 
->	### ATTN!
+> ### ATTN!
 >
 > There is no way to attain these quest items with real world money. You want to be able to traverse to new planes of existence, earn the right.
 
@@ -31,5 +31,5 @@ Planes in Tlessa, offer harder creatures, more adventures, more chances at items
 
 > ### ATTN!
 >
-> The surface plane can be traversed to from any plane that is not the surface plane with out a quest item.
+> The surface plane can be traversed to from any plane that is not the surface plane without a quest item.
 

@@ -27,9 +27,9 @@ class UpdateAutomationsList implements ShouldBroadcast
     public $automations;
 
     /**
-     * @var bool $activatebar
+     * @var bool $activateBar
      */
-    public $activatebar;
+    public $activateBar;
 
     /**
      * @param User $user

@@ -31,7 +31,7 @@ class MapsController extends Controller {
             'kingdom_color' => $request->kingdom_color,
         ]);
 
-        return redirect()->route('maps')->with('success', $request->name . ' uploaded successsfully.');
+        return redirect()->route('maps')->with('success', $request->name . ' uploaded successfully.');
     }
 
     public function createBonuses(GameMap $gameMap) {

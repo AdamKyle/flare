@@ -11,7 +11,7 @@ will take by an NPC, and a global message will go out:
     </a>
 </div>
 
-Players will see there maps update automatically to reflect that there is a new yellow kingdom: NPC Kingdoms
+Players will see their maps update automatically to reflect that there is a new yellow kingdom: NPC Kingdoms
 
 <div class="mb-4">
     <a href="/storage/info/npc-kingdoms/images/npc-kingdom.png" class="glightbox">

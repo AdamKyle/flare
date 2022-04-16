@@ -146,7 +146,7 @@ class CharacterHealthInformation {
         $map     = Map::where('character_id', $this->character->id)->first();
         $gameMap = GameMap::find($map->game_map_id);
 
-        if ($gameMap->maptype()->isPurgatory()) {
+        if ($gameMap->mapType()->isPurgatory()) {
             if ($classType->isProphet()) {
                 return 0.65;
             }

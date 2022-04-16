@@ -13,14 +13,14 @@ class AttackTimeOutEvent
     use SerializesModels;
 
     /**
-     * @var Charcater $character
+     * @var Character $character
      */
     public $character;
 
     /**
      * Create a new event instance.
      *
-     * @param  Character $charactr
+     * @param  Character $character
      * @return void
      */
     public function __construct(Character $character)

@@ -18,7 +18,7 @@ class CraftedItemTimeOutListener
                 case 'double':
                     $timeOut = 20;
                     break;
-                case 'tripple':
+                case 'triple':
                     $timeOut = 30;
                     break;
             }

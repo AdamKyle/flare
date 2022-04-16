@@ -133,7 +133,7 @@ class ItemHandler {
 
         if ($totalDamage > 0) {
             if ($canResist) {
-                $message = 'The enemies blood flows through the air and gives you life: ' . number_format($totalDamage);
+                $message = 'The enemy\'s blood flows through the air and gives you life: ' . number_format($totalDamage);
 
                 $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
 
@@ -146,7 +146,7 @@ class ItemHandler {
                     $message = 'The enemy resists your attempt to steal it\'s life.';
                     $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
                 } else {
-                    $message = 'The enemies blood flows through the air and gives you life: ' . number_format($totalDamage);
+                    $message = 'The enemy\'s blood flows through the air and gives you life: ' . number_format($totalDamage);
                     $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
 
                     $this->currentMonsterHealth   -= $totalDamage;
@@ -261,7 +261,7 @@ class ItemHandler {
 
         if ($attacker instanceOf Monster) {
             if ($attacker->can_use_artifacts) {
-                $message = 'The enemies artifacts begin to glow ...';
+                $message = 'The enemy\'s artifacts begin to glow...';
                 $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
 
                 $this->artifactDamage($attacker, $defender, $voided);
@@ -287,7 +287,7 @@ class ItemHandler {
             $artifactDamage            -= $artifactDamage * $dmgReduction;
 
             if ($dc <= 0 || rand(1, 100) > $dc) {
-                $message = 'Your artifacts were annulled ...';
+                $message = 'Your artifacts were annulled...';
                 $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
 
                 return;
@@ -315,7 +315,7 @@ class ItemHandler {
 
             if ($artifactDamage > 0) {
                 if ($dc <= 0 || rand(1, 100) > $dc) {
-                    $message = 'The enemies artifacts were annulled!';
+                    $message = 'The enemy\'s artifacts were annulled!';
                     $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
                     return;
                 }
@@ -328,7 +328,7 @@ class ItemHandler {
 
                 $this->currentCharacterHealth = $health;
 
-                $message = 'The enemies artifacts lash out in intense energy doing: ' . $artifactDamage;
+                $message = 'The enemy\'s artifacts lash out in intense energy doing: ' . $artifactDamage;
                 $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
             }
         }
@@ -365,7 +365,7 @@ class ItemHandler {
 
             if ($spellDamage > 0) {
                 if ($dc <= 0 || rand(1, 100) > $dc) {
-                    $message = 'The enemies spells have no effect!';
+                    $message = 'The enemy\'s spells have no effect!';
                     $this->battleLogs = $this->addMessage($message, 'info-battle', $this->battleLogs);
 
                     return;
@@ -379,7 +379,7 @@ class ItemHandler {
 
                 $this->currentCharacterHealth = $health;
 
-                $message = 'The enemies spells burst towards you, slamming into you for: ' . number_format($spellDamage);
+                $message = 'The enemy\'s spells burst towards you, slamming into you for: ' . number_format($spellDamage);
                 $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
             }
         }

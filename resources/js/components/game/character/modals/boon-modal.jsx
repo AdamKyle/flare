@@ -158,7 +158,7 @@ export default class BoonModal extends React.Component {
                   {
                     this.props.boon.base_damage_mod_bonus !== null ?
                       <>
-                        <dt>Skill Base Damge Mod</dt>
+                        <dt>Skill Base Damage Mod</dt>
                         <dd className="text-success">+{(this.props.boon.base_damage_mod_bonus * 100).toFixed(2)} %</dd>
                       </>
                       : null
@@ -182,7 +182,7 @@ export default class BoonModal extends React.Component {
                   {
                     this.props.boon.fight_time_out_mod_bonus !== null ?
                       <>
-                        <dt>Skill Fight Time Out Bonus</dt>
+                        <dt>Skill Fight Timeout Bonus</dt>
                         <dd className="text-success">+{(this.props.boon.fight_time_out_mod_bonus * 100).toFixed(2)} %</dd>
                       </>
                       : null

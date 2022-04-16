@@ -34,7 +34,7 @@ class SetSailValidation extends FormRequest
         return [
             'current_port_id.required' => 'Current Port Is required.',
             'cost.required'            => 'Cost is required.',
-            'time_out_value.required'  => 'Time out value is required.',
+            'time_out_value.required'  => 'Timeout value is required.',
         ];
     }
 }

@@ -376,7 +376,7 @@ class KingdomControllerTest extends TestCase {
             'logs' => [1]
         ])->response;
 
-        $response->assertSessionHas('error', "No logs exist for selected.");
+        $response->assertSessionHas('error', "No log exists for your selection.");
     }
 
     protected function createKingdom(): KingdomManagement {

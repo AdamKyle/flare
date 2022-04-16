@@ -33,7 +33,7 @@ class KingdomUnitMovementController extends Controller {
 
         if ($timeLeft > 0.90) {
             return response()->json([
-                'message' => 'You\'re units are too close to their destination.'
+                'message' => 'Your units are too close to their destination.'
             ], 200);
         }
 

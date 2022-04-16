@@ -75,7 +75,7 @@ class AdventureManagement {
                         ],
                         [
                             "class" => "info-damage",
-                            "message" => "TestFighter hit for (weapon): 36"
+                            "message" => "TestFighter hits for (weapon): 36"
                         ],
                         [
                             "class" => "action-fired",

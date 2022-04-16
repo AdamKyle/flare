@@ -234,7 +234,7 @@ export default class GoblinCoinBank extends React.Component {
           <Tab eventKey="purchase-coins" title="Purchase Bars">
             <div className="tw-mt-4">
               <p>
-                <em>Welcome child, to the Goblin Coin Bank! Here you can transmute your vast wealth into magically infused gold bars.</em>
+                <em>Welcome, child, to the Goblin Coin Bank! Here you can transmute your vast wealth into magically infused gold bars.</em>
                 <em>These gold bars, up to a maximum of 1000, will add 0.1% bonus to your Current Defence Bonus (Morale and Defence Tab).</em>
                 <em> All it costs is 2 billion gold per bar. Don't worry, we gobbies will keep your gold safe!</em>
               </p>
@@ -244,7 +244,7 @@ export default class GoblinCoinBank extends React.Component {
                 these bars and the player who takes the kingdom gets your vast wealth!
                 </p>
                 <p>
-                  <strong>Note!</strong>: If you have purchased more people then the maximum allowed for your kingdom and you or the kingdom has no gold, The Old Man
+                  <strong>Note!</strong>: If you have purchased more people than the maximum allowed for your kingdom and you or the kingdom has no gold, The Old Man
                   (Kingdom Holder NPC) will take gold bars equal to the total cost rounded up. If he would take 2.5 bars, he takes three.
                 </p>
               </AlertInfo>
@@ -293,13 +293,13 @@ export default class GoblinCoinBank extends React.Component {
           <Tab eventKey="withdraw-coins" title="Exchange Bars">
             <div className="tw-mt-4">
               <p>
-                <em>Looking to withdraw some of your riches child? Lets see what we can do for you today.</em>
+                <em>Looking to withdraw some of your riches, child? Let's see what we can do for you today.</em>
                 <em> Jack! Get this leader their gold! How much was that again?</em>
               </p>
               <AlertInfo icon={'fas fa-question-circle'} title="Info">
                 <p>
                   Withdrawing gold bars as gold will reduce your kingdom defence by the amount of bars you take out.
-                  You also cannot take out more bars then space you have in your coin purse!
+                  You also cannot take out more bars than you have space in your coin purse!
                 </p>
               </AlertInfo>
               <dl>

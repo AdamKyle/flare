@@ -14,7 +14,7 @@ class ItemDetails extends Component
 {
     public $item;
 
-    public $showUsabillityError = false;
+    public $showUsabilityError = false;
 
     public $affectsSkillError   = false;
 

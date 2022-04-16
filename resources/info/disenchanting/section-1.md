@@ -62,7 +62,7 @@ The person who wins the lottery, triggers a global message.
 
 There are two quest items that effect the amount of gold dust you get:
 
-- Disenchanters Magnifying Glass: +45% XP and Skill bonus towards Disenchanting
+- Disenchanter's Magnifying Glass: +45% XP and Skill bonus towards Disenchanting
   - You can get this by speaking to the Soldier and paying 25k Gold Dust
-- Grain of sand has a 2% chance (out of a 1000) to give you 5% of your gold dust as a rush.
+- Grain of Sand has a 2% chance (out of a 1000) to give you 5% of your gold dust as a rush.
   - Got by killing Astral Hell Gods on Surface with a 0.1% drop chance.

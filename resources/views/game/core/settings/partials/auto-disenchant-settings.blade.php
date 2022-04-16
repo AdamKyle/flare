@@ -51,7 +51,7 @@
                         </p>
                         <p>
                             If you are slightly under geared and head to Shadow Plane, select the last option to get the gear you want. Remember, any item
-                            and any affix can drop in combination in the Shadow Plane as long as the creature is 10 levels higher then you.
+                            and any affix can drop in combination in the Shadow Plane as long as the creature is 10 levels higher than you.
                         </p>
                     </div>
                 </div>

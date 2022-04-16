@@ -70,7 +70,7 @@ class CharacterInventoryControllerApiTest extends TestCase
     }
 
     public function testCanDestroyAllItems() {
-        $user = $this->character->inventoryManagement()->giveitem($this->createItem([
+        $user = $this->character->inventoryManagement()->giveItem($this->createItem([
             'name'             => 'Armour',
             'base_damage'      => 6,
             'base_ac'          => 6,
@@ -91,7 +91,7 @@ class CharacterInventoryControllerApiTest extends TestCase
     public function testCanDisenchantAllItems() {
         Queue::fake();
 
-        $user = $this->character->inventoryManagement()->giveitem($this->createItem([
+        $user = $this->character->inventoryManagement()->giveItem($this->createItem([
             'name'             => 'Armour',
             'item_prefix_id'   => $this->createItemAffix(['type' => 'prefix']),
             'base_damage'      => 6,
@@ -99,7 +99,7 @@ class CharacterInventoryControllerApiTest extends TestCase
             'type'             => 'gloves',
             'default_position' => 'hands',
             'crafting_type'    => 'armour',
-        ]))->giveitem($this->createItem([
+        ]))->giveItem($this->createItem([
             'name'             => 'Armour',
             'item_prefix_id'   => $this->createItemAffix(['type' => 'prefix']),
             'base_damage'      => 6,
@@ -107,7 +107,7 @@ class CharacterInventoryControllerApiTest extends TestCase
             'type'             => 'gloves',
             'default_position' => 'hands',
             'crafting_type'    => 'armour',
-        ]))->giveitem($this->createItem([
+        ]))->giveItem($this->createItem([
             'name'             => 'Armour',
             'item_prefix_id'   => $this->createItemAffix(['type' => 'prefix']),
             'base_damage'      => 6,
@@ -123,7 +123,7 @@ class CharacterInventoryControllerApiTest extends TestCase
     }
 
     public function testHasNothingToDisenchant() {
-        $user = $this->character->inventoryManagement()->giveitem($this->createItem([
+        $user = $this->character->inventoryManagement()->giveItem($this->createItem([
             'name'             => 'Armour',
             'base_damage'      => 6,
             'base_ac'          => 6,
@@ -190,7 +190,7 @@ class CharacterInventoryControllerApiTest extends TestCase
     public function testUnequipAll() {
 
         $user = $this->character->inventoryManagement()
-            ->giveitem($this->createItem([
+            ->giveItem($this->createItem([
                 'name'             => 'Armour',
                 'base_damage'      => 6,
                 'base_ac'          => 6,
@@ -255,7 +255,7 @@ class CharacterInventoryControllerApiTest extends TestCase
     public function testCannotUnEquipItem() {
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($user)->json('post', '/api/character/'.$user->character->id.'/inventory/unequip' , [
+        $response = $this->actingAs($user)->json('post', '/api/character/'.$user->character->id.'/inventory/unequip', [
             'item_to_remove' => rand(900,9560),
             'inventory_set_equipped' => false,
         ])->response;

@@ -24,9 +24,9 @@ Holy Items are useful for adding additional Devouring Darkness, Devouring Darkne
 Players can only unlock the ability to make Holy Items after they have:
 
 - Gained access to Purgatory through a series of quests.
-- Gained Access to the Purgatories Smithies House after completing a series of quests.
+- Gained Access to the Purgatory Smith's House after completing a series of quests.
 
-Once you have accomplished the last one, and you enter the house, you're crafting/enchanting drop down list wll update to show: Smithies Work Bench.
+Once you have accomplished the last one, and you enter the house, your crafting/enchanting drop down list wll update to show: Smith's Workbench.
 
 Players will need:
 
@@ -40,11 +40,11 @@ Items can have up to a maximum of 20 stacks of holy applied to them. every holy 
 
 Players will unlock these oils through the use of Alchemy.
 
-Once a player has access to the Purgatory Smiths House, and open the crafting work bench they will see:
+Once a player has access to the Purgatory Smiths House, and open the crafting workbench they will see:
 
 <div class="mb-4">
-    <a href="/storage/info/holy-items/images/smithies-work-bench.png" class="glightbox">
-        <img src="/storage/info/holy-items/images/smithies-work-bench.png" class="img-fluid" />
+    <a href="/storage/info/holy-items/images/smiths-workbench.png" class="glightbox">
+        <img src="/storage/info/holy-items/images/smiths-workbench.png" class="img-fluid" />
     </a>
 </div>
 

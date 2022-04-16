@@ -91,11 +91,11 @@ class RewardHandler {
 
         event(new CharacterLevelUpEvent($character, false));
 
-        event(new ExplorationLogUpdate($character->user, 'Gained an additional ' . $xp . ' XP.' , false, true));
+        event(new ExplorationLogUpdate($character->user, 'Gained an additional ' . $xp . ' XP.', false, true));
 
         CharacterAttackTypesCacheBuilder::dispatch($character, true)->delay(now()->addSeconds(5));
 
-        event(new ExplorationLogUpdate($character->user, 'Your character stats will update in a moment ...', false, true));
+        event(new ExplorationLogUpdate($character->user, 'Your character stats will update in a moment...', false, true));
     }
 
     protected function processEncounterFactionBonus(Character $character, int $amount) {
@@ -119,7 +119,7 @@ class RewardHandler {
     }
 
     private function getMaxLevel(Character $character): int {
-        $item      = Item::where('effect', ItemEffectsValue::CONTNUE_LEVELING)->first();
+        $item      = Item::where('effect', ItemEffectsValue::CONTINUE_LEVELING)->first();
 
         if (is_null($item)) {
             return MaxLevel::MAX_LEVEL;

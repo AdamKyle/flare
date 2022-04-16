@@ -97,7 +97,7 @@ export default class TrainPassiveSkillModal extends React.Component {
               them unlocked. You may only train one at a time.
             </p>
             <p>
-              You may of course log out, as these can train in the background.
+              You may, of course, log out, as these can train in the background.
               When finished, you will see a notification in the notification center.
             </p>
             <p>

@@ -20,18 +20,18 @@ class IsPlayerBannedMiddleware
         $user = auth()->user();
 
         /**
-         * User might not be logged in, but looking at a 
-         * specific route we said they dont have to be logged in for.
+         * User might not be logged in, but looking at a
+         * specific route we said they don't have to be logged in for.
          */
         if (is_null($user)) {
             return $next($request);
         }
 
-        $until = !is_null($user->unbanned_at) ?  $user->unbanned_at->format('l jS \\of F Y h:i:s A') . ' ' . $user->unbanned_at->timezoneName. '.' : 'For ever.';
+        $until = !is_null($user->unbanned_at) ?  $user->unbanned_at->format('l jS \\of F Y h:i:s A') . ' ' . $user->unbanned_at->timezoneName. '.' : 'Forever.';
 
         if ($user->is_banned) {
             Auth::logout();
-            
+
             return redirect()->to('/')->with('error', 'You have been banned until: ' . $until);
         }
 

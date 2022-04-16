@@ -20,7 +20,7 @@ export default class Purchase extends React.Component {
       this.setState({
         errorMessage: null,
         queenProcessing: true,
-        successmessage: null,
+        successMessage: null,
       }, () => {
         axios.post('/api/character/'+this.props.characterId+'/random-enchant/purchase', {
           type: this.state.valuation
@@ -61,7 +61,7 @@ export default class Purchase extends React.Component {
       });
     } else {
       this.setState({
-        errorMessage: 'Ooooooh hoo hooo hooo child! You cannot trick me, you must spend your coin on me for me to love you. Do you want me to love you? THEN PICK ONE!'
+        errorMessage: 'Ooooooh hoo hooo hooo, child! You cannot trick me, you must spend your coin on me for me to love you. Do you want me to love you? THEN PICK ONE!'
       });
     }
   }
@@ -74,7 +74,7 @@ export default class Purchase extends React.Component {
       case 'basic':
         cost = 10000000000;
         break;
-      case 'meduim':
+      case 'medium':
         cost = 50000000000;
         break;
       case 'legendary':
@@ -86,7 +86,7 @@ export default class Purchase extends React.Component {
 
     if (cost > this.props.currencies.gold) {
       this.setState({
-        errorMessage: 'No... no.. child. You are too poor for such luxuries. Sigh, and all I ever wanted was a rich handsome... what ever you are. Please, sigh, pick another one.',
+        errorMessage: 'No... no.. child. You are too poor for such luxuries. Sigh, and all I ever wanted was a rich handsome... whatever you are. Please, sigh, pick another one.',
         canAfford: false,
       });
     } else {
@@ -141,7 +141,7 @@ export default class Purchase extends React.Component {
             {
               this.state.successMessage !== null ?
                 <AlertSuccess icon={"fas fa-check-circle"} title={'Look at you beautiful!'}>
-                  <p><em>Oooooh hooo hooo hooo! Look at you my beautiful child. Look at that big powerful enchanted item! Ooooooh hooo hoo hoo!</em></p>
+                  <p><em>Oooooh hooo hooo hooo! Look at you, my beautiful child. Look at that big powerful enchanted item! Ooooooh hooo hoo hoo!</em></p>
                   <p>{this.state.successMessage}</p>
                 </AlertSuccess>
                 : null
@@ -166,14 +166,14 @@ export default class Purchase extends React.Component {
             <hr />
             <p>
               When selecting a valuation, this is what you will pay. All stats are randomly generated. The item she picks will
-              never go above 4 billion gold. Both item, amount of affixes (1 or 2) and it's affix stats will all be randomly generated.
+              never go above 4 billion gold. Both item, amount of affixes (1 or 2) and its affix stats will all be randomly generated.
             </p>
             <p>
-              You will pay the valuation cost, get the item and then you can re-roll it's stats.
+              You will pay the valuation cost, get the item and then you can re-roll its stats.
             </p>
             <p>
               There are three parts to each valuation: Cost, Damage Range (dr) and Percentage Range (pr). Damage Range (or dr) is how much damage a
-              randomly generate affix can do. Weather or not it is stackable/irresistible is up to lady luck her self.<br />
+              randomly generate affix can do. Weather or not it is stackable/irresistible is up to lady luck herself.<br />
               Percentage Range (or pr) is applied to all aspects of the affix that is a percentage based value, from enemy stat reductions, player stat increases, skills,
               and so on.
             </p>

@@ -6,7 +6,7 @@ use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
-use App\Flare\Transformers\MonsterTransfromer;
+use App\Flare\Transformers\MonsterTransformer;
 use App\Game\Battle\Services\ConjureService;
 use App\Game\Maps\Console\Commands\UpdateMapCount;
 use App\Game\Maps\Services\TraverseService;
@@ -55,7 +55,7 @@ class ServiceProvider extends ApplicationServiceProvider
                $app->make(Manager::class),
                $app->make(CharacterSheetBaseInfoTransformer::class),
                $app->make(BuildCharacterAttackTypes::class),
-               $app->make(MonsterTransfromer::class),
+               $app->make(MonsterTransformer::class),
                $app->make(LocationService::class),
                $app->make(MapTileValue::class)
            );

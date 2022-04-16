@@ -47,6 +47,6 @@ class KingdomSettlementLockout implements ShouldQueue
             'can_settle_again_at' => null,
         ]);
 
-        event(new ServerMessageEvent($this->character->user, 'You may now settle a new kingdom. Your "lockout" is ended.'));
+        event(new ServerMessageEvent($this->character->user, 'You may now settle a new kingdom. Your "lockout" has ended.'));
     }
 }

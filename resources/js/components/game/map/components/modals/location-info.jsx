@@ -85,12 +85,12 @@ export default class LocationInfo extends React.Component {
                 <AlertInfo icon={"fas fa-question-circle"} title={"Attn!"}>
                   <p>
                     These locations contain the same monsters you have been fighting but their stats are increased and their percentage based stats such as skills
-                    and resistances will also increased. Players will want stat and resistance reduction affixes in conjunction with class based affixes to deal enough damage but also
-                    reduce the enemies resistances and stats so you can have a chance to hit them.
+                    and resistances will also increase. Players will want stat and resistance reduction affixes in conjunction with class based affixes to deal enough damage but also
+                    reduce the enemy's resistances and stats so you can have a chance to hit them.
                   </p>
                   <p>
                     It is suggested that players have equipment that helps with Resistance Reduction and Stat Reduction <a href="/information/enchanting">enchantments</a>.
-                    Players with out <a href="/information/voidance">Voidance or Devoidance</a> may find it harder to fight creatures here.
+                    Players without <a href="/information/voidance">Voidance or Devoidance</a> may find it harder to fight creatures here.
                   </p>
                   <p>
                     Special locations have a chance to drop specific quest items. You cannot auto battle to get these to drop, you must manually farm them. If auto battle is detected
@@ -98,7 +98,7 @@ export default class LocationInfo extends React.Component {
                     Having high looting makes the process easier.
                   </p>
                   <p>
-                    Finally, if a special location is on a plane that increases the enemies strength, that is ALSO taken into consideration when fighting monsters at that location. For example if a plane increases
+                    Finally, if a special location is on a plane that increases the enemy's strength, that is ALSO taken into consideration when fighting monsters at that location. For example if a plane increases
                     monster stats and percentage based attributes by 70%, and the special location increases stats by 1 Billion and 50% to Percentage, then all of that is added together when fighting in these locations.
                     <strong> Gear, level and stats all matter. Caution is advised.</strong>
                   </p>

@@ -81,7 +81,7 @@ class RegisterController extends Controller
         $user = User::where('ip_address', $ip)->where('is_banned', true)->first();
 
         if ($user) {
-            $until = !is_null($user->unbanned_at) ? $user->unbanned_at->format('l jS \\of F Y h:i:s A') . ' ' . $user->unbanned_at->timezoneName . '.' : 'For ever.';
+            $until = !is_null($user->unbanned_at) ? $user->unbanned_at->format('l jS \\of F Y h:i:s A') . ' ' . $user->unbanned_at->timezoneName . '.' : 'Forever.';
 
             throw new \Exception('You have been banned until: ' . $until);
         }

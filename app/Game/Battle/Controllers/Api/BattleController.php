@@ -20,7 +20,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Monster;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Models\User;
-use App\Flare\Transformers\MonsterTransfromer;
+use App\Flare\Transformers\MonsterTransformer;
 
 class BattleController extends Controller {
 
@@ -30,7 +30,7 @@ class BattleController extends Controller {
 
     private $monster;
 
-    public function __construct(Manager $manager, CharacterAttackTransformer $character, MonsterTransfromer $monster, BattleEventHandler $battleEventHandler) {
+    public function __construct(Manager $manager, CharacterAttackTransformer $character, MonsterTransformer $monster, BattleEventHandler $battleEventHandler) {
         $this->middleware('is.character.dead')->except(['revive', 'index']);
         $this->middleware('is.character.adventuring')->except(['index']);
 

@@ -25,7 +25,7 @@ If applicable, add screenshots to help explain your problem.
 
 **Browser and Version**
 - e.g. Edge 15, Chrome 45, Safari 74
-  - Please note we do not support, no will we ever support Internet explorer of any version.
+  - Please note we do not support, nor will we ever support Internet explorer of any version.
 
 **Smartphone (please complete the following information):**
  - Device: [e.g. iPhone6]

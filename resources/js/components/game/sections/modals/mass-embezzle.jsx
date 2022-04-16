@@ -79,7 +79,7 @@ export default class MassEmbezzle extends React.Component {
               If at any time the amount of gold to be given to you would take you above cap, the embezzling will stop.
             </p>
             <p>
-              Through out the process pay attention to chat, this will tell you what, where and how much gold was taken out.
+              Throughout the process pay attention to chat, this will tell you what, where and how much gold was taken out.
               This process can take longer the more kingdoms you have.
             </p>
             <p>

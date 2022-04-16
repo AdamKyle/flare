@@ -49,7 +49,7 @@ Trait CanHaveQuestItem {
      * @param int $itemId
      * @return bool
      */
-    public static function canRecieveItem(Character $character, int $itemId): bool {
+    public static function canReceiveItem(Character $character, int $itemId): bool {
         $foundItem = $character->inventory->slots->filter(function($slot) use($itemId) {
             return $slot->item_id === $itemId && $slot->item->type === 'quest';
         })->first();

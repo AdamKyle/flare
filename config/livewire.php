@@ -50,7 +50,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | This value sets the middleware group that will be applied to the main
-    | Livewire "message" endpoint (the endpoint that gets hit everytime
+    | Livewire "message" endpoint (the endpoint that gets hit every time
     | a Livewire component updates). It is set to "web" by default.
     |
     */

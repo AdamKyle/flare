@@ -15,7 +15,7 @@ class ForceNameChangeEvent implements ShouldBroadcastNow
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
-     * Character whos name is being changed.
+     * Character whose name is being changed.
      *
      * @var Character $character
      */

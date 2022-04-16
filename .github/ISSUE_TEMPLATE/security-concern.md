@@ -23,4 +23,4 @@ Example: Players should not be able to access any of the games API, I suggest cr
 >
 > Security concerns are taken very seriously. If you feel you can tackle the issue and would like to, please feel free to create a new branch with this tickets name in the branch. Ie: Issue-XXX-Security-issue-unlawful-api-access
 >
-> Any player caught abusing security issues in game will be banned, No questions asked.
+> Any player caught abusing security issues in-game will be banned, No questions asked.

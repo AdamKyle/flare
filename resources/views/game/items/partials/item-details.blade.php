@@ -36,7 +36,7 @@
                     Walk on Death Water in Dungeons
                     @break
                 @case('teleport-to-celestial')
-                    Teleport to the Celestial Entity on which ever plane they are located on. You must have access to that plane.
+                    Teleport to the Celestial Entity on whichever plane they are located on. You must have access to that plane.
                     @break
                 @case('affixes-irresistible')
                     Enemies cannot resist your affixes (unless they void you first)

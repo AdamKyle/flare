@@ -10,9 +10,9 @@ inventory, or we have to go to the market board and purchase some cheap items to
 
 We could also just farm adventures and fight monsters for drops.
 
-Got some gold Dust? Great, lets conjure the [Celestial Entity](/information/celstials)!
+Got some gold Dust? Great, let's conjure the [Celestial Entity](/information/celestials)!
 
-Now that we have defeated the Celestial Entity and got the reward (this could take a few tries for you as it is a 25% drop) lets turn it in.
+Now that we have defeated the Celestial Entity and got the reward (this could take a few tries for you as it is a 25% drop) let's turn it in.
 
 First message the npc to see where they are, in this example they are at:
 
@@ -45,7 +45,7 @@ the actions section, Alchemy.
 
 Alchemy will require you to disenchant gear to get Gold Dust and kill more Celestials to get shards. You can learn more under [Usable items](/information/usable-items).
 
-## This is great and all, but can I see this in game?
+## This is great and all, but can I see this in-game?
 
 Absolutely you can. On the map section, beside the player count is a: Plane Quests link:
 
@@ -85,10 +85,10 @@ strongest monsters' known.
 Dungeons, Shadow Plane and Labyrinth all have quests that are apart-of the Tree of Hunting expedition, but since some of them have no one off or parent quests,
 you won't see tabs for them.
 
-The list of quests above (in the table), won't give you the level of details this in game tree will, but instead gives you a simplified break down of the
+The list of quests above (in the table), won't give you the level of details this in-game tree will, but instead gives you a simplified break down of the
 quests.
 
-Let's see what I mean, click on the quest: Satans Calling and see this:
+Let's see what I mean, click on the quest: Satan's Calling and see this:
 
 <div class="mb-4">
     <a href="/storage/info/quests/images/example-quest-npc-info.png" class="glightbox">
@@ -101,7 +101,7 @@ The first tab is the NPC details. On the left we have where the NPC is, what pla
 If the NPC is not on the surface, like this one, we give you the details of EXACTLY how to reach this NPC.
 
 The best way to complete the "how to access" section, is to read from the top down, but start bottom up. So for example, your first thing to do is kill Labyrinth Fiend,
-to get the Key of Labyrinth, which lets you traverse to Labyrinth.
+to get the Key of Labyrinth, which let's you traverse to Labyrinth.
 
 Now you have to complete a quest called Light the way, if you look the modal image above, you see this quest is Under Map the Unseen, which requires you to complete
 Hunting Expedition. See how they are all connected?
@@ -114,7 +114,7 @@ Clicking on the Required to Complete Tab:
     </a>
 </div>
 
-The first sub tab will show the basics, clicking on each other the other tabs will show you exactly how to get them. For example the first Required item is Satans Hide,
+The first sub tab will show the basics, clicking on each other the other tabs will show you exactly how to get them. For example the first Required item is Satan's Hide,
 how do we get that? Click the Item Requirements tab:
 
 <div class="mb-4">

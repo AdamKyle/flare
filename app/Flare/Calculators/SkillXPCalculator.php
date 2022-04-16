@@ -34,9 +34,9 @@ class SkillXPCalculator {
     }
 
     protected function getBaseXp(Skill $skill): int {
-        if ($skill->lavel >= 10) {
+        if ($skill->level >= 10) {
             return 100;
-        } else if ($skill->lavel >= 100) {
+        } else if ($skill->level >= 100) {
             return 500;
         } else if ($skill->level >= 500) {
             return 750;

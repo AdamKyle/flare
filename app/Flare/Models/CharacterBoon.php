@@ -77,7 +77,7 @@ class CharacterBoon extends Model
     }
 
     public function skillType(): SkillTypeValue {
-        return new SkillTypeValue($this->affcted_skill_type);
+        return new SkillTypeValue($this->affect_skill_type);
     }
 
     protected static function newFactory() {

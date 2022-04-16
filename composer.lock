@@ -189,7 +189,7 @@
                     "email": "info@bkwld.com"
                 }
             ],
-            "description": "A trait for Laravel Eloquent models that lets you clone of a model and it's relationships, including files.",
+            "description": "A trait for Laravel Eloquent models that let's you clone of a model and its relationships, including files.",
             "support": {
                 "issues": "https://github.com/BKWLD/cloner/issues",
                 "source": "https://github.com/BKWLD/cloner/tree/3.10.0"

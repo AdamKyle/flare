@@ -81,7 +81,7 @@ export default class CharacterSheet extends React.Component {
             <>
               {
                 this.state.characterSheet.is_dead ?
-                  <AlertWarning icon={'fas fa-exclamation-triangle'} title={'You are a bit dead friend ...'}>
+                  <AlertWarning icon={'fas fa-exclamation-triangle'} title={'You are a bit dead friend...'}>
                     <p>
                       You are dead. You will not be able to manage: Inventory, Skills or Boons. Please revive.
                       You can revive by heading to the game section and clicking revive.
@@ -104,7 +104,7 @@ export default class CharacterSheet extends React.Component {
                       and you can manage your own kingdoms. Got it? Good! I can breathe again.
                     </p>
                     <p>
-                      Oh and child... Don't log out or die, or that's it for automation.
+                      Oh, and child... Don't log out or die, or that's it for automation.
                     </p>
                   </AlertWarning>
                   : null
@@ -115,7 +115,7 @@ export default class CharacterSheet extends React.Component {
                   <AlertWarning icon={'fas fa-exclamation-triangle'} title={'Automation is running'}>
                     You are currently adventuring. You will not be able to manage: Inventory, Skills or Boons.
                     You can cancel an adventure by heading to the game section and clicking adventure on the map
-                    and then click cancel for the current running adventure.
+                    and then click cancel for the currently running adventure.
                   </AlertWarning>
                 : null
               }

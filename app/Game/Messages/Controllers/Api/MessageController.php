@@ -220,7 +220,7 @@ class MessageController extends Controller {
             if ($hasItem) {
                 $success = $pctService->usePCT($user->character, $request->attempt_to_teleport);
             } else {
-                broadcast(new ServerMessageEvent($user, 'You are missing a quest item to do that child.'));
+                broadcast(new ServerMessageEvent($user, 'You are missing a quest item to do that, child.'));
 
                 return response()->json([], 200);
             }
@@ -229,7 +229,7 @@ class MessageController extends Controller {
         }
 
         if (!$success) {
-            broadcast(new ServerMessageEvent($user, 'There are no celestials in the world right now child!'));
+            broadcast(new ServerMessageEvent($user, 'There are no celestials in the world right now, child!'));
 
             return response()->json([], 200);
         }

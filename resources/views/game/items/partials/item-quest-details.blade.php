@@ -155,7 +155,7 @@
                 </li>
             </ul>
             <p>
-                As most players know there are three types of caps in this game when it comes to leveling: Soft (you get 50% of the remaining XP), Medium (You get 25% of the remaining XP)
+                As most players know, there are three types of caps in this game when it comes to leveling: Soft (you get 50% of the remaining XP), Medium (You get 25% of the remaining XP)
                 and Hard (You get 10% of the remaining XP) Cap.
                 Soft cap starts at 1/2 the way to your max level, medium is 75% of the way and Hard is the last ten levels. If a quest item states
                 it ignores caps, you will get all the XP + the bonus AFTER any relevant skill training deductions - regardless of level.
@@ -181,7 +181,7 @@
         making you use raw unmodified stats and damage to strike the enemy.</p>
         <p>Devouring Light on the player will void the enemy of their enchantment damage and artifacts.</p>
         <p>Devouring Darkness will have a chance on either side to void the others Devouring Light.</p>
-        <p>If the enemy is devoided (Devouring Darkness has fired) they cannot then void you. A Devouring Darkness successful fire will void a Devouring Light chance of ever firiing,
+        <p>If the enemy is devoided (Devouring Darkness has fired) they cannot then void you. A Devouring Darkness successful fire will void a Devouring Light chance of ever firing,
         which then allows your Devouring Light a chance to fire and void the enemy for the battle.</p>
         <p>You can read more about how this works in the <a href="/information/voidance">help section</a>.</p>
       </x-core.alerts.info-alert>

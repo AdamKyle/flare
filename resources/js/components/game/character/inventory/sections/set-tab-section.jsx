@@ -226,7 +226,7 @@ export default class SetTabSection extends React.Component {
 
   updateSetName() {
     if (this.state.setName.length > 30 || this.state.setName < 5) {
-      this.props.setErrorMessage('Set name cannot be less then 5 characters or greater then 30 characters, with spaces included.');
+      this.props.setErrorMessage('Set name cannot be less than 5 characters or greater than 30 characters, with spaces included.');
     } else {
       this.setState({loading: true});
 
@@ -293,13 +293,13 @@ export default class SetTabSection extends React.Component {
               </p>
 
               <p>
-                A set may also contain one and only one unique. A unique may have one or two enchants and is green,
-                alas you can only have ONE per set.
+                A set may also contain one and only one unique. A unique may have one or two enchants and is green.
+                Alas, you can only have ONE per set.
               </p>
 
               <p>
                 You can still use sets as a stash tab, which seem to be what you are doing here. Gear in sets do not
-                count towards your inventory max and can contain as any items as you please.
+                count towards your inventory max and can contain as many items as you please.
               </p>
             </AlertWarning>
           : null

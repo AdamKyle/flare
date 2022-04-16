@@ -75,7 +75,7 @@ class EquipItemService {
     /**
      * Set the character
      *
-     * @param Charactr $character
+     * @param Character $character
      * @return EquipItemService
      */
     public function setCharacter(Character $character): EquipItemService {

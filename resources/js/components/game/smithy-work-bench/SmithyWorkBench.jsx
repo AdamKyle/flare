@@ -239,7 +239,7 @@ export default class SmithyWorkBench extends React.Component {
 
   render() {
     if (this.state.loading) {
-      return <p className="mt-2">One moment ...</p>
+      return <p className="mt-2">One moment...</p>
     }
 
     const foundItem        = this.state.items.filter((i) => i.item.id === this.state.selectedItem);

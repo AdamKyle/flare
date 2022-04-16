@@ -91,7 +91,7 @@ You can click on the row in the table to see the details of what it costs to upg
 
 Some buildings such as keep, walls, farm and barracks will cause your kingdom to lose morale per hour if they fall to a durability of zero.
 
-For example, lets upgrade our Keep (you can scroll the modal down, as not all the details may fit o the screen):
+For example, let's upgrade our Keep (you can scroll the modal down, as not all the details may fit o the screen):
 
 <div class="mb-4">
     <a href="/storage/info/kingdoms/images/building-upgrade.png" class="glightbox">
@@ -123,7 +123,7 @@ Passives can take hours and Kingmanship can take a few hours to get a to a decen
 
 > ### ATTN!
 > 
-> Numbers shown in the images may not reflect in game values.
+> Numbers shown in the images may not reflect in-game values.
 
 Notice how you had a building queue and unit queue tab? Let’s click on the building queue tab:
 
@@ -143,7 +143,7 @@ Here you can see our building is upgrading, if we click the row in the table for
 
 **Wait, did I see that you use gold to upgrade buildings?**
 
-Yes you did child, let me show you:
+Yes you did, child. Let me show you:
 
 <div class="mb-4">
     <a href="/storage/info/kingdoms/images/gold-upgrade-building.png" class="glightbox">
@@ -176,7 +176,7 @@ You can see we can cancel the building; we can do the same thing for units in th
 
 > ## ATTN!
 >
-> Canceling a building takes the time it started and the time it will complete as well as the time left to calculate how many resources, including population, percentage wise, you’ll get back. If the building is almost done upgrading you won’t be able to cancel because the builder is almost done, and you would get less then 10% materials back.
+> Canceling a building takes the time it started and the time it will complete as well as the time left to calculate how many resources, including population, percentage wise, you’ll get back. If the building is almost done upgrading you won’t be able to cancel because the builder is almost done, and you would get less than 10% materials back.
 >
 > You will see a notice if you attempt to cancel when you have, for example a few minutes or seconds left.
 
@@ -227,9 +227,9 @@ head this modal well, for this a penalty for recklessly abandoning your kingdoms
 
 You will be locked out for 30 minutes from attempting to settle another kingdom, take a kingdom through npc actions or war.
 
-Should you abandon another kingdom in that 30 minute lock out window, you will in cure another 30 minute time out on top of the remaining time you have left.
+Should you abandon another kingdom in that 30 minute lock out window, you will in cure another 30 minute timeout on top of the remaining time you have left.
 
-There is nowhere in game to see this timeout. You will be told of the time left when you attempt to settle another kingdom or wage war and 
+There is nowhere in-game to see this timeout. You will be told of the time left when you attempt to settle another kingdom or wage war and 
 attempt to take one, or if you attempt to use NPC commands to take one.
 
 

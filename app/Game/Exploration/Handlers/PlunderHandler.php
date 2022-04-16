@@ -15,7 +15,7 @@ class PlunderHandler {
     }
 
     public function plunder(Character $character, CharacterAutomation $characterAutomation) {
-        event(new ExplorationLogUpdate($character->user, 'Oh, we just had to track down these creatures and rip them to shreds didn\'t we? One small peaceful walk turns into a blood bath. How fun ...', true));
+        event(new ExplorationLogUpdate($character->user, 'Oh, we just had to track down these creatures and rip them to shreds didn\'t we? One small peaceful walk turns into a bloodbath. How fun...', true));
 
         $fightAmount = rand(1, 6);
 
@@ -25,6 +25,6 @@ class PlunderHandler {
             $fightAmount--;
         }
 
-        event(new ExplorationLogUpdate($character->user, 'Good lord child! We barley survived that. or at least I barley survived that. Can we just have a peaceful walk in the forest without you trying to kill us? Is that too hard to ask? Christ!', true));
+        event(new ExplorationLogUpdate($character->user, 'Good lord, child! We barely survived that, or at least I barely survived that. Can we just have a peaceful walk in the forest without you trying to kill us? Is that too much to ask? Christ!', true));
     }
 }

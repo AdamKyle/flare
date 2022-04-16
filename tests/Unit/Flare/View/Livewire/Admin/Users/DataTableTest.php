@@ -32,7 +32,7 @@ class DataTableTest extends TestCase
                 ->assertSee('trox');
     }
 
-    public function testTheComponentLoadsOppisiteOrder() {
+    public function testTheComponentLoadsOppositeOrder() {
 
         Livewire::test(DataTable::class, [
             'sortAsc' => false
@@ -68,7 +68,7 @@ class DataTableTest extends TestCase
         ->assertDontSee('Zex');
     }
 
-    public function testSearchForNonExistantCharacter() {
+    public function testSearchForNonExistentCharacter() {
 
         Livewire::test(DataTable::class)
         ->assertSee('Zex')

@@ -414,7 +414,7 @@ export default class SkillDetails extends React.Component {
                   that will go towards leveling this skill.
                 </p>
                 <p>
-                  You cannot train more then one skill at a time.
+                  You cannot train more than one skill at a time.
                 </p>
                 <hr />
                 <dl className="mt-4">{this.renderSkills()}</dl>
@@ -440,7 +440,7 @@ export default class SkillDetails extends React.Component {
             <Tab eventKey="misc-skills" title="Misc. Skills">
               <div className="character-skill-info">
                 <p className="mt-4">
-                  These are misc skills that are leveled by other actions in game. For example,
+                  These are misc skills that are leveled by other in-game actions. For example,
                   Disenchanting is leveled only by you physically disenchanting items.
                 </p>
                 <p>

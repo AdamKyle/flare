@@ -19,7 +19,7 @@ class FixKingdomCurrentResources extends Command
      *
      * @var string
      */
-    protected $description = 'Fix kingdoms resources';
+    protected $description = 'Fix kingdom\'s resources';
 
     /**
      * Create a new command instance.

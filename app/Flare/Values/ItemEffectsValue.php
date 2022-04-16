@@ -18,7 +18,7 @@ class ItemEffectsValue {
     const PURGATORY             = 'purgatory';
     const TELEPORT_TO_CELESTIAL = 'teleport-to-celestial';
     const AFFIXES_IRRESISTIBLE  = 'affixes-irresistible';
-    const CONTNUE_LEVELING      = 'continue-leveling';
+    const CONTINUE_LEVELING     = 'continue-leveling';
     const GOLD_DUST_RUSH        = 'gold-dust-rush';
     const MASS_EMBEZZLE         = 'mass-embezzle';
     const WALK_ON_MAGMA         = 'walk-on-magma';
@@ -39,7 +39,7 @@ class ItemEffectsValue {
         self::HELL                  => 'hell',
         self::TELEPORT_TO_CELESTIAL => 'teleport-to-celestial',
         self::AFFIXES_IRRESISTIBLE  => 'affixes-irresistible',
-        self::CONTNUE_LEVELING      => 'continue-leveling',
+        self::CONTINUE_LEVELING     => 'continue-leveling',
         self::GOLD_DUST_RUSH        => 'gold-dust-rush',
         self::MASS_EMBEZZLE         => 'mass-embezzle',
         self::QUEEN_OF_HEARTS       => 'speak-to-queen-of-hearts',

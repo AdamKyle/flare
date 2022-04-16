@@ -9,7 +9,7 @@ You will craft at least 10 to a maximum of 20 items with no bonuses before being
 > ### ATTN!
 > 
 >  Low level crafting is RNG based. There will be times you fail more than succeed. This is because, each crafting skill
-> has a crafting bonus that starts at 0%. Additional levels increase this by .25%. There is equipment in game that you can buy from the
+> has a crafting bonus that starts at 0%. Additional levels increase this by .25%. There is equipment in-game that you can buy from the
 > shop and affixes you can enchant onto items to increase this bonus at lower levels to give you more of a shot at crafting the item.
 
 Failing to craft the item will cost you the gold you need to craft the item, and you'll get no experience points.

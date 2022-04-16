@@ -29,7 +29,7 @@ Let's break down what's all in a skill, you can see this information by clicking
 
 > ### ATTN!
 >
-> You will see these throughout this guide. These three modifier attributes can also exist on artifacts, quest items, enchanted items and even regular items them selves.
+> You will see these throughout this guide. These three modifier attributes can also exist on artifacts, quest items, enchanted items and even regular items themselves.
 
 - **Fight Timeout Modifier**: With every kill, comes a timeout of 10 seconds, 20 if the enemy has killed you. These modifiers take a specific percentage off your timer. [Learn more about timers](/information/time-gates)
 - **Skill Bonus Per Level**: The percentage bonus applied per level up (to a maximum of 99.00%)

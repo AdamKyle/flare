@@ -23,9 +23,9 @@ use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item as FractalItem;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
-use App\Flare\Transformers\MarketItemsTransfromer;
+use App\Flare\Transformers\MarketItemsTransformer;
 use App\Flare\Models\Item;
-use App\Flare\Transformers\ItemTransfromer;
+use App\Flare\Transformers\ItemTransformer;
 use App\Game\Market\Requests\ChangeItemTypeRequest;
 use App\Game\Market\Requests\ItemDetailsRequest;
 use League\Fractal\Resource\ResourceAbstract;
@@ -38,7 +38,7 @@ class  MarketController extends Controller {
 
     private $transformer;
 
-    public function __construct(Manager $manager, MarketItemsTransfromer $transformer) {
+    public function __construct(Manager $manager, MarketItemsTransformer $transformer) {
         $this->manager     = $manager;
         $this->transformer = $transformer;
     }
@@ -70,9 +70,9 @@ class  MarketController extends Controller {
         ], 200);
     }
 
-    public function listingDetails(Item $item, ItemTransfromer $itemTransfromer) {
+    public function listingDetails(Item $item, ItemTransformer $itemTransformer) {
 
-        $item = new FractalItem($item, $itemTransfromer);
+        $item = new FractalItem($item, $itemTransformer);
         $item = $this->manager->createData($item)->toArray();
 
         return response()->json($item, 200);
@@ -111,14 +111,14 @@ class  MarketController extends Controller {
         ], 200);
     }
 
-    public function fetchItemData(ItemDetailsRequest $request, ItemTransfromer $itemTransfromer) {
+    public function fetchItemData(ItemDetailsRequest $request, ItemTransformer $itemTransformer) {
         $item = Item::find($request->item_id);
 
         if (is_null($item)) {
             return response()->json([], 404);
         }
 
-        $item = new FractalItem($item, $itemTransfromer);
+        $item = new FractalItem($item, $itemTransformer);
         $item = $this->manager->createData($item)->toArray();
 
         return response()->json($item, 200);

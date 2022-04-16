@@ -17,7 +17,7 @@
                 </p>
                 <p>
                     Counting your gold, you walk in with confidence, knowing you will walk out with
-                    better gear. Knowing ... Your enemies stand no chance.
+                    better gear. Knowing... your enemies stand no chance.
                 </p>
                 <p>
                     As you enter, you see an old man behind a worn counter. He smiles warmly at you. Welcoming you:

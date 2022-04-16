@@ -21,9 +21,9 @@ class KingdomManagement {
         KingdomCache;
 
     /**
-     * @var Character $charactr
+     * @var Character $character
      */
-    private Character $charactr;
+    private Character $character;
 
     /**
      * @var CharacterFactory $characterFactory
@@ -68,9 +68,9 @@ class KingdomManagement {
      *
      * If the kingdom does not exist, we will throw an error.
      *
-     * Options may be passed to the game building that repersent the game_buildings attributes.
+     * Options may be passed to the game building that represent the game_buildings attributes.
      *
-     * The kingdom building will be assigned to the kingdom it's self, additional options may be
+     * The kingdom building will be assigned to the kingdom itself, additional options may be
      * passed in. These options match the kingdom_buildings attributes.
      *
      * @param array $gameBuildingOptions | []

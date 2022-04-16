@@ -1,6 +1,6 @@
 # Equipment
 
-Equipment in Tlessa works differently then other games. All the core pieces you can buy from the shop will raise all your stats. Your body piece and weapon are what you will want to aim for when buying new gear.
+Equipment in Tlessa works differently than other games. All the core pieces you can buy from the shop will raise all your stats. Your body piece and weapon are what you will want to aim for when buying new gear.
 The body will always increase stats the most (all your core stats), while weapons will increase the stats (core stats) by a smaller but equal amount. All stat increases stack across all pieces of equipment.
 
 > ### ATTN!!
@@ -44,9 +44,9 @@ Click on the equip tab above your inventory table:
     </a>
 </div>
 
-Here you can see that we are already have an item equipped. All items in both the inventory and equipped table as well as any other table showing an item (shops, market board, information section …) can be clicked on to get more details about the item.
+Here you can see that we are already have an item equipped. All items in both the inventory and equipped table as well as any other table showing an item (shops, market board, information section...) can be clicked on to get more details about the item.
 
-However, we got us some nice weapons and armour, lets head back to the inventory section (by clicking the inventory tab beside equipment). In this table, you will see an actions section.
+However, we got us some nice weapons and armour, let's head back to the inventory section (by clicking the inventory tab beside equipment). In this table, you will see an actions section.
 
 <div class="mb-4">
     <a href="/storage/info/equipment/images/equipping.png" class="glightbox">
@@ -86,7 +86,7 @@ You will also see any information about skills, such as bonuses and attached aff
 </div>
 
 When you place equipment in an already occupied slot, that item will be replaced and put back into your inventory for you to sell, destroy or put up for sale on the [market board](/information/market-board).
-If an item is worse off then what you have you will see the stats for it go red.
+If an item is worse off than what you have you will see the stats for it go red.
 Some items will let you replace one of two position for that item, in either case the item currently equipped will show as well in the comparison section of the page:
 
 <div class="mb-4">

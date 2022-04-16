@@ -7,7 +7,7 @@
 
 @if ($item->type === 'bow' || $item->type === 'hammer' || $item->type === 'stave')
     <x-core.alerts.info-alert title="ATTN!">
-        You can choose what ever hand to hold this item in , but you <strong>cannot</strong> duel wield two of these items, because they are two-handed items.
+        You can choose whatever hand to hold this item in, but you <strong>cannot</strong> dual wield two of these items, because they are two-handed items.
         When using Cast and Attack or Attack and Cast, this weapon will be used regardless of hand.
     </x-core.alerts.info-alert>
 @endif

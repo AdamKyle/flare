@@ -236,7 +236,7 @@ export default class KingdomAttackModal extends React.Component {
     if (this.state.fetchingAttackData) {
       return (
         <LoadingModal
-          loadingText="Fetching Kingdom Attack Data ..."
+          loadingText="Fetching Kingdom Attack Data..."
           show={this.props.show}
           close={this.props.close}
         />

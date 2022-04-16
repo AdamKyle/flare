@@ -23,7 +23,7 @@ class ShowTimeOutEvent implements ShouldBroadcast
     /**
      * @var bool $activateBar
      */
-    public $activatebar;
+    public $activateBar;
 
     /**
      * @var bool $canAttack
@@ -39,15 +39,15 @@ class ShowTimeOutEvent implements ShouldBroadcast
      * Create a new event instance.
      *
      * @param User $user
-     * @param bool $activatebar
+     * @param bool $activateBar
      * @param bool $canAttack
      * @param int $forLength | 0
      * @return void
      */
-    public function __construct(User $user, bool $activatebar, bool $canAttack, int $forLength = 0)
+    public function __construct(User $user, bool $activateBar, bool $canAttack, int $forLength = 0)
     {
         $this->user        = $user;
-        $this->activatebar = $activatebar;
+        $this->activateBar = $activateBar;
         $this->canAttack   = $canAttack;
         $this->forLength   = $forLength;
     }

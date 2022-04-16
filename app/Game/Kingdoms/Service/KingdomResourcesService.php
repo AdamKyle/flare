@@ -86,7 +86,7 @@ class KingdomResourcesService {
     /**
      * Updates the kingdoms resources.
      *
-     * Will updates cores resourses, population and morale.
+     * Will updates cores resources, population and morale.
      *
      * This will also alert the player if they are online, via the chat are.
      *
@@ -165,7 +165,7 @@ class KingdomResourcesService {
                 'current_morale' => $currentMorale - 0.10,
             ]);
 
-            $message = $this->kingdom->name . ' is loosing morale, due to not being walked for more then 5 days, at Location (x/y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position . ' on the: ' . $this->kingdom->gameMap->name . ' plane.';
+            $message = $this->kingdom->name . ' is losing morale, due to not being walked for more than 5 days, at Location (x/y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position . ' on the: ' . $this->kingdom->gameMap->name . ' plane.';
 
             $this->notifyUser($message);
 
@@ -295,8 +295,8 @@ class KingdomResourcesService {
         $character = $this->kingdom->character;
 
         if (!is_null($character)) {
-            broadcast(new GameServerMessageEvent($character->user,'The Old Man stomps around! "You were warned! time to pay up!" 
-            The kingdom at (X/Y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position . ' on plane: ' . $this->kingdom->gameMap->name . ' 
+            broadcast(new GameServerMessageEvent($character->user,'The Old Man stomps around! "You were warned! time to pay up!"
+            The kingdom at (X/Y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position . ' on plane: ' . $this->kingdom->gameMap->name . '
             is in trouble for being over populated.'));
         }
 
@@ -320,7 +320,7 @@ class KingdomResourcesService {
             $this->kingdom = $this->kingdom->refresh();
 
             if (!is_null($character)) {
-                broadcast(new GameServerMessageEvent($character->user,'The Old Man grumbles! "Now I have to take the rest out of your pockets child!" (Not enough Treasury)'));
+                broadcast(new GameServerMessageEvent($character->user,'The Old Man grumbles! "Now I have to take the rest out of your pockets, child!" (Not enough Treasury)'));
             }
 
         } else if ($totalCost <= $kingdomTreasury) {
@@ -356,11 +356,11 @@ class KingdomResourcesService {
                     $newAmount = 0;
 
                     if (!is_null($character)) {
-                        broadcast(new GameServerMessageEvent($character->user,'The Old Man jumps for joy! "These are all mine now child!" (The kingdom lost all it\'s Gold Bars, but The Old Man is happy now ... Win, Win?)'));
+                        broadcast(new GameServerMessageEvent($character->user,'The Old Man jumps from joy! "These are all mine now, child!" (The kingdom lost all its Gold Bars, but The Old Man is happy now... Win-Win?)'));
                     }
                 } else {
                     if (!is_null($character)) {
-                        broadcast(new GameServerMessageEvent($character->user,'The Old Man grumbles! "Some of these are mine now..." (The kingdom lost: '.($percentage * 100).'% Gold Bars, but The Old Man is happy now ... Win, Win?)'));
+                        broadcast(new GameServerMessageEvent($character->user,'The Old Man grumbles! "Some of these are mine now..." (The kingdom lost: '.($percentage * 100).'% Gold Bars, but The Old Man is happy now... Win-Win?)'));
                     }
                 }
 
@@ -382,7 +382,7 @@ class KingdomResourcesService {
             $this->kingdom = $this->kingdom->refresh();
 
             if (!is_null($character)) {
-                broadcast(new GameServerMessageEvent($character->user,'The Old Man smiles! "I told you I would collect whats owed!"'));
+                broadcast(new GameServerMessageEvent($character->user,'The Old Man smiles! "I told you I would collect what\'s owed!"'));
             }
 
             event(new UpdateTopBarEvent($this->kingdom->character->refresh()));
@@ -436,14 +436,14 @@ class KingdomResourcesService {
             ]);
         }
 
-        broadcast(new GlobalMessageEvent('The Old Man causes the ground to shake, the units to explode and the buildings to engulf in flames. People are dying left, right and center as he Laughs. "I warned you child!"'));
+        broadcast(new GlobalMessageEvent('The Old Man causes the ground to shake, the units to explode and the buildings to engulf in flames. People are dying left, right and center as he Laughs. "I warned you, child!"'));
 
         $this->kingdom = $this->kingdom->refresh();
 
         $this->giveNPCKingdoms();
         $this->removeKingdomFromMap();
 
-        broadcast(new GlobalMessageEvent('The Old Man walks away from the carnage, "I always collect ...."'));
+        broadcast(new GlobalMessageEvent('The Old Man walks away from the carnage, "I always collect..."'));
     }
 
     /**

@@ -6,7 +6,7 @@ import KingdomsMenu from "./game/components/menu/kingdoms-menu";
 /**
  * Register the kingdom menu.
  *
- * The adventure menu shows in the game section and any where, where the
+ * The adventure menu shows in the game section and anywhere, where the
  * menu for the player exists.
  *
  * This will turn red when there are new unopened messages.

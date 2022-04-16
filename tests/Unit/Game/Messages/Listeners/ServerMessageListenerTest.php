@@ -170,7 +170,7 @@ class ServerMessageListenerTest extends TestCase
         Event::assertDispatched(ServerMessageEvent::class);
     }
 
-    public function testDisenchamtWthOutSkill()
+    public function testDisenchantWithoutSkill()
     {
         $user = $this->createUser();
 

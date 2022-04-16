@@ -38,7 +38,7 @@ export default class MonsterAttack {
       if (this.canHit(monster, this.defender)) {
 
         if (this.isBlocked(previousAttackType, this.defender, damage, isCharacterVoided)) {
-          this.addMessage('The enemies attack was blocked!');
+          this.addMessage('The enemy\'s attack was blocked!');
 
           this.useItems(monster, isCharacterVoided, isMonsterVoided, previousAttackType);
 
@@ -160,7 +160,7 @@ export default class MonsterAttack {
       if (defenderReduction > 0) {
         damage = (damage - (damage * defenderReduction)).toFixed(2);
 
-        this.addMessage('Your rings negate some of the enemies enchantment damage.');
+        this.addMessage('Your rings negate some of the enemy\'s enchantment damage.');
       }
 
       if (damage <= 0.0) {
@@ -186,16 +186,16 @@ export default class MonsterAttack {
       const roll          = random(1, 100);
 
       if (evasionChance >= 1.0) {
-        this.addHealingMessage('You evade the enemies spells!');
+        this.addHealingMessage('You evade the enemy\'s spells!');
 
         return;
       }
 
       if (roll > dc) {
-        this.addHealingMessage('You evade the enemies spells!');
+        this.addHealingMessage('You evade the enemy\'s spells!');
       } else {
         if (this.isBlocked(previousAttackType, defender, damage, isCharacterVoided)) {
-          this.addHealingMessage('You managed to block the enemies spells with your armour!');
+          this.addHealingMessage('You managed to block the enemy\'s spells with your armour!');
 
           return;
         }
@@ -244,14 +244,14 @@ export default class MonsterAttack {
 
       if (defenderHealingReduction > 0) {
         healFor = healFor - healFor * defenderHealingReduction;
-        this.addMessage('Your rings negate some of the enemies healing power.');
+        this.addMessage('Your rings negate some of the enemy\'s healing power.');
       }
 
       if (healFor > 1) {
         this.currentMonsterHealth = this.currentMonsterHealth + healFor;
         this.addHealingMessage(attacker.name + '\'s healing spells wash over them for: ' + this.formatNumber(healFor.toFixed(0)));
       } else {
-        this.addMessage('Your rings negate all of the enemies healing power.');
+        this.addMessage('Your rings negate all of the enemy\'s healing power.');
       }
     }
   }

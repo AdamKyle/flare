@@ -13,7 +13,7 @@
             <x-core.alerts.warning-alert title="ATTN!">
                 <p>
                     Do not use this to make changes to kingdom buildings stats or assigned units. Only use this if you have
-                    no players in game or you have new buildings to introduce.
+                    no players in-game or you have new buildings to introduce.
                 </p>
                 <p>
                     Import will only assign new buildings to players kingdoms.

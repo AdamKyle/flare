@@ -16,7 +16,7 @@ class BuildingCosts
     const WALLS            = 'Walls';
     const BARRACKS         = 'Barracks';
     const CHURCH           = 'Church';
-    const SETTLERS_HALL    = 'Settlers Hall';
+    const SETTLERS_HALL    = 'Settler\'s Hall';
     const GOBLIN_COIN_BANK = 'Goblin Coin Bank';
     const CANNONEER_SHOP   = 'Cannoneer Shop';
     const CALVARY          = 'Calvary Training Grounds';
@@ -113,7 +113,7 @@ class BuildingCosts
         return $this->name === self::CHURCH;
     }
 
-    public function isSettlerrsHall(): bool {
+    public function isSettlersHall(): bool {
         return $this->name === self::SETTLERS_HALL;
     }
 

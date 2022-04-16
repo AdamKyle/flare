@@ -30,7 +30,7 @@ class EventsProvider extends ServiceProvider {
 
     protected $listen = [
 
-        // When the battle is over, set the attack time out.
+        // When the battle is over, set the attack timeout.
         AttackTimeOutEvent::class => [
             AttackTimeOutListener::class,
         ],
@@ -64,7 +64,7 @@ class EventsProvider extends ServiceProvider {
             UpdateSkillListener::class,
         ],
 
-        // When battle is over check if their are drops.
+        // When battle is over check if there are drops.
         // Assign them to the character.
         DropsCheckEvent::class => [
             DropsCheckListener::class,

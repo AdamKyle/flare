@@ -19,17 +19,17 @@
                     </p>
                     <p>
                         Counting your gold, you walk in with confidence, knowing you will walk out with
-                        better gear. Knowing ... Your enemies stand no chance.
+                        better gear. Knowing... That your enemies stand no chance.
                     </p>
                     <p>
-                        As you enter, you see an old man behind a worn counter. He smiles warmly at you. Welcoming you:
+                        As you enter, you see an old man behind a worn out counter. He smiles warmly at you. Welcoming you:
                     </p>
 
-                    <p><strong>Shop Keeper</strong>: <em>Hello! welcome! what can I get for you?</em></p>
+                    <p><strong>Shop Keeper</strong>: <em>Hello! Welcome! what can I get you?</em></p>
                 @else
                     <p>On your journey you come across a merchant on the road. He is carrying his bag full of trinkets and goodies.</p>
                     <p>As you approach, he takes off his backpack and warmly greets you:</p>
-                    <p><strong>Shop Keeper</strong>: <em>These roads are dangerous my friend! What can I get you?</em></p>
+                    <p><strong>Shop Keeper</strong>: <em>These roads are dangerous, my friend! What can I get you?</em></p>
                 @endif
             </x-core.cards.card>
 

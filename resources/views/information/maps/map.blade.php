@@ -61,11 +61,11 @@
                                 stats and their damage dealt are reduced by 60%. When characters enter they will see their modified stats adjust to reflect this.
                             </p>
                             <p>
-                                Further complicating things, vampires damage is capped at 50% of their total life stealing %. Casters with out high resistance reduction and skill reduction gear
+                                Further complicating things, vampires damage is capped at 50% of their total life stealing %. Casters without high resistance reduction and skill reduction gear
                                 will find their spells are being evaded. Quest items which make your affixes irresistible no longer work down here.
                             </p>
                             <p>
-                                Finally, enemies down here are different then other planes, they're stats start in the tens of millions and go up from there. Players wil also need to a quest line to walk on magma, unlock purgatory and speak with the Fabled
+                                Finally, enemies down here are different then other planes, their stats start in the tens of millions and go up from there. Players wil also need to a quest line to walk on magma, unlock purgatory and speak with the Fabled
                                 and illustrious Queen of Hearts.
                             </p>
                         @endif
@@ -83,7 +83,7 @@
                             <p>Finally all quest items that make Affix damage irresistible will not work down here.</p>
                             <p>
                                 Players also cannot walk on water down here, nor can you settle kingdoms. Chance's are, even with the best Alchemy items and current gear you will not make it to
-                                the bottom of the monster list. This is intended as Purgatory is one of the hardest planes in game to get to and to fight in because of all the reductions.
+                                the bottom of the monster list. This is intended as Purgatory is one of the hardest planes in the game to get to and to fight in because of all the reductions.
                             </p>
                             <p>
                                 Players will want to be decked out in the top tier gear with one 100 Billion unique that has two enchants rolled as high as you can get them (600+% for your damage stat).

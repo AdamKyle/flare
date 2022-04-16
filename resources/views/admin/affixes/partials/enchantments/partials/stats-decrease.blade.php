@@ -51,8 +51,8 @@
       <x-core.cards.card>
         <x-core.alerts.info-alert title="Quick Tip">
           <p>
-            These Affixes effect your enemies STR and reduces it. The more you have the more is reduced. These affixes can stack and may include other affixes in
-            the same list that reduce the enemies STR. Even if an affix would have non stacking elements about it, such as voidance,
+            These Affixes effect your enemy's STR and reduces it. The more you have the more is reduced. These affixes can stack and may include other affixes in
+            the same list that reduce the enemy's STR. Even if an affix would have non stacking elements about it, such as voidance,
             the stat reducing will still stack.
           </p>
         </x-core.alerts.info-alert>
@@ -70,8 +70,8 @@
       <x-core.cards.card>
         <x-core.alerts.info-alert title="Quick Tip">
           <p>
-            These Affixes effect your enemies DEX and reduces it. The more you have the more is reduced. These affixes can stack and may include other affixes in
-            the same list that reduce the enemies DEX. Even if an affix would have non stacking elements about it, such as voidance,
+            These Affixes effect your enemy's DEX and reduces it. The more you have the more is reduced. These affixes can stack and may include other affixes in
+            the same list that reduce the enemy's DEX. Even if an affix would have non stacking elements about it, such as voidance,
             the stat reducing will still stack.
           </p>
         </x-core.alerts.info-alert>
@@ -89,8 +89,8 @@
       <x-core.cards.card>
         <x-core.alerts.info-alert title="Quick Tip">
           <p>
-            These Affixes effect your enemies DUR and reduces it. The more you have the more is reduced. These affixes can stack and may include other affixes in
-            the same list that reduce the enemies DUR. Even if an affix would have non stacking elements about it, such as voidance,
+            These Affixes effect your enemy's DUR and reduces it. The more you have the more is reduced. These affixes can stack and may include other affixes in
+            the same list that reduce the enemy's DUR. Even if an affix would have non stacking elements about it, such as voidance,
             the stat reducing will still stack.
           </p>
         </x-core.alerts.info-alert>
@@ -108,8 +108,8 @@
       <x-core.cards.card>
         <x-core.alerts.info-alert title="Quick Tip">
           <p>
-            These Affixes effect your enemies INT and reduces it. The more you have the more is reduced. These affixes can stack and may include other affixes in
-            the same list that reduce the enemies INT. Even if an affix would have non stacking elements about it, such as voidance,
+            These Affixes effect your enemy's INT and reduces it. The more you have the more is reduced. These affixes can stack and may include other affixes in
+            the same list that reduce the enemy's INT. Even if an affix would have non stacking elements about it, such as voidance,
             the stat reducing will still stack.
           </p>
         </x-core.alerts.info-alert>
@@ -127,8 +127,8 @@
       <x-core.cards.card>
         <x-core.alerts.info-alert title="Quick Tip">
           <p>
-            These Affixes effect your enemies CHR and reduces it. The more you have the more is reduced. These affixes can stack and may include other affixes in
-            the same list that reduce the enemies CHR. Even if an affix would have non stacking elements about it, such as voidance,
+            These Affixes effect your enemy's CHR and reduces it. The more you have the more is reduced. These affixes can stack and may include other affixes in
+            the same list that reduce the enemy's CHR. Even if an affix would have non stacking elements about it, such as voidance,
             the stat reducing will still stack.
           </p>
         </x-core.alerts.info-alert>
@@ -146,8 +146,8 @@
       <x-core.cards.card>
         <x-core.alerts.info-alert title="Quick Tip">
           <p>
-            These Affixes effect your enemies AGI and reduces it. The more you have the more is reduced. These affixes can stack and may include other affixes in
-            the same list that reduce the enemies AGI. Even if an affix would have non stacking elements about it, such as voidance,
+            These Affixes effect your enemy's AGI and reduces it. The more you have the more is reduced. These affixes can stack and may include other affixes in
+            the same list that reduce the enemy's AGI. Even if an affix would have non stacking elements about it, such as voidance,
             the stat reducing will still stack.
           </p>
         </x-core.alerts.info-alert>
@@ -165,8 +165,8 @@
       <x-core.cards.card>
         <x-core.alerts.info-alert title="Quick Tip">
           <p>
-            These Affixes effect your enemies Focus and reduces it. The more you have the more is reduced. These affixes can stack and may include other affixes in
-            the same list that reduce the enemies Focus. Even if an affix would have non stacking elements about it, such as voidance,
+            These Affixes effect your enemy's Focus and reduces it. The more you have the more is reduced. These affixes can stack and may include other affixes in
+            the same list that reduce the enemy's Focus. Even if an affix would have non stacking elements about it, such as voidance,
             the stat reducing will still stack.
           </p>
         </x-core.alerts.info-alert>

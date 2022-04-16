@@ -419,7 +419,7 @@ export default class EnchantingAction extends React.Component {
         <div className={"container justify-content-center " + (!this.state.loading ? 'hide' : '')}>
           <div className="row">
             <div className="col-md-10 text-align-center text-info">
-              Loading please wait ...
+              Loading please wait...
             </div>
           </div>
         </div>

@@ -22,7 +22,7 @@ use App\Flare\Events\ServerMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent as MessageEvent;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Character;
-use App\Flare\Transformers\MonsterTransfromer;
+use App\Flare\Transformers\MonsterTransformer;
 use App\Flare\Values\ItemEffectsValue;
 
 class TraverseService {
@@ -33,7 +33,7 @@ class TraverseService {
     private $manager;
 
     /**
-     * @var MonsterTransfromer $monsterTransformer
+     * @var MonsterTransformer $monsterTransformer
      */
     private $monsterTransformer;
 
@@ -53,14 +53,14 @@ class TraverseService {
      * TraverseService constructor.
      *
      * @param Manager $manager
-     * @param MonsterTransfromer $monsterTransformer
+     * @param MonsterTransformer $monsterTransformer
      * @param LocationService $locationService
      */
     public function __construct(
         Manager $manager,
         CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer,
         BuildCharacterAttackTypes $buildCharacterAttackTypes,
-        MonsterTransfromer $monsterTransformer,
+        MonsterTransformer $monsterTransformer,
         LocationService $locationService,
         MapTileValue $mapTileValue
     ) {
@@ -210,7 +210,7 @@ class TraverseService {
 
             event(new MessageEvent($character->user,  $message));
 
-            event(new GlobalMessageEvent('Thunder claps in the sky: ' . $character->name . ' has called forth The Creators gates of despair and unleashed the enemies of Kalitar! The Creator is Furious! "Hear me child! I shall face you in the depths of my despair and crush the soul from your bones!" the lands fall silent, the children no longer have faith and the fabric of time rips open ...'));
+            event(new GlobalMessageEvent('Thunder claps in the sky: ' . $character->name . ' has called forth The Creator\'s gates of despair and unleashed the enemies of Kalitar! The Creator is Furious! "Hear me, child! I shall face you in the depths of my despair and crush the soul from your bones!" the lands fall silent, the children no longer have faith and the fabric of time rips open...'));
         }
     }
 
@@ -312,7 +312,7 @@ class TraverseService {
      */
     protected function updateActionTypeCache(Character $character, float $deduction) {
 
-        event(new GameServerMessageEvent($character->user, 'One moment while we refresh your stats ...'));
+        event(new GameServerMessageEvent($character->user, 'One moment while we refresh your stats...'));
 
         resolve(BuildCharacterAttackTypes::class)->buildCache($character);
 
@@ -337,7 +337,7 @@ class TraverseService {
     }
 
     /**
-     * When the character traverses, lets update the global character count for all planes.
+     * When the character traverses, let's update the global character count for all planes.
      *
      * @param int $oldMap
      */

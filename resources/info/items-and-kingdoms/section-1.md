@@ -27,7 +27,7 @@ Once at that kingdom, we click attack like normal, but this time we see:
     </a>
 </div>
 
-You can use as many items as many times as you have items, lets use our item and see what happens:
+You can use as many items as many times as you have items, let's use our item and see what happens:
 
 First you will see:
 

@@ -156,7 +156,7 @@ class CharacterAttackInformation {
     }
 
     /**
-     * Fetch all suffix items  that reduce an enemies stats.
+     * Fetch all suffix items  that reduce an enemy's stats.
      *
      * @return Collection
      */

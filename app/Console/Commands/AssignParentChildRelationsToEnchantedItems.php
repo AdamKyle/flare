@@ -48,7 +48,7 @@ class AssignParentChildRelationsToEnchantedItems extends Command
                foreach ($items as $item) {
                    $this->assignRelation($item);
 
-                   $this->line('Updated: ' . $item->name . ' to have children ...');
+                   $this->line('Updated: ' . $item->name . ' to have children...');
                }
             });
 

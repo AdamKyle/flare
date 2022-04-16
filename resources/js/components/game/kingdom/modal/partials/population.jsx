@@ -24,7 +24,7 @@ export default class Population extends React.Component {
       if (this.state.toPurchase <= 0) {
         return this.setState({
           showError: true,
-          errorText: 'Total to purchase cannot be less then or equal to 0.',
+          errorText: 'Total to purchase cannot be less than or equal to 0.',
           loading: false,
         });
       }
@@ -105,8 +105,8 @@ export default class Population extends React.Component {
 
           <p>
             <em>
-              One should never ask where the people come from. It's a contentious subject even among the scholars of the land. I can see that look of skepticism in your eyes
-              child, alas you are here for a reason. Lets do business.
+              One should never ask where the people come from. It's a contentious subject even among the scholars of the land. I can see that look of skepticism in your eyes,
+              child. Alas, you are here for a reason. Let's do business.
             </em>
           </p>
 
@@ -119,7 +119,7 @@ export default class Population extends React.Component {
             that's 5,000,000 gold (10k Per additional person over the cap). He will first take from the treasury of the afflicted kingdom. If there is not enough gold, he will take it or the rest of the owed amount
             out of your pockets. If you and your kingdom do not have enough gold to pay, you will lose the kingdom.</p>
             <p>If you have gold bars from the Goblin Coin Bank, he will take the bars until the price is paid rounding up. If he were to take 2.5 bars, he will take three.</p>
-            <p>Should you still not be able to pay, he will reduce all the buildings, units, everything, to 0. He will then Take the kingdom and finally he will destroy the kingdom, clearing up
+            <p>Should you still not be able to pay, he will reduce all the buildings, units, everything, to 0. He will then take the kingdom and finally he will destroy the kingdom, clearing up
             space for a new kingdom. You will see all this as global messages.</p>
           </AlertWarning>
 

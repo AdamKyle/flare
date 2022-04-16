@@ -16,7 +16,7 @@ class ItemAffixTest extends TestCase
             'type' => 'suffix'
         ]);
 
-        $this->assertEquals('prefix', $affix->getOppisiteType());
+        $this->assertEquals('prefix', $affix->getOppositeType());
     }
 
     public function testGetSuffixFromAffix() {
@@ -24,6 +24,6 @@ class ItemAffixTest extends TestCase
             'type' => 'affix'
         ]);
 
-        $this->assertEquals('suffix', $affix->getOppisiteType());
+        $this->assertEquals('suffix', $affix->getOppositeType());
     }
 }

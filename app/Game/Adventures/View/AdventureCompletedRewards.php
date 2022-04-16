@@ -76,7 +76,7 @@ class AdventureCompletedRewards {
 
 
             if ($foundItem->type === 'quest') {
-                if (self::canRecieveItem($character, $foundItem->id)) {
+                if (self::canReceiveItem($character, $foundItem->id)) {
                     $item['can_have'] = true;
                 } else {
                     $item['can_have'] = false;

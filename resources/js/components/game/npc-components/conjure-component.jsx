@@ -87,7 +87,7 @@ export default class ConjureComponent extends React.Component {
             creature in the list cost wise, you can click "Conjure" and a global message will go out stating that you
             have conjured a Celestial Entity. These creatures spawn at random locations
             and if that location is a kingdom it has a specific percentage chance of dealing damage to the whole kingdom
-            (including morale), which in it's self is a % of damage done.</p>
+            (including morale), which is in itself a % of damage done.</p>
           <p>You must go to the location the Celestial Entity spawns at, to fight it. These fights are done server side
             with a 5 second timeout in between attacks, to allow other players a chance
             to attack.</p>

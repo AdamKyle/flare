@@ -51,7 +51,7 @@ class ItemValidator {
             }
 
             if (is_null($item->damages_kingdoms) && empty($item->stat_increase) && is_null($item->affects_skill_type)) {
-                $component->showUsabillityError = true;
+                $component->showUsabilityError = true;
 
                 $isValid = false;
             }

@@ -28,8 +28,8 @@ class NpcCommandService {
     }
 
     public function handleNPC(Character $character, Npc $npc, string $message) {
-        if ($character->currentAutomations()->where('type', AutomationType::EXPLORING)->get()->isNotempty()) {
-            broadcast(new ServerMessageEvent($character->user, 'Child listen! You are so busy thrashing about that you can\'t even focus on this conversation. Stop the auto fighting and then talk to me. Got it? Clear enough? Christ child!', true));
+        if ($character->currentAutomations()->where('type', AutomationType::EXPLORING)->get()->isNotEmpty()) {
+            broadcast(new ServerMessageEvent($character->user, 'Child, listen! You are so busy thrashing about that you can\'t even focus on this conversation. Stop the auto fighting and then talk to me. Got it? Clear enough? Christ, child!', true));
 
             return;
         }
@@ -38,7 +38,7 @@ class NpcCommandService {
 
         if (!is_null($command)) {
 
-            broadcast(new ServerMessageEvent($character->user, 'Processing message ...'));
+            broadcast(new ServerMessageEvent($character->user, 'Processing message...'));
 
             $this->handleForType($character, $npc);
 
@@ -89,7 +89,7 @@ class NpcCommandService {
             return broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('queen_plane', $npc), true));
         }
 
-        if (!$this->characterHasQuestItemToIntereact($character, ItemEffectsValue::QUEEN_OF_HEARTS)) {
+        if (!$this->characterHasQuestItemToInteract($character, ItemEffectsValue::QUEEN_OF_HEARTS)) {
             return broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('missing_queen_item', $npc), true));
         } else {
             broadcast(new NpcComponentShowEvent($character->user, NpcComponentsValue::ENCHANT));
@@ -99,7 +99,7 @@ class NpcCommandService {
     }
 
 
-    protected function characterHasQuestItemToIntereact(Character $character, string $type): bool {
+    protected function characterHasQuestItemToInteract(Character $character, string $type): bool {
         $foundQuestItem = $character->inventory->slots->filter(function($slot) use($type) {
             return $slot->item->type === 'quest' && $slot->item->effect === $type;
         })->first();

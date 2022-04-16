@@ -5,7 +5,7 @@ import AdventureMenu from './game/components/menu/adventure-menu';
 /**
  * Register the adventure menu.
  *
- * The adventure menu shows in the game section and any where, where the
+ * The adventure menu shows in the game section and anywhere, where the
  * menu for the player exists.
  *
  * This will turn green and show an additional sub menu when the adventure

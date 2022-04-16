@@ -118,7 +118,7 @@ export default class UnitQueue extends React.Component {
         <hr/>
         <div className="alert alert-warning">
           If you cancel this upgrade, you'll get a percentage of the materials and population back based on
-          the amount of time left. If the resources you would get back are less then 10%, you wont be able to
+          the amount of time left. If the resources you would get back are less than 10%, you wont be able to
           cancel the unit recruitment.
         </div>
       </>
@@ -152,7 +152,7 @@ export default class UnitQueue extends React.Component {
       >
         <Modal.Header closeButton>
           <Modal.Title id="building-queue-management-modal">
-            {this.state.unit !== null ? this.state.unit.name : 'One second ...'}
+            {this.state.unit !== null ? this.state.unit.name : 'One second...'}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>

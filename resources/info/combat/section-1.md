@@ -30,7 +30,7 @@ Hovering over these will give you tool tips about whats involved in the attack.
     </a>
 </div>
 
-It&#39;s important to pay attention to your class to determine which attack is best for you. Of course, Tlessa wants you to experiment. Let&#39;s go over the attack types:
+It's important to pay attention to your class to determine which attack is best for you. Of course, Tlessa wants you to experiment. Let's go over the attack types:
 
 > ### ATTN!!
 > 
@@ -50,7 +50,7 @@ If you have no weapons equipped, we will use 2% of your primary damage stat, whe
 When attacking, your artifacts, affixes and rings will fire.
 
 You can still be resurrected if you have a healing spell equipped, but instead of healing with spells, you will only get 1 health for resurrecting. If you have life stealing affixes attached, these can also fire, 
-however resurrecting and healing will only happen at the end of the enemies turn assuming the enemy is not dead.
+however resurrecting and healing will only happen at the end of the enemy's turn assuming the enemy is not dead.
 
 Class skills have a chance to fire (to do damage) once during this attack. Class Skill bonuses are automatically applied assuming you follow its rules.
 
@@ -77,13 +77,13 @@ Prophets will get 30% of their chr for healing and rangers get 15% of their chr 
 In theory, Prophets could go glass cannon and use damage spells, but you would need to balance the CHR with the INT to not only do enough damage but also
 heal enough.
 
-When determining if a caster can hit, we use the casters focus (25% of) + their casting accuracy against the enemy&#39;s dodge.
+When determining if a caster can hit, we use the casters focus (25% of) + their casting accuracy against the enemy's dodge.
 
 Class skills (damage) have a chance to twice here for casters and vampires. Once for the spell damage and once for the healing spell.
 
 Prophets Double Heal and Heretics Double Cast can both fire assuming you follow the class skill rules, when using this attack.
 
-When casting it&#39;s your spells, we also fire off affixes, rings and artifacts.
+When casting your spells, we also fire off affixes, rings and artifacts.
 
 **Best For:** Heretics
 
@@ -104,7 +104,7 @@ Cast and Attack will first cast with the spell in **spell slot one** and the wea
 
 Attack and Cast will first use the weapon in **the left hand** and the spell in **spell slot two.**
 
-If you have a bow equipped you will use that, regardless of which hand it&#39;s in, as bows are duel wield weapons.
+If you have a bow equipped you will use that, regardless of which hand it's in, as bows are two-handed weapons.
 
 Enemies can block both attacks: Cast and then Attack (or Attack and Cast). They can also dodge both attacks.
 
@@ -124,7 +124,7 @@ if they survive the enemy.
 
 Fighters will apply their class bonus to their defence.
 
-When you use this option, you will muster all the strength you have to block not just the enemies attack but potentially their spells as well.
+When you use this option, you will muster all the strength you have to block not just the enemy's attack but potentially their spells as well.
 
 After which your affixes and artifacts will also fire.
 
@@ -149,20 +149,20 @@ If an enemy is devoided, they are devoided for the whole battle - even if you di
 
 Vampires are the only class where the [life stealing affixes](/information/enchanting) will stack. However, the damage is not 100% of what you would do.
 Instead, the damage is your first most powerful life stealing, multiplied by 75% of the sum of the rest of the affixes. This percentage is the amount of
-life you will steal from the enemy, which will scale with the enemies' health. The harder the enemy the more damage you do.
+life you will steal from the enemy, which will scale with the enemy's health. The harder the enemy the more damage you do.
 
 The problem is, Vampires do not do enough damage with life stealing alone, this is where you can either Attack or Cast. Casting will give you two chances, assuming your damage spell hits,
 to fire off Vampire Thirst which can kill an enemy. Using Attack would do 5% of your Durability, with no weapons equipped. The higher the dur, the more damage.
 
 Another thing to note about life stealing affixes is that they **will not fire if the weapon/spell damage you do, before the affixes, rings and artifacts would fire, kills the enemy**.
-There would be no point to you stealing a dead enemies' health. Vampires will know if the enemy is too trivial when they're life stealing affixes do not fire.
+There would be no point to you stealing a dead enemy's health. Vampires will know if the enemy is too trivial when their life stealing affixes do not fire.
 
-You will never do 100% of an enemies' health, regardless of how good the enchantments are. The total Life you can steal at any one time is 99% of the enemies' health from 
+You will never do 100% of an enemy's health, regardless of how good the enchantments are. The total Life you can steal at any one time is 99% of the enemy's health from 
 Life Stealing enchantments.
 
 ## Rings can fire even if dead
 
-Your rings can mitigate the enemies attempt to heal or to use their spells, even if you are dead. The lore around this is simple:
+Your rings can mitigate the enemy's attempt to heal or to use their spells, even if you are dead. The lore around this is simple:
 
 > Rings are magical items that do not need the character to be alive to fire off their reductions or evasions. 
 > These rings have a mind of their own when it comes to these types of magic. However, a rings damage cannot fire if the character is dead,

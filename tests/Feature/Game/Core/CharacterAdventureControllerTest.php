@@ -306,7 +306,7 @@ class CharacterAdventureControllerTest extends TestCase
         $response->assertSessionHas('error', "You cannot collect already collected rewards.");
     }
 
-    public function testCannotDistributeRewardsWhenAdventureing() {
+    public function testCannotDistributeRewardsWhenAdventuring() {
         $user = $this->character->adventureManagement()->updateLog([
             'in_progress' => true
         ])->getCharacterFactory()->getUser();
@@ -342,7 +342,7 @@ class CharacterAdventureControllerTest extends TestCase
         $this->assertTrue(AdventureLog::all()->isEmpty());
     }
 
-    public function testCannotDeleteAdventureLogWhenAdventuireInProgress() {
+    public function testCannotDeleteAdventureLogWhenAdventureInProgress() {
 
         $this->character->adventureManagement()->updateLog([
             'in_progress' => true,

@@ -88,7 +88,7 @@ class RandomAffixDetails {
             'Spiritbound Rage',
             'Exile\'s Enchantment',
             'Demonic Infinity',
-            'Guardians Fear',
+            'Guardian\s Fear',
         ];
     }
 

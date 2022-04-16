@@ -33,13 +33,13 @@ class ExplorationController extends Controller {
 
         if (!AttackTypeValue::attackTypeExists($request->attack_type)) {
             return response()->json([
-                'message' => 'invalid attack type was selected. Please select from the drop down.'
+                'message' => 'Invalid attack type was selected. Please select from the drop down.'
             ], 422);
         }
 
         if ($character->currentAutomations()->where('type', AutomationType::EXPLORING)->count() > 0) {
             return response()->json([
-                'message' => 'Nope. You already have on in progress.'
+                'message' => 'Nope. You already have one in progress.'
             ], 422);
         }
 

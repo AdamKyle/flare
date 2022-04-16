@@ -14,12 +14,12 @@ export default class ReRoll extends React.Component {
       affixesToSelectFrom: [],
       canAfford: false,
       actionsToTake: {
-        'base' : 'Re rolls the base aspect of the enchantment(s). Will not re roll the name of the enchantment how ever.',
-        'stats': 'Re rolls the stats portion of the affix, including enemy stat reductions.',
-        'skills': 'Re Rolls the skills aspect including enemy skill reduction.',
-        'damage': 'Re rolls the damage aspect of the enchantment, this includes weather the damage can stack  and is irresistible.',
-        'resistance': 'Re rolls the resistance aspect of the enchantment.',
-        'everything': 'Re rolls everything about the enchantment accept for it\'s name.',
+        'base' : 'Re-rolls the base aspect of the enchantment(s). Will not re-roll the name of the enchantment, however.',
+        'stats': 'Re-rolls the stats portion of the affix, including enemy stat reductions.',
+        'skills': 'Re-Rolls the skills aspect including enemy skill reduction.',
+        'damage': 'Re-rolls the damage aspect of the enchantment, this includes weather the damage can stack  and is irresistible.',
+        'resistance': 'Re-rolls the resistance aspect of the enchantment.',
+        'everything': 'Re-rolls everything about the enchantment accept for it\'s name.',
       },
       formOptions: {
         selected_slot_id: 0,
@@ -229,7 +229,7 @@ export default class ReRoll extends React.Component {
       this.setState({
         formOptions: formOptions,
         cantAfford: false,
-        errorMessage: 'Child... child... I am tiring of these games child. Is there anything you can buy that will make me love you? Ooooh hoo hoo hoo!'
+        errorMessage: 'Child... child.. I am tired of these games, child. Is there anything you can buy that will make me love you? Ooooh hoo hoo hoo!'
       })
     }
   }
@@ -249,7 +249,7 @@ export default class ReRoll extends React.Component {
           <div className="col-md-6">
             {
               this.state.errorMessage !== null ?
-                <AlertError icon={"fas fa-exclamation"} title={'You angered the Queen'}>
+                <AlertError icon={"fas fa-exclamation"} title={'You angered the Queen!'}>
                   <p>
                     {this.state.errorMessage}
                   </p>
@@ -282,12 +282,12 @@ export default class ReRoll extends React.Component {
                 <option key={'all-enchantments'} value={'all-enchantments'}>All attached enchantments</option>
               </select>
               <p className="mt-2">
-                Selecting All attached enchantments, on a unique where only one of the enchantments is randomly generated will not re roll any non unique enchantments on the item.
+                Selecting All attached enchantments, on a unique where only one of the enchantments is randomly generated will not re-roll any non-unique enchantments on the item.
                 As such, only unique enchantments are listed here.
               </p>
             </div>
             <div className={this.state.formOptions.selected_affix === 0 ? 'hide' : 'form-group'}>
-              <label htmlFor="enchantment-valuation" className="mr-2">What to re roll</label>
+              <label htmlFor="enchantment-valuation" className="mr-2">What to re-roll</label>
               <select className="form-control mr-2" id="enchantment-valuation" value={this.state.formOptions.selectedReRollType} onChange={this.updateReRollType.bind(this)}>
                 <option key={''} value={''}>Please Select</option>
                 {this.renderReRollSelectOptions()}
@@ -322,7 +322,7 @@ export default class ReRoll extends React.Component {
             </p>
             <p>
               Next you will select, once you select a unique, one or both of the enchantments. If you select both affixes the cost will double.
-              The cost is based on the valuation cost, the more valuable, the more expensive to re roll.
+              The cost is based on the valuation cost, the more valuable, the more expensive to re-roll.
             </p>
             <p>
               Finally, you will select the section of the affix to re-roll, or you can re-roll everything. Each section

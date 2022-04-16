@@ -16,7 +16,7 @@ return [
     // Depending on how large you let battle_count to grow, this will be the average of the most common.
     //
     // For example, if ou set this to 15, then the average of the numbers in battle_count will have to
-    // fall with in +-4 of the 15 for a time out to potentially trigger.
+    // fall within +-4 of the 15 for a timeout to potentially trigger.
     //
     // ============================
     'battle_time'  => env('BATTLE_TIME', 1),
@@ -31,7 +31,7 @@ return [
     // ============================
     'possibly_cheating' => env('POSSIBLY_CHEATING_COUNT', 3),
 
-    // ======= TIME OUT DELETE =======
+    // ======= TIMEOUT DELETE =======
     //
     // How long before we delete the cache for cheating?
     //

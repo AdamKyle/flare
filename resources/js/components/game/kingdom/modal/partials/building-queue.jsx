@@ -145,7 +145,7 @@ export default class BuildingQueue extends React.Component {
         <hr/>
         <div className="alert alert-warning">
           If you cancel this upgrade, you'll get a percentage of the materials and population back based on
-          the amount of time left. If the resources you would get back are less then 10%, you wont be able to
+          the amount of time left. If the resources you would get back are less than 10%, you wont be able to
           cancel the building upgrade.
         </div>
       </>
@@ -164,7 +164,7 @@ export default class BuildingQueue extends React.Component {
           consider it gone.
         </p>
         <p>
-          If the time elapsed is greater then 85% then you cannot cancel the process and must allow it to finish. This would be too wasteful
+          If the time elapsed is greater than 85% then you cannot cancel the process and must allow it to finish. This would be too wasteful
           of both gold and people.
         </p>
         <p>
@@ -193,7 +193,7 @@ export default class BuildingQueue extends React.Component {
       >
         <Modal.Header closeButton>
           <Modal.Title id="building-queue-management-modal">
-            {this.state.building !== null ? this.state.building.name : 'One second ...'}
+            {this.state.building !== null ? this.state.building.name : 'One second...'}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>

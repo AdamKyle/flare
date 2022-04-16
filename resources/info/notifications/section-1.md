@@ -44,7 +44,7 @@ These server messages are only directed to you, so the rest of chat wont be poll
 
 Information about your [kingdom]() will also appear here as well. Everything from building upgrading to kingdoms coming under attack will appear in chat so long as you are in chat or be emailed to you all at once, once per hour. With the exception of incoming attacks.
 
-Some messages can be seen by every one, such as global messages. There are few global messages:
+Some messages can be seen by everyone, such as global messages. There are few global messages:
 
 - Character finds a quest item
 - Characters kingdom is under attack on a specific plane (location is not shown).

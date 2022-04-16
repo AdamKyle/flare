@@ -45,7 +45,7 @@ class AffixesController extends Controller {
 
         $itemAffixService->deleteAffix($affix);
 
-        return redirect()->back()->with('success', $name . ' was deleated successfully.');
+        return redirect()->back()->with('success', $name . ' was deleted successfully.');
     }
 
     public function exportItems() {

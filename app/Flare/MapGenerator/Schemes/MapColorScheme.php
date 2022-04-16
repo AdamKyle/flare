@@ -8,11 +8,11 @@ use ChristianEssl\LandmapGeneration\Color\Shader\ShaderInterface;
 use ChristianEssl\LandmapGeneration\Struct\Color;
 use ChristianEssl\LandmapGeneration\Enum\FillType;
 
-class MapColorSheme extends DefaultColorScheme {
+class MapColorScheme extends DefaultColorScheme {
 
     /**
-     * Constrctor
-     * 
+     * Constructor
+     *
      * @param ShaderInterface $shader | null
      * @param mixed $land | null
      * @param mixed $water | null
