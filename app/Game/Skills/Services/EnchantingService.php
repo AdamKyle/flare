@@ -97,10 +97,9 @@ class EnchantingService {
      *
      * @param array $enchantmentIds
      * @param int $itemId
-     * @param int $suppliedCost
      * @return bool
      */
-    public function doesCostMatchForEnchanting(array $enchantmentIds, int $itemId, int $suppliedCost): bool {
+    public function getCostOfEnchantment(array $enchantmentIds, int $itemId): bool {
         $itemAffixes   = ItemAffix::findMany($enchantmentIds);
         $itemToEnchant = Item::find($itemId);
 
@@ -120,7 +119,7 @@ class EnchantingService {
             }
         }
 
-        return $cost === $suppliedCost;
+        return $cost;
     }
 
     /**
