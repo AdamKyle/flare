@@ -39,8 +39,16 @@ class ItemsController extends Controller {
 
     public function edit(Item $item) {
         return view('admin.items.manage', [
-            'item' => $item,
-            'editing' => true,
+            'item'             => $item,
+            'defaultPositions' => [
+                'bow',
+                'body',
+                'leggings',
+                'feet',
+                'sleeves',
+                'helmet',
+                'gloves',
+            ],
         ]);
     }
 
