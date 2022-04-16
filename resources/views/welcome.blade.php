@@ -2,8 +2,8 @@
 
 @section('content')
     <div class="container mx-auto px-4 mb-5">
-        <div class="text-center mb-10">
-            <h1 class="mb-5 font-thin text-7xl dark:text-gray-300 text-gray-800">Planes of Tlessa</h1>
+        <div class="text-center mb-10 mt-10">
+            <h1 class="mb-5 font-thin text-7xl dark:text-gray-300 text-gray-800 text-4xl md:text-9xl">Planes of Tlessa</h1>
             <p class="mb-10 dark:text-gray-300 text-gray-800 italic">A world full of mystery and exploration.</p>
             <x-core.buttons.link-buttons.primary-button  css="mr-2" href="{{route('register')}}">
                 Join Today!
@@ -29,21 +29,25 @@
 
         </div>
 
-        <img src="{{asset('promotion/game.png')}}" class="w-100 mb-10" />
-
-        <div class="text-center w-full lg:w-1/3 mx-auto">
-            <h2 class="mb-5 font-thin text-5xl dark:text-gray-300 text-gray-800">Stay logged in!</h2>
-            <p class="mb-10 dark:text-gray-300 text-gray-800">
-                There is no set it and forget it. This game requires you be engaged.
-                Timers and such only last minutes at best, with attack and movement timers being set to seconds.
-            </p>
+        <div class="grid md:grid-cols-2 gap-3 mt-5 w-full mt-10 mx-auto lg:w-2/3 md:mt-20 mb-20">
+            <img src="{{asset('promotion/game.png')}}" class="max-w-full lg:max-w-[74%]"/>
+            <div class="lg:flex lg:items-center">
+                <div class="text-center mt-4 md:mt-0 md:text-left">
+                    <h2 class="mb-5 font-thin md:text-4xl lg:text-5xl dark:text-gray-300 text-gray-800">A world of possibilities</h2>
+                    <div class="mb-10 dark:text-gray-300 text-gray-800">
+                        <p class="mt-2 mb-4">Tlessa offers a lot for the average player to do, from crafting, enchanting, gear progression, quests, monsters, kingdoms to manage and to take, there is more to do here
+                        including but not limited to: Reach level 4000+, Fight Epic Celestials, Go on Adventures, Get Faction Points for unique and so much more.</p>
+                        <p class="mb-4"><strong>Best part?</strong> it's all free! Just requires time investment, as little or as much as you want</p>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="grid lg:grid-cols-3 gap-3">
-            <x-core.cards.card css="hover:bg-gray-100 dark:hover:bg-gray-800 hover:drop-shadow-md hover:cursor-pointer">
+        <div class="grid lg:grid-cols-3 gap-3 w-full lg:w-2/3 m-auto">
+            <x-core.cards.card-with-hover>
                 <div class="flex justify-center items-center">
                     <div class="w-1/5 text-7xl">
-                        <i class="ra ra-player text-primary-600"></i>
+                        <i class="ra ra-player text-primary-600 relative top-[10px] right-[10px]"></i>
                     </div>
                     <div class="w-4/5">
                         <h5>
@@ -57,11 +61,11 @@
                         </p>
                     </div>
                 </div>
-            </x-core.cards.card>
-            <x-core.cards.card css="hover:bg-gray-100 dark:hover:bg-gray-800 hover:drop-shadow-md hover:cursor-pointer">
+            </x-core.cards.card-with-hover>
+            <x-core.cards.card-with-hover>
                 <div class="flex justify-center items-center">
                     <div class="w-1/5 text-7xl">
-                        <i class="ra ra-player-king text-primary-600"></i>
+                        <i class="ra ra-player-king text-primary-600 relative top-[10px] right-[10px]"></i>
                     </div>
                     <div class="w-4/5">
                         <h5>
@@ -70,16 +74,16 @@
                             ])}}">Rule Kingdoms!</a>
                         </h5>
                         <p>
-                            Buy/sell weapons, armor, rings, artifacts and more and out fit your character
-                            for the road ahead. Who knows what beasties you might find!
+                            Settle, Manage and wage war against other players! You can use Kingdom passives to train new skills to unlock new buildings
+                            and units that give your kingdom even more power!
                         </p>
                     </div>
                 </div>
-            </x-core.cards.card>
-            <x-core.cards.card css="hover:bg-gray-100 dark:hover:bg-gray-800 hover:drop-shadow-md hover:cursor-pointer">
+            </x-core.cards.card-with-hover>
+            <x-core.cards.card-with-hover>
                 <div class="flex justify-center items-center">
                     <div class="w-1/5 text-7xl">
-                        <i class="ra ra-trail text-primary-600"></i>
+                        <i class="ra ra-trail text-primary-600 relative top-[10px] right-[10px]"></i>
                     </div>
                     <div class="w-4/5">
                         <h5>
@@ -92,14 +96,14 @@
                         </p>
                     </div>
                 </div>
-            </x-core.cards.card>
+            </x-core.cards.card-with-hover>
         </div>
 
-        <div class="grid lg:grid-cols-2 gap-3 mt-5 w-full mt-10 mx-auto lg:w-2/3 lg:mt-20">
+        <div class="grid md:grid-cols-2 gap-3 mt-5 w-full mt-10 mx-auto lg:w-2/3 md:mt-20">
             <img src="{{asset('promotion/map.png')}}" class="w-100 mb-5" />
-            <div class="lg:flex lg:items-center">
+            <div class="md:flex md:items-center text-center md:text-left">
                 <div>
-                    <h2 class="mb-5 font-thin text-5xl dark:text-gray-300 text-gray-800">See where you're going!</h2>
+                    <h2 class="mb-5 font-thin md:text-4xl lg:text-5xl dark:text-gray-300 text-gray-800">See where you're going!</h2>
                     <p class="mb-10 dark:text-gray-300 text-gray-800">Adventure on a map by clicking the action buttons. Certain locations will have adventures and some you can set sail from, such as ports!</p>
 
                     <x-core.buttons.link-buttons.primary-button href="{{route('info.page', [
@@ -125,11 +129,11 @@
             </p>
         </div>
 
-        <div class="grid lg:grid-cols-3 gap-3 mt-20">
+        <div class="grid lg:grid-cols-3 gap-3 mt-20 w-full lg:w-2/3 m-auto">
             <x-core.cards.card css="hover:bg-gray-100 dark:hover:bg-gray-800 hover:drop-shadow-md hover:cursor-pointer">
                 <div class="flex justify-center items-center">
                     <div class="w-1/5 text-7xl">
-                        <i class="ra ra-anvil text-primary-600"></i>
+                        <i class="ra ra-anvil text-primary-600 relative top-[10px] right-[10px]"></i>
                     </div>
                     <div class="w-4/5">
                         <h5>
@@ -144,7 +148,7 @@
             <x-core.cards.card css="hover:bg-gray-100 dark:hover:bg-gray-800 hover:drop-shadow-md hover:cursor-pointer">
                 <div class="flex justify-center items-center">
                     <div class="w-1/5 text-7xl">
-                        <i class="ra ra-forging text-primary-600"></i>
+                        <i class="ra ra-forging text-primary-600 relative top-[10px] right-[10px]"></i>
                     </div>
                     <div class="w-4/5">
                         <h5>
@@ -159,7 +163,7 @@
             <x-core.cards.card css="hover:bg-gray-100 dark:hover:bg-gray-800 hover:drop-shadow-md hover:cursor-pointer">
                 <div class="flex justify-center items-center">
                     <div class="w-1/5 text-7xl">
-                        <i class="ra ra-wooden-sign text-primary-600"></i>
+                        <i class="ra ra-wooden-sign text-primary-600 relative top-[10px] right-[10px]"></i>
                     </div>
                     <div class="w-4/5">
                         <h5>
@@ -173,7 +177,7 @@
             </x-core.cards.card>
         </div>
 
-        <div class="w-full lg:w-2/4 mx-auto mt-10 lg:mt-20">
+        <div class="w-full lg:w-2/4 mx-auto mt-10 lg:mt-20 mb-10">
             <h2 class="mb-5 font-thin text-center text-5xl dark:text-gray-300 text-gray-800">
                 <i class="far fa-question-circle"></i>
                 FAQ
