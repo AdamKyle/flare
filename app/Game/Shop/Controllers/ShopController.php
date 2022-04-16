@@ -208,7 +208,7 @@ class ShopController extends Controller {
 
     public function shopCompare(Request $request, Character $character, ComparisonService $comparisonService) {
 
-        $viewData = $comparisonService->buildShopData($character, Item::find($request->item_id), $request->item_type);
+        $viewData = $comparisonService->buildShopData($character, Item::where('name', $request->item_name)->first(), $request->item_type);
 
         Cache::put('shop-comparison-character-' . $character->id, $viewData, now()->addMinutes(10));
 

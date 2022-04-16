@@ -34,6 +34,8 @@
     <script src={{mix('js/manifest.js')}} type="text/javascript"></script>
     <script src={{mix('js/vendor.js')}} type="text/javascript"></script>
 
+    <script src={{mix('js/dark-mode.js')}} type="text/javascript"></script>
+
     @stack('head')
 </head>
 @php

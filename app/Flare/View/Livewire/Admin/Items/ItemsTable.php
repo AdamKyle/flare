@@ -25,26 +25,37 @@ class ItemsTable extends DataTableComponent {
     public function filters(): array {
         return [
             SelectFilter::make('Types')
-                ->options([
-                    'weapon'        => 'Weapons',
-                    'bow'           => 'Bows',
-                    'body'          => 'Body',
-                    'helmet'        => 'Helmets',
-                    'shield'        => 'Shields',
-                    'sleeves'       => 'Sleeves',
-                    'gloves'        => 'Gloves',
-                    'leggings'      => 'Leggings',
-                    'feet'          => 'Feet',
-                    'ring'          => 'Rings',
-                    'artifact'      => 'Artifacts',
-                    'spell-healing' => 'Healing Spells',
-                    'spell-damage'  => 'Damage Spells',
-                ]),
+                ->options($this->buildOptions()),
         ];
     }
 
+    protected function buildOptions(): array {
+        $options = [
+            'weapon'        => 'Weapons',
+            'bow'           => 'Bows',
+            'body'          => 'Body',
+            'helmet'        => 'Helmets',
+            'shield'        => 'Shields',
+            'sleeves'       => 'Sleeves',
+            'gloves'        => 'Gloves',
+            'leggings'      => 'Leggings',
+            'feet'          => 'Feet',
+            'ring'          => 'Rings',
+            'artifact'      => 'Artifacts',
+            'spell-healing' => 'Healing Spells',
+            'spell-damage'  => 'Damage Spells',
+        ];
+
+        if (auth()->user()->hasRole('Admin')) {
+            $options['trinket'] = 'Trinkets';
+            $options['quest']   = 'Quest items';
+        }
+
+        return $options;
+    }
+
     public function columns(): array {
-        return[
+        $columns = [
             Column::make('Name')->format(function ($value, $row) {
                 $itemId = Item::where('name', $value)->first()->id;
 
@@ -59,9 +70,28 @@ class ItemsTable extends DataTableComponent {
             }),
             Column::make('Min Crafting Lv.', 'skill_level_required')->sortable(),
             Column::make('Trivial Crafting Lv.', 'skill_level_trivial')->sortable(),
+            Column::make('Damage', 'base_damage')->sortable()->format(function ($value) {
+                return number_format($value);
+            }),
+            Column::make('AC', 'base_ac')->sortable()->format(function ($value) {
+                return number_format($value);
+            }),
+            Column::make('Healing', 'base_healing')->sortable()->format(function ($value) {
+                return number_format($value);
+            }),
             Column::make('Cost')->sortable()->format(function ($value) {
                 return number_format($value);
             }),
         ];
+
+        if (!auth()->user()->hasRole('Admin')) {
+            $columns[] = Column::make('Actions')->label(
+                fn($row, Column $column)  => view('admin.items.table-components.shop-actions-section', [
+                    'character' => auth()->user()->character
+                ])->withRow($row)
+            );
+        }
+
+        return $columns;
     }
 }

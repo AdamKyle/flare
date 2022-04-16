@@ -1,7 +1,7 @@
 @php
     $backUrl = route('items.list');
 
-    if (!auth()->user()->hasRole('admin')) {
+    if (!auth()->user()->hasRole('Admin')) {
         $backUrl = route('game.shop.buy', ['character' => auth()->user()->character->id]);
     }
 @endphp

@@ -3,6 +3,7 @@
 namespace App\Game\Core\Services;
 
 
+use App\Flare\Models\SetSlot;
 use Cache;
 
 use League\Fractal\Manager;
@@ -101,7 +102,7 @@ class ComparisonService {
 
         return [
             'details'        => $this->equipItemService->getItemStats($item, $service->inventory(), $character),
-            'itemToEquip'    => $this->buildItemDetails($itemToEquip),
+            'itemToEquip'    => $this->itemDetails($item),
             'type'           => $service->getType($item, $type),
             'slotId'         => $item->id,
             'slotPosition'   => null,
@@ -111,6 +112,7 @@ class ComparisonService {
             'staveEquipped'  => $this->equipItemService->isTwoHandedItemEquipped($item, $service->inventory(), 'stave'),
             'setEquipped'    => $hasSet,
             'setIndex'       => $setIndex,
+            'setName'        => !is_null($setEquipped) ? $setEquipped->name : null,
         ];
     }
 
@@ -152,6 +154,14 @@ class ComparisonService {
         $item = (new Manager())->createData($item)->toArray()['data'];
 
         $item['slot_id'] = $slot->id;
+
+        return $item;
+    }
+
+    protected function itemDetails(Item $item): array {
+        $item = new FractalItem($item, new ItemComparisonTransfromer);
+
+        $item = (new Manager())->createData($item)->toArray()['data'];
 
         return $item;
     }

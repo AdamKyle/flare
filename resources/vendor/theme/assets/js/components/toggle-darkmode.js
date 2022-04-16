@@ -1,10 +1,6 @@
-// Dark Mode
-const darkMode = () => {
+const toggleDarkMode = () => {
   const root = document.documentElement;
-
   const scheme = localStorage.getItem("scheme");
-
-  scheme && root.classList.add(scheme);
 
   const darkModeToggler = document.getElementById("darkModeToggler");
 
@@ -44,6 +40,6 @@ const darkMode = () => {
       enableDarkMode();
     }
   });
-};
+}
 
-darkMode();
+toggleDarkMode();

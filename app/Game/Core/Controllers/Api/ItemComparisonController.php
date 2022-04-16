@@ -19,7 +19,7 @@ class ItemComparisonController extends Controller {
         $itemToEquip = InventorySlot::where('inventory_id', $inventory->id)->where('id', $request->slot_id)->first();
 
         if (is_null($itemToEquip)) {
-            return redirect()->back()->with('error', 'Item not found in your inventory.');
+            return response()->json(['message' => 'Item not found in your inventory.'], 422);
         }
 
         $type = $request->item_to_equip_type;

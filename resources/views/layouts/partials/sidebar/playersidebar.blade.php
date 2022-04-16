@@ -1,10 +1,9 @@
 <!-- Menu Bar -->
 <aside class="menu-bar menu-sticky menu-hidden">
     <div class="menu-items">
-        <a href="#no-link" class="link" data-target="[data-menu=character]" data-toggle="tooltip-menu"
-           data-tippy-content="Character">
-            <span class="icon ra ra-player"></span>
-            <span class="title">Character</span>
+        <a href="{{route('home')}}" class="link" data-toggle="tooltip-menu" data-tippy-content="Game">
+            <span class="icon fas fa-dice-d20"></span>
+            <span class="title">Game</span>
         </a>
         <a href="#no-link" class="link" data-target="[data-menu=shop]" data-toggle="tooltip-menu"
            data-tippy-content="Shop">
