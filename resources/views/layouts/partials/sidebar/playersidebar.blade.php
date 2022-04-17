@@ -1,7 +1,7 @@
 <!-- Menu Bar -->
 <aside class="menu-bar menu-sticky menu-hidden">
     <div class="menu-items">
-        <a href="{{route('home')}}" class="link" data-toggle="tooltip-menu" data-tippy-content="Game">
+        <a href="{{route('game')}}" class="link" data-toggle="tooltip-menu" data-tippy-content="Game">
             <span class="icon fas fa-dice-d20"></span>
             <span class="title">Game</span>
         </a>

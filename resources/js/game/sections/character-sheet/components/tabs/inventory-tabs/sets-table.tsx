@@ -18,6 +18,7 @@ import SuccessAlert from "../../../../../components/ui/alerts/simple-alerts/succ
 import {isEqual} from "lodash";
 import WarningAlert from "../../../../../components/ui/alerts/simple-alerts/warning-alert";
 import RenameSetModal from "../../modals/rename-set-modal";
+import clsx from "clsx";
 
 export default class SetsTable extends React.Component<SetsInventoryTabProps, SetsTableState> implements ActionsInterface {
     constructor(props: SetsInventoryTabProps) {
@@ -188,7 +189,7 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
         return this.state.drop_down_labels.map((label: string) => {
             return {
                 name: label,
-                icon_class: 'ra ra-crossed-swords',
+                icon_class: clsx('ra ra-crossed-swords', {'text-yellow-600': this.cannotEquipSet(label)}),
                 on_click: () => this.switchTable(label)
             }
         });
@@ -217,11 +218,13 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
                     on_click: () => this.emptySet()
                 });
 
-                actions.push({
-                    name: 'Equip set',
-                    icon_class: 'ra ra-crossed-swords',
-                    on_click: () => this.equipSet()
-                });
+                if (!this.cannotEquipSet()) {
+                    actions.push({
+                        name: 'Equip set',
+                        icon_class: 'ra ra-crossed-swords',
+                        on_click: () => this.equipSet()
+                    });
+                }
             }
         }
 
@@ -246,18 +249,16 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
         return this.state.selected_set === this.props.set_name_equipped || this.props.is_dead
     }
 
-    cannotEquip() {
+    cannotEquipSet(setName?: string) {
         if (this.state.selected_set !== null) {
+
+            if (typeof setName !== 'undefined') {
+                return !this.props.sets[setName].equippable
+            }
+
             return !this.props.sets[this.state.selected_set].equippable
         }
 
-        return this.props.is_dead;
-    }
-
-    showCannotEquipMessage() {
-        if (this.state.selected_set !== null) {
-            return !this.props.sets[this.state.selected_set].equippable
-        }
 
         return false;
     }
@@ -279,7 +280,7 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
                     : null
                 }
                 {
-                    this.showCannotEquipMessage() ?
+                    this.cannotEquipSet() ?
                         <WarningAlert additional_css={'mb-4'}>
                             Cannot equip set because it violates the <a href={'/information/equipment-sets'} target='_blank'>set <i className="fas fa-external-link-alt"></i></a> rules.
                             You can still treat this set like a stash tab.

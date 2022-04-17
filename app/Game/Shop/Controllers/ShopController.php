@@ -108,26 +108,6 @@ class ShopController extends Controller {
         return redirect()->back()->with('success', 'Sold all your unequipped items for a total of: ' . $totalSoldFor . ' gold.');
     }
 
-    public function shopBuyBulk(Request $request, Character $character) {
-
-        if ($character->gold === 0) {
-            return redirect()->back()->with('error', 'You do not have enough gold.');
-        }
-
-        $items = Item::findMany($request->items);
-
-        if ($items->isEmpty()) {
-            return redirect()->back()->with('error', 'No items could be found. Did you select any?');
-        }
-
-        PurchaseItemsJob::dispatch($character, $items)->onConnection('shop_buying');
-
-        return redirect()->back()->with('success', 'Your items are being purchased.
-        You can check your character sheet to see them come in. If you cannot afford the items, the game chat section will update.
-        Once all items are purchased, the chat section will update to inform you.');
-
-    }
-
     public function buy(Request $request, Character $character) {
 
         if ($character->gold === 0) {
@@ -247,7 +227,7 @@ class ShopController extends Controller {
 
         $inventory = Inventory::where('character_id', $character->id)->first();
 
-        $slot      = InventorySlot::where('equipped', false)->where('item_id', $item->id)->first();
+        $slot      = InventorySlot::where('equipped', false)->where('item_id', $item->id)->where('inventory_id', $inventory->id)->first();
 
         $request->merge([
             'slot_id' => $slot->id,
@@ -258,11 +238,6 @@ class ShopController extends Controller {
             ->replaceItem();
 
         $this->updateCharacterAttackDataCache($character);
-
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'equipped'));
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'sets'));
-
-        event(new CharacterInventoryDetailsUpdate($character->user));
 
         return redirect()->to(route('game.shop.buy', ['character' => $character]))->with('success', 'Purchased and equipped: ' . $item->affix_name . '.');
     }

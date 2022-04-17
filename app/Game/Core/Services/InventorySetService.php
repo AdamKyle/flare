@@ -304,6 +304,10 @@ class InventorySetService {
             return false;
         }
 
+        if ($shields->count() == 2 && $weapons->count() > 0) {
+            return false;
+        }
+
         if ($hasShield && $hasBow) {
             return false;
         }

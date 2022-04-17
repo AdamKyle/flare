@@ -21,7 +21,7 @@ export default class Dialogue extends React.Component<DialogueTypes, any> {
             <Transition appear show={this.props.is_open} as={Fragment}>
                 <Dialog
                     as="div"
-                    className="fixed inset-0 z-10 overflow-y-auto"
+                    className="fixed inset-0 z-10"
                     onClose={this.emptyClose.bind(this)}
                 >
                     <Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
@@ -55,7 +55,7 @@ export default class Dialogue extends React.Component<DialogueTypes, any> {
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <div className={clsx("inline-block w-full p-6 my-8 overflow-y-auto text-left align-middle transition-all transform bg-white dark:bg-gray-700 drop-shadow-2xl rounded-md", {'max-w-7xl': this.props.large_modal && !this.props.medium_modal}, {'max-w-5xl': this.props.medium_modal}, {'max-w-3xl': !this.props.large_modal && !this.props.medium_modal})}>
+                            <div className={clsx("inline-block w-full p-6 my-8 text-left align-middle transition-all transform bg-white dark:bg-gray-700 drop-shadow-2xl rounded-md", {'max-w-7xl': this.props.large_modal && !this.props.medium_modal}, {'max-w-5xl': this.props.medium_modal}, {'max-w-3xl': !this.props.large_modal && !this.props.medium_modal})}>
                                 <Dialog.Title
                                     as="h3"
                                     className="flex items-center text-lg font-medium leading-6 text-gray-700 dark:text-gray-500 relative mb-5"
