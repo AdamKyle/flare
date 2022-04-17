@@ -46,7 +46,7 @@ class EnchantingController extends Controller {
 
         if ($cost > $character->gold || !$cost) {
 
-            event(new ServerMessageEvent($character->user, 'You cannot afford to enchant this ...'));
+            event(new ServerMessageEvent($character->user, 'You cannot afford to enchant this...'));
 
             return response()->json([], 200);
         }
