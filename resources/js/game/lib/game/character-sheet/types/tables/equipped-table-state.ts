@@ -6,4 +6,6 @@ export default interface EquippedTableState {
     loading: boolean;
 
     search_string: string;
+
+    success_message: string | null;
 }

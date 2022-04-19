@@ -378,19 +378,30 @@ class CharacterInventoryController extends Controller {
 
             $this->updateCharacterAttackDataCache($character);
 
-            event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'sets'));
-            event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
-            event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'equipped'));
+            $inventoryName = 'Set ' . $inventoryIndex + 1;
 
-            event(new CharacterInventoryDetailsUpdate($character->user));
+            if (!is_null($inventorySet->name)) {
+                $inventoryName = $inventorySet->name;
+            }
 
-            return response()->json(['message' => 'Unequipped Set ' . $inventoryIndex + 1 . '.'], 200);
+            $character = $character->refresh();
+
+            $inventory = $this->characterInventoryService->setCharacter($character);
+
+            return response()->json([
+                'message' => 'Unequipped ' . $inventoryName . '.',
+                'inventory' => [
+                    'set_is_equipped' => false,
+                    'equipped'        => $inventory->getInventoryForType('equipped'),
+                    'sets'            => $inventory->getInventoryForType('sets')['sets'],
+                ]
+            ]);
         }
 
         $foundItem = $character->inventory->slots->find($request->item_to_remove);
 
         if (is_null($foundItem)) {
-            return response()->json(['error' => 'No item found to be equipped.'], 422);
+            return response()->json(['error' => 'No item found to be unequipped.'], 422);
         }
 
         $foundItem->update([
@@ -402,20 +413,17 @@ class CharacterInventoryController extends Controller {
 
         $this->updateCharacterAttackDataCache($character);
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'equipped'));
+        $character = $character->refresh();
 
-        event(new CharacterInventoryDetailsUpdate($character->user));
+        $inventory = $this->characterInventoryService->setCharacter($character);
 
-        $affixData = $this->enchantingService->fetchAffixes($character->refresh());
-
-        event(new UpdateCharacterEnchantingList(
-            $character->user,
-            $affixData['affixes'],
-            $affixData['character_inventory'],
-        ));
-
-        return response()->json(['message' => 'Unequipped item.'], 200);
+        return response()->json([
+            'message' => 'Unequipped item: ' . $foundItem->item->name,
+            'inventory' => [
+                'inventory' => $inventory->getInventoryForType('inventory'),
+                'equipped'  => $inventory->getInventoryForType('equipped'),
+            ]
+        ]);
     }
 
     public function unequipAll(Request $request, Character $character, InventorySetService $inventorySetService) {
@@ -496,8 +504,15 @@ class CharacterInventoryController extends Controller {
 
         $characterInventoryService = $this->characterInventoryService->setCharacter($character);
 
+        $inventoryName = 'Set ' . $setIndex + 1;
+        $set = InventorySet::where('is_equipped', true)->first();
+
+        if (!is_null($set->name)) {
+            $inventoryName = $set->name;
+        }
+
         return response()->json([
-            'message' => 'Set ' . $setIndex + 1 . ' is now equipped',
+            'message' => $inventoryName .  ' is now equipped',
             'inventory' => [
                 'equipped'          => $characterInventoryService->getInventoryForType('equipped'),
                 'set_is_equipped'   => true,

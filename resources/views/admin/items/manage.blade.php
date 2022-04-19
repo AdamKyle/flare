@@ -61,6 +61,10 @@
                         </div>
                     </div>
                     <div id="tab-style-2-2" class="collapse">
+
+
+                    </div>
+                    <div id="tab-style-2-3" class="collapse">
                         <div class="grid md:grid-cols-2 md:gap-3">
                             <div>
                                 <h3 class="mb-3">Base Info</h3>
@@ -117,13 +121,13 @@
                             <label class="label block mb-2" for="devouring_darkness">Devouring Darkness</label>
                             <input id="devouring_darkness" type="number" class="form-control" name="devouring_darkness" value="{{!is_null($item) ? $item->devouring_darkness : ''}}">
                         </div>
-
-                    </div>
-                    <div id="tab-style-2-3" class="collapse">
-                        Step 3 Content
                     </div>
                     <div id="tab-style-2-4" class="collapse">
-                        Step 4 Content
+                        <label class="custom-checkbox mb-5" for="can_resurrect">
+                            <input type="checkbox" id="can_resurrect" name="can_resurrect" {{!is_null($item) ? $item->can_resurrect ? 'checked' : '' : ''}}>
+                            <span></span>
+                            <span>Can Craft</span>
+                        </label>
                     </div>
                     <div id="tab-style-2-5" class="collapse">
                         Step 5 Content

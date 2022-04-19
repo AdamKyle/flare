@@ -97,17 +97,17 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
             return [
                 {
                     name: 'Destroy All',
-                    icon_class: 'fas fa-shopping-bag',
+                    icon_class: 'far fa-trash-alt',
                     on_click: () => this.manageDestroyAll()
                 },
                 {
                     name: 'Disenchant All',
-                    icon_class: 'ra ra-bubbling-potion',
+                    icon_class: 'ra ra-fire',
                     on_click: () => this.manageDisenchantAll()
                 },
                 {
                     name: 'Sell All',
-                    icon_class: 'ra ra-bubbling-potion',
+                    icon_class: 'far fa-money-bill-alt',
                     on_click: () => this.manageSellAll()
                 },
             ]
@@ -116,12 +116,12 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
         return [
             {
                 name: 'Use many',
-                icon_class: 'fas fa-shopping-bag',
+                icon_class: 'ra ra-bottle-vapors',
                 on_click: () => this.manageDestroyAll()
             },
             {
                 name: 'Destroy All',
-                icon_class: 'fas fa-shopping-bag',
+                icon_class: 'far fa-trash-alt',
                 on_click: () => this.manageDestroyAll()
             },
         ]

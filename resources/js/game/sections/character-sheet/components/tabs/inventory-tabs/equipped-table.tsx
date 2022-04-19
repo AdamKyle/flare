@@ -11,6 +11,7 @@ import {AxiosError, AxiosResponse} from "axios";
 import {isEqual} from "lodash";
 import EquippedInventoryTabProps from "../../../../../lib/game/character-sheet/types/tabs/equipped-inventory-tab-props";
 import EquippedTableState from "../../../../../lib/game/character-sheet/types/tables/equipped-table-state";
+import SuccessAlert from "../../../../../components/ui/alerts/simple-alerts/success-alert";
 
 export default class EquippedTable extends React.Component<EquippedInventoryTabProps, EquippedTableState> implements ActionsInterface  {
     constructor(props: EquippedInventoryTabProps) {
@@ -20,6 +21,7 @@ export default class EquippedTable extends React.Component<EquippedInventoryTabP
             data: this.props.equipped_items,
             loading: false,
             search_string: '',
+            success_message: null,
         }
     }
 
@@ -69,6 +71,12 @@ export default class EquippedTable extends React.Component<EquippedInventoryTabP
         });
     }
 
+    manageSuccessMessage() {
+        this.setState({
+            success_message: null
+        });
+    }
+
     unequipAll() {
         this.setState({
             loading: true,
@@ -77,7 +85,8 @@ export default class EquippedTable extends React.Component<EquippedInventoryTabP
                 is_set_equipped: this.props.is_set_equipped,
             }).doAjaxCall('post', (result: AxiosResponse) => {
                 this.setState({
-                    loading: false
+                    loading: false,
+                    success_message: result.data.message
                 }, () => {
                     this.props.update_inventory(result.data.inventory);
                 });
@@ -88,7 +97,23 @@ export default class EquippedTable extends React.Component<EquippedInventoryTabP
     }
 
     unequip(id: number) {
+        this.setState({
+            loading: true,
+        }, () => {
+            (new Ajax()).setRoute('character/'+this.props.character_id+'/inventory/unequip').setParameters({
+                inventory_set_equipped: this.props.is_set_equipped,
+                item_to_remove: id,
+            }).doAjaxCall('post', (result: AxiosResponse) => {
+                this.setState({
+                    loading: false,
+                    success_message: result.data.message
+                }, () => {
+                    this.props.update_inventory(result.data.inventory);
+                });
+            }, (error: AxiosError) => {
 
+            });
+        });
     }
 
     saveAsSet() {
@@ -98,6 +123,13 @@ export default class EquippedTable extends React.Component<EquippedInventoryTabP
     render() {
         return (
             <Fragment>
+                {
+                    this.state.success_message !== null ?
+                        <SuccessAlert additional_css={'mb-4 mt-4'} close_alert={this.manageSuccessMessage.bind(this)}>
+                            {this.state.success_message}
+                        </SuccessAlert>
+                     : null
+                }
                 <div className='mb-5'>
                     <div className='flex items-center'>
                         <div>
