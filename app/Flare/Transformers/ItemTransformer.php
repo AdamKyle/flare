@@ -8,7 +8,7 @@ use Facades\App\Flare\Calculators\SellItemCalculator;
 use League\Fractal\TransformerAbstract;
 use App\Flare\Models\Item;
 
-class MarketItemsTransformer extends TransformerAbstract {
+class ItemTransformer extends TransformerAbstract {
 
     use IsItemUnique;
 

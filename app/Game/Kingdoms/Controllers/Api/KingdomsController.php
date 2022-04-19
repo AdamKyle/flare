@@ -359,7 +359,7 @@ class KingdomsController extends Controller
 
         if ($amountToEmbezzle > $kingdom->treasury) {
             return response()->json([
-                'message' => "You don\'t have the gold in your treasury."
+                'message' => "You don't have the gold in your treasury."
             ], 422);
         }
 

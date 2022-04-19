@@ -481,7 +481,7 @@ class KingdomsControllerTest extends TestCase
 
         $content = json_decode($response->content());
 
-        $this->assertEquals('You don\'t have the gold in your treasury.', $content->message);
+        $this->assertEquals("You don't have the gold in your treasury.", $content->message);
     }
 
     public function testCannotEmbezzleMoraleTooLow() {
