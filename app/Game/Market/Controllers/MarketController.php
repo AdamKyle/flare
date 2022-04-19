@@ -9,7 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\MarketBoard;
-use App\Flare\Transformers\MarketItemsTransfromer;
+use App\Flare\Transformers\MarketItemsTransformer;
 use App\Game\Core\Events\UpdateMarketBoardBroadcastEvent;
 use App\Game\Core\Traits\UpdateMarketBoard;
 
@@ -22,7 +22,7 @@ class MarketController extends Controller {
 
     private $transformer;
 
-    public function __construct(Manager $manager, MarketItemsTransfromer $transformer) {
+    public function __construct(Manager $manager, MarketItemsTransformer $transformer) {
         $this->manager     = $manager;
         $this->transformer = $transformer;
     }

@@ -100,7 +100,7 @@ class NpcQuestRewardHandler {
             if ($effectType->getCopperCoins()) {
                 broadcast(new GlobalMessageEvent('Lighting streaks across the skies, blackness fills the skies. A thunderous roar is heard across the land.'));
 
-                broadcast(new ServerMessageEvent($character->user, 'Careful child. You seem to have angered The Creator. Are you prepared?', true));
+                broadcast(new ServerMessageEvent($character->user, 'Careful, child. You seem to have angered The Creator. Are you prepared?', true));
             }
         }
 
@@ -110,7 +110,7 @@ class NpcQuestRewardHandler {
         ]);
 
         if (!is_null($quest->rewardItem->devouring_darkness) || !is_null($quest->rewardItem->devouring_light)) {
-            $this->updateCharacterAttakDataCache($character);
+            $this->updateCharacterAttackDataCache($character);
         }
 
         $this->npcServerMessage($npc, $character, 'given_item');
@@ -127,7 +127,7 @@ class NpcQuestRewardHandler {
             'is_locked' => false
         ]);
 
-        $this->updateCharacterAttakDataCache($character->refresh());
+        $this->updateCharacterAttackDataCache($character->refresh());
 
         $this->npcServerMessage($npc, $character, 'skill_unlocked');
 
@@ -189,7 +189,7 @@ class NpcQuestRewardHandler {
         broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build($type, $npc), true));
     }
 
-    public function updateCharacterAttakDataCache(Character $character) {
+    public function updateCharacterAttackDataCache(Character $character) {
         $this->buildCharacterAttackTypes->buildCache($character);
 
         $characterData = new Item($character->refresh(), $this->characterAttackTransformer);

@@ -102,7 +102,7 @@ export default class MoveToSetModal extends React.Component {
               : null
           }
           <p>
-            You may select below a set which you wish to move this item to. You can only select sets that
+            You may select a set below to which you wish to move this item to. You can only select sets that
             are not currently equipped.
           </p>
           <p>
@@ -119,7 +119,7 @@ export default class MoveToSetModal extends React.Component {
             </ul>
           </p>
           <p><sup>*</sup> IE, You can have 1 ring that has two regular enchants and 1 green ring that has 1 or 2 Unique Enchants. If you then add a helmet
-          that also has unique enchants, the set will not be equipable.</p>
+          that also has unique enchants, the set will not be equippable.</p>
           <p>
             <select className="form-control monster-select" id="monsters" name="monsters"
                     value={this.state.selectedSet}

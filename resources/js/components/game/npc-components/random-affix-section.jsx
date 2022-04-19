@@ -117,10 +117,10 @@ export default class RandomAffixSection extends React.Component {
             <Fragment>
               <div className="text-center">
                 <p>
-                  <em>ooooh hoo hoo hoo! Are you hiding all your uniques? They have to be in your inventory silly.</em>
+                  <em>Ooooh hoo hoo hoo! Are you hiding all your uniques? They have to be in your inventory, silly.</em>
                 </p>
                 <p>
-                  <em>Maybe you want to buy one from me instead handsome .... What are you again? Oooh hoo hoo hoo!!!</em>
+                  <em>Maybe you want to buy one from me instead, handsome... What are you again? Oooh hoo hoo hoo!!!</em>
                 </p>
               </div>
               <hr />

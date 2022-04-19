@@ -2,7 +2,6 @@
 
 namespace App\Flare\Models;
 
-use Database\Factories\NpceFactory;
 use Database\Factories\NpcFactory;
 use Database\Factories\QuestFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

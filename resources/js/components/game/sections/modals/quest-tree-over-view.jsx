@@ -123,7 +123,7 @@ export default class QuestTreeOverView extends React.Component {
           <Modal.Body>
             <p>
               Below you will find a tree for each parent quest. This gives you an idea of how all the quests are linked together.
-              You can click on each quest to view it's relevant details.
+              You can click on each quest to view its relevant details.
             </p>
             <p>
               Some quests, specifically those in chains (blue lines connecting) can take you across multiple planes. Make sure you have the appropriate

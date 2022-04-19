@@ -14,5 +14,5 @@ see [traverse](/information/traverse) - to then traverse to the plane of existen
 
 ## Planes
 
-Below are a list of planes, clicking on them will show you more information including how to access said plane.
+Below is a list of planes, clicking on them will show you more information, including how to access said plane.
 

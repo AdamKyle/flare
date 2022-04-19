@@ -63,6 +63,9 @@ class ItemsController extends Controller {
             'armour' => [
                 'helmet', 'body', 'leggings', 'sleeves', 'feet', 'shield', 'gloves'
             ],
+            'spells' => [
+                'spell-damage', 'spell-healing',
+            ],
             'rings' => [
                 'ring'
             ],
@@ -74,6 +77,9 @@ class ItemsController extends Controller {
             ],
             'artifacts' => [
                 'artifact'
+            ],
+            'trinkets' => [
+                'trinket'
             ]
         ];
 

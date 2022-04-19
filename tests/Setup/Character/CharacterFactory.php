@@ -192,7 +192,7 @@ class CharacterFactory {
 
         // In case it's called again, we don't want duplicates.
         // If the monster updates its plane or a monster is created
-        // with a different plane then the character, we need to make sure their
+        // with a different plane than the character, we need to make sure their
         // faction system is always up-to-date.
         $this->character->factions()->delete();
 
@@ -284,9 +284,9 @@ class CharacterFactory {
     /**
      * Lets you ban a character
      *
-     * If the length is not set, then the ban is for ever.
+     * If the length is not set, then the ban is forever.
      *
-     * Length should be acarbon date object.
+     * Length should be a carbon date object.
      *
      * @param string $reason | null
      * @param string $request | null

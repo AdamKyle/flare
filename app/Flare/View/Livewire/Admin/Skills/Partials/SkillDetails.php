@@ -42,7 +42,7 @@ class SkillDetails extends Component
         $this->validate();
 
         if ($this->skill->max_level <= 0) {
-            $this->addError('gameSkill.max_level', 'Cannot be equal to or less then 0');
+            $this->addError('gameSkill.max_level', 'Cannot be equal to or less than 0');
         }
 
         $this->skill->save();

@@ -60,7 +60,7 @@ class DropCheckCalculator {
     /**
      * Determines if the player can get a quest item from the monster.
      *
-     * Fetches the adventure bonues, if applies and applies it to the looting bonus against the monster quest_item_drop_chance.
+     * Fetches the adventure bonuses, if applies and applies it to the looting bonus against the monster quest_item_drop_chance.
      *
      * @param Monster $monster
      * @param Adventure|null $adventure

@@ -31,7 +31,7 @@ Tier two can start as early as your first few hours, but the items you get are l
 Once you do the [quests](/information/quests) to unlock [The Queen of Hearts NPC](/information/npcs) you can then purchase 50 and 100 billion valuation items that you can then re-roll
 and finally move to your desired gear piece.
 
-Once you have purchased a good 100 billion valuation unique from here, re rolled it and moved its affixes you have ended Tier 2.
+Once you have purchased a good 100 billion valuation unique from here, re-rolled it and moved its affixes you have ended Tier 2.
 
 ## Tier Three: Holy items
 

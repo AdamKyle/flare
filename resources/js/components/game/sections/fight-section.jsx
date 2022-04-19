@@ -258,7 +258,7 @@ export default class FightSection extends React.Component {
   monsterVoidance(monsterInfo, character, voidance) {
     if (monsterInfo.canMonsterDevoidPlayer(character.devouring_darkness_res)) {
       this.battleMessagesBeforeFight.push({
-        message: this.props.monster.name + ' has devoided your voidance! You feel fear start to build.',
+        message: this.props.monster.name + ' has devoided your voidance! You feel fear starting to build up.',
         class: 'enemy-action-fired'
       });
 
@@ -315,7 +315,7 @@ export default class FightSection extends React.Component {
 
     if (monsterInfo.canMonsterDevoidPlayer(character.devouring_darkness_res) && this.isMonsterDevoided) {
       this.battleMessagesBeforeFight.push({
-        message: this.props.monster.name + ' has devoided your voidance! You feel fear start to build.',
+        message: this.props.monster.name + ' has devoided your voidance! You feel fear starting to build up.',
         class: 'action-fired'
       });
 
@@ -410,7 +410,7 @@ export default class FightSection extends React.Component {
     this.battleMessagesBeforeFight = [];
 
     if (state.characterCurrentHealth <= 0) {
-      state.battleMessages.push({message: 'Death has come for you this day child! Resurrect to try again!', class: 'enemy-action-fired'});
+      state.battleMessages.push({message: 'Death has come for you this day, child! Resurrect to try again!', class: 'enemy-action-fired'});
     }
 
     if (state.characterCurrentHealth > this.state.characterCurrentHealth) {

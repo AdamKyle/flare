@@ -68,7 +68,7 @@ class BaseStatValue {
     }
 
     /**
-     * Get durabillity based on race and class modifiers.
+     * Get durability based on race and class modifiers.
      *
      * @return int
      */
@@ -81,7 +81,7 @@ class BaseStatValue {
     }
 
     /**
-     * Get durabillity based on race and class modifiers.
+     * Get durability based on race and class modifiers.
      *
      * @return int
      */

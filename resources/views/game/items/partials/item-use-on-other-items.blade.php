@@ -9,8 +9,8 @@
             add small % boost to your items as well as devoidance % boosts. These boosts are rand between a set range for each level.
         </p>
         <p>
-            Finally, these items can also increase what's known as Devoidance and Voidance Resistance, this allows you to resist an enemies attempt to
-            void or devoid you. The more stacks of holy uou have, the more resistance you can build up.
+            Finally, these items can also increase what's known as Devoidance and Voidance Resistance, this allows you to resist an enemy's attempt to
+            void or devoid you. The more stacks of holy you have, the more resistance you can build up.
         </p>
     </div>
 

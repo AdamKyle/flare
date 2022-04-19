@@ -2,6 +2,8 @@
 
 namespace App\Admin\Import\Kingdoms\Sheets;
 
+use App\Flare\Models\GameBuilding;
+use App\Flare\Models\GameUnit;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use App\Flare\Models\GameBuildingUnit;
@@ -20,10 +22,10 @@ class BuildingsUnitsSheet implements ToCollection {
                 ];
 
                 $gameBuildingUnit = GameBuildingUnit::find($row[0]);
+                $gameUnit         = GameUnit::find($row[1]);
+                $gameBuilding     = GameBuilding::find($row[2]);
 
-                if (!is_null($gameBuildingUnit)) {
-                    $gameBuildingUnit->update($buildingUnitData);
-                } else {
+                if (is_null($gameBuildingUnit) && !is_null($gameUnit) && !is_null($gameBuilding)) {
                     GameBuildingUnit::create($buildingUnitData);
                 }
             }

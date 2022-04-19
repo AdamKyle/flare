@@ -43,7 +43,7 @@ class CreateAdventureNotificationEventTest extends TestCase
 
         $skill = $this->character->skills()->join('game_skills', function($join) {
             $join->on('game_skills.id', 'skills.game_skill_id')
-                 ->where('name', 'Looting'); 
+                 ->where('name', 'Looting');
         })->first();
 
         $this->character->adventureLogs()->create([
@@ -52,7 +52,7 @@ class CreateAdventureNotificationEventTest extends TestCase
             'complete'             => true,
             'in_progress'          => false,
             'last_completed_level' => 1,
-            'logs'                 => 
+            'logs'                 =>
             [
                 "vcCBZhAOqy3Dg9V6a1MRWCthCGFNResjhH7ttUsFFpREdVoH9oNqyrjVny3cX8McbjyGHZYeJ8txcTov" => [
                     [
@@ -60,14 +60,14 @@ class CreateAdventureNotificationEventTest extends TestCase
                         "attacker" => "Kyle Adams",
                         "defender" => "Goblin",
                         "messages" => [
-                            "Kyle Adams hit for 30",
+                            "Kyle Adams hits for 30",
                         ],
                         "is_monster" => false,
                         ],
                     ],
                 ]
             ],
-            'rewards'              => 
+            'rewards'              =>
             [
                 "exp" => 100,
                 "gold" => 75,
@@ -96,7 +96,7 @@ class CreateAdventureNotificationEventTest extends TestCase
     }
 
 
-    public function testAventureNotification()
+    public function testAdventureNotification()
     {
 
         event(new CreateAdventureNotificationEvent($this->character->adventureLogs->first()));

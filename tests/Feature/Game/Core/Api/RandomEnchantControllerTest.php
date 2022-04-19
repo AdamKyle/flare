@@ -34,7 +34,7 @@ class RandomEnchantControllerTest extends TestCase
         $this->character = null;
     }
 
-    public function testGetUniquesForTheQueenofHearts() {
+    public function testGetUniquesForTheQueenOfHearts() {
 
         $character = $this->character->inventoryManagement()->giveItem($this->createItem([
             'item_suffix_id' => $this->createItemAffix([
@@ -247,7 +247,7 @@ class RandomEnchantControllerTest extends TestCase
         );
 
         $slotId = $character->getSlotId(0);
-        $itemSlotid  = $character->getSlotId(1);
+        $itemSlotId  = $character->getSlotId(1);
 
         $character = $character->getCharacter();
 
@@ -263,7 +263,7 @@ class RandomEnchantControllerTest extends TestCase
         $response    = $this->actingAs($character->user)
             ->json('POST', '/api/character/'.$characterId.'/random-enchant/move', [
                 'selected_slot_id'           => $slotId,
-                'selected_secondary_slot_id' => $itemSlotid,
+                'selected_secondary_slot_id' => $itemSlotId,
                 'selected_affix'             => 'all-enchantments',
                 'shard_cost'                 => 2000,
                 'gold_cost'                  => 100000000000,
@@ -291,7 +291,7 @@ class RandomEnchantControllerTest extends TestCase
         );
 
         $slotId      = $otherCharacter->getSlotId(0);
-        $itemSlotid  = $otherCharacter->getSlotId(1);
+        $itemSlotId  = $otherCharacter->getSlotId(1);
 
         $character = $this->character->getCharacter(false);
 
@@ -307,7 +307,7 @@ class RandomEnchantControllerTest extends TestCase
         $response    = $this->actingAs($character->user)
             ->json('POST', '/api/character/'.$characterId.'/random-enchant/move', [
                 'selected_slot_id'           => $slotId,
-                'selected_secondary_slot_id' => $itemSlotid,
+                'selected_secondary_slot_id' => $itemSlotId,
                 'selected_affix'             => 'all-enchantments',
                 'shard_cost'                 => 150000,
                 'gold_cost'                  => 10000000000.,
@@ -334,7 +334,7 @@ class RandomEnchantControllerTest extends TestCase
         );
 
         $slotId = $character->getSlotId(0);
-        $itemSlotid  = $character->getSlotId(1);
+        $itemSlotId  = $character->getSlotId(1);
 
         $character = $character->getCharacter();
 
@@ -343,7 +343,7 @@ class RandomEnchantControllerTest extends TestCase
         $response    = $this->actingAs($character->user)
             ->json('POST', '/api/character/'.$characterId.'/random-enchant/move', [
                 'selected_slot_id'           => $slotId,
-                'selected_secondary_slot_id' => $itemSlotid,
+                'selected_secondary_slot_id' => $itemSlotId,
                 'selected_affix'             => 'all-enchantments',
                 'shard_cost'                 => 150000,
                 'gold_cost'                  => 10000000000.,

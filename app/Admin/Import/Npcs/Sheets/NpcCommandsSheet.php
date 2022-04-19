@@ -21,7 +21,9 @@ class NpcCommandsSheet implements ToCollection {
                     'command_type' => $row[3],
                 ];
 
-                NpcCommand::UpdateOrCreate(['id' => $commandData['id']], $commandData);
+                if (!is_null(Npc::find($commandData['npc_id']))) {
+                    NpcCommand::UpdateOrCreate(['id' => $commandData['id']], $commandData);
+                }
             }
         }
     }

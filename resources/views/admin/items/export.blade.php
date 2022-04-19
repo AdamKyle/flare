@@ -33,6 +33,11 @@
                 </form>
                 <form method="POST" action="{{ route('items.export-data') }}" class="tw-mt-4">
                     @csrf
+                    <input value="spells" name="type_to_export" type="hidden" />
+                    <button type="submit" class="btn btn-primary">Export Spells Only</button>
+                </form>
+                <form method="POST" action="{{ route('items.export-data') }}" class="tw-mt-4">
+                    @csrf
                     <input value="quest" name="type_to_export" type="hidden" />
                     <button type="submit" class="btn btn-primary">Export Quest Items Only</button>
                 </form>
@@ -40,6 +45,11 @@
                     @csrf
                     <input value="alchemy" name="type_to_export" type="hidden" />
                     <button type="submit" class="btn btn-primary">Export Alchemy Items Only</button>
+                </form>
+                <form method="POST" action="{{ route('items.export-data') }}" class="tw-mt-4">
+                    @csrf
+                    <input value="trinkets" name="type_to_export" type="hidden" />
+                    <button type="submit" class="btn btn-primary">Export Trinket Items Only</button>
                 </form>
             </div>
         </div>

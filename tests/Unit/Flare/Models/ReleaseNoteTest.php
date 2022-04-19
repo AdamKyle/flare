@@ -11,7 +11,7 @@ class ReleaseNoteTest extends TestCase
 {
     use RefreshDatabase, CreateReleaseNotes;
 
-    public function testMakeSureReleaeNoteExists() {
+    public function testMakeSureReleaseNoteExists() {
 
         $this->createReleaseNotes([
             'name'         => 'sample',

@@ -64,7 +64,7 @@ export default class SellItemModal extends React.Component {
       const listFor = parseInt(this.state.list_for) || 0;
 
       if (listFor < 0) {
-        return this.setState({error: true, error_message: 'List price cannot be less then 0.'});
+        return this.setState({error: true, error_message: 'List price cannot be less than 0.'});
       }
 
       if (listFor === 0) {
@@ -88,7 +88,7 @@ export default class SellItemModal extends React.Component {
             const response = err.response;
 
             if (response.status === 401) {
-              return lodation.reload;
+              return location.reload;
             }
 
             if (response.status === 429) {

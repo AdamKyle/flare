@@ -319,7 +319,7 @@ export default class QuestDetails extends React.Component {
                         <Tab eventKey="required-item" title="Item Requirements">
                           <h3 className="tw-font-light mt-3">Quest Requires Item: {<ItemName item={this.props.quest.item} />}</h3>
                           <hr />
-                          <p>This quest requires you to hand in item. Below you will find relevant details as to how to obtain the item
+                          <p>This quest requires you to hand in an item. Below you will find relevant details as to how to obtain the item
                             you need.</p>
                           {this.renderItem(this.props.quest.item)}
                         </Tab>
@@ -364,7 +364,7 @@ export default class QuestDetails extends React.Component {
                           <h3 className="tw-font-light mt-3">Quest Requires Plane Access</h3>
                           <hr />
                           <p>This quest requires that you have access to a specific plane. You can find the relevant details of the quest that would get you access.
-                            There may be other quests involved, so make sure to check that quest out to see whats required.</p>
+                            There may be other quests involved, so make sure to check that quest out to see what's required.</p>
 
                           <dl>
                             {this.renderPlaneAccessRequirements(this.props.quest.required_plane)}
@@ -377,7 +377,7 @@ export default class QuestDetails extends React.Component {
               </Tab>
               <Tab eventKey="reward-info" title="Reward">
                 <div className="mt-3">
-                  <p>Upon completing this quest, buy speaking to the NPC and entering the command, once you have
+                  <p>Upon completing this quest, by speaking to the NPC and entering the command, once you have
                   met the required objectives you will be rewarded with the following.</p>
                   <hr />
                   <dl>

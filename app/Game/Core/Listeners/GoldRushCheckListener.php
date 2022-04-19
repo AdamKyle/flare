@@ -36,11 +36,11 @@ class GoldRushCheckListener
         if ($hasGoldRush) {
             $goldRush = ceil($event->character->gold + $event->character->gold * 0.03);
 
-            $maxCurrentices = new MaxCurrenciesValue($goldRush, MaxCurrenciesValue::GOLD);
+            $maxCurrencies = new MaxCurrenciesValue($goldRush, MaxCurrenciesValue::GOLD);
 
             $type = 'gold_rush';
 
-            if ($maxCurrentices->canNotGiveCurrency()) {
+            if ($maxCurrencies->canNotGiveCurrency()) {
                 $event->character->gold = MaxCurrenciesValue::MAX_GOLD;;
                 $event->character->save();
 

@@ -13,7 +13,7 @@ From here we can message the NPc in question:
     </a>
 </div>
 
-As you can see we have to be at their location. Teleport or move to their location and from there message them again.
+As you can see we have to be at their location. Teleport or move to their location and from there, message them again.
 
 This time you should see:
 
@@ -25,7 +25,7 @@ This time you should see:
 
 Now we can select our Entity to conjure. Once we have - we can choose public or private.
 
-If it's public every one will be told of the location of the entity. If it's private, as we will do in this example, you will
+If it's public, everyone will be told of the location of the entity. If it's private, as we will do in this example, you will
 see that the location details are only given to you. Before we see those details we have to pay:
 
 <div class="mb-4">

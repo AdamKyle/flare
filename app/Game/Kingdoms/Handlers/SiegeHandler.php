@@ -59,7 +59,7 @@ class SiegeHandler {
      * Attack
      *
      * Starts with the primary target, moves to attacking fall back building and then attacks all
-     * kingdom buildings assuming their are siege units left.
+     * kingdom buildings assuming there are siege units left.
      *
      * @param Kingdom $defender
      * @param array $siegeUnits

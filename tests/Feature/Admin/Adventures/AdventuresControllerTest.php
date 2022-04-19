@@ -198,7 +198,7 @@ class AdventuresControllerTest extends TestCase
         $this->assertEquals('Example Content', $adventure->refresh()->floorDescriptions()->first()->description);
     }
 
-    public function testFailToSaveFloorDescrtiptions() {
+    public function testFailToSaveFloorDescriptions() {
         $adventure = $this->createNewAdventure();
 
         $this->actingAs($this->user)->visit(route('adventures.list'))->visit(route('adventure.floor_descriptions', [

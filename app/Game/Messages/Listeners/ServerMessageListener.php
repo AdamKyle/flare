@@ -39,7 +39,7 @@ class ServerMessageListener
 
                 return broadcast(new ServerMessage($event->user, $message));
             case 'gold_rush':
-                $message = 'Gold Rush! You\'re gold is now: ' . $event->forMessage . ' Gold! 5% of your total gold has been awarded to you.';
+                $message = 'Gold Rush! Your gold is now: ' . $event->forMessage . ' Gold! 5% of your total gold has been awarded to you.';
 
                 return broadcast(new ServerMessage($event->user, $message));
             case 'gold_capped':
@@ -47,7 +47,7 @@ class ServerMessageListener
 
                 return broadcast(new ServerMessage($event->user, $message));
             case 'gained_item':
-                $message = 'You found a: ' . $event->forMessage . ' on the enemies corpse!';
+                $message = 'You found a: ' . $event->forMessage . ' on the enemy\'s corpse!';
 
                 return broadcast(new ServerMessage($event->user, $message, false, true, $event->link, $event->id));
             case 'found_item':
@@ -94,7 +94,7 @@ class ServerMessageListener
 
                 return broadcast(new ServerMessage($event->user, $message));
             case 'lotto_max':
-                $message = 'You won the daily Gold Dust Lottery! Congratz! You won: ' . $event->forMessage . ' Gold Dust';
+                $message = 'You won the daily Gold Dust Lottery! Congrats! You won: ' . $event->forMessage . ' Gold Dust';
 
                 return broadcast(new ServerMessage($event->user, $message));
             case 'daily_lottery':

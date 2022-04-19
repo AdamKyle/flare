@@ -88,7 +88,7 @@ class BaseTransformer extends TransformerAbstract {
     }
 
     public function getMaxLevel(Character $character) {
-        $item      = Item::where('effect', ItemEffectsValue::CONTNUE_LEVELING)->first();
+        $item      = Item::where('effect', ItemEffectsValue::CONTINUE_LEVELING)->first();
 
         if (is_null($item)) {
             return MaxLevel::MAX_LEVEL;

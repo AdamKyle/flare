@@ -105,7 +105,7 @@
         var lightbox = GLightbox();
 
         lightbox.on('open', (target) => {
-            // do nothing ...
+            // do nothing...
         });
     </script>
 

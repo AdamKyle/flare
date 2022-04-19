@@ -66,8 +66,8 @@ export default class TimeOutBar extends React.Component {
       }
 
       this.setState({
-        maxTimeOut: event.activatebar ? forLength : 0,
-        active: event.activatebar,
+        maxTimeOut: event.activateBar ? forLength : 0,
+        active: event.activateBar,
       }, () => {
         if (this.props.hasOwnProperty('updateCanAttack')) {
           this.props.updateCanAttack(event.canAttack);

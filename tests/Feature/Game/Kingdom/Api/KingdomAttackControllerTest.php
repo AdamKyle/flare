@@ -104,7 +104,7 @@ class KingdomAttackControllerTest extends TestCase
 
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($user)->json('POST', route('kingdom.atack', [
+        $response = $this->actingAs($user)->json('POST', route('kingdom.attack', [
             'character' => $this->character->getCharacter(false)->id
         ]), [
             'defender_id' => $this->createEnemyKingdom()->id,
@@ -136,7 +136,7 @@ class KingdomAttackControllerTest extends TestCase
             'siege_weapon' => true,
         ], 500);
 
-        $response = $this->actingAs($user)->json('POST', route('kingdom.atack', [
+        $response = $this->actingAs($user)->json('POST', route('kingdom.attack', [
             'character' => $this->character->getCharacter(false)->id
         ]), [
             'defender_id' => $this->createEnemyKingdom()->id,
@@ -160,7 +160,7 @@ class KingdomAttackControllerTest extends TestCase
     public function testFailToAttackDefendingKingdomThatDoesNotExist() {
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($user)->json('POST', route('kingdom.atack', [
+        $response = $this->actingAs($user)->json('POST', route('kingdom.attack', [
             'character' => $this->character->getCharacter(false)->id
         ]), [
             'defender_id' => 27,
@@ -185,7 +185,7 @@ class KingdomAttackControllerTest extends TestCase
     public function testFailToAttackDefendingKingdomWhenAttackingKingdomDoesntExist() {
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($user)->json('POST', route('kingdom.atack', [
+        $response = $this->actingAs($user)->json('POST', route('kingdom.attack', [
             'character' => $this->character->getCharacter(false)->id
         ]), [
             'defender_id' => $this->createEnemyKingdom()->id,
@@ -210,7 +210,7 @@ class KingdomAttackControllerTest extends TestCase
     public function testFailToAttackDefendingKingdomWhenAttackingUnitsDoesntExist() {
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($user)->json('POST', route('kingdom.atack', [
+        $response = $this->actingAs($user)->json('POST', route('kingdom.attack', [
             'character' => $this->character->getCharacter(false)->id
         ]), [
             'defender_id' => $this->createEnemyKingdom()->id,
@@ -232,10 +232,10 @@ class KingdomAttackControllerTest extends TestCase
         $this->assertEquals('No unit exists for name: Sample Jazz on this kingdom: Sample', $content->message);
     }
 
-    public function testFailToAttackDefendingKingdomWhenAttackingUnitsexeedsAmountYouHave() {
+    public function testFailToAttackDefendingKingdomWhenAttackingUnitsExceedsAmountYouHave() {
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($user)->json('POST', route('kingdom.atack', [
+        $response = $this->actingAs($user)->json('POST', route('kingdom.attack', [
             'character' => $this->character->getCharacter(false)->id
         ]), [
             'defender_id' => $this->createEnemyKingdom()->id,
@@ -260,7 +260,7 @@ class KingdomAttackControllerTest extends TestCase
     public function testCannotAttackDefendingKingdomMissingDefenderId() {
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($user)->json('POST', route('kingdom.atack', [
+        $response = $this->actingAs($user)->json('POST', route('kingdom.attack', [
             'character' => $this->character->getCharacter(false)->id
         ]))->response;
 
@@ -274,7 +274,7 @@ class KingdomAttackControllerTest extends TestCase
     public function testCannotAttackDefendingKingdomMissingUnitsToSend() {
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($user)->json('POST', route('kingdom.atack', [
+        $response = $this->actingAs($user)->json('POST', route('kingdom.attack', [
             'character' => $this->character->getCharacter(false)->id
         ]), [
             'defender_id' => $this->createEnemyKingdom()->id,
@@ -290,7 +290,7 @@ class KingdomAttackControllerTest extends TestCase
     public function testCannotAttackDefendingKingdomUnitsToSendMustBeAnArray() {
         $user = $this->character->getUser();
 
-        $response = $this->actingAs($user)->json('POST', route('kingdom.atack', [
+        $response = $this->actingAs($user)->json('POST', route('kingdom.attack', [
             'character' => $this->character->getCharacter(false)->id
         ]), [
             'defender_id'   => $this->createEnemyKingdom()->id,

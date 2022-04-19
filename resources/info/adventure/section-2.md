@@ -8,7 +8,7 @@ When you are ready to begin your adventure and you on a location, you can click 
     </a>
 </div>
 
-The same details you saw from clicking on an adventure above, is the same details you'll see in game.
+The same details you saw from clicking on an adventure above, is the same details you'll see in-game.
 
 ## Attack Types
 
@@ -44,7 +44,7 @@ Characters who become gold capped or are already gold capped will not get any go
 
 ## Information about adventures
 
-Lets go over some basics. 
+Let's go over some basics. 
 
 - Adventures have a set number of levels, this is then multiplied by the time per level to give you the total time.
   - The longer the adventure, the greater the chance for random items, quest items from monsters and gold rushes.
@@ -75,7 +75,7 @@ When you embark on the adventure you can't:
 - Destroy items
 - Manage your kingdoms
 
-You can at any time cancel the adventure. This will not give you any rewards. How ever, in the event your kingdoms come under attack, you might want to cancel that long running adventure. Learn more in [Kingdoms]() section of the guide.
+You can at any time cancel the adventure. This will not give you any rewards. However, in the event your kingdoms come under attack, you might want to cancel that long running adventure. Learn more in the [Kingdoms]() section of the guide.
 
 ### I cannot stay logged in, what if I leave?
 

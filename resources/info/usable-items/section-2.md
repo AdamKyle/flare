@@ -13,7 +13,7 @@ damaging items will not allow you to use them from the inventory.
 
 Let's actually use one of these items:
 
-First lets see what this potion does (click the name, all names in tables are clickable):
+First let's see what this potion does (click the name, all names in tables are clickable):
 
 <div class="mb-4">
     <a href="/storage/info/usable-items/images/item-details.png" class="glightbox">

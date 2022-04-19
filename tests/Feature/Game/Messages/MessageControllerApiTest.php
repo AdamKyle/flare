@@ -268,7 +268,7 @@ class MessageControllerApiTest extends TestCase
         $this->assertEquals(401, $response->status());
     }
 
-    public function testGetServerMesssageForType() {
+    public function testGetServerMessageForType() {
         $user = $this->character->getUser();
 
         $response = $this->actingAs($user)
@@ -290,7 +290,7 @@ class MessageControllerApiTest extends TestCase
         $this->assertEquals(401, $response->status());
     }
 
-    public function testSendPrivateMesssage() {
+    public function testSendPrivateMessage() {
         $user = $this->character->getUser();
         $character = (new CharacterFactory)->createBaseCharacter();
 
@@ -360,7 +360,7 @@ class MessageControllerApiTest extends TestCase
         $this->assertEquals(200, $response->status());
     }
 
-    public function testCannotFindPlayerForPrivateMesssage() {
+    public function testCannotFindPlayerForPrivateMessage() {
         $user = $this->character->getUser();
 
         $response = $this->actingAs($user)
@@ -471,7 +471,7 @@ class MessageControllerApiTest extends TestCase
             'type'            => CelestialConjureType::PRIVATE,
         ]);
 
-        // We don't have actual maps, so lets fake the water.
+        // We don't have actual maps, so let's fake the water.
         $water = Mockery::mock(MapTileValue::class)->makePartial();
 
         $this->app->instance(MapTileValue::class, $water);
@@ -520,7 +520,7 @@ class MessageControllerApiTest extends TestCase
             'type'            => CelestialConjureType::PRIVATE,
         ]);
 
-        // We don't have actual maps, so lets fake the water.
+        // We don't have actual maps, so let's fake the water.
         $water = Mockery::mock(MapTileValue::class)->makePartial();
 
         $this->app->instance(MapTileValue::class, $water);
@@ -607,7 +607,7 @@ class MessageControllerApiTest extends TestCase
 
         resolve(BuildMonsterCacheService::class)->buildCache();
 
-        // We don't have actual maps, so lets fake the water.
+        // We don't have actual maps, so let's fake the water.
         $water = Mockery::mock(MapTileValue::class)->makePartial();
 
         $this->app->instance(MapTileValue::class, $water);
@@ -626,7 +626,7 @@ class MessageControllerApiTest extends TestCase
         $this->assertEquals(200, $response->status());
     }
 
-    public function testCanUseTraverseAndTeleportFromPCTWhenCannotWalkOnwater() {
+    public function testCanUseTraverseAndTeleportFromPCTWhenCannotWalkOnWater() {
 
         $this->character->inventoryManagement()->giveItem($this->createItem([
             'type' => 'quest',
@@ -658,7 +658,7 @@ class MessageControllerApiTest extends TestCase
 
         resolve(BuildMonsterCacheService::class)->buildCache();
 
-        // We don't have actual maps, so lets fake the water.
+        // We don't have actual maps, so let's fake the water.
         $water = Mockery::mock(MapTileValue::class)->makePartial();
 
         $this->app->instance(MapTileValue::class, $water);
@@ -713,7 +713,7 @@ class MessageControllerApiTest extends TestCase
 
         resolve(BuildMonsterCacheService::class)->buildCache();
 
-        // We don't have actual maps, so lets fake the water.
+        // We don't have actual maps, so let's fake the water.
         $water = Mockery::mock(MapTileValue::class)->makePartial();
 
         $this->app->instance(MapTileValue::class, $water);
@@ -765,7 +765,7 @@ class MessageControllerApiTest extends TestCase
 
         resolve(BuildMonsterCacheService::class)->buildCache();
 
-        // We don't have actual maps, so lets fake the water.
+        // We don't have actual maps, so let's fake the water.
         $water = Mockery::mock(MapTileValue::class)->makePartial();
 
         $this->app->instance(MapTileValue::class, $water);
@@ -818,7 +818,7 @@ class MessageControllerApiTest extends TestCase
 
         resolve(BuildMonsterCacheService::class)->buildCache();
 
-        // We don't have actual maps, so lets fake the water.
+        // We don't have actual maps, so let's fake the water.
         $water = Mockery::mock(MapTileValue::class)->makePartial();
 
         $this->app->instance(MapTileValue::class, $water);

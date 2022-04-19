@@ -11,7 +11,7 @@ use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Monster;
-use App\Flare\Transformers\MonsterTransfromer;
+use App\Flare\Transformers\MonsterTransformer;
 
 class BuildMonsterCacheService {
 
@@ -19,7 +19,7 @@ class BuildMonsterCacheService {
 
     private $monster;
 
-    public function __construct(Manager $manager, MonsterTransfromer $monster) {
+    public function __construct(Manager $manager, MonsterTransformer $monster) {
         $this->manager            = $manager;
         $this->monster            = $monster;
     }

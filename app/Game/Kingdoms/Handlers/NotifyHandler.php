@@ -283,7 +283,7 @@ class NotifyHandler {
             }
 
             $message = 'You have taken ' . $characterName . '\'s kingdom at (X\Y) ' . $defender->x_position . '/' . $defender->y_position .
-                ' on the ' . $mapName . ' plane. Any surviving units have been added to the kingdoms units. Check the kingdom attack logs for more info.';
+                ' on the ' . $mapName . ' plane. Any surviving units have been added to the kingdom\'s units. Check the kingdom attack logs for more info.';
 
             $type = 'kingdom-taken';
         }

@@ -199,12 +199,12 @@
               <p>Based on the units you selected, we will allow these units to be accessed as specific levels of the building.
               For example if you selected 5 units and entered 5 for the units per level that would mean, you get a unit
               at level 1, 6, 11, 16 and 21.</p>
-              <p class="text-danger">Amount of selected units and the units per level can never be greator then the maximum building level.</p>
+              <p class="text-danger">Amount of selected units and the units per level can never be greater than the maximum building level.</p>
               <div class="mt2">
                   <h5>Formula used</h5>
-                  <p>The following formula is how we determine if what you selected and entered is greator then then building max level</p>
+                  <p>The following formula is how we determine if what you selected and entered is greater than the building max level</p>
                   <p>(Total Units selected * units per level) - (Total units selected - 1)</p>
-                  <p>In our example above the answer would be 21. If your building max level is less then 21, you wont be able to create this building.</p>
+                  <p>In our example above the answer would be 21. If your building max level is less than 21, you wont be able to create this building.</p>
               </div>
             </div>
             <div class="modal-footer">

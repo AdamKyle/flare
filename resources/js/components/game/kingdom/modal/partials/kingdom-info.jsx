@@ -31,7 +31,7 @@ const renderHelp = (props) => (
 
 const renderPopulation = (props) => (
   <Tooltip id="button-tooltip" {...props}>
-    A kingdom can buy more people. These people will show up instantly. How ever, be cautioned. If you have more people then you are allowed at the
+    A kingdom can buy more people. These people will show up instantly. However, be cautioned. If you have more people than you are allowed at the
     Hourly reset, your kingdom treasury will lose 10,000 gold PER person over the cap. Buying people is only done to increase your military.
   </Tooltip>
 );

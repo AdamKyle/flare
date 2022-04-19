@@ -255,7 +255,7 @@ export default class CharacterDetails extends React.Component {
                   <h4 className='mt-4'>Holy Bonuses</h4>
                   <hr />
                   <dl className="mt-4">
-                    <dt>Over All Holy Bonus:</dt>
+                    <dt>Overall Holy Bonus:</dt>
                     <dd>{(sheet.holy_bonus * 100).toFixed(2)}%</dd>
                     <dt>Holy Stacks</dt>
                     <dd>{sheet.current_stacks}/{sheet.max_holy_stacks}</dd>

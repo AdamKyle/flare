@@ -54,9 +54,9 @@ class HealingExtraActionHandler {
 
             $healFor          = $characterInformationBuilder->buildHealFor();
 
-            $critcialChance   = $characterInformationBuilder->getSkill('Criticality');
+            $criticalChance   = $characterInformationBuilder->getSkill('Criticality');
 
-            $dc = 100 - 100 * $critcialChance;
+            $dc = 100 - 100 * $criticalChance;
 
             if (rand(1, 100) > $dc) {
                 $message = 'The heavens open and your wounds start to heal over (Critical heal!)';

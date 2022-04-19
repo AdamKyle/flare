@@ -1023,7 +1023,7 @@ class MapControllerApiTest extends TestCase
 
         $this->assertEquals('Current Port Is required.', $content->errors->current_port_id[0]);
         $this->assertEquals('Cost is required.', $content->errors->cost[0]);
-        $this->assertEquals('Time out value is required.', $content->errors->time_out_value[0]);
+        $this->assertEquals('Timeout value is required.', $content->errors->time_out_value[0]);
     }
 
     public function testCannotSetSailInValidData() {

@@ -12,7 +12,7 @@ class RebuildBuildingTest extends TestCase {
     use RefreshDatabase;
 
     private $character;
-    
+
     public function setUp(): void {
         parent::setUp();
 
@@ -29,7 +29,7 @@ class RebuildBuildingTest extends TestCase {
         $this->character = null;
     }
 
-    public function testJobCouldNotBeExcecutedNoQueueFound() {
+    public function testJobCouldNotBeExecutedNoQueueFound() {
         $building = $this->character->getKingdom()->buildings->first();
         $user     = $this->character->getUser();
 

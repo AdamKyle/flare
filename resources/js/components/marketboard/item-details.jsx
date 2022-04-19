@@ -18,7 +18,7 @@ export default class ItemDetails extends React.Component {
     if (this.props.item.item_prefix === null && this.props.item.item_suffix === null) {
       return (
         <div className="alert alert-info">
-          There are no affixes on this this.props.item.
+          There are no affixes on this item.
         </div>
       );
     }

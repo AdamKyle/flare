@@ -23,7 +23,7 @@ export default class Deposit extends React.Component {
       if (this.state.toDeposit <= 0) {
         return this.setState({
           showError: true,
-          errorText: 'Total to deposit cannot be less then or equal to 0.',
+          errorText: 'Total to deposit cannot be less than or equal to 0.',
           loading: false,
         });
       }

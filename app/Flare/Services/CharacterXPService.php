@@ -86,7 +86,7 @@ class CharacterXPService {
         $inventory = Inventory::where('character_id', $character->id)->first();
 
         return InventorySlot::where('inventory_slots.inventory_id', $inventory->id)->join('items', function($join) {
-            $join->on('items.id', 'inventory_slots.item_id')->where('items.type', 'quest')->where('items.effect', ItemEffectsValue::CONTNUE_LEVELING);
+            $join->on('items.id', 'inventory_slots.item_id')->where('items.type', 'quest')->where('items.effect', ItemEffectsValue::CONTINUE_LEVELING);
         })->select('inventory_slots.*')->get()->isNotEmpty();
     }
 

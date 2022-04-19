@@ -40,7 +40,7 @@ class SkillModifiersTest extends TestCase
         Livewire::test(SkillModifiers::class)->call('update', null)->assertNotSet('skill.name', $skill->name);
     }
 
-    public function testFailToSaveModifierWhenMofiersAreEmpty() {
+    public function testFailToSaveModifierWhenModifiersAreEmpty() {
 
         $this->actingAs($this->createAdmin($this->createAdminRole(), []));
 
@@ -66,7 +66,7 @@ class SkillModifiersTest extends TestCase
         $this->assertNull($character->refresh()->skills()->where('game_skill_id', $skill->id)->first());
     }
 
-    public function testFailToSaveModifierWhenMofiersAreBelowZero() {
+    public function testFailToSaveModifierWhenModifiersAreBelowZero() {
 
         $this->actingAs($this->createAdmin($this->createAdminRole(), []));
 

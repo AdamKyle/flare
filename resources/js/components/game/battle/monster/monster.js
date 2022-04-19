@@ -205,7 +205,7 @@ export default class Monster {
 
       this.monster = monster;
 
-      return [{message: 'The enemy looks in awe at the shiny artifacts. They seem less resistant to their allure then before!', class: 'info-damage'}]
+      return [{message: 'The enemy looks in awe at the shiny artifacts. They seem less resistant to their allure than before!', class: 'info-damage'}]
     }
 
     this.monster = monster;

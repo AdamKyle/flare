@@ -78,7 +78,7 @@ export default class AdventureEmbark extends React.Component {
         <LoadingModal
           show={this.props.show}
           close={this.props.embarkClose}
-          loadingText={"One moment ..."}
+          loadingText={"One moment..."}
         />
       );
     }
@@ -146,7 +146,7 @@ export default class AdventureEmbark extends React.Component {
             </div>
             <p>
               Should your inventory be full or close to full, this empty set you select will be used. Should the list be empty and your inventory is close to being full,
-              when you go to collect the items from the adventure, <strong>any item you cannot collect will be lost for ever</strong>.
+              when you go to collect the items from the adventure, <strong>any item you cannot collect will be lost forever</strong>.
             </p>
           </Modal.Body>
           <Modal.Footer>

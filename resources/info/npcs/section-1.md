@@ -7,7 +7,7 @@ Tlessa comes with NPC characters that you interact with via chat. To do this you
 This will show messages to you based on what you are attempting to do. To conjure [Celestials](/information/celestials),
 [Taking Kingdoms](/information/npc-kingdoms) or to complete [quests](/information/quests).
 
-As you might have noticed there is a verity that you can do. Below is a list of NPCs along with their accepted commands.
+As you might have noticed, there is a variety of things that you can do. Below is a list of NPCs along with their accepted commands.
 
 These commands must be typed exactly, or they won't work.
 

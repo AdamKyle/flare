@@ -9,7 +9,7 @@ import UnitBuildingQueue from './partials/unit-recruitment-queue.jsx';
 import KingdomUnits from './partials/kingdom-units';
 import RecruitUnit from './recruit-unit';
 import LoadingModal from '../../components/loading/loading-modal';
-import KingdomRenameModal from './kingdom-raname-modal';
+import KingdomRenameModal from './kingdom-rename-modal';
 import AlertInfo from "../../components/base/alert-info";
 
 export default class KingdomManagementModal extends React.Component {
@@ -176,7 +176,7 @@ export default class KingdomManagementModal extends React.Component {
     if (this.state.isLoading) {
       return (
         <LoadingModal
-          loadingText="Fetching Kingdom Data ..."
+          loadingText="Fetching Kingdom Data..."
           show={this.props.show}
           close={this.props.close}
         />
@@ -207,7 +207,7 @@ export default class KingdomManagementModal extends React.Component {
               <div className="mt-3">
                 <AlertInfo icon={'fas fa-question-circle'} title="Info">
                   Click on the rows to open the building upgrade modal in the Buildings tab. Click Buildings in Queue to see
-                  the buildings currently being upgraded/rebuilt. With in the same tab, you can click on any row, to then cancel a
+                  the buildings currently being upgraded/rebuilt. Within the same tab, you can click on any row, to then cancel a
                   building upgrade and get partial resources back.
                 </AlertInfo>
                 <Tabs defaultActiveKey="kingdom-buildings" id="kingdom-management-buildings">
@@ -237,7 +237,7 @@ export default class KingdomManagementModal extends React.Component {
               <div className="mt-3">
                 <AlertInfo icon={'fas fa-question-circle'} title="Info">
                   Click on the rows to open the unit recruitment modal in the Recruitable Units tab. Click Units in Queue to see
-                  the units currently being recruited. With in the same tab, you can click on any row, to then cancel a
+                  the units currently being recruited. Within the same tab, you can click on any row, to then cancel a
                   unit recruitment and get partial resources back.
                 </AlertInfo>
                 <Tabs defaultActiveKey="kingdom-units" id="kingdom-management-buildings">

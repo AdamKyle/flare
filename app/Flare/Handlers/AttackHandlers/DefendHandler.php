@@ -81,7 +81,7 @@ class DefendHandler {
         $voided     = $this->isAttackVoided($attackType);
 
         if ($this->attackExtraActionHandler->canAutoAttack($characterInfo)) {
-            $message          = 'You dance through out the shadows, weaving a web of deadly magics. The enemy is blind to you. (Auto Hit)';
+            $message          = 'You dance through the shadows, weaving a web of deadly magics. The enemy is blind to you. (Auto Hit)';
 
             $this->battleLogs = $this->addMessage($message, 'action-fired', $this->battleLogs);
 
@@ -112,7 +112,7 @@ class DefendHandler {
     }
 
     protected function fireOffVampireThirst(CharacterInformationBuilder $characterInfo, bool $voided = false) {
-        $this->monsterHealth   = $this->attackExtraActionHandler->setCharacterhealth($this->characterHealth)->vampireThirst($characterInfo, $this->monsterHealth, $voided);
+        $this->monsterHealth   = $this->attackExtraActionHandler->setCharacterHealth($this->characterHealth)->vampireThirst($characterInfo, $this->monsterHealth, $voided);
 
         $this->characterHealth = $this->attackExtraActionHandler->getCharacterHealth();
 

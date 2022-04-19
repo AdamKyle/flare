@@ -27,7 +27,7 @@ class NpcCommandHandlerTest extends TestCase {
 
     private $character;
 
-    private $npckingdom;
+    private $npcKingdom;
 
     private $questNpc;
 

@@ -50,7 +50,7 @@ class UseItemsService  {
         }
 
         if ($this->damageToKingdom > 0.0) {
-            $message = $character->name . ' Has caused the earth to shake, the buildings to crumble and the units to slaughtered at: ' .
+            $message = $character->name . ' has caused the earth to shake, the buildings to crumble and the units to be slaughtered at: ' .
                 $defendingKingdom->name . ' (kingdom) doing: ' . ($this->damageToKingdom * 100) . '% damage to units and buildings, on the ' . $defendingKingdom->gameMap->name . ' plane. Even The Creator trembles in fear.';
         } else {
             $message = 'The defender of: ' . $defendingKingdom->name . ' (kingdom) on the ' . $defendingKingdom->gameMap->name .

@@ -17,7 +17,7 @@ class ClassBonusInformationTest extends TestCase
 
         $details = (new ClassBonusInformation())->buildClassBonusDetailsForInfo($fighter->name);
 
-        $this->assertEquals('Duel Weapon equipped or Weapon/Shield equipped', $details['requires']);
+        $this->assertEquals('Dual Weapon equipped or Weapon/Shield equipped', $details['requires']);
     }
 
     public function testGetInforForRanger() {
@@ -33,7 +33,7 @@ class ClassBonusInformationTest extends TestCase
 
         $details = (new ClassBonusInformation())->buildClassBonusDetailsForInfo($thief->name);
 
-        $this->assertEquals('Duel weapons equipped', $details['requires']);
+        $this->assertEquals('Dual weapons equipped', $details['requires']);
     }
 
     public function testGetInforForHeretic() {

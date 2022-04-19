@@ -10,7 +10,7 @@ class GoldRushCheckCalculator {
     /**
      * Fetches the gold rush check chance.
      *
-     * Fetches the adventure bonus if applies and applies it to the looting bonus agains the monsters drop check.
+     * Fetches the adventure bonus if applicable and applies it to the looting bonus against the monster's drop check.
      *
      * If true, the check passed and the character should be rewarded.
      *

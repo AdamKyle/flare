@@ -23,7 +23,7 @@ export default class Embezzle extends React.Component {
       if (this.state.totalToEmbezzle <= 0) {
         return this.setState({
           showError: true,
-          errorText: 'Total to embezzle cannot be less then or equal to 0.',
+          errorText: 'Total to embezzle cannot be less than or equal to 0.',
           loading: false,
         });
       }

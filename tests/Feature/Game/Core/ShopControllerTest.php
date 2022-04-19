@@ -397,7 +397,7 @@ class ShopControllerTest extends TestCase
                 'equip_type'     => 'weapon',
                 'item_id_to_buy' => $weapon->id,
             ])
-            ->see('You are not capable of affording such luxury child!');
+            ->see('You are not capable of affording such luxury, child!');
     }
 
     public function testCannotBuyAndReplaceNotEnoughGold() {

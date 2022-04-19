@@ -14,9 +14,9 @@ Morale affects your kingdom in a few ways.
 
 ## Units
 
-Now that we have upgraded a building, lets discuss units.
+Now that we have upgraded a building, let's discuss units.
 
-With in kingdom management you can click Unit Recruitment beside the Buildings at the bottom:
+Within kingdom management you can click Unit Recruitment beside the Buildings at the bottom:
 
 <div class="mb-4">
     <a href="/storage/info/kingdoms/images/unit-table.png" class="glightbox">

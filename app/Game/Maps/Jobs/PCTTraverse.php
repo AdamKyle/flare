@@ -60,7 +60,7 @@ class PCTTraverse implements ShouldQueue
             return;
         }
 
-        broadcast(new ServerMessageEvent($this->character->user, 'Processing teleport ...'));
+        broadcast(new ServerMessageEvent($this->character->user, 'Processing teleport...'));
 
         PCTTeleport::dispatch($this->character, $this->x, $this->y, $this->celestialFight->monster->name, $this->celestialGameMap->name);
     }

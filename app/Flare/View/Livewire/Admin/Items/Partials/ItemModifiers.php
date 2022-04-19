@@ -21,7 +21,7 @@ class ItemModifiers extends Component
         ItemEffectsValue::HELL,
         ItemEffectsValue::TELEPORT_TO_CELESTIAL,
         ItemEffectsValue::AFFIXES_IRRESISTIBLE,
-        ItemEffectsValue::CONTNUE_LEVELING,
+        ItemEffectsValue::CONTINUE_LEVELING,
         ItemEffectsValue::GOLD_DUST_RUSH,
         ItemEffectsValue::MASS_EMBEZZLE,
         ItemEffectsValue::QUEEN_OF_HEARTS,

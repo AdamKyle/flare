@@ -97,10 +97,9 @@ class EnchantingService {
      *
      * @param array $enchantmentIds
      * @param int $itemId
-     * @param int $suppliedCost
      * @return bool
      */
-    public function doesCostMatchForEnchanting(array $enchantmentIds, int $itemId, int $suppliedCost): bool {
+    public function getCostOfEnchantment(array $enchantmentIds, int $itemId): bool {
         $itemAffixes   = ItemAffix::findMany($enchantmentIds);
         $itemToEnchant = Item::find($itemId);
 
@@ -120,13 +119,13 @@ class EnchantingService {
             }
         }
 
-        return $cost === $suppliedCost;
+        return $cost;
     }
 
     /**
      * Enchant an item.
      *
-     * Attamepts to enchant an item with the supplied afixes and slot.
+     * Attempts to enchant an item with the supplied affixes and slot.
      *
      * The params passed in must be the request params coming back from the request.
      *
@@ -167,7 +166,7 @@ class EnchantingService {
     public function timeForEnchanting(Item $item) {
 
         if (!is_null($item->itemPrefix) && !is_null($item->itemSuffix)) {
-            return 'tripple';
+            return 'triple';
         }
 
         if (!is_null($item->itemPrefix) || !is_null($item->itemSuffix)) {

@@ -4,7 +4,7 @@
     Arcane Alchemists are also as proficient with damaging spells like Heretics and are ok at using Healing spells.
 </p>
 <p>
-    Charisma is how you will hit the enemies, in conjunction with Accuracy or Casting Accuracy or both.
+    Charisma is how you hit enemies, in conjunction with Accuracy or Casting Accuracy or both.
 </p>
 <ul>
     <li>With a stave equipped you do +15% modded chr on top of your damage.</li>

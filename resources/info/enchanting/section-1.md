@@ -26,7 +26,7 @@ If the item already has an enchantment on it, for each additional enchantment th
 >
 > If the item already has an enchantment on it, the cost to replace will be 1000 gold + New Affix Cost. 
 
-For example if a Rusty Bloody Broken Dagger has a suffix on it, and you are attempting to replace the suffix, you will receive a 20-second time out. However, if you wanted to add a prefix it would be 10 second timeout.
+For example if a Rusty Bloody Broken Dagger has a suffix on it, and you are attempting to replace the suffix, you will receive a 20-second timeout. However, if you wanted to add a prefix it would be 10 second timeout.
 
 If, however, you are attempting to replace two enchantments on an item, it will be a 30-second timeout.
 
@@ -34,7 +34,7 @@ Each additional 10 seconds is for the disenchanting or removal of previous encha
 
 For each affix, you roll to see if you can enchant. Your roll is the Enchanting skill bonus along with any other relevant bonus. 
 
-If you fail to enchant the item, weather is be with one enchant or two, the item and the gold required to do so are lost for ever. 
+If you fail to enchant the item, weather is be with one enchant or two, the item and the gold required to do so are lost forever. 
 
 This is where it gets dicey for low level characters who have a low level enchanting skill and want to attach two 
 enchantments to an item because if they apply the first enchantment and fail to apply the second, the gold and item are lost.
@@ -73,7 +73,7 @@ One enchantment is level appropriate for your enchanting level, however the othe
 
 > ### ATTN!
 > 
-> When referring to, too easy to craft ..., what this means is that one or both enchantments are too easy for you at the current level of enchanting.
+> When referring to, too easy to craft..., what this means is that one or both enchantments are too easy for you at the current level of enchanting.
 > As you gain levels in enchanting you get new affixes unlocked. All affixes have a max level before they become too easy.
 
 ## Requirements for enchanting
@@ -98,7 +98,7 @@ They can be destroyed or sold on the [market](/information/market-board) board. 
 
 > ### ATTN
 > 
-> There is nothing in game you can buy with real world money to gain an advantage on enchanting. No quest items, no gear, no nothing.
+> There is nothing in-game you can buy with real world money to gain an advantage on enchanting. No quest items, no gear, no nothing.
 
 
 ## Damage and Stacking/Non Stacking
@@ -115,9 +115,9 @@ You can mix and match these, however, it's best to go with stacking over non.
 
 ## Damage Resistance
 
-All enemies have a chance to resist affix damage. Some enchantments state that the damage is irresistible meaning it by passes all enemy resistances.
+All enemies have a chance to resist affix damage. Some enchantments state that the damage is irresistible meaning it bypasses all enemy resistances.
 
-Ideally, players want irresistible stacking damage, as this will by pass and stack all the affixes who can stack together.
+Ideally, players want irresistible stacking damage, as this will bypass and stack all the affixes who can stack together.
 
 ## Enemies can resist damage
 
@@ -142,12 +142,12 @@ These affixes steal life from the enemy. There is a trick to these affixes thoug
 The reason for that is because, if your character is a vampire these affixes have a chance (that is, they are not voided) to fire during your attack along with your other affixes
 and again after the enemy attacks, assuming you or the enemy are not dead.
 
-For other classes, these affixes will only fire after the enemies turn, assuming you or the enemy are not dead.
+For other classes, these affixes will only fire after the enemy's turn, assuming you or the enemy are not dead.
 
 **Life stealing will never do more than your character's health in damage. The more durability a character, specifically vampires, have, the more damage you do when it comes
-to life stealing. What ever your health is at the time of firing is the health we will use to determine if the amount is greater than or not.**
+to life stealing. Whatever your health is at the time of firing is the health we will use to determine if the amount is greater than or not.**
 
-Life stealing will also not fire if the enemies' health is already below 0.
+Life stealing will also not fire if the enemy's health is already below 0.
 
 ## Stat Reduction
 
@@ -181,7 +181,7 @@ things like Damage modifiers - which effect your base attack will also stack. Wh
 - Skill Base Damage Modifier, Ac Modifier and Healing Modifier can go well above 100%, but we only take the best enchantment for each type.
 - Class Bonuses, we take the best one of all you have equipped.
 - Stat Increases can go over 100% and can stack.
-- Fight Time Out Modifiers (this effects the timer in between attacks) - we take the best one, same for movement based timeout modifiers.
+- Fight Timeout Modifiers (this effects the timer in between attacks) - we take the best one, same for movement based timeout modifiers.
 
 
 

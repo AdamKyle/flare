@@ -79,7 +79,7 @@ class NpcCommandTypes
     }
 
     /**
-     * Is this a re roll?
+     * Is this a re-roll?
      *
      * @return bool
      */

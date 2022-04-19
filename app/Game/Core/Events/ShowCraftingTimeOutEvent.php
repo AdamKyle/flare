@@ -23,7 +23,7 @@ class ShowCraftingTimeOutEvent implements ShouldBroadcast
     /**
      * @var bool $activateBar
      */
-    public $activatebar;
+    public $activateBar;
 
     /**
      * @var bool $canCraft
@@ -45,10 +45,10 @@ class ShowCraftingTimeOutEvent implements ShouldBroadcast
      * @param int  $timeout
      * @return void
      */
-    public function __construct(User $user, bool $activatebar, bool $canCraft, int $timeout = null)
+    public function __construct(User $user, bool $activateBar, bool $canCraft, int $timeout = null)
     {
         $this->user        = $user;
-        $this->activatebar = $activatebar;
+        $this->activateBar = $activateBar;
         $this->canCraft    = $canCraft;
         $this->timeout     = $timeout;
     }

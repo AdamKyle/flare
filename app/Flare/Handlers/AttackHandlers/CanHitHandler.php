@@ -129,7 +129,7 @@ class CanHitHandler {
     }
 
     /**
-     * Fetch the dpdge bonus of the defender.
+     * Fetch the dodge bonus of the defender.
      *
      * @param $defender
      * @return float

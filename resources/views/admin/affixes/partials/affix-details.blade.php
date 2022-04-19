@@ -91,9 +91,9 @@
       <div class="card">
         <div class="card-body">
           <p>
-            Affixes such as these will fire automatically. How ever enemies can out right
+            Affixes such as these will fire automatically. However, enemies can outright
             resist the damage done. All enemies have a % of resistance against affixes. Celestials have a higher
-            amount of resistance then regular drop down critters.
+            amount of resistance than regular drop down critters.
           </p>
           <p>
             Unlike artifact Annulment and Spell Evasion, the resistance will not reduce damage done, instead it will
@@ -159,10 +159,10 @@
         <div class="card-body">
           <p>
             These Affixes can and cannot stack. If you are a vampire they will stack and you have a chance for them to fire twice.
-            The first time they can fire is during the attack and the second time is after the enemies round if you or
+            The first time they can fire is during the attack and the second time is after the enemy's round if you or
             the enemy is still alive.
           </p>
-          <p>The chance aspect depends on the enemies affix resistance, assuming you do not have the appropriate quest item.</p>
+          <p>The chance aspect depends on the enemy's affix resistance, assuming you do not have the appropriate quest item.</p>
           <p>
             If you are <strong>not</strong> a vampire, these affixes will
             <strong>NOT</strong> stack. Instead we will use your highest and it will only fire after the enemy attack.
@@ -213,7 +213,7 @@
         <div class="card-body">
           <p>
             These Affixes only affect enemies and can reduce ALL their skills at once by a specified %. These affixes work
-            in the same vein as stat reduction affixes, how ever these do not stack. We take the best one of all you have on.
+            in the same vein as stat reduction affixes, however these do not stack. We take the best one of all you have on.
           </p>
           <dl>
             <dt>Skills Affected:</dt>

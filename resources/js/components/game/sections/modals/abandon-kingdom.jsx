@@ -46,11 +46,11 @@ export default class AbandonKingdom extends React.Component {
               : null
             }
             <p>Are you sure you want to do this?</p>
-            <p>There are the consequences for just abandoning your kingdoms. There are no consequences for letting a kingdom all to dust.</p>
+            <p>There are consequences for just abandoning your kingdoms. There are no consequences for letting a kingdom fall to dust.</p>
             <ul>
-              <li>Kingdom will lose 100% of it's Treasury.</li>
-              <li>Kingdom will lose 75% of it's units and population</li>
-              <li>Kingdom buildings will lose 35% of durability</li>
+              <li>Kingdom will lose 100% of its Treasury.</li>
+              <li>Kingdom will lose 75% of its units and population</li>
+              <li>Kingdom buildings will lose 35% durability</li>
               <li>Kingdom morale will fall to 50%.</li>
               <li><strong>You will not be allowed to settle another kingdom for 30 minutes as punishment.</strong></li>
               <li className="text-danger"><strong>You cannot abandon a kingdom that has Gold Bars.</strong></li>
@@ -59,10 +59,10 @@ export default class AbandonKingdom extends React.Component {
             <AlertWarning icon={'fas fa-exclamation-triangle'} title={'ATTN! Timeout Stacks!'}>
               <p>If you abandon another kingdom after this one, you will incur another 30 minute timeout <strong>ON TOP</strong> of the one you already have.</p>
               <p>
-                For example, lets assume you abandon this kingdom and 15 minutes later, abandon another one.
-                The timeout has increased from 15 (because 15 minutes already passed) to 45 (15 + 30 = 45). There is no where in game to see this timer.
+                For example, let's assume you abandon this kingdom and 15 minutes later, abandon another one.
+                The timeout has increased from 15 (because 15 minutes already passed) to 45 (15 + 30 = 45). There is nowhere in-game to see this timer.
                 You will be told when you can settle again via chat. Attempting to settle will also tell you how many minutes you have left as will waging war and attempting to take another
-                players kingdom.
+                player's kingdom.
               </p>
               <p>The Old man will also not let you take any yellow kingdoms during this time. He will also tell you when you can settle again.</p>
             </AlertWarning>

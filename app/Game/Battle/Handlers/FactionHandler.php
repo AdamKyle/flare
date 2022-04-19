@@ -166,7 +166,7 @@ class FactionHandler {
 
         if ($character->isInventoryFull()) {
 
-            event(new ServerMessageEvent($character->user, 'You got no item as your inventory is full. Clear space for the next time!'));
+            event(new ServerMessageEvent($character->user, 'You got no item as your inventory is full. Clear space for next time!'));
         } else {
 
             $character->inventory->slots()->create([

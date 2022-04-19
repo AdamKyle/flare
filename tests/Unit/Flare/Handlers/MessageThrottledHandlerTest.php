@@ -32,12 +32,12 @@ class MessageThrottledHandlerTest extends TestCase
 
         Queue::fake();
         Event::fake();
-        
+
         $handler = resolve(MessageThrottledHandler::class);
         $user    = $this->createUser([
             'message_throttle_count' => 3
         ]);
-        
+
         $handler->forUser($user)->increaseThrottleCount()->silence();
 
         $user = $user->refresh();
@@ -45,7 +45,7 @@ class MessageThrottledHandlerTest extends TestCase
         $this->assertTrue($user->is_silenced);
         $this->assertNotNull($user->can_speak_again_at);
 
-        // Anything higher then three they cannot speak.
+        // Anything higher than three they cannot speak.
         $this->assertEquals(4, $user->message_throttle_count);
     }
 }

@@ -49,6 +49,6 @@ class CharacterBoonJob implements ShouldQueue
 
         $useItemService->updateCharacter($character->refresh());
 
-        event(new ServerMessageEvent($character->user, 'A boon has worn off your stats (skills) have been adjusted accordingly.'));
+        event(new ServerMessageEvent($character->user, 'A boon has worn off, your stats (skills) have been adjusted accordingly.'));
     }
 }

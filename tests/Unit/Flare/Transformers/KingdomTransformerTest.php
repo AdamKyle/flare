@@ -29,9 +29,9 @@ class KingdomTransformerTest extends TestCase
         $kingdom = $this->createTestKingdomWithRecruitableUnit();
 
         $manager            = new Manager();
-        $kingdomTransfromer = resolve(KingdomTransformer::class);
+        $kingdomTransformer = resolve(KingdomTransformer::class);
 
-        $kingdom = new Item($kingdom, $kingdomTransfromer);
+        $kingdom = new Item($kingdom, $kingdomTransformer);
         $kingdom = $manager->createData($kingdom)->toArray();
 
         $this->assertNotEmpty($kingdom['data']['recruitable_units']);

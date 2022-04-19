@@ -1,7 +1,7 @@
 <x-cards.card-with-title title="Usable Item">
     <div class="alert alert-info mb-3 mt-2">
         <p>
-            When using this item, it's effects will be applied for a specified amount of time in minutes. Usable items, accept those that are used
+            When using this item, its effects will be applied for a specified amount of time in minutes. Usable items, accept those that are used
             to attack kingdoms, are used from the character inventory section. These items can only be crafted and <strong>can be sold on the market</strong>.
         </p>
         <p>

@@ -8,7 +8,7 @@
                     <x-core.alerts.info-alert title="ATTN!">
                         Deepest apologizes, however Planes of Tlessa is currently down for maintenance and unlike other deployments,
                         this one has had to disable the Registration and Login for a short time. We promise to be back up and running soon
-                        and hope to see you all in game soon. For more info, please check <a href="https://discord.gg/hcwdqJUerh" target="_blank">Discord.</a>
+                        and hope to see you all in-game soon. For more info, please check <a href="https://discord.gg/hcwdqJUerh" target="_blank">Discord.</a>
                     </x-core.alerts.info-alert>
                 @endif
                 <div class="jumbotron  mt-5">
@@ -32,7 +32,7 @@
                     <div class="snippit-section text-center">
                         <h2>Stay logged in!</h2>
                         <p>
-                            There is no set it and forget it. This game requires you be engaged.
+                            There is no "set and forget it". This game requires you to be engaged.
                             Timers and such only last minutes at best, with attack and movement timers being set to seconds.
                         </p>
                     </div>
@@ -52,7 +52,7 @@
                                             'pageName' => 'equipment'
                                         ])}}">Equip your character!</a>
                                     </h5>
-                                    <p>Buy/sell weapons, armor, rings, artifacts and more and out fit your character
+                                    <p>Buy/sell weapons, armor, rings, artifacts and more and outfit your character
                                         for the road ahead. Who knows what beasties you might find!</p>
                                 </div>
                             </div>
@@ -118,8 +118,8 @@
                         </span>
                         Put that credit card away!
                     </h2>
-                    <p>This game is free. This game has one philosophy: You want it? Earn it! Every thing from the best gear,
-                        to the strongest kingdoms to ability to travel from one plane to the next is all only attainable by playing the game.</p>
+                    <p>This game is free. This game has one philosophy: You want it? Earn it! Everything from the best gear,
+                        to the strongest kingdoms, to the ability to travel from one plane to the next is all only attainable by playing the game.</p>
                 </div>
             </div>
         </div>
@@ -192,9 +192,9 @@
                             No, and there never will be. You cannot buy anything in this game, no weapons, gear, armor,
                             advantages, nothing. You want it, you will earn it.
                         </dd>
-                        <dt>Are there Adds?</dt>
+                        <dt>Are there Ads?</dt>
                         <dd>
-                            No. There are no adds what so ever.
+                            No. There are no ads whatsoever.
                         </dd>
                         <dt>Is it persistent?</dt>
                         <dd>
@@ -215,10 +215,10 @@
                             from doing that action again for a matter of seconds or minutes. However, the goal of Tlessa is
                             not to keep you engaged, so for example you could: Fight, Craft, Move and then wait for their respective timers
                             to end before doing the same thing. In the aforementioned example: Killing a monster gates you a 10 second time
-                            out before being able to kill the monster again, but being killed by said monster, gives you a 20 second time out before being able
+                            out before being able to kill the monster again, but being killed by said monster, gives you a 20 second timeout before being able
                             to revive.
                         </dd>
-                        <dt>Are they're factions/guilds/clans?</dt>
+                        <dt>Are there factions/guilds/clans?</dt>
                         <dd>
                             No. In Tlessa, it's every person for themselves. There is no guild or clan system in Tlessa.
                         </dd>

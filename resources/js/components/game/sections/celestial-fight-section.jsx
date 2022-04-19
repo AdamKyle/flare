@@ -10,7 +10,7 @@ const renderAttackToolTip = (props) => (
     If you are a Fighter or Thief, you will attack with both weapons if you have them equipped.
     If you are not a Fighter or Thief, you will attack with the best weapon.
     If you have no weapon equipped, you will attack with 2% of your primary damage stat.
-    Fighters will use 15% of their strength for weapons, 5% with out weapons. Where as Thieves and Rangers
+    Fighters will use 15% of their strength for weapons, 5% without weapons. Whereas Thieves and Rangers
     will use 5% of their primary damage stat and only 2% (including other classes) when attacking with no weapons.
   </Tooltip>
 );
@@ -21,7 +21,7 @@ const renderCastingToolTip = (props) => (
 
     We will attack with both spells. Heretics get an additional 30% of their primary damage stat as attack. Heretics can also cast with no
     spells equipped at 2% of their primary damage attack. Rangers, for healing, get 15% of their Chr while Prophets get 30% of their chr.
-    If a prophet has no healing spell equipped, they still do their % of healing, how ever prophets special Double Heal will not fire
+    If a prophet has no healing spell equipped, they still do their % of healing, however prophet's special Double Heal will not fire
     with no healing spells equipped. Rangers can also heal for 15% of their chr with no healing spells equipped.
   </Tooltip>
 );

@@ -86,7 +86,7 @@
           <td>{{$user->is_banned ? 'Yes' : 'No'}}</td>
           <td>
             @if ($user->is_banned && is_null($user->unbanned_at))
-              For ever
+              Forever
             @elseif($user->is_banned && !is_null($user->unbanned_at))
               {{ $user->unbanned_at->setTimeZone(config('app.timezone'))->format('l jS \\of F Y h:i:s A') }}
             @else
@@ -193,7 +193,7 @@
                   <x-forms.button-with-form
                     formRoute="{{ route('ban.user', ['user' => $user->id]) }}"
                     formId="{{'ban-user-perm-' . $user->id}}"
-                    buttonTitle="For ever"
+                    buttonTitle="Forever"
                     class="dropdown-item"
                   >
                     <input type="hidden" name="ban_for" value="perm">

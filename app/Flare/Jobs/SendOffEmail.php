@@ -36,8 +36,8 @@ class SendOffEmail implements ShouldQueue
     }
 
     /**
-     * Processes the type of simmulation test we want.
-     * 
+     * Processes the type of simulation test we want.
+     *
      * @return void
      */
     public function handle() {

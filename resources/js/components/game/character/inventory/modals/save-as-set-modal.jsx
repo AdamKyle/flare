@@ -102,7 +102,7 @@ export default class SaveAsSetModal extends React.Component {
               : null
           }
           <p>
-            You may select below a set which you wish to move this item to. You can only select sets that
+            You may select a set below to which you wish to move this item to. You can only select sets that
             are not currently equipped.
           </p>
           <p>

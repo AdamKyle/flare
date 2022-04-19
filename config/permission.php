@@ -108,7 +108,7 @@ return [
         'key' => 'spatie.permission.cache',
 
         /*
-         * When checking for a permission against a model by passing a Permission
+         * When checking for a permission against a model bypassing a Permission
          * instance to the check, this key determines what attribute on the
          * Permissions model is used to cache against.
          *

@@ -46,7 +46,7 @@
         <x-core.alerts.info-alert title="Quick Tip">
           <p>
             These affixes raise the characters class bonus. The higher the bonus, the higher the chance to fire off your special attack
-            which is based off your class skill. These <strong>do not stack</strong>, how ever other aspects such as skills,
+            which is based off your class skill. These <strong>do not stack</strong>, however other aspects such as skills,
             stats and damage that can stack, will stack. Other Affixes that raise your Class Bonus may be listed here.
           </p>
         </x-core.alerts.info-alert>
@@ -65,7 +65,7 @@
         <x-core.alerts.info-alert title="Quick Tip">
           <p>
             These affixes increase your Base Damage Modifier. This amplifies your damage.
-            These do stack, so having more is often better then having none.
+            These do stack, so having more is often better than having none.
           </p>
         </x-core.alerts.info-alert>
 
@@ -83,7 +83,7 @@
         <x-core.alerts.info-alert title="Quick Tip">
           <p>
             These affixes increase your Base Healing Modifier. This amplifies your healing.
-            These do stack, so having more is often better then having none.
+            These do stack, so having more is often better than having none.
           </p>
         </x-core.alerts.info-alert>
 
@@ -101,7 +101,7 @@
         <x-core.alerts.info-alert title="Quick Tip">
           <p>
             These affixes increase your Base Armour Class (AC). This amplifies your ability to block damage.
-            These do stack, so having more is often better then having none.
+            These do stack, so having more is often better than having none.
           </p>
         </x-core.alerts.info-alert>
 
@@ -119,7 +119,7 @@
         <x-core.alerts.info-alert title="Quick Tip">
           <p>
             These affixes reduce the amount of time on the Fight Timer after you successfully kill a critter from the drop down.
-            Your time out will never go below 1 second, even if you have over 100% on the Fight Timeout Bonus.
+            Your timeout will never go below 1 second, even if you have over 100% on the Fight Timeout Bonus.
           </p>
         </x-core.alerts.info-alert>
 
@@ -136,7 +136,7 @@
       <x-core.cards.card>
         <x-core.alerts.info-alert title="Quick Tip">
           <p>
-            These affixes can effect your move time out. These can reduce the amount of time you have to wait between being able to move again.
+            These affixes can effect your move timeout. These can reduce the amount of time you have to wait between being able to move again.
             These do stack and will never let you go below 1 second for movement.
           </p>
         </x-core.alerts.info-alert>

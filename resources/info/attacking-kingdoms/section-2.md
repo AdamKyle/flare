@@ -1,7 +1,7 @@
 
 As you can see each unit has its own building, level that building must be to recruit, and the costs associated with the units themselves.
 
-Now that we have some units, lets see how we attack, first lets look at the map:
+Now that we have some units, let's see how we attack, first let's look at the map:
 
 <div class="mb-4">
     <a href="/storage/info/attacking-kingdoms/images/kingdoms-on-map.png" class="glightbox">
@@ -92,7 +92,7 @@ To see the units in movement. You cancel the unit movement by clicking on the ro
 
 Once a kingdom is attacked, and the units return a log will be generated. If you lost all your units in the attack, you would get a log right away.
 
-When you attack a kingdom, you&#39;ll see a global message go out:
+When you attack a kingdom, you'll see a global message go out:
 
 <div class="mb-4">
     <a href="/storage/info/attacking-kingdoms/images/global-message.png" class="glightbox">
@@ -128,7 +128,7 @@ they are going. However, for incoming attacks, there is no way to know till they
 
 ## Attacking to take over
 
-To take over another kingdom you need a special unit that must be sent with regular unit&#39;s, not siege units or healers. For example, send them with archers or spearmen.
+To take over another kingdom you need a special unit that must be sent with regular units, not siege units or healers. For example, send them with archers or spearmen.
 
 The unit in question is a settler. These units can reduce a morale of a kingdom by 10%. If the morale of the kingdom is 0%, they will take the kingdom and you will have a new kingdom.
 
@@ -155,7 +155,7 @@ You get no resources, no gold, no nothing from straight up attacking another kin
 
 ## Attack Logs
 
-Once, the kingdom has been attacked there are two forms of attack logs. One for the defender:
+Once the kingdom has been attacked, there are two forms of attack logs. One for the defender:
 
 <div class="mb-4">
     <a href="/storage/info/attacking-kingdoms/images/kingdom-attacked.png" class="glightbox">

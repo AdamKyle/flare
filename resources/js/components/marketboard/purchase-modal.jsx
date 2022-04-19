@@ -103,7 +103,7 @@ export default class PurchaseModal extends React.Component {
     if (this.state.loading) {
       return (
         <LoadingModal
-          loadingText="Fetching Kingdom Data ..."
+          loadingText="Fetching Kingdom Data..."
           show={this.props.show}
           close={this.props.close}
         />
@@ -176,16 +176,16 @@ export default class PurchaseModal extends React.Component {
           }
           <p>Is this the item you would like to purchase? It
             will <strong>cost</strong>: {(this.props.modalData.listed_price * 1.05).toFixed(0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} Gold (incl. 5% tax)</p>
-          {this.state.loading ? 'Loading please wait ...' : <>
+          {this.state.loading ? 'Loading please wait...' : <>
             <p><strong> Base cost</strong>: {this.state.item.cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} Gold</p>
 
-            <p>Base cost is the item cost + cost of attached affixes. This is handy to know if the item is more expensive then making it yourself, or significantly cheaper. Most items will be listed for higher,
+            <p>Base cost is the item cost + cost of attached affixes. This is handy to know if the item is more expensive than making it yourself, or significantly cheaper. Most items will be listed for higher,
               due to the inherit risk in crafting and enchanting.</p>
             <p>Min Cost comes from special items like Uniques and Holy items. These special items apply what is called a min cost, that is the item cannot be sold for less the
             min cost of the item. This only applies to the market and not the shop.</p>
           </> }
           { this.state.loading ?
-            'Loading please wait ...' :
+            'Loading please wait...' :
               this.state.item.usable ?
                 <UsableItemDetails item={this.state.item} /> :
                   <ItemDetails item={this.state.item}/>

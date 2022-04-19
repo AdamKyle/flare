@@ -41,20 +41,20 @@ class ClassBonusInformation {
     protected function getClassDetails(CharacterClassValue $classAttackValue, array $details): array  {
         if ($classAttackValue->isFighter()) {
             $details['type'] = Str::ucfirst(ClassAttackValue::FIGHTERS_DOUBLE_DAMAGE);
-            $details['requires'] = 'Duel Weapon equipped or Weapon/Shield equipped';
-            $details['description'] = 'With a weapon equipped you have a small chance to do damage equal to your modded attack + 15% of the modded attack, with out being blocked. With a shield equipped you have will use your class bonus towards your defence.';
+            $details['requires'] = 'Dual Weapon equipped or Weapon/Shield equipped';
+            $details['description'] = 'With a weapon equipped you have a small chance to do damage equal to your modded attack + 15% of the modded attack, without being blocked. With a shield equipped you have will use your class bonus towards your defence.';
         }
 
         if ($classAttackValue->isRanger()) {
             $details['type'] = Str::ucfirst(ClassAttackValue::RANGER_TRIPLE_ATTACK);
             $details['requires'] = 'Bow equipped';
-            $details['description'] = 'With a bow equipped you have a small chance to attack 3 additional times with the bow, with out being blocked.';
+            $details['description'] = 'With a bow equipped you have a small chance to attack 3 additional times with the bow, without being blocked.';
         }
 
         if ($classAttackValue->isThief()) {
             $details['type'] = Str::ucfirst(ClassAttackValue::THIEVES_SHADOW_DANCE);
-            $details['requires'] = 'Duel weapons equipped';
-            $details['description'] = 'With duel weapons equipped, you have a chance to slip by the enemy and instantly hit them.';
+            $details['requires'] = 'Dual weapons equipped';
+            $details['description'] = 'With dual weapons equipped, you have a chance to slip by the enemy and instantly hit them.';
         }
 
         if ($classAttackValue->isHeretic()) {
@@ -72,7 +72,7 @@ class ClassBonusInformation {
         if ($classAttackValue->isVampire()) {
             $details['type'] = Str::ucfirst(ClassAttackValue::VAMPIRE_THIRST);
             $details['requires'] = 'N/A';
-            $details['description'] = 'Everytime you attack, you have a chance to fire off the thirst which can steal 15% of your dur from the enemy as both attack and healing.';
+            $details['description'] = 'Every time you attack, you have a chance to fire off the thirst which can steal 15% of your dur from the enemy as both attack and healing.';
         }
 
         if ($classAttackValue->isBlacksmith()) {
@@ -84,7 +84,7 @@ class ClassBonusInformation {
         if ($classAttackValue->isArcaneAlchemist()) {
             $details['type'] = Str::ucfirst(ClassAttackValue::ARCANE_ALCHEMISTS_DREAMS);
             $details['requires'] = 'Stave';
-            $details['description'] = 'Everytime you attack you have chance to, based on class bonus and with a stave equipped, to do Alchemists Ravenous Dream. This can do 10% of your int followed by an additional 3% for each additional attack between 2 and 6 times.';
+            $details['description'] = 'Every time you attack you have chance to, based on class bonus and with a stave equipped, to do Alchemists Ravenous Dream. This can do 10% of your int followed by an additional 3% for each additional attack between 2 and 6 times.';
         }
 
         return $details;

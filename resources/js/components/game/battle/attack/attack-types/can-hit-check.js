@@ -95,7 +95,7 @@ export default class CanHitCheck {
   calculateCanHit(toHitBase) {
     const needToHit = 100 - 100 * toHitBase;
 
-    const roll      = random(1 , 100);
+    const roll      = random(1, 100);
 
     return roll > needToHit;
   }

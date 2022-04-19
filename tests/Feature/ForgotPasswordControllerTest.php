@@ -15,7 +15,7 @@ class ForgotPasswordControllerTest extends TestCase
         CreateUser,
         CreateRole;
 
-    public function testCanSeeResetPaswordPage() {
+    public function testCanSeeResetPasswordPage() {
 
         $this->visit('/login')
             ->click('Forgot Your Password?')

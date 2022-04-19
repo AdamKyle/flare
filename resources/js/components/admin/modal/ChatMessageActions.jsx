@@ -196,7 +196,7 @@ export default class ChatMessageActions extends React.Component {
                         <option value="">Please select</option>
                         <option value="one-day">1 Day</option>
                         <option value="one-week">1 Week</option>
-                        <option value="perm">For Ever</option>
+                        <option value="perm">Forever</option>
                       </select>
                     </div>
                   </div>

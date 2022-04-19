@@ -75,7 +75,7 @@ export default class DestroyAllModal extends React.Component {
           }
           <p>
             This will destroy <strong>ALL</strong> items in your inventory that are not currently equipped or
-            in a set. No Gold dust will be given for this action. Are you sure?
+            in a set. No gold dust will be given for this action. Are you sure?
           </p>
           {
             this.state.loading ?

@@ -37,12 +37,12 @@ class AttackHandler {
 
         if ($totalAttack > $defenderKingdomBuildingsDefence) {
 
-            $totalPercentageDurabilityLost = $this->calculatePerentageLost($totalAttack, $defenderKingdomBuildingsDefence);
+            $totalPercentageDurabilityLost = $this->calculatePercentageLost($totalAttack, $defenderKingdomBuildingsDefence);
 
             $this->updateAllKingdomBuildings($targets, $totalPercentageDurabilityLost);
 
             if ($defenderSiegeUnitsAttack !== 0) {
-                $totalPercentageOfAttackersLost = $this->calculatePerentageLost($defenderSiegeUnitsAttack, $totalDefence);
+                $totalPercentageOfAttackersLost = $this->calculatePercentageLost($defenderSiegeUnitsAttack, $totalDefence);
 
                 $newUnitTotal       = $this->getNewUnitTotal($unitInfo['amount'], $totalPercentageOfAttackersLost);
                 $unitInfo['amount'] = $newUnitTotal > 0 ? $newUnitTotal : 0;
@@ -50,7 +50,7 @@ class AttackHandler {
         } else {
 
             if ($defenderSiegeUnitsAttack !== 0) {
-                $totalPercentageOfAttackersLost = $this->calculatePerentageLost($defenderSiegeUnitsAttack, $totalDefence);
+                $totalPercentageOfAttackersLost = $this->calculatePercentageLost($defenderSiegeUnitsAttack, $totalDefence);
 
                 $newUnitTotal       = $this->getNewUnitTotal($unitInfo['amount'], $totalPercentageOfAttackersLost);
                 $unitInfo['amount'] = $newUnitTotal > 0 ? $newUnitTotal : 0;
@@ -87,16 +87,16 @@ class AttackHandler {
         }
 
         if ($totalAttack > $totalDefenderDefence) {
-            $totalDefenderPercentageLost = $this->calculatePerentageLost($totalAttack, $totalDefenderDefence);
-            $totalAttackersLost          = $this->calculatePerentageLost($totalAttack, $totalDefenderDefence, true);
+            $totalDefenderPercentageLost = $this->calculatePercentageLost($totalAttack, $totalDefenderDefence);
+            $totalAttackersLost          = $this->calculatePercentageLost($totalAttack, $totalDefenderDefence, true);
 
             $this->updateDefenderUnits($defender, $totalDefenderPercentageLost);
             $newUnitTotal = $this->getNewUnitTotal($unitInfo['amount'], $totalAttackersLost);
 
             $unitInfo['amount'] = $newUnitTotal > 0 ? $newUnitTotal : 0;
         } else {
-            $totalDefenderPercentageLost = $this->calculatePerentageLost($totalDefenderAttack, $totalDefence, true);
-            $totalAttackersLost          = $this->calculatePerentageLost($totalDefenderAttack, $totalDefence);
+            $totalDefenderPercentageLost = $this->calculatePercentageLost($totalDefenderAttack, $totalDefence, true);
+            $totalAttackersLost          = $this->calculatePercentageLost($totalDefenderAttack, $totalDefence);
 
             $this->updateDefenderUnits($defender, $totalDefenderPercentageLost);
             $newUnitTotal = $this->getNewUnitTotal($unitInfo['amount'], $totalAttackersLost);
@@ -112,7 +112,7 @@ class AttackHandler {
      *
      * @param KingdomBuilding $target
      * @param array $unitInfo
-     * @param array $healerUnitsattackKingdomBuildings
+     * @param array $healerUnitsAttackKingdomBuildings
      * @return array
      */
     public function attackTarget(KingdomBuilding $target, array $unitInfo): array {
@@ -129,8 +129,8 @@ class AttackHandler {
         $defence = $defence + $defence * $kingdomDefence;
 
         if ($totalAttack > $target->current_defence) {
-            $totalPercentageUnitsLost      = $this->calculatePerentageLost($totalAttack, $defence, true);
-            $totalPercentageDurabilityLost = $this->calculatePerentageLost($totalAttack, $defence);
+            $totalPercentageUnitsLost      = $this->calculatePercentageLost($totalAttack, $defence, true);
+            $totalPercentageDurabilityLost = $this->calculatePercentageLost($totalAttack, $defence);
 
             $this->updateKingdomBuilding($target, $totalPercentageDurabilityLost);
 
@@ -138,7 +138,7 @@ class AttackHandler {
             $unitInfo['amount'] = $newUnitTotal > 0 ? $newUnitTotal : 0;
         } else {
 
-            $totalPercentageUnitsLost = $this->calculatePerentageLost($totalAttack, $defence, true);
+            $totalPercentageUnitsLost = $this->calculatePercentageLost($totalAttack, $defence, true);
 
             $this->updateKingdomBuilding($target, 0.01);
 

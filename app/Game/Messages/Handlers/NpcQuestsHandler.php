@@ -66,7 +66,7 @@ class NpcQuestsHandler {
                 }
             }
 
-            if ($this->questHasCurrencieRequirement($quest)) {
+            if ($this->questHasCurrenciesRequirement($quest)) {
                 if ($this->canPay($character, $quest)) {
                     $this->payCurrencies($character, $npc, $quest);
 
@@ -124,7 +124,7 @@ class NpcQuestsHandler {
             }
         }
 
-        if ($this->questHasCurrencieRequirement($quest)) {
+        if ($this->questHasCurrenciesRequirement($quest)) {
             if (!$this->canPay($character, $quest)) {
                 return true;
             }
@@ -179,7 +179,7 @@ class NpcQuestsHandler {
         return !is_null($quest->access_to_map_id);
     }
 
-    public function questHasCurrencieRequirement(Quest $quest): bool {
+    public function questHasCurrenciesRequirement(Quest $quest): bool {
         return $quest->gold_dust_cost > 0 || $quest->gold_cost > 0 || $quest->shard_cost > 0;
     }
 

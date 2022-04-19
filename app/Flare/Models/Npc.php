@@ -3,7 +3,6 @@
 namespace App\Flare\Models;
 
 use App\Flare\Values\NpcTypes;
-use Database\Factories\NpceFactory;
 use Database\Factories\NpcFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

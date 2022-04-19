@@ -94,7 +94,7 @@ class AdventureControllerApiTest extends TestCase
         $this->assertEquals("Adventure has started!", $content->message);
     }
 
-    public function testCannotAdvenutreWhenOneIsInProgress() {
+    public function testCannotAdventureWhenOneIsInProgress() {
 
         $user      = $this->character->getUser();
         $character = $this->character->updateCharacter([

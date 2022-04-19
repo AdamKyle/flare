@@ -51,7 +51,7 @@ class PCTTeleport implements ShouldQueue
      */
     public function handle(MovementService $movementService)
     {
-        $movement = $movementService->teleport($this->character, $this->celestialX, $this->celestialY, 0 , 0, true);
+        $movement = $movementService->teleport($this->character, $this->celestialX, $this->celestialY, 0, 0, true);
 
         if ($movement['status'] === 422) {
             broadcast(new ServerMessageEvent($this->character->user, $movement['message']));

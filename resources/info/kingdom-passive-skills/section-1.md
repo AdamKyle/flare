@@ -44,7 +44,7 @@ Ie, Building Management At level 0, takes 2 hours to level 1. To then level it t
 
 The formula is simple: `New Level + 1 * Passive skill time per hour`.
 
-So lets use above, to go to level 2, our new level is level 1: `1 + 1 * 2 = 4 hours to train to level 2.`
+So let's use above, to go to level 2, our new level is level 1: `1 + 1 * 2 = 4 hours to train to level 2.`
 
 If we want to go to level 3, from level 2: `2 + 1 * 2 = 6 Hours to train from level 2 to level 3.`
 
@@ -58,7 +58,7 @@ and you mix it with the Kingmanship skill, your units, buildings and time needed
 Players who are serious about kingdoms will want to level all the passives and their Kingmanship skill to 999. This allows you to quickly recruit,
 move and wage war when you have vast amounts of gold (the cap is 2 Trillion for players and that's more than enough to outfit a kingdom to a decent amount.)
 
-Enough talk though, lets look at our skills:
+Enough talk though, let's look at our skills:
 
 <div class="mb-4">
     <a href="/storage/info/kingdom-passive-skills/images/kingdom-passive-tree.png" class="glightbox">
@@ -68,7 +68,7 @@ Enough talk though, lets look at our skills:
 
 This here is our passive skills. As you can see I have unlocked some of these already, but you will not have any, other than Kingdom Management unlocked.
 
-Clicking the title will open a new tab with the skills' information, and it's child skills (should it have any, that is skills dependent on you upgrading this one to a specific level)
+Clicking the title will open a new tab with the skills' information, and its child skills (should it have any, that is skills dependent on you upgrading this one to a specific level)
 
 > ## ATTN!
 > 

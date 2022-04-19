@@ -21,11 +21,11 @@ class CleanNotificationTest extends TestCase
             'character_id' => $character->id,
             'title' => 'Sample',
             'message' => 'Sample',
-            'status' => 'succes',
+            'status' => 'success',
             'type' => 'notification',
             'read' => true,
             'url' => 'test',
-        ]);   
+        ]);
 
         $this->assertEquals(0, $this->artisan('clean:notifications'));
 

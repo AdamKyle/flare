@@ -218,7 +218,7 @@ export default class AlchemyAction extends React.Component {
     }
 
     if (this.state.loading) {
-      return <p className="mt-2">One moment ...</p>
+      return <p className="mt-2">One moment...</p>
     }
 
     return (

@@ -83,7 +83,7 @@ export default class DisenchantItemModal extends React.Component {
 
           <p>
             Disenchanting gives you skill XP towards disenchanting and half towards enchanting. Gold dust is used in quests,
-            special types of crafting and to purchase some powerful items later in game.
+            special types of crafting and to purchase some powerful items later in the game.
             See <a href={"/information/currencies"}>Currencies</a> for more info.
           </p>
           {

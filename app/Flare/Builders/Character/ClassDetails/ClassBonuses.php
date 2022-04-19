@@ -224,7 +224,7 @@ class ClassBonuses {
     /**
      * Get thieves attack bonus.
      *
-     * Only applies if they are duel wielding weapons.
+     * Only applies if they are dual wielding weapons.
      *
      * @param Character $character
      * @return float
@@ -283,7 +283,7 @@ class ClassBonuses {
     /**
      * Get thieves fight timeout mod.
      *
-     * Only applies if they are duel wielding.
+     * Only applies if they are dual wielding.
      *
      * @param Character $character
      * @return float

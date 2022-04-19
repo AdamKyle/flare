@@ -23,10 +23,10 @@
 </ul>
 <p>
   When attacking with no weapons, Fighters will do 5% of their strength as their attack, while other classes do 2%. When attacking with weapons you use 15% of your strength
-  towards to over all damage.
+  towards the overall damage.
 </p>
 <p>If you go the weapon/shield route, make sure to add some extra dur (through enchanting) to that shield and level your class skill for the extra armour class bonus.</p>
-<p>Fighters will want a race that provides good strength and dex: Orc (dex and str - great for duel wielding), Dark Dwarf/Centaur (str and dur - great for weapon/shield).</p>
+<p>Fighters will want a race that provides good strength and dex: Orc (dex and str - great for dual wielding), Dark Dwarf/Centaur (str and dur - great for weapon/shield).</p>
 <p>For skills, it is best for you to focus on the following:</p>
 <ul>
   <li>Accuracy until you can reliably hit something with your weapon, being blocked is fine, you just need a better weapon.</li>

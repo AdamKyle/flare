@@ -18,7 +18,7 @@
 @if($npc->commands->isNotEmpty())
 
     <x-core.cards.card-with-title title="Available Commands" css="tw-mb-5">
-        <p class="mb-2">These are the available commands you can message to the NPC. They're type correlates to the action they will
+        <p class="mb-2">These are the available commands you can message to the NPC. Their type correlates to the action they will
             take when you message them.</p>
         <div class="alert alert-info mb-3">
             When messaging a NPC their command you would type:

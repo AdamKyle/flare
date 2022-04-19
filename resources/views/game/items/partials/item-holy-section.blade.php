@@ -2,7 +2,7 @@
 <p>
     Below are the combination of the bonuses applied through the various holy stacks already applied.
     Stat increases will increase the stats on the item by the combined percentage. Whole Devouring Darkness will
-    apply to your over all Devouring Darkness.
+    apply to your overall Devouring Darkness.
 </p>
 
 <p>

@@ -51,7 +51,7 @@ class SiegeHandlerTest extends TestCase {
     }
 
     public function testAttackKingdomAllBuildingsHaveFallen() {
-        $unitsToAttack = $this->createAtackingUnits();
+        $unitsToAttack = $this->createAttackingUnits();
         $defender      = $this->createEnemyKingdom()->getKingdom();
 
         $siegeHandler  = resolve(SiegeHandler::class);
@@ -75,7 +75,7 @@ class SiegeHandlerTest extends TestCase {
     }
 
     public function testAttackKingdomCantGetPastTheWalls() {
-        $unitsToAttack = $this->createAtackingUnits();
+        $unitsToAttack = $this->createAttackingUnits();
         $defender      = $this->createEnemyKingdom()->getKingdom();
 
 
@@ -96,7 +96,7 @@ class SiegeHandlerTest extends TestCase {
     }
 
     public function testAttackKingdomAllBuildingsHaveFallenWithSiegeWeapons() {
-        $unitsToAttack = $this->createAtackingUnits();
+        $unitsToAttack = $this->createAttackingUnits();
         $defender      = $this->createEnemyKingdom()->assignUnits([
             'siege_weapon' => true,
             'attack'       => 3000,
@@ -117,7 +117,7 @@ class SiegeHandlerTest extends TestCase {
     }
 
     public function testAttackKingdomWhereDefenderHasSiegeUnits() {
-        $unitsToAttack = $this->createAtackingUnits();
+        $unitsToAttack = $this->createAttackingUnits();
         $defender      = $this->createEnemyKingdom()->assignUnits([
             'siege_weapon' => true,
             'attack'       => 3000,
@@ -149,7 +149,7 @@ class SiegeHandlerTest extends TestCase {
     }
 
     public function testAttackKingdomsWithNoDefence() {
-        $unitsToAttack = $this->createAtackingUnits();
+        $unitsToAttack = $this->createAttackingUnits();
         $defender      = $this->createEnemyKingdom()->getKingdom();
 
         foreach ($defender->buildings as $building) {
@@ -174,7 +174,7 @@ class SiegeHandlerTest extends TestCase {
     }
 
     public function testDefenderUnitsGetHealed() {
-        $unitsToAttack = $this->createAtackingUnits();
+        $unitsToAttack = $this->createAttackingUnits();
         $defender      = $this->createEnemyKingdom()->assignUnits([
             'can_heal' => true,
             'heal_percentage' => 0.01
@@ -193,7 +193,7 @@ class SiegeHandlerTest extends TestCase {
         $this->assertEquals(50000, $healingUnit->amount);
     }
 
-    protected function createAtackingUnits(): array {
+    protected function createAttackingUnits(): array {
         return [
             [
                 "amount"         => 10,

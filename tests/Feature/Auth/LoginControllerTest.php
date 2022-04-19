@@ -59,6 +59,6 @@ class LoginControllerTest extends TestCase
             ->submitForm('Login', [
                 'email'    => $user->email,
                 'password' => 'ReallyLongPassword',
-            ])->see('You have been banned until: For ever.');
+            ])->see('You have been banned until: Forever.');
     }
 }

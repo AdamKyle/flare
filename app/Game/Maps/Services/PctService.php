@@ -43,7 +43,7 @@ class PctService {
         } else {
 
             if ($character->map->gameMap->mapType()->isHell() || $character->map->gameMap->mapType()->isPurgatory()) {
-                broadcast(new ServerMessageEvent($character->user, 'Child, the power of those magics is too weak where you are. traverse to at least Shadow Plane first ...'));
+                broadcast(new ServerMessageEvent($character->user, 'Child, the power of those magics is too weak where you are. Traverse to at least the Shadow Plane first...'));
 
                 return true;
             }

@@ -54,7 +54,7 @@ class KingdomsController extends Controller {
         $logs = KingdomLog::findMany($request->logs);
 
         if ($logs->isEmpty()) {
-            return redirect()->back()->with('error', 'No logs exist for selected.');
+            return redirect()->back()->with('error', 'No log exists for your selection.');
         }
 
         foreach ($logs as $log) {

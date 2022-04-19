@@ -81,9 +81,9 @@ class DeLevelCharacter extends Command
             'dur'   => $this->addValue($character, 'dur'),
             'dex'   => $this->addValue($character, 'dex'),
             'chr'   => $this->addValue($character, 'chr'),
-            'int'   => $this->addvalue($character, 'int'),
-            'agi'   => $this->addvalue($character, 'agi'),
-            'focus' => $this->addvalue($character, 'focus'),
+            'int'   => $this->addValue($character, 'int'),
+            'agi'   => $this->addValue($character, 'agi'),
+            'focus' => $this->addValue($character, 'focus'),
         ];
     }
 

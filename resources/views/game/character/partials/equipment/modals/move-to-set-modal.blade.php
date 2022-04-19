@@ -20,7 +20,7 @@
                         <li>2 Spells (1 Healing, 1 Damage or 2 Healing or 2 Damage)</li>
                         <li>2 Artifacts</li>
                     </ul>
-                    <p>Sets may be incomplete, but if they do not conform to the above they will be treated as stash tabs (not equipable).</p>
+                    <p>Sets may be incomplete, but if they do not conform to the above they will be treated as stash tabs (not equippable).</p>
                     <p>Equipping a set (regardless of if it's incomplete) will replace all currently equipped items.</p>
                     <p>It is suggested, unless you are moving the item to a stash tab, that you equip the full set of items you wish to save
                     and then use the Save as Set button to save that set of equipment.</p>

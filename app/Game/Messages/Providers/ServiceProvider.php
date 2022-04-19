@@ -6,7 +6,7 @@ namespace App\Game\Messages\Providers;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
-use App\Flare\Transformers\MonsterTransfromer;
+use App\Flare\Transformers\MonsterTransformer;
 use App\Game\Messages\Handlers\NpcKingdomHandler;
 use App\Game\Messages\Handlers\NpcQuestRewardHandler;
 use App\Game\Messages\Handlers\NpcQuestsHandler;

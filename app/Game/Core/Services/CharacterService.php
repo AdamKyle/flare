@@ -9,8 +9,8 @@ use App\Game\Core\Values\LevelUpValue;
 class CharacterService
 {
     /**
-     * Level up the charater.
-     * 
+     * Level up the character.
+     *
      * @param Character $character
      * @return void
      */

@@ -29,7 +29,7 @@ class DataTable extends Component
 
         if ($this->sortField === 'game_maps.name') {
             $location = Location::join('game_maps', function($join) {
-                $join = $join->on('locations.game_map_id', '=' ,'game_maps.id');
+                $join = $join->on('locations.game_map_id', '=', 'game_maps.id');
 
                 if ($this->search !== '') {
                     $join->where('game_maps.name', 'like', '%'.$this->search.'%');

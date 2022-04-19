@@ -12,7 +12,7 @@ You have come to the right place my friend; you have come to The Planes of Tless
 > ### ATTN!
 > 
 > All images in this guide can be clicked on to see a bigger version of the image. All images are taken during the development process. 
-> Numbers may not match what is shown in game and items as well as monsters may be different.
+> Numbers may not match what is shown in-game and items as well as monsters may be different.
 > 
 > It is suggested players play on a tablet or larger for their screen resolution. Desktop or laptop is preferred.
 
@@ -55,15 +55,15 @@ There is something for everyone, it just depends on what you want to do. Run the
 
 ## Why?
 
-It's simple really. I wanted to make a game that I wanted to play with inspiration from games I have played. Thats really the main purpose. I am a software developer by trade, it's what I do all day, every day. So why not use my down time to create something. 
+It's simple really. I wanted to make a game that I wanted to play with inspiration from games I have played. Thats really the main purpose. I am a software developer by trade, it's what I do all day, everyday. So why not use my down time to create something. 
 
 I was really inspired by a game called [Race War Kingdoms](https://www.racewarkingdoms.com/) as well as a few other games. I wanted to keep things simple, clean and easy to use. But I wanted to expand on some systems and make them easier and more enjoyable to use.
 
 ## Emails
 
-When the system emails you it will be from **planesoftlessa**. Please do not respond, these emails are sent by the system and theres no one on the other side to respond to emails. 
+When the system emails you it will be from **planesoftlessa**. Please do not respond, these emails are sent by the system and there's no one on the other side to respond to emails. 
 
-Because every one is different with how they manage emails, please make sure you check your: trash, spam, junk and any other filter you might have that could move any email from **planesoftlessa**, from your inbox.
+Because everyone is different with how they manage emails, please make sure you check your: trash, spam, junk and any other filter you might have that could move any email from **planesoftlessa**, from your inbox.
 
 We will not spam you with email.
 
@@ -86,8 +86,8 @@ Emails are only sent if you are not online at the time of this happening. Some o
 
 When you log in, you may sit there for a total of 90 minutes without doing anything before your session is killed. That is, we log you out behind the scenes.
 
-This is useful information to know if you plan to auto attack for longer then one hour. Most players will play with the character sheet in one tab and the game, what you see
-when you log in, in another. This way they can refresh the character tab without loosing chat logs on the game tab.
+This is useful information to know if you plan to auto attack for longer than one hour. Most players will play with the character sheet in one tab and the game, what you see
+when you log in, in another. This way they can refresh the character tab without losing chat logs on the game tab.
 
 Attack [automation](/information/automation) can run for a total of 8 hours, however, due to the nature of Tlessa being an active game, you have to be logged in
 for the automation to keep running. This is why it's useful to have a second tab, character sheet, open, so you can refresh every so often to keep the attack
@@ -97,15 +97,15 @@ automation running.
 
 <div class="mb-3">
 
-- **Where are the cash shops or currency shops to buy items or gold**: As stated through out this information section, there is no way your money will get you any where in game because there is no cash shop or way for you to spend real world money.
+- **Where are the cash shops or currency shops to buy items or gold**: As stated throughout this information section, there is no way your money will get you anywhere in-game because there is no cash shop or way for you to spend real world money.
 
-- **How do you make money, are there adds?**: There are no adds, I make no money off this game what so ever. It is completely open source. In order to pay for server costs, I have a job and a credit card.
+- **How do you make money? Are there ads?**: There are no ads, I make no money off this game whatsoever. It is completely open source. In order to pay for server costs, I have a job and a credit card.
 
 - **How do I get rid of [time gates](/information/time-gates)**: You don't. This is how we slow you down a bit and stop you from overwhelming the server. 
 
 - **What Browsers are supported?**: Anything other than any version of Internet Explorer. This game will never support Internet Explorer, but we do support Edge. (Javascript is a must)
 
-- **Are their Clans? Factions or Guilds?**: No. Its every player for them selves.
+- **Are there Clans? Factions or Guilds?**: No. It's every player for themselves.
 
 - **PVP?**: Coming in a later update.
 
@@ -116,17 +116,17 @@ automation running.
 - **Leaderboards?**: Nope. There is no way for you to see if another player is doing better or worse than you.
 
 - **What's the max level?**: 1000. This is subject to change with future updates. At level 500, you will gain 75% of the xp, at level 750 you will gain 50%, at level 950 you will gain 25% and finally at level 1000 you will gain none.
-  There is hpw ever a [quest](/information/quests) item, called the Sash of Heavens  that will allow you to level to the new Max (at the time of this writing its 3600), which changes
+  There is however a [quest](/information/quests) item, called the Sash of Heavens that will allow you to level to the new Max (at the time of this writing its 3600), which changes
   every month (adding 100 levels to the cap).
 
-- **Can I play on mobile?**: Of course! How ever note a couple of things:
-    - For iPad Pro users Please play in portrait mode. The map is too squished in landscape mode.
-    
+- **Can I play on mobile?**: Of course! However note a couple of things:
+    - For iPad Pro users Please play in portrait mode. The map is too squeezed in landscape mode.
+
 - **What's the Server time?**: America/Edmonton - The Creator (aka: me) is based out of Canada.
 
 </div>
 
-  > ### ATNN!
+  > ### ATTN!
   >
   > While the game works on mobile devices, some aspects of the map may not work, such as being able to tap
   > on the locations to view their details. You can still drag the map around and teleport, move and set
@@ -134,15 +134,15 @@ automation running.
 
 ## Regarding how updates work.
 
-This game follows a semver system for it's versioning system. For those that do not know what semver is, it basically means the following:
+This game follows a semver system for its versioning system. For those that do not know what semver is, it basically means the following:
 
 example: a.b.c
 
 - **a** is major releases, this corresponds to expansions that bring major new features, changes and re-balancing. The idea is to have these happen every year or so. With no commitment on when they will be released.
 - **b** is for minor features and changes including re-balancing. These might include minor enhancements, quality of life, slight changes, flushing out of existing features without too much change or adding small new features. The goal is release these, once every 6 months or so (with no commitment on when).
-- **c** is for patches. These include game breaking fixes, small patches to fix known issues, small ui fixes and re-balancing. These happen ASAP (with in two days) for game breaking bugs and with in a week for other issues.
+- **c** is for patches. These include game breaking fixes, small patches to fix known issues, small ui fixes and re-balancing. These happen ASAP (within two days) for game breaking bugs and within a week for other issues.
 
-Because I am a software developer by day (it's what pays for the server costs) I cannot commit to timelines, unless something is seriously broken and not working.
+Because I am a software developer by day (it's what pays for the server costs), I cannot commit to timelines, unless something is seriously broken and not working.
 
 When doing major releases, these are considered to be "expansions". That come with at least one new plane of existence and lots of new features.
 
@@ -153,17 +153,17 @@ Rollout are done in a way to be zero downtime. However, with that said - all rol
 There is an exception to the release notes:
 
 - If the release notes make mention of new items, planes of existence, monsters, locations, adventures, enchantments, skills or changes to existing items or previously mentioned, these will be done after the rollout. The game has an Admin section that I, The Creator, have access too.
-I, The Creator, will send a global message to chat informing all players to refresh their pages for the changes to take effect, in regard to new items and changes.
+I, The Creator, will send a global message to chat informing all players to refresh their pages for the changes to take effect, in regards to new items and changes.
 
 ## Regarding Bugs
 
-If you find a bug in game - especially one that is exploitable, and you fail to report the bug you can have your account banned for ever. [See Rules](/information/rules).
+If you find a bug in the game - especially one that is exploitable, and you fail to report the bug you can have your account banned forever. [See Rules](/information/rules).
 
 You can report bugs by going to [github](https://github.com/AdamKyle/flare/issues) and filing a new issue. There are three templates to choose from: 
 
-- **Bug Report**: For bugs in game.
+- **Bug Report**: For bugs in the game.
 - **New Feature Request**: For requesting new features
 - **Security Concern**: Accessing areas you can't such as other players content or admin related content.
 
-Since not every one has github you can use the [discord](https://discord.gg/FHYVdcE3Pf) chat to report bugs in the bugs section or request new features in the suggestions section.
+Since not everyone has github you can use the [discord](https://discord.gg/FHYVdcE3Pf) chat to report bugs in the bugs section or request new features in the suggestions section.
 

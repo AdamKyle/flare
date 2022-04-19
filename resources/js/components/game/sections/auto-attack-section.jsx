@@ -308,7 +308,7 @@ export default class AutoAttackSection extends React.Component {
         this.setState({
           isStopping: false,
           successMessage: result.data.message,
-          successTitle: 'Stopping ...'
+          successTitle: 'Stopping...'
         });
       }).catch((err) => {
         if (err.hasOwnProperty('response')) {

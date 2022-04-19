@@ -110,7 +110,7 @@ export default class Factions extends React.Component {
           </p>
           <p>
             Killing monsters will get you 1 point for the first level of each faction
-            and 2 points there after for each kill. For example you need 500 Kills on surface to advance
+            and 2 points thereafter for each kill. For example, you need 500 Kills on surface to advance
             to the next level. For level 2 you need a 500 kills but need 1000 points (2 points) to get to level 3.
             See <a href={"/information/factions"}>Factions</a> in the help docs for more info.
           </p>

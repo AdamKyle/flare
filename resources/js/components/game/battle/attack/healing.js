@@ -17,13 +17,13 @@ export default class Healing {
 
       if (extraActionChance.type === ExtraActionType.PROPHET_HEALING && extraActionChance.has_item) {
         this.battleMessages.push({
-          message: 'The Lords Blessing washes over you. Your healing spells fire again!',
+          message: 'The Lord\'s blessing washes over you. Your healing spells fire again!',
         });
 
         characterCurrentHealth += character.heal_for;
 
         this.battleMessages.push({
-          message: 'The Lords Blessing heals you for: ' + character.heal_for.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+          message: 'The Lord\'s blessing heals you for: ' + character.heal_for.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
         });
       }
     }

@@ -19,7 +19,7 @@
       <dd>{{$skill->is_locked ? 'Yes' : 'No'}}</dd>
     @endif
   </dl>
-  <p class="tw-mt-5"><sup>*</sup> There is a formula to figure out the new time, Lets assume the skill at level 0, takes 2 hours.
+  <p class="tw-mt-5"><sup>*</sup> There is a formula to figure out the new time, Let's assume the skill at level 0, takes 2 hours.
     At level 1, the new time requirement to get to level 2 will be <code>1 + 1 * 2 = 4 hours</code>. Let me break that down: <code>New Skill Level (1) + 1 * Total Hours at level 0 (2) = 4 Hours</code>.
   </p>
 </x-core.cards.card>

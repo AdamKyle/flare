@@ -5,7 +5,7 @@ will have the same critter list as the rest of the plane, except the creatures b
 
 Each plane has a special location. The purpose of these places is to test your characters' ability to kill creatures in one hit and test your gear.
 
-These places can drop items, while the character fights a monsters whose max level is at least ten levels higher than then players, that can
+These places can drop items, while the character fights a monsters whose max level is at least ten levels higher than the player, that can
 have attached affixes with a valuation of no more than 4 billion gold.
 
 Aside from that, players can also find special quest items that only drop in these locations and are required for some quests.
@@ -21,12 +21,12 @@ Players do not need special quest items to enter these locations, but are cautio
     </a>
 </div>
 
-**Note**: the image above may be different than in game experience, that is the location may be a different name, and different coordinates.
+**Note**: The image above may be different than in-game experience, that is the location may be a different name, and different coordinates.
 
 Above you can see the details of one of these locations. You can see the monsters core stats are raised by a specific amount and all the % base attributes,
 such as accuracy, dodge, spell evasion, [voidance and devoidance](/information/voidance) is also raised by a specific % amount.
 
-Characters will want to have the appropriate quest items to fend off voidance and devoidance as well and enchantments that help reduce the enemies stats
+Characters will want to have the appropriate quest items to fend off voidance and devoidance as well and enchantments that help reduce the enemy's stats
 and their resistances as well as skill reduction.
 
 It is fair to say, depending on special location plane, that these place can be mid to end game (roughly level 1000+ with decent gear).

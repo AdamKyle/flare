@@ -2,12 +2,12 @@
 
 In this world, some enemies can make you weak, this happens at the beginning of the fight, before the attacks are handled.
 
-Regular critters won&#39;t void you much, although harder creatures in the list can (10-15%) While Celestials can void you starting at 50%.
+Regular critters won't void you much, although harder creatures in the list can (10-15%) While Celestials can void you starting at 50%.
 
 ## What does it mean to be voided?
 
-- Your affixes won&#39;t fire.
-- Your stats won&#39;t include any modifications (raw stats)
+- Your affixes won't fire.
+- Your stats won't include any modifications (raw stats)
 - Your artifacts will not fire
 - Your health will be much lower (raw DUR lower)
 
@@ -18,7 +18,7 @@ Regular critters won&#39;t void you much, although harder creatures in the list 
 > 
 > To get around this, follow the next section.
 > 
-> Character Devouring Light and Darkness will fire before the enemies. If the enemy is devoided or voided or has their stats reduced,
+> Character Devouring Light and Darkness will fire before the enemy's. If the enemy is devoided or voided or has their stats reduced,
 > that will affect the enemy the entire battle, as it would you.
 > 
 > The only place this does not hold true (in relation to being voided for a whole fight) is in Celestial Fights and Planned PVP as well as Adventures.
@@ -43,7 +43,7 @@ By completing a small quest chain that involves Gold Dust and the starter item y
 
 - Creepy Baby Doll – Buy from soldier for 25k Gold Dust (You have to do: Hunting Expedition and The key to Disenchanting first)
   - **See: [Quests](/information/quests) for more info on the order they are done in.**
-  - Makes your affixes irresistible. You can still be voided though, thus even with this item it won&#39;t help much against being voided
+  - Makes your affixes irresistible. You can still be voided though, thus even with this item it won't help much against being voided
 - Shadow Plane Grimoire – Buy from the Wondering Merchant (Requires Creepy Baby Doll and 30,000 Gold Dust)
     - Your affixes are still irresistible, but now you have a 50% to void the enemy and a 15% to devoid them
 - Eye of the Beholder – Buy from the Wondering Merchant (Requires Shadow Plane Grimoire and 50k Gold Dust)
@@ -70,7 +70,7 @@ If you do not have devoid or have both then you can:
   - (Assuming you, and they are voided) Both you and the enemy cannot use affixes, you will use raw stats and no boons.
   - The enemy cannot use artifacts
 
-The enemy cannot then re-void you on their turn, no matter how many rounds a fight lasts, the enemy, nor you, can re-void or re-devoid. It&#39;s a once per battle situation.
+The enemy cannot then re-void you on their turn, no matter how many rounds a fight lasts, the enemy, nor you, can re-void or re-devoid. It's a once per battle situation.
 
 The only way, at this time, that you can get Devouring Darkness is through the quest item upgrade chain. **There are no affixes to handle this.**
 
