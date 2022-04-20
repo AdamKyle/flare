@@ -20,7 +20,7 @@ use League\Fractal\Resource\Item;
 class UnitService {
 
     /**
-     * @var mixed $compled
+     * @var mixed $completed
      */
     private $completed;
 
@@ -142,9 +142,9 @@ class UnitService {
      *
      * @param UnitInQueue $queue
      * @param Manager $manager
-     * @param KingdomTransformer $transfromer
+     * @param KingdomTransformer $transformer
      */
-    public function cancelRecruit(UnitInQueue $queue, Manager $manager, KingdomTransformer $transfromer): bool {
+    public function cancelRecruit(UnitInQueue $queue, Manager $manager, KingdomTransformer $transformer): bool {
 
         $kingdom = $queue->kingdom;
         $user    = $kingdom->character->user;
@@ -173,12 +173,12 @@ class UnitService {
             }
 
             $unit    = $queue->unit;
-            $kingdom = $this->updateKingdomAfterCancelation($kingdom, $unit, $queue);
+            $kingdom = $this->updateKingdomAfterCancellation($kingdom, $unit, $queue);
         }
 
         $queue->delete();
 
-        $kingdom  = new Item($kingdom->refresh(), $transfromer);
+        $kingdom  = new Item($kingdom->refresh(), $transformer);
 
         $kingdom = $manager->createData($kingdom)->toArray();
 
@@ -217,7 +217,7 @@ class UnitService {
         })->first();
     }
 
-    protected function updateKingdomAfterCancelation(Kingdom $kingdom, GameUnit $unit, UnitInQueue $queue): Kingdom {
+    protected function updateKingdomAfterCancellation(Kingdom $kingdom, GameUnit $unit, UnitInQueue $queue): Kingdom {
         $kingdom->update([
             'current_wood'       => $kingdom->current_wood + (($unit->wood_cost * $queue->amount) * $this->totalResources),
             'current_clay'       => $kingdom->current_clay + (($unit->clay_cost * $queue->amount) * $this->totalResources),

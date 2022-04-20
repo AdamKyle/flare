@@ -297,7 +297,7 @@
                 </div>
             </div>
 
-            @if ($showUsabillityError)
+            @if ($showUsabilityError)
                 <div class="alert alert-danger mb-2 mt-2">
                     You must choose an option since this is usable.
                 </div>
@@ -378,14 +378,14 @@
                     <div class="{{!is_null($item->affects_skill_type) ? 'row' : 'hide'}}">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="fight_time_out_mod_bonus">Increases Skill Fight Time Out By: </label>
+                                <label for="fight_time_out_mod_bonus">Increases Skill Fight Timeout By: </label>
                                 <input type="number" steps="0.01" class="form-control" id="fight_time_out_mod_bonus" name="fight_time_out_mod_bonus" wire:model="item.fight_time_out_mod_bonus" {{!$item->damages_kingdoms || is_null($item->damages_kingdoms) ? '' : 'disabled'}}>
                                 @error('item.fight_time_out_mod_bonus') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="move_time_out_mod_bonus">Increases Move Time Out By: </label>
+                                <label for="move_time_out_mod_bonus">Increases Move Timeout By: </label>
                                 <input type="number" steps="0.01" class="form-control" id="move_time_out_mod_bonus" name="move_time_out_mod_bonus" wire:model="item.move_time_out_mod_bonus" {{!$item->damages_kingdoms || is_null($item->damages_kingdoms) ? '' : 'disabled'}}>
                                 @error('item.move_time_out_mod_bonus') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>

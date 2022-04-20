@@ -74,7 +74,7 @@ class RandomEnchantController extends Controller {
 
         event(new UpdateQueenOfHeartsPanel($character->user, $this->randomEnchantmentService->fetchDataForApi($character)));
 
-        broadcast(new ServerMessageEvent($character->user, 'The Queen of Hearts blushes, smiles and bats her eye lashes at you as she hands you, from out of no where, a new shiny object: ' . $item->affix_name, true));
+        broadcast(new ServerMessageEvent($character->user, 'The Queen of Hearts blushes, smiles and bats her eye lashes at you as she hands you, from out of nowhere, a new shiny object: ' . $item->affix_name, true));
 
         return response()->json([
             'item'      => $item,
@@ -90,17 +90,17 @@ class RandomEnchantController extends Controller {
         })->first();
 
         if (is_null($slot)) {
-            return response()->json(['message' => 'Where did you put that item child? Ooooh hooo hooo hooo! Are you playing hide and seek with it? (Unique does not exist.)'], 422);
+            return response()->json(['message' => 'Where did you put that item, child? Ooooh hooo hooo hooo! Are you playing hide and seek with it? (Unique does not exist.)'], 422);
         }
 
         if (!$this->reRollEnchantmentService->doesReRollCostMatch($request->selected_reroll_type, $request->selected_affix, $request->gold_dust_cost, $request->shard_cost)) {
-            event (new GlobalMessageEvent($character->name . ' has pissed off the Queen of hearts with their cheating ways. Their shards and gold dust cost did not match! The Creator is watching you child!'));
+            event (new GlobalMessageEvent($character->name . ' has pissed off the Queen of Hearts with their cheating ways. Their shards and gold dust cost did not match! The Creator is watching you, child!'));
 
             return response()->json(['message' => 'No! You\'re a very bad person! (stop cheating)'], 422);
         }
 
         if ($character->gold_dust < $request->gold_dust_cost || $character->shards < $request->shard_cost) {
-            return response()->json(['message' => 'What! No! Child! I don\'t like poor people. I don\'t  even date poor men! Oh this is so saddening child! (You dont have enough currency, you made the Queen sad.)'], 422);
+            return response()->json(['message' => 'What! No! Child! I don\'t like poor people. I don\'t even date poor men! Oh this is so saddening, child! (You don\'t have enough currency, you made the Queen sad.)'], 422);
         }
 
         $this->reRollEnchantmentService->reRoll(
@@ -118,7 +118,7 @@ class RandomEnchantController extends Controller {
             'gold'      => $character->gold,
             'gold_dust' => $character->gold_dust,
             'shards'    => $character->shards,
-            'message'   => 'The Queen has re rolled: ' . $slot->item->affix_name . ' Check your inventory to see the new stats.',
+            'message'   => 'The Queen has re-rolled: ' . $slot->item->affix_name . ' Check your inventory to see the new stats.',
         ], 200);
     }
 
@@ -132,17 +132,17 @@ class RandomEnchantController extends Controller {
         })->first();
 
         if (is_null($slot) || is_null($secondSlot)) {
-            return response()->json(['message' => 'Where did you put those items child? Ooooh hooo hooo hooo! Are you playing hide and seek with it? (Either the unique or the requested item does not exist.)'], 422);
+            return response()->json(['message' => 'Where did you put those items, child? Ooooh hooo hooo hooo! Are you playing hide and seek with it? (Either the unique or the requested item does not exist.)'], 422);
         }
 
         if (!$this->reRollEnchantmentService->doesMovementCostMatch($slot->item->id, $request->selected_affix, $request->gold_cost, $request->shard_cost)) {
-            event (new GlobalMessageEvent($character->name . ' has pissed off the Queen of hearts with their cheating ways. Their shards and gold dust cost did not match! The Creator is watching you child!'));
+            event (new GlobalMessageEvent($character->name . ' has pissed off the Queen of Hearts with their cheating ways. Their shards and gold dust cost did not match! The Creator is watching you, child!'));
 
             return response()->json(['message' => 'No! You\'re a very bad person! (stop cheating)'], 422);
         }
 
         if ($character->gold < $request->gold_cost || $character->shards < $request->shard_cost) {
-            return response()->json(['message' => 'What! No! Child! I don\'t like poor people. I don\'t  even date poor men! Oh this is so saddening child! (You dont have enough currency, you made the Queen sad.)'], 422);
+            return response()->json(['message' => 'What! No! Child! I don\'t like poor people. I don\'t even date poor men! Oh this is so saddening, child! (You don\'t have enough currency, you made the Queen sad.)'], 422);
         }
 
         $this->reRollEnchantmentService->moveAffixes(

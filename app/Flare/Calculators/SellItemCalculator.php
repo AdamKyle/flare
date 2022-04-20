@@ -31,7 +31,7 @@ class SellItemCalculator {
     }
 
     /**
-     * Fetch the cost of the item with it's affixes.
+     * Fetch the cost of the item with its affixes.
      *
      * @param Item $item
      * @return int

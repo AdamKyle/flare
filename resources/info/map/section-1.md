@@ -28,7 +28,7 @@ With the item, the character cannot traverse any blue sections of the map.
 
 The above shows you the movement options. You can move in one of four directions, each movement is 16 pixels across, each square is 16 pixels.
 
-Movement has a time out of 10 seconds.
+Movement has a timeout of 10 seconds.
 
 ### Setting Sail
 
@@ -54,7 +54,7 @@ You will see this modal every time you go to embark.
 
 ![teleport](/storage/info/map/images/teleport.png)
 
-Here we can teleport. You select the X and Y axis and from there the total time out in minutes, cost in gold and total distance, calculated in pixels.
+Here we can teleport. You select the X and Y axis and from there, the total timeout in minutes, cost in gold and total distance, calculated in pixels.
 
 Teleporting cost is based on distance / character intelligence (minimum of 1) * 1000 gold.
 
@@ -64,7 +64,7 @@ Teleporting cost is based on distance / character intelligence (minimum of 1) * 
 
 You can do the following while each of the time-outs is playing out. At any time you can manage your kingdoms and chat with other players:
 
-- **Moving**: Applies 10 second time out. You can do everything but embark on adventures.
+- **Moving**: Applies 10 second timeout. You can do everything but embark on adventures.
 - **Adventuring**: Timer dependent on total levels of adventure. You can do nothing related to your character, movement, attacking or anything else including shopping, market boards, movement and so on. You are otherwise occupied.
 - **Sailing**: Timer dependent on distance. Actions are treated the same as moving.
 - **Teleport**: Timer dependent on distance. Actions are treated the same as moving.

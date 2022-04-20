@@ -106,7 +106,7 @@ class Attributes extends Component
         }
 
         if (!$isValid) {
-            return $this->addError('error', 'Your selected units and units per level are greator then your max level.');
+            return $this->addError('error', 'Your selected units and units per level are greater than your max level.');
         }
 
         $this->gameBuilding->save();
@@ -122,7 +122,7 @@ class Attributes extends Component
         if ($this->editing) {
             $message = 'Updated Building: ' . $this->gameBuilding->refresh()->name;
         }
-        
+
         $this->emitTo('core.form-wizard', $functionName, $index, true, [
             'type'    => 'success',
             'message' => $message,

@@ -8,7 +8,7 @@ Both races and classes can provide these additional bonuses.
 
 **Accuracy**: Your chance to hit the enemy. We take this skills bonus into account when you are fighting monsters. The higher the bonus, the higher the chance to hit the enemy.
 
-**Dodge**: Your chance to dodge the enemies attack. We take this skill bonus into account when you are trying to dodge the incoming attack. The higher the bonus, the higher the chance to dodge.
+**Dodge**: Your chance to dodge the enemy's attack. We take this skill bonus into account when you are trying to dodge the incoming attack. The higher the bonus, the higher the chance to dodge.
 
 Those top three come from what are called [skills](/information/skill-information) which you level up by selecting train, selecting a desired amount of XP to sacrifice from killing monsters
 and slowly level these over time.
@@ -17,7 +17,7 @@ and slowly level these over time.
 > 
 > Do not try and cap (or reach max level) when starting out on any of these trainable skills. It will take you a long time. Instead, focus on training Accuracy
 > until you can reliably hit something with your weapon. Once you can do that, switch over to another skill, such as looting for example and level that for a while.
-> Tlessa is a game that's player in the long run, there is no quick gratification here.
+> Tlessa is a long term game, there is no instant gratification here.
 
 **Defence Modifier**: This is added to the characters total AC. AC starts with a base of 10. Equipping armor and items that give bonuses to the defence modifier along with bonuses to the AC will increase the characters ability to not take any damage.
 

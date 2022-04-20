@@ -88,7 +88,7 @@ class MonsterAttackHandler {
 
             $this->characterHealth -= $monsterAttack;
 
-            $message = $attacker->name . ' hit for: ' . number_format($monsterAttack);
+            $message = $attacker->name . ' hits for: ' . number_format($monsterAttack);
             $this->battleLogs = $this->addMessage($message, 'enemy-action-fired');
 
             $this->useItems($attacker, $defender, $attackType, $isDefenderVoided);
@@ -100,7 +100,7 @@ class MonsterAttackHandler {
 
         if ($this->canHitHandler->canHit($attacker, $defender, $isDefenderVoided)) {
             if ($this->blockedAttack($monsterAttack, $defender, $attackType, $isDefenderVoided)) {
-                $message          = 'You blocked the enemies attack!';
+                $message          = 'You blocked the enemy\'s attack!';
                 $this->battleLogs = $this->addMessage($message, 'action-fired', $this->battleLogs);
 
                 $this->useItems($attacker, $defender, $attackType, $isDefenderVoided);
@@ -110,7 +110,7 @@ class MonsterAttackHandler {
 
             $this->characterHealth -= $monsterAttack;
 
-            $message = $attacker->name . ' hit for: ' . number_format($monsterAttack);
+            $message = $attacker->name . ' hits for: ' . number_format($monsterAttack);
 
             $this->battleLogs = $this->addMessage($message, 'enemy-action-fired');
 
@@ -199,11 +199,11 @@ class MonsterAttackHandler {
 
 
             if ($this->blockedAttack($monsterSpellDamage, $defender, $attackType, $isDefenderVoided)) {
-                $message = 'You managed to block the enemies spells with your armour!';
+                $message = 'You managed to block the enemy\'s spells with your armour!';
                 $this->battleLogs = $this->addMessage($message, 'action-fired', $this->battleLogs);
             } else {
                 if ($defenderReduction > 1.0) {
-                    $message = 'You evaded the enemies spells!';
+                    $message = 'You evaded the enemy\'s spells!';
                     $this->battleLogs = $this->addMessage($message, 'action-fired', $this->battleLogs);
 
                     return;
@@ -212,7 +212,7 @@ class MonsterAttackHandler {
                     $roll = rand(1, 100);
 
                     if ($roll > $dc) {
-                        $message = 'You evaded the enemies spells!';
+                        $message = 'You evaded the enemy\'s spells!';
                         $this->battleLogs = $this->addMessage($message, 'action-fired', $this->battleLogs);
 
                         return;
@@ -245,7 +245,7 @@ class MonsterAttackHandler {
             $damage            = rand(1, $attacker->max_affix_damage);
 
             if ($defenderReduction > 0) {
-                $message = 'Your rings negate some of the enemies enchantment damage.';
+                $message = 'Your rings negate some of the enemy\'s enchantment damage.';
                 $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
 
                 $damage -= ceil($damage * $defenderReduction);
@@ -270,7 +270,7 @@ class MonsterAttackHandler {
             }
 
             if ($healing >= 1) {
-                $message = 'Your rings negate some of the enemies healing power.';
+                $message = 'Your rings negate some of the enemy\'s healing power.';
                 $this->battleLogs = $this->addMessage($message, 'action-fired', $this->battleLogs);
 
                 $message = $attacker->name . '\'s healing spells wash over them for: ' . number_format($healing);
@@ -278,7 +278,7 @@ class MonsterAttackHandler {
 
                 $this->monsterHealth += $healing;
             } else {
-                $message = 'Your rings negate all of the enemies healing power.';
+                $message = 'Your rings negate all of the enemy\'s healing power.';
                 $this->battleLogs = $this->addMessage($message, 'action-fired', $this->battleLogs);
             }
         }

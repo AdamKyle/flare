@@ -28,7 +28,7 @@ class InventorySetService {
 
         $inventorySet = $inventorySet->refresh();
 
-        // Is the inventory set still considered equipable?
+        // Is the inventory set still considered equippable?
         $inventorySet->update([
             'can_be_equipped' => $this->isSetEquippable($inventorySet),
         ]);
@@ -50,7 +50,7 @@ class InventorySetService {
 
         $set = $set->refresh();
 
-        // Is the inventory set still considered equipable?
+        // Is the inventory set still considered equippable?
         $set->update([
             'can_be_equipped' => $this->isSetEquippable($set),
         ]);
@@ -173,10 +173,10 @@ class InventorySetService {
     }
 
     /**
-     * Checks to see if the set is equipable.
+     * Checks to see if the set is equippable.
      *
      * When new items are added or items are removed from the set, the set will call this
-     * function to then update it's euippable status.
+     * function to then update its equippable status.
      *
      * @param InventorySet $inventorySet
      * @return bool
@@ -228,7 +228,7 @@ class InventorySetService {
     /**
      * Do we have at least one weapon?
      *
-     * If you have more then two weapons, its a no.
+     * If you have more than two weapons, it's a no.
      *
      * If you have a bow and a weapon or a shield, its a no.
      *
@@ -350,7 +350,7 @@ class InventorySetService {
     /**
      * Is the type of armour being passed in a count of 1?
      *
-     * If you have more then one piece of armour its a no.
+     * If you have more than one piece of armour it's a no.
      *
      * @param InventorySet $inventorySet
      * @param string $type

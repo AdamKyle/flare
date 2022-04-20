@@ -2,7 +2,7 @@
 
 -------------------
 
-In Tlessa there are a verity of races and classes that the character can choose from. All of these races and classes affect your base stats, bonus to specific skills and your class determines your base damage stat.
+In Tlessa there are a variety of races and classes that the character can choose from. All of these races and classes affect your base stats, bonus to specific skills and your class determines your base damage stat.
 
 While, for optimal play, you might want to pick a race and class that suit each other, you are free to make any character you want.
 
@@ -17,9 +17,9 @@ class skill special attacks. We will talk more about that in another section cal
 > ### ATTN!
 > 
 > The only way to change your race or class is to delete and re-make your account. There is no downside to this other
-> then loosing all the hard work you may have put in. So please pick carefully.
+> than losing all the hard work you may have put in. So please pick carefully.
 > 
-> There is now downside to you picking a race that may not suite the desired class, you can make up for this
+> There is no downside to you picking a race that may not suit the desired class, you can make up for this
 > later in the game. Early game, however might be a bit more difficult, but not impossible.
 
 When selecting a race you may pick from:

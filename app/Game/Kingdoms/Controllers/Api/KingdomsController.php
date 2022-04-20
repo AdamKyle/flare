@@ -26,10 +26,10 @@ use App\Flare\Jobs\CoreJob;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Kingdoms\Jobs\MassEmbezzle;
 use App\Game\Kingdoms\Requests\KingdomDepositRequest;
-use App\Game\Kingdoms\Requests\KingdomUnitRecrutmentRequest;
+use App\Game\Kingdoms\Requests\KingdomUnitRecruitmentRequest;
 use App\Game\Kingdoms\Requests\PurchaseGoldBarsRequest;
 use App\Game\Kingdoms\Requests\PurchasePeopleRequest;
-use App\Game\Kingdoms\Requests\WithrawGoldBarsRequest;
+use App\Game\Kingdoms\Requests\WithdrawGoldBarsRequest;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 use App\Game\Kingdoms\Values\UnitCosts;
 use App\Game\Kingdoms\Requests\KingdomRenameRequest;
@@ -248,7 +248,7 @@ class KingdomsController extends Controller
         return response()->json([], 200);
     }
 
-    public function recruitUnits(KingdomUnitRecrutmentRequest $request, Kingdom $kingdom, GameUnit $gameUnit, UnitService $service)
+    public function recruitUnits(KingdomUnitRecruitmentRequest $request, Kingdom $kingdom, GameUnit $gameUnit, UnitService $service)
     {
         if ($request->amount > KingdomMaxValue::MAX_UNIT) {
             return response()->json([
@@ -378,7 +378,7 @@ class KingdomsController extends Controller
 
         if ($maxCurrencies->canNotGiveCurrency()) {
             return response()->json([
-                'message' => number_format($amountToEmbezzle) . ' Would yput you well over the gold cap limit.'
+                'message' => number_format($amountToEmbezzle) . ' Would put you well over the gold cap limit.'
             ], 422);
         }
 
@@ -560,7 +560,7 @@ class KingdomsController extends Controller
         ], 200);
     }
 
-    public function withdrawGoldBars(WithrawGoldBarsRequest $request, Kingdom $kingdom)
+    public function withdrawGoldBars(WithdrawGoldBarsRequest $request, Kingdom $kingdom)
     {
         if ($kingdom->character->id !== auth()->user()->character->id) {
             return response()->json([
@@ -626,7 +626,7 @@ class KingdomsController extends Controller
 
         if ($unitsInMovement->isNotEmpty()) {
             return response()->json([
-                'message' => 'You either sent units, that in movement, or an attack is incoming. Either way there is units in movement from or to this kingdom and you cannot abandon it.'
+                'message' => 'You either sent units that are currently moving, or an attack is incoming. Either way, there are units in movement from or to this kingdom and you cannot abandon it.'
             ], 422);
         }
 

@@ -524,7 +524,7 @@ class CharacterInventoryController extends Controller {
     public function UseManyItems(UseManyItemsValidation $request, Character $character) {
         if ($character->boons->count() === 10) {
             return response()->json(['message' => 'You can only have a max of ten boons applied.
-            Check active boons to see which ones you have. You can always cancel one by clicking on the row.'], 422);
+            Check Active Boons to see which ones you have. You can always cancel one by clicking on the row.'], 422);
         }
 
         $slots = $character->inventory->slots()->findMany($request->slot_ids);
@@ -545,7 +545,7 @@ class CharacterInventoryController extends Controller {
 
         UseMultipleItems::withChain($jobs)->dispatch($character, $slots->first()->id);
 
-        return response()->json(['message' => 'Boons are being applied. You can check Active Boons tab to see them be applied or check chat to see boons being applied.'], 200);
+        return response()->json(['message' => 'Boons are being applied. You can check Active Boons tab to see if they are applied or check chat to see boons being applied.'], 200);
     }
 
     public function destroyAlchemyItem(Request $request, Character $character) {

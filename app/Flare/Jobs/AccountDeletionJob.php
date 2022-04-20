@@ -19,7 +19,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\MarketBoard;
 use App\Flare\Models\UserSiteAccessStatistics;
-use App\Flare\Transformers\MarketItemsTransfromer;
+use App\Flare\Transformers\MarketItemsTransformer;
 use App\Game\Core\Traits\UpdateMarketBoard;
 use App\Game\Kingdoms\Service\KingdomResourcesService;
 use App\Game\Messages\Events\GlobalMessageEvent;
@@ -55,7 +55,7 @@ class AccountDeletionJob implements ShouldQueue
             }
 
             if (!$user->character->inventorySets->isEmpty()) {
-                $this->emptyCharacterInventorysets($user->character->inventorySets);
+                $this->emptyCharacterInventorySets($user->character->inventorySets);
             }
 
             $this->deleteCharacterMarketListings($user->character);
@@ -71,8 +71,8 @@ class AccountDeletionJob implements ShouldQueue
             $siteAccessStatistic = UserSiteAccessStatistics::orderBy('created_at', 'desc')->first();
 
             UserSiteAccessStatistics::create([
-                'amount_signed_in' => $siteAccessStatistic->ammount_signed_in - 1,
-                'amount_registered' => $siteAccessStatistic->ammount_registered - 1,
+                'amount_signed_in' => $siteAccessStatistic->amount_signed_in - 1,
+                'amount_registered' => $siteAccessStatistic->amount_registered - 1,
             ]);
 
             $adminUser = User::with('roles')->whereHas('roles', function ($q) {
@@ -109,7 +109,7 @@ class AccountDeletionJob implements ShouldQueue
             }
         });
 
-        $this->sendUpdate(resolve(MarketItemsTransfromer::class), resolve(Manager::class), $character->user);
+        $this->sendUpdate(resolve(MarketItemsTransformer::class), resolve(Manager::class), $character->user);
     }
     protected function emptyCharacterInventory(Inventory $inventory) {
         foreach ($inventory->slots as $slot) {
@@ -145,7 +145,7 @@ class AccountDeletionJob implements ShouldQueue
 
         $character->notifications()->delete();
 
-        $character->currentAutoMations()->delete();
+        $character->currentAutomations()->delete();
 
         $character->factions()->delete();
 

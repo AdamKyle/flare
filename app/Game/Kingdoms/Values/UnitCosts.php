@@ -12,12 +12,12 @@ class UnitCosts
     const SWORDSMEN       = 'Swordsmen';
     const RAM             = 'Ram';
     const TREBUCHET       = 'Trebuchet';
-    const MOUNTED_KNGHTS  = 'Mounted Knights';
+    const MOUNTED_KNIGHTS = 'Mounted Knights';
     const MOUNTED_ARCHERS = 'Mounted Archers';
     const CANNON          = 'Cannon';
     const PRIEST          = 'Priest';
     const CLERIC          = 'Cleric';
-    const PALIDIN         = 'Paladin';
+    const PALADIN         = 'Paladin';
     const SETTLER         = 'Settler';
     const PERSON          = 'Person';
 
@@ -28,11 +28,11 @@ class UnitCosts
         self::RAM             => self::RAM,
         self::TREBUCHET       => self::TREBUCHET,
         self::CANNON          => self::CANNON,
-        self::MOUNTED_KNGHTS  => self::MOUNTED_KNGHTS,
+        self::MOUNTED_KNIGHTS => self::MOUNTED_KNIGHTS,
         self::MOUNTED_ARCHERS => self::MOUNTED_ARCHERS,
         self::PRIEST          => self::PRIEST,
         self::CLERIC          => self::CLERIC,
-        self::PALIDIN         => self::PALIDIN,
+        self::PALADIN         => self::PALADIN,
         self::SETTLER         => self::SETTLER,
         self::PERSON          => self::PERSON,
     ];
@@ -62,7 +62,7 @@ class UnitCosts
                 return 1000;
             case self::CANNON:
                 return 5000;
-            case self::MOUNTED_KNGHTS:
+            case self::MOUNTED_KNIGHTS:
                 return 700;
             case self::MOUNTED_ARCHERS:
                 return 300;
@@ -70,7 +70,7 @@ class UnitCosts
                 return 75;
             case self::CLERIC:
                 return 125;
-            case self::PALIDIN:
+            case self::PALADIN:
                 return 250;
             case self::SETTLER:
                 return 2500;
@@ -110,7 +110,7 @@ class UnitCosts
     }
 
     public function isPaladin(): bool {
-        return $this->name === self::PALIDIN;
+        return $this->name === self::PALADIN;
     }
 
     public function isSettler(): bool {

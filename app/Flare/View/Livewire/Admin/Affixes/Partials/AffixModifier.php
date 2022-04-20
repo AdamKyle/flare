@@ -15,7 +15,7 @@ class AffixModifier extends Component
 
     public $editing = false;
 
-    protected $listeners = ['validateInput' , 'update'];
+    protected $listeners = ['validateInput', 'update'];
 
     protected $rules = [
         'itemAffix.base_damage_mod'          => 'nullable',

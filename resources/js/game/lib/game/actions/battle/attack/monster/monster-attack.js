@@ -42,7 +42,7 @@ export default class MonsterAttack extends BattleBase {
       if (this.canHit(monster, this.defender)) {
 
         if (this.isBlocked(previousAttackType, this.defender, damage, isCharacterVoided)) {
-          this.addMessage('The enemies attack was blocked!', 'player-action');
+          this.addMessage('The enemy\'s attack was blocked!', 'player-action');
 
           this.useItems(monster, isCharacterVoided, isMonsterVoided, previousAttackType);
 
@@ -164,7 +164,7 @@ export default class MonsterAttack extends BattleBase {
       if (defenderReduction > 0) {
         damage = (damage - (damage * defenderReduction)).toFixed(2);
 
-        this.addMessage('Your rings negate some of the enemies enchantment damage.', 'player-action');
+        this.addMessage('Your rings negate some of the enemy\'s enchantment damage.', 'player-action');
       }
 
       if (damage <= 0.0) {
@@ -190,16 +190,16 @@ export default class MonsterAttack extends BattleBase {
       const roll          = random(1, 100);
 
       if (evasionChance >= 1.0) {
-        this.addMessage('You evade the enemies spells!', 'player-action');
+        this.addMessage('You evade the enemy\'s spells!', 'player-action');
 
         return;
       }
 
       if (roll > dc) {
-        this.addMessage('You evade the enemies spells!', 'player-action');
+        this.addMessage('You evade the enemy\'s spells!', 'player-action');
       } else {
         if (this.isBlocked(previousAttackType, defender, damage, isCharacterVoided)) {
-          this.addMessage('You managed to block the enemies spells with your armour!', 'player-action');
+          this.addMessage('You managed to block the enemy\'s spells with your armour!', 'player-action');
 
           return;
         }
@@ -248,14 +248,14 @@ export default class MonsterAttack extends BattleBase {
 
       if (defenderHealingReduction > 0) {
         healFor = healFor - healFor * defenderHealingReduction;
-        this.addMessage('Your rings negate some of the enemies healing power.', 'player-action');
+        this.addMessage('Your rings negate some of the enemy\'s healing power.', 'player-action');
       }
 
       if (healFor > 1) {
         this.currentMonsterHealth = this.currentMonsterHealth + healFor;
         this.addMessage(attacker.name + '\'s healing spells wash over them for: ' + formatNumber(healFor.toFixed(0)), 'enemy-action');
       } else {
-        this.addMessage('Your rings negate all of the enemies healing power.', 'player-action');
+        this.addMessage('Your rings negate all of the enemy\'s healing power.', 'player-action');
       }
     }
   }

@@ -194,7 +194,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | PhpSpreadsheet offers a way to hook into the process of a value being
-    | written to a cell. In there some assumptions are made on how the
+    | written to a cell. In there, some assumptions are made on how the
     | value should be formatted. If you want to change those defaults,
     | you can implement your own default value binder.
     |

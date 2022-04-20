@@ -71,7 +71,7 @@
                             <td>{{$log->time_happened}}</td>
                             <td>
                                 @if (KingdomLogStatus::statusType($log->status)->lostKingdom())
-                                    Your kingdom has fallen. There is nothing to show. Best to settle else where.
+                                    Your kingdom has fallen. There is nothing to show. Best to settle elsewhere.
                                 @else
                                     N/A
                                 @endif

@@ -11,7 +11,7 @@ use App\Flare\Models\Kingdom;
 use App\Flare\Models\MarketBoard;
 use App\Flare\Models\Skill;
 use App\Flare\Models\UserSiteAccessStatistics;
-use App\Flare\Transformers\MarketItemsTransfromer;
+use App\Flare\Transformers\MarketItemsTransformer;
 use App\Game\Core\Traits\UpdateMarketBoard;
 use App\Game\Kingdoms\Events\UpdateGlobalMap;
 use App\Game\Kingdoms\Events\UpdateNPCKingdoms;

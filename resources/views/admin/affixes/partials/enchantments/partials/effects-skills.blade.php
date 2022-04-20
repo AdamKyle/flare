@@ -65,7 +65,7 @@
         <x-core.alerts.info-alert title="Quick Tip">
           <p>
             These Affixes only affect enemies and can reduce ALL their skills at once by a specified %. These affixes work
-            in the same vein as stat reduction affixes, how ever these do not stack. We take the best one of all you have on.
+            in the same vein as stat reduction affixes, however, these do not stack. We take the best one of all you have on.
           </p>
         </x-core.alerts.info-alert>
 

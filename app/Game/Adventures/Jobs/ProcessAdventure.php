@@ -37,7 +37,7 @@ class ProcessAdventure implements ShouldQueue
      * @param Character $character
      * @param Adventure $adventure
      * @param string $name
-     * @param int $curentLevel
+     * @param int $currentLevel
      * @return void
      */
     public function __construct(

@@ -391,8 +391,8 @@ class Item extends Model
     /**
      * Gets the total healing value for the item.
      *
-     * In some cases an item might not have a base_healing value.
-     * how ever might have either prefix or suffix or both.
+     * In some cases an item might not have a base_healing value,
+     * however, it might have either prefix or suffix or both.
      *
      * In this case we will set the healFor variable to one.
      * this will allow the healing modifiers to be applied to the item.

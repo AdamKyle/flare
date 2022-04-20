@@ -37,7 +37,7 @@ return [
     |
     | This option allows to modify the prefix used by all the chart route names.
     | This is mostly used if there's the need to modify the route names that are
-    | binded to the charts.
+    | bound to the charts.
     |
     */
     'global_route_name_prefix' => 'charts',

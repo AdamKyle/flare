@@ -30,7 +30,7 @@ class NpcServerMessageBuilderTest extends TestCase {
         $message = $this->npcMessageBuilder->build('conjure', $this->npc);
 
         $this->assertEquals(
-            $this->npc->real_name . '\'s Eyes light up as magic races through the air. "It is done child!" he bellows and magic strikes the earth!',
+            $this->npc->real_name . '\'s Eyes light up as magic races through the air. "It is done, child!" he bellows and magic strikes the earth!',
             $message
         );
     }
@@ -66,7 +66,7 @@ class NpcServerMessageBuilderTest extends TestCase {
         $message = $this->npcMessageBuilder->build('not_enough_gold', $this->npc);
 
         $this->assertEquals(
-            '"I do not like dealing with poor people. You do not have the gold child!"',
+            '"I do not like dealing with poor people. You do not have the gold, child!"',
             $message
         );
     }
@@ -75,7 +75,7 @@ class NpcServerMessageBuilderTest extends TestCase {
         $message = $this->npcMessageBuilder->build('missing_queen_item', $this->npc);
 
         $this->assertEquals(
-            $this->npc->real_name . ' looks at you with a blank stare. You try again and she just refuses to talk to you or acknowledge you. Maybe you need a quest item? Something to do with: Queens Decision (Quest) ???',
+            $this->npc->real_name . ' looks at you with a blank stare. You try again and she just refuses to talk to you or acknowledge you. Maybe you need a quest item? Something to do with: Queens Decision (Quest)???',
             $message
         );
     }
@@ -102,7 +102,7 @@ class NpcServerMessageBuilderTest extends TestCase {
         $message = $this->npcMessageBuilder->build('queen_plane', $this->npc);
 
         $this->assertEquals(
-            $this->npc->real_name . ' looks at you, blinks here eyes and screams: "NO! NO! NO! you have to come to me child. Come to me and let me love you...Oooooh hooo hoo hoo!" You must be any where in Hell to access her.',
+            $this->npc->real_name . ' looks at you, blinks here eyes and screams: "NO! NO! NO! You have to come to me, child. Come to me and let me love you... Oooooh hooo hoo hoo!" You must be anywhere in Hell to access her.',
             $message
         );
     }
@@ -120,7 +120,7 @@ class NpcServerMessageBuilderTest extends TestCase {
         $message = $this->npcMessageBuilder->build('what_do_you_want', $this->npc);
 
         $this->assertEquals(
-            '"Select something child, one of those green items and tell me what you want. Remember I am not a cheap woman. You must please me to get what you want! I am the Queen of Hearts after all. Oooooh hooo hoo hoo!"',
+            '"Select something, child. One of those green items and tell me what you want. Remember I am not a cheap woman. You must please me to get what you want! I am the Queen of Hearts after all. Oooooh hooo hoo hoo!"',
             $message
         );
     }
@@ -129,7 +129,7 @@ class NpcServerMessageBuilderTest extends TestCase {
         $message = $this->npcMessageBuilder->build('missing_parent_quest', $this->npc);
 
         $this->assertEquals(
-            '"Child! there is something you have to do, before you talk to me. Go do it!" (Open Plane Quests and find the quest you are trying to complete. Quests with lines connecting must be done in order).',
+            '"Child! There is something you have to do, before you talk to me. Go do it!" (Open Plane Quests and find the quest you are trying to complete. Quests with lines connecting must be done in order).',
             $message
         );
     }
@@ -138,7 +138,7 @@ class NpcServerMessageBuilderTest extends TestCase {
         $message = $this->npcMessageBuilder->build('take_a_look', $this->npc);
 
         $this->assertEquals(
-            '"Why don\'t you take a look, and show me what you can afford my child."',
+            '"Why don\'t you take a look, and show me what you can afford, my child."',
             $message
         );
     }
@@ -147,7 +147,7 @@ class NpcServerMessageBuilderTest extends TestCase {
         $message = $this->npcMessageBuilder->build('kingdom_time_out', $this->npc);
 
         $this->assertEquals(
-            $this->npc->real_name . ' looks disappointed as he looks at the ground and finally states: "No! You abandoned your last kingdom. You can wait...."',
+            $this->npc->real_name . ' looks disappointed as he looks at the ground and finally states: "No! You abandoned your last kingdom. You can wait..."',
             $message
         );
     }
@@ -156,7 +156,7 @@ class NpcServerMessageBuilderTest extends TestCase {
         $message = $this->npcMessageBuilder->build('paid_conjuring', $this->npc);
 
         $this->assertEquals(
-            $this->npc->real_name . ' takes your currency and smiles: "Thank you child. I shall begin the conjuration at once."',
+            $this->npc->real_name . ' takes your currency and smiles: "Thank you, child. I shall begin the conjuration at once."',
             $message
         );
     }
@@ -165,7 +165,7 @@ class NpcServerMessageBuilderTest extends TestCase {
         $message = $this->npcMessageBuilder->build('already_conjured', $this->npc);
 
         $this->assertEquals(
-            '"No child! I have already conjured for you!"',
+            '"No, child! I have already conjured for you!"',
             $message
         );
     }
@@ -174,7 +174,7 @@ class NpcServerMessageBuilderTest extends TestCase {
         $message = $this->npcMessageBuilder->build('public_exists', $this->npc);
 
         $this->assertEquals(
-            '"No Child! Too many Celestial Entities wondering around can cause an unbalance, even The Creator can\'t fix!"',
+            '"No, child! Too many Celestial Entities wondering around can cause an unbalance, even The Creator can\'t fix!"',
             $message
         );
     }

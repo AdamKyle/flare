@@ -18,33 +18,33 @@ class NpcServerMessageBuilder {
             case 'took_kingdom':
                 return $npc->real_name . ' smiles in your direction. "It\'s done!"';
             case 'kingdom_time_out':
-                return $npc->real_name . ' looks disappointed as he looks at the ground and finally states: "No! You abandoned your last kingdom. You can wait...."';
+                return $npc->real_name . ' looks disappointed as he looks at the ground and finally states: "No! You abandoned your last kingdom. You can wait..."';
             case 'cannot_have':
-                return  '"Sorry, you can\'t have that."';
+                return '"Sorry, you can\'t have that."';
             case 'too_poor':
                 return '"I despise peasants! I spit on the ground before you! Come back when you can afford such treasures!"';
             case 'not_enough_gold':
-                return '"I do not like dealing with poor people. You do not have the gold child!"';
+                return '"I do not like dealing with poor people. You do not have the gold, child!"';
             case 'conjure':
-                return $npc->real_name . '\'s Eyes light up as magic races through the air. "It is done child!" he bellows and magic strikes the earth!';
+                return $npc->real_name . '\'s Eyes light up as magic races through the air. "It is done, child!" he bellows and magic strikes the earth!';
             case 'take_a_look':
-                return '"Why don\'t you take a look, and show me what you can afford my child."';
+                return '"Why don\'t you take a look, and show me what you can afford, my child."';
             case 'location':
                 return '"Child! You must come to me to make the exchange. Find me at (x/y): ' . $npc->x_position . '/' . $npc->y_position . ' ("'.$npc->gameMapName().'" Plane). Message me again when you are here."';
             case 'dead':
-                return '"I don\'t deal with dead people. Resurrect child."';
+                return '"I don\'t deal with dead people. Resurrect, child."';
             case 'adventuring':
                 return '"Child, you are adventuring. Come chat with me when you are NOT busy!"';
             case 'paid_conjuring':
-                return  $npc->real_name . ' takes your currency and smiles: "Thank you child. I shall begin the conjuration at once."';
+                return $npc->real_name . ' takes your currency and smiles: "Thank you, child. I shall begin the conjuration at once."';
             case 'already_conjured':
-                return '"No child! I have already conjured for you!"';
+                return '"No, child! I have already conjured for you!"';
             case 'missing_queen_item':
-                return $npc->real_name . ' looks at you with a blank stare. You try again and she just refuses to talk to you or acknowledge you. Maybe you need a quest item? Something to do with: Queens Decision (Quest) ???';
+                return $npc->real_name . ' looks at you with a blank stare. You try again and she just refuses to talk to you or acknowledge you. Maybe you need a quest item? Something to do with: Queens Decision (Quest)???';
             case 'queen_plane':
-                return $npc->real_name . ' looks at you, blinks here eyes and screams: "NO! NO! NO! you have to come to me child. Come to me and let me love you...Oooooh hooo hoo hoo!" You must be any where in Hell to access her.';
+                return $npc->real_name . ' looks at you, blinks here eyes and screams: "NO! NO! NO! You have to come to me, child. Come to me and let me love you... Oooooh hooo hoo hoo!" You must be anywhere in Hell to access her.';
             case 'public_exists':
-                return '"No Child! Too many Celestial Entities wondering around can cause an unbalance, even The Creator can\'t fix!"';
+                return '"No, child! Too many Celestial Entities wondering around can cause an unbalance, even The Creator can\'t fix!"';
             case 'location_of_conjure':
                 return '"Child, I have conjured the portal, I have opened the gates! Here is the location (X/Y): '.$celestialFight->x_position.'/'.$celestialFight->y_position.' ('.$celestialFight->gameMapName().' Plane)"';
             case 'taken_item':
@@ -58,7 +58,7 @@ class NpcServerMessageBuilder {
             case 'given_item':
                 return '"Here child, take this! It might be of use to you!" (Check the help section under quest items to see what this does, or check your inventory and click on the item)';
             case 'inventory_full':
-                return '"I cannot take the item from you child! Your inventory is to full! Come back when you clean out some space."';
+                return '"I cannot take the item from you, child! Your inventory is to full! Come back when you clean out some space."';
             case 'gold_capped':
                 return '"Child! You are (or very close to being) Gold capped! You get no Gold.';
             case 'gold_dust_capped':
@@ -68,13 +68,13 @@ class NpcServerMessageBuilder {
             case 'currency_given':
                 return '"I have payment for you, here take this!"';
             case 'quest_complete':
-                return '"Pleasure doing business with you child!"';
+                return '"Pleasure doing business with you, child!"';
             case 'no_quests':
                 return '"Sorry child, no work for you today. I either have nothing or you have a quest, but you might be missing something maybe? Check the requirements in: Plane Quests (beside character count in the map area)"';
             case 'no_skill':
                 return '"Sorry child, I do not see a skill that needs unlocking."';
             case 'dont_own_skill':
-                return  '"Sorry child, you don\'t seem to own the skill to be unlocked!" (Chances are if you are seeing this, it\'s a bug. Head to discord post in the bugs section, link at the top)';
+                return '"Sorry child, you don\'t seem to own the skill to be unlocked!" (Chances are if you are seeing this, it\'s a bug. Head to discord post in the bugs section, link at the top)';
             case 'xp_given':
                 return '"Here child, take this for your hard work!"';
             case 'skill_unlocked':
@@ -82,11 +82,11 @@ class NpcServerMessageBuilder {
             case 'take_currency':
                 return '"Child! I shall take those shiny coins from you! I have something for you in return!"';
             case 'what_do_you_want':
-                return '"Select something child, one of those green items and tell me what you want. Remember I am not a cheap woman. You must please me to get what you want! I am the Queen of Hearts after all. Oooooh hooo hoo hoo!"';
+                return '"Select something, child. One of those green items and tell me what you want. Remember I am not a cheap woman. You must please me to get what you want! I am the Queen of Hearts after all. Oooooh hooo hoo hoo!"';
             case 'missing_parent_quest':
-                return '"Child! there is something you have to do, before you talk to me. Go do it!" (Open Plane Quests and find the quest you are trying to complete. Quests with lines connecting must be done in order).';
+                return '"Child! There is something you have to do, before you talk to me. Go do it!" (Open Plane Quests and find the quest you are trying to complete. Quests with lines connecting must be done in order).';
             case 'no_matching_command':
-                return  '"Huh?! What do you want child!?! I don\'t have all day for these games child! Spit it out!" ' . $npc->real_name . ' Seems annoyed by you. Maybe you misspoke?';
+                return '"Huh?! What do you want, child!?! I don\'t have all day for these games, child! Spit it out!" ' . $npc->real_name . ' Seems annoyed by you. Maybe you misspoke?';
             default:
                 return '';
         }

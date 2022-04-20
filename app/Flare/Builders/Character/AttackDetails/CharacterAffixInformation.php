@@ -115,7 +115,7 @@ class CharacterAffixInformation {
     }
 
     /**
-     * Fetch all suffix items  that reduce an enemies stats.
+     * Fetch all suffix items  that reduce an enemy's stats.
      *
      * @return Collection
      */
@@ -201,7 +201,7 @@ class CharacterAffixInformation {
         $amount = $voidance + $this->fetchVoidanceFromAffixes($type);
 
         if ($type === 'devouring_darkness') {
-            $amount = $voidance + $this->fetchVoidanceFromHolyitems();
+            $amount = $voidance + $this->fetchVoidanceFromHolyItems();
         }
 
         if ($this->character->map->gameMap->mapType()->isPurgatory()) {

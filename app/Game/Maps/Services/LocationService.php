@@ -21,7 +21,7 @@ class LocationService {
     use KingdomCache, LiveCharacterCount, CanPlayerMassEmbezzle;
 
     /**
-     * @var PortSevice $portService
+     * @var PortService $portService
      */
     private $portService;
 
@@ -63,7 +63,7 @@ class LocationService {
     private $kingdomToAttack = [];
 
     /**
-     * Contructor
+     * Constructor
      *
      * @param PortService $portService
      * @param KingdomTransformer $kingdomTransformer
@@ -174,9 +174,9 @@ class LocationService {
     /**
      * Processes the location.
      *
-     * We will fetch the location information for the character postion.
+     * We will fetch the location information for the character position.
      *
-     * This includes port details and any relavant adventures the location might have.
+     * This includes port details and any relevant adventures the location might have.
      *
      * @param Character $character
      * @return void
@@ -197,7 +197,7 @@ class LocationService {
     /**
      * Determines the action the player can take.
      *
-     * Based on he character position, if there is a kingdom or not
+     * Based on the character position, if there is a kingdom or not.
      * We determine the action the player can take. That is, can they settle?
      * Can they attack the kingdom or can they manage the kingdom?
      *

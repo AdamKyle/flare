@@ -8,7 +8,7 @@ use ChristianEssl\LandmapGeneration\Struct\Color as StructColor;
 use ChristianEssl\LandmapGeneration\Color\Shader\DetailShader;
 use ChristianEssl\LandmapGeneration\Utility\ImageUtility;
 use App\Flare\MapGenerator\Builders\ImageBuilder;
-use App\Flare\MapGenerator\Schemes\MapColorSheme;
+use App\Flare\MapGenerator\Schemes\MapColorScheme;
 
 class MapBuilder {
 
@@ -23,12 +23,12 @@ class MapBuilder {
     private $imageBuilder;
 
     /**
-     * @var SturctColor $land | null
+     * @var StructColor $land | null
      */
     private $land;
 
     /**
-     * @var SturctColor $water | null
+     * @var StructColor $water | null
      */
     private $water;
 
@@ -131,7 +131,7 @@ class MapBuilder {
      */
     public function BuildMap(string $mapName, int $waterLevel = 30): void {
         $settings = $this->mapSettings
-            ->setColorScheme(new MapColorSheme(new DetailShader(), $this->land, $this->water))
+            ->setColorScheme(new MapColorScheme(new DetailShader(), $this->land, $this->water))
             ->setWidth($this->width)
             ->setHeight($this->height)
             ->setWaterLevel($waterLevel);

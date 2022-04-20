@@ -11,7 +11,7 @@
             </div>
 
             <div class="alert alert-info">
-                Please tell us why you think you were banned unfairly. You're request will be responded to with in 72 hours of recieiving it. All future requests will be ignored. <strong>All decisions are final</strong>.
+                Please tell us why you think you were banned unfairly. Your request will be responded to within 72 hours of receiving it. All future requests will be ignored. <strong>All decisions are final</strong>.
             </div>
 
             <div class="mb-2 mt-2">

@@ -39,7 +39,7 @@ class MassEmbezzle implements ShouldQueue
         $kingdomsForMap = $this->character->kingdoms()->where('game_map_id', $mapId)->orderBy('id')->get();
 
         if ($kingdomsForMap->isEmpty()) {
-            event(new ServerMessageEvent($this->character->user, 'You have no kingdoms on this plane ...'));
+            event(new ServerMessageEvent($this->character->user, 'You have no kingdoms on this plane...'));
 
             $this->character->update([
                 'is_mass_embezzling' => false,

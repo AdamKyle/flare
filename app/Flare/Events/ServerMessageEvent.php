@@ -13,7 +13,7 @@ class ServerMessageEvent
     use SerializesModels;
 
     /**
-     * Type of server messsage.
+     * Type of server message.
      *
      * @var string $type
      */

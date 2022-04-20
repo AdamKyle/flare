@@ -114,7 +114,7 @@ class AttackExtraActionHandler {
 
         $character = $characterInformationBuilder->getCharacter();
 
-        $message = $character->name . ' hit for (weapon(s)): ' . number_format($damage);
+        $message = $character->name . ' hits for (weapon(s)): ' . number_format($damage);
 
         $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
 
@@ -139,7 +139,7 @@ class AttackExtraActionHandler {
 
                 $monsterCurrentHealth -= $totalDamage;
 
-                $message = $characterInformationBuilder->getCharacter()->name . ' hit for (weapon): ' . number_format($totalDamage);
+                $message = $characterInformationBuilder->getCharacter()->name . ' hits for (weapon): ' . number_format($totalDamage);
                 $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
             }
         }
@@ -168,7 +168,7 @@ class AttackExtraActionHandler {
                 return $monsterCurrentHealth;
             }
 
-            $message        = 'A fury takes over you. You notch the arrows thrice at the enemies direction';
+            $message        = 'A fury takes over you. You notch the arrows thrice at the enemy\'s direction.';
             $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
 
             $damage = $characterInformationBuilder->getTotalWeaponDamage($voided) * 0.15;
@@ -178,7 +178,7 @@ class AttackExtraActionHandler {
             for ($i = 1; $i <= 3; $i++) {
                 $monsterCurrentHealth -= $damage;
 
-                $message = $character->name . ' hit for (weapon): ' . number_format($damage);
+                $message = $character->name . ' hits for (weapon): ' . number_format($damage);
 
                 $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
             }
@@ -211,7 +211,7 @@ class AttackExtraActionHandler {
 
             $monsterCurrentHealth -= $initialDamage;
 
-            $message = $characterInformationBuilder->getCharacter()->name . ' hit for (Hammer): ' . number_format($initialDamage);
+            $message = $characterInformationBuilder->getCharacter()->name . ' hits for (Hammer): ' . number_format($initialDamage);
             $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
 
             $rollForAfterShock = rand(1, 100);
@@ -226,7 +226,7 @@ class AttackExtraActionHandler {
 
                     $monsterCurrentHealth -= $initialDamage;
 
-                    $message = 'Aftershock hit for: ' . number_format($initialDamage) . '!';
+                    $message = 'Aftershock hits for: ' . number_format($initialDamage) . '!';
                     $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
                 }
             }
@@ -259,7 +259,7 @@ class AttackExtraActionHandler {
 
             $monsterCurrentHealth -= $initialDamage;
 
-            $message = $characterInformationBuilder->getCharacter()->name . ' hit for (Arcane Alchemist Ravenous Dream): ' . number_format($initialDamage);
+            $message = $characterInformationBuilder->getCharacter()->name . ' hits for (Arcane Alchemist Ravenous Dream): ' . number_format($initialDamage);
             $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
 
             $times                = rand(2, 6);
@@ -273,7 +273,7 @@ class AttackExtraActionHandler {
                 if ($times === $originalTimes) {
                     $monsterCurrentHealth -= $initialDamage;
 
-                    $message = $characterInformationBuilder->getCharacter()->name . ' hit for (Arcane Alchemist Ravenous Dream): ' . number_format($initialDamage);
+                    $message = $characterInformationBuilder->getCharacter()->name . ' hits for (Arcane Alchemist Ravenous Dream): ' . number_format($initialDamage);
                     $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
                 } else {
                     $initialDamage = $characterInformationBuilder->statMod('int') * $additionalPercentage;
@@ -318,7 +318,7 @@ class AttackExtraActionHandler {
 
                 $monsterCurrentHealth -= $totalDamage;
 
-                $message = $characterInformationBuilder->getCharacter()->name . ' hit for (weapon): ' . number_format($totalDamage);
+                $message = $characterInformationBuilder->getCharacter()->name . ' hits for (weapon): ' . number_format($totalDamage);
                 $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
             }
         }
@@ -365,7 +365,7 @@ class AttackExtraActionHandler {
                 return $monsterCurrentHealth;
             }
 
-            $message        = 'There is a thirst child, its in your soul! Lash out and kill!';
+            $message        = 'There is a thirst, child, it\'s in your soul! Lash out and kill!';
             $this->messages = $this->addMessage($message, 'action-fired', $this->messages);
 
             if (!$voided) {
@@ -382,7 +382,7 @@ class AttackExtraActionHandler {
             $monsterCurrentHealth -= $totalAttack;
             $this->characterHealth += $totalAttack;
 
-            $message        = $character->name . ' hit for (and healed for) (thirst!) ' . number_format($totalAttack);
+            $message        = $character->name . ' hits for (and healed for) (thirst!) ' . number_format($totalAttack);
             $this->messages = $this->addMessage($message, 'action-fired', $this->messages);
         }
 
@@ -497,7 +497,7 @@ class AttackExtraActionHandler {
 
         $character = $characterInformationBuilder->getCharacter();
 
-        $message = $character->name . ' hit for (weapon): ' . number_format($characterAttack);
+        $message = $character->name . ' hits for (weapon): ' . number_format($characterAttack);
 
         $this->messages = $this->addMessage($message, 'info-damage', $this->messages);
 

@@ -294,7 +294,7 @@ class CharacterInventoryControllerTest extends TestCase
 
     public function testSeeCompareItemsWithNoCache() {
         $user = $this->character->inventoryManagement()
-            ->giveitem($this->createItem([
+            ->giveItem($this->createItem([
                 'name' => 'Spear',
                 'base_damage' => 6,
                 'type' => 'weapon',
@@ -311,7 +311,7 @@ class CharacterInventoryControllerTest extends TestCase
 
     public function testYouAreNotAllowedToDoThatMissingSlot() {
         $user = $this->character->inventoryManagement()
-            ->giveitem($this->createItem([
+            ->giveItem($this->createItem([
                 'name' => 'Spear',
                 'base_damage' => 6,
                 'type' => 'weapon',
@@ -336,7 +336,7 @@ class CharacterInventoryControllerTest extends TestCase
         ]);
 
         $user = $this->character->inventoryManagement()
-            ->giveitem($item)
+            ->giveItem($item)
             ->getCharacterFactory()
             ->getUser();
 

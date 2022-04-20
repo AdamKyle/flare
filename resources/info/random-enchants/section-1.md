@@ -2,11 +2,11 @@
 
 > ## ATTN!
 > 
-> No amount of real-world money will get you better uniques then anyone else, specifically when it comes to re-rolling or
-> purchasing enchantments from the Queen her self (more on that later).
+> No amount of real-world money will get you better uniques than anyone else, specifically when it comes to re-rolling or
+> purchasing enchantments from the Queen herself (more on that later).
 > 
-> The only way you get the Affix you want from her is by re-rolling with in game currencies that you only get from playing the 
-> game it's self. See [Currencies](/information/currencies) for more details.
+> The only way you get the Affix you want from her is by re-rolling with in-game currencies that you only get from playing the 
+> game itself. See [Currencies](/information/currencies) for more details.
 
 In Tlessa there are two types of enchantments: Craftable and Random. The latter is not craftable but can be sold and purchased
 from the market board.
@@ -25,11 +25,11 @@ With Randomly Generated Enchantments, these are a few names to watch for:
 - Spiritbound Rage
 - Exile\'s Enchantment
 - Demonic Infinity
-- Guardians Fear
+- Guardian\'s Fear
 
 These can appear as Prefixes, Suffixes **OR BOTH**. The stats, everything about them is randomly generated.
 
-For example, lets look at the cost to percentage range:
+For example, let's look at the cost to percentage range:
 
 <table class="table table-bordered">
     <thead>
@@ -77,7 +77,7 @@ as a player. Not only do you need a quest item to get into Hell, where she is lo
 
 ## Queen of Hearts
 
-The Queen of Hearts is inspired by a character off another game, called Disgaea 5. There is a character named is Seraphina, a bubbly character that might be able to have a crush on you.
+The Queen of Hearts is inspired by a character off another game, called Disgaea 5. There is a character named Seraphina, a bubbly character that might be able to have a crush on you.
 
 Players who are familiar with Disgaea will recognize this, while others who are not, will see her as a fun NPC to interact with.
 
@@ -86,9 +86,9 @@ Players who are familiar with Disgaea will recognize this, while others who are 
 - **Players must have their uniques they want to re-roll or move in the inventory and not be equipped. She will not look in sets.**
 
 Players must be at her location on Hell to interact with her. To complete these quests, take a moment and check out the [quests](/information/quests) documentation to understand
-how players can complete quests and see quests as well as details how to complete, in game.
+how players can complete quests and see quests as well as details how to complete, in-game.
 
-Now that we have completed the quest lets discuss the panel you see when you interact with her. There are two types of panels that can open:
+Now that we have completed the quest let's discuss the panel you see when you interact with her. There are two types of panels that can open:
 
 This one, below, will show up if you have no uniques in your inventory:
 
@@ -106,7 +106,7 @@ This one, below, will show up if you have uniques in your inventory you will see
     </a>
 </div>
 
-There are three tabs to use here: Purchase, Re Roll and Move
+There are three tabs to use here: Purchase, Re-roll and Move
 
 Let's go through the first tab, which is also what you will see if you have no uniques (see first image above)
 
@@ -178,7 +178,7 @@ Let's now take this Unique and reroll its stats, keeping in minds that every re-
     </a>
 </div>
 
-Now, lets select our unique from the first dropdown, more will appear, then select "All attached enchantments" and finally select Stats.
+Now, let's select our unique from the first dropdown, more will appear, then select "All attached enchantments" and finally select Stats.
 
 <div class="mb-4">
     <a href="/storage/info/random-enchants/images/set-up-re-roll.png" class="glightbox">
@@ -196,7 +196,7 @@ The cost is based on:
 
 In this case the cost is: 10K GD + 10K GD (both affixes) + 16.6666% for the selection of stats.
 
-Now, when selecting what to re roll you have some options:
+Now, when selecting what to re-roll you have some options:
 
 - Base
 - Stats
@@ -209,12 +209,12 @@ These all correspond to the tab of the affix, from the above images (of the gene
 
 **The name will never be rerolled, nor will the type be.**
 
-In our case we are re-rolling the stats, hence the 16.6666%, but if we re rolled everything on these affixes the cost would be:
+In our case we are re-rolling the stats, hence the 16.6666%, but if we re-rolled everything on these affixes the cost would be:
 
 - 10K GD * 4 for Gold dust (40k)
 - 100 Shards * 4 for Shard cost (400)
 
-Lets re roll our stats, as we have them selected.
+Let's re-roll our stats, as we have them selected.
 
 Do note, that since we are re-rolling our stats, all stats including enemy stat reductions will be re-rolled. You cannot pick and choose stats.
 
@@ -224,7 +224,7 @@ Do note, that since we are re-rolling our stats, all stats including enemy stat 
 > again, why? because every time you re-roll we generate a new item and give it to you, this prevents other players who have (which is very rare) the same affix
 > or item combination from having their stuff overwritten as well.
 > 
-> Remember, all items that you are holding or have equipped are just references to the items and affix combinations already in game.
+> Remember, all items that you are holding or have equipped are just references to the items and affix combinations already in the game.
 > 
 > You can open the new item, from your inventory, in a new tab and compare them side by side.
 
@@ -235,7 +235,7 @@ Do note, that since we are re-rolling our stats, all stats including enemy stat 
 </div>
 
 As you can see we re-rolled out item, if we look at it, and compare it to the item, we might have open in a separate tab, we can see
-that the stats have changed. I won't show you here, as I just flooded you with images the first time, but your unique that you re rolled should have new stats
+that the stats have changed. I won't show you here, as I just flooded you with images the first time, but your unique that you re-rolled should have new stats
 if you are following along (and have appropriate access, quest item - see above.)
 
 You can keep doing this until you are out of gold dust or until you have the affix you want. Remember, this is all RNG, it could take a while.
@@ -243,7 +243,7 @@ You can keep doing this until you are out of gold dust or until you have the aff
 Let's assume we have re-rolled the items the way we want them, as we can see we have two affixes on this item, now we want to move these 
 affixes to another item, that we crafted.
 
-So lets head over to the move tab:
+So let's head over to the move tab:
 
 <div class="mb-4">
     <a href="/storage/info/random-enchants/images/move-uniques.png" class="glightbox">
@@ -251,7 +251,7 @@ So lets head over to the move tab:
     </a>
 </div>
 
-As you can see here it looks very similar to the re-roll tab we were just on. Lets select our item and another item we want to move the Affixes to.
+As you can see here it looks very similar to the re-roll tab we were just on. Let's select our item and another item we want to move the Affixes to.
 
 > ### ATTN
 > 

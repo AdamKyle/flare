@@ -37,7 +37,7 @@ class UpdateAdventureLogsBroadcastEvent implements ShouldBroadcastNow
     public $isAdventuring;
 
     /**
-     * @var bool $cancled | false
+     * @var bool $canceled | false
      */
     public $canceled;
 
@@ -46,7 +46,7 @@ class UpdateAdventureLogsBroadcastEvent implements ShouldBroadcastNow
      *
      * @param Collection $adventureLogs
      * @param User $user
-     * @param bool $cancled
+     * @param bool $canceled
      * @return void
      */
     public function __construct(Collection $adventureLogs, User $user, bool $canceled = false)

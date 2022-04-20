@@ -1,7 +1,7 @@
 <x-core.cards.card css="mt-5 w-full m-auto">
     <x-core.alerts.warning-alert title="Caution!">
-        <p>Check the "Planes Quest" (in the map actions section, under the map) section in game to see more details about where to go, what items you need, and how to complete the quest.</p>
-        <p>For even more details you can click  "All Quests" from within that panel to see a quest tree of every single quest in game. Some quests are linked to other and thus locked behind you completing that
+        <p>Check the "Planes Quest" (in the map actions section, under the map) section in-game to see more details about where to go, what items you need, and how to complete the quest.</p>
+        <p>For even more details you can click  "All Quests" from within that panel to see a quest tree of every single quest in the game. Some quests are linked to other and thus locked behind you completing that
         quest first. Others are just one off quests. All quests can be clicked on and will tell you all relevant details.</p>
     </x-core.alerts.warning-alert>
     <div class="row pb-2">

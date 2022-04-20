@@ -7,7 +7,7 @@
   one <a href="/information/enchanting">damaging affix</a>.
 </p>
 <p>
-  Rangers who use Cast and Attack or Attack and cast can heal with out spells, at 15% of their CHR. If a ranger has a healing spell equipped they still get the
+  Rangers who use Cast and Attack or Attack and cast can heal without spells, at 15% of their CHR. If a ranger has a healing spell equipped they still get the
   additional 15% chr added to their healing output.
 </p>
 <p>Rangers will want a race that quick and nimble (High Elf or Centaur) or focuses on dexterity, Orc.</p>

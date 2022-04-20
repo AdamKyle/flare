@@ -9,7 +9,7 @@ For example this game draws heavily on two games:
 - [Race War Kingdoms](http://www.glitchless.com/racewarkingdoms.html)
 - [Tribal Wars Two](https://www.innogames.com/games/tribal-wars-2/)
 
-If you have ideas for the game please, open a ticket with the appropriate template.
+If you have ideas for the game, please open a ticket with the appropriate template.
 
 ## Features
 
@@ -27,7 +27,7 @@ If you have ideas for the game please, open a ticket with the appropriate templa
 
 ## Common FAQ
 
-- Is this game pay to win? cash shops? Ads?
+- Is this game pay to win? Cash shops? Ads?
 
 No, there is no way for you to spend any money in this game. You cannot buy levels, characters, items, nothing. You want it, you earn it.
 
@@ -36,13 +36,13 @@ No, there is no way for you to spend any money in this game. You cannot buy leve
 It doesn't. It's a completely free, open source game with no intentions to add any form of 
 monetization.
 
-- Are their clans, guilds or resets for the kingdoms or other aspects of the game?
+- Are there clans, guilds or resets for the kingdoms or other aspects of the game?
 
 No. It's every person for themselves. There are also no resets.
 
 - Are there energy systems or ways to slow the player down?
 
-No and yes. There are no energy systems, that is there is no feature in game to prevent you from being as active as you want to be. 
+No and yes. There are no energy systems, that is there is no feature in-game to prevent you from being as active as you want to be. 
 However, we do make use of timers, these can range from 10 seconds for successfully killing a monster to a few minutes for an adventure to (at most) a couple of hours for upgrading buildings (at higher levels) for your kingdom.
 
 The idea is to keep you engaged and playing.
@@ -76,7 +76,7 @@ not to mention you need redis running for websockets and horizon.
 - listen for queues: `php artisan horizon`
 - Publish information section: `php artisan move:files` <sup>**</sup>
 - From there you can register as a new player.
-  - Or since you ran the `create:admn` command you can reset your admin password and login as admin to make changes to the game<sup>*</sup>.
+  - Or since you ran the `create:admin` command you can reset your admin password and login as admin to make changes to the game<sup>*</sup>.
 - Regular players, who sign up, will only see the game section.
 
 <sup>*</sup> See setting up an email below.
@@ -85,7 +85,7 @@ not to mention you need redis running for websockets and horizon.
 
 ## Redis
 
-We use redis for jobs and queues with in the system. To get started, make sure you have php redis installed, the redis server and that its running.
+We use redis for jobs and queues within the system. To get started, make sure you have php redis installed, the redis server and that it's running.
 
 Next update the .env file with:
 
@@ -101,7 +101,7 @@ then run: `php artisan queue:work --queue=high,default --tries=1`
 
 ## Websockets
 
-This game depends heavily on websockets for almost everything we do. With that said to get started all you have to do is set the following in the env
+This game depends heavily on websockets for almost everything we do. With that said, to get started all you have to do is set the following in the env
 and then start the websocket server:
 
 ```
@@ -115,7 +115,7 @@ PUSHER_APP_CLUSTER=mt1
 
 ## Horizon
 
-This game uses' horizon to monitor its jobs. For local development, just go to /horizon.
+This game uses horizon to monitor its jobs. For local development, just go to /horizon.
 
 ## Extra Config
 
@@ -134,7 +134,7 @@ For example, you can read [here](https://medium.com/@agavitalis/how-to-send-an-e
 
 ## Setting up the database
 
-When setting up the databsse you need to things in order, or you can get unexpected results. Follow the steps below to get Tlessa up and running:
+When setting up the database you need to do things in order, or you can get unexpected results. Follow the steps below to get Tlessa up and running:
 
 - php artisan storage:link
 - php artisan migrate
@@ -171,9 +171,9 @@ With that done. You have the game imported.
 ## Testing
 
 - `composer phpunit` this will also generate code coverage report.
-- `./vendor/bin/phpunit` this will not generate code coverage but can be used for debugging specific tests via the `--filrer=` option
+- `./vendor/bin/phpunit` this will not generate code coverage but can be used for debugging specific tests via the `--filter=` option
 
 ## Tip For Deploying
 
-- when it comes to the mjml emails you might get an error about how it could not find mjml in your directory where you deployed to.
+- When it comes to the mjml emails you might get an error about how it could not find mjml in your directory where you deployed to.
   All you have to do is install MJML (`npm -i -g mjml`) as a global package.

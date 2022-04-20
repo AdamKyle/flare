@@ -106,9 +106,9 @@
       <x-core.alerts.info-alert title="Quick Tip">
         <p>
           These affixes can steal life from an enemy. If you are a vampire, you want as many of these on all your gear
-          as possible. As these will stack, stealing a maximum of 99% of the enemies health.
+          as possible. As these will stack, stealing a maximum of 99% of the enemy's health.
           If you are not a vampire, having multiple will not do anything for you as we take the best one when determine life to steal
-          which only happens during your healing phase (after the enemies attack if you or the enemy are still alive).
+          which only happens during your healing phase (after the enemy's attack, if you or the enemy are still alive).
           For vampires, these fire as part of their attack.
         </p>
       </x-core.alerts.info-alert>
@@ -130,9 +130,9 @@
     >
       <x-core.alerts.info-alert title="Quick Tip">
           <p>
-              These affixes do not stack, how ever if they have stats, skills or other modifiers they will stack unless other wise stated.
+              These affixes do not stack, however, if they have stats, skills or other modifiers they will stack unless other wise stated.
             For the entrancing aspect, we don't stack that %. We take the best one. This gives you a chance to stun the enemy allowing
-            you to by pass their ability to block or dodge. Enemies can still evade spells and resist them. These make is it so the enemy cannot
+            you to bypass their ability to block or dodge. Enemies can still evade spells and resist them. These make is it so the enemy cannot
             block or dodge.
           </p>
       </x-core.alerts.info-alert>
@@ -149,7 +149,7 @@
         <p>
           These affixes use a feature called Devouring Light (apart of the Voidance and Devoidance Family) Devouring light gives you
           a small chance to void the enemy. When you void an enemy, their enchantments and spells will not fire. An enemy still has a chance to void you.
-          If you also have a quest item, such as Dead Kings Crown, you will also have whats called Devouring Darkness. No enemy has this, how ever it will allow you to devoid
+          If you also have a quest item, such as Dead Kings Crown, you will also have whats called Devouring Darkness. No enemy has this, however, it will allow you to devoid
           and enemy and thus they cannot void you, a devoid cannot cancel another devoid. A void cannot cancel another void.
         </p>
       </x-core.alerts.info-alert>

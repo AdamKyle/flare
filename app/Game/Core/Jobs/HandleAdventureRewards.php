@@ -46,7 +46,7 @@ class HandleAdventureRewards implements ShouldQueue
      * @return void
      */
     public function handle(AdventureRewardService $adventureRewardService) {
-        Cache::put('character-adventure-rewards-' . $this->character->id, 'processing ...');
+        Cache::put('character-adventure-rewards-' . $this->character->id, 'processing...');
 
         $adventureRewardService->distributeRewards($this->rewards, $this->character, $this->adventureLog);
 
@@ -68,6 +68,6 @@ class HandleAdventureRewards implements ShouldQueue
 
         event(new UpdateTopBarEvent($character));
 
-        event(new ServerMessageEvent($character->user, 'Xp, Skill XP, Currencies have all been rewarded. You can start another adventure while we process your items or you can wait if you please. Keep an eye on Server tab for item updates.'));
+        event(new ServerMessageEvent($character->user, 'Xp, Skill XP, Currencies have all been awarded. You can start another adventure while we process your items or you can wait if you prefer. Keep an eye on Server tab for item updates.'));
     }
 }

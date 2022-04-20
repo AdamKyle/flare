@@ -60,7 +60,7 @@ that you can enable if you wish.
     </a>
 </div>
 
-There are a few emails out side of this that you cannot disable:
+There are a few emails outside of this that you cannot disable:
 
 - Password reset
 - You have been banned

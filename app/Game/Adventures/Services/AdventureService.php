@@ -67,7 +67,7 @@ class AdventureService {
      *
      * @param Character $character
      * @param Adventure $adventure
-     * @param RewardBuilder $rewardbuilder
+     * @param RewardBuilder $rewardBuilder
      * @param string $name
      */
     public function __construct(AdventureFightService $adventureFightService)
@@ -204,7 +204,7 @@ class AdventureService {
             event(new CharacterIsDeadBroadcastEvent($character->user, true));
             event(new UpdateTopBarEvent($character));
             event(new UpdateAdventureLogsBroadcastEvent($character->refresh()->adventureLogs, $character->user));
-            event(new ServerMessageEvent($character->user, 'adventure', 'You died while on your explortations! Check your Adventure logs for more information.'));
+            event(new ServerMessageEvent($character->user, 'adventure', 'You died while on an exploration! Check your Adventure logs for more information.'));
         } else {
             Mail::to($this->character->user->email)->send(new AdventureCompleted($adventureLog->refresh(), $character));
         }

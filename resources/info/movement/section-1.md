@@ -16,7 +16,7 @@ As you can see from the above image, Tlessa comes with a map that you can move a
 
 As you can see in the image, there is an orange icon and some blue icons. 
 
-The orange man icon represents you. The Blue icons represent ports. Ports are the only location in game that you can access the [market board](/information/market) from.
+The orange man icon represents you. The Blue icons represent ports. Ports are the only location in-game that you can access the [market board](/information/market) from.
 
 You can use the direction buttons, north, east, south, west to move in the corresponding direction. All movement is done 16 pixels at a time.
 
@@ -52,7 +52,7 @@ These three actions (settle, manage and attack) will be under the Craft/Enchant 
 
 ## Timeout
 
-For moving, setting sail, adventuring and teleporting, there is a timeout that happens. This time out will last as long as indicated by the timer by the action.
+For moving, setting sail, adventuring and teleporting, there is a timeout that happens. This timeout will last as long as indicated by the timer by the action.
 
 - Moving is 10 seconds 
 - Traversing is 10 seconds (can be done from anywhere)

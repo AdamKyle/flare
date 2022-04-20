@@ -108,9 +108,9 @@ class AffixAttributeBuilder {
         return [
             'name'                 => $names[rand(0, count($names) - 1)],
             'type'                 => $type,
-            'description'          => 'This is a randomly generated affix. By speaking with the Queen of Hearts in Hell, you can re-roll specific stats for it\'s cost plus the appropriate shard cost. 
-                All attributes are randomly rolled each time you get an item via completing faction achievements or from purchasing from the Queen of Hearts. These affixes cannot be crafted. But can be sold on the market. 
-                The Queen of Hearts will also let you switch the affix to another item, for the affix and shard cost. For more info, see help docs under NPC\'s for more details.
+            'description'          => 'This is a randomly generated affix. By speaking with the Queen of Hearts in Hell, you can re-roll specific stats for it\'s cost plus the appropriate shard cost.
+                All attributes are randomly rolled each time you get an item via completing faction achievements or from purchasing from the Queen of Hearts. These affixes cannot be crafted. But can be sold on the market.
+                The Queen of Hearts will also let you switch the affix to another item, for the affix and shard cost. For more info, see help docs under NPCs for more details.
                 You can also check out the help docs under crafting/enchanting to read more about randomly generated affixes.',
             'cost'                 => $amountPaid,
             'int_required'         => '0',

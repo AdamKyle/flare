@@ -66,9 +66,9 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $kingdom = $kingdom->refresh();
 
-        $resouceService = resolve(KingdomResourcesService::class);
+        $resourceService = resolve(KingdomResourcesService::class);
 
-        $resouceService->setKingdom($kingdom)->updateKingdom();
+        $resourceService->setKingdom($kingdom)->updateKingdom();
 
         $kingdom = $kingdom->refresh();
 
@@ -125,9 +125,9 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $kingdom = $kingdom->refresh();
 
-        $resouceService = resolve(KingdomResourcesService::class);
+        $resourceService = resolve(KingdomResourcesService::class);
 
-        $resouceService->setKingdom($kingdom)->updateKingdom();
+        $resourceService->setKingdom($kingdom)->updateKingdom();
 
         $kingdom = $kingdom->refresh();
 
@@ -151,9 +151,9 @@ class KingdomResourcesServiceTest extends TestCase {
             'last_walked'        => null,
         ]);
 
-        $resouceService = resolve(KingdomResourcesService::class);
+        $resourceService = resolve(KingdomResourcesService::class);
 
-        $resouceService->setKingdom($kingdom)->updateKingdom();
+        $resourceService->setKingdom($kingdom)->updateKingdom();
 
         $kingdom = $kingdom->refresh();
 
@@ -184,9 +184,9 @@ class KingdomResourcesServiceTest extends TestCase {
             'last_activity'=> 1602801731,
         ]]);
 
-        $resouceService = resolve(KingdomResourcesService::class);
+        $resourceService = resolve(KingdomResourcesService::class);
 
-        $resouceService->setKingdom($kingdom)->updateKingdom();
+        $resourceService->setKingdom($kingdom)->updateKingdom();
 
         $kingdom = $kingdom->refresh();
 
@@ -194,7 +194,7 @@ class KingdomResourcesServiceTest extends TestCase {
         $this->assertTrue($kingdom->npc_owned);
     }
 
-    public function testKingdomIsGivenToNpcWhenLastWalkedIsGreatorThenFortyDays() {
+    public function testKingdomIsGivenToNpcWhenLastWalkedIsGreaterThenFortyDays() {
 
         $this->createNpc();
 
@@ -208,9 +208,9 @@ class KingdomResourcesServiceTest extends TestCase {
             'last_walked'        => now()->subDays(50),
         ]);
 
-        $resouceService = resolve(KingdomResourcesService::class);
+        $resourceService = resolve(KingdomResourcesService::class);
 
-        $resouceService->setKingdom($kingdom)->updateKingdom();
+        $resourceService->setKingdom($kingdom)->updateKingdom();
 
         $kingdom = $kingdom->refresh();
 
@@ -246,9 +246,9 @@ class KingdomResourcesServiceTest extends TestCase {
             'show_kingdom_update_messages' => true,
         ]);
 
-        $resouceService = resolve(KingdomResourcesService::class);
+        $resourceService = resolve(KingdomResourcesService::class);
 
-        $resouceService->setKingdom($kingdom)->updateKingdom();
+        $resourceService->setKingdom($kingdom)->updateKingdom();
 
         $kingdom = $kingdom->refresh();
 
@@ -278,9 +278,9 @@ class KingdomResourcesServiceTest extends TestCase {
             'color'      => $kingdom->color,
         ]]);
 
-        $resouceService = resolve(KingdomResourcesService::class);
+        $resourceService = resolve(KingdomResourcesService::class);
 
-        $resouceService->setKingdom($kingdom)->updateKingdom();
+        $resourceService->setKingdom($kingdom)->updateKingdom();
 
         $kingdom = $kingdom->refresh();
 
@@ -307,9 +307,9 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $this->app->instance(KingdomResourcesService::class, $mock);
 
-        $resouceService = resolve(KingdomResourcesService::class);
+        $resourceService = resolve(KingdomResourcesService::class);
 
-        $resouceService->setKingdom($kingdom->refresh())->updateKingdom();
+        $resourceService->setKingdom($kingdom->refresh())->updateKingdom();
 
         $this->assertTrue(true);
     }
@@ -377,9 +377,9 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $kingdom = $kingdom->refresh();
 
-        $resouceService = resolve(KingdomResourcesService::class);
+        $resourceService = resolve(KingdomResourcesService::class);
 
-        $resouceService->setKingdom($kingdom)->updateKingdom();
+        $resourceService->setKingdom($kingdom)->updateKingdom();
 
         $kingdom = $kingdom->refresh();
 
@@ -435,9 +435,9 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $kingdom = $kingdom->refresh();
 
-        $resouceService = resolve(KingdomResourcesService::class);
+        $resourceService = resolve(KingdomResourcesService::class);
 
-        $resouceService->setKingdom($kingdom)->updateKingdom();
+        $resourceService->setKingdom($kingdom)->updateKingdom();
 
         $kingdom = $kingdom->refresh();
 
@@ -493,9 +493,9 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $kingdom = $kingdom->refresh();
 
-        $resouceService = resolve(KingdomResourcesService::class);
+        $resourceService = resolve(KingdomResourcesService::class);
 
-        $resouceService->setKingdom($kingdom)->updateKingdom();
+        $resourceService->setKingdom($kingdom)->updateKingdom();
 
         $kingdom = $kingdom->refresh();
 
@@ -551,9 +551,9 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $kingdom = $kingdom->refresh();
 
-        $resouceService = resolve(KingdomResourcesService::class);
+        $resourceService = resolve(KingdomResourcesService::class);
 
-        $resouceService->setKingdom($kingdom)->updateKingdom();
+        $resourceService->setKingdom($kingdom)->updateKingdom();
 
         $kingdom = $kingdom->refresh();
 
@@ -563,7 +563,7 @@ class KingdomResourcesServiceTest extends TestCase {
 
 
 
-    public function testKingdomMaxResourceGetsSetAsCurrentResourse() {
+    public function testKingdomMaxResourceGetsSetAsCurrentResource() {
         $kingdom = $this->createKingdom([
             'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(true)->id,
             'game_map_id'        => GameMap::first()->id,
@@ -610,9 +610,9 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $kingdom = $kingdom->refresh();
 
-        $resouceService = resolve(KingdomResourcesService::class);
+        $resourceService = resolve(KingdomResourcesService::class);
 
-        $resouceService->setKingdom($kingdom)->updateKingdom();
+        $resourceService->setKingdom($kingdom)->updateKingdom();
 
         $kingdom = $kingdom->refresh();
 
@@ -620,7 +620,7 @@ class KingdomResourcesServiceTest extends TestCase {
         $this->assertEquals($kingdom->current_wood, 1);
     }
 
-    public function testKingdomNoResourcesGetsSetAsCurrentResourse() {
+    public function testKingdomNoResourcesGetsSetAsCurrentResource() {
         $kingdom = $this->createKingdom([
             'character_id'       => (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter(true)->id,
             'game_map_id'        => GameMap::first()->id,
@@ -670,9 +670,9 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $kingdom = $kingdom->refresh();
 
-        $resouceService = resolve(KingdomResourcesService::class);
+        $resourceService = resolve(KingdomResourcesService::class);
 
-        $resouceService->setKingdom($kingdom)->updateKingdom();
+        $resourceService->setKingdom($kingdom)->updateKingdom();
 
         $kingdom = $kingdom->refresh();
 
@@ -726,9 +726,9 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $kingdom = $kingdom->refresh();
 
-        $resouceService = resolve(KingdomResourcesService::class);
+        $resourceService = resolve(KingdomResourcesService::class);
 
-        $resouceService->setKingdom($kingdom)->updateKingdom();
+        $resourceService->setKingdom($kingdom)->updateKingdom();
 
         $kingdom = $kingdom->refresh();
 
@@ -784,9 +784,9 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $kingdom = $kingdom->refresh();
 
-        $resouceService = resolve(KingdomResourcesService::class);
+        $resourceService = resolve(KingdomResourcesService::class);
 
-        $resouceService->setKingdom($kingdom)->updateKingdom();
+        $resourceService->setKingdom($kingdom)->updateKingdom();
 
         $kingdom = $kingdom->refresh();
 
@@ -848,9 +848,9 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $kingdom = $kingdom->refresh();
 
-        $resouceService = resolve(KingdomResourcesService::class);
+        $resourceService = resolve(KingdomResourcesService::class);
 
-        $resouceService->setKingdom($kingdom)->updateKingdom();
+        $resourceService->setKingdom($kingdom)->updateKingdom();
 
         $kingdom = $kingdom->refresh();
 
@@ -912,9 +912,9 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $kingdom = $kingdom->refresh();
 
-        $resouceService = resolve(KingdomResourcesService::class);
+        $resourceService = resolve(KingdomResourcesService::class);
 
-        $resouceService->setKingdom($kingdom)->updateKingdom();
+        $resourceService->setKingdom($kingdom)->updateKingdom();
 
         $kingdom = $kingdom->refresh();
 
@@ -975,9 +975,9 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $kingdom = $kingdom->refresh();
 
-        $resouceService = resolve(KingdomResourcesService::class);
+        $resourceService = resolve(KingdomResourcesService::class);
 
-        $resouceService->setKingdom($kingdom)->updateKingdom();
+        $resourceService->setKingdom($kingdom)->updateKingdom();
 
         $kingdom = $kingdom->refresh();
 
@@ -1037,9 +1037,9 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $kingdom = $kingdom->refresh();
 
-        $resouceService = resolve(KingdomResourcesService::class);
+        $resourceService = resolve(KingdomResourcesService::class);
 
-        $resouceService->setKingdom($kingdom)->updateKingdom();
+        $resourceService->setKingdom($kingdom)->updateKingdom();
 
         $kingdom = $kingdom->refresh();
 
@@ -1099,16 +1099,16 @@ class KingdomResourcesServiceTest extends TestCase {
 
         $kingdom = $kingdom->refresh();
 
-        $resouceService = resolve(KingdomResourcesService::class);
+        $resourceService = resolve(KingdomResourcesService::class);
 
-        $resouceService->setKingdom($kingdom)->updateKingdom();
+        $resourceService->setKingdom($kingdom)->updateKingdom();
 
         $kingdom = $kingdom->refresh();
 
         $this->assertEquals($kingdom->current_morale, 0);
     }
 
-    public function testDoNotUpdateTreasureyWhenKingdomMoraleIsZero() {
+    public function testDoNotUpdateTreasuryWhenKingdomMoraleIsZero() {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
 
         DB::table('sessions')->insert([[

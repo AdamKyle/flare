@@ -2,7 +2,7 @@
 
 namespace App\Flare\Models;
 
-use App\Flare\Transformers\MarketItemsTransfromer;
+use App\Flare\Transformers\MarketItemsTransformer;
 use App\Game\Core\Traits\UpdateMarketBoard;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

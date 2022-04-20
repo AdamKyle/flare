@@ -57,10 +57,10 @@ use App\Flare\Services\CharacterRewardService;
 use App\Flare\Services\FightService;
 use App\Flare\Transformers\KingdomBuildingTransformer;
 use App\Flare\Transformers\CharacterAttackTransformer;
-use App\Flare\Transformers\ItemTransfromer;
+use App\Flare\Transformers\ItemTransformer;
 use App\Flare\Transformers\KingdomTransformer;
-use App\Flare\Transformers\MarketItemsTransfromer;
-use App\Flare\Transformers\MonsterTransfromer;
+use App\Flare\Transformers\MarketItemsTransformer;
+use App\Flare\Transformers\MonsterTransformer;
 use App\Flare\Transformers\UnitTransformer;
 use App\Flare\Values\BaseSkillValue;
 use App\Flare\View\Components\AdventureLogs;
@@ -214,16 +214,16 @@ class ServiceProvider extends ApplicationServiceProvider
             return new UnitTransformer();
         });
 
-        $this->app->bind(MonsterTransfromer::class, function($app){
-            return new MonsterTransfromer();
+        $this->app->bind(MonsterTransformer::class, function($app){
+            return new MonsterTransformer();
         });
 
-        $this->app->bind(MarketItemsTransfromer::class, function($app){
-            return new MarketItemsTransfromer();
+        $this->app->bind(MarketItemsTransformer::class, function($app){
+            return new MarketItemsTransformer();
         });
 
-        $this->app->bind(ItemTransfromer::class, function($app) {
-            return new ItemTransfromer();
+        $this->app->bind(ItemTransformer::class, function($app) {
+            return new ItemTransformer();
         });
 
         $this->app->bind(InventoryTransformer::class, function() {
@@ -397,7 +397,7 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(BuildMonsterCacheService::class, function($app) {
             return new BuildMonsterCacheService(
                 $app->make(Manager::class),
-                $app->make(MonsterTransfromer::class)
+                $app->make(MonsterTransformer::class)
             );
         });
 

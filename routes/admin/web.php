@@ -40,7 +40,7 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::get('/admin/monsters/create', ['as' => 'monsters.create', 'uses' => 'MonstersController@create']);
     Route::get('/admin/monsters/{monster}', ['as' => 'monsters.monster', 'uses' => 'MonstersController@show']);
     Route::get('/admin/monsters/{monster}/edit', ['as' => 'monster.edit', 'uses' => 'MonstersController@edit']);
-    Route::post('/admin/monsters/{monster}/pblish', ['as' => 'monster.publish', 'uses' => 'MonstersController@publish']);
+    Route::post('/admin/monsters/{monster}/publish', ['as' => 'monster.publish', 'uses' => 'MonstersController@publish']);
 
     Route::get('/admin/items/export-items', ['as' => 'items.export', 'uses' => 'ItemsController@exportItems']);
     Route::get('/admin/items/import-items', ['as' => 'items.import', 'uses' => 'ItemsController@importItems']);
@@ -73,7 +73,7 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::post('/admin/users/{user}/ban-user', ['as' => 'ban.user', 'uses' => 'UsersController@banUser']);
     Route::post('/admin/users/{user}/un-ban-user', ['as' => 'unban.user', 'uses' => 'UsersController@unBanUser']);
     Route::post('/admin/users/{user}/submit-reason', ['as' => 'ban.user.with.reason', 'uses' => 'UsersController@submitBanReason']);
-    Route::post('/admin/users/{user}/ingore-unban-request', ['as' => 'user.ignore.unban.request', 'uses' => 'UsersController@ignoreUnBanRequest']);
+    Route::post('/admin/users/{user}/ignore-unban-request', ['as' => 'user.ignore.unban.request', 'uses' => 'UsersController@ignoreUnBanRequest']);
     Route::post('/admin/users/{user}/force-name-change', ['as' => 'user.force.name.change', 'uses' => 'UsersController@forceNameChange']);
     Route::post('/admin/users/{user}/enable-auto-battle', ['as' => 'user.enable.auto.battle', 'uses' => 'UsersController@enableAutoBattle']);
     Route::post('/admin/users/{user}/disable-auto-battle', ['as' => 'user.disable.auto.battle', 'uses' => 'UsersController@disableAutoBattle']);

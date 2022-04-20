@@ -19,7 +19,7 @@ trait AttackHandlerCalculations {
      * @param bool $flipped
      * @return float
      */
-    public function calculatePerentageLost(int $totalAttack, int $totalDefence, bool $flipped = false): float {
+    public function calculatePercentageLost(int $totalAttack, int $totalDefence, bool $flipped = false): float {
         if ($totalDefence === 0) {
             return 0.0;
         }
@@ -34,7 +34,7 @@ trait AttackHandlerCalculations {
     /**
      * Update the kingdom buildings based on durability percentage lost.
      *
-     * This percentage is then divided across all buildings so they take dmage equally.
+     * This percentage is then divided across all buildings so they take damage equally.
      *
      * @param KingdomBuilding $building
      * @param float $durabilityPercentageLost

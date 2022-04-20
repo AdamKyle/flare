@@ -6,7 +6,7 @@ use App\Flare\Traits\IsItemUnique;
 use League\Fractal\TransformerAbstract;
 use App\Flare\Models\MarketBoard;
 
-class MarketItemsTransfromer extends TransformerAbstract {
+class MarketItemsTransformer extends TransformerAbstract {
 
     use IsItemUnique;
 

@@ -34,7 +34,7 @@ class ClearCelestials extends Command
      *
      * @var string
      */
-    protected $description = 'Clears celestials older then an hour';
+    protected $description = 'Clears celestials older than an hour';
 
     /**
      * Create a new command instance.

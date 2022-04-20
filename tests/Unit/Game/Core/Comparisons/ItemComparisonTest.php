@@ -160,7 +160,7 @@ class ItemComparisonTest extends TestCase
         ]);
 
         $character = $this->character->InventoryManagement()
-                                     ->giveitem($itemToEquip)
+                                     ->giveItem($itemToEquip)
                                      ->equipItem('hands', $itemToEquip->name)
                                      ->getCharacter(false);
 
@@ -192,7 +192,7 @@ class ItemComparisonTest extends TestCase
         ]);
 
         $character = $this->character->InventoryManagement()
-                                     ->giveitem($itemToEquip)
+                                     ->giveItem($itemToEquip)
                                      ->equipItem('hands', $itemToEquip->name)
                                      ->getCharacter(false);
 
@@ -222,7 +222,7 @@ class ItemComparisonTest extends TestCase
         ]);
 
         $character = $this->character->InventoryManagement()
-                                     ->giveitem($itemToEquip)
+                                     ->giveItem($itemToEquip)
                                      ->equipItem('spell_one', $itemToEquip->name)
                                      ->getCharacter(false);
 
@@ -252,7 +252,7 @@ class ItemComparisonTest extends TestCase
         ]);
 
         $character = $this->character->InventoryManagement()
-                                     ->giveitem($itemToEquip)
+                                     ->giveItem($itemToEquip)
                                      ->equipItem('spell_one', $itemToEquip->name)
                                      ->getCharacter(false);
 
@@ -284,7 +284,7 @@ class ItemComparisonTest extends TestCase
         ]);
 
         $character = $this->character->InventoryManagement()
-                                     ->giveitem($itemToEquip)
+                                     ->giveItem($itemToEquip)
                                      ->equipItem('spell_one', $itemToEquip->name)
                                      ->getCharacter(false);
 

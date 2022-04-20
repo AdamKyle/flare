@@ -148,7 +148,7 @@ export default class Damage extends BattleBase {
 
     let dc          = 75 + Math.ceil(75 * defender.spell_evasion);
     let roll        = random(1, 100);
-    let totalDamage = attacker.spell_damag;
+    let totalDamage = attacker.spell_damage;
 
     if (dc >= 100) {
       dc = 99;
@@ -396,7 +396,7 @@ export default class Damage extends BattleBase {
       }
 
       if (extraActionChance.type === ExtraActionType.VAMPIRE_THIRST) {
-        this.addMessage('There is a thirst child, its in your soul! Lash out and kill!', 'regular');
+        this.addMessage('There is a thirst, child, it\'s in your soul! Lash out and kill!', 'regular');
 
         let totalAttack = Math.round(attacker.dur_modded + attacker.dur_modded * 0.15);
 

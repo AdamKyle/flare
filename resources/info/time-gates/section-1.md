@@ -12,7 +12,7 @@ All timers will be visible to players. You can close a panel that has a timer an
 
 Crafting, Attacking, Adventuring, Moving, Setting Sail, Enchanting, Fighting and Teleporting all currently have timers. Each one varies depending on what it is the timer is for. 
 
-Even [Kingdoms](/information/kingdoms) has their own timers for upgrading, repairing, unit recruitment and unit movement.
+Even [Kingdoms](/information/kingdoms) have their own timers for upgrading, repairing, unit recruitment and unit movement.
 
 All of these are separate. So you can craft, kill a goblin, and move/set sail or start and adventure, for example (in that order - see [Adventure](/information/adventure) section for what happens when you begin an adventure).
 
@@ -20,21 +20,21 @@ Let's go over these:
 
 - **Crafting**: When you craft an item, whether you are successful or not, you will receive a 10-second timer.
 - **Fighting**: When fighting, all attacks are done client side. Once you or the creature are dead one of two timers can appear:
-  - **If you die**: You will receive a 20-second time out before you can revive.
+  - **If you die**: You will receive a 20-second timeout before you can revive.
     - You are considered dead and cannot do a lot of things. See bellow.
-  - **If the Monster dies**: You will receive a 10-second time out.
-- **Moving**: When a character moves, they will receive a 10-second time out.
-- **Setting Sail**: The panel for setting sail will tell you how long in minutes your time out for movement based actions will be.
+  - **If the Monster dies**: You will receive a 10-second timeout.
+- **Moving**: When a character moves, they will receive a 10-second timeout.
+- **Setting Sail**: The panel for setting sail will tell you how long in minutes your timeout for movement based actions will be.
 - **Adventuring**: Depending on levels of adventure the time could vary. Each adventure will tell you how long it will take to completely fulfil.
-- **Enchanting**: Can give a 10, 20 or 30 second time out depending on if you are applying one enchant, replacing one enchant or replacing two enchants.
-- **Teleporting**: Will give you a time out equal to the time mentioned in the teleport panel when going from one location to another.
-- **Traversing**: From one plane to the next, assuming you have the quest item (see [Traversing](/information/traversing)) will give you a 10-second time out for movement based actions.
+- **Enchanting**: Can give a 10, 20 or 30 second timeout depending on if you are applying one enchant, replacing one enchant or replacing two enchants.
+- **Teleporting**: Will give you a timeout equal to the time mentioned in the teleport panel when going from one location to another.
+- **Traversing**: From one plane to the next, assuming you have the quest item (see [Traversing](/information/traversing)) will give you a 10-second timeout for movement based actions.
 - **Kingdoms**: These each have their own set of timers:
   - **Building upgrade**: Leveling a building has a timer in relation to minutes. The higher the building level, the longer it takes.
   - **Unit recruitment**: Recruiting units can take seconds, minutes or even hours, depending on the amount of units you are recruiting.
   - **Building Repair**: Has a timer based on current level of building. Repairs can only be done when a building reaches durability of 0. Leveling a damaged building, that is one that has a durability below its max but above 0, will replace current durability with the new max.
   - **Unit Movement**: All units have a moment speed. This speed is applied to the units regardless of how many you send, but stacks with other units that have a slower or equal movement speed. Distance is also taken into consideration.
-- **Celestial Fights**: If the [Celestial](/information/celestials) Entity is not killed in one hit, there is a ten-second server time out to allow other players who might have joined a chance to land a hit.
+- **Celestial Fights**: If the [Celestial](/information/celestials) Entity is not killed in one hit, there is a ten-second server timeout to allow other players who might have joined a chance to land a hit.
 ### Character death
 
 Your character can die in a few ways. Fighting monsters and dying in an adventure as well as Celestials killing you. When you die, you cannot:

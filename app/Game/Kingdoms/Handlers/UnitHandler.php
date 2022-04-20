@@ -125,16 +125,16 @@ class UnitHandler {
 
         if ($totalAttack > $totalDefenderDefence) {
 
-            $totalAttackingUnitsLost = $this->calculatePerentageLost($totalAttack, $totalDefenderDefence, true);
-            $totalDefenderUnitsLost  = $this->calculatePerentageLost($totalAttack, $totalDefenderDefence);
+            $totalAttackingUnitsLost = $this->calculatePercentageLost($totalAttack, $totalDefenderDefence, true);
+            $totalDefenderUnitsLost  = $this->calculatePercentageLost($totalAttack, $totalDefenderDefence);
 
             $attackingUnits = $this->updateAttackingUnits($attackingUnits, $totalAttackingUnitsLost);
 
             $this->updateDefenderUnits($defender, $totalDefenderUnitsLost);
         } else {
 
-            $totalAttackingUnitsLost = $this->calculatePerentageLost($totalAttackingDefence, $totalDefenderAttack, true);
-            $totalDefenderUnitsLost  = $this->calculatePerentageLost($totalAttackingDefence, $totalDefenderAttack);
+            $totalAttackingUnitsLost = $this->calculatePercentageLost($totalAttackingDefence, $totalDefenderAttack, true);
+            $totalDefenderUnitsLost  = $this->calculatePercentageLost($totalAttackingDefence, $totalDefenderAttack);
 
             $attackingUnits = $this->updateAttackingUnits($attackingUnits, $totalAttackingUnitsLost);
 

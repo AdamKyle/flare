@@ -135,7 +135,7 @@ class KingdomUnitMovementApiTest extends TestCase
         $content = json_decode($response->content());
 
         $this->assertEquals(200, $response->status());
-        $this->assertEquals('You\'re units are too close to their destination.', $content->message);
+        $this->assertEquals('Your units are too close to their destination.', $content->message);
     }
 
     protected function createKingdom(): KingdomManagement {

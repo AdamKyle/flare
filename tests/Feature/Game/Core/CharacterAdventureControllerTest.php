@@ -170,7 +170,7 @@ class CharacterAdventureControllerTest extends TestCase
         $this->actingAs($user)
              ->visitRoute('game') // So we have somewhere to redirect back too
              ->visitRoute('game.current.adventure')
-             ->see('You have no currently completed adventure. Check your completed adventures for more details.');
+             ->see('You currently have no completed adventure. Check your completed adventures for more details.');
     }
 
     public function testCharacterCannotSeeLatestAdventureWithNoAdventureId()
@@ -185,7 +185,7 @@ class CharacterAdventureControllerTest extends TestCase
         $this->actingAs($user)
             ->visitRoute('game') // So we have somewhere to redirect back too
             ->visitRoute('game.current.adventure')
-            ->see('You have no currently completed adventure. Check your completed adventures for more details.');
+            ->see('You currently have no completed adventure. Check your completed adventures for more details.');
     }
 
     public function testDistributeRewards() {
@@ -306,7 +306,7 @@ class CharacterAdventureControllerTest extends TestCase
         $response->assertSessionHas('error', "You cannot collect already collected rewards.");
     }
 
-    public function testCannotDistributeRewardsWhenAdventureing() {
+    public function testCannotDistributeRewardsWhenAdventuring() {
         $user = $this->character->adventureManagement()->updateLog([
             'in_progress' => true
         ])->getCharacterFactory()->getUser();
@@ -342,7 +342,7 @@ class CharacterAdventureControllerTest extends TestCase
         $this->assertTrue(AdventureLog::all()->isEmpty());
     }
 
-    public function testCannotDeleteAdventureLogWhenAdventuireInProgress() {
+    public function testCannotDeleteAdventureLogWhenAdventureInProgress() {
 
         $this->character->adventureManagement()->updateLog([
             'in_progress' => true,

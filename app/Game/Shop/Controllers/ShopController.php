@@ -210,7 +210,7 @@ class ShopController extends Controller {
         $item = Item::find($request->item_id_to_buy);
 
         if ($item->craft_only) {
-            return redirect()->back()->with('error', 'You are not capable of affording such luxury child!');
+            return redirect()->back()->with('error', 'You are not capable of affording such luxury, child!');
         }
 
         if ($item->cost > $character->gold) {

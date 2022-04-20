@@ -31,7 +31,7 @@ Encounters are done every 10 minutes as you can see from here:
     </a>
 </div>
 
-You might think, so I fight the same monster once every 10 minutes? no no, we go on an adventure, lets pay attention to our chat tabs shall we?
+You might think, so I fight the same monster once every 10 minutes? no no, we go on an adventure, let's pay attention to our chat tabs shall we?
 
 <div class="mb-4">
     <a href="/storage/info/exploration/images/all-chat-tabs.png" class="glightbox">
@@ -59,7 +59,7 @@ When a chat tab updates there is a bell notification that pops up beside it:
     </a>
 </div>
 
-Pay attention for these while you do other things in game, to see when the next encounter is about to begin.
+Pay attention for these while you do other things in-game, to see when the next encounter is about to begin.
 
 An exploration in progress looks like:
 

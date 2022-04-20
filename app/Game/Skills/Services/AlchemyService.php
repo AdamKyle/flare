@@ -41,7 +41,7 @@ class AlchemyService {
         $item      = Item::find($itemId);
 
         if (is_null($item)) {
-            event(new GameServerMessageEvent($character->user, 'Nope. No item exists.'));
+            event(new GameServerMessageEvent($character->user, 'Nope. Item does not exist.'));
 
             return;
         }

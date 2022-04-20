@@ -50,7 +50,7 @@ class CharacterAdventureController extends Controller {
         $adventureLog = $character->adventureLogs()->find($character->current_adventure_id);
 
         if (is_null($adventureLog)) {
-            return redirect()->to(route('game'))->with('error', 'You have no currently completed adventure. Check your completed adventures for more details.');
+            return redirect()->to(route('game'))->with('error', 'You currently have no completed adventure. Check your completed adventures for more details.');
         }
 
         // Update the corresponding notification:
@@ -95,7 +95,7 @@ class CharacterAdventureController extends Controller {
 
     public function delete(AdventureLog $adventureLog) {
         if ($adventureLog->in_progress) {
-            return redirect()->back()->with('error', 'Cannot delete log currently in progress.');
+            return redirect()->back()->with('error', 'Cannot delete log for currently in progress adventure.');
         }
 
         $adventureLog->delete();
@@ -107,7 +107,7 @@ class CharacterAdventureController extends Controller {
         $logs = AdventureLog::findMany($request->logs);
 
         if ($logs->isEmpty()) {
-            return redirect()->back()->with('error', 'No logs exist for selected.');
+            return redirect()->back()->with('error', 'No log exists for your selection.');
         }
 
         foreach ($logs as $log) {

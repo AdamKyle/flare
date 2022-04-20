@@ -105,7 +105,7 @@ class ReRollEnchantmentService {
 
         event(new UpdateQueenOfHeartsPanel($character->user, $this->randomEnchantmentService->fetchDataForApi($character)));
 
-        event(new ServerMessageEvent($character->user, 'Ooooh hoo hoo hoo! I have done it child! I have made the modifications and I think you\'ll be happy! Oh child I am so happy! ooh hoo hoo hoo!', true));
+        event(new ServerMessageEvent($character->user, 'Ooooh hoo hoo hoo! I have done it, child! I have made the modifications and I think you\'ll be happy! Oh child, I am so happy! Ooh hoo hoo hoo!', true));
     }
 
     public function doesMovementCostMatch(int $selectedItemToMoveId, string $selectedAffix, int $suppliedGold, int $suppliedShards): bool {
@@ -238,7 +238,7 @@ class ReRollEnchantmentService {
 
         event(new UpdateQueenOfHeartsPanel($character->user, $this->randomEnchantmentService->fetchDataForApi($character)));
 
-        event(new ServerMessageEvent($character->user, 'Ooooh hoo hoo hoo! I have done as thou have requested, my lovely, beautiful gorgeous child! Oh look at how powerful you are!', true));
+        event(new ServerMessageEvent($character->user, 'Ooooh hoo hoo hoo! I have done as thou have requested, my lovely, beautiful, gorgeous child! Oh look at how powerful you are!', true));
 
         if ($deletedAll) {
             event(new GlobalMessageEvent($character->name . ' Makes the Queen of Hearts glow so bright, thousands of demons in Hell are banished by her beauty and power alone!'));
@@ -301,18 +301,18 @@ class ReRollEnchantmentService {
     protected function changeAffix(Character $character, Item $item, ItemAffix $itemAffix, string $changeType) {
         $amountPaid             = new RandomAffixDetails($itemAffix->cost);
 
-        $affixeAttributeBuilder = $this->affixAttributeBuilder->setPercentageRange($amountPaid->getPercentageRange())
+        $affixAttributeBuilder = $this->affixAttributeBuilder->setPercentageRange($amountPaid->getPercentageRange())
                                                               ->setDamageRange($amountPaid->getDamageRange())
                                                               ->setCharacterSkills($character->skills);
         if ($changeType === 'everything') {
-            $changes = $affixeAttributeBuilder->buildAttributes($itemAffix->type, $itemAffix->cost);
+            $changes = $affixAttributeBuilder->buildAttributes($itemAffix->type, $itemAffix->cost);
 
             unset($changes['name']);
         } else {
             $changes = [];
 
             foreach ($this->functionMap[$changeType] as $functionName) {
-                $changes = array_merge($changes, $affixeAttributeBuilder->{$functionName}());
+                $changes = array_merge($changes, $affixAttributeBuilder->{$functionName}());
             }
         }
 

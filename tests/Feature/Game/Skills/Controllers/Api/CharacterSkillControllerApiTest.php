@@ -219,7 +219,7 @@ class CharacterSkillControllerApiTest extends TestCase {
                          ])->response;
 
         $this->assertEquals(200, $response->status());
-        $this->assertFalse($currentGold === $this->character->getcharacter()->gold);
+        $this->assertFalse($currentGold === $this->character->getCharacter()->gold);
     }
 
     public function testCannotEnchantItemWhenCannotCraft() {

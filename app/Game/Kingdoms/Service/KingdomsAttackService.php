@@ -171,7 +171,7 @@ class KingdomsAttackService {
      *
      * Can also throw if you do not have enough units in the kingdom.
      *
-     * Will also update the kingdoms units with the reamining values.
+     * Will also update the kingdom's units with the remaining values.
      *
      * @param Kingdom $kingdom
      * @param array $units

@@ -126,7 +126,7 @@ class ItemAffix extends Model
         return ItemAffixFactory::new();
     }
 
-    public function scopeGetOppisiteType() {
+    public function scopeGetOppositeType() {
         if ($this->type === 'suffix')  {
             return 'prefix';
         }

@@ -10,9 +10,9 @@ sets of equipment, you can treat one or more sets as stash tabs, since the sets 
 
 ### Best practices
 
-It is suggested that you equip the set of items you want to save, and then save it for later. In fact lets go through that together:
+It is suggested that you equip the set of items you want to save, and then save it for later. In fact let's go through that together:
 
-Lets assume we have our equipped items:
+Let's assume we have our equipped items:
 
 <div class="mb-4">
     <a href="/storage/info/equipment-sets/images/equipped-item.png" class="glightbox">
@@ -20,7 +20,7 @@ Lets assume we have our equipped items:
     </a>
 </div>
 
-As you can see there is a button called: Save as set.
+As you can see, there is a button called: Save as set.
 
 Let's click this and see what happens!
 
@@ -71,7 +71,7 @@ A set must contain:
 Sets may be incomplete and still be able to be equipped. You can equip a set by clicking the sets tab, 
 clicking the tab of the set you want to equip and auto equip all items.
 
-Sets will replace what ever is equipped.
+Sets will replace whatever is equipped.
 
 If the set does not conform to the above rules, then the set will be treated as a stash tab.
 

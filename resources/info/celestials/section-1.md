@@ -18,7 +18,7 @@ However, the character that kills the Celestial entity gets the reward. Hence, t
 
 These Creatures can give out Gold Dust, Shards, Items and even have a chance to drop quest items used in [quests](/information/quests).
 
-Celestial’s can be conjured to their respective plane either publicly or privately by speaking with the correct [NPC](/information/npcs).
+Celestials can be conjured to their respective plane either publicly or privately by speaking with the correct [NPC](/information/npcs).
 
 If conjured publicly, a global message will go out with coordinates to the location of the entity, allowing any
 character, to swoop in and kill it.

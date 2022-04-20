@@ -16,7 +16,7 @@ class ExplorationHandler {
         'A starlit clearing amidst a forest of flowering trees. The sky is filled with howling winds and flashes of lightning.',
         'Deep in the Kalitarie Jungle. A natural stone bridge crosses a murky river nearby.',
         'Somewhere amidst broken hills. A company of grim mercenaries rests in their camp. You move cautiously.',
-        'I came across a small church. Quickly did I notice it has no doors or windows.',
+        'I came across a small church. Quickly I noticed it had no doors or windows.',
         'An outcrop of wind-carved rock in the Pale Waste. The air is strangely still and quiet.',
         'A shambling mound of vines lurks in the undergrowth.',
     ];
@@ -33,7 +33,7 @@ class ExplorationHandler {
 
         $this->processExplorationFightService->processFight($characterAutomation, $character);
 
-        event(new ExplorationLogUpdate($character->user, 'Child what did I tell you about paying attention to your surroundings, you could have died. Wait... Where are you going? This is no time to hunt them down! Christ, we\'re all going to die.', true));
+        event(new ExplorationLogUpdate($character->user, 'Child, what did I tell you about paying attention to your surroundings? You could have died. Wait... Where are you going? This is no time to hunt them down! Christ, we\'re all going to die.', true));
     }
 
     protected function fetchRandomDescription(): String {

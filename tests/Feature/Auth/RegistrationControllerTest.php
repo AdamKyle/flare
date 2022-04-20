@@ -51,7 +51,7 @@ class RegistrationControllerTest extends TestCase
         parent::tearDown();
     }
 
-    public function testCanSeeRegistation() {
+    public function testCanSeeRegistration() {
         $this->visit('/login')
             ->click('Register')
             ->see('E-Mail Address')

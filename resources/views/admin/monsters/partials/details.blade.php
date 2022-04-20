@@ -97,7 +97,7 @@
         <p>All Enemies have a chance to completely annul your affixes that do damage. This percentage is also known as
             a "chance". The stronger the enemy the higher the chance to annul your affix damage.</p>
         <p>
-            There are some affixes who's damage cannot be resisted, this is known as irresistible damage. Even if an enemies
+            There are some affixes who's damage cannot be resisted, this is known as irresistible damage. Even if an enemy's
             Affix Resistance is over 100% this damage cannot be resisted.
         </p>
         <p>
@@ -105,7 +105,7 @@
             artifacts irresistible. You can then further upgrade this to make spells irresistible.
         </p>
         <ul>
-            <li>Casters will use 5% of their Focus as the base DC check for enemies resistances check to see if the enemy can avoid the spell(s).</li>
+            <li>Casters will use 5% of their Focus as the base DC check for enemy's resistances check to see if the enemy can avoid the spell(s).</li>
             <li>Vampires will use 5% of their Durability as the base dc check for resistances check to see if the enemy can avoid life stealing affixes.</li>
         </ul>
     </x-core.alerts.info-alert>
@@ -123,7 +123,7 @@
     <x-core.alerts.info-alert>
         <p>
             All monsters can cast to some degree, have artifacts, affixes and can heal. Here you will see the details corresponding to that.
-            There are a couple things to keep in mind however:
+            There are a couple things to keep in mind, however:
         </p>
         <ul>
             <li>
@@ -134,11 +134,11 @@
             </li>
             <li>
                 Monsters will only heal, if they get a turn. In that case, like players, they heal at the end of their turn for a % of their Dur.
-                This is where stat reducing affixes can come in handy. You can reduce the enemies durability so they cannot heal as much.
+                This is where stat reducing affixes can come in handy. You can reduce the enemy's durability so they cannot heal as much.
             </li>
         </ul>
         <p>
-            There is a quest chain you can do that rewards you at the end with a new item that will annul the enemies affixes, artifacts, spells
+            There is a quest chain you can do that rewards you at the end with a new item that will annul the enemy's affixes, artifacts, spells
             and ability to heal.
         </p>
     </x-core.alerts.info-alert>
@@ -191,7 +191,7 @@
             <p>Celestial entities also drop what are called <strong>Shards</strong>. These are used in <a href="/information/usable-items">Alchemy</a> in place of gold.</p>
             <p>Celestial Entities can also spawn randomly on the map by a player, any player, just moving around. When these entities spawn - be it summoned or other wise, they
                 spawn in random locations at which the player must then go to. If the location is a kingdom is a small chance of it doing damage to the kingdom. The chance of a beast spawning
-                is greater then the chance of it doing damage to a kingdom when it does spawn.</p>
+                is greater than the chance of it doing damage to a kingdom when it does spawn.</p>
             <p>
                 <strong>Vampires</strong> will only do 50% damage to these creatures via their life stealing affixes and class bonus.
             </p>

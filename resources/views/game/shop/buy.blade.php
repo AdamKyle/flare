@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-  <div class="w-full lg:w-3/4 m-auto">
+    <div class="w-full lg:w-3/4 m-auto">
 
     <div class="m-auto">
         <x-core.cards.card>

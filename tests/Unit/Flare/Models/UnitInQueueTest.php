@@ -17,7 +17,7 @@ class UnitInQueueTest extends TestCase
         CreateKingdom,
         CreateGameUnit;
 
-    private $charactr;
+    private $character;
 
     public function testGetCharacter() {
         $kingdom = $this->createTestKingdom();

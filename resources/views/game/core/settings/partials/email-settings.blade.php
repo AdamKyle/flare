@@ -7,7 +7,7 @@
                     <div class="alert alert-info">
                         Emails only get sent when you are not online.
                         You cannot turn off emails for being banned or for the request of an unban.
-                        We will never use your email for anything other then whats listed in this box.
+                        We will never use your email for anything other than what's listed in this box.
                     </div>
                 </div>
             </div>

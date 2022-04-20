@@ -26,9 +26,9 @@ class ExplorationTimeOut implements ShouldBroadcast
     public $forLength;
 
     /**
-     * @var bool $activatebar
+     * @var bool $activateBar
      */
-    public $activatebar;
+    public $activateBar;
 
     /**
      * Create a new event instance.
@@ -41,7 +41,7 @@ class ExplorationTimeOut implements ShouldBroadcast
     {
         $this->user        = $user;
         $this->forLength   = $forLength;
-        $this->activatebar = true;
+        $this->activateBar = true;
     }
 
     /**

@@ -43,7 +43,7 @@ class NotificationsControllerTest extends TestCase {
             'status'       => 'success',
             'type'         => 'adventure',
             'read'         => false,
-            'url'          => 'somthing.com',
+            'url'          => 'something.com',
         ]);
 
         $response = $this->actingAs($user)
@@ -69,7 +69,7 @@ class NotificationsControllerTest extends TestCase {
             'status'       => 'success',
             'type'         => 'adventure',
             'read'         => true,
-            'url'          => 'somthing.com',
+            'url'          => 'something.com',
         ]);
 
 
@@ -94,7 +94,7 @@ class NotificationsControllerTest extends TestCase {
             'status'       => 'success',
             'type'         => 'adventure',
             'read'         => false,
-            'url'          => 'somthing.com',
+            'url'          => 'something.com',
         ]);
 
         $response = $this->actingAs($user)
@@ -118,7 +118,7 @@ class NotificationsControllerTest extends TestCase {
             'status'       => 'success',
             'type'         => 'adventure',
             'read'         => false,
-            'url'          => 'somthing.com',
+            'url'          => 'something.com',
         ], 2);
 
         $notificationId = Notification::first()->id;
@@ -143,7 +143,7 @@ class NotificationsControllerTest extends TestCase {
             'status'       => 'success',
             'type'         => 'adventure',
             'read'         => false,
-            'url'          => 'somthing.com',
+            'url'          => 'something.com',
         ], 2);
 
         $user = (new CharacterFactory)->createBaseCharacter()->getUser();

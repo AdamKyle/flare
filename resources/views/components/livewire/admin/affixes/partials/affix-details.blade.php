@@ -74,7 +74,7 @@
         <div class="col-md-4">
             <div class="form-group form-check-inline">
                 <input type="checkbox" class="form-check-input" id="affix-damage-stackable" wire:model="itemAffix.damage_can_stack">
-                <label class="form-check-label" for="affix-damage-stackable">Is Damage Stackable (having more then one stacks it)?</label>
+                <label class="form-check-label" for="affix-damage-stackable">Is Damage Stackable (having more than one stacks it)?</label>
             </div>
         </div>
     </div>

@@ -17,7 +17,7 @@
     <hr />
     <div class="row page-titles">
         <div class="col-md-6 align-self-right">
-            <h4 class="mt-2">{{$monster->questitem->affix_name}} (Quest Item)</h4>
+            <h4 class="mt-2">{{$monster->questItem->affix_name}} (Quest Item)</h4>
             <span style="font-size: 12px;">
                 <strong>Drop Chance:</strong> {{$monster->quest_item_drop_chance * 100}}%
                 @if(!is_null($quest))

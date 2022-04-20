@@ -20,7 +20,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Monster;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Models\User;
-use App\Flare\Transformers\MonsterTransfromer;
+use App\Flare\Transformers\MonsterTransformer;
 
 class BattleController extends Controller {
 

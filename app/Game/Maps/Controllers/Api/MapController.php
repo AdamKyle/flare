@@ -44,7 +44,7 @@ class MapController extends Controller {
         return response()->json($locationService->getLocationData($character), 200);
     }
 
-    public function move(MoveRequest $request, Character $character, MovementService $movementSevice) {
+    public function move(MoveRequest $request, Character $character, MovementService $movementService) {
         if (!$character->can_move) {
             return response()->json(['invalid input'], 429);
         }
@@ -64,7 +64,7 @@ class MapController extends Controller {
             }
         }
 
-        $response = $movementSevice->updateCharacterPosition($character, $request->all());
+        $response = $movementService->updateCharacterPosition($character, $request->all());
 
         $status = $response['status'];
 
@@ -87,12 +87,12 @@ class MapController extends Controller {
         return response()->json($response, $status);
     }
 
-    public function teleport(TeleportRequest $request, Character $character, MovementService $movementSevice) {
+    public function teleport(TeleportRequest $request, Character $character, MovementService $movementService) {
         if (!$character->can_move) {
             return response()->json(['invalid input'], 429);
         }
 
-        $response = $movementSevice->teleport($character, $request->x, $request->y, $request->cost, $request->timeout);
+        $response = $movementService->teleport($character, $request->x, $request->y, $request->cost, $request->timeout);
 
         $status = $response['status'];
 

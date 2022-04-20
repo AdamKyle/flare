@@ -156,7 +156,7 @@ class KingdomBuildingService {
      *
      * Will cancel the resources if the total resources are above 10%.
      *
-     * Can return false if there is not enough time left or the too little resources given back.
+     * Can return false if there is not enough time left or too little resources given back.
      *
      * @codeCoverageIgnore
      * @param KingdomBuildingInQueue $queue
@@ -198,7 +198,7 @@ class KingdomBuildingService {
                 return false;
             }
 
-            $kingdom = $this->updateKingdomAfterCancelation($kingdom, $building);
+            $kingdom = $this->updateKingdomAfterCancellation($kingdom, $building);
         }
 
         $queue->delete();
@@ -348,7 +348,7 @@ class KingdomBuildingService {
      * @param KingdomBuilding $building
      * @return Kingdom
      */
-    protected function updateKingdomAfterCancelation(Kingdom $kingdom, KingdomBuilding $building): Kingdom {
+    protected function updateKingdomAfterCancellation(Kingdom $kingdom, KingdomBuilding $building): Kingdom {
 
         $kingdom->update([
             'current_wood'       => $kingdom->current_wood + ($building->wood_cost * $this->totalResources),

@@ -26,7 +26,7 @@ class UpdateSiteStatisticsChart implements ShouldBroadcastNow
     public array $registered = [];
 
     /**
-     * @var array $signedin
+     * @var array $signedIn
      */
     public array $signedIn = [];
 

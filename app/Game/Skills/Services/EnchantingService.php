@@ -163,7 +163,7 @@ class EnchantingService {
     public function timeForEnchanting(Item $item) {
 
         if (!is_null($item->itemPrefix) && !is_null($item->itemSuffix)) {
-            return 'tripple';
+            return 'triple';
         }
 
         if (!is_null($item->itemPrefix) || !is_null($item->itemSuffix)) {

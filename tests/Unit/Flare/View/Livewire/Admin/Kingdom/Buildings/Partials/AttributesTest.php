@@ -10,7 +10,7 @@ use Tests\TestCase;
 use Tests\Traits\CreateGameBuilding;
 use Tests\Traits\CreateGameUnit;
 
-class AtrributesTest extends TestCase
+class AttributesTest extends TestCase
 {
     use RefreshDatabase, CreateGameBuilding, CreateGameUnit;
 
@@ -80,7 +80,7 @@ class AtrributesTest extends TestCase
         ])->set('selectedUnits', [$unit->id])
           ->set('gameBuilding.units_per_level', 300)
           ->call('validateInput', 'nextStep', 2)
-          ->assertSee('Your selected units and units per level are greator then your max level.');
+          ->assertSee('Your selected units and units per level are greater than your max level.');
     }
 
     public function testIsEditing() {

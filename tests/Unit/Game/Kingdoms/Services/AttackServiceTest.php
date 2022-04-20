@@ -108,7 +108,7 @@ class AttackServiceTest extends TestCase {
         $this->assertTrue(KingdomLog::all()->isNotEmpty());
     }
 
-    public function testLostAttackWithSomeSurvingUnitsWhenNoSettlerUnit() {
+    public function testLostAttackWithSomeSurvivingUnitsWhenNoSettlerUnit() {
         $defender = $this->createCharacterKingdom()->assignUnits([
             'attack'       => 15000,
             'defence'      => 15000,

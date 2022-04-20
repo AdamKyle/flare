@@ -129,7 +129,7 @@ class KingdomBuilding extends Model
     }
 
     public function getIsChurchAttribute() {
-        return $this->gameBuilding->is_chruch;
+        return $this->gameBuilding->is_church;
     }
 
     public function getGivesResourcesAttribute() {

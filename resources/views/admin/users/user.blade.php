@@ -10,7 +10,7 @@
         ></x-core.page-title>
 
         @if ($character->user->is_banned)
-            <h4 class="mt-3 ml-1">Banned Until: {{is_null($character->user->unbanned_at) ? 'For ever' : $character->user->unbanned_at->format('l jS \\of F Y h:i:s A')}} </h4>
+            <h4 class="mt-3 ml-1">Banned Until: {{is_null($character->user->unbanned_at) ? 'Forever' : $character->user->unbanned_at->format('l jS \\of F Y h:i:s A')}} </h4>
             <x-core.cards.card>
                 <p><strong>Banned Because: </strong> {{$character->user->banned_reason}}</p>
 

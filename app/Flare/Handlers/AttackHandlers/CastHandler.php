@@ -189,17 +189,20 @@ class CastHandler {
         }
 
         $this->monsterHealth   = $this->attackExtraActionHandler->setCharacterhealth($this->characterHealth)->vampireThirst($characterInfo, $this->monsterHealth, $voided, $this->dmgReduction);
+
         $this->characterHealth = $this->attackExtraActionHandler->getCharacterHealth();
 
         $this->battleLogs      = [...$this->battleLogs, ...$this->attackExtraActionHandler->getMessages()];
 
         $this->attackExtraActionHandler->resetMessages();
+
+        return true;
     }
 
     protected function fireOffVampireThirst(CharacterInformationBuilder $characterInfo, int $characterHealth = null, bool $voided = false) {
         $health = is_null($characterHealth) ? $this->characterHealth : $characterHealth;
 
-        $this->monsterHealth   = $this->attackExtraActionHandler->setCharacterhealth($health)->vampireThirst($characterInfo, $this->monsterHealth, $voided, $this->dmgReduction);
+        $this->monsterHealth   = $this->attackExtraActionHandler->setCharacterHealth($health)->vampireThirst($characterInfo, $this->monsterHealth, $voided, $this->dmgReduction);
 
         if (!is_null($characterHealth)) {
             $health           = $this->attackExtraActionHandler->getCharacterHealth();

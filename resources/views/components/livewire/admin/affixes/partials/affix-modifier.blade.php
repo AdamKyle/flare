@@ -226,14 +226,14 @@
     <div class="row">
         <div class="col-md-6">
             <div class="form-group">
-                <label for="fight_time_out_mod_bonus">Increases Skill Fight Time Out By: </label>
+                <label for="fight_time_out_mod_bonus">Increases Skill Fight Timeout By: </label>
                 <input type="number" steps="0.01" class="form-control" id="fight_time_out_mod_bonus" name="fight_time_out_mod_bonus" wire:model="itemAffix.fight_time_out_mod_bonus">
                 @error('itemAffix.fight_time_out_mod_bonus') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
-                <label for="move_time_out_mod_bonus">Increases Move Time Out By: </label>
+                <label for="move_time_out_mod_bonus">Increases Move Timeout By: </label>
                 <input type="number" steps="0.01" class="form-control" id="move_time_out_mod_bonus" name="move_time_out_mod_bonus" wire:model="itemAffix.move_time_out_mod_bonus">
                 @error('itemAffix.move_time_out_mod_bonus') <span class="text-danger">{{ $message }}</span> @enderror
             </div>

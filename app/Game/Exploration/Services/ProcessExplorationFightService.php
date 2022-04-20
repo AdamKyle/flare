@@ -58,7 +58,7 @@ class ProcessExplorationFightService {
             $automation->delete();
 
             $battleMessages[] = [
-                'message' => 'This took way to long! Check your gear child!',
+                'message' => 'This took way to long! Check your gear, child!',
                 'class'   => 'enemy-action-fired',
             ];
 
@@ -66,7 +66,7 @@ class ProcessExplorationFightService {
 
             event(new ExplorationAttackMessage($character->user, $battleMessages));
 
-            event(new ExplorationLogUpdate($character->user, 'You and the enemy are just missing each other ...'));
+            event(new ExplorationLogUpdate($character->user, 'You and the enemy are just missing each other...'));
 
             throw new Exception('battle took too long.');
         }

@@ -82,7 +82,7 @@ class SetupFightHandler {
         $monsterIsDevoided   = false;
 
         if ($this->canMonsterDevoidCharacter($defender, $attacker)) {
-            $message = $defender->name . ' has devoided your voidance! You feel fear start to build.';
+            $message = $defender->name . ' has devoided your voidance! You feel fear starting to build up.';
 
             $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
 
@@ -127,7 +127,7 @@ class SetupFightHandler {
         }
 
         if ($this->canMonsterDevoidCharacter($defender, $attacker) && !$monsterIsDevoided) {
-            $message = $defender->name . ' has devoided your voidance! You feel fear start to build.';
+            $message = $defender->name . ' has devoided your voidance! You feel fear starting to build up.';
 
             $this->battleLogs = $this->addMessage($message, 'enemy-action-fired', $this->battleLogs);
 
@@ -266,11 +266,11 @@ class SetupFightHandler {
 
     protected function reduceEnemyStats($defender) {
         $prefix                 = $this->characterInformationBuilder->findPrefixStatReductionAffix();
-        $affixesAreIrresistable = $this->characterInformationBuilder->canAffixesBeResisted();
+        $affixesAreIrresistible = $this->characterInformationBuilder->canAffixesBeResisted();
 
         if (!is_null($prefix)) {
 
-            if (!$this->canReduce($defender, $prefix, $affixesAreIrresistable)) {
+            if (!$this->canReduce($defender, $prefix, $affixesAreIrresistible)) {
                 return $defender;
             }
 
@@ -283,7 +283,7 @@ class SetupFightHandler {
             $defender->focus = $defender->focus - ($defender->focus * $prefix->focus_reduction);
         }
 
-        return $this->reduceSuffixStatsOnEnemies($defender, $affixesAreIrresistable);
+        return $this->reduceSuffixStatsOnEnemies($defender, $affixesAreIrresistible);
     }
 
     protected function canReduce($defender, ItemAffix $affix = null, bool $irresistible = false): bool {
@@ -395,7 +395,7 @@ class SetupFightHandler {
                 $defender->affix_resistance = 0.0;
             }
 
-            $message = 'The enemy looks in awe at the shiny artifacts. They seem less resistant to their allure then before!';
+            $message = 'The enemy looks in awe at the shiny artifacts. They seem less resistant to their allure than before!';
 
             $this->battleLogs = $this->addMessage($message, 'info-damage', $this->battleLogs);
         }

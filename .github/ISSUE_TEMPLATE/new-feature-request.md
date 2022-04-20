@@ -11,7 +11,7 @@ assignees: ''
 >
 > If you are planning to implement this feature, all tests must pass. Failure to do so will have the feature rejected until they do.
 >
-> No feature is allowed to "require" payment of any kind for the player to be able to access. They can how ever be restricted by level, skill, plane, gold or any other existing "gate" in game.
+> No feature is allowed to "require" payment of any kind for the player to be able to access. They can, however, be restricted by level, skill, plane, gold or any other existing "gate" in-game.
 >
 > If this feature implements or makes use of timers, you must make sure the player can log out, in, navigate to any page and come back and see the timer still running.
 

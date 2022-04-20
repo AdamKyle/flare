@@ -25,7 +25,7 @@ class UpdateCharacterEvent
     /**
      * @var Adventure $adventure
      */
-    public $dventure;
+    public $adventure;
 
     /**
      * Create a new event instance.

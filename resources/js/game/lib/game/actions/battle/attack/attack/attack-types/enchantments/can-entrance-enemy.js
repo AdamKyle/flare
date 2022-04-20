@@ -25,7 +25,7 @@ export default class CanEntranceEnemy extends BattleBase {
         const dc = 100 - (100 * defender.affix_resistance);
 
         if (dc <= 0 || random(0, 100) > dc) {
-          this.addMessage('The enemy is resists your entrancing enchantments!', 'enemy-action');
+          this.addMessage('The enemy resists your entrancing enchantments!', 'enemy-action');
 
         } else {
           this.addMessage('The enemy is dazed by your enchantments!', 'player-action');

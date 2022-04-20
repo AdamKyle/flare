@@ -176,7 +176,7 @@ class MovementService {
         }
 
         if ($this->mapTile->isPurgatoryWater((int) $mapTileColor)) {
-            return $this->errorResult('You would slip away into the void if you tried to go that way child!');
+            return $this->errorResult('You would slip away into the void if you tried to go that way, child!');
         }
 
         if (!is_null($lockedLocation)) {
@@ -291,7 +291,7 @@ class MovementService {
                 } else {
                     $canManage = true;
 
-                    $kingdom->updateLastwalked();
+                    $kingdom->updateLastWalked();
                 }
             } else {
                 $canAttack = true;
@@ -351,9 +351,9 @@ class MovementService {
     }
 
     /**
-     * Send off the movement time out.
+     * Send off the movement timeout.
      *
-     * Sets the character's abillity to move to false.
+     * Sets the character's ability to move to false.
      * Sets the can move again to 10 seconds from now.
      *
      * Sends off the broadcast event to update the front end.
@@ -403,7 +403,7 @@ class MovementService {
         }
 
         if ($this->mapTile->isPurgatoryWater($this->mapTile->getTileColor($character, $x, $y))) {
-            return $this->errorResult('You would slip away into the void if you tried to go that way child!');
+            return $this->errorResult('You would slip away into the void if you tried to go that way, child!');
         }
 
         if (!is_null($lockedLocation)) {

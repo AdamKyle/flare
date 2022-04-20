@@ -73,7 +73,7 @@
               @if (is_null($adventureLog->rewards))
                 <p class="text-center">You already collected the items for this adventure.</p>
               @else
-                <p class="text-center">There were no items found during this adventure.</p>
+                      <p class="tw-text-center">No items were found during this adventure.</p>
               @endif
             @endif
           </x-core.tabs.tab-content>
@@ -99,8 +99,13 @@
 
     </div>
   @elseif ($adventureLog->took_to_long)
+<<<<<<< HEAD
     <p class="text-red-600">You're adventure took far too long. Exhaustion made you flee. The battle messages below might offer a clue as to why.</p>
     <p>When an adventure takes too long it can be a verity of reasons. For example maybe you do just enough to damage to slowly bring them down
+=======
+    <p class="tw-text-red-600">Your adventure took far too long. Exhaustion made you flee. The battle messages below might offer a clue as to why.</p>
+    <p>When an adventure takes too long it can be a variety of reasons. For example maybe you do just enough to damage to slowly bring them down
+>>>>>>> master
     but they heal too much, or you life stealing affixes do not do enough damage compared with your weapons to kill them. If this is the case
     it might be best to invest in some better gear with some better enchantments.</p>
   @else
