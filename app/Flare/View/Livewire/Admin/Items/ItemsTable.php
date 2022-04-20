@@ -33,6 +33,8 @@ class ItemsTable extends DataTableComponent {
         $options = [
             'weapon'        => 'Weapons',
             'bow'           => 'Bows',
+            'stave'         => 'Staves',
+            'hammer'        => 'Hammers',
             'body'          => 'Body',
             'helmet'        => 'Helmets',
             'shield'        => 'Shields',
@@ -68,8 +70,7 @@ class ItemsTable extends DataTableComponent {
             Column::make('Type')->searchable()->format(function ($value) {
                 return ucfirst(str_replace('-', ' ', $value));
             }),
-            Column::make('Min Crafting Lv.', 'skill_level_required')->sortable(),
-            Column::make('Trivial Crafting Lv.', 'skill_level_trivial')->sortable(),
+
             Column::make('Damage', 'base_damage')->sortable()->format(function ($value) {
                 return number_format($value);
             }),
@@ -90,6 +91,9 @@ class ItemsTable extends DataTableComponent {
                     'character' => auth()->user()->character
                 ])->withRow($row)
             );
+        } else {
+            $columns[] = Column::make('Min Crafting Lv.', 'skill_level_required')->sortable();
+            $columns[] = Column::make('Trivial Crafting Lv.', 'skill_level_trivial')->sortable();
         }
 
         return $columns;

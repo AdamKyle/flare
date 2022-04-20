@@ -99,10 +99,6 @@ class ShopController extends Controller {
 
         $character = $character->refresh();
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
-
-        event(new CharacterInventoryDetailsUpdate($character->user));
-
         event(new UpdateTopBarEvent($character));
 
         return redirect()->back()->with('success', 'Sold all your unequipped items for a total of: ' . $totalSoldFor . ' gold.');
@@ -144,46 +140,11 @@ class ShopController extends Controller {
         }
 
         $item         = $inventorySlot->item;
-        $totalSoldFor = SellItemCalculator::fetchTotalSalePrice($item);
+        $totalSoldFor = SellItemCalculator::fetchSalePriceWithAffixes($item);
 
         event(new SellItemEvent($inventorySlot, $character));
 
         return redirect()->back()->with('success', 'Sold: ' . $item->affix_name . ' for: ' . $totalSoldFor . ' gold.');
-    }
-
-    public function shopSellBulk(Request $request, Character $character, ShopService $service) {
-        if (empty($request->slots)) {
-            return redirect()->back()->with('error', 'No items could be found. Did you select any?');
-        }
-
-        $inventory = Inventory::where('character_id', $character->id)->first();
-        $slots     = InventorySlot::whereIn('id', $request->slots)->where('inventory_id', $inventory->id)->get();
-
-        $totalSoldFor = $service->fetchTotalSoldFor($slots, $character);
-
-        $newGold      = $character->gold + $totalSoldFor;
-
-        $maxCurrencies = new MaxCurrenciesValue($newGold, MaxCurrenciesValue::GOLD);
-
-        if ($maxCurrencies->canNotGiveCurrency()) {
-            $newGold = MaxCurrenciesValue::MAX_GOLD;
-        }
-
-        $character->update([
-            'gold' => $newGold
-        ]);
-
-        InventorySlot::whereIn('id', $request->slots)->where('inventory_id', $inventory->id)->delete();
-
-        $character = $character->refresh();
-
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
-
-        event(new CharacterInventoryDetailsUpdate($character->user));
-
-        event(new UpdateTopBarEvent($character));
-
-        return redirect()->back()->with('success', 'Sold selected items for: ' . $totalSoldFor . ' gold.');
     }
 
     public function shopCompare(Request $request, Character $character, ComparisonService $comparisonService) {

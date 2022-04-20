@@ -31,8 +31,14 @@
         <div class="w-full md:w-3/5 m-auto mt-5">
             <x-core.cards.card-with-title title="Buy and Replace">
                 <p>If the item you are replacing is in a set, that item will be moved to your inventory.
-                    If you do not have inventory space, your purchase will fail (you won't loose gold).</p>
-                @if ($itemToEquip['type'] === 'weapon')
+                    If you do not have inventory space, your purchase will fail (you won't lose gold).</p>
+                @if (in_array($itemToEquip['type'], ['stave', 'bow', 'hammer']))
+                    <x-core.alerts.info-alert title="Attn!">
+                        It does not matter which hand you pick as this item is a duel wielded weapon. This weapon can be used with
+                        Attack and Cast and Cast and Attack.
+                    </x-core.alerts.info-alert>
+                @endif
+                @if (in_array($itemToEquip['type'], ['weapon', 'stave', 'bow', 'shield', 'hammer']))
                     <div class="w-full mt-4">
                         <div class="flex justify-center">
                             <form method="post" action="{{route('game.shop.buy-and-replace', ['character' => auth()->user()->character->id])}}" class="mr-5">

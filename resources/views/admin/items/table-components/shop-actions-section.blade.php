@@ -10,8 +10,12 @@
         </form>
     </div>
     <div>
-    <x-core.buttons.link-buttons.primary-button>
-        Buy Item
-    </x-core.buttons.link-buttons.primary-button>
+        <form method='post' action="{{route('game.shop.buy.item', ['character' => $character->id])}}">
+            @csrf
+            <input type="hidden" name="item_id" value="{{App\Flare\Models\Item::where('name', $row->name)->first()->id}}" />
+            <x-core.buttons.primary-button type="submit">
+                Buy Item
+            </x-core.buttons.primary-button>
+        </form>
     </div>
 </div>
