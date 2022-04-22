@@ -3,13 +3,13 @@ import ItemNameColorationButton from "../../../../../components/ui/item-name-col
 import { formatNumber } from "../../../format-number";
 import ActionsInterface from "./actions-interface";
 import InventoryDetails from "../../types/inventory/inventory-details";
+import UsableItemsDetails from "../../types/inventory/usable-items-details";
 
-export const BuildInventoryTableColumns = (component?: ActionsInterface, clickAction?: (item: InventoryDetails) => any) => {
+export const BuildInventoryTableColumns = (component?: ActionsInterface, clickAction?: (item?: InventoryDetails | UsableItemsDetails) => any) => {
     const columns = [
         {
             name: 'Name',
             selector: (row: { item_name: string; }) => row.item_name,
-            sortable: true,
             cell: (row: any) => <ItemNameColorationButton item={row} on_click={clickAction} />
         },
         {
@@ -35,7 +35,6 @@ export const BuildInventoryTableColumns = (component?: ActionsInterface, clickAc
         columns.push({
             name: 'Actions',
             selector: (row: any) => '',
-            sortable: true,
             cell: (row: any) => component.actions(row)
         });
     }
@@ -43,18 +42,16 @@ export const BuildInventoryTableColumns = (component?: ActionsInterface, clickAc
     return columns;
 }
 
-export const buildLimitedColumns = (component?: ActionsInterface) => {
+export const buildLimitedColumns = (component?: ActionsInterface, onClick?: (item?: InventoryDetails | UsableItemsDetails) => any) => {
         const columns = [
             {
                 name: 'Name',
                 selector: (row: { item_name: string; }) => row.item_name,
-                sortable: true,
-                cell: (row: any) => <ItemNameColorationButton item={row} />
+                cell: (row: any) => <ItemNameColorationButton item={row} on_click={onClick}/>
             },
             {
                 name: 'Description',
                 selector: (row: { description: string; }) => row.description,
-                sortable: true,
                 cell: (row: any) => row.description
             },
         ];
@@ -63,7 +60,6 @@ export const buildLimitedColumns = (component?: ActionsInterface) => {
             columns.push({
                 name: 'Actions',
                 selector: (row: any) => '',
-                sortable: true,
                 cell: (row: any) => component.actions(row)
             });
         }

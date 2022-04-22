@@ -61,10 +61,6 @@ class UseItemService {
 
         CharacterBoonJob::dispatch($boon->id)->delay($completedAt);
 
-        $character = $character->refresh();
-
-        $this->updateCharacter($character, $item);
-
         $slot->delete();
     }
 

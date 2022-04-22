@@ -28,7 +28,6 @@ use App\Flare\Models\Item;
 use App\Flare\Transformers\ItemTransformer;
 use App\Game\Market\Requests\ChangeItemTypeRequest;
 use App\Game\Market\Requests\ItemDetailsRequest;
-use League\Fractal\Resource\ResourceAbstract;
 
 class  MarketController extends Controller {
 
@@ -40,7 +39,7 @@ class  MarketController extends Controller {
 
     private $characterInventoryService;
 
-    public function __construct(Manager $manager, MarketItemsTransfromer $transformer, CharacterInventoryService $characterInventoryService) {
+    public function __construct(Manager $manager, MarketItemsTransformer $transformer, CharacterInventoryService $characterInventoryService) {
         $this->manager                   = $manager;
         $this->transformer               = $transformer;
         $this->characterInventoryService = $characterInventoryService;
@@ -225,7 +224,8 @@ class  MarketController extends Controller {
         return response()->json([
             'message'   => 'Listed: ' . $itemName . ' For: ' . number_format($request->list_for) . ' Gold.',
             'inventory' => [
-                'inventory' => $inventory->getInventoryForType('inventory')
+                'inventory' => $inventory->getInventoryForType('inventory'),
+                'usable_items' => $inventory->getInventoryForType('usable_items'),
             ]
         ]);
     }

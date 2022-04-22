@@ -1,5 +1,6 @@
 import InventoryDetails from "./inventory-details";
 import SetDetails from "./set-details";
+import UsableItemsDetails from "./usable-items-details";
 
 export default interface Inventory {
 
@@ -9,7 +10,7 @@ export default interface Inventory {
 
     quest_items: InventoryDetails[] | [];
 
-    usable_items: InventoryDetails[] | [];
+    usable_items: UsableItemsDetails[] | [];
 
     savable_sets: SetDetails[] | [];
 

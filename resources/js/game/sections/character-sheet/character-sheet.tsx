@@ -31,7 +31,7 @@ export default class CharacterSheet extends React.Component<CharacterSheetProps,
 
                 <div className='flex flex-col lg:flex-row w-full gap-2'>
                     <BasicCard additionalClasses={'overflow-x-auto lg:w-1/2'}>
-                        <CharacterTabs  character={this.props.character} />
+                        <CharacterTabs character={this.props.character} />
                     </BasicCard>
                     <BasicCard additionalClasses={'overflow-x-auto lg:w-1/2'}>
                         <div className='grid lg:grid-cols-2 gap-2'>

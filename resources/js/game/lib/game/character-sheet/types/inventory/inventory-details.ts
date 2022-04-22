@@ -4,6 +4,8 @@ export default interface InventoryDetails {
 
     id: number;
 
+    slot_id: number;
+
     is_unique: boolean;
 
     item_name: string;
@@ -17,4 +19,6 @@ export default interface InventoryDetails {
     attack: number;
 
     has_holy_stacks_applied: number,
+
+    usable: boolean,
 }

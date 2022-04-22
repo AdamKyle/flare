@@ -1,6 +1,8 @@
+import MenuItemType from "./menu-item-type";
+
 export default interface DropDownProps {
 
-    menu_items: {name: string, icon_class?: string, on_click: Function }[] | [];
+    menu_items: MenuItemType[] | [];
 
     selected_name?: string | null;
 

@@ -23,7 +23,8 @@ class InventoryTransformer extends TransformerAbstract {
      */
     public function transform(InventorySlot|SetSlot $slot) {
         return [
-            'id'                      => $slot->id,
+            'id'                      => $slot->item->id,
+            'slot_id'                 => $slot->id,
             'item_name'               => $slot->item->affix_name,
             'type'                    => $slot->item->type,
             'description'             => $slot->item->description,
@@ -32,6 +33,7 @@ class InventoryTransformer extends TransformerAbstract {
             'has_holy_stacks_applied' => $slot->item->holy_stacks_applied,
             'ac'                      => $slot->item->getTotalDefence(),
             'attack'                  => $slot->item->getTotalDamage(),
+            'usable'                  => $slot->item->usable,
         ];
     }
 }

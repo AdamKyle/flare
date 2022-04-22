@@ -5,6 +5,7 @@ import {BuildInventoryTableColumns} from "../../../../../lib/game/character-shee
 import InventoryDetails from "../../../../../lib/game/character-sheet/types/inventory/inventory-details";
 import InventoryItemComparison from "../../modals/inventory-item-comparison";
 import InventoryItemsTableState from "../../../../../lib/game/character-sheet/types/tables/inventory-items-table-state";
+import UsableItemsDetails from "../../../../../lib/game/character-sheet/types/inventory/usable-items-details";
 
 export default class InventoryTable extends React.Component<InventoryTabProps, InventoryItemsTableState> {
 
@@ -18,11 +19,11 @@ export default class InventoryTable extends React.Component<InventoryTabProps, I
         }
     }
 
-    viewItem(item: InventoryDetails) {
+    viewItem(item?: InventoryDetails | UsableItemsDetails) {
         this.setState({
             view_comparison: true,
-            slot_id: item.id,
-            item_type: item.type,
+            slot_id: typeof item !== 'undefined' ? item.slot_id : 0,
+            item_type: typeof item !== 'undefined' ? item.type : '',
         });
     }
 

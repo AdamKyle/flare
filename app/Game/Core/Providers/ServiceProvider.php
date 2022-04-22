@@ -10,6 +10,7 @@ use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Transformers\InventoryTransformer;
 use App\Flare\Transformers\Serializers\CoreSerializer;
+use App\Flare\Transformers\UsableItemTransformer;
 use App\Game\Battle\Services\BattleDrop;
 use App\Game\Core\Services\CharacterPassiveSkills;
 use App\Game\Core\Services\ComparisonService;
@@ -87,6 +88,7 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(CharacterInventoryService::class, function($app) {
             return new CharacterInventoryService(
                 $app->make(InventoryTransformer::class),
+                $app->make(UsableItemTransformer::class),
                 $app->make(Manager::class)
             );
         });

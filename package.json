@@ -60,7 +60,7 @@
         "postcss-nesting": "^8.0.1",
         "pusher-js": "^5.0.3",
         "react-charts": "^3.0.0-beta.36",
-        "react-data-table-component": "^7.4.7",
+        "react-data-table-component": "^7.5.0",
         "react-draggable": "^4.1.0",
         "react-organizational-chart": "^2.1.0",
         "react-resizable": "^3.0.4",

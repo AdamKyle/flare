@@ -83,7 +83,6 @@ export default class ListItemModal extends React.Component<any, any> {
     }
 
     render() {
-        console.log(this.state);
         return (
             <Dialogue is_open={this.props.is_open}
                       handle_close={this.props.manage_modal}

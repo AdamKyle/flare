@@ -458,33 +458,6 @@ class CharacterInventoryController extends Controller {
         ], 200);
     }
 
-    public function useItem(Character $character, Item $item, UseItemService $useItemService) {
-        if ($character->boons->count() === 10) {
-            return response()->json(['message' => 'You can only have a max of ten boons applied.
-            Check active boons to see which ones you have. You can always cancel one by clicking on the row.'], 422);
-        }
-
-        $slot = $character->inventory->slots->filter(function($slot) use($item) {
-            return $slot->item_id === $item->id;
-        })->first();
-
-        if (is_null($slot)) {
-            return response()->json(['message' => 'You don\'t have this item.'], 422);
-        }
-
-        $useItemService->useItem($slot, $character, $item);
-
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'usable_items'));
-
-        event(new CharacterInventoryDetailsUpdate($character->user));
-
-        $this->updateCharacterAttackDataCache($character);
-
-        event(new UpdateTopBarEvent($character->refresh()));
-
-        return response()->json(['message' => 'Applied: ' . $item->name . ' for: ' . $item->lasts_for . ' Minutes.'], 200);
-    }
-
     public function equipItemSet(Character $character, InventorySet $inventorySet, InventorySetService $inventorySetService) {
         if (!$inventorySet->can_be_equipped) {
             return response()->json(['message' => 'Set cannot be equipped.'], 422);
@@ -521,7 +494,39 @@ class CharacterInventoryController extends Controller {
         ]);
     }
 
-    public function UseManyItems(UseManyItemsValidation $request, Character $character) {
+    public function useItem(Character $character, Item $item, UseItemService $useItemService) {
+        if ($character->boons->count() === 10) {
+            return response()->json(['message' => 'You can only have a max of ten boons applied.
+            Check active boons to see which ones you have. You can always cancel one by clicking on the row.'], 422);
+        }
+
+        $slot = $character->inventory->slots->filter(function($slot) use($item) {
+            return $slot->item_id === $item->id;
+        })->first();
+
+        if (is_null($slot)) {
+            return response()->json(['message' => 'You don\'t have this item.'], 422);
+        }
+
+        $useItemService->useItem($slot, $character, $item);
+
+        $this->updateCharacterAttackDataCache($character);
+
+        $character = $character->refresh();
+
+        event(new UpdateTopBarEvent($character));
+
+        $inventory = $this->characterInventoryService->setCharacter($character);
+
+        return response()->json([
+            'message' => 'Applied: ' . $item->name . ' for: ' . $item->lasts_for . ' Minutes.',
+            'inventory' => [
+                'usable_items' => $inventory->getInventoryForType('usable_items')
+            ]
+        ], 200);
+    }
+
+    public function UseManyItems(UseManyItemsValidation $request, Character $character, UseItemService $useItemService) {
         if ($character->boons->count() === 10) {
             return response()->json(['message' => 'You can only have a max of ten boons applied.
             Check Active Boons to see which ones you have. You can always cancel one by clicking on the row.'], 422);
@@ -533,19 +538,24 @@ class CharacterInventoryController extends Controller {
             return response()->json(['message' => 'You do not own any of these items. What are you doing?'], 422);
         }
 
-        $jobs = [];
-
         foreach ($slots as $index => $slot) {
-            // @codeCoverageIgnoreStart
             if ($index !== 0) {
-                $jobs[] = new UseMultipleItems($character, $slot->id);
+                $useItemService->useItem($slot, $character, $slot->item);
             }
-            // @codeCoverageIgnoreEnd
         }
 
-        UseMultipleItems::withChain($jobs)->dispatch($character, $slots->first()->id);
+        $character = $character->refresh();
 
-        return response()->json(['message' => 'Boons are being applied. You can check Active Boons tab to see if they are applied or check chat to see boons being applied.'], 200);
+        $inventory = $this->characterInventoryService->setCharacter($character);
+
+        event(new UpdateTopBarEvent($character));
+
+        return response()->json([
+            'message' => 'Boons are being applied. You can check Active Boons tab to see if they are applied or check chat to see boons being applied.',
+            'inventory' => [
+                'usable_items' => $inventory->getInventoryForType('usable_items'),
+            ]
+        ], 200);
     }
 
     public function destroyAlchemyItem(Request $request, Character $character) {
@@ -563,13 +573,18 @@ class CharacterInventoryController extends Controller {
 
         $slot->delete();
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'usable_items'));
+        $character = $character->refresh();
 
-        event(new CharacterInventoryDetailsUpdate($character->user));
+        event(new UpdateTopBarEvent($character));
 
-        event(new UpdateTopBarEvent($character->refresh()));
+        $inventory = $this->characterInventoryService->setCharacter($character);
 
-        return response()->json(['message' => 'Destroyed Alchemy Item: ' . $name . '.'], 200);
+        return response()->json([
+            'message' => 'Destroyed Alchemy Item: ' . $name . '.',
+            'inventory' => [
+                'usable_items' => $inventory->getInventoryForType('usable_items')
+            ]
+        ]);
     }
 
     public function destroyAllAlchemyItems(Character $character) {
@@ -581,13 +596,18 @@ class CharacterInventoryController extends Controller {
             $slot->delete();
         }
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'usable_items'));
+        $character = $character->refresh();
 
-        event(new CharacterInventoryDetailsUpdate($character->user));
+        event(new UpdateTopBarEvent($character));
 
-        event(new UpdateTopBarEvent($character->refresh()));
+        $inventory = $this->characterInventoryService->setCharacter($character);
 
-        return response()->json(['message' => 'Destroyed All Alchemy Items.'], 200);
+        return response()->json([
+            'message' => 'Destroyed All Alchemy Items.',
+            'inventory' => [
+                'usable_items' => $inventory->getInventoryForType('usable_items')
+            ]
+        ]);
     }
 
     /**

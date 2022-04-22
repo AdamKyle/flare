@@ -1,6 +1,7 @@
 @import "../vendor/theme/assets/css/style.css";
 @import "./map.css";
 @import "./fight-buttons.css";
+@import "./react-data-tables.css";
 
 .glightbox {
     img {
@@ -32,7 +33,6 @@ dl {
 }
 
 dt {
-    margin-left: auto;
     width: 50%;
     text-align: left;
     font-weight: bolder;

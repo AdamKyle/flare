@@ -2,6 +2,7 @@
 
 namespace App\Game\Core\Services;
 
+use App\Flare\Transformers\UsableItemTransformer;
 use League\Fractal\Resource\Collection as LeagueCollection;
 use League\Fractal\Resource\Item as LeagueItem;
 use App\Flare\Models\Inventory;
@@ -48,13 +49,19 @@ class CharacterInventoryService {
     private $inventoryTransformer;
 
     /**
+     * @var UsableItemTransformer $usableItemTransformer
+     */
+    private $usableItemTransformer;
+
+    /**
      * @var Manager $manager
      */
     private $manager;
 
-    public function __construct(InventoryTransformer $inventoryTransformer, Manager $manager) {
-        $this->inventoryTransformer = $inventoryTransformer;
-        $this->manager              = $manager;
+    public function __construct(InventoryTransformer $inventoryTransformer, UsableItemTransformer $usableItemTransformer,  Manager $manager) {
+        $this->inventoryTransformer  = $inventoryTransformer;
+        $this->usableItemTransformer = $usableItemTransformer;
+        $this->manager               = $manager;
     }
 
     /**
@@ -191,7 +198,7 @@ class CharacterInventoryService {
                 ->where('items.type', 'alchemy');
         })->select('inventory_slots.*')->get();
 
-        $slots = new LeagueCollection($slots, $this->inventoryTransformer);
+        $slots = new LeagueCollection($slots, $this->usableItemTransformer);
 
         return $this->manager->createData($slots)->toArray();
     }

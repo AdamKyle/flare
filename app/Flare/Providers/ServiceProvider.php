@@ -42,6 +42,7 @@ use App\Flare\Transformers\BasicKingdomTransformer;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Transformers\InventoryTransformer;
 use App\Flare\Transformers\OtherKingdomTransformer;
+use App\Flare\Transformers\UsableItemTransformer;
 use App\Game\Core\Services\CharacterService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Flare\Values\BaseStatValue;
@@ -224,6 +225,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(ItemTransformer::class, function($app) {
             return new ItemTransformer();
+        });
+
+        $this->app->bind(UsableItemTransformer::class, function($app) {
+            return new UsableItemTransformer();
         });
 
         $this->app->bind(InventoryTransformer::class, function() {

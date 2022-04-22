@@ -10,6 +10,7 @@ import SuccessAlert from "../../../../components/ui/alerts/simple-alerts/success
 import InventoryTabSectionProps from "../../../../lib/game/character-sheet/types/tabs/inventory-tab-section-props";
 import InventoryTabSectionState from "../../../../lib/game/character-sheet/types/tabs/inventory-tab-section-state";
 import clsx from "clsx";
+import UsableItemsDetails from "../../../../lib/game/character-sheet/types/inventory/usable-items-details";
 
 export default class InventoryTabSection extends React.Component<InventoryTabSectionProps, InventoryTabSectionState> {
 
@@ -19,9 +20,11 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
         this.state = {
             table: 'Inventory',
             data: this.props.inventory,
+            usable_items: this.props.usable_items,
             show_destroy_all: false,
             show_disenchant_all: false,
             show_sell_all: false,
+            show_destroy_all_alchemy: false,
             success_message: null,
             search_string: '',
         }
@@ -31,6 +34,12 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
         if (!isEqual(this.state.data, this.props.inventory) && this.state.search_string.length === 0) {
             this.setState({
                 data: this.props.inventory
+            });
+        }
+
+        if (!isEqual(this.state.usable_items, this.props.usable_items) && this.state.search_string.length === 0) {
+            this.setState({
+                usable_items: this.props.usable_items
             });
         }
     }
@@ -43,8 +52,7 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
 
     switchTable(type: string) {
         this.setState({
-            table: type,
-            data: type === 'Inventory' ? this.props.inventory : this.props.usable_items
+            table: type
         });
     }
 
@@ -60,7 +68,7 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
             });
         } else {
             this.setState({
-                data: this.props.usable_items.filter((item: InventoryDetails) => {
+                usable_items: this.props.usable_items.filter((item: UsableItemsDetails) => {
                     return item.item_name.includes(value) || item.description.includes(value);
                 }),
                 search_string: value,
@@ -77,6 +85,12 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
     manageDestroyAll() {
         this.setState({
             show_destroy_all: !this.state.show_destroy_all,
+        })
+    }
+
+    manageDestroyAllAlchemy() {
+        this.setState({
+            show_destroy_all_alchemy: !this.state.show_destroy_all_alchemy,
         })
     }
 
@@ -122,7 +136,7 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
             {
                 name: 'Destroy All',
                 icon_class: 'far fa-trash-alt',
-                on_click: () => this.manageDestroyAll()
+                on_click: () => this.manageDestroyAllAlchemy()
             },
         ]
     }
@@ -182,10 +196,10 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
                 </div>
 
                 {
-                    this.state.table === 'Inventory' ?
+                    this.state.table === 'Inventory'  ?
                         <InventoryTable dark_table={this.props.dark_tables} character_id={this.props.character_id} inventory={this.state.data} is_dead={this.props.is_dead} update_inventory={this.props.update_inventory} usable_sets={this.props.usable_sets} set_success_message={this.setSuccessMessage.bind(this)}/>
                         :
-                        <UsableItemsTable dark_table={this.props.dark_tables} usable_items={this.props.usable_items} is_dead={this.props.is_dead} />
+                        <UsableItemsTable dark_table={this.props.dark_tables} character_id={this.props.character_id} usable_items={this.state.usable_items} is_dead={this.props.is_dead} update_inventory={this.props.update_inventory} set_success_message={this.setSuccessMessage.bind(this)}/>
                 }
 
                 {
@@ -193,7 +207,8 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
                         <InventoryActionConfirmationModal
                             is_open={this.state.show_destroy_all}
                             manage_modal={this.manageDestroyAll.bind(this)}
-                            title={'Destroy all'} url={'character/'+this.props.character_id+'/inventory/destroy-all'}
+                            title={'Destroy all'}
+                            url={'character/'+this.props.character_id+'/inventory/destroy-all'}
                             update_inventory={this.props.update_inventory}
                             set_success_message={this.setSuccessMessage.bind(this)}
                         >
@@ -209,6 +224,23 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
                             </p>
                         </InventoryActionConfirmationModal>
                     : null
+                }
+
+                {
+                    this.state.show_destroy_all_alchemy ?
+                        <InventoryActionConfirmationModal
+                            is_open={this.state.show_destroy_all_alchemy}
+                            manage_modal={this.manageDestroyAllAlchemy.bind(this)}
+                            title={'Destroy all Alchemy Items'}
+                            url={'character/'+this.props.character_id+'/inventory/destroy-all-alchemy-items'}
+                            update_inventory={this.props.update_inventory}
+                            set_success_message={this.setSuccessMessage.bind(this)}
+                        >
+                            <p>
+                                Are you sure you want to do this? This action will destroy all (Alchemy) items in your inventory. You cannot undo this action.
+                            </p>
+                        </InventoryActionConfirmationModal>
+                        : null
                 }
 
                 {

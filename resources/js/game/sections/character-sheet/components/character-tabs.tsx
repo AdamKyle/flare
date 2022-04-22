@@ -5,6 +5,8 @@ import BasicCard from "../../../components/ui/cards/basic-card";
 import PopOverContainer from "../../../components/ui/popover/pop-over-container";
 import InfoTab from "./tabs/info-tab";
 import CharacterTabsProps from "../../../lib/game/character-sheet/types/character-tabs-props";
+import CharacterActiveBoons from "./character-active-boons";
+import InfoAlert from "../../../components/ui/alerts/simple-alerts/info-alert";
 
 export default class CharacterTabs extends React.Component<CharacterTabsProps, any> {
 
@@ -33,7 +35,7 @@ export default class CharacterTabs extends React.Component<CharacterTabsProps, a
                         <InfoTab character={this.props.character} />
                     </TabPanel>
                     <TabPanel key={'active-boons'}>
-                        Active Boons
+                        <CharacterActiveBoons character_id={this.props.character?.id} />
                     </TabPanel>
                     <TabPanel key={'factions'}>
                         Factions

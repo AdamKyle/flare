@@ -172,11 +172,11 @@
 
     <!-- Scripts -->
 
+    @livewireScripts
+
     <script src={{mix('js/theme-vendor.js')}} type="text/javascript"></script>
     <script src={{mix('js/theme-script.js')}} type="text/javascript"></script>
     <script src="{{ mix('js/app.js') }}"></script>
-
-    @livewireScripts
 
     @stack('scripts')
 </body>
