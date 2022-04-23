@@ -7,6 +7,7 @@ use App\Admin\Events\UpdateAdminChatEvent;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Transformers\CharacterTopBarTransformer;
 use App\Flare\Transformers\SkillsTransformer;
+use App\Flare\Transformers\UsableItemTransformer;
 use App\Game\Core\Services\CharacterPassiveSkills;
 use Illuminate\Http\Request;
 use League\Fractal\Resource\Collection;
@@ -91,19 +92,8 @@ class CharacterSheetController extends Controller {
     }
 
     public function activeBoons(Character $character) {
-        $boons = $character->boons->toArray();
-
-        foreach ($boons as $key => $boon) {
-            $skills = GameSkill::where('type', $boon['affect_skill_type'])->pluck('name')->toArray();
-
-            $boon['type'] = (new ItemUsabilityType($boon['type']))->getNamedValue();
-            $boon['affected_skills'] = implode(', ', $skills);
-
-            $boons[$key] = $boon;
-        }
-
         return response()->json([
-            'active_boons' => $boons,
+            'active_boons' => $character->boons->load('itemUsed'),
         ]);
     }
 

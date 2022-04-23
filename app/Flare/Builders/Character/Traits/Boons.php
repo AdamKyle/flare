@@ -20,10 +20,27 @@ trait Boons {
     }
 
     public function fetchStatIncrease(Character $character, string $statAttribute): float {
-        return CharacterBoon::where('character_id', $character->id)->whereNotNull($statAttribute)->sum($statAttribute);
+        return CharacterBoon::where('character_id', $character->id)->join('items', function($join) use ($statAttribute) {
+            $join->on('items.id', '=', 'character_boons.item_id')
+                 ->whereNotNull('items.' . $statAttribute);
+        })->sum('items.' . $statAttribute);
     }
 
-    public function fetchStatIncreaseFromType(Character $character): float {
-        return CharacterBoon::where('character_id', $character->id)->where('type', ItemUsabilityType::STAT_INCREASE)->sum('stat_bonus');
+    public function fetchStatIncreaseSum(Character $character): float {
+        return CharacterBoon::where('character_id', $character->id)->join('items', function($join) {
+            $join->on('items.id', '=', 'character_boons.item_id');
+        })->sum('items.stat_increase');
+    }
+
+    public function fetchFightTimeOutModifier(Character $character): float {
+        return CharacterBoon::where('character_id', $character->id)->join('items', function($join) {
+            $join->on('items.id', '=', 'character_boons.item_id');
+        })->sum('items.fight_time_out_mod_bonus');
+    }
+
+    public function fetchMoveTimOutModifier(Character $character): float {
+        return CharacterBoon::where('character_id', $character->id)->join('items', function($join) {
+            $join->on('items.id', '=', 'character_boons.item_id');
+        })->sum('items.move_time_out_mod_bonus');
     }
 }

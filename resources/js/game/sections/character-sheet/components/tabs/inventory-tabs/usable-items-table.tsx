@@ -14,6 +14,7 @@ import {AxiosError, AxiosResponse} from "axios";
 import InventoryUseItem from "../../modals/inventory-use-item";
 import UsableItemsDetails from "../../../../../lib/game/character-sheet/types/inventory/usable-items-details";
 import InventoryUseDetails from "../../modals/inventory-use-details";
+import InventoryUseManyItems from "../../modals/inventory-use-many-items";
 
 export default class UsableItemsTable extends React.Component<UsableItemTable, any> implements ActionsInterface {
     constructor(props: UsableItemTable) {
@@ -23,12 +24,13 @@ export default class UsableItemsTable extends React.Component<UsableItemTable, a
             show_list_modal: false,
             show_use_item_modal: false,
             show_usable_details: false,
+            show_use_many: false,
             item_to_list: null,
             item_to_use: null,
         }
     }
 
-    manageUseItem(row?: InventoryDetails) {
+    manageUseItem(row?: UsableItemsDetails) {
         this.setState({
             show_use_item_modal: !this.state.show_use_item_modal,
             item_to_use: typeof row !== 'undefined' ? row : null,
@@ -53,11 +55,7 @@ export default class UsableItemsTable extends React.Component<UsableItemTable, a
         });
     }
 
-    useItem() {
-
-    }
-
-    destroy(row: InventoryDetails) {
+    destroy(row: UsableItemsDetails) {
         (new Ajax()).setRoute('character/'+this.props.character_id+'/inventory/destroy-alchemy-item').setParameters({
             slot_id: row.slot_id,
         }).doAjaxCall('post', (result: AxiosResponse) => {
@@ -69,14 +67,14 @@ export default class UsableItemsTable extends React.Component<UsableItemTable, a
         });
     }
 
-    manageList(item?: InventoryDetails) {
+    manageList(item?: UsableItemsDetails) {
         this.setState({
             show_list_modal: !this.state.show_list_modal,
             item_to_list: typeof item !== 'undefined' ? item : null,
         });
     }
 
-    actions(row: InventoryDetails): JSX.Element {
+    actions(row: UsableItemsDetails): JSX.Element {
         const items: MenuItemType[] = [
             {
                 name: 'List',
@@ -90,7 +88,7 @@ export default class UsableItemsTable extends React.Component<UsableItemTable, a
             },
         ];
 
-        if (row.usable) {
+        if (row.usable && !row.damages_kingdoms) {
             items.push({
                 name: 'Use Item',
                 icon_class: 'ra ra-bubbling-potion',
@@ -109,6 +107,8 @@ export default class UsableItemsTable extends React.Component<UsableItemTable, a
             item_to_use: typeof item !== 'undefined' ? item : null,
         });
     }
+
+
 
     render() {
         return (
@@ -132,7 +132,6 @@ export default class UsableItemsTable extends React.Component<UsableItemTable, a
                         <InventoryUseItem
                             is_open={this.state.show_use_item_modal}
                             manage_modal={this.manageUseItem.bind(this)}
-                            use_item={this.useItem.bind(this)}
                             item={this.state.item_to_use}
                             update_inventory={this.props.update_inventory}
                             set_success_message={this.props.set_success_message}
@@ -150,6 +149,8 @@ export default class UsableItemsTable extends React.Component<UsableItemTable, a
                         />
                     : null
                 }
+
+
             </Fragment>
 
         );

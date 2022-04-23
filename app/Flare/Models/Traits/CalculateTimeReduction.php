@@ -2,9 +2,12 @@
 
 namespace App\Flare\Models\Traits;
 
+use App\Flare\Builders\Character\Traits\Boons;
 use App\Flare\Models\Skill;
 
 trait CalculateTimeReduction {
+
+    use Boons;
 
     /**
      * Calculates the total bonus including boons.
@@ -24,16 +27,16 @@ trait CalculateTimeReduction {
 
         $character = $skill->character;
 
-        $column = null;
+        $bonus = 0.0;
 
         if ($modifier === 'fight_time_out_mod_bonus_per_level') {
-            $column = 'fight_time_out_mod_bonus';
+            $bonus = $this->fetchFightTimeOutModifier($character);
         }
 
         if ($modifier === 'move_time_out_mod_bonus_per_level') {
-            $column = 'move_time_out_mod_bonus';
+            $bonus = $this->fetchMoveTimOutModifier($character);
         }
 
-        return $currentValue + $character->boons()->where('affect_skill_type', $skill->baseSkill->type)->max($column);
+        return $currentValue + $bonus;
     }
 }

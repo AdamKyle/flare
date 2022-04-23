@@ -46,7 +46,7 @@ export default class Damage extends BattleBase {
 
         totalDamage = totalDamage - totalDamage * damageDeduction;
 
-        this.addActionMessage('The enemy\'s blood flows through the air and gives you life: ' + this.formatNumber(Math.ceil(totalDamage)));
+        this.addMessage('The enemy\'s blood flows through the air and gives you life: ' + formatNumber(Math.ceil(totalDamage)), 'player-action');
 
         monsterCurrentHealth -= totalDamage;
         characterCurrentHealth += totalDamage;
@@ -60,7 +60,7 @@ export default class Damage extends BattleBase {
           this.addMessage('The enemy resists your attempt to steal it\'s life.');
         } else {
 
-          this.addActionMessage('The enemy\'s blood flows through the air and gives you life: ' + this.formatNumber(Math.ceil(totalDamage)));
+          this.addMessage('The enemy\'s blood flows through the air and gives you life: ' + formatNumber(Math.ceil(totalDamage)), 'player-action');
 
           monsterCurrentHealth -= totalDamage;
           characterCurrentHealth += totalDamage;
@@ -214,20 +214,20 @@ export default class Damage extends BattleBase {
 
         monsterCurrentHealth -= damage;
 
-        this.addMessage(attacker.name + ' hits for (Hammer): ' + this.formatNumber(damage));
+        this.addMessage(attacker.name + ' hits for (Hammer): ' + formatNumber(damage), 'player-action');
 
         let roll = random(1, 100);
         roll += roll * 0.60;
 
         if (roll > 99) {
-          this.addActionMessage('The enemy feels the aftershocks of the Hammer Smash!');
+          this.addMessage('The enemy feels the aftershocks of the Hammer Smash!', 'regular');
 
           for (let i = 3; i > 0; i--) {
             damage -= damage * 0.15;
 
             monsterCurrentHealth -= damage;
 
-            this.addActionMessage('Aftershock hits for: ' + this.formatNumber(damage));
+            this.addMessage('Aftershock hits for: ' + formatNumber(damage), 'player-action');
           }
         }
       }
@@ -257,7 +257,7 @@ export default class Damage extends BattleBase {
 
         monsterCurrentHealth -= damage;
 
-        this.addMessage(attacker.name + ' hits for (Arcane Alchemist Ravenous Dream):: ' + this.formatNumber(damage));
+        this.addMessage(attacker.name + ' hits for (Arcane Alchemist Ravenous Dream): ' + formatNumber(damage), 'player-action');
 
         let times = random(2, 6);
         const originalTimes = times;
@@ -270,7 +270,7 @@ export default class Damage extends BattleBase {
             monsterCurrentHealth -= damage;
 
 
-            this.addMessage(attacker.name + ' hits for (Arcane Alchemist Ravenous Dream):: ' + this.formatNumber(damage));
+            this.addMessage(attacker.name + ' hits for (Arcane Alchemist Ravenous Dream): ' + formatNumber(damage), 'player-action');
           } else {
             let damage = attacker.int_modded * 0.10;
 
@@ -282,7 +282,7 @@ export default class Damage extends BattleBase {
 
             monsterCurrentHealth -= damage;
 
-            this.addMessage(attacker.name + ' hits for (Arcane Alchemist Ravenous Dream):: ' + this.formatNumber(damage));
+            this.addMessage(attacker.name + ' hits for (Arcane Alchemist Ravenous Dream): ' + formatNumber(damage), 'player-action');
           }
 
           times--;
@@ -303,13 +303,13 @@ export default class Damage extends BattleBase {
       }
 
       if (extraActionChance.type === ExtraActionType.RANGER_TRIPLE_ATTACK && extraActionChance.has_item) {
-        this.addActionMessage('A fury takes over you. You notch the arrows thrice at the enemy\'s direction');
+        this.addMessage('A fury takes over you. You notch the arrows thrice at the enemy\'s direction');
 
         for (let i = 1; i <= 3; i++) {
           const totalDamage    = (attackData.weapon_damage + attackData.weapon_damage * .15).toFixed(0);
           monsterCurrentHealth = monsterCurrentHealth - totalDamage;
 
-          this.addMessage(attacker.name + ' hits for (weapon - triple attack) ' + this.formatNumber(totalDamage));
+          this.addMessage(attacker.name + ' hits for (weapon - triple attack) ' + formatNumber(totalDamage));
         }
       }
     }

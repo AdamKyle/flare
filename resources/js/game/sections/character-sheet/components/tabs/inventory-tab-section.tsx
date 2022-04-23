@@ -11,6 +11,7 @@ import InventoryTabSectionProps from "../../../../lib/game/character-sheet/types
 import InventoryTabSectionState from "../../../../lib/game/character-sheet/types/tabs/inventory-tab-section-state";
 import clsx from "clsx";
 import UsableItemsDetails from "../../../../lib/game/character-sheet/types/inventory/usable-items-details";
+import InventoryUseManyItems from "../modals/inventory-use-many-items";
 
 export default class InventoryTabSection extends React.Component<InventoryTabSectionProps, InventoryTabSectionState> {
 
@@ -24,6 +25,7 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
             show_destroy_all: false,
             show_disenchant_all: false,
             show_sell_all: false,
+            show_use_many: false,
             show_destroy_all_alchemy: false,
             success_message: null,
             search_string: '',
@@ -100,6 +102,12 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
         })
     }
 
+    manageUseManyItems() {
+        this.setState({
+            show_use_many: !this.state.show_use_many,
+        })
+    }
+
     closeSuccess(){
         this.setState({
             success_message: null
@@ -131,7 +139,7 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
             {
                 name: 'Use many',
                 icon_class: 'ra ra-bottle-vapors',
-                on_click: () => this.manageDestroyAll()
+                on_click: () => this.manageUseManyItems()
             },
             {
                 name: 'Destroy All',
@@ -292,6 +300,19 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
                                 For example, on a 10 gold item that has two 12 billion enchants on it, you would only make 4,000,000,010 gold before taxes.
                             </p>
                         </InventoryActionConfirmationModal>
+                        : null
+                }
+
+                {
+                    this.state.show_use_many && this.state.usable_items.length > 0 ?
+                        <InventoryUseManyItems
+                            is_open={this.state.show_use_many}
+                            manage_modal={this.manageUseManyItems.bind(this)}
+                            items={this.state.usable_items}
+                            update_inventory={this.props.update_inventory}
+                            character_id={this.props.character_id}
+                            set_success_message={this.setSuccessMessage.bind(this)}
+                        />
                         : null
                 }
             </Fragment>

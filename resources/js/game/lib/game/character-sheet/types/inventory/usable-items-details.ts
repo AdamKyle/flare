@@ -54,4 +54,6 @@ export default interface UsableItemsDetails {
     skills: string[] | [];
 
     usable: boolean;
+
+    stat_increase: number;
 }

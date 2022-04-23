@@ -138,7 +138,7 @@ export default class MagicAndWeaponAttackBase extends BattleBase {
       if (canCast) {
         if (this.canBlock(attackData.spell_damage)) {
 
-          this.addEnemyActionMessage(this.defender.name + ' blocked your damaging spell!');
+          this.addMessage(this.defender.name + ' blocked your damaging spell!', 'enemy-action');
 
           if (attackData.heal_for > 0) {
             castAttack.healWithSpells(attackData);
@@ -152,7 +152,7 @@ export default class MagicAndWeaponAttackBase extends BattleBase {
         }
       } else {
 
-        this.addEnemyActionMessage('Your damage spell missed!');
+        this.addMessage('Your damage spell missed!', 'enemy-action');
       }
 
       this.battle_messages    = [...this.battle_messages, canHitCheck.getBattleMessages()]

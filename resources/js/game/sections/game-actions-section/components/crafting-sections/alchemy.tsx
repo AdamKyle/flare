@@ -49,7 +49,7 @@ export default class Alchemy extends React.Component<any, any> {
     buildItems() {
         return this.state.craftable_items.map((item: any) => {
             return {
-                label: item.name + ' Gold Dust Cost: ' + formatNumber(item.gold_dust_cost) + ' Shards Cost: ' + formatNumber(item.shards_cost),
+                label: item.name + ', Gold Dust Cost: ' + formatNumber(item.gold_dust_cost) + ' Shards Cost: ' + formatNumber(item.shards_cost),
                 value: item.id,
             }
         })
@@ -61,7 +61,7 @@ export default class Alchemy extends React.Component<any, any> {
             const item = this.state.selected_item;
 
             return {
-                label: item.name + ' Gold Dust Cost: ' + formatNumber(item.gold_dust_cost) + ' Shards Cost: ' + formatNumber(item.shards_cost),
+                label: item.name + ', Gold Dust Cost: ' + formatNumber(item.gold_dust_cost) + ' Shards Cost: ' + formatNumber(item.shards_cost),
                 value: item.id,
             }
         }

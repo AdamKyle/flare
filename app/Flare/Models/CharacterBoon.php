@@ -19,25 +19,7 @@ class CharacterBoon extends Model
      */
     protected $fillable = [
         'character_id',
-        'type',
-        'stat_bonus',
-        'affect_skill_type',
-        'skill_bonus',
-        'base_damage_mod_bonus',
-        'base_healing_mod_bonus',
-        'base_ac_mod_bonus',
-        'base_ac_mod',
-        'base_damage_mod',
-        'base_healing_mod',
-        'fight_time_out_mod_bonus',
-        'move_time_out_mod_bonus',
-        'skill_training_bonus',
-        'str_mod',
-        'dex_mod',
-        'int_mod',
-        'chr_mod',
-        'focus_mod',
-        'agi_mod',
+        'item_id',
         'started',
         'complete',
     ];
@@ -49,25 +31,7 @@ class CharacterBoon extends Model
      */
     protected $casts = [
         'character_id'                            => 'integer',
-        'type'                                    => 'integer',
-        'stat_bonus'                              => 'float',
-        'affect_skill_type'                       => 'integer',
-        'skill_bonus'                             => 'float',
-        'base_damage_mod_bonus'                   => 'float',
-        'base_healing_mod_bonus'                  => 'float',
-        'base_ac_mod_bonus'                       => 'float',
-        'base_ac_mod'                             => 'float',
-        'base_damage_mod'                         => 'float',
-        'base_healing_mod'                        => 'float',
-        'fight_time_out_mod_bonus'                => 'float',
-        'move_time_out_mod_bonus'                 => 'float',
-        'skill_training_bonus'                    => 'float',
-        'str_mod'                                 => 'float',
-        'dex_mod'                                 => 'float',
-        'int_mod'                                 => 'float',
-        'chr_mod'                                 => 'float',
-        'focus_mod'                               => 'float',
-        'agi_mod'                                 => 'float',
+        'item_id'                                 => 'integer',
         'started'                                 => 'datetime',
         'complete'                                => 'datetime',
     ];
@@ -76,8 +40,8 @@ class CharacterBoon extends Model
         return $this->belongsTo(Character::class, 'character_id', 'id');
     }
 
-    public function skillType(): SkillTypeValue {
-        return new SkillTypeValue($this->affect_skill_type);
+    public function itemUsed() {
+        return $this->belongsTo(Item::class, 'item_id', 'id');
     }
 
     protected static function newFactory() {

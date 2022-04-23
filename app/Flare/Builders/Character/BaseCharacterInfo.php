@@ -166,7 +166,7 @@ class BaseCharacterInfo {
 
             $base = $base + $base * $bonus;
         } else if ($boons->isNotEmpty()) {
-            $bonus = $this->fetchStatIncreaseFromType($character);
+            $bonus = $this->fetchStatIncreaseSum($character);
 
             $base = $base + $base * $bonus;
         }

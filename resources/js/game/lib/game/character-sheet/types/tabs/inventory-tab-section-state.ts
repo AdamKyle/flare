@@ -16,6 +16,8 @@ export default interface InventoryTabSectionState {
 
     show_sell_all: boolean;
 
+    show_use_many: boolean;
+
     success_message: string | null;
 
     search_string: string;
