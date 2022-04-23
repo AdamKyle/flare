@@ -35,7 +35,6 @@ Route::group(['middleware' => ['auth', 'throttle:100,1', 'is.character.who.they.
             Route::post('/character/{character}/inventory/unequip-all', ['uses' => 'Api\CharacterInventoryController@unequipAll']);
             Route::post('/character/{character}/inventory-set/equip/{inventorySet}', ['uses' => 'Api\CharacterInventoryController@equipItemSet']);
             Route::post('/character/{character}/inventory/use-item/{item}', ['uses' => 'Api\CharacterInventoryController@useItem']);
-            Route::post('/character/{character}/inventory/use-many', ['uses' => 'Api\CharacterInventoryController@useManyItems']);
 
             Route::get('/character/{character}/inventory/uniques', ['uses' => 'Api\RandomEnchantController@uniquesOnly']);
             Route::post('/character/{character}/random-enchant/purchase', ['uses' => 'Api\RandomEnchantController@purchase']);

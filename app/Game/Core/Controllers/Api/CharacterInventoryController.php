@@ -525,39 +525,7 @@ class CharacterInventoryController extends Controller {
             ]
         ], 200);
     }
-
-    public function UseManyItems(UseManyItemsValidation $request, Character $character, UseItemService $useItemService) {
-        if ($character->boons->count() === 10) {
-            return response()->json(['message' => 'You can only have a max of ten boons applied.
-            Check Active Boons to see which ones you have. You can always cancel one by clicking on the row.'], 422);
-        }
-
-        $slots = $character->inventory->slots()->findMany($request->slot_ids);
-
-        if ($slots->isEmpty()) {
-            return response()->json(['message' => 'You do not own any of these items. What are you doing?'], 422);
-        }
-
-        foreach ($slots as $index => $slot) {
-            if ($index !== 0) {
-                $useItemService->useItem($slot, $character, $slot->item);
-            }
-        }
-
-        $character = $character->refresh();
-
-        $inventory = $this->characterInventoryService->setCharacter($character);
-
-        event(new UpdateTopBarEvent($character));
-
-        return response()->json([
-            'message' => 'Boons are being applied. You can check Active Boons tab to see if they are applied or check chat to see boons being applied.',
-            'inventory' => [
-                'usable_items' => $inventory->getInventoryForType('usable_items'),
-            ]
-        ], 200);
-    }
-
+    
     public function destroyAlchemyItem(Request $request, Character $character) {
         $slot = $character->inventory->slots->filter(function($slot) use($request) {
             return $slot->id === $request->slot_id;
