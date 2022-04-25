@@ -12,10 +12,10 @@
         <div class="flex items-center relative">
             @if (!is_null($route))
                 <h2 class="font-light mb-3">
-                    <a href={{$route}} {{$attributes}}>{{$title}}</a>
+                    <a href={{$route}} {{$attributes}}>{!!  $title !!}</a>
                 </h2>
             @else
-                <h2 class="font-light mb-3">{{$title}}</h2>
+                <h2 class="font-light mb-3">{!!  $title !!}</h2>
             @endif
             <div class="absolute right-0 top-[8px]">
                 @if (auth()->user()->hasRole('Admin') && $editUrl !== '#')

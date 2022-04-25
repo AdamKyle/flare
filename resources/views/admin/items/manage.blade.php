@@ -3,9 +3,9 @@
 @section('content')
     <div class="lg:w-3/4 lg:px-4 pt-5 lg:pt-0 m-auto">
         <x-core.cards.card-with-title
-            title="{{!is_null($item) ? 'Edit: ' . $item->name : 'Create New Item'}}"
+            title="{{!is_null($item) ? 'Edit: ' . nl2br($item->name) : 'Create New Item'}}"
             buttons="true"
-            backUrl="{{route('items.list')}}"
+            backUrl="{{!is_null($item) ? route('items.item', ['item' => $item->id]) : route('items.list')}}"
         >
             <x-core.form-wizard.container action="{{route('item.store')}}" modelId="{{!is_null($item) ? $item->id : 0}}" lastTab="tab-style-2-5">
                 <x-core.form-wizard.tabs>
