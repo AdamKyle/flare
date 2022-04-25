@@ -18,7 +18,7 @@
                 <h2 class="font-light mb-3">{{$title}}</h2>
             @endif
             <div class="absolute right-0 top-[8px]">
-                @if (auth()->user()->hasRole('Admin'))
+                @if (auth()->user()->hasRole('Admin') && $editUrl !== '#')
                     <x-core.buttons.link-buttons.primary-button href="{{$editUrl}}">
                         Edit
                     </x-core.buttons.link-buttons.primary-button>
