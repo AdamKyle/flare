@@ -525,7 +525,7 @@ class CharacterInventoryController extends Controller {
             ]
         ], 200);
     }
-    
+
     public function destroyAlchemyItem(Request $request, Character $character) {
         $slot = $character->inventory->slots->filter(function($slot) use($request) {
             return $slot->id === $request->slot_id;

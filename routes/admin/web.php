@@ -51,6 +51,7 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::get('/admin/items/create', ['as' => 'items.create', 'uses' => 'ItemsController@create']);
     Route::get('/admin/items/{item}', ['as' => 'items.item', 'uses' => 'ItemsController@show']);
     Route::get('/admin/items/{item}/edit', ['as' => 'items.edit', 'uses' => 'ItemsController@edit']);
+    Route::post('/admin/items/store', ['as' => 'item.store', 'uses' => 'ItemsController@store']);
     Route::post('/admin/items/{item}/delete', ['as' => 'items.delete', 'uses' => 'ItemsController@delete']);
     Route::post('/admin/items/delete-all', ['as' => 'items.delete.all', 'uses' => 'ItemsController@deleteAll']);
 

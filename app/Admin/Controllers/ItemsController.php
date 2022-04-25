@@ -5,6 +5,8 @@ namespace App\Admin\Controllers;
 use App\Admin\Exports\Items\ItemsExport;
 use App\Admin\Import\Items\ItemsImport;
 use App\Admin\Services\ItemsService;
+use App\Flare\Values\ItemEffectsValue;
+use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Facades\App\Flare\Calculators\SellItemCalculator;
@@ -33,13 +35,26 @@ class ItemsController extends Controller {
         ]);
     }
 
-    public function show(Item $item) {
-        return $this->renderItemShow('game.items.item', $item);
-    }
-
     public function edit(Item $item) {
         return view('admin.items.manage', [
             'item'             => $item,
+            'types'            => [
+                'weapon',
+                'bow',
+                'body',
+                'shield',
+                'leggings',
+                'feet',
+                'sleeves',
+                'helmet',
+                'gloves',
+                'ring',
+                'spell-healing',
+                'spell-damage',
+                'artifact',
+                'quest',
+                'alchemy',
+            ],
             'defaultPositions' => [
                 'bow',
                 'body',
@@ -49,7 +64,42 @@ class ItemsController extends Controller {
                 'helmet',
                 'gloves',
             ],
+            'craftingTypes' => [
+                'weapon',
+                'armour',
+                'ring',
+                'spell',
+                'artifact',
+                'alchemy',
+            ],
+            'skillTypes' => SkillTypeValue::$namedValues,
+            'effects' => [
+                ItemEffectsValue::WALK_ON_WATER,
+                ItemEffectsValue::WALK_ON_DEATH_WATER,
+                ItemEffectsValue::WALK_ON_MAGMA,
+                ItemEffectsValue::LABYRINTH,
+                ItemEffectsValue::DUNGEON,
+                ItemEffectsValue::SHADOWPLANE,
+                ItemEffectsValue::HELL,
+                ItemEffectsValue::TELEPORT_TO_CELESTIAL,
+                ItemEffectsValue::AFFIXES_IRRESISTIBLE,
+                ItemEffectsValue::CONTINUE_LEVELING,
+                ItemEffectsValue::GOLD_DUST_RUSH,
+                ItemEffectsValue::MASS_EMBEZZLE,
+                ItemEffectsValue::QUEEN_OF_HEARTS,
+                ItemEffectsValue::PURGATORY,
+                ItemEffectsValue::FACTION_POINTS,
+                ItemEffectsValue::GET_COPPER_COINS,
+            ]
         ]);
+    }
+
+    public function show(Item $item) {
+        return $this->renderItemShow('game.items.item', $item);
+    }
+
+    public function store(Request $request) {
+        dd($request->all());
     }
 
     public function exportItems() {
