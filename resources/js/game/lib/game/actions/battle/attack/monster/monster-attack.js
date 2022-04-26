@@ -214,7 +214,7 @@ export default class MonsterAttack extends BattleBase {
 
         this.currentCharacterHealth = this.currentCharacterHealth - damage
 
-        this.addActionMessage(attacker.name + '\'s spells burst toward you doing: ' + formatNumber(damage), 'enemy-action');
+        this.addMessage(attacker.name + '\'s spells burst toward you doing: ' + formatNumber(damage), 'enemy-action');
 
         return;
       }

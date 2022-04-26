@@ -6,6 +6,7 @@ import InventoryDetails from "../../../../../lib/game/character-sheet/types/inve
 import InventoryItemComparison from "../../modals/inventory-item-comparison";
 import InventoryItemsTableState from "../../../../../lib/game/character-sheet/types/tables/inventory-items-table-state";
 import UsableItemsDetails from "../../../../../lib/game/character-sheet/types/inventory/usable-items-details";
+import InfoAlert from "../../../../../components/ui/alerts/simple-alerts/info-alert";
 
 export default class InventoryTable extends React.Component<InventoryTabProps, InventoryItemsTableState> {
 
@@ -38,6 +39,9 @@ export default class InventoryTable extends React.Component<InventoryTabProps, I
     render() {
         return (
             <Fragment>
+                <InfoAlert additional_css={'mt-4 mb-4'}>
+                    Click the item name to get additional actions.
+                </InfoAlert>
                 <Table data={this.props.inventory} columns={BuildInventoryTableColumns(undefined, this.viewItem.bind(this))} dark_table={this.props.dark_table}/>
 
                 {
@@ -53,6 +57,7 @@ export default class InventoryTable extends React.Component<InventoryTabProps, I
                             usable_sets={this.props.usable_sets}
                             set_success_message={this.props.set_success_message}
                             dark_charts={this.props.dark_table}
+                            is_dead={this.props.is_dead}
                         />
                         : null
                 }

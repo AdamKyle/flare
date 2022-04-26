@@ -34,6 +34,7 @@ class InventoryTransformer extends TransformerAbstract {
             'ac'                      => $slot->item->getTotalDefence(),
             'attack'                  => $slot->item->getTotalDamage(),
             'usable'                  => $slot->item->usable,
+            'holy_stacks'             => $slot->item->holy_stacks,
         ];
     }
 }

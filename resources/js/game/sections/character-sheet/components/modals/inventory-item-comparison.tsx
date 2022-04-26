@@ -182,7 +182,6 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
 
     destroyItem() {
 
-
         this.setState({
             action_loading: true
         });
@@ -271,6 +270,20 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
     }
 
     render() {
+
+        if (this.props.is_dead) {
+            return (
+                <Dialogue is_open={this.props.is_open}
+                          handle_close={this.props.manage_modal}
+                          title={'You are dead'}
+                          secondary_actions={null}
+                          large_modal={false}
+                          primary_button_disabled={false}
+                >
+                    <p className='text-red-700 dark:text-red-400'>And you thought dead people could manage their inventory. Go to the game tab, click revive and live again.</p>
+                </Dialogue>
+            )
+        }
 
         return (
             <Dialogue is_open={this.props.is_open}

@@ -19,7 +19,7 @@ export default class ItemNameColorationText extends React.Component<ItemNameColo
             },{
                 'text-sky-700 dark:text-sky-300': this.props.item.holy_stacks_applied > 0 && !this.props.item.is_unique && this.props.item.type !== 'trinket'
             },{
-                'text-gray-600': this.props.item.affix_count === 0 && !this.props.item.is_unique && this.props.item.holy_stacks_applied === 0 && this.props.item.type !== 'trinket'
+                'text-gray-600 dark:text-white': this.props.item.affix_count === 0 && !this.props.item.is_unique && this.props.item.holy_stacks_applied === 0 && this.props.item.type !== 'trinket'
             },{
                 'text-blue-500': this.props.item.affix_count === 1 && !this.props.item.is_unique && this.props.item.holy_stacks_applied === 0 && this.props.item.type !== 'trinket'
             },{

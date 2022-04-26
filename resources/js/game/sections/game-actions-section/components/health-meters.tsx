@@ -36,6 +36,16 @@ export default class HealthMeters extends React.Component<HealthMeterProps, any>
         return scaled.toFixed(1) + suffix;
     }
 
+    healthPercent() {
+        const percentage = (this.props.current_health / this.props.max_health);
+
+        if (percentage > 1.0) {
+            return 1.0;
+        }
+
+        return percentage;
+    }
+
     render() {
         return(
             <div className='mb-2'>
@@ -56,7 +66,7 @@ export default class HealthMeters extends React.Component<HealthMeterProps, any>
                         'bg-red-600': this.props.is_enemy
                     }, {
                         'bg-green-600': !this.props.is_enemy
-                    })} style={{width: ((this.props.current_health / this.props.max_health) * 100) + '%'}}></div>
+                    })} style={{width: (this.healthPercent() * 100) + '%'}}></div>
                 </div>
             </div>
         )

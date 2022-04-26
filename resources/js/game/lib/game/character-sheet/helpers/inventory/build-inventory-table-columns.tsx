@@ -29,6 +29,12 @@ export const BuildInventoryTableColumns = (component?: ActionsInterface, clickAc
             sortable: true,
             format: (row: any) => formatNumber(row.ac)
         },
+        {
+            name: 'Holy Stacks',
+            selector: (row: { holy_stacks: number; has_holy_stacks_applied: number; }) => row.holy_stacks,
+            sortable: true,
+            format: (row: any) => row.has_holy_stacks_applied + '/' + row.holy_stacks
+        },
     ];
 
     if (typeof component !== 'undefined') {

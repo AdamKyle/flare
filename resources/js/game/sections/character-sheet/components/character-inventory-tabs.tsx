@@ -1,4 +1,4 @@
-import React from "react";
+ import React from "react";
 import Tabs from "../../../components/ui/tabs/tabs";
 import TabPanel from "../../../components/ui/tabs/tab-panel";
 import EquippedTable from "./tabs/inventory-tabs/equipped-table";

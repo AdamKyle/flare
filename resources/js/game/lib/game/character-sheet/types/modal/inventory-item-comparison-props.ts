@@ -6,6 +6,8 @@ export default interface InventoryItemComparisonProps {
 
     dark_charts: boolean;
 
+    is_dead: boolean;
+
     manage_modal: () => void;
 
     title: string;
