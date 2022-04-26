@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Admin\Import\Affixes\AffixesImport;
+use App\Flare\Models\GameSkill;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Maatwebsite\Excel\Facades\Excel;
@@ -37,7 +38,13 @@ class AffixesController extends Controller {
         return view('admin.affixes.manage', [
             'itemAffix' => $affix,
             'editing'   => true,
+            'types'     => ['prefix', 'suffix'],
+            'skills'    => GameSkill::all()->pluck('name')->toArray(),
         ]);
+    }
+
+    public function store(Request $request) {
+        dd($request->all());
     }
 
     public function delete(Request $request, ItemAffixService $itemAffixService, ItemAffix $affix) {

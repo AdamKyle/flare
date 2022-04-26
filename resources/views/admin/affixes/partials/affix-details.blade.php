@@ -1,3 +1,5 @@
+
+
 <div class="row">
   <div class="col-md-6">
     <div class="card">
@@ -93,7 +95,7 @@
           <p>
             Affixes such as these will fire automatically. However, enemies can outright
             resist the damage done. All enemies have a % of resistance against affixes. Celestials have a higher
-            amount of resistance than regular drop down critters.
+            amount of resistance than regular dropdown critters.
           </p>
           <p>
             Unlike artifact Annulment and Spell Evasion, the resistance will not reduce damage done, instead it will

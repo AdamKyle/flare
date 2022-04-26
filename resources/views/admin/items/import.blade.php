@@ -1,25 +1,26 @@
 @extends('layouts.app')
 
 @section('content')
-    <x-core.page-title title="Import Item Data" route="{{route('home')}}" color="success" link="Home">
-    </x-core.page-title>
 
-    <x-cards.card>
-        <div class="alert alert-warning">
-            <p>
-                <strong>Please note</strong>: If an item has an affix or a affects a skill that no longer exists, the item will be ignored.
-            </p>
-        </div>
-
-        <div class="mt-4">
+    <x-core.layout.info-container>
+        <x-core.cards.card-with-title
+            title="Import Items"
+            buttons="true"
+            backUrl="{{route('items.list')}}"
+        >
+            <div class="mt-4 mb-4">
+                <x-core.alerts.info-alert title="Attn!">
+                    If an item affects a skill that no doesn't exist, the item will be ignored.
+                </x-core.alerts.info-alert>
+            </div>
             <form class="mt-4" action="{{route('items.import-data')}}" method="POST" enctype="multipart/form-data">
                 @csrf
-                <div class="form-group">
-                    <label for="items_import">Item's File</label>
-                    <input type="file" class="form-control" id="items_import" aria-describedby="items_import" name="items_import">
+                <div class="mb-5">
+                    <label class="label block mb-2" for="items_import">Items File</label>
+                    <input id="items_import" type="file" class="form-control" name="items_import" />
                 </div>
-                <button type="submit" class="btn btn-primary">Import</button>
+                <x-core.buttons.primary-button type="submit">Import Items</x-core.buttons.primary-button>
             </form>
-        </div>
-    </x-cards.card>
+        </x-core.cards.card-with-title>
+    </x-core.layout.info-container>
 @endsection

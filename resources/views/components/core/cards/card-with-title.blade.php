@@ -7,7 +7,7 @@
     'editUrl'     => '#',
 ])
 
-<div class="{{$css}}">
+<div class="mb-4">
     @if ($buttons != 'false')
         <div class="flex items-center relative">
             @if (!is_null($route))

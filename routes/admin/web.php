@@ -64,6 +64,7 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::get('/admin/affixes/create', ['as' => 'affixes.create', 'uses' => 'AffixesController@create']);
     Route::get('/admin/affixes/{affix}', ['as' => 'affixes.affix', 'uses' => 'AffixesController@show']);
     Route::get('/admin/affixes/{affix}/edit', ['as' => 'affixes.edit', 'uses' => 'AffixesController@edit']);
+    Route::post('/admin/affixes/store', ['as' => 'affixes.store', 'uses' => 'AffixesController@store']);
     Route::post('/admin/affixes/{affix}/delete', ['as' => 'affixes.delete', 'uses' => 'AffixesController@delete']);
 
     Route::get('/admin/users', ['as' => 'users.list', 'uses' => 'UsersController@index']);

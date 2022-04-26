@@ -1,15 +1,18 @@
 @extends('layouts.app')
 
 @section('content')
-    <x-core.page-title title="Export Affix Data" route="{{route('home')}}" color="success" link="Home">
-    </x-core.page-title>
-
-    <x-cards.card>
-        <div class="text-center mt-4">
-            <form method="POST" action="{{ route('affixes.export-data') }}">
+    <x-core.layout.info-container>
+        <x-core.cards.card-with-title
+            title="Export Affixes"
+            buttons="true"
+            backUrl="{{route('affixes.list')}}"
+        >
+            <form method="POST" action="{{ route('affixes.export-data') }}" class="text-center">
                 @csrf
-                <button type="submit" class="btn btn-primary">Export</button>
+                <x-core.buttons.primary-button type="submit">
+                    Export
+                </x-core.buttons.primary-button>
             </form>
-        </div>
-    </x-cards.card>
+        </x-core.cards.card-with-title>
+    </x-core.layout.info-container>
 @endsection

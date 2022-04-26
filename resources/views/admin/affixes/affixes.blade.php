@@ -26,6 +26,6 @@
                 <i class="fas fa-file-upload"></i> Import
             </x-core.buttons.link-buttons.primary-button>
         </x-core.page-title>
-        @livewire('admin.affixes.data-table')
+        @livewire('admin.affixes.affixes-table')
     </div>
 @endsection

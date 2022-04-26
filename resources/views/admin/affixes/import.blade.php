@@ -1,25 +1,26 @@
 @extends('layouts.app')
 
 @section('content')
-    <x-core.page-title title="Import Affix Data" route="{{route('home')}}" color="success" link="Home">
-    </x-core.page-title>
 
-    <x-cards.card>
-        <div class="alert alert-warning">
-            <p>
-                <strong>Please note</strong>: If an affix affects a skill that does not exist, the affix will be skipped.
-            </p>
-        </div>
-
-        <div class="mt-4">
+    <x-core.layout.info-container>
+        <x-core.cards.card-with-title
+            title="Import Affixes"
+            buttons="true"
+            backUrl="{{route('affixes.list')}}"
+        >
+            <div class="mt-4 mb-4">
+                <x-core.alerts.info-alert title="Attn!">
+                    If an affix affects a skill that does not exist, the affix will be skipped.
+                </x-core.alerts.info-alert>
+            </div>
             <form class="mt-4" action="{{route('affixes.import-data')}}" method="POST" enctype="multipart/form-data">
                 @csrf
-                <div class="form-group">
-                    <label for="affixes_import">Item's File</label>
-                    <input type="file" class="form-control" id="affixes_import" aria-describedby="affixes_import" name="affixes_import">
+                <div class="mb-5">
+                    <label class="label block mb-2" for="affixes_import">Affixes File</label>
+                    <input id="affixes_import" type="file" class="form-control" name="affixes_import" />
                 </div>
-                <button type="submit" class="btn btn-primary">Import</button>
+                <x-core.buttons.primary-button type="submit">Import Affixes</x-core.buttons.primary-button>
             </form>
-        </div>
-    </x-cards.card>
+        </x-core.cards.card-with-title>
+    </x-core.layout.info-container>
 @endsection
