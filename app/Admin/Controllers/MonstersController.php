@@ -42,7 +42,8 @@ class MonstersController extends Controller {
     public function create() {
         return view('admin.monsters.manage', [
             'monster' => null,
-            'editing' => false,
+            'gameMaps'   => GameMap::all(),
+            'questItems' => Item::where('type', 'quest')->get(),
         ]);
     }
 
@@ -86,6 +87,43 @@ class MonstersController extends Controller {
     }
 
     public function store(Request $request) {
-        dd($request->all());
+        $data = $this->cleanRequestData($request->all());
+
+        $monster = Monster::updateOrCreate(['id' => $data['id']], $data);
+
+        $message = 'Created: ' . $monster->name;
+
+        if ($data['id'] !== 0) {
+            $message = 'Updated: ' . $monster->name;
+        }
+
+        return response()->redirectToRoute('monsters.monster', ['monster' => $monster->id])->with('success', $message);
+    }
+
+    protected function cleanRequestData(array $params): array {
+
+
+        if (!filter_var($params['is_celestial_entity'], FILTER_VALIDATE_BOOLEAN)) {
+            $params['is_celestial_entity'] = false;
+            $params['gold_cost']           = 0;
+            $params['gold_dust_cost']      = 0;
+            $params['shards']              = 0;
+        }
+
+        if (!filter_var($params['can_cast'], FILTER_VALIDATE_BOOLEAN)) {
+            $params['can_cast']         = false;
+            $params['max_spell_damage'] = 0;
+        }
+
+        if (!filter_var($params['can_use_artifacts'], FILTER_VALIDATE_BOOLEAN)) {
+            $params['can_use_artifacts']   = false;
+            $params['max_artifact_damage'] = 0;
+        }
+
+        if (is_null($params['quest_item_id'])) {
+            $params['quest_item_drop_chance'] = 0.0;
+        }
+
+        return $params;
     }
 }
