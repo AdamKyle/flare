@@ -4,7 +4,7 @@
         <option value="">Please select</option>
         @foreach($options as $option)
             @php
-                $modelValue  = $model->{$name};
+                $modelValue  = !is_null($model) ? $model->{$name} : '';
                 $optionValue = $option->{$value};
                 $optionTitle = $option->{$key};
             @endphp

@@ -4,6 +4,7 @@ namespace App\Admin\Controllers;
 
 use App\Admin\Exports\Items\ItemsExport;
 use App\Admin\Import\Items\ItemsImport;
+use App\Admin\Requests\ItemsManagementRequest;
 use App\Admin\Services\ItemsService;
 use App\Flare\Values\ItemEffectsValue;
 use App\Game\Skills\Values\SkillTypeValue;
@@ -53,7 +54,7 @@ class ItemsController extends Controller {
         return $this->renderItemShow('game.items.item', $item);
     }
 
-    public function store(Request $request) {
+    public function store(ItemsManagementRequest $request) {
         $data = $this->itemService->cleanRequestData($request->all());
 
         $item = Item::updateOrCreate(['id' => $request->id], $data);
