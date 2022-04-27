@@ -3,10 +3,12 @@
 namespace App\Admin\Controllers;
 
 use App\Flare\Models\GameMap;
+use App\Flare\Models\Item;
 use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Traits\Controllers\MonstersShowInformation;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Flare\Models\Monster;
 use App\Admin\Import\Monsters\MonstersImport;
@@ -46,8 +48,9 @@ class MonstersController extends Controller {
 
     public function edit(Monster $monster) {
         return view('admin.monsters.manage', [
-            'monster' => $monster,
-            'editing' => true,
+            'monster'    => $monster,
+            'gameMaps'   => GameMap::all(),
+            'questItems' => Item::where('type', 'quest')->get(),
         ]);
     }
 
