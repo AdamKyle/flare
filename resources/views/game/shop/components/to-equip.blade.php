@@ -1,1 +1,1 @@
-@include('game.items.components.item-data', ['item' => \App\Flare\Models\Item::find($item['id'])])
+@include('game.items.components.item-data', ['item' => \App\Flare\Models\Item::find($item['id']), 'isShop' => $isShop])

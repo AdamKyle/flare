@@ -26,7 +26,7 @@ class AffixesTable extends DataTableComponent {
                     return '<a href="/admin/affixes/'. $affixId.'">'.$row->name . '</a>';
                 }
 
-                return '<a href="/information/affix/'. $affixId.'">'.$row->name . '</a>';
+                return '<a href="/information/affix/'. $affixId.'" target="_blank">  <i class="fas fa-external-link-alt"></i> '.$row->name . '</a>';
             })->html(),
 
             Column::make('Type')->searchable(),

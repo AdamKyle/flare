@@ -9,11 +9,8 @@
         >
             <x-item-display-color :item="$item" />
         </x-core.page-title-slot>
-        <hr />
-        @if ($item->market_sellable)
-            <x-core.alerts.info-alert title="Market Info">This item can be sold on the market.</x-core.alerts.info-alert>
-        @endif
-        @include('game.items.partials.item', [
+
+        @include('game.items.item', [
             'item' => $item
         ])
     </div>
