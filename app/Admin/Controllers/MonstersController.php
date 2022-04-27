@@ -124,6 +124,8 @@ class MonstersController extends Controller {
             $params['quest_item_drop_chance'] = 0.0;
         }
 
+        $params['published'] = true;
+
         return $params;
     }
 }

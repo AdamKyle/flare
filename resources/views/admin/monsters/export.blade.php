@@ -1,15 +1,18 @@
 @extends('layouts.app')
 
 @section('content')
-    <x-core.page-title title="Export Monster Data" route="{{route('home')}}" color="success" link="Home">
-    </x-core.page-title>
-
-    <x-cards.card>
-        <div class="text-center mt-4">
-            <form method="POST" action="{{ route('monsters.export-data') }}">
+    <x-core.layout.info-container>
+        <x-core.cards.card-with-title
+            title="Export Monsters"
+            buttons="true"
+            backUrl="{{route('monsters.list')}}"
+        >
+            <form method="POST" action="{{ route('monsters.export-data') }}" class="text-center">
                 @csrf
-                <button type="submit" class="btn btn-primary">Export</button>
+                <x-core.buttons.primary-button type="submit">
+                    Export
+                </x-core.buttons.primary-button>
             </form>
-        </div>
-    </x-cards.card>
+        </x-core.cards.card-with-title>
+    </x-core.layout.info-container>
 @endsection
