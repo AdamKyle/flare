@@ -27,7 +27,7 @@
                         wire:model{{ $component->getSearchOptions() }}="{{ $component->getTableName() }}.search"
                         placeholder="{{ __('Search') }}"
                         type="text"
-                        class="block w-full border-gray-300 rounded-md shadow-sm transition duration-150 ease-in-out sm:text-sm sm:leading-5 dark:bg-gray-700 dark:text-white dark:border-gray-600 @if ($component->hasSearch()) rounded-none rounded-l-md focus:ring-0 focus:border-gray-300 @else focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md pl-2 @endif"
+                        class="block w-full border-gray-300 rounded-md shadow-sm transition duration-150 ease-in-out sm:text-sm sm:leading-5 dark:bg-gray-700 dark:text-white dark:border-gray-600 @if ($component->hasSearch()) rounded-none rounded-l-md focus:ring-0 focus:border-gray-300 @else focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md @endif pl-4"
                     />
 
                     @if ($component->hasSearch())
@@ -84,7 +84,6 @@
 
                     @if ($component->isFilterLayoutPopover())
                         <div
-                            wire:key='{{ $component->getTableName() }}-filters-popover-menu'
                             x-cloak
                             x-show="open"
                             x-transition:enter="transition ease-out duration-100"
@@ -380,7 +379,6 @@
 
                         @if ($component->isFilterLayoutPopover())
                             <ul
-                                wire:key='{{ $component->getTableName() }}-filters-popover-menu'
                                 x-cloak
                                 class="dropdown-menu w-100 mt-md-5"
                                 x-bind:class="{'show' : open}"
@@ -504,27 +502,27 @@
         </div>
     </div>
 
-{{--    @if ($component->filtersAreEnabled() && $component->filtersVisibilityIsEnabled() && $component->hasFilters() && $component->isFilterLayoutSlideDown())--}}
-{{--        <div--}}
-{{--            x-cloak--}}
-{{--            x-show="filtersOpen"--}}
-{{--        >--}}
-{{--            <div class="container">--}}
-{{--                <div class="row">--}}
-{{--                    @foreach($component->getFilters() as $filter)--}}
-{{--                        <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">--}}
-{{--                            <label for="{{ $component->getTableName() }}-filter-{{ $filter->getKey() }}"--}}
-{{--                                class="d-block">--}}
-{{--                                {{ $filter->getName() }}--}}
-{{--                            </label>--}}
+    @if ($component->filtersAreEnabled() && $component->filtersVisibilityIsEnabled() && $component->hasFilters() && $component->isFilterLayoutSlideDown())
+        <div
+            x-cloak
+            x-show="filtersOpen"
+        >
+            <div class="container">
+                <div class="row">
+                    @foreach($component->getFilters() as $filter)
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+                            <label for="{{ $component->getTableName() }}-filter-{{ $filter->getKey() }}"
+                                class="d-block">
+                                {{ $filter->getName() }}
+                            </label>
 
-{{--                            {{ $filter->render($component) }}--}}
-{{--                        </div>--}}
-{{--                    @endforeach--}}
-{{--                </div>--}}
-{{--            </div>--}}
-{{--        </div>--}}
-{{--    @endif--}}
+                            {{ $filter->render($component) }}
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    @endif
 @elseif ($theme === 'bootstrap-5')
     <div class="d-md-flex justify-content-between mb-3">
         <div class="d-md-flex">
@@ -604,7 +602,6 @@
 
                         @if ($component->isFilterLayoutPopover())
                             <ul
-                                wire:key='{{ $component->getTableName() }}-filters-popover-menu'
                                 x-cloak
                                 class="dropdown-menu w-100"
                                 x-bind:class="{'show' : open}"

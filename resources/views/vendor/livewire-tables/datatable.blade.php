@@ -13,8 +13,9 @@
 
             @foreach($columns as $index => $column)
                 @continue($column->isHidden())
-{{--                @continue($this->columnSelectIsEnabled() && ! $this->columnSelectIsEnabledForColumn($column))--}}
-{{--                @continue($this->currentlyReorderingIsDisabled() && $column->isReorderColumn() && $this->hideReorderColumnUnlessReorderingIsEnabled())--}}
+                @continue($this->columnSelectIsEnabled() && ! $this->columnSelectIsEnabledForColumn($column))
+                @continue($this->currentlyReorderingIsDisabled() && $column->isReorderColumn() && $this->hideReorderColumnUnlessReorderingIsEnabled())
+
                 <x-livewire-tables::table.th :column="$column" :index="$index" />
             @endforeach
         </x-slot>
@@ -33,8 +34,8 @@
 
                 @foreach($columns as $colIndex => $column)
                     @continue($column->isHidden())
-{{--                    @continue($this->columnSelectIsEnabled() && ! $this->columnSelectIsEnabledForColumn($column))--}}
-{{--                    @continue($this->currentlyReorderingIsDisabled() && $column->isReorderColumn() && $this->hideReorderColumnUnlessReorderingIsEnabled())--}}
+                    @continue($this->columnSelectIsEnabled() && ! $this->columnSelectIsEnabledForColumn($column))
+                    @continue($this->currentlyReorderingIsDisabled() && $column->isReorderColumn() && $this->hideReorderColumnUnlessReorderingIsEnabled())
 
                     <x-livewire-tables::table.td :column="$column" :colIndex="$colIndex">
                         {{ $column->renderContents($row) }}
@@ -59,4 +60,8 @@
     </x-livewire-tables::table>
 
     <x-livewire-tables::pagination :rows="$rows" />
+
+    @isset($customView)
+        @include($customView)
+    @endisset
 </x-livewire-tables::wrapper>

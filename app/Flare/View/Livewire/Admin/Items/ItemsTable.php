@@ -16,10 +16,15 @@ class ItemsTable extends DataTableComponent {
     }
 
     public function builder(): Builder {
-        return Item::whereNotIn('type', ['quest', 'alchemy'])
-            ->whereNull('item_prefix_id')
-            ->whereNull('item_suffix_id')
-            ->when($this->getAppliedFilterWithValue('types'), fn ($query, $type) => $query->where('type', $type));
+        if (auth()->user()->hasRole('Admin')) {
+            $item = Item::query();
+        } else {
+            $item = Item::whereNotIn('type', ['quest', 'alchemy']);
+        }
+
+        return $item->whereNull('item_prefix_id')
+                    ->whereNull('item_suffix_id')
+                    ->when($this->getAppliedFilterWithValue('types'), fn ($query, $type) => $query->where('type', $type));
     }
 
     public function filters(): array {
