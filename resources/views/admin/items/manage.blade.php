@@ -24,7 +24,14 @@
                                 <x-core.forms.select :model="$item" label="Type:" modelKey="type" name="type" :options="$types" />
                                 <x-core.forms.text-area :model="$item" label="Description:" modelKey="description" name="description" />
                                 <x-core.forms.select :model="$item" label="Default Position (Armour only):" modelKey="default_position" name="default_position" :options="$defaultPositions" />
+
+                                <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                                <h3 class="mb-3">Quest</h3>
                                 <x-core.forms.select :model="$item" label="Effects (Quest items only):" modelKey="effect" name="effect" :options="$effects" />
+
+                                <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                                <h3 class="mb-3">Drop Location</h3>
+                                <x-core.forms.collection-select :model="$item" label="Drops From:" modelKey="drop_location_id" name="drop_location_id" value="id" key="name" :options="$locations" />
                             </div>
                             <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                             <div>
@@ -66,8 +73,17 @@
                                 <x-core.forms.input :model="$item" label="Base AC Mod (%):" modelKey="base_ac_mod" name="base_ac_mod" />
                                 <x-core.forms.input :model="$item" label="Base healing Mod (%):" modelKey="base_healing_mod" name="base_healing_mod" />
                                 <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+
+                                <h3 class="mb-3">Resurrection Chance</h3>
                                 <x-core.forms.check-box :model="$item" label="Can Ressurect?" modelKey="can_resurrect" name="can_resurrect" />
                                 <x-core.forms.input :model="$item" label="Ressuectrion Chance (%):" modelKey="resurrection_chance" name="resurrection_chance" />
+
+                                <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                                <h3 class="mb-3">Xp Modifiers</h3>
+                                <x-core.forms.input :model="$item" label="XP Bonus (%):" modelKey="xp_bonus" name="xp_bonus" />
+                                <x-core.forms.check-box :model="$item" label="Can Ignore Caps?" modelKey="ignores_caps" name="ignores_caps" />
+
+
                             </div>
                             <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                             <div>
@@ -91,12 +107,18 @@
                         <x-core.forms.select :model="$item" label="Crafting Type:" modelKey="crafting_type" name="crafting_type" :options="$craftingTypes" />
                         <x-core.forms.input :model="$item" label="Skill Level Required:" modelKey="skill_level_required" name="skill_level_required" />
                         <x-core.forms.input :model="$item" label="Skill Level Trivial:" modelKey="skill_level_trivial" name="skill_level_trivial" />
+
+                        <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                        <h3 class="mb-3">Holy Level</h3>
+                        <x-core.forms.input :model="$item" label="Holy Level:" modelKey="holy_level" name="holy_level" />
+
                     </x-core.form-wizard.content>
                     <x-core.form-wizard.content target="tab-style-2-5">
                         <div class="grid md:grid-cols-2 gap-2">
                             <div>
                                 <h3 class="mb-3">Basic Usable Info</h3>
                                 <x-core.forms.check-box :model="$item" label="Usable?" modelKey="usable" name="usable" />
+                                <x-core.forms.check-box :model="$item" label="Can use on items?" modelKey="can_use_on_other_items" name="can_use_on_other_items" />
                                 <x-core.forms.input :model="$item" label="Lasts For (Minutes):" modelKey="lasts_for" name="lasts_for" />
                                 <x-core.forms.check-box :model="$item" label="Increases Stats?" modelKey="stat_increase" name="stat_increase" />
                                 <x-core.forms.input :model="$item" label="Increases All Stats By (%):" modelKey="increase_stat_by" name="increase_stat_by" />
@@ -106,7 +128,7 @@
                             <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                             <div>
                                 <h3>Skill Info</h3>
-                                <x-core.forms.key-value-select :model="$item" label="Type:" modelKey="type" name="type" :options="$skillTypes"/>
+                                <x-core.forms.key-value-select :model="$item" label="Type:" modelKey="affects_skill_type" name="affects_skill_type" :options="$skillTypes"/>
                                 <x-core.forms.input :model="$item" label="Skill Damage Modifier (%):" modelKey="base_damage_mod_bonus" name="base_damage_mod_bonus" />
                                 <x-core.forms.input :model="$item" label="Skill AC Modifier (%):" modelKey="base_ac_mod_bonus" name="base_ac_mod_bonus" />
                                 <x-core.forms.input :model="$item" label="Skill Healing Modifier (%):" modelKey="base_healing_mod_bonus" name="base_healing_mod_bonus" />
@@ -119,6 +141,6 @@
                     </x-core.form-wizard.content>
                 </x-core.form-wizard.contents>
             </x-core.form-wizard.container>
-        </x-core.cards.card-with-title>>
+        </x-core.cards.card-with-title>
     </div>
 @endsection

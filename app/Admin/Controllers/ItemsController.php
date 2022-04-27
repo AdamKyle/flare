@@ -24,74 +24,29 @@ class ItemsController extends Controller {
 
     use ItemsShowInformation;
 
+    /**
+     * @var ItemsService $itemService
+     */
+    private ItemsService $itemService;
+
+    public function __construct(ItemsService $itemService) {
+        $this->itemService = $itemService;
+    }
+
     public function index() {
         return view('admin.items.items');
     }
 
     public function create() {
-        return view('admin.items.manage', [
+        return view('admin.items.manage', array_merge([
             'item' => null,
-            'editing' => false,
-        ]);
+        ], $this->itemService->formInputs()));
     }
 
     public function edit(Item $item) {
-        return view('admin.items.manage', [
+        return view('admin.items.manage', array_merge([
             'item'             => $item,
-            'types'            => [
-                'weapon',
-                'bow',
-                'body',
-                'shield',
-                'leggings',
-                'feet',
-                'sleeves',
-                'helmet',
-                'gloves',
-                'ring',
-                'spell-healing',
-                'spell-damage',
-                'artifact',
-                'quest',
-                'alchemy',
-            ],
-            'defaultPositions' => [
-                'bow',
-                'body',
-                'leggings',
-                'feet',
-                'sleeves',
-                'helmet',
-                'gloves',
-            ],
-            'craftingTypes' => [
-                'weapon',
-                'armour',
-                'ring',
-                'spell',
-                'artifact',
-                'alchemy',
-            ],
-            'skillTypes' => SkillTypeValue::$namedValues,
-            'effects' => [
-                ItemEffectsValue::WALK_ON_WATER,
-                ItemEffectsValue::WALK_ON_DEATH_WATER,
-                ItemEffectsValue::WALK_ON_MAGMA,
-                ItemEffectsValue::LABYRINTH,
-                ItemEffectsValue::DUNGEON,
-                ItemEffectsValue::SHADOWPLANE,
-                ItemEffectsValue::HELL,
-                ItemEffectsValue::TELEPORT_TO_CELESTIAL,
-                ItemEffectsValue::AFFIXES_IRRESISTIBLE,
-                ItemEffectsValue::CONTINUE_LEVELING,
-                ItemEffectsValue::GOLD_DUST_RUSH,
-                ItemEffectsValue::MASS_EMBEZZLE,
-                ItemEffectsValue::QUEEN_OF_HEARTS,
-                ItemEffectsValue::PURGATORY,
-                ItemEffectsValue::FACTION_POINTS,
-                ItemEffectsValue::GET_COPPER_COINS,
-            ]
-        ]);
+        ], $this->itemService->formInputs()));
     }
 
     public function show(Item $item) {
@@ -99,7 +54,17 @@ class ItemsController extends Controller {
     }
 
     public function store(Request $request) {
-        dd($request->all());
+        $data = $this->itemService->cleanRequestData($request->all());
+
+        $item = Item::updateOrCreate(['id' => $request->id], $data);
+
+        $message = 'Created ' . $item->name;
+
+        if ($request->id !== 0) {
+            $message = 'Updated ' . $item->name;
+        }
+
+        return response()->redirectToRoute('game.items.item', ['item' => $item->id])->with('success', $message);
     }
 
     public function exportItems() {
