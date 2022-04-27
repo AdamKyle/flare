@@ -79,12 +79,12 @@ class ItemsService {
             $params['effect'] = null;
         }
 
-        if (!isset($params['can_use_on_other_items'])) {
+        if (!filter_var($params['can_use_on_other_items'], FILTER_VALIDATE_BOOLEAN)) {
             $params['can_use_on_other_items'] = false;
             $params['holy_level'] = null;
         }
 
-        if (!isset($params['usable'])) {
+        if (!filter_var($params['usable'], FILTER_VALIDATE_BOOLEAN)) {
             $params['usable']             = false;
             $params['lasts_for']          = null;
             $params['damages_kingdoms']   = false;
@@ -94,18 +94,20 @@ class ItemsService {
             $params['shards_cost']        = 0;
         }
 
-        if (!isset($params['damages_kingdoms'])) {
+        if (!filter_var($params['damages_kingdom'], FILTER_VALIDATE_BOOLEAN)) {
             $params['damages_kingdoms'] = false;
             $params['kingdom_damage']   = null;
         }
 
-        if ($params['damages_kingdoms']) {
+        if (filter_var($params['damages_kingdom'], FILTER_VALIDATE_BOOLEAN)) {
+            $params['damages_kingdoms']   = true;
             $params['lasts_for']          = null;
             $params['stat_increase']      = null;
             $params['affects_skill_type'] = null;
         }
 
-        if (!$params['stat_increase']) {
+        if (!filter_var($params['stat_increase'], FILTER_VALIDATE_BOOLEAN)) {
+            $params['stat_increase']    = false;
             $params['increase_stat_by'] = 0;
         }
 
@@ -114,11 +116,14 @@ class ItemsService {
             $params['increase_skill_training_bonus_by'] = null;
         }
 
-        if (!isset($params['can_resurrect'])) {
+
+        if (!filter_var($params['can_resurrect'], FILTER_VALIDATE_BOOLEAN)) {
+            $params['can_resurrect']       = false;
             $params['resurrection_chance'] = null;
         }
 
-        if (!isset($params['can_craft'])) {
+        if (!filter_var($params['can_craft'], FILTER_VALIDATE_BOOLEAN)) {
+            $params['can_craft']            = false;
             $params['crafting_type']        = null;
             $params['craft_only']           = false;
             $params['skill_level_required'] = null;

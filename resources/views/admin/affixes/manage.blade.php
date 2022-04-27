@@ -33,7 +33,7 @@
                                 <x-core.forms.input :model="$itemAffix" label="Dur Modifier (%):" modelKey="dur_mod" name="dur_mod" />
                                 <x-core.forms.input :model="$itemAffix" label="Agi Modifier (%):" modelKey="agi_mod" name="agi_mod" />
                                 <x-core.forms.input :model="$itemAffix" label="Int Modifier (%):" modelKey="int_mod" name="int_mod" />
-                                <x-core.forms.input :model="$itemAffix" label="Agi Modifier (%):" modelKey="agi_mod" name="agi_mod" />
+                                <x-core.forms.input :model="$itemAffix" label="Chr Modifier (%):" modelKey="chr_mod" name="chr_mod" />
                                 <x-core.forms.input :model="$itemAffix" label="Focus Modifier (%):" modelKey="focus_mod" name="focus_mod" />
                             </div>
                             <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
@@ -83,7 +83,7 @@
                                 <x-core.forms.input :model="$itemAffix" label="Dur Reduction (%):" modelKey="dur_reduction" name="dur_reduction" />
                                 <x-core.forms.input :model="$itemAffix" label="Agi Reduction (%):" modelKey="agi_reduction" name="agi_reduction" />
                                 <x-core.forms.input :model="$itemAffix" label="Int Reduction (%):" modelKey="int_reduction" name="int_reduction" />
-                                <x-core.forms.input :model="$itemAffix" label="Agi Reduction (%):" modelKey="agi_reduction" name="agi_reduction" />
+                                <x-core.forms.input :model="$itemAffix" label="Chr Reduction (%):" modelKey="chr_reduction" name="chr_reduction" />
                                 <x-core.forms.input :model="$itemAffix" label="Focus Reduction (%):" modelKey="focus_reduction" name="focus_reduction" />
                             </div>
                             <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>

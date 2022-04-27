@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Admin\Import\Affixes\AffixesImport;
+use App\Admin\Requests\AffixManagementRequest;
 use App\Flare\Models\GameSkill;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -14,6 +15,12 @@ use App\Admin\Requests\AffixesImport as AffixesImportRequest;
 
 class AffixesController extends Controller {
 
+    private $itemAffixService;
+
+    public function __construct(ItemAffixService $itemAffixService) {
+        $this->itemAffixService = $itemAffixService;
+    }
+
     public function index() {
         return view('admin.affixes.affixes', [
             'affixes' => ItemAffix::all(),
@@ -21,10 +28,10 @@ class AffixesController extends Controller {
     }
 
     public function create() {
-        return view('admin.affixes.manage', [
+
+        return view('admin.affixes.manage', array_merge([
             'itemAffix' => null,
-            'editing'   => false,
-        ]);
+        ], $this->itemAffixService->getFormData()));
     }
 
     public function show(ItemAffix $affix) {
@@ -35,16 +42,23 @@ class AffixesController extends Controller {
     }
 
     public function edit(ItemAffix $affix) {
-        return view('admin.affixes.manage', [
+        return view('admin.affixes.manage', array_merge([
             'itemAffix' => $affix,
-            'editing'   => true,
-            'types'     => ['prefix', 'suffix'],
-            'skills'    => GameSkill::all()->pluck('name')->toArray(),
-        ]);
+        ], $this->itemAffixService->getFormData()));
     }
 
-    public function store(Request $request) {
-        dd($request->all());
+    public function store(AffixManagementRequest $request) {
+        $data = $this->itemAffixService->cleanRequestData($request->all());
+
+        $affix = ItemAffix::updateOrCreate(['id' => $data['id']], $data);
+
+        $message = 'Created: ' . $affix['name'];
+
+        if ($affix['id'] !== 0) {
+            $message = 'Updated: ' . $affix['name'];
+        }
+
+        return response()->redirectToRoute('affixes.affix', ['affix' => $affix->id])->with('success', $message);
     }
 
     public function delete(Request $request, ItemAffixService $itemAffixService, ItemAffix $affix) {

@@ -3,6 +3,7 @@
 namespace App\Admin\Services;
 
 use App\Flare\Events\ServerMessageEvent;
+use App\Flare\Models\GameSkill;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
@@ -12,6 +13,32 @@ use App\Flare\Models\MarketHistory;
 use Illuminate\Database\Eloquent\Collection;
 
 class ItemAffixService {
+
+    public function getFormData(): array {
+        return [
+            'types'     => ['prefix', 'suffix'],
+            'skills'    => GameSkill::all()->pluck('name')->toArray(),
+        ];
+    }
+
+    public function cleanRequestData(array $params): array {
+        if ($params['type'] !== 'quest') {
+            $params['effect'] = null;
+        }
+
+        if (!filter_var($params['reduces_enemy_stats'], FILTER_VALIDATE_BOOLEAN)) {
+            $params['reduces_enemy_stats'] = false;
+            $params['str_reduction']       = 0.00;
+            $params['dex_reduction']       = 0.00;
+            $params['dur_reduction']       = 0.00;
+            $params['agi_reduction']       = 0.00;
+            $params['int_reduction']       = 0.00;
+            $params['chr_reduction']       = 0.00;
+            $params['focus_reduction']     = 0.00;
+        }
+
+        return $params;
+    }
 
     /**
      * Delete the Affix.
