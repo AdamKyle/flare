@@ -6,7 +6,7 @@
         <x-core.cards.card-with-title
             title="{{!is_null($monster) ? 'Edit: ' . nl2br($monster->name) : 'Create New Monster'}}"
             buttons="true"
-            backUrl="{{!is_null($monster) ? route('monsters.monster', ['monster' => $monster->id]) : route('monster.list')}}"
+            backUrl="{{!is_null($monster) ? route('monsters.monster', ['monster' => $monster->id]) : route('monsters.list')}}"
         >
             <x-core.form-wizard.container action="{{route('monster.store')}}" modelId="{{!is_null($monster) ? $monster->id : 0}}" lastTab="tab-style-2-5">
                 <x-core.form-wizard.tabs>

@@ -2,13 +2,13 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Requests\MonsterManagementRequest;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
 use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Traits\Controllers\MonstersShowInformation;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Flare\Models\Monster;
 use App\Admin\Import\Monsters\MonstersImport;
@@ -86,7 +86,7 @@ class MonstersController extends Controller {
         return redirect()->back()->with('success', 'imported monster data.');
     }
 
-    public function store(Request $request) {
+    public function store(MonsterManagementRequest $request) {
         $data = $this->cleanRequestData($request->all());
 
         $monster = Monster::updateOrCreate(['id' => $data['id']], $data);
