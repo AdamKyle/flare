@@ -40,7 +40,7 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::get('/admin/monsters/create', ['as' => 'monsters.create', 'uses' => 'MonstersController@create']);
     Route::get('/admin/monsters/{monster}', ['as' => 'monsters.monster', 'uses' => 'MonstersController@show']);
     Route::get('/admin/monsters/{monster}/edit', ['as' => 'monster.edit', 'uses' => 'MonstersController@edit']);
-    Route::post('/admin/monsters/{monster}/publish', ['as' => 'monster.publish', 'uses' => 'MonstersController@publish']);
+    Route::post('/admin/monsters/store', ['as' => 'monster.store', 'uses' => 'MonstersController@store']);
 
     Route::get('/admin/items/export-items', ['as' => 'items.export', 'uses' => 'ItemsController@exportItems']);
     Route::get('/admin/items/import-items', ['as' => 'items.import', 'uses' => 'ItemsController@importItems']);

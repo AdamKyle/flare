@@ -82,13 +82,7 @@ class MonstersController extends Controller {
         return redirect()->back()->with('success', 'imported monster data.');
     }
 
-    public function publish(Monster $monster) {
-        $monster->update(['published' => true]);
-
-        $this->monsterCache->buildCache();
-
-        event(new GlobalMessageEvent('Monsters have been updated (or created), please refresh to see the new list.'));
-
-        return redirect()->to(route('monsters.list'))->with('success', 'Monster was published.');
+    public function store(Request $request) {
+        dd($request->all());
     }
 }
