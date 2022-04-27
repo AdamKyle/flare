@@ -27,13 +27,17 @@
         'quest'   => $quest,
         'canEdit' => true,
     ])
+
 </x-core.layout.info-container>
 
-<div class="mt-4 mb-4">
+<div class="mt-4">
+    <h3 class="mb-4">Quest Item Details</h3>
     @if (!is_null($monster->quest_item_id))
         <p class="mb-4"><strong>Drop Chance: </strong> {{$monster->quest_item_drop_chance * 100}}%, used in: <a href="{{route('info.page.quest', ['quest' =>$quest->id])}}">{{$quest->name}}</a></p>
-        @include('game.items.partials.item-details', ['item' => $monster->questItem])
+        @include('game.items.components.item-details', $questItem)
     @endif
 </div>
+
+
 
 

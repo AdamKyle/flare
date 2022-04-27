@@ -9,6 +9,8 @@ use App\Flare\Models\Quest;
 
 trait MonstersShowInformation {
 
+    use ItemsShowInformation;
+
     /**
      * Renders the monster show.
      *
@@ -23,8 +25,9 @@ trait MonstersShowInformation {
         }
 
         return view($viewName, [
-            'monster' => $monster,
-            'quest'   => $quest,
+            'monster'   => $monster,
+            'quest'     => $quest,
+            'questItem' => $this->itemShowDetails($monster->questItem),
         ]);
     }
 }
