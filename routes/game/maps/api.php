@@ -1,13 +1,19 @@
 <?php
 
 Route::middleware(['auth', 'is.player.banned', 'is.character.who.they.say.they.are'])->group(function() {
+
+    Route::get('/map/traverse-maps', ['uses' => 'Api\MapController@traverseMaps']);
+
     // Map related info:
     Route::get('/map/{character}', ['uses' => 'Api\MapController@mapInformation']);
 
     // Fetch Quests for map:
     Route::get('/map/quests/{character}', ['uses' => 'Api\MapController@fetchQuests']);
 
+
+
     Route::group(['middleware' => 'throttle:moving'], function() {
+
         // Map Movement:
         Route::post('/move/{character}', ['uses' => 'Api\MapController@move']);
 

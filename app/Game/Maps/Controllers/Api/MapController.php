@@ -2,6 +2,7 @@
 
 namespace App\Game\Maps\Controllers\Api;
 
+use App\Flare\Models\GameMap;
 use App\Game\Maps\Requests\QuestDataRequest;
 use Cache;
 use App\Flare\Models\Npc;
@@ -71,6 +72,10 @@ class MapController extends Controller {
         unset($response['status']);
 
         return response()->json($response, $status);
+    }
+
+    public function traverseMaps() {
+        return response()->json(GameMap::select('id', 'name')->get());
     }
 
     public function traverse(TraverseRequest $request, Character $character, MovementService $movementService) {

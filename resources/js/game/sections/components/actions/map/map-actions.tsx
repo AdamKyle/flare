@@ -8,6 +8,7 @@ import TeleportModal from "../modals/teleport-modal";
 import OrangeButton from "../../../../components/ui/buttons/orange-button";
 import ViewLocationDetailsModal from "../modals/view-location-details-modal";
 import SetSailModal from "../modals/set-sail-modal";
+import TraverseModal from "../modals/traverse-modal";
 
 export default class MapActions extends React.Component<MapActionsProps, MapActionsState> {
 
@@ -22,6 +23,7 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
             player_kingdom_id: null,
             enemy_kingdom_id: null,
             open_set_sail_modal: false,
+            show_traverse: false,
         }
     }
 
@@ -186,7 +188,9 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
     }
 
     traverse() {
-
+        this.setState({
+            show_traverse: !this.state.show_traverse
+        })
     }
 
     viewLocation() {
@@ -321,6 +325,16 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                                                    enemy_kingdom_id={this.state.enemy_kingdom_id}
                          />
                      : null
+                }
+
+                {
+                    this.state.show_traverse ?
+                        <TraverseModal
+                            is_open={this.state.show_traverse}
+                            handle_close={this.traverse.bind(this)}
+                            character_id={this.props.character_id}
+                        />
+                    : null
                 }
             </Fragment>
         )
