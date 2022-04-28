@@ -14,7 +14,7 @@ export default class CanHitCheck extends BattleBase {
     return this.canAutoHit
   }
 
-  canHit (attacker, defender, battleMessages, voided) {
+  canHit (attacker, defender) {
     const damage        = new Damage();
 
     if (attacker.hasOwnProperty('class')) {
@@ -28,19 +28,9 @@ export default class CanHitCheck extends BattleBase {
       }
     }
 
-    let attackerAccuracy = attacker.skills.filter(s => s.name === 'Accuracy')[0].skill_bonus;
     let defenderDodge    = defender.dodge
-    let toHitBase        = this.toHitCalculation(attacker.to_hit_base, defender.dex, attackerAccuracy, defenderDodge);
-
-    if (attackerAccuracy >= 1.0) {
-      return true;
-    }
-
-    if (defenderDodge >= 1.0) {
-      return false;
-    }
-
-    return this.calculateCanHit(toHitBase);
+    console.log(this.toHitCalculation(attacker.to_hit_base, defender.agi, attacker.skills.accuracy, defenderDodge));
+    return this.toHitCalculation(attacker.to_hit_base, defender.agi, attacker.skills.accuracy, defenderDodge);
   }
 
   canCast(attacker, defender) {
@@ -57,11 +47,11 @@ export default class CanHitCheck extends BattleBase {
         return true;
       }
 
-      attackerAccuracy = attacker.skills.filter(s => s.name === 'Casting Accuracy')[0].skill_bonus;
+      attackerAccuracy = attacker.skills.casting_accuracy;
       dodge            = defender.dodge;
     } else {
       attackerAccuracy = attacker.casting_accuracy;
-      dodge            = defender.skills.filter(s => s.name === 'Dodge')[0].skill_bonus;
+      dodge            = defender.skills.dodge;
     }
 
     if (attackerAccuracy >= 1.0) {
@@ -72,15 +62,12 @@ export default class CanHitCheck extends BattleBase {
       return false;
     }
 
-    let toHitBase = this.toHitCalculation(attacker.to_hit_base, defender.focus, attackerAccuracy, dodge);
-
-    return this.calculateCanHit(toHitBase);
+    return this.toHitCalculation(attacker.to_hit_base, defender.agi, attackerAccuracy, dodge)
   }
 
   canMonsterHit(attacker, defender) {
     let monsterAccuracy = attacker.accuracy;
-    let defenderDodge   = defender.skills.filter(s => s.name === 'Dodge')[0].skill_bonus;
-    let toHitBase       = this.toHitCalculation(attacker.to_hit_base, attacker.dex, monsterAccuracy, defenderDodge);
+    let defenderDodge   = defender.dodge;
 
     if (monsterAccuracy > 1.0) {
       return true;
@@ -90,15 +77,7 @@ export default class CanHitCheck extends BattleBase {
       return false;
     }
 
-    return this.calculateCanHit(toHitBase);
-  }
-
-  calculateCanHit(toHitBase) {
-    const needToHit = 100 - 100 * toHitBase;
-
-    const roll      = random(1, 100);
-
-    return roll > needToHit;
+    return this.toHitCalculation(attacker.to_hit_base, attacker.agi, monsterAccuracy, defenderDodge);
   }
 
   getBattleMessages () {
@@ -109,26 +88,20 @@ export default class CanHitCheck extends BattleBase {
     return this.canAutoHit;
   }
 
-  toHitCalculation(toHit, dex, accuracy, dodge) {
-    if (dex > 2000000000) {
-      return 1.0;
+  toHitCalculation(toHit, agi, accuracy, dodge) {
+
+    let enemyAgi = agi * 0.20; // Take only 20%.
+    let playerToHit = toHit * 0.20; // take only 20%.
+
+    if (playerToHit < 10) {
+      playerToHit = toHit;
     }
 
-    if (dodge >= 1.0) {
-      return 0.0
+    if (enemyAgi < 10) {
+      enemyAgi = agi;
     }
 
-    const enemyDex  = (dex / 2000000000);
-    toHit           = (toHit / 2000000000);
-    const hitChance = (toHit + accuracy);
-
-    const enemyDodgeChance =  (enemyDex + dodge);
-
-    if (enemyDodgeChance > hitChance) {
-      return enemyDodgeChance - hitChance
-    }
-
-    return 1.0
+    return (playerToHit + playerToHit * accuracy) > (enemyAgi + enemyAgi * dodge);
   }
 }
 

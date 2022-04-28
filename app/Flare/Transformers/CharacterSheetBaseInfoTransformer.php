@@ -5,6 +5,7 @@ namespace App\Flare\Transformers;
 
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameSkill;
+use App\Flare\Models\Skill;
 use Cache;
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Models\Character;
@@ -28,6 +29,13 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
         $characterTrinketsInformation = resolve(CharacterTrinketsInformation::class);
         $gameClass                    = GameClass::find($character->game_class_id);
 
+
+        $accuracySkill                = Skill::where('game_skill_id', GameSkill::where('name', 'Accuracy')->first()->id)->where('character_id', $character->id)->first();
+        $castingAccuracySkill         = Skill::where('game_skill_id', GameSkill::where('name', 'Casting Accuracy')->first()->id)->where('character_id', $character->id)->first();
+        $dodgeSkill                   = Skill::where('game_skill_id', GameSkill::where('name', 'Dodge')->first()->id)->where('character_id', $character->id)->first();
+        $criticalitySkill             = Skill::where('game_skill_id', GameSkill::where('name', 'Criticality')->first()->id)->where('character_id', $character->id)->first();
+
+
         return [
             'id'                          => $character->id,
             'user_id'                     => $character->user_id,
@@ -39,7 +47,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
             'heal_for'                    => $characterHealthInformation->buildHealFor(),
             'damage_stat'                 => $character->damage_stat,
             'to_hit_stat'                 => $character->class->to_hit_stat,
-            'to_hit_base'                 => $this->getToHitBase($character, $characterInformation),
+            'to_hit_base'                 => $character->{$character->class->to_hit_stat}, //$this->getToHitBase($character, $characterInformation),
             'voided_to_hit_base'          => $this->getToHitBase($character, $characterInformation, true),
             'base_stat'                   => $characterInformation->statMod($character->class->damage_stat),
             'voided_base_stat'            => $character->{$character->class->damage_stat},
@@ -91,7 +99,12 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
             'ambush_resistance_chance'    => $characterTrinketsInformation->getAmbushResistanceChance($character),
             'counter_chance'              => $characterTrinketsInformation->getCounterChance($character),
             'counter_resistance_chance'   => $characterTrinketsInformation->getCounterResistanceChance($character),
-            'skills'                      => $character->skills()->whereIn('game_skill_id', GameSkill::whereIn('name', ['Accuracy', 'Dodge', 'Casting Accuracy', 'Criticality'])->pluck('id')->toArray())->get(),
+            'skills'                      => [
+                'accuracy'         => $accuracySkill->skill_bonus,
+                'casting_accuracy' => $castingAccuracySkill->skill_bonus,
+                'dodge'            => $dodgeSkill->skill_bonus,
+                'criticality'      => $criticalitySkill->skill_bonus,
+            ],
             'devouring_light_res'         => $holyStacks->fetchDevouringResistanceBonus($character),
             'devouring_darkness_res'      => $holyStacks->fetchDevouringResistanceBonus($character),
             'is_attack_automation_locked' => $character->is_attack_automation_locked,

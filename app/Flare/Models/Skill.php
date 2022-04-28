@@ -317,11 +317,13 @@ class Skill extends Model
     }
 
     private function fetchSlotsWithEquipment(): Collection  {
-        $inventory = Inventory::where('character_id', $this->character->id)->first();
+        $inventory = Inventory::where('character_id', $this->character_id)->first();
+
         $slots     = InventorySlot::where('inventory_id', $inventory->id)->where('equipped', true)->get();
 
         if ($slots->isEmpty()) {
-            $equippedSet = $this->character->inventorySets->where('is_equipped', true)->first();
+
+            $equippedSet = InventorySet::where('character_id', $this->character_id)->where('is_equipped', true)->first();
 
             if (!is_null($equippedSet)) {
                 $slots = $equippedSet->slots;
@@ -334,6 +336,4 @@ class Skill extends Model
     protected static function newFactory() {
         return SkillFactory::new();
     }
-
-
 }

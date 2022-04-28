@@ -128,7 +128,7 @@ export default class CastAttack extends BattleBase {
     }
 
     if (this.attacker.class === 'Prophet' || this.attacker.class === 'Heretic') {
-      const bonus = this.attacker.skills.filter(s => s.name === 'Casting Accuracy')[0].skill_bonus
+      const bonus = this.attacker.skills.casting_accuracy
 
       dc   = roll - Math.ceil(dc * bonus);
       roll = roll - Math.ceil(roll * evasion);
@@ -140,7 +140,7 @@ export default class CastAttack extends BattleBase {
       return;
     }
 
-    const skillBonus = this.attacker.skills.filter(s => s.name === 'Criticality')[0].skill_bonus;
+    const skillBonus = this.attacker.skills.criticality;
     let damage       = attackData.spell_damage;
 
     const critDc     = 100 - 100 * skillBonus;

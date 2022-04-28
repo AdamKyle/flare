@@ -34,7 +34,7 @@ class CharacterAttackTransformer extends BaseTransformer {
             'heal_for'                    => $characterHealthInformation->buildHealFor(),
             'damage_stat'                 => $character->damage_stat,
             'to_hit_stat'                 => $character->class->to_hit_stat,
-            'to_hit_base'                 => $this->getToHitBase($character, $characterInformation),
+            'to_hit_base'                 => $character->{$character->class->to_hit_stat}, //$this->getToHitBase($character, $characterInformation),
             'voided_to_hit_base'          => $this->getToHitBase($character, $characterInformation, true),
             'base_stat'                   => $characterInformation->statMod($character->class->damage_stat),
             'voided_base_stat'            => $character->{$character->class->damage_stat},

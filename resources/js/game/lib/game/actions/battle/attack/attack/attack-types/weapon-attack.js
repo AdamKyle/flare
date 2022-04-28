@@ -99,7 +99,7 @@ export default class WeaponAttack extends BattleBase {
 
   attackWithWeapon(attackData, isEntranced, canAutoHit) {
 
-    const skillBonus = this.attacker.skills.filter(s => s.name === 'Criticality')[0].skill_bonus;
+    const skillBonus = this.attacker.skills.criticality;
 
     let damage = attackData.weapon_damage;
 
