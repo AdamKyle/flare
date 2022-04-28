@@ -21,11 +21,14 @@ export default class MapSection extends React.Component<MapProps, MapState> {
 
     private mapTimeOut: any;
 
+    private traverseUpdate: any;
+
     constructor(props: MapProps) {
         super(props);
 
         this.state = {
             map_url: '',
+            map_id: 0,
             map_position: {
                 x: 0, y: 0
             },
@@ -48,27 +51,17 @@ export default class MapSection extends React.Component<MapProps, MapState> {
         }
 
         // @ts-ignore
-        this.mapTimeOut = Echo.private('show-timeout-move-' + this.props.user_id);
+        this.mapTimeOut     = Echo.private('show-timeout-move-' + this.props.user_id);
+
+        // @ts-ignore
+        this.traverseUpdate = Echo.private('update-map-plane-' + this.props.user_id);
     }
 
     componentDidMount() {
         (new Ajax()).setRoute('map/' + this.props.character_id)
                     .doAjaxCall('get', (result: AxiosResponse) => {
 
-            let state = {...MapStateManager.setState(result.data), ...{loading: false}};
-
-            state.location_with_adventures = getLocationWithAdventures(state);
-            state.port_location = getPortLocation(state);
-            state.map_position = {
-                x: getNewXPosition(state.character_position.x, state.map_position.x, this.props.view_port),
-                y: getNewYPosition(state.character_position.y, state.map_position.y, this.props.view_port),
-            }
-
-            if (state.time_left !== 0) {
-                state.can_player_move = false;
-            }
-
-            this.setState(state);
+            this.setStateFromData(result.data);
         }, (err: AxiosError) => {
 
         });
@@ -79,6 +72,27 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                 can_player_move: event.canMove,
             });
         });
+
+        this.traverseUpdate.listen('Game.Maps.Events.UpdateMapBroadcast', (event: any) => {
+            this.setStateFromData(event.mapDetails);
+        });
+    }
+
+    setStateFromData(data: any) {
+        let state = {...MapStateManager.setState(data), ...{loading: false, map_id: data.character_map.game_map.id}};
+
+        state.location_with_adventures = getLocationWithAdventures(state);
+        state.port_location = getPortLocation(state);
+        state.map_position = {
+            x: getNewXPosition(state.character_position.x, state.map_position.x, this.props.view_port),
+            y: getNewYPosition(state.character_position.y, state.map_position.y, this.props.view_port),
+        }
+
+        if (state.time_left !== 0) {
+            state.can_player_move = false;
+        }
+
+        this.setState(state);
     }
 
     fetchLeftBounds(): number {
@@ -158,7 +172,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
 ``
         return(
             <Fragment>
-                <div className='overflow-hidden max-h-[350px] md:ml-[20px]'>
+                <div className='overflow-hidden max-h-[330px]'>
                     <Draggable
                         position={this.state.map_position}
                         bounds={{top: -160, left: this.fetchLeftBounds(), right: this.state.right_bounds, bottom: this.state.bottom_bounds}}
@@ -203,6 +217,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                                 enemy_kingdoms={this.state.enemy_kingdoms}
                                 view_port={this.props.view_port}
                                 is_dead={this.props.is_dead}
+                                map_id={this.state.map_id}
                     />
                 </div>
                 <div className={'mt-3'}>

@@ -4,6 +4,8 @@ export default interface MapActionsProps {
 
     move_player: (direction: string) => void;
 
+    map_id: number | 0;
+
     teleport_player: (data: {x: number, y: number, cost: number, timeout: number}) => void;
 
     set_sail: (data: {x: number, y: number, cost: number, timeout: number}) => void;

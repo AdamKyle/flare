@@ -5,6 +5,8 @@ import NpcKingdomsDetails from "./npc-kingdoms-details";
 export default interface MapState {
     map_url: string;
 
+    map_id: number | 0;
+
     map_position: {x: number, y: number};
 
     character_position: {x: number, y: number};

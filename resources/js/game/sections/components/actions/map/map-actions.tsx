@@ -333,6 +333,7 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                             is_open={this.state.show_traverse}
                             handle_close={this.traverse.bind(this)}
                             character_id={this.props.character_id}
+                            map_id={this.props.map_id}
                         />
                     : null
                 }

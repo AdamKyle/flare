@@ -30,12 +30,19 @@ class MapController extends Controller {
     private $mapTile;
 
     /**
+     * @var MovementService $movementService
+     */
+    private $movementService;
+
+    /**
      * Constructor
      *
      * @param MapTileValue $mapTile
+     * @param MovementService $movementService
      */
-    public function __construct(MapTileValue $mapTile) {
-        $this->mapTile = $mapTile;
+    public function __construct(MapTileValue $mapTile, MovementService $movementService) {
+        $this->mapTile         = $mapTile;
+        $this->movementService = $movementService;
 
         $this->middleware('is.character.adventuring')->except(['mapInformation', 'fetchQuests']);
         $this->middleware('is.character.dead')->except(['mapInformation', 'fetchQuests']);
@@ -75,7 +82,8 @@ class MapController extends Controller {
     }
 
     public function traverseMaps() {
-        return response()->json(GameMap::select('id', 'name')->get());
+
+        return response()->json($this->movementService->getMapsToTraverse(auth()->user()->character));
     }
 
     public function traverse(TraverseRequest $request, Character $character, MovementService $movementService) {

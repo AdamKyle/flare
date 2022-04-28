@@ -25,6 +25,11 @@ class MoveTimeOutEvent
     public $setSail;
 
     /**
+     * @var bool $traverse
+     */
+    public $traverse;
+
+    /**
      * Constructor
      *
      * @param Character $character

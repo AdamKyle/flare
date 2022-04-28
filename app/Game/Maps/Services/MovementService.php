@@ -31,6 +31,7 @@ use App\Game\Maps\Values\MapTileValue;
 use App\Game\Maps\Values\MapPositionValue;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent as GameServerMessageEvent;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 use League\Fractal\Manager;
 
@@ -136,6 +137,37 @@ class MovementService {
     }
 
     /**
+     * Get traversable maps for the player.
+     *
+     * @param Character $character
+     * @return Collection
+     */
+    public function getMapsToTraverse(Character $character): Collection {
+        $gameMaps = GameMap::select('id', 'required_location_id', 'name')->get();
+
+        $xPosition = $character->map->character_position_x;
+        $yPosition = $character->map->character_position_y;
+
+        $characterLocation = Location::where('x', $xPosition)->where('y', $yPosition)->first();
+
+        // Some maps are hidden from the list unless the player is physically at the location or on the map.
+        foreach ($gameMaps as $index => $gameMap) {
+            if (!is_null($gameMap->required_location_id) && !$character->map->gameMap->mapType()->isPurgatory()) {
+                if (!is_null($characterLocation)) {
+
+                    if ($characterLocation->id !== $gameMap->required_location_id) {
+                        unset($gameMaps[$index]);
+                    }
+                } else {
+                    unset($gameMaps[$index]);
+                }
+            }
+        }
+
+        return $gameMaps;
+    }
+
+    /**
      * Update the characters position.
      *
      * Only updates the character position if the character can walk on water
@@ -205,16 +237,7 @@ class MovementService {
 
         $this->traverseService->travel($mapId, $character);
 
-        $character = $character->refresh();
-
-        $xPosition = $character->map->character_position_x;
-        $yPosition = $character->map->character_position_y;
-
-        $lockedLocation = Location::where('x', $xPosition)->where('y', $yPosition)->where('game_map_id', $character->map->game_map_id)->where('required_quest_item_id', true)->first();
-
-        return $this->successResult([
-            'lockedLocationType' => is_null($lockedLocation) ? null : $lockedLocation->type
-        ]);
+        return $this->successResult();
     }
 
     /**
@@ -677,6 +700,4 @@ class MovementService {
         event(new MoveTimeOutEvent($character, $timeOutValue, true));
         event(new UpdateTopBarEvent($character));
     }
-
-
 }

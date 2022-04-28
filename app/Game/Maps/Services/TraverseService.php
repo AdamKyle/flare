@@ -2,6 +2,8 @@
 
 namespace App\Game\Maps\Services;
 
+use App\Flare\Jobs\CharacterAttackTypesCacheBuilderWithDeductions;
+use App\Flare\Models\Map;
 use Illuminate\Support\Facades\Cache;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
@@ -16,7 +18,6 @@ use App\Game\Maps\Events\UpdateGlobalCharacterCountBroadcast;
 use App\Game\Maps\Events\UpdateMonsterList;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Messages\Events\GlobalMessageEvent;
-use App\Game\Messages\Events\ServerMessageEvent as GameServerMessageEvent;
 use App\Game\Maps\Events\UpdateMapBroadcast;
 use App\Flare\Events\ServerMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent as MessageEvent;
@@ -140,36 +141,8 @@ class TraverseService {
 
         $oldMap = $character->map->gameMap;
 
-        $character->map()->update([
-            'game_map_id' => $mapId
-        ]);
+        $this->updateCharactersPosition($character, $mapId);
 
-        $character = $character->refresh();
-
-        $xPosition = $character->map->character_position_x;
-        $yPosition = $character->map->character_position_y;
-
-        $cache = CoordinatesCache::getFromCache();
-
-        $character = $this->changeLocation($character, $cache);
-
-        $newXPosition = $character->map->character_position_x;
-        $newYPosition = $character->map->character_position_y;
-
-        // @codeCoverageIgnoreStart
-        //
-        // Ignore this aspect as it's really hard to mock without messing up the tile value mock.
-        if ($newXPosition !== $xPosition || $newYPosition !== $yPosition) {
-
-            $color = $this->mapTileValue->getTileColor($character, $xPosition, $yPosition);
-
-            if ($this->mapTileValue->isWaterTile($color) || $this->mapTileValue->isDeathWaterTile($color) || $this->mapTileValue->isMagma($color)) {
-                event(new ServerMessageEvent($character->user, 'moved-location', 'Your character was moved as you are missing the appropriate quest item.'));
-            }
-        }
-        // @codeCoverageIgnoreEnd
-
-        $this->updateGlobalCharacterMapCount($oldMap->id);
         $this->updateMap($character);
         $this->updateActions($mapId, $character, $oldMap);
 
@@ -215,6 +188,47 @@ class TraverseService {
     }
 
     /**
+     * Updates the position of the character on the map.
+     *
+     * If the character is on a map tile where they do not have access, such as water, we move them off it
+     * and keep doing this till we fnd land.
+     *
+     * @param Character $character
+     * @param int $mapId
+     * @return void
+     */
+    protected function updateCharactersPosition(Character $character, int $mapId) {
+        $character->map()->update([
+            'game_map_id' => $mapId
+        ]);
+
+        $character = $character->refresh();
+
+        $xPosition = $character->map->character_position_x;
+        $yPosition = $character->map->character_position_y;
+
+        $cache = CoordinatesCache::getFromCache();
+
+        $character = $this->changeLocation($character, $cache);
+
+        $newXPosition = $character->map->character_position_x;
+        $newYPosition = $character->map->character_position_y;
+
+        // @codeCoverageIgnoreStart
+        //
+        // Ignore this aspect as it's really hard to mock without messing up the tile value mock.
+        if ($newXPosition !== $xPosition || $newYPosition !== $yPosition) {
+
+            $color = $this->mapTileValue->getTileColor($character, $xPosition, $yPosition);
+
+            if ($this->mapTileValue->isWaterTile($color) || $this->mapTileValue->isDeathWaterTile($color) || $this->mapTileValue->isMagma($color)) {
+                event(new ServerMessageEvent($character->user, 'moved-location', 'Your character was moved as you are missing the appropriate quest item.'));
+            }
+        }
+        // @codeCoverageIgnoreEnd
+    }
+
+    /**
      * Change the players' location if they cannot walk on the planes water.
      *
      * We do this till we find ground.
@@ -256,7 +270,7 @@ class TraverseService {
             'can_move_again_at' => now()->addSeconds(10),
         ]);
 
-        event(new MoveTimeOutEvent($character, 0, false, true));
+        event(new MoveTimeOutEvent($character, 10, false, true));
     }
 
     /**
@@ -268,14 +282,31 @@ class TraverseService {
     protected function updateActions(int $mapId, Character $character, GameMap $oldGameMap) {
         $user         = $character->user;
         $gameMap      = GameMap::find($mapId);
-        $characterMap = $character->map;
 
-        $locationWithEffect   = Location::whereNotNull('enemy_strength_type')
-                                        ->where('x', $characterMap->character_position_x)
-                                        ->where('y', $characterMap->character_position_y)
-                                        ->where('game_map_id', $characterMap->game_map_id)
-                                        ->first();
+        $this->updateActionsForMap($gameMap, $oldGameMap, $character);
 
+        $monsters = $this->getMonstersForMap($character->map, $mapId);
+
+        $characterBaseStats = new Item($character, $this->characterSheetBaseInfoTransformer);
+
+        $characterBaseStats = $this->manager->createData($characterBaseStats)->toArray();
+
+        event(new UpdateBaseCharacterInformation($user, $characterBaseStats));
+
+        event(new UpdateTopBarEvent($character));
+
+        event(new UpdateMonsterList($monsters, $user));
+    }
+
+    /**
+     * Updates the character attack data based on map type.
+     *
+     * @param GameMap $gameMap
+     * @param GameMap $oldGameMap
+     * @param Character $character
+     * @return void
+     */
+    protected function updateActionsForMap(GameMap $gameMap, GameMap $oldGameMap, Character $character) {
         if ($gameMap->mapType()->isPurgatory() && $oldGameMap->mapType()->isHell()) {
             $this->updateActionTypeCache($character, $gameMap->enemy_stat_bonus);
         } else if ($gameMap->mapType()->isHell() && $oldGameMap->mapType()->isPurgatory() || ($gameMap->mapType()->isHell() && !$oldGameMap->mapType()->isPurgatory())) {
@@ -283,24 +314,20 @@ class TraverseService {
         } else if (!$gameMap->mapType()->isHell() && !$gameMap->mapType()->isPurgatory() && ($oldGameMap->mapType()->isHell() || $oldGameMap->mapType()->isPurgatory())) {
             $this->updateActionTypeCache($character, 0.0);
         }
+    }
 
-        $characterBaseStats = new Item($character, $this->characterSheetBaseInfoTransformer);
+    protected function getMonstersForMap(Map $characterMap, int $mapId): array {
+        $locationWithEffect   = Location::whereNotNull('enemy_strength_type')
+            ->where('x', $characterMap->character_position_x)
+            ->where('y', $characterMap->character_position_y)
+            ->where('game_map_id', $characterMap->game_map_id)
+            ->first();
 
         if (!is_null($locationWithEffect)) {
-            $monsters  = Cache::get('monsters')[$locationWithEffect->name];
-        } else {
-            $monsters  = Cache::get('monsters')[GameMap::find($mapId)->name];
+            return Cache::get('monsters')[$locationWithEffect->name];
         }
 
-        $characterBaseStats = $this->manager->createData($characterBaseStats)->toArray();
-
-        broadcast(new UpdateMonsterList($monsters, $user));
-
-        event(new UpdateBaseCharacterInformation($user, $characterBaseStats));
-
-        event(new UpdateTopBarEvent($character));
-
-
+        return Cache::get('monsters')[GameMap::find($mapId)->name];
     }
 
     /**
@@ -311,20 +338,7 @@ class TraverseService {
      * @return void
      */
     protected function updateActionTypeCache(Character $character, float $deduction) {
-
-        event(new GameServerMessageEvent($character->user, 'One moment while we refresh your stats...'));
-
-        resolve(BuildCharacterAttackTypes::class)->buildCache($character);
-
-        $attackData = Cache::get('character-attack-data-' . $character->id);
-
-        if ($deduction > 0.0) {
-            foreach ($attackData as $key => $array) {
-                $attackData[$key]['damage_deduction'] = $deduction;
-            }
-        }
-
-        Cache::put('character-attack-data-' . $character->id, $attackData);
+        CharacterAttackTypesCacheBuilderWithDeductions::dispatch($character, $deduction);
     }
 
     /**

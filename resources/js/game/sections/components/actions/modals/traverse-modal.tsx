@@ -4,6 +4,7 @@ import Select from "react-select";
 import ComponentLoading from "../../../../components/ui/loading/component-loading";
 import {AxiosError, AxiosResponse} from "axios";
 import Ajax from "../../../../lib/ajax/ajax";
+import LoadingProgressBar from "../../../../components/ui/progress-bars/loading-progress-bar";
 
 
 export default class TraverseModal extends React.Component<any, any> {
@@ -47,8 +48,10 @@ export default class TraverseModal extends React.Component<any, any> {
     }
 
     getDefaultValue() {
+        const playerMap = this.state.game_maps.filter((map: any) => map.id === this.props.map_id)[0];
+
         if (this.state.map  === 0) {
-            return {label: 'Please Select map', value: 0}
+            return {label: playerMap.name, value: playerMap.id}
         }
 
         const map = this.state.game_maps.filter((map: any) => map.id === this.state.map)[0];
@@ -62,7 +65,19 @@ export default class TraverseModal extends React.Component<any, any> {
     traverse() {
         this.setState({
             is_traversing: true,
-        })
+        });
+
+        (new Ajax()).setRoute('map/traverse/' + this.props.character_id).setParameters({
+            map_id: this.state.map,
+        }).doAjaxCall('post', (result: AxiosResponse) => {
+            this.setState({
+                is_traversing: false,
+            });
+
+            this.props.handle_close();
+        }, (error: AxiosError) => {
+
+        });
     }
 
     render() {
@@ -70,9 +85,10 @@ export default class TraverseModal extends React.Component<any, any> {
             <Dialogue is_open={this.props.is_open}
                       handle_close={this.props.handle_close}
                       title={'Traverse'}
+                      primary_button_disabled={this.state.is_traversing}
                       secondary_actions={{
                           handle_action: this.traverse.bind(this),
-                          secondary_button_disabled: false,
+                          secondary_button_disabled: this.state.is_traversing,
                           secondary_button_label: 'Traverse',
                       }}
             >
@@ -94,16 +110,27 @@ export default class TraverseModal extends React.Component<any, any> {
                                 className="fas fa-external-link-alt"></i></a> which if followed does help make these areas easier to farm valuable currencies and XP in.
                             </p>
                             <div className='w-2/3'>
-                                <Select
-                                    onChange={this.setMap.bind(this)}
-                                    options={this.buildTraverseOptions()}
-                                    menuPosition={'absolute'}
-                                    menuPlacement={'bottom'}
-                                    styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999, color: '#000000' }) }}
-                                    menuPortalTarget={document.body}
-                                    value={this.getDefaultValue()}
-                                />
+                                {
+                                    this.state.is_traversing ?
+                                        <span className='text-orange-700 dark:text-orange-400'>Traversing. One moment ...</span>
+                                    :
+                                        <Select
+                                            onChange={this.setMap.bind(this)}
+                                            options={this.buildTraverseOptions()}
+                                            menuPosition={'absolute'}
+                                            menuPlacement={'bottom'}
+                                            styles={{menuPortal: (base) => ({...base, zIndex: 9999, color: '#000000'})}}
+                                            menuPortalTarget={document.body}
+                                            value={this.getDefaultValue()}
+                                        />
+                                }
                             </div>
+
+                            {
+                                this.state.is_traversing ?
+                                    <LoadingProgressBar />
+                                : null
+                            }
                         </Fragment>
                 }
 
