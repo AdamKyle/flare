@@ -236,6 +236,12 @@ class CharacterInventoryController extends Controller {
             return $set->is_equipped;
         });
 
+        $setName = 'Set ' . $setIndex + 1;
+
+        if (!is_null($inventorySet->name)) {
+            $setName = $inventorySet->name;
+        }
+
         event(new UpdateTopBarEvent($character));
 
         $this->updateCharacterAttackDataCache($character);
@@ -244,7 +250,7 @@ class CharacterInventoryController extends Controller {
 
         event(new CharacterInventoryDetailsUpdate($character->user));
 
-        return response()->json(['message' => 'Set ' . $setIndex + 1 . ' is now equipped (equipment has been moved to the set)']);
+        return response()->json(['message' => $setName . ' is now equipped (equipment has been moved to the set)']);
     }
 
     public function removeFromSet(RemoveItemRequest $request, Character $character, InventorySetService $inventorySetService) {

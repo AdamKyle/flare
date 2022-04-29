@@ -53,6 +53,7 @@ export default class Attack extends BattleBase {
     }
 
     if (type === 'monster') {
+
       const monsterAttack = new MonsterAttack(attacker, defender, this.characterCurrentHealth, this.monsterCurrentHealth);
       const state = monsterAttack.doAttack(attackType, this.isVoided, this.isMonsterVoided);
 
@@ -80,7 +81,7 @@ export default class Attack extends BattleBase {
       this.state = {
         characterCurrentHealth: this.characterCurrentHealth,
         monsterCurrentHealth: this.monsterCurrentHealth,
-        battle_messages: this.battle_messages,
+        battle_messages: [...this.state.battle_messages, ...this.battle_messages],
       }
 
       if (this.isCharacterDead()) {

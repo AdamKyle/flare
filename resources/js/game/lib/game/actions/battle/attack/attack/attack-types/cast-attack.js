@@ -70,7 +70,7 @@ export default class CastAttack extends BattleBase {
       if (canHit) {
         if (this.canBlock()) {
 
-          this.addEnemyActionMessage(this.defender.name + ' blocked your damaging spell!');
+          this.addMessage(this.defender.name + ' blocked your damaging spell!', 'enemy-action');
 
           if (attackData.heal_for > 0) {
             this.healWithSpells(attackData);
@@ -185,13 +185,13 @@ export default class CastAttack extends BattleBase {
       counterHandler.resetMessages();
 
       if (this.monsterHealth <= 0) {
-        this.addEnemyActionMessage('Your counter of their counter has slaughtered the enemy!');
+        this.addMessage('Your counter of their counter has slaughtered the enemy!', 'enemy-action');
 
         return;
       }
 
       if (this.characterCurrentHealth <= 0) {
-        this.addEnemyActionMessage('The enemies counter has slaughtered you!');
+        this.addMessage('The enemies counter has slaughtered you!', 'enemy-action');
 
         return;
       }
@@ -200,7 +200,7 @@ export default class CastAttack extends BattleBase {
 
   healWithSpells(attackData) {
 
-    const skillBonus = this.attacker.skills.filter(s => s.name === 'Criticality')[0].skill_bonus;
+    const skillBonus = this.attacker.skills.criticality;
 
     let healFor = attackData.heal_for;
 

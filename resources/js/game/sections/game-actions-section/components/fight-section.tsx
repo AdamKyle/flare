@@ -149,6 +149,8 @@ export default class FightSection extends React.Component<FightSectionProps, any
 
         const attackState = attack.getState();
 
+        console.log(attackState);
+
         this.setState({
             battle_messages: [...this.battle_messages, ...attackState.battle_messages],
             monster_current_health: attackState.monsterCurrentHealth,
@@ -157,15 +159,17 @@ export default class FightSection extends React.Component<FightSectionProps, any
 
         this.battle_messages = [];
 
-        (new Ajax()).setRoute('battle-results/' + this.props.character?.id).setParameters({
-            is_character_dead: attackState.characterCurrentHealth <= 0,
-            is_defender_dead: attackState.monsterCurrentHealth <= 0,
-            monster_id: this.state.monster_to_fight_id,
-        }).doAjaxCall('post', (result: AxiosResponse) => {
-            this.props.set_attack_time_out(result.data.time_out);
-        }, (error: AxiosError) => {
-            console.log(error);
-        })
+        if (attackState.characterCurrentHealth <= 0 || attackState.monsterCurrentHealth <= 0) {
+            (new Ajax()).setRoute('battle-results/' + this.props.character?.id).setParameters({
+                is_character_dead: attackState.characterCurrentHealth <= 0,
+                is_defender_dead: attackState.monsterCurrentHealth <= 0,
+                monster_id: this.state.monster_to_fight_id,
+            }).doAjaxCall('post', (result: AxiosResponse) => {
+                // this.props.set_attack_time_out(result.data.time_out);
+            }, (error: AxiosError) => {
+                console.log(error);
+            });
+        }
     }
 
     attackButtonDisabled() {

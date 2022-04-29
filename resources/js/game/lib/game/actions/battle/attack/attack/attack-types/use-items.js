@@ -107,7 +107,7 @@ export default class UseItems extends BattleBase {
 
       this.characterCurrentHealth = this.characterCurrentHealth - totalDamage;
 
-      this.addEnemyActionMessage(attacker.name + '\'s artifacts hit for: ' + formatNumber(totalDamage), 'enemy-action');
+      this.addMessage(attacker.name + '\'s artifacts hit for: ' + formatNumber(totalDamage), 'enemy-action');
     }
   }
 

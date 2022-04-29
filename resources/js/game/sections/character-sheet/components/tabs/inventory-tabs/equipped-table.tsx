@@ -49,6 +49,20 @@ export default class EquippedTable extends React.Component<EquippedInventoryTabP
     }
 
     assignToSet(label: string) {
+        this.setState({
+            loading: true,
+        }, () => {
+            (new Ajax()).setRoute('character/'+this.props.character_id+'/inventory/save-equipped-as-set').setParameters({
+                move_to_set: this.props.sets[label].set_id,
+            }).doAjaxCall('post', (result: AxiosResponse) => {
+                this.setState({
+                    loading: false,
+                    success_message: result.data.message,
+                })
+            }, (error: AxiosError) => {
+
+            });
+        });
 
     }
 

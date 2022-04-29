@@ -155,13 +155,15 @@ class CharacterInventoryService {
 
             if (is_null($inventorySet->name)) {
                 $sets['Set ' . $index + 1] = [
-                    'items' => $this->manager->createData($slots)->toArray(),
+                    'items'      => $this->manager->createData($slots)->toArray(),
                     'equippable' => $inventorySet->can_be_equipped,
+                    'set_id'     => $inventorySet->id,
                 ];
             } else {
                 $sets[$inventorySet->name] = [
-                    'items' => $this->manager->createData($slots)->toArray(),
+                    'items'      => $this->manager->createData($slots)->toArray(),
                     'equippable' => $inventorySet->can_be_equipped,
+                    'set_id'     => $inventorySet->id,
                 ];
             }
         }

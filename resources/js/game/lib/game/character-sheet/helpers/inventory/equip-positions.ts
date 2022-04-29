@@ -1,6 +1,7 @@
 export abstract class EquipPositions {
 
     public static getAllowedPositions(type: string) {
+        console.log(type);
         switch(type) {
             case 'stave':
             case 'hammer':
@@ -8,9 +9,10 @@ export abstract class EquipPositions {
             case 'weapon':
             case 'shield':
                 return ['left-hand','right-hand'];
-            case 'rings':
+            case 'ring':
                 return ['ring-one','ring-two'];
-            case 'spells':
+            case 'spell-damage':
+            case 'spell-healing':
                 return ['spell-one','spell-two'];
             case 'artifact':
                 return ['artifact-one','artifact-two'];

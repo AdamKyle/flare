@@ -151,6 +151,14 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
 
         if (setId.length > 0) {
             setId = setId[0].id;
+        } else {
+            const contentsOfName: string[]|undefined = this.state.selected_set?.split(' ');
+
+            if (typeof contentsOfName !== 'undefined') {
+                const indexOfSet = parseInt(contentsOfName[1]) - 1;
+
+                setId = this.props.savable_sets[indexOfSet].id;
+            }
         }
 
         this.setState({

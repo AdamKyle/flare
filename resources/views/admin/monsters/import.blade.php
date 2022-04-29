@@ -13,11 +13,11 @@
                     If a quest item or game map does not exist, the monster will be skipped.
                 </x-core.alerts.info-alert>
             </div>
-            <form class="mt-4" action="{{route('affixes.import-data')}}" method="POST" enctype="multipart/form-data">
+            <form class="mt-4" action="{{route('monsters.import-data')}}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="mb-5">
-                    <label class="label block mb-2" for="affixes_import">Monster File</label>
-                    <input id="affixes_import" type="file" class="form-control" name="affixes_import" />
+                    <label class="label block mb-2" for="monsters_import">Monster File</label>
+                    <input id="monsters_import" type="file" class="form-control" name="monsters_import" />
                 </div>
                 <x-core.buttons.primary-button type="submit">Import Monsters</x-core.buttons.primary-button>
             </form>

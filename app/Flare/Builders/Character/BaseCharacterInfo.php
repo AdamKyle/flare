@@ -61,9 +61,13 @@ class BaseCharacterInfo {
             return $this->applyCharacterBoons($character, $base);
         }
 
+        $totalPercent = 0.0;
+
         foreach ($equipped as $slot) {
-            $base += $base * $this->fetchModdedStat($stat, $slot->item);
+            $totalPercent += $this->fetchModdedStat($stat, $slot->item);
         }
+
+        $base = $base + $base * $totalPercent;
 
         $base  = $this->applyCharacterBoons($character, $base);
         $total = $this->applyCharacterBoons($character, $base, $stat . '_mod');
@@ -161,17 +165,15 @@ class BaseCharacterInfo {
     protected function applyCharacterBoons(Character $character, $base, string $statAttribute = null): float {
         $boons = $this->fetchCharacterBoons($character);
 
+        $totalPercent = 0.0;
+
         if (!is_null($statAttribute) && $boons->isNotEmpty()) {
-            $bonus = $this->fetchStatIncrease($character, $statAttribute);
-
-            $base = $base + $base * $bonus;
+            $totalPercent = $this->fetchStatIncrease($character, $statAttribute);
         } else if ($boons->isNotEmpty()) {
-            $bonus = $this->fetchStatIncreaseSum($character);
-
-            $base = $base + $base * $bonus;
+            $totalPercent = $this->fetchStatIncreaseSum($character);
         }
 
-        return $base;
+        return $base + $base * $totalPercent;
     }
 
     /**
