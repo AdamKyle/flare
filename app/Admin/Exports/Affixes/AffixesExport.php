@@ -10,13 +10,19 @@ class AffixesExport implements WithMultipleSheets {
 
     use Exportable;
 
+    private $type;
+
+    public function __construct(string $type) {
+        $this->type = $type;
+    }
+
     /**
      * @return array
      */
     public function sheets(): array {
         $sheets   = [];
 
-        $sheets[] = new AffixesSheet;
+        $sheets[] = new AffixesSheet($this->type);
 
         return $sheets;
     }

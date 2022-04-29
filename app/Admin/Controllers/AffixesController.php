@@ -80,8 +80,21 @@ class AffixesController extends Controller {
     /**
      * @codeCoverageIgnore
      */
-    public function export() {
-        $response = Excel::download(new AffixesExport, 'affixes.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+    public function export(Request $request) {
+
+        if (!$request->has('export_type')) {
+            return redirect()->back()->with('error', 'No export type selected.');
+        }
+
+        $type = $request->export_type;
+
+        $fileName = ucFirst($type);
+
+        if (preg_match('/_/', $type)) {
+           $fileName = ucFirst(str_replace('_', ' ', $type));
+        }
+
+        $response = Excel::download(new AffixesExport($type), $fileName . ' (Affixes).xlsx', \Maatwebsite\Excel\Excel::XLSX);
         ob_end_clean();
 
         return $response;
