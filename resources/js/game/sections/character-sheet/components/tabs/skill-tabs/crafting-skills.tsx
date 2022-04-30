@@ -1,14 +1,27 @@
-import React from "react";
+import React, {Fragment} from "react";
 import Table from "../../../../../components/ui/data-tables/table";
 import SkillType from "../../../../../lib/game/character-sheet/types/skills/skill-type";
 import DangerButton from "../../../../../components/ui/buttons/danger-button";
 import PrimaryButton from "../../../../../components/ui/buttons/primary-button";
 import CraftingSkillsProps from "../../../../../lib/game/character-sheet/types/skills/tables/crafting-skills-props";
+import SkillInformation from "../../modals/skills/skill-information";
 
 export default class CraftingSkills extends React.Component<CraftingSkillsProps, any> {
 
     constructor(props: CraftingSkillsProps) {
         super(props);
+
+        this.state = {
+            show_skill_details: false,
+            skill: null,
+        }
+    }
+
+    manageSkillDetails(row?: any) {
+        this.setState({
+            show_skill_details: !this.state.show_skill_details,
+            skill: typeof row !== 'undefined' ? row : null,
+        });
     }
 
     buildColumns() {
@@ -17,6 +30,9 @@ export default class CraftingSkills extends React.Component<CraftingSkillsProps,
                 name: 'Name',
                 selector: (row: { name: string; }) => row.name,
                 sortable: true,
+                cell: (row: SkillType) => <span key={row.id + '-' + (Math.random() + 1).toString(36).substring(7)}>
+                    <button onClick={() => this.manageSkillDetails(row)}>{row.name}</button>
+                </span>
             },
             {
                 name: 'Level',
@@ -35,7 +51,19 @@ export default class CraftingSkills extends React.Component<CraftingSkillsProps,
 
     render() {
         return(
-            <Table columns={this.buildColumns()} data={this.props.crafting_skills} dark_table={this.props.dark_table} />
+            <Fragment>
+                <Table columns={this.buildColumns()} data={this.props.crafting_skills} dark_table={this.props.dark_table} />
+
+                {
+                    this.state.show_skill_details && this.state.skill !== null ?
+                        <SkillInformation
+                            skill={this.state.skill}
+                            manage_modal={this.manageSkillDetails.bind(this)}
+                            is_open={this.state.show_skill_details}
+                        />
+                        : null
+                }
+            </Fragment>
         )
     }
 

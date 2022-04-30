@@ -82,7 +82,7 @@ As you can see (first image above, not the modal) Surface has two parent quests:
 and Hunting Expedition, which then unlocks a whole mess of quests that start you on your way to unlocking Purgatory - which holds some of the 
 strongest monsters' known.
 
-Dungeons, Shadow Plane and Labyrinth all have quests that are apart-of the Tree of Hunting expedition, but since some of them have no one off or parent quests,
+Dungeons, Shadow Plane and Labyrinth all have quests that are apart-of the KingdomPassiveTree of Hunting expedition, but since some of them have no one off or parent quests,
 you won't see tabs for them.
 
 The list of quests above (in the table), won't give you the level of details this in-game tree will, but instead gives you a simplified break down of the

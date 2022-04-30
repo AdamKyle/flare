@@ -64,7 +64,7 @@ export default class CharacterSkillsTabs extends React.Component<CharacterSkillT
                     <CraftingSkills crafting_skills={this.state.skills.crafting_skills} dark_table={this.state.dark_tables} />
                 </TabPanel>
                 <TabPanel key={'kingdom-passives'}>
-                    <KingdomPassives is_dead={this.props.is_dead} />
+                    <KingdomPassives is_dead={this.props.is_dead} character_id={this.props.character_id} />
                 </TabPanel>
             </Tabs>
         )

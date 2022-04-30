@@ -16,7 +16,7 @@ If you have ideas for the game, please open a ticket with the appropriate templa
 - Crafting/Enchanting
 - Uniques
 - Faction Farming
-- Kingdom Passive Skill Tree, Various Trainable Skills
+- Kingdom Passive Skill KingdomPassiveTree, Various Trainable Skills
 - Fighting Monsters including automation (Exploration)
 - Adventuring
 - Kingdom Management
