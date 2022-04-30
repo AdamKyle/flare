@@ -29,7 +29,7 @@ export default class PopOverContainer extends React.Component<PopOverContainerPr
                                 leaveTo="opacity-0 translate-y-1"
                             >
                                 <Popover.Panel
-                                    className={clsx('absolute z-50 w-screen px-4 mt-3 transform -translate-x-[34%]', {
+                                    className={clsx('absolute z-50 w-screen px-4 mt-3 transform -translate-x-[34%] sm:-translate-x-[23%] md:-translate-x-[30%]', {
                                         'md:-translate-x-1/2 left-1/2 sm:px-0 lg:max-w-3xl': !this.props.make_small
                                     }, {
                                         'left-1/2 sm:px-0 lg:max-w-[350px]': this.props.make_small

@@ -3,6 +3,7 @@ import EnemyKingdomPin from "./enemy-kingdom-pin";
 import KingdomProps from "../../../lib/game/types/map/kingdom-pins/kingdom-props";
 import OtherKingdomModal from "./modals/other-kingdom-modal";
 import KingdomState from "../../../lib/game/types/map/kingdom-pins/kingdom-state";
+import {viewPortWatcher} from "../../../lib/view-port-watcher";
 
 export default class EnemyKingdoms extends React.Component<KingdomProps, KingdomState> {
 
@@ -12,6 +13,22 @@ export default class EnemyKingdoms extends React.Component<KingdomProps, Kingdom
         this.state = {
             open_kingdom_modal: false,
             kingdom_id: 0,
+            view_port: null,
+        }
+    }
+
+    componentDidMount() {
+        viewPortWatcher(this);
+    }
+
+    componentDidUpdate() {
+        if (this.state.view_port !== null) {
+            if (this.state.view_port < 1600 && this.state.open_kingdom_modal) {
+                this.setState({
+                    kingdom_id: 0,
+                    open_kingdom_modal: false,
+                });
+            }
         }
     }
 

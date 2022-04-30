@@ -3,4 +3,5 @@ export default interface KingdomState {
 
     kingdom_id: number,
 
+    view_port: number | null;
 }

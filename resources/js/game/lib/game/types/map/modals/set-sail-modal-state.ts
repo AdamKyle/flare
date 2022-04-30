@@ -26,4 +26,6 @@ export default interface SetSailModalState {
     time_out: number;
 
     current_port: LocationDetails | null;
+
+    view_port: number | null;
 }

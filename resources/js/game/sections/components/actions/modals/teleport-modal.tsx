@@ -7,6 +7,7 @@ import PopOverContainer from "../../../../components/ui/popover/pop-over-contain
 import {fetchCost} from "../../../../lib/game/map/teleportion-costs";
 import {formatNumber} from "../../../../lib/game/format-number";
 import TeleportModalState from "../../../../lib/game/types/map/modals/teleport-modal-state";
+import {viewPortWatcher} from "../../../../lib/view-port-watcher";
 
 
 export default class TeleportModal extends React.Component<TeleportModalProps, TeleportModalState> {
@@ -26,11 +27,14 @@ export default class TeleportModal extends React.Component<TeleportModalProps, T
             time_out: 0,
             current_location: null,
             current_player_kingdom: null,
-            current_enemy_kingdom: null
+            current_enemy_kingdom: null,
+            view_port: null,
         }
     }
 
     componentDidMount() {
+        viewPortWatcher(this);
+
         if (this.props.locations !== null) {
             const foundLocation = this.props.locations.filter((location) => location.x === this.props.character_position.x && location.y === this.props.character_position.y);
 
@@ -63,6 +67,12 @@ export default class TeleportModal extends React.Component<TeleportModalProps, T
     }
 
     componentDidUpdate() {
+        if (this.state.view_port !== null) {
+            if (this.state.view_port < 1600) {
+                this.props.handle_close();
+            }
+        }
+
         if (this.props.locations === null) {
             return;
         }

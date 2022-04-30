@@ -3,6 +3,7 @@ import LocationProps from "../../../lib/game/types/map/location-pins/location-pr
 import LocationPin from "./location-pin";
 import LocationState from "../../../lib/game/types/map/location-pins/location-state";
 import LocationModal from "./modals/location-modal";
+import {viewPortWatcher} from "../../../lib/view-port-watcher";
 
 export default class Location extends React.Component<LocationProps, LocationState> {
 
@@ -12,8 +13,24 @@ export default class Location extends React.Component<LocationProps, LocationSta
         this.state = {
             open_location_modal: false,
             location: null,
+            view_port: null,
         }
 
+    }
+
+    componentDidMount() {
+        viewPortWatcher(this);
+    }
+
+    componentDidUpdate() {
+        if (this.state.view_port !== null) {
+            if (this.state.view_port < 1600 && this.state.open_location_modal) {
+                this.setState({
+                    location: null,
+                    open_location_modal: false,
+                });
+            }
+        }
     }
 
     closeLocationDetails() {

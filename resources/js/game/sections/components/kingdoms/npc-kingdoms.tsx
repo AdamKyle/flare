@@ -4,6 +4,7 @@ import KingdomProps from "../../../lib/game/types/map/kingdom-pins/kingdom-props
 import NpcKingdomPin from "./npc-kingdom-pin";
 import NpcKingdomProps from "../../../lib/game/types/map/kingdom-pins/npc-kingdom-props";
 import NpcKingdomPinProps from "../../../lib/game/types/map/kingdom-pins/npc-kingdom-pin-props";
+import {viewPortWatcher} from "../../../lib/view-port-watcher";
 
 export default class NpcKingdoms extends React.Component<NpcKingdomProps, any> {
 

@@ -5,6 +5,7 @@ import ComponentLoading from "../../../../components/ui/loading/component-loadin
 import {AxiosError, AxiosResponse} from "axios";
 import Ajax from "../../../../lib/ajax/ajax";
 import LoadingProgressBar from "../../../../components/ui/progress-bars/loading-progress-bar";
+import {viewPortWatcher} from "../../../../lib/view-port-watcher";
 
 
 export default class TraverseModal extends React.Component<any, any> {

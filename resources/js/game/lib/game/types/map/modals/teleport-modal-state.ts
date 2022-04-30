@@ -23,5 +23,7 @@ export default interface TeleportModalState {
 
     current_player_kingdom: PlayerKingdomsDetails | null;
 
-    current_enemy_kingdom: PlayerKingdomsDetails | null
+    current_enemy_kingdom: PlayerKingdomsDetails | null;
+
+    view_port: number | null;
 }

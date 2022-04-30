@@ -7,6 +7,7 @@ import {fetchCost} from "../../../../lib/game/map/teleportion-costs";
 import {formatNumber} from "../../../../lib/game/format-number";
 import SetSailModalProps from "../../../../lib/game/types/map/modals/set-sail-modal-props";
 import SetSailModalState from "../../../../lib/game/types/map/modals/set-sail-modal-state";
+import {viewPortWatcher} from "../../../../lib/view-port-watcher";
 
 
 export default class TeleportModal extends React.Component<SetSailModalProps, SetSailModalState> {
@@ -28,10 +29,13 @@ export default class TeleportModal extends React.Component<SetSailModalProps, Se
             current_location: null,
             current_player_kingdom: null,
             current_enemy_kingdom: null,
+            view_port: null,
         }
     }
 
     componentDidMount() {
+        viewPortWatcher(this);
+
         if (this.props.ports !== null) {
             const foundLocation = this.props.ports.filter((port) => port.x === this.props.character_position.x && port.y === this.props.character_position.y);
 
@@ -55,6 +59,12 @@ export default class TeleportModal extends React.Component<SetSailModalProps, Se
                 this.setState({
                     current_port: foundLocation[0],
                 });
+            }
+        }
+
+        if (this.state.view_port !== null) {
+            if (this.state.view_port < 1600) {
+                this.props.handle_close();
             }
         }
     }
