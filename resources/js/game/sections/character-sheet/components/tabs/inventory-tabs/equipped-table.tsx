@@ -67,6 +67,10 @@ export default class EquippedTable extends React.Component<EquippedInventoryTabP
     }
 
     hasEmptySet() {
+        if (this.props.is_set_equipped) {
+            return false;
+        }
+
         const dropDownLabels = Object.keys(this.props.sets);
 
         // @ts-ignore
@@ -159,6 +163,14 @@ export default class EquippedTable extends React.Component<EquippedInventoryTabP
                             this.hasEmptySet() ?
                                 <div className='ml-2'>
                                     <DropDown menu_items={this.buildMenuItems()} button_title={'Assign to Set'} disabled={this.props.is_dead} />
+                                </div>
+                            : null
+                        }
+
+                        {
+                            this.props.is_set_equipped ?
+                                <div className='ml-2 text-green-700 dark:text-green-500'>
+                                    Set Equipped.
                                 </div>
                             : null
                         }
