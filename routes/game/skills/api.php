@@ -2,8 +2,6 @@
 
 Route::middleware(['auth', 'is.player.banned', 'is.character.who.they.say.they.are'])->group(function() {
 
-    Route::get('/character/kingdom-passives/{character}', ['uses' => 'Api\PassiveSkillsController@getKingdomPassives']);
-
     Route::get('/character/skills/{character}', ['uses' => 'Api\SkillsController@fetchSkills']);
 
     Route::middleware([ 'is.character.dead', 'is.character.adventuring'])->group(function() {

@@ -121,8 +121,6 @@ class TrainPassiveSkill implements ShouldQueue
 
         $character = $this->character->Refresh();
 
-        event(new UpdateTopBarEvent($character));
-
         event(new UpdatePassiveTree($character->user, $character->passiveSkills));
     }
 

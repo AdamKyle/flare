@@ -36,6 +36,8 @@ export default class KingdomPassiveTree extends React.Component<any, any> {
         });
     }
 
+
+
     render() {
         return (
             <Fragment>
@@ -57,6 +59,10 @@ export default class KingdomPassiveTree extends React.Component<any, any> {
                             is_open={this.state.show_training_modal}
                             manage_modal={this.showTrainingModal.bind(this)}
                             skill={this.state.skill}
+                            manage_success_message={this.props.manage_success_message}
+                            update_passives={this.props.update_passives}
+                            character_id={this.props.character_id}
+                            is_dead={this.props.is_dead}
                         />
                     : null
                 }

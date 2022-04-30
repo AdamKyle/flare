@@ -14,15 +14,25 @@ class CharacterPassiveSkillController extends Controller {
 
     private $passiveSkillTrainingService;
 
-    public function __construct(PassiveSkillTrainingService $passiveSkillTrainingService) {
+    private $characterPassiveSkills;
+
+    public function __construct(PassiveSkillTrainingService $passiveSkillTrainingService, CharacterPassiveSkills $characterPassiveSkills) {
         $this->passiveSkillTrainingService = $passiveSkillTrainingService;
+        $this->characterPassiveSkills      = $characterPassiveSkills;
+    }
+
+    public function getKingdomPassives(Character $character) {
+        return response()->json([
+            'kingdom_passives' => $this->characterPassiveSkills->getPassiveSkills($character),
+        ]);
     }
 
     public function trainSkill(CharacterPassiveSkill $characterPassiveSkill, Character $character) {
         $this->passiveSkillTrainingService->trainSkill($characterPassiveSkill, $character);
 
         return response()->json([
-            'message' => 'Started training ' . $characterPassiveSkill->passiveSkill->name,
+            'message'          => 'Started training ' . $characterPassiveSkill->passiveSkill->name,
+            'kingdom_passives' => $this->characterPassiveSkills->getPassiveSkills($character),
         ]);
     }
 
@@ -38,10 +48,9 @@ class CharacterPassiveSkillController extends Controller {
 
         event(new UpdateTopBarEvent($character));
 
-        event(new UpdatePassiveTree($character->user, $characterPassiveSkills->getPassiveSkills($character)));
-
         return response()->json([
-            'message' => 'Stopped training ' . $characterPassiveSkill->passiveSkill->name,
+            'message'          => 'Stopped training ' . $characterPassiveSkill->passiveSkill->name,
+            'kingdom_passives' => $this->characterPassiveSkills->getPassiveSkills($character),
         ]);
     }
 }

@@ -35,7 +35,5 @@ class PassiveSkillTrainingService {
         TrainPassiveSkill::dispatch($character, $skill)->delay($delayTime);
 
         event(new UpdateTopBarEvent($character));
-
-        event(new UpdatePassiveTree($character->user, $this->characterPassiveSkills->getPassiveSkills($character)));
     }
 }
