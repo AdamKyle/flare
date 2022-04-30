@@ -6,6 +6,9 @@ import PrimaryButton from "../../../../../components/ui/buttons/primary-button";
 import DangerButton from "../../../../../components/ui/buttons/danger-button";
 import SkillInformation from "../../modals/skills/skill-information";
 import {formatNumber} from "../../../../../lib/game/format-number";
+import TrainSkill from "../../modals/skills/train-skill";
+import {AxiosError, AxiosResponse} from "axios";
+import Ajax from "../../../../../lib/ajax/ajax";
 
 export default class Skills extends React.Component<SkillsProps, any> {
 
@@ -14,15 +17,35 @@ export default class Skills extends React.Component<SkillsProps, any> {
 
         this.state = {
             show_skill_details: false,
+            show_train_skill: false,
             skill: null,
+            stopping: false,
+            success_message: null,
         }
     }
 
-    trainSkill(id: number) {
+    manageTrainSkill(row: any) {
+        this.setState({
+            show_train_skill: !this.state.show_train_skill,
+            skill: typeof row !== 'undefined' ? row : null,
+        });
     }
 
-    stopTraining(id: number) {
+    stopTraining(row: any) {
+        this.setState({
+            stopping: true,
+        }, () => {
+            (new Ajax()).setRoute('skill/cancel-train/'+this.props.character_id+'/' + row.id).doAjaxCall('post', (result: AxiosResponse) => {
+                this.setState({
+                    stopping: false,
+                    success_message: result.data.message,
+                }, () => {
+                    this.props.update_skills(result.data.skills)
+                })
+            }, (error: AxiosError) => {
 
+            });
+        });
     }
 
     manageSkillDetails(row?: any) {
@@ -30,6 +53,22 @@ export default class Skills extends React.Component<SkillsProps, any> {
             show_skill_details: !this.state.show_skill_details,
             skill: typeof row !== 'undefined' ? row : null,
         });
+    }
+
+    setSuccessMessage(message: string) {
+        this.setState({
+            success_message: message,
+        });
+    }
+
+    closeSuccessMessage() {
+        this.setState({
+            success_message: null,
+        });
+    }
+
+    isAnySkillTraining() {
+        return this.props.trainable_skills.filter((skill) => skill.is_training).length > 0;
     }
 
     buildColumns() {
@@ -66,9 +105,10 @@ export default class Skills extends React.Component<SkillsProps, any> {
                 cell: (row: SkillType) => <span key={row.id + '-' + (Math.random() + 1).toString(36).substring(7)}>
                     {
                         row.is_training ?
-                            <DangerButton button_label={'Stop Training'} on_click={() => this.stopTraining(row.id)} disabled={this.props.is_dead} />
+                            <DangerButton button_label={this.state.stopping ? <span>Stopping <i
+                                className="fas fa-spinner fa-pulse"></i></span> : 'Stop training'} on_click={() => this.stopTraining(row)} disabled={this.props.is_dead || this.state.stopping} />
                         :
-                            <PrimaryButton button_label={'Train'} on_click={() => this.trainSkill(row.id)} disabled={this.props.is_dead} />
+                            <PrimaryButton button_label={'Train'} on_click={() => this.manageTrainSkill(row)} disabled={this.props.is_dead || this.isAnySkillTraining()} />
                     }
                 </span>
             },
@@ -86,6 +126,18 @@ export default class Skills extends React.Component<SkillsProps, any> {
                             skill={this.state.skill}
                             manage_modal={this.manageSkillDetails.bind(this)}
                             is_open={this.state.show_skill_details}
+                        />
+                    : null
+                }
+
+                {
+                    this.state.show_train_skill && this.state.skill !== null ?
+                        <TrainSkill is_open={this.state.show_train_skill}
+                                    manage_modal={this.manageTrainSkill.bind(this)}
+                                    skill={this.state.skill}
+                                    set_success_message={this.setSuccessMessage.bind(this)}
+                                    update_skills={this.props.update_skills}
+                                    character_id={this.props.character_id}
                         />
                     : null
                 }

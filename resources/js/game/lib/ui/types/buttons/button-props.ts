@@ -4,7 +4,7 @@ export default interface ButtonProps {
 
     disabled?: boolean,
 
-    button_label: string,
+    button_label: string | JSX.Element,
 
     on_click: (args: any) => void;
 }

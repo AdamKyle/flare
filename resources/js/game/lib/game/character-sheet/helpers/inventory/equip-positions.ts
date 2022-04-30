@@ -1,7 +1,6 @@
 export abstract class EquipPositions {
 
     public static getAllowedPositions(type: string) {
-        console.log(type);
         switch(type) {
             case 'stave':
             case 'hammer':

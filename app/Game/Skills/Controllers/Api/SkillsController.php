@@ -26,7 +26,10 @@ class SkillsController extends Controller {
         $result = $skillService->trainSkill($character, $request->skill_id, $request->xp_percentage);
 
         return response()->json([
-            'message' => $result['message']
+            'message' => $result['message'],
+            'skills'  => [
+                'training_skills' => $skillService->getSkills($character->refresh(), GameSkill::where('can_train', true)->pluck('id')->toArray()),
+            ]
         ], $result['status']);
     }
 
@@ -40,8 +43,11 @@ class SkillsController extends Controller {
             'xp_towards'         => 0.0,
         ]);
 
-        $skillService->updateSkills($character->refresh());
-
-        return response()->json(['message' => 'You stopped training: ' . $skill->name], 200);
+        return response()->json([
+            'message' => 'You stopped training: ' . $skill->name,
+            'skills'  => [
+                'training_skills' => $skillService->getSkills($character->refresh(), GameSkill::where('can_train', true)->pluck('id')->toArray()),
+            ]
+        ]);
     }
 }

@@ -10,6 +10,7 @@ import ComponentLoading from "../../../components/ui/loading/component-loading";
 import CharacterSkillTabsState from "../../../lib/game/character-sheet/types/skills/character-skill-tabs-state";
 import {watchForDarkModeSkillsChange} from "../../../lib/game/dark-mode-watcher";
 import CharacterSkillTabsProps from "../../../lib/game/character-sheet/types/skills/character-skill-tabs-props";
+import SkillType from "../../../lib/game/character-sheet/types/skills/skill-type";
 
 export default class CharacterSkillsTabs extends React.Component<CharacterSkillTabsProps, CharacterSkillTabsState> {
 
@@ -49,6 +50,21 @@ export default class CharacterSkillsTabs extends React.Component<CharacterSkillT
         });
     }
 
+    updateSkills(skills: any) {
+        if (typeof skills !== 'undefined') {
+            console.log(skills);
+            let stateSkills = JSON.parse(JSON.stringify(this.state.skills));
+
+            const keys = Object.keys(skills);
+
+            stateSkills[keys[0]] = skills[keys[0]];
+
+            this.setState({
+                skills: stateSkills
+            })
+        }
+    }
+
     render() {
 
         if (this.state.loading || this.state.skills === null) {
@@ -58,7 +74,7 @@ export default class CharacterSkillsTabs extends React.Component<CharacterSkillT
         return (
             <Tabs tabs={this.tabs} full_width={true}>
                 <TabPanel key={'skills'}>
-                    <Skills trainable_skills={this.state.skills.training_skills} dark_table={this.state.dark_tables} is_dead={this.props.is_dead} />
+                    <Skills trainable_skills={this.state.skills.training_skills} dark_table={this.state.dark_tables} is_dead={this.props.is_dead} update_skills={this.updateSkills.bind(this)} character_id={this.props.character_id}/>
                 </TabPanel>
                 <TabPanel key={'crafting'}>
                     <CraftingSkills crafting_skills={this.state.skills.crafting_skills} dark_table={this.state.dark_tables} />

@@ -149,8 +149,6 @@ export default class FightSection extends React.Component<FightSectionProps, any
 
         const attackState = attack.getState();
 
-        console.log(attackState);
-
         this.setState({
             battle_messages: [...this.battle_messages, ...attackState.battle_messages],
             monster_current_health: attackState.monsterCurrentHealth,

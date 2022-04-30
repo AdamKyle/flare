@@ -77,8 +77,6 @@ class SkillService {
             'xp_max'             => is_null($skill->xp_max) ? rand(100, 150) : $skill->xp_max,
         ]);
 
-        $this->updateSkills($character->refresh());
-
         return $this->successResult([
             'message' => 'You are now training ' . $skill->name
         ]);

@@ -41,8 +41,6 @@ export default class CharacterActiveBoons extends React.Component<any, any> {
         )
     }
 
-    console.log(this.state);
-
     return (
         <Fragment>
             <InfoAlert>
