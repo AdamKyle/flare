@@ -160,7 +160,7 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
     }
 
     cannotCraft() {
-        return this.state.crafting_time_out > 0 || !this.props.character_statuses?.can_craft
+        return this.state.crafting_time_out > 0 || !this.props.character_statuses?.can_craft || this.props.character_statuses?.is_dead
     }
 
     buildCraftingList() {
@@ -237,7 +237,7 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
                                     {
                                         this.state.character?.is_dead ?
                                             <div className='text-center my-4'>
-                                                <PrimaryButton button_label={'Revive'} on_click={this.revive.bind(this)} additional_css={'mb-4'} />
+                                                <PrimaryButton button_label={'Revive'} on_click={this.revive.bind(this)} additional_css={'mb-4'} disabled={!this.props.character_statuses?.can_attack}/>
                                                 <p>
                                                     You are dead. Please Revive.
                                                 </p>

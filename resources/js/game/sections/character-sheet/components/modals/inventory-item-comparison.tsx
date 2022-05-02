@@ -22,6 +22,7 @@ import InventoryComparisonAdjustment
 import SellItemModal from "./components/inventory-comparison/sell-item-modal";
 import ListItemModal from "./components/inventory-comparison/list-item-modal";
 import InventoryComparisonActions from "../../../../lib/game/character-sheet/ajax/inventory-comparison-actions";
+import ComparisonSection from "./components/inventory-comparison/comparison-section";
 
 export default class InventoryItemComparison extends React.Component<InventoryItemComparisonProps, InventoryItemComparisonState> {
 
@@ -50,6 +51,12 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
         }
     }
 
+    setStatusToLoading() {
+        this.setState({
+            action_loading: !this.state.action_loading
+        })
+    }
+
     componentDidMount() {
         (new Ajax()).setRoute('character/'+this.props.character_id+'/inventory/comparison').setParameters({
             params: {
@@ -64,82 +71,6 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
         }, (error: AxiosError) => {
             console.log(error);
         })
-    }
-
-    equipItem(type: string, position?: string) {
-
-        this.setState({
-            action_loading: true
-        });
-
-        const params = {
-            position: position,
-            slot_id: this.props.slot_id,
-            equip_type: type,
-        };
-
-        (new InventoryComparisonActions()).equipItem(this, params);
-    }
-
-    moveItem(setId: number) {
-
-        this.setState({
-            action_loading: true
-        });
-
-        const params = {
-            move_to_set: setId,
-            slot_id: this.state.comparison_details?.itemToEquip.slot_id,
-        };
-
-        (new InventoryComparisonActions()).moveItem(this, params);
-    }
-
-    sellItem() {
-        this.setState({
-            action_loading: true
-        });
-
-        const params = {
-            slot_id: this.state.comparison_details?.itemToEquip.slot_id,
-        };
-
-        (new InventoryComparisonActions()).sellItem(this, params);
-    }
-
-    listItem(price: number) {
-        this.setState({
-            action_loading: true
-        });
-
-        const params = {
-            list_for: price,
-            slot_id: this.state.comparison_details?.itemToEquip.slot_id,
-        };
-
-        (new InventoryComparisonActions()).listItem(this, params);
-    }
-
-
-    disenchantItem() {
-        this.setState({
-            action_loading: true
-        });
-
-        (new InventoryComparisonActions()).disenchantItem(this);
-    }
-
-    destroyItem() {
-
-        this.setState({
-            action_loading: true
-        });
-
-        const params = {
-            slot_id: this.state.comparison_details?.itemToEquip.slot_id,
-        };
-
-        (new InventoryComparisonActions()).destroyItem(this, params);
     }
 
     buildTitle() {
@@ -169,31 +100,6 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
         return false;
     }
 
-    manageEquipModal() {
-        this.setState({
-            show_equip_modal: !this.state.show_equip_modal
-        })
-    }
-
-    manageMoveModalModal() {
-        this.setState({
-            show_move_modal: !this.state.show_move_modal
-        })
-    }
-
-    manageSellModal(item?: InventoryComparisonAdjustment) {
-        this.setState({
-            show_sell_modal: !this.state.show_sell_modal,
-            item_to_sell: typeof item === 'undefined' ? null : item,
-        })
-    }
-
-    manageListItemModal(item?: InventoryComparisonAdjustment) {
-        this.setState({
-            show_list_item_modal: !this.state.show_list_item_modal,
-            item_to_sell: typeof item === 'undefined' ? null : item,
-        })
-    }
 
     isGridSize(size: number, itemToEquip: InventoryComparisonAdjustment) {
         switch(size) {
@@ -234,86 +140,20 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
                     this.state.loading || this.state.comparison_details === null ?
                         <div className='p-5 mb-2'><ComponentLoading /></div>
                     :
-                        <div className='p-5'>
-                            <ItemComparisonSection comparison_details={this.state.comparison_details} />
-                            <div className='border-b-2 mt-6 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                            <div className={clsx(
-                                'mt-6 grid grid-cols-1 w-full gap-2 md:m-auto',
-                                {
-                                    'md:w-3/4': this.isLargeModal(),
-                                    'md:grid-cols-6': this.isGridSize(6, this.state.comparison_details.itemToEquip),
-                                    'md:grid-cols-4': this.isGridSize(4, this.state.comparison_details.itemToEquip),
-                                }
-                            )}>
-                                <PrimaryOutlineButton button_label={'Equip'} on_click={this.manageEquipModal.bind(this)} disabled={this.state.action_loading}/>
-                                <PrimaryOutlineButton button_label={'Move'} on_click={this.manageMoveModalModal.bind(this)} disabled={this.state.action_loading}/>
-                                <SuccessOutlineButton button_label={'Sell'} on_click={() => this.manageSellModal(this.state.comparison_details?.itemToEquip)} disabled={this.state.action_loading}/>
-
-                                {
-                                    this.state.comparison_details.itemToEquip.affix_count > 0 || this.state.comparison_details.itemToEquip.holy_stacks_applied > 0 ?
-                                        <SuccessOutlineButton button_label={'List'}
-                                                              on_click={() => this.manageListItemModal(this.state.comparison_details?.itemToEquip)}
-                                                              disabled={this.state.action_loading}/>
-                                        : null
-                                }
-
-                                {
-                                    this.state.comparison_details.itemToEquip.affix_count > 0 ?
-                                        <DangerOutlineButton button_label={'Disenchant'} on_click={this.disenchantItem.bind(this)} disabled={this.state.action_loading}/>
-                                    : null
-                                }
-
-                                <DangerOutlineButton button_label={'Destroy'} on_click={this.destroyItem.bind(this)} disabled={this.state.action_loading}/>
-                            </div>
-
-                            {
-                                this.state.action_loading ?
-                                    <LoadingProgressBar />
-                                    : null
-                            }
-
-                            {
-                                this.state.show_equip_modal ?
-                                    <EquipModal is_open={this.state.show_equip_modal}
-                                                manage_modal={this.manageEquipModal.bind(this)}
-                                                item_to_equip={this.state.comparison_details.itemToEquip}
-                                                equip_item={this.equipItem.bind(this)}
-                                    />
-                                    : null
-                            }
-
-                            {
-                                this.state.show_move_modal ?
-                                    <MoveItemModal is_open={this.state.show_move_modal}
-                                                   manage_modal={this.manageMoveModalModal.bind(this)}
-                                                   usable_sets={this.props.usable_sets}
-                                                   move_item={this.moveItem.bind(this)}
-                                    />
-                                    : null
-                            }
-
-                            {
-                                this.state.show_sell_modal && this.state.item_to_sell !== null ?
-                                    <SellItemModal is_open={this.state.show_sell_modal}
-                                                   manage_modal={this.manageSellModal.bind(this)}
-                                                   sell_item={this.sellItem.bind(this)}
-                                                   item={this.state.item_to_sell}
-                                    />
-                                    : null
-                            }
-
-                            {
-                                this.state.show_list_item_modal ?
-                                    <ListItemModal
-                                        is_open={this.state.show_list_item_modal}
-                                        manage_modal={this.manageListItemModal.bind(this)}
-                                        list_item={this.listItem.bind(this)}
-                                        item={this.state.item_to_sell}
-                                        dark_charts={this.props.dark_charts}
-                                    />
-                                    : null
-                            }
-                        </div>
+                        <ComparisonSection
+                            is_large_modal={this.isLargeModal()}
+                            is_grid_size={this.isGridSize.bind(this)}
+                            comparison_details={this.state.comparison_details}
+                            set_action_loading={this.setStatusToLoading.bind(this)}
+                            is_action_loading={this.state.action_loading}
+                            update_inventory={this.props.update_inventory}
+                            set_success_message={this.props.set_success_message}
+                            manage_modal={this.props.manage_modal}
+                            character_id={this.props.character_id}
+                            dark_charts={this.props.dark_charts}
+                            usable_sets={this.props.usable_sets}
+                            slot_id={this.props.slot_id}
+                        />
                 }
             </Dialogue>
         );

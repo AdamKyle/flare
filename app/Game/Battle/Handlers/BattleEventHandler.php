@@ -3,6 +3,7 @@
 namespace App\Game\Battle\Handlers;
 
 use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Game\Core\Events\AttackTimeOutEvent;
 use Illuminate\Support\Facades\Cache;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
@@ -24,6 +25,8 @@ class BattleEventHandler {
         $character->update(['is_dead' => true]);
 
         $character = $character->refresh();
+
+        event(new AttackTimeOutEvent($character));
 
         event(new ServerMessageEvent($character->user, 'You are dead. Please revive yourself by clicking revive.'));
         event(new UpdateCharacterStatus($character));

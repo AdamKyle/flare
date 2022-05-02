@@ -90,8 +90,8 @@ export default class CanHitCheck extends BattleBase {
 
   toHitCalculation(toHit, agi, accuracy, dodge) {
 
-    let enemyAgi = agi * 0.20; // Take only 20%.
-    let playerToHit = toHit * 0.20; // take only 20%.
+    let enemyAgi = agi * 0.02; // Take only 20%.
+    let playerToHit = toHit * 0.02; // take only 20%.
 
     if (playerToHit < 10) {
       playerToHit = toHit;
