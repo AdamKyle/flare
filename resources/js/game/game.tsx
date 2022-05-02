@@ -12,6 +12,7 @@ import Actions from "./sections/game-actions-section/actions";
 import ManualProgressBar from "./components/ui/progress-bars/manual-progress-bar";
 import FetchGameData from "./lib/game/ajax/FetchGameData";
 import CharacterSheet from "./sections/character-sheet/character-sheet";
+import GameChat from "./sections/chat/game-chat";
 
 export default class Game extends React.Component<GameProps, GameState> {
 
@@ -203,9 +204,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                     </TabPanel>
                 </Tabs>
 
-                <BasicCard additionalClasses={'mt-10 mb-5'}>
-                    <p>Chat Section</p>
-                </BasicCard>
+                <GameChat user_id={this.props.userId} />
             </div>
         );
 

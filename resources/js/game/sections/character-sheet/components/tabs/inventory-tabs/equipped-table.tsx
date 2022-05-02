@@ -71,6 +71,10 @@ export default class EquippedTable extends React.Component<EquippedInventoryTabP
             return false;
         }
 
+        if (this.state.data.length === 0) {
+            return false;
+        }
+
         const dropDownLabels = Object.keys(this.props.sets);
 
         // @ts-ignore
@@ -157,7 +161,7 @@ export default class EquippedTable extends React.Component<EquippedInventoryTabP
                             <input type='text' name='search' className='form-control' onChange={this.search.bind(this)} placeholder={'search'}/>
                         </div>
                         <div className='ml-2'>
-                            <DangerButton button_label={'Unequip All'} on_click={this.unequipAll.bind(this)} disabled={this.props.is_dead} />
+                            <DangerButton button_label={'Unequip All'} on_click={this.unequipAll.bind(this)} disabled={this.props.is_dead || this.state.data.length === 0} />
                         </div>
                         {
                             this.hasEmptySet() ?

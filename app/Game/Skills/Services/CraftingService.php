@@ -205,12 +205,12 @@ class CraftingService {
     private function attemptToPickUpItem(Character $character, Item $item): bool {
         if (!$character->isInventoryFull()) {
 
-            $character->inventory->slots()->create([
+            $slot = $character->inventory->slots()->create([
                 'item_id'      => $item->id,
                 'inventory_id' => $character->inventory->id,
             ]);
 
-            event(new ServerMessageEvent($character->user, 'crafted', $item->name));
+            event(new ServerMessageEvent($character->user, 'crafted', $item->name, $slot->id));
 
             return true;
         }

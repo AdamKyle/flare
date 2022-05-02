@@ -28,10 +28,23 @@ class ItemsSheet implements ToCollection {
 
                 if (!is_null($item)) {
                     $item->update($itemData);
+
+                    $this->updateChildrenElements($item->refresh());
                 } else {
                     Item::create($itemData);
                 }
             }
+        }
+    }
+
+    protected function updateChildrenElements(Item $item) {
+        foreach ($item->children as $childItem) {
+            $attributes = $item->getAttributes();
+
+            $attributes['item_suffix_id'] = $childItem->item_suffix_id;
+            $attributes['item_prefix_id'] = $childItem->item_prefix_id;
+
+            $childItem->update();
         }
     }
 

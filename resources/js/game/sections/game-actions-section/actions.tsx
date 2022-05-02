@@ -163,6 +163,52 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
         return this.state.crafting_time_out > 0 || !this.props.character_statuses?.can_craft
     }
 
+    buildCraftingList() {
+        const options = [
+            {
+                name: 'Craft',
+                icon_class: 'ra ra-hammer',
+                on_click: () => this.openCrafting('craft'),
+            },
+            {
+                name: 'Enchant',
+                icon_class: 'ra ra-burning-embers',
+                on_click: () => this.openCrafting('enchant'),
+            },
+            {
+                name: 'Trinketry',
+                icon_class: 'ra ra-anvil',
+                on_click: () => this.openCrafting('trinketry'),
+            }
+        ];
+
+        if (!this.props.character.is_alchemy_locked) {
+            options.splice(2, 0, {
+                name: 'Alchemy',
+                icon_class: 'ra ra-potion',
+                on_click: () => this.openCrafting('alchemy'),
+            });
+        }
+
+        if (this.props.character.can_use_work_bench) {
+            if (typeof options[2] !== 'undefined') {
+                options.splice(3, 0, {
+                    name: 'Workbench',
+                    icon_class: 'ra ra-anvil',
+                    on_click: () => this.openCrafting('workbench'),
+                })
+            } else {
+                options.splice(2, 0, {
+                    name: 'Workbench',
+                    icon_class: 'ra ra-anvil',
+                    on_click: () => this.openCrafting('workbench'),
+                });
+            }
+        }
+
+        return options;
+    }
+
     render() {
 
         return (
@@ -173,33 +219,7 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
                     :
                         <div className='grid md:grid-cols-4'>
                             <div className='md:col-start-1 md:col-span-1'>
-                                <DropDown menu_items={[
-                                    {
-                                        name: 'Craft',
-                                        icon_class: 'ra ra-hammer',
-                                        on_click: () => this.openCrafting('craft'),
-                                    },
-                                    {
-                                        name: 'Enchant',
-                                        icon_class: 'ra ra-burning-embers',
-                                        on_click: () => this.openCrafting('enchant'),
-                                    },
-                                    {
-                                        name: 'Alchemy',
-                                        icon_class: 'ra ra-potion',
-                                        on_click: () => this.openCrafting('alchemy'),
-                                    },
-                                    {
-                                        name: 'Workbench',
-                                        icon_class: 'ra ra-anvil',
-                                        on_click: () => this.openCrafting('workbench'),
-                                    },
-                                    {
-                                        name: 'Trinketry',
-                                        icon_class: 'ra ra-anvil',
-                                        on_click: () => this.openCrafting('trinketry'),
-                                    }
-                                ]} button_title={'Craft/Enchant'} disabled={this.state.character?.is_dead || this.cannotCraft()} selected_name={this.getSelectedCraftingOption()}/>
+                                <DropDown menu_items={this.buildCraftingList()} button_title={'Craft/Enchant'} disabled={this.state.character?.is_dead || this.cannotCraft()} selected_name={this.getSelectedCraftingOption()}/>
                                 <DangerButton button_label={'Attack Kingdom'} on_click={this.attackKingdom.bind(this)} disabled={this.state.character?.is_dead} />
                             </div>
                             <div className='border-b-2 block border-b-gray-300 dark:border-b-gray-600 my-3 md:hidden'></div>

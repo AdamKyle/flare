@@ -126,15 +126,15 @@ export default class Damage extends BattleBase {
       const extraActionChance = attacker.extra_action_chance;
 
       if (extraActionChance.type === ExtraActionType.THIEVES_SHADOW_DANCE && extraActionChance.has_item) {
+
+        if (!this.canUse(extraActionChance.chance)) {
+          return false;
+        }
+
         this.addMessage('You dance along in the shadows, the enemy doesn\'t see you. Strike now!', 'regular');
 
         return true;
       }
-
-      if (!this.canUse(extraActionChance.chance)) {
-        return false;
-      }
-
     }
 
     return false;

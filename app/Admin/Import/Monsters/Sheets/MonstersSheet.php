@@ -63,7 +63,25 @@ class MonstersSheet implements ToCollection {
                     }
                 }
 
-                $cleanData[$key] = $value;
+                if ($key === 'health_range_min') {
+                    $cleanData['health_range'] = $monster['health_range_min'] . '-' . $monster['health_range_max'];
+                }
+
+                if ($key === 'attack_range_min') {
+                    $cleanData['attack_range'] = $monster['attack_range_min'] . '-' . $monster['attack_range_max'];
+                }
+
+                if ($key === 'health_range_max') {
+                    continue;
+                }
+
+                if ($key === 'attack_range_max') {
+                    continue;
+                }
+
+                if ($key !== 'health_range_min' && $key !== 'attack_range_min') {
+                    $cleanData[$key] = $value;
+                }
             }
         }
 

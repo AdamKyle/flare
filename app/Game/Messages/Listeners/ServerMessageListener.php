@@ -49,7 +49,7 @@ class ServerMessageListener
             case 'gained_item':
                 $message = 'You found a: ' . $event->forMessage . ' on the enemy\'s corpse!';
 
-                return broadcast(new ServerMessage($event->user, $message, false, true, $event->link, $event->id));
+                return broadcast(new ServerMessage($event->user, $message,));
             case 'found_item':
                 $message = 'You happen upon a: ' . $event->forMessage . '!';
 
@@ -57,7 +57,7 @@ class ServerMessageListener
             case 'crafted':
                 $message = 'You crafted a: ' . $event->forMessage . '!';
 
-                return broadcast(new ServerMessage($event->user, $message));
+                return broadcast(new ServerMessage($event->user, $message, $event->id));
             case 'enchantment_failed':
             case 'silenced':
             case 'deleted_affix':

@@ -7,6 +7,8 @@ export default interface SetsTableState {
 
     selected_set: string | null;
 
+    selected_set_index: number | null;
+
     success_message: string | null;
 
     show_rename_set: boolean;

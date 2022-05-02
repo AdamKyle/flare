@@ -20,27 +20,12 @@ class ServerMessageEvent implements ShouldBroadcastNow
     /**
      * @var User $user
      */
-    public $user;
+    private $user;
 
     /**
      * @var string message
      */
     public $message;
-
-    /**
-     * @var bool $npc
-     */
-    public $npc;
-
-    /**
-     * @var bool $isLink
-     */
-    public $isLink;
-
-    /**
-     * @var string|null $link
-     */
-    public $link;
 
     /**
      * @var int|null $id
@@ -57,12 +42,9 @@ class ServerMessageEvent implements ShouldBroadcastNow
      * @param string|null $link
      * @param int|null $id
      */
-    public function __construct(User $user, string $message, bool $npc = false, bool $isLink = false, string $link = null, int $id = null) {
+    public function __construct(User $user, string $message,  int $id = null) {
         $this->user    = $user;
         $this->message = $message;
-        $this->isLink  = $isLink;
-        $this->link    = $link;
-        $this->npc     = $npc;
         $this->id      = $id;
     }
 

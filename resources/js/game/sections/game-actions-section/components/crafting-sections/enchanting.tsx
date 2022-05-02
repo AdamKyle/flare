@@ -56,7 +56,7 @@ export default class Enchanting extends React.Component<any, any> {
                 }, () => {
                     // Select the next item in the list.
                     const foundIndex = result.data.character_inventory.findIndex((item: any) => {
-                        return item.id === this.state.selected_item
+                        return item.slot_id === this.state.selected_item
                     });
 
                     if (foundIndex !== -1) {
@@ -64,7 +64,7 @@ export default class Enchanting extends React.Component<any, any> {
 
                         if (typeof result.data.character_inventory[newIndex] != 'undefined') {
                             this.setState({
-                                selected_item: result.data.character_inventory[newIndex].id
+                                selected_item: result.data.character_inventory[newIndex].slot_id
                             });
                         }
                     }
@@ -97,7 +97,7 @@ export default class Enchanting extends React.Component<any, any> {
         return this.state.enchantable_items.map((item: any) => {
             return {
                 label: item.item_name,
-                value: item.id,
+                value: item.slot_id,
             }
         });
     }
@@ -116,7 +116,7 @@ export default class Enchanting extends React.Component<any, any> {
     selectedItemToEnchant() {
         if (this.state.selected_item !== null) {
             const foundItem = this.state.enchantable_items.filter((item: any) => {
-                return item.id === this.state.selected_item;
+                return item.slot_id === this.state.selected_item;
             });
 
             if (foundItem.length > 0) {
@@ -142,7 +142,7 @@ export default class Enchanting extends React.Component<any, any> {
 
             if (foundEnchantment.length > 0) {
                 return {
-                    label: foundEnchantment[0].name + ' Cost: ' + foundEnchantment[0].cost,
+                    label: foundEnchantment[0].name + ' Cost: ' + formatNumber(foundEnchantment[0].cost),
                     value: this.state['selected_' + type]
                 }
             }

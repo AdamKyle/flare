@@ -28,6 +28,7 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
             data: [],
             drop_down_labels: [],
             selected_set: null,
+            selected_set_index: null,
             loading: false,
             success_message: null,
             show_rename_set: false,
@@ -55,15 +56,28 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
         // @ts-ignore
         const data = sets[setKeys[0]].items;
 
+        console.log(this.state.selected_set, setKeys, setKeys[0]);
+
+        let setIndex = this.state.selected_set_index === null ? 0 : this.state.selected_set_index;
+        let selectedSet = '';
+
+        if (this.state.selected_set === null) {
+            selectedSet = setKeys[0];
+            setIndex    = 0;
+        } else {
+            selectedSet = setKeys[setIndex];
+        }
+
         this.setState({
             data: data,
             drop_down_labels: setKeys,
-            selected_set: setKeys[0],
+            selected_set: selectedSet,
+            selected_set_index: setIndex,
         })
     }
 
     actions(row: InventoryDetails): JSX.Element {
-        return <DangerButton button_label={'Remove'} on_click={() => this.removeFromSet(row.id)} disabled={this.buttonsDisabled()} />
+        return <DangerButton button_label={'Remove'} on_click={() => this.removeFromSet(row.slot_id)} disabled={this.buttonsDisabled()} />
     }
 
     emptySet() {
@@ -187,9 +201,14 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
         // @ts-ignore
         const data = this.props.sets[set].items;
 
+        const keys = Object.keys(this.props.sets);
+
+        const index = keys.indexOf(set, 0);
+
         this.setState({
             data: data,
             selected_set: set,
+            selected_set_index: index !== -1 ? index : 0
         });
     }
 
@@ -277,6 +296,14 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
         });
     }
 
+    buildSetTitle() {
+        if (this.state.selected_set !== null) {
+            return 'Viewing: '+this.state.selected_set + '.';
+        }
+
+        return null
+    }
+
     render() {
         return (
             <Fragment>
@@ -295,9 +322,16 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
                         </WarningAlert>
                     : null
                 }
+                {
+                    this.buildSetTitle() !== null ?
+                        <div>
+                            <h4 className='text-orange-500 dark:text-orange-400'>{this.buildSetTitle()}</h4>
+                        </div>
+                    : null
+                }
                 <div className='flex items-center'>
                     <div>
-                        <DropDown menu_items={this.buildMenuItems()} button_title={'Set'} selected_name={this.state.selected_set} secondary_selected={this.props.set_name_equipped} disabled={this.props.is_dead}  />
+                        <DropDown menu_items={this.buildMenuItems()} button_title={'Sets'} selected_name={this.state.selected_set} secondary_selected={this.props.set_name_equipped} disabled={this.props.is_dead}  />
                     </div>
                     <div className='ml-2'>
                         <DropDown menu_items={this.buildActionsDropDown()} button_title={'Actions'} disabled={this.props.is_dead}  />

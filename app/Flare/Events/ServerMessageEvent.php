@@ -39,6 +39,8 @@ class ServerMessageEvent
      */
     public $forMessage;
 
+    public $slotId;
+
     /**
      * Create a new event instance.
      *
@@ -48,12 +50,11 @@ class ServerMessageEvent
      * @param string|null $link
      * @param int|null $id
      */
-    public function __construct(User $user, string $type, $forMessage = null, string $link = null, int $id = null)
+    public function __construct(User $user, string $type, $forMessage = null, int $id = null)
     {
         $this->type        = $type;
         $this->user        = $user;
         $this->forMessage  = $forMessage;
-        $this->link        = $link;
-        $this->id          = $id;
+        $this->id          = is_null($id) ? 0 : $id;
     }
 }

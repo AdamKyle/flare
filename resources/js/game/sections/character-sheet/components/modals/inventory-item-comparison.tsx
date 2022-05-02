@@ -21,6 +21,7 @@ import InventoryComparisonAdjustment
     from "../../../../lib/game/character-sheet/types/modal/inventory-comparison-adjustment";
 import SellItemModal from "./components/inventory-comparison/sell-item-modal";
 import ListItemModal from "./components/inventory-comparison/list-item-modal";
+import InventoryComparisonActions from "../../../../lib/game/character-sheet/ajax/inventory-comparison-actions";
 
 export default class InventoryItemComparison extends React.Component<InventoryItemComparisonProps, InventoryItemComparisonState> {
 
@@ -71,23 +72,13 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
             action_loading: true
         });
 
-        (new Ajax()).setRoute('character/'+this.props.character_id+'/inventory/equip-item').setParameters({
+        const params = {
             position: position,
             slot_id: this.props.slot_id,
             equip_type: type,
-        }).doAjaxCall('post', (result: AxiosResponse) => {
-            this.setState({
-                action_loading: false,
-            }, () => {
-                this.props.update_inventory(result.data.inventory);
+        };
 
-                this.props.set_success_message(result.data.message);
-
-                this.props.manage_modal();
-            })
-        }, (error: AxiosError) => {
-
-        });
+        (new InventoryComparisonActions()).equipItem(this, params);
     }
 
     moveItem(setId: number) {
@@ -96,22 +87,12 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
             action_loading: true
         });
 
-        (new Ajax()).setRoute('character/'+this.props.character_id+'/inventory/move-to-set').setParameters({
+        const params = {
             move_to_set: setId,
             slot_id: this.state.comparison_details?.itemToEquip.slot_id,
-        }).doAjaxCall('post', (result: AxiosResponse) => {
-            this.setState({
-                action_loading: false,
-            }, () => {
-                this.props.update_inventory(result.data.inventory);
+        };
 
-                this.props.set_success_message(result.data.message);
-
-                this.props.manage_modal();
-            })
-        }, (error: AxiosError) => {
-
-        });
+        (new InventoryComparisonActions()).moveItem(this, params);
     }
 
     sellItem() {
@@ -119,21 +100,11 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
             action_loading: true
         });
 
-        (new Ajax()).setRoute('character/'+this.props.character_id+'/inventory/sell-item').setParameters({
+        const params = {
             slot_id: this.state.comparison_details?.itemToEquip.slot_id,
-        }).doAjaxCall('post', (result: AxiosResponse) => {
-            this.setState({
-                action_loading: false,
-            }, () => {
-                this.props.update_inventory(result.data.inventory);
+        };
 
-                this.props.set_success_message(result.data.message);
-
-                this.props.manage_modal();
-            })
-        }, (error: AxiosError) => {
-
-        });
+        (new InventoryComparisonActions()).sellItem(this, params);
     }
 
     listItem(price: number) {
@@ -141,22 +112,12 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
             action_loading: true
         });
 
-        (new Ajax()).setRoute('market-board/sell-item/' + this.props.character_id).setParameters({
+        const params = {
             list_for: price,
             slot_id: this.state.comparison_details?.itemToEquip.slot_id,
-        }).doAjaxCall('post', (result: AxiosResponse) => {
-            this.setState({
-                action_loading: false,
-            }, () => {
-                this.props.update_inventory(result.data.inventory);
+        };
 
-                this.props.set_success_message(result.data.message);
-
-                this.props.manage_modal();
-            })
-        }, (error: AxiosError) => {
-
-        });
+        (new InventoryComparisonActions()).listItem(this, params);
     }
 
 
@@ -165,19 +126,7 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
             action_loading: true
         });
 
-        (new Ajax()).setRoute('disenchant/' + this.state.comparison_details?.itemToEquip.id).doAjaxCall('post', (result: AxiosResponse) => {
-            this.setState({
-                action_loading: false,
-            }, () => {
-                this.props.update_inventory(result.data.inventory);
-
-                this.props.set_success_message(result.data.message);
-
-                this.props.manage_modal();
-            })
-        }, (error: AxiosError) => {
-
-        });
+        (new InventoryComparisonActions()).disenchantItem(this);
     }
 
     destroyItem() {
@@ -186,21 +135,11 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
             action_loading: true
         });
 
-        (new Ajax()).setRoute('character/'+this.props.character_id+'/inventory/destroy').setParameters({
-            slot_id: this.state.comparison_details?.itemToEquip.slot_id
-        }).doAjaxCall('post', (result: AxiosResponse) => {
-            this.setState({
-                action_loading: false,
-            }, () => {
-                this.props.update_inventory(result.data.inventory);
+        const params = {
+            slot_id: this.state.comparison_details?.itemToEquip.slot_id,
+        };
 
-                this.props.set_success_message(result.data.message);
-
-                this.props.manage_modal();
-            })
-        }, (error: AxiosError) => {
-
-        });
+        (new InventoryComparisonActions()).destroyItem(this, params);
     }
 
     buildTitle() {
@@ -255,8 +194,6 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
             item_to_sell: typeof item === 'undefined' ? null : item,
         })
     }
-
-    stubbedClick(){}
 
     isGridSize(size: number, itemToEquip: InventoryComparisonAdjustment) {
         switch(size) {

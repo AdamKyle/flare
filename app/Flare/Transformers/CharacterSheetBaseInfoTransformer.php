@@ -5,7 +5,9 @@ namespace App\Flare\Transformers;
 
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameSkill;
+use App\Flare\Models\Location;
 use App\Flare\Models\Skill;
+use App\Game\Skills\Values\SkillTypeValue;
 use Cache;
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Models\Character;
@@ -108,6 +110,8 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
             'devouring_light_res'         => $holyStacks->fetchDevouringResistanceBonus($character),
             'devouring_darkness_res'      => $holyStacks->fetchDevouringResistanceBonus($character),
             'is_attack_automation_locked' => $character->is_attack_automation_locked,
+            'is_alchemy_locked'           => $this->isAlchemyLocked($character),
+            'can_use_work_bench'          => $this->canUseWorkBench($character),
             'ambush_resistance'           => $characterTrinketsInformation->getAmbushResistanceChance($character),
             'counter_resistance'          => $characterTrinketsInformation->getCounterResistanceChance($character),
             'voided_weapon_attack'        => $characterInformation->getTotalWeaponDamage(false),
@@ -123,5 +127,18 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
                 'stat_reduction'     => $characterInformation->findSuffixStatReductionAffixes(),
             ],
         ];
+    }
+
+    public function isAlchemyLocked(Character $character): bool {
+        return Skill::where('character_id', $character->id)->where('game_skill_id', GameSkill::where('type', SkillTypeValue::ALCHEMY)->first()->id)->first()->is_locked;
+    }
+
+    public function canUseWorkBench(Character $character): bool {
+        $characterXPosition = $character->map->character_position_x;
+        $characterYPosition = $character->map->character_position_y;
+
+        $location = Location::where('x', $characterXPosition)->where('y', $characterYPosition)->where('name', 'Purgatory Smiths House')->first();
+
+        return !is_null($location);
     }
 }

@@ -32,13 +32,13 @@ class  EnchantingController extends Controller {
 
     public function enchant(EnchantingValidation $request, Character $character) {
         if (!$character->can_craft) {
-            return response()->json(['message' => 'invalid input.'], 429);
+            return response()->json(['message' => 'Cannot Craft.'], 429);
         }
 
         $slot = $this->enchantingService->getSlotFromInventory($character, $request->slot_id);
 
         if (is_null($slot)) {
-            return response()->json(['message' => 'invalid input.'], 422);
+            return response()->json(['message' => 'Invalid Slot.'], 422);
         }
 
         $cost = $this->enchantingService->getCostOfEnchantment($request->affix_ids, $slot->item->id);
