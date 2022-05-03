@@ -25,6 +25,10 @@ class AffixesSheet implements FromView, WithTitle, ShouldAutoSize {
 
         $query = $this->createQuery(ItemAffix::query(), $this->type);
 
+        if ($this->type === 'all') {
+            $query = ItemAffix::query();
+        }
+
         return view('admin.exports.affixes.sheets.affixes', [
             'affixes' => $query->where('randomly_generated', false)->orderBy('skill_level_required', 'asc')->get(),
         ]);

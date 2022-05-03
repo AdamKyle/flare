@@ -4,6 +4,8 @@ namespace App\Console\Commands;
 
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
+use App\Flare\Models\MarketBoard;
+use App\Flare\Models\MarketHistory;
 use App\Flare\Models\SetSlot;
 use Illuminate\Console\Command;
 
@@ -40,14 +42,23 @@ class DeleteDuplicateItems extends Command
      */
     public function handle()
     {
-        $duplicateIDs = Item::where('name', 'like', '%DUPLICATED%')->get()->pluck('id')->toArray();
+        $duplicateIDs = Item::where('name', 'like', '%DUPLICATE%')->get()->pluck('id')->toArray();
 
         foreach ($duplicateIDs as $duplicateID) {
             $inventorySlotsWithItem    = InventorySlot::where('item_id', $duplicateID)->get();
             $inventorySetSlotsWithItem = SetSlot::where('item_id', $duplicateID)->get();
 
             if ($inventorySetSlotsWithItem->isEmpty() && $inventorySlotsWithItem->isEmpty()) {
-                Item::find($duplicateID)->delete();
+
+                $duplicateItem = Item::find($duplicateID);
+
+                $this->replaceMarketItems($duplicateItem);
+
+                $this->replaceMarketHistory($duplicateItem);
+
+                $duplicateItem->appliedHolyStacks()->delete();
+
+                $duplicateItem->delete();
 
                 $this->info('Deleted ' . $duplicateID);
                 $this->newLine();
@@ -56,17 +67,23 @@ class DeleteDuplicateItems extends Command
 
                 $name = $duplicatedItem->name;
 
-                $name = trim(str_replace('DUPLICATED', '', $name));
+                $name = trim(str_replace('DUPLICATE', '', $name));
 
                 foreach ($inventorySlotsWithItem as $slot) {
-                   $this->replaceItem($slot, $name);
+                   $this->replaceItem($slot, $duplicatedItem);
                 }
 
                 foreach ($inventorySetSlotsWithItem as $slot) {
-                    $this->replaceItem($slot, $name);
+                    $this->replaceItem($slot, $duplicatedItem);
                 }
 
-                Item::find($duplicateID)->delete();
+                $this->replaceMarketItems($duplicatedItem);
+
+                $this->replaceMarketHistory($duplicatedItem);
+
+                $duplicatedItem->appliedHolyStacks()->delete();
+
+                $duplicatedItem->delete();
 
                 $this->info('Deleted (and replaced with non duplicate items) ' . $duplicateID);
                 $this->newLine();
@@ -74,8 +91,72 @@ class DeleteDuplicateItems extends Command
         }
     }
 
-    protected function replaceItem(InventorySlot | SetSlot $slot, string $name) {
-        $item = $slot->item;
+    protected function replaceMarketItems(Item $item) {
+        $marketListings = MarketBoard::where('item_id', $item->id)->get();
+        $name           = trim(str_replace('DUPLICATE', '', $item->name));
+
+        foreach ($marketListings as $listing) {
+            $newItemWithAffixes = Item::where('item_suffix_id', $item->item_suffix_id)->where('item_prefix_id', $item->item_prefix_id)->where('name', $name)->first();
+
+            if (is_null($newItemWithAffixes)) {
+                $duplicatedItem = Item::where('name', $name)->first()->duplicate();
+
+                $duplicatedItem->update([
+                    'item_suffix_id' => $item->item_suffix_id,
+                    'item_prefix_id' => $item->item_prefix_id
+                ]);
+
+                $duplicatedItem = $this->updateNewItemsHolyStacks($item, $duplicatedItem);
+
+                $itemForMarket = $duplicatedItem->refresh();
+
+                $listing->update([
+                    'item_id' => $itemForMarket->id,
+                ]);
+
+            } else {
+                $listing->update([
+                    'item_id' => $newItemWithAffixes->id,
+                ]);
+            }
+        }
+    }
+
+    protected function replaceMarketHistory(Item $item) {
+        $marketHistories = MarketHistory::where('item_id', $item->id)->get();
+        $name            = trim(str_replace('DUPLICATE', '', $item->name));
+
+        foreach ($marketHistories as $history) {
+            $newItemWithAffixes = Item::where('item_suffix_id', $item->item_suffix_id)->where('item_prefix_id', $item->item_prefix_id)->where('name', $name)->first();
+
+            if (is_null($newItemWithAffixes)) {
+                $duplicatedItem = Item::where('name', $name)->first()->duplicate();
+
+                $duplicatedItem->update([
+                    'item_suffix_id' => $item->item_suffix_id,
+                    'item_prefix_id' => $item->item_prefix_id
+                ]);
+
+                $duplicatedItem = $this->updateNewItemsHolyStacks($item, $duplicatedItem);
+
+                $itemForMarket = $duplicatedItem->refresh();
+
+                $history->update([
+                    'item_id' => $itemForMarket->id,
+                ]);
+
+            } else {
+                $history->update([
+                    'item_id' => $newItemWithAffixes->id,
+                ]);
+            }
+        }
+    }
+
+    protected function replaceItem(InventorySlot | SetSlot $slot, Item $duplicateItem, bool $hasHolyStacks = false) {
+        $item    = $slot->item;
+
+        $name    = trim(str_replace('DUPLICATE', '', $item->name));
 
         $newItem = Item::where('name', $name)->first();
 
@@ -90,6 +171,8 @@ class DeleteDuplicateItems extends Command
                     'item_suffix_id' => $item->item_suffix_id,
                     'item_prefix_id' => $item->item_prefix_id
                 ]);
+
+                $duplicatedItem = $this->updateNewItemsHolyStacks($duplicateItem, $duplicatedItem);
 
                 $itemForSlot = $duplicatedItem->refresh();
 
@@ -106,5 +189,22 @@ class DeleteDuplicateItems extends Command
                 'item_id' => $newItem->id,
             ]);
         }
+    }
+
+    protected function updateNewItemsHolyStacks(Item $duplicatedItem, Item $newItem): Item {
+
+        if ($duplicatedItem->appliedHolyStacks()->count() > 0) {
+            foreach ($duplicatedItem->appliedHolyStacks as $stack) {
+                $stackAttributes = $stack->getAttributes();
+
+                $stackAttributes['item_id'] = $newItem->id;
+
+                $newItem->appliedHolyStacks()->create($stackAttributes);
+
+                $stack->delete();
+            }
+        }
+
+        return $newItem;
     }
 }

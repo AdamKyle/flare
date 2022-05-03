@@ -4,6 +4,7 @@
     @php
     // TODO: Find a better place for this.
     $types = [
+            'all'                      => 'All Affixes',
             'str_mod'                  => 'Raises STR',
             'int_mod'                  => 'Raises Int',
             'dex_mod'                  => 'Raises Dex',
