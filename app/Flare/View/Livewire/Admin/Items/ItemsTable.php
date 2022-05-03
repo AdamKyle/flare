@@ -11,6 +11,8 @@ use App\Flare\Models\Item;
 
 class ItemsTable extends DataTableComponent {
 
+    public $isShop = false;
+
     public function configure(): void {
         $this->setPrimaryKey('id');
     }
@@ -20,6 +22,10 @@ class ItemsTable extends DataTableComponent {
             $item = Item::query();
         } else {
             $item = Item::whereNotIn('type', ['quest', 'alchemy']);
+        }
+
+        if ($this->isShop) {
+            $item = $item->whereNotIn('type', ['trinket', 'quest', 'alchemy'])->where('cost', '<=', 2000000000);
         }
 
         return $item->whereNull('item_prefix_id')

@@ -204,7 +204,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                     </TabPanel>
                 </Tabs>
 
-                <GameChat user_id={this.props.userId} />
+                <GameChat user_id={this.props.userId} character_id={this.state.character.id}/>
             </div>
         );
 

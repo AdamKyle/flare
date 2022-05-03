@@ -158,12 +158,14 @@ class CharacterInventoryService {
                     'items'      => $this->manager->createData($slots)->toArray(),
                     'equippable' => $inventorySet->can_be_equipped,
                     'set_id'     => $inventorySet->id,
+                    'equipped'   => $inventorySet->is_equipped,
                 ];
             } else {
                 $sets[$inventorySet->name] = [
                     'items'      => $this->manager->createData($slots)->toArray(),
                     'equippable' => $inventorySet->can_be_equipped,
                     'set_id'     => $inventorySet->id,
+                    'equipped'   => $inventorySet->is_equipped,
                 ];
             }
         }
@@ -243,9 +245,10 @@ class CharacterInventoryService {
             if (!$inventorySet->equipped) {
 
                 $indexes[] = [
-                    'index' => array_search($id, $setIds) + 1,
-                    'id' => $id,
-                    'name' => is_null($inventorySet->name) ? 'Set ' . array_search($id, $setIds) + 1 : $inventorySet->name,
+                    'index'    => array_search($id, $setIds) + 1,
+                    'id'       => $id,
+                    'name'     => is_null($inventorySet->name) ? 'Set ' . array_search($id, $setIds) + 1 : $inventorySet->name,
+                    'equipped' => $inventorySet->equipped,
                 ];
             }
         }

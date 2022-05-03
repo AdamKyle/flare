@@ -97,7 +97,7 @@ export default class GameChat extends React.Component<any, any> {
                 </TabPanel>
 
                 <TabPanel key={'server-messages'}>
-                    <ServerMessages server_messages={this.state.server_messages}/>
+                    <ServerMessages server_messages={this.state.server_messages} character_id={this.props.character_id} />
                 </TabPanel>
 
                 <TabPanel key={'exploration-messages'}>

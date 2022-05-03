@@ -23,7 +23,8 @@ class InventoryTransformer extends TransformerAbstract {
      */
     public function transform(InventorySlot|SetSlot $slot) {
         return [
-            'id'                      => $slot->item->id,
+            'id'                      => $slot->id,
+            'item_id'                 => $slot->item->id,
             'slot_id'                 => $slot->id,
             'item_name'               => $slot->item->affix_name,
             'type'                    => $slot->item->type,

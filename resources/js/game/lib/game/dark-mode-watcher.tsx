@@ -2,6 +2,7 @@ import CharacterInventoryTabs from "../../sections/character-sheet/components/ch
 import CharacterSkillsTabs from "../../sections/character-sheet/components/character-skills-tabs";
 import CharacterActiveBoons from "../../sections/character-sheet/components/character-active-boons";
 import {Component, ReactComponentElement} from "react";
+import ItemComparison from "../../sections/chat/modals/item-comparison";
 
 /**
  * When dark mode is enabled set the dark_table to true on the table.
@@ -18,6 +19,20 @@ export const watchForDarkModeInventoryChange = (component: CharacterInventoryTab
         } else if (!window.localStorage.hasOwnProperty('scheme') && component.state.dark_tables) {
             component.setState({
                 dark_tables: false
+            });
+        }
+    }, 10);
+}
+
+export const watchForChatDarkModeComparisonChange = (component: ItemComparison) => {
+    window.setInterval(() => {
+        if (window.localStorage.hasOwnProperty('scheme') && component.state.dark_charts !== true) {
+            component.setState({
+                dark_charts: window.localStorage.scheme === 'dark'
+            })
+        } else if (!window.localStorage.hasOwnProperty('scheme') && component.state.dark_charts) {
+            component.setState({
+                dark_charts: false
             });
         }
     }, 10);

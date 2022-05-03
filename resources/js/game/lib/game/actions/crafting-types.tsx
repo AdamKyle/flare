@@ -3,5 +3,9 @@ export const getCraftingType = (type: string): string => {
         return 'armour';
     }
 
+    if (type === 'spell-damage' || type === 'spell-healing') {
+        return 'spell';
+    }
+
     return type;
 }

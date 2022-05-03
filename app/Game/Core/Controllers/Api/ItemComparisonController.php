@@ -5,16 +5,24 @@ namespace App\Game\Core\Controllers\Api;
 use App\Flare\Models\Character;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
+use App\Game\Core\Requests\ComparisonFromChatValidate;
 use App\Game\Core\Requests\ComparisonValidation;
+use App\Game\Core\Services\CharacterInventoryService;
 use App\Game\Core\Services\ComparisonService;
 use App\Http\Controllers\Controller;
 
 class ItemComparisonController extends Controller {
 
-    public function __construct() {
+    private $comparisonService;
+
+    private $characterInventoryService;
+
+    public function __construct(ComparisonService $comparisonService, CharacterInventoryService $characterInventoryService) {
+        $this->comparisonService         = $comparisonService;
+        $this->characterInventoryService = $characterInventoryService;
     }
 
-    public function compareItem(ComparisonValidation $request, Character $character, ComparisonService $comparisonService, ) {
+    public function compareItem(ComparisonValidation $request, Character $character) {
         $inventory   = Inventory::where('character_id', $character->id)->first();
         $itemToEquip = InventorySlot::where('inventory_id', $inventory->id)->where('id', $request->slot_id)->first();
 
@@ -28,8 +36,30 @@ class ItemComparisonController extends Controller {
             $type = 'spell';
         }
 
-        $data = $comparisonService->buildComparisonData($character, $itemToEquip, $type);
+        $data = $this->comparisonService->buildComparisonData($character, $itemToEquip, $type);
 
         return response()->json($data);
+    }
+
+    public function compareItemFromChat(ComparisonFromChatValidate $request, Character $character) {
+        $inventory   = Inventory::where('character_id', $character->id)->first();
+        $itemToEquip = InventorySlot::where('inventory_id', $inventory->id)->where('id', $request->slot_id)->first();
+
+        if (is_null($itemToEquip)) {
+            return response()->json(['message' => 'Item does not exist  ...'], 422);
+        }
+
+        $type = $itemToEquip->item->type;
+
+        if ($type === 'spell-healing' || $type === 'spell-damage') {
+            $type = 'spell';
+        }
+
+        $data = $this->comparisonService->buildComparisonData($character, $itemToEquip, $type);
+
+        return response()->json([
+            'comparison_data' => $data,
+            'usable_sets'     => $this->characterInventoryService->setCharacter($character)->getInventoryForType('usable_sets')
+        ]);
     }
 }

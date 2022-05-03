@@ -50,13 +50,11 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
         }
     }
 
-    setSetData(sets: {[key: string]: { equippable: boolean; items: InventoryDetails[] | [] }}) {
+    setSetData(sets: {[key: string]: { equippable: boolean; items: InventoryDetails[] | [], equipped: boolean }}) {
         const setKeys = Object.keys(sets);
 
         // @ts-ignore
         const data = sets[setKeys[0]].items;
-
-        console.log(this.state.selected_set, setKeys, setKeys[0]);
 
         let setIndex = this.state.selected_set_index === null ? 0 : this.state.selected_set_index;
         let selectedSet = '';
@@ -64,6 +62,13 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
         if (this.state.selected_set === null) {
             selectedSet = setKeys[0];
             setIndex    = 0;
+
+            for (let i = 0; i < setKeys.length; i++) {
+                if (sets[setKeys[i]].equipped) {
+                    setIndex    = setKeys.findIndex((setKey) => setKey === setKeys[i]);
+                    selectedSet = setKeys[setIndex];
+                }
+            }
         } else {
             selectedSet = setKeys[setIndex];
         }
@@ -81,12 +86,10 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
     }
 
     emptySet() {
-        let setId: any = this.props.savable_sets.filter((set) => {
-            return set.name === this.state.selected_set;
-        });
+        let setId = 0;
 
-        if (setId.length > 0) {
-            setId = setId[0].id;
+        if (this.state.selected_set_index !== null) {
+            setId = this.props.savable_sets[this.state.selected_set_index].id;
         }
 
         this.setState({

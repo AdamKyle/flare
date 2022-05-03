@@ -72,7 +72,7 @@ class ServerMessageListener
             case 'plane-transfer':
             case 'enchanted':
             case 'moved-location':
-                return broadcast(new ServerMessage($event->user, $event->forMessage));
+                return broadcast(new ServerMessage($event->user, $event->forMessage, $event->id));
             case 'failed_to_craft':
                 $message = 'You failed to craft the item! You lost the investment.';
 

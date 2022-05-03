@@ -262,7 +262,7 @@ class EnchantingService {
     protected function appliedEnchantment(InventorySlot $slot, ItemAffix $affix, Character $character, Skill $enchantingSkill, bool $tooEasy = false) {
         $message = 'Applied enchantment: '.$affix->name.' to: ' . $slot->item->refresh()->affix_name;
 
-        event(new ServerMessageEvent($character->user, 'enchanted', $message));
+        event(new ServerMessageEvent($character->user, 'enchanted', $message, $slot->id));
 
         if (!$tooEasy) {
             event(new UpdateSkillEvent($enchantingSkill));

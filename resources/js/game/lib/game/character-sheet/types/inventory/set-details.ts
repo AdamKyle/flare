@@ -5,4 +5,6 @@ export default interface SetDetails {
     index:  number;
 
     name: string;
+
+    equipped: boolean;
 }

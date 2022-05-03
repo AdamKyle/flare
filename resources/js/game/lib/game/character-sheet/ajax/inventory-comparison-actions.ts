@@ -20,11 +20,16 @@ export default class InventoryComparisonActions {
         (new Ajax()).setRoute('character/'+component.props.character_id+'/inventory/equip-item')
                     .setParameters(params)
                     .doAjaxCall('post', (result: AxiosResponse) => {
+
                         component.props.set_action_loading();
 
-                        component.props.update_inventory(result.data.inventory);
+                        if (typeof component.props.update_inventory !== 'undefined') {
+                            component.props.update_inventory(result.data.inventory);
+                        }
 
-                        component.props.set_success_message(result.data.message);
+                        if (typeof component.props.set_success_message !== 'undefined') {
+                            component.props.set_success_message(result.data.message);
+                        }
 
                         component.props.manage_modal();
                     }, (error: AxiosError) => {
@@ -38,9 +43,13 @@ export default class InventoryComparisonActions {
                     .doAjaxCall('post', (result: AxiosResponse) => {
                         component.props.set_action_loading();
 
-                        component.props.update_inventory(result.data.inventory);
+                        if (typeof component.props.update_inventory !== 'undefined') {
+                            component.props.update_inventory(result.data.inventory);
+                        }
 
-                        component.props.set_success_message(result.data.message);
+                        if (typeof component.props.set_success_message !== 'undefined') {
+                            component.props.set_success_message(result.data.message);
+                        }
 
                         component.props.manage_modal();
                     }, (error: AxiosError) => {
@@ -54,9 +63,13 @@ export default class InventoryComparisonActions {
                     .doAjaxCall('post', (result: AxiosResponse) => {
                         component.props.set_action_loading();
 
-                        component.props.update_inventory(result.data.inventory);
+                        if (typeof component.props.update_inventory !== 'undefined') {
+                            component.props.update_inventory(result.data.inventory);
+                        }
 
-                        component.props.set_success_message(result.data.message);
+                        if (typeof component.props.set_success_message !== 'undefined') {
+                            component.props.set_success_message(result.data.message);
+                        }
 
                         component.props.manage_modal();
                     }, (error: AxiosError) => {
@@ -70,9 +83,13 @@ export default class InventoryComparisonActions {
                     .doAjaxCall('post', (result: AxiosResponse) => {
                         component.props.set_action_loading();
 
-                        component.props.update_inventory(result.data.inventory);
+                        if (typeof component.props.update_inventory !== 'undefined') {
+                            component.props.update_inventory(result.data.inventory);
+                        }
 
-                        component.props.set_success_message(result.data.message);
+                        if (typeof component.props.set_success_message !== 'undefined') {
+                            component.props.set_success_message(result.data.message);
+                        }
 
                         component.props.manage_modal();
                     }, (error: AxiosError) => {
@@ -85,9 +102,13 @@ export default class InventoryComparisonActions {
                     .doAjaxCall('post', (result: AxiosResponse) => {
                         component.props.set_action_loading();
 
-                        component.props.update_inventory(result.data.inventory);
+                        if (typeof component.props.update_inventory !== 'undefined') {
+                            component.props.update_inventory(result.data.inventory);
+                        }
 
-                        component.props.set_success_message(result.data.message);
+                        if (typeof component.props.set_success_message !== 'undefined') {
+                            component.props.set_success_message(result.data.message);
+                        }
 
                         component.props.manage_modal();
                     }, (error: AxiosError) => {
@@ -101,9 +122,13 @@ export default class InventoryComparisonActions {
                     .doAjaxCall('post', (result: AxiosResponse) => {
                         component.props.set_action_loading();
 
-                        component.props.update_inventory(result.data.inventory);
+                        if (typeof component.props.update_inventory !== 'undefined') {
+                            component.props.update_inventory(result.data.inventory);
+                        }
 
-                        component.props.set_success_message(result.data.message);
+                        if (typeof component.props.set_success_message !== 'undefined') {
+                            component.props.set_success_message(result.data.message);
+                        }
 
                         component.props.manage_modal();
                     }, (error: AxiosError) => {
