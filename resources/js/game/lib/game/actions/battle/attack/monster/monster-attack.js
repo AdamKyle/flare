@@ -144,8 +144,6 @@ export default class MonsterAttack extends BattleBase {
     if (!isMonsterVoided) {
       const useItems = new UseItems(this.defender, this.currentMonsterHealth, this.currentCharacterHealth);
 
-      useItems.useArtifacts(attacker, this.defender, 'monster');
-
       this.mergeMessages(useItems.getBattleMessage());
 
       this.currentCharacterHealth = useItems.getCharacterCurrentHealth();

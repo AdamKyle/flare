@@ -32,7 +32,6 @@ export default class UseItems extends BattleBase {
       this.mergeMessages(damageAffixes.getBattleMessages());
     }
 
-    this.useArtifacts(attackData, this.defender, 'player');
     this.ringDamage(attackData, this.defender, 'player');
   }
 
@@ -57,58 +56,6 @@ export default class UseItems extends BattleBase {
     this.monsterCurrentHealth   = lifeStealingAffixes.getMonsterHealth();
 
     this.mergeMessages(lifeStealingAffixes.getBattleMessages());
-  }
-
-  useArtifacts(attacker, defender, type) {
-    if (type == 'player') {
-      if (attacker.artifact_damage !== 0) {
-        this.addMessage('Your artifacts glow before the enemy!', 'regular');
-
-        this.artifactDamage(attacker, defender, type);
-
-      }
-    } else {
-      if (attacker.artifact_damage !== 0) {
-
-        this.addMessage('The enemy\'s artifacts glow brightly!');
-
-        this.artifactDamage(attacker, defender, type);
-      }
-    }
-  }
-
-  artifactDamage(attacker, defender, type) {
-
-    if (type === 'player') {
-
-      const dc        = 100 - (100 * defender.artifact_annulment);
-      let totalDamage = attacker.artifact_damage - attacker.artifact_damage * attacker.damage_deduction;
-
-      if (dc <= 0 || random(1, 100) > dc) {
-        this.addMessage(attacker.name + '\'s artifacts are annulled!', 'regular');
-
-        return;
-      }
-
-      this.monsterCurrentHealth = this.monsterCurrentHealth - totalDamage;
-
-      this.addMessage(attacker.name + '\'s artifacts hit for: ' + formatNumber(Math.ceil(totalDamage)), 'player-action');
-    }
-
-    if (type === 'monster') {
-      const dc        = 100 - (100 * defender.artifact_annulment);
-      let totalDamage = attacker.artifact_damage;
-
-      if (dc <= 0 || random(1, 100) > dc) {
-        this.addMessage(attacker.name + '\'s artifacts are annulled!', 'regular');
-
-        return;
-      }
-
-      this.characterCurrentHealth = this.characterCurrentHealth - totalDamage;
-
-      this.addMessage(attacker.name + '\'s artifacts hit for: ' + formatNumber(totalDamage), 'enemy-action');
-    }
   }
 
   ringDamage(attacker, defender, type) {

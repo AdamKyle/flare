@@ -54,7 +54,6 @@ class ItemsTable extends DataTableComponent {
             'leggings'      => 'Leggings',
             'feet'          => 'Feet',
             'ring'          => 'Rings',
-            'artifact'      => 'Artifacts',
             'spell-healing' => 'Healing Spells',
             'spell-damage'  => 'Damage Spells',
         ];

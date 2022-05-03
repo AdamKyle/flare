@@ -65,10 +65,6 @@ class DeleteDuplicateItems extends Command
             } else {
                 $duplicatedItem = Item::find($duplicateID);
 
-                $name = $duplicatedItem->name;
-
-                $name = trim(str_replace('DUPLICATE', '', $name));
-
                 foreach ($inventorySlotsWithItem as $slot) {
                    $this->replaceItem($slot, $duplicatedItem);
                 }

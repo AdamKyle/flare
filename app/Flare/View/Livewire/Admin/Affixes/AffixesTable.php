@@ -85,7 +85,6 @@ class AffixesTable extends DataTableComponent {
             'Armour Crafting'          => 'Armour Crafting',
             'Spell Crafting'           => 'Spell Crafting',
             'Ring Crafting'            => 'Ring Crafting',
-            'Artifact Crafting'        => 'Artifact Crafting',
             'Enchanting'               => 'Enchanting',
             'Alchemy'                  => 'Alchemy',
             'Accuracy'                 => 'Accuracy',

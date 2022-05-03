@@ -24,9 +24,9 @@ class EquipItemValidation extends FormRequest
     public function rules()
     {
         return [
-            'position'           => 'required|in:left-hand,right-hand,body,shield,leggings,feet,sleeves,sleeves,helmet,gloves,ring-one,ring-two,spell-one,spell-two,artifact-one,artifact-two,trinket-one,trinket-two',
+            'position'           => 'required|in:left-hand,right-hand,body,shield,leggings,feet,sleeves,sleeves,helmet,gloves,ring-one,ring-two,spell-one,spell-two,trinket-one,trinket-two',
             'slot_id'            => 'required',
-            'equip_type'         => 'required|in:weapon,hammer,bow,stave,body,shield,leggings,feet,sleeves,helmet,gloves,ring,spell-healing,spell-damage,artifact,trinket',
+            'equip_type'         => 'required|in:weapon,hammer,bow,stave,body,shield,leggings,feet,sleeves,helmet,gloves,ring,spell-healing,spell-damage,trinket',
         ];
     }
 
