@@ -8,6 +8,7 @@ import Messages from "./components/messages";
 import Ajax from "../../lib/ajax/ajax";
 import ServerMessages from "./server-messages";
 import {cloneDeep} from "lodash";
+import {AxiosError, AxiosResponse} from "axios";
 
 export default class GameChat extends React.Component<any, any> {
 
@@ -43,7 +44,7 @@ export default class GameChat extends React.Component<any, any> {
         // @ts-ignore
         this.serverMessages.listen('Game.Messages.Events.ServerMessageEvent', (event: any) => {
             let messages = cloneDeep(this.state.server_messages);
-            console.log(messages, event);
+
             if (messages.length > 1000) {
                 messages.length = 250; // Remove the last 3/4's worth of messages
             }
@@ -68,10 +69,27 @@ export default class GameChat extends React.Component<any, any> {
         });
     }
 
-    sendMessage() {
-        (new Ajax()).setRoute('public-message').setParameters({
-            message: this.state.message,
-        });
+    sendMessage(e?: any) {
+
+        if (typeof e !== 'undefined') {
+            if (e.key === 'Enter') {
+                (new Ajax()).setRoute('public-message').setParameters({
+                    message: this.state.message,
+                }).doAjaxCall('post', (result: AxiosResponse) => {
+                    console.log(result.data);
+                }, (error: AxiosError) => {
+
+                });
+            }
+        } else {
+            (new Ajax()).setRoute('public-message').setParameters({
+                message: this.state.message,
+            }).doAjaxCall('post', (result: AxiosResponse) => {
+                console.log(result.data);
+            }, (error: AxiosError) => {
+
+            });
+        }
     }
 
     render() {
