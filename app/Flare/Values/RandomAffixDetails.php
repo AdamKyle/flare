@@ -41,24 +41,24 @@ class RandomAffixDetails {
     public function getPercentageRange(): array {
         switch($this->value) {
             case self::MEDIUM:
-                return [225, 350];
+                return [50, 75];
             case self::LEGENDARY:
-                return [375, 700];
+                return [75, 99];
             case self::BASIC:
             default:
-                return [105, 185];
+                return [35, 50];
         }
     }
 
     public function getDamageRange(): array {
         switch($this->value) {
             case self::MEDIUM:
-                return [10000000, 25000000];
+                return [50000, 75000];
             case self::LEGENDARY:
-                return [50000000, 125000000];
+                return [75000, 99999];
             case self::BASIC:
             default:
-                return [3000000, 8000000];
+                return [30000, 50000];
         }
     }
 
@@ -89,6 +89,11 @@ class RandomAffixDetails {
             'Exile\'s Enchantment',
             'Demonic Infinity',
             'Guardian\s Fear',
+            'Esoteric Flash',
+            'Tranquility Gift',
+            'Putrefaction of Mortality',
+            'Beam of Lightning',
+            'Burst of Precision'
         ];
     }
 
