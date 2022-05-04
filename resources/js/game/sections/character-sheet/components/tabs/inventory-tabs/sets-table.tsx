@@ -90,11 +90,8 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
     }
 
     emptySet() {
-        let setId = 0;
-
-        if (this.state.selected_set_index !== null) {
-            setId = this.props.savable_sets[this.state.selected_set_index].id;
-        }
+        // @ts-ignore
+        const setId = this.props.sets[this.state.selected_set].set_id
 
         this.setState({
             loading: true
@@ -212,6 +209,8 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
 
         const index = keys.indexOf(set, 0);
 
+        console.log(set, keys, index);
+
         this.setState({
             data: data,
             selected_set: set,
@@ -245,7 +244,7 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
         })
 
         if (this.state.selected_set !== null) {
-            if (this.state.selected_set !== this.props.set_name_equipped) {
+            if (this.state.selected_set !== this.props.set_name_equipped && this.props.sets[this.state.selected_set].items.length > 0) {
                 actions.push({
                     name: 'Empty set',
                     icon_class: 'ra ra-crossed-swords',

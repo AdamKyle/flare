@@ -83,7 +83,17 @@ class DeleteAllArtifacts extends Command
             $questItem->delete();
         }
 
-        ItemAffix::where('skill_name', 'Artifact Crafting')->delete();
+        $affixes = ItemAffix::where('skill_name', 'Artifact Crafting')->get();
+
+        foreach ($affixes as $affix) {
+            Item::where('item_suffix_id', $affix->id)->update([
+                'item_suffix_id' => null,
+            ]);
+
+            Item::where('item_prefix_id', $affix->id)->update([
+                'item_prefix_id' => null,
+            ]);
+        }
 
         $gameSkill = GameSkill::where('name', 'Artifact Crafting')->first();
 

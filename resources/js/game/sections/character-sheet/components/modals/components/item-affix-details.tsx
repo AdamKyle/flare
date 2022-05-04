@@ -9,7 +9,6 @@ export default class ItemAffixDetails extends React.Component<any, any> {
     }
 
     render() {
-        console.log(this.props.affix);
         return(
             <Dialogue is_open={this.props.is_open}
                       handle_close={this.props.manage_modal}

@@ -73,6 +73,7 @@ class ItemTransformer extends TransformerAbstract {
             'min_cost'                         => SellItemCalculator::fetchMinPrice($item),
             'holy_level'                       => $item->holy_level,
             'holy_stacks'                      => $item->holy_stacks,
+            'applied_stacks'                   => $item->appliedHolyStacks,
             'holy_stack_devouring_darkness'    => $item->holy_stack_devouring_darkness,
             'holy_stack_stat_bonus'            => $item->holy_stack_stat_bonus,
             'holy_stacks_applied'              => $item->holy_stacks_applied,

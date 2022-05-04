@@ -30,10 +30,10 @@ export default class CharacterSheet extends React.Component<CharacterSheetProps,
                 }
 
                 <div className='flex flex-col lg:flex-row w-full gap-2'>
-                    <BasicCard additionalClasses={'overflow-x-auto lg:w-1/2'}>
+                    <BasicCard additionalClasses={'overflow-y-auto lg:w-1/2'}>
                         <CharacterTabs character={this.props.character} />
                     </BasicCard>
-                    <BasicCard additionalClasses={'overflow-x-auto lg:w-1/2'}>
+                    <BasicCard additionalClasses={'overflow-y-auto lg:w-1/2'}>
                         <div className='grid lg:grid-cols-2 gap-2'>
                             <div>
                                 <dl>
@@ -67,10 +67,10 @@ export default class CharacterSheet extends React.Component<CharacterSheetProps,
                     </BasicCard>
                 </div>
                 <div className='flex flex-col lg:flex-row gap-2 w-full mt-2'>
-                    <BasicCard additionalClasses={'overflow-x-auto lg:w-1/2 lg:h-fit'}>
+                    <BasicCard additionalClasses={'overflow-y-auto lg:w-1/2 lg:h-fit'}>
                         <CharacterSkillsTabs character_id={this.props.character.id} is_dead={this.props.character.is_dead}/>
                     </BasicCard>
-                    <BasicCard additionalClasses={'overflow-x-auto lg:w-1/2 lg:h-fit'}>
+                    <BasicCard additionalClasses={'overflow-y-auto lg:w-1/2 lg:h-fit'}>
                         <CharacterInventoryTabs character_id={this.props.character.id} is_dead={this.props.character.is_dead} user_id={this.props.character.user_id} />
                     </BasicCard>
                 </div>

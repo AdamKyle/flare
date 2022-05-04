@@ -1,6 +1,7 @@
 import React, {Fragment} from "react";
 import {formatNumber} from "../../../../../lib/game/format-number";
 import ItemAffixDetails from "./item-affix-details";
+import ItemHolyDetails from "./item-holy-details";
 
 export default class ItemDetails extends React.Component<any, any> {
 
@@ -165,7 +166,7 @@ export default class ItemDetails extends React.Component<any, any> {
                                         <dd>{(this.props.item.holy_stack_stat_bonus * 100).toFixed(2)}%</dd>
                                         <dt>Holy Stack Break Down</dt>
                                         <dd>
-                                            <button type='button' className='text-orange-600 dark:text-orange-500 hover:text-orange-700 dark:hover:text-orange-400' onClick={() => this.manageHolyStacksDetails(this.props.item.holy_stacks)}>View Details</button>
+                                            <button type='button' className='text-orange-600 dark:text-orange-500 hover:text-orange-700 dark:hover:text-orange-400' onClick={() => this.manageHolyStacksDetails(this.props.item.applied_stacks)}>View Details</button>
                                         </dd>
                                     </Fragment>
                                 : null
@@ -199,6 +200,12 @@ export default class ItemDetails extends React.Component<any, any> {
                 {
                     this.state.view_affix && this.state.affix !== null ?
                         <ItemAffixDetails is_open={this.state.view_affix} affix={this.state.affix} manage_modal={this.manageAffixModal.bind(this)} />
+                    : null
+                }
+
+                {
+                    this.state.view_stacks && this.state.holy_stacks !== null ?
+                        <ItemHolyDetails is_open={this.state.view_stacks} holy_stacks={this.state.holy_stacks} manage_modal={this.manageHolyStacksDetails.bind(this)} />
                     : null
                 }
             </div>
