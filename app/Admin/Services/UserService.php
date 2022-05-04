@@ -10,6 +10,7 @@ use App\Flare\Jobs\UpdateSilencedUserJob;
 use App\Flare\Models\User;
 use App\Admin\Events\RefreshUserScreenEvent;
 use App\Admin\Jobs\UpdateBannedUserJob;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Messages\Events\MessageSentEvent;
 
 
@@ -62,6 +63,8 @@ class UserService {
         $message = 'The creator has silenced you until: ' . $canSpeakAgainAt->format('Y-m-d H:i:s') . ' ('.(int) $silenceFor.' Minutes server time) Making accounts to get around this is a bannable offense.';
 
         event(new ServerMessageEvent($user, 'silenced', $message));
+
+        event(new UpdateTopBarEvent($user->character));
 
         UpdateSilencedUserJob::dispatch($user)->delay($canSpeakAgainAt);
 

@@ -1,8 +1,6 @@
 import React from "react";
-import BasicCard from "../../components/ui/cards/basic-card";
 import Tabs from "../../components/ui/tabs/tabs";
 import TabPanel from "../../components/ui/tabs/tab-panel";
-import PopOverContainer from "../../components/ui/popover/pop-over-container";
 import PrimaryButton from "../../components/ui/buttons/primary-button";
 import Messages from "./components/messages";
 import Ajax from "../../lib/ajax/ajax";
@@ -10,10 +8,12 @@ import ServerMessages from "./server-messages";
 import {cloneDeep} from "lodash";
 import {AxiosError, AxiosResponse} from "axios";
 import {generateServerMessage} from "../../lib/ajax/generate-server-message";
+import { DateTime } from "luxon";
+import Chat from "./chat";
 
 export default class GameChat extends React.Component<any, any> {
 
-    private tabs: {name: string, key: string}[];
+    private tabs: {name: string, key: string, updated: boolean,}[];
 
     private chat: any;
 
@@ -28,17 +28,35 @@ export default class GameChat extends React.Component<any, any> {
             chat: [],
             server_messages: [],
             message: '',
+            is_silenced: false,
+            can_talk_again_at: null,
+            tabs: [{
+                key: 'chat',
+                name: 'Chat',
+                updated: false,
+            }, {
+                key: 'server-messages',
+                name: 'Server Message',
+                updated: false,
+            }, {
+                key: 'exploration-messages',
+                name: 'Exploration',
+                updated: false,
+            }]
         }
 
         this.tabs = [{
             key: 'chat',
-            name: 'Chat'
+            name: 'Chat',
+            updated: false,
         }, {
             key: 'server-messages',
             name: 'Server Message',
+            updated: false,
         }, {
             key: 'exploration-messages',
-            name: 'Exploration'
+            name: 'Exploration',
+            updated: false,
         }];
 
         // @ts-ignore
@@ -52,6 +70,12 @@ export default class GameChat extends React.Component<any, any> {
     }
 
     componentDidMount() {
+
+        this.setState({
+            is_silenced: this.props.is_silenced,
+            can_talk_again_at: this.props.can_talk_again_at,
+        })
+
         // @ts-ignore
         this.serverMessages.listen('Game.Messages.Events.ServerMessageEvent', (event: any) => {
             let messages = cloneDeep(this.state.server_messages);
@@ -68,6 +92,8 @@ export default class GameChat extends React.Component<any, any> {
 
             this.setState({
                 server_messages: messages
+            },() => {
+                this.setTabToUpdated('server-messages');
             });
         });
 
@@ -90,6 +116,8 @@ export default class GameChat extends React.Component<any, any> {
 
            this.setState({
                chat: chat,
+           }, () => {
+               this.setTabToUpdated('chat');
            })
         });
 
@@ -108,61 +136,43 @@ export default class GameChat extends React.Component<any, any> {
 
             this.setState({
                 chat: chat,
+            }, () => {
+                this.setTabToUpdated('chat');
             })
         });
     }
 
-    setMessage(e: React.ChangeEvent<HTMLInputElement>) {
-        this.setState({
-            message: e.target.value,
-        });
+    componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any) {
+        console.log(this.props.is_silenced, this.state.is_silenced);
+        // if (this.props.is_silenced !== this.state.is_silenced && this.props.is_silenced !== null) {
+        //     this.setState({
+        //         is_silenced: this.props.is_sileneced,
+        //         can_talk_again_at: this.props.can_talk_again_at,
+        //     })
+        // }
     }
 
-    sendMessage(e?: any) {
 
-        if (typeof e !== 'undefined') {
-            if (e.key === 'Enter') {
-                this.handleMessage();
+    pushSilencedMethod() {
+        if (this.state.is_silenced) {
+            const chat = cloneDeep(this.state.chat);
+
+            if (chat.length > 1000) {
+                chat.length = 500;
             }
-        } else {
-            this.handleMessage();
+
+            chat.unshift({
+                message: 'You are silenced until: ' + DateTime.fromISO(this.state.scan_talk_again_at).toLocal(),
+                type: 'error-message',
+            })
+
+            this.setState({
+                chat: chat
+            });
         }
     }
 
-    privateMessage(characterName: string) {
-        this.setState({
-            message: '/m ' + characterName + ': '
-        });
-    }
-
-    handleMessage() {
-        if (this.state.message.includes('/m')) {
-            this.sendPrivateMessage();
-        } else {
-            this.sendPublicMessage();
-        }
-    }
-
-    sendPublicMessage() {
-        this.setState({
-            message: '',
-        });
-
-        (new Ajax()).setRoute('public-message').setParameters({
-            message: this.state.message,
-        }).doAjaxCall('post', (result: AxiosResponse) => {
-        }, (error: AxiosError) => {
-
-        });
-    }
-
-    sendPrivateMessage() {
-        const messageData = this.state.message.match(/^\/m\s+(\w+[\w| ]*):\s*(.*)/);
-
-        if (messageData === null) {
-            return generateServerMessage('invalid_command');
-        }
-
+    pushPrivateMessageSent(messageData: string[]) {
         const chat = cloneDeep(this.state.chat);
 
         if (chat.length >= 1000) {
@@ -178,54 +188,50 @@ export default class GameChat extends React.Component<any, any> {
             message: '',
             chat: chat,
         });
-
-        (new Ajax()).setRoute('private-message').setParameters({
-            user_name: messageData[1],
-            message: messageData[2],
-        }).doAjaxCall('post', (result: AxiosResponse) => {}, (error: AxiosError) => {});
     }
 
-    renderChatMessages() {
-        const self = this;
 
-        return this.state.chat.map(function(message: any) {
-            switch (message.type) {
-                case 'chat':
-                    return <li style={{color: message.color}} className='mb-2'>
-                        [{message.map_name} {message.x}/{message.y}] <button type='button' className='underline' onClick={() => self.privateMessage(message.character_name)}>{message.character_name}</button>: {message.message}
-                    </li>
-                case 'private-message-sent':
-                    return <li className='text-fuchsia-400 italic mb-2'>{message.message}</li>
-                case 'private-message-received':
-                    return <li className='text-fuchsia-300 italic mb-2'><button type='button' className='underline' onClick={() => self.privateMessage(message.from)}>{message.from}</button>: {message.message}</li>
-                default:
-                    return null;
 
-            }
+    resetTabChange(key: string) {
+        let tabs = cloneDeep(this.state.tabs);
+
+        tabs = this.state.tabs.map((tab: any) => {
+            return  tab.key === key ? {...tab, updated: false} : tab
         });
+
+        this.setState({
+            tabs: tabs,
+        })
     }
+
+    setTabToUpdated(key: string) {
+        let tabs = cloneDeep(this.state.tabs);
+
+        tabs = this.state.tabs.map((tab: any) => {
+            return  tab.key === key ? {...tab, updated: true} : tab
+        });
+
+        this.setState({
+            tabs: tabs,
+        })
+    }
+
+
 
     render() {
         return (
-            <Tabs tabs={this.tabs}>
+            <Tabs tabs={this.state.tabs} icon_key={'updated'} when_tab_changes={this.resetTabChange.bind(this)}>
                 <TabPanel key={'chat'}>
-                    <div className='flex items-center mb-4'>
-                        <div className='grow pr-4'>
-                            <input type='text' name='chat' className='form-control' onChange={this.setMessage.bind(this)} onKeyDown={this.sendMessage.bind(this)} value={this.state.message} />
-                        </div>
-                        <div className='flex-none'>
-                            <PrimaryButton button_label={'Send'} on_click={this.sendMessage.bind(this)} />
-                        </div>
-                    </div>
-                    <div>
-                        <Messages>
-                            {this.renderChatMessages()}
-                        </Messages>
-                    </div>
+                    <Chat is_silenced={this.props.is_silenced}
+                          chat={this.state.chat}
+                          set_tab_to_updated={this.setTabToUpdated.bind(this)}
+                          push_silenced_messsage={this.pushSilencedMethod.bind(this)}
+                          push_private_message_sent={this.pushPrivateMessageSent.bind(this)}
+                    />
                 </TabPanel>
 
                 <TabPanel key={'server-messages'}>
-                    <ServerMessages server_messages={this.state.server_messages} character_id={this.props.character_id} />
+                    <ServerMessages server_messages={this.state.server_messages} character_id={this.props.character_id}/>
                 </TabPanel>
 
                 <TabPanel key={'exploration-messages'}>

@@ -46,6 +46,8 @@ class CharacterTopBarTransformer extends BaseTransformer {
             'gold_dust'         => number_format($character->gold_dust),
             'shards'            => number_format($character->shards),
             'copper_coins'      => number_format($character->copper_coins),
+            'is_silenced'       => $character->user->is_silenced,
+            'can_talk_again_at' => $character->user->can_talk_again_at,
         ];
     }
 }

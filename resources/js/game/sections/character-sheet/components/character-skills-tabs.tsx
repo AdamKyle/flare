@@ -52,7 +52,6 @@ export default class CharacterSkillsTabs extends React.Component<CharacterSkillT
 
     updateSkills(skills: any) {
         if (typeof skills !== 'undefined') {
-            console.log(skills);
             let stateSkills = JSON.parse(JSON.stringify(this.state.skills));
 
             const keys = Object.keys(skills);

@@ -12,4 +12,6 @@ export default interface CharacterStatusType {
     is_dead: boolean;
 
     automation_locked: boolean;
+
+    is_silenced: boolean;
 }

@@ -152,4 +152,8 @@ export interface CharacterType {
     can_adventure_again_at: number|null;
 
     can_use_work_bench: boolean;
+
+    is_silenced: boolean;
+
+    can_talk_again_at: string;
 }

@@ -4,4 +4,8 @@ export default interface TabProperties {
 
     full_width? : boolean;
 
+    icon_key?: string;
+
+    when_tab_changes?: (key: string) => void;
+
 }

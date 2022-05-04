@@ -17,12 +17,10 @@ export default class ViewLocationDetailsModal extends React.Component<ViewLocati
     }
 
     componentDidMount() {
-        console.log('hello?');
         viewPortWatcher(this);
     }
 
     componentDidUpdate() {
-        console.log(this.state.view_port);
         if (this.state.view_port !== null) {
             if (this.state.view_port < 1600) {
                 this.setState({

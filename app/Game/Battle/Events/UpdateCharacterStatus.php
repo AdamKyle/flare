@@ -35,6 +35,7 @@ class UpdateCharacterStatus implements ShouldBroadcastNow {
             'can_adventure'       => $character->can_adventure,
             'is_dead'             => $character->is_dead,
             'automation_locked'   => $character->user->can_auto_attack,
+            'is_silenced'         => $character->is_silenced,
         ];
 
         $this->user = $character->user;

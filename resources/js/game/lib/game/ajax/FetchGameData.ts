@@ -61,6 +61,7 @@ export default class FetchGameData {
                 can_adventure: result.data.sheet.can_adventure,
                 is_dead: result.data.sheetis_dead,
                 automation_locked: result.data.sheet.automation_locked,
+                is_silenced: result.data.sheet.is_silenced,
             }
         });
     }

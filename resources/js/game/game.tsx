@@ -131,6 +131,7 @@ export default class Game extends React.Component<GameProps, GameState> {
         this.setState({character_currencies: currencies});
     }
 
+
     renderLoading() {
         return  (
             <div className='flex h-screen justify-center items-center max-w-md m-auto mt-[-150px]'>
@@ -204,7 +205,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                     </TabPanel>
                 </Tabs>
 
-                <GameChat user_id={this.props.userId} character_id={this.state.character.id}/>
+                <GameChat user_id={this.props.userId} character_id={this.state.character.id} is_silenced={this.state.character.is_silenced} can_talk_again_at={this.state.character.can_talk_again_at} />
             </div>
         );
 

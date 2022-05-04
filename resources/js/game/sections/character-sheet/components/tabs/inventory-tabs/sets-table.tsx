@@ -209,8 +209,6 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
 
         const index = keys.indexOf(set, 0);
 
-        console.log(set, keys, index);
-
         this.setState({
             data: data,
             selected_set: set,

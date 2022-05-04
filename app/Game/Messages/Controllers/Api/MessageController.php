@@ -43,7 +43,7 @@ class MessageController extends Controller {
         ], 200);
     }
 
-    public function fetchMessages() {
+    public function fetchMessages(User $user) {
         $messages = Message::with(['user', 'user.roles', 'user.character'])
                             ->where('from_user', null)
                             ->where('to_user', null)
@@ -83,7 +83,10 @@ class MessageController extends Controller {
                             ->all();
 
         return response()->json(
-            $messages,
+            array_merge($messages, [
+                'is_silenced'       => $user->is_silenced,
+                'can_talk_again_at' => $user->can_speak_again_at,
+            ]),
             200
         );
     }

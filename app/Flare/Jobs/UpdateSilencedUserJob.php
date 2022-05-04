@@ -3,6 +3,7 @@
 namespace App\Flare\Jobs;
 
 use App\Admin\Events\UpdateAdminChatEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -45,7 +46,11 @@ class UpdateSilencedUserJob implements ShouldQueue
 
         $forMessage = 'You are now able to speak and private message again.';
 
-        event(new ServerMessageEvent($this->user->refresh(), 'silenced', $forMessage));
+        $user = $this->user->refresh(0);
+
+        event(new ServerMessageEvent($user, 'silenced', $forMessage));
+
+        event(new UpdateTopBarEvent($user->character));
 
         $adminUser = User::with('roles')->whereHas('roles', function($q) { $q->where('name', 'Admin'); })->first();
 

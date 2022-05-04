@@ -5,6 +5,8 @@ namespace App\Flare\Handlers;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Jobs\UpdateSilencedUserJob;
 use App\Flare\Models\User;
+use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Game\Core\Events\UpdateTopBarEvent;
 
 class MessageThrottledHandler {
 
@@ -15,7 +17,7 @@ class MessageThrottledHandler {
 
     /**
      * Throttle for user
-     * 
+     *
      * @param User $user
      * @return MessageThrottledHandler
      */
@@ -27,7 +29,7 @@ class MessageThrottledHandler {
 
     /**
      * Increase the users throttle count by one.
-     * 
+     *
      * @return MessageThrottledHandler
      */
     public function increaseThrottleCount(): MessageThrottledHandler {
@@ -44,7 +46,7 @@ class MessageThrottledHandler {
     /**
      * Silence the user if their throttle count is
      * above or equal to 3.
-     * 
+     *
      * @return MessageThrottledHandler
      */
     public function silence(): MessageThrottledHandler {
@@ -59,9 +61,11 @@ class MessageThrottledHandler {
 
             $forMessage = 'You have been silenced until: ' . $canSpeakAgainAt->format('Y-m-d H:i:s') . ' (5 minutes, server time). Making accounts to get around this is a bannable offense.';
             $user       = $this->user->refresh();
-            
+
             event(new ServerMessageEvent($user, 'silenced', $forMessage));
-            
+
+            event(new UpdateTopBarEvent($user->character));
+
             UpdateSilencedUserJob::dispatch($user)->delay($canSpeakAgainAt);
         }
 

@@ -36,7 +36,6 @@ export default class ServerMessages extends React.Component<any, any> {
     }
 
     render() {
-        console.log(this.state.view_item, this.state.slot_id);
         return (
             <Fragment>
                 <Messages>
