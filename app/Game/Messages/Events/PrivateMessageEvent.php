@@ -20,7 +20,7 @@ class PrivateMessageEvent implements ShouldBroadcastNow
     /**
      * @var User $user
      */
-    public $user;
+    private $user;
 
     /**
      * @var string $message
