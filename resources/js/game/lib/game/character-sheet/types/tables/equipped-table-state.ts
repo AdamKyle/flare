@@ -8,4 +8,8 @@ export default interface EquippedTableState {
     search_string: string;
 
     success_message: string | null;
+
+    item_id: number | null;
+
+    view_item: boolean;
 }

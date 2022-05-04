@@ -19,6 +19,8 @@ import {isEqual} from "lodash";
 import WarningAlert from "../../../../../components/ui/alerts/simple-alerts/warning-alert";
 import RenameSetModal from "../../modals/rename-set-modal";
 import clsx from "clsx";
+import UsableItemsDetails from "../../../../../lib/game/character-sheet/types/inventory/usable-items-details";
+import InventoryUseDetails from "../../modals/inventory-item-details";
 
 export default class SetsTable extends React.Component<SetsInventoryTabProps, SetsTableState> implements ActionsInterface {
     constructor(props: SetsInventoryTabProps) {
@@ -33,6 +35,8 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
             success_message: null,
             show_rename_set: false,
             search_string: '',
+            item_id: null,
+            view_item: false,
         }
     }
 
@@ -307,6 +311,13 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
         return null
     }
 
+    viewItem(item?: InventoryDetails | UsableItemsDetails) {
+        this.setState({
+            item_id: typeof item !== 'undefined' ? item.item_id : null,
+            view_item: !this.state.view_item
+        })
+    }
+
     render() {
         return (
             <Fragment>
@@ -377,7 +388,13 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
                     : null
                 }
 
-                <Table data={this.state.data} columns={BuildInventoryTableColumns(this)} dark_table={this.props.dark_tables}/>
+                {
+                    this.state.view_item && this.state.item_id !== null ?
+                        <InventoryUseDetails character_id={this.props.character_id} item_id={this.state.item_id} is_open={this.state.view_item} manage_modal={this.viewItem.bind(this)} />
+                    : null
+                }
+
+                <Table data={this.state.data} columns={BuildInventoryTableColumns(this, this.viewItem.bind(this))} dark_table={this.props.dark_tables}/>
             </Fragment>
         );
     }

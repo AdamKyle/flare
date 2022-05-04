@@ -141,10 +141,6 @@ export default class Crafting extends React.Component<any, any> {
                 label: 'Spells',
                 value: 'spell',
             },
-            {
-                label: 'Artifacts',
-                value: 'artifact',
-            }
         ]
     }
 

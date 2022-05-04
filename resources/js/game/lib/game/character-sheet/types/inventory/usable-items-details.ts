@@ -7,6 +7,8 @@ export default interface UsableItemsDetails {
 
     slot_id: number;
 
+    item_id: number;
+
     type: string;
 
     agi_mod: number | 0;

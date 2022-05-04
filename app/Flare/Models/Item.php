@@ -257,11 +257,11 @@ class Item extends Model
 
     public function getIsUniqueAttribute() {
 
-        if (!is_null($this->item_suffix_id)) {
+        if (!is_null($this->itemSuffix)) {
             return $this->itemSuffix->randomly_generated;
         }
 
-        if (!is_null($this->item_prefix_id)) {
+        if (!is_null($this->itemPrefix)) {
             return $this->itemPrefix->randomly_generated;
         }
 

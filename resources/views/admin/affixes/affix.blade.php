@@ -255,7 +255,6 @@
                 <p class="mt-4 mb-4">These affixes do not stack and only effect the enemy. These reduce the following resistances that all enemies have:</p>
                 <ul class="mb-4 list-disc ml-[20px]">
                     <li>Spell Evasion</li>
-                    <li>Artifact Annulment</li>
                     <li>Affix Resistance</li>
                 </ul>
                 <p class="mb-4">Should you have many equipped, we will take the best one of them all.</p>

@@ -2,40 +2,33 @@
 
 namespace App\Game\Core\Controllers\Api;
 
+use App\Flare\Models\SetSlot;
+use League\Fractal\Resource\Item as FractalItem;
 use App\Flare\Events\UpdateCharacterAttackEvent;
 use App\Flare\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySet;
-use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
-use App\Flare\Values\RandomAffixDetails;
+use App\Flare\Transformers\ItemTransformer;
 use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
-use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Exceptions\EquipItemException;
-use App\Game\Core\Jobs\UseMultipleItems;
 use App\Game\Core\Requests\EquipItemValidation;
 use App\Game\Core\Requests\RemoveItemRequest;
 use App\Game\Core\Requests\RenameSetRequest;
 use App\Game\Core\Requests\SaveEquipmentAsSet;
-use App\Game\Core\Requests\UseManyItemsValidation;
 use App\Game\Core\Services\EquipItemService;
 use App\Game\Core\Services\UseItemService;
-use App\Game\Skills\Events\UpdateCharacterEnchantingList;
 use App\Game\Skills\Services\EnchantingService;
-use Illuminate\Support\Facades\Cache;
 use League\Fractal\Manager;
-use League\Fractal\Resource\Item as ResourceItem;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Game\Core\Events\UpdateTopBarEvent;
-use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Models\Character;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Skills\Jobs\DisenchantItem;
 use App\Game\Core\Services\CharacterInventoryService;
-use App\Game\Core\Events\UpdateAttackStats;
 use App\Game\Core\Requests\MoveItemRequest;
 use App\Game\Core\Services\InventorySetService;
 
@@ -68,6 +61,32 @@ class CharacterInventoryController extends Controller {
         $inventory = $this->characterInventoryService->setCharacter($character);
 
         return response()->json($inventory->getInventoryForApi(), 200);
+    }
+
+    public function itemDetails(Character $character, Item $item, Manager $manager, ItemTransformer $itemTransformer) {
+
+        $slot = Inventory::where('character_id', $character->id)->first()->slots()->where('item_id', $item->id)->first();
+
+        if (is_null($slot)) {
+            $slot = SetSlot::where('item_id', $item->id)->first();
+
+            $characterInventorySet = InventorySet::find($slot->inventory_set_id)->where('character_id', $character->id)->first();
+
+            if (is_null($characterInventorySet)) {
+                $slot = null;
+            }
+        }
+
+        if (is_null($slot)) {
+            return response()->json([
+                'message' => 'You cannot do that.'
+            ]);
+        }
+
+        $item = new FractalItem($slot->item, $itemTransformer);
+        $item = (new Manager())->createData($item)->toArray();
+
+        return response()->json($item);
     }
 
 

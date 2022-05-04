@@ -13,19 +13,19 @@
                     <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                     <dl>
                         <dt>Str Modifier</dt>
-                        <dd>{{$item->str_mod * 100}} %</dd>
+                        <dd>{{$item->str_mod * 100}}%</dd>
                         <dt>Dex Modifier</dt>
-                        <dd>{{$item->dex_mod * 100}} %</dd>
+                        <dd>{{$item->dex_mod * 100}}%</dd>
                         <dt>Agi Modifier</dt>
-                        <dd>{{$item->agi_mod * 100}} %</dd>
+                        <dd>{{$item->agi_mod * 100}}%</dd>
                         <dt>Chr Modifier</dt>
-                        <dd>{{$item->chr_mod * 100}} %</dd>
+                        <dd>{{$item->chr_mod * 100}}%</dd>
                         <dt>Dur Modifier</dt>
-                        <dd>{{$item->dur_mod * 100}} %</dd>
+                        <dd>{{$item->dur_mod * 100}}%</dd>
                         <dt>Int Modifier</dt>
-                        <dd>{{$item->int_mod * 100}} %</dd>
+                        <dd>{{$item->int_mod * 100}}%</dd>
                         <dt>Focus Modifier</dt>
-                        <dd>{{$item->focus_mod * 100}} %</dd>
+                        <dd>{{$item->focus_mod * 100}}%</dd>
                     </dl>
                 </div>
                 <div class='block md:hidden border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
@@ -65,8 +65,6 @@
                     <dl>
                         <dt>Spell Evasion</dt>
                         <dd>{{$item->spell_evasion * 100}} %</dd>
-                        <dt>Artifact Dmg. Reduction</dt>
-                        <dd>{{$item->artifact_annulment * 100}} %</dd>
                         <dt>Healing Reduction</dt>
                         <dd>{{$item->healing_reduction * 100}} %</dd>
                         <dt>Affix Dmg. Reduction</dt>

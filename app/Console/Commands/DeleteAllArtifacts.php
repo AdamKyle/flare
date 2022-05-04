@@ -9,6 +9,7 @@ use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
 use App\Flare\Models\MarketBoard;
 use App\Flare\Models\MarketHistory;
+use App\Flare\Models\Monster;
 use App\Flare\Models\Quest;
 use App\Flare\Models\QuestsCompleted;
 use App\Flare\Models\SetSlot;
@@ -63,11 +64,21 @@ class DeleteAllArtifacts extends Command
         $questItems = Item::where('skill_name', 'Artifact Crafting')->get();
 
         foreach ($questItems as $questItem) {
+
+            Monster::where('quest_item_id', $questItem->id)->update([
+                'quest_item_id'          => null,
+                'quest_item_drop_chance' => null
+            ]);
+
             InventorySlot::where('item_id', $questItem->id)->delete();
 
-            $quest = Quest::where('reward_item', $questItem->id)->orWhere('item_id', $questItem->id)->orWhere('secondary_required_item', $questItem->id)->first();
+            $quests = Quest::where('reward_item', $questItem->id)->orWhere('item_id', $questItem->id)->orWhere('secondary_required_item', $questItem->id)->get();
 
-            QuestsCompleted::where('quest_id', $quest->id)->delete();
+            foreach ($quests as $quest) {
+                QuestsCompleted::where('quest_id', $quest->id)->delete();
+
+                $quest->delete();
+            }
 
             $questItem->delete();
         }

@@ -6,6 +6,8 @@ export default interface InventoryDetails {
 
     slot_id: number;
 
+    item_id: number;
+
     is_unique: boolean;
 
     item_name: string;

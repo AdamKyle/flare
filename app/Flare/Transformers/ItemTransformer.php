@@ -23,6 +23,7 @@ class ItemTransformer extends TransformerAbstract {
         return [
             'id'                               => $item->id,
             'name'                             => $item->affix_name,
+            'affix_count'                      => $item->affix_count,
             'description'                      => nl2br(e($item->description)),
             'base_damage'                      => $item->getTotalDamage(),
             'base_ac'                          => $item->getTotalDefence(),
@@ -64,7 +65,8 @@ class ItemTransformer extends TransformerAbstract {
             'can_resurrect'                    => $item->can_resurrect,
             'resurrection_chance'              => $item->resurrection_chance,
             'spell_evasion'                    => $item->spell_evasion,
-            'artifact_annulment'               => $item->artifact_annulment,
+            'healing_reduction'                => $item->healing_reduction,
+            'affix_damage_reduction'           => $item->affix_damage_reduction,
             'increase_skill_bonus_by'          => $item->increase_skill_bonus_by,
             'increase_skill_training_bonus_by' => $item->increase_skill_training_bonus_by,
             'unique'                           => $this->isUnique($item),
@@ -78,6 +80,10 @@ class ItemTransformer extends TransformerAbstract {
             'ambush_resistance_chance'         => $item->ambush_resistance,
             'counter_chance'                   => $item->counter_chance,
             'counter_resistance_chance'        => $item->counter_resistance,
+            'devouring_light'                  => $item->devouring_light,
+            'devouring_darkness'               => $item->devouring_darkness,
+            'ambush_resistance'                => $item->ambush_resistance,
+            'counter_resistance'               => $item->counter_resistance,
         ];
     }
 }

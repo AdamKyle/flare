@@ -27,6 +27,8 @@ Route::group(['middleware' => ['auth', 'throttle:100,1', 'is.character.who.they.
     Route::group(['middleware' => ['is.character.dead', 'is.character.adventuring']], function() {
         Route::middleware(['is.character.exploring'])->group(function() {
 
+            Route::get('/character/{character}/inventory/item/{item}', ['uses' => 'Api\CharacterInventoryController@itemDetails']);
+
             Route::get('/character/{character}/inventory/comparison', ['uses' => 'Api\ItemComparisonController@compareItem']);
             Route::get('/character/{character}/inventory/comparison-from-chat', ['uses' => 'Api\ItemComparisonController@compareItemFromChat']);
 

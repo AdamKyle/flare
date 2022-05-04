@@ -51,6 +51,7 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
+
         if ($exception instanceof TokenMismatchException) {
             return redirect()->to('/')->with('error', 'You were logged out due to inactivity. Please login again.');
         }

@@ -12,6 +12,8 @@ import {isEqual} from "lodash";
 import EquippedInventoryTabProps from "../../../../../lib/game/character-sheet/types/tabs/equipped-inventory-tab-props";
 import EquippedTableState from "../../../../../lib/game/character-sheet/types/tables/equipped-table-state";
 import SuccessAlert from "../../../../../components/ui/alerts/simple-alerts/success-alert";
+import UsableItemsDetails from "../../../../../lib/game/character-sheet/types/inventory/usable-items-details";
+import InventoryUseDetails from "../../modals/inventory-item-details";
 
 export default class EquippedTable extends React.Component<EquippedInventoryTabProps, EquippedTableState> implements ActionsInterface  {
     constructor(props: EquippedInventoryTabProps) {
@@ -22,6 +24,8 @@ export default class EquippedTable extends React.Component<EquippedInventoryTabP
             loading: false,
             search_string: '',
             success_message: null,
+            item_id: null,
+            view_item: false,
         }
     }
 
@@ -31,6 +35,13 @@ export default class EquippedTable extends React.Component<EquippedInventoryTabP
                 data: this.props.equipped_items
             });
         }
+    }
+
+    viewItem(item?: InventoryDetails | UsableItemsDetails) {
+        this.setState({
+            item_id: typeof item !== 'undefined' ? item.item_id : null,
+            view_item: !this.state.view_item
+        })
     }
 
     search(e: React.ChangeEvent<HTMLInputElement>) {
@@ -185,7 +196,14 @@ export default class EquippedTable extends React.Component<EquippedInventoryTabP
                         : null
                     }
                 </div>
-                <Table data={this.state.data} columns={BuildInventoryTableColumns(this)} dark_table={this.props.dark_tables}/>
+
+                {
+                    this.state.view_item && this.state.item_id !== null ?
+                        <InventoryUseDetails character_id={this.props.character_id} item_id={this.state.item_id} is_open={this.state.view_item} manage_modal={this.viewItem.bind(this)} />
+                        : null
+                }
+
+                <Table data={this.state.data} columns={BuildInventoryTableColumns(this, this.viewItem.bind(this))} dark_table={this.props.dark_tables}/>
             </Fragment>
         );
     }

@@ -16,4 +16,8 @@ export default interface SetsTableState {
     loading: boolean;
 
     search_string: string;
+
+    item_id: number | null;
+
+    view_item: boolean;
 }
