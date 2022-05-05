@@ -215,7 +215,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                     </TabPanel>
                 </Tabs>
 
-                <GameChat user_id={this.props.userId} character_id={this.state.character.id} is_silenced={this.state.character.is_silenced} can_talk_again_at={this.state.character.can_talk_again_at} />
+                <GameChat user_id={this.props.userId} character_id={this.state.character.id} is_silenced={this.state.character.is_silenced} can_talk_again_at={this.state.character.can_talk_again_at} is_admin={false} />
 
                 {
                     this.state.character.force_name_change ?

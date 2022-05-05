@@ -44,7 +44,12 @@ class PrivateMessageEvent implements ShouldBroadcastNow
     {
         $this->user    = $user;
         $this->message = $message;
-        $this->from    = $from->character->name;
+
+        if ($from->hasRole('Admin')) {
+            $this->from = 'The Creator';
+        } else {
+            $this->from = $from->character->name;
+        }
     }
 
     /**

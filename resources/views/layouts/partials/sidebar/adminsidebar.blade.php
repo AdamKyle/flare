@@ -28,6 +28,10 @@
                 <span class="fas fa-chart-bar"></span>
                 Statistics
             </a>
+            <a href="{{route('admin.chat-logs')}}">
+                <span class="fas fa-clipboard-list"></span>
+                Chat Logs
+            </a>
         </div>
     </div>
 

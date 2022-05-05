@@ -104,15 +104,25 @@ export default class GameChat extends React.Component<any, any> {
                chat.length = 500;
            }
 
-           chat.unshift({
-               color: event.message.color,
-               map_name: event.message.map_name,
-               character_name: event.name,
-               message: event.message.message,
-               x: event.message.x_position,
-               y: event.message.y_position,
-               type: 'chat',
-           });
+           console.log(event);
+
+           if (event.name === 'Admin') {
+               chat.unshift({
+                   message: event.message.message,
+                   character_name: 'The Creator',
+                   type: 'creator-message',
+               });
+           } else {
+               chat.unshift({
+                   color: event.message.color,
+                   map_name: event.message.map_name,
+                   character_name: event.name,
+                   message: event.message.message,
+                   x: event.message.x_position,
+                   y: event.message.y_position,
+                   type: 'chat',
+               });
+           }
 
            this.setState({
                chat: chat,
@@ -190,8 +200,6 @@ export default class GameChat extends React.Component<any, any> {
         });
     }
 
-
-
     resetTabChange(key: string) {
         let tabs = cloneDeep(this.state.tabs);
 
@@ -216,9 +224,16 @@ export default class GameChat extends React.Component<any, any> {
         })
     }
 
-
-
     render() {
+        if (this.props.is_admin) {
+            return <Chat is_silenced={this.props.is_silenced}
+                         chat={this.state.chat}
+                         set_tab_to_updated={this.setTabToUpdated.bind(this)}
+                         push_silenced_messsage={this.pushSilencedMethod.bind(this)}
+                         push_private_message_sent={this.pushPrivateMessageSent.bind(this)}
+            />
+        }
+
         return (
             <Tabs tabs={this.state.tabs} icon_key={'updated'} when_tab_changes={this.resetTabChange.bind(this)}>
                 <TabPanel key={'chat'}>

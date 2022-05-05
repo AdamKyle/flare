@@ -9,6 +9,9 @@ Route::get('/game/npcs/{npc}', ['as' => 'game.npcs.show', 'uses' => 'NpcsControl
 
 Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::get('/admin', ['as' => 'home', 'uses' => 'AdminController@home']);
+
+    Route::get('/admin/chat-logs', ['as' => 'admin.chat-logs', 'uses' => 'AdminController@chatLogs']);
+
     Route::get('/admin/maps', ['as' => 'maps', 'uses' => 'MapsController@index']);
     Route::get('/admin/maps/{gameMap}/add-bonuses', ['as' => 'map.bonuses', 'uses' => 'MapsController@createBonuses']);
     Route::get('/admin/maps/{gameMap}/view-bonuses', ['as' => 'view.map.bonuses', 'uses' => 'MapsController@viewBonuses']);

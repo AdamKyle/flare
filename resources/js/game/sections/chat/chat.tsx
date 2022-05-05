@@ -124,9 +124,15 @@ export default class Chat extends React.Component<any, any> {
                 case 'private-message-sent':
                     return <li className='text-fuchsia-400 italic mb-2'>{message.message}</li>
                 case 'private-message-received':
+                    if (message.from === 'The Creator') {
+                        return <li className='text-fuchsia-300 text-xl italic mb-2'>{message.from}: {message.message}</li>
+                    }
+
                     return <li className='text-fuchsia-300 italic mb-2'><button type='button' className='underline' onClick={() => self.privateMessage(message.from)}>{message.from}</button>: {message.message}</li>
                 case 'error-message':
                     return <li className='text-red-400 bold mb-2'>{message.message}</li>
+                case 'creator-message':
+                    return <li className='text-yellow-300 text-xl bold mb-2'>{message.character_name}: {message.message}</li>
                 default:
                     return null;
 

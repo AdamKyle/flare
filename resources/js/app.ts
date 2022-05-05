@@ -14,3 +14,8 @@ require('./bootstrap');
  */
 require('./game/game-launcher');
 
+/**
+ * When the administrator is logged in, load their chat.
+ */
+require('./game/admin/admin-chat');
+
