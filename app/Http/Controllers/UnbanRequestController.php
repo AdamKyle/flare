@@ -8,6 +8,7 @@ use Cache;
 use Hash;
 use Illuminate\Http\Request;
 use Mail;
+use Monolog\Handler\MailHandler;
 
 class UnbanRequestController extends Controller
 {
@@ -53,7 +54,7 @@ class UnbanRequestController extends Controller
             ]);
 
             foreach (User::role('Admin')->get() as $adminUser) {
-                Mail::to($adminUser->email)->send(new UnBanRequestMail($user));
+                MailHandler::dispatch($adminUser->email, new UnBanRequestMail($user))->delay(now()->addMinutes(1));
             }
 
             Cache::delete('user-temp-' . $user->id);

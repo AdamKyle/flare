@@ -11,10 +11,39 @@ use App\Flare\Models\User;
 use App\Admin\Events\RefreshUserScreenEvent;
 use App\Admin\Jobs\UpdateBannedUserJob;
 use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\MessageSentEvent;
 
 
 class UserService {
+
+    public function banUser(User $user, array $params) {
+        $unBanAt = null;
+
+        if ($params['for'] !== 'perm') {
+            $unBanAt = $this->fetchUnBanAt($user, $params['for']);
+
+            if (is_null($unBanAt)) {
+                return false;
+            }
+        } else {
+            $this->broadCastAdminMessage($user);
+        }
+
+        $user->update([
+            'is_banned'     => true,
+            'unbanned_at'   => $unBanAt,
+            'banned_reason' => $params['reason'],
+        ]);
+
+        $user = $user->refresh();
+
+        event(new UpdateTopBarEvent($user->character));
+
+        $this->sendUserMail($user, $unBanAt);
+
+        return true;
+    }
 
     /**
      * Fetch the unban at value.
@@ -76,7 +105,7 @@ class UserService {
             'force_name_change' => true
         ]);
 
-        event(new ForceNameChangeEvent($user->character));
+        event(new UpdateTopBarEvent($user->character->refresh()));
 
         broadcast(new UpdateAdminChatEvent(auth()->user()));
     }
@@ -90,11 +119,7 @@ class UserService {
     public function broadCastAdminMessage(User $user): void {
         $message = $user->character->name . ' Sees the sky open and lightening comes hurtling down, striking the earth - cracking the air for miles around! They have been smitten by the hand of The Creator!';
 
-        $message = auth()->user()->messages()->create([
-            'message' => $message,
-        ]);
-
-        broadcast(new MessageSentEvent(auth()->user(), $message))->toOthers();
+        event(new GlobalMessageEvent($message));
     }
 
     /**

@@ -13,6 +13,7 @@ import ManualProgressBar from "./components/ui/progress-bars/manual-progress-bar
 import FetchGameData from "./lib/game/ajax/FetchGameData";
 import CharacterSheet from "./sections/character-sheet/character-sheet";
 import GameChat from "./sections/chat/game-chat";
+import ForceNameChange from "./sections/force-name-change/force-name-change";
 
 export default class Game extends React.Component<GameProps, GameState> {
 
@@ -25,6 +26,8 @@ export default class Game extends React.Component<GameProps, GameState> {
     private characterStatus: any;
 
     private characterAttackData: any;
+
+    private forceNameChange: any;
 
     constructor(props: GameProps) {
         super(props)
@@ -68,6 +71,9 @@ export default class Game extends React.Component<GameProps, GameState> {
 
         // @ts-ignore
         this.characterAttackData = Echo.private('update-character-attack-' + this.props.userId);
+
+        // @ts-ignore
+        this.forceNameChange = Echo.private('force-name-change-' + this.props.userId);
     }
 
     componentDidMount() {
@@ -91,6 +97,10 @@ export default class Game extends React.Component<GameProps, GameState> {
         this.characterTopBar.listen('Game.Core.Events.UpdateTopBarBroadcastEvent', (event: any) => {
             this.setState({
                 character: {...this.state.character, ...event.characterSheet}
+            }, () => {
+                if (event.characterSheet.is_banned) {
+                    location.reload();
+                }
             });
         });
 
@@ -206,6 +216,12 @@ export default class Game extends React.Component<GameProps, GameState> {
                 </Tabs>
 
                 <GameChat user_id={this.props.userId} character_id={this.state.character.id} is_silenced={this.state.character.is_silenced} can_talk_again_at={this.state.character.can_talk_again_at} />
+
+                {
+                    this.state.character.force_name_change ?
+                        <ForceNameChange character_id={this.state.character.id} />
+                    : null
+                }
             </div>
         );
 

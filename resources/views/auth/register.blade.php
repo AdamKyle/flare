@@ -45,7 +45,7 @@
                         <i class="far fa-question-circle pl-2 cursor"
                            data-toggle="tooltip"
                            data-tippy-placement="right"
-                           data-tippy-content="Character names may not contain spaces an can only be 15 characters long and only contain letters and numbers (of any case)."
+                           data-tippy-content="Character names may not contain spaces an can only be 15 characters long (5 characters min) and only contain letters and numbers (of any case)."
                         ></i>
                     </label>
                     <input id="name" type="text" class="form-control" name="name" value="{{ old('name') }}" required autocomplete="name" autofocus>

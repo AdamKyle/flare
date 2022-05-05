@@ -156,4 +156,6 @@ export interface CharacterType {
     is_silenced: boolean;
 
     can_talk_again_at: string;
+
+    force_name_change: boolean;
 }

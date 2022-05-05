@@ -1,146 +1,209 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="w-full lg:w-3/4 m-auto">
+    <x-core.layout.info-container>
+
         <x-core.page-title
-          title="{{$character->name . '(LV: ' . number_format($character->level) . ')'}}"
-          route="{{route('users.list')}}}}"
-          link="Back"
-          color="primary"
-        ></x-core.page-title>
-
-        @if ($character->user->is_banned)
-            <h4 class="mt-3 ml-1">Banned Until: {{is_null($character->user->unbanned_at) ? 'Forever' : $character->user->unbanned_at->format('l jS \\of F Y h:i:s A')}} </h4>
-            <x-core.cards.card>
-                <p><strong>Banned Because: </strong> {{$character->user->banned_reason}}</p>
-
-                @if (!is_null($character->user->un_ban_request))
-                    <p><strong>Request: </strong> {{$character->user->un_ban_request}}</p>
-                @endif
-                <hr />
-                <x-forms.button-with-form
-                  form-route="{{route('unban.user', [
-                                'user' => $character->user->id
-                            ])}}"
-                  form-id="{{$character->user->id}}-unban"
-                  button-title="Unban"
-                  class="btn btn-success float-right ml-2"
-                />
-                @if (!is_null($character->user->un_ban_request))
-                    <button class="btn btn-danger float-right ml-2" data-toggle="modal" data-target="#are-you-sure-"{{$character->user->id}}>Ignore</button>
-
-                    @include('admin.users.modals.are-you-sure', [
-                        'character' => $character
-                    ])
-                    @endif
-                    </div>
-            </x-core.cards.card>
-        @endif
-
-        <x-core.cards.card css="mb-5">
-            <strong>Current Gold</strong>: {{number_format($character->gold)}}
-        </x-core.cards.card>
+            title="{{$character->name}}"
+            route="{{route('home')}}"
+            color="success" link="Home"
+        >
+        </x-core.page-title>
 
         <x-core.cards.card>
-            <div class="row mb-3">
-                <div class="col-md-12">
-                    <strong>Attack</strong>: {{number_format($character->getInformation()->getTotalWeaponDamage())}} / <strong>AC</strong>: {{number_format($character->getInformation()->buildDefence())}} / <strong>Heal For</strong>: {{number_format($character->getHeathInformation()->buildHealFor())}}
-                    <hr />
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-4">
-                    <strong>Race</strong>
-                    <hr />
+            <div class="grid md:grid-cols-2 gap-3 mb-4">
+                <div>
                     <dl>
-                        <dt>name:</dt>
+                        <dt>Race</dt>
                         <dd>{{$character->race->name}}</dd>
-                        <dt>Str Modifier:</dt>
-                        <dd>{{$character->race->str_mod}} pts.</dd>
-                        <dt>Dex Modifier:</dt>
-                        <dd>{{$character->race->dex_mod}} pts.</dd>
-                        <dt>Dur Modifier:</dt>
-                        <dd>{{$character->race->dur_mod}} pts.</dd>
-                        <dt>Int Modifier:</dt>
-                        <dd>{{$character->race->int_mod}} pts.</dd>
-                        <dt>Chr Modifier:</dt>
-                        <dd>{{$character->race->chr_mod}} pts.</dd>
+                        <dt>Class</dt>
+                        <dd>{{$character->class->name}}</dd>
+                        <dt>Level</dt>
+                        <dd>{{$character->level}}</dd>
                     </dl>
 
-                    <hr />
-                    <strong>Class</strong>
-                    <hr />
+                    <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                    <h3 class="text-sky-600 dark:text-sky-500">Currencies</h3>
+                    <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                     <dl>
-                        <dt>Name:</dt>
-                        <dd>{{$character->class->name}}</dd>
-                        <dt>Str Modifier:</dt>
-                        <dd>{{$character->class->str_mod}} pts.</dd>
-                        <dt>Dex Modifier:</dt>
-                        <dd>{{$character->class->dex_mod}} pts.</dd>
-                        <dt>Dur Modifier:</dt>
-                        <dd>{{$character->class->dur_mod}} pts.</dd>
-                        <dt>Int Modifier:</dt>
-                        <dd>{{$character->class->int_mod}} pts.</dd>
-                        <dt>Chr Modifier:</dt>
-                        <dd>{{$character->class->chr_mod}} pts.</dd>
+                        <dt>Gold</dt>
+                        <dd>{{$character->gold}}</dd>
+                        <dt>Gold Dust</dt>
+                        <dd>{{$character->gold_dust}}</dd>
+                        <dt>Shards</dt>
+                        <dd>{{$character->shards}}</dd>
+                        <dt>Copper Coins</dt>
+                        <dd>{{$character->copper_coins}}</dd>
                     </dl>
                 </div>
-                <div class="col-md-8">
-                    <strong>Stats (With Modifiers)</strong>
-                    <hr />
+                <div>
                     <dl>
-                        <dt>Str:</dt>
-                        <dd>{{number_format($character->getInformation()->statMod('str'))}}</dd>
-                        <dt>Dex:</dt>
-                        <dd>{{number_format($character->getInformation()->statMod('dex'))}}</dd>
-                        <dt>Dur:</dt>
-                        <dd>{{number_format($character->getInformation()->statMod('dur'))}}</dd>
-                        <dt>Int:</dt>
-                        <dd>{{number_format($character->getInformation()->statMod('int'))}}</dd>
-                        <dt>Chr:</dt>
-                        <dd>{{number_format($character->getInformation()->statMod('chr'))}}</dd>
+                        <dt>(Raw) Str</dt>
+                        <dd>{{number_format($character->str)}}</dd>
+                        <dt>(Raw) Dex</dt>
+                        <dd>{{number_format($character->dex)}}</dd>
+                        <dt>(Raw) Int</dt>
+                        <dd>{{number_format($character->int)}}</dd>
+                        <dt>(Raw) Agi</dt>
+                        <dd>{{number_format($character->agi)}}</dd>
+                        <dt>(Raw) Chr</dt>
+                        <dd>{{number_format($character->chr)}}</dd>
+                        <dt>(Raw) Focus</dt>
+                        <dd>{{number_format($character->focus)}}</dd>
                     </dl>
-                    <hr />
-                    <strong>Skills</strong>
-                    <hr />
-                    @foreach($character->skills as $skill)
-                        <dl>
-                            <dt><a href="{{route('skill.character.info', ['skill' => $skill->id])}}">{{$skill->name}}</a>:</dt>
-                            <dd>
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        Level/Max: {{$skill->level}} / {{$skill->max_level}}
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="progress skill-training mb-2 text-center">
-                                            <div class="progress-bar skill-bar" role="progressbar" aria-valuenow="{{$skill->xp}}" aria-valuemin="0" style="width: {{$skill->xp}}%;">{{$skill->xp}}</div>
-                                        </div>
-                                    </div>
-                                    @if ((bool) $skill->can_train)
-                                        <div class="col-md-4 text-left">
-                                            @if ($skill->currently_training)
-                                                <i class="fas fa-info-circle skill-info-icon text-info"
-                                                   style="position:relative; top: -4px;"
-                                                   data-toggle="tooltip" data-placement="top"
-                                                   title="Xp % Towards: {{$skill->xp_towards * 100}}%"
-                                                ></i>
-                                            @endif
-                                        </div>
-                                    @endif
+                </div>
+            </div>
+
+            <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+            <h3 class="text-sky-600 dark:text-sky-500">Administrator Actions</h3>
+            <div class="accordion border border-gray-300 dark:border-gray-900 rounded-xl mt-5">
+                <h5 class="border-t border-gray-300 dark:border-gray-900 p-5" data-toggle="collapse" data-target="#accordion-2">
+                    Force Name Change
+                    <span class="collapse-indicator la la-arrow-circle-down"></span>
+                </h5>
+                <div id="accordion-2" class="collapse">
+                    <div class="p-5 pt-0">
+                        <x-core.forms.regular-form method="POST" action="{{ route('user.force.name.change', ['user' => $character->user]) }}">
+                            @csrf
+
+                            <x-core.buttons.primary-button css="ltr:ml-auto rtl:mr-auto" type="submit">
+                                Force user to change their name
+                            </x-core.buttons.primary-button>
+                        </x-core.forms.regular-form>
+                    </div>
+                </div>
+                <h5 class="border-t border-gray-300 dark:border-gray-900 p-5" data-toggle="collapse"
+                    data-target="#accordion-3">
+                    Silence Character
+                    <span class="collapse-indicator la la-arrow-circle-down"></span>
+                </h5>
+                <div id="accordion-3" class="collapse">
+                    <div class="p-5 pt-0">
+                        <x-core.forms.regular-form method="POST" action="{{ route('user.silence', ['user' => $character->user]) }}">
+                            @csrf
+
+                            <div class="mb-5">
+                                <label for="silence-options" class="label block mb-2">Silence Options</label>
+                                <select class="form-control" id="silence-options" name="silence_for">
+                                    <option>Please select</option>
+                                    <option value="5">5 Minutes</option>
+                                    <option value="10">10 Minutes</option>
+                                    <option value="30">30 Minutes</option>
+                                </select>
+                            </div>
+
+                            <div class="flex">
+                                <x-core.buttons.primary-button css="ltr:ml-auto rtl:mr-auto" type="submit">
+                                    Silence User
+                                </x-core.buttons.primary-button>
+                            </div>
+                        </x-core.forms.regular-form>
+                    </div>
+                </div>
+                <h5 class="border-t border-gray-300 dark:border-gray-900 p-5" data-toggle="collapse"
+                    data-target="#accordion-4">
+                    Ban Character
+                    <span class="collapse-indicator la la-arrow-circle-down"></span>
+                </h5>
+                <div id="accordion-4" class="collapse">
+                    <div class="p-5 pt-0">
+                        @if ($character->user->ignored_unban_request)
+                            <div class="mb-4 mt-4 text-red-600 dark:text-red-500">
+                                You have chosen to ignore this users request to be unbanned. You may however, unban the character.
+                            </div>
+
+                            <div class="mb-4 mt-4">
+                                <strong>Reason They are banned:</strong> {{$character->user->banned_reason}}
+                            </div>
+
+                            <div class="mb-4 mt-4">
+                                <strong>Character Request:</strong> {{$character->user->un_ban_request}}
+                            </div>
+
+                            <x-core.forms.regular-form method="POST" action="{{ route('unban.user', ['user' => $character->user]) }}">
+                                @csrf
+                                <div class="flex">
+                                    <x-core.buttons.success-button type="submit">
+                                        Unban User
+                                    </x-core.buttons.success-button>
+
                                 </div>
-                            </dd>
-                        </dl>
-                    @endforeach
+                            </x-core.forms.regular-form>
+                        @elseif (!is_null($character->user->un_ban_request))
+                            <div class="mb-4 mt-4">
+                                <strong>Reason They are banned:</strong> {{$character->user->banned_reason}}
+                            </div>
+
+                            <div class="mb-4 mt-4">
+                                <strong>Character Request:</strong> {{$character->user->un_ban_request}}
+                            </div>
+
+                            <h4 class="mb-5 mt-5">Unban Character</h4>
+
+                            <x-core.forms.regular-form method="POST" action="{{ route('unban.user', ['user' => $character->user]) }}">
+                                @csrf
+                                <div class="flex">
+                                    <x-core.buttons.success-button type="submit">
+                                        Unban User
+                                    </x-core.buttons.success-button>
+
+                                </div>
+                            </x-core.forms.regular-form>
+
+                            <h4 class="mb-5 mt-5">Or, Ignore Request</h4>
+
+                            <x-core.forms.regular-form method="POST" action="{{ route('user.ignore.unban.request', ['user' => $character->user]) }}">
+                                @csrf
+                                <div class="flex">
+                                    <x-core.buttons.primary-button type="submit">
+                                        Ignore Request
+                                    </x-core.buttons.primary-button>
+                                </div>
+                            </x-core.forms.regular-form>
+                        @elseif ($character->user->is_banned)
+                            <div class="mb-4 mt-4">
+                                <strong>Reason They are banned:</strong> {{$character->user->banned_reason}}
+                            </div>
+
+                            <x-core.forms.regular-form method="POST" action="{{ route('unban.user', ['user' => $character->user]) }}">
+                                @csrf
+                                <div class="flex">
+                                    <x-core.buttons.success-button type="submit">
+                                        Unban User
+                                    </x-core.buttons.success-button>
+                                </div>
+                            </x-core.forms.regular-form>
+                        @else
+                            <x-core.forms.regular-form method="POST" action="{{ route('ban.user', ['user' => $character->user]) }}">
+                                @csrf
+
+                                <div class="mb-5">
+                                    <label for="ban-length-options" class="label block mb-2">Ban Options</label>
+                                    <select class="form-control" id="ban-length-options" name="for">
+                                        <option>Please select</option>
+                                        <option value="one-day">1 Day</option>
+                                        <option value="one-week">1 Week</option>
+                                        <option value="perm">For ever</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-5">
+                                    <label for="ban-reason" class="label block mb-2">Reason</label>
+                                    <textarea class="form-control" id="ban-reason" name="reason"></textarea>
+                                </div>
+
+                                <div class="flex">
+                                    <x-core.buttons.primary-button css="ltr:ml-auto rtl:mr-auto" type="submit">
+                                        Ban User
+                                    </x-core.buttons.primary-button>
+                                </div>
+                            </x-core.forms.regular-form>
+                        @endif
+
+                    </div>
                 </div>
             </div>
         </x-core.cards.card>
+    </x-core.layout.info-container>
 
-        <h4 class="mt-5">Currently Equipped</h4>
-        <hr />
-
-        @livewire('character.inventory.data-table', [
-            'includeEquipped' => true,
-            'character'       => $character,
-        ])
-    </div>
 @endsection

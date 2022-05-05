@@ -8,6 +8,7 @@ use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Transformers\CharacterTopBarTransformer;
 use App\Flare\Transformers\SkillsTransformer;
 use App\Flare\Transformers\UsableItemTransformer;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Services\CharacterPassiveSkills;
 use Illuminate\Http\Request;
 use League\Fractal\Resource\Collection;

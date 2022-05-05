@@ -1,49 +1,32 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container small-container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="row page-titles">
-                <div class="col-md-6 align-self-right">
-                    <h4 class="mt-2">Unban Request Process</h4>
+
+    <div class="container flex items-center justify-center mt-20 py-10">
+        <div class="w-full md:w-1/2 xl:w-1/3">
+            <div class="mx-5 md:mx-10">
+                <h2 class="uppercase">Unban Request</h2>
+                <h4 class="uppercase">Email Verification Form</h4>
+            </div>
+            <x-core.cards.form-card css="mt-5 p-5 md:p-10" method="POST" action="{{ route('un.ban.request.email') }}">
+                @csrf
+
+                <div class="mb-5">
+                    <label class="label block mb-2" for="name">{{ __('E-Mail Address') }}</label>
+                    <input id="name" type="email" class="form-control" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
+                    @error('email')
+                    <div class="text-red-800 dark:text-red-500 pt-3" role="alert">
+                        <strong>{{$message}}</strong>
+                    </div>
+                    @enderror
                 </div>
-            </div>
 
-            <div class="alert alert-info">
-                To begin the process, please enter your email. <strong>All decisions are final</strong>.
-            </div>
-
-            <div class="card">
-                <div class="card-body">
-                    <form method="POST" action="{{ route('un.ban.request.email') }}">
-                        @csrf
-
-                        <div class="form-group row">
-                            <label for="email" class="col-md-4 col-form-label text-md-right">{{ __('E-Mail Address') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ $email ?? old('email') }}" required autocomplete="email" autofocus />
-
-                                @error('email')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="form-group row mb-0">
-                            <div class="col-md-6 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
-                                    {{ __('Next Step') }}
-                                </button>
-                            </div>
-                        </div>
-                    </form>
+                <div class="flex">
+                    <x-core.buttons.primary-button css="ltr:ml-auto rtl:mr-auto" type="submit">
+                        Next Step
+                    </x-core.buttons.primary-button>
                 </div>
-            </div>
+            </x-core.cards.form-card>
         </div>
     </div>
-</div>
 @endsection

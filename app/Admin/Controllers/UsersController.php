@@ -25,17 +25,6 @@ class UsersController extends Controller {
         return view('admin.users.users');
     }
 
-    public function resetPassword(User $user) {
-
-        $token = app('Password')::getRepository()->create($user);
-
-        $mailable = new ResetPasswordEmail($token);
-
-        SendOffEmail::dispatch($user, $mailable)->delay(now()->addMinutes(1));
-
-        return redirect()->back()->with('success', $user->character->name . ' password reset email sent.');
-    }
-
     public function show(User $user) {
 
         if ($user->hasRole('Admin')) {
@@ -58,51 +47,15 @@ class UsersController extends Controller {
     }
 
     public function banUser(Request $request, User $user) {
-        if (!$request->has('ban_for')) {
-            return redirect()->back()->with('error', 'Invalid input.');
-        }
-
-        return redirect()->to(route('ban.reason', [
-            'user' => $user,
-            'for'  => $request->ban_for,
-        ]));
-    }
-
-    public function banReason(User $user, string $for) {
-        return view('admin.users.user-ban-reason', [
-            'user' => $user,
-            'for'  => $for,
-        ]);
-    }
-
-    public function submitBanReason(Request $request, User $user) {
 
         $request->validate([
             'for'    => 'required',
             'reason' => 'required',
         ]);
 
-        $unBanAt = null;
-
-        if ($request->for !== 'perm') {
-            $unBanAt = $this->userService->fetchUnBanAt($user, $request->for);
-
-            if (is_null($unBanAt)) {
-                redirect()->back()->with('error', 'Invalid input for ban length.');
-            }
-        } else {
-            $this->userService->broadCastAdminMessage($user);
+        if (!$this->userService->banUser($user, $request->all())) {
+            return redirect()->back()->with('error', 'Invalid input for ban length.');
         }
-
-        $user->update([
-            'is_banned'   => true,
-            'unbanned_at' => $unBanAt,
-            'banned_reason' => $request->reason,
-        ]);
-
-        $user = $user->refresh();
-
-        $this->userService->sendUserMail($user, $unBanAt);
 
         return redirect()->to(route('users.user', [
             'user' => $user->id
@@ -112,10 +65,11 @@ class UsersController extends Controller {
     public function unBanUser(Request $request, User $user) {
 
         $user->update([
-            'is_banned'      => false,
-            'unbanned_at'    => null,
-            'un_ban_request' => null,
-            'ban_reason'     => null,
+            'is_banned'             => false,
+            'unbanned_at'           => null,
+            'un_ban_request'        => null,
+            'ban_reason'            => null,
+            'ignored_unban_request' => false,
         ]);
 
         $mailable = new GenericMail($user, 'You are now unbanned and may log in again.', 'You have been unbanned');
@@ -126,6 +80,10 @@ class UsersController extends Controller {
     }
 
     public function ignoreUnBanRequest(Request $request, User $user) {
+
+        $user->update([
+            'ignored_unban_request' => true,
+        ]);
 
         $mailable = new GenericMail($user, 'This is to inform you that your request to be unbanned has been denied. All decisions are final. Future requests will be ignored.', 'Your request has been denied', true);
 
@@ -138,24 +96,5 @@ class UsersController extends Controller {
         $this->userService->forceNameChange($user);
 
         return redirect()->back()->with('success', $user->character->name . ' forced to change their name.');
-    }
-
-    public function enableAutoBattle(Request $request, User $user) {
-
-        $character = $user->character;
-
-        foreach ($character->factions as $faction) {
-            $newPointsNeeded  = $faction->points_needed * 10;
-            $newCurrentPoints = $faction->current_points * 10;
-
-            $faction->update([
-                'current_points' => $newCurrentPoints,
-                'points_needed'  => $newPointsNeeded,
-            ]);
-        }
-
-        event(new ServerMessageEvent($user->refresh(), 'The Creator has enabled auto battle for you. Please refresh.'));
-
-        return redirect()->back()->with('success', $user->character->name . ' can now use auto battle.');
     }
 }

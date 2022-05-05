@@ -99,6 +99,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
             'can_adventure_again_at'      => now()->diffInSeconds($character->can_adventure_again_at),
             'is_silenced'                 => $character->user->is_silenced,
             'can_talk_again_at'           => $character->user->can_talk_again_at,
+            'force_name_change'           => $character->force_name_change,
             'ambush_chance'               => $characterTrinketsInformation->getAmbushChance($character),
             'ambush_resistance_chance'    => $characterTrinketsInformation->getAmbushResistanceChance($character),
             'counter_chance'              => $characterTrinketsInformation->getCounterChance($character),
