@@ -21,6 +21,8 @@ export default class GameChat extends React.Component<any, any> {
 
     private privateMessages: any;
 
+    private globalMessage: any;
+
     constructor(props: any) {
         super(props);
 
@@ -67,6 +69,9 @@ export default class GameChat extends React.Component<any, any> {
 
         // @ts-ignore
         this.privateMessages = Echo.private('private-message-' + this.props.user_id);
+
+        // @ts-ignore
+        this.globalMessage = Echo.join('global-message');
     }
 
     componentDidMount() {
@@ -74,6 +79,34 @@ export default class GameChat extends React.Component<any, any> {
         this.setState({
             is_silenced: this.props.is_silenced,
             can_talk_again_at: this.props.can_talk_again_at,
+        });
+
+        (new Ajax()).setRoute('last-chats').doAjaxCall('get', (result: AxiosResponse) => {
+            const chats = result.data.map((chat: any) => {
+                if (chat.name === 'Admin') {
+                    return {
+                        message: chat.message,
+                        character_name: 'The Creator',
+                        type: 'creator-message',
+                    }
+                } else {
+                    return {
+                        color: chat.color,
+                        map_name: chat.map,
+                        character_name: chat.name,
+                        message: chat.message,
+                        x: chat.x_position,
+                        y: chat.y_position,
+                        type: 'chat',
+                    }
+                }
+            }).filter((chat: any) => typeof chat !== 'undefined');
+
+            this.setState({
+                chat: chats,
+            });
+        }, (error: AxiosError) => {
+
         })
 
         // @ts-ignore
@@ -150,16 +183,37 @@ export default class GameChat extends React.Component<any, any> {
                 this.setTabToUpdated('chat');
             })
         });
+
+        this.globalMessage.listen('Game.Messages.Events.GlobalMessageEvent', (event: any) => {
+            console.log(event);
+            const chat = cloneDeep(this.state.chat);
+
+            if (chat.length > 1000) {
+                chat.length = 500;
+            }
+
+            chat.unshift({
+                message: event.message,
+                type: 'global-message',
+            });
+
+            this.setState({
+                chat: chat,
+            }, () => {
+                this.setTabToUpdated('chat');
+            })
+        })
     }
 
     componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any) {
         console.log(this.props.is_silenced, this.state.is_silenced);
-        // if (this.props.is_silenced !== this.state.is_silenced && this.props.is_silenced !== null) {
-        //     this.setState({
-        //         is_silenced: this.props.is_sileneced,
-        //         can_talk_again_at: this.props.can_talk_again_at,
-        //     })
-        // }
+
+        if (this.props.is_silenced !== this.state.is_silenced) {
+            this.setState({
+                is_silenced: this.props.is_sileneced,
+                can_talk_again_at: this.props.can_talk_again_at,
+            });
+        }
     }
 
 
@@ -172,7 +226,7 @@ export default class GameChat extends React.Component<any, any> {
             }
 
             chat.unshift({
-                message: 'You are silenced until: ' + DateTime.fromISO(this.state.scan_talk_again_at).toLocal(),
+                message: 'You little child have been chatting up a storm. Slow down. I\'ll let you know whe you can talk again ...',
                 type: 'error-message',
             })
 
@@ -197,6 +251,23 @@ export default class GameChat extends React.Component<any, any> {
         this.setState({
             message: '',
             chat: chat,
+        });
+    }
+
+    pushErrorMessage(message: string) {
+        const chat = cloneDeep(this.state.chat);
+
+        if (chat.length > 1000) {
+            chat.length = 500;
+        }
+
+        chat.unshift({
+            message: message,
+            type: 'error-message',
+        })
+
+        this.setState({
+            chat: chat
         });
     }
 
@@ -231,6 +302,7 @@ export default class GameChat extends React.Component<any, any> {
                          set_tab_to_updated={this.setTabToUpdated.bind(this)}
                          push_silenced_messsage={this.pushSilencedMethod.bind(this)}
                          push_private_message_sent={this.pushPrivateMessageSent.bind(this)}
+                         push_error_message={this.pushErrorMessage.bind(this)}
             />
         }
 
@@ -238,10 +310,12 @@ export default class GameChat extends React.Component<any, any> {
             <Tabs tabs={this.state.tabs} icon_key={'updated'} when_tab_changes={this.resetTabChange.bind(this)}>
                 <TabPanel key={'chat'}>
                     <Chat is_silenced={this.props.is_silenced}
+                          can_talk_again_at={this.props.can_talk_again_at}
                           chat={this.state.chat}
                           set_tab_to_updated={this.setTabToUpdated.bind(this)}
                           push_silenced_messsage={this.pushSilencedMethod.bind(this)}
                           push_private_message_sent={this.pushPrivateMessageSent.bind(this)}
+                          push_error_message={this.pushErrorMessage.bind(this)}
                     />
                 </TabPanel>
 

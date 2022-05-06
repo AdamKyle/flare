@@ -9,6 +9,8 @@ import {generateServerMessage} from "../../lib/ajax/generate-server-message";
 
 export default class Chat extends React.Component<any, any> {
 
+    private chatInput: any;
+
     constructor(props: any) {
         super(props);
 
@@ -24,23 +26,26 @@ export default class Chat extends React.Component<any, any> {
     }
 
     sendMessage(e?: any) {
-
-        if (this.props.is_silenced) {
-            return this.props.push_silenced_messsage();
-        }
-
         if (typeof e !== 'undefined') {
             if (e.key === 'Enter') {
-                this.handleMessage();
+                if (this.props.is_silenced) {
+                    return this.props.push_silenced_messsage();
+                }
+
+                return this.handleMessage();
             }
-        } else {
-            this.handleMessage();
         }
+    }
+
+    postMessage() {
+        return this.handleMessage();
     }
 
     privateMessage(characterName: string) {
         this.setState({
             message: '/m ' + characterName + ': '
+        }, () => {
+            this.chatInput.focus();
         });
     }
 
@@ -59,6 +64,10 @@ export default class Chat extends React.Component<any, any> {
 
         if (this.props.is_silenced) {
             return this.props.push_silenced_messsage()
+        }
+
+        if (this.state.message.length > 240) {
+            return this.props.push_error_message('Woah! message is longer then 240 characters. Lets not get crazy now child!');
         }
 
         this.setState({
@@ -133,6 +142,8 @@ export default class Chat extends React.Component<any, any> {
                     return <li className='text-red-400 bold mb-2'>{message.message}</li>
                 case 'creator-message':
                     return <li className='text-yellow-300 text-xl bold mb-2'>{message.character_name}: {message.message}</li>
+                case 'global-message':
+                    return <li className='text-yellow-400 bold italic mb-2'>{message.message}</li>
                 default:
                     return null;
 
@@ -145,10 +156,12 @@ export default class Chat extends React.Component<any, any> {
             <Fragment>
                 <div className='flex items-center mb-4'>
                     <div className='grow pr-4'>
-                        <input type='text' name='chat' className='form-control' onChange={this.setMessage.bind(this)} onKeyDown={this.sendMessage.bind(this)} value={this.state.message} />
+                        <input type='text' name='chat' className='form-control' onChange={this.setMessage.bind(this)} onKeyDown={this.sendMessage.bind(this)} value={this.state.message} ref={(input) => {
+                            this.chatInput = input;
+                        }}/>
                     </div>
                     <div className='flex-none'>
-                        <PrimaryButton button_label={'Send'} on_click={this.sendMessage.bind(this)} />
+                        <PrimaryButton button_label={'Send'} on_click={this.postMessage.bind(this)} />
                     </div>
                 </div>
                 <div>
