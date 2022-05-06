@@ -10,7 +10,7 @@
         </x-core.page-title>
 
         <x-core.cards.card>
-            Place logs table here ....
+            @livewire('admin.chat.chat-logs')
         </x-core.cards.card>
     </x-core.layout.info-container>
 @endsection
