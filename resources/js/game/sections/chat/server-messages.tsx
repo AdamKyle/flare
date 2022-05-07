@@ -2,12 +2,12 @@ import React, {Fragment} from "react";
 import Messages from "./components/messages";
 import {cloneDeep} from "lodash";
 import ItemComparison from "./modals/item-comparison";
+import ServerMessagesComponentProps from "../../lib/game/chat/components/server-messages-component-props";
+import ServerMessagesComponentState from "../../lib/game/chat/components/server-messages-component-state";
 
-export default class ServerMessages extends React.Component<any, any> {
+export default class ServerMessages extends React.Component<ServerMessagesComponentProps, ServerMessagesComponentState> {
 
-    private serverMessages: any;
-
-    constructor(props: any) {
+    constructor(props: ServerMessagesComponentProps) {
         super(props);
 
         this.state = {
@@ -24,7 +24,7 @@ export default class ServerMessages extends React.Component<any, any> {
     }
 
     buildMessages() {
-        return this.props.server_messages.map((message: { message: string, id: number, slot_id: number | null, event_id: number | 0 }) => {
+        return this.props.server_messages.map((message) => {
             if (message.event_id !== 0 && message.event_id !== null) {
                 return <li className='text-pink-400 my-2 break-all lg:break-normal' key={message.id}>
                     <button type='button' className='italic underline hover:text-pink-300' onClick={() => this.viewItem(message.event_id)}>{message.message} <i className='ra ra-anvil'></i></button>

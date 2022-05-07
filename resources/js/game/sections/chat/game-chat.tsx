@@ -1,20 +1,14 @@
 import React from "react";
 import Tabs from "../../components/ui/tabs/tabs";
 import TabPanel from "../../components/ui/tabs/tab-panel";
-import PrimaryButton from "../../components/ui/buttons/primary-button";
-import Messages from "./components/messages";
 import Ajax from "../../lib/ajax/ajax";
 import ServerMessages from "./server-messages";
-import {cloneDeep} from "lodash";
 import {AxiosError, AxiosResponse} from "axios";
-import {generateServerMessage} from "../../lib/ajax/generate-server-message";
-import { DateTime } from "luxon";
 import Chat from "./chat";
+import GameChatProps from "../../lib/game/chat/game-chat-props";
+import GameChatState from "../../lib/game/chat/game-chat-state";
 
-export default class GameChat extends React.Component<any, any> {
-
-    private tabs: {name: string, key: string, updated: boolean,}[];
-
+export default class GameChat extends React.Component<GameChatProps, GameChatState> {
     private chat: any;
 
     private serverMessages: any;
@@ -23,7 +17,7 @@ export default class GameChat extends React.Component<any, any> {
 
     private globalMessage: any;
 
-    constructor(props: any) {
+    constructor(props: GameChatProps) {
         super(props);
 
         this.state = {
@@ -46,20 +40,6 @@ export default class GameChat extends React.Component<any, any> {
                 updated: false,
             }]
         }
-
-        this.tabs = [{
-            key: 'chat',
-            name: 'Chat',
-            updated: false,
-        }, {
-            key: 'server-messages',
-            name: 'Server Message',
-            updated: false,
-        }, {
-            key: 'exploration-messages',
-            name: 'Exploration',
-            updated: false,
-        }];
 
         // @ts-ignore
         this.chat = Echo.join('chat');
@@ -111,7 +91,7 @@ export default class GameChat extends React.Component<any, any> {
 
         // @ts-ignore
         this.serverMessages.listen('Game.Messages.Events.ServerMessageEvent', (event: any) => {
-            let messages = cloneDeep(this.state.server_messages);
+            let messages = JSON.parse(JSON.stringify(this.state.server_messages));
 
             if (messages.length > 1000) {
                 messages.length = 250; // Remove the last 3/4's worth of messages
@@ -131,7 +111,7 @@ export default class GameChat extends React.Component<any, any> {
         });
 
         this.chat.listen('Game.Messages.Events.MessageSentEvent', (event: any) => {
-           const chat = cloneDeep(this.state.chat);
+           const chat = JSON.parse(JSON.stringify(this.state.chat))
 
            if (chat.length > 1000) {
                chat.length = 500;
@@ -165,7 +145,7 @@ export default class GameChat extends React.Component<any, any> {
         });
 
         this.privateMessages.listen('Game.Messages.Events.PrivateMessageEvent', (event: any) => {
-            const chat = cloneDeep(this.state.chat);
+            const chat = JSON.parse(JSON.stringify(this.state.chat))
 
             if (chat.length > 1000) {
                 chat.length = 500;
@@ -185,8 +165,7 @@ export default class GameChat extends React.Component<any, any> {
         });
 
         this.globalMessage.listen('Game.Messages.Events.GlobalMessageEvent', (event: any) => {
-            console.log(event);
-            const chat = cloneDeep(this.state.chat);
+            const chat = JSON.parse(JSON.stringify(this.state.chat))
 
             if (chat.length > 1000) {
                 chat.length = 500;
@@ -206,7 +185,6 @@ export default class GameChat extends React.Component<any, any> {
     }
 
     componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any) {
-        console.log(this.props.is_silenced, this.state.is_silenced);
 
         if (this.props.is_silenced === null) {
             return;
@@ -214,7 +192,7 @@ export default class GameChat extends React.Component<any, any> {
 
         if (this.props.is_silenced !== this.state.is_silenced) {
             this.setState({
-                is_silenced: this.props.is_sileneced,
+                is_silenced: this.props.is_silenced,
                 can_talk_again_at: this.props.can_talk_again_at,
             });
         }
@@ -223,14 +201,14 @@ export default class GameChat extends React.Component<any, any> {
 
     pushSilencedMethod() {
         if (this.state.is_silenced) {
-            const chat = cloneDeep(this.state.chat);
+            const chat = JSON.parse(JSON.stringify(this.state.chat))
 
             if (chat.length > 1000) {
                 chat.length = 500;
             }
 
             chat.unshift({
-                message: 'You little child have been chatting up a storm. Slow down. I\'ll let you know whe you can talk again ...',
+                message: 'You child, have been chatting up a storm. Slow down. I\'ll let you know whe you can talk again ...',
                 type: 'error-message',
             })
 
@@ -241,7 +219,7 @@ export default class GameChat extends React.Component<any, any> {
     }
 
     pushPrivateMessageSent(messageData: string[]) {
-        const chat = cloneDeep(this.state.chat);
+        const chat = JSON.parse(JSON.stringify(this.state.chat))
 
         if (chat.length >= 1000) {
             chat.length = 500;
@@ -259,7 +237,7 @@ export default class GameChat extends React.Component<any, any> {
     }
 
     pushErrorMessage(message: string) {
-        const chat = cloneDeep(this.state.chat);
+        const chat = JSON.parse(JSON.stringify(this.state.chat))
 
         if (chat.length > 1000) {
             chat.length = 500;
@@ -276,9 +254,7 @@ export default class GameChat extends React.Component<any, any> {
     }
 
     resetTabChange(key: string) {
-        let tabs = cloneDeep(this.state.tabs);
-
-        tabs = this.state.tabs.map((tab: any) => {
+        const tabs = this.state.tabs.map((tab: any) => {
             return  tab.key === key ? {...tab, updated: false} : tab
         });
 
@@ -288,9 +264,7 @@ export default class GameChat extends React.Component<any, any> {
     }
 
     setTabToUpdated(key: string) {
-        let tabs = cloneDeep(this.state.tabs);
-
-        tabs = this.state.tabs.map((tab: any) => {
+        const tabs = this.state.tabs.map((tab: any) => {
             return  tab.key === key ? {...tab, updated: true} : tab
         });
 
@@ -303,8 +277,9 @@ export default class GameChat extends React.Component<any, any> {
         if (this.props.is_admin) {
             return <Chat is_silenced={this.props.is_silenced}
                          chat={this.state.chat}
+                         can_talk_again_at={this.props.can_talk_again_at}
                          set_tab_to_updated={this.setTabToUpdated.bind(this)}
-                         push_silenced_messsage={this.pushSilencedMethod.bind(this)}
+                         push_silenced_message={this.pushSilencedMethod.bind(this)}
                          push_private_message_sent={this.pushPrivateMessageSent.bind(this)}
                          push_error_message={this.pushErrorMessage.bind(this)}
             />
@@ -317,7 +292,7 @@ export default class GameChat extends React.Component<any, any> {
                           can_talk_again_at={this.props.can_talk_again_at}
                           chat={this.state.chat}
                           set_tab_to_updated={this.setTabToUpdated.bind(this)}
-                          push_silenced_messsage={this.pushSilencedMethod.bind(this)}
+                          push_silenced_message={this.pushSilencedMethod.bind(this)}
                           push_private_message_sent={this.pushPrivateMessageSent.bind(this)}
                           push_error_message={this.pushErrorMessage.bind(this)}
                     />

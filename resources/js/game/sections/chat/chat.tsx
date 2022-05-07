@@ -1,13 +1,13 @@
 import React, {Fragment} from "react";
 import PrimaryButton from "../../components/ui/buttons/primary-button";
 import Messages from "./components/messages";
-import {cloneDeep} from "lodash";
-import {DateTime} from "luxon";
 import Ajax from "../../lib/ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
 import {generateServerMessage} from "../../lib/ajax/generate-server-message";
+import ChatComponentProps from "../../lib/game/chat/components/chat-component-props";
+import ChatComponentState from "../../lib/game/chat/components/chat-component-state";
 
-export default class Chat extends React.Component<any, any> {
+export default class Chat extends React.Component<ChatComponentProps, ChatComponentState> {
 
     private chatInput: any;
 
@@ -29,7 +29,7 @@ export default class Chat extends React.Component<any, any> {
         if (typeof e !== 'undefined') {
             if (e.key === 'Enter') {
                 if (this.props.is_silenced) {
-                    return this.props.push_silenced_messsage();
+                    return this.props.push_silenced_message();
                 }
 
                 return this.handleMessage();
@@ -63,7 +63,7 @@ export default class Chat extends React.Component<any, any> {
         }
 
         if (this.props.is_silenced) {
-            return this.props.push_silenced_messsage()
+            return this.props.push_silenced_message()
         }
 
         if (this.state.message.length > 240) {
@@ -90,7 +90,7 @@ export default class Chat extends React.Component<any, any> {
         }
 
         if (this.props.is_silenced) {
-            return this.props.push_silenced_messsage();
+            return this.props.push_silenced_message();
         }
 
         this.props.push_private_message_sent(messageData);
