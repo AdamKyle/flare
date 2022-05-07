@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import GameProps from './lib/game/types/game-props';
 import Tabs from './components/ui/tabs/tabs';
 import TabPanel from "./components/ui/tabs/tab-panel";
@@ -14,6 +14,7 @@ import FetchGameData from "./lib/game/ajax/FetchGameData";
 import CharacterSheet from "./sections/character-sheet/character-sheet";
 import GameChat from "./sections/chat/game-chat";
 import ForceNameChange from "./sections/force-name-change/force-name-change";
+import SmallerActions from "./sections/game-actions-section/smaller-actions";
 
 export default class Game extends React.Component<GameProps, GameState> {
 
@@ -167,7 +168,7 @@ export default class Game extends React.Component<GameProps, GameState> {
         }
 
         return (
-            <div className="md:container">
+            <Fragment>
                 { this.state.view_port < 1600 && this.state.show_size_message ?
                     <WarningAlert additional_css={'mb-5'} close_alert={this.hideDeviceSizeMessage.bind(this)}>
                         Your devices screen size is too small to properly display the map.
@@ -186,7 +187,12 @@ export default class Game extends React.Component<GameProps, GameState> {
                                     />
                                 </BasicCard>
                                 <BasicCard additionalClasses={'min-h-60'}>
-                                    <Actions character_id={this.props.characterId} character={this.state.character} character_statuses={this.state.character_status} />
+                                    {
+                                        this.state.view_port < 1600 ?
+                                            <SmallerActions character_id={this.props.characterId} character={this.state.character} character_statuses={this.state.character_status} />
+                                        :
+                                            <Actions character_id={this.props.characterId} character={this.state.character} character_statuses={this.state.character_status} />
+                                    }
                                 </BasicCard>
                             </div>
                             <BasicCard additionalClasses={'hidden lg:block md:mt-0 lg:col-start-3 lg:col-end-3 max-h-[575px]'}>
@@ -222,7 +228,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                         <ForceNameChange character_id={this.state.character.id} />
                     : null
                 }
-            </div>
+            </Fragment>
         );
 
     }

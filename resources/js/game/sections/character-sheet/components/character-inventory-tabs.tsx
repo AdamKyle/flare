@@ -103,13 +103,13 @@ export default class CharacterInventoryTabs extends React.Component<CharacterInv
                     <InventoryTabSection dark_tables={this.state.dark_tables} character_id={this.props.character_id} inventory={this.state.inventory.inventory} usable_items={this.state.inventory.usable_items} is_dead={this.props.is_dead} update_inventory={this.updateInventory.bind(this)} usable_sets={this.state.inventory.usable_sets}/>
                 </TabPanel>
                 <TabPanel key={'equipped'}>
-                    <EquippedTable dark_tables={this.state.dark_tables} equipped_items={this.state.inventory.equipped} is_dead={this.props.is_dead} sets={this.state.inventory.sets} character_id={this.props.character_id} is_set_equipped={this.state.inventory.set_is_equipped} update_inventory={this.updateInventory.bind(this)} />
+                    {/*<EquippedTable dark_tables={this.state.dark_tables} equipped_items={this.state.inventory.equipped} is_dead={this.props.is_dead} sets={this.state.inventory.sets} character_id={this.props.character_id} is_set_equipped={this.state.inventory.set_is_equipped} update_inventory={this.updateInventory.bind(this)} />*/}
                 </TabPanel>
                 <TabPanel key={'sets'}>
-                    <SetsTable dark_tables={this.state.dark_tables} sets={this.state.inventory.sets} is_dead={this.props.is_dead} character_id={this.props.character_id} savable_sets={this.state.inventory.savable_sets} update_inventory={this.updateInventory.bind(this)} set_name_equipped={this.state.inventory.set_name_equipped} />
+                    {/*<SetsTable dark_tables={this.state.dark_tables} sets={this.state.inventory.sets} is_dead={this.props.is_dead} character_id={this.props.character_id} savable_sets={this.state.inventory.savable_sets} update_inventory={this.updateInventory.bind(this)} set_name_equipped={this.state.inventory.set_name_equipped} />*/}
                 </TabPanel>
                 <TabPanel key={'quest'}>
-                    <QuestItemsTable dark_table={this.state.dark_tables} quest_items={this.state.inventory.quest_items} is_dead={this.props.is_dead} />
+                    {/*<QuestItemsTable dark_table={this.state.dark_tables} quest_items={this.state.inventory.quest_items} is_dead={this.props.is_dead} />*/}
                 </TabPanel>
             </Tabs>
         )

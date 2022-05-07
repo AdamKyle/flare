@@ -13,12 +13,15 @@ import PrimaryButton from "../../components/ui/buttons/primary-button";
 import {capitalize, isEqual} from "lodash";
 import clsx from "clsx";
 import ActionsProps from "../../lib/game/types/actions/actions-props";
+import ActionsManager from "../../lib/game/actions/actions-manager";
 
 export default class Actions extends React.Component<ActionsProps, ActionsState> {
 
     private attackTimeOut: any;
 
     private craftingTimeOut: any;
+
+    private actionsManager: ActionsManager;
 
     constructor(props: ActionsProps) {
         super(props);
@@ -40,20 +43,13 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
 
         // @ts-ignore
         this.craftingTimeOut = Echo.private('show-crafting-timeout-bar-' + this.props.character.user_id);
+
+        this.actionsManager = new ActionsManager(this);
     }
 
     componentDidMount() {
 
-        (new Ajax()).setRoute('actions/' + this.props.character_id).doAjaxCall('get', (result: AxiosResponse) => {
-            this.setState({
-                character: this.props.character,
-                monsters: result.data.monsters,
-                attack_time_out: this.props.character.can_attack_again_at !== null ? this.props.character.can_attack_again_at : 0,
-                loading: false,
-            })
-        }, (error: AxiosError) => {
-
-        });
+        this.actionsManager.initialFetch(this.props);
 
         // @ts-ignore
         this.attackTimeOut.listen('Game.Core.Events.ShowTimeOutEvent', (event: any) => {
@@ -71,155 +67,67 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
     }
 
     componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<ActionsState>, snapshot?: any) {
-
-        if (this.state.character?.is_dead && !this.props.character.is_dead) {
-            this.setState({
-                character_revived: true,
-            })
-        }
-
-        if (!isEqual(this.props.character, this.state.character)) {
-            this.setState({
-                character: this.props.character
-            });
-        }
+        this.actionsManager.actionComponentUpdated(this.state, this.props)
     }
 
     openCrafting(type: 'craft' | 'enchant' | 'alchemy' | 'workbench' | 'trinketry' | null) {
-        this.setState({
-            crafting_type: type,
-        });
+        this.actionsManager.setCraftingType(type);
     }
 
     removeCraftingType() {
-        this.setState({
-            crafting_type: null,
-        });
+        this.actionsManager.removeCraftingSection();
     }
 
     attackKingdom() {
     }
 
     setSelectedMonster(monster: any) {
-        let isSameMonster = false;
-
-        if (monster.id === this.state.monster_to_fight?.id) {
-            isSameMonster = true;
-        }
-
-        this.setState({
-            monster_to_fight: monster,
-            is_same_monster: isSameMonster,
-        });
+        this.actionsManager.setSelectedMonster(monster);
     }
 
     resetSameMonster() {
-        this.setState({
-            is_same_monster: false,
-        });
+        this.actionsManager.resetSameMonster();
     }
 
     revive() {
-        (new Ajax()).setRoute('battle-revive/' + this.props.character?.id).doAjaxCall('post', (result: AxiosResponse) => {
-
-        }, (error: AxiosError) => {
-
-        });
+        this.actionsManager.revive(this.props.character_id);
     }
 
     setAttackTimeOut(attack_time_out: number) {
-        this.setState({
-            attack_time_out: attack_time_out
-        });
+        this.actionsManager.setAttackTimeOut(attack_time_out);
     }
 
     updateTimer() {
-        this.setState({
-            attack_time_out: 0,
-        })
+        this.actionsManager.updateTimer();
     }
 
     updateCraftingTimer() {
-        this.setState({
-            crafting_time_out: 0,
-        })
+        this.actionsManager.updateCraftingTimer();
     }
 
     resetRevived() {
-        this.setState({
-            character_revived: false
-        });
+        this.actionsManager.resetRevived();
     }
 
     getSelectedCraftingOption() {
-        if (this.state.crafting_type !== null) {
-            return capitalize(this.state.crafting_type);
-        }
-
-        return '';
+        this.actionsManager.getSelectedCraftingOption();
     }
 
     cannotCraft() {
-        return this.state.crafting_time_out > 0 || !this.props.character_statuses?.can_craft || this.props.character_statuses?.is_dead
-    }
-
-    buildCraftingList() {
-        const options = [
-            {
-                name: 'Craft',
-                icon_class: 'ra ra-hammer',
-                on_click: () => this.openCrafting('craft'),
-            },
-            {
-                name: 'Enchant',
-                icon_class: 'ra ra-burning-embers',
-                on_click: () => this.openCrafting('enchant'),
-            },
-            {
-                name: 'Trinketry',
-                icon_class: 'ra ra-anvil',
-                on_click: () => this.openCrafting('trinketry'),
-            }
-        ];
-
-        if (!this.props.character.is_alchemy_locked) {
-            options.splice(2, 0, {
-                name: 'Alchemy',
-                icon_class: 'ra ra-potion',
-                on_click: () => this.openCrafting('alchemy'),
-            });
-        }
-
-        if (this.props.character.can_use_work_bench) {
-            if (typeof options[2] !== 'undefined') {
-                options.splice(3, 0, {
-                    name: 'Workbench',
-                    icon_class: 'ra ra-anvil',
-                    on_click: () => this.openCrafting('workbench'),
-                })
-            } else {
-                options.splice(2, 0, {
-                    name: 'Workbench',
-                    icon_class: 'ra ra-anvil',
-                    on_click: () => this.openCrafting('workbench'),
-                });
-            }
-        }
-
-        return options;
+        return this.actionsManager.cannotCraft();
     }
 
     render() {
 
         return (
-            <div className='px-4'>
+            <div className='lg:px-4'>
                 {
                     this.state.loading ?
                         <ComponentLoading />
                     :
                         <div className='grid md:grid-cols-4'>
                             <div className='md:col-start-1 md:col-span-1'>
-                                <DropDown menu_items={this.buildCraftingList()} button_title={'Craft/Enchant'} disabled={this.state.character?.is_dead || this.cannotCraft()} selected_name={this.getSelectedCraftingOption()}/>
+                                <DropDown menu_items={this.actionsManager.buildCraftingList(this.openCrafting.bind(this))} button_title={'Craft/Enchant'} disabled={this.state.character?.is_dead || this.cannotCraft()} selected_name={this.actionsManager.getSelectedCraftingOption()}/>
                                 <DangerButton button_label={'Attack Kingdom'} on_click={this.attackKingdom.bind(this)} disabled={this.state.character?.is_dead} />
                             </div>
                             <div className='border-b-2 block border-b-gray-300 dark:border-b-gray-600 my-3 md:hidden'></div>

@@ -20,4 +20,6 @@ export default interface ActionsState {
     character_revived: boolean;
 
     crafting_type: 'craft' | 'enchant' | 'alchemy' | 'workbench' | 'trinketry' | null;
+
+    selected_action?: string|null;
 }

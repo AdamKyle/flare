@@ -9,7 +9,7 @@ export default class Messages extends React.Component<any, any> {
     render() {
         return (
             <BasicCard additionalClasses={'mb-10'}>
-                <div className='bg-gray-800 p-4 max-h-[800px] min-h-[200px] overflow-x-auto'>
+                <div className='bg-gray-800 md:p-4 max-h-[800px] min-h-[200px] overflow-x-auto'>
                     <ul className='ml-5'>
                         {this.props.children}
                     </ul>

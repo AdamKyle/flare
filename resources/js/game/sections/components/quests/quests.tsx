@@ -41,14 +41,6 @@ export default class Quests extends React.Component<QuestsProps, QuestState> {
                         </div>
                     :
                         <Fragment>
-                            <InfoAlert>
-                                <p className='my-2'>Each plane has it's own sets of quests. Some have long quest chains that unlock various features and upgrades for your gear.</p>
-                                <p className='my-2'>Players who do not do quests, will not get very far in Tlessa as these quests unlock features of the game and allow you to further progress. All quests tell you explicitly how to complete them.</p>
-                                <p className='my-2'>The gathering of the required currencies, items and so on will take you a while, but once you have done all the quests, your character will be
-                                    much stronger, better equipped you will have a better understanding of the various systems in Tlessa and how they come together.</p>
-                                <p className='my-2'>Finally, there are two types of quests Tlessa: Quest Chains, what you see below, and One Off Quests (next tab over). Quest chains unlock the bulk of the features while one
-                                    offs are good for upgrading early game quest items.</p>
-                            </InfoAlert>
                             <DropDown menu_items={[
                                 {
                                     name: 'Surface',

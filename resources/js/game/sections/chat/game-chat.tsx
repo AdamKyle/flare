@@ -208,6 +208,10 @@ export default class GameChat extends React.Component<any, any> {
     componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any) {
         console.log(this.props.is_silenced, this.state.is_silenced);
 
+        if (this.props.is_silenced === null) {
+            return;
+        }
+
         if (this.props.is_silenced !== this.state.is_silenced) {
             this.setState({
                 is_silenced: this.props.is_sileneced,

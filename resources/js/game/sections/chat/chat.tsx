@@ -127,23 +127,23 @@ export default class Chat extends React.Component<any, any> {
         return this.props.chat.map(function(message: any) {
             switch (message.type) {
                 case 'chat':
-                    return <li style={{color: message.color}} className='mb-2'>
+                    return <li style={{color: message.color}} className='mb-2 break-all md:break-normal'>
                         [{message.map_name} {message.x}/{message.y}] <button type='button' className='underline' onClick={() => self.privateMessage(message.character_name)}>{message.character_name}</button>: {message.message}
                     </li>
                 case 'private-message-sent':
-                    return <li className='text-fuchsia-400 italic mb-2'>{message.message}</li>
+                    return <li className='text-fuchsia-400 italic mb-2 break-all md:break-normal'>{message.message}</li>
                 case 'private-message-received':
                     if (message.from === 'The Creator') {
-                        return <li className='text-fuchsia-300 text-xl italic mb-2'>{message.from}: {message.message}</li>
+                        return <li className='text-fuchsia-300 text-xl italic mb-2 break-all md:break-normal'>{message.from}: {message.message}</li>
                     }
 
-                    return <li className='text-fuchsia-300 italic mb-2'><button type='button' className='underline' onClick={() => self.privateMessage(message.from)}>{message.from}</button>: {message.message}</li>
+                    return <li className='text-fuchsia-300 italic mb-2 break-all md:break-normal'><button type='button' className='underline' onClick={() => self.privateMessage(message.from)}>{message.from}</button>: {message.message}</li>
                 case 'error-message':
-                    return <li className='text-red-400 bold mb-2'>{message.message}</li>
+                    return <li className='text-red-400 bold mb-2 break-all md:break-normal'>{message.message}</li>
                 case 'creator-message':
-                    return <li className='text-yellow-300 text-xl bold mb-2'>{message.character_name}: {message.message}</li>
+                    return <li className='text-yellow-300 text-xl bold mb-2 break-all md:break-normal'>{message.character_name}: {message.message}</li>
                 case 'global-message':
-                    return <li className='text-yellow-400 bold italic mb-2'>{message.message}</li>
+                    return <li className='text-yellow-400 bold italic mb-2 break-all md:break-normal'>{message.message}</li>
                 default:
                     return null;
 
