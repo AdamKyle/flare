@@ -38,6 +38,8 @@ class Quest extends Model {
         'secondary_required_item',
         'faction_game_map_id',
         'required_faction_level',
+        'before_completion_description',
+        'after_completion_description',
     ];
 
     protected $casts = [

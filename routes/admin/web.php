@@ -140,6 +140,8 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::post('/admin/quests/export-data', ['as' => 'quests.export-data', 'uses' => 'QuestsController@export']);
     Route::post('/admin/quests/import-data', ['as' => 'quests.import-data', 'uses' => 'QuestsController@import']);
 
+    Route::post('/admin/quests/store', ['as' => 'quest.store', 'uses' => 'QuestsController@store']);
+
     Route::get('/admin/quests/index', ['as' => 'quests.index', 'uses' => 'QuestsController@index']);
     Route::get('/admin/quests/create', ['as' => 'quests.create', 'uses' => 'QuestsController@create']);
     Route::get('/admin/quests/edit/{quest}', ['as' => 'quests.edit', 'uses' => 'QuestsController@edit']);

@@ -1,20 +1,25 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container-fluid">
-        <div class="row page-titles">
-            <div class="col-md-6 align-self-right">
-                <h4 class="mt-2">{{$quest->name}}</h4>
-            </div>
-            <div class="col-md-6 align-self-right">
-                @if (auth()->user()->hasRole('isAdmin'))
-                    <a href="{{route('home')}}" class="btn btn-success float-right ml-2">Home</a>
-                @else
-                    <a href="{{url()->previous()}}" class="btn btn-primary float-right ml-2">Back</a>
-                @endif
-            </div>
-        </div>
-        <hr />
-        @include('admin.quests.partials.show', ['quest' => $quest])
-    </div>
+
+    <x-core.layout.info-container>
+        @php
+            $backUrl = route('quests.index');
+
+            if (!auth()->user()->hasRole('Admin')) {
+                $backUrl = '/information/quests';
+            }
+        @endphp
+
+        <x-core.cards.card-with-title
+            title="{{$quest->name}}"
+            buttons="true"
+            backUrl="{{$backUrl}}"
+            editUrl="{{route('quests.edit', ['quest' => $quest->id])}}"
+        >
+            @include('admin.quests.partials.show', ['quest' => $quest])
+        </x-core.cards.card-with-title>
+
+
+    </x-core.layout.info-container>
 @endsection

@@ -229,4 +229,26 @@ class SkillTypeValue {
     public function getNamedValue(): string {
         return self::$namedValues[$this->value];
     }
+
+    /**
+     * @return int[]
+     */
+    public static function getValues(): array {
+        return [
+            0  => 'Training',
+            1  => 'Crafting',
+            2  => 'Enchanting',
+            3  => 'Disenchanting',
+            4  => 'Alchemy',
+            5  => 'Effects Battle Timer',
+            6  => 'Effects Directional Move Timer',
+            7  => 'Effects Movement Timer',
+            8  => 'Effects Kingdom Building Timers',
+            9  => 'Effects Unit Recruitment Timers',
+            10 => 'Effects Unit Movement Timers',
+            11 => 'Effects Spell Evasion',
+            12 => 'Effects Artifact Annulment',
+            13 => 'Effects the kingdom in some way'
+        ];
+    }
 }

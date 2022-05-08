@@ -2,8 +2,13 @@
 
 namespace App\Admin\Controllers;
 
+use App\Flare\Models\GameMap;
+use App\Flare\Models\Item;
+use App\Flare\Models\Npc;
+use App\Game\Skills\Values\SkillTypeValue;
 use Cache;
 use App\Flare\Models\Character;
+use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Controllers\Controller;
 use App\Admin\Exports\Quests\QuestsExport;
@@ -33,16 +38,30 @@ class QuestsController extends Controller {
 
     public function create() {
         return view('admin.quests.manage', [
-            'quest'   => null,
-            'editing' => false,
+            'quest'          => null,
+            'editing'        => false,
+            'npcs'           => Npc::pluck('real_name', 'id')->toArray(),
+            'questItems'     => Item::where('type', 'quest')->pluck('name', 'id')->toArray(),
+            'quests'         => Quest::pluck('name', 'id')->toArray(),
+            'gameMaps'       => GameMap::pluck('name', 'id')->toArray(),
+            'skillTypes'     => SkillTypeValue::getValues(),
         ]);
     }
 
     public function edit(Quest $quest) {
         return view('admin.quests.manage', [
-            'quest'   => $quest,
-            'editing' => true,
+            'quest'          => $quest,
+            'editing'        => true,
+            'npcs'           => Npc::pluck('real_name', 'id')->toArray(),
+            'questItems'     => Item::where('type', 'quest')->pluck('name', 'id')->toArray(),
+            'quests'         => Quest::pluck('name', 'id')->toArray(),
+            'gameMaps'       => GameMap::pluck('name', 'id')->toArray(),
+            'skillTypes'     => SkillTypeValue::getValues(),
         ]);
+    }
+
+    public function store(Request $request) {
+        dd($request->all());
     }
 
     public function exportQuests() {

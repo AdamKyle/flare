@@ -3,7 +3,6 @@
 @import "./fight-buttons.css";
 @import "./react-data-tables.css";
 
-
 .glightbox {
     img {
         @apply max-w-3xl mx-auto mt-3 mb-3;
