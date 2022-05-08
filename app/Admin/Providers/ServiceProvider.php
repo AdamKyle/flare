@@ -2,7 +2,9 @@
 
 namespace App\Admin\Providers;
 
+use App\Admin\Requests\QuestManagement;
 use App\Admin\Services\ItemsService;
+use App\Admin\Services\QuestService;
 use App\Charts\AllCharacterGoldChart;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use ConsoleTVs\Charts\Registrar as Charts;
@@ -41,6 +43,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(ItemsService::class, function($app) {
             return new ItemsService();
+        });
+
+        $this->app->bind(QuestService::class, function() {
+            return new QuestService();
         });
 
         $this->commands([CreateAdminAccount::class, GiveKingdomsToNpcs::class]);

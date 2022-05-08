@@ -2,6 +2,8 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Requests\QuestManagement;
+use App\Admin\Services\QuestService;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
 use App\Flare\Models\Npc;
@@ -18,6 +20,12 @@ use App\Flare\Models\GameSkill;
 use App\Flare\Models\Quest;
 
 class QuestsController extends Controller {
+
+    private $questService;
+
+    public function __construct(QuestService $questService) {
+        $this->questService = $questService;
+    }
 
     public function index() {
         return view('admin.quests.index');
@@ -60,8 +68,17 @@ class QuestsController extends Controller {
         ]);
     }
 
-    public function store(Request $request) {
-        dd($request->all());
+    public function store(QuestManagement $request) {
+
+        $quest = $this->questService->createOrUpdateQuest($request->all());
+
+        $message = 'Created: ' . $quest->name;
+
+        if ($request->id !== 0) {
+            $message = 'Updated: ' . $quest->name;
+        }
+
+        return redirect()->back()->with('success', $message);
     }
 
     public function exportQuests() {

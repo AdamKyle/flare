@@ -21,5 +21,23 @@
         </x-core.cards.card-with-title>
 
 
+        <div class="grid grid-cols-2 gap-2">
+            <x-core.cards.card-with-title
+                title="Before Completion Text"
+            >
+                <p>
+                    {!! nl2br($quest->before_completion_description)  !!}
+                </p>
+            </x-core.cards.card-with-title>
+
+            <x-core.cards.card-with-title
+                title="After Completion Text"
+            >
+                <p>
+                    {!! nl2br($quest->after_completion_description)  !!}
+                </p>
+            </x-core.cards.card-with-title>
+        </div>
+
     </x-core.layout.info-container>
 @endsection

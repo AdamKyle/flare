@@ -55,7 +55,7 @@ export default class QuestNode extends React.Component<QuestNodeProps, any> {
 
                 {
                     this.state.open_quest_modal ?
-                        <QuestDetailsModal is_open={this.state.open_quest_modal} handle_close={this.showQuestDetails.bind(this)} quest_id={this.props.quest?.id} character_id={this.props.character_id} />
+                        <QuestDetailsModal is_open={this.state.open_quest_modal} handle_close={this.showQuestDetails.bind(this)} quest_id={this.props.quest?.id} character_id={this.props.character_id} is_complete={this.isParentQuestComplete()}/>
                     : null
                 }
             </div>

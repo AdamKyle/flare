@@ -220,7 +220,9 @@ export default class QuestDetailsModal extends React.Component<any, any> {
 
     render() {
         const npcPLaneAccess = this.fetchNpcPlaneAccess();
-
+        if (this.state.quest_details !== null) {
+            console.log(this.state.quest_details.before_completion_description);
+        }
         return (
             <Dialogue is_open={this.props.is_open} handle_close={this.props.handle_close} secondary_actions={null} title={this.buildTitle()} large_modal={true}>
                 {
@@ -237,19 +239,6 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                                             <dl>
                                                 <dt>Name</dt>
                                                 <dd>{this.state.quest_details.npc.name}</dd>
-                                                <dt className="text-green-700 dark:text-green-600"><i className="fas fa-comment"></i> How to message</dt>
-                                                <dd className='flex items-center'>
-                                                    <span className='text-green-700 dark:text-green-600'><code>{this.state.quest_details.npc.text_command_to_message} {this.getNPCCommands(this.state.quest_details.npc)}</code></span>
-                                                    <div>
-                                                        <PopOverContainer icon={'fas fa-info-circle'} icon_label={'Help'}>
-                                                            <h3 className='text-gray-700 dark:text-gray-200'>How to message</h3>
-                                                            <p className='my-2 text-gray-700 dark:text-gray-200'>
-                                                                All you have to do is copy and paste the command you see and paste it in the chat box, make sure there are no spaces before the
-                                                                command. Quest NPC's require you to be at there location, failure to be will tell you when you message them.
-                                                            </p>
-                                                        </PopOverContainer>
-                                                    </div>
-                                                </dd>
                                                 <dt>Coordinates (X/Y)</dt>
                                                 <dd>{this.state.quest_details.npc.x_position} / {this.state.quest_details.npc.y_position}</dd>
                                                 <dt>On Plane</dt>
@@ -257,6 +246,15 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                                                 <dt>Must be at same location?</dt>
                                                 <dd>{this.state.quest_details.npc.must_be_at_same_location ? 'Yes' : 'No'}</dd>
                                             </dl>
+                                            <div className='mt-4 mb-4'>
+                                                {
+                                                    this.props.is_complete ?
+                                                        <div dangerouslySetInnerHTML={{__html: this.state.quest_details.after_completion_description.replace(/\n/g, "<br/>")}}></div>
+                                                   :
+                                                        <div dangerouslySetInnerHTML={{__html: this.state.quest_details.before_completion_description.replace(/\n/g, "<br/>")}}></div>
+                                                }
+
+                                            </div>
                                         </div>
                                         {
                                             npcPLaneAccess !== null ?
