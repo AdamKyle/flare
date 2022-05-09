@@ -51,6 +51,10 @@ export default class QuestDetailsModal extends React.Component<any, any> {
         });
     }
 
+    handInQuest() {
+
+    }
+
     buildTitle() {
         if (this.state.quest_details === null) {
             return 'Fetching details ...';
@@ -224,7 +228,16 @@ export default class QuestDetailsModal extends React.Component<any, any> {
             console.log(this.state.quest_details.before_completion_description);
         }
         return (
-            <Dialogue is_open={this.props.is_open} handle_close={this.props.handle_close} secondary_actions={null} title={this.buildTitle()} large_modal={true}>
+            <Dialogue is_open={this.props.is_open}
+                      handle_close={this.props.handle_close}
+                      secondary_actions={{
+                          secondary_button_disabled: !this.props.is_parent_complete || this.props.is_quest_complete,
+                          secondary_button_label: 'Hand in',
+                          handle_action: this.handInQuest.bind(this),
+                      }}
+                      title={this.buildTitle()}
+                      large_modal={true}
+            >
                 {
                     this.state.loading ?
                         <div className={'h-24 mt-10 relative'}>
