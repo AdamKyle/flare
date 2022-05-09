@@ -15,6 +15,7 @@ import CharacterSheet from "./sections/character-sheet/character-sheet";
 import GameChat from "./sections/chat/game-chat";
 import ForceNameChange from "./sections/force-name-change/force-name-change";
 import SmallerActions from "./sections/game-actions-section/smaller-actions";
+import QuestType from "./lib/game/types/quests/quest-type";
 
 export default class Game extends React.Component<GameProps, GameState> {
 
@@ -59,7 +60,6 @@ export default class Game extends React.Component<GameProps, GameState> {
             kingdoms: [],
             quests: null,
         }
-
 
         // @ts-ignore
         this.characterTopBar = Echo.private('update-top-bar-' + this.props.userId);
@@ -142,6 +142,12 @@ export default class Game extends React.Component<GameProps, GameState> {
         this.setState({character_currencies: currencies});
     }
 
+    updateCharacterQuests(quests: QuestType) {
+        this.setState({
+            quests: quests
+        });
+    }
+
 
     renderLoading() {
         return  (
@@ -211,7 +217,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                     </TabPanel>
                     <TabPanel key={'quests'}>
                         <BasicCard>
-                            <Quests quest_details={this.state.quests} character_id={this.props.characterId} />
+                            <Quests quest_details={this.state.quests} character_id={this.props.characterId} update_quests={this.updateCharacterQuests.bind(this)}/>
                         </BasicCard>
                     </TabPanel>
                     <TabPanel key={'kingdoms'}>

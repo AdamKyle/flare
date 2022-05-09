@@ -1,46 +1,25 @@
 <?php
 
-namespace App\Game\Messages\Handlers;
+namespace App\Game\Quests\Handlers;
 
+use App\Flare\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Npc;
 use App\Flare\Models\Quest;
-use App\Flare\Services\BuildCharacterAttackTypes;
-use App\Flare\Transformers\CharacterAttackTransformer;
-use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
-use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
-use App\Game\Core\Events\UpdateAttackStats;
-use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item;
 
 class NpcQuestRewardHandler {
 
     private $npcServerMessageBuilder;
 
-    private $characterAttackTransformer;
-
-    private $buildCharacterAttackTypes;
-
-    private $manager;
-
-    public function __construct(NpcServerMessageBuilder    $npcServerMessageBuilder,
-                                CharacterSheetBaseInfoTransformer $characterAttackTransformer,
-                                BuildCharacterAttackTypes  $buildCharacterAttackTypes,
-                                Manager                    $manager
-    ) {
+    public function __construct(NpcServerMessageBuilder    $npcServerMessageBuilder) {
         $this->npcServerMessageBuilder    = $npcServerMessageBuilder;
-        $this->characterAttackTransformer = $characterAttackTransformer;
-        $this->buildCharacterAttackTypes  = $buildCharacterAttackTypes;
-        $this->manager                    = $manager;
     }
 
     public function processReward(Quest $quest, Npc $npc, Character $character) {
@@ -139,7 +118,7 @@ class NpcQuestRewardHandler {
         $newValue = $character->gold + $quest->reward_gold;
 
         if ((new MaxCurrenciesValue($newValue, MaxCurrenciesValue::GOLD))->canNotGiveCurrency()) {
-            return;
+            $newValue = MaxCurrenciesValue::GOLD;
         }
 
         $character->update([
@@ -156,7 +135,7 @@ class NpcQuestRewardHandler {
         $newValue = $character->gold_dust + $quest->reward_gold_dust;
 
         if ((new MaxCurrenciesValue($newValue, MaxCurrenciesValue::GOLD_DUST))->canNotGiveCurrency()) {
-            return;
+            $newValue = MaxCurrenciesValue::GOLD_DUST;
         }
 
         $character->update([
@@ -173,7 +152,7 @@ class NpcQuestRewardHandler {
         $newValue = $character->shards + $quest->reward_shards;
 
         if ((new MaxCurrenciesValue($newValue, MaxCurrenciesValue::SHARDS))->canNotGiveCurrency()) {
-            return;
+            $newValue = MaxCurrenciesValue::SHARDS;
         }
 
         $character->update([
@@ -190,13 +169,7 @@ class NpcQuestRewardHandler {
     }
 
     public function updateCharacterAttackDataCache(Character $character) {
-        $this->buildCharacterAttackTypes->buildCache($character);
-
-        $characterData = new Item($character->refresh(), $this->characterAttackTransformer);
-
-        $characterData = $this->manager->createData($characterData)->toArray();
-
-        event(new UpdateBaseCharacterInformation($character->user, $characterData));
+        CharacterAttackTypesCacheBuilder::dispatch($character);
     }
 
     public function createQuestLog(Character $character, Quest $quest) {
@@ -210,9 +183,5 @@ class NpcQuestRewardHandler {
         broadcast(new ServerMessageEvent($character->user, 'Quest: ' . $quest->name . ' completed. Check quest logs under adventure logs section.'));
 
         event(new UpdateTopBarEvent($character));
-
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'quest_items'));
-
-        event(new CharacterInventoryDetailsUpdate($character->user));
     }
 }

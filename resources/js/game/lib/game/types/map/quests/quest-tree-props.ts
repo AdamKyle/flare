@@ -1,4 +1,5 @@
 import {QuestDetails} from "../../../map/types/quest-details";
+import QuestType from "../../quests/quest-type";
 
 export default interface QuestTreeProps {
 
@@ -9,4 +10,6 @@ export default interface QuestTreeProps {
     character_id: number;
 
     plane: string;
+
+    update_quests: (quests: QuestType) => void;
 }

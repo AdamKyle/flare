@@ -10,6 +10,7 @@ import clsx from "clsx";
 import InfoAlert from "../../../../components/ui/alerts/simple-alerts/info-alert";
 import CurrencyRequirement from "./components/currency-requirement";
 import Reward from "./components/reward";
+import LoadingProgressBar from "../../../../components/ui/progress-bars/loading-progress-bar";
 
 export default class QuestDetailsModal extends React.Component<any, any> {
 
@@ -21,6 +22,7 @@ export default class QuestDetailsModal extends React.Component<any, any> {
         this.state = {
             quest_details: null,
             loading: true,
+            handing_in: false,
         }
 
         this.tabs = [{
@@ -52,7 +54,23 @@ export default class QuestDetailsModal extends React.Component<any, any> {
     }
 
     handInQuest() {
+        this.setState({
+            handing_in: true,
+        }, () => {
+            (new Ajax()).setRoute('quest/'+this.props.quest_id+'/hand-in-quest/' + this.props.character_id).doAjaxCall('post', (result: AxiosResponse) => {
+                this.setState({
+                    handing_in: false,
+                });
 
+                this.props.update_quests(result.data);
+
+                this.props.handle_close();
+            }, (error: AxiosError) => {
+                this.setState({
+                    handing_in: false,
+                });
+            })
+        });
     }
 
     buildTitle() {
@@ -294,6 +312,12 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                                     <Reward quest={this.state.quest_details} />
                                 </TabPanel>
                             </Tabs>
+
+                            {
+                                this.state.handing_in ?
+                                    <LoadingProgressBar />
+                                : null
+                            }
                         </Fragment>
                 }
             </Dialogue>

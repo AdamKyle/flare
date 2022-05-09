@@ -3,6 +3,7 @@
 namespace App\Admin\Services;
 
 use App\Flare\Models\Quest;
+use App\Game\Quests\Handlers\NpcQuestsHandler;
 
 class QuestService {
 

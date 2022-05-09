@@ -3,6 +3,7 @@ import KingdomDetails from "../map/types/kingdom-details";
 import {QuestDetails} from "../map/types/quest-details";
 import CharacterCurrenciesType from "../character/character-currencies-type";
 import CharacterStatusType from "../character/character-status-type";
+import QuestType from "./quests/quest-type";
 
 export default interface GameState {
 
@@ -24,9 +25,5 @@ export default interface GameState {
 
     kingdoms: KingdomDetails[] | [];
 
-    quests: {
-        quests: QuestDetails[]|[],
-        completed_quests: number[],
-        player_plane: string,
-    } | null
+    quests: QuestType | null;
 }

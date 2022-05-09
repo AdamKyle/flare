@@ -35,7 +35,7 @@ export  default class QuestTree extends React.Component<QuestTreeProps, any> {
 
         return parentQuest.child_quests.map((quest) => {
             return (
-                <TreeNode label={<QuestNode quest={quest} character_id={this.props.character_id} completed_quests={this.props.completed_quests}/>}>
+                <TreeNode label={<QuestNode quest={quest} character_id={this.props.character_id} completed_quests={this.props.completed_quests} update_quests={this.props.update_quests}/>}>
                     {this.renderQuestTree(quest)}
                 </TreeNode>
             )
@@ -84,7 +84,7 @@ export  default class QuestTree extends React.Component<QuestTreeProps, any> {
                     lineWidth={'2px'}
                     lineColor={'#0ea5e9'}
                     lineBorderRadius={'10px'}
-                    label={<QuestNode quest={quest} character_id={this.props.character_id} completed_quests={this.props.completed_quests}/>}
+                    label={<QuestNode quest={quest} character_id={this.props.character_id} completed_quests={this.props.completed_quests} update_quests={this.props.update_quests}/>}
                 >
                     {this.renderQuestTree(quest)}
                 </Tree>
@@ -100,7 +100,7 @@ export  default class QuestTree extends React.Component<QuestTreeProps, any> {
                         lineWidth={'2px'}
                         lineColor={'#0ea5e9'}
                         lineBorderRadius={'10px'}
-                        label={<QuestNode quest={this.fetchParentQuestChain()} character_id={this.props.character_id} completed_quests={this.props.completed_quests}/>}
+                        label={<QuestNode quest={this.fetchParentQuestChain()} character_id={this.props.character_id} completed_quests={this.props.completed_quests} update_quests={this.props.update_quests}/>}
                     >
                         {this.renderQuestTree(this.fetchParentQuestChain())}
                     </Tree>

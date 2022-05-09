@@ -62,6 +62,7 @@ export default class QuestNode extends React.Component<QuestNodeProps, any> {
                             character_id={this.props.character_id}
                             is_parent_complete={this.isParentQuestComplete()}
                             is_quest_complete={this.isQuestCompleted()}
+                            update_quests={this.props.update_quests}
                         />
                     : null
                 }
