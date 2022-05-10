@@ -29,6 +29,10 @@ export default class OtherKingdomModal extends React.Component<OtherKingdomModal
         }
     }
 
+    attackKingdom(kingdom?: KingdomDetails | null) {
+        console.log(kingdom);
+    }
+
     componentDidMount() {
         (new Ajax()).setRoute('kingdoms/other/'+this.props.kingdom_id).doAjaxCall('get', (result: AxiosResponse) => {
             const kingdomData = result.data;
@@ -76,10 +80,6 @@ export default class OtherKingdomModal extends React.Component<OtherKingdomModal
         }
 
         return 'Error: Could not build title.';
-    }
-
-    attackKingdom(kingdomDetails?: KingdomDetails | null) {
-        console.log(kingdomDetails);
     }
 
     render() {

@@ -92,6 +92,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
             state.can_player_move = false;
         }
 
+        // @ts-ignore
         this.setState(state);
     }
 
@@ -169,7 +170,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
         if (this.state.loading) {
             return <ComponentLoading />
         }
-``
+
         return(
             <Fragment>
                 <div className='overflow-hidden max-h-[330px]'>
@@ -215,6 +216,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                                 player_kingdoms={this.state.player_kingdoms}
                                 character_id={this.props.character_id}
                                 enemy_kingdoms={this.state.enemy_kingdoms}
+                                npc_kingdoms={this.state.npc_kingdoms}
                                 view_port={this.props.view_port}
                                 is_dead={this.props.is_dead}
                                 map_id={this.state.map_id}

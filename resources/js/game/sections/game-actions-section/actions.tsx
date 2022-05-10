@@ -1,16 +1,12 @@
 import React from "react";
-import Ajax from "../../lib/ajax/ajax";
-import {AxiosError, AxiosResponse} from "axios";
 import ComponentLoading from "../../components/ui/loading/component-loading";
 import DropDown from "../../components/ui/drop-down/drop-down";
-import DangerButton from "../../components/ui/buttons/danger-button";
 import MonsterSelection from "./components/monster-selection";
 import CraftingSection from "./components/crafting-section";
 import FightSection from "./components/fight-section";
 import ActionsState from "../../lib/game/types/actions/actions-state";
 import TimerProgressBar from "../../components/ui/progress-bars/timer-progress-bar";
 import PrimaryButton from "../../components/ui/buttons/primary-button";
-import {capitalize, isEqual} from "lodash";
 import clsx from "clsx";
 import ActionsProps from "../../lib/game/types/actions/actions-props";
 import ActionsManager from "../../lib/game/actions/actions-manager";
@@ -128,7 +124,6 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
                         <div className='grid md:grid-cols-4'>
                             <div className='md:col-start-1 md:col-span-1'>
                                 <DropDown menu_items={this.actionsManager.buildCraftingList(this.openCrafting.bind(this))} button_title={'Craft/Enchant'} disabled={this.state.character?.is_dead || this.cannotCraft()} selected_name={this.actionsManager.getSelectedCraftingOption()}/>
-                                <DangerButton button_label={'Attack Kingdom'} on_click={this.attackKingdom.bind(this)} disabled={this.state.character?.is_dead} />
                             </div>
                             <div className='border-b-2 block border-b-gray-300 dark:border-b-gray-600 my-3 md:hidden'></div>
                             <div className='md:col-start-2 md:col-span-3 mt-1'>

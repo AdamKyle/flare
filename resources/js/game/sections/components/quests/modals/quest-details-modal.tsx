@@ -258,8 +258,6 @@ export default class QuestDetailsModal extends React.Component<any, any> {
     render() {
         const npcPLaneAccess = this.fetchNpcPlaneAccess();
 
-        console.log(this.props.is_complete);
-
         return (
             <Dialogue is_open={this.props.is_open}
                       handle_close={this.props.handle_close}

@@ -1,4 +1,5 @@
 import LocationDetails from "../../map/types/location-details";
+import NpcKingdomsDetails from "./npc-kingdoms-details";
 
 export default interface MapActionsProps {
 
@@ -17,6 +18,8 @@ export default interface MapActionsProps {
     location_with_adventures: LocationDetails | null;
 
     locations: LocationDetails[] | null;
+
+    npc_kingdoms: NpcKingdomsDetails[] | null;
 
     player_kingdoms: {id: number, x_position: number, y_position: number, color: string, character_id: number, name: string}[] | null;
 

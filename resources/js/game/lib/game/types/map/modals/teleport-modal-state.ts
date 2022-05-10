@@ -1,5 +1,6 @@
 import LocationDetails from "../../../map/types/location-details";
 import PlayerKingdomsDetails from "../player-kingdoms-details";
+import NpcKingdomsDetails from "../npc-kingdoms-details";
 
 export default interface TeleportModalState {
 
@@ -24,6 +25,8 @@ export default interface TeleportModalState {
     current_player_kingdom: PlayerKingdomsDetails | null;
 
     current_enemy_kingdom: PlayerKingdomsDetails | null;
+
+    current_npc_kingdom: NpcKingdomsDetails | null;
 
     view_port: number | null;
 }

@@ -2,6 +2,8 @@ import {ClassArray, ClassDictionary} from "clsx";
 import LocationDetails from "../../../map/types/location-details";
 import PlayerKingdomsDetails from "../player-kingdoms-details";
 import CharacterCurrenciesType from "../../../character/character-currencies-type";
+import NpcKingdoms from "../../../../../sections/components/kingdoms/npc-kingdoms";
+import NpcKingdomsDetails from "../npc-kingdoms-details";
 
 export default interface TeleportModalProps  {
 
@@ -26,6 +28,8 @@ export default interface TeleportModalProps  {
     player_kingdoms: PlayerKingdomsDetails[] | null;
 
     enemy_kingdoms: PlayerKingdomsDetails[] | null;
+
+    npc_kingdoms: NpcKingdomsDetails[] | null;
 
     teleport_player: (data: {x: number, y: number, cost: number, timeout: number}) => void
 }
