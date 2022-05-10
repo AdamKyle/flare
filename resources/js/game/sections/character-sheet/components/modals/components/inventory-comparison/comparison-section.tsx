@@ -120,7 +120,7 @@ export default class ComparisonSection extends React.Component<any, any> {
     render() {
         return (
             <div className='p-5'>
-                <ItemComparisonSection comparison_details={this.props.comparison_details} />
+                <ItemComparisonSection comparison_details={this.props.comparison_details} view_port={this.props.view_port}/>
                 <div className='border-b-2 mt-6 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                 <div className={clsx(
                     'mt-6 grid grid-cols-1 w-full gap-2 md:m-auto',

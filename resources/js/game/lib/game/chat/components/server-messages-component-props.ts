@@ -5,4 +5,6 @@ export default interface ServerMessagesComponentProps {
     server_messages: ServerMessageType[] | [];
 
     character_id: number;
+
+    view_port: number;
 }

@@ -49,6 +49,7 @@ export default class ServerMessages extends React.Component<ServerMessagesCompon
                             manage_modal={this.viewItem.bind(this)}
                             character_id={this.props.character_id}
                             slot_id={this.state.slot_id}
+                            view_port={this.props.view_port}
                         />
                     : null
                 }

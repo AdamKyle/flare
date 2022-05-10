@@ -282,9 +282,12 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                                 <TabPanel key={'npc-details'}>
                                     <div className={clsx({'grid md:grid-cols-2 gap-2': npcPLaneAccess !== null})}>
                                         <div>
+                                            <div className='border-b-2 block border-b-gray-300 dark:border-b-gray-600 my-3 md:hidden'></div>
+                                            <strong>Basic Info</strong>
+                                            <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                                             <dl>
                                                 <dt>Name</dt>
-                                                <dd>{this.state.quest_details.npc.name}</dd>
+                                                <dd>{this.state.quest_details.npc.real_name}</dd>
                                                 <dt>Coordinates (X/Y)</dt>
                                                 <dd>{this.state.quest_details.npc.x_position} / {this.state.quest_details.npc.y_position}</dd>
                                                 <dt>On Plane</dt>
@@ -306,12 +309,7 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                                             npcPLaneAccess !== null ?
                                                 <div className={clsx({'md:pl-2': npcPLaneAccess !== null})}>
                                                     <div className='border-b-2 block border-b-gray-300 dark:border-b-gray-600 my-3 md:hidden'></div>
-                                                    <InfoAlert>
-                                                        <p className={'my-3'}>
-                                                            This NPC is on another plane. You can see below the steps required
-                                                            and/or the quests/items you need to access this NPC.
-                                                        </p>
-                                                    </InfoAlert>
+                                                    <strong>Npc Access Requirements</strong>
                                                     <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                                                     <dl className={'md:ml-8'}>{npcPLaneAccess}</dl>
                                                 </div>

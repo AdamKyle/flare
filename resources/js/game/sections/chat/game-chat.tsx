@@ -286,26 +286,28 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
         }
 
         return (
-            <Tabs tabs={this.state.tabs} icon_key={'updated'} when_tab_changes={this.resetTabChange.bind(this)}>
-                <TabPanel key={'chat'}>
-                    <Chat is_silenced={this.props.is_silenced}
-                          can_talk_again_at={this.props.can_talk_again_at}
-                          chat={this.state.chat}
-                          set_tab_to_updated={this.setTabToUpdated.bind(this)}
-                          push_silenced_message={this.pushSilencedMethod.bind(this)}
-                          push_private_message_sent={this.pushPrivateMessageSent.bind(this)}
-                          push_error_message={this.pushErrorMessage.bind(this)}
-                    />
-                </TabPanel>
+            <div className='mt-4 mb-4'>
+                <Tabs tabs={this.state.tabs} icon_key={'updated'} when_tab_changes={this.resetTabChange.bind(this)}>
+                    <TabPanel key={'chat'}>
+                        <Chat is_silenced={this.props.is_silenced}
+                              can_talk_again_at={this.props.can_talk_again_at}
+                              chat={this.state.chat}
+                              set_tab_to_updated={this.setTabToUpdated.bind(this)}
+                              push_silenced_message={this.pushSilencedMethod.bind(this)}
+                              push_private_message_sent={this.pushPrivateMessageSent.bind(this)}
+                              push_error_message={this.pushErrorMessage.bind(this)}
+                        />
+                    </TabPanel>
 
-                <TabPanel key={'server-messages'}>
-                    <ServerMessages server_messages={this.state.server_messages} character_id={this.props.character_id}/>
-                </TabPanel>
+                    <TabPanel key={'server-messages'}>
+                        <ServerMessages server_messages={this.state.server_messages} character_id={this.props.character_id} view_port={this.props.view_port}/>
+                    </TabPanel>
 
-                <TabPanel key={'exploration-messages'}>
+                    <TabPanel key={'exploration-messages'}>
 
-                </TabPanel>
-            </Tabs>
+                    </TabPanel>
+                </Tabs>
+            </div>
         )
     }
 }

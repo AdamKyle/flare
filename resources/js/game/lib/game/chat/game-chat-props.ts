@@ -4,4 +4,5 @@ export default interface GameChatProps {
     is_silenced: boolean;
     can_talk_again_at: string|null;
     is_admin: boolean;
+    view_port: number;
 }

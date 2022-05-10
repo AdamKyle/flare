@@ -46,6 +46,8 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
 
     componentDidMount() {
 
+        this.actionsManager.initialFetch(this.props);
+
         // @ts-ignore
         this.attackTimeOut.listen('Game.Core.Events.ShowTimeOutEvent', (event: any) => {
             this.setState({
@@ -59,6 +61,10 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
                 crafting_time_out: event.timeout,
             });
         });
+    }
+
+    componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<ActionsState>, snapshot?: any) {
+        this.actionsManager.actionComponentUpdated(this.state, this.props)
     }
 
     showAction(data: any) {
@@ -116,6 +122,30 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
         });
     }
 
+    setSelectedMonster(monster: any) {
+        this.actionsManager.setSelectedMonster(monster);
+    }
+
+    resetSameMonster() {
+        this.actionsManager.resetSameMonster();
+    }
+
+    revive() {
+        this.actionsManager.revive(this.props.character_id);
+    }
+
+    setAttackTimeOut(attack_time_out: number) {
+        this.actionsManager.setAttackTimeOut(attack_time_out);
+    }
+
+    updateTimer() {
+        this.actionsManager.updateTimer();
+    }
+
+    resetRevived() {
+        this.actionsManager.resetRevived();
+    }
+
     createMonster() {
         return (
             <Fragment>
@@ -123,7 +153,7 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
                     <i className="fas fa-times-circle"></i>
                 </button>
                 <MonsterSelection monsters={this.state.monsters}
-                                  update_monster={this.actionsManager.setSelectedMonster.bind(this)}
+                                  update_monster={this.setSelectedMonster.bind(this)}
                                   timer_running={this.state.attack_time_out > 0}
                                   character={this.state.character}
                 />
@@ -131,13 +161,13 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
                 {
                     this.state.monster_to_fight !== null ?
                         <FightSection
-                            set_attack_time_out={this.actionsManager.setAttackTimeOut.bind(this)}
+                            set_attack_time_out={this.setAttackTimeOut.bind(this)}
                             monster_to_fight={this.state.monster_to_fight}
                             character={this.state.character}
                             is_same_monster={this.state.is_same_monster}
-                            reset_same_monster={this.actionsManager.resetSameMonster.bind(this)}
+                            reset_same_monster={this.resetSameMonster.bind(this)}
                             character_revived={this.state.character_revived}
-                            reset_revived={this.actionsManager.resetRevived.bind(this)}
+                            reset_revived={this.resetRevived.bind(this)}
                         />
                         : null
                 }

@@ -129,7 +129,7 @@ class QuestHandlerService {
     public function moveCharacter(Character $character, Npc $npc): array|Character {
         if ($npc->game_map_id !== $character->map->game_map_id) {
             if (!$this->canTravelToMap->canTravel($npc->game_map_id, $character)) {
-                return $this->errorResult('You are missing the required quest item to travel to this NPC.');
+                return $this->errorResult('You are missing the required quest item to travel to this NPC. Check NPC Access Requirements Section above.');
             }
         }
 

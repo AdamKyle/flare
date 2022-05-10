@@ -207,7 +207,7 @@ export default class ItemComparisonSection extends React.Component<any, any> {
         return (
             <Fragment>
                 {
-                    this.props.comparison_details.details.length > 0 ?
+                    this.props.comparison_details.details.length > 0 && this.props.view_port >= 1600 ?
                         this.props.comparison_details.details.length === 2 ?
                             this.renderTabs(true)
                             :

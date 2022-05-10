@@ -129,6 +129,7 @@ export default class ItemComparison extends React.Component<any, any> {
                             dark_charts={this.state.dark_charts}
                             usable_sets={this.state.usable_sets}
                             slot_id={this.props.slot_id}
+                            view_port={this.props.view_port}
                         />
                 }
             </Dialogue>
