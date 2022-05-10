@@ -53,8 +53,12 @@ export default class ActionsManager {
         });
     }
 
-    setSelectedMonster(monster: any) {
+    setSelectedMonster(monster: any|null) {
         let isSameMonster = false;
+
+        if (monster === null) {
+            return;
+        }
 
         if (monster.id === this.component.state.monster_to_fight?.id) {
             isSameMonster = true;

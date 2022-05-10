@@ -10,6 +10,7 @@ import FightSection from "./components/fight-section";
 import DropDown from "../../components/ui/drop-down/drop-down";
 import clsx from "clsx";
 import TimerProgressBar from "../../components/ui/progress-bars/timer-progress-bar";
+import PrimaryButton from "../../components/ui/buttons/primary-button";
 
 export default class SmallerActions extends React.Component<ActionsProps, ActionsState> {
 
@@ -142,6 +143,10 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
         this.actionsManager.updateTimer();
     }
 
+    updateCraftingTimer() {
+        this.actionsManager.updateCraftingTimer();
+    }
+
     resetRevived() {
         this.actionsManager.resetRevived();
     }
@@ -159,6 +164,17 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
                 />
 
                 {
+                    this.state.character?.is_dead ?
+                        <div className='text-center my-4'>
+                            <PrimaryButton button_label={'Revive'} on_click={this.revive.bind(this)} additional_css={'mb-4'} disabled={!this.props.character_statuses?.can_attack}/>
+                            <p>
+                                You are dead. Please Revive.
+                            </p>
+                        </div>
+                        : null
+                }
+
+                {
                     this.state.monster_to_fight !== null ?
                         <FightSection
                             set_attack_time_out={this.setAttackTimeOut.bind(this)}
@@ -168,6 +184,7 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
                             reset_same_monster={this.resetSameMonster.bind(this)}
                             character_revived={this.state.character_revived}
                             reset_revived={this.resetRevived.bind(this)}
+                            is_small={true}
                         />
                         : null
                 }
@@ -229,10 +246,10 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
                                   'md:grid-cols-2': this.state.attack_time_out !== 0 && this.state.crafting_time_out !== 0
                               })}>
                                   <div>
-                                      <TimerProgressBar time_remaining={this.state.attack_time_out} time_out_label={'Attack Timeout'} update_time_remaining={this.actionsManager.updateTimer.bind(this)} />
+                                      <TimerProgressBar time_remaining={this.state.attack_time_out} time_out_label={'Attack Timeout'} update_time_remaining={this.updateTimer.bind(this)} />
                                   </div>
                                   <div>
-                                      <TimerProgressBar time_remaining={this.state.crafting_time_out} time_out_label={'Crafting Timeout'} update_time_remaining={this.actionsManager.updateCraftingTimer.bind(this)} />
+                                      <TimerProgressBar time_remaining={this.state.crafting_time_out} time_out_label={'Crafting Timeout'} update_time_remaining={this.updateCraftingTimer.bind(this)} />
                                   </div>
                               </div>
                           </div>

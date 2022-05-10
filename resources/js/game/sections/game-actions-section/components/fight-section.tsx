@@ -119,6 +119,17 @@ export default class FightSection extends React.Component<FightSectionProps, any
     }
 
     renderBattleMessages() {
+
+        if (this.props.is_small && this.state.battle_messages.length > 0) {
+            const message = this.state.battle_messages.filter((battleMessage: BattleMessage) => battleMessage.message.includes('resurrect') || battleMessage.message.includes('has been defeated!'))
+
+            if (message.length > 0) {
+                return <p className='text-red-500 dark:text-red-400'>{message[0].message}</p>
+            } else {
+                return <p className='text-blue-500 dark:text-blue-400'>Attack child!</p>
+            }
+        }
+
         return this.state.battle_messages.filter((value: BattleMessage, index: number, self: BattleMessage[]) => {
             return index === self.findIndex((t: BattleMessage) => {
                 return t.message === value.message && t.type === value.type;

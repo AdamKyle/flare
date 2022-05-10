@@ -163,6 +163,7 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
                                                 reset_same_monster={this.resetSameMonster.bind(this)}
                                                 character_revived={this.state.character_revived}
                                                 reset_revived={this.resetRevived.bind(this)}
+                                                is_small={false}
                                             />
                                         : null
                                     }

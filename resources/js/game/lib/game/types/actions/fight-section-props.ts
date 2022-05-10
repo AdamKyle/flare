@@ -16,4 +16,6 @@ export default interface FightSectionProps {
     reset_revived: () => void;
 
     character_revived: boolean;
+
+    is_small: boolean;
 }

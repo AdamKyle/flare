@@ -21,7 +21,7 @@ export default class Dialogue extends React.Component<DialogueTypes, any> {
             <Transition appear show={this.props.is_open} as={Fragment}>
                 <Dialog
                     as="div"
-                    className="fixed inset-0 z-10"
+                    className="absolute inset-0 z-50 top-[100px]"
                     onClose={this.emptyClose.bind(this)}
                 >
                     <Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
