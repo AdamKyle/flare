@@ -47,7 +47,7 @@ export default class ViewLocationDetailsModal extends React.Component<ViewLocati
                 handle_close={this.props.close_modal}
                 kingdom_id={this.props.kingdom_id}
                 character_id={this.props.character_id}
-                hide_secondary={true} />
+                hide_secondary={false} />
         }
 
         if (this.props.enemy_kingdom_id !== null && this.state.is_open) {

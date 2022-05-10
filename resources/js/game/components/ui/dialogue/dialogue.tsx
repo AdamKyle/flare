@@ -70,14 +70,20 @@ export default class Dialogue extends React.Component<DialogueTypes, any> {
                                 <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                                 <div className="mt-4">
 
-                                    {
-                                       this.props.secondary_actions !== null ?
-                                         <PrimaryButton additional_css={'mr-2'} button_label={this.props.secondary_actions.secondary_button_label} on_click={this.props.secondary_actions.handle_action} disabled={this.props.secondary_actions.secondary_button_disabled}/>
-                                        : null
-                                    }
+
 
                                     <DangerButton button_label={'Cancel'} on_click={this.closeModal.bind(this)} disabled={this.props.primary_button_disabled} />
 
+                                    {
+                                        this.props.secondary_actions !== null ?
+                                            <PrimaryButton additional_css={'float-right'} button_label={this.props.secondary_actions.secondary_button_label} on_click={this.props.secondary_actions.handle_action} disabled={this.props.secondary_actions.secondary_button_disabled}/>
+                                        : null
+                                    }
+                                    {
+                                        typeof this.props.tertiary_actions !== 'undefined' && this.props.tertiary_actions !== null ?
+                                            <PrimaryButton additional_css={'mr-2 float-right'} button_label={this.props.tertiary_actions.tertiary_button_label} on_click={this.props.tertiary_actions.handle_action} disabled={this.props.tertiary_actions.tertiary_button_disabled} />
+                                        : null
+                                    }
                                 </div>
                             </div>
                         </Transition.Child>

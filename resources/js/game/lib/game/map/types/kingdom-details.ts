@@ -44,4 +44,6 @@ export default interface KingdomDetails {
     x_position: number;
 
     y_position: number;
+
+    npc_owned: boolean;
 }

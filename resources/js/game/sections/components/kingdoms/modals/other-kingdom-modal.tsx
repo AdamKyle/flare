@@ -10,6 +10,7 @@ import clsx from "clsx";
 import WarningAlert from "../../../../components/ui/alerts/simple-alerts/warning-alert";
 import PopOverContainer from "../../../../components/ui/popover/pop-over-container";
 import OtherKingdomModalProps from "../../../../lib/game/types/map/kingdom-pins/modals/other-kingdom-modal-props";
+import KingdomDetails from "../../../../lib/game/map/types/kingdom-details";
 
 export default class OtherKingdomModal extends React.Component<OtherKingdomModalProps, KingdomModalState> {
 
@@ -63,13 +64,23 @@ export default class OtherKingdomModal extends React.Component<OtherKingdomModal
     buildTitle() {
         if (this.state.kingdom_details !== null) {
             const kingdomDetails = this.state.kingdom_details;
+            let title            = '';
 
-            return kingdomDetails.name + ' ['+ (this.props.is_enemy_kingdom ? ' Enemy ' : ' NPC Owned ') +'] (X/Y): ' + kingdomDetails.x_position + '/' + kingdomDetails.y_position;
+            if (kingdomDetails.npc_owned) {
+                title = 'NPC Owned';
+            } else if (this.props.is_enemy_kingdom) {
+                title = 'Enemy';
+            }
+
+            return kingdomDetails.name + ' ['+ title +'] (X/Y): ' + kingdomDetails.x_position + '/' + kingdomDetails.y_position;
         }
 
         return 'Error: Could not build title.';
     }
 
+    attackKingdom(kingdomDetails?: KingdomDetails | null) {
+        console.log(kingdomDetails);
+    }
 
     render() {
         return(
@@ -80,6 +91,11 @@ export default class OtherKingdomModal extends React.Component<OtherKingdomModal
                           secondary_button_disabled: this.teleportDisabled(),
                           secondary_button_label: 'Teleport',
                           handle_action: this.handleTeleport.bind(this),
+                      }}
+                      tertiary_actions={{
+                          tertiary_button_disabled: this.teleportDisabled(),
+                          tertiary_button_label: 'Attack Kingdom',
+                          handle_action: () => this.attackKingdom(this.state.kingdom_details),
                       }}
             >
                 {

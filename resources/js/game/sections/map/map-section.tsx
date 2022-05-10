@@ -192,7 +192,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
 
                                 <EnemyKingdoms kingdoms={this.state.enemy_kingdoms} character_id={this.props.character_id} character_position={this.state.character_position} currencies={this.props.currencies} teleport_player={this.handleTeleportPlayer.bind(this)}/>
 
-                                <NpcKingdoms kingdoms={this.state.npc_kingdoms}/>
+                                <NpcKingdoms kingdoms={this.state.npc_kingdoms} character_id={this.props.character_id} character_position={this.state.character_position} currencies={this.props.currencies} teleport_player={this.handleTeleportPlayer.bind(this)} />
 
                                 <div className="map-x-pin" style={this.playerIcon()}></div>
                             </div>

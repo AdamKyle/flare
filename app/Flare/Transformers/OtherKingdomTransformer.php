@@ -38,6 +38,7 @@ class OtherKingdomTransformer extends TransformerAbstract {
             'walls_defence'      => $kingdom->getWallsDefence(),
             'gold_bars_defence'  => $kingdom->fetchGoldBarsDefenceBonus(),
             'defence_bonus'      => $kingdom->fetchKingdomDefenceBonus(),
+            'npc_owned'          => $kingdom->npc_owned,
         ];
     }
 }

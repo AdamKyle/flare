@@ -10,6 +10,7 @@ import {formatNumber, percent} from "../../../../lib/game/format-number";
 import clsx from "clsx";
 import WarningAlert from "../../../../components/ui/alerts/simple-alerts/warning-alert";
 import PopOverContainer from "../../../../components/ui/popover/pop-over-container";
+import KingdomDetails from "../../../../lib/game/map/types/kingdom-details";
 
 export default class KingdomModal extends React.Component<KingdomModalProps, KingdomModalState> {
 
@@ -47,6 +48,10 @@ export default class KingdomModal extends React.Component<KingdomModalProps, Kin
         return this.state.cost === 0 || !this.state.can_afford;
     }
 
+    attackKingdomDisabled() {
+        this.state.kingdom_details === null || this.state.loading
+    }
+
     handleTeleport() {
         if (typeof this.props.teleport_player !== 'undefined') {
             this.props.teleport_player({
@@ -70,14 +75,12 @@ export default class KingdomModal extends React.Component<KingdomModalProps, Kin
         return 'Error: Could not build title.';
     }
 
-
-
     render() {
         return(
             <Dialogue is_open={this.props.is_open}
                       handle_close={this.props.handle_close}
                       title={this.state.loading ? 'One moment ...' : this.buildTitle()}
-                      secondary_actions={ this.props.hide_secondary ? null : {
+                      secondary_actions={{
                           secondary_button_disabled: this.teleportDisabled(),
                           secondary_button_label: 'Teleport',
                           handle_action: this.handleTeleport.bind(this),
