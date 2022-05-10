@@ -39,15 +39,32 @@ class QuestsController extends Controller {
             ], 422);
         }
 
-        $this->questHandler->npcQuestsHandler()->handleNpcQuest($character, $quest);
+        $characterIsAtLocation = $character->map()
+                                           ->where('x_position', $quest->npc->x_position)
+                                           ->where('y_position', $quest->npc->y_position)
+                                           ->where('game_map_id', $quest->npc->game_map_id);
 
-        event(new GlobalMessageEvent($character->name . ' Has completed a quest ('.$quest->name.') for: ' . $quest->npc->real_name . ' and been rewarded with a godly gift!'));
+        if (!is_null($characterIsAtLocation)) {
 
-        $character = $character->refresh();
+            $response = $this->questHandler->moveCharacter($character, $quest->npc);
 
-        return response()->json([
-            'completed_quests' => $character->questsCompleted()->pluck('quest_id'),
-            'player_plane'     => $character->map->gameMap->name,
-        ]);
+            if ($response instanceof Character) {
+                $response = $this->questHandler->handInQuest($character, $quest);
+            }
+        } else {
+            $response = $this->questHandler->handInQuest($character, $quest);
+        }
+
+        if ($response['status'] === 422) {
+            unset($response['status']);
+
+            return response()->json($response, 422);
+        }
+
+        unset($response['status']);
+
+        return response()->json($response);
+
+
     }
 }

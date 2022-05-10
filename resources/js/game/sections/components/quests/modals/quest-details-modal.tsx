@@ -11,6 +11,8 @@ import InfoAlert from "../../../../components/ui/alerts/simple-alerts/info-alert
 import CurrencyRequirement from "./components/currency-requirement";
 import Reward from "./components/reward";
 import LoadingProgressBar from "../../../../components/ui/progress-bars/loading-progress-bar";
+import SuccessAlert from "../../../../components/ui/alerts/simple-alerts/success-alert";
+import DangerAlert from "../../../../components/ui/alerts/simple-alerts/danger-alert";
 
 export default class QuestDetailsModal extends React.Component<any, any> {
 
@@ -23,6 +25,8 @@ export default class QuestDetailsModal extends React.Component<any, any> {
             quest_details: null,
             loading: true,
             handing_in: false,
+            success_message: null,
+            error_message: null,
         }
 
         this.tabs = [{
@@ -60,15 +64,26 @@ export default class QuestDetailsModal extends React.Component<any, any> {
             (new Ajax()).setRoute('quest/'+this.props.quest_id+'/hand-in-quest/' + this.props.character_id).doAjaxCall('post', (result: AxiosResponse) => {
                 this.setState({
                     handing_in: false,
+                    success_message: result.data.message,
                 });
 
-                this.props.update_quests(result.data);
+                const data = result.data;
+
+                delete data.message;
+
+                this.props.update_quests(data);
 
                 this.props.handle_close();
             }, (error: AxiosError) => {
-                this.setState({
-                    handing_in: false,
-                });
+
+                if (typeof error.response !== 'undefined') {
+                    const response = error.response;
+
+                    this.setState({
+                        handing_in: false,
+                        error_message: response.data.message
+                    });
+                }
             })
         });
     }
@@ -242,9 +257,9 @@ export default class QuestDetailsModal extends React.Component<any, any> {
 
     render() {
         const npcPLaneAccess = this.fetchNpcPlaneAccess();
-        if (this.state.quest_details !== null) {
-            console.log(this.state.quest_details.before_completion_description);
-        }
+
+        console.log(this.props.is_complete);
+
         return (
             <Dialogue is_open={this.props.is_open}
                       handle_close={this.props.handle_close}
@@ -277,9 +292,9 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                                                 <dt>Must be at same location?</dt>
                                                 <dd>{this.state.quest_details.npc.must_be_at_same_location ? 'Yes' : 'No'}</dd>
                                             </dl>
-                                            <div className='mt-4 mb-4'>
+                                            <div className={clsx('mt-4 mb-4 transition-all duration-200')}>
                                                 {
-                                                    this.props.is_complete ?
+                                                    this.props.is_quest_complete ?
                                                         <div dangerouslySetInnerHTML={{__html: this.state.quest_details.after_completion_description.replace(/\n/g, "<br/>")}}></div>
                                                    :
                                                         <div dangerouslySetInnerHTML={{__html: this.state.quest_details.before_completion_description.replace(/\n/g, "<br/>")}}></div>
@@ -312,6 +327,26 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                                     <Reward quest={this.state.quest_details} />
                                 </TabPanel>
                             </Tabs>
+
+                            {
+                                this.state.success_message !== null ?
+                                    <div className='mb-4 mt-4'>
+                                        <SuccessAlert>
+                                            {this.state.success_message}
+                                        </SuccessAlert>
+                                    </div>
+                                    : null
+                            }
+
+                            {
+                                this.state.error_message !== null ?
+                                    <div className='mb-4 mt-4'>
+                                        <DangerAlert>
+                                            {this.state.error_message}
+                                        </DangerAlert>
+                                    </div>
+                                    : null
+                            }
 
                             {
                                 this.state.handing_in ?

@@ -70,6 +70,22 @@ class MapTileValue {
         return in_array($color, [255255255]);
     }
 
+    public function canWalk(Character $character, int $x, int $y) {
+        if (!$this->canWalkOnWater($character, $x, $y)) {
+            return false;
+        }
+
+        if (!$this->canWalkOnDeathWater($character, $x, $y)) {
+            return false;
+        }
+
+        if (!$this->canWalkOnMagma($character, $x, $y)) {
+            return false;
+        }
+
+        return true;
+    }
+
     /**
      * Can the character walk on death water?
      *

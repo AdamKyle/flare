@@ -3,6 +3,8 @@
 namespace App\Game\Quests\Providers;
 
 use App\Admin\Services\QuestService;
+use App\Game\Maps\Validation\CanTravelToMap;
+use App\Game\Maps\Values\MapTileValue;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
 use App\Game\Quests\Handlers\NpcQuestRewardHandler;
 use App\Game\Quests\Handlers\NpcQuestsHandler;
@@ -32,7 +34,9 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(QuestHandlerService::class, function($app) {
             return new QuestHandlerService(
-                $app->make(NpcQuestsHandler::class)
+                $app->make(NpcQuestsHandler::class),
+                $app->make(CanTravelToMap::class),
+                $app->make(MapTileValue::class),
             );
         });
     }
