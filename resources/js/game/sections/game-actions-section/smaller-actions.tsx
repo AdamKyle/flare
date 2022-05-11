@@ -11,6 +11,7 @@ import DropDown from "../../components/ui/drop-down/drop-down";
 import clsx from "clsx";
 import TimerProgressBar from "../../components/ui/progress-bars/timer-progress-bar";
 import PrimaryButton from "../../components/ui/buttons/primary-button";
+import MapMovementActions from "./components/small-actions/map-movement-actions";
 
 export default class SmallerActions extends React.Component<ActionsProps, ActionsState> {
 
@@ -218,7 +219,7 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
     }
 
     showMapMovement() {
-        return null;
+        return <MapMovementActions />;
     }
 
     buildSection() {

@@ -58,7 +58,6 @@ export default class FetchGameData {
                 can_attack_again_at: result.data.sheet.can_attack_again_at,
                 can_craft: result.data.sheet.can_craft,
                 can_craft_again_at: result.data.sheet.can_craft_again_at,
-                can_adventure: result.data.sheet.can_adventure,
                 is_dead: result.data.sheetis_dead,
                 automation_locked: result.data.sheet.automation_locked,
                 is_silenced: result.data.sheet.is_silenced,

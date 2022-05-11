@@ -33,6 +33,7 @@ export default class ViewLocationDetailsModal extends React.Component<ViewLocati
     }
 
     buildModalData() {
+
         if (this.props.location !== null && this.state.is_open) {
             return <LocationModal is_open={this.state.is_open}
                                   handle_close={this.props.close_modal}

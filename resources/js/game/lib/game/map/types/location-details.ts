@@ -14,8 +14,6 @@ export default interface LocationDetails {
 
     is_port: boolean;
 
-    adventures: LocationAdventureDetails[] | null;
-
     enemy_strength_type: string | null;
 
     increase_enemy_percentage_by: number | null;

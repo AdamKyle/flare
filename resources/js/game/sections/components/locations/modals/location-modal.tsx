@@ -31,20 +31,6 @@ export default class LocationModal extends React.Component<LocationModalPros, Lo
         }
     }
 
-    renderAdventures() {
-        if (this.props.location.adventures !== null) {
-            return this.props.location.adventures.map((adventure) => {
-                return <li>
-                    <a href={'/information/adventure/' + adventure.id} target='_blank'>
-                        {adventure.name} <i className="fas fa-external-link-alt"></i>
-                    </a>
-                </li>
-            });
-        }
-
-        return [];
-    }
-
     handleTeleport() {
         if (typeof this.props.teleport_player !== 'undefined') {
             this.props.teleport_player({
@@ -107,94 +93,25 @@ export default class LocationModal extends React.Component<LocationModalPros, Lo
                 }
 
                 {
-                    this.props.location.adventures !== null ?
-                       this.props.location.adventures.length > 0 ?
-                            <Fragment>
-                                <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                                <div className='grid gap-2 md:grid-cols-2'>
-                                    <Fragment>
-                                        <div>
-                                            <div className='flex items-center mb-4'>
-                                                <h4>Adventures</h4>
-                                                <div>
-                                                    <PopOverContainer icon={'fas fa-info-circle'} icon_label={'Help'} additional_css={'left-[150px] md:left-0'}>
-                                                        <h3>Adventures</h3>
-                                                        <p className='my-2'>
-                                                            Looks likes this locations has <a href={"/information/adventure"} target='_blank'>adventures <i className="fas fa-external-link-alt"></i></a> that
-                                                            you can complete. If you click on one, you can see it's details. This is very fun! Adventures can be done to gain XP, Skill XP and
-                                                            <a href={"/information/factions"} target='_blank'> faction points <i className="fas fa-external-link-alt"></i></a> which give you <a href={"/information/random-enchants"} target='_blank'>
-                                                            Uniques <i className="fas fa-external-link-alt"></i></a>.
-                                                        </p>
-                                                    </PopOverContainer>
-                                                </div>
-                                            </div>
-                                            <ul>
-                                                {this.renderAdventures()}
-                                            </ul>
-                                        </div>
-                                        {
-                                            !this.props.hide_secondary_button ?
-                                                <div
-                                                    className='border-b-2 block border-b-gray-300 dark:border-b-gray-600 my-3 md:hidden'
-                                                >
-                                                </div>
-                                            : null
-                                        }
-                                    </Fragment>
-
-                                    {
-                                        !this.props.hide_secondary_button ?
-                                            <div className={clsx({
-                                                'col-start-1 col-span-2': this.props.location.adventures.length === 0
-                                            })}>
-                                                <div className='flex items-center mb-4'>
-                                                    <h4>Teleport Details</h4>
-                                                    <div>
-                                                        <PopOverContainer icon={'fas fa-info-circle'} icon_label={'Help'}
-                                                                          additional_css={'left-[150px] md:left-0'}>
-                                                            <h3>Teleportation</h3>
-                                                            <p className='my-2'>
-                                                                This location will let you teleport to it for a fee and a
-                                                                timeout in minutes. If you have trained the skill <a
-                                                                href='/information/skill-information' target='_blank'>
-                                                                Quick Feet <i
-                                                                className="fas fa-external-link-alt"></i></a> to a high
-                                                                enough level then the timer will reduce the time before you
-                                                                can move again by a % down to a maximum of 1 minute.
-                                                                If the teleport button is disabled, you cannot afford to
-                                                                travel.
-                                                            </p>
-                                                        </PopOverContainer>
-                                                    </div>
-                                                </div>
-                                                {
-                                                    this.state.cost > 0 ?
-                                                        <dl>
-                                                            <dt>Cost to teleport (gold):</dt>
-                                                            <dd className={clsx(
-                                                                {'text-gray-700': this.state.cost === 0},
-                                                                {'text-green-600': this.state.can_afford && this.state.cost > 0},
-                                                                {'text-red-600': !this.state.can_afford && this.state.cost > 0}
-                                                            )}>{formatNumber(this.state.cost)}</dd>
-                                                            <dt>Can afford to teleport:</dt>
-                                                            <dd>{this.state.can_afford ? 'Yes' : 'No'}</dd>
-                                                            <dt>Distance (miles):</dt>
-                                                            <dd>{this.state.distance}</dd>
-                                                            <dt>Timeout (minutes):</dt>
-                                                            <dd>{this.state.time_out}</dd>
-                                                        </dl>
-                                                    :
-                                                        <WarningAlert>
-                                                            You are too close to the location to be able to teleport.
-                                                        </WarningAlert>
-                                                }
-                                            </div>
-                                        : null
-                                    }
-                                </div>
-                            </Fragment>
-                        : null
-                    : null
+                    this.state.cost > 0 ?
+                        <dl>
+                            <dt>Cost to teleport (gold):</dt>
+                            <dd className={clsx(
+                                {'text-gray-700': this.state.cost === 0},
+                                {'text-green-600': this.state.can_afford && this.state.cost > 0},
+                                {'text-red-600': !this.state.can_afford && this.state.cost > 0}
+                            )}>{formatNumber(this.state.cost)}</dd>
+                            <dt>Can afford to teleport:</dt>
+                            <dd>{this.state.can_afford ? 'Yes' : 'No'}</dd>
+                            <dt>Distance (miles):</dt>
+                            <dd>{this.state.distance}</dd>
+                            <dt>Timeout (minutes):</dt>
+                            <dd>{this.state.time_out}</dd>
+                        </dl>
+                    :
+                        <WarningAlert>
+                            You are too close to the location to be able to teleport.
+                        </WarningAlert>
                 }
             </Dialogue>
         )

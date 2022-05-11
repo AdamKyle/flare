@@ -44,7 +44,7 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
             this.setState({is_movement_disabled: true});
         }
 
-        if (this.props.locations !== null && (this.state.location === null && this.state.player_kingdom_id === null && this.state.enemy_kingdom_id === null)) {
+        if (this.props.locations !== null && (this.state.location === null && this.state.player_kingdom_id === null && this.state.enemy_kingdom_id === null && this.state.npc_kingdom_id === null)) {
             this.updateViewLocationData()
         } else if (this.props.locations === null && this.state.location !== null) {
             this.setState({
@@ -157,7 +157,7 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
             state.npc_kingdom_id = foundNpcKingdom[0].id;
         }
 
-        if (state.location === null && state.player_kingdom_id === null && state.enemy_kingdom_id === null) {
+        if (state.location === null && state.player_kingdom_id === null && state.enemy_kingdom_id === null && state.npc_kingdom_id === null) {
             return;
         }
 
@@ -182,10 +182,6 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
         this.setState({
             open_set_sail_modal: !this.state.open_set_sail_modal,
         });
-    }
-
-    adventure() {
-
     }
 
     setSail() {
@@ -214,34 +210,6 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
         });
     }
 
-    renderAdventureButton() {
-        if (this.props.location_with_adventures !== null) {
-            if (this.props.location_with_adventures.adventures !== null) {
-                if (this.props.location_with_adventures.adventures.length > 0) {
-                    return <SuccessOutlineButton additional_css={clsx('text-center px-0', {
-                        'col-start-2 col-end-2': this.props.port_location === null
-                    })} button_label={'Adventure'} on_click={this.adventure.bind(this)} disabled={this.state.is_movement_disabled || this.props.is_dead} />
-                }
-            }
-        }
-    }
-
-    adventureButtonIsHidden() {
-        if (this.props.location_with_adventures === null) {
-            return true;
-        }
-
-        if (this.props.location_with_adventures.adventures === null) {
-            return true;
-        }
-
-        if (this.props.location_with_adventures.adventures.length === 0) {
-            return true;
-        }
-
-        return false;
-    }
-
     renderViewDetailsButton() {
         if (this.state.location !== null || this.state.player_kingdom_id !== 0 || this.state.enemy_kingdom_id !== 0 || this.state.npc_kingdom_id !== 0) {
             return <OrangeButton button_label={'View Location Details'} on_click={() => this.viewLocation()} disabled={this.props.is_dead} />;
@@ -254,18 +222,19 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                 <div className='grid xl:grid-cols-2'>
                     <span>X/Y: {this.props.character_position.x}/{this.props.character_position.y}</span>
                     <div className='xl:mr-[24px]'>
-                        <div className={'grid grid-cols-3 gap-1'}>
-                            {
-                                this.renderAdventureButton()
-                            }
+                        <div className={'grid grid-cols-2 gap-1'}>
 
                             {
                                 this.props.port_location !== null ?
-                                    <SuccessOutlineButton additional_css={clsx('text-center', {
-                                        'col-start-2 col-end-2': this.adventureButtonIsHidden(),
-                                    })} button_label={'Set Sail'} on_click={this.setSail.bind(this)} disabled={this.state.is_movement_disabled || this.props.is_dead}/>
+                                    <SuccessOutlineButton additional_css={'text-center col-start-1 col-end-1'} button_label={'Set Sail'} on_click={this.setSail.bind(this)} disabled={this.state.is_movement_disabled || this.props.is_dead}/>
                                     : null
                             }
+
+                            <SuccessOutlineButton additional_css={'text-center col-start-2 col-end-2'}
+                                                  button_label={'Teleport'}
+                                                  on_click={this.teleport.bind(this)}
+                                                  disabled={this.state.is_movement_disabled || this.props.is_dead}
+                            />
                         </div>
                     </div>
                 </div>
