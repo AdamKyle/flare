@@ -9,6 +9,7 @@ import OrangeButton from "../../../../components/ui/buttons/orange-button";
 import ViewLocationDetailsModal from "../modals/view-location-details-modal";
 import SetSailModal from "../modals/set-sail-modal";
 import TraverseModal from "../modals/traverse-modal";
+import KingdomDetails from "../../../../lib/game/map/types/kingdom-details";
 
 export default class MapActions extends React.Component<MapActionsProps, MapActionsState> {
 
@@ -22,6 +23,7 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
             show_location_details: false,
             player_kingdom_id: null,
             enemy_kingdom_id: null,
+            npc_kingdom_id: null,
             open_set_sail_modal: false,
             show_traverse: false,
         }
@@ -119,18 +121,20 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
 
     updateViewLocationData() {
 
-        if (this.props.locations == null || this.props.player_kingdoms === null || this.props.enemy_kingdoms === null) {
+        if (this.props.locations == null || this.props.player_kingdoms === null || this.props.enemy_kingdoms === null || this.props.npc_kingdoms === null) {
             return;
         }
 
         const foundLocation      = this.props.locations.filter((location) => location.x === this.props.character_position.x && location.y === this.props.character_position.y);
         const foundPlayerKingdom = this.props.player_kingdoms.filter((kingdom) => kingdom.x_position === this.props.character_position.x && kingdom.y_position === this.props.character_position.y);
         const foundEnemyKingdom  = this.props.enemy_kingdoms.filter((kingdom) => kingdom.x_position === this.props.character_position.x && kingdom.y_position === this.props.character_position.y);
+        const foundNpcKingdom    = this.props.npc_kingdoms.filter((kingdom) => kingdom.x_position === this.props.character_position.x && kingdom.y_position === this.props.character_position.y);
 
         let state = {
             location: null,
             player_kingdom_id: null,
             enemy_kingdom_id: null,
+            npc_kingdom_id: null
         }
 
         if (foundLocation.length > 0) {
@@ -146,6 +150,11 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
         if (foundEnemyKingdom.length > 0) {
             // @ts-ignore
             state.enemy_kingdom_id = foundEnemyKingdom[0].id;
+        }
+
+        if (foundNpcKingdom.length > 0) {
+            // @ts-ignore
+            state.npc_kingdom_id = foundNpcKingdom[0].id;
         }
 
         if (state.location === null && state.player_kingdom_id === null && state.enemy_kingdom_id === null) {
@@ -234,8 +243,8 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
     }
 
     renderViewDetailsButton() {
-        if (this.state.location !== null || this.state.player_kingdom_id !== 0 || this.state.enemy_kingdom_id !== 0) {
-            return <OrangeButton additional_css={'block lg:hidden'} button_label={'View Location Details'} on_click={() => this.viewLocation()} disabled={this.props.is_dead} />;
+        if (this.state.location !== null || this.state.player_kingdom_id !== 0 || this.state.enemy_kingdom_id !== 0 || this.state.npc_kingdom_id !== 0) {
+            return <OrangeButton button_label={'View Location Details'} on_click={() => this.viewLocation()} disabled={this.props.is_dead} />;
         }
     }
 
@@ -267,7 +276,8 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                     </div>
                 </div>
                 <div className='text-left mt-4 mb-3'>
-                    Characters On Map: {this.props.players_on_map}
+                    <p className='mb-4'>Characters On Map: {this.props.players_on_map}</p>
+                    {this.renderViewDetailsButton()}
                 </div>
                 <div className='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 hidden sm:block'></div>
                 <div className='grid gap-2 lg:grid-cols-5 lg:gap-4'>
@@ -276,7 +286,6 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                     <PrimaryButton disabled={this.state.is_movement_disabled || this.props.is_dead} button_label={'West'} on_click={() => this.move('west')} />
                     <PrimaryButton disabled={this.state.is_movement_disabled || this.props.is_dead} button_label={'East'} on_click={() => this.move('east')} />
                     <PrimaryButton disabled={this.state.is_movement_disabled || this.props.is_dead} button_label={'Traverse'} on_click={() => this.traverse()} />
-                    {this.renderViewDetailsButton()}
                 </div>
 
                 {
@@ -324,6 +333,7 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                                                    character_id={this.props.character_id}
                                                    kingdom_id={this.state.player_kingdom_id}
                                                    enemy_kingdom_id={this.state.enemy_kingdom_id}
+                                                   npc_kingdom_id={this.state.npc_kingdom_id}
                          />
                      : null
                 }

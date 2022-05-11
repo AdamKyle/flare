@@ -50,11 +50,19 @@ export default class ViewLocationDetailsModal extends React.Component<ViewLocati
                 hide_secondary={false} />
         }
 
-        if (this.props.enemy_kingdom_id !== null && this.state.is_open) {
+        if ((this.props.enemy_kingdom_id !== null || this.props.npc_kingdom_id !== null) && this.state.is_open) {
+            let kingdomId: number = 0;
+
+            if (this.props.enemy_kingdom_id !== null) {
+                kingdomId = this.props.enemy_kingdom_id;
+            } else if (this.props.npc_kingdom_id !== null) {
+                kingdomId = this.props.npc_kingdom_id;
+            }
+
             return <OtherKingdomModal
                 is_open={this.state.is_open}
                 handle_close={this.props.close_modal}
-                kingdom_id={this.props.enemy_kingdom_id}
+                kingdom_id={kingdomId}
                 character_id={this.props.character_id}
                 hide_secondary={true}
                 is_enemy_kingdom={true}

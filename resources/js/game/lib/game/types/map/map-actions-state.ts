@@ -14,6 +14,8 @@ export default interface MapActionsState {
 
     enemy_kingdom_id: number | null;
 
+    npc_kingdom_id: number | null;
+
     show_location_details: boolean;
 
     show_traverse: boolean;

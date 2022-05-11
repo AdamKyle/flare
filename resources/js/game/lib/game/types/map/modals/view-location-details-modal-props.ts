@@ -9,6 +9,8 @@ export default interface ViewLocationDetailsModalProps {
 
     enemy_kingdom_id: number | null;
 
+    npc_kingdom_id: number | null;
+
     character_id: number;
 
     close_modal: () => void;
