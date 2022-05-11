@@ -34,7 +34,6 @@ class BattleController extends Controller {
      */
     public function __construct(BattleEventHandler $battleEventHandler) {
         $this->middleware('is.character.dead')->except(['revive', 'index']);
-        $this->middleware('is.character.adventuring')->except(['index']);
 
         $this->battleEventHandler = $battleEventHandler;
     }

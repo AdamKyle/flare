@@ -47,7 +47,6 @@ class ShopController extends Controller {
     ) {
         $this->middleware('auth');
         $this->middleware('is.character.dead');
-        $this->middleware('is.character.adventuring');
 
         $this->equipItemService                       = $equipItemService;
         $this->buildCharacterAttackTypes              = $buildCharacterAttackTypes;

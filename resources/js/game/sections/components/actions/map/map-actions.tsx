@@ -266,12 +266,6 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                                     })} button_label={'Set Sail'} on_click={this.setSail.bind(this)} disabled={this.state.is_movement_disabled || this.props.is_dead}/>
                                     : null
                             }
-
-                            <SuccessOutlineButton additional_css={clsx('text-center', {'col-start-3 col-end-3': this.props.location_with_adventures === null && this.props.port_location === null }, {'col-start-3 col-end-3': this.props.location_with_adventures !== null || this.props.port_location !== null })}
-                                                  button_label={'Teleport'}
-                                                  on_click={this.teleport.bind(this)}
-                                                  disabled={this.state.is_movement_disabled || this.props.is_dead}
-                            />
                         </div>
                     </div>
                 </div>

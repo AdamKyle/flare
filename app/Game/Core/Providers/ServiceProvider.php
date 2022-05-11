@@ -13,7 +13,6 @@ use App\Flare\Transformers\Serializers\CoreSerializer;
 use App\Flare\Transformers\UsableItemTransformer;
 use App\Game\Battle\Services\BattleDrop;
 use App\Game\Core\Services\CharacterPassiveSkills;
-use App\Game\Core\Services\ComparisonService;
 use App\Game\Core\Services\DropCheckService;
 use App\Game\Core\Services\HolyItemService;
 use App\Game\Core\Services\InventorySetService;
@@ -23,7 +22,6 @@ use App\Game\Skills\Services\DisenchantService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
 use App\Game\Core\Comparison\ItemComparison;
-use App\Game\Core\Middleware\IsCharacterAdventuringMiddleware;
 use App\Game\Core\Middleware\IsCharacterAtLocationMiddleware;
 use App\Game\Core\Middleware\IsCharacterWhoTheySayTheyAre;
 use App\Game\Core\Services\AdventureRewardService;
@@ -122,8 +120,5 @@ class ServiceProvider extends ApplicationServiceProvider
      */
     public function boot()
     {
-        $router = $this->app['router'];
-
-        $router->aliasMiddleware('is.character.adventuring', IsCharacterAdventuringMiddleware::class);
     }
 }

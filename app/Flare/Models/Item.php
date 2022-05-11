@@ -3,7 +3,6 @@
 namespace App\Flare\Models;
 
 use App\Flare\Models\Traits\CalculateSkillBonus;
-use App\Flare\Models\Traits\CalculateTimeReduction;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Bkwld\Cloner\Cloneable;
@@ -163,7 +162,6 @@ class Item extends Model
         'required_monster',
         'required_quest',
         'locations',
-        'adventures',
         'holy_stack_devouring_darkness',
         'holy_stack_stat_bonus',
         'holy_stacks_applied',
@@ -287,14 +285,6 @@ class Item extends Model
     public function getLocationsAttribute() {
         if ($this->type === 'quest') {
            return Location::where('quest_reward_item_id', $this->id)->with('map')->get();
-        }
-
-        return [];
-    }
-
-    public function getAdventuresAttribute() {
-        if ($this->type === 'quest') {
-            return Adventure::where('reward_item_id', $this->id)->with('location', 'location.map')->get();
         }
 
         return [];

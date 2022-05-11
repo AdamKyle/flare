@@ -6,7 +6,6 @@ use App\Flare\Values\LocationEffectValue;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Database\Factories\LocationFactory;
-use App\Flare\Models\GameMap;
 use App\Flare\Models\Traits\WithSearch;
 
 class Location extends Model
@@ -50,10 +49,6 @@ class Location extends Model
 
     public function map() {
         return $this->hasOne(GameMap::class, 'id', 'game_map_id');
-    }
-
-    public function adventures() {
-        return $this->hasMany(Adventure::class, 'location_id', 'id');
     }
 
     public function requiredQuestItem() {

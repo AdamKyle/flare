@@ -149,10 +149,6 @@ class Character extends Model
         return $this->kingdoms->count();
     }
 
-    public function adventureLogs() {
-        return $this->hasMany(AdventureLog::class);
-    }
-
     public function notifications() {
         return $this->hasMany(Notification::class, 'character_id', 'id');
     }

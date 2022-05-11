@@ -50,8 +50,6 @@ class CharacterInventoryController extends Controller {
         $this->middleware('auth');
 
         $this->middleware('is.character.dead');
-
-        $this->middleware('is.character.adventuring');
     }
 
     public function compare(

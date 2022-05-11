@@ -44,7 +44,6 @@ class MapController extends Controller {
         $this->mapTile         = $mapTile;
         $this->movementService = $movementService;
 
-        $this->middleware('is.character.adventuring')->except(['mapInformation', 'fetchQuests']);
         $this->middleware('is.character.dead')->except(['mapInformation', 'fetchQuests']);
     }
 

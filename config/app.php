@@ -214,8 +214,6 @@ return [
         App\Game\Messages\Providers\EventsProvider::class,
         App\Game\Messages\Providers\ServiceProvider::class,
         App\Game\Maps\Providers\EventsProvider::class,
-        App\Game\Adventures\Providers\EventsProvider::class,
-        App\Game\Adventures\Providers\ServiceProvider::class,
         App\Game\Maps\Providers\ServiceProvider::class,
         App\Game\Kingdoms\Providers\ServiceProvider::class,
         App\Game\Skills\Providers\ServiceProvider::class,
