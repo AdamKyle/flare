@@ -4,7 +4,7 @@ Route::middleware(['auth', 'is.player.banned', 'is.character.who.they.say.they.a
 
     Route::get('/character/skills/{character}', ['uses' => 'Api\SkillsController@fetchSkills']);
 
-    Route::middleware([ 'is.character.dead', 'is.character.adventuring'])->group(function() {
+    Route::middleware([ 'is.character.dead'])->group(function() {
         // Fetch Items
         Route::get('/crafting/{character}', ['uses' => 'Api\CraftingController@fetchItemsToCraft']);
 

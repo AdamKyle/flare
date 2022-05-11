@@ -4,7 +4,6 @@ Route::group(['middleware' => [
     'auth',
     'is.character.who.they.say.they.are',
     'is.character.dead',
-    'is.character.adventuring',
     'can.access.market',
     'is.character.exploring'
 ]], function() {

@@ -5,7 +5,6 @@ Route::group(['middleware' => [
     'throttle:100,1',
     'is.character.who.they.say.they.are',
     'is.character.dead',
-    'is.character.adventuring',
     'is.player.banned'
 ]], function() {
 

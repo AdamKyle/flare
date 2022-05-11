@@ -24,7 +24,7 @@ Route::group(['middleware' => ['auth', 'throttle:100,1', 'is.character.who.they.
 
     Route::get('/character/{character}/inventory', ['uses' => 'Api\CharacterInventoryController@inventory']);
 
-    Route::group(['middleware' => ['is.character.dead', 'is.character.adventuring']], function() {
+    Route::group(['middleware' => ['is.character.dead']], function() {
         Route::middleware(['is.character.exploring'])->group(function() {
 
             Route::get('/character/{character}/inventory/item/{item}', ['uses' => 'Api\CharacterInventoryController@itemDetails']);
