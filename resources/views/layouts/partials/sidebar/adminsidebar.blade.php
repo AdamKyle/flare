@@ -106,22 +106,6 @@
                         </a>
                     </div>
 
-                    <a href="#no-link" class="active" data-toggle="collapse" data-target="#manage-adventures">
-                        <span class="collapse-indicator la la-arrow-circle-down"></span>
-                        Manage Adventures
-                    </a>
-
-                    <div id="manage-adventures" class="collapse">
-                        <a href="{{route('adventures.list')}}">
-                            <span class="ra ra-trail"></span>
-                            Adventures
-                        </a>
-                        <a href="{{route('adventures.create')}}">
-                            <span class="fas fa-plus"></span>
-                            Create New Adventure
-                        </a>
-                    </div>
-
                     <a href="#no-link" class="active" data-toggle="collapse" data-target="#manage-quests">
                         <span class="collapse-indicator la la-arrow-circle-down"></span>
                         Manage Quests

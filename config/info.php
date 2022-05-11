@@ -193,16 +193,6 @@ return [
             'craft_only'          => false,
         ]
     ],
-    'adventure' => [
-        [
-            'livewire'            => true,
-            'view'                => 'admin.adventures.data-table',
-            'only'                => null,
-            'insert_before_table' => null,
-            'type'                => null,
-            'craft_only'          => false,
-        ]
-    ],
     'crafting' => [
         [
             'livewire'            => true,

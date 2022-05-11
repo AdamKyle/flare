@@ -147,10 +147,6 @@
                     <span class="ra ra-player-pyromaniac"></span>
                     Traverse Action
                 </a>
-                <a href="{{route('info.page', ['pageName' => 'adventure'])}}">
-                    <span class="ra ra-trail"></span>
-                    Adventure Action
-                </a>
                 <a href="{{route('info.page', ['pageName' => 'set-sail'])}}">
                     <span class="fas fa-ship"></span>
                     Set Sail Action

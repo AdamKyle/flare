@@ -7,8 +7,6 @@ export default interface CharacterStatusType {
 
     can_craft_again_at: number;
 
-    can_adventure: boolean;
-
     is_dead: boolean;
 
     automation_locked: boolean;

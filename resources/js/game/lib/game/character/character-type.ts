@@ -145,11 +145,7 @@ export interface CharacterType {
 
     can_craft: boolean;
 
-    can_adventure: boolean;
-
     can_craft_again_at: number|null;
-
-    can_adventure_again_at: number|null;
 
     can_use_work_bench: boolean;
 
