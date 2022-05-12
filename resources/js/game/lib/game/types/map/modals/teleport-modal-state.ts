@@ -29,4 +29,6 @@ export default interface TeleportModalState {
     current_npc_kingdom: NpcKingdomsDetails | null;
 
     view_port: number | null;
+
+    show_help: boolean;
 }

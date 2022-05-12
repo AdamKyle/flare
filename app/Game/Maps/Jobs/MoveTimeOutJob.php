@@ -2,6 +2,7 @@
 
 namespace App\Game\Maps\Jobs;
 
+use App\Game\Battle\Events\UpdateCharacterStatus;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -44,6 +45,8 @@ class MoveTimeOutJob implements ShouldQueue
             'can_move_again_at' => null,
         ]);
 
-        broadcast(new ShowTimeOutEvent($character->refresh()->user, false, true));
+        event(new ShowTimeOutEvent($character->refresh()->user, false, true));
+
+        event(new UpdateCharacterStatus($character));
     }
 }

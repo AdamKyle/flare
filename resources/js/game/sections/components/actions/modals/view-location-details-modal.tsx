@@ -22,7 +22,7 @@ export default class ViewLocationDetailsModal extends React.Component<ViewLocati
 
     componentDidUpdate() {
         if (this.state.view_port !== null) {
-            if (this.state.view_port < 1600) {
+            if (this.state.view_port < 1600 && !this.props.is_small_screen) {
                 this.setState({
                     is_open: false,
                 }, () => {
@@ -33,7 +33,6 @@ export default class ViewLocationDetailsModal extends React.Component<ViewLocati
     }
 
     buildModalData() {
-
         if (this.props.location !== null && this.state.is_open) {
             return <LocationModal is_open={this.state.is_open}
                                   handle_close={this.props.close_modal}

@@ -93,7 +93,7 @@ export default class OtherKingdomModal extends React.Component<OtherKingdomModal
                           handle_action: this.handleTeleport.bind(this),
                       }}
                       tertiary_actions={{
-                          tertiary_button_disabled: this.teleportDisabled(),
+                          tertiary_button_disabled: false,
                           tertiary_button_label: 'Attack Kingdom',
                           handle_action: () => this.attackKingdom(this.state.kingdom_details),
                       }}
@@ -106,8 +106,8 @@ export default class OtherKingdomModal extends React.Component<OtherKingdomModal
                     :
                         <Fragment>
                             <div>
-                                <div className='grid grid-cols-1 md:grid-cols-3'>
-                                    <div className='md:col-start-1 md:col-span-2'>
+                                <div className='lg:grid lg:grid-cols-1 lg:grid-cols-3'>
+                                    <div className='lg:col-start-1 lg:col-span-2'>
                                         <dl>
                                             <dt>
                                                 <div className='flex items-center mb-4'>
@@ -187,7 +187,7 @@ export default class OtherKingdomModal extends React.Component<OtherKingdomModal
                                             <dd>{percent(this.state.kingdom_details?.defence_bonus)}%</dd>
                                         </dl>
                                     </div>
-                                    <div className='md:col-start-3 md:col-end-3'>
+                                    <div className='lg:col-start-3 lg:col-end-3'>
                                         <dl>
                                             <dt>Treasure:</dt>
                                             <dd>{formatNumber(this.state.kingdom_details?.treasury)}</dd>

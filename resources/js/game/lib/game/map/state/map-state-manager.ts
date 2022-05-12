@@ -30,6 +30,21 @@ export default class MapStateManager {
         }
     }
 
+    static setMapMovementActionsState(data: any): any {
+        return {
+            character_position: {
+                x: data.character_map.character_position_x, y: data.character_map.character_position_y
+            },
+            locations: data.locations,
+            player_kingdoms: data.my_kingdoms,
+            enemy_kingdoms: data.other_kingdoms,
+            npc_kingdoms: data.npc_kingdoms,
+            time_left: parseInt(this.getTimeLeftInSeconds(data).toFixed(0)),
+            port_location: null,
+            coordinates: data.coordinates,
+        }
+    }
+
     /**
      * Returns the seconds left.
      *

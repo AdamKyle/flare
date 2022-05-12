@@ -8,6 +8,8 @@ import {fetchCost} from "../../../../lib/game/map/teleportion-costs";
 import {formatNumber} from "../../../../lib/game/format-number";
 import TeleportModalState from "../../../../lib/game/types/map/modals/teleport-modal-state";
 import {viewPortWatcher} from "../../../../lib/view-port-watcher";
+import QuestHelpModal from "../../quests/modals/quest-help-modal";
+import TeleportHelpModal from "./teleport-help-modal";
 
 
 export default class TeleportModal extends React.Component<TeleportModalProps, TeleportModalState> {
@@ -30,6 +32,7 @@ export default class TeleportModal extends React.Component<TeleportModalProps, T
             current_enemy_kingdom: null,
             current_npc_kingdom: null,
             view_port: null,
+            show_help: false,
         }
     }
 
@@ -127,6 +130,12 @@ export default class TeleportModal extends React.Component<TeleportModalProps, T
                 });
             }
         }
+    }
+
+    manageHelpDialogue() {
+        this.setState({
+            show_help: !this.state.show_help
+        })
     }
 
     getDefaultLocationValue() {
@@ -457,21 +466,20 @@ export default class TeleportModal extends React.Component<TeleportModalProps, T
                     <dd className='flex items-center'>
                         <span>{this.state.time_out} Minutes</span>
                         <div>
-                            <PopOverContainer icon={'fas fa-info-circle'} icon_label={'Help'}>
-                                <h3>Regarding Skills</h3>
-                                <p className='my-2'>
-                                    When it comes to the teleport timeout, you have a skill called <a href='/information/skill-information' target='_blank'>Quick Feet <i
-                                    className="fas fa-external-link-alt"></i></a>, which if raised over time, will
-                                    reduce the movement time out of teleporting down from the current value to 1 minute, regardless of distance.
-                                </p>
-                                <p>
-                                    You can find this on your character sheet, under Skills. You can sacrifice a % of your XP from monsters
-                                    in order to level the skill over time, by clicking train on Quick Feet and then selecting the amount of XP to sacrifice between 10-100%.
-                                </p>
-                            </PopOverContainer>
+                            <div className='ml-2'>
+                                <button type={"button"} onClick={() => this.manageHelpDialogue()} className='text-blue-500 dark:text-blue-300'>
+                                    <i className={'fas fa-info-circle'}></i> Help
+                                </button>
+                            </div>
                         </div>
                     </dd>
                 </dl>
+
+                {
+                    this.state.show_help ?
+                        <TeleportHelpModal manage_modal={this.manageHelpDialogue.bind(this)} />
+                    : null
+                }
             </Dialogue>
         )
     }

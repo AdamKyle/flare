@@ -4,6 +4,7 @@ namespace App\Game\Maps\Services;
 
 use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Events\ServerMessageEvent;
+use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\CelestialFight;
 use App\Flare\Models\Character;
@@ -642,6 +643,8 @@ class MovementService {
             event(new MoveTimeOutEvent($character, $timeout, true));
         }
         event(new UpdateTopBarEvent($character));
+
+        event(new UpdateCharacterStatus($character));
 
         event(new UpdateMapDetailsBroadcast($character->map()->with('gameMap')->first(), $character->user, $this, false, $pctCommand));
     }

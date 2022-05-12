@@ -19,6 +19,8 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
 
     private craftingTimeOut: any;
 
+    private mapTimeOut: any;
+
     private actionsManager: ActionsManager;
 
     constructor(props: ActionsProps) {
@@ -34,7 +36,9 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
             attack_time_out: 0,
             crafting_time_out: 0,
             character_revived: false,
+            can_player_move: true,
             crafting_type: null,
+            movement_time_out: 0,
         }
 
         // @ts-ignore
@@ -42,6 +46,9 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
 
         // @ts-ignore
         this.craftingTimeOut = Echo.private('show-crafting-timeout-bar-' + this.props.character.user_id);
+
+        // @ts-ignore
+        this.mapTimeOut     = Echo.private('show-timeout-move-' + this.props.character.user_id);
 
         this.actionsManager = new ActionsManager(this);
     }
@@ -63,6 +70,19 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
                 crafting_time_out: event.timeout,
             });
         });
+
+        this.mapTimeOut.listen('Game.Maps.Events.ShowTimeOutEvent', (event: any) => {
+            this.setState({
+                movement_time_out: event.forLength,
+                can_player_move: event.canMove,
+            });
+        });
+
+        if (!this.props.character.can_move) {
+            this.setState({
+                movement_time_out: this.props.character.can_move_again_at,
+            });
+        }
     }
 
     componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<ActionsState>, snapshot?: any) {
@@ -124,6 +144,12 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
         });
     }
 
+    closeMapSection() {
+        this.setState({
+            selected_action: null,
+        })
+    }
+
     setSelectedMonster(monster: any) {
         this.actionsManager.setSelectedMonster(monster);
     }
@@ -142,6 +168,12 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
 
     updateTimer() {
         this.actionsManager.updateTimer();
+    }
+
+    updateMapTimer(movement_time_out: number) {
+        this.setState({
+            movement_time_out: movement_time_out
+        });
     }
 
     updateCraftingTimer() {
@@ -219,7 +251,14 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
     }
 
     showMapMovement() {
-        return <MapMovementActions />;
+        return (
+            <Fragment>
+                <button type='button' onClick={this.closeMapSection.bind(this)} className='text-red-600 dark:text-red-500 absolute right-[5px] top-[5px]'>
+                    <i className="fas fa-times-circle"></i>
+                </button>
+                <MapMovementActions character={this.props.character} update_map_timer={this.updateMapTimer.bind(this)} currencies={this.props.currencies}/>
+            </Fragment>
+        );
     }
 
     buildSection() {
@@ -242,18 +281,6 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
                   this.state.selected_action !== null ?
                       <Fragment>
                           {this.buildSection()}
-                          <div className='relative top-[24px]'>
-                              <div className={clsx('grid gap-2', {
-                                  'md:grid-cols-2': this.state.attack_time_out !== 0 && this.state.crafting_time_out !== 0
-                              })}>
-                                  <div>
-                                      <TimerProgressBar time_remaining={this.state.attack_time_out} time_out_label={'Attack Timeout'} update_time_remaining={this.updateTimer.bind(this)} />
-                                  </div>
-                                  <div>
-                                      <TimerProgressBar time_remaining={this.state.crafting_time_out} time_out_label={'Crafting Timeout'} update_time_remaining={this.updateCraftingTimer.bind(this)} />
-                                  </div>
-                              </div>
-                          </div>
                       </Fragment>
                   :
                       <Select
@@ -267,6 +294,25 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
                       />
               }
 
+              <div className='relative top-[18px]'>
+                  <div className={clsx('grid gap-2', {
+                      'md:grid-cols-2': this.state.attack_time_out !== 0 && this.state.crafting_time_out !== 0
+                  })}>
+                      <div>
+                          <TimerProgressBar time_remaining={this.state.attack_time_out} time_out_label={'Attack Timeout'} update_time_remaining={this.updateTimer.bind(this)} />
+                      </div>
+                      <div>
+                          <TimerProgressBar time_remaining={this.state.crafting_time_out} time_out_label={'Crafting Timeout'} update_time_remaining={this.updateCraftingTimer.bind(this)} />
+                      </div>
+                  </div>
+              </div>
+              {
+                  typeof this.state.movement_time_out !== 'undefined' && this.state.movement_time_out !== 0 ?
+                      <div className={'relative top-[24px]'}>
+                          <TimerProgressBar time_remaining={this.state.movement_time_out} time_out_label={'Movement Timeout'}/>
+                      </div>
+                      : null
+              }
           </Fragment>
         );
     }

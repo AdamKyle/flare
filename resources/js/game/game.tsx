@@ -50,7 +50,6 @@ export default class Game extends React.Component<GameProps, GameState> {
 
         this.state = {
             view_port: 0,
-            show_size_message: true,
             character_status: null,
             loading: true,
             character_currencies: undefined,
@@ -128,12 +127,6 @@ export default class Game extends React.Component<GameProps, GameState> {
         });
     }
 
-    hideDeviceSizeMessage(): void {
-        this.setState({
-            show_size_message: false,
-        });
-    }
-
     updateCharacterStatus(characterStatus: any): void {
         this.setState({character_status: characterStatus});
     }
@@ -175,12 +168,6 @@ export default class Game extends React.Component<GameProps, GameState> {
 
         return (
             <Fragment>
-                { this.state.view_port < 1600 && this.state.show_size_message ?
-                    <WarningAlert additional_css={'mb-5'} close_alert={this.hideDeviceSizeMessage.bind(this)}>
-                        Your devices screen size is too small to properly display the map.
-                    </WarningAlert>
-                    : null
-                }
                 <Tabs tabs={this.tabs}>
                     <TabPanel key={'game'}>
                         <div className="grid lg:grid-cols-3 gap-3">
@@ -195,7 +182,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                                 <BasicCard additionalClasses={'min-h-60'}>
                                     {
                                         this.state.view_port < 1600 ?
-                                            <SmallerActions character_id={this.props.characterId} character={this.state.character} character_statuses={this.state.character_status} />
+                                            <SmallerActions character_id={this.props.characterId} character={this.state.character} character_statuses={this.state.character_status} currencies={this.state.character_currencies} />
                                         :
                                             <Actions character_id={this.props.characterId} character={this.state.character} character_statuses={this.state.character_status} />
                                     }

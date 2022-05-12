@@ -3,28 +3,6 @@ import MapStateManager from './state/map-state';
 import LocationDetails from "./types/location-details";
 
 /**
- * Gets a location that contains adventures based on the characters current position.
- *
- * @param mapState
- * @return location or null
- * @type [{mapState: MapState}]
- */
-export const getLocationWithAdventures = (mapState: MapState | MapStateManager): LocationDetails | null => {
-
-    if (mapState.locations === null) {
-        return null;
-    }
-
-    const locationWithAdventure = mapState.locations.filter((location) => location.x === mapState.character_position.x && location.y === mapState.character_position.y);
-
-    if (locationWithAdventure.length > 0) {
-        return locationWithAdventure[0]
-    }
-
-    return null;
-}
-
-/**
  * Gets the current port that the player is on.
  *
  * @param mapState

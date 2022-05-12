@@ -14,4 +14,6 @@ export default interface ViewLocationDetailsModalProps {
     character_id: number;
 
     close_modal: () => void;
+
+    is_small_screen: boolean;
 }

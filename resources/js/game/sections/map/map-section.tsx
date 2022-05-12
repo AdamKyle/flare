@@ -13,7 +13,7 @@ import MovePlayer from "../../lib/game/map/ajax/move-player";
 import MapStateManager from "../../lib/game/map/state/map-state-manager";
 import NpcKingdoms from "../components/kingdoms/npc-kingdoms";
 import ComponentLoading from "../../components/ui/loading/component-loading";
-import {getLocationWithAdventures, getPortLocation} from "../../lib/game/map/location-helpers";
+import {getPortLocation} from "../../lib/game/map/location-helpers";
 // @ts-ignore
 import Draggable from 'react-draggable/build/web/react-draggable.min';
 
@@ -38,7 +38,6 @@ export default class MapSection extends React.Component<MapProps, MapState> {
             bottom_bounds: 0,
             right_bounds: 0,
             locations: null,
-            location_with_adventures: null,
             port_location: null,
             loading: true,
             player_kingdoms: null,
@@ -81,8 +80,8 @@ export default class MapSection extends React.Component<MapProps, MapState> {
     setStateFromData(data: any) {
         let state = {...MapStateManager.setState(data), ...{loading: false, map_id: data.character_map.game_map.id}};
 
-        state.location_with_adventures = getLocationWithAdventures(state);
         state.port_location = getPortLocation(state);
+
         state.map_position = {
             x: getNewXPosition(state.character_position.x, state.map_position.x, this.props.view_port),
             y: getNewYPosition(state.character_position.y, state.map_position.y, this.props.view_port),
@@ -206,7 +205,6 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                                 set_sail={this.handleSetSail.bind(this)}
                                 can_player_move={this.state.can_player_move}
                                 players_on_map={this.state.characters_on_map}
-                                location_with_adventures={this.state.location_with_adventures}
                                 port_location={this.state.port_location}
                                 ports={this.fetchPorts()}
                                 coordinates={this.state.coordinates}

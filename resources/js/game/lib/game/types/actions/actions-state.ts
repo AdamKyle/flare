@@ -21,5 +21,13 @@ export default interface ActionsState {
 
     crafting_type: 'craft' | 'enchant' | 'alchemy' | 'workbench' | 'trinketry' | null;
 
+    /**
+     * These are for Smaller Actions Component.
+     */
+
     selected_action?: string|null;
+
+    movement_time_out?: number;
+
+    can_player_move?: boolean;
 }

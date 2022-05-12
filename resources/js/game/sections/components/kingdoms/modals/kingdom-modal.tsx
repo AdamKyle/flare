@@ -94,7 +94,7 @@ export default class KingdomModal extends React.Component<KingdomModalProps, Kin
                     :
                         <Fragment>
                             <div>
-                                <div className={'grid md:grid-cols-3 md:gap-2'}>
+                                <div className={'w-full lg:grid lg:grid-cols-3 lg:gap-2'}>
                                     <div>
                                         <dl>
                                             <dt>Wood:</dt>
@@ -119,8 +119,8 @@ export default class KingdomModal extends React.Component<KingdomModalProps, Kin
                                     </div>
                                 </div>
                                 <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                                <div className='grid md:grid-cols-3'>
-                                    <div className='col-start-1 col-span-3 md:col-span-2'>
+                                <div className='lg:grid lg:grid-cols-3'>
+                                    <div className='lg:col-start-1 lg:col-span-3 lg:col-span-2'>
                                         <dl>
                                             <dt>
                                                 <div className='flex items-center mb-4'>
@@ -201,7 +201,7 @@ export default class KingdomModal extends React.Component<KingdomModalProps, Kin
                                         </dl>
                                         <div className='border-b-2 block border-b-gray-300 dark:border-b-gray-600 my-3 md:hidden'></div>
                                     </div>
-                                    <div className='md:col-start-3 md:col-end-3'>
+                                    <div className='lg:col-start-3 lg:col-end-3'>
                                         <dl>
                                             <dt>Treasure:</dt>
                                             <dd>{formatNumber(this.state.kingdom_details?.treasury)}</dd>

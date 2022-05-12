@@ -17,8 +17,6 @@ export default interface MapState {
 
     locations: LocationDetails[] | null;
 
-    location_with_adventures: LocationDetails | null;
-
     port_location: LocationDetails | null;
 
     loading: boolean;

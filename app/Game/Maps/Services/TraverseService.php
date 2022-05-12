@@ -4,6 +4,7 @@ namespace App\Game\Maps\Services;
 
 use App\Flare\Jobs\CharacterAttackTypesCacheBuilderWithDeductions;
 use App\Flare\Models\Map;
+use App\Game\Battle\Events\UpdateCharacterStatus;
 use Illuminate\Support\Facades\Cache;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
@@ -269,6 +270,8 @@ class TraverseService {
             'can_move'          => false,
             'can_move_again_at' => now()->addSeconds(10),
         ]);
+
+        event(new UpdateCharacterStatus($character));
 
         event(new MoveTimeOutEvent($character, 10, false, true));
     }

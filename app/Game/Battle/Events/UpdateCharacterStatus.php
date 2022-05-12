@@ -27,6 +27,8 @@ class UpdateCharacterStatus implements ShouldBroadcastNow {
      * @param Character $character
      */
     public function __construct(Character $character) {
+        $character = $character->refresh();
+
         $this->characterStatuses = [
             'can_attack'          => $character->can_attack,
             'can_attack_again_at' => $character->can_attack_again_at,
@@ -35,6 +37,7 @@ class UpdateCharacterStatus implements ShouldBroadcastNow {
             'is_dead'             => $character->is_dead,
             'automation_locked'   => $character->user->can_auto_attack,
             'is_silenced'         => $character->is_silenced,
+            'can_move'            => $character->can_move
         ];
 
         $this->user = $character->user;

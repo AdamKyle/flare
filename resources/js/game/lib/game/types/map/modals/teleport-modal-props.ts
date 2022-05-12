@@ -21,7 +21,7 @@ export default interface TeleportModalProps  {
 
     currencies?: CharacterCurrenciesType;
 
-    view_port: number;
+    view_port?: number;
 
     locations: LocationDetails[] | null;
 

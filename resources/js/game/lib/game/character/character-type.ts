@@ -154,4 +154,8 @@ export interface CharacterType {
     can_talk_again_at: string;
 
     force_name_change: boolean;
+
+    can_move: boolean;
+
+    can_move_again_at: number;
 }

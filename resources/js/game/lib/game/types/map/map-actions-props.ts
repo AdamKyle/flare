@@ -15,8 +15,6 @@ export default interface MapActionsProps {
 
     players_on_map: number;
 
-    location_with_adventures: LocationDetails | null;
-
     locations: LocationDetails[] | null;
 
     npc_kingdoms: NpcKingdomsDetails[] | null;

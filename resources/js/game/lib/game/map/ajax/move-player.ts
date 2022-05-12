@@ -4,7 +4,7 @@ import {generateServerMessage} from "../../../ajax/generate-server-message";
 import Ajax from "../../../ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
 import MapStateManager from "../state/map-state-manager";
-import {getLocationWithAdventures, getPortLocation} from "../location-helpers";
+import {getPortLocation} from "../location-helpers";
 import {getNewXPosition, getNewYPosition} from "../map-position";
 
 export default class MovePlayer {
@@ -63,7 +63,6 @@ export default class MovePlayer {
             state.character_position.x = playerPosition.x;
             state.character_position.y = playerPosition.y;
 
-            state.location_with_adventures = getLocationWithAdventures(state);
             state.port_location = getPortLocation(state);
             state.map_position = {
                 x: getNewXPosition(state.character_position.x, state.map_position.x, viewPort),
@@ -76,23 +75,31 @@ export default class MovePlayer {
         })
     }
 
-    teleportPlayer(data: {x: number, y: number, cost: number, timeout: number}, characterId: number, viewPort: number) {
+    teleportPlayer(data: {x: number, y: number, cost: number, timeout: number}, characterId: number, viewPort?: number) {
         (new Ajax()).setRoute('map/teleport/' + characterId).setParameters(data)
             .doAjaxCall('post', (result: AxiosResponse) => {
-                let state = {...MapStateManager.setState(result.data), ...this.component.state};
+                if (typeof viewPort !== 'undefined') {
+                    let state = {...MapStateManager.setState(result.data), ...this.component.state};
 
-                state.character_position.x = data.x;
-                state.character_position.y = data.y;
+                    state.character_position.x = data.x;
+                    state.character_position.y = data.y;
 
-                state.location_with_adventures = getLocationWithAdventures(state);
-                state.port_location = getPortLocation(state);
+                    state.port_location = getPortLocation(state);
 
-                state.map_position = {
-                    x: getNewXPosition(state.character_position.x, state.map_position.x, viewPort),
-                    y: getNewYPosition(state.character_position.y, state.map_position.y, viewPort)
+                    state.map_position = {
+                        x: getNewXPosition(state.character_position.x, state.map_position.x, viewPort),
+                        y: getNewYPosition(state.character_position.y, state.map_position.y, viewPort)
+                    }
+
+                    this.component.setState(state);
+                } else {
+                    let state = {...MapStateManager.setMapMovementActionsState(result.data), ...this.component.state};
+
+                    state.character_position.x = data.x;
+                    state.character_position.y = data.y;
+
+                    this.component.setState(state);
                 }
-
-                this.component.setState(state);
             }, (error: AxiosError) => {
                 this.handleErrors(error);
             });
@@ -106,7 +113,6 @@ export default class MovePlayer {
                 state.character_position.x = data.x;
                 state.character_position.y = data.y;
 
-                state.location_with_adventures = getLocationWithAdventures(state);
                 state.port_location = getPortLocation(state);
 
                 state.map_position = {

@@ -297,6 +297,7 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                                                    kingdom_id={this.state.player_kingdom_id}
                                                    enemy_kingdom_id={this.state.enemy_kingdom_id}
                                                    npc_kingdom_id={this.state.npc_kingdom_id}
+                                                   is_small_screen={false}
                          />
                      : null
                 }
