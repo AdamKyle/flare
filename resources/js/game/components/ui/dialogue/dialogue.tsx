@@ -21,7 +21,7 @@ export default class Dialogue extends React.Component<DialogueTypes, any> {
             <Transition appear show={this.props.is_open} as={Fragment}>
                 <Dialog
                     as="div"
-                    className={"absolute inset-0 z-50 top-[100px] " + this.props.additional_dialogue_css}
+                    className={"absolute inset-0 z-50 top-[10%] "}
                     onClose={this.emptyClose.bind(this)}
                 >
                     <Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
@@ -39,13 +39,13 @@ export default class Dialogue extends React.Component<DialogueTypes, any> {
                             <Dialog.Overlay className="fixed inset-0" />
                         </Transition.Child>
 
-                        {/* This element is to trick the browser into centering the modal contents. */}
-                        <span
-                            className="inline-block h-screen align-middle"
-                            aria-hidden="true"
-                        >
-                          &#8203;
-                        </span>
+                        {/*/!* This element is to trick the browser into centering the modal contents. *!/*/}
+                        {/*<span*/}
+                        {/*    className="inline-block h-screen align-middle"*/}
+                        {/*    aria-hidden="true"*/}
+                        {/*>*/}
+                        {/*  &#8203;*/}
+                        {/*</span>*/}
                         <Transition.Child
                             as={Fragment}
                             enter="ease-out duration-300"

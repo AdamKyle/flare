@@ -56,6 +56,11 @@ export default class Quests extends React.Component<QuestsProps, QuestState> {
                                     icon_class: 'ra ra-footprint'
                                 },
                                 {
+                                    name: 'Dungeons',
+                                    on_click: this.setPlaneForQuests.bind(this),
+                                    icon_class: 'ra ra-footprint'
+                                },
+                                {
                                     name: 'Hell',
                                     on_click: this.setPlaneForQuests.bind(this),
                                     icon_class: 'ra ra-footprint'

@@ -83,7 +83,7 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
             }).filter((chat: any) => typeof chat !== 'undefined');
 
             this.setState({
-                chat: chats,
+                chat: [...this.state.chat, ...chats],
             });
         }, (error: AxiosError) => {
 
