@@ -2,7 +2,13 @@
 
 namespace App\Console\Commands;
 
+use App\Flare\Builders\AffixAttributeBuilder;
+use App\Flare\Models\InventorySlot;
+use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
+use App\Flare\Models\SetSlot;
+use App\Flare\Values\RandomAffixDetails;
+use App\Game\Core\Services\ReRollEnchantmentService;
 use Illuminate\Console\Command;
 
 class ReBalanceAffixes extends Command
@@ -36,7 +42,7 @@ class ReBalanceAffixes extends Command
      *
      * @return int
      */
-    public function handle() {
+    public function handle(AffixAttributeBuilder $affixAttributeBuilder) {
         $this->reBalanceBaseAttributes();
         $this->reBalanceReductions();
         $this->reBalanceIntRequired();
@@ -45,6 +51,35 @@ class ReBalanceAffixes extends Command
         $this->reBalanceDevouringLight();
         $this->reBalanceDamage();
         $this->reBalanceSkillBonuses();
+
+        $this->rebalanceUniques($affixAttributeBuilder);
+    }
+
+    public function rebalanceUniques(AffixAttributeBuilder $affixAttributeBuilder) {
+        foreach (ItemAffix::where('cost', '=', RandomAffixDetails::BASIC)->where('randomly_generated', true)->get() as $affix) {
+            $this->processItemsWithUnique($affix, $affixAttributeBuilder);
+        }
+
+        foreach (ItemAffix::where('cost', '=', RandomAffixDetails::MEDIUM)->where('randomly_generated', true)->get() as $affix) {
+            $this->processItemsWithUnique($affix, $affixAttributeBuilder);
+        }
+
+        foreach (ItemAffix::where('cost', '=', RandomAffixDetails::LEGENDARY)->where('randomly_generated', true)->get() as $affix) {
+            $this->processItemsWithUnique($affix, $affixAttributeBuilder);
+        }
+    }
+
+    protected function processItemsWithUnique(ItemAffix $affix, AffixAttributeBuilder $affixAttributeBuilder) {
+        $amountPaid             = new RandomAffixDetails($affix->cost);
+
+        $affixAttributeBuilder =  $affixAttributeBuilder->setPercentageRange($amountPaid->getPercentageRange())
+                                                        ->setDamageRange($amountPaid->getDamageRange());
+
+        $attributes = $affixAttributeBuilder->buildAttributes($affix->type, $affix->cost, true);
+
+        unset($attributes['name']);
+
+        $affix->update($attributes);
     }
 
     public function reBalanceBaseAttributes() {

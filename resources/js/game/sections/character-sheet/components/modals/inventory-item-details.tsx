@@ -42,6 +42,7 @@ export default class InventoryUseDetails extends React.Component<any, any> {
                       title={this.modalTitle()}
                       secondary_actions={null}
                       large_modal={true}
+                      additional_dialogue_css={'top-[110px]'}
             >
                 <div className="mb-5 relative">
                     {

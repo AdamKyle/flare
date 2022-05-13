@@ -23,4 +23,6 @@ export default interface DialogueTypes {
     large_modal?: boolean;
 
     medium_modal?: boolean;
+
+    additional_dialogue_css?: string;
 }

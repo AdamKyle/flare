@@ -57,9 +57,10 @@ class AffixAttributeBuilder {
      *
      * @param string $type
      * @param int $amountPaid
+     * @param bool $ignoreSkills
      * @return array
      */
-    public function buildAttributes(string $type, int $amountPaid): array {
+    public function buildAttributes(string $type, int $amountPaid, bool $ignoreSkills = false): array {
         $attributes = [];
 
         if ($this->increasesStats()) {
@@ -87,11 +88,15 @@ class AffixAttributeBuilder {
         $attributes = $this->mergeDetails($attributes, $this->setClassBonus());
         $attributes = $this->mergeDetails($attributes, $this->setReductions());
 
-        if ($this->canHaveSkill()) {
-            $attributes = $this->mergeDetails($attributes, $this->setSkillDetails());
-        }
+        if (!$ignoreSkills) {
+            if ($this->canHaveSkill()) {
+                $attributes = $this->mergeDetails($attributes, $this->setSkillDetails());
+            }
 
-        if ($this->canHaveSkillBonuses()) {
+            if ($this->canHaveSkillBonuses()) {
+                $attributes = $this->mergeDetails($attributes, $this->setSkillBonuses());
+            }
+        } else {
             $attributes = $this->mergeDetails($attributes, $this->setSkillBonuses());
         }
 

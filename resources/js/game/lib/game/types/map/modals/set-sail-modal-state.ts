@@ -28,4 +28,6 @@ export default interface SetSailModalState {
     current_port: LocationDetails | null;
 
     view_port: number | null;
+
+    show_help: boolean;
 }

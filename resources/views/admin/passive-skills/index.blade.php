@@ -9,11 +9,7 @@
     >
       <x-core.buttons.link-buttons.primary-button
         href="{{route('passive.skills.create')}}"
-<<<<<<< HEAD
         css="ml-5"
-=======
-        css="tw-ml-2"
->>>>>>> 1.1.10
       >
         Create Passive
       </x-core.buttons.link-buttons.primary-button>
@@ -30,7 +26,7 @@
         <i class="fas fa-file-upload"></i> Import
       </x-core.buttons.link-buttons.primary-button>
     </x-core.page-title>
-    <hr />
-    @livewire('admin.passive-skills.data-table')
+
+    @livewire('admin.passive-skills.passive-skill-table')
   </div>
 @endsection

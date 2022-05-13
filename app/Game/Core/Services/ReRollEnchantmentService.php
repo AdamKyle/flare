@@ -79,17 +79,7 @@ class ReRollEnchantmentService {
             'shards'    => $character->shards - $shardCost,
         ]);
 
-        $duplicateItem   = $slot->item->duplicate();
-
-        $duplicateItem   = $this->applyHolyStacks($slot->item, $duplicateItem);
-
-        foreach ($this->fetchAffixesForReRoll($duplicateItem, $affixType) as $affix) {
-            $this->changeAffix($character, $duplicateItem, $affix, $reRollType);
-        }
-
-        $duplicateItem->update([
-            'market_sellable' => true,
-        ]);
+        $duplicateItem = $this->doReRoll($character, $slot->item, $affixType, $reRollType);
 
         $slot->update([
             'item_id' => $duplicateItem->id,
@@ -99,13 +89,27 @@ class ReRollEnchantmentService {
 
         event(new UpdateTopBarEvent($character));
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
-
-        event(new CharacterInventoryDetailsUpdate($character->user));
-
         event(new UpdateQueenOfHeartsPanel($character->user, $this->randomEnchantmentService->fetchDataForApi($character)));
 
         event(new ServerMessageEvent($character->user, 'Ooooh hoo hoo hoo! I have done it, child! I have made the modifications and I think you\'ll be happy! Oh child, I am so happy! Ooh hoo hoo hoo!', true));
+    }
+
+    public function doReRoll(Character $character, Item $item, string $affixType, string $reRollType) {
+        $duplicateItem   = $item->duplicate();
+
+        $duplicateItem   = $this->applyHolyStacks($item, $duplicateItem);
+
+        $affixes = $this->fetchAffixesForReRoll($duplicateItem, $affixType);
+
+        foreach ($affixes as $affix) {
+            $this->changeAffix($character, $duplicateItem, $affix, $reRollType);
+        }
+
+        $duplicateItem->update([
+            'market_sellable' => true,
+        ]);
+
+        return $duplicateItem->refresh();
     }
 
     public function doesMovementCostMatch(int $selectedItemToMoveId, string $selectedAffix, int $suppliedGold, int $suppliedShards): bool {
@@ -231,10 +235,6 @@ class ReRollEnchantmentService {
         $character = $character->refresh();
 
         event(new UpdateTopBarEvent($character));
-
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
-
-        event(new CharacterInventoryDetailsUpdate($character->user));
 
         event(new UpdateQueenOfHeartsPanel($character->user, $this->randomEnchantmentService->fetchDataForApi($character)));
 
