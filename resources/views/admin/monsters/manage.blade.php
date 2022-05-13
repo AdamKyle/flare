@@ -57,22 +57,13 @@
                     </x-core.form-wizard.content>
                     <x-core.form-wizard.content target="tab-style-2-2">
                         <x-core.forms.input :model="$monster" label="Spell Evasion (%):" modelKey="spell_evasion" name="spell_evasion"/>
-                        <x-core.forms.input :model="$monster" label="Artifact Annulment (%):" modelKey="artifact_annulment" name="artifact_annulment"/>
                         <x-core.forms.input :model="$monster" label="Affix Damage Resistance (%):" modelKey="affix_resistance" name="affix_resistance"/>
                     </x-core.form-wizard.content>
                     <x-core.form-wizard.content target="tab-style-2-3">
-                        <div class="grid md:grid-cols-2 gap-2">
-                            <div>
-                                <h3 class="mb-3">Casting Details</h3>
-                                <x-core.forms.check-box :model="$monster" label="Can Cast?" modelKey="can_cast" name="can_cast" />
-                                <x-core.forms.input :model="$monster" label="Max Cast Amount:" modelKey="max_spell_damage" name="max_spell_damage"/>
-                            </div>
-                                <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
-                            <div>
-                                <h3 class="mb-3">Artifact Details</h3>
-                                <x-core.forms.check-box :model="$monster" label="Can Use Artifacts?" modelKey="can_use_artifacts" name="can_use_artifacts" />
-                                <x-core.forms.input :model="$monster" label="Max Artifact Amount:" modelKey="max_artifact_damage" name="max_artifact_damage"/>
-                            </div>
+                        <div>
+                            <h3 class="mb-3">Casting Details</h3>
+                            <x-core.forms.check-box :model="$monster" label="Can Cast?" modelKey="can_cast" name="can_cast" />
+                            <x-core.forms.input :model="$monster" label="Max Cast Amount:" modelKey="max_spell_damage" name="max_spell_damage"/>
                         </div>
 
                         <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>

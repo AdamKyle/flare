@@ -9,6 +9,12 @@ use App\Admin\Exports\Monsters\Sheets\MonstersSheet;
 
 class MonstersExport implements WithMultipleSheets {
 
+    private string $type;
+
+    public function __construct(string $type) {
+        $this->type = $type;
+    }
+
     use Exportable;
 
     /**
@@ -17,7 +23,7 @@ class MonstersExport implements WithMultipleSheets {
     public function sheets(): array {
         $sheets   = [];
 
-        $sheets[] = new MonstersSheet;
+        $sheets[] = new MonstersSheet($this->type);
 
         return $sheets;
     }

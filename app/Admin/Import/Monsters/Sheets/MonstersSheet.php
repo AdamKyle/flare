@@ -18,7 +18,7 @@ class MonstersSheet implements ToCollection {
 
                 $monster = $this->returnCleanMonster($originalMonster);
 
-                if (is_null($monster)) {
+                if (is_null($monster) || !isset($monster['id'])) {
                     continue;
                 }
 

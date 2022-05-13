@@ -10,12 +10,18 @@ use App\Flare\Models\Monster;
 
 class MonstersSheet implements FromView, WithTitle, ShouldAutoSize {
 
+    private string $type;
+
+    public function __construct(string $type) {
+        $this->type = $type;
+    }
+
     /**
      * @return View
      */
     public function view(): View {
         return view('admin.exports.monsters.sheets.monsters', [
-            'monsters' => Monster::orderBy('game_map_id')->get(),
+            'monsters' => Monster::orderBy('game_map_id')->where('is_celestial_entity', ($this->type === 'celestial'))->get(),
         ]);
     }
 

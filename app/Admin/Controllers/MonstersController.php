@@ -9,6 +9,7 @@ use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Traits\Controllers\MonstersShowInformation;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Flare\Models\Monster;
 use App\Admin\Import\Monsters\MonstersImport;
@@ -66,8 +67,15 @@ class MonstersController extends Controller {
     /**
      * @codeCoverageIgnore
      */
-    public function export() {
-        $response = Excel::download(new MonstersExport, 'monsters.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+    public function export(Request $request) {
+
+        $fileName = 'monsters.xlsx';
+
+        if ($request->monster_type === 'celestial') {
+            $fileName = 'celestials.xlsx';
+        }
+
+        $response = Excel::download(new MonstersExport($request->monster_type), $fileName, \Maatwebsite\Excel\Excel::XLSX);
         ob_end_clean();
 
         return $response;
@@ -102,7 +110,6 @@ class MonstersController extends Controller {
 
     protected function cleanRequestData(array $params): array {
 
-
         if (!filter_var($params['is_celestial_entity'], FILTER_VALIDATE_BOOLEAN)) {
             $params['is_celestial_entity'] = false;
             $params['gold_cost']           = 0;
@@ -115,16 +122,9 @@ class MonstersController extends Controller {
             $params['max_spell_damage'] = 0;
         }
 
-        if (!filter_var($params['can_use_artifacts'], FILTER_VALIDATE_BOOLEAN)) {
-            $params['can_use_artifacts']   = false;
-            $params['max_artifact_damage'] = 0;
-        }
-
         if (is_null($params['quest_item_id'])) {
             $params['quest_item_drop_chance'] = 0.0;
         }
-
-        $params['published'] = true;
 
         return $params;
     }

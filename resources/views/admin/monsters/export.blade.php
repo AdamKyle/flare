@@ -7,12 +7,23 @@
             buttons="true"
             backUrl="{{route('monsters.list')}}"
         >
-            <form method="POST" action="{{ route('monsters.export-data') }}" class="text-center">
-                @csrf
-                <x-core.buttons.primary-button type="submit">
-                    Export
-                </x-core.buttons.primary-button>
-            </form>
+            <div class="grid grid-cols-1 gap-3 items-center">
+                <form method="POST" action="{{ route('monsters.export-data') }}" class="text-center">
+                    @csrf
+                    <input type="hidden" value="monster" name="monster_type" />
+                    <x-core.buttons.primary-button type="submit">
+                        Export Monsters
+                    </x-core.buttons.primary-button>
+                </form>
+
+                <form method="POST" action="{{ route('monsters.export-data') }}" class="text-center">
+                    @csrf
+                    <input type="hidden" value="celestial" name="monster_type" />
+                    <x-core.buttons.primary-button type="submit">
+                        Export Celestials
+                    </x-core.buttons.primary-button>
+                </form>
+            </div>
         </x-core.cards.card-with-title>
     </x-core.layout.info-container>
 @endsection
