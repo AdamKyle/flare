@@ -293,14 +293,13 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                                                 <dt>Must be at same location?</dt>
                                                 <dd>{this.state.quest_details.npc.must_be_at_same_location ? 'Yes' : 'No'}</dd>
                                             </dl>
-                                            <div className={clsx('mt-4 mb-4 transition-all duration-200')}>
+                                            <div className='my-4 max-h-[160px] overflow-x-scroll border border-slate-200 dark:border-slate-700 rounded-md bg-slate-200 dark:bg-slate-700 p-4'>
                                                 {
                                                     this.props.is_quest_complete ?
                                                         <div dangerouslySetInnerHTML={{__html: this.state.quest_details.after_completion_description.replace(/\n/g, "<br/>")}}></div>
                                                    :
                                                         <div dangerouslySetInnerHTML={{__html: this.state.quest_details.before_completion_description.replace(/\n/g, "<br/>")}}></div>
                                                 }
-
                                             </div>
                                         </div>
                                         {

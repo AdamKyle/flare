@@ -221,7 +221,7 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
             <Fragment>
                 <div className='grid xl:grid-cols-2'>
                     <span>X/Y: {this.props.character_position.x}/{this.props.character_position.y}</span>
-                    <div className='xl:mr-[24px]'>
+                    <div className='xl:mr-[48px]'>
                         <div className={'grid grid-cols-2 gap-1'}>
 
                             {

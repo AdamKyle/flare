@@ -12,6 +12,7 @@ import ComparisonSection
 import {
     watchForChatDarkModeComparisonChange,
 } from "../../../lib/game/dark-mode-watcher";
+import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
 
 export default class ItemComparison extends React.Component<any, any> {
 
@@ -24,6 +25,7 @@ export default class ItemComparison extends React.Component<any, any> {
             action_loading: false,
             loading: true,
             dark_charts: false,
+            error_message: null,
         }
     }
 
@@ -41,7 +43,17 @@ export default class ItemComparison extends React.Component<any, any> {
                 usable_sets: result.data.usable_sets
             })
         }, (error: AxiosError) => {
-            console.log(error);
+
+            if (typeof error.response !== 'undefined') {
+                const response = error.response;
+
+                if (response.status === 404) {
+                    this.setState({
+                        error_message: 'Item no longer exists in your inventory...',
+                        loading: false,
+                    })
+                }
+            }
         })
     }
 
@@ -52,6 +64,10 @@ export default class ItemComparison extends React.Component<any, any> {
     }
 
     buildTitle() {
+        if (this.state.error_message !== null) {
+            return 'Um ... ERROR!'
+        }
+
         if (this.state.comparison_details === null) {
             return 'Loading comparison data ...';
         }
@@ -111,26 +127,36 @@ export default class ItemComparison extends React.Component<any, any> {
                       handle_close={this.props.manage_modal}
                       title={this.buildTitle()}
                       secondary_actions={null}
-                      large_modal={true}
+                      large_modal={this.state.error_message === null}
                       primary_button_disabled={this.state.action_loading}
             >
                 {
-                    this.state.loading || this.state.comparison_details === null ?
+                    this.state.loading ?
                         <div className='p-5 mb-2'><ComponentLoading /></div>
                         :
-                        <ComparisonSection
-                            is_large_modal={this.isLargeModal()}
-                            is_grid_size={this.isGridSize.bind(this)}
-                            comparison_details={this.state.comparison_details}
-                            set_action_loading={this.setStatusToLoading.bind(this)}
-                            is_action_loading={this.state.action_loading}
-                            manage_modal={this.props.manage_modal}
-                            character_id={this.props.character_id}
-                            dark_charts={this.state.dark_charts}
-                            usable_sets={this.state.usable_sets}
-                            slot_id={this.props.slot_id}
-                            view_port={this.props.view_port}
-                        />
+                        <Fragment>
+                            {
+                                this.state.error_message !== null ?
+                                    <div className='mx-4 text-red-500 text-center text-lg'>
+                                        {this.state.error_message}
+                                    </div>
+                                :
+                                    <ComparisonSection
+                                        is_large_modal={this.isLargeModal()}
+                                        is_grid_size={this.isGridSize.bind(this)}
+                                        comparison_details={this.state.comparison_details}
+                                        set_action_loading={this.setStatusToLoading.bind(this)}
+                                        is_action_loading={this.state.action_loading}
+                                        manage_modal={this.props.manage_modal}
+                                        character_id={this.props.character_id}
+                                        dark_charts={this.state.dark_charts}
+                                        usable_sets={this.state.usable_sets}
+                                        slot_id={this.props.slot_id}
+                                        view_port={this.props.view_port}
+                                    />
+                            }
+                        </Fragment>
+
                 }
             </Dialogue>
         )

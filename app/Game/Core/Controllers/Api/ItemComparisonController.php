@@ -46,7 +46,7 @@ class ItemComparisonController extends Controller {
         $itemToEquip = InventorySlot::where('inventory_id', $inventory->id)->where('id', $request->slot_id)->first();
 
         if (is_null($itemToEquip)) {
-            return response()->json(['message' => 'Item does not exist  ...'], 422);
+            return response()->json(['message' => 'Item does not exist  ...'], 404);
         }
 
         $type = $itemToEquip->item->type;

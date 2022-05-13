@@ -1,6 +1,7 @@
 import React from "react";
 import Select from "react-select";
 import PrimaryButton from "../../../components/ui/buttons/primary-button";
+import {isEqual} from "lodash";
 
 export default class MonsterSelection extends React.Component<any, any> {
 
@@ -12,6 +13,15 @@ export default class MonsterSelection extends React.Component<any, any> {
             attack_disabled: true,
         }
 
+    }
+
+    componentDidUpdate(prevProps: any, prevState: any) {
+        if (!isEqual(this.props.monsters, prevProps.monsters) && this.state.selected_monster !== null) {
+            this.setState({
+                selected_monster: null,
+                attack_disabled: true,
+            });
+        }
     }
 
     setMonsterToFight(data: any) {

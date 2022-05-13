@@ -198,53 +198,6 @@
                         </dd>
                     </dl>
                 @endif
-                @if (!is_null($adventure))
-                    <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                    <p class="mb-4">All you have to do is complete the adventure to attain the item.</p>
-                    <dl>
-                        <dt>Adventure Name: </dt>
-                        <dd>
-                            @auth
-                                @if (auth()->user()->hasRole('Admin'))
-                                    <a href="{{route('adventures.adventure', [
-                                                        'adventure' => $adventure->id
-                                                    ])}}" target="_blank"><i class="fas fa-external-link-alt"></i> {{$adventure->name}}</a>
-                                @else
-                                    <a href="{{route('info.page.adventure', [
-                                                        'adventure' => $adventure->id
-                                                    ])}}" target="_blank"><i class="fas fa-external-link-alt"></i> {{$adventure->name}}</a>
-                                @endif
-                            @else
-                                <a href="{{route('info.page.adventure', [
-                                                        'adventure' => $adventure->id
-                                                    ])}}" target="_blank"><i class="fas fa-external-link-alt"></i> {{$adventure->name}}</a>
-                            @endauth
-                        </dd>
-                        <dt>Location of adventure: </dt>
-                        <dd>
-                            @auth
-                                @if (auth()->user()->hasRole('Admin'))
-                                    <a href="{{route('locations.location', [
-                                                        'location' => $adventure->location->id
-                                                    ])}}" target="_blank"><i class="fas fa-external-link-alt"></i> {{$adventure->location->name}}</a>
-                                @else
-                                    <a href="{{route('info.page.location', [
-                                                        'location' => $adventure->location->id
-                                                    ])}}" target="_blank"><i class="fas fa-external-link-alt"></i> {{$adventure->location->name}}</a>
-                                @endif
-                            @else
-                                <a href="{{route('info.page.location', [
-                                                        'location' => $adventure->location->id
-                                                    ])}}" target="_blank"><i class="fas fa-external-link-alt"></i> {{$adventure->location->name}}</a>
-                            @endauth
-
-                        </dd>
-                        <dt>X/Y: </dt>
-                        <dd>
-                            {{$adventure->location->x}} / {{$adventure->location->y}}
-                        </dd>
-                    </dl>
-                @endif
                 @if (!is_null($quest))
                     <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                     <p class="mb-4">Players must complete the quest to obtain the item.</p>

@@ -132,7 +132,7 @@ class BaseCharacterInfo {
             $strBonus * $character->str * 0.02;
         }
 
-        return $ac + $strBonus;
+        return ($ac / 6) + $strBonus;
     }
 
     /**

@@ -21,6 +21,8 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
 
     private mapTimeOut: any;
 
+    private monsterUpdate: any;
+
     private actionsManager: ActionsManager;
 
     constructor(props: ActionsProps) {
@@ -50,6 +52,9 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
         // @ts-ignore
         this.mapTimeOut     = Echo.private('show-timeout-move-' + this.props.character.user_id);
 
+        // @ts-ignore
+        this.monsterUpdate = Echo.private('update-monsters-list-' + this.props.character.user_id);
+
         this.actionsManager = new ActionsManager(this);
     }
 
@@ -71,11 +76,20 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
             });
         });
 
+        // @ts-ignore
         this.mapTimeOut.listen('Game.Maps.Events.ShowTimeOutEvent', (event: any) => {
             this.setState({
                 movement_time_out: event.forLength,
                 can_player_move: event.canMove,
             });
+        });
+
+        // @ts-ignore
+        this.monsterUpdate.listen('App.Game.Maps.Events.UpdateMonsterList', (event: any) => {
+            this.setState({
+                monsters: event.monster,
+                monster_to_fight: null,
+            })
         });
 
         if (!this.props.character.can_move) {

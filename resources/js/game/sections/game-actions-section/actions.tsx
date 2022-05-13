@@ -19,6 +19,8 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
 
     private actionsManager: ActionsManager;
 
+    private monsterUpdate: any;
+
     constructor(props: ActionsProps) {
         super(props);
 
@@ -40,6 +42,9 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
         // @ts-ignore
         this.craftingTimeOut = Echo.private('show-crafting-timeout-bar-' + this.props.character.user_id);
 
+        // @ts-ignore
+        this.monsterUpdate = Echo.private('update-monsters-list-' + this.props.character.user_id);
+
         this.actionsManager = new ActionsManager(this);
     }
 
@@ -60,6 +65,14 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
                 crafting_time_out: event.timeout,
             });
         });
+
+        // @ts-ignore
+        this.monsterUpdate.listen('Game.Maps.Events.UpdateMonsterList', (event: any) => {
+           this.setState({
+               monsters: event.monsters,
+               monster_to_fight: null,
+           })
+        });
     }
 
     componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<ActionsState>, snapshot?: any) {
@@ -72,9 +85,6 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
 
     removeCraftingType() {
         this.actionsManager.removeCraftingSection();
-    }
-
-    attackKingdom() {
     }
 
     setSelectedMonster(monster: any) {
@@ -114,7 +124,6 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
     }
 
     render() {
-
         return (
             <div className='lg:px-4'>
                 {

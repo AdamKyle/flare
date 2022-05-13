@@ -1,7 +1,4 @@
-import LocationAdventureDetails from "./location-adventure-details";
-
 export default interface LocationDetails {
-
     id: number;
 
     name: string;
@@ -27,5 +24,4 @@ export default interface LocationDetails {
     required_quest_item_id: number | null;
 
     type: string | null;
-
 }
