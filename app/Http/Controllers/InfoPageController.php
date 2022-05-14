@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameMap;
+use App\Flare\Models\InfoPage;
 use App\Flare\Models\Npc;
 use App\Flare\Models\PassiveSkill;
 use App\Flare\Models\Quest;
@@ -35,80 +36,16 @@ class InfoPageController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function viewPage(Request $request, string $pageName)
-    {
-        $files = Storage::disk('info')->files($pageName);
+    public function viewPage(Request $request, string $pageName) {
+        $page = InfoPage::where('page_name', $pageName)->first();
 
-        if (empty($files)) {
+        if (is_null($page)) {
             abort(404);
-        }
-
-        if (is_null(config('info.' . $pageName))) {
-            abort(404);
-        }
-
-        $sections = [];
-
-        $files = $this->cleanFiles($files);
-
-        for ($i = 0; $i < count($files); $i++) {
-            if (explode('.', $files[$i])[1] === 'md') {
-                $view          = null;
-                $livewire      = false;
-                $only          = null;
-                $index         = $i === 0 ? 0 : $i;
-                $before        = null;
-                $showSkillInfo = false;
-                $showDropDown  = false;
-                $type          = null;
-                $craftOnly     = false;
-
-
-                $viewAttributes = isset(config('info.' . $pageName)[$index]['view_attributes']) ? config('info.' . $pageName)[$index]['view_attributes'] : null;
-
-                if (isset(config('info.' . $pageName)[$index])) {
-                    $view                = config('info.' . $pageName)[$index]['view'];
-                    $viewAttributes      = $viewAttributes;
-                    $livewire            = config('info.' . $pageName)[$index]['livewire'];
-                    $only                = config('info.' . $pageName)[$index]['only'];
-                    $type                = config('info.' . $pageName)[$index]['type'];
-                    $craftOnly           = config('info.' . $pageName)[$index]['craft_only'];
-
-                    if (isset(config('info.' . $pageName)[$index]['insert_before_table'])) {
-                        $before = config('info.' . $pageName)[$index]['insert_before_table'];
-                    }
-
-                    if (isset(config('info.' . $pageName)[$index]['showSkillInfo'])) {
-                        $showSkillInfo = config('info.' . $pageName)[$index]['showSkillInfo'];
-                    }
-
-                    if (isset(config('info.' . $pageName)[$index]['showDropDown'])) {
-                        $showDropDown = config('info.' . $pageName)[$index]['showDropDown'];
-                    }
-
-                    if (isset(config('info.' . $pageName)[$index]['type'])) {
-                        $type = config('info.' . $pageName)[$index]['type'];
-                    }
-                }
-
-                $sections[] = [
-                    'content'         => Storage::disk('info')->get($files[$i]),
-                    'view'            => $view,
-                    'view_attributes' => $viewAttributes,
-                    'livewire'        => $livewire,
-                    'only'            => $only,
-                    'type'            => $type,
-                    'craftOnly'       => $craftOnly,
-                    'before'          => $before,
-                    'showSkillInfo'   => $showSkillInfo,
-                    'showDropDown'    => $showDropDown,
-                ];
-            }
         }
 
         return view('information.core', [
-            'pageTitle' => $pageName,
-            'sections'  => $sections,
+            'pageTitle' => ucfirst(str_replace('-', ' ', $page->page_name)),
+            'sections'  => $page->page_sections,
         ]);
     }
 

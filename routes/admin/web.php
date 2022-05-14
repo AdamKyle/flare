@@ -148,4 +148,10 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::get('/admin/quests/{quest}', ['as' => 'quests.show', 'uses' => 'QuestsController@show']);
 
     Route::get('/admin/statistics/dashboard', ['as' => 'admin.statistics', 'uses' => 'StatisticsController@index']);
+
+    Route::get('/admin/information-management', ['as' => 'admin.info-management', 'uses' => 'InformationController@index']);
+    Route::get('/admin/information-management/create-page', ['as' => 'admin.info-management.create-page', 'uses' => 'InformationController@managePage']);
+    Route::get('/admin/information-management/page/{infoPage}', ['as' => 'admin.info-management.page', 'uses' => 'InformationController@page']);
+    Route::get('/admin/information-management/update-page/{infoPage}', ['as' => 'admin.info-management.up-page', 'uses' => 'InformationController@managePage']);
+
 });

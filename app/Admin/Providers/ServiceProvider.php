@@ -3,6 +3,7 @@
 namespace App\Admin\Providers;
 
 use App\Admin\Requests\QuestManagement;
+use App\Admin\Services\InfoPageService;
 use App\Admin\Services\ItemsService;
 use App\Admin\Services\QuestService;
 use App\Charts\AllCharacterGoldChart;
@@ -47,6 +48,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(QuestService::class, function() {
             return new QuestService();
+        });
+
+        $this->app->bind(InfoPageService::class, function() {
+            return new InfoPageService();
         });
 
         $this->commands([CreateAdminAccount::class, GiveKingdomsToNpcs::class]);

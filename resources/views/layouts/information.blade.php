@@ -26,6 +26,8 @@
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" />
+
     <link href="{{ mix('css/app.css') }}" rel="stylesheet">
     <link href="{{ mix('css/tailwind.css') }}" rel="stylesheet">
 
@@ -34,6 +36,7 @@
     <script src={{mix('js/manifest.js')}} type="text/javascript"></script>
     <script src={{mix('js/vendor.js')}} type="text/javascript"></script>
 
+    <script src="https://cdn.jsdelivr.net/gh/mcstudios/glightbox/dist/js/glightbox.min.js"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     @stack('head')
@@ -68,82 +71,6 @@
                 <a href="{{route('login')}}" class="ml-6 mr-2 text-lg">Login</a> | <a href="{{route('register')}}" class="ml-2 mr-2 text-lg">Register</a>
             </div>
         @endguest
-
-
-{{--        <!-- Notifications -->--}}
-{{--        <div class="dropdown self-stretch mr-3 ml-3">--}}
-{{--            <button type="button"--}}
-{{--                    class="relative flex items-center h-full btn-link ltr:ml-1 rtl:mr-1 px-2 text-2xl leading-none la la-bell"--}}
-{{--                    data-toggle="custom-dropdown-menu" data-tippy-arrow="true" data-tippy-placement="bottom-end">--}}
-{{--                        <span--}}
-{{--                          class="absolute top-0 right-0 rounded-full border border-primary -mt-1 -mr-1 px-2 leading-tight text-xs font-body text-primary">3</span>--}}
-{{--            </button>--}}
-{{--            <div class="custom-dropdown-menu">--}}
-{{--                <div class="flex items-center px-5 py-2">--}}
-{{--                    <h5 class="mb-0 uppercase">Notifications</h5>--}}
-{{--                    <button class="btn btn_outlined btn_warning uppercase ltr:ml-auto rtl:mr-auto">Clear All</button>--}}
-{{--                </div>--}}
-{{--                <hr>--}}
-{{--                <div class="p-5 hover:bg-primary-100 dark:hover:bg-primary-900">--}}
-{{--                    <a href="#">--}}
-{{--                        <h6 class="uppercase">Heading One</h6>--}}
-{{--                    </a>--}}
-{{--                    <p>Lorem ipsum dolor, sit amet consectetur.</p>--}}
-{{--                    <small>Today</small>--}}
-{{--                </div>--}}
-{{--                <hr>--}}
-{{--                <div class="p-5 hover:bg-primary-100 dark:hover:bg-primary-900">--}}
-{{--                    <a href="#">--}}
-{{--                        <h6 class="uppercase">Heading Two</h6>--}}
-{{--                    </a>--}}
-{{--                    <p>Mollitia sequi dolor architecto aut deserunt.</p>--}}
-{{--                    <small>Yesterday</small>--}}
-{{--                </div>--}}
-{{--                <hr>--}}
-{{--                <div class="p-5 hover:bg-primary-100 dark:hover:bg-primary-900">--}}
-{{--                    <a href="#">--}}
-{{--                        <h6 class="uppercase">Heading Three</h6>--}}
-{{--                    </a>--}}
-{{--                    <p>Nobis reprehenderit sed quos deserunt</p>--}}
-{{--                    <small>Last Week</small>--}}
-{{--                </div>--}}
-{{--            </div>--}}
-{{--        </div>--}}
-
-{{--        <!-- User Menu -->--}}
-{{--        <div class="dropdown">--}}
-{{--            <button class="flex items-center ltr:ml-4 rtl:mr-4 text-gray-700" data-toggle="custom-dropdown-menu"--}}
-{{--                    data-tippy-arrow="true" data-tippy-placement="bottom-end">--}}
-{{--                <span class="avatar">JD</span>--}}
-{{--            </button>--}}
-{{--            <div class="custom-dropdown-menu w-64">--}}
-{{--                <div class="p-5">--}}
-{{--                    <h5 class="uppercase">John Doe</h5>--}}
-{{--                    <p>Editor</p>--}}
-{{--                </div>--}}
-{{--                <hr>--}}
-{{--                <div class="p-5">--}}
-{{--                    <a href="#"--}}
-{{--                       class="flex items-center text-gray-700 dark:text-gray-500 hover:text-primary dark:hover:text-primary">--}}
-{{--                        <span class="la la-user-circle text-2xl leading-none ltr:mr-2 rtl:ml-2"></span>--}}
-{{--                        View Profile--}}
-{{--                    </a>--}}
-{{--                    <a href="#"--}}
-{{--                       class="flex items-center text-gray-700 dark:text-gray-500 hover:text-primary dark:hover:text-primary mt-5">--}}
-{{--                        <span class="la la-key text-2xl leading-none ltr:mr-2 rtl:ml-2"></span>--}}
-{{--                        Change Password--}}
-{{--                    </a>--}}
-{{--                </div>--}}
-{{--                <hr>--}}
-{{--                <div class="p-5">--}}
-{{--                    <a href="#"--}}
-{{--                       class="flex items-center text-gray-700 dark:text-gray-500 hover:text-primary dark:hover:text-primary">--}}
-{{--                        <span class="la la-power-off text-2xl leading-none ltr:mr-2 rtl:ml-2"></span>--}}
-{{--                        Logout--}}
-{{--                    </a>--}}
-{{--                </div>--}}
-{{--            </div>--}}
-{{--        </div>--}}
     </div>
 </header>
 
@@ -177,6 +104,10 @@
 <script src={{mix('js/theme-vendor.js')}} type="text/javascript"></script>
 <script src={{mix('js/theme-script.js')}} type="text/javascript"></script>
 <script src="{{ mix('js/app.js') }}"></script>
+
+<script>
+    const lightbox = GLightbox();
+</script>
 
 @stack('scripts')
 </body>

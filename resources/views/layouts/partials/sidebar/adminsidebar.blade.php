@@ -32,6 +32,10 @@
                 <span class="fas fa-clipboard-list"></span>
                 Chat Logs
             </a>
+            <a href="{{route('admin.info-management')}}">
+                <span class="fas fa-feather"></span>
+                Information Management
+            </a>
         </div>
     </div>
 

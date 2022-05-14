@@ -19,3 +19,8 @@ require('./game/game-launcher');
  */
 require('./game/admin/admin-chat');
 
+/**
+ * When the administrator is managing the information help docs.
+ */
+require('./game/admin/info-management/info-management-init');
+

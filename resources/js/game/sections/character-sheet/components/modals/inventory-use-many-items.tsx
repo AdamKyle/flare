@@ -1,11 +1,6 @@
 import React from "react";
 import Dialogue from "../../../../components/ui/dialogue/dialogue";
-import UsableItemSection from "./components/usable-item-section";
-import LoadingProgressBar from "../../../../components/ui/progress-bars/loading-progress-bar";
-import {AxiosError, AxiosResponse} from "axios";
-import Ajax from "../../../../lib/ajax/ajax";
 import Select from "react-select";
-import {formatNumber} from "../../../../lib/game/format-number";
 import UsableItemsDetails from "../../../../lib/game/character-sheet/types/inventory/usable-items-details";
 import ManualProgressBar from "../../../../components/ui/progress-bars/manual-progress-bar";
 import UseManyItems from "../../../../lib/game/character-sheet/ajax/use-many-items";

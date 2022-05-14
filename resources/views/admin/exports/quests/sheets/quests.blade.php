@@ -21,6 +21,8 @@
         <th>secondary_required_item</th>
         <th>faction_game_map_id</th>
         <th>required_faction_level</th>
+        <th>before_completion_description</th>
+        <th>after_completion_description</th>
     </tr>
     </thead>
     <tbody>
@@ -46,6 +48,8 @@
             <td>{{!is_null($quest->secondary_required_item) ? $quest->secondary_required_item : ''}}</td>
             <td>{{!is_null($quest->faction_game_map_id) ? $quest->faction_game_map_id : ''}}</td>
             <td>{{!is_null($quest->required_faction_level) ? $quest->required_faction_level : ''}}</td>
+            <td>{{nl2br($quest->before_completion_description)}}</td>
+            <td>{{nl2br($quest->after_completion_description)}}</td>
         </tr>
     @endforeach
     </tbody>

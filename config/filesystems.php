@@ -62,6 +62,13 @@ return [
             'visibility' => 'public',
         ],
 
+        'info-sections-images' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/info-sections-images'),
+            'url' => env('APP_URL').'/storage/info-sections-images',
+            'visibility' => 'public',
+        ],
+
         'info' => [
             'driver' => 'local',
             'root' => storage_path('app/public/info'),
