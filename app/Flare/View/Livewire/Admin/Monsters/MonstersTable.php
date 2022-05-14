@@ -17,30 +17,17 @@ class MonstersTable extends DataTableComponent {
     }
 
     public function builder(): Builder {
-
-        return Monster::query()->when(
-            $this->getAppliedFilterWithValue('maps'), function ($query, $map) {
-                $celestialType = false;
-
-                if (str_contains($map, 'Celestials')) {
-                    $celestialType = true;
-
-                    $gameMapId     = GameMap::where('name', trim(str_replace('Celestials', '', $map)))->first()->id;
-                } else {
-                    $gameMapId     = GameMap::where('name', $map)->first()->id;
-                }
-
-                return $query->where('game_map_id', $gameMapId)->where('is_celestial_entity', $celestialType);
-            });
+        return Monster::query();
     }
 
     public function filters(): array {
         return [
             SelectFilter::make('Maps')
                 ->options([
-                    'Surface'                 =>  'Surface',
+                    ''                        => 'Please Select',
+                    'Surface'                 => 'Surface',
                     'Labyrinth'               => 'Labyrinth',
-                    'Dungeons'                =>  'Dungeons',
+                    'Dungeons'                => 'Dungeons',
                     'Shadow Plane'            => 'Shadow Plane',
                     'Purgatory'               => 'Purgatory',
                     'Surface Celestials'      => 'Surface Celestials',
@@ -48,13 +35,25 @@ class MonstersTable extends DataTableComponent {
                     'Dungeons Celestials'     => 'Dungeons Celestials',
                     'Shadow Plane Celestials' => 'Shadow Planes Celestials',
                     'Purgatory Celestials'    => 'Purgatory Celestials',
-                ]),
+                ])->filter(function(Builder $builder, string $value) {
+                    $celestialType = false;
+
+                    if (str_contains($value, 'Celestials')) {
+                        $celestialType = true;
+
+                        $gameMapId     = GameMap::where('name', trim(str_replace('Celestials', '', $value)))->first()->id;
+                    } else {
+                        $gameMapId     = GameMap::where('name', $value)->first()->id;
+                    }
+
+                    return $builder->where('game_map_id', $gameMapId)->where('is_celestial_entity', $celestialType);
+                }),
         ];
     }
 
     public function columns(): array {
         return [
-            Column::make('Name')->format(function ($value, $row) {
+            Column::make('Name')->searchable()->format(function ($value, $row) {
                 $monsterId = Monster::where('name', $value)->first()->id;
 
                 if (auth()->user()->hasRole('Admin')) {

@@ -29,21 +29,22 @@ class ItemsTable extends DataTableComponent {
         }
 
         return Item::whereNull('item_prefix_id')
-                    ->whereNull('item_suffix_id')
-                    ->when($this->getAppliedFilterWithValue('types'), function ($query, $type) {
-                        return $query->where('type', $type);
-                    });
+                    ->whereNull('item_suffix_id');
     }
 
     public function filters(): array {
         return [
             SelectFilter::make('Types')
-                ->options($this->buildOptions()),
+                ->options($this->buildOptions())
+                ->filter(function(Builder $builder, string $value) {
+                    return $builder->where('type', $value);
+                }),
         ];
     }
 
     protected function buildOptions(): array {
         $options = [
+            ''              => 'Please Select',
             'weapon'        => 'Weapons',
             'bow'           => 'Bows',
             'stave'         => 'Staves',

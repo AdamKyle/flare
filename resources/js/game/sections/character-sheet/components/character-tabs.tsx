@@ -7,6 +7,7 @@ import InfoTab from "./tabs/info-tab";
 import CharacterTabsProps from "../../../lib/game/character-sheet/types/character-tabs-props";
 import CharacterActiveBoons from "./character-active-boons";
 import InfoAlert from "../../../components/ui/alerts/simple-alerts/info-alert";
+import CharacterFactions from "./character-factions";
 
 export default class CharacterTabs extends React.Component<CharacterTabsProps, any> {
 
@@ -38,7 +39,7 @@ export default class CharacterTabs extends React.Component<CharacterTabsProps, a
                         <CharacterActiveBoons character_id={this.props.character?.id} />
                     </TabPanel>
                     <TabPanel key={'factions'}>
-                        Factions
+                        <CharacterFactions character_id={this.props.character?.id} />
                     </TabPanel>
                 </Tabs>
             </Fragment>

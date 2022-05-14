@@ -2,6 +2,7 @@
 
 namespace App\Flare\View\Livewire\Admin\Affixes;
 
+use App\Flare\Models\GameMap;
 use App\Flare\Models\ItemAffix;
 use Illuminate\Database\Eloquent\Builder;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
@@ -15,36 +16,36 @@ class AffixesTable extends DataTableComponent {
     }
 
     public function builder(): Builder {
-        return ItemAffix::where('randomly_generated', false)->when($this->getAppliedFilterWithValue('types'), function ($query, $type) {
-           $invalidField = '0';
-           $damageField  = 'damage';
-           $booleanFields = ['irresistible_damage', 'damage_can_stack'];
-
-           if ($invalidField === $type) {
-               return $query;
-           }
-
-           if ($damageField === $type) {
-               return $query->where($type, '>', 0);
-           }
-
-           if (in_array($type, $booleanFields)) {
-               return $query->where($type, true);
-           }
-
-           if (preg_match('/_/', $type)) {
-               return $query->where($type, '>', 0);
-           }
-
-           return $query->where('skill_name', $type);
-
-        });
+        return ItemAffix::where('randomly_generated', false);
     }
 
     public function filters(): array {
         return [
             SelectFilter::make('Types')
-                ->options($this->buildOptions()),
+                ->options($this->buildOptions())
+                ->filter(function(Builder $builder, string $value) {
+                    $invalidField = '0';
+                    $damageField  = 'damage';
+                    $booleanFields = ['irresistible_damage', 'damage_can_stack'];
+
+                    if ($invalidField === $value) {
+                        return $builder;
+                    }
+
+                    if ($damageField === $value) {
+                        return $builder->where($value, '>', 0);
+                    }
+
+                    if (in_array($value, $booleanFields)) {
+                        return $builder->where($value, true);
+                    }
+
+                    if (preg_match('/_/', $value)) {
+                        return $builder->where($value, '>', 0);
+                    }
+
+                    return $builder->where('skill_name', $value);
+                }),
         ];
     }
 

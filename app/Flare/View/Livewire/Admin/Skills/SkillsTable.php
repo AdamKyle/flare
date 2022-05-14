@@ -17,16 +17,7 @@ class SkillsTable extends DataTableComponent {
     public function builder(): Builder {
         return GameSkill::query()->when($this->getAppliedFilterWithValue('types'), function ($query, $type) {
 
-            switch($type) {
-                case 'class_specific':
-                    return $query->whereNotNull('game_class_id');
-                case 'can_train':
-                    return $query->where('can_train', true);
-                case 'cannot_train':
-                    return $query->where('can_train', false);
-                default:
-                    return $query;
-            }
+
         });
     }
 
@@ -38,7 +29,18 @@ class SkillsTable extends DataTableComponent {
                     'class_specific' => 'Class Specific',
                     'can_train'      => 'Can Train',
                     'cannot_train'   => 'Cannot Train',
-                ]),
+                ])->filter(function(Builder $builder, string $value) {
+                    switch($value) {
+                        case 'class_specific':
+                            return $builder->whereNotNull('game_class_id');
+                        case 'can_train':
+                            return $builder->where('can_train', true);
+                        case 'cannot_train':
+                            return $builder->where('can_train', false);
+                        default:
+                            return $builder;
+                    }
+                }),
         ];
     }
 
