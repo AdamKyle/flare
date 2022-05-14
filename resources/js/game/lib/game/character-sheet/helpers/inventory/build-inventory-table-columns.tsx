@@ -5,7 +5,7 @@ import ActionsInterface from "./actions-interface";
 import InventoryDetails from "../../types/inventory/inventory-details";
 import UsableItemsDetails from "../../types/inventory/usable-items-details";
 
-export const BuildInventoryTableColumns = (component?: ActionsInterface, clickAction?: (item?: InventoryDetails | UsableItemsDetails) => any) => {
+export const BuildInventoryTableColumns = (component?: ActionsInterface, clickAction?: (item?: InventoryDetails | UsableItemsDetails) => any, componentName?: string) => {
     const columns = [
         {
             name: 'Name',
@@ -36,6 +36,16 @@ export const BuildInventoryTableColumns = (component?: ActionsInterface, clickAc
             format: (row: any) => row.has_holy_stacks_applied + '/' + row.holy_stacks
         },
     ];
+
+    if (typeof componentName !== 'undefined') {
+        if (componentName === 'equipped') {
+            columns.push({
+                name: 'Position',
+                selector: (row: any) => '',
+                cell: (row: any) => row.position,
+            });
+        }
+    }
 
     if (typeof component !== 'undefined') {
         columns.push({

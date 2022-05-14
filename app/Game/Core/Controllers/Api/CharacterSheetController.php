@@ -6,6 +6,7 @@ use App\Admin\Events\UpdateAdminChatEvent;
 
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Transformers\CharacterTopBarTransformer;
+use App\Flare\Transformers\ItemTransformer;
 use App\Flare\Transformers\SkillsTransformer;
 use App\Flare\Transformers\UsableItemTransformer;
 use App\Game\Core\Events\UpdateTopBarEvent;
@@ -92,9 +93,23 @@ class CharacterSheetController extends Controller {
         ]);
     }
 
-    public function activeBoons(Character $character) {
+    public function activeBoons(Character $character, UsableItemTransformer $usableItemTransformer,  Manager $manager) {
+        $characterBoons = $character->boons->load('itemUsed');
+
+        $characterBoons = $characterBoons->transform(function($boon) use($usableItemTransformer, $manager) {
+            $item = new Item($boon->itemUsed, $usableItemTransformer);
+            $item = (new Manager())->createData($item)->toArray();
+
+            $item         = $item['data'];
+            $item['name'] = $boon->itemUsed->name;
+
+            $boon->boon_applied = $item;
+
+            return $boon;
+        });
+
         return response()->json([
-            'active_boons' => $character->boons->load('itemUsed'),
+            'active_boons' => $characterBoons
         ]);
     }
 

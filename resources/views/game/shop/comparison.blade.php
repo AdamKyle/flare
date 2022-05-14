@@ -5,14 +5,16 @@
 
         @php
             $positions = [
-                'weapon'   => ['left-hand','right-hand'],
-                'ring'     => ['ring-one','ring-two'],
-                'spell'    => ['spell-one','spell-two'],
-                'artifact' => ['artifact-one','artifact-two'],
+                'weapon'          => ['left-hand','right-hand'],
+                'stave'           => ['left-hand','right-hand'],
+                'hammer'          => ['left-hand','right-hand'],
+                'bow'             => ['left-hand','right-hand'],
+                'ring'            => ['ring-one','ring-two'],
+                'spell-healing'   => ['spell-one','spell-two'],
+                'spell-damage'    => ['spell-one','spell-two'],
+                'shield'          => ['left-hand', 'right-hand']
             ];
         @endphp
-
-        @include('game.shop.components.to-equip', ['item' => $itemToEquip, 'isShop' => true])
 
         <x-core.cards.card-with-title title="Comparison Data">
             @include('game.shop.components.comparison-details', ['details' => $details])
@@ -33,7 +35,7 @@
                         Attack and Cast and Cast and Attack.
                     </x-core.alerts.info-alert>
                 @endif
-                @if (in_array($itemToEquip['type'], ['weapon', 'stave', 'bow', 'shield', 'hammer']))
+                @if (in_array($itemToEquip['type'], ['weapon', 'stave', 'bow', 'shield', 'hammer', 'ring', 'spell-healing', 'spell-damage', 'shield']))
                     <div class="w-full mt-4">
                         <div class="flex justify-center">
                             <form method="post" action="{{route('game.shop.buy-and-replace', ['character' => auth()->user()->character->id])}}" class="mr-5">

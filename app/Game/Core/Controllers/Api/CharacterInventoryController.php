@@ -65,17 +65,7 @@ class CharacterInventoryController extends Controller {
 
     public function itemDetails(Character $character, Item $item, Manager $manager, ItemTransformer $itemTransformer) {
 
-        $slot = Inventory::where('character_id', $character->id)->first()->slots()->where('item_id', $item->id)->first();
-
-        if (is_null($slot)) {
-            $slot = SetSlot::where('item_id', $item->id)->first();
-
-            $characterInventorySet = InventorySet::find($slot->inventory_set_id)->where('character_id', $character->id)->first();
-
-            if (is_null($characterInventorySet)) {
-                $slot = null;
-            }
-        }
+        $slot = $this->characterInventoryService->getSlotForItemDetails($character, $item);
 
         if (is_null($slot)) {
             return response()->json([
@@ -84,7 +74,7 @@ class CharacterInventoryController extends Controller {
         }
 
         $item = new FractalItem($slot->item, $itemTransformer);
-        $item = (new Manager())->createData($item)->toArray();
+        $item = $manager->createData($item)->toArray();
 
         return response()->json($item);
     }
@@ -141,19 +131,8 @@ class CharacterInventoryController extends Controller {
         })->values();
 
         if ($slots->isNotEmpty()) {
-            $jobs = [];
 
-            foreach ($slots as $index => $slot) {
-                if ($index !== 0) {
-                    if ($index === ($slots->count() - 1)) {
-                        $jobs[] = new DisenchantItem($character, $slot->id, true);
-                    } else {
-                        $jobs[] = new DisenchantItem($character, $slot->id);
-                    }
-                }
-            }
-
-            DisenchantItem::withChain($jobs)->onConnection('disenchanting')->dispatch($character, $slots->first()->id);
+            $this->characterInventoryService->disenchantAllItems($slots, $character);
 
             return response()->json(['message' => 'You can freely move about.
                 Your inventory will update as items disenchant. Check chat to see
@@ -264,10 +243,6 @@ class CharacterInventoryController extends Controller {
         event(new UpdateTopBarEvent($character));
 
         $this->updateCharacterAttackDataCache($character);
-
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'sets'));
-
-        event(new CharacterInventoryDetailsUpdate($character->user));
 
         return response()->json(['message' => $setName . ' is now equipped (equipment has been moved to the set)']);
     }

@@ -16,7 +16,7 @@ export const removeCommas = (number: string): number => {
  * @return string
  * @type [{number: number | null | undefined}]
  */
-export const formatNumber = (number: number | null | undefined): string => {
+export const formatNumber = (number: number | string | null | undefined): string => {
 
     if (number === null) {
         return '0';
@@ -26,7 +26,11 @@ export const formatNumber = (number: number | null | undefined): string => {
         return '0';
     }
 
-    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    if (typeof number === 'string') {
+        return parseInt(number).toFixed(0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    return number.toFixed(0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
 /**

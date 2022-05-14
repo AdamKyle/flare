@@ -12,4 +12,8 @@
     <div class="mt-auto">
         @include('game.shop.components.single-comparison', ['details' => $details[0]])
     </div>
+@else
+    <div class="mt-auto text-center">
+        Nothing to compare. Anything is better than nothing.
+    </div>
 @endif

@@ -21,16 +21,18 @@ class ItemsTable extends DataTableComponent {
         if (auth()->user()->hasRole('Admin')) {
             $item = Item::query();
         } else {
-            $item = Item::whereNotIn('type', ['quest', 'alchemy']);
+            $item = Item::whereNotIn('type', ['quest', 'alchemy', 'trinket']);
         }
 
         if ($this->isShop) {
-            $item = $item->whereNotIn('type', ['trinket', 'quest', 'alchemy'])->where('cost', '<=', 2000000000);
+            $item = $item->where('cost', '<=', 2000000000);
         }
 
-        return $item->whereNull('item_prefix_id')
+        return Item::whereNull('item_prefix_id')
                     ->whereNull('item_suffix_id')
-                    ->when($this->getAppliedFilterWithValue('types'), fn ($query, $type) => $query->where('type', $type));
+                    ->when($this->getAppliedFilterWithValue('types'), function ($query, $type) {
+                        return $query->where('type', $type);
+                    });
     }
 
     public function filters(): array {

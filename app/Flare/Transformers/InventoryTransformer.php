@@ -36,6 +36,7 @@ class InventoryTransformer extends TransformerAbstract {
             'attack'                  => $slot->item->getTotalDamage(),
             'usable'                  => $slot->item->usable,
             'holy_stacks'             => $slot->item->holy_stacks,
+            'position'                => ucfirst(str_replace('-', ' ', $slot->position)),
         ];
     }
 }

@@ -203,7 +203,7 @@ export default class EquippedTable extends React.Component<EquippedInventoryTabP
                         : null
                 }
 
-                <Table data={this.state.data} columns={BuildInventoryTableColumns(this, this.viewItem.bind(this))} dark_table={this.props.dark_tables}/>
+                <Table data={this.state.data} columns={BuildInventoryTableColumns(this, this.viewItem.bind(this), 'equipped')} dark_table={this.props.dark_tables}/>
             </Fragment>
         );
     }

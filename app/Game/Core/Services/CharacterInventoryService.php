@@ -3,6 +3,7 @@
 namespace App\Game\Core\Services;
 
 use App\Flare\Transformers\UsableItemTransformer;
+use App\Game\Skills\Jobs\DisenchantItem;
 use League\Fractal\Resource\Collection as LeagueCollection;
 use League\Fractal\Resource\Item as LeagueItem;
 use App\Flare\Models\Inventory;
@@ -144,6 +145,52 @@ class CharacterInventoryService {
                 return $this->getInventoryForApi();
 
         }
+    }
+
+    /**
+     * Gets the slot that holds the item, for its details.
+     *
+     * @param Character $character
+     * @param Item $item
+     * @return InventorySlot|SetSlot|null
+     */
+    public function getSlotForItemDetails(Character $character, Item $item): InventorySlot | SetSlot | null {
+        $slot = Inventory::where('character_id', $character->id)->first()->slots()->where('item_id', $item->id)->first();
+
+        if (is_null($slot)) {
+            $slot = SetSlot::where('item_id', $item->id)->first();
+
+            $characterInventorySet = InventorySet::find($slot->inventory_set_id)->where('character_id', $character->id)->first();
+
+            if (is_null($characterInventorySet)) {
+                $slot = null;
+            }
+        }
+
+        return $slot;
+    }
+
+    /**
+     * Disenchant all items in an inventory.
+     *
+     * @param Collection $slots
+     * @param Character $character
+     * @return void
+     */
+    public function disenchantAllItems(Collection $slots, Character $character) {
+        $jobs = [];
+
+        foreach ($slots as $index => $slot) {
+            if ($index !== 0) {
+                if ($index === ($slots->count() - 1)) {
+                    $jobs[] = new DisenchantItem($character, $slot->id, true);
+                } else {
+                    $jobs[] = new DisenchantItem($character, $slot->id);
+                }
+            }
+        }
+
+        DisenchantItem::withChain($jobs)->onConnection('disenchanting')->dispatch($character, $slots->first()->id);
     }
 
     public function getCharacterInventorySets(): array {
