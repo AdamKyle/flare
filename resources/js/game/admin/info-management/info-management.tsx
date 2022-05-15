@@ -51,7 +51,7 @@ export default class InfoManagement extends React.Component<any, any> {
         })
     }
 
-    async formatAndSendData() {
+    formatAndSendData() {
         const sections = this.state.info_sections.map((section: any, index: number, elements: any[]) => {
             const form = new FormData();
 
@@ -67,41 +67,46 @@ export default class InfoManagement extends React.Component<any, any> {
                 form.append('final_section', 'false');
             }
 
-            return form;
+            form.append('order', (index + 1).toString())
+
+            return {
+                index: index + 1,
+                form_contents: form
+            };
         });
 
         this.postForms(sections);
     }
 
-    postForms(sections: FormData[]) {
+    async postForms(sections: any[]) {
 
         this.setState({
             posting: true,
-            posting_index: 1,
         }, () => {
-            sections.forEach((section: FormData, index: number) => {
-                (new Ajax()).setRoute('admin/info-section/store-page')
-                            .setParameters(section)
-                            .doAjaxCall('post', (result: AxiosResponse) => {
+            sections.forEach((section: any, index: number) => {
+                this.post(section, sections.length, index);
+            });
+        });
+    }
 
-                                if (this.state.posting_index === (index + 1)) {
-                                    return this.setState({
-                                        posting: false,
-                                        positing_index: 0,
-                                        success_message: result.data.message,
-                                    });
-                                }
+    post(section: any, length: number, index: number) {
+        (new Ajax()).setRoute('admin/info-section/store-page')
+            .setParameters(section.form_contents)
+            .doAjaxCall('post', (result: AxiosResponse) => {
+                if (length - 1 === index) {
+                    return this.setState({
+                        posting: false,
+                        positing_index: 0,
+                        success_message: result.data.message,
+                    });
+                } else {
+                    this.setState({
+                        posting_index: this.state.posting_index + 1,
+                    });
+                }
+            }, (error: AxiosError) => {
 
-                                if (index !== 0) {
-                                    this.setState({
-                                        posting_index: index + 1,
-                                    });
-                                }
-                            }, (error: AxiosError) => {
-
-                            });
-            })
-        })
+            });
     }
 
     setInforSections(index: number, content: any) {

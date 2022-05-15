@@ -65,12 +65,11 @@ export default class InfoSection extends React.Component<any, any> {
     }
 
     updateParentElement() {
-        console.log(this.state);
         this.props.update_parent_element(this.props.index, {
             live_wire_component: this.state.selected_live_wire_component,
             content: this.state.content,
             content_image: this.state.image_to_upload,
-        })
+        });
     }
 
     render() {

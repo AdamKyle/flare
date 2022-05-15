@@ -18,7 +18,7 @@ class InformationController extends Controller {
     }
 
     public function storePage(Request $request) {
-        $this->infoPageService->storePage($request->all());
+        $this->infoPageService->createPage($request->all());
 
         return response()->json([
             'message' => $request['page_name'] . ' has been saved.',

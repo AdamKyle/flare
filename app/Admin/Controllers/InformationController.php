@@ -26,6 +26,14 @@ class InformationController extends Controller {
     }
 
     public function page(InfoPage $infoPage) {
+        $pageSections = $infoPage->page_sections;
 
+        usort($pageSections, function ($a, $b) {return $a['display_order'] > $b['display_order']; });
+
+        return view('information.core', [
+            'pageTitle' => ucfirst(str_replace('-', ' ', $infoPage->page_name)),
+            'sections'  => $pageSections,
+            'pageId'    => $infoPage->id,
+        ]);
     }
 }

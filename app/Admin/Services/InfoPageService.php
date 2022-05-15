@@ -3,44 +3,39 @@
 namespace App\Admin\Services;
 
 use App\Flare\Models\InfoPage;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class InfoPageService {
 
-    public function storePage(array $params) {
-        $this->store($params);
+    public function createPage(array $params) {
+        $this->create($params);
     }
 
-    protected function store(array $params) {
-        $pageId = $params['page_id'];
+    protected function create(array $params) {
+        $section = $this->createSection($params);
 
-        $page = InfoPage::find($pageId);
-
-        if (!is_null($page)) {
-            $this->addSectionsToCache($params, $params['page_name'], $page);
-        } else {
-            $this->addSectionsToCache($params, $params['page_name'], $page);
-        }
-
-        if (filter_var($params['final_section'], FILTER_VALIDATE_BOOLEAN)) {
-            $this->storeContents($params['page_name'], $page);
-        }
+        $this->storeContents($params['page_name'], $section);
     }
 
-    protected function storeContents(string $pageName, InfoPage $page = null) {
-        if (!is_null($page)) {
-            $this->deleteStoredImages($page->page_sections, $page->page_name);
+    protected function storeContents(string $pageName, array $sections) {
 
-            $page->update(['page_sections' => Cache::get($pageName)]);
+        $page = InfoPage::where('page_name', Str::kebab(strtolower($pageName)))->first();
+
+        if (!is_null($page)) {
+            $pageSections   = $page->page_sections;
+
+            $pageSections[] = $sections;
+
+            $page->update(['page_sections' => $pageSections]);
         } else {
+            $pageSections   = [];
+            $pageSections[] = $sections;
+
             InfoPage::create([
-                'page_name'     => Str::kebab(strtolower($pageName)),
-                'page_sections' => Cache::get($pageName),
+                'page_name' => Str::kebab(strtolower($pageName)),
+                'page_sections' => $pageSections,
             ]);
-
-            Cache::delete($pageName);
         }
     }
 
@@ -52,19 +47,7 @@ class InfoPageService {
         }
     }
 
-    protected function addSectionsToCache(array $params, string $pageName, InfoPage $page = null) {
-        if (!Cache::has($pageName)) {
-            $sections = Cache::get($pageName);
-
-            $sections[] = $this->createSection($params);
-
-            Cache::put($pageName, $sections);
-        } else {
-            Cache::put($pageName, $this->createSection($params, $page));
-        }
-    }
-
-    protected function createSection(array $params, InfoPage $page = null): array {
+    protected function createSection(array $params): array {
         $pageName = $params['page_name'];
         $path     = null;
 
@@ -76,6 +59,7 @@ class InfoPageService {
             'content'             => $params['content'],
             'content_image_path'  => $path,
             'live_wire_component' => $params['live_wire_component'] !== 'null' ? $params['live_wire_component'] : null,
+            'display_order'       => $params['order'],
         ];
 
         return $sections;

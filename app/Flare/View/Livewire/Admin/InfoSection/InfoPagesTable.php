@@ -21,7 +21,7 @@ class InfoPagesTable extends DataTableComponent {
                 $infoPageId = InfoPage::where('page_name', $value)->first()->id;
 
 
-                return '<a href="/admin/information-management/page/'.$infoPageId.'" target="_blank">'.$row->page_name . '</a>';
+                return '<a href="/admin/information-management/page/'.$infoPageId.'">'.$row->page_name . '</a>';
             })->html(),
 
             Column::make('Created At', 'created_at'),

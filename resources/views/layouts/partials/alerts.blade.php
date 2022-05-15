@@ -1,4 +1,4 @@
-<div class="pb-5 w-full md:w-2/4 md:m-auto">
+<div class="pb-5 w-full md:w-2/4">
     @if (session('success'))
         <x-core.alerts.closable-success-alert title="Look at you go!" icon="far fa-grin">
             <p class="mt-3">{{ session('success') }}</p>

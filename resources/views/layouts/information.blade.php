@@ -81,15 +81,13 @@
 
     @guest
         @include('layouts.partials.alerts')
+
         @yield('content')
     @endguest
 
     @auth
-        @if(!auth()->user()->hasRole('Admin'))
-        <div id="refresh"></div>
-        @endif
-
         @include('layouts.partials.alerts')
+
         @yield('content')
     @endauth
 

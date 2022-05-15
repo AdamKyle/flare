@@ -1,3 +1,5 @@
-<div class="max-w-7xl p-10 m-auto">
-    {{$slot}}
+<div class="flex h-screen justify-center">
+    <div class="width-full md:w-3/4">
+        {{$slot}}
+    </div>
 </div>

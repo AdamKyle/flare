@@ -147,23 +147,13 @@
     <main class="workspace dark:bg-gray-900">
 
         @guest
-            <div>
-                @include('layouts.partials.alerts')
-                @yield('content')
-            </div>
+            @include('layouts.partials.alerts')
+            @yield('content')
         @endguest
 
         @auth
-            <div>
-                <div>
-                    @if(!auth()->user()->hasRole('Admin'))
-                        <div id="refresh"></div>
-                    @endif
-
-                    @include('layouts.partials.alerts')
-                    @yield('content')
-                </div>
-            </div>
+            @include('layouts.partials.alerts')
+            @yield('content')
         @endauth
 
     </main>
