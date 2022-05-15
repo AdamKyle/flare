@@ -30,7 +30,7 @@ class InformationController extends Controller {
 
         usort($pageSections, function ($a, $b) {return $a['display_order'] > $b['display_order']; });
 
-        return view('information.core', [
+        return view('admin.information.show', [
             'pageTitle' => ucfirst(str_replace('-', ' ', $infoPage->page_name)),
             'sections'  => $pageSections,
             'pageId'    => $infoPage->id,
