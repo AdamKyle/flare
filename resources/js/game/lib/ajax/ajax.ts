@@ -40,7 +40,7 @@ export default class Ajax implements AjaxInterface {
     }
 
     getRequest(url: string, params?: any): Promise<AxiosResponse<any>> {
-        return axios.get('/api/' + url, params);
+        return axios.get('/api/' + url, {params: params});
     }
 
     postRequest(url: string, params?: any): Promise<AxiosResponse<any>> {

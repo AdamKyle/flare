@@ -77,7 +77,7 @@
 @include('layouts.partials.sidebar.informationsidebar');
 
 <!-- Workspace -->
-<main class="workspace">
+<main class="workspace scrolling-section">
 
     @guest
         @include('layouts.partials.alerts')

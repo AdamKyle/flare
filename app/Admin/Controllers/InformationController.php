@@ -2,8 +2,6 @@
 
 namespace App\Admin\Controllers;
 
-use App\Admin\Services\InfoPageService;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\InfoPage;
 

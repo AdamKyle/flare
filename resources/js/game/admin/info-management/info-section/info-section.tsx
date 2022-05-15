@@ -3,6 +3,7 @@ const ReactQuill = require('react-quill');
 import 'react-quill/dist/quill.snow.css';
 import BasicCard from "../../../components/ui/cards/basic-card";
 import Select from "react-select";
+import PrimaryButton from "../../../components/ui/buttons/primary-button";
 
 export default class InfoSection extends React.Component<any, any> {
 
@@ -14,6 +15,14 @@ export default class InfoSection extends React.Component<any, any> {
             selected_live_wire_component: null,
             image_to_upload: null,
         }
+    }
+
+    componentDidMount() {
+        this.setState({
+            content: this.props.content.content,
+            selected_live_wire_component: this.props.content.live_wire_component,
+            image_to_upload: null,
+        })
     }
 
     setValue(data: any) {
@@ -100,6 +109,14 @@ export default class InfoSection extends React.Component<any, any> {
                     menuPortalTarget={document.body}
                     value={this.defaultSelectedAction()}
                 />
+
+                {
+                   this.props.add_section !== null ?
+                       <div className='text-right'>
+                           <PrimaryButton button_label={'Add Section'} on_click={this.props.add_section} additional_css={'mt-4'}/>
+                       </div>
+                   : null
+                }
             </BasicCard>
         )
     }

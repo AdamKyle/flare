@@ -9,6 +9,11 @@
     }
 }
 
+.scrolling-section {
+    max-height: calc(100vh - 5rem);
+    overflow-y: scroll;
+}
+
 blockquote {
     @apply bg-blue-100 dark:bg-blue-500 border-solid border border-blue-300 dark:border-blue-700 rounded-sm py-1 border-l-8 border-l-blue-500 dark:border-blue-900 dark:text-gray-300 !important;
 

@@ -144,7 +144,17 @@
     @endauth
 
     <!-- Workspace -->
-    <main class="workspace dark:bg-gray-900">
+    @auth
+        @if (auth()->user()->hasRole('Admin'))
+            <main class="workspace scrolling-section mb-10 dark:bg-gray-900">
+        @else
+            <main class="workspace dark:bg-gray-900">
+        @endif
+    @endauth
+
+    @guest
+        <main class="workspace dark:bg-gray-900">
+    @endguest
 
         @guest
             @include('layouts.partials.alerts')
