@@ -83,6 +83,7 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::post('/admin/skills/export-data', ['as' => 'skills.export-data', 'uses' => 'SkillsController@export']);
     Route::post('/admin/skills/import-data', ['as' => 'skills.import-data', 'uses' => 'SkillsController@importData']);
 
+    Route::post('/admin/skills/store', ['as' => 'skills.store', 'uses' => 'SkillsController@store']);
     Route::get('/admin/skills', ['as' => 'skills.list', 'uses' => 'SkillsController@index']);
     Route::get('/admin/skill/{skill}', ['as' => 'skills.skill', 'uses' => 'SkillsController@show']);
     Route::get('/admin/skills/create', ['as' => 'skills.create', 'uses' => 'SkillsController@create']);

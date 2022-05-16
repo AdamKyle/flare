@@ -74,7 +74,7 @@
     </div>
 </header>
 
-@include('layouts.partials.sidebar.informationsidebar');
+@include('layouts.partials.sidebar.informationsidebar')
 
 <!-- Workspace -->
 <main class="workspace scrolling-section">

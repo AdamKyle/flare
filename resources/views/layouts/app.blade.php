@@ -167,9 +167,6 @@
         @endauth
 
     </main>
-
-
-
     <!-- Scripts -->
 
     @livewireScripts

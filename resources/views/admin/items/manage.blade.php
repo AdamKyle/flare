@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="lg:w-3/4 lg:px-4 pt-5 lg:pt-0 m-auto">
+    <x-core.layout.info-container>
         <x-core.cards.card-with-title
             title="{{!is_null($item) ? 'Edit: ' . nl2br($item->name) : 'Create New Item'}}"
             buttons="true"
@@ -142,5 +142,5 @@
                 </x-core.form-wizard.contents>
             </x-core.form-wizard.container>
         </x-core.cards.card-with-title>
-    </div>
+    </x-core.layout.info-container>>
 @endsection

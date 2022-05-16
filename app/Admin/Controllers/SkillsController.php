@@ -3,6 +3,9 @@
 namespace App\Admin\Controllers;
 
 use App\Admin\Services\AssignSkillService;
+use App\Flare\Models\GameClass;
+use App\Game\Skills\Values\SkillTypeValue;
+use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\GameSkill;
@@ -24,16 +27,25 @@ class SkillsController extends Controller {
 
     public function create() {
         return view('admin.skills.manage', [
-            'skill'   => null,
-            'editing' => false,
+            'skill'      => null,
+            'skillTypes' => SkillTypeValue::$namedValues,
+            'gameClasses' => GameClass::pluck('name', 'id')
         ]);
     }
 
     public function edit(GameSkill $skill) {
         return view('admin.skills.manage', [
-            'skill'   => $skill,
-            'editing' => true,
+            'skill'      => $skill,
+            'skillTypes' => SkillTypeValue::$namedValues,
+            'gameClasses' => GameClass::pluck('name', 'id')
         ]);
+    }
+
+
+    public function store(Request $request) {
+        $skill = GameSkill::updateOrCreate(['id' => $request->id], $request->all());
+
+        return response()->redirectToRoute('skills.skill', ['skill' => $skill->id])->with('success', $skill->name. ' was saved successfully.');
     }
 
     public function exportSkills() {
