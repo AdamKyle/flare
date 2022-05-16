@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container flex items-center justify-center mt-20 py-10">
+    <div class="container flex items-center justify-center">
         <div class="w-full md:w-1/2 xl:w-1/3">
             <div class="mx-5 md:mx-10">
                 <h2 class="uppercase">Welcome back!</h2>

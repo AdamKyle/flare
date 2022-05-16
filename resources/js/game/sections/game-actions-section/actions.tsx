@@ -1,15 +1,14 @@
 import React from "react";
+import clsx from "clsx";
 import ComponentLoading from "../../components/ui/loading/component-loading";
 import DropDown from "../../components/ui/drop-down/drop-down";
-import MonsterSelection from "./components/monster-selection";
-import CraftingSection from "./components/crafting-section";
-import FightSection from "./components/fight-section";
 import ActionsState from "../../lib/game/types/actions/actions-state";
 import TimerProgressBar from "../../components/ui/progress-bars/timer-progress-bar";
-import PrimaryButton from "../../components/ui/buttons/primary-button";
-import clsx from "clsx";
 import ActionsProps from "../../lib/game/types/actions/actions-props";
 import ActionsManager from "../../lib/game/actions/actions-manager";
+import SuccessOutlineButton from "../../components/ui/buttons/success-outline-button";
+import MainActionSection from "./components/main-action-section";
+import ExplorationSection from "./components/exploration-section";
 
 export default class Actions extends React.Component<ActionsProps, ActionsState> {
 
@@ -34,6 +33,7 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
             crafting_time_out: 0,
             character_revived: false,
             crafting_type: null,
+            show_exploration: false,
         }
 
         // @ts-ignore
@@ -77,6 +77,12 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
 
     componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<ActionsState>, snapshot?: any) {
         this.actionsManager.actionComponentUpdated(this.state, this.props)
+    }
+
+    manageExploration() {
+        this.setState({
+            show_exploration: !this.state.show_exploration,
+        })
     }
 
     openCrafting(type: 'craft' | 'enchant' | 'alchemy' | 'workbench' | 'trinketry' | null) {
@@ -133,45 +139,31 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
                         <div className='grid md:grid-cols-4'>
                             <div className='md:col-start-1 md:col-span-1'>
                                 <DropDown menu_items={this.actionsManager.buildCraftingList(this.openCrafting.bind(this))} button_title={'Craft/Enchant'} disabled={this.state.character?.is_dead || this.cannotCraft()} selected_name={this.actionsManager.getSelectedCraftingOption()}/>
+                                <SuccessOutlineButton button_label={'Exploration'} on_click={this.manageExploration.bind(this)} additional_css={'w-1/2'} />
                             </div>
                             <div className='border-b-2 block border-b-gray-300 dark:border-b-gray-600 my-3 md:hidden'></div>
                             <div className='md:col-start-2 md:col-span-3 mt-1'>
-                                <MonsterSelection monsters={this.state.monsters} update_monster={this.setSelectedMonster.bind(this)} timer_running={this.state.attack_time_out > 0} character={this.state.character}/>
-
                                 {
-                                    this.state.crafting_type !== null ?
-                                        <CraftingSection remove_crafting={this.removeCraftingType.bind(this)} type={this.state.crafting_type} character_id={this.props.character.id} cannot_craft={this.cannotCraft()}/>
-                                    : null
+                                    this.state.show_exploration ?
+                                        <ExplorationSection character={this.state.character} manage_exploration={this.manageExploration.bind(this)} />
+                                    :
+                                        <MainActionSection monsters={this.state.monsters}
+                                                           attack_time_out={this.state.attack_time_out}
+                                                           crafting_type={this.state.crafting_type}
+                                                           character={this.state.character}
+                                                           character_revived={this.state.character_revived}
+                                                           is_same_monster={this.state.is_same_monster}
+                                                           monster_to_fight={this.state.monster_to_fight}
+                                                           set_selected_monster={this.setSelectedMonster.bind(this)}
+                                                           remove_crafting_type={this.removeCraftingType.bind(this)}
+                                                           cannot_craft={this.cannotCraft()}
+                                                           revive={this.revive.bind(this)}
+                                                           set_attack_timeOut={this.setAttackTimeOut.bind(this)}
+                                                           reset_same_monster={this.resetSameMonster.bind(this)}
+                                                           reset_revived={this.resetRevived.bind(this)}
+                                        />
                                 }
 
-                                <div className={'md:ml-[-100px]'}>
-
-                                    {
-                                        this.state.character?.is_dead ?
-                                            <div className='text-center my-4'>
-                                                <PrimaryButton button_label={'Revive'} on_click={this.revive.bind(this)} additional_css={'mb-4'} disabled={!this.props.character_statuses?.can_attack}/>
-                                                <p>
-                                                    You are dead. Please Revive.
-                                                </p>
-                                            </div>
-                                        : null
-                                    }
-
-                                    {
-                                        this.state.monster_to_fight !== null ?
-                                            <FightSection
-                                                set_attack_time_out={this.setAttackTimeOut.bind(this)}
-                                                monster_to_fight={this.state.monster_to_fight}
-                                                character={this.state.character}
-                                                is_same_monster={this.state.is_same_monster}
-                                                reset_same_monster={this.resetSameMonster.bind(this)}
-                                                character_revived={this.state.character_revived}
-                                                reset_revived={this.resetRevived.bind(this)}
-                                                is_small={false}
-                                            />
-                                        : null
-                                    }
-                                </div>
 
                             </div>
                         </div>

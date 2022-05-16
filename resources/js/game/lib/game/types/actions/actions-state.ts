@@ -21,6 +21,8 @@ export default interface ActionsState {
 
     crafting_type: 'craft' | 'enchant' | 'alchemy' | 'workbench' | 'trinketry' | null;
 
+    show_exploration?: boolean;
+
     /**
      * These are for Smaller Actions Component.
      */

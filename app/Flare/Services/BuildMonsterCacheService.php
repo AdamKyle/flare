@@ -31,8 +31,7 @@ class BuildMonsterCacheService {
 
         foreach (GameMap::all() as $gameMap) {
             $monsters =  new Collection(
-                Monster::where('published', true)
-                    ->where('is_celestial_entity', false)
+                Monster::where('is_celestial_entity', false)
                     ->where('game_map_id', $gameMap->id)
                     ->get(),
                 $this->monster
@@ -42,10 +41,9 @@ class BuildMonsterCacheService {
         }
 
         foreach (Location::whereNotNull('enemy_strength_type')->get() as $location) {
-            $monsters = Monster::where('published', true)
-                               ->where('is_celestial_entity', false)
-                               ->where('game_map_id', $location->game_map_id)
-                               ->get();
+            $monsters = Monster::where('is_celestial_entity', false)
+                      ->where('game_map_id', $location->game_map_id)
+                      ->get();
 
             switch ($location->enemy_strength_type) {
                 case LocationEffectValue::INCREASE_STATS_BY_HUNDRED_THOUSAND:
