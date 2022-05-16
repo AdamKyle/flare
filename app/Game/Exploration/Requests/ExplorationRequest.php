@@ -24,8 +24,6 @@ class ExplorationRequest extends FormRequest
     public function rules()
     {
         return [
-            'skill_id'                 => 'nullable|integer',
-            'xp_towards'               => 'nullable|numeric',
             'auto_attack_length'       => 'required|integer',
             'move_down_the_list_every' => 'nullable|integer',
             'selected_monster_id'      => 'required|integer',

@@ -2,6 +2,7 @@
 
 namespace App\Game\Exploration\Services;
 
+use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
@@ -36,18 +37,6 @@ class ExplorationAutomationService {
      */
     public function beginAutomation(Character $character, array $params): array {
 
-        if (!is_null($params['skill_id']) && !is_null($params['xp_towards'])) {
-            $result = $this->switchSkills($character, $params['skill_id'], $params['xp_towards']);
-
-            if (!$result instanceof Character) {
-                // @codeCoverageIgnoreStart
-                return $result;
-                // @codeCoverageIgnoreEnd
-            }
-
-            $character = $result;
-        }
-
         $automation = CharacterAutomation::create([
             'character_id'                  => $character->id,
             'monster_id'                    => $params['selected_monster_id'],
@@ -60,14 +49,9 @@ class ExplorationAutomationService {
             'attack_type'                   => $params['attack_type'],
         ]);
 
-        $delay = $automation->completed_at->diffInSeconds(now());
-
         $character = $character->refresh();
 
-        event(new ExplorationTimeOut($character->user, $delay));
-        event (new ExplorationStatus($character->user, true));
-        event(new UpdateTopBarEvent($character));
-        event(new UpdateAutomationsList($character->user, $character->currentAutomations));
+        event(new UpdateCharacterStatus($character));
 
         Exploration::dispatch($character, $automation->id, $automation->attack_type)->onConnection('long_running')->delay(now()->addMinutes(10));
 
@@ -75,7 +59,7 @@ class ExplorationAutomationService {
 
         return $this->successResult([
             'message' => 'The exploration is underway. Soon you will set out for the grandest adventure of your life. Keep an eye on the Exploration
-            tab to get information about how the exploration is going. Check the help tab for more info or the Help docs for further details.'
+            tab to get information about how the exploration is going.'
         ]);
     }
 

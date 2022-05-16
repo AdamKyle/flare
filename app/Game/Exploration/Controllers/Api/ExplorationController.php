@@ -19,16 +19,6 @@ use App\Game\Automation\Request\AttackAutomationStartRequest;
 
 class ExplorationController extends Controller {
 
-    public function index(Character $character, ExplorationAutomationService $explorationAutomationService) {
-        $automation = $character->currentAutomations()->where('type', AutomationType::EXPLORING)->first();
-
-        $data = $explorationAutomationService->fetchData($character, $automation);
-
-        return response()->json([
-            'automation' => $data,
-        ], 200);
-    }
-
     public function begin(ExplorationRequest $request, Character $character, ExplorationAutomationService $explorationAutomationService) {
 
         if (!AttackTypeValue::attackTypeExists($request->attack_type)) {
@@ -47,7 +37,6 @@ class ExplorationController extends Controller {
 
         return response()->json([
             'message' => $response['message'],
-            'id'      => $character->refresh()->currentAutomations()->where('type', AutomationType::EXPLORING)->first()->id,
         ], $response['status']);
     }
 
