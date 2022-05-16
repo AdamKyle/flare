@@ -12,6 +12,7 @@ import clsx from "clsx";
 import TimerProgressBar from "../../components/ui/progress-bars/timer-progress-bar";
 import PrimaryButton from "../../components/ui/buttons/primary-button";
 import MapMovementActions from "./components/small-actions/map-movement-actions";
+import ExplorationSection from "./components/exploration-section";
 
 export default class SmallerActions extends React.Component<ActionsProps, ActionsState> {
 
@@ -114,6 +115,9 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
             label: 'Fight',
             value: 'fight'
         }, {
+            label: 'Exploration',
+            value: 'explore'
+        },{
             label: 'Craft',
             value: 'craft'
         }, {
@@ -159,6 +163,12 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
     }
 
     closeMapSection() {
+        this.setState({
+            selected_action: null,
+        })
+    }
+
+    closeExplorationSection() {
         this.setState({
             selected_action: null,
         })
@@ -264,6 +274,19 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
         );
     }
 
+    renderExploration() {
+        return (
+            <Fragment>
+                <button type='button' onClick={this.closeExplorationSection.bind(this)} className='text-red-600 dark:text-red-500 absolute right-[5px] top-[5px]'>
+                    <i className="fas fa-times-circle"></i>
+                </button>
+
+                <ExplorationSection character={this.state.character} manage_exploration={this.closeExplorationSection.bind(this)} monsters={this.state.monsters} />
+            </Fragment>
+
+        );
+    }
+
     showMapMovement() {
         return (
             <Fragment>
@@ -279,6 +302,8 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
         switch(this.state.selected_action) {
             case 'fight':
                 return this.createMonster();
+            case 'explore':
+                return this.renderExploration();
             case 'craft':
                 return this.showCrafting();
             case 'map-movement':

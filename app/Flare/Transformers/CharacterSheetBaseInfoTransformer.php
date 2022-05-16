@@ -7,6 +7,7 @@ use App\Flare\Models\GameClass;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Location;
 use App\Flare\Models\Skill;
+use App\Flare\Values\AutomationType;
 use App\Game\Skills\Values\SkillTypeValue;
 use Cache;
 use App\Flare\Builders\CharacterInformationBuilder;
@@ -95,6 +96,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
             'can_attack'                  => $character->can_attack,
             'can_attack_again_at'         => now()->diffInSeconds($character->can_attack_again_at),
             'can_craft_again_at'          => now()->diffInSeconds($character->can_craft_again_at),
+            'is_automation_running'       => $character->currentAutomations()->where('type', AutomationType::EXPLORING)->get()->isNotEmpty(),
             'is_silenced'                 => $character->user->is_silenced,
             'can_talk_again_at'           => $character->user->can_talk_again_at,
             'can_move'                    => $character->can_move,
@@ -112,7 +114,6 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
             ],
             'devouring_light_res'         => $holyStacks->fetchDevouringResistanceBonus($character),
             'devouring_darkness_res'      => $holyStacks->fetchDevouringResistanceBonus($character),
-            'is_attack_automation_locked' => $character->is_attack_automation_locked,
             'is_alchemy_locked'           => $this->isAlchemyLocked($character),
             'can_use_work_bench'          => $this->canUseWorkBench($character),
             'ambush_resistance'           => $characterTrinketsInformation->getAmbushResistanceChance($character),

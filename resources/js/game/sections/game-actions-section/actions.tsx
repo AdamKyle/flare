@@ -138,14 +138,18 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
                     :
                         <div className='grid md:grid-cols-4'>
                             <div className='md:col-start-1 md:col-span-1'>
-                                <DropDown menu_items={this.actionsManager.buildCraftingList(this.openCrafting.bind(this))} button_title={'Craft/Enchant'} disabled={this.state.character?.is_dead || this.cannotCraft()} selected_name={this.actionsManager.getSelectedCraftingOption()}/>
+                                {
+                                    !this.state.show_exploration ?
+                                        <DropDown menu_items={this.actionsManager.buildCraftingList(this.openCrafting.bind(this))} button_title={'Craft/Enchant'} disabled={this.state.character?.is_dead || this.cannotCraft()} selected_name={this.actionsManager.getSelectedCraftingOption()}/>
+                                    : null
+                                }
                                 <SuccessOutlineButton button_label={'Exploration'} on_click={this.manageExploration.bind(this)} additional_css={'w-1/2'} />
                             </div>
                             <div className='border-b-2 block border-b-gray-300 dark:border-b-gray-600 my-3 md:hidden'></div>
                             <div className='md:col-start-2 md:col-span-3 mt-1'>
                                 {
                                     this.state.show_exploration ?
-                                        <ExplorationSection character={this.state.character} manage_exploration={this.manageExploration.bind(this)} />
+                                        <ExplorationSection character={this.state.character} manage_exploration={this.manageExploration.bind(this)} monsters={this.state.monsters} />
                                     :
                                         <MainActionSection monsters={this.state.monsters}
                                                            attack_time_out={this.state.attack_time_out}
