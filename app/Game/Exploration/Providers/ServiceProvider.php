@@ -2,6 +2,7 @@
 
 namespace App\Game\Exploration\Providers;
 
+use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Flare\Services\FightService;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Handlers\FactionHandler;
@@ -34,7 +35,8 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(ExplorationAutomationService::class, function($app) {
             return new ExplorationAutomationService(
-                $app->make(SkillService::class)
+                $app->make(SkillService::class),
+                $app->make(MonsterPlayerFight::class)
             );
         });
 

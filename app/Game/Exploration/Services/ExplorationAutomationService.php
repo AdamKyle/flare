@@ -2,6 +2,7 @@
 
 namespace App\Game\Exploration\Services;
 
+use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
@@ -24,11 +25,14 @@ class ExplorationAutomationService {
      */
     private $skillService;
 
+    private MonsterPlayerFight $monsterPlayerFight;
+
     /**
      * @param SkillService $skillService
      */
-    public function __construct(SkillService $skillService) {
+    public function __construct(SkillService $skillService, MonsterPlayerFight $monsterPlayerFight) {
         $this->skillService = $skillService;
+        $this->monsterPlayerFight = $monsterPlayerFight;
     }
 
     /**
@@ -37,30 +41,41 @@ class ExplorationAutomationService {
      */
     public function beginAutomation(Character $character, array $params): array {
 
-        $automation = CharacterAutomation::create([
-            'character_id'                  => $character->id,
-            'monster_id'                    => $params['selected_monster_id'],
-            'type'                          => AutomationType::EXPLORING,
-            'started_at'                    => now(),
-            'completed_at'                  => now()->addHours($params['auto_attack_length']),
-            'move_down_monster_list_every'  => $params['move_down_the_list_every'],
-            'previous_level'                => $character->level,
-            'current_level'                 => $character->level,
-            'attack_type'                   => $params['attack_type'],
-        ]);
+        $response = $this->monsterPlayerFight->setUpFight($character, $params);
 
-        $character = $character->refresh();
+        if ($response instanceof MonsterPlayerFight) {
 
-        event(new UpdateCharacterStatus($character));
+            $response->fightMonster();
+        }
 
-        Exploration::dispatch($character, $automation->id, $automation->attack_type)->onConnection('long_running')->delay(now()->addMinutes(10));
+        return $response;
 
-        event(new ExplorationLogUpdate($character->user, 'First round will begin in 10 minutes.'));
+//        $automation = CharacterAutomation::create([
+//            'character_id'                  => $character->id,
+//            'monster_id'                    => $params['selected_monster_id'],
+//            'type'                          => AutomationType::EXPLORING,
+//            'started_at'                    => now(),
+//            'completed_at'                  => now()->addHours($params['auto_attack_length']),
+//            'move_down_monster_list_every'  => $params['move_down_the_list_every'],
+//            'previous_level'                => $character->level,
+//            'current_level'                 => $character->level,
+//            'attack_type'                   => $params['attack_type'],
+//        ]);
+//
+//        $character = $character->refresh();
+//
+//        event(new UpdateCharacterStatus($character));
+//
+//        Exploration::dispatch($character, $automation->id, $automation->attack_type)->onConnection('long_running')->delay(now()->addMinutes(10));
+//
+//        event(new ExplorationLogUpdate($character->user, 'First round will begin in 10 minutes.'));
+//
+//        return $this->successResult([
+//            'message' => 'The exploration is underway. Soon you will set out for the grandest adventure of your life. Keep an eye on the Exploration
+//            tab to get information about how the exploration is going.'
+//        ]);
 
-        return $this->successResult([
-            'message' => 'The exploration is underway. Soon you will set out for the grandest adventure of your life. Keep an eye on the Exploration
-            tab to get information about how the exploration is going.'
-        ]);
+        return $this->successResult();
     }
 
     /**

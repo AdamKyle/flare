@@ -3,6 +3,9 @@ import DangerButton from "../../../components/ui/buttons/danger-button";
 import Select from "react-select";
 import PrimaryButton from "../../../components/ui/buttons/primary-button";
 import {replace, startCase} from "lodash";
+import Ajax from "../../../lib/ajax/ajax";
+import {AxiosError, AxiosResponse} from "axios";
+import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 
 export default class ExplorationSection extends React.Component<any, any> {
     constructor(props: any) {
@@ -96,10 +99,10 @@ export default class ExplorationSection extends React.Component<any, any> {
             value: 'cast',
         },{
             label: 'Attack and cast',
-            value: 'attack-and-cast',
+            value: 'attack_and_cast',
         },{
             label: 'Cast and attack',
-            value: 'cast-and-attack',
+            value: 'cast_and_attack',
         },{
             label: 'defend',
             value: 'defend',
@@ -162,7 +165,22 @@ export default class ExplorationSection extends React.Component<any, any> {
     }
 
     startExploration() {
-        console.log('Start exploration here .... ');
+        this.setState({
+            loading: true,
+        }, () => {
+            (new Ajax()).setRoute('exploration/'+this.props.character.id+'/start').setParameters({
+                auto_attack_length: this.state.time_selected,
+                move_down_the_list_every: this.state.move_down_monster_list,
+                selected_monster_id: this.state.monster_selected.id,
+                attack_type: this.state.attack_type,
+            }).doAjaxCall('post', (result: AxiosResponse) => {
+                console.log(result.data)
+
+                this.setState({
+                    loading: false,
+                });
+            }, (error: AxiosError) => {});
+        })
     }
 
     render() {
@@ -218,9 +236,14 @@ export default class ExplorationSection extends React.Component<any, any> {
                 </div>
 
                 <div className={'lg:text-center md:ml-[-100px] mt-3 mb-3'}>
-                    <PrimaryButton button_label={'Explore'} on_click={this.startExploration.bind(this)} disabled={this.state.monster_selected === null || this.state.time_selected === null || this.state.attack_type === null} additional_css={'mr-2'}/>
-                    <DangerButton button_label={'Close'} on_click={this.props.manage_exploration} />
+                    <PrimaryButton button_label={'Explore'} on_click={this.startExploration.bind(this)} disabled={this.state.monster_selected === null || this.state.time_selected === null || this.state.attack_type === null || this.state.loading} additional_css={'mr-2'}/>
+                    <DangerButton button_label={'Close'} on_click={this.props.manage_exploration} disabled={this.state.loading} />
 
+                    {
+                        this.state.loading ?
+                            <LoadingProgressBar />
+                        : null
+                    }
 
                     <div className='relative top-[24px] italic'>
                         <p>For more help please the <a href='/information/exploration' target='_blank'>Exploration <i

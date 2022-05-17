@@ -35,9 +35,10 @@ class ExplorationController extends Controller {
 
         $response = $explorationAutomationService->beginAutomation($character, $request->all());
 
-        return response()->json([
-            'message' => $response['message'],
-        ], $response['status']);
+        return response()->json();
+//        return response()->json([
+//            'message' => $response['message'],
+//        ], $response['status']);
     }
 
     public function stop(CharacterAutomation $characterAutomation, Character $character) {

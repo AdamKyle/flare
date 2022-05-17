@@ -13,6 +13,7 @@ use App\Flare\Builders\Character\AttackDetails\DamageDetails\WeaponInformation;
 use App\Flare\Builders\Character\BaseCharacterInfo;
 use App\Flare\Builders\Character\AttackDetails\CharacterAttackBuilder;
 use App\Flare\Builders\Character\AttackDetails\CharacterAttackInformation;
+use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Builders\Character\ClassDetails\ClassBonuses;
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Handlers\AmbushHandler;
@@ -33,6 +34,10 @@ use App\Flare\Handlers\SetupFightHandler;
 use App\Flare\Middleware\IsCharacterLoggedInMiddleware;
 use App\Flare\Middleware\IsCharacterWhoTheySayTheyAreMiddleware;
 use App\Flare\Middleware\IsGloballyTimedOut;
+use App\Flare\ServerFight\Fight\Voidance;
+use App\Flare\ServerFight\Monster\BuildMonster;
+use App\Flare\ServerFight\Monster\ServerMonster;
+use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Services\CanUserEnterSiteService;
@@ -417,6 +422,35 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(CanUserEnterSiteService::class, function($app) {
            return new CanUserEnterSiteService();
+        });
+
+        $this->app->bind(ServerMonster::class, function() {
+            return new ServerMonster();
+        });
+
+        $this->app->bind(BuildMonster::class, function($app) {
+            return new BuildMonster(
+                $app->make(ServerMonster::class),
+            );
+        });
+
+        $this->app->bind(Voidance::class, function() {
+            return new Voidance();
+        });
+
+        $this->app->bind(CharacterCacheData::class, function($app) {
+            return new CharacterCacheData(
+                $app->make(Manager::class),
+                $app->make(CharacterSheetBaseInfoTransformer::class),
+            );
+        });
+
+        $this->app->bind(MonsterPlayerFight::class, function($app) {
+            return new MonsterPlayerFight(
+                $app->make(BuildMonster::class),
+                $app->make(CharacterCacheData::class),
+                $app->make(Voidance::class),
+            );
         });
     }
 

@@ -93,7 +93,7 @@ export default class Monster extends BattleBase {
     }
 
     canMonsterVoidPlayer(devouringLightResistance: number): boolean {
-        let chance = this.monster.devouring_darkness_chance
+        let chance = this.monster.devouring_light_chance
 
         if (devouringLightResistance > chance) {
             return false;
@@ -264,16 +264,10 @@ export default class Monster extends BattleBase {
 
         if (reduction > 0.0) {
             monster.spell_evasion      = monster.spell_evasion - reduction;
-
-            monster.artifact_annulment = monster.artifact_annulment - reduction;
             monster.affix_resistance   = monster.affix_resistance - reduction;
 
             if (monster.spell_evasion < 0.0) {
                 monster.spell_evasion = 0.0;
-            }
-
-            if (monster.artifact_annulment < 0.0) {
-                monster.artifact_annulment = 0.0;
             }
 
             if (monster.affix_resistance < 0.0) {
@@ -282,7 +276,7 @@ export default class Monster extends BattleBase {
 
             this.monster = monster;
 
-            this.addMessage(this.name() + ' is less resistant to your charms! (spell/artifact/affix resistance reduced!)', 'player-action');
+            this.addMessage(this.name() + ' is less resistant to your charms! (spell/affix resistance reduced!)', 'player-action');
         }
 
         return;
