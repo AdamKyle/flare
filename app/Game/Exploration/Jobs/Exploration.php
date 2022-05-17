@@ -2,6 +2,8 @@
 
 namespace App\Game\Exploration\Jobs;
 
+use App\Flare\ServerFight\MonsterPlayerFight;
+use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Monster;
 use App\Game\Exploration\Events\ExplorationDetails;
@@ -26,11 +28,12 @@ class Exploration implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $character;
+    public Character $character;
 
-    private $automationId;
+    private int $automationId;
 
-    private $attackType;
+    private string $attackType;
+
 
     public function __construct(Character $character, int $automationId, string $attackType) {
         $this->character    = $character;
@@ -38,16 +41,61 @@ class Exploration implements ShouldQueue
         $this->attackType   = $attackType;
     }
 
-    public function handle(EncounterService $encounterService, ExplorationAutomationService $explorationAutomationService, RewardHandler $rewardHandler) {
+    public function handle(MonsterPlayerFight $monsterPlayerFight, BattleEventHandler $battleEventHandler) {
 
         $automation = CharacterAutomation::where('character_id', $this->character->id)->where('id', $this->automationId)->first();
 
         if ($this->shouldBail($automation)) {
-            $this->endAutomation($rewardHandler, $automation);
+            //$this->endAutomation($rewardHandler, $automation);
 
             return;
         }
 
+        $automation = $this->updateAutomation($automation);
+
+        $params = [
+            'selected_monster_id' => $automation->monster_id,
+            'attack_type'         => $this->attackType,
+        ];
+
+        $response = $monsterPlayerFight->setUpFight($this->character, $params);
+
+        if ($response instanceof MonsterPlayerFight) {
+
+            $fightResponse = $response->fightMonster();
+
+            $response->deleteCharacterCache($this->character);
+
+            if (!$fightResponse) {
+                $battleEventHandler->processDeadCharacter($this->character);
+
+                $automation->delete();
+
+                event(new ExplorationLogUpdate($this->character->user, 'You died during exploration. Exploration has ended.'));
+
+                event(new ExplorationTimeOut($this->character->user, 0));
+
+                return;
+            }
+
+            $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id'], true);
+        }
+    }
+
+    protected function shouldBail(CharacterAutomation $automation = null): bool {
+
+        if (is_null($automation)) {
+            return true;
+        }
+
+        if (now()->greaterThanOrEqualTo($automation->completed_at)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    protected function updateAutomation(CharacterAutomation $automation) {
         if (!is_null($automation->move_down_monster_list_every)) {
             $characterLevel = $this->character->refresh()->level;
 
@@ -68,44 +116,9 @@ class Exploration implements ShouldQueue
                         'monster_id'     => $nextMonster->id,
                         'previous_level' => $characterLevel,
                     ]);
-
-                    $data = $explorationAutomationService->fetchData($this->character, $automation->refresh());
-
-                    event(new ExplorationDetails($this->character->user, $data));
                 }
             }
         }
-
-        $succeeded = $encounterService->processEncounter($this->character, $automation);
-
-        if ($succeeded) {
-            $timeLeft = now()->diffInMinutes($automation->completed_at);
-
-            if ($timeLeft < 10) {
-                $this->endAutomation($rewardHandler, $automation);
-
-                return;
-            }
-
-            $character = $this->character->refresh();
-
-            event(new ExplorationLogUpdate($character->user, 'Next encounter will start in 10 minutes.'));
-
-            Exploration::dispatch($character, $automation->id, $this->attackType)->delay(now()->addMinutes(10));
-        }
-    }
-
-    protected function shouldBail(CharacterAutomation $automation = null): bool {
-
-        if (is_null($automation)) {
-            return true;
-        }
-
-        if (now()->greaterThanOrEqualTo($automation->completed_at)) {
-            return true;
-        }
-
-        return false;
     }
 
     protected function endAutomation(RewardHandler $rewardHandler, ?CharacterAutomation $automation) {
@@ -123,9 +136,6 @@ class Exploration implements ShouldQueue
             $character = $this->character->refresh();
 
             event(new ExplorationTimeOut($character->user, 0));
-            event(new ExplorationStatus($character->user, false));
-            event(new UpdateTopBarEvent($character));
-            event(new UpdateAutomationsList($character->user, $character->currentAutomations));
         }
     }
 }

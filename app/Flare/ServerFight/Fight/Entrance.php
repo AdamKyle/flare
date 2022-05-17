@@ -18,7 +18,9 @@ class Entrance extends BattleBase {
     public function __construct(CharacterCacheData $characterCacheData) {
         parent::__construct();
 
-        $this->characterCacheData = $characterCacheData;
+        $this->characterCacheData   = $characterCacheData;
+        $this->isEnemyEntranced     = false;
+        $this->isCharacterEntranced = false;
     }
 
     public function isCharacterEntracned() {

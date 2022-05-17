@@ -2,128 +2,49 @@
 
 namespace App\Game\Exploration\Services;
 
-use App\Flare\ServerFight\MonsterPlayerFight;
-use App\Game\Battle\Events\UpdateCharacterStatus;
-use App\Game\Core\Events\UpdateTopBarEvent;
-use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
-use App\Game\Exploration\Jobs\Exploration;
+use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Flare\Values\AutomationType;
-use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Battle\Handlers\BattleEventHandler;
+use App\Flare\Models\Character;
 use App\Game\Exploration\Events\ExplorationLogUpdate;
-use App\Game\Skills\Services\SkillService;
-use App\Game\Exploration\Events\ExplorationStatus;
-use App\Game\Exploration\Events\ExplorationTimeOut;
-use App\Game\Exploration\Events\UpdateAutomationsList;
+use App\Game\Exploration\Jobs\Exploration;
 
 class ExplorationAutomationService {
 
-    use ResponseBuilder;
-
-    /**
-     * @var SkillService $skillService
-     */
-    private $skillService;
-
     private MonsterPlayerFight $monsterPlayerFight;
 
-    /**
-     * @param SkillService $skillService
-     */
-    public function __construct(SkillService $skillService, MonsterPlayerFight $monsterPlayerFight) {
-        $this->skillService = $skillService;
+    private BattleEventHandler $battleEventHandler;
+
+    public function __construct(MonsterPlayerFight $monsterPlayerFight, BattleEventHandler $battleEventHandler) {
         $this->monsterPlayerFight = $monsterPlayerFight;
+        $this->battleEventHandler = $battleEventHandler;
     }
 
     /**
      * @param Character $character
      * @param array $params
      */
-    public function beginAutomation(Character $character, array $params): array {
+    public function beginAutomation(Character $character, array $params) {
 
-        $response = $this->monsterPlayerFight->setUpFight($character, $params);
+        $automation = CharacterAutomation::create([
+            'character_id'                   => $character->id,
+            'monster_id'                     => $params['selected_monster_id'],
+            'type'                           => AutomationType::EXPLORING,
+            'started_at'                     => now(),
+            'completed_at'                   => now()->addHours($params['auto_attack_length']),
+            'move_down_monster_list_every'   => $params['move_down_the_list_every'],
+            'previous_level'                 => $character->level,
+            'current_level'                  => $character->level,
+            'attack_type'                    => $params['attack_type'],
+        ]);
 
-        if ($response instanceof MonsterPlayerFight) {
+        event(new ExplorationLogUpdate($character->user, 'The exploration will begin in 5 minutes. Every 5 minutes you will encounter the enemy up to a maximum of 8 times in a single "encounter"'));
 
-            $response->fightMonster();
-        }
-
-        return $response;
-
-//        $automation = CharacterAutomation::create([
-//            'character_id'                  => $character->id,
-//            'monster_id'                    => $params['selected_monster_id'],
-//            'type'                          => AutomationType::EXPLORING,
-//            'started_at'                    => now(),
-//            'completed_at'                  => now()->addHours($params['auto_attack_length']),
-//            'move_down_monster_list_every'  => $params['move_down_the_list_every'],
-//            'previous_level'                => $character->level,
-//            'current_level'                 => $character->level,
-//            'attack_type'                   => $params['attack_type'],
-//        ]);
-//
-//        $character = $character->refresh();
-//
-//        event(new UpdateCharacterStatus($character));
-//
-//        Exploration::dispatch($character, $automation->id, $automation->attack_type)->onConnection('long_running')->delay(now()->addMinutes(10));
-//
-//        event(new ExplorationLogUpdate($character->user, 'First round will begin in 10 minutes.'));
-//
-//        return $this->successResult([
-//            'message' => 'The exploration is underway. Soon you will set out for the grandest adventure of your life. Keep an eye on the Exploration
-//            tab to get information about how the exploration is going.'
-//        ]);
-
-        return $this->successResult();
+        $this->startAutomation($character, $automation->id, $params['attack_type']);
     }
 
-    /**
-     * @param Character $character
-     * @param CharacterAutomation|null $automation
-     * @return array
-     */
-    public function fetchData(Character $character, ?CharacterAutomation $automation = null): array {
-        $skillCurrentlyTraining = $character->skills->filter(function ($skill) {
-            return $skill->currently_training;
-        })->first();
-
-        $data = [];
-
-        if (!is_null($automation)) {
-            $data = [
-                'id'                       => $automation->id,
-                'skill_id'                 => !is_null($skillCurrentlyTraining) ? $skillCurrentlyTraining->id : null,
-                'xp_towards'               => !is_null($skillCurrentlyTraining) ? $skillCurrentlyTraining->xp_towards : null,
-                'auto_attack_length'       => $automation->completed_at->diffInSeconds(now()),
-                'move_down_the_list_every' => $automation->move_down_monster_list_every,
-                'selected_monster_id'      => $automation->monster_id,
-                'attack_type'              => $automation->attack_type,
-            ];
-
-            event(new ExplorationStatus($character->user, true));
-        } else {
-            event(new ExplorationStatus($character->user, false));
-        }
-
-        return $data;
-    }
-
-    /**
-     * @param Character $character
-     * @param int $skillId
-     * @param float $xp
-     * @return Character|array
-     */
-    protected function switchSkills(Character $character, int $skillId, float $xp): Character|array {
-        $result = $this->skillService->trainSkill($character, $skillId, $xp);
-
-        if ($result['status'] !== 200) {
-            // @codeCoverageIgnoreStart
-            return $result;
-            // @codeCoverageIgnoreEnd
-        }
-
-        return $character->refresh();
+    protected function startAutomation(Character $character, int $automationId, string $attackType) {
+        Exploration::dispatch($character, $automationId, $attackType)->delay(now()->addMinutes(5));
     }
 }

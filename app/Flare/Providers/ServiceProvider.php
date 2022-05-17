@@ -34,8 +34,10 @@ use App\Flare\Handlers\SetupFightHandler;
 use App\Flare\Middleware\IsCharacterLoggedInMiddleware;
 use App\Flare\Middleware\IsCharacterWhoTheySayTheyAreMiddleware;
 use App\Flare\Middleware\IsGloballyTimedOut;
+use App\Flare\ServerFight\Fight\Affixes;
 use App\Flare\ServerFight\Fight\Ambush;
 use App\Flare\ServerFight\Fight\Attack;
+use App\Flare\ServerFight\Fight\CanHit;
 use App\Flare\ServerFight\Fight\CharacterAttacks\BaseCharacterAttack;
 use App\Flare\ServerFight\Fight\CharacterAttacks\CharacterAttack;
 use App\Flare\ServerFight\Fight\CharacterAttacks\Types\WeaponType;
@@ -461,10 +463,20 @@ class ServiceProvider extends ApplicationServiceProvider
             return new Entrance($app->make(CharacterCacheData::class));
         });
 
+        $this->app->bind(CanHit::class, function($app) {
+            return new CanHit($app->make(CharacterCacheData::class));
+        });
+
+        $this->app->bind(Affixes::class, function($app) {
+            return new Affixes($app->make(CharacterCacheData::class));
+        });
+
         $this->app->bind(WeaponType::class, function($app) {
             return new WeaponType(
                 $app->make(CharacterCacheData::class),
-                $app->make(Entrance::class)
+                $app->make(Entrance::class),
+                $app->make(CanHit::class),
+                $app->make(Affixes::class),
             );
         });
 

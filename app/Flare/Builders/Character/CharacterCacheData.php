@@ -27,8 +27,8 @@ class CharacterCacheData {
     }
 
     public function getCachedCharacterData(Character $character, string $key): mixed {
-        if (Cache::has('character-exploration-' . $character->id)) {
-            return Cache::get('character-exploration-' . $character->id);
+        if (Cache::has('character-sheet-' . $character->id)) {
+            return Cache::get('character-sheet-' . $character->id)[$key];
         }
 
         $characterId = $character->id;
@@ -36,8 +36,14 @@ class CharacterCacheData {
         $character = new Item($character, $this->characterSheetBaseInfoTransformer);
         $character = $this->manager->createData($character)->toArray();
 
-        Cache::put('character-exploration-stat-reduction-affixes-' . $characterId, $character);
+        Cache::put('character-sheet-' . $characterId, $character);
 
         return $character[$key];
+    }
+
+    public function deleteCharacterSheet(Character $character) {
+        if (Cache::has('character-sheet-' . $character->id)) {
+            return Cache::delete('character-sheet-' . $character->id);
+        }
     }
 }

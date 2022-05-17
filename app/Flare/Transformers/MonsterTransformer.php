@@ -32,7 +32,7 @@ class MonsterTransformer extends TransformerAbstract {
             'int'                       => $shouldIncrease ? $this->increaseValue($monster->int, $increaseAmount) : $monster->int,
             'agi'                       => $shouldIncrease ? $this->increaseValue($monster->agi, $increaseAmount) : $monster->agi,
             'focus'                     => $shouldIncrease ? $this->increaseValue($monster->focus, $increaseAmount) : $monster->focus,
-            'to_hit_base'               => $shouldIncrease ? $this->increaseValue($monster->dex, $increaseAmount) / 10000 : $monster->dex / 10000,
+            'to_hit_base'               => $shouldIncrease ? $this->increaseValue($monster->dex, $increaseAmount) : $monster->dex,
             'ac'                        => $shouldIncrease ? $this->increaseValue($monster->ac, $increaseAmount) : $monster->ac,
             'health_range'              => $monster->health_range,
             'attack_range'              => $monster->attack_range,

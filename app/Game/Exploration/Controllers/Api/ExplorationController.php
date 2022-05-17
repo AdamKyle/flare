@@ -33,12 +33,11 @@ class ExplorationController extends Controller {
             ], 422);
         }
 
-        $response = $explorationAutomationService->beginAutomation($character, $request->all());
+        $explorationAutomationService->beginAutomation($character, $request->all());
 
-        return response()->json();
-//        return response()->json([
-//            'message' => $response['message'],
-//        ], $response['status']);
+        return response()->json([
+            'message' => 'Exploration has started. Check the exploration tab (beside server messages) for update. The tab will every five minutes, rewards are handed to you or disenchanted automatically.'
+        ]);
     }
 
     public function stop(CharacterAutomation $characterAutomation, Character $character) {

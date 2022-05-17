@@ -4,6 +4,7 @@ namespace App\Flare\ServerFight;
 
 use App\Flare\ServerFight\Fight\Ambush;
 use App\Flare\ServerFight\Fight\Attack;
+use App\Game\Battle\Handlers\BattleEventHandler;
 use Cache;
 use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\ServerFight\Fight\Voidance;
@@ -21,6 +22,8 @@ class MonsterPlayerFight {
     private array $battleMessages;
 
     private string $attackType;
+
+    private bool $tookTooLong;
 
     private Character $character;
 
@@ -41,6 +44,7 @@ class MonsterPlayerFight {
         $this->ambush             = $ambush;
         $this->attack             = $attack;
         $this->battleMessages     = [];
+        $this->tookTooLong        = false;
     }
 
     public function setUpFight(Character $character, array $params) {
@@ -55,7 +59,23 @@ class MonsterPlayerFight {
         return $this;
     }
 
-    public function fightMonster() {
+    public function getTookTooLong(): bool {
+        return $this->tookTooLong;
+    }
+
+    public function deleteCharacterCache(Character $character) {
+        $this->characterCacheData->deleteCharacterSheet($character);
+    }
+
+    public function getBattleMessages() {
+        return $this->battleMessages;
+    }
+
+    public function resetBattleMessages() {
+        $this->battleMessages = [];
+    }
+
+    public function fightMonster(): bool {
         $characterStatReductionAffixes = $this->characterCacheData->getCachedCharacterData($this->character, 'stat_affixes');
         $skillReduction                = $this->characterCacheData->getCachedCharacterData($this->character, 'skill_reduction');
         $resistanceReduction           = $this->characterCacheData->getCachedCharacterData($this->character, 'resistance_reduction');
@@ -97,6 +117,26 @@ class MonsterPlayerFight {
         $this->attack->setHealth($ambush->getHealthObject())
                      ->setIsCharacterVoided($isPlayerVoided)
                      ->attack($this->character, $monster, $this->attackType, 'character');
+
+        if ($this->attack->getCharacterHealth() <= 0) {
+            $this->mergeMessages($this->attack->getMessages());
+
+            $this->attack->resetBattleMessages();
+
+            return false;
+        }
+
+        if ($this->attack->getMonsterHealth() <= 0) {
+            $this->mergeMessages($this->attack->getMessages());
+
+            $this->attack->resetBattleMessages();
+
+            return true;
+        }
+
+        $this->tookTooLong = $this->attack->tookTooLong();
+
+        return false;
     }
 
     protected function fetchMonster(string $mapName, int $monsterId): array {

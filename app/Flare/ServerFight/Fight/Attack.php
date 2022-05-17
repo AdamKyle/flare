@@ -55,6 +55,18 @@ class Attack {
         return $this->tookTooLong;
     }
 
+    public function getMessages(): array {
+        return $this->battleMessages;
+    }
+
+    public function getCharacterHealth() {
+        return $this->characterHealth;
+    }
+
+    public function getMonsterHealth() {
+        return $this->monsterHealth;
+    }
+
     public function attack(Character $character, ServerMonster $serverMonster, string $attackType, string $whoAttacks) {
 
         if ($this->characterHealth <= 0) {
@@ -96,13 +108,11 @@ class Attack {
 
             $response->resetMessages();
 
-            dump($this->battleMessages);
-
-            dd('stop');
+            $this->attack($character, $serverMonster, $attackType, 'monster');
         }
 
         if ($whoAttacks === 'monster') {
-
+            dd('stop here');
         }
 
         $this->attackCounter++;

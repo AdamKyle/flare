@@ -57,7 +57,7 @@ export default class Damage extends BattleBase {
         const dc = 100 - (100 * defender.affix_resistance);
 
         if (dc <= 0 || random(1, 100) > dc) {
-          this.addMessage('The enemy resists your attempt to steal it\'s life.');
+          this.addMessage('The enemy resists your attempt to steal it\'s life.', 'enemy-action');
         } else {
 
           this.addMessage('The enemy\'s blood flows through the air and gives you life: ' + formatNumber(Math.ceil(totalDamage)), 'player-action');
@@ -89,7 +89,7 @@ export default class Damage extends BattleBase {
         if (dc <= 0 || random(1, 100) > dc) {
           this.addMessage('Your damaging enchantments (resistible) have been resisted.', 'enemy-action');
         } else {
-          totalDamage += attacker.non_stacking_damage;
+          totalDamage = attacker.non_stacking_damage - attacker.non_stacking_damage * damageDeduction;
         }
       }
     }

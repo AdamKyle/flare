@@ -2,20 +2,12 @@
 
 namespace App\Game\Exploration\Providers;
 
-use App\Flare\ServerFight\MonsterPlayerFight;
-use App\Flare\Services\FightService;
+
 use App\Game\Battle\Handlers\BattleEventHandler;
-use App\Game\Battle\Handlers\FactionHandler;
-use App\Game\Exploration\Handlers\ExplorationHandler;
-use App\Game\Exploration\Handlers\FightHandler;
-use App\Game\Exploration\Handlers\PlunderHandler;
-use App\Game\Exploration\Handlers\RewardHandler;
-use App\Game\Exploration\Middleware\IsCharacterExploring;
-use App\Game\Exploration\Services\EncounterService;
-use App\Game\Exploration\Services\ExplorationAutomationService;
-use App\Game\Exploration\Services\ProcessExplorationFightService;
-use App\Game\Skills\Services\SkillService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
+use App\Flare\ServerFight\MonsterPlayerFight;
+use App\Game\Exploration\Middleware\IsCharacterExploring;
+use App\Game\Exploration\Services\ExplorationAutomationService;
 
 class ServiceProvider extends ApplicationServiceProvider
 {
@@ -26,49 +18,12 @@ class ServiceProvider extends ApplicationServiceProvider
      */
     public function register() {
 
-        $this->app->bind(ProcessExplorationFightService::class, function($app) {
-            return new ProcessExplorationFightService(
-                $app->make(FightService::class),
-                $app->make(BattleEventHandler::class)
-            );
-        });
 
         $this->app->bind(ExplorationAutomationService::class, function($app) {
             return new ExplorationAutomationService(
-                $app->make(SkillService::class),
-                $app->make(MonsterPlayerFight::class)
+                $app->make(MonsterPlayerFight::class),
+                $app->make(BattleEventHandler::class)
             );
-        });
-
-        $this->app->bind(ExplorationHandler::class, function($app) {
-            return new ExplorationHandler(
-                $app->make(ProcessExplorationFightService::class)
-            );
-        });
-
-        $this->app->bind(FightHandler::class, function($app) {
-            return new FightHandler(
-                $app->make(ProcessExplorationFightService::class)
-            );
-        });
-
-        $this->app->bind(PlunderHandler::class, function($app) {
-            return new PlunderHandler(
-                $app->make(FightHandler::class)
-            );
-        });
-
-        $this->app->bind(RewardHandler::class, function($app) {
-            return new RewardHandler($app->make(FactionHandler::class));
-        });
-
-        $this->app->bind(EncounterService::class, function($app) {
-           return new EncounterService(
-               $app->make(ExplorationHandler::class),
-               $app->make(FightHandler::class),
-               $app->make(PlunderHandler::class),
-               $app->make(RewardHandler::class)
-           );
         });
     }
 
