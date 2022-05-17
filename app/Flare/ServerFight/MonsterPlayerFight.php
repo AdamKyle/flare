@@ -2,6 +2,8 @@
 
 namespace App\Flare\ServerFight;
 
+use App\Flare\ServerFight\Fight\Ambush;
+use App\Flare\ServerFight\Fight\Attack;
 use Cache;
 use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\ServerFight\Fight\Voidance;
@@ -18,6 +20,8 @@ class MonsterPlayerFight {
 
     private array $battleMessages;
 
+    private string $attackType;
+
     private Character $character;
 
     private BuildMonster $buildMonster;
@@ -26,16 +30,23 @@ class MonsterPlayerFight {
 
     private Voidance $voidance;
 
-    public function __construct(BuildMonster $buildMonster, CharacterCacheData $characterCacheData, Voidance $voidance) {
+    private Ambush $ambush;
+
+    private Attack $attack;
+
+    public function __construct(BuildMonster $buildMonster, CharacterCacheData $characterCacheData, Voidance $voidance, Ambush $ambush, Attack $attack) {
         $this->buildMonster       = $buildMonster;
         $this->characterCacheData = $characterCacheData;
         $this->voidance           = $voidance;
+        $this->ambush             = $ambush;
+        $this->attack             = $attack;
         $this->battleMessages     = [];
     }
 
     public function setUpFight(Character $character, array $params) {
         $this->character = $character;
         $this->monster   = $this->fetchMonster($character->map->gameMap->name, $params['selected_monster_id']);
+        $this->attackType = $params['attack_type'];
 
         if (empty($this->monster)) {
             return $this->errorResult('No monster was found.');
@@ -57,7 +68,35 @@ class MonsterPlayerFight {
 
         $this->mergeMessages($this->buildMonster->getMessages());
 
-        dd($monster, $this->voidance->isPlayerVoided());
+        $isPlayerVoided = $this->voidance->isPlayerVoided();
+
+        $ambush = $this->ambush->handleAmbush($this->character, $monster, $isPlayerVoided);
+
+        $this->mergeMessages($ambush->getMessages());
+
+        $health = $ambush->getHealthObject();
+
+        if ($health['character_health'] <= 0) {
+            $this->battleMessages[] = [
+                'message' => 'The enemies ambush has slaughtered you!',
+                'type'    => 'enemy-action',
+            ];
+
+            return false;
+        }
+
+        if ($health['monster_health'] <= 0) {
+            $this->battleMessages[] = [
+                'message' => 'Your ambush has slaughtered the enemy!',
+                'type'    => 'enemy-action',
+            ];
+
+            return true;
+        }
+
+        $this->attack->setHealth($ambush->getHealthObject())
+                     ->setIsCharacterVoided($isPlayerVoided)
+                     ->attack($this->character, $monster, $this->attackType, 'character');
     }
 
     protected function fetchMonster(string $mapName, int $monsterId): array {

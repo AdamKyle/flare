@@ -17,7 +17,16 @@ class BattleBase {
         ];
     }
 
+    public function mergeMessages(array $messages) {
+        $this->battleMessages = [...$this->battleMessages, ...$messages];
+    }
+
     public function getMessages() {
         return $this->battleMessages;
     }
+
+    public function clearMessages() {
+        $this->battleMessages = [];
+    }
+
 }

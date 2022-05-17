@@ -228,7 +228,6 @@ class CharacterAttackBuilder {
             'name'                      => $this->character->name,
             'defence'                   => $this->characterInformationBuilder->buildDefence($voided),
             'ring_damage'               => $this->characterInformationBuilder->getTotalRingDamage($voided),
-            'artifact_damage'           => $voided ? 0 : $this->characterInformationBuilder->getTotalArtifactDamage(),
             'heal_for'                  => $this->characterHealthInformation->buildHealFor($voided),
             'res_chance'                => $this->characterHealthInformation->fetchResurrectionChance(),
             'damage_deduction'          => $characterReduction,

@@ -20,14 +20,10 @@ class CharacterCacheData {
         $this->characterSheetBaseInfoTransformer = $characterInformationBuilder;
     }
 
-    public function getDataFromAttackCache(Character $character, string $attackType, string $key = null): array {
-        if ($key === 'stat_reduction') {
-            return $this->getStatReduction($character);
-        }
-
+    public function getDataFromAttackCache(Character $character, string $attackType): array {
         $characterAttackData = Cache::get('character-attack-data-' . $character->id);
 
-        return $characterAttackData[$attackType];
+        return $characterAttackData['attack_types'][$attackType];
     }
 
     public function getCachedCharacterData(Character $character, string $key): mixed {

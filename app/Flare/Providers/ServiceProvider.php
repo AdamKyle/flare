@@ -34,6 +34,12 @@ use App\Flare\Handlers\SetupFightHandler;
 use App\Flare\Middleware\IsCharacterLoggedInMiddleware;
 use App\Flare\Middleware\IsCharacterWhoTheySayTheyAreMiddleware;
 use App\Flare\Middleware\IsGloballyTimedOut;
+use App\Flare\ServerFight\Fight\Ambush;
+use App\Flare\ServerFight\Fight\Attack;
+use App\Flare\ServerFight\Fight\CharacterAttacks\BaseCharacterAttack;
+use App\Flare\ServerFight\Fight\CharacterAttacks\CharacterAttack;
+use App\Flare\ServerFight\Fight\CharacterAttacks\Types\WeaponType;
+use App\Flare\ServerFight\Fight\Entrance;
 use App\Flare\ServerFight\Fight\Voidance;
 use App\Flare\ServerFight\Monster\BuildMonster;
 use App\Flare\ServerFight\Monster\ServerMonster;
@@ -445,11 +451,42 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
+        $this->app->bind(Ambush::class, function($app) {
+            return new Ambush(
+                $app->make(CharacterCacheData::class),
+            );
+        });
+
+        $this->app->bind(Entrance::class, function($app) {
+            return new Entrance($app->make(CharacterCacheData::class));
+        });
+
+        $this->app->bind(WeaponType::class, function($app) {
+            return new WeaponType(
+                $app->make(CharacterCacheData::class),
+                $app->make(Entrance::class)
+            );
+        });
+
+        $this->app->bind(CharacterAttack::class, function($app) {
+            return new CharacterAttack($app->make(WeaponType::class));
+        });
+
+        $this->app->bind(BaseCharacterAttack::class, function($app) {
+            return new BaseCharacterAttack($app->make(CharacterAttack::class));
+        });
+
+        $this->app->bind(Attack::class, function($app) {
+            return new Attack($app->make(BaseCharacterAttack::class));
+        });
+
         $this->app->bind(MonsterPlayerFight::class, function($app) {
             return new MonsterPlayerFight(
                 $app->make(BuildMonster::class),
                 $app->make(CharacterCacheData::class),
                 $app->make(Voidance::class),
+                $app->make(Ambush::class),
+                $app->make(Attack::class),
             );
         });
     }
