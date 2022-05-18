@@ -5,6 +5,7 @@ import CharacterSkillsTabs from "./components/character-skills-tabs";
 import CharacterInventoryTabs from "./components/character-inventory-tabs";
 import CharacterSheetProps from "../../lib/game/character-sheet/types/character-sheet-props";
 import DangerAlert from "../../components/ui/alerts/simple-alerts/danger-alert";
+import WarningAlert from "../../components/ui/alerts/simple-alerts/warning-alert";
 
 export default class CharacterSheet extends React.Component<CharacterSheetProps, any> {
 
@@ -27,6 +28,17 @@ export default class CharacterSheet extends React.Component<CharacterSheetProps,
                                 or even use items. Go resurrect child!</p>
                         </DangerAlert>
                     : null
+                }
+
+                {
+                    this.props.character.is_automation_running ?
+                        <WarningAlert additional_css={'mb-4'}>
+                            <p className='p-3'>Child! You are busy with Exploration. You cannot manage aspects of your inventory or skills such as whats training, passives or equipped items.</p>
+                            <p className='p-3'>How ever, you can still manage the items you craft - such as sell, disenchant and destroy. You can also move items to sets, but not equip sets.</p>
+                            <p className='p-3'>Please see <a href='/information/holy-items' target='_blank'>Exploration <i
+                                className="fas fa-external-link-alt"></i></a> for more details.</p>
+                        </WarningAlert>
+                        : null
                 }
 
                 <div className='flex flex-col lg:flex-row w-full gap-2'>
@@ -68,10 +80,10 @@ export default class CharacterSheet extends React.Component<CharacterSheetProps,
                 </div>
                 <div className='flex flex-col lg:flex-row gap-2 w-full mt-2'>
                     <BasicCard additionalClasses={'overflow-y-auto lg:w-1/2 lg:h-fit'}>
-                        <CharacterSkillsTabs character_id={this.props.character.id} is_dead={this.props.character.is_dead}/>
+                        <CharacterSkillsTabs character_id={this.props.character.id} is_dead={this.props.character.is_dead} is_automation_running={this.props.character.is_automation_running}/>
                     </BasicCard>
                     <BasicCard additionalClasses={'overflow-y-auto lg:w-1/2 lg:h-fit'}>
-                        <CharacterInventoryTabs character_id={this.props.character.id} is_dead={this.props.character.is_dead} user_id={this.props.character.user_id} />
+                        <CharacterInventoryTabs character_id={this.props.character.id} is_dead={this.props.character.is_dead} user_id={this.props.character.user_id} is_automation_running={this.props.character.is_automation_running}/>
                     </BasicCard>
                 </div>
             </div>

@@ -3,6 +3,7 @@
 namespace App\Game\Maps\Services;
 
 use App\Flare\Values\LocationEffectValue;
+use App\Game\Battle\Events\UpdateCharacterStatus;
 use Illuminate\Support\Collection;
 use Storage;
 use League\Fractal\Manager;
@@ -90,6 +91,9 @@ class LocationService {
                                   ->where('game_map_id', $character->map->game_map_id)
                                   ->whereNotNull('required_quest_item_id')
                                   ->first();
+
+        // In case automation is running, this way the timer updates.
+        event(new UpdateCharacterStatus($character));
 
         return [
             'map_url'                => Storage::disk('maps')->url($character->map_url),

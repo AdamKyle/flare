@@ -43,7 +43,7 @@ export default class Crafting extends React.Component<any, any> {
                 const url = craftingGetEndPoints('craft', this.props.character_id);
 
                 (new Ajax()).setRoute(url).setParameters({
-                    params: {crafting_type: this.state.selected_type}
+                    crafting_type: this.state.selected_type
                 }).doAjaxCall('get', (result: AxiosResponse) => {
                     this.setState({
                         loading: false,

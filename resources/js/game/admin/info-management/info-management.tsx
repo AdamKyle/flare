@@ -85,7 +85,7 @@ export default class InfoManagement extends React.Component<any, any> {
             }
 
             if (this.props.info_page_id !== 0) {
-                form.append('display_order', (index).toString())
+                form.append('display_order', (index + 1).toString())
             } else {
                 form.append('order', (index + 1).toString())
             }
@@ -105,6 +105,7 @@ export default class InfoManagement extends React.Component<any, any> {
     }
 
     postForms(sections: any[]) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
 
         this.setState({
             posting: true,

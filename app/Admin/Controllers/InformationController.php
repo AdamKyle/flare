@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Requests\InfoImport;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\InfoPage;
 
@@ -21,6 +22,29 @@ class InformationController extends Controller {
         return view('admin.information.manage', [
             'infoPageId' => $infoPage->id,
         ]);
+    }
+
+    public function export() {
+        return response()->attachment(InfoPage::all(), 'inforamtion');
+    }
+
+    public function import(InfoImport $request) {
+
+        $data = json_decode(trim($request->file('info_import')->get()), true);
+
+        foreach ($data as $key => $modelEntry) {
+            InfoPage::updateOrCreate(['id' => $modelEntry['id']], $modelEntry);
+        }
+
+        return response()->redirectToRoute('admin.info-management')->with('success', 'Info has been imported. Do not forget to sync up the backup images.');
+    }
+
+    public function exportInfo() {
+        return response()->view('admin.information.export');
+    }
+
+    public function importInfo() {
+        return response()->view('admin.information.import');
     }
 
     public function page(InfoPage $infoPage) {

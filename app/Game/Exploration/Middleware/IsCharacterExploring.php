@@ -23,16 +23,16 @@ class IsCharacterExploring
         if ($request->wantsJson()) {
             if ($isTooBusy) {
 
-                event(new ServerMessageEvent(auth()->user(), 'No. You\'re too busy. (Are you auto battling? If so, stop. Then engage the action you want.)'));
+                event(new ServerMessageEvent(auth()->user(), 'No. You\'re too busy. (Are you auto battling? If so, stop. Then engage the action you want. You can still sell items from your inventory.)'));
 
                 return response()->json([
-                    'error' => 'You are too busy to do that. You are currently exploring.',
+                    'error' => 'You are too busy to do that. You are currently exploring. You can still sell items from your inventory.',
                 ], 422);
             }
         } else {
             if ($isTooBusy) {
 
-                event(new ServerMessageEvent(auth()->user(), 'No. You\'re too busy. (Are you exploring? Stop exploring and attempt the action again.)'));
+                event(new ServerMessageEvent(auth()->user(), 'No. You\'re too busy. (Are you exploring? Stop exploring and attempt the action again. You can still sell items from your inventory.)'));
 
                 return redirect()->route('game')->with('error', 'You are too busy to do that. You are currently exploring.');
             }

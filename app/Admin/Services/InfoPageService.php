@@ -84,7 +84,10 @@ class InfoPageService {
 
             $section = $this->uploadNewImage($section, $params, $page->page_name);
 
-            $section['content']             = str_replace('<p><br></p>', '', $params['content']);
+            $content = str_replace('<p><br></p>', '', $params['content']);
+            $content = str_replace('<p>&nbsp;</p>', '', $content);
+
+            $section['content']             = $content;
             $section['live_wire_component'] = $params['live_wire_component'];
 
             $sections[$sectionIndex] = $section;
@@ -148,8 +151,11 @@ class InfoPageService {
             $path = Storage::disk('info-sections-images')->putFile(Str::kebab(strtolower($pageName)), $params['content_image']);
         }
 
+        $content = str_replace('<p><br></p>', '', $params['content']);
+        $content = str_replace('<p>&nbsp;</p>', '', $content);
+
         $sections = [
-            'content'             => str_replace('<p><br></p>', '', $params['content']),
+            'content'             => $content,
             'content_image_path'  => $path,
             'live_wire_component' => $params['live_wire_component'] !== 'null' ? $params['live_wire_component'] : null,
             'display_order'       => isset($params['order']) ? $params['order'] : $params['display_order'],

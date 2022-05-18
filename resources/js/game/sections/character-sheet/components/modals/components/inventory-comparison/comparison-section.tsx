@@ -12,6 +12,7 @@ import ListItemModal from "./list-item-modal";
 import InventoryComparisonAdjustment
     from "../../../../../../lib/game/character-sheet/types/modal/inventory-comparison-adjustment";
 import InventoryComparisonActions from "../../../../../../lib/game/character-sheet/ajax/inventory-comparison-actions";
+import WarningAlert from "../../../../../../components/ui/alerts/simple-alerts/warning-alert";
 
 export default class ComparisonSection extends React.Component<any, any> {
 
@@ -120,6 +121,14 @@ export default class ComparisonSection extends React.Component<any, any> {
     render() {
         return (
             <div className='p-5'>
+                {
+                    this.props.is_automation_running ?
+                        <WarningAlert additional_css={'mb-4'}>
+                            <p className='pb-3'>You are exploring. Some actions have been disabled.</p>
+                        </WarningAlert>
+                    : null
+                }
+
                 <ItemComparisonSection comparison_details={this.props.comparison_details} view_port={this.props.view_port}/>
                 <div className='border-b-2 mt-6 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                 <div className={clsx(
@@ -130,7 +139,7 @@ export default class ComparisonSection extends React.Component<any, any> {
                         'md:grid-cols-4': this.props.is_grid_size(4, this.props.comparison_details.itemToEquip),
                     }
                 )}>
-                    <PrimaryOutlineButton button_label={'Equip'} on_click={this.manageEquipModal.bind(this)} disabled={this.props.is_action_loading}/>
+                    <PrimaryOutlineButton button_label={'Equip'} on_click={this.manageEquipModal.bind(this)} disabled={this.props.is_action_loading || this.props.is_automation_running}/>
                     <PrimaryOutlineButton button_label={'Move'} on_click={this.manageMoveModalModal.bind(this)} disabled={this.props.is_action_loading}/>
                     <SuccessOutlineButton button_label={'Sell'} on_click={() => this.manageSellModal(this.props.comparison_details.itemToEquip)} disabled={this.props.is_action_loading}/>
 
@@ -138,7 +147,7 @@ export default class ComparisonSection extends React.Component<any, any> {
                         this.props.comparison_details.itemToEquip.affix_count > 0 || this.props.comparison_details.itemToEquip.holy_stacks_applied > 0 ?
                             <SuccessOutlineButton button_label={'List'}
                                                   on_click={() => this.manageListItemModal(this.props.comparison_details.itemToEquip)}
-                                                  disabled={this.props.is_action_loading}/>
+                                                  disabled={this.props.is_action_loading || this.props.is_automation_running}/>
                         : null
                     }
 

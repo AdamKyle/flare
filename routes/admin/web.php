@@ -150,7 +150,12 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
 
     Route::get('/admin/statistics/dashboard', ['as' => 'admin.statistics', 'uses' => 'StatisticsController@index']);
 
+    Route::post('/admin/information-management/export', ['as' => 'admin.info-management.export', 'uses' => 'InformationController@export']);
+    Route::post('/admin/information-management/import', ['as' => 'admin.info-management.import', 'uses' => 'InformationController@import']);
+
     Route::get('/admin/information-management', ['as' => 'admin.info-management', 'uses' => 'InformationController@index']);
+    Route::get('/admin/information-management/export-data', ['as' => 'admin.info-management.export-data', 'uses' => 'InformationController@exportInfo']);
+    Route::get('/admin/information-management/import-data', ['as' => 'admin.info-management.import-data', 'uses' => 'InformationController@importInfo']);
     Route::get('/admin/information-management/create-page', ['as' => 'admin.info-management.create-page', 'uses' => 'InformationController@managePage']);
     Route::get('/admin/information-management/page/{infoPage}', ['as' => 'admin.info-management.page', 'uses' => 'InformationController@page']);
     Route::get('/admin/information-management/update-page/{infoPage}', ['as' => 'admin.info-management.up-page', 'uses' => 'InformationController@managePage']);

@@ -10,4 +10,6 @@ export default interface InventoryTabSectionProps extends CoreInventoryTabProps 
     usable_items: UsableItemsDetails[] | [];
 
     usable_sets: SetDetails[] | [];
+
+    is_automation_running: boolean;
 }

@@ -88,8 +88,8 @@ class AccountDeletionJob implements ShouldQueue
 
                 event(new GlobalMessageEvent('The Creator is sad today: ' . $characterName . ' has decided to call it quits. We wish them the best on their journeys'));
             } else {
-                $message = 'Hello, your account was deleted due to account inactivity. 
-                A player may only be inactive for 5 months at a time. You are of course welcome to come back at 
+                $message = 'Hello, your account was deleted due to account inactivity.
+                A player may only be inactive for 5 months at a time. You are of course welcome to come back at
                 any time and start a new character.';
 
                 Mail::to($user)->send(new GenericMail($user, $message, 'Automated Account Deletion', true));
@@ -142,8 +142,6 @@ class AccountDeletionJob implements ShouldQueue
         $character->boons()->delete();
 
         $character->questsCompleted()->delete();
-
-        $character->notifications()->delete();
 
         $character->currentAutomations()->delete();
 

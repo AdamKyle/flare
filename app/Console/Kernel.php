@@ -5,7 +5,6 @@ namespace App\Console;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use App\Console\Commands\CleanMarketHistory;
-use App\Console\Commands\CleanNotifications;
 use App\Console\Commands\MoveInfoFiles;
 use App\Console\Commands\UpdateKingdom;
 use Spatie\ShortSchedule\ShortSchedule;
@@ -21,7 +20,6 @@ class Kernel extends ConsoleKernel {
      * @var array
      */
     protected $commands = [
-        CleanNotifications::class,
         MoveInfoFiles::class,
         CleanMarketHistory::class,
         UpdateKingdom::class,
@@ -35,8 +33,6 @@ class Kernel extends ConsoleKernel {
      */
     protected function schedule(Schedule $schedule) {
 
-        // Clean notifications every month.
-        $schedule->command('clean:notifications')->monthly()->timezone(config('app.timezone'));
 
         // Increase the max level every month.
         $schedule->command('increase:max_level')->monthly()->timezone(config('app.timezone'));
@@ -51,13 +47,7 @@ class Kernel extends ConsoleKernel {
         $schedule->command('cache:droppable-items')->everySixHours()->timezone(config('app.timezone'));
 
         // Refresh the high-end droppable items.
-        $schedule->command('cache:highend-droppable-items')->everyThreeHours()->timezone(config('app.timezone'));
-
-        // Give people a chance to win daily lottery for gold dust
-        $schedule->command('daily:gold-dust')->dailyAt('12:00')->timezone(config('app.timezone'));
-
-        // Weekly Celestial Rate is increased to 80% spawn chance on Wednesdays at 1 pm America Edmonton time.
-        $schedule->command('weekly:celestial-spawn')->weeklyOn(3, '13:00')->timezone(config('app.timezone'));
+        $schedule->command('cache:high-end-items')->everyThreeHours()->timezone(config('app.timezone'));
 
         // Clear the celestials every hour.
         $schedule->command('clear:celestials')->hourly()->timezone(config('app.timezone'));
@@ -77,8 +67,15 @@ class Kernel extends ConsoleKernel {
         // clean the kingdom logs every week on monday at 2 am.
         $schedule->command('clean:kingdomLogs')->weeklyOn(1, '2:00')->timezone(config('app.timezone'));
 
-        // clean the adventure logs every week on monday at 2 am.
-        $schedule->command('clean:adventure-logs')->weeklyOn(1, '2:00')->timezone(config('app.timezone'));
+        /**
+         * Game Events:
+         */
+
+        // Give people a chance to win daily lottery for gold dust
+        $schedule->command('daily:gold-dust')->dailyAt('12:00')->timezone(config('app.timezone'));
+
+        // Weekly Celestial Rate is increased to 80% spawn chance on Wednesdays at 1 pm America Edmonton time.
+        $schedule->command('weekly:celestial-spawn')->weeklyOn(3, '13:00')->timezone(config('app.timezone'));
     }
 
     /**

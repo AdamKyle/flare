@@ -3,7 +3,6 @@
 namespace App\Game\Kingdoms\Controllers;
 
 use App\Flare\Models\KingdomLog;
-use App\Flare\Models\Notification;
 use App\Game\Adventures\Events\UpdateAdventureLogsBroadcastEvent;
 use App\Game\Kingdoms\Events\UpdateKingdomLogs;
 use App\Game\Kingdoms\Service\KingdomLogService;

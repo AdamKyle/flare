@@ -11,4 +11,6 @@ export default interface SkillsProps {
     dark_table: boolean;
 
     is_dead: boolean;
+
+    is_automation_running: boolean;
 }

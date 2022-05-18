@@ -213,7 +213,8 @@ export default class ExplorationSection extends React.Component<any, any> {
                             }
 
                             <div className='text-center'>
-                                <DangerButton button_label={'Stop Exploration'} on_click={this.stopExploration.bind(this)} disabled={this.state.loading} />
+                                <DangerButton button_label={'Stop Exploration'} on_click={this.stopExploration.bind(this)} disabled={this.state.loading} additional_css={'mr-2'}/>
+                                <PrimaryButton button_label={'Close Exploration'} on_click={this.props.manage_exploration} disabled={this.state.loading} />
                             </div>
                         </Fragment>
                     :

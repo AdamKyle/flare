@@ -56,7 +56,7 @@ export default class EquippedTable extends React.Component<EquippedInventoryTabP
     }
 
     actions(row: InventoryDetails): JSX.Element {
-        return <DangerButton button_label={'Unequip'} on_click={() => this.unequip(row.slot_id)} disabled={this.props.is_dead} />
+        return <DangerButton button_label={'Unequip'} on_click={() => this.unequip(row.slot_id)} disabled={this.props.is_dead || this.props.is_automation_running} />
     }
 
     assignToSet(label: string) {
@@ -172,12 +172,12 @@ export default class EquippedTable extends React.Component<EquippedInventoryTabP
                             <input type='text' name='search' className='form-control' onChange={this.search.bind(this)} placeholder={'search'}/>
                         </div>
                         <div className='ml-2'>
-                            <DangerButton button_label={'Unequip All'} on_click={this.unequipAll.bind(this)} disabled={this.props.is_dead || this.state.data.length === 0} />
+                            <DangerButton button_label={'Unequip All'} on_click={this.unequipAll.bind(this)} disabled={this.props.is_dead || this.state.data.length === 0 || this.props.is_automation_running} />
                         </div>
                         {
                             this.hasEmptySet() ?
                                 <div className='ml-2'>
-                                    <DropDown menu_items={this.buildMenuItems()} button_title={'Assign to Set'} disabled={this.props.is_dead} />
+                                    <DropDown menu_items={this.buildMenuItems()} button_title={'Assign to Set'} disabled={this.props.is_dead || this.props.is_automation_running} />
                                 </div>
                             : null
                         }

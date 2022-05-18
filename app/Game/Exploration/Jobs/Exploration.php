@@ -59,11 +59,17 @@ class Exploration implements ShouldQueue
         if ($response instanceof MonsterPlayerFight) {
 
             if ($this->encounter($response, $automation, $battleEventHandler, $params)) {
-                Exploration::dispatch($this->character, $this->automationId, $this->attackType)->delay(now()->addMinutes(5));
+                $time = now()->diffInMinutes($automation->completed_at);
+
+                Exploration::dispatch($this->character, $this->automationId, $this->attackType)->delay(now()->addMinutes($time >= 5 ? 5 : $time));
+
+                return;
             }
         }
 
         $automation->delete();
+
+        $response->deleteCharacterCache($this->character);
 
         event(new ExplorationLogUpdate($this->character->user, 'Something went wrong with automation. Could not process fight. Automation Canceled.'));
 
@@ -78,10 +84,10 @@ class Exploration implements ShouldQueue
         if ($this->fightAutomationMonster($response, $automation, $battleEventHandler, $params)) {
             event(new ExplorationLogUpdate($user, 'You search the corpse of you enemy for clues, where did they come from? None to be found. Upon searching the area further, you find the enemies friends.', true));
 
-            $enemies = rand(1, 6);
+            $enemies = rand(1, 7);
 
-            event(new ExplorationLogUpdate($user, '"Chirst child there are: '.$enemies.' of them ..."
-            The guides hisses at you from the shadows. You ignore his words and prepare for battle. One right after the other ...', true));
+            event(new ExplorationLogUpdate($user, '"Chirst, child there are: '.$enemies.' of them ..."
+            The Guide hisses at you from the shadows. You ignore his words and prepare for battle. One right after the other ...', true));
 
             for ($i = 1; $i <= $enemies; $i++) {
                 if (!$this->fightAutomationMonster($response, $automation, $battleEventHandler, $params)) {
@@ -102,13 +108,13 @@ class Exploration implements ShouldQueue
     protected function fightAutomationMonster(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, array $params) {
         $fightResponse = $response->fightMonster();
 
-        $response->deleteCharacterCache($this->character);
-
         if (!$fightResponse) {
 
             $automation->delete();
 
             $battleEventHandler->processDeadCharacter($this->character);
+
+            $response->deleteCharacterCache($this->character);
 
             event(new ExplorationLogUpdate($this->character->user, 'You died during exploration. Exploration has ended.'));
 
@@ -167,9 +173,13 @@ class Exploration implements ShouldQueue
         if (!is_null($automation)) {
             $automation->delete();
 
-            event(new ExplorationLogUpdate($this->character->user, 'Phew, child! I did not think we would survive all of your shenanigans.
-                So many times I could have died! Do you ever think about anyone other than yourself? No? Didn\'t think so. Either way, I am off.
-                Let me know when we go on our next adventure.', true));
+            event(new ExplorationLogUpdate($this->character->user, '"Phew, child! I did not think we would survive all of your shenanigans.
+                So many times I could have died! Do you ever think about anyone other than yourself? No? Didn\'t think so." The Guide storms off and you follow him in silence.', true));
+
+            event(new ExplorationLogUpdate($this->character->user, 'Your adventures over, you head to back to the nearest town. Upon arriving, you and The Guide spot the closest Inn. Soaked in the
+            blood of your enemies, the sweat of the lingers on you like a bad smell. Entering the establishment and finding a table, you are greeted by a big busty women with shaggy long red hair messily tied in a pony tail.
+            She leans down to the table, her cleavage close enough to your face that you can see the freckles and lines of age. Her grin missing a tooth, she states: "What can I get the both of ya?" You shutter on the inside.', true));
+
 
             $character = $this->character->refresh();
 
@@ -185,8 +195,8 @@ class Exploration implements ShouldQueue
 
         $gold = $character->gold + 10000;
 
-        if ($gold > MaxCurrenciesValue::GOLD) {
-            $gold = MaxCurrenciesValue::GOLD;
+        if ($gold >= MaxCurrenciesValue::MAX_GOLD) {
+            $gold = MaxCurrenciesValue::MAX_GOLD;
         }
 
         $character->update(['gold' => $gold]);

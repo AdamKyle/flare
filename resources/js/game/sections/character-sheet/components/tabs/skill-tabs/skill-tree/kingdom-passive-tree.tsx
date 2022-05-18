@@ -19,7 +19,7 @@ export default class KingdomPassiveTree extends React.Component<any, any> {
         if (passive.children.length > 0) {
             nodes = passive.children.map((child: any ) => {
                 return (
-                    <TreeNode label={<Node passive={child} show_passive_modal={this.showTrainingModal.bind(this)} />}>
+                    <TreeNode label={<Node passive={child} show_passive_modal={this.showTrainingModal.bind(this)} is_automation_running={this.props.is_automation_running} />}>
                         {this.buildNodes(child)}
                     </TreeNode>
                 )
@@ -48,6 +48,7 @@ export default class KingdomPassiveTree extends React.Component<any, any> {
                     label={<Node
                         passive={this.props.passives}
                         show_passive_modal={this.showTrainingModal.bind(this)}
+                        is_automation_running={this.props.is_automation_running}
                     />}
                 >
                     {this.buildNodes(this.props.passives)}

@@ -2,9 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Flare\Models\Item;
 use App\Flare\Models\MarketHistory;
-use App\Flare\Models\Notification;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 

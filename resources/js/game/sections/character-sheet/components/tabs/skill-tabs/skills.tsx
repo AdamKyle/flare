@@ -106,9 +106,9 @@ export default class Skills extends React.Component<SkillsProps, any> {
                     {
                         row.is_training ?
                             <DangerButton button_label={this.state.stopping ? <span>Stopping <i
-                                className="fas fa-spinner fa-pulse"></i></span> : 'Stop training'} on_click={() => this.stopTraining(row)} disabled={this.props.is_dead || this.state.stopping} />
+                                className="fas fa-spinner fa-pulse"></i></span> : 'Stop training'} on_click={() => this.stopTraining(row)} disabled={this.props.is_dead || this.state.stopping || this.props.is_automation_running} />
                         :
-                            <PrimaryButton button_label={'Train'} on_click={() => this.manageTrainSkill(row)} disabled={this.props.is_dead || this.isAnySkillTraining()} />
+                            <PrimaryButton button_label={'Train'} on_click={() => this.manageTrainSkill(row)} disabled={this.props.is_dead || this.isAnySkillTraining() || this.props.is_automation_running} />
                     }
                 </span>
             },

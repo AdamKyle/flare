@@ -241,7 +241,7 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
             on_click: () => this.manageRenameSet()
         })
 
-        if (this.state.selected_set !== null) {
+        if (this.state.selected_set !== null && !this.props.is_automation_running) {
             if (this.state.selected_set !== this.props.set_name_equipped && this.props.sets[this.state.selected_set].items.length > 0) {
                 actions.push({
                     name: 'Empty set',
@@ -277,7 +277,7 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
     }
 
     buttonsDisabled() {
-        return this.state.selected_set === this.props.set_name_equipped || this.props.is_dead
+        return this.state.selected_set === this.props.set_name_equipped || this.props.is_dead || this.props.is_automation_running
     }
 
     cannotEquipSet(setName?: string) {

@@ -23,14 +23,14 @@ Route::group(['middleware' => ['auth', 'throttle:100,1', 'is.character.who.they.
     Route::get('/maps/{character}', ['uses' => 'Api\MapsController@index']);
 
     Route::get('/character/{character}/inventory', ['uses' => 'Api\CharacterInventoryController@inventory']);
+    Route::get('/character/{character}/inventory/comparison', ['uses' => 'Api\ItemComparisonController@compareItem']);
+    Route::get('/character/{character}/inventory/comparison-from-chat', ['uses' => 'Api\ItemComparisonController@compareItemFromChat']);
 
     Route::group(['middleware' => ['is.character.dead']], function() {
         Route::middleware(['is.character.exploring'])->group(function() {
 
             Route::get('/character/{character}/inventory/item/{item}', ['uses' => 'Api\CharacterInventoryController@itemDetails']);
 
-            Route::get('/character/{character}/inventory/comparison', ['uses' => 'Api\ItemComparisonController@compareItem']);
-            Route::get('/character/{character}/inventory/comparison-from-chat', ['uses' => 'Api\ItemComparisonController@compareItemFromChat']);
 
             Route::post('/character/{character}/inventory/equip-item', ['uses' => 'Api\CharacterInventoryController@equipItem']);
             Route::post('/character/{character}/inventory/save-equipped-as-set', ['uses' => 'Api\CharacterInventoryController@saveEquippedAsSet']);

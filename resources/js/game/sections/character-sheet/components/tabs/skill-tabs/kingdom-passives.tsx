@@ -130,7 +130,9 @@ export default class KingdomPassives extends React.Component<any, any> {
                                                 manage_success_message={this.manageSuccessMessage.bind(this)}
                                                 update_passives={this.updatePassives.bind(this)}
                                                 character_id={this.props.character_id}
-                                                is_dead={this.props.is_dead} />
+                                                is_dead={this.props.is_dead}
+                                                is_automation_running={this.props.is_automation_running}
+                            />
 
                             {
                                 this.state.skill_in_training != null ?

@@ -59,10 +59,8 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
 
     componentDidMount() {
         (new Ajax()).setRoute('character/'+this.props.character_id+'/inventory/comparison').setParameters({
-            params: {
-                slot_id: this.props.slot_id,
-                item_to_equip_type: this.props.item_type,
-            }
+            slot_id: this.props.slot_id,
+            item_to_equip_type: this.props.item_type,
         }).doAjaxCall('get', (result: AxiosResponse) => {
             this.setState({
                 loading: false,
@@ -153,6 +151,7 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
                             dark_charts={this.props.dark_charts}
                             usable_sets={this.props.usable_sets}
                             slot_id={this.props.slot_id}
+                            is_automation_running={this.props.is_automation_running}
                         />
                 }
             </Dialogue>

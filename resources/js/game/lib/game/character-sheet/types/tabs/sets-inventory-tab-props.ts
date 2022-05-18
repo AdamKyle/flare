@@ -8,4 +8,6 @@ export default interface SetsInventoryTabProps extends CoreInventoryTabProps {
     savable_sets: SetDetails[] | [];
 
     set_name_equipped: string;
+
+    is_automation_running: boolean;
 }

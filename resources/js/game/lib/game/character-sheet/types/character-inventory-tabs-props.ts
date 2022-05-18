@@ -5,4 +5,6 @@ export default interface CharacterInventoryTabsProps {
     is_dead: boolean;
 
     user_id: number;
+
+    is_automation_running: boolean;
 }

@@ -13,9 +13,10 @@ export default class ExplorationMessages extends React.Component<ExplorationMess
     buildMessages() {
         return this.props.exploration_messages.map((message: ExplorationMessageType) => {
             if (message.id !== 0 && message.id !== null) {
-                return <li className={clsx('my-2 break-all lg:break-normal text-green-300', {
+                return <li className={clsx('my-2 break-all lg:break-normal ', {
                     'italic': message.make_italic,
                     'text-blue-500 font-bold': message.is_reward,
+                    'text-green-300': !message.is_reward
 
                 })} key={message.id}>
                     {message.message}

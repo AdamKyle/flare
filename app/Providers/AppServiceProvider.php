@@ -24,5 +24,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        \Response::macro('attachment', function ($content, $fileName) {
+
+            $headers = [
+                'Content-type' => 'text/json',
+                'Content-Disposition' => "attachment; filename=".$fileName.".json",
+            ];
+
+            return \Response::make($content, 200, $headers);
+
+        });
     }
 }

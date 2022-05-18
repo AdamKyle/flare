@@ -14,4 +14,6 @@ export default interface UsableItemTable {
     update_inventory: (inventory: {[key: string]: InventoryDetails[]}) => void;
 
     set_success_message: (message: string) => void;
+
+    is_automation_running: boolean;
 }

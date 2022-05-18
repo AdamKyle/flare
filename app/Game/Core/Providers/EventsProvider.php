@@ -10,8 +10,6 @@ use App\Game\Core\Events\DropsCheckEvent;
 use App\Game\Core\Events\GoldRushCheckEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Events\AttackTimeOutEvent;
-use App\Game\Core\Events\CreateAdventureNotificationEvent;
-use App\Game\Core\Listeners\CreateAdventureNotificationListener;
 use App\Game\Core\Listeners\AttackTimeOutListener;
 use App\Game\Core\Listeners\UpdateTopBarListener;
 use App\Game\Core\Listeners\UpdateCharacterListener;
@@ -54,10 +52,6 @@ class EventsProvider extends ServiceProvider {
             GoldRushCheckListener::class,
         ],
 
-        // When an adventure ends we create the notification:
-        CreateAdventureNotificationEvent::class => [
-            CreateAdventureNotificationListener::class,
-        ],
 
         // When the character levels up:
         CharacterLevelUpEvent::class => [

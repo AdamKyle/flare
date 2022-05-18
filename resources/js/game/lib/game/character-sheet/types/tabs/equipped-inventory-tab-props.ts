@@ -7,4 +7,6 @@ export default interface EquippedInventoryTabProps extends CoreInventoryTabProps
     is_set_equipped: boolean;
 
     sets: {[key: string]: { equippable: boolean; items: InventoryDetails[] | [], set_id: number }};
+
+    is_automation_running: boolean;
 }
