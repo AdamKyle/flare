@@ -75,6 +75,8 @@ export interface CharacterType {
 
     can_attack_again_at: number|null;
 
+    is_automation_running: boolean;
+
     race: string;
 
     class: string;

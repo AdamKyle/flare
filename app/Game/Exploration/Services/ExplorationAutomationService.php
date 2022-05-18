@@ -5,9 +5,11 @@ namespace App\Game\Exploration\Services;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Flare\Values\AutomationType;
+use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Flare\Models\Character;
 use App\Game\Exploration\Events\ExplorationLogUpdate;
+use App\Game\Exploration\Events\ExplorationTimeOut;
 use App\Game\Exploration\Jobs\Exploration;
 
 class ExplorationAutomationService {
@@ -39,7 +41,11 @@ class ExplorationAutomationService {
             'attack_type'                    => $params['attack_type'],
         ]);
 
+        event(new UpdateCharacterStatus($character));
+
         event(new ExplorationLogUpdate($character->user, 'The exploration will begin in 5 minutes. Every 5 minutes you will encounter the enemy up to a maximum of 8 times in a single "encounter"'));
+
+        event(new ExplorationTimeOut($character->user, now()->diffInSeconds($automation->completed_at)));
 
         $this->startAutomation($character, $automation->id, $params['attack_type']);
     }

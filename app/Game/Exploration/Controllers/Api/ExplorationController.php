@@ -2,6 +2,7 @@
 
 namespace App\Game\Exploration\Controllers\Api;
 
+use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Values\AttackTypeValue;
@@ -35,14 +36,17 @@ class ExplorationController extends Controller {
 
         $explorationAutomationService->beginAutomation($character, $request->all());
 
+
         return response()->json([
             'message' => 'Exploration has started. Check the exploration tab (beside server messages) for update. The tab will every five minutes, rewards are handed to you or disenchanted automatically.'
         ]);
     }
 
-    public function stop(CharacterAutomation $characterAutomation, Character $character) {
+    public function stop(Character $character) {
 
-        if ($character->id !== $characterAutomation->character_id) {
+        $characterAutomation = CharacterAutomation::where('character_id', $character->id)->where('type', AutomationType::EXPLORING)->first();
+
+        if (is_null($characterAutomation)) {
             return response()->json([
                 'message' => 'Nope. You don\'t own that.'
             ], 422);
@@ -54,13 +58,10 @@ class ExplorationController extends Controller {
 
         event(new ExplorationTimeOut($character->user, 0));
         event(new ExplorationStatus($character->user, false));
-        event(new UpdateTopBarEvent($character));
-        event(new UpdateAutomationsList($character->user, $character->currentAutomations));
+        event(new UpdateCharacterStatus($character));
 
-        event(new ExplorationLogUpdate($character->user, 'Exploration has ended.'));
+        event(new ExplorationLogUpdate($character->user, 'Exploration has been stopped at player request.'));
 
-        return response()->json([
-            'message' => 'Exploration has stopped.'
-        ]);
+        return response()->json();
     }
 }

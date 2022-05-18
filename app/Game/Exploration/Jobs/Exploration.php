@@ -4,6 +4,7 @@ namespace App\Game\Exploration\Jobs;
 
 use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Monster;
@@ -104,9 +105,10 @@ class Exploration implements ShouldQueue
         $response->deleteCharacterCache($this->character);
 
         if (!$fightResponse) {
-            $battleEventHandler->processDeadCharacter($this->character);
 
             $automation->delete();
+
+            $battleEventHandler->processDeadCharacter($this->character);
 
             event(new ExplorationLogUpdate($this->character->user, 'You died during exploration. Exploration has ended.'));
 
@@ -133,7 +135,7 @@ class Exploration implements ShouldQueue
         return false;
     }
 
-    protected function updateAutomation(CharacterAutomation $automation) {
+    protected function updateAutomation(CharacterAutomation $automation): CharacterAutomation {
         if (!is_null($automation->move_down_monster_list_every)) {
             $characterLevel = $this->character->refresh()->level;
 
@@ -157,6 +159,8 @@ class Exploration implements ShouldQueue
                 }
             }
         }
+
+        return $automation->refresh();
     }
 
     protected function endAutomation(?CharacterAutomation $automation) {
@@ -170,6 +174,8 @@ class Exploration implements ShouldQueue
             $character = $this->character->refresh();
 
             $this->rewardPlayer($character);
+
+            event(new UpdateCharacterStatus($character));
 
             event(new ExplorationTimeOut($character->user, 0));
         }

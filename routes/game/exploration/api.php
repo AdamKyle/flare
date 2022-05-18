@@ -8,6 +8,6 @@ Route::middleware([
 
     Route::middleware(['is.character.dead'])->group(function() {
         Route::post('/exploration/{character}/start', ['as' => 'exploration.start', 'uses' => 'Api\ExplorationController@begin']);
-        Route::post('/exploration/{characterAutomation}/{character}/stop', ['as' => 'exploration.stop', 'uses' => 'Api\ExplorationController@stop']);
+        Route::post('/exploration/{character}/stop', ['as' => 'exploration.stop', 'uses' => 'Api\ExplorationController@stop']);
     });
 });

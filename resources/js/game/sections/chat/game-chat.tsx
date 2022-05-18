@@ -7,6 +7,7 @@ import {AxiosError, AxiosResponse} from "axios";
 import Chat from "./chat";
 import GameChatProps from "../../lib/game/chat/game-chat-props";
 import GameChatState from "../../lib/game/chat/game-chat-state";
+import ExplorationMessages from "./exploration-messages";
 
 export default class GameChat extends React.Component<GameChatProps, GameChatState> {
     private chat: any;
@@ -17,12 +18,15 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
 
     private globalMessage: any;
 
+    private explorationMessage: any;
+
     constructor(props: GameChatProps) {
         super(props);
 
         this.state = {
             chat: [],
             server_messages: [],
+            exploration_messages: [],
             message: '',
             is_silenced: false,
             can_talk_again_at: null,
@@ -46,6 +50,9 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
 
         // @ts-ignore
         this.serverMessages = Echo.private('server-message-' + this.props.user_id);
+
+        // @ts-ignore
+        this.explorationMessage = Echo.private('exploration-log-update-' + this.props.user_id);
 
         // @ts-ignore
         this.privateMessages = Echo.private('private-message-' + this.props.user_id);
@@ -88,6 +95,28 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
         }, (error: AxiosError) => {
 
         })
+
+        // @ts-ignore
+        this.explorationMessage.listen('Game.Exploration.Events.ExplorationLogUpdate', (event: any) => {
+            let messages = JSON.parse(JSON.stringify(this.state.exploration_messages));
+
+            if (messages.length > 1000) {
+                messages.length = 250; // Remove the last 3/4's worth of messages
+            }
+
+            messages.unshift({
+                id: (Math.random() + 1).toString(36).substring(7),
+                message: event.message,
+                make_italic: event.makeItalic,
+                is_reward: event.isReward,
+            });
+
+            this.setState({
+                exploration_messages: messages
+            },() => {
+                this.setTabToUpdated('exploration-messages');
+            });
+        });
 
         // @ts-ignore
         this.serverMessages.listen('Game.Messages.Events.ServerMessageEvent', (event: any) => {
@@ -304,7 +333,7 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
                     </TabPanel>
 
                     <TabPanel key={'exploration-messages'}>
-
+                        <ExplorationMessages exploration_messages={this.state.exploration_messages} />
                     </TabPanel>
                 </Tabs>
             </div>

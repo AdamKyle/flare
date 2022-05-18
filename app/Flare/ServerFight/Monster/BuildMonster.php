@@ -124,7 +124,7 @@ class BuildMonster extends BattleBase {
         return $monster;
     }
 
-    private function reduceAllStats(array $monster, array $characterStatReductionAffixes, float $resistanceReduction): array|boolean {
+    private function reduceAllStats(array $monster, array $characterStatReductionAffixes, float $resistanceReduction): array|bool {
 
         $allStatReduction = $characterStatReductionAffixes['all_stat_reduction'];
 

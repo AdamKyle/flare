@@ -90,7 +90,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
 
         this.explorationTimeOut.listen('Game.Exploration.Events.ExplorationTimeOut', (event: any) => {
             this.setState({
-                time_left: event.forLength,
+                automation_time_out: event.forLength,
             });
         });
     }
@@ -244,17 +244,24 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                 </div>
                 <div className={'mt-3'}>
                     {
-                        this.state.automation_time_out !== 0 ?
+                        this.state.automation_time_out !== 0 && this.state.time_left !== 0 ?
+
                             <Fragment>
                                 <div className='grid grid-cols-2 gap-2'>
-                                    <TimerProgressBar time_remaining={this.state.time_left} time_out_label={'Movement Timeout'}/>
-                                    <TimerProgressBar time_remaining={this.state.automation_time_out} time_out_label={'Exploration'}/>
+                                    <div>
+                                        <TimerProgressBar time_remaining={this.state.time_left} time_out_label={'Movement Timeout'}/>
+                                    </div>
+                                    <div>
+                                        <TimerProgressBar time_remaining={this.state.automation_time_out} time_out_label={'Exploration'}/>
+                                    </div>
                                 </div>
                             </Fragment>
                         :
-                            <TimerProgressBar time_remaining={this.state.time_left} time_out_label={'Movement Timeout'}/>
+                            <Fragment>
+                                <TimerProgressBar time_remaining={this.state.automation_time_out} time_out_label={'Exploration'}/>
+                                <TimerProgressBar time_remaining={this.state.time_left} time_out_label={'Movement Timeout'}/>
+                            </Fragment>
                     }
-
                 </div>
             </Fragment>
         )
