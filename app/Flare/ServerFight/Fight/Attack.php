@@ -22,9 +22,12 @@ class Attack {
 
     private BaseCharacterAttack $baseCharacterAttack;
 
-    public function __construct(BaseCharacterAttack $baseCharacterAttack) {
+    private MonsterAttack $monsterAttack;
+
+    public function __construct(BaseCharacterAttack $baseCharacterAttack, MonsterAttack $monsterAttack) {
 
         $this->baseCharacterAttack = $baseCharacterAttack;
+        $this->monsterAttack       = $monsterAttack;
 
         $this->battleMessages = [];
     }
@@ -108,13 +111,31 @@ class Attack {
 
             $response->resetMessages();
 
+            $this->attackCounter++;
+
             $this->attack($character, $serverMonster, $attackType, 'monster');
         }
 
         if ($whoAttacks === 'monster') {
-            dd('stop here');
-        }
+            $this->monsterAttack->setIsCharacterVoided($this->isCharacterVoided)
+                                ->setCharacterHealth($this->characterHealth)
+                                ->setMonsterHealth($this->monsterHealth)
+                                ->monsterAttack($serverMonster, $character, $attackType);
 
-        $this->attackCounter++;
+            $this->mergeBattleMessages($this->monsterAttack->getMessages());
+
+            $this->characterHealth = $this->monsterAttack->getCharacterHealth();
+            $this->monsterHealth   = $this->getMonsterHealth();
+
+            if ($this->monsterHealth > $serverMonster->getHealth()) {
+                $this->monsterHealth = $serverMonster->getHealth();
+            }
+
+            $this->monsterAttack->clearMessages();
+
+            $this->attackCounter++;
+
+            $this->attack($character, $serverMonster, $attackType, 'monster');
+        }
     }
 }

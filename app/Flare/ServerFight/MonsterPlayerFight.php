@@ -75,6 +75,10 @@ class MonsterPlayerFight {
         $this->battleMessages = [];
     }
 
+    public function getEnemyName() {
+        return $this->monster['name'];
+    }
+
     public function fightMonster(): bool {
         $characterStatReductionAffixes = $this->characterCacheData->getCachedCharacterData($this->character, 'stat_affixes');
         $skillReduction                = $this->characterCacheData->getCachedCharacterData($this->character, 'skill_reduction');

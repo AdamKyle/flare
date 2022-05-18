@@ -23,6 +23,8 @@ export default class MapSection extends React.Component<MapProps, MapState> {
 
     private traverseUpdate: any;
 
+    private explorationTimeOut: any;
+
     constructor(props: MapProps) {
         super(props);
 
@@ -47,20 +49,30 @@ export default class MapSection extends React.Component<MapProps, MapState> {
             can_player_move: true,
             characters_on_map: 0,
             time_left: 0,
+            automation_time_out: 0,
         }
 
         // @ts-ignore
-        this.mapTimeOut     = Echo.private('show-timeout-move-' + this.props.user_id);
+        this.mapTimeOut         = Echo.private('show-timeout-move-' + this.props.user_id);
 
         // @ts-ignore
-        this.traverseUpdate = Echo.private('update-map-plane-' + this.props.user_id);
+        this.explorationTimeOut = Echo.private('exploration-timeout-' + this.props.user_id);
+
+        // @ts-ignore
+        this.traverseUpdate     = Echo.private('update-map-plane-' + this.props.user_id);
     }
 
     componentDidMount() {
         (new Ajax()).setRoute('map/' + this.props.character_id)
                     .doAjaxCall('get', (result: AxiosResponse) => {
 
-            this.setStateFromData(result.data);
+            this.setStateFromData(result.data, () => {
+                if (this.props.automation_completed_at !== 0) {
+                    this.setState({
+                        automation_time_out: this.props.automation_completed_at
+                    })
+                }
+            });
         }, (err: AxiosError) => {
 
         });
@@ -75,9 +87,15 @@ export default class MapSection extends React.Component<MapProps, MapState> {
         this.traverseUpdate.listen('Game.Maps.Events.UpdateMapBroadcast', (event: any) => {
             this.setStateFromData(event.mapDetails);
         });
+
+        this.explorationTimeOut.listen('Game.Exploration.Events.ExplorationTimeOut', (event: any) => {
+            this.setState({
+                time_left: event.forLength,
+            });
+        });
     }
 
-    setStateFromData(data: any) {
+    setStateFromData(data: any, callback?: () => void) {
         let state = {...MapStateManager.setState(data), ...{loading: false, map_id: data.character_map.game_map.id}};
 
         state.port_location = getPortLocation(state);
@@ -92,7 +110,11 @@ export default class MapSection extends React.Component<MapProps, MapState> {
         }
 
         // @ts-ignore
-        this.setState(state);
+        this.setState(state, () => {
+            if (typeof callback !== 'undefined') {
+                return callback();
+            }
+        });
     }
 
     fetchLeftBounds(): number {
@@ -221,7 +243,18 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                     />
                 </div>
                 <div className={'mt-3'}>
-                    <TimerProgressBar time_remaining={this.state.time_left} time_out_label={'Movement Timeout'}/>
+                    {
+                        this.state.automation_time_out !== 0 ?
+                            <Fragment>
+                                <div className='grid grid-cols-2 gap-2'>
+                                    <TimerProgressBar time_remaining={this.state.time_left} time_out_label={'Movement Timeout'}/>
+                                    <TimerProgressBar time_remaining={this.state.automation_time_out} time_out_label={'Exploration'}/>
+                                </div>
+                            </Fragment>
+                        :
+                            <TimerProgressBar time_remaining={this.state.time_left} time_out_label={'Movement Timeout'}/>
+                    }
+
                 </div>
             </Fragment>
         )

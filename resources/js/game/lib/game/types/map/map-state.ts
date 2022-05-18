@@ -31,6 +31,8 @@ export default interface MapState {
 
     time_left: number,
 
+    automation_time_out: number;
+
     can_player_move: boolean,
 
     characters_on_map: number,

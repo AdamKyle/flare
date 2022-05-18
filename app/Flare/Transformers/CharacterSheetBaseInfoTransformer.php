@@ -97,6 +97,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
             'can_attack_again_at'         => now()->diffInSeconds($character->can_attack_again_at),
             'can_craft_again_at'          => now()->diffInSeconds($character->can_craft_again_at),
             'is_automation_running'       => $character->currentAutomations()->where('type', AutomationType::EXPLORING)->get()->isNotEmpty(),
+            'automation_completed_at'     => $this->getTimeLeftOnAutomation($character),
             'is_silenced'                 => $character->user->is_silenced,
             'can_talk_again_at'           => $character->user->can_talk_again_at,
             'can_move'                    => $character->can_move,
@@ -144,5 +145,15 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
         $location = Location::where('x', $characterXPosition)->where('y', $characterYPosition)->where('name', 'Purgatory Smiths House')->first();
 
         return !is_null($location);
+    }
+
+    protected function getTimeLeftOnAutomation(Character $character) {
+        $automation = $character->currentAutomations()->where('type', AutomationType::EXPLORING)->first();
+
+        if (!is_null($automation)) {
+            return now()->diffInSeconds($automation->completed_at);
+        }
+
+        return 0;
     }
 }

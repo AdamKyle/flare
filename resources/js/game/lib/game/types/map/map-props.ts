@@ -14,4 +14,6 @@ export default interface MapProps {
     };
 
     is_dead?: boolean;
+
+    automation_completed_at: number;
 }

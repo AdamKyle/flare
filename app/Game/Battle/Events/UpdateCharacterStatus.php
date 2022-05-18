@@ -31,17 +31,28 @@ class UpdateCharacterStatus implements ShouldBroadcastNow {
         $character = $character->refresh();
 
         $this->characterStatuses = [
-            'can_attack'            => $character->can_attack,
-            'can_attack_again_at'   => $character->can_attack_again_at,
-            'can_craft'             => $character->can_craft,
-            'can_craft_again_at'    => $character->can_craft_again_at,
-            'is_dead'               => $character->is_dead,
-            'is_automation_running' => $character->currentAutomations()->where('type', AutomationType::EXPLORING)->get()->isNotEmpty(),
-            'is_silenced'           => $character->is_silenced,
-            'can_move'              => $character->can_move,
+            'can_attack'              => $character->can_attack,
+            'can_attack_again_at'     => $character->can_attack_again_at,
+            'can_craft'               => $character->can_craft,
+            'can_craft_again_at'      => $character->can_craft_again_at,
+            'is_dead'                 => $character->is_dead,
+            'is_automation_running'   => $character->currentAutomations()->where('type', AutomationType::EXPLORING)->get()->isNotEmpty(),
+            'automation_completed_at' => $this->getTimeLeftOnAutomation($character),
+            'is_silenced'             => $character->is_silenced,
+            'can_move'                => $character->can_move,
         ];
 
         $this->user = $character->user;
+    }
+
+    protected function getTimeLeftOnAutomation(Character $character) {
+        $automation = $character->currentAutomations()->where('type', AutomationType::EXPLORING)->first();
+
+        if (!is_null($automation)) {
+            return now()->diffInSeconds($automation->completed_at);
+        }
+
+        return 0;
     }
 
     /**

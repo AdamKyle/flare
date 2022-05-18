@@ -18,7 +18,7 @@ class ExplorationTimeOut implements ShouldBroadcast
     /**
      * @var User $user
      */
-    public $user;
+    private $user;
 
     /**
      * @var int $forLength
@@ -41,7 +41,6 @@ class ExplorationTimeOut implements ShouldBroadcast
     {
         $this->user        = $user;
         $this->forLength   = $forLength;
-        $this->activateBar = true;
     }
 
     /**

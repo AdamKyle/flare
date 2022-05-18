@@ -127,6 +127,8 @@ export interface CharacterType {
 
     voided_to_hit_base: number;
 
+    automation_completed_at: number;
+
     xp: number,
 
     xp_next: number,

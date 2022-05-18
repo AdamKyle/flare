@@ -195,6 +195,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                                     view_port={this.state.view_port}
                                     currencies={this.state.character_currencies}
                                     is_dead={this.state.character?.is_dead}
+                                    automation_completed_at={this.state.character?.automation_completed_at}
                                 />
                             </BasicCard>
                         </div>

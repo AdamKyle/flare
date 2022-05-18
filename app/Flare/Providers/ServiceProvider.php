@@ -42,6 +42,7 @@ use App\Flare\ServerFight\Fight\CharacterAttacks\BaseCharacterAttack;
 use App\Flare\ServerFight\Fight\CharacterAttacks\CharacterAttack;
 use App\Flare\ServerFight\Fight\CharacterAttacks\Types\WeaponType;
 use App\Flare\ServerFight\Fight\Entrance;
+use App\Flare\ServerFight\Fight\MonsterAttack;
 use App\Flare\ServerFight\Fight\Voidance;
 use App\Flare\ServerFight\Monster\BuildMonster;
 use App\Flare\ServerFight\Monster\ServerMonster;
@@ -488,8 +489,19 @@ class ServiceProvider extends ApplicationServiceProvider
             return new BaseCharacterAttack($app->make(CharacterAttack::class));
         });
 
+        $this->app->bind(MonsterAttack::class, function($app) {
+            return new MonsterAttack(
+                $app->make(CharacterCacheData::class),
+                $app->make(Entrance::class),
+                $app->make(CanHit::class)
+            );
+        });
+
         $this->app->bind(Attack::class, function($app) {
-            return new Attack($app->make(BaseCharacterAttack::class));
+            return new Attack(
+                $app->make(BaseCharacterAttack::class),
+                $app->make(MonsterAttack::class)
+            );
         });
 
         $this->app->bind(MonsterPlayerFight::class, function($app) {
