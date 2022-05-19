@@ -73,7 +73,7 @@ class MonsterAttack extends BattleBase {
 
         $this->characterHealth -= $attack;
 
-        $this->addMessage($monster->getName() . ' hits for: ' + number_format($attack), 'enemy-action');
+        $this->addMessage($monster->getName() . ' hits for: ' . number_format($attack), 'enemy-action');
     }
 
     protected function fireEnchantments(ServerMonster $monster, Character $character) {

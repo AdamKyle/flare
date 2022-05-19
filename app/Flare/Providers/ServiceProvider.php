@@ -40,6 +40,7 @@ use App\Flare\ServerFight\Fight\Attack;
 use App\Flare\ServerFight\Fight\CanHit;
 use App\Flare\ServerFight\Fight\CharacterAttacks\BaseCharacterAttack;
 use App\Flare\ServerFight\Fight\CharacterAttacks\CharacterAttack;
+use App\Flare\ServerFight\Fight\CharacterAttacks\Types\CastType;
 use App\Flare\ServerFight\Fight\CharacterAttacks\Types\WeaponType;
 use App\Flare\ServerFight\Fight\Entrance;
 use App\Flare\ServerFight\Fight\MonsterAttack;
@@ -481,8 +482,20 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
+        $this->app->bind(CastType::class, function($app) {
+            return new CastType(
+                $app->make(CharacterCacheData::class),
+                $app->make(Entrance::class),
+                $app->make(CanHit::class),
+                $app->make(Affixes::class),
+            );
+        });
+
         $this->app->bind(CharacterAttack::class, function($app) {
-            return new CharacterAttack($app->make(WeaponType::class));
+            return new CharacterAttack(
+                $app->make(WeaponType::class),
+                $app->make(CastType::class),
+            );
         });
 
         $this->app->bind(BaseCharacterAttack::class, function($app) {
