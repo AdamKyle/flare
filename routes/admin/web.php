@@ -148,7 +148,12 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::get('/admin/quests/edit/{quest}', ['as' => 'quests.edit', 'uses' => 'QuestsController@edit']);
     Route::get('/admin/quests/{quest}', ['as' => 'quests.show', 'uses' => 'QuestsController@show']);
 
-    Route::get('/admin/statistics/dashboard', ['as' => 'admin.statistics', 'uses' => 'StatisticsController@index']);
+    Route::post('/admin/guide-quests/store', ['as' => 'admin.guide-quests.store', 'uses' => 'GuideQuestsController@store']);
+
+    Route::get('/admin/guide-quests', ['as' => 'admin.guide-quests', 'uses' => 'GuideQuestsController@index']);
+    Route::get('/admin/guide-quests/create', ['as' => 'admin.guide-quests.create', 'uses' => 'GuideQuestsController@create']);
+    Route::get('/admin/guide-quests/edit/{guideQuest}', ['as' => 'admin.guide-quests.edit', 'uses' => 'GuideQuestsController@edit']);
+    Route::get('/admin/guide-quests/show/{guideQuest}', ['as' => 'admin.guide-quests.show', 'uses' => 'GuideQuestsController@show']);
 
     Route::post('/admin/information-management/export', ['as' => 'admin.info-management.export', 'uses' => 'InformationController@export']);
     Route::post('/admin/information-management/import', ['as' => 'admin.info-management.import', 'uses' => 'InformationController@import']);
@@ -160,4 +165,6 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::get('/admin/information-management/page/{infoPage}', ['as' => 'admin.info-management.page', 'uses' => 'InformationController@page']);
     Route::get('/admin/information-management/update-page/{infoPage}', ['as' => 'admin.info-management.up-page', 'uses' => 'InformationController@managePage']);
 
+
+    Route::get('/admin/statistics/dashboard', ['as' => 'admin.statistics', 'uses' => 'StatisticsController@index']);
 });

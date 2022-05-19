@@ -20,6 +20,7 @@ class QuestsCompleted extends Model {
     protected $fillable = [
         'character_id',
         'quest_id',
+        'guide_quest_id',
     ];
 
     public function character() {
@@ -28,6 +29,10 @@ class QuestsCompleted extends Model {
 
     public function quest() {
         return $this->belongsTo(Quest::class, 'quest_id', 'id');
+    }
+
+    public function guideQuest() {
+        return $this->belongsTo(GuideQuest::class, 'guide_quest_id', 'id');
     }
 
     protected static function newFactory() {

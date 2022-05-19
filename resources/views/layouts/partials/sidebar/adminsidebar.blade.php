@@ -36,6 +36,10 @@
                 <span class="fas fa-feather"></span>
                 Information Management
             </a>
+            <a href="{{route('admin.guide-quests')}}">
+                <span class="fas fa-feather"></span>
+                Guide Quests
+            </a>
         </div>
     </div>
 

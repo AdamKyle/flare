@@ -3,6 +3,7 @@
 namespace App\Admin\Providers;
 
 use App\Admin\Requests\QuestManagement;
+use App\Admin\Services\GuideQuestService;
 use App\Admin\Services\InfoPageService;
 use App\Admin\Services\ItemsService;
 use App\Admin\Services\QuestService;
@@ -52,6 +53,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(InfoPageService::class, function() {
             return new InfoPageService();
+        });
+
+        $this->app->bind(GuideQuestService::class, function() {
+            return new GuideQuestService();
         });
 
         $this->commands([CreateAdminAccount::class, GiveKingdomsToNpcs::class]);

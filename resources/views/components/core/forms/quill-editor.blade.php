@@ -5,7 +5,7 @@
 <div class="mb-5">
     <label class="label block mb-2" for="{{$name}}">{{$label}}</label>
     <input type="hidden" name="{{$name}}" value="{{!is_null($model) ? trim($model->{$modelKey}) : ''}}" id="{{$name}}"/>
-    <div id="{{$quillId}}" class="form-control">{!!nl2br($model->{$modelKey})!!}</div>
+    <div id="{{$quillId}}" class="form-control">{!! !is_null($model) ? nl2br($model->{$modelKey}) : '' !!}</div>
 </div>
 
 @push('scripts')
