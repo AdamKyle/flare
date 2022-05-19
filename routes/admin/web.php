@@ -101,6 +101,8 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::post('/admin/passive-skills/store', ['as' => 'passive.skill.store', 'uses' => 'PassiveSkillsController@store']);
     Route::post('/admin/passive-skills/{passiveSkill}/update', ['as' => 'passive.skill.update', 'uses' => 'PassiveSkillsController@update']);
 
+    Route::post('/admin/race/store', ['as' => 'races.store', 'uses' => 'RacesController@store']);
+
     Route::get('/admin/races', ['as' => 'races.list', 'uses' => 'RacesController@index']);
     Route::get('/admin/races/create', ['as' => 'races.create', 'uses' => 'RacesController@create']);
     Route::get('/admin/races/{race}', ['as' => 'races.race', 'uses' => 'RacesController@show']);

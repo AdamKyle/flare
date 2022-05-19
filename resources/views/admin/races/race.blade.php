@@ -1,17 +1,21 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="mt-20 mb-10 w-full lg:w-3/5 m-auto">
-        <div class="m-auto">
-            <x-core.page-title
-              title="{{$race->name}}"
-              route="{{url()->previous()}}"
-              link="Back"
-              color="primary"
-            ></x-core.page-title>
-        </div>
-        <hr />
-        <x-core.cards.card>
+    <x-core.layout.info-container>
+        @php
+            $backUrl = route('races.list');
+
+            if (!auth()->user()->hasRole('Admin')) {
+                $backUrl = '/information/races-and-classes';
+            }
+        @endphp
+
+        <x-core.cards.card-with-title
+            title="{{$race->name}}"
+            buttons="true"
+            backUrl="{{$backUrl}}"
+            editUrl="{{route('races.edit', ['race' => $race->id])}}"
+        >
             <dl>
                 <dt>Strength Modifier</dt>
                 <dd>+ {{$race->str_mod}} pts.</dd>
@@ -32,12 +36,6 @@
                 <dt>Defense Modifier</dt>
                 <dd>+ {{$race->defense_mod * 100}} %</dd>
             </dl>
-            @if (!is_null(auth()->user()))
-                @if (auth()->user()->hasRole('Admin'))
-                    <a href="{{route('races.edit', [
-                                        'race' => $race
-                                    ])}}" class="btn btn-primary mt-2">Edit</a>
-                @endif
-            @endif
-        </x-core.cards.card>
+        </x-core.cards.card-with-title>
+    </x-core.layout.info-container>
 @endsection
