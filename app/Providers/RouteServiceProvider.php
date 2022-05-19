@@ -92,6 +92,7 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapGamePassiveSkillApiRoutes();
         $this->mapQuestApiRoutes();
         $this->mapShopApiRoutes();
+        $this->mapGameGuideQuestsApiRoutes();
     }
 
     /**
@@ -244,5 +245,12 @@ class RouteServiceProvider extends ServiceProvider
             ->middleware('web')
             ->namespace('App\Game\PassiveSkills\Controllers')
             ->group(base_path('routes/game/passive-skills/api.php'));
+    }
+
+    protected function mapGameGuideQuestsApiRoutes() {
+        Route::prefix('api')
+            ->middleware('web')
+            ->namespace('App\Game\GuideQuests\Controllers')
+            ->group(base_path('routes/game/guide-quests/api.php'));
     }
 }

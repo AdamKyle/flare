@@ -7,6 +7,11 @@
 require('./bootstrap');
 
 /**
+ * Only shows when the player has the guide quest enabled.
+ */
+require('./game/sections/guide-quests/guide-quests-init');
+
+/**
  * Load the game.
  *
  * This will grab the user and the character id from the

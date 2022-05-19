@@ -72,6 +72,12 @@
 
             @auth
                 <div>
+                    @if (!is_null(auth()->user()->character))
+                        @include('layouts.partials.player.guide-button')
+                    @endif
+                </div>
+
+                <div>
                     <label class="switch switch_outlined" data-toggle="tooltip" data-tippy-content="Toggle Dark Mode">
                         <input id="darkModeToggler" type="checkbox">
                         <span></span>

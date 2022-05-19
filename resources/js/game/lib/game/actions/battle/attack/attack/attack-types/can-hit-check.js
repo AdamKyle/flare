@@ -101,11 +101,11 @@ export default class CanHitCheck extends BattleBase {
     let enemyAgi = agi * 0.02; // Take only 20%.
     let playerToHit = toHit * 0.02; // take only 20%.
 
-    if (playerToHit < 10) {
+    if (playerToHit < 50) {
       playerToHit = toHit;
     }
 
-    if (enemyAgi < 10) {
+    if (enemyAgi < 50) {
       enemyAgi = agi;
     }
 

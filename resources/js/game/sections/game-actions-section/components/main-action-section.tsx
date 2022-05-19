@@ -36,7 +36,7 @@ export default class MainActionSection extends React.Component<any, any> {
                     {
                         this.props.character?.is_dead ?
                             <div className='text-center my-4'>
-                                <PrimaryButton button_label={'Revive'} on_click={this.props.revive} additional_css={'mb-4'} disabled={!this.props.character_statuses?.can_attack}/>
+                                <PrimaryButton button_label={'Revive'} on_click={this.props.revive} additional_css={'mb-4'} disabled={!this.props.character.can_attack}/>
                                 <p>
                                     You are dead. Please Revive.
                                 </p>

@@ -45,8 +45,8 @@ class User extends Authenticatable
         'disable_attack_type_popover',
         'auto_disenchant_amount',
         'timeout_until',
-        'is_test',
         'will_be_deleted',
+        'guide_enabled'
     ];
 
     /**

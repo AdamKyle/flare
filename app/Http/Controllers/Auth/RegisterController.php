@@ -2,14 +2,11 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Flare\Events\ServerMessageEvent;
-use App\Flare\Events\SiteAccessedEvent;
+use Cache;
 use App\Flare\Jobs\RegisterMessage;
 use App\Flare\Services\CanUserEnterSiteService;
-use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Http\Controllers\Controller;
-use App\Flare\Models\User;
-use Illuminate\Support\Str;
+use App\Flare\Models\User;;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Http\Request;
@@ -96,6 +93,7 @@ class RegisterController extends Controller
             'password'         => Hash::make($data['password']),
             'ip_address'       => $ip,
             'last_logged_in'   => now(),
+            'guide_enabled'    => isset($data['guide_enabled'])
         ]);
     }
 
@@ -123,6 +121,10 @@ class RegisterController extends Controller
             $user = $this->create($request->all(), $request->ip());
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
+        }
+
+        if ($user->guide_enabled) {
+            Cache::put('user-show-guide-initial-message-' . $user->id, 'true');
         }
 
         event(new Registered($user));
