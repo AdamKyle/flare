@@ -2,7 +2,7 @@
     <x-core.page-title
         title="{{$pageTitle}}"
         route="{{url()->previous()}}"
-        color="success" link="back"
+        color="success" link="Back"
     >
         @auth
             @if (auth()->user()->hasRole('Admin'))
@@ -22,7 +22,7 @@
         </x-core.alerts.simple-info-alert>
     </div>
 
-    <div class="prose dark:prose min-w-full m-auto">
+    <div class="prose dark:prose-invert min-w-full m-auto">
         @foreach($sections as $section)
 
             @if (is_null($section['content_image_path']))

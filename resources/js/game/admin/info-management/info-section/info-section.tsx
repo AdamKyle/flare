@@ -47,8 +47,14 @@ export default class InfoSection extends React.Component<any, any> {
 
     buildOptions() {
         return [{
-            label: 'Admin Items',
+            label: 'Items',
             value: 'admin.items.items-table',
+        }, {
+            label: 'Races',
+            value: 'admin.races.races-table',
+        },{
+            label: 'Classes',
+            value: 'admin.classes.classes-table',
         }];
     }
 
