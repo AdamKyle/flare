@@ -1,23 +1,41 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="row page-titles">
-        <div class="col-md-6 align-self-left">
-            <h4 class="mt-3">{{!is_null($class) ? 'Edit class: ' . $class->name : 'Create class'}}</h4>
-        </div>
-        <div class="col-md-6 align-self-right">
-            <a href="{{route('home')}}" class="btn btn-success float-right ml-2">Home</a>
-        </div>
-    </div>
-    @livewire('core.form-wizard', [
-        'views' => [
-            'admin.classes.partials.game-class',
-        ],
-        'model'     => $class,
-        'modelName' => 'gameClass',
-        'steps' => [
-            'Details'
-        ],
-        'finishRoute' => 'classes.list',
-    ])
+    <x-core.layout.info-container>
+        <x-core.cards.card-with-title
+            title="{{!is_null($class) ? 'Edit: ' . nl2br($class->name) : 'Create New Race'}}"
+            buttons="true"
+            backUrl="{{!is_null($class) ? route('classes.class', ['class' => $class->id]) : route('classes.list')}}"
+        >
+            <x-core.form-wizard.container action="{{route('classes.store')}}" modelId="{{!is_null($class) ? $class->id : 0}}" lastTab="tab-style-2-5">
+                <x-core.form-wizard.tabs>
+                    <x-core.form-wizard.tab target="tab-style-2-1" primaryTitle="Basic Info" secondaryTitle="Basic information about the class." isActive="true"/>
+                    <x-core.form-wizard.tab target="tab-style-2-2" primaryTitle="Skill Info" secondaryTitle="Basic information about the c;ass effects on skills."/>
+                </x-core.form-wizard.tabs>
+                <x-core.form-wizard.contents>
+                    <x-core.form-wizard.content target="tab-style-2-1" isOpen="true">
+                        <h3 class="mb-3">Basic Info</h3>
+                        <x-core.forms.input :model="$class" label="Name:" modelKey="name" name="name" />
+                        <x-core.forms.select :model="$class" label="To Hit Stat:" modelKey="to_hit_stat" name="to_hit_stat" :options="$stats" />
+                        <x-core.forms.select :model="$class" label="Damage Stat:" modelKey="damage_stat" name="damage_stat" :options="$stats" />
+                        <x-core.forms.input :model="$class" label="Strength Modifier:" modelKey="str_mod" name="str_mod" />
+                        <x-core.forms.input :model="$class" label="Dexterity Modifier:" modelKey="dex_mod" name="dex_mod" />
+                        <x-core.forms.input :model="$class" label="Intelligence Modifier:" modelKey="int_mod" name="int_mod" />
+                        <x-core.forms.input :model="$class" label="Agility Modifier:" modelKey="agi_mod" name="agi_mod" />
+                        <x-core.forms.input :model="$class" label="Charisma Modifier:" modelKey="chr_mod" name="chr_mod" />
+                        <x-core.forms.input :model="$class" label="Durability Modifier:" modelKey="dur_mod" name="dur_mod" />
+                        <x-core.forms.input :model="$class" label="Focus Modifier:" modelKey="focus_mod" name="focus_mod" />
+                        <x-core.forms.input :model="$class" label="Defence Modifier:" modelKey="defense_mod" name="defense_mod" />
+                    </x-core.form-wizard.content>
+
+                    <x-core.form-wizard.content target="tab-style-2-2">
+                        <h3 class="mb-3">Basic Skill Info</h3>
+                        <x-core.forms.input :model="$class" label="Accuracy Modifier:" modelKey="accuracy_mod" name="accuracy_mod" />
+                        <x-core.forms.input :model="$class" label="Dodge Modifier:" modelKey="dodge_mod" name="dodge_mod" />
+                        <x-core.forms.input :model="$class" label="Looting Modifier:" modelKey="looting_mod" name="looting_mod" />
+                    </x-core.form-wizard.content>
+                </x-core.form-wizard.contents>
+            </x-core.form-wizard.container>
+        </x-core.cards.card-with-title>
+    </x-core.layout.info-container>
 @endsection

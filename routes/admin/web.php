@@ -108,6 +108,8 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::get('/admin/races/{race}', ['as' => 'races.race', 'uses' => 'RacesController@show']);
     Route::get('/admin/races/{race}/edit', ['as' => 'races.edit', 'uses' => 'RacesController@edit']);
 
+    Route::post('/admin/classes/store', ['as' => 'classes.store', 'uses' => 'ClassesController@store']);
+
     Route::get('/admin/classes', ['as' => 'classes.list', 'uses' => 'ClassesController@index']);
     Route::get('/admin/classes/create', ['as' => 'classes.create', 'uses' => 'ClassesController@create']);
     Route::get('/admin/classes/{class}', ['as' => 'classes.class', 'uses' => 'ClassesController@show']);

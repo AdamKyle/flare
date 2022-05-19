@@ -20,6 +20,6 @@
             {{--                </x-core.buttons.link-buttons.primary-button>--}}
             </x-core.page-title>
         </div>
-        @livewire('admin.classes.data-table')
+        @livewire('admin.classes.classes-table')
     </div>
 @endsection
