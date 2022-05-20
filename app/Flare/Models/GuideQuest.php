@@ -25,6 +25,7 @@ class GuideQuest extends Model
         'required_game_map_id',
         'required_quest_id',
         'required_quest_item_id',
+        'reward_level',
     ];
 
     /**
@@ -41,6 +42,7 @@ class GuideQuest extends Model
         'required_game_map_id'   => 'integer',
         'required_quest_id'      => 'integer',
         'required_quest_item_id' => 'integer',
+        'reward_level'           => 'integer',
     ];
 
     protected $appends = [

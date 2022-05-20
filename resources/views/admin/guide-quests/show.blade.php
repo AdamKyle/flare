@@ -10,6 +10,15 @@
         >
             <div class='grid md:grid-cols-2 gap-4'>
                 <div>
+                    <h3 class="text-sky-600 dark:text-sky-500">Reward Details</h3>
+                    <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                    <dl class="mb-4">
+                        <dt>Reward Level</dt>
+                        <dd>{{$guideQuest->reward_level}}</dd>
+                    </dl>
+                    <p class="mb-5">
+                        Refers to the level of item between 1 and X that will be generted with random affixes.
+                    </p>
                     <h3 class="text-sky-600 dark:text-sky-500">Requirements</h3>
                     <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                     <dl>

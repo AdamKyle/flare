@@ -17,6 +17,7 @@
                     <x-core.form-wizard.content target="tab-style-2-1" isOpen="true">
                         <h3 class="mb-3">Basic Info</h3>
                         <x-core.forms.input :model="$guideQuest" label="Name:" modelKey="name" name="name" />
+                        <x-core.forms.input :model="$guideQuest" label="Reward Level:" modelKey="reward_level" name="reward_level" />
                         <x-core.forms.quill-editor :model="$guideQuest" label="Guide Text:" modelKey="intro_text" name="intro_text" quillId="intro-text"/>
                         <x-core.forms.quill-editor :model="$guideQuest" label="Instructions:" modelKey="instructions" name="instructions" quillId="quest-instructions"/>
                     </x-core.form-wizard.content>

@@ -35,7 +35,7 @@ export default class CharacterSheet extends React.Component<CharacterSheetProps,
                         <WarningAlert additional_css={'mb-4'}>
                             <p className='p-3'>Child! You are busy with Exploration. You cannot manage aspects of your inventory or skills such as whats training, passives or equipped items.</p>
                             <p className='p-3'>How ever, you can still manage the items you craft - such as sell, disenchant and destroy. You can also move items to sets, but not equip sets.</p>
-                            <p className='p-3'>Please see <a href='/information/holy-items' target='_blank'>Exploration <i
+                            <p className='p-3'>Please see <a href='/information/exploration' target='_blank'>Exploration <i
                                 className="fas fa-external-link-alt"></i></a> for more details.</p>
                         </WarningAlert>
                         : null

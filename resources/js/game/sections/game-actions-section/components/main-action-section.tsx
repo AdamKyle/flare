@@ -18,7 +18,7 @@ export default class MainActionSection extends React.Component<any, any> {
                         <MonsterSelection monsters={this.props.monsters} update_monster={this.props.set_selected_monster} timer_running={this.props.attack_time_out > 0} character={this.props.character}/>
                     :
                         <div className='mb-4 md:ml-[120px]'>
-                            Exploration is running, You cannot fight monsters. <a href='/information/holy-items' target='_blank'>See Exploration Help <i
+                            Exploration is running, You cannot fight monsters. <a href='/information/exploration' target='_blank'>See Exploration Help <i
                             className="fas fa-external-link-alt"></i></a> for more details.
                         </div>
                 }

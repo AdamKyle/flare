@@ -6,4 +6,8 @@ export default interface KingdomModalState extends LocationModalState {
     loading: boolean;
 
     kingdom_details: KingdomDetails | null,
+
+    show_help: boolean;
+
+    help_type: string;
 }

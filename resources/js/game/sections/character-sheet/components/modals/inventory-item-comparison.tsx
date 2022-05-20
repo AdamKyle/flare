@@ -7,21 +7,10 @@ import InventoryItemComparisonState
     from "../../../../lib/game/character-sheet/types/modal/inventory-item-comparison-state";
 import ItemNameColorationText from "../../../../components/ui/item-name-coloration-text";
 import {capitalize} from "lodash";
-import PrimaryOutlineButton from "../../../../components/ui/buttons/primary-outline-button";
-import SuccessOutlineButton from "../../../../components/ui/buttons/success-outline-button";
-import DangerOutlineButton from "../../../../components/ui/buttons/danger-outline-button";
-import clsx from "clsx";
-import EquipModal from "./components/inventory-comparison/equip-modal";
-import LoadingProgressBar from "../../../../components/ui/progress-bars/loading-progress-bar";
 import InventoryItemComparisonProps
     from "../../../../lib/game/character-sheet/types/modal/inventory-item-comparison-props";
-import ItemComparisonSection from "./components/item-comparison-section";
-import MoveItemModal from "./components/inventory-comparison/move-item-modal";
 import InventoryComparisonAdjustment
     from "../../../../lib/game/character-sheet/types/modal/inventory-comparison-adjustment";
-import SellItemModal from "./components/inventory-comparison/sell-item-modal";
-import ListItemModal from "./components/inventory-comparison/list-item-modal";
-import InventoryComparisonActions from "../../../../lib/game/character-sheet/ajax/inventory-comparison-actions";
 import ComparisonSection from "./components/inventory-comparison/comparison-section";
 
 export default class InventoryItemComparison extends React.Component<InventoryItemComparisonProps, InventoryItemComparisonState> {

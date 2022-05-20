@@ -41,7 +41,7 @@ class UpdateSkillListener
             return;
         }
 
-        $skillXP = $this->getSkillXp($event->skill, $event->adventure, $event->monster);
+        $skillXP = $this->getSkillXp($event->skill, $event->monster);
 
         $this->updateSkill($event->skill, $skillXP);
 
@@ -58,10 +58,10 @@ class UpdateSkillListener
         }
     }
 
-    protected function getSkillXp(Skill $skill, Adventure $adventure = null, Monster $monster = null): float|int {
+    protected function getSkillXp(Skill $skill, Monster $monster = null): float|int {
         $gameMap = $skill->character->map->gameMap;
 
-        $skillXP = SkillXPCalculator::fetchSkillXP($skill, $adventure, $monster);
+        $skillXP = SkillXPCalculator::fetchSkillXP($skill, $monster);
 
         if (!is_null($gameMap->skill_training_bonus)) {
             $skillXP = $skillXP + $skillXP * $gameMap->skill_training_bonus;

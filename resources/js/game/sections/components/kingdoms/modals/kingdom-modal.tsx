@@ -10,7 +10,6 @@ import {formatNumber, percent} from "../../../../lib/game/format-number";
 import clsx from "clsx";
 import WarningAlert from "../../../../components/ui/alerts/simple-alerts/warning-alert";
 import PopOverContainer from "../../../../components/ui/popover/pop-over-container";
-import KingdomDetails from "../../../../lib/game/map/types/kingdom-details";
 
 export default class KingdomModal extends React.Component<KingdomModalProps, KingdomModalState> {
 
@@ -26,6 +25,8 @@ export default class KingdomModal extends React.Component<KingdomModalProps, Kin
             y: 0,
             loading: true,
             kingdom_details: null,
+            show_help: false,
+            help_type: '',
         }
     }
 

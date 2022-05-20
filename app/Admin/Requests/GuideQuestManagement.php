@@ -30,6 +30,7 @@ class GuideQuestManagement extends FormRequest
             'name'         => 'required',
             'intro_text'   => 'required',
             'instructions' => 'required',
+            'reward_level' => 'required|integer'
         ];
     }
 
@@ -42,7 +43,8 @@ class GuideQuestManagement extends FormRequest
         return [
             'name.required'         => 'Missing Name',
             'intro_text.required'   => 'Missing Intro Text',
-            'instructions.required' => 'Missing Instructions'
+            'instructions.required' => 'Missing Instructions',
+            'reward_level.required' => 'Missing Reward Level',
         ];
     }
 }

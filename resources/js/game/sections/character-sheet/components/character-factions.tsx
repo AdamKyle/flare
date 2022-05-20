@@ -90,8 +90,9 @@ export default class CharacterFactions extends React.Component<any, any> {
                 <div className='my-5'>
                     {
                         this.state.factions.length > 0 ?
-                            <InfoAlert>
-                                This tab does not update in real time. You can switch tabs to get the latest data.
+                            <InfoAlert additional_css={'mb-4'}>
+                                This tab does not update in real time. You can switch tabs to get the latest data. You can learn more about <a href='/information/factions' target='_blank'>Factions <i
+                                className="fas fa-external-link-alt"></i></a> in the help docs.
                             </InfoAlert>
                             : null
                     }

@@ -2,89 +2,20 @@
 
 namespace App\Flare\Builders;
 
-use Illuminate\Database\Eloquent\Builder;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
-use App\Flare\Models\Location;
 
 class RandomItemDropBuilder {
 
-    /**
-     * @var ?string $monsterPlane
-     */
-    private ?string $monsterPlane;
-
-    /**
-     * @var int $characterLevel
-     */
-    private int $characterLevel = 0;
-
-    /**
-     * @var int $monsterLevel
-     */
-    private int $monsterLevel   = 0;
-
-    /**
-     * @var Location|null $location
-     */
-    private ?Location $location;
-
-    /**
-     * Set the monster plane.
-     *
-     * @param string $name
-     * @return $this
-     */
-    public function setMonsterPlane(string $name): RandomItemDropBuilder {
-        $this->monsterPlane = $name;
-
-        return $this;
-    }
-
-    /**
-     * set the character level.
-     *
-     * @param int $level
-     * @return $this
-     */
-    public function setCharacterLevel(int $level): RandomItemDropBuilder {
-        $this->characterLevel = $level;
-
-        return $this;
-    }
-
-    /**
-     * set the monster level.
-     *
-     * @param int $level
-     * @return $this
-     */
-    public function setMonsterMaxLevel(int $level): RandomItemDropBuilder {
-        $this->monsterLevel = $level;
-
-        return $this;
-    }
-
-    /**
-     * Set the location.
-     *
-     * @param Location|null $location
-     * @return RandomItemDropBuilder
-     */
-    public function setLocation(Location $location = null): RandomItemDropBuilder {
-        $this->location = $location;
-
-        return $this;
-    }
 
     /**
      * Generates the random item for a player.
      *
      * @return Item|null
      */
-    public function generateItem(): ?Item {
-        $item    = $this->getItem();
-        $affixes = $this->getAffixes();
+    public function generateItem(int $forLevel): ?Item {
+        $item    = $this->getItem($forLevel);
+        $affixes = $this->getAffixes($forLevel);
 
         if (count($affixes) < 1) {
             return null;
@@ -107,14 +38,15 @@ class RandomItemDropBuilder {
      *
      * @return Item
      */
-    protected function getItem(): Item {
+    protected function getItem(int $level): Item {
         $query =  Item::inRandomOrder()->doesntHave('itemSuffix')
                                        ->doesntHave('itemPrefix')
-                                       ->whereNotIn('type', ['artifact', 'quest', 'alchemy', 'trinket']);
+                                       ->whereNotIn('type', ['artifact', 'quest', 'alchemy', 'trinket'])
+                                       ->where('skill_level_required', '<=', rand(1, $level));
 
 
 
-        return $this->canDropRestrictions($query)->first();
+        return $query->first();
     }
 
     /**
@@ -122,16 +54,16 @@ class RandomItemDropBuilder {
      *
      * @return array
      */
-    protected function getAffixes(): array {
+    protected function getAffixes(int $level): array {
         $affixes = [];
 
-        $affixes[] = $this->canDropRestrictions(ItemAffix::inRandomOrder()->where('type', 'prefix'))->first();
+        $affixes[] = ItemAffix::inRandomOrder()->where('type', 'prefix')->where('skill_Level_required', '<=', rand(1, $level))->first();
 
         if (rand(1, 100) > 50) {
-            $affix = $this->canDropRestrictions(ItemAffix::inRandomOrder()->where('type', 'suffix'))->first();
+            $affix = ItemAffix::inRandomOrder()->where('type', 'suffix')->where('skill_Level_required', '<=', rand(1, $level))->first();
 
             if (!is_null($affix)) {
-                $affixes[] = $this->canDropRestrictions(ItemAffix::inRandomOrder()->where('type', 'suffix'))->first();
+                $affixes[] = $affix;
             }
         }
 
@@ -175,27 +107,5 @@ class RandomItemDropBuilder {
         $item->update($updates);
 
         return $item;
-    }
-
-    /**
-     * Defines the restrictions on random query.
-     *
-     * If the monster is not a Shadow Plane monster and the location is not special (null) and the characters levels are not 10 levels
-     * higher than the max level, then we return only items or affixes that can drop.
-     *
-     * Else the valuation must be less than 4 billion gold.
-     *
-     * @param Builder $query
-     * @return Builder
-     */
-    protected function canDropRestrictions(Builder $query): Builder {
-        $totalLevels = $this->monsterLevel - $this->characterLevel;
-
-        if (($this->monsterPlane !== 'Shadow Plane' || is_null($this->location)) && !($totalLevels >= 10)) {
-            return $query->where('can_drop', true);
-        }
-
-        // Only drops up to 4 Billion is cost may drop.
-        return $query->where('cost', '<=', 4000000000);
     }
 }

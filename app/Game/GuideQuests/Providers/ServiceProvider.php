@@ -3,6 +3,7 @@
 namespace App\Game\GuideQuests\Providers;
 
 use App\Flare\Builders\CharacterInformationBuilder;
+use App\Flare\Builders\RandomItemDropBuilder;
 use App\Flare\Models\Skill;
 use App\Game\Core\Services\CharacterPassiveSkills;
 use App\Game\GuideQuests\Services\GuideQuestService;
@@ -28,7 +29,9 @@ class ServiceProvider extends ApplicationServiceProvider
         //
         // The test coverage never gets here.
         $this->app->bind(GuideQuestService::class, function($app) {
-            return new GuideQuestService();
+            return new GuideQuestService(
+                $app->make(RandomItemDropBuilder::class)
+            );
         });
         // @codeCoverageIgnoreEnd
     }

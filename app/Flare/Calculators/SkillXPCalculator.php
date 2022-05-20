@@ -19,30 +19,17 @@ class SkillXPCalculator {
      * @param Monster|null $monster
      * @return float|int
      */
-    public function fetchSkillXP(Skill $skill, Adventure $adventure = null, Monster $monster = null) {
-        $adventureBonus = $this->fetchAdventureBonus($adventure);
+    public function fetchSkillXP(Skill $skill, Monster $monster = null) {
         $xpTowards      = $this->getXpTowards($skill, $monster);
-        $totalBonus     = $skill->skill_training_bonus + $adventureBonus;
+        $totalBonus     = $skill->skill_training_bonus;
 
         if ($skill->can_train) {
-            $base = ($this->getBaseXp($skill) + $xpTowards);
+            $base = 25 + $xpTowards;
         } else {
-            $base = 20;
+            $base = 10;
         }
 
         return $base + $base * $totalBonus;
-    }
-
-    protected function getBaseXp(Skill $skill): int {
-        if ($skill->level >= 10) {
-            return 100;
-        } else if ($skill->level >= 100) {
-            return 500;
-        } else if ($skill->level >= 500) {
-            return 750;
-        }
-
-        return 25;
     }
 
     protected function getXpTowards(Skill $skill, Monster $monster = null) {

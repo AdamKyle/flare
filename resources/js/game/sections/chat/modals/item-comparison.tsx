@@ -33,9 +33,7 @@ export default class ItemComparison extends React.Component<any, any> {
         watchForChatDarkModeComparisonChange(this);
 
         (new Ajax()).setRoute('character/'+this.props.character_id+'/inventory/comparison-from-chat').setParameters({
-            params: {
-                slot_id: this.props.slot_id,
-            }
+            slot_id: this.props.slot_id,
         }).doAjaxCall('get', (result: AxiosResponse) => {
             this.setState({
                 loading: false,

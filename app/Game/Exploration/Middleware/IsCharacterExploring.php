@@ -26,7 +26,7 @@ class IsCharacterExploring
                 event(new ServerMessageEvent(auth()->user(), 'No. You\'re too busy. (Are you auto battling? If so, stop. Then engage the action you want. You can still sell items from your inventory.)'));
 
                 return response()->json([
-                    'error' => 'You are too busy to do that. You are currently exploring. You can still sell items from your inventory.',
+                    'message' => 'You are too busy to do that. You are currently exploring. You can still sell items from your inventory.',
                 ], 422);
             }
         } else {

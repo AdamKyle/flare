@@ -3,12 +3,11 @@ import Dialogue from "../../../components/ui/dialogue/dialogue";
 import ComponentLoading from "../../../components/ui/loading/component-loading";
 import {AxiosError, AxiosResponse} from "axios";
 import Ajax from "../../../lib/ajax/ajax";
-import BasicCard from "../../../components/ui/cards/basic-card";
-import CharacterTopSection from "../../character-top-section/character-top-section";
-import SmallerActions from "../../game-actions-section/smaller-actions";
-import Actions from "../../game-actions-section/actions";
 import Tabs from "../../../components/ui/tabs/tabs";
 import TabPanel from "../../../components/ui/tabs/tab-panel";
+import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
+import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
+import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
 
 export default class GuideQuest extends React.Component<any, any> {
     private tabs: {name: string, key: string}[];
@@ -27,8 +26,10 @@ export default class GuideQuest extends React.Component<any, any> {
         this.state = {
             loading: true,
             error_message: null,
+            success_message: null,
             quest_data: null,
             can_hand_in: false,
+            is_handing_in: false,
         }
     }
 
@@ -39,7 +40,16 @@ export default class GuideQuest extends React.Component<any, any> {
                 quest_data: result.data.quest,
                 can_hand_in: result.data.can_hand_in
             });
-        }, (error: AxiosError) => {});
+        }, (error: AxiosError) => {
+            if (typeof error.response !== 'undefined') {
+                const response = error.response;
+
+                this.setState({
+                    error_message: response.data.message,
+                    is_handing_in: false,
+                })
+            }
+        });
     }
 
     buildTitle() {
@@ -50,8 +60,26 @@ export default class GuideQuest extends React.Component<any, any> {
         return this.state.quest_data.name;
     }
 
+    closeMessage() {
+        this.setState({
+            success_message: null,
+            error_message: null,
+        });
+    }
+
     handInQuest() {
-        console.log('hand in ...');
+        this.setState({
+            is_handing_in: true,
+        }, () => {
+            (new Ajax()).setRoute('guide-quests/hand-in/'+this.props.user_id+'/'+this.state.quest_data.id).doAjaxCall('post', (result: AxiosResponse) => {
+                this.setState({
+                    is_handing_in: false,
+                    quest_data: result.data.quest,
+                    can_hand_in: result.data.can_hand_in,
+                    success_message: result.data.message,
+                });
+            }, (error: AxiosError) => {});
+        })
     }
 
     render() {
@@ -72,14 +100,29 @@ export default class GuideQuest extends React.Component<any, any> {
                         <div className='p-5 mb-2'><ComponentLoading/></div>
                     :
                         <Fragment>
-                            <div className={''}>
+                            {
+                                this.state.success_message !== null ?
+                                    <SuccessAlert close_alert={this.closeMessage.bind(this)}>
+                                        {this.state.success_message}
+                                    </SuccessAlert>
+                                : null
+                            }
+
+                            {
+                                this.state.error_message !== null ?
+                                    <DangerAlert close_alert={this.closeMessage.bind(this)}>
+                                        {this.state.error_message}
+                                    </DangerAlert>
+                                    : null
+                            }
+                            <div className={'mt-2'}>
                                 <h3 className='mb-2'>Required to complete</h3>
                                 <ul className='list-disc ml-[18px]'>
                                     { this.state.quest_data.required_level !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Level your character to: {this.state.quest_data.required_level}</li> : null }
                                     { this.state.quest_data.quest_name !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Complete the quest: {this.state.quest_data.quest_name}</li> : null }
                                     { this.state.quest_data.skill_name !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get Skill: {this.state.quest_data.skill_name} to level: {this.state.quest_data.required_skill_level}</li> : null }
                                     { this.state.quest_data.faction_name !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get Faction: {this.state.quest_data.faction_name} to level: {this.state.quest_data.required_faction_level}</li> : null }
-                                    { this.state.quest_data.game_map_name !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get Access to: {this.state.quest_data.game_map_name}</li> : null }
+                                    { this.state.quest_data.required_game_map_id !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get Access to: {this.state.quest_data.game_map_name}</li> : null }
                                 </ul>
                             </div>
 
@@ -98,6 +141,11 @@ export default class GuideQuest extends React.Component<any, any> {
                                 </TabPanel>
                             </Tabs>
                             <p className={'mt-4 mb-4'}>The Hand in button will become available when you meet the requirements.</p>
+                            {
+                                this.state.is_handing_in ?
+                                    <LoadingProgressBar />
+                                : null
+                            }
                         </Fragment>
                 }
             </Dialogue>

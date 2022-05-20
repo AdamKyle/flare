@@ -11,13 +11,12 @@ use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use App\Flare\Values\MapNameValue;
 use App\Flare\Values\AutomationType;
-use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
-use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Traits\CanHaveQuestItem;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Skills\Services\DisenchantService;
 use Facades\App\Flare\Calculators\DropCheckCalculator;
 use Facades\App\Flare\Calculators\SellItemCalculator;
+use App\Game\Messages\Events\ServerMessageEvent as GameServerMessage;
 use Illuminate\Support\Facades\Cache;
 
 class BattleDrop {
@@ -183,14 +182,48 @@ class BattleDrop {
 
         if (is_null($drop)) {
             return $this->randomItemDropBuilder
-                        ->setLocation($this->locationWithEffect)
-                        ->setMonsterPlane($this->monster->gameMap->name)
-                        ->setCharacterLevel($character->level)
-                        ->setMonsterMaxLevel($this->monster->max_level)
-                        ->generateItem();
+                        ->generateItem($this->getMaxLevelBasedOnPlane($character));
         }
 
         return $drop;
+    }
+
+    protected function getMaxLevelBasedOnPlane(Character $character): int {
+        $characterLevel = $character->level;
+
+        if ($character->map->gameMap->mapType()->isSurface()) {
+            if ($characterLevel >= 50) {
+                return 50;
+            }
+
+            return $characterLevel;
+        }
+
+        if ($character->map->gameMap->mapType()->isLabyrinth()) {
+            if ($characterLevel >= 150) {
+                return 150;
+            }
+
+            return $characterLevel;
+        }
+
+        if ($character->map->gameMap->mapType()->isDungeon()) {
+            if ($characterLevel >= 240) {
+                return 240;
+            }
+
+            return $characterLevel;
+        }
+
+        if ($character->map->gameMap->mapType()->isHell()) {
+            if ($characterLevel >= 300) {
+                return 300;
+            }
+
+            return $characterLevel;
+        }
+
+        return 300;
     }
 
     protected function getCacheDrop(Character $character, string $gameMapName, Location $locationWithEffect = null): ?Item {
@@ -271,9 +304,9 @@ class BattleDrop {
             $cost = SellItemCalculator::fetchSalePriceWithAffixes($item);
 
             if ($cost >= 1000000000) {
-                event(new ServerMessageEvent($character->user, 'gained_item', $item->affix_name, route('game.items.item', [
-                    'item' => $item
-                ]), $item->id));
+                $slot = $character->refresh()->inventory->slots()->where('item_id', $item->id)->first();
+
+                event(new ServerMessageEvent($character->user, 'You found: ' . $item->affix_name . ' on the enemies corpse.', $slot->id));
             } else {
                 $this->disenchantService->disenchantItemWithSkill($character->refresh(), false);
             }
@@ -297,15 +330,15 @@ class BattleDrop {
             if ($item->type === 'quest') {
                 $message = $character->name . ' has found: ' . $item->affix_name;
 
-                event(new ServerMessageEvent($character->user, 'gained_item', $item->affix_name, route('game.items.item', [
-                    'item' => $item
-                ]), $item->id));
+                $slot = $character->refresh()->inventory->slots()->where('item_id', $item->id)->first();
+
+                event(new GameServerMessage($character->user, 'You found: ' . $item->affix_name . ' on the enemies corpse.', $slot->id));
 
                 broadcast(new GlobalMessageEvent($message));
             } else {
-                event(new ServerMessageEvent($character->user, 'gained_item', $item->affix_name, route('game.items.item', [
-                    'item' => $item
-                ]), $item->id));
+                $slot = $character->refresh()->inventory->slots()->where('item_id', $item->id)->first();
+
+                event(new GameServerMessage($character->user, 'You found: ' . $item->affix_name . ' on the enemies corpse.', $slot->id));
             }
         }
     }

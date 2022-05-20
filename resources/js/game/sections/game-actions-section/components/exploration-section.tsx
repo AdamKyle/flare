@@ -202,7 +202,7 @@ export default class ExplorationSection extends React.Component<any, any> {
                     this.props.character.is_automation_running ?
                         <Fragment>
                             <div className='mb-4 md:ml-[120px]'>
-                                Exploration is running. You cancel below. <a href='/information/holy-items' target='_blank'>See Exploration Help <i
+                                Exploration is running. You cancel below. <a href='/information/exploration' target='_blank'>See Exploration Help <i
                                 className="fas fa-external-link-alt"></i></a> for more details.
                             </div>
 

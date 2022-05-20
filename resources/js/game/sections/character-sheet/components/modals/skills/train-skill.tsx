@@ -4,9 +4,9 @@ import DangerAlert from "../../../../../components/ui/alerts/simple-alerts/dange
 import { formatNumber } from "../../../../../lib/game/format-number";
 import Select from "react-select";
 import LoadingProgressBar from "../../../../../components/ui/progress-bars/loading-progress-bar";
-import PopOverContainer from "../../../../../components/ui/popover/pop-over-container";
 import {AxiosError, AxiosResponse} from "axios";
 import Ajax from "../../../../../lib/ajax/ajax";
+import SkillHelpModal from "./skill-help-modal";
 
 export default class TrainSkill extends React.Component<any, any> {
 
@@ -17,6 +17,7 @@ export default class TrainSkill extends React.Component<any, any> {
             selected_value: 0.0,
             error_message: null,
             loading: false,
+            show_help: false,
         }
     }
 
@@ -85,9 +86,6 @@ export default class TrainSkill extends React.Component<any, any> {
         },{
             label: '100%',
             value: 1.0,
-        },{
-            label: '10%',
-            value: 0.10,
         }]
     }
 
@@ -103,6 +101,12 @@ export default class TrainSkill extends React.Component<any, any> {
             label: this.state.selected_value * 100 + '%',
             value: this.state.selected_value
         }
+    }
+
+    manageHelpDialogue() {
+        this.setState({
+            show_help: !this.state.show_help,
+        });
     }
 
     render() {
@@ -145,20 +149,11 @@ export default class TrainSkill extends React.Component<any, any> {
                     <dt className='flex items-center'>
                         <span>XP Towards</span>
                         <div>
-                            <PopOverContainer icon={'fas fa-info-circle'} icon_label={'Help'}>
-                                <h3 className='text-gray-700 dark:text-gray-200'>Sacrifice XP</h3>
-                                <p className='my-2 text-gray-700 dark:text-gray-200'>
-                                    By setting this to a percentage, any XP gained from monsters, Adventures or Exploration
-                                    will be reduced <strong>BEFORE</strong> additional modifiers and quest items are applied. This amount will then be
-                                    applied to the skill XP.
-                                </p>
-                                <p className='my-2 text-gray-700 dark:text-gray-200'>
-                                    As you level these skills the XP will go up by 100 per skill level, that is at level 1, you need 100XP, but at level 10, you need 1000.
-                                </p>
-                                <p className='my-2 text-gray-700 dark:text-gray-200'>
-                                    From level 1-10, you will get a base of 25XP + what you choose to sacrifice, at level 10 to 99, you get 100 XP. Level 100 - 499 you get 500XP and finally level 500-999 you get 750XP.
-                                </p>
-                            </PopOverContainer>
+                            <div className='ml-2'>
+                                <button type={"button"} onClick={() => this.manageHelpDialogue()} className='text-blue-500 dark:text-blue-300'>
+                                    <i className={'fas fa-info-circle'}></i> Help
+                                </button>
+                            </div>
                         </div>
                     </dt>
                     <dd>
@@ -181,6 +176,12 @@ export default class TrainSkill extends React.Component<any, any> {
                 {
                     this.state.loading ?
                         <LoadingProgressBar />
+                    : null
+                }
+
+                {
+                    this.state.show_help ?
+                        <SkillHelpModal manage_modal={this.manageHelpDialogue.bind(this)} />
                     : null
                 }
 
