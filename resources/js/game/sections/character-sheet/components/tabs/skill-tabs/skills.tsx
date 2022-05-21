@@ -9,6 +9,7 @@ import {formatNumber} from "../../../../../lib/game/format-number";
 import TrainSkill from "../../modals/skills/train-skill";
 import {AxiosError, AxiosResponse} from "axios";
 import Ajax from "../../../../../lib/ajax/ajax";
+import WarningAlert from "../../../../../components/ui/alerts/simple-alerts/warning-alert";
 
 export default class Skills extends React.Component<SkillsProps, any> {
 
@@ -118,6 +119,16 @@ export default class Skills extends React.Component<SkillsProps, any> {
     render() {
         return(
             <Fragment>
+                {
+                    this.props.is_automation_running ?
+                        <div className='mb-4'>
+                            <WarningAlert>
+                                Exploration is running. You cannot train or stop training skills.
+                            </WarningAlert>
+                        </div>
+                        : null
+                }
+
                 <Table columns={this.buildColumns()} data={this.props.trainable_skills} dark_table={this.props.dark_table} />
 
                 {

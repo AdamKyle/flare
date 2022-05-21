@@ -13,7 +13,7 @@
 >
     @if (auth()->user()->hasRole('Admin'))
         <x-core.buttons.link-buttons.primary-button
-            href="route('items.edit', ['item' => $item->id])}}"
+            href="{{route('items.edit', ['item' => $item->id])}}"
             css="tw-ml-2"
         >
             Edit Item

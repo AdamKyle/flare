@@ -7,6 +7,7 @@ import TimerProgressBar from "../../../../../components/ui/progress-bars/timer-p
 import InfoAlert from "../../../../../components/ui/alerts/simple-alerts/info-alert";
 import SuccessAlert from "../../../../../components/ui/alerts/simple-alerts/success-alert";
 import {DateTime} from "luxon";
+import WarningAlert from "../../../../../components/ui/alerts/simple-alerts/warning-alert";
 
 export default class KingdomPassives extends React.Component<any, any> {
 
@@ -125,6 +126,16 @@ export default class KingdomPassives extends React.Component<any, any> {
                                     Click The skill name for additional actions. The timer will show below the tree when a skill is in progress.
                                 </InfoAlert>
                             </div>
+                            {
+                                this.props.is_automation_running ?
+                                    <div className='mb-4'>
+                                        <WarningAlert>
+                                            Exploration is running. You cannot manage your passive skills.
+                                        </WarningAlert>
+                                    </div>
+                                : null
+                            }
+
                             <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                             <KingdomPassiveTree passives={this.state.kingdom_passives[0]}
                                                 manage_success_message={this.manageSuccessMessage.bind(this)}

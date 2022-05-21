@@ -18,9 +18,10 @@ export default class InventoryUseDetails extends React.Component<any, any> {
 
     componentDidMount() {
         (new Ajax()).setRoute('character/'+this.props.character_id+'/inventory/item/' + this.props.item_id).doAjaxCall('get', (result: AxiosResponse) => {
+            console.log(result.data);
             this.setState({
                 loading: false,
-                item: result.data.data,
+                item: result.data,
             });
         }, (error: AxiosResponse) => {
 

@@ -33,6 +33,9 @@ export default class ItemDetails extends React.Component<any, any> {
     render() {
         return (
             <div className='max-h-[400px] overflow-y-scroll'>
+                <p className='mb-4 mt-4 text-sky-700 dark:text-sky-500'>
+                    {this.props.item.description}
+                </p>
                 <div className='grid md:grid-cols-3 gap-3 mb-4'>
                     <div>
                         <h4 className='text-sky-600 dark:text-sky-500'>Stats</h4>

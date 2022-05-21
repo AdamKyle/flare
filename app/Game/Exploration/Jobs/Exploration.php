@@ -2,10 +2,13 @@
 
 namespace App\Game\Exploration\Jobs;
 
+use App\Flare\Models\Faction;
+use App\Flare\Models\GameMap;
 use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Handlers\BattleEventHandler;
+use App\Game\Battle\Handlers\FactionHandler;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Monster;
 use App\Game\Exploration\Events\ExplorationTimeOut;
@@ -37,7 +40,7 @@ class Exploration implements ShouldQueue
         $this->attackType   = $attackType;
     }
 
-    public function handle(MonsterPlayerFight $monsterPlayerFight, BattleEventHandler $battleEventHandler) {
+    public function handle(MonsterPlayerFight $monsterPlayerFight, BattleEventHandler $battleEventHandler, FactionHandler $factionHandler) {
 
         $automation = CharacterAutomation::where('character_id', $this->character->id)->where('id', $this->automationId)->first();
 
@@ -59,6 +62,9 @@ class Exploration implements ShouldQueue
         if ($response instanceof MonsterPlayerFight) {
 
             if ($this->encounter($response, $automation, $battleEventHandler, $params)) {
+
+                $this->rewardAdditionalFactionPoints($factionHandler);
+
                 $time = now()->diffInMinutes($automation->completed_at);
 
                 Exploration::dispatch($this->character, $this->automationId, $this->attackType)->delay(now()->addMinutes($time >= 5 ? 5 : $time));
@@ -120,8 +126,12 @@ class Exploration implements ShouldQueue
 
             event(new ExplorationTimeOut($this->character->user, 0));
 
+            dump($response->getBattleMessages());
+
             return false;
         }
+
+        $response->resetBattleMessages();
 
         $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id'], true);
 
@@ -167,6 +177,25 @@ class Exploration implements ShouldQueue
         }
 
         return $automation->refresh();
+    }
+
+    protected function rewardAdditionalFactionPoints(FactionHandler $factionHandler) {
+        $map     = GameMap::find($this->character->map->game_map_id);
+        $faction = Faction::where('character_id', $this->character->id)->where('game_map_id', $map->id)->first();
+
+        $hasQuestItem = $factionHandler->playerHasQuestItem($this->character);
+
+        $amount = 25;
+
+        if ($faction->current_level == 0) {
+            $amount = 50;
+        } else if ($faction->current_level === 0 && $hasQuestItem) {
+            $amount = 25;
+        } else {
+            $amount = 10;
+        }
+
+        $factionHandler->handleCustomFactionAmount($this->character, $amount);
     }
 
     protected function endAutomation(?CharacterAutomation $automation) {

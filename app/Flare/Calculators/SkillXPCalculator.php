@@ -26,7 +26,7 @@ class SkillXPCalculator {
         if ($skill->can_train) {
             $base = 25 + $xpTowards;
         } else {
-            $base = 10;
+            $base = 25;
         }
 
         return $base + $base * $totalBonus;

@@ -13,11 +13,14 @@ export default class Node extends React.Component<any, any> {
     }
 
     render() {
+        console.log(this.props.passive);
         return (
             <div>
                 <button onClick={() => this.props.show_passive_modal(this.props.passive)} disabled={this.props.is_automation_running}>
                     <h4 className={clsx({
-                        'text-red-500 dark:text-red-400' : this.props.passive.is_locked,
+                        'text-red-500 dark:text-red-400' : this.props.passive.parent_skill_id !== null && this.props.passive.is_locked,
+                        'text-blue-500 dark:text-blue-400' : this.props.passive.parent_skill_id === null,
+                        'text-green-700 dark:text-green-600': this.props.passive.current_level === this.props.passive.max_level,
                     })}>{this.props.passive.name}
                     </h4>
                 </button>

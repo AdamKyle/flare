@@ -17,18 +17,18 @@ class Affixes extends BattleBase {
         $this->characterCacheData = $characterCacheData;
     }
 
-    public function getCharacterAffixDamage(Character $character, ServerMonster $monster, array $attackData) {
-        $totalDamage       = $attackData['affixes']['stacking_damage'] * $attackData['damage_deduction'];
-        $nonStackingDamage = $attackData['affixes']['non_stacking_damage'] * $attackData['damage_deduction'];
+    public function getCharacterAffixDamage(Character $character, ServerMonster $monster, array $attackData): int {
+        $totalDamage       = $attackData['affixes']['stacking_damage'] - $attackData['affixes']['stacking_damage'] * $attackData['damage_deduction'];
+        $nonStackingDamage = $attackData['affixes']['non_stacking_damage'] - $attackData['affixes']['stacking_damage'] * $attackData['damage_deduction'];
         $cantBeResisted    = $attackData['affixes']['cant_be_resisted'];
 
         if ($totalDamage > 0 || $nonStackingDamage > 0) {
             if ($cantBeResisted) {
                 $this->addMessage('The enemy cannot resist your enchantments! They are so glowy!', 'regular');
 
-                $this->addMessage('Your enchantments glow with rage. Your enemy cowers. (non resisted dmg): ' . number_format($totalDamage));
+                $this->addMessage('Your enchantments glow with rage. Your enemy cowers. (non resisted dmg): ' . number_format($totalDamage + $nonStackingDamage));
 
-                return $totalDamage;
+                return $totalDamage + $nonStackingDamage;
             } else {
                 $dc = 100 - 100 * $monster->getMonsterStat('affix_resistance');
 
@@ -37,7 +37,7 @@ class Affixes extends BattleBase {
 
                 }  else {
 
-                    $this->addMessage('Your enchantments glow with rage. Your enemy cowers: ' . number_format($totalDamage));
+                    $this->addMessage('Your enchantments glow with rage. Your enemy cowers: ' . number_format($nonStackingDamage), 'player-action');
 
                     return $nonStackingDamage;
                 }

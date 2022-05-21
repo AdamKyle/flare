@@ -37,6 +37,8 @@ export default class SkillInformation extends React.Component<any, any> {
                     <dd>{this.props.skill.xp_towards !== null ? (this.props.skill.xp_towards * 100).toFixed(2) : 0.00}%</dd>
                     <dt>Skill Bonus</dt>
                     <dd>{(this.props.skill.skill_bonus * 100).toFixed(2)}%</dd>
+                    <dt>Skill XP Bonus</dt>
+                    <dd>{(this.props.skill.skill_xp_bonus * 100).toFixed(2)} %</dd>
                     <dt>XP</dt>
                     <dd>{formatNumber(this.props.skill.xp)} / {formatNumber(this.props.skill.xp_max)}</dd>
                 </dl>

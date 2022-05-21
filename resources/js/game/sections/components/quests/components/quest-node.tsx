@@ -32,7 +32,7 @@ export default class QuestNode extends React.Component<QuestNodeProps, any> {
         if (this.props.quest !== null) {
 
             if (this.props.quest.is_parent) {
-                return this.isQuestCompleted();
+                return true;
             }
 
             // @ts-ignore

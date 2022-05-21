@@ -71,7 +71,7 @@ class PlayerHealing extends BattleBase {
         return false;
     }
 
-    protected function lifeSteal(Character $character, ServerMonster $monster, array $arrayType) {
+    protected function lifeSteal(Character $character, ServerMonster $monster, array $attackType) {
         $damage = $this->affixes->getAffixLifeSteal($character, $monster, $attackType);
 
         $this->monsterHealth -= $damage;

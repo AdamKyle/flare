@@ -32,7 +32,7 @@ class RacesTable extends DataTableComponent
                     }
                 }
 
-                return '<a href="/information/races/'. $gameRace.'">'.$row->name .'</a>';
+                return '<a href="/information/race/'. $gameRace.'">'.$row->name .'</a>';
 
             })->html(),
             Column::make('Str Mod', 'str_mod')->sortable(),

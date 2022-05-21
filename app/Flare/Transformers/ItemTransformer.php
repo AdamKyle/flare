@@ -40,7 +40,7 @@ class ItemTransformer extends TransformerAbstract {
             'focus_modifier'                   => $item->getTotalPercentageForStat('focus'),
             'type'                             => $item->type,
             'default_position'                 => $item->default_position,
-            'skill_name'                       => $item->skill_training_name,
+            'skill_name'                       => $item->skill_name,
             'skill_training_bonus'             => $item->skill_training_bonus,
             'skill_bonus'                      => $item->skill_bonus,
             'item_prefix'                      => $item->itemPrefix,

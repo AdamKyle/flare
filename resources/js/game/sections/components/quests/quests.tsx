@@ -44,28 +44,37 @@ export default class Quests extends React.Component<QuestsProps, QuestState> {
                         </div>
                     :
                         <Fragment>
-                            <DropDown menu_items={[
-                                {
-                                    name: 'Surface',
-                                    on_click: this.setPlaneForQuests.bind(this),
-                                    icon_class: 'ra ra-footprint'
-                                },
-                                {
-                                    name: 'Labyrinth',
-                                    on_click: this.setPlaneForQuests.bind(this),
-                                    icon_class: 'ra ra-footprint'
-                                },
-                                {
-                                    name: 'Dungeons',
-                                    on_click: this.setPlaneForQuests.bind(this),
-                                    icon_class: 'ra ra-footprint'
-                                },
-                                {
-                                    name: 'Hell',
-                                    on_click: this.setPlaneForQuests.bind(this),
-                                    icon_class: 'ra ra-footprint'
-                                },
-                            ]} button_title={'Planes'} />
+                            <div className='flex items-center'>
+                                <div>
+                                    <DropDown menu_items={[
+                                        {
+                                            name: 'Surface',
+                                            on_click: this.setPlaneForQuests.bind(this),
+                                            icon_class: 'ra ra-footprint'
+                                        },
+                                        {
+                                            name: 'Labyrinth',
+                                            on_click: this.setPlaneForQuests.bind(this),
+                                            icon_class: 'ra ra-footprint'
+                                        },
+                                        {
+                                            name: 'Dungeons',
+                                            on_click: this.setPlaneForQuests.bind(this),
+                                            icon_class: 'ra ra-footprint'
+                                        },
+                                        {
+                                            name: 'Hell',
+                                            on_click: this.setPlaneForQuests.bind(this),
+                                            icon_class: 'ra ra-footprint'
+                                        },
+                                    ]} button_title={'Planes'} />
+                                </div>
+                                <div>
+                                    <a href='/information/quests' target='_blank' className='ml-2'>Quests help <i
+                                        className="fas fa-external-link-alt"></i></a>
+                                </div>
+
+                            </div>
                             <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                             <div className='overflow-x-auto max-w-[400px] sm:max-w-[600px] md:max-w-[100%]'>
                                 <QuestTree quests={this.state.quests} completed_quests={this.state.completed_quests} character_id={this.props.character_id} plane={this.state.current_plane} update_quests={this.props.update_quests}/>

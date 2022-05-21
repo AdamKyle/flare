@@ -215,7 +215,7 @@ class FactionHandler {
         return $duplicateItem;
     }
 
-    protected function playerHasQuestItem(Character $character): bool {
+    public function playerHasQuestItem(Character $character): bool {
         $inventory = Inventory::where('character_id', $character->id)->first();
         $item      = Item::where('effect', ItemEffectsValue::FACTION_POINTS)->first();
 

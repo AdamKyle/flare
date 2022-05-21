@@ -75,6 +75,7 @@ class ItemsService {
     }
 
     public function cleanRequestData(array $params): array {
+
         if ($params['type'] !== 'quest') {
             $params['effect'] = null;
         }
@@ -94,12 +95,12 @@ class ItemsService {
             $params['shards_cost']        = 0;
         }
 
-        if (!filter_var($params['damages_kingdom'], FILTER_VALIDATE_BOOLEAN)) {
+        if (!filter_var($params['damages_kingdoms'], FILTER_VALIDATE_BOOLEAN)) {
             $params['damages_kingdoms'] = false;
             $params['kingdom_damage']   = null;
         }
 
-        if (filter_var($params['damages_kingdom'], FILTER_VALIDATE_BOOLEAN)) {
+        if (filter_var($params['damages_kingdoms'], FILTER_VALIDATE_BOOLEAN)) {
             $params['damages_kingdoms']   = true;
             $params['lasts_for']          = null;
             $params['stat_increase']      = null;

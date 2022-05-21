@@ -7,6 +7,8 @@ import InventoryDetails from "../../../../../lib/game/character-sheet/types/inve
 import QuestItemsInventoryTabProps
     from "../../../../../lib/game/character-sheet/types/tabs/quest-items-inventory-tab-props";
 import QuestItemsTableState from "../../../../../lib/game/character-sheet/types/tables/quest-items-table-state";
+import UsableItemsDetails from "../../../../../lib/game/character-sheet/types/inventory/usable-items-details";
+import InventoryUseDetails from "../../modals/inventory-item-details";
 
 export default class QuestItemsTable extends React.Component<QuestItemsInventoryTabProps, QuestItemsTableState> {
     constructor(props: QuestItemsInventoryTabProps) {
@@ -14,6 +16,8 @@ export default class QuestItemsTable extends React.Component<QuestItemsInventory
 
         this.state = {
             data: this.props.quest_items,
+            item_id: null,
+            view_item: false,
         }
     }
 
@@ -27,6 +31,13 @@ export default class QuestItemsTable extends React.Component<QuestItemsInventory
         });
     }
 
+    viewItem(item?: InventoryDetails | UsableItemsDetails) {
+        this.setState({
+            item_id: typeof item !== 'undefined' ? item.item_id : null,
+            view_item: !this.state.view_item
+        })
+    }
+
     render() {
         return (
             <Fragment>
@@ -38,9 +49,19 @@ export default class QuestItemsTable extends React.Component<QuestItemsInventory
                         <div>
                             <input type='text' name='search' className='form-control' onChange={this.search.bind(this)} />
                         </div>
+                        <div>
+                            <a href='/information/quests' target='_blank' className='ml-2'>Quests help <i
+                                className="fas fa-external-link-alt"></i></a>
+                        </div>
                     </div>
                 </div>
-                <Table data={this.state.data} columns={buildLimitedColumns()} dark_table={this.props.dark_table}/>
+                <Table data={this.state.data} columns={buildLimitedColumns(undefined, this.viewItem.bind(this))} dark_table={this.props.dark_table}/>
+
+                {
+                    this.state.view_item && this.state.item_id !== null ?
+                        <InventoryUseDetails character_id={this.props.character_id} item_id={this.state.item_id} is_open={this.state.view_item} manage_modal={this.viewItem.bind(this)} />
+                    : null
+                }
             </Fragment>
         );
     }

@@ -144,7 +144,7 @@ class BuildMonster extends BattleBase {
             return $monster;
         }
 
-        return false;
+        return $monster;
     }
 
     private function reduceSpecificStats(array $monster, array $characterStatReductionAffixes): array {

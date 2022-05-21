@@ -32,7 +32,7 @@ class ClassesTable extends DataTableComponent
                     }
                 }
 
-                return '<a href="/information/races/'. $gameClass.'">'.$row->name .'</a>';
+                return '<a href="/information/class/'. $gameClass.'">'.$row->name .'</a>';
 
             })->html(),
             Column::make('To Hit', 'to_hit_stat')->sortable(),

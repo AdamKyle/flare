@@ -109,7 +109,7 @@ export default class CharacterInventoryTabs extends React.Component<CharacterInv
                     <SetsTable dark_tables={this.state.dark_tables} sets={this.state.inventory.sets} is_dead={this.props.is_dead} character_id={this.props.character_id} savable_sets={this.state.inventory.savable_sets} update_inventory={this.updateInventory.bind(this)} set_name_equipped={this.state.inventory.set_name_equipped} is_automation_running={this.props.is_automation_running}/>
                 </TabPanel>
                 <TabPanel key={'quest'}>
-                    <QuestItemsTable dark_table={this.state.dark_tables} quest_items={this.state.inventory.quest_items} is_dead={this.props.is_dead} />
+                    <QuestItemsTable dark_table={this.state.dark_tables} quest_items={this.state.inventory.quest_items} is_dead={this.props.is_dead} character_id={this.props.character_id} />
                 </TabPanel>
             </Tabs>
         )

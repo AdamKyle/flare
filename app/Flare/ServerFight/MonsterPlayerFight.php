@@ -73,6 +73,10 @@ class MonsterPlayerFight {
 
     public function resetBattleMessages() {
         $this->battleMessages = [];
+
+        $this->voidance->clearMessages();;
+        $this->ambush->clearMessages();
+        $this->attack->resetBattleMessages();
     }
 
     public function getEnemyName() {

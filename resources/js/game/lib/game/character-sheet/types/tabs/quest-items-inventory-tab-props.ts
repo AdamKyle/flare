@@ -6,4 +6,6 @@ export default interface QuestItemsInventoryTabProps {
     quest_items: InventoryDetails[] | [];
 
     is_dead: boolean;
+
+    character_id: number;
 }
