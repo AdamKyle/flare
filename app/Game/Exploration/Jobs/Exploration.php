@@ -62,9 +62,9 @@ class Exploration implements ShouldQueue
                 $time = now()->diffInMinutes($automation->completed_at);
 
                 Exploration::dispatch($this->character, $this->automationId, $this->attackType)->delay(now()->addMinutes($time >= 5 ? 5 : $time));
-
-                return;
             }
+
+            return;
         }
 
         $automation->delete();

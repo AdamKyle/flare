@@ -40,6 +40,7 @@ use App\Flare\ServerFight\Fight\Attack;
 use App\Flare\ServerFight\Fight\CanHit;
 use App\Flare\ServerFight\Fight\CharacterAttacks\BaseCharacterAttack;
 use App\Flare\ServerFight\Fight\CharacterAttacks\CharacterAttack;
+use App\Flare\ServerFight\Fight\CharacterAttacks\PlayerHealing;
 use App\Flare\ServerFight\Fight\CharacterAttacks\Types\CastType;
 use App\Flare\ServerFight\Fight\CharacterAttacks\Types\WeaponType;
 use App\Flare\ServerFight\Fight\Entrance;
@@ -505,6 +506,7 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(MonsterAttack::class, function($app) {
             return new MonsterAttack(
                 $app->make(CharacterCacheData::class),
+                $app->make(PlayerHealing::class),
                 $app->make(Entrance::class),
                 $app->make(CanHit::class)
             );
@@ -515,6 +517,13 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(BaseCharacterAttack::class),
                 $app->make(MonsterAttack::class)
             );
+        });
+
+        $this->app->bind(PlayerHealing::class, function($app) {
+           return new PlayerHealing(
+               $app->make(CharacterCacheData::class),
+               $app->make(Affixes::class)
+           );
         });
 
         $this->app->bind(MonsterPlayerFight::class, function($app) {

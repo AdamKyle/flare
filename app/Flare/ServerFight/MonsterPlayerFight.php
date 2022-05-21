@@ -80,6 +80,9 @@ class MonsterPlayerFight {
     }
 
     public function fightMonster(): bool {
+
+        $this->characterCacheData->deleteCharacterSheet($this->character);
+
         $characterStatReductionAffixes = $this->characterCacheData->getCachedCharacterData($this->character, 'stat_affixes');
         $skillReduction                = $this->characterCacheData->getCachedCharacterData($this->character, 'skill_reduction');
         $resistanceReduction           = $this->characterCacheData->getCachedCharacterData($this->character, 'resistance_reduction');

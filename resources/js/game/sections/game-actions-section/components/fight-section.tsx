@@ -196,6 +196,8 @@ export default class FightSection extends React.Component<FightSectionProps, any
                     <AttackButton additional_css={'btn-cast-attack'} icon_class={'ra ra-lightning-sword'} on_click={() => this.attack('cast_and_attack')} disabled={this.attackButtonDisabled()}/>
                     <AttackButton additional_css={'btn-attack-cast'} icon_class={'ra ra-lightning-sword'} on_click={() => this.attack('attack_and_cast')} disabled={this.attackButtonDisabled()}/>
                     <AttackButton additional_css={'btn-defend'} icon_class={'ra ra-round-shield'} on_click={() => this.attack('defend')} disabled={this.attackButtonDisabled()}/>
+                    <a href='/information/combat' target='_blank' className='ml-2'>Help <i
+                        className="fas fa-external-link-alt"></i></a>
                 </div>
                 {
                     this.state.monster_max_health > 0 && this.props.character !== null ?

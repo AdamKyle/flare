@@ -104,6 +104,8 @@ class CastType extends BattleBase
             }
         } else {
             $this->addMessage('Your attack missed!', 'enemy-action');
+
+            $this->secondaryAttack($character, $monster);
         }
     }
 
@@ -113,10 +115,16 @@ class CastType extends BattleBase
         }
 
         $this->heal($character);
+
+        $this->secondaryAttack($character, $monster);
+    }
+
+    protected function secondaryAttack(Character $character, ServerMonster $monster) {
         $this->affixLifeStealingDamage($character, $monster);
         $this->affixDamage($character, $monster);
         $this->ringDamage();
     }
+
 
     protected function affixDamage(Character $character, ServerMonster $monster) {
         $damage = $this->affixes->getCharacterAffixDamage($character, $monster, $this->attackData);

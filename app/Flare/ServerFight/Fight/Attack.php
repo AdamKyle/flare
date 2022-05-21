@@ -135,7 +135,7 @@ class Attack {
 
             $this->attackCounter++;
 
-            $this->attack($character, $serverMonster, $attackType, 'monster');
+            $this->attack($character, $serverMonster, $attackType, 'character');
         }
     }
 }

@@ -104,6 +104,10 @@
                 <span class="ra ra-archer"></span>
                 Combat
             </a>
+            <a href="{{route('info.page', ['pageName' => 'ambush-and-counter'])}}">
+                <span class="ra  ra-bat-sword"></span>
+                Combat
+            </a>
             <a href="{{route('info.page', ['pageName' => 'automation'])}}">
                 <span class="fas fa-user-clock"></span>
                 Automation

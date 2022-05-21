@@ -112,7 +112,7 @@ class TrinketCraftingService {
      * @return Skill
      */
     protected function fetchCharacterSkill(Character $character): Skill {
-        $gameSkill = GameSkill::where('name', 'Trinkentry')->first();
+        $gameSkill = GameSkill::where('name', 'Trinketry')->first();
 
         return $character->skills()->where('game_skill_id', $gameSkill->id)->first();
     }

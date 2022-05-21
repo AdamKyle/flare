@@ -194,6 +194,8 @@ export default class Crafting extends React.Component<any, any> {
                                   on_click={this.clearCrafting.bind(this)}
                                   additional_css={'ml-2'}
                                   disabled={this.state.loading || this.props.cannot_craft} />
+                    <a href='/information/crafting' target='_blank' className='ml-2'>Help <i
+                        className="fas fa-external-link-alt"></i></a>
                 </div>
                 <div className='block lg:hidden grid grid-cols-1 gap-3 mt-3 mb-3'>
                     <PrimaryButton button_label={'Craft'} on_click={this.craft.bind(this)} disabled={this.state.loading || this.state.selected_item === null || this.props.cannot_craft} />
@@ -201,6 +203,8 @@ export default class Crafting extends React.Component<any, any> {
                     <DangerButton button_label={'Close'}
                                   on_click={this.clearCrafting.bind(this)}
                                   disabled={this.state.loading || this.props.cannot_craft} />
+                    <a href='/information/crafting' target='_blank' className='ml-2'>Help <i
+                        className="fas fa-external-link-alt"></i></a>
                 </div>
             </Fragment>
         )

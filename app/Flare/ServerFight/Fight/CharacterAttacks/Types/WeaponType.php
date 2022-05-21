@@ -88,6 +88,8 @@ class WeaponType extends BattleBase {
             }
         } else {
             $this->addMessage('Your attack missed!', 'enemy-action');
+
+            $this->secondaryAttack($character, $serverMonster);
         }
 
         return $this;
@@ -108,6 +110,10 @@ class WeaponType extends BattleBase {
 
     public function weaponAttack(Character $character, ServerMonster $monster, int $weaponDamage) {
         $this->weaponDamage($character, $monster, $weaponDamage);
+        $this->secondaryAttack($character, $monster);
+    }
+
+    protected function secondaryAttack(Character $character, ServerMonster $monster,) {
         $this->affixLifeStealingDamage($character, $monster);
         $this->affixDamage($character, $monster);
         $this->ringDamage();

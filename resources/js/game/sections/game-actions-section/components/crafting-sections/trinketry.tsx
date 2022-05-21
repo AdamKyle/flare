@@ -47,7 +47,7 @@ export default class Trinketry extends React.Component<any, any> {
     buildItems() {
         return this.state.craftable_items.map((item: any) => {
             return {
-                label: item.name + ' Gold Dust Cost: ' + formatNumber(item.gold_dust_cost) + ' Shards Cost: ' + formatNumber(item.shards_cost),
+                label: item.name + ' Gold Dust Cost: ' + formatNumber(item.gold_dust_cost) + ' Copper Coin Cost: ' + formatNumber(item.copper_coin_cost),
                 value: item.id,
             }
         })
@@ -120,6 +120,8 @@ export default class Trinketry extends React.Component<any, any> {
                                   on_click={this.clearCrafting.bind(this)}
                                   additional_css={'ml-2'}
                                   disabled={this.state.loading || this.props.cannot_craft} />
+                    <a href='/information/ambush-and-counter' target='_blank' className='ml-2'>Help <i
+                        className="fas fa-external-link-alt"></i></a>
                 </div>
             </Fragment>
         )
