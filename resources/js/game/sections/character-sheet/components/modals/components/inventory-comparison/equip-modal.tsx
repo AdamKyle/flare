@@ -55,6 +55,12 @@ export default class EquipModal extends React.Component<EquipModalProps, any> {
                 }
 
                 {
+                    this.props.is_bow_equipped || this.props.is_hammer_equipped || this.props.is_stave_equipped ?
+                        <p className='mt-3 mb-3'>Equipping this item will remove your two handed equipped item.</p>
+                    : null
+                }
+
+                {
                     this.renderEquipButtons()
                 }
             </Dialogue>

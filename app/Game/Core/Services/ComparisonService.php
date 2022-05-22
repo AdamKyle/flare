@@ -44,16 +44,16 @@ class ComparisonService {
             ->setInventory($type);
 
         $viewData = [
-            'details'     => [],
-            'itemToEquip' => $this->buildItemDetails($itemToEquip),
-            'type'        => $service->getType($itemToEquip->item, $type),
-            'slotId'      => $itemToEquip->id,
-            'characterId' => $character->id,
-            'bowEquipped' => false,
-            'setEquipped' => false,
-            'hammerEquipped' => false,
-            'staveEquipped'  => false,
-            'setIndex'    => 0,
+            'details'        => [],
+            'itemToEquip'    => $this->buildItemDetails($itemToEquip),
+            'type'           => $service->getType($itemToEquip->item, $type),
+            'slotId'         => $itemToEquip->id,
+            'characterId'    => $character->id,
+            'bowEquipped'    => $this->hasTypeEquipped($character, 'bow'),
+            'setEquipped'    => false,
+            'hammerEquipped' => $this->hasTypeEquipped($character, 'hammer'),
+            'staveEquipped'  => $this->hasTypeEquipped($character, 'stave'),
+            'setIndex'       => 0,
         ];
 
         if ($service->inventory()->isNotEmpty()) {
@@ -71,9 +71,9 @@ class ComparisonService {
                 'slotId'         => $itemToEquip->id,
                 'slotPosition'   => $itemToEquip->position,
                 'characterId'    => $character->id,
-                'bowEquipped'    => $this->equipItemService->isTwoHandedItemEquipped($itemToEquip->item, $service->inventory(), 'bow'),
-                'hammerEquipped' => $this->equipItemService->isTwoHandedItemEquipped($itemToEquip->item, $service->inventory(), 'hammer'),
-                'staveEquipped'  => $this->equipItemService->isTwoHandedItemEquipped($itemToEquip->item, $service->inventory(), 'stave'),
+                'bowEquipped'    => $this->hasTypeEquipped($character, 'bow'),
+                'hammerEquipped' => $this->hasTypeEquipped($character, 'hammer'),
+                'staveEquipped'  => $this->hasTypeEquipped($character, 'stave'),
                 'setEquipped'    => $hasSet,
                 'setIndex'       => $setIndex,
             ];
@@ -107,9 +107,9 @@ class ComparisonService {
             'slotId'         => $item->id,
             'slotPosition'   => null,
             'characterId'    => $character->id,
-            'bowEquipped'    => $this->equipItemService->isTwoHandedItemEquipped($item, $service->inventory(), 'bow'),
-            'hammerEquipped' => $this->equipItemService->isTwoHandedItemEquipped($item, $service->inventory(), 'hammer'),
-            'staveEquipped'  => $this->equipItemService->isTwoHandedItemEquipped($item, $service->inventory(), 'stave'),
+            'bowEquipped'    => $this->hasTypeEquipped($character, 'bow'),
+            'hammerEquipped' => $this->hasTypeEquipped($character, 'hammer'),
+            'staveEquipped'  => $this->hasTypeEquipped($character, 'stave'),
             'setEquipped'    => $hasSet,
             'setIndex'       => $setIndex,
             'setName'        => !is_null($setEquipped) ? $setEquipped->name : null,
@@ -145,6 +145,12 @@ class ComparisonService {
                     return $slot;
                 }
             }
+        })->isNotEmpty();
+    }
+
+    public function hasTypeEquipped(Character $character, string $type): bool {
+        return $character->getInformation()->fetchInventory()->filter(function($slot) use($type) {
+            return $slot->item->type === $type;
         })->isNotEmpty();
     }
 

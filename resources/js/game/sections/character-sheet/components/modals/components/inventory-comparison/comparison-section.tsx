@@ -119,12 +119,20 @@ export default class ComparisonSection extends React.Component<any, any> {
     }
 
     render() {
+        console.log(this.props.comparison_details);
         return (
             <div className='p-5'>
                 {
                     this.props.is_automation_running ?
                         <WarningAlert additional_css={'mb-4'}>
-                            <p className='pb-3'>You are exploring. Some actions have been disabled.</p>
+                            <p>You are exploring. Some actions have been disabled.</p>
+                        </WarningAlert>
+                    : null
+                }
+                {
+                    !this.props.is_automation_running  && (this.props.comparison_details.hammerEquipped || this.props.comparison_details.bowEquipped || this.props.comparison_details.staveEquipped) ?
+                        <WarningAlert additional_css={'mb-4'}>
+                            <p>The item you are looking at will replace the current two handed weapon you have equipped.</p>
                         </WarningAlert>
                     : null
                 }
@@ -137,6 +145,7 @@ export default class ComparisonSection extends React.Component<any, any> {
                         'md:w-3/4': this.props.is_large_modal,
                         'md:grid-cols-6': this.props.is_grid_size(6, this.props.comparison_details.itemToEquip),
                         'md:grid-cols-4': this.props.is_grid_size(4, this.props.comparison_details.itemToEquip),
+                        'hidden': this.props.comparison_details.itemToEquip.type === 'quest',
                     }
                 )}>
                     <PrimaryOutlineButton button_label={'Equip'} on_click={this.manageEquipModal.bind(this)} disabled={this.props.is_action_loading || this.props.is_automation_running}/>
@@ -172,6 +181,9 @@ export default class ComparisonSection extends React.Component<any, any> {
                                     manage_modal={this.manageEquipModal.bind(this)}
                                     item_to_equip={this.props.comparison_details.itemToEquip}
                                     equip_item={this.equipItem.bind(this)}
+                                    is_bow_equipped={this.props.comparison_details.bowEquipped}
+                                    is_hammer_equipped={this.props.comparison_details.hammerEquipped}
+                                    is_stave_equipped={this.props.comparison_details.staveEquipped}
                         />
                     : null
                 }

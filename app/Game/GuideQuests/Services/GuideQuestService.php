@@ -82,11 +82,17 @@ class GuideQuestService {
         }
 
         if (!is_null($quest->required_level)) {
-            return $character->level === $quest->required_level;
+            return $character->level >= $quest->required_level;
         }
 
         if ($quest->required_skill !== null) {
             return $character->skills()->where('game_skill_id', $quest->required_skill)->first()->level >= $quest->required_skill_level;
+        }
+
+        if (!is_null($quest->required_faction_id)) {
+            $faction = $character->factions()->find($quest->required_faction_id);
+
+            return $faction->current_level >= $quest->required_faction_level;
         }
 
         return false;

@@ -1,32 +1,19 @@
 
-<div class="row justify-content-center">
-    <div class="col-md-12">
-        <x-cards.card-with-title title="Character Name">
-            <form action="{{route('user.settings.character', ['user' => $user->id])}}" method="POST">
-                @csrf
-                
-                <div class="form-group row">
-                    <label for="name" class="col-md-4 col-form-label text-md-right">{{ __('Character Name') }}</label>
+<x-core.cards.card-with-title title="Character Name">
+    <form action="{{route('user.settings.character', ['user' => $user->id])}}" method="POST">
+        @csrf
 
-                    <div class="col-md-6">
-                    <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{$name}}" required autocomplete="name" autofocus>
+        <div class="mb-5">
+            <label class="label block mb-2" for="character-name">Character Name</label>
+            <input id="character-name" type="text" class="form-control" name="name" value="{{$name}}" required autofocus>
 
-                        @error('name')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
-                    </div>
+            @error('name')
+                <div class="invalid-feedback mt-2" role="alert">
+                    <strong>{{ $message }}</strong>
                 </div>
+            @enderror
+        </div>
 
-                <div class="form-group row mb-0">
-                    <div class="col-md-6 offset-md-4">
-                        <button type="submit" class="btn btn-primary">
-                            {{ __('Change Name') }}
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </x-cards.card-with-title>
-    </div>
-</div>
+        <x-core.buttons.primary-button type="submit">Change name</x-core.buttons.primary-button>
+    </form>
+</x-core.cards.card-with-title>

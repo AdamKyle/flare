@@ -31,7 +31,6 @@ class User extends Authenticatable
         'banned_reason',
         'un_ban_request',
         'ignored_unban_request',
-        'adventure_email',
         'upgraded_building_email',
         'kingdoms_update_email',
         'rebuilt_building_email',

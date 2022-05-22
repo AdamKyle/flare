@@ -9,4 +9,10 @@ export default interface EquipModalProps {
     item_to_equip: InventoryComparisonAdjustment;
 
     equip_item: (type: string, position?: string) => void;
+
+    is_hammer_equipped: boolean;
+
+    is_bow_equipped: boolean;
+
+    is_stave_equipped: boolean;
 }

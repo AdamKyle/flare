@@ -88,7 +88,7 @@ class FactionHandler {
 
         $faction = $faction->refresh();
 
-        if ($faction->current_points === $faction->points_needed && !FactionLevel::isMaxLevel($faction->current_level)) {
+        if ($faction->current_points >= $faction->points_needed && !FactionLevel::isMaxLevel($faction->current_level)) {
 
             $this->handleFactionLevelUp($character, $faction, $gameMap->name);
 
@@ -150,12 +150,12 @@ class FactionHandler {
             event(new ServerMessageEvent($character->user, 'You got no item as your inventory is full. Clear space for next time!'));
         } else {
 
-            $character->inventory->slots()->create([
+            $slot = $character->inventory->slots()->create([
                 'inventory_id' => $character->inventory->id,
                 'item_id'      => $item->id,
             ]);
 
-            event(new ServerMessageEvent($character->user, 'Rewarded with (item with randomly generated affix(es)): ' . $item->affix_name));
+            event(new ServerMessageEvent($character->user, 'Rewarded with (item with randomly generated affix(es)): ' . $item->affix_name, $slot->id));
         }
     }
 

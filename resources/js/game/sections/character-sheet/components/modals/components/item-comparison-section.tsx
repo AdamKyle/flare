@@ -7,6 +7,7 @@ import Tabs from "../../../../../components/ui/tabs/tabs";
 import TabPanel from "../../../../../components/ui/tabs/tab-panel";
 import {formatNumber} from "../../../../../lib/game/format-number";
 import ItemNameColorationText from "../../../../../components/ui/item-name-coloration-text";
+import ItemDetails from "./item-details";
 
 export default class ItemComparisonSection extends React.Component<any, any> {
 
@@ -135,6 +136,7 @@ export default class ItemComparisonSection extends React.Component<any, any> {
     }
 
     renderSingleComparison() {
+        console.log(this.props.comparison_details);
         if (this.props.comparison_details !== null) {
             return (
                 <div>
@@ -156,9 +158,15 @@ export default class ItemComparisonSection extends React.Component<any, any> {
 
         return (
             <div>
-                <dl>
-                    {this.renderItemToEquip(this.props.comparison_details.itemToEquip)}
-                </dl>
+                {
+                    this.props.comparison_details.itemToEquip.type === 'quest' ?
+                        <ItemDetails item={this.props.comparison_details.itemToEquip} />
+                    :
+                        <dl>
+                            {this.renderItemToEquip(this.props.comparison_details.itemToEquip)}
+                        </dl>
+                }
+
             </div>
         )
     }

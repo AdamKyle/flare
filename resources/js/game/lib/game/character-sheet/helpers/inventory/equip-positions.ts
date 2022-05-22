@@ -13,10 +13,8 @@ export abstract class EquipPositions {
             case 'spell-damage':
             case 'spell-healing':
                 return ['spell-one','spell-two'];
-            case 'artifact':
-                return ['artifact-one','artifact-two'];
             case 'trinket':
-                return ['artifact-one','artifact-two'];
+                return ['trinket-one','trinket-two'];
             case 'armour':
             default:
                 return null;
@@ -28,6 +26,6 @@ export abstract class EquipPositions {
     }
 
     public static isArmour(type: string) {
-        return ['body', 'shield', 'leggings', 'feet', 'sleeves', 'helmet', 'gloves'].includes(type);
+        return ['body', 'leggings', 'feet', 'sleeves', 'helmet', 'gloves'].includes(type);
     }
 }

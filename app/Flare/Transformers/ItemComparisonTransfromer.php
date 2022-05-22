@@ -42,6 +42,7 @@ class ItemComparisonTransfromer extends TransformerAbstract {
             'skill_level_req'                  => $item->skill_level_required,
             'skill_level_trivial'              => $item->skill_level_trivial,
             'cost'                             => SellItemCalculator::fetchSalePriceWithAffixes($item),
+            'shop_cost'                        => $item->cost,
             'base_damage_mod_bonus'            => $item->base_damage_mod_bonus,
             'base_healing_mod_bonus'           => $item->base_healing_mod_bonus,
             'base_ac_mod_bonus'                => $item->base_ac_mod_bonus,

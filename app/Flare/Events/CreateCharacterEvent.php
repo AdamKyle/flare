@@ -46,12 +46,12 @@ class CreateCharacterEvent
      * @param Request $request
      * @return void
      */
-    public function __construct(User $user, GameMap $map, Request $request)
+    public function __construct(User $user, GameMap $map, Request $request, string $characterName = null)
     {
         $this->user          = $user;
         $this->race          = GameRace::find($request->race);
         $this->class         = GameClass::find($request->class);
         $this->map           = $map;
-        $this->characterName = $request->name;
+        $this->characterName = !is_null($characterName) ? $characterName : $request->name;
     }
 }

@@ -28,7 +28,7 @@ class ItemsTable extends DataTableComponent {
             $item = $item->where('cost', '<=', 2000000000);
         }
 
-        return Item::whereNull('item_prefix_id')
+        return $item->whereNull('item_prefix_id')
                     ->whereNull('item_suffix_id');
     }
 

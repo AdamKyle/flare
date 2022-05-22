@@ -3,6 +3,8 @@
 namespace App\Game\Core\Controllers;
 
 use App\Flare\Events\UpdateCharacterAttackEvent;
+use App\Flare\Models\GameClass;
+use App\Flare\Models\GameRace;
 use Hash;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -18,7 +20,9 @@ class SettingsController extends Controller {
 
     public function index(User $user) {
         return view('game.core.settings.settings', [
-            'user' => $user,
+            'user'    => $user,
+            'races'   => GameRace::pluck('name', 'id'),
+            'classes' => GameClass::pluck('name', 'id'),
         ]);
     }
 
@@ -82,5 +86,16 @@ class SettingsController extends Controller {
         ]);
 
         return redirect()->back()->with('success', 'Updated character name.');
+    }
+
+    public function guideSettings(Request $request, User $user) {
+
+        if (filter_var($request->guide_enabled, FILTER_VALIDATE_BOOLEAN)) {
+            $user->update([
+                'guide_enabled' => $request->guide_enabled,
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Updated character guide setting.');
     }
 }

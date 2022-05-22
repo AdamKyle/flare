@@ -52,6 +52,7 @@ use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Services\CanUserEnterSiteService;
+use App\Flare\Services\CharacterDeletion;
 use App\Flare\Services\CharacterXPService;
 use App\Flare\Services\DailyGoldDustService;
 use App\Flare\Transformers\BasicKingdomTransformer;
@@ -63,6 +64,7 @@ use App\Flare\View\Components\Forms\Input;
 use App\Flare\View\Components\Forms\Select;
 use App\Flare\View\Components\Forms\TextArea;
 use App\Game\Core\Services\CharacterService;
+use App\Game\Kingdoms\Service\KingdomResourcesService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Flare\Values\BaseStatValue;
 use App\Flare\Builders\CharacterBuilder;
@@ -534,6 +536,10 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(Ambush::class),
                 $app->make(Attack::class),
             );
+        });
+
+        $this->app->bind(CharacterDeletion::class, function($app) {
+            return new CharacterDeletion($app->make(KingdomResourcesService::class));
         });
     }
 

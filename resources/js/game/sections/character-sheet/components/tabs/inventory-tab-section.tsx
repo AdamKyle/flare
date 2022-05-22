@@ -184,7 +184,7 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
                         ]} button_title={'Type'} selected_name={this.state.table} disabled={this.props.is_dead} />
                     </div>
                     <div className={clsx('ml-2', {'hidden': this.isDropDownHidden()})}>
-                        <DropDown menu_items={this.createActionsDropDown()} button_title={'Actions'} selected_name={this.state.table} disabled={this.props.is_dead ||  this.props.is_automation_running} />
+                        <DropDown menu_items={this.createActionsDropDown()} button_title={'Actions'} selected_name={this.state.table} disabled={this.props.is_dead} />
                     </div>
                     <div className='ml-4 md:ml-0 my-4 md:my-0 md:absolute md:right-0'>
                         <div className='flex items-center'>

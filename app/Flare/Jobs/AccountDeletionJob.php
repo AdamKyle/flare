@@ -4,24 +4,18 @@ namespace App\Flare\Jobs;
 
 use DB;
 use Mail;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
-use League\Fractal\Manager;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use App\Flare\Services\CharacterDeletion;
 use App\Flare\Models\User;
 use App\Flare\Events\UpdateSiteStatisticsChart;
 use App\Flare\Mail\GenericMail;
-use App\Flare\Models\Character;
-use App\Flare\Models\Inventory;
-use App\Flare\Models\MarketBoard;
 use App\Flare\Models\UserSiteAccessStatistics;
-use App\Flare\Transformers\MarketItemsTransformer;
 use App\Game\Core\Traits\UpdateMarketBoard;
-use App\Game\Kingdoms\Service\KingdomResourcesService;
 use App\Game\Messages\Events\GlobalMessageEvent;
 
 class AccountDeletionJob implements ShouldQueue
@@ -45,28 +39,12 @@ class AccountDeletionJob implements ShouldQueue
         $this->systemDeletion = $systemDeletion;
     }
 
-    public function handle(KingdomResourcesService $kingdomResourcesService) {
+    public function handle(CharacterDeletion $characterDeletion) {
         try {
             $user = $this->user;
             $characterName = $user->character->name;
 
-            if (!is_null($user->character->inventory)) {
-                $this->emptyCharacterInventory($user->character->inventory);
-            }
-
-            if (!$user->character->inventorySets->isEmpty()) {
-                $this->emptyCharacterInventorySets($user->character->inventorySets);
-            }
-
-            $this->deleteCharacterMarketListings($user->character);
-
-            foreach ($user->character->kingdoms as $kingdom) {
-                $kingdomResourcesService->setKingdom($kingdom)->giveNPCKingdoms(false, true);
-            }
-
-            $user->character->skills()->delete();
-
-            $this->deleteCharacter($user->character);
+            $characterDeletion->deleteCharacterFromUser($user->character);
 
             $siteAccessStatistic = UserSiteAccessStatistics::orderBy('created_at', 'desc')->first();
 
@@ -99,62 +77,5 @@ class AccountDeletionJob implements ShouldQueue
         } catch (\Exception $e) {
             Log::info($e->getMessage());
         }
-    }
-
-    protected function deleteCharacterMarketListings(Character $character) {
-
-        MarketBoard::where('character_id', $character->id)->chunkById(250, function($marketListings) {
-            foreach ($marketListings as $marketListing) {
-                $marketListing->delete();
-            }
-        });
-
-        $this->sendUpdate(resolve(MarketItemsTransformer::class), resolve(Manager::class), $character->user);
-    }
-    protected function emptyCharacterInventory(Inventory $inventory) {
-        foreach ($inventory->slots as $slot) {
-            $slot->delete();
-        }
-
-        $inventory->delete();
-    }
-
-    protected function emptyCharacterInventorySets(Collection $inventorySets) {
-        foreach ($inventorySets as $set) {
-            foreach ($set->slots as $slot) {
-                $slot->delete();
-            }
-
-            $set->delete();
-        }
-    }
-
-
-    protected function deleteCharacter(Character $character) {
-        $character->skills()->delete();
-
-        $character->kingdomAttackLogs()->delete();
-
-        $character->adventureLogs()->delete();
-
-        $character->unitMovementQueues()->delete();
-
-        $character->boons()->delete();
-
-        $character->questsCompleted()->delete();
-
-        $character->currentAutomations()->delete();
-
-        $character->factions()->delete();
-
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-
-        $character->passiveSkills()->delete();
-
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-
-        $character->map()->delete();
-
-        $character->delete();
     }
 }

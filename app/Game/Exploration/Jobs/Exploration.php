@@ -183,6 +183,10 @@ class Exploration implements ShouldQueue
         $map     = GameMap::find($this->character->map->game_map_id);
         $faction = Faction::where('character_id', $this->character->id)->where('game_map_id', $map->id)->first();
 
+        if ($faction->maxed) {
+            return;
+        }
+
         $hasQuestItem = $factionHandler->playerHasQuestItem($this->character);
 
         $amount = 25;
@@ -194,6 +198,8 @@ class Exploration implements ShouldQueue
         } else {
             $amount = 10;
         }
+
+        event(new ExplorationLogUpdate($this->character->user, 'Gained: ' . $amount . ' Additional ' . $map->name . ' Faction points', false, true));
 
         $factionHandler->handleCustomFactionAmount($this->character, $amount);
     }

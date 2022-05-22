@@ -27,7 +27,7 @@
                 <p>
 
                 <p class="mb-4 text-orange-700 dark:text-orange-500">
-                    <strong>Cost: </strong> {{number_format($itemToEquip['cost'])}} Gold
+                    <strong>Cost: </strong> {{number_format($itemToEquip['shop_cost'])}} Gold
                 </p>
                 @if (in_array($itemToEquip['type'], ['stave', 'bow', 'hammer']))
                     <x-core.alerts.info-alert title="Attn!">
@@ -42,7 +42,7 @@
                                 @csrf
                                 <input type="hidden" value="{{$itemToEquip['type']}}" name="equip_type" />
                                 <input type="hidden" value="{{$slotId}}" name="slot_id" />
-                                <input type="hidden" value="left-hand" name="position" />
+                                <input type="hidden" value="{{$positions[$itemToEquip['type']][0]}}" name="position" />
                                 <input type="hidden" value="{{$itemToEquip['id']}}" name="item_id_to_buy" />
                                 <x-core.buttons.primary-button>
                                     {{ucfirst(str_replace('-', ' ', $positions[$itemToEquip['type']][0]))}}
@@ -52,7 +52,7 @@
                                 @csrf
                                 <input type="hidden" value="{{$itemToEquip['type']}}" name="equip_type" />
                                 <input type="hidden" value="{{$slotId}}" name="slot_id" />
-                                <input type="hidden" value="right-hand" name="position" />
+                                <input type="hidden" value="{{$positions[$itemToEquip['type']][1]}}" name="position" />
                                 <input type="hidden" value="{{$itemToEquip['id']}}" name="item_id_to_buy" />
                                 <x-core.buttons.primary-button>
                                     {{ucfirst(str_replace('-', ' ', $positions[$itemToEquip['type']][1]))}}
