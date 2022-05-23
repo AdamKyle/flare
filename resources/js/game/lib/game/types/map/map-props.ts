@@ -15,5 +15,7 @@ export default interface MapProps {
 
     is_dead?: boolean;
 
+    is_automaton_running: boolean;
+
     automation_completed_at: number;
 }

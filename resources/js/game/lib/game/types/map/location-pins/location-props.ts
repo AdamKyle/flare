@@ -10,4 +10,5 @@ export default interface LocationProps {
 
     teleport_player: (data: {x: number, y: number, cost: number, timeout: number}) => void;
 
+    can_move: boolean;
 }

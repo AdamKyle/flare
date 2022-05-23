@@ -32,6 +32,8 @@ class ServerMessageEvent implements ShouldBroadcastNow
      */
     public $id;
 
+    public $isQuestItem;
+
     /**
      * ServerMessageEvent constructor.
      *
@@ -42,10 +44,11 @@ class ServerMessageEvent implements ShouldBroadcastNow
      * @param string|null $link
      * @param int|null $id
      */
-    public function __construct(User $user, string $message,  int $id = null) {
-        $this->user    = $user;
-        $this->message = $message;
-        $this->id      = $id;
+    public function __construct(User $user, string $message,  int $id = null, bool $isQuestItem = false) {
+        $this->user        = $user;
+        $this->message     = $message;
+        $this->id          = $id;
+        $this->isQuestItem = $isQuestItem;
     }
 
     /**

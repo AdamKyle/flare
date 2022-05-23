@@ -26,20 +26,17 @@ class Affixes extends BattleBase {
             if ($cantBeResisted) {
                 $this->addMessage('The enemy cannot resist your enchantments! They are so glowy!', 'regular');
 
-                $this->addMessage('Your enchantments glow with rage. Your enemy cowers. (non resisted dmg): ' . number_format($totalDamage + $nonStackingDamage));
+                $this->addMessage('Your enchantments glow with rage. Your enemy cowers. (non resisted dmg): ' . number_format($totalDamage + $nonStackingDamage), 'player-action');
 
                 return $totalDamage + $nonStackingDamage;
             } else {
-                $dc = 100 - 100 * $monster->getMonsterStat('affix_resistance');
 
-                if ($dc <= 0 || rand(1, 100) > $dc) {
-                    $this->addMessage('Your damaging enchantments (resistible) have been resisted.', 'enemy-action');
+                if ($nonStackingDamage > 0) {
+                    return $this->doAffixDamage($monster, $nonStackingDamage, $totalDamage);
+                } else {
+                    $this->addMessage('Your (non resistable) enchantments glow with rage. Your enemy cowers: ' . number_format($totalDamage), 'player-action');
 
-                }  else {
-
-                    $this->addMessage('Your enchantments glow with rage. Your enemy cowers: ' . number_format($nonStackingDamage), 'player-action');
-
-                    return $nonStackingDamage;
+                    return $totalDamage;
                 }
             }
         }
@@ -80,5 +77,22 @@ class Affixes extends BattleBase {
         }
 
         return 0;
+    }
+
+    protected function doAffixDamage(ServerMonster $monster, int $nonStackingDamage, int $totalDamage) {
+        $dc = 100 - 100 * $monster->getMonsterStat('affix_resistance');
+
+        if ($dc <= 0 || rand(1, 100) > $dc) {
+            $this->addMessage('Your damaging enchantments (resistible) have been resisted. However ...', 'enemy-action');
+
+            $this->addMessage('Your (non resistible) enchantments glow with rage. Your enemy cowers: ' . number_format($totalDamage), 'player-action');
+
+            return $totalDamage;
+        } else {
+
+            $this->addMessage('Your enchantments glow with rage. Your enemy cowers: ' . number_format($nonStackingDamage), 'player-action');
+
+            return $nonStackingDamage;
+        }
     }
 }

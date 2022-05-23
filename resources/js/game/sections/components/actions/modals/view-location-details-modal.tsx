@@ -38,7 +38,8 @@ export default class ViewLocationDetailsModal extends React.Component<ViewLocati
                                   handle_close={this.props.close_modal}
                                   title={this.props.location.name + ' (X/Y): ' + this.props.location.x + '/' + this.props.location.y}
                                   location={this.props.location}
-                                  hide_secondary_button={true} />
+                                  hide_secondary_button={true}
+                                  can_move={this.props.can_move}/>
         }
 
         if (this.props.kingdom_id !== null && this.state.is_open) {
@@ -47,7 +48,8 @@ export default class ViewLocationDetailsModal extends React.Component<ViewLocati
                 handle_close={this.props.close_modal}
                 kingdom_id={this.props.kingdom_id}
                 character_id={this.props.character_id}
-                hide_secondary={false} />
+                hide_secondary={false}
+                can_move={this.props.can_move}/>
         }
 
         if ((this.props.enemy_kingdom_id !== null || this.props.npc_kingdom_id !== null) && this.state.is_open) {
@@ -66,6 +68,7 @@ export default class ViewLocationDetailsModal extends React.Component<ViewLocati
                 character_id={this.props.character_id}
                 hide_secondary={true}
                 is_enemy_kingdom={true}
+                can_move={this.props.can_move}
             />
         }
 

@@ -51,7 +51,7 @@ export default class OtherKingdomModal extends React.Component<OtherKingdomModal
     }
 
     teleportDisabled() {
-        return this.state.cost === 0 || !this.state.can_afford;
+        return this.state.cost === 0 || !this.state.can_afford || !this.props.can_move;
     }
 
     handleTeleport() {

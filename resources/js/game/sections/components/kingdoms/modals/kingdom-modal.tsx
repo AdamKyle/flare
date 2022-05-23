@@ -46,7 +46,7 @@ export default class KingdomModal extends React.Component<KingdomModalProps, Kin
     }
 
     teleportDisabled() {
-        return this.state.cost === 0 || !this.state.can_afford;
+        return this.state.cost === 0 || !this.state.can_afford || !this.props.can_move;
     }
 
     attackKingdomDisabled() {

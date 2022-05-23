@@ -45,7 +45,7 @@ export default class LocationModal extends React.Component<LocationModalPros, Lo
     }
 
     teleportDisabled(): boolean {
-        return this.state.cost === 0 || !this.state.can_afford;
+        return this.state.cost === 0 || !this.state.can_afford || !this.props.can_move;
     }
 
     render() {

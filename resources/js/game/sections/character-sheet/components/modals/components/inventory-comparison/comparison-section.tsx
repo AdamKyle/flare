@@ -119,7 +119,6 @@ export default class ComparisonSection extends React.Component<any, any> {
     }
 
     render() {
-        console.log(this.props.comparison_details);
         return (
             <div className='p-5'>
                 {

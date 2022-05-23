@@ -297,6 +297,7 @@ export default class MapMovementActions extends React.Component<any, any> {
                                                   enemy_kingdom_id={this.state.enemy_kingdom_id}
                                                   npc_kingdom_id={this.state.npc_kingdom_id}
                                                   is_small_screen={true}
+                                                  can_move={this.props.character.can_move}
                         />
                     : null
                 }

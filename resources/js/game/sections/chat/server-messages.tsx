@@ -4,6 +4,7 @@ import {cloneDeep} from "lodash";
 import ItemComparison from "./modals/item-comparison";
 import ServerMessagesComponentProps from "../../lib/game/chat/components/server-messages-component-props";
 import ServerMessagesComponentState from "../../lib/game/chat/components/server-messages-component-state";
+import InventoryUseDetails from "../character-sheet/components/modals/inventory-item-details";
 
 export default class ServerMessages extends React.Component<ServerMessagesComponentProps, ServerMessagesComponentState> {
 
@@ -13,21 +14,23 @@ export default class ServerMessages extends React.Component<ServerMessagesCompon
         this.state = {
             slot_id: 0,
             view_item: false,
+            is_quest_item: false,
         }
     }
 
-    viewItem(slotId?: number) {
+    viewItem(slotId?: number, isQuest?: any) {
         this.setState({
             slot_id: typeof slotId !== 'undefined' ? slotId : 0,
-            view_item: !this.state.view_item
+            view_item: !this.state.view_item,
+            is_quest_item: typeof isQuest !== 'undefined' ? isQuest : false,
         })
     }
 
     buildMessages() {
-        return this.props.server_messages.map((message) => {
+        return this.props.server_messages.map((message: any) => {
             if (message.event_id !== 0 && message.event_id !== null) {
                 return <li className='text-pink-400 my-2 break-all lg:break-normal' key={message.id}>
-                    <button type='button' className='italic underline hover:text-pink-300' onClick={() => this.viewItem(message.event_id)}>{message.message} <i className='ra ra-anvil'></i></button>
+                    <button type='button' className='italic underline hover:text-pink-300' onClick={() => this.viewItem(message.event_id, message.is_quest_item)}>{message.message} <i className='ra ra-anvil'></i></button>
                 </li>
             }
 
@@ -44,13 +47,19 @@ export default class ServerMessages extends React.Component<ServerMessagesCompon
 
                 {
                     this.state.view_item && this.state.slot_id !== 0 ?
-                        <ItemComparison
-                            is_open={this.state.view_item}
-                            manage_modal={this.viewItem.bind(this)}
-                            character_id={this.props.character_id}
-                            slot_id={this.state.slot_id}
-                            view_port={this.props.view_port}
-                        />
+                        this.state.is_quest_item ?
+                            <InventoryUseDetails character_id={this.props.character_id}
+                                                 item_id={this.state.slot_id}
+                                                 is_open={this.state.view_item}
+                                                 manage_modal={this.viewItem.bind(this)} />
+                        :
+                            <ItemComparison
+                                is_open={this.state.view_item}
+                                manage_modal={this.viewItem.bind(this)}
+                                character_id={this.props.character_id}
+                                slot_id={this.state.slot_id}
+                                view_port={this.props.view_port}
+                            />
                     : null
                 }
             </Fragment>

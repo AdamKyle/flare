@@ -197,7 +197,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                 <div className='overflow-hidden max-h-[300px]'>
                     <Draggable
                         position={this.state.map_position}
-                        bounds={{top: -160, left: this.fetchLeftBounds(), right: this.state.right_bounds, bottom: this.state.bottom_bounds}}
+                        bounds={{top: -200, left: this.fetchLeftBounds(), right: this.state.right_bounds, bottom: this.state.bottom_bounds}}
                         handle=".handle"
                         defaultPosition={{x: 0, y: 0}}
                         grid={[16, 16]}
@@ -208,13 +208,36 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                             <div className='handle game-map'
                                  style={this.getStyle()}>
 
-                                <Location locations={this.state.locations} character_position={this.state.character_position} currencies={this.props.currencies} teleport_player={this.handleTeleportPlayer.bind(this)} />
+                                <Location locations={this.state.locations}
+                                          character_position={this.state.character_position}
+                                          currencies={this.props.currencies}
+                                          teleport_player={this.handleTeleportPlayer.bind(this)}
+                                          can_move={this.state.can_player_move}
+                                />
 
-                                <Kingdoms kingdoms={this.state.player_kingdoms} character_id={this.props.character_id} character_position={this.state.character_position} currencies={this.props.currencies} teleport_player={this.handleTeleportPlayer.bind(this)}/>
+                                <Kingdoms kingdoms={this.state.player_kingdoms}
+                                          character_id={this.props.character_id}
+                                          character_position={this.state.character_position}
+                                          currencies={this.props.currencies}
+                                          teleport_player={this.handleTeleportPlayer.bind(this)}
+                                          can_move={this.state.can_player_move}
+                                />
 
-                                <EnemyKingdoms kingdoms={this.state.enemy_kingdoms} character_id={this.props.character_id} character_position={this.state.character_position} currencies={this.props.currencies} teleport_player={this.handleTeleportPlayer.bind(this)}/>
+                                <EnemyKingdoms kingdoms={this.state.enemy_kingdoms}
+                                               character_id={this.props.character_id}
+                                               character_position={this.state.character_position}
+                                               currencies={this.props.currencies}
+                                               teleport_player={this.handleTeleportPlayer.bind(this)}
+                                               can_move={this.state.can_player_move}
+                                />
 
-                                <NpcKingdoms kingdoms={this.state.npc_kingdoms} character_id={this.props.character_id} character_position={this.state.character_position} currencies={this.props.currencies} teleport_player={this.handleTeleportPlayer.bind(this)} />
+                                <NpcKingdoms kingdoms={this.state.npc_kingdoms}
+                                             character_id={this.props.character_id}
+                                             character_position={this.state.character_position}
+                                             currencies={this.props.currencies}
+                                             teleport_player={this.handleTeleportPlayer.bind(this)}
+                                             can_move={this.state.can_player_move}
+                                />
 
                                 <div className="map-x-pin" style={this.playerIcon()}></div>
                             </div>
@@ -240,6 +263,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                                 view_port={this.props.view_port}
                                 is_dead={this.props.is_dead}
                                 map_id={this.state.map_id}
+                                is_automation_running={this.props.is_automaton_running}
                     />
                 </div>
                 <div className={'mt-3'}>

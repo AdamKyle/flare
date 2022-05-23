@@ -332,7 +332,7 @@ class BattleDrop {
 
                 $slot = $character->refresh()->inventory->slots()->where('item_id', $item->id)->first();
 
-                event(new GameServerMessage($character->user, 'You found: ' . $item->affix_name . ' on the enemies corpse.', $slot->id));
+                event(new GameServerMessage($character->user, 'You found: ' . $item->affix_name . ' on the enemies corpse.', $item->id, true));
 
                 broadcast(new GlobalMessageEvent($message));
             } else {

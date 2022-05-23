@@ -15,7 +15,6 @@ export default class Location extends React.Component<LocationProps, LocationSta
             location: null,
             view_port: null,
         }
-
     }
 
     componentDidMount() {
@@ -95,6 +94,7 @@ export default class Location extends React.Component<LocationProps, LocationSta
                                        currencies={this.props.currencies}
                                        teleport_player={this.props.teleport_player}
                                        hide_secondary_button={false}
+                                       can_move={this.props.can_move}
                         />
                     : null
                 }

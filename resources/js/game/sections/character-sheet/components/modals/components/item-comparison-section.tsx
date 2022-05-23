@@ -136,7 +136,6 @@ export default class ItemComparisonSection extends React.Component<any, any> {
     }
 
     renderSingleComparison() {
-        console.log(this.props.comparison_details);
         if (this.props.comparison_details !== null) {
             return (
                 <div>
@@ -158,15 +157,9 @@ export default class ItemComparisonSection extends React.Component<any, any> {
 
         return (
             <div>
-                {
-                    this.props.comparison_details.itemToEquip.type === 'quest' ?
-                        <ItemDetails item={this.props.comparison_details.itemToEquip} />
-                    :
-                        <dl>
-                            {this.renderItemToEquip(this.props.comparison_details.itemToEquip)}
-                        </dl>
-                }
-
+                <dl>
+                    {this.renderItemToEquip(this.props.comparison_details.itemToEquip)}
+                </dl>
             </div>
         )
     }

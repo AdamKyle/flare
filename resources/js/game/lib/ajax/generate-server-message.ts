@@ -10,10 +10,8 @@ import {AxiosError, AxiosResponse} from "axios";
  */
 export const generateServerMessage = (type: string, customMessage?: string) => {
     (new Ajax()).setRoute('server-message').setParameters({
-        params: {
-            type: type,
-            custom_message: customMessage
-        }
+        type: type,
+        custom_message: customMessage
     }).doAjaxCall('get', (result: AxiosResponse) => {}, (error: AxiosError) => {
         if (error.hasOwnProperty('response')) {
             const response = error.response;

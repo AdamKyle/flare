@@ -56,6 +56,8 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
             this.handleLocationChange();
         } else if (this.state.enemy_kingdom_id !== null) {
             this.handleEnemyKingdomChange();
+        } else if (this.state.npc_kingdom_id !== null) {
+            this.handleNpcKingdomsChange();
         }
     }
 
@@ -105,7 +107,7 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
         }
 
         if (this.props.enemy_kingdoms === null) {
-            return this.setState({ enemy_kingdom_id: 0 });
+            return this.setState({ enemy_kingdom_id: null });
         }
 
         const foundEnemyKingdom      = this.props.enemy_kingdoms.filter((kingdom) => kingdom.x_position === this.props.character_position.x && kingdom.y_position === this.props.character_position.y);
@@ -116,6 +118,26 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
             }
         } else {
             return this.setState({ enemy_kingdom_id: null });
+        }
+    }
+
+    handleNpcKingdomsChange() {
+        if (this.state.npc_kingdom_id === 0) {
+            return;
+        }
+
+        if (this.props.npc_kingdoms === null) {
+            return this.setState({ npc_kingdom_id: null });
+        }
+
+        const npcKingdom      = this.props.npc_kingdoms.filter((kingdom) => kingdom.x_position === this.props.character_position.x && kingdom.y_position === this.props.character_position.y);
+
+        if (npcKingdom.length > 0) {
+            if (npcKingdom[0].id !== this.state.npc_kingdom_id) {
+                return this.setState({ npc_kingdom_id: null });
+            }
+        } else {
+            return this.setState({ npc_kingdom_id: null });
         }
     }
 
@@ -211,7 +233,7 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
     }
 
     renderViewDetailsButton() {
-        if (this.state.location !== null || this.state.player_kingdom_id !== 0 || this.state.enemy_kingdom_id !== 0 || this.state.npc_kingdom_id !== 0) {
+        if (this.state.location !== null || this.state.player_kingdom_id !== null || this.state.enemy_kingdom_id !== null || this.state.npc_kingdom_id !== null) {
             return <OrangeButton button_label={'View Location Details'} on_click={() => this.viewLocation()} disabled={this.props.is_dead} />;
         }
     }
@@ -226,14 +248,14 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
 
                             {
                                 this.props.port_location !== null ?
-                                    <SuccessOutlineButton additional_css={'text-center col-start-1 col-end-1'} button_label={'Set Sail'} on_click={this.setSail.bind(this)} disabled={this.state.is_movement_disabled || this.props.is_dead}/>
+                                    <SuccessOutlineButton additional_css={'text-center col-start-1 col-end-1'} button_label={'Set Sail'} on_click={this.setSail.bind(this)} disabled={this.state.is_movement_disabled || this.props.is_dead || this.props.is_automation_running}/>
                                     : null
                             }
 
                             <SuccessOutlineButton additional_css={'text-center col-start-2 col-end-2'}
                                                   button_label={'Teleport'}
                                                   on_click={this.teleport.bind(this)}
-                                                  disabled={this.state.is_movement_disabled || this.props.is_dead}
+                                                  disabled={this.state.is_movement_disabled || this.props.is_dead || this.props.is_automation_running}
                             />
                         </div>
                     </div>
@@ -298,6 +320,7 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                                                    enemy_kingdom_id={this.state.enemy_kingdom_id}
                                                    npc_kingdom_id={this.state.npc_kingdom_id}
                                                    is_small_screen={false}
+                                                   can_move={this.props.can_player_move}
                          />
                      : null
                 }

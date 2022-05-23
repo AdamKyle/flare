@@ -12,7 +12,7 @@ export const getNewYPosition = (characterY: number, mapPositionY: number, viewPo
     }
 
     if (characterY > 320) {
-        return -150;
+        return -200;
     }
 
     return mapPositionY;

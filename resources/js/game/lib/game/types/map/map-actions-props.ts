@@ -43,4 +43,6 @@ export default interface MapActionsProps {
         gold_dust: number,
         copper_coins: number,
     };
+
+    is_automation_running: boolean;
 }

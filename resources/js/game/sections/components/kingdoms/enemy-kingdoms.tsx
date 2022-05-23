@@ -78,6 +78,7 @@ export default class EnemyKingdoms extends React.Component<KingdomProps, Kingdom
                                            handle_close={this.closeKingdomModal.bind(this)}
                                            is_enemy_kingdom={true}
                                            hide_secondary={false}
+                                           can_move={this.props.can_move}
                         />
                         : null
                 }

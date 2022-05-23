@@ -15,5 +15,7 @@ export interface LocationModalPros {
 
     teleport_player?: (data: {x: number, y: number, cost: number, timeout: number}) => void;
 
-    hide_secondary_button: boolean | null
+    hide_secondary_button: boolean | null;
+
+    can_move: boolean;
 }

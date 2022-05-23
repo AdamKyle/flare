@@ -9,4 +9,6 @@ export default interface KingdomProps {
     currencies?: {gold: number, gold_dust: number, shards: number, copper_coins: number};
 
     teleport_player: (data: {x: number, y: number, cost: number, timeout: number}) => void;
+
+    can_move: boolean;
 }

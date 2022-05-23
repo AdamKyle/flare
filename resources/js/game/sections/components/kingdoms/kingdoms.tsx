@@ -76,6 +76,7 @@ export default class Kingdoms extends React.Component<KingdomProps, KingdomState
                                       teleport_player={this.teleportPlayer.bind(this)}
                                       handle_close={this.closeKingdomModal.bind(this)}
                                       hide_secondary={false}
+                                      can_move={this.props.can_move}
                         />
                         : null
                 }
