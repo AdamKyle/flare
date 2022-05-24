@@ -44,6 +44,15 @@ class BaseCharacterAttack {
             case 'cast':
                 $response = $this->characterAttack->cast($character, $monster, $isPlayerVoided, $this->characterHealth, $this->monsterHealth);
                 break;
+            case 'attack_and_cast':
+                $response = $this->characterAttack->attackAndCast($character, $monster, $isPlayerVoided, $this->characterHealth, $this->monsterHealth);
+                break;
+            case 'cast_and_attack':
+                $response = $this->characterAttack->castAndAttack($character, $monster, $isPlayerVoided, $this->characterHealth, $this->monsterHealth);
+                break;
+            case 'defend':
+                $response = $this->characterAttack->defend($character, $monster, $isPlayerVoided, $this->characterHealth, $this->monsterHealth);
+                break;
             default:
                 $this->battleMessages[] = ['message' => 'No Attack Type Supplied. Attack Failed for character.', 'event-action'];
         }

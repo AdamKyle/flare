@@ -16,10 +16,11 @@ export default class UseItems extends BattleBase {
   }
 
   useItems(attackData, attackerClass, isVoided) {
-
     if (!isVoided) {
       if (attackerClass === 'Vampire') {
         this.lifeStealingAffixes(attackData, true, isVoided);
+      } else {
+        this.lifeStealingAffixes(attackData, false, isVoided);
       }
 
       const damageAffixes = new DamageAffixes(this.characterCurrentHealth, this.monsterCurrentHealth);
@@ -30,9 +31,11 @@ export default class UseItems extends BattleBase {
       this.monsterCurrentHealth = damageAffixes.getMonsterHealth();
 
       this.mergeMessages(damageAffixes.getBattleMessages());
+
+      this.ringDamage(attackData, this.defender, 'player');
     }
 
-    this.ringDamage(attackData, this.defender, 'player');
+
   }
 
   getBattleMessage() {

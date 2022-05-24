@@ -49,23 +49,19 @@ class VampireThirst extends BattleBase {
     public function handleAttack(Character $character, array $attackData) {
         $extraActionData = $this->characterCacheData->getCachedCharacterData($character, 'extra_action_chance');
 
-        if (!rand(1, 100) > (100 - 100 * $extraActionData['chance'])) {
+        if (!(rand(1, 100) > (100 - 100 * $extraActionData['chance']))) {
             return;
         }
 
-        $this->addMessage('There is a thirst, child, it\'s in your soul! Lash out and kill!', 'regular');
-
         $dur    = $this->characterCacheData->getCachedCharacterData($character, 'dur_modded');
         $damage = $dur + $dur * 0.15;
+
+        $this->addMessage('There is a thirst, child, it\'s in your soul! Lash out and kill!', 'regular');
 
         if ($attackData['damage_deduction'] > 0.0) {
             $this->addMessage('The Plane weakens your ability to do full damage!', 'enemy-action');
 
             $damage = $damage - $damage * $attackData['damage_deduction'];
-        }
-
-        if ($damage > $this->monsterHealth) {
-            $damage = $this->monsterHealth;
         }
 
         $this->doBaseAttack($character, $damage);

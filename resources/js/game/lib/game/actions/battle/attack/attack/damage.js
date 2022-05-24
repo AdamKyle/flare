@@ -428,10 +428,6 @@ export default class Damage extends BattleBase {
           totalAttack -= totalAttack * attackData.damage_reduction;
         }
 
-        if (totalAttack > attacker.dur_modded) {
-          totalAttack = attacker.dur_modded;
-        }
-
         monsterCurrentHealth   = monsterCurrentHealth - totalAttack;
         characterCurrentHealth = characterCurrentHealth + totalAttack
 

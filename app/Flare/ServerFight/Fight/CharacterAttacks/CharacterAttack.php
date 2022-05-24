@@ -3,7 +3,10 @@
 namespace App\Flare\ServerFight\Fight\CharacterAttacks;
 
 use App\Flare\Models\Character;
+use App\Flare\ServerFight\Fight\CharacterAttacks\Types\AttackAndCast;
+use App\Flare\ServerFight\Fight\CharacterAttacks\Types\CastAndAttack;
 use App\Flare\ServerFight\Fight\CharacterAttacks\Types\CastType;
+use App\Flare\ServerFight\Fight\CharacterAttacks\Types\Defend;
 use App\Flare\ServerFight\Fight\CharacterAttacks\Types\WeaponType;
 use App\Flare\ServerFight\Monster\ServerMonster;
 
@@ -13,11 +16,20 @@ class CharacterAttack {
 
     private CastType $castType;
 
+    private AttackAndCast $attackAndCast;
+
+    private CastAndAttack $castAndAttack;
+
+    private Defend $defend;
+
     private mixed $type;
 
-    public function __construct(WeaponType $weaponType, CastType $castType) {
-        $this->weaponType = $weaponType;
-        $this->castType   = $castType;
+    public function __construct(WeaponType $weaponType, CastType $castType, AttackAndCast $attackAndCast, CastAndAttack $castAndAttack, Defend $defend) {
+        $this->weaponType    = $weaponType;
+        $this->castType      = $castType;
+        $this->attackAndCast = $attackAndCast;
+        $this->castAndAttack = $castAndAttack;
+        $this->defend        = $defend;
     }
 
     public function attack(Character $character, ServerMonster $monster, bool $isPlayerVoided, int $characterHealth, int $monsterHealth): CharacterAttack {
@@ -38,6 +50,39 @@ class CharacterAttack {
                          ->castAttack($character, $monster);
 
         $this->type = $this->castType;
+
+        return $this;
+    }
+
+    public function attackAndCast(Character $character, ServerMonster $monster, bool $isPlayerVoided, int $characterHealth, int $monsterHealth): CharacterAttack {
+        $this->attackAndCast->setCharacterHealth($characterHealth)
+                            ->setMonsterHealth($monsterHealth)
+                            ->setCharacterAttackData($character, $isPlayerVoided)
+                            ->handleAttack($character, $monster);
+
+        $this->type = $this->attackAndCast;
+
+        return $this;
+    }
+
+    public function castAndAttack(Character $character, ServerMonster $monster, bool $isPlayerVoided, int $characterHealth, int $monsterHealth): CharacterAttack {
+        $this->castAndAttack->setCharacterHealth($characterHealth)
+                            ->setMonsterHealth($monsterHealth)
+                            ->setCharacterAttackData($character, $isPlayerVoided)
+                            ->handleAttack($character, $monster);
+
+        $this->type = $this->castAndAttack;
+
+        return $this;
+    }
+
+    public function defend(Character $character, ServerMonster $monster, bool $isPlayerVoided, int $characterHealth, int $monsterHealth): CharacterAttack {
+        $this->defend->setCharacterHealth($characterHealth)
+                     ->setMonsterHealth($monsterHealth)
+                     ->setCharacterAttackData($character, $isPlayerVoided)
+                     ->defend($character, $monster);
+
+        $this->type = $this->defend;
 
         return $this;
     }

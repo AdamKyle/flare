@@ -37,7 +37,7 @@ class DoubleHeal extends BattleBase {
 
         if ($extraActionData['has_item']) {
 
-            if (!rand(1, 100) > (100 - 100 * $extraActionData['chance'])) {
+            if (!(rand(1, 100) > (100 - 100 * $extraActionData['chance']))) {
                 return;
             }
 

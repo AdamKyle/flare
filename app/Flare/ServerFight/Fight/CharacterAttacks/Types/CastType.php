@@ -88,7 +88,8 @@ class CastType extends BattleBase
 
         if ($this->entrance->isEnemyEntranced()) {
             $this->doSpellDamage($character, $monster, $spellDamage);
-            return $this;
+
+            return;
         }
 
         if ($this->canHit->canPlayerAutoHit($character)) {
@@ -96,7 +97,7 @@ class CastType extends BattleBase
 
             $this->doSpellDamage($character, $monster, $spellDamage);
 
-            return $this;
+            return;
         }
 
         if ($this->canHit->canPlayerCastSpell($character, $monster, $this->isVoided)) {
@@ -124,9 +125,13 @@ class CastType extends BattleBase
     }
 
     protected function secondaryAttack(Character $character, ServerMonster $monster) {
-        $this->affixLifeStealingDamage($character, $monster);
-        $this->affixDamage($character, $monster);
-        $this->ringDamage();
+        if (!$this->isVoided) {
+            $this->affixLifeStealingDamage($character, $monster);
+            $this->affixDamage($character, $monster);
+            $this->ringDamage();
+        } else {
+            $this->addMessage('You are voided, none of your rings or enchantments fire ...', 'enemy-action');
+        }
     }
 
 

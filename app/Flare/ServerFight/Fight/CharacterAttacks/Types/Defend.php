@@ -11,7 +11,7 @@ use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks;
 use App\Flare\ServerFight\Fight\Entrance;
 use App\Flare\ServerFight\Monster\ServerMonster;
 
-class WeaponType extends BattleBase {
+class Defend extends BattleBase {
 
     private int $monsterHealth;
 
@@ -41,36 +41,34 @@ class WeaponType extends BattleBase {
         $this->specialAttacks     = $specialAttacks;
     }
 
-    public function setMonsterHealth(int $monsterHealth): WeaponType {
+    public function setMonsterHealth(int $monsterHealth): Defend {
         $this->monsterHealth = $monsterHealth;
 
         return $this;
     }
 
-    public function setCharacterHealth(int $characterHealth): WeaponType {
+    public function setCharacterHealth(int $characterHealth): Defend {
         $this->characterHealth = $characterHealth;
 
         return $this;
     }
 
-    public function setCharacterAttackData(Character $character, bool $isVoided): WeaponType {
+    public function setCharacterAttackData(Character $character, bool $isVoided): Defend {
 
-        $this->attackData = $this->characterCacheData->getDataFromAttackCache($character, $isVoided ? 'voided_attack' : 'attack');
+        $this->attackData = $this->characterCacheData->getDataFromAttackCache($character, $isVoided ? 'voided_defend' : 'defend');
         $this->isVoided   = $isVoided;
 
         return $this;
     }
 
-    public function doWeaponAttack(Character $character, ServerMonster $serverMonster): WeaponType {
+    public function defend(Character $character, ServerMonster $serverMonster): Defend {
 
         $this->entrance->playerEntrance($character, $serverMonster, $this->attackData);
 
         $this->mergeMessages($this->entrance->getMessages());
 
-        $weaponDamage = $this->attackData['weapon_damage'];
-
         if ($this->entrance->isEnemyEntranced()) {
-            $this->weaponAttack($character, $serverMonster, $weaponDamage);
+            $this->secondaryAttack($character, $serverMonster);
 
             return $this;
         }
@@ -78,23 +76,12 @@ class WeaponType extends BattleBase {
         if ($this->canHit->canPlayerAutoHit($character)) {
             $this->addMessage('You dance along in the shadows, the enemy doesn\'t see you. Strike now!', 'regular');
 
-            $this->weaponAttack($character, $serverMonster, $weaponDamage);
+            $this->secondaryAttack($character, $serverMonster);
 
             return $this;
         }
 
-        if ($this->canHit->canPlayerHitMonster($character, $serverMonster, $this->isVoided)) {
-
-            if ($serverMonster->getMonsterStat('ac') > $weaponDamage) {
-                $this->addMessage('Your weapon was blocked!', 'enemy-action');
-            } else {
-                $this->weaponAttack($character, $serverMonster, $weaponDamage);
-            }
-        } else {
-            $this->addMessage('Your attack missed!', 'enemy-action');
-
-            $this->secondaryAttack($character, $serverMonster);
-        }
+        $this->secondaryAttack($character, $serverMonster);
 
         return $this;
     }
@@ -112,11 +99,6 @@ class WeaponType extends BattleBase {
         return $this->characterHealth;
     }
 
-    public function weaponAttack(Character $character, ServerMonster $monster, int $weaponDamage) {
-        $this->weaponDamage($character, $monster, $weaponDamage);
-        $this->secondaryAttack($character, $monster);
-    }
-
     protected function secondaryAttack(Character $character, ServerMonster $monster) {
         if (!$this->isVoided) {
             $this->affixLifeStealingDamage($character, $monster);
@@ -125,6 +107,8 @@ class WeaponType extends BattleBase {
         } else {
             $this->addMessage('You are voided, none of your rings or enchantments fire ...', 'enemy-action');
         }
+
+        $this->vampireSpecial($character, $this->attackData);
     }
 
     protected function affixDamage(Character $character, ServerMonster $monster) {
@@ -158,33 +142,6 @@ class WeaponType extends BattleBase {
         $this->affixes->clearMessages();
     }
 
-    protected function weaponDamage(Character $character, ServerMonster $monster, int $weaponDamage) {
-        $criticality = $this->characterCacheData->getCachedCharacterData($character, 'skills')['criticality'];
-
-        if (rand(1, 100) > (100 - 100 * $criticality)) {
-            $this->addMessage('You become overpowered with rage! (Critical strike!)', 'player-action');
-
-            $weaponDamage *= 2;
-        }
-
-        $totalDamage = $weaponDamage - $weaponDamage * $this->attackData['damage_deduction'];
-
-        $this->monsterHealth -= $totalDamage;
-
-        $this->addMessage('Your weapon hits ' . $monster->getName() . ' for: ' . number_format($totalDamage), 'player-action');
-
-        $this->specialAttacks->setCharacterHealth($this->characterHealth)
-                             ->setMonsterHealth($this->monsterHealth)
-                             ->doWeaponSpecials($character, $this->attackData);
-
-        $this->mergeMessages($this->specialAttacks->getMessages());
-
-        $this->characterHealth = $this->specialAttacks->getCharacterHealth();
-        $this->monsterHealth   = $this->specialAttacks->getMonsterHealth();
-
-        $this->specialAttacks->clearMessages();
-    }
-
     protected function ringDamage() {
         $ringDamage = $this->attackData['ring_damage'];
 
@@ -192,6 +149,22 @@ class WeaponType extends BattleBase {
             $this->monsterHealth -= ($ringDamage - $ringDamage * $this->attackData['damage_deduction']);
 
             $this->addMessage('Your rings hit for: ' . number_format($ringDamage), 'player-action');
+        }
+    }
+
+    protected function vampireSpecial(Character $character, array $attackData) {
+        if ($character->classType()->isVampire()) {
+            $this->specialAttacks
+                 ->setCharacterHealth($this->characterHealth)
+                 ->setMonsterHealth($this->monsterHealth)
+                 ->vampireThirst($character, $attackData);
+
+            $this->characterHealth = $this->specialAttacks->getCharacterHealth();
+            $this->monsterHealth   = $this->specialAttacks->getMonsterHealth();
+
+            $this->mergeMessages($this->specialAttacks->getMessages());
+
+            $this->specialAttacks->clearMessages();
         }
     }
 }

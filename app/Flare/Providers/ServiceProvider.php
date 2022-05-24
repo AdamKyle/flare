@@ -48,7 +48,10 @@ use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\DoubleCast;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\DoubleHeal;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\TripleAttack;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\VampireThirst;
+use App\Flare\ServerFight\Fight\CharacterAttacks\Types\AttackAndCast;
+use App\Flare\ServerFight\Fight\CharacterAttacks\Types\CastAndAttack;
 use App\Flare\ServerFight\Fight\CharacterAttacks\Types\CastType;
+use App\Flare\ServerFight\Fight\CharacterAttacks\Types\Defend;
 use App\Flare\ServerFight\Fight\CharacterAttacks\Types\WeaponType;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\HammerSmash;
 use App\Flare\ServerFight\Fight\Entrance;
@@ -499,10 +502,45 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
+        $this->app->bind(AttackAndCast::class, function($app) {
+            return new AttackAndCast(
+                $app->make(CharacterCacheData::class),
+                $app->make(Entrance::class),
+                $app->make(CanHit::class),
+                $app->make(Affixes::class),
+                $app->make(WeaponType::class),
+                $app->make(CastType::class),
+            );
+        });
+
+        $this->app->bind(CastAndAttack::class, function($app) {
+            return new CastAndAttack(
+                $app->make(CharacterCacheData::class),
+                $app->make(Entrance::class),
+                $app->make(CanHit::class),
+                $app->make(Affixes::class),
+                $app->make(WeaponType::class),
+                $app->make(CastType::class),
+            );
+        });
+
+        $this->app->bind(Defend::class, function($app) {
+            return new Defend(
+                $app->make(CharacterCacheData::class),
+                $app->make(Entrance::class),
+                $app->make(CanHit::class),
+                $app->make(Affixes::class),
+                $app->make(SpecialAttacks::class),
+            );
+        });
+
         $this->app->bind(CharacterAttack::class, function($app) {
             return new CharacterAttack(
                 $app->make(WeaponType::class),
                 $app->make(CastType::class),
+                $app->make(AttackAndCast::class),
+                $app->make(CastAndAttack::class),
+                $app->make(Defend::class),
             );
         });
 
