@@ -202,7 +202,7 @@ export default class ExplorationSection extends React.Component<any, any> {
                     this.props.character.is_automation_running ?
                         <Fragment>
                             <div className='mb-4 md:ml-[120px]'>
-                                Exploration is running. You cancel below. <a href='/information/exploration' target='_blank'>See Exploration Help <i
+                                Exploration is running. You can cancel it below. <a href='/information/exploration' target='_blank'>See Exploration Help <i
                                 className="fas fa-external-link-alt"></i></a> for more details.
                             </div>
 
@@ -269,7 +269,7 @@ export default class ExplorationSection extends React.Component<any, any> {
                             </div>
 
                             <div className={'lg:text-center md:ml-[-100px] mt-3 mb-3'}>
-                                <PrimaryButton button_label={'Explore'} on_click={this.startExploration.bind(this)} disabled={this.state.monster_selected === null || this.state.time_selected === null || this.state.attack_type === null || this.state.loading} additional_css={'mr-2'}/>
+                                <PrimaryButton button_label={'Explore'} on_click={this.startExploration.bind(this)} disabled={this.state.monster_selected === null || this.state.time_selected === null || this.state.attack_type === null || this.state.loading || this.props.character.is_dead} additional_css={'mr-2'}/>
                                 <DangerButton button_label={'Close'} on_click={this.props.manage_exploration} disabled={this.state.loading} />
 
                                 {

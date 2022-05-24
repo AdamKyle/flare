@@ -59,6 +59,7 @@ export default class ServerMessages extends React.Component<ServerMessagesCompon
                                 character_id={this.props.character_id}
                                 slot_id={this.state.slot_id}
                                 view_port={this.props.view_port}
+                                is_automation_running={this.props.is_automation_running}
                             />
                     : null
                 }

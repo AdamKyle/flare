@@ -118,6 +118,13 @@ export default class ComparisonSection extends React.Component<any, any> {
         (new InventoryComparisonActions()).destroyItem(this, params);
     }
 
+    showReplaceMessage() {
+        if (!this.props.is_automation_running) {
+            const twoHandedEquipped = (this.props.comparison_details.hammerEquipped || this.props.comparison_details.bowEquipped || this.props.comparison_details.staveEquipped);
+            return ['hammer', 'bow', 'stave'].includes(this.props.comparison_details.itemToEquip.type) && twoHandedEquipped;
+        }
+    }
+
     render() {
         return (
             <div className='p-5'>
@@ -129,7 +136,7 @@ export default class ComparisonSection extends React.Component<any, any> {
                     : null
                 }
                 {
-                    !this.props.is_automation_running  && (this.props.comparison_details.hammerEquipped || this.props.comparison_details.bowEquipped || this.props.comparison_details.staveEquipped) ?
+                    this.showReplaceMessage() ?
                         <WarningAlert additional_css={'mb-4'}>
                             <p>The item you are looking at will replace the current two handed weapon you have equipped.</p>
                         </WarningAlert>

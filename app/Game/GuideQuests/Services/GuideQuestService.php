@@ -116,10 +116,12 @@ class GuideQuestService {
         if (!is_null($fetchItem)) {
             $fetchSuffix = ItemAffix::where('skill_level_required', '<=', $level)
                 ->where('type', 'suffix')
+                ->orderByDesc('skill_level_required')
                 ->first();
 
             $fetchPrefix = ItemAffix::where('skill_level_required', '<=', $level)
                 ->where('type', 'prefix')
+                ->orderByDesc('skill_level_required')
                 ->first();
 
             $fetchItem = $fetchItem->duplicate();
@@ -136,7 +138,7 @@ class GuideQuestService {
 
             $slot = $character->refresh()->inventory->slots()->where('item_id', $fetchItem->id)->first();
 
-            event(new ServerMessageEvent($character->user, 'You found: ' . $fetchItem->affix_name . ' was rewarded to you by The Guide', $slot->id));
+            event(new ServerMessageEvent($character->user, 'The Guide rewarded you with: ' . $fetchItem->affix_name . '. (Its the enchantments you care about child ...)', $slot->id));
         }
 
         return $character->refresh();

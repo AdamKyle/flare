@@ -39,7 +39,12 @@
                         </x-core.cards.card>
                     </div>
 
-                    <img src="{{Storage::disk('info-sections-images')->url($section['content_image_path'])}}" class="rounded-sm p-1 bg-white border max-w-[475px] cursor-pointer glightbox md:mt-[30px]" alt="image"/>
+                    <div>
+                        <img src="{{Storage::disk('info-sections-images')->url($section['content_image_path'])}}" class="rounded-sm p-1 bg-white border max-w-[475px] cursor-pointer glightbox md:mt-[30px]" alt="image"/>
+                        <div class="relative top-[-30px] text-gray-700 dark:text-white italic">
+                            All images can be clicked on to be made larger.
+                        </div>
+                    </div>
                 </div>
             @endif
 

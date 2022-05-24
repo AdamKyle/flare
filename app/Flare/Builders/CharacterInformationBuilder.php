@@ -176,7 +176,7 @@ class CharacterInformationBuilder {
      * @throws \Exception
      */
     public function buildTotalAttack(): int {
-        return $this->getTotalWeaponDamage() + $this->getTotalSpellDamage() + $this->getTotalArtifactDamage() + $this->getTotalRingDamage();
+        return $this->getTotalWeaponDamage() + $this->getTotalSpellDamage() + $this->getTotalRingDamage();
     }
 
     /**
@@ -283,15 +283,6 @@ class CharacterInformationBuilder {
      */
     public function getTotalSpellDamage(bool $voided = false): int {
         return $this->characterAttackInformation->getCharacterDamageInformation()->getSpellDamage($this->character, $voided);
-    }
-
-    /**
-     * Get the total artifact damage.
-     *
-     * @return int
-     */
-    public function getTotalArtifactDamage(bool $voided = false): int {
-        return $this->characterAttackInformation->getCharacterDamageInformation()->getArtifactDamage($this->character, $voided);
     }
 
     /**

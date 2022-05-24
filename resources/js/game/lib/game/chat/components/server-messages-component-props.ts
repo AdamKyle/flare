@@ -7,4 +7,6 @@ export default interface ServerMessagesComponentProps {
     character_id: number;
 
     view_port: number;
+
+    is_automation_running: boolean;
 }

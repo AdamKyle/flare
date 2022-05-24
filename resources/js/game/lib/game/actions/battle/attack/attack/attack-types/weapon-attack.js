@@ -87,8 +87,8 @@ export default class WeaponAttack extends BattleBase {
 
   setState() {
     const state = {
-      characterCurrentHealth: this.characterCurrentHealth,
-      monsterCurrentHealth: this.monsterHealth,
+      characterCurrentHealth: parseInt(this.characterCurrentHealth).toFixed(0),
+      monsterCurrentHealth: parseInt(this.monsterHealth).toFixed(0),
       battle_messages: this.getMessages(),
     }
 

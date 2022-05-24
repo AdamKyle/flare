@@ -14,6 +14,10 @@
             <span class="icon ra ra-wooden-sign"></span>
             <span class="title">Market</span>
         </a>
+        <a href="#no-link" class="link" data-target="[data-menu=quests]" data-toggle="tooltip-menu" data-tippy-content="Quests">
+            <span class="icon fas fa-feather"></span>
+            <span class="title">Quest Log</span>
+        </a>
     </div>
 
     <!-- Character -->
@@ -57,6 +61,22 @@
                 <span class="fas fa-search-dollar"></span>
                 Your Listings
             </a>
+        </div>
+    </div>
+
+    <!-- Quests -->
+    <div class="menu-detail" data-menu="quests">
+        <div class="menu-detail-wrapper">
+            <a href="#">
+                <span class="fas fa-feather"></span>
+                Completed Quests
+            </a>
+            @if (auth()->user()->guide_enabled)
+                <a href="#">
+                    <span class="fas fa-feather"></span>
+                    Completed Guide Quests
+                </a>
+            @endif
         </div>
     </div>
 </aside>

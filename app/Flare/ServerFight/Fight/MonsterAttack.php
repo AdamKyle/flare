@@ -132,7 +132,7 @@ class MonsterAttack extends BattleBase {
 
 
         if ($spellDamage > 0 )  {
-            $spellEvasion = $this->characterCacheData->getCachedCharacterData('spell_evasion');
+            $spellEvasion = $this->characterCacheData->getCachedCharacterData($character,'spell_evasion');
             $dc           = 100 - 100 * $spellEvasion;
             $roll         = rand(1, 100);
 

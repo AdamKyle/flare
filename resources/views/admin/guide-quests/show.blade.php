@@ -2,12 +2,19 @@
 
 @section('content')
     <x-core.layout.info-container>
-        <x-core.cards.card-with-title
+        <x-core.page-title
             title="{{$guideQuest->name}}"
-            buttons="true"
-            backUrl="{{route('admin.guide-quests')}}"
-            editUrl="{{route('admin.guide-quests.edit', ['guideQuest' => $guideQuest->id])}}"
+            route="{{route('admin.guide-quests')}}"
+            color="success" link="Guide Quests"
         >
+            <x-core.buttons.link-buttons.primary-button
+                href="{{route('admin.guide-quests.edit', ['guideQuest' => $guideQuest->id])}}"
+            >
+                Edit Quest
+            </x-core.buttons.link-buttons.primary-button>
+        </x-core.page-title>
+
+        <x-core.cards.card>
             <div class='grid md:grid-cols-2 gap-4'>
                 <div>
                     <h3 class="text-sky-600 dark:text-sky-500">Reward Details</h3>
@@ -65,6 +72,6 @@
                     </div>
                 </div>
             </div>
-        </x-core.cards.card-with-title>
+        </x-core.cards.card>
     </x-core.layout.info-container>
 @endsection

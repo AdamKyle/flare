@@ -7,6 +7,7 @@ use App\Flare\Models\Character;
 use App\Flare\ServerFight\BattleBase;
 use App\Flare\ServerFight\Fight\Affixes;
 use App\Flare\ServerFight\Fight\CanHit;
+use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks;
 use App\Flare\ServerFight\Fight\Entrance;
 use App\Flare\ServerFight\Monster\ServerMonster;
 
@@ -29,14 +30,17 @@ class CastType extends BattleBase
 
     private Affixes $affixes;
 
-    public function __construct(CharacterCacheData $characterCacheData, Entrance $entrance, CanHit $canHit, Affixes $affixes)
+    private SpecialAttacks $specialAttacks;
+
+    public function __construct(CharacterCacheData $characterCacheData, Entrance $entrance, CanHit $canHit, Affixes $affixes, SpecialAttacks $specialAttacks)
     {
         parent::__construct();
 
         $this->characterCacheData = $characterCacheData;
-        $this->entrance = $entrance;
-        $this->canHit = $canHit;
-        $this->affixes = $affixes;
+        $this->entrance           = $entrance;
+        $this->canHit             = $canHit;
+        $this->affixes            = $affixes;
+        $this->specialAttacks     = $specialAttacks;
     }
 
     public function setMonsterHealth(int $monsterHealth): CastType
@@ -196,6 +200,17 @@ class CastType extends BattleBase
         $this->monsterHealth -= $totalDamage;
 
         $this->addMessage('Your damage spell(s) hits ' . $monster->getName() . ' for: ' . number_format($totalDamage), 'player-action');
+
+        $this->specialAttacks->setCharacterHealth($this->characterHealth)
+                             ->setMonsterHealth($this->monsterHealth)
+                             ->doCastDamageSpecials($character, $this->attackData);
+
+        $this->characterHealth = $this->specialAttacks->getCharacterHealth();
+        $this->monsterHealth   = $this->specialAttacks->getMonsterHealth();
+
+        $this->mergeMessages($this->specialAttacks->getMessages());
+
+        $this->specialAttacks->clearMessages();
     }
 
     public function heal(Character $character) {
@@ -217,6 +232,14 @@ class CastType extends BattleBase
             }
 
             $this->addMessage('Your healing spell(s) heals you for: ' . number_format($healFor), 'player-action');
+
+            $this->specialAttacks->doCastHealSpecials($character, $this->attackData);
+
+            $this->characterHealth = $this->specialAttacks->getCharacterHealth();
+
+            $this->mergeMessages($this->specialAttacks->getMessages());
+
+            $this->specialAttacks->clearMessages();
         }
     }
 }

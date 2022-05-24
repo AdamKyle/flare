@@ -190,7 +190,7 @@ export default class Damage extends BattleBase {
 
     this.characterCurrentHealth += healFor
 
-    this.addMessage('Your healing spell(s) heals for: ' + formatNumber(parseInt(healFor.toFixed(0))), 'player-action')
+    this.addMessage('Your healing spell(s) heals for an additional: ' + formatNumber(parseInt(healFor.toFixed(0))), 'player-action')
   }
 
   hammerSmash(attacker, monsterCurrentHealth, attackData) {
@@ -225,9 +225,11 @@ export default class Damage extends BattleBase {
           for (let i = 3; i > 0; i--) {
             damage -= damage * 0.15;
 
-            monsterCurrentHealth -= damage;
+            if (damage >= 1) {
+              monsterCurrentHealth -= damage;
 
-            this.addMessage('Aftershock hits for: ' + formatNumber(damage), 'player-action');
+              this.addMessage('Aftershock hits for: ' + formatNumber(damage), 'player-action');
+            }
           }
         }
       }
@@ -262,27 +264,28 @@ export default class Damage extends BattleBase {
         let times = random(2, 6);
         const originalTimes = times;
 
-        this.addMessage('The earth shakes as you cause a multitude of explosions to engulf the enemy.', 'regular');
-
         while (times > 0) {
 
           if (times === originalTimes) {
             monsterCurrentHealth -= damage;
-
 
             this.addMessage(attacker.name + ' hits for (Arcane Alchemist Ravenous Dream): ' + formatNumber(damage), 'player-action');
           } else {
             let damage = attacker.int_modded * 0.10;
 
             if (attackData.damage_reduction > 0.0) {
-              this.addMessage('The Plane weakens your ability to do full damage!', 'regular');
+              this.addMessage('The Plane weakens your ability to do full damage!', 'enemy-action');
 
               damage -= damage * attackData.damage_reduction;
             }
 
-            monsterCurrentHealth -= damage;
+            if (damage >= 1) {
+                this.addMessage('The earth shakes as you cause a multitude of explosions to engulf the enemy.', 'regular');
 
-            this.addMessage(attacker.name + ' hits for (Arcane Alchemist Ravenous Dream): ' + formatNumber(damage), 'player-action');
+                monsterCurrentHealth -= damage;
+
+                this.addMessage(attacker.name + ' hits for (Arcane Alchemist Ravenous Dream): ' + formatNumber(damage), 'player-action');
+            }
           }
 
           times--;
@@ -303,10 +306,17 @@ export default class Damage extends BattleBase {
       }
 
       if (extraActionChance.type === ExtraActionType.RANGER_TRIPLE_ATTACK && extraActionChance.has_item) {
-        this.addMessage('A fury takes over you. You notch the arrows thrice at the enemy\'s direction');
+        this.addMessage('A fury takes over you. You notch the arrows thrice at the enemy\'s direction', 'regular');
 
         for (let i = 1; i <= 3; i++) {
-          const totalDamage    = (attackData.weapon_damage + attackData.weapon_damage * .15).toFixed(0);
+          let totalDamage    = (attackData.weapon_damage + attackData.weapon_damage * .15).toFixed(0);
+
+          if (attackData.damage_reduction > 0.0) {
+            this.addMessage('The Plane weakens your ability to do full damage!', 'enemy-action');
+
+            totalDamage -= totalDamage * attackData.damage_reduction;
+          }
+
           monsterCurrentHealth = monsterCurrentHealth - totalDamage;
 
           this.addMessage(attacker.name + ' hits for (weapon - triple attack) ' + formatNumber(totalDamage));
@@ -326,15 +336,21 @@ export default class Damage extends BattleBase {
       }
 
       if (extraActionChance.type === ExtraActionType.FIGHTERS_DOUBLE_DAMAGE && extraActionChance.has_item) {
+        this.addMessage('The strength of your rage courses through your veins!', 'regular');
+
+        let totalDamage = (attackData.weapon_damage + attackData.weapon_damage * .15).toFixed(0);
+
+        if (attackData.damage_reduction > 0.0) {
+          this.addMessage('The Plane weakens your ability to do full damage!', 'enemy-action');
+
+          totalDamage -= totalDamage * attackData.damage_reduction;
+        }
+
         for (let i = 1; i <= 2; i++) {
-
-          this.addMessage('The strength of your rage courses through your veins!', 'regular');
-
-          const totalDamage = (attackData.weapon_damage + attackData.weapon_damage * .15).toFixed(0);
 
           monsterCurrentHealth = monsterCurrentHealth - totalDamage;
 
-          this.addMessage(attacker.name + ' hitw for (weapon - double attack) ' + formatNumber(totalDamage), 'player-action');
+          this.addMessage(attacker.name + ' hit for (weapon - double attack) ' + formatNumber(totalDamage), 'player-action');
         }
       }
     }
@@ -353,7 +369,13 @@ export default class Damage extends BattleBase {
       if (extraActionChance.type === ExtraActionType.HERETICS_DOUBLE_CAST && extraActionChance.has_item) {
         this.addMessage('Magic crackles through the air as you cast again!', 'regular');
 
-        const totalDamage     = attackData.spell_damage + attackData.spell_damage * 0.15;
+        let totalDamage     = attackData.spell_damage + attackData.spell_damage * 0.15;
+
+        if (attackData.damage_reduction > 0.0) {
+          this.addMessage('The Plane weakens your ability to do full damage!', 'enemy-action');
+
+          totalDamage -= totalDamage * attackData.damage_reduction;
+        }
 
         monsterCurrentHealth -= totalDamage;
 
@@ -400,7 +422,11 @@ export default class Damage extends BattleBase {
 
         let totalAttack = Math.round(attacker.dur_modded + attacker.dur_modded * 0.15);
 
-        totalAttack     = totalAttack - totalAttack * damageDeduction;
+        if (attackData.damage_reduction > 0.0) {
+          this.addMessage('The Plane weakens your ability to do full damage!', 'enemy-action');
+
+          totalAttack -= totalAttack * attackData.damage_reduction;
+        }
 
         if (totalAttack > attacker.dur_modded) {
           totalAttack = attacker.dur_modded;

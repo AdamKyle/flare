@@ -7,6 +7,7 @@ use App\Flare\Models\Character;
 use App\Flare\ServerFight\BattleBase;
 use App\Flare\ServerFight\Fight\Affixes;
 use App\Flare\ServerFight\Fight\CanHit;
+use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks;
 use App\Flare\ServerFight\Fight\Entrance;
 use App\Flare\ServerFight\Monster\ServerMonster;
 
@@ -28,13 +29,16 @@ class WeaponType extends BattleBase {
 
     private Affixes $affixes;
 
-    public function __construct(CharacterCacheData $characterCacheData, Entrance $entrance, CanHit $canHit, Affixes $affixes) {
+    private SpecialAttacks $specialAttacks;
+
+    public function __construct(CharacterCacheData $characterCacheData, Entrance $entrance, CanHit $canHit, Affixes $affixes, SpecialAttacks $specialAttacks) {
         parent::__construct();
 
         $this->characterCacheData = $characterCacheData;
         $this->entrance           = $entrance;
         $this->canHit             = $canHit;
         $this->affixes            = $affixes;
+        $this->specialAttacks     = $specialAttacks;
     }
 
     public function setMonsterHealth(int $monsterHealth): WeaponType {
@@ -164,6 +168,17 @@ class WeaponType extends BattleBase {
         $this->monsterHealth -= $totalDamage;
 
         $this->addMessage('Your weapon hits ' . $monster->getName() . ' for: ' . number_format($totalDamage), 'player-action');
+
+        $this->specialAttacks->setCharacterHealth($this->characterHealth)
+                             ->setMonsterHealth($this->monsterHealth)
+                             ->doWeaponSpecials($character, $this->attackData);
+
+        $this->mergeMessages($this->specialAttacks->getMessages());
+
+        $this->characterHealth = $this->specialAttacks->getCharacterHealth();
+        $this->monsterHealth   = $this->specialAttacks->getMonsterHealth();
+
+        $this->specialAttacks->clearMessages();
     }
 
     protected function ringDamage() {

@@ -330,7 +330,7 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
                     </TabPanel>
 
                     <TabPanel key={'server-messages'}>
-                        <ServerMessages server_messages={this.state.server_messages} character_id={this.props.character_id} view_port={this.props.view_port}/>
+                        <ServerMessages server_messages={this.state.server_messages} character_id={this.props.character_id} view_port={this.props.view_port} is_automation_running={this.props.is_automation_running}/>
                     </TabPanel>
 
                     <TabPanel key={'exploration-messages'}>

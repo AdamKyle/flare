@@ -5,4 +5,5 @@ export default interface GameChatProps {
     can_talk_again_at: string|null;
     is_admin: boolean;
     view_port: number;
+    is_automation_running: boolean;
 }

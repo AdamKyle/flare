@@ -57,8 +57,8 @@ export default class Attack extends BattleBase {
       const monsterAttack = new MonsterAttack(attacker, defender, this.characterCurrentHealth, this.monsterCurrentHealth);
       const state = monsterAttack.doAttack(attackType, this.isVoided, this.isMonsterVoided);
 
-      this.characterCurrentHealth = state.characterCurrentHealth;
-      this.monsterCurrentHealth   = state.monsterCurrentHealth;
+      this.characterCurrentHealth = parseInt(state.characterCurrentHealth).toFixed(0);
+      this.monsterCurrentHealth   = parseInt(state.monsterCurrentHealth).toFixed(0);
 
       this.battle_messages         = [...this.battle_messages, ...state.battleMessages];
 

@@ -22,6 +22,7 @@ if (adminChat !== null) {
             can_talk_again_at={null}
             is_admin={true}
             view_port={1600}
+            is_automation_running={false}
         />,
         adminChat
     );

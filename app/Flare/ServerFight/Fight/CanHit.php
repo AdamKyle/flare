@@ -29,14 +29,14 @@ class CanHit {
             return false;
         }
 
-        $playerToHit = $statValue * 0.02;
-        $enemyAgi    = $defenderAgi * 0.02;
+        $playerToHit = $statValue * 0.20;
+        $enemyAgi    = $defenderAgi * 0.20;
 
-        if ($playerToHit < 10) {
+        if ($playerToHit < 50) {
             $playerToHit = $statValue;
         }
 
-        if ($enemyAgi < 10) {
+        if ($enemyAgi < 50) {
             $enemyAgi = $defenderAgi;
         }
 
@@ -59,8 +59,8 @@ class CanHit {
     }
 
     public function canMonsterHitPlayer(Character $character, ServerMonster $monster, bool $isPlayerVoided) {
-        $monsterToHit    = $monster->getMonsterStat('to_hit_base') * 0.02;
-        $characterAgi    = $this->characterCacheData->getCachedCharacterData($character, $isPlayerVoided ? 'agi' : 'agi_modded') * 0.02;
+        $monsterToHit    = $monster->getMonsterStat('to_hit_base') * 0.20;
+        $characterAgi    = $this->characterCacheData->getCachedCharacterData($character, $isPlayerVoided ? 'agi' : 'agi_modded') * 0.20;
         $monsterAccuracy = $monster->getMonsterStat('accuracy');
         $characterDodge  = $this->characterCacheData->getCachedCharacterData($character, 'skills')['dodge'];
 
@@ -72,11 +72,11 @@ class CanHit {
             return true;
         }
 
-        if ($monsterToHit < 10) {
+        if ($monsterToHit < 50) {
             $monsterToHit = $monster->getMonsterStat('to_hit_base');
         }
 
-        if ($characterAgi < 10) {
+        if ($characterAgi < 50) {
             $characterAgi = $this->characterCacheData->getCachedCharacterData($character, $isPlayerVoided ? 'agi' : 'agi_modded');
         }
 
@@ -98,14 +98,14 @@ class CanHit {
             return false;
         }
 
-        $playerToHit = $statValue * 0.02;
-        $enemyAgi    = $defenderAgi * 0.02;
+        $playerToHit = $statValue * 0.20;
+        $enemyAgi    = $defenderAgi * 0.20;
 
-        if ($playerToHit < 10) {
+        if ($playerToHit < 50) {
             $playerToHit = $statValue;
         }
 
-        if ($enemyAgi < 10) {
+        if ($enemyAgi < 50) {
             $enemyAgi = $defenderAgi;
         }
 
@@ -113,8 +113,8 @@ class CanHit {
     }
 
     public function canMonsterCastSpell(Character $character, ServerMonster $monster, bool $isPlayerVoided) {
-        $monsterToHit    = $monster->getMonsterStat('to_hit_base') * 0.02;
-        $characterAgi    = $this->characterCacheData->getCachedCharacterData($character, $isPlayerVoided ? 'agi' : 'agi_modded') * 0.02;
+        $monsterToHit    = $monster->getMonsterStat('to_hit_base') * 0.2;
+        $characterAgi    = $this->characterCacheData->getCachedCharacterData($character, $isPlayerVoided ? 'agi' : 'agi_modded') * 0.2;
         $monsterAccuracy = $monster->getMonsterStat('casting_accuracy');
         $characterDodge  = $this->characterCacheData->getCachedCharacterData($character, 'skills')['dodge'];
 
@@ -126,11 +126,11 @@ class CanHit {
             return true;
         }
 
-        if ($monsterToHit < 10) {
+        if ($monsterToHit < 50) {
             $monsterToHit = $monster->getMonsterStat('to_hit_base');
         }
 
-        if ($characterAgi < 10) {
+        if ($characterAgi < 50) {
             $characterAgi = $this->characterCacheData->getCachedCharacterData($character, $isPlayerVoided ? 'agi' : 'agi_modded');
         }
 

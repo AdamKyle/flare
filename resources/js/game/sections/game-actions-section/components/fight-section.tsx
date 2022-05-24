@@ -204,8 +204,8 @@ export default class FightSection extends React.Component<FightSectionProps, any
                         <div className={clsx('mb-4 max-w-md m-auto', {
                             'mt-4': this.attackButtonDisabled()
                         })}>
-                            <HealthMeters is_enemy={true} name={this.props.monster_to_fight.name} current_health={this.state.monster_current_health} max_health={this.state.monster_max_health} />
-                            <HealthMeters is_enemy={false} name={this.props.character.name} current_health={this.state.character_current_health} max_health={this.state.character_max_health} />
+                            <HealthMeters is_enemy={true} name={this.props.monster_to_fight.name} current_health={parseInt(this.state.monster_current_health)} max_health={this.state.monster_max_health} />
+                            <HealthMeters is_enemy={false} name={this.props.character.name} current_health={parseInt(this.state.character_current_health)} max_health={this.state.character_max_health} />
                         </div>
                     : null
                 }

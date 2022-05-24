@@ -153,6 +153,7 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::get('/admin/quests/{quest}', ['as' => 'quests.show', 'uses' => 'QuestsController@show']);
 
     Route::post('/admin/guide-quests/store', ['as' => 'admin.guide-quests.store', 'uses' => 'GuideQuestsController@store']);
+    Route::post('/admin/guide-quests/{guideQuest}/delete', ['as' => 'admin.guide-quests.delete', 'uses' => 'GuideQuestsController@delete']);
 
     Route::get('/admin/guide-quests', ['as' => 'admin.guide-quests', 'uses' => 'GuideQuestsController@index']);
     Route::get('/admin/guide-quests/create', ['as' => 'admin.guide-quests.create', 'uses' => 'GuideQuestsController@create']);

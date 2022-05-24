@@ -26,7 +26,7 @@ class GuideQuestsController extends Controller {
         $character = $user->character;
         $response  = $this->guideQuestService->handInQuest($character, $guideQuest);
 
-        $message = 'You have completed the quest: ' . $guideQuest->name . ' on to the next. Below is the next quest for you to do!';
+        $message = 'You have completed the quest: "' . $guideQuest->name . '". On to the next! Below is the next quest for you to do!';
 
         if ($response) {
             return $this->getNextQuest($character->refresh(), $message);

@@ -26,7 +26,7 @@ export default class ItemComparisonSection extends React.Component<any, any> {
     }
 
     renderChange(details: InventoryComparisonAdjustment, itemToEquip?: InventoryComparisonAdjustment) {
-        const invalidFields     = ['id', 'min_cost', 'skill_level_req', 'skill_level_trivial', 'holy_level', 'holy_stack_devouring_darkness', 'holy_stack_stat_bonus', 'holy_stacks', 'holy_stacks_applied', 'cost', 'slot_id', 'affix_count'];
+        const invalidFields     = ['id', 'min_cost', 'skill_level_req', 'skill_level_trivial', 'holy_level', 'holy_stack_devouring_darkness', 'holy_stack_stat_bonus', 'holy_stacks', 'holy_stacks_applied', 'cost', 'shop_cost', 'slot_id', 'affix_count'];
         const wholeNumberValues = ['damage_adjustment', 'ac_adjustment', 'healing_adjustment', 'base_damage', 'base_ac', 'holy_stacks', 'holy_stacks_applied'];
 
         let elements = Object.keys(details).map((key) => {
@@ -81,7 +81,7 @@ export default class ItemComparisonSection extends React.Component<any, any> {
     }
 
     renderItemToEquip(itemToEquip: InventoryComparisonAdjustment) {
-        const invalidFields     = ['id', 'min_cost', 'skill_level_req', 'skill_level_trivial', 'cost', 'slot_id', 'holy_level', 'affix_count'];
+        const invalidFields     = ['id', 'min_cost', 'skill_level_req', 'skill_level_trivial', 'cost', 'shop_cost', 'slot_id', 'holy_level', 'affix_count'];
         const wholeNumberValues = ['damage_adjustment', 'ac_adjustment', 'healing_adjustment', 'base_damage', 'base_ac', 'holy_stacks', 'holy_stacks_applied'];
 
         return Object.keys(itemToEquip).map((key) => {

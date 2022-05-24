@@ -10,6 +10,7 @@ import ViewLocationDetailsModal from "../modals/view-location-details-modal";
 import SetSailModal from "../modals/set-sail-modal";
 import TraverseModal from "../modals/traverse-modal";
 import KingdomDetails from "../../../../lib/game/map/types/kingdom-details";
+import PurpleButton from "../../../../components/ui/buttons/purple-button";
 
 export default class MapActions extends React.Component<MapActionsProps, MapActionsState> {
 
@@ -262,7 +263,10 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                 </div>
                 <div className='text-left mt-4 mb-3'>
                     <p className='mb-4'>Characters On Map: {this.props.players_on_map}</p>
-                    {this.renderViewDetailsButton()}
+                    <div className='flex items-center'>
+                        {this.renderViewDetailsButton()}
+                        <PurpleButton button_label={'Conjure'} on_click={() => this.viewLocation()} disabled={this.props.is_dead} additional_css={'ml-2'}/>
+                    </div>
                 </div>
                 <div className='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 hidden sm:block'></div>
                 <div className='grid gap-2 lg:grid-cols-5 lg:gap-4'>

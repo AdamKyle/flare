@@ -220,6 +220,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                           character_id={this.state.character.id}
                           is_silenced={this.state.character.is_silenced}
                           can_talk_again_at={this.state.character.can_talk_again_at}
+                          is_automation_running={this.state.character.is_automation_running}
                           is_admin={false}
                           view_port={this.state.view_port}
                 />

@@ -41,8 +41,16 @@ use App\Flare\ServerFight\Fight\CanHit;
 use App\Flare\ServerFight\Fight\CharacterAttacks\BaseCharacterAttack;
 use App\Flare\ServerFight\Fight\CharacterAttacks\CharacterAttack;
 use App\Flare\ServerFight\Fight\CharacterAttacks\PlayerHealing;
+use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks;
+use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\AlchemistsRavenousDream;
+use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\DoubleAttack;
+use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\DoubleCast;
+use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\DoubleHeal;
+use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\TripleAttack;
+use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\VampireThirst;
 use App\Flare\ServerFight\Fight\CharacterAttacks\Types\CastType;
 use App\Flare\ServerFight\Fight\CharacterAttacks\Types\WeaponType;
+use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\HammerSmash;
 use App\Flare\ServerFight\Fight\Entrance;
 use App\Flare\ServerFight\Fight\MonsterAttack;
 use App\Flare\ServerFight\Fight\Voidance;
@@ -60,9 +68,6 @@ use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Transformers\InventoryTransformer;
 use App\Flare\Transformers\OtherKingdomTransformer;
 use App\Flare\Transformers\UsableItemTransformer;
-use App\Flare\View\Components\Forms\Input;
-use App\Flare\View\Components\Forms\Select;
-use App\Flare\View\Components\Forms\TextArea;
 use App\Game\Core\Services\CharacterService;
 use App\Game\Kingdoms\Service\KingdomResourcesService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
@@ -85,10 +90,8 @@ use App\Flare\Transformers\MarketItemsTransformer;
 use App\Flare\Transformers\MonsterTransformer;
 use App\Flare\Transformers\UnitTransformer;
 use App\Flare\Values\BaseSkillValue;
-use App\Flare\View\Components\AdventureLogs;
 use App\Flare\View\Components\ItemDisplayColor;
 use App\Flare\Builders\Character\ClassDetails\HolyStacks;
-use App\Flare\View\Livewire\Admin\Items\Validators\ItemValidator;
 use Blade;
 use League\Fractal\Manager;
 
@@ -482,6 +485,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(Entrance::class),
                 $app->make(CanHit::class),
                 $app->make(Affixes::class),
+                $app->make(SpecialAttacks::class),
             );
         });
 
@@ -491,6 +495,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(Entrance::class),
                 $app->make(CanHit::class),
                 $app->make(Affixes::class),
+                $app->make(SpecialAttacks::class),
             );
         });
 
@@ -526,6 +531,38 @@ class ServiceProvider extends ApplicationServiceProvider
                $app->make(CharacterCacheData::class),
                $app->make(Affixes::class)
            );
+        });
+
+        $this->app->bind(SpecialAttacks::class, function() {
+            return new SpecialAttacks();
+        });
+
+        $this->app->bind(HammerSmash::class, function($app) {
+            return new HammerSmash($app->make(CharacterCacheData::class));
+        });
+
+        $this->app->bind(AlchemistsRavenousDream::class, function($app) {
+            return new AlchemistsRavenousDream($app->make(CharacterCacheData::class));
+        });
+
+        $this->app->bind(TripleAttack::class, function($app) {
+            return new TripleAttack($app->make(CharacterCacheData::class));
+        });
+
+        $this->app->bind(DoubleAttack::class, function($app) {
+            return new DoubleAttack($app->make(CharacterCacheData::class));
+        });
+
+        $this->app->bind(DoubleCast::class, function($app) {
+            return new DoubleCast($app->make(CharacterCacheData::class));
+        });
+
+        $this->app->bind(DoubleHeal::class, function($app) {
+            return new DoubleHeal($app->make(CharacterCacheData::class));
+        });
+
+        $this->app->bind(VampireThirst::class, function($app) {
+            return new VampireThirst($app->make(CharacterCacheData::class));
         });
 
         $this->app->bind(MonsterPlayerFight::class, function($app) {

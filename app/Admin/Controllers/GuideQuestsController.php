@@ -58,4 +58,10 @@ class GuideQuestsController extends Controller {
             'questItems'  => Item::where('type', 'quest')->pluck('name', 'id')->toArray(),
         ]);
     }
+
+    public function delete(GuideQuest $guideQuest) {
+        $guideQuest->delete();
+
+        return response()->redirectToRoute('admin.guide-quests')->with('success', 'Deleted guide quest.');
+    }
 }

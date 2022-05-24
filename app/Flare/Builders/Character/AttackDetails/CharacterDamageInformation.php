@@ -63,28 +63,6 @@ class CharacterDamageInformation {
     }
 
     /**
-     * Get the character's artifact Damage.
-     *
-     * @param bool $voided
-     * @return int
-     */
-    public function getArtifactDamage(Character $character, bool $voided = false): int {
-        $damage = 0;
-
-        foreach ($this->fetchInventory($character) as $slot) {
-            if ($slot->item->type === 'artifact') {
-                if ($damage === 0) {
-                    $damage += $slot->item->getTotalDamage();
-                } else {
-                    $damage += ceil($slot->item->getTotalDamage() / 2);
-                }
-            }
-        }
-
-        return $damage;
-    }
-
-    /**
      * Get the characters ring damage.
      *
      * @param bool $voided

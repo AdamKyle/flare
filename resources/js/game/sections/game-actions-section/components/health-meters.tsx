@@ -33,7 +33,7 @@ export default class HealthMeters extends React.Component<HealthMeterProps, any>
         var scaled = statNumber / scale;
 
         // format number and add suffix
-        return scaled.toFixed(1) + suffix;
+        return scaled.toFixed(0) + suffix;
     }
 
     healthPercent() {

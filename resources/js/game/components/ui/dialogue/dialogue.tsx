@@ -21,7 +21,7 @@ export default class Dialogue extends React.Component<DialogueTypes, any> {
             <Transition appear show={this.props.is_open} as={Fragment}>
                 <Dialog
                     as="div"
-                    className={"absolute inset-0 z-50 top-[10%] "}
+                    className={"absolute inset-0 z-50"}
                     onClose={this.emptyClose.bind(this)}
                 >
                     <Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
@@ -55,6 +55,7 @@ export default class Dialogue extends React.Component<DialogueTypes, any> {
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
+                            <div className='flex flex-col h-screen justify-center items-center'>
                             <div className={clsx("inline-block w-full p-6 my-8 text-left align-middle transition-all transform bg-white dark:bg-gray-700 drop-shadow-2xl rounded-md", {'max-w-7xl': this.props.large_modal && !this.props.medium_modal}, {'max-w-5xl': this.props.medium_modal}, {'max-w-3xl': !this.props.large_modal && !this.props.medium_modal})}>
                                 <Dialog.Title
                                     as="span"
@@ -70,8 +71,6 @@ export default class Dialogue extends React.Component<DialogueTypes, any> {
                                 <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                                 <div className="mt-4">
 
-
-
                                     <DangerButton button_label={'Cancel'} on_click={this.closeModal.bind(this)} disabled={this.props.primary_button_disabled} />
 
                                     {
@@ -85,6 +84,7 @@ export default class Dialogue extends React.Component<DialogueTypes, any> {
                                         : null
                                     }
                                 </div>
+                            </div>
                             </div>
                         </Transition.Child>
                     </div>
