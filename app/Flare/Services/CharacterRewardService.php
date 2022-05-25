@@ -3,7 +3,6 @@
 namespace App\Flare\Services;
 
 use App\Flare\Events\ServerMessageEvent;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Flare\Models\Adventure;
 use App\Flare\Models\Character;
@@ -18,6 +17,7 @@ use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Services\CharacterService;
+use App\Game\Messages\Events\ServerMessageEvent as GameServerMessageEvent;
 use Facades\App\Flare\Calculators\XPCalculator;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
@@ -149,6 +149,18 @@ class CharacterRewardService {
 
         if (!is_null($gameMap->xp_bonus)) {
             $xp = ($xp + $xp * $gameMap->xp_bonus);
+        }
+
+        $guideEnabled              = $this->character->user->guide_enabled;
+        $hasNoCompletedGuideQuests = $this->character->questsCompleted()
+                                                     ->whereNotNull('guide_quest_id')
+                                                     ->get()
+                                                     ->isEmpty();
+
+        if ($guideEnabled && $hasNoCompletedGuideQuests && $this->character->level < 2) {
+            $xp += 10;
+
+            event(new GameServerMessageEvent($this->character->user, 'Rewarded an extra 10XP while doing the first guide quest. This bonus will end after you reach level 2.'));
         }
 
         $xp = $this->character->xp + $xp;

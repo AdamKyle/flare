@@ -118,7 +118,7 @@ export default class CastAttack extends BattleBase {
 
   attackWithSpells(attackData, isEntranced, canAutoHit) {
     const evasion = this.defender.spell_evasion;
-    let dc        = 100;
+    let dc        = 100 - (100 - 100 * evasion);
     let roll      = random(1, 100);
 
     if (evasion > 1.0 && !isEntranced) {
@@ -127,12 +127,8 @@ export default class CastAttack extends BattleBase {
       return;
     }
 
-    if (this.attacker.class === 'Prophet' || this.attacker.class === 'Heretic') {
-      const bonus = this.attacker.skills.casting_accuracy
-
-      dc   = roll - Math.ceil(dc * bonus);
-      roll = roll - Math.ceil(roll * evasion);
-    }
+    const bonus = this.attacker.skills.casting_accuracy;
+    roll        = roll + Math.ceil(roll * bonus);
 
     if (roll < dc && dc > 0 && !isEntranced) {
       this.addMessage('The enemy evades your magic!', 'enemy-action')

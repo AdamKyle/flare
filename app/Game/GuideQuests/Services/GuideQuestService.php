@@ -27,7 +27,8 @@ class GuideQuestService {
         if (is_null($lastCompletedGuideQuest)) {
             $quest = GuideQuest::first();
         } else {
-            $quest = GuideQuest::find($lastCompletedGuideQuest->guide_quest_id + 1);
+            $questId = GuideQuest::where('id', '>', $lastCompletedGuideQuest->guide_quest_id)->min('id');
+            $quest   = GuideQuest::find($questId);
         }
 
         if (is_null($quest)) {
@@ -41,8 +42,6 @@ class GuideQuestService {
         if (!$this->canHandInQuest($character, $quest)) {
             return false;
         }
-
-        $item = $this->randomItemDropBuilder->generateItem($quest->reward_level);
 
         if ($character->isInventoryFull()) {
             event(new ServerMessageEvent($character->user, 'Failed to give you quest reward item. Inventory is full.'));

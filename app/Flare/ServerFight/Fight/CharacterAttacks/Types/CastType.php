@@ -196,7 +196,9 @@ class CastType extends BattleBase
                 return;
             }
 
-            if (rand(1, 100) > (100 - 100 * $monsterSpellEvasion)) {
+            $evasion = 100 - (100 - 100 * $monsterSpellEvasion);
+
+            if (rand(1, 100) > $evasion) {
                 $this->addMessage('The enemy evades your magic!', 'enemy-action');
 
                 return;

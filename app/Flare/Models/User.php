@@ -86,6 +86,7 @@ class User extends Authenticatable
         'auto_disenchant'                => 'boolean',
         'disable_attack_type_popover'    => 'boolean',
         'will_be_deleted'                => 'boolean',
+        'guide_enabled'                  => 'boolean',
     ];
 
     public function character() {
