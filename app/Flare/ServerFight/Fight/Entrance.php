@@ -56,6 +56,10 @@ class Entrance extends BattleBase {
     protected function canPlayerEntranceMonster(Character $character, ServerMonster $monster, array $attackType): bool {
         $chance = $attackType['affixes']['entrancing_chance'] - $monster->getMonsterStat('affix_resistance');
 
+        if ($attackType['affixes']['cant_be_resisted']) {
+            return true;
+        }
+
         if ($chance > 1) {
             return true;
         }

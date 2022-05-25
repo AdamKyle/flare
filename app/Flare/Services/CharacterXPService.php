@@ -53,6 +53,24 @@ class CharacterXPService {
         return (new MaxLevel($character->level, $xp))->fetchXP($ignoreCaps, $xpBonus);
     }
 
+    public function canCharacterGainXP(Character $character): int {
+
+
+        $canContinueLeveling = $this->canContinueLeveling($character);
+
+        if ($canContinueLeveling) {
+            $config = MaxLevelConfiguration::first();
+
+            if (is_null($config)) {
+                return $character->level !== MaxLevel::MAX_LEVEL;
+            }
+
+            return $character->level !== $config->max_level;
+        }
+
+        return $character->level !== MaxLevel::MAX_LEVEL;
+    }
+
     public function isCharacterHalfWay(int $characterLevel): bool {
         $halfWay       = MaxLevelConfiguration::first()->half_way;
         $threeQuarters = MaxLevelConfiguration::first()->three_quarters;

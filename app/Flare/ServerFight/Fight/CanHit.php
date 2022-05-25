@@ -44,6 +44,10 @@ class CanHit {
     }
 
     public function canPlayerAutoHit(Character $character): bool {
+        if (!$character->classType()->isThief()) {
+            return false;
+        }
+
         $extraActionInfo = $this->characterCacheData->getCachedCharacterData($character, 'extra_action_chance');
 
         if ($extraActionInfo['has_item']) {
@@ -90,11 +94,11 @@ class CanHit {
         $characterAccuracy = $this->characterCacheData->getCachedCharacterData($character, 'skills')['casting_accuracy'];
         $enemyDodge        = $monster->getMonsterStat('dodge');
 
-        if ($enemyDodge >= 1) {
-            return false;
+        if ($characterAccuracy >= 1) {
+            return true;
         }
 
-        if ($characterAccuracy >= 1) {
+        if ($enemyDodge >= 1) {
             return false;
         }
 

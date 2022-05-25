@@ -140,7 +140,13 @@ class WeaponType extends BattleBase {
     }
 
     protected function affixLifeStealingDamage(Character $character, ServerMonster $monster) {
-        $damage = $this->affixes->getAffixLifeSteal($character, $monster, $this->attackData);
+        if ($this->monsterHealth <= 0) {
+            return;
+        }
+
+        $lifeStealing = $this->affixes->getAffixLifeSteal($character, $monster, $this->attackData);
+
+        $damage = $monster->getHealth() * $lifeStealing;
 
         if ($damage > 0) {
             $this->monsterHealth   -= $damage;
@@ -158,7 +164,7 @@ class WeaponType extends BattleBase {
         $this->affixes->clearMessages();
     }
 
-    protected function weaponDamage(Character $character, ServerMonster $monster, int $weaponDamage) {
+    public function weaponDamage(Character $character, ServerMonster $monster, int $weaponDamage) {
         $criticality = $this->characterCacheData->getCachedCharacterData($character, 'skills')['criticality'];
 
         if (rand(1, 100) > (100 - 100 * $criticality)) {

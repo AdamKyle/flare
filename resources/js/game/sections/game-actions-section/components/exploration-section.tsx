@@ -98,13 +98,13 @@ export default class ExplorationSection extends React.Component<any, any> {
             label: 'Cast',
             value: 'cast',
         },{
-            label: 'Attack and cast',
+            label: 'Attack and Cast',
             value: 'attack_and_cast',
         },{
-            label: 'Cast and attack',
+            label: 'Cast and Attack',
             value: 'cast_and_attack',
         },{
-            label: 'defend',
+            label: 'Defend',
             value: 'defend',
         }];
     }

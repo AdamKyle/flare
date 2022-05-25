@@ -18,7 +18,7 @@ class Attack {
 
     private array $battleMessages;
 
-    private bool $tookTooLong;
+    private bool $tookTooLong = false;
 
     private BaseCharacterAttack $baseCharacterAttack;
 
@@ -96,13 +96,6 @@ class Attack {
             $response = $this->baseCharacterAttack->setMonsterHealth($this->monsterHealth)
                                                   ->setCharacterHealth($this->characterHealth)
                                                   ->doAttack($character, $serverMonster, $this->isCharacterVoided, $attackType);
-
-
-            if (is_null($response)) {
-                $this->mergeBattleMessages($this->baseCharacterAttack->getMessages());
-
-                return;
-            }
 
             $this->mergeBattleMessages($response->getMessages());
 

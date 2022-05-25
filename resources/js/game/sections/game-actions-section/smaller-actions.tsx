@@ -13,6 +13,7 @@ import TimerProgressBar from "../../components/ui/progress-bars/timer-progress-b
 import PrimaryButton from "../../components/ui/buttons/primary-button";
 import MapMovementActions from "./components/small-actions/map-movement-actions";
 import ExplorationSection from "./components/exploration-section";
+import WarningAlert from "../../components/ui/alerts/simple-alerts/warning-alert";
 
 export default class SmallerActions extends React.Component<ActionsProps, ActionsState> {
 
@@ -42,6 +43,7 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
             can_player_move: true,
             crafting_type: null,
             movement_time_out: 0,
+            automation_time_out: 0,
         }
 
         // @ts-ignore
@@ -98,6 +100,12 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
                 movement_time_out: this.props.character.can_move_again_at,
             });
         }
+
+        if (this.props.character.is_automation_running) {
+            this.setState({
+                automation_time_out: this.props.character.automation_completed_at,
+            });
+        }
     }
 
     componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<ActionsState>, snapshot?: any) {
@@ -111,10 +119,7 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
     }
 
     buildOptions() {
-        return [{
-            label: 'Fight',
-            value: 'fight'
-        }, {
+        const options = [{
             label: 'Exploration',
             value: 'explore'
         },{
@@ -123,7 +128,16 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
         }, {
             label: 'Map Movement',
             value: 'map-movement'
-        }]
+        }];
+
+        if (!this.props.character.is_automation_running) {
+            options.unshift({
+                label: 'Fight',
+                value: 'fight'
+            });
+        }
+
+        return options;
     }
 
     defaultSelectedAction() {
@@ -293,7 +307,7 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
                 <button type='button' onClick={this.closeMapSection.bind(this)} className='text-red-600 dark:text-red-500 absolute right-[5px] top-[5px]'>
                     <i className="fas fa-times-circle"></i>
                 </button>
-                <MapMovementActions character={this.props.character} update_map_timer={this.updateMapTimer.bind(this)} currencies={this.props.currencies}/>
+                <MapMovementActions character={this.props.character} update_map_timer={this.updateMapTimer.bind(this)} currencies={this.props.currencies} is_automation_running={this.props.character.is_automation_running}/>
             </Fragment>
         );
     }
@@ -322,6 +336,17 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
                           {this.buildSection()}
                       </Fragment>
                   :
+                      <Fragment>
+                          {
+                              this.props.character.is_automation_running ?
+                                  <div className='my-2'>
+                                      <WarningAlert>
+                                          Exploration is running, You cannot fight monsters. <a href='/information/exploration' target='_blank'>See Exploration Help <i
+                                          className="fas fa-external-link-alt"></i></a> for more details.
+                                      </WarningAlert>
+                                  </div>
+                              : null
+                          }
                       <Select
                           onChange={this.showAction.bind(this)}
                           options={this.buildOptions()}
@@ -331,9 +356,10 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
                           menuPortalTarget={document.body}
                           value={this.defaultSelectedAction()}
                       />
+                      </Fragment>
               }
 
-              <div className='relative top-[18px]'>
+              <div className='relative top-[18px] bottom-[10px]'>
                   <div className={clsx('grid gap-2', {
                       'md:grid-cols-2': this.state.attack_time_out !== 0 && this.state.crafting_time_out !== 0
                   })}>
@@ -345,13 +371,28 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
                       </div>
                   </div>
               </div>
-              {
-                  typeof this.state.movement_time_out !== 'undefined' && this.state.movement_time_out !== 0 ?
-                      <div className={'relative top-[24px]'}>
-                          <TimerProgressBar time_remaining={this.state.movement_time_out} time_out_label={'Movement Timeout'}/>
-                      </div>
-                      : null
-              }
+
+              <div className='relative top-[18px]'>
+                  <div className={clsx('grid gap-2', {
+                      'md:grid-cols-2': this.state.movement_time_out !== 0 && this.state.automation_time_out !== 0
+                  })}>
+                      {
+                          typeof this.state.movement_time_out !== 'undefined'?
+                              <div>
+                                  <TimerProgressBar time_remaining={this.state.movement_time_out} time_out_label={'Movement Timeout'} />
+                              </div>
+                          : null
+                      }
+
+                      {
+                          typeof this.state.automation_time_out !== 'undefined'?
+                              <div>
+                                  <TimerProgressBar time_remaining={this.state.automation_time_out} time_out_label={'Exploration'} />
+                              </div>
+                              : null
+                      }
+                  </div>
+              </div>
           </Fragment>
         );
     }

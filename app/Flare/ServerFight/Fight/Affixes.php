@@ -44,12 +44,12 @@ class Affixes extends BattleBase {
         return 0;
     }
 
-    public function getAffixLifeSteal(Character $character, ServerMonster $monster, array $attackData): int {
+    public function getAffixLifeSteal(Character $character, ServerMonster $monster, array $attackData): float {
 
-        $affixLifeStealing = $attackData['affixes'][$character->classType()->isVampire() ? 'stacking_life_stealing' : 'life_stealing'] * $attackData['damage_deduction'];
+        $affixLifeStealing = $attackData['affixes'][$character->classType()->isVampire() ? 'stacking_life_stealing' : 'life_stealing'] - $attackData['damage_deduction'];
         $cantBeResisted    = $attackData['affixes']['cant_be_resisted'];
 
-        if ($affixLifeStealing <= 0) {
+        if (is_null($affixLifeStealing)) {
             return 0;
         }
 
@@ -59,9 +59,11 @@ class Affixes extends BattleBase {
             $this->addMessage('The enemy screams in pain as you siphon large amounts of their health towards you!', 'player-action');
         }
 
+        $damage = $monster->getHealth() * $affixLifeStealing;
+
         if ($cantBeResisted) {
 
-            $this->addMessage('The enemy\'s blood flows through the air and gives you life: ' + number_format($affixLifeStealing), 'player-action');
+            $this->addMessage('The enemy\'s blood flows through the air and gives you life: ' . number_format($damage), 'player-action');
 
             return $affixLifeStealing;
         }
@@ -71,7 +73,7 @@ class Affixes extends BattleBase {
         if ($dc <= 0 || rand(1, 100) > $dc) {
             $this->addMessage('The enemy resists your attempt to steal it\'s life.', 'enemy-action');
         } else {
-            $this->addMessage('The enemy\'s blood flows through the air and gives you life: ' + number_format($affixLifeStealing), 'player-action');
+            $this->addMessage('The enemy\'s blood flows through the air and gives you life: ' . number_format($damage), 'player-action');
 
             return $affixLifeStealing;
         }

@@ -129,19 +129,15 @@ class MonsterPlayerFight {
                      ->setIsCharacterVoided($isPlayerVoided)
                      ->attack($this->character, $monster, $this->attackType, 'character');
 
+        $this->mergeMessages($this->attack->getMessages());
+
+        $this->attack->resetBattleMessages();
+
         if ($this->attack->getCharacterHealth() <= 0) {
-            $this->mergeMessages($this->attack->getMessages());
-
-            $this->attack->resetBattleMessages();
-
             return false;
         }
 
         if ($this->attack->getMonsterHealth() <= 0) {
-            $this->mergeMessages($this->attack->getMessages());
-
-            $this->attack->resetBattleMessages();
-
             return true;
         }
 

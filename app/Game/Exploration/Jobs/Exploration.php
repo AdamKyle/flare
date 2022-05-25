@@ -114,8 +114,6 @@ class Exploration implements ShouldQueue
     protected function fightAutomationMonster(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, array $params) {
         $fightResponse = $response->fightMonster();
 
-        dump($response->getBattleMessages());
-
         if (!$fightResponse) {
 
             $automation->delete();
@@ -127,8 +125,6 @@ class Exploration implements ShouldQueue
             event(new ExplorationLogUpdate($this->character->user, 'You died during exploration. Exploration has ended.'));
 
             event(new ExplorationTimeOut($this->character->user, 0));
-
-            dump($response->getBattleMessages());
 
             return false;
         }

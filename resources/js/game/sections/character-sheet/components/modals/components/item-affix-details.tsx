@@ -67,7 +67,7 @@ export default class ItemAffixDetails extends React.Component<any, any> {
                             <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                             <dl>
                                 <dt>Class Bonus</dt>
-                                <dd>{this.props.affix.class_bonus !== null ? this.props.affix.class_bonus : 'N/A'}</dd>
+                                <dd>{this.props.affix.class_bonus !== null ? (this.props.affix.class_bonus * 100).toFixed(2) + '%' : 'N/A'}</dd>
                             </dl>
 
                             <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>

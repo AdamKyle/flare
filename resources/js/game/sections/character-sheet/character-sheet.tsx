@@ -45,7 +45,7 @@ export default class CharacterSheet extends React.Component<CharacterSheetProps,
                     <BasicCard additionalClasses={'overflow-y-auto lg:w-1/2'}>
                         <CharacterTabs character={this.props.character} />
                     </BasicCard>
-                    <BasicCard additionalClasses={'overflow-y-auto lg:w-1/2 md:max-h-[200px]'}>
+                    <BasicCard additionalClasses={'overflow-y-auto lg:w-1/2 md:max-h-[225px]'}>
                         <div className='grid lg:grid-cols-2 gap-2'>
                             <div>
                                 <dl>
@@ -73,7 +73,13 @@ export default class CharacterSheet extends React.Component<CharacterSheetProps,
                                     <dd>{this.props.character.damage_stat}</dd>
                                     <dt>To Hit:</dt>
                                     <dd>Accuracy, {this.props.character.to_hit_stat}</dd>
+                                    <dt>Class Bonus:</dt>
+                                    <dd>{(this.props.character.extra_action_chance.chance * 100).toFixed(2)}%</dd>
                                 </dl>
+                                <p className='mt-4'>
+                                    For more information about class bonus please see <a href='/information/races-and-classes' target='_blank'>Races and Classes Help <i
+                                    className="fas fa-external-link-alt"></i></a>
+                                </p>
                             </div>
                         </div>
                     </BasicCard>

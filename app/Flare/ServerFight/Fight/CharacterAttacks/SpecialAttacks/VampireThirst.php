@@ -49,8 +49,10 @@ class VampireThirst extends BattleBase {
     public function handleAttack(Character $character, array $attackData) {
         $extraActionData = $this->characterCacheData->getCachedCharacterData($character, 'extra_action_chance');
 
-        if (!(rand(1, 100) > (100 - 100 * $extraActionData['chance']))) {
-            return;
+        if (!($extraActionData['chance'] >= 1)) {
+            if (!(rand(1, 100) > (100 - 100 * $extraActionData['chance']))) {
+                return;
+            }
         }
 
         $dur    = $this->characterCacheData->getCachedCharacterData($character, 'dur_modded');

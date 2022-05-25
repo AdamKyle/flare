@@ -51,8 +51,10 @@ class AlchemistsRavenousDream extends BattleBase {
 
         if ($extraActionData['has_item']) {
 
-            if (!(rand(1, 100) > (100 - 100 * $extraActionData['chance']))) {
-                return;
+            if (!($extraActionData['chance'] >= 1)) {
+                if (!(rand(1, 100) > (100 - 100 * $extraActionData['chance']))) {
+                    return;
+                }
             }
 
             $this->addMessage('The world around you fades to blackness, your eyes glow red with rage. The enemy trembles.', 'regular');

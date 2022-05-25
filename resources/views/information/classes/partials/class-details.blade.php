@@ -5,7 +5,7 @@
     $buttons = 'true';
 
     if (!auth()->user()->hasRole('Admin')) {
-        $buttons = '';
+        $backUrl = '/information/races-and-classes';
     }
 @endphp
 

@@ -14,6 +14,7 @@ import TeleportModal from "../../../components/actions/modals/teleport-modal";
 import MovePlayer from "../../../../lib/game/map/ajax/move-player";
 import ViewLocationDetailsModal from "../../../components/actions/modals/view-location-details-modal";
 import TraverseModal from "../../../components/actions/modals/traverse-modal";
+import WarningAlert from "../../../../components/ui/alerts/simple-alerts/warning-alert";
 
 export default class MapMovementActions extends React.Component<any, any> {
 
@@ -254,6 +255,17 @@ export default class MapMovementActions extends React.Component<any, any> {
                                     : null
                             }
 
+                            {
+                                this.props.character.is_automation_running ?
+                                    <div className='my-2'>
+                                        <WarningAlert>
+                                            Exploration is running, You cannot teleport. <a href='/information/exploration' target='_blank'>See Exploration Help <i
+                                            className="fas fa-external-link-alt"></i></a> for more details.
+                                        </WarningAlert>
+                                    </div>
+                                    : null
+                            }
+
                             <div className='grid gap-3'>
                                 {
                                     this.canSeeViewLocationDetailsButton() ?
@@ -263,9 +275,11 @@ export default class MapMovementActions extends React.Component<any, any> {
                                 }
 
                                 <PrimaryOutlineButton button_label={'Teleport'}
-                                                      on_click={this.manageTeleport.bind(this)} disabled={!this.props.character.can_move}/>
+                                                      on_click={this.manageTeleport.bind(this)}
+                                                      disabled={!this.props.character.can_move || this.props.is_automation_running || this.props.character.is_dead} />
                                 <SuccessOutlineButton button_label={'Traverse'}
-                                                      on_click={this.manageTraverse.bind(this)} disabled={!this.props.character.can_move}/>
+                                                      on_click={this.manageTraverse.bind(this)}
+                                                      disabled={!this.props.character.can_move || this.props.character.is_dead} />
                             </div>
                         </Fragment>
                 }

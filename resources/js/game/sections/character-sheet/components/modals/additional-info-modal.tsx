@@ -33,6 +33,8 @@ export default class AdditionalInfoModal extends React.Component<AdditionalInfoM
             return null;
         }
 
+        console.log(this.props.character);
+
         return (
             <Dialogue is_open={this.props.is_open}
                       handle_close={this.props.manage_modal}

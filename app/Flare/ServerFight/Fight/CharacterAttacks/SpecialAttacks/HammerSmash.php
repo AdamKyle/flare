@@ -45,8 +45,10 @@ class HammerSmash extends BattleBase {
 
         if ($extraActionData['has_item']) {
 
-            if (!(rand(1, 100) > (100 - 100 * $extraActionData['chance']))) {
-                return;
+            if (!($extraActionData['chance'] >= 1)) {
+                if (!(rand(1, 100) > (100 - 100 * $extraActionData['chance']))) {
+                    return;
+                }
             }
 
             $damage = $this->characterCacheData->getCachedCharacterData($character, 'str_modded') * 0.30;

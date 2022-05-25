@@ -87,36 +87,39 @@ class CastType extends BattleBase
         $spellDamage = $this->attackData['spell_damage'];
 
         if ($this->entrance->isEnemyEntranced()) {
-            $this->doSpellDamage($character, $monster, $spellDamage);
+            $this->doSpellDamage($character, $monster, $spellDamage, true);
 
-            return;
+            return $this;
         }
+
+        $this->mergeMessages($this->entrance->getMessages());
 
         if ($this->canHit->canPlayerAutoHit($character)) {
             $this->addMessage('You dance along in the shadows, the enemy doesn\'t see you. Strike now!', 'regular');
 
-            $this->doSpellDamage($character, $monster, $spellDamage);
+            $this->doSpellDamage($character, $monster, $spellDamage, true);
 
-            return;
+            return $this;
         }
 
         if ($this->canHit->canPlayerCastSpell($character, $monster, $this->isVoided)) {
-
             if ($monster->getMonsterStat('ac') > $spellDamage) {
                 $this->addMessage('Your weapon was blocked!', 'enemy-action');
             } else {
                 $this->doSpellDamage($character, $monster, $spellDamage);
             }
         } else {
-            $this->addMessage('Your attack missed!', 'enemy-action');
+            $this->addMessage('Your spell fizzled and failed!', 'enemy-action');
 
             $this->secondaryAttack($character, $monster);
         }
+
+        return $this;
     }
 
-    public function doSpellDamage(Character $character, ServerMonster $monster, int $spellDamage) {
+    public function doSpellDamage(Character $character, ServerMonster $monster, int $spellDamage, bool $entranced = false) {
         if ($spellDamage > 0) {
-            $this->spellDamage($character, $monster, $spellDamage);
+            $this->spellDamage($character, $monster, $spellDamage, $entranced);
         }
 
         $this->heal($character);
@@ -148,7 +151,13 @@ class CastType extends BattleBase
     }
 
     protected function affixLifeStealingDamage(Character $character, ServerMonster $monster) {
-        $damage = $this->affixes->getAffixLifeSteal($character, $monster, $this->attackData);
+        if ($this->monsterHealth <= 0) {
+            return;
+        }
+
+        $lifeStealing = $this->affixes->getAffixLifeSteal($character, $monster, $this->attackData);
+
+        $damage = $monster->getHealth() * $lifeStealing;
 
         if ($damage > 0) {
             $this->monsterHealth   -= $damage;
@@ -176,20 +185,22 @@ class CastType extends BattleBase
         }
     }
 
-    protected function spellDamage(Character $character, ServerMonster $monster, int $spellDamage) {
+    public function spellDamage(Character $character, ServerMonster $monster, int $spellDamage, bool $entranced = false) {
 
         $monsterSpellEvasion = $monster->getMonsterStat('spell_evasion');
 
-        if ($monsterSpellEvasion > 1) {
-            $this->addMessage('The enemy evades your magic!', 'enemy-action');
+        if (!$entranced) {
+            if ($monsterSpellEvasion > 1) {
+                $this->addMessage('The enemy evades your magic!', 'enemy-action');
 
-            return;
-        }
+                return;
+            }
 
-        if (rand(1, 100) > (100 - 100 * $monsterSpellEvasion)) {
-            $this->addMessage('The enemy evades your magic!', 'enemy-action');
+            if (rand(1, 100) > (100 - 100 * $monsterSpellEvasion)) {
+                $this->addMessage('The enemy evades your magic!', 'enemy-action');
 
-            return;
+                return;
+            }
         }
 
         $criticality = $this->characterCacheData->getCachedCharacterData($character, 'skills')['criticality'];

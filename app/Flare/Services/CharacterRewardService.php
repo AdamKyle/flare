@@ -140,6 +140,10 @@ class CharacterRewardService {
             $this->trainSkill($currentSkill, $adventure, $monster);
         }
 
+        if (!$this->characterXpService->canCharacterGainXP($this->character)) {
+            return;
+        }
+
         $xp = XPCalculator::fetchXPFromMonster($monster, $this->character->level, $xpReduction);
         $xp = $this->characterXpService->determineXPToAward($this->character, $xp);
 

@@ -172,7 +172,13 @@ class AttackAndCast extends BattleBase
     }
 
     protected function affixLifeStealingDamage(Character $character, ServerMonster $monster) {
-        $damage = $this->affixes->getAffixLifeSteal($character, $monster, $this->attackData);
+        if ($this->monsterHealth <= 0) {
+            return;
+        }
+
+        $lifeStealing = $this->affixes->getAffixLifeSteal($character, $monster, $this->attackData);
+
+        $damage = $monster->getHealth() * $lifeStealing;
 
         if ($damage > 0) {
             $this->monsterHealth   -= $damage;
@@ -206,7 +212,7 @@ class AttackAndCast extends BattleBase
         $this->weaponType->setMonsterHealth($this->monsterHealth)
                          ->setCharacterHealth($this->characterHealth)
                          ->setCharacterAttackData($character, $this->isVoided)
-                         ->weaponAttack($character, $monster, $weaponDamage);
+                         ->weaponDamage($character, $monster, $weaponDamage);
 
         $this->mergeMessages($this->weaponType->getMessages());
 
@@ -222,13 +228,13 @@ class AttackAndCast extends BattleBase
         $this->castType->setMonsterHealth($this->monsterHealth)
                        ->setCharacterHealth($this->characterHealth)
                        ->setCharacterAttackData($character, $this->isVoided)
-                       ->doSpellDamage($character, $monster, $spellDamage);
+                       ->spellDamage($character, $monster, $spellDamage, $this->entrance->isEnemyEntranced());
 
-        $this->mergeMessages($this->weaponType->getMessages());
+        $this->mergeMessages($this->castType->getMessages());
 
-        $this->characterHealth = $this->weaponType->getCharacterHealth();
-        $this->monsterHealth   = $this->weaponType->getMonsterHealth();
+        $this->characterHealth = $this->castType->getCharacterHealth();
+        $this->monsterHealth   = $this->castType->getMonsterHealth();
 
-        $this->weaponType->resetMessages();
+        $this->castType->resetMessages();
     }
 }

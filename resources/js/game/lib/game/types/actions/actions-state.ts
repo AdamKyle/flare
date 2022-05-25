@@ -32,4 +32,6 @@ export default interface ActionsState {
     movement_time_out?: number;
 
     can_player_move?: boolean;
+
+    automation_time_out?: number;
 }
