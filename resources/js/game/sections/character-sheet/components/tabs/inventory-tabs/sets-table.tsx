@@ -4,8 +4,6 @@ import {
     BuildInventoryTableColumns,
 } from "../../../../../lib/game/character-sheet/helpers/inventory/build-inventory-table-columns";
 import DropDown from "../../../../../components/ui/drop-down/drop-down";
-import PrimaryButton from "../../../../../components/ui/buttons/primary-button";
-import PopOverContainer from "../../../../../components/ui/popover/pop-over-container";
 import InventoryDetails from "../../../../../lib/game/character-sheet/types/inventory/inventory-details";
 import ActionsInterface from "../../../../../lib/game/character-sheet/helpers/inventory/actions-interface";
 import DangerButton from "../../../../../components/ui/buttons/danger-button";
@@ -355,20 +353,8 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
                                 null
                         }
                     </div>
-                    <div className='ml-4 md:ml-0 my-4 md:my-0 md:absolute md:right-0'>
-                        <div className='flex items-center'>
-                            <div>
-                                <input type='text' name='search' className='form-control' onChange={this.search.bind(this)} placeholder={'Search'}/>
-                            </div>
-                            <div className='mt-2'>
-                                <PopOverContainer icon={'fas fa-info-circle'} icon_label={'Help'} additional_css={'left-[14px] md:left-0'} make_small={true} >
-                                    <h3>Searching</h3>
-                                    <p className='my-2'>
-                                        This will only search in the currently selected set. If you are looking for items in other sets, you must select the set, then search.
-                                    </p>
-                                </PopOverContainer>
-                            </div>
-                        </div>
+                    <div className='ml-4 md:ml-0 my-4 md:my-0 md:absolute md:right-[10px]'>
+                        <input type='text' name='search' className='form-control' onChange={this.search.bind(this)} placeholder={'Search'}/>
                     </div>
                 </div>
 

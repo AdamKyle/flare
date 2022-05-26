@@ -106,7 +106,7 @@ class MovementService {
      */
     private $manager;
 
-    private const CHANCE_FOR_CELESTIAL_TO_SPAWN = 1000000;
+    private const CHANCE_FOR_CELESTIAL_TO_SPAWN = 1000;
 
     /**
      * Constructor

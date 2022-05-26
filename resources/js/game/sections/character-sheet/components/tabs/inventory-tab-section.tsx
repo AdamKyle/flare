@@ -186,20 +186,8 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
                     <div className={clsx('ml-2', {'hidden': this.isDropDownHidden()})}>
                         <DropDown menu_items={this.createActionsDropDown()} button_title={'Actions'} selected_name={this.state.table} disabled={this.props.is_dead} />
                     </div>
-                    <div className='ml-4 md:ml-0 my-4 md:my-0 md:absolute md:right-0'>
-                        <div className='flex items-center'>
-                            <div>
-                                <input type='text' name='search' className='form-control' onChange={this.search.bind(this)} placeholder={'Search'}/>
-                            </div>
-                            <div className='mt-2'>
-                                <PopOverContainer icon={'fas fa-info-circle'} icon_label={'Help'} additional_css={'left-[14px] md:left-0'} make_small={true} >
-                                    <h3>Searching</h3>
-                                    <p className='my-2'>
-                                       This will only search within the current selected type. To find other items, change types and search.
-                                    </p>
-                                </PopOverContainer>
-                            </div>
-                        </div>
+                    <div className='ml-4 md:ml-0 my-4 md:my-0 md:absolute md:right-[10px]'>
+                        <input type='text' name='search' className='form-control' onChange={this.search.bind(this)} placeholder={'Search'}/>
                     </div>
                 </div>
 
