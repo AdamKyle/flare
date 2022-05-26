@@ -38,14 +38,7 @@ export default class Dialogue extends React.Component<DialogueTypes, any> {
                         >
                             <Dialog.Overlay className="fixed inset-0" />
                         </Transition.Child>
-
-                        {/*/!* This element is to trick the browser into centering the modal contents. *!/*/}
-                        {/*<span*/}
-                        {/*    className="inline-block h-screen align-middle"*/}
-                        {/*    aria-hidden="true"*/}
-                        {/*>*/}
-                        {/*  &#8203;*/}
-                        {/*</span>*/}
+                        
                         <Transition.Child
                             as={Fragment}
                             enter="ease-out duration-300"
@@ -56,7 +49,7 @@ export default class Dialogue extends React.Component<DialogueTypes, any> {
                             leaveTo="opacity-0 scale-95"
                         >
                             <div className="fixed inset-0 flex items-center justify-center p-4">
-                                <div className="flex min-h-full items-center justify-center">
+                                <div className="flex min-h-full min-w-full items-center justify-center">
                                 <div className={clsx("inline-block w-full p-6 my-8 text-left align-middle transition-all transform bg-white dark:bg-gray-700 drop-shadow-2xl rounded-md", {'max-w-7xl': this.props.large_modal && !this.props.medium_modal}, {'max-w-5xl': this.props.medium_modal}, {'max-w-3xl': !this.props.large_modal && !this.props.medium_modal})}>
                                     <Dialog.Title
                                         as="span"
