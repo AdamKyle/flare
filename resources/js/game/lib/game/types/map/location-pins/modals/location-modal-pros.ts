@@ -18,4 +18,8 @@ export interface LocationModalPros {
     hide_secondary_button: boolean | null;
 
     can_move: boolean;
+
+    is_automation_running: boolean;
+
+    is_dead: boolean;
 }

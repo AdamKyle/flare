@@ -213,6 +213,8 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                                           currencies={this.props.currencies}
                                           teleport_player={this.handleTeleportPlayer.bind(this)}
                                           can_move={this.state.can_player_move}
+                                          is_dead={this.props.is_dead}
+                                          is_automation_running={this.props.is_automaton_running}
                                 />
 
                                 <Kingdoms kingdoms={this.state.player_kingdoms}
@@ -221,6 +223,8 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                                           currencies={this.props.currencies}
                                           teleport_player={this.handleTeleportPlayer.bind(this)}
                                           can_move={this.state.can_player_move}
+                                          is_dead={this.props.is_dead}
+                                          is_automation_running={this.props.is_automaton_running}
                                 />
 
                                 <EnemyKingdoms kingdoms={this.state.enemy_kingdoms}
@@ -229,6 +233,8 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                                                currencies={this.props.currencies}
                                                teleport_player={this.handleTeleportPlayer.bind(this)}
                                                can_move={this.state.can_player_move}
+                                               is_dead={this.props.is_dead}
+                                               is_automation_running={this.props.is_automaton_running}
                                 />
 
                                 <NpcKingdoms kingdoms={this.state.npc_kingdoms}
@@ -237,6 +243,8 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                                              currencies={this.props.currencies}
                                              teleport_player={this.handleTeleportPlayer.bind(this)}
                                              can_move={this.state.can_player_move}
+                                             is_dead={this.props.is_dead}
+                                             is_automation_running={this.props.is_automaton_running}
                                 />
 
                                 <div className="map-x-pin" style={this.playerIcon()}></div>

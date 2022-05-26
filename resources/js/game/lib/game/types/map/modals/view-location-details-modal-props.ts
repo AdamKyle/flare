@@ -18,4 +18,8 @@ export default interface ViewLocationDetailsModalProps {
     is_small_screen: boolean;
 
     can_move: boolean;
+
+    is_automation_running: boolean;
+
+    is_dead: boolean;
 }

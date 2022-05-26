@@ -11,25 +11,33 @@ use App\Flare\Models\Item;
 
 class ItemsTable extends DataTableComponent {
 
-    public $isShop = false;
+    public $isShop     = false;
+    public $type       = null;
+    public $locationId = null;
 
     public function configure(): void {
         $this->setPrimaryKey('id');
     }
 
     public function builder(): Builder {
-        if (auth()->user()->hasRole('Admin')) {
-            $item = Item::query();
-        } else {
-            $item = Item::whereNotIn('type', ['quest', 'alchemy', 'trinket']);
-        }
-
-        if ($this->isShop) {
-            $item = $item->where('cost', '<=', 2000000000);
-        }
+        $item = $this->buildItemQuery();
 
         return $item->whereNull('item_prefix_id')
                     ->whereNull('item_suffix_id');
+    }
+
+    protected function buildItemQuery(): Builder {
+        $query = Item::query();
+
+        if (!is_null($this->type) && !is_null($this->locationId)) {
+            $query = Item::where('type', $this->type)->where('drop_location_id', $this->locationId);
+        }
+
+        if ($this->isShop) {
+            $query = $query->where('cost', '<=', 2000000000)->whereNotIn('type', ['quest', 'alchemy', 'trinket']);
+        }
+
+        return $query;
     }
 
     public function filters(): array {

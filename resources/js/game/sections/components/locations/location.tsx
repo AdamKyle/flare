@@ -95,6 +95,8 @@ export default class Location extends React.Component<LocationProps, LocationSta
                                        teleport_player={this.props.teleport_player}
                                        hide_secondary_button={false}
                                        can_move={this.props.can_move}
+                                       is_automation_running={this.props.is_automation_running}
+                                       is_dead={this.props.is_dead}
                         />
                     : null
                 }

@@ -77,6 +77,8 @@ export default class Kingdoms extends React.Component<KingdomProps, KingdomState
                                       handle_close={this.closeKingdomModal.bind(this)}
                                       hide_secondary={false}
                                       can_move={this.props.can_move}
+                                      is_automation_running={this.props.is_automation_running}
+                                      is_dead={this.props.is_dead}
                         />
                         : null
                 }

@@ -14,6 +14,9 @@
         // Bypass raising errors on `any` type
         "allowSyntheticDefaultImports": true,
         "allowJs": true,
+        "lib": [
+            "ES2021.String", "dom"
+        ]
     },
     "include": ["resources/js/**/*"]  // Frontend paths pattern
 }

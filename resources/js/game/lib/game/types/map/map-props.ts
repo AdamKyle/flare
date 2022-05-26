@@ -13,7 +13,7 @@ export default interface MapProps {
         copper_coins: number,
     };
 
-    is_dead?: boolean;
+    is_dead: boolean;
 
     is_automaton_running: boolean;
 

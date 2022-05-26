@@ -45,10 +45,11 @@ export default class LocationModal extends React.Component<LocationModalPros, Lo
     }
 
     teleportDisabled(): boolean {
-        return this.state.cost === 0 || !this.state.can_afford || !this.props.can_move;
+        return this.state.cost === 0 || !this.state.can_afford || !this.props.can_move || this.props.is_automation_running || this.props.is_dead;
     }
 
     render() {
+        console.log(this.props.location);
         return (
             <Dialogue is_open={this.props.is_open}
                       handle_close={this.props.handle_close}
@@ -82,7 +83,11 @@ export default class LocationModal extends React.Component<LocationModalPros, Lo
                                 </PopOverContainer>
                                 </div>
                             </div>
-                            <dl>
+                            <p className={'mb-4'}>
+                                Places like this can increase the enemies stats and resistances as well as skills. It is essential that players craft appropriate resistance
+                                and stat reduction gear to survive harder creatures here.
+                            </p>
+                            <dl className={'mb-4'}>
                                 <dt>Increase Core Stats By: </dt>
                                 <dd>{formatNumber(this.props.location.increases_enemy_stats_by)}</dd>
                                 <dt>Increase Percentage Based Values By: </dt>

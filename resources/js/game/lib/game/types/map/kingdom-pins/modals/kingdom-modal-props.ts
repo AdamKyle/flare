@@ -16,4 +16,8 @@ export default interface KingdomModalProps {
     hide_secondary: boolean;
 
     can_move: boolean;
+
+    is_automation_running: boolean;
+
+    is_dead: boolean;
 }

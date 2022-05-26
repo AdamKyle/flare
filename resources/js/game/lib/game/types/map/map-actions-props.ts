@@ -35,7 +35,7 @@ export default interface MapActionsProps {
 
     view_port: number;
 
-    is_dead?: boolean;
+    is_dead: boolean;
 
     currencies?: {
         gold: number,

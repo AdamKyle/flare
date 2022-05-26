@@ -312,6 +312,8 @@ export default class MapMovementActions extends React.Component<any, any> {
                                                   npc_kingdom_id={this.state.npc_kingdom_id}
                                                   is_small_screen={true}
                                                   can_move={this.props.character.can_move}
+                                                  is_automation_running={this.props.is_automation_running}
+                                                  is_dead={this.props.character.is_dead}
                         />
                     : null
                 }

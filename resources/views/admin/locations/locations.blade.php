@@ -2,15 +2,30 @@
 
 @section('content')
 <div class="container-fluid">
-    <div class="row page-titles">
-        <div class="col-md-6 align-self-right">
-            <h4 class="mt-2">Locations</h4>
-        </div>
-        <div class="col-md-6 align-self-right">
-            <a href="{{route('home')}}" class="btn btn-success float-right ml-2">Home</a>
-            <a href="{{route('locations.create')}}" class="btn btn-primary float-right ml-2">Create</a>
-        </div>
-    </div>
-    @livewire('admin.locations.data-table')
+    <x-core.page-title
+        title="Locations"
+        route="{{route('home')}}"
+        color="success" link="Home"
+    >
+        <x-core.buttons.link-buttons.primary-button
+            href="{{route('locations.create')}}"
+            css="tw-ml-2"
+        >
+            Create Location
+        </x-core.buttons.link-buttons.primary-button>
+{{--        <x-core.buttons.link-buttons.primary-button--}}
+{{--            href="{{route('items.export')}}"--}}
+{{--            css="tw-ml-2"--}}
+{{--        >--}}
+{{--            <i class="fas fa-file-export"></i> Export--}}
+{{--        </x-core.buttons.link-buttons.primary-button>--}}
+{{--        <x-core.buttons.link-buttons.primary-button--}}
+{{--            href="{{route('items.import')}}"--}}
+{{--            css="tw-ml-2"--}}
+{{--        >--}}
+{{--            <i class="fas fa-file-upload"></i> Import--}}
+{{--        </x-core.buttons.link-buttons.primary-button>--}}
+    </x-core.page-title>
+    @livewire('admin.locations.locations-table')
 </div>
 @endsection

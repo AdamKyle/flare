@@ -11,4 +11,8 @@ export default interface NpcKingdomProps {
     teleport_player: (data: {x: number, y: number, cost: number, timeout: number}) => void;
 
     can_move: boolean;
+
+    is_automation_running: boolean;
+
+    is_dead: boolean;
 }

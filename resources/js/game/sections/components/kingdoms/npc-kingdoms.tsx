@@ -79,6 +79,8 @@ export default class NpcKingdoms extends React.Component<NpcKingdomProps, any> {
                                            is_enemy_kingdom={true}
                                            hide_secondary={false}
                                            can_move={this.props.can_move}
+                                           is_automation_running={this.props.is_automation_running}
+                                           is_dead={this.props.is_dead}
                         />
                         : null
                 }

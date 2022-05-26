@@ -194,7 +194,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                                     character_id={this.props.characterId}
                                     view_port={this.state.view_port}
                                     currencies={this.state.character_currencies}
-                                    is_dead={this.state.character?.is_dead}
+                                    is_dead={this.state.character.is_dead}
                                     is_automaton_running={this.state.character.is_automation_running}
                                     automation_completed_at={this.state.character.automation_completed_at}
                                 />

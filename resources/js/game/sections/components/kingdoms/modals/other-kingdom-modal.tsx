@@ -51,7 +51,7 @@ export default class OtherKingdomModal extends React.Component<OtherKingdomModal
     }
 
     teleportDisabled() {
-        return this.state.cost === 0 || !this.state.can_afford || !this.props.can_move;
+        return this.state.cost === 0 || !this.state.can_afford || !this.props.can_move || this.props.is_dead;
     }
 
     handleTeleport() {
@@ -104,7 +104,7 @@ export default class OtherKingdomModal extends React.Component<OtherKingdomModal
                           handle_action: this.handleTeleport.bind(this),
                       }}
                       tertiary_actions={{
-                          tertiary_button_disabled: false,
+                          tertiary_button_disabled: this.props.is_automation_running || this.props.is_dead,
                           tertiary_button_label: 'Attack Kingdom',
                           handle_action: () => this.attackKingdom(this.state.kingdom_details),
                       }}

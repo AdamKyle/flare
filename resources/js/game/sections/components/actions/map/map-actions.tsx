@@ -3,13 +3,11 @@ import MapActionsProps from "../../../../lib/game/types/map/map-actions-props";
 import PrimaryButton from "../../../../components/ui/buttons/primary-button";
 import SuccessOutlineButton from "../../../../components/ui/buttons/success-outline-button";
 import MapActionsState from "../../../../lib/game/types/map/map-actions-state";
-import clsx from 'clsx';
 import TeleportModal from "../modals/teleport-modal";
 import OrangeButton from "../../../../components/ui/buttons/orange-button";
 import ViewLocationDetailsModal from "../modals/view-location-details-modal";
 import SetSailModal from "../modals/set-sail-modal";
 import TraverseModal from "../modals/traverse-modal";
-import KingdomDetails from "../../../../lib/game/map/types/kingdom-details";
 import PurpleButton from "../../../../components/ui/buttons/purple-button";
 
 export default class MapActions extends React.Component<MapActionsProps, MapActionsState> {
@@ -265,7 +263,7 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                     <p className='mb-4'>Characters On Map: {this.props.players_on_map}</p>
                     <div className='flex items-center'>
                         {this.renderViewDetailsButton()}
-                        <PurpleButton button_label={'Conjure'} on_click={() => this.viewLocation()} disabled={this.props.is_dead} additional_css={'ml-2'}/>
+                        <PurpleButton button_label={'Conjure'} on_click={() => this.viewLocation()} disabled={this.state.is_movement_disabled || this.props.is_dead || this.props.is_automation_running} additional_css={'ml-2'}/>
                     </div>
                 </div>
                 <div className='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 hidden sm:block'></div>
@@ -325,6 +323,8 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                                                    npc_kingdom_id={this.state.npc_kingdom_id}
                                                    is_small_screen={false}
                                                    can_move={this.props.can_player_move}
+                                                   is_automation_running={this.props.is_automation_running}
+                                                   is_dead={this.props.is_dead}
                          />
                      : null
                 }
