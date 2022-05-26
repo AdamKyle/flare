@@ -2,10 +2,9 @@
 
 namespace App\Game\Core\Traits;
 
-use App\Flare\Models\GameMap;
-use App\Game\Messages\Events\GlobalMessageEvent;
 use Cache;
 use Illuminate\Database\Eloquent\Collection;
+use App\Flare\Models\GameMap;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 
@@ -69,6 +68,7 @@ trait KingdomCache {
      * Gets the enemy kingdoms cache.
      *
      * @param Character $character
+     * @param bool $refresh
      * @return mixed
      */
     public function getEnemyKingdoms(Character $character, bool $refresh = false) {
@@ -209,6 +209,7 @@ trait KingdomCache {
      * Create the kingdom array for the cache.
      *
      * @param Collection $kingdoms
+     * @return array
      */
     protected function createKingdomArray(Collection $kingdoms): array {
         $kingdomData = [];

@@ -121,6 +121,8 @@ class CelestialFightService {
         BattleAttackHandler::dispatch($character->id, $celestialFight->monster_id)->onQueue('default_long')->delay(now()->addSeconds(2));
 
         event(new GlobalMessageEvent($character->name . ' has slain the '.$celestialFight->monster->name.'! They have been rewarded with a godly gift!'));
+
+        $this->characterCacheData->deleteCharacterSheet($character);
     }
 
     protected function updateCharacterInFight(Character $character, CharacterInCelestialFight $characterInCelestialFight) {

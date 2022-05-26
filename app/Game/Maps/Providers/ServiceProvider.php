@@ -2,24 +2,22 @@
 
 namespace App\Game\Maps\Providers;
 
+use League\Fractal\Manager;
+use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
+use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Services\BuildMonsterCacheService;
-use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Transformers\MonsterTransformer;
 use App\Game\Battle\Services\ConjureService;
 use App\Game\Maps\Console\Commands\UpdateMapCount;
 use App\Game\Maps\Services\TraverseService;
-use App\Game\Messages\Services\PctService;
-use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
-use App\Flare\Cache\CoordinatesCache;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Maps\Calculations\DistanceCalculation;
 use App\Game\Maps\Services\LocationService;
 use App\Game\Maps\Services\MovementService;
 use App\Game\Maps\Services\PortService;
 use App\Game\Maps\Values\MapPositionValue;
-use League\Fractal\Manager;
 
 class ServiceProvider extends ApplicationServiceProvider
 {
@@ -42,10 +40,6 @@ class ServiceProvider extends ApplicationServiceProvider
             return new PortService($app->make(DistanceCalculation::class), $app->make(MapPositionValue::class));
         });
 
-        $this->app->bind(PctService::class, function($app) {
-            return new PctService();
-        });
-
         $this->app->bind(MapTileValue::class, function($app) {
             return new MapTileValue();
         });
@@ -63,8 +57,7 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(LocationService::class, function($app) {
             return new LocationService(
-                $app->make(PortService::class),
-                $app->make(CoordinatesCache::class)
+                $app->make(CoordinatesCache::class),
             );
         });
 
