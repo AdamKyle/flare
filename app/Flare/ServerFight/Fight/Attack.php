@@ -20,6 +20,10 @@ class Attack {
 
     private bool $tookTooLong = false;
 
+    private bool $attackOnlyOnce = false;
+
+    private bool $alreadyAttacked = false;
+
     private BaseCharacterAttack $baseCharacterAttack;
 
     private MonsterAttack $monsterAttack;
@@ -42,6 +46,12 @@ class Attack {
     public function setHealth(array $healthObject): Attack {
         $this->characterHealth = $healthObject['character_health'];
         $this->monsterHealth   = $healthObject['monster_health'];
+
+        return $this;
+    }
+
+    public function onlyAttackOnce(bool $once): Attack {
+        $this->attackOnlyOnce = $once;
 
         return $this;
     }
@@ -92,6 +102,10 @@ class Attack {
             return;
         }
 
+        if ($this->alreadyAttacked) {
+            return;
+        }
+
         if ($whoAttacks === 'character') {
             $response = $this->baseCharacterAttack->setMonsterHealth($this->monsterHealth)
                                                   ->setCharacterHealth($this->characterHealth)
@@ -127,6 +141,10 @@ class Attack {
             $this->monsterAttack->clearMessages();
 
             $this->attackCounter++;
+
+            if ($this->attackOnlyOnce) {
+                $this->alreadyAttacked = true;
+            }
 
             $this->attack($character, $serverMonster, $attackType, 'character');
         }

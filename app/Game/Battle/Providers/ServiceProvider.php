@@ -2,8 +2,10 @@
 
 namespace App\Game\Battle\Providers;
 
+use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Builders\RandomItemDropBuilder;
+use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Services\CharacterRewardService;
 use App\Flare\Transformers\CharacterAttackTransformer;
@@ -75,7 +77,7 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
         $this->app->bind(CelestialFightService::class, function($app) {
-            return new CelestialFightService($app->make(BattleEventHandler::class));
+            return new CelestialFightService($app->make(BattleEventHandler::class), $app->make(CharacterCacheData::class), $app->make(MonsterPlayerFight::class));
         });
 
         $this->commands([

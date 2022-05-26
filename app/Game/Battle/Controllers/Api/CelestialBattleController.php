@@ -41,8 +41,6 @@ class CelestialBattleController extends Controller {
 
         return response()->json([
             'celestial_monsters'  => $celestialBeings,
-            'character_gold'      => $character->gold,
-            'character_gold_dust' => $character->gold_dust,
         ], 200);
     }
 

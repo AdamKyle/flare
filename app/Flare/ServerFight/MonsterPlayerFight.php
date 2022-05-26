@@ -83,7 +83,15 @@ class MonsterPlayerFight {
         return $this->monster['name'];
     }
 
-    public function fightMonster(): bool {
+    public function getCharacterHealth() {
+        return $this->attack->getCharacterHealth();
+    }
+
+    public function getMonsterHealth() {
+        return $this->attack->getMonsterHealth();
+    }
+
+    public function fightMonster(bool $onlyOnce = false): bool {
 
         $this->characterCacheData->deleteCharacterSheet($this->character);
 
@@ -127,6 +135,7 @@ class MonsterPlayerFight {
 
         $this->attack->setHealth($ambush->getHealthObject())
                      ->setIsCharacterVoided($isPlayerVoided)
+                     ->onlyAttackOnce($onlyOnce)
                      ->attack($this->character, $monster, $this->attackType, 'character');
 
         $this->mergeMessages($this->attack->getMessages());

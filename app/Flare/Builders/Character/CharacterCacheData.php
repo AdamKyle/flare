@@ -31,19 +31,25 @@ class CharacterCacheData {
             return Cache::get('character-sheet-' . $character->id)[$key];
         }
 
-        $characterId = $character->id;
+        $cache = $this->characterSheetCache($character);
 
-        $character = new Item($character, $this->characterSheetBaseInfoTransformer);
-        $character = $this->manager->createData($character)->toArray();
-
-        Cache::put('character-sheet-' . $characterId, $character);
-
-        return $character[$key];
+        return $cache[$key];
     }
 
     public function deleteCharacterSheet(Character $character) {
         if (Cache::has('character-sheet-' . $character->id)) {
             return Cache::delete('character-sheet-' . $character->id);
         }
+    }
+
+    public function characterSheetCache(Character $character) {
+        $this->deleteCharacterSheet($character);
+
+        $characterId = $character->id;
+
+        $character = new Item($character, $this->characterSheetBaseInfoTransformer);
+        $character = $this->manager->createData($character)->toArray();
+
+        return Cache::put('character-sheet-' . $characterId, $character);
     }
 }
