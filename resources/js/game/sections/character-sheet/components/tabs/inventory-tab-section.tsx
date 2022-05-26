@@ -205,7 +205,7 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
 
                 {
                     this.state.table === 'Inventory'  ?
-                        <InventoryTable dark_table={this.props.dark_tables} character_id={this.props.character_id} inventory={this.state.data} is_dead={this.props.is_dead} update_inventory={this.props.update_inventory} usable_sets={this.props.usable_sets} set_success_message={this.setSuccessMessage.bind(this)} is_automation_running={this.props.is_automation_running}/>
+                        <InventoryTable dark_table={this.props.dark_tables} character_id={this.props.character_id} inventory={this.state.data} is_dead={this.props.is_dead} update_inventory={this.props.update_inventory} usable_sets={this.props.usable_sets} set_success_message={this.setSuccessMessage.bind(this)} is_automation_running={this.props.is_automation_running} />
                         :
                         <UsableItemsTable dark_table={this.props.dark_tables} character_id={this.props.character_id} usable_items={this.state.usable_items} is_dead={this.props.is_dead} update_inventory={this.props.update_inventory} set_success_message={this.setSuccessMessage.bind(this)} is_automation_running={this.props.is_automation_running}/>
                 }

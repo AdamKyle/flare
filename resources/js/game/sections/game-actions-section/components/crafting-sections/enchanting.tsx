@@ -67,6 +67,20 @@ export default class Enchanting extends React.Component<any, any> {
                                 selected_item: result.data.character_inventory[newIndex].slot_id
                             });
                         }
+                    } else {
+                        let indexOfNonEnchantedItem = result.data.character_inventory.findIndex((inventory: any) => {
+                            return inventory.attached_affixes_count === 0
+                        });
+
+                        if (indexOfNonEnchantedItem === -1) {
+                            indexOfNonEnchantedItem = 0;
+                        }
+
+                        if (result.data.character_inventory.length > 0) {
+                            this.setState({
+                                selected_item: result.data.character_inventory[indexOfNonEnchantedItem].slot_id
+                            });
+                        }
                     }
                 });
             }, (error: AxiosError) => {

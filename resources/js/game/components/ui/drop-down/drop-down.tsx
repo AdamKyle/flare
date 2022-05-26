@@ -29,6 +29,7 @@ export default class DropDown extends React.Component<DropDownProps, any> {
                                 'px-2': menuItem.hasOwnProperty('icon_class')
                             })}
                             onClick={() => menuItem.on_click(menuItem.name)}
+                            disabled={this.props.disabled}
                         >
                             {
                                 typeof menuItem.icon_class !== 'undefined' ?
@@ -49,7 +50,12 @@ export default class DropDown extends React.Component<DropDownProps, any> {
             <div className="my-4">
                 <Menu as="div" className="relative inline-block text-left">
                     <div>
-                        <Menu.Button className="inline-flex justify-center w-full px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-sm hover:bg-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
+                        <Menu.Button className="inline-flex justify-center w-full px-4 py-2 text-sm font-medium rounded-sm
+                        focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-200 dark:focus-visible:ring-white focus-visible:ring-opacity-75 hover:bg-blue-700
+                        hover:drop-shadow-md dark:text-white hover:text-gray-300 bg-blue-600 dark:bg-blue-700 text-white dark:hover:bg-blue-600
+                        dark:hover:text-white font-semibold py-2 px-4 rounded-sm drop-shadow-sm disabled:bg-blue-400 dark:disabled:bg-blue-400"
+                                     disabled={this.props.disabled}
+                        >
                             {this.props.button_title}
                             <i className="fas fa-chevron-down w-5 h-5 ml-2 -mr-1 text-white mt-1" aria-hidden="true"></i>
                         </Menu.Button>

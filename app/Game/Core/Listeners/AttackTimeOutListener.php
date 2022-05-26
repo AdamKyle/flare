@@ -6,6 +6,7 @@ use App\Flare\Builders\Character\ClassDetails\ClassBonuses;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Skill;
+use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Core\Events\AttackTimeOutEvent;
 use App\Game\Core\Events\ShowTimeOutEvent;
 use App\Game\Core\Jobs\AttackTimeOutJob;
@@ -43,7 +44,9 @@ class AttackTimeOutListener
             'can_attack_again_at' => now()->addSeconds($time),
         ]);
 
-        broadcast(new ShowTimeOutEvent($event->character->user, $time));
+        event(new UpdateCharacterStatus($event->character));
+
+        event(new ShowTimeOutEvent($event->character->user, $time));
 
         AttackTimeOutJob::dispatch($event->character)->delay(now()->addSeconds($time));
     }

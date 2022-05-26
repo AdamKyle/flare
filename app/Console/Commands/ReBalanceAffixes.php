@@ -10,6 +10,7 @@ use App\Flare\Models\SetSlot;
 use App\Flare\Values\RandomAffixDetails;
 use App\Game\Core\Services\ReRollEnchantmentService;
 use Illuminate\Console\Command;
+use Illuminate\Database\Eloquent\Collection;
 
 class ReBalanceAffixes extends Command
 {
@@ -190,10 +191,16 @@ class ReBalanceAffixes extends Command
     }
 
     public function reBalanceIntRequired() {
-        $affixes = ItemAffix::where('randomly_generated', false)->orderBy('int_required', 'asc')->get();
+        $prefixes = ItemAffix::where('randomly_generated', false)->where('type', 'prefix')->orderBy('skill_level_required', 'asc')->get();
+        $suffixes = ItemAffix::where('randomly_generated', false)->where('type', 'suffix')->orderBy('skill_level_required', 'asc')->get();
 
+        $this->rebalanceInt($prefixes);
+        $this->rebalanceInt($suffixes);
+    }
+
+    protected function rebalanceInt(Collection $affixes) {
         $min = 5;
-        $max = 5000;
+        $max = 1000;
 
         $increments = round($max / $affixes->count());
 

@@ -4,6 +4,7 @@ namespace App\Game\GuideQuests\Services;
 
 use App\Flare\Builders\RandomItemDropBuilder;
 use App\Flare\Models\Character;
+use App\Flare\Models\GameMap;
 use App\Flare\Models\GuideQuest;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
@@ -80,21 +81,41 @@ class GuideQuestService {
             return false;
         }
 
+        $canHandIn = false;
+
         if (!is_null($quest->required_level)) {
-            return $character->level >= $quest->required_level;
+            $canHandIn = $character->level >= $quest->required_level;
         }
 
         if ($quest->required_skill !== null) {
-            return $character->skills()->where('game_skill_id', $quest->required_skill)->first()->level >= $quest->required_skill_level;
+            $canHandIn = $character->skills()->where('game_skill_id', $quest->required_skill)->first()->level >= $quest->required_skill_level;
         }
 
         if (!is_null($quest->required_faction_id)) {
-            $faction = $character->factions()->find($quest->required_faction_id);
+            $faction = $character->factions()->where('game_map_id', $quest->required_faction_id)->first();
 
-            return $faction->current_level >= $quest->required_faction_level;
+            $canHandIn = $faction->current_level >= $quest->required_faction_level;
         }
 
-        return false;
+        if (!is_null($quest->required_game_map_id)) {
+            $gameMap = GameMap::find($quest->required_game_map_id);
+
+            $canHandIn = $character->inventory->slots->filter(function($slot) use($gameMap) {
+                return $slot->item->type === 'quest' && $slot->item->id === $gameMap->map_required_item->id;
+            })->isNotEmpty();
+        }
+
+        if (!is_null($quest->required_quest_id)) {
+            $canHandIn = !is_null($character->questsCompleted()->where('quest_id', $quest->id)->first());
+        }
+
+        if (!is_null($quest->required_quest_item_id)) {
+            $canHandIn = $character->inventory->slots->filter(function($slot) use($quest) {
+                return $slot->item->type === 'quest' && $slot->item->id === $quest->required_quest_item_id;
+            })->isNotEmpty();
+        }
+
+        return $canHandIn;
     }
 
     protected function rewardItem(Character $character): Character {

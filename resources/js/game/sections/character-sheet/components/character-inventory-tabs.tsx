@@ -62,13 +62,15 @@ export default class CharacterInventoryTabs extends React.Component<CharacterInv
 
         // @ts-ignore
         this.updateInventoryListener.listen('Game.Core.Events.CharacterInventoryUpdateBroadCastEvent', (event: any) => {
-            const inventoryState = JSON.parse(JSON.stringify(this.state.inventory));
+            if (this.state.inventory !== null) {
+                const inventoryState = JSON.parse(JSON.stringify(this.state.inventory));
 
-            inventoryState.inventory = event.inventory;
+                inventoryState.inventory = event.inventory;
 
-            this.setState({
-                inventory: inventoryState
-            });
+                this.setState({
+                    inventory: inventoryState
+                });
+            }
         });
     }
 
@@ -100,7 +102,7 @@ export default class CharacterInventoryTabs extends React.Component<CharacterInv
         return (
             <Tabs tabs={this.tabs} full_width={true}>
                 <TabPanel key={'inventory'}>
-                    <InventoryTabSection dark_tables={this.state.dark_tables} character_id={this.props.character_id} inventory={this.state.inventory.inventory} usable_items={this.state.inventory.usable_items} is_dead={this.props.is_dead} update_inventory={this.updateInventory.bind(this)} usable_sets={this.state.inventory.usable_sets} is_automation_running={this.props.is_automation_running}/>
+                    <InventoryTabSection dark_tables={this.state.dark_tables} character_id={this.props.character_id} inventory={this.state.inventory.inventory} usable_items={this.state.inventory.usable_items} is_dead={this.props.is_dead} update_inventory={this.updateInventory.bind(this)} usable_sets={this.state.inventory.usable_sets} is_automation_running={this.props.is_automation_running} user_id={this.props.user_id}/>
                 </TabPanel>
                 <TabPanel key={'equipped'}>
                     <EquippedTable dark_tables={this.state.dark_tables} equipped_items={this.state.inventory.equipped} is_dead={this.props.is_dead} sets={this.state.inventory.sets} character_id={this.props.character_id} is_set_equipped={this.state.inventory.set_is_equipped} update_inventory={this.updateInventory.bind(this)} is_automation_running={this.props.is_automation_running}/>

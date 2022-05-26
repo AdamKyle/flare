@@ -81,9 +81,15 @@ export default class ExplorationSection extends React.Component<any, any> {
         return [{
             label: '1 Hour(s)',
             value: 1,
-        }, {
+        },{
+            label: '2 Hour(s)',
+            value: 2,
+        },{
             label: '4 Hour(s)',
             value: 4,
+        },{
+            label: '6 Hour(s)',
+            value: 6,
         },{
             label: '8 Hour(s)',
             value: 8,
@@ -196,6 +202,7 @@ export default class ExplorationSection extends React.Component<any, any> {
     }
 
     render() {
+        console.log(this.props.character.can_attack);
         return(
             <Fragment>
                 {
@@ -269,7 +276,7 @@ export default class ExplorationSection extends React.Component<any, any> {
                             </div>
 
                             <div className={'lg:text-center md:ml-[-100px] mt-3 mb-3'}>
-                                <PrimaryButton button_label={'Explore'} on_click={this.startExploration.bind(this)} disabled={this.state.monster_selected === null || this.state.time_selected === null || this.state.attack_type === null || this.state.loading || this.props.character.is_dead} additional_css={'mr-2'}/>
+                                <PrimaryButton button_label={'Explore'} on_click={this.startExploration.bind(this)} disabled={this.state.monster_selected === null || this.state.time_selected === null || this.state.attack_type === null || this.state.loading || this.props.character.is_dead || !this.props.character.can_attack} additional_css={'mr-2'}/>
                                 <DangerButton button_label={'Close'} on_click={this.props.manage_exploration} disabled={this.state.loading} />
 
                                 {

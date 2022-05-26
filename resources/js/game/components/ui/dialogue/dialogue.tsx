@@ -55,36 +55,38 @@ export default class Dialogue extends React.Component<DialogueTypes, any> {
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <div className='flex flex-col h-screen justify-center items-center'>
-                            <div className={clsx("inline-block w-full p-6 my-8 text-left align-middle transition-all transform bg-white dark:bg-gray-700 drop-shadow-2xl rounded-md", {'max-w-7xl': this.props.large_modal && !this.props.medium_modal}, {'max-w-5xl': this.props.medium_modal}, {'max-w-3xl': !this.props.large_modal && !this.props.medium_modal})}>
-                                <Dialog.Title
-                                    as="span"
-                                    className="flex items-center text-lg font-medium leading-6 text-gray-700 dark:text-gray-500 relative mb-5 text-[16px] lg:text-xl"
-                                >
-                                    {this.props.title}
-                                    <button className='flex items-center absolute right-[20px] cursor-pointer hover:text-gray-800 dark:hover:text-gray-600' onClick={this.closeModal.bind(this)} disabled={this.props.primary_button_disabled}><i className="fas fa-times "></i></button>
-                                </Dialog.Title>
-                                <div className="mt-2">
+                            <div className="fixed inset-0 flex items-center justify-center p-4">
+                                <div className="flex min-h-full items-center justify-center">
+                                <div className={clsx("inline-block w-full p-6 my-8 text-left align-middle transition-all transform bg-white dark:bg-gray-700 drop-shadow-2xl rounded-md", {'max-w-7xl': this.props.large_modal && !this.props.medium_modal}, {'max-w-5xl': this.props.medium_modal}, {'max-w-3xl': !this.props.large_modal && !this.props.medium_modal})}>
+                                    <Dialog.Title
+                                        as="span"
+                                        className="flex items-center text-lg font-medium leading-6 text-gray-700 dark:text-gray-500 relative mb-5 text-[16px] lg:text-xl"
+                                    >
+                                        {this.props.title}
+                                        <button className='flex items-center absolute right-[20px] cursor-pointer hover:text-gray-800 dark:hover:text-gray-600' onClick={this.closeModal.bind(this)} disabled={this.props.primary_button_disabled}><i className="fas fa-times "></i></button>
+                                    </Dialog.Title>
+                                    <div className="mt-2">
+                                        <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                                        {this.props.children}
+                                    </div>
                                     <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                                    {this.props.children}
-                                </div>
-                                <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                                <div className="mt-4">
+                                    <div className="mt-4">
 
-                                    <DangerButton button_label={'Cancel'} on_click={this.closeModal.bind(this)} disabled={this.props.primary_button_disabled} />
+                                        <DangerButton button_label={'Cancel'} on_click={this.closeModal.bind(this)} disabled={this.props.primary_button_disabled} />
 
-                                    {
-                                        this.props.secondary_actions !== null ?
-                                            <PrimaryButton additional_css={'float-right'} button_label={this.props.secondary_actions.secondary_button_label} on_click={this.props.secondary_actions.handle_action} disabled={this.props.secondary_actions.secondary_button_disabled}/>
-                                        : null
-                                    }
-                                    {
-                                        typeof this.props.tertiary_actions !== 'undefined' && this.props.tertiary_actions !== null ?
-                                            <PrimaryButton additional_css={'mr-2 float-right'} button_label={this.props.tertiary_actions.tertiary_button_label} on_click={this.props.tertiary_actions.handle_action} disabled={this.props.tertiary_actions.tertiary_button_disabled} />
-                                        : null
-                                    }
+                                        {
+                                            this.props.secondary_actions !== null ?
+                                                <PrimaryButton additional_css={'float-right'} button_label={this.props.secondary_actions.secondary_button_label} on_click={this.props.secondary_actions.handle_action} disabled={this.props.secondary_actions.secondary_button_disabled}/>
+                                            : null
+                                        }
+                                        {
+                                            typeof this.props.tertiary_actions !== 'undefined' && this.props.tertiary_actions !== null ?
+                                                <PrimaryButton additional_css={'mr-2 float-right'} button_label={this.props.tertiary_actions.tertiary_button_label} on_click={this.props.tertiary_actions.handle_action} disabled={this.props.tertiary_actions.tertiary_button_disabled} />
+                                            : null
+                                        }
+                                    </div>
                                 </div>
-                            </div>
+                                </div>
                             </div>
                         </Transition.Child>
                     </div>

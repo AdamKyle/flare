@@ -140,7 +140,7 @@ export default class GuideQuest extends React.Component<any, any> {
                                     </div>
                                 </TabPanel>
                             </Tabs>
-                            <p className={'mt-4 mb-4'}>The Hand in button will become available when you meet the requirements.</p>
+                            <p className={'mt-4 mb-4'}>The Hand in button will become available when you meet the requirements. Unless exploration is running.</p>
                             {
                                 this.state.is_handing_in ?
                                     <LoadingProgressBar />

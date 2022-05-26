@@ -47,7 +47,7 @@ export default class Trinketry extends React.Component<any, any> {
     buildItems() {
         return this.state.craftable_items.map((item: any) => {
             return {
-                label: item.name + ' Gold Dust Cost: ' + formatNumber(item.gold_dust_cost) + ' Copper Coin Cost: ' + formatNumber(item.copper_coin_cost),
+                label: item.name + ', Gold Dust Cost: ' + formatNumber(item.gold_dust_cost) + ' Copper Coin Cost: ' + formatNumber(item.copper_coin_cost),
                 value: item.id,
             }
         })
@@ -59,7 +59,7 @@ export default class Trinketry extends React.Component<any, any> {
             const item = this.state.selected_item;
 
             return {
-                label: item.name + ' Gold Dust Cost: ' + formatNumber(item.gold_dust_cost) + ' Copper Coins Cost: ' + formatNumber(item.copper_coin_cost),
+                label: item.name + ', Gold Dust Cost: ' + formatNumber(item.gold_dust_cost) + ' Copper Coins Cost: ' + formatNumber(item.copper_coin_cost),
                 value: item.id,
             }
         }
