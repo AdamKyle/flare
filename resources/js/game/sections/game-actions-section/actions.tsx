@@ -172,14 +172,14 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
                                     <SuccessOutlineButton button_label={'Exploration'} on_click={this.manageExploration.bind(this)} additional_css={'w-1/2'} disabled={this.props.character.is_dead} />
                                 </div>
                                 {
-                                    this.props.celestial_id !== 0 ?
+                                    this.props.celestial_id !== 0 && !this.state.show_exploration ?
                                         <div className='mb-4'>
                                             <SuccessOutlineButton button_label={'Fight Celestial!'} on_click={this.manageFightCelestial.bind(this)} additional_css={'w-1/2'} disabled={this.props.character.is_dead || this.props.character.is_automation_running} />
                                         </div>
                                     : null
                                 }
                                 {
-                                    typeof this.state.duel_characters !== 'undefined' && this.state.duel_characters.length > 0 ?
+                                    typeof this.state.duel_characters !== 'undefined' && this.state.duel_characters.length > 0 && !this.state.show_exploration ?
                                         <div className='mb-4'>
                                             <SuccessOutlineButton button_label={'Duel!'} on_click={this.manageDuel.bind(this)} additional_css={'w-1/2'} disabled={this.props.character.is_dead || this.props.character.is_automation_running} />
                                         </div>
