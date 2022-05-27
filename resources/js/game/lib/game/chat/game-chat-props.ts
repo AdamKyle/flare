@@ -6,4 +6,5 @@ export default interface GameChatProps {
     is_admin: boolean;
     view_port: number;
     is_automation_running: boolean;
+    update_finished_loading?: () => void;
 }

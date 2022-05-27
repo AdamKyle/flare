@@ -49,9 +49,27 @@ export default class Chat extends React.Component<ChatComponentProps, ChatCompon
         });
     }
 
+    publicEntity(type: string) {
+        let teleport = false;
+
+        if (type.includes('/pct')) {
+            teleport = true;
+        }
+
+        this.setState({
+            message: '',
+        });
+
+        (new Ajax()).setRoute('public-entity').setParameters({
+            attempt_to_teleport: teleport,
+        }).doAjaxCall('post', (success: AxiosResponse) => {}, (error: AxiosError) => {});
+    }
+
     handleMessage() {
         if (this.state.message.includes('/m')) {
             this.sendPrivateMessage();
+        } else if (this.state.message.includes('/pct') || this.state.message.includes('/pc')) {
+            this.publicEntity(this.state.message);
         } else {
             this.sendPublicMessage();
         }

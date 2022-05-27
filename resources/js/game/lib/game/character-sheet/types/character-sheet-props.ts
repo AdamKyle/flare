@@ -4,4 +4,6 @@ export default interface CharacterSheetProps {
 
     character: CharacterType | null;
 
+    finished_loading: boolean;
+
 }

@@ -40,14 +40,16 @@ export default class CharacterSkillsTabs extends React.Component<CharacterSkillT
     componentDidMount() {
         watchForDarkModeSkillsChange(this);
 
-        (new Ajax()).setRoute('character/skills/' + this.props.character_id).doAjaxCall('get', (result: AxiosResponse) => {
-            this.setState({
-                skills: result.data,
-                loading: false,
+        if (this.props.finished_loading) {
+            (new Ajax()).setRoute('character/skills/' + this.props.character_id).doAjaxCall('get', (result: AxiosResponse) => {
+                this.setState({
+                    skills: result.data,
+                    loading: false,
+                });
+            }, (error: AxiosError) => {
+                console.log(error);
             });
-        }, (error: AxiosError) => {
-            console.log(error);
-        });
+        }
     }
 
     updateSkills(skills: any) {

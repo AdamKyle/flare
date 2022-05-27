@@ -65,8 +65,8 @@ class LocationService {
             'locations'              => $this->fetchLocationData($character),
             'can_move'               => $character->can_move,
             'can_move_again_at'      => $character->can_move_again_at,
-            'coordinates'             => $this->coordinatesCache->getFromCache(),
-            'celestials'             => $this->getCelestialEntityId($character),
+            'coordinates'            => $this->coordinatesCache->getFromCache(),
+            'celestial_id'           => $this->getCelestialEntityId($character),
             'can_settle_kingdom'     => $this->canSettle,
             'my_kingdoms'            => $this->getKingdoms($character),
             'npc_kingdoms'           => Kingdom::select('id', 'x_position', 'y_position', 'npc_owned', 'name')->whereNull('character_id')->where('game_map_id', $character->map->game_map_id)->where('npc_owned', true)->get(),
@@ -94,12 +94,18 @@ class LocationService {
     }
 
     protected function getCelestialEntityId(Character $character) {
-        return CelestialFight::with('monster')->join('monsters', function($join) use($character) {
+        $fight = CelestialFight::with('monster')->join('monsters', function($join) use($character) {
             $join->on('monsters.id', 'celestial_fights.monster_id')
                 ->where('x_position', $character->x_position)
                 ->where('y_position', $character->y_position)
                 ->where('monsters.game_map_id', $character->map->gameMap->id);
-        })->select('celestial_fights.id')->get();
+        })->select('celestial_fights.id')->first();
+
+        if (!is_null($fight)) {
+            return $fight->id;
+        }
+
+        return null;
     }
 
     /**

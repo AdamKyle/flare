@@ -2,6 +2,7 @@
 
 namespace App\Game\Maps\Events;
 
+use App\Game\Maps\Services\LocationService;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -28,11 +29,10 @@ class UpdateMapBroadcast implements ShouldBroadcastNow
     /**
      * Create a new event instance.
      *
-     * @param array $mapDetails
      * @param User $user
      */
-    public function __construct(array $mapDetails, User $user) {
-        $this->mapDetails = $mapDetails;
+    public function __construct(User $user) {
+        $this->mapDetails = resolve(LocationService::class)->getLocationData($user->character);
         $this->user       = $user;
     }
 

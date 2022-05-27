@@ -1,11 +1,11 @@
 import React, { Fragment } from 'react';
+import clsx from "clsx";
 import GameProps from './lib/game/types/game-props';
 import Tabs from './components/ui/tabs/tabs';
 import TabPanel from "./components/ui/tabs/tab-panel";
 import BasicCard from "./components/ui/cards/basic-card";
 import MapSection from "./sections/map/map-section";
 import GameState from "./lib/game/types/game-state";
-import WarningAlert from "./components/ui/alerts/simple-alerts/warning-alert";
 import CharacterTopSection from "./sections/character-top-section/character-top-section";
 import Quests from "./sections/components/quests/quests";
 import Actions from "./sections/game-actions-section/actions";
@@ -52,9 +52,11 @@ export default class Game extends React.Component<GameProps, GameState> {
             view_port: 0,
             character_status: null,
             loading: true,
+            finished_loading: false,
             character_currencies: undefined,
             secondary_loading_title: 'Fetching character sheet ...',
             percentage_loaded: 0,
+            celestial_id: 0,
             character: null,
             kingdoms: [],
             quests: null,
@@ -141,6 +143,17 @@ export default class Game extends React.Component<GameProps, GameState> {
         });
     }
 
+    updateCelestial(celestialId: number | null) {
+        this.setState({
+            celestial_id: celestialId !== null ? celestialId : 0,
+        });
+    }
+
+    updateFinishedLoading() {
+        this.setState({
+            finished_loading: true,
+        })
+    }
 
     renderLoading() {
         return  (
@@ -182,13 +195,28 @@ export default class Game extends React.Component<GameProps, GameState> {
                                 <BasicCard additionalClasses={'min-h-60'}>
                                     {
                                         this.state.view_port < 1600 ?
-                                            <SmallerActions character_id={this.props.characterId} character={this.state.character} character_statuses={this.state.character_status} currencies={this.state.character_currencies} />
+                                            <SmallerActions
+                                                character_id={this.props.characterId}
+                                                character={this.state.character}
+                                                character_statuses={this.state.character_status}
+                                                currencies={this.state.character_currencies}
+                                                celestial_id={this.state.celestial_id}
+                                                update_celestial={this.updateCelestial.bind(this)}
+                                            />
                                         :
-                                            <Actions character_id={this.props.characterId} character={this.state.character} character_statuses={this.state.character_status} />
+                                            <Actions
+                                                character_id={this.props.characterId}
+                                                character={this.state.character}
+                                                character_statuses={this.state.character_status}
+                                                celestial_id={this.state.celestial_id}
+                                                update_celestial={this.updateCelestial.bind(this)}
+                                            />
                                     }
                                 </BasicCard>
                             </div>
-                            <BasicCard additionalClasses={'hidden lg:block md:mt-0 lg:col-start-3 lg:col-end-3 max-h-[575px]'}>
+                            <BasicCard additionalClasses={clsx('hidden lg:block md:mt-0 lg:col-start-3 lg:col-end-3 max-h-[575px]', {
+                                'max-h-[614px]': this.state.character.is_dead
+                            })}>
                                 <MapSection
                                     user_id={this.props.userId}
                                     character_id={this.props.characterId}
@@ -197,12 +225,13 @@ export default class Game extends React.Component<GameProps, GameState> {
                                     is_dead={this.state.character.is_dead}
                                     is_automaton_running={this.state.character.is_automation_running}
                                     automation_completed_at={this.state.character.automation_completed_at}
+                                    show_celestial_fight_button={this.updateCelestial.bind(this)}
                                 />
                             </BasicCard>
                         </div>
                     </TabPanel>
                     <TabPanel key={'character-sheet'}>
-                        <CharacterSheet character={this.state.character} />
+                        <CharacterSheet character={this.state.character} finished_loading={this.state.finished_loading} />
                     </TabPanel>
                     <TabPanel key={'quests'}>
                         <BasicCard>
@@ -223,6 +252,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                           is_automation_running={this.state.character.is_automation_running}
                           is_admin={false}
                           view_port={this.state.view_port}
+                          update_finished_loading={this.updateFinishedLoading.bind(this)}
                 />
 
                 {

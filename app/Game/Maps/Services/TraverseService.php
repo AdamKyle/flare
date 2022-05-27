@@ -350,7 +350,7 @@ class TraverseService {
      * @param Character $character
      */
     protected function updateMap(Character $character) {
-        broadcast(new UpdateMapBroadcast($this->locationService->getLocationData($character->refresh()), $character->user));
+        event(new UpdateMapBroadcast($character->user, $this->locationService->getLocationData($character->refresh())));
     }
 
     /**
@@ -362,13 +362,13 @@ class TraverseService {
         $maps = GameMap::where('id', '=', $oldMap)->get();
 
         foreach ($maps as $map) {
-            broadcast(new UpdateGlobalCharacterCountBroadcast($map));
+            event(new UpdateGlobalCharacterCountBroadcast($map));
         }
 
         $maps = GameMap::where('id', '!=', $oldMap)->get();
 
         foreach ($maps as $map) {
-            broadcast(new UpdateGlobalCharacterCountBroadcast($map));
+            event(new UpdateGlobalCharacterCountBroadcast($map));
         }
     }
 }

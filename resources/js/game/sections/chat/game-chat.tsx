@@ -91,6 +91,10 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
 
             this.setState({
                 chat: [...this.state.chat, ...chats],
+            }, () => {
+                if (typeof this.props.update_finished_loading !== 'undefined') {
+                    this.props.update_finished_loading();
+                }
             });
         }, (error: AxiosError) => {
 

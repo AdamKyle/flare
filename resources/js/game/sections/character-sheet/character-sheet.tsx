@@ -43,7 +43,7 @@ export default class CharacterSheet extends React.Component<CharacterSheetProps,
 
                 <div className='flex flex-col lg:flex-row w-full gap-2'>
                     <BasicCard additionalClasses={'overflow-y-auto lg:w-1/2'}>
-                        <CharacterTabs character={this.props.character} />
+                        <CharacterTabs character={this.props.character} finished_loading={this.props.finished_loading} />
                     </BasicCard>
                     <BasicCard additionalClasses={'overflow-y-auto lg:w-1/2 md:max-h-[225px]'}>
                         <div className='grid lg:grid-cols-2 gap-2'>
@@ -86,10 +86,10 @@ export default class CharacterSheet extends React.Component<CharacterSheetProps,
                 </div>
                 <div className='flex flex-col lg:flex-row gap-2 w-full mt-2'>
                     <BasicCard additionalClasses={'overflow-y-auto lg:w-1/2 lg:h-fit'}>
-                        <CharacterSkillsTabs character_id={this.props.character.id} is_dead={this.props.character.is_dead} is_automation_running={this.props.character.is_automation_running}/>
+                        <CharacterSkillsTabs character_id={this.props.character.id} is_dead={this.props.character.is_dead} is_automation_running={this.props.character.is_automation_running} finished_loading={this.props.finished_loading}/>
                     </BasicCard>
                     <BasicCard additionalClasses={'overflow-y-auto lg:w-1/2 lg:h-fit'}>
-                        <CharacterInventoryTabs character_id={this.props.character.id} is_dead={this.props.character.is_dead} user_id={this.props.character.user_id} is_automation_running={this.props.character.is_automation_running}/>
+                        <CharacterInventoryTabs character_id={this.props.character.id} is_dead={this.props.character.is_dead} user_id={this.props.character.user_id} is_automation_running={this.props.character.is_automation_running} finished_loading={this.props.finished_loading}/>
                     </BasicCard>
                 </div>
             </div>

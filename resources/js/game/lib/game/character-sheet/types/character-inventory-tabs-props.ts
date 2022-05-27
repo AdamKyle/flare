@@ -7,4 +7,6 @@ export default interface CharacterInventoryTabsProps {
     user_id: number;
 
     is_automation_running: boolean;
+
+    finished_loading: boolean;
 }

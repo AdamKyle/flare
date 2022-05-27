@@ -4,4 +4,6 @@ export default interface CharacterSkillTabsProps {
     is_dead: boolean;
 
     is_automation_running: boolean;
+
+    finished_loading: boolean;
 }

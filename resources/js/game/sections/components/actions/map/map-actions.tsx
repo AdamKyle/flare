@@ -9,6 +9,7 @@ import ViewLocationDetailsModal from "../modals/view-location-details-modal";
 import SetSailModal from "../modals/set-sail-modal";
 import TraverseModal from "../modals/traverse-modal";
 import PurpleButton from "../../../../components/ui/buttons/purple-button";
+import Conjuration from "../modals/conjuration";
 
 export default class MapActions extends React.Component<MapActionsProps, MapActionsState> {
 
@@ -25,6 +26,7 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
             npc_kingdom_id: null,
             open_set_sail_modal: false,
             show_traverse: false,
+            show_conjuration: false,
         }
     }
 
@@ -231,6 +233,18 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
         });
     }
 
+    conjure() {
+        this.setState({
+            show_conjuration: true,
+        });
+    }
+
+    closeConjure() {
+        this.setState({
+            show_conjuration: false,
+        });
+    }
+
     renderViewDetailsButton() {
         if (this.state.location !== null || this.state.player_kingdom_id !== null || this.state.enemy_kingdom_id !== null || this.state.npc_kingdom_id !== null) {
             return <OrangeButton button_label={'View Location Details'} on_click={() => this.viewLocation()} disabled={this.props.is_dead} />;
@@ -263,7 +277,7 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                     <p className='mb-4'>Characters On Map: {this.props.players_on_map}</p>
                     <div className='flex items-center'>
                         {this.renderViewDetailsButton()}
-                        <PurpleButton button_label={'Conjure'} on_click={() => this.viewLocation()} disabled={this.state.is_movement_disabled || this.props.is_dead || this.props.is_automation_running} additional_css={'ml-2'}/>
+                        <PurpleButton button_label={'Conjure'} on_click={() => this.conjure()} disabled={this.state.is_movement_disabled || this.props.is_dead || this.props.is_automation_running} additional_css={'ml-2'}/>
                     </div>
                 </div>
                 <div className='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 hidden sm:block'></div>
@@ -310,7 +324,18 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                                        currencies={this.props.currencies}
                                        ports={this.props.ports}
                         />
-                        : null
+                    : null
+                }
+
+                {
+                    this.state.show_conjuration ?
+                        <Conjuration is_open={this.state.show_conjuration}
+                                     handle_close={this.closeConjure.bind(this)}
+                                     title={'Conjuration'}
+                                     currencie={this.props.currencies}
+                                     character_id={this.props.character_id}
+                        />
+                    : null
                 }
 
                 {

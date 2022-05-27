@@ -48,7 +48,7 @@ class BattleEventHandler {
 
         if (!is_null($characterInCelestialFight)) {
             $characterInCelestialFight->update([
-                'character_current_health' => $this->fetchStatFromCache($character, 'health'),
+                'character_current_health' => $character->getInformation()->buildHealth(),
             ]);
         }
 

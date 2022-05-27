@@ -87,6 +87,9 @@ class NpcServerMessageBuilder {
                 return '"Child! There is something you have to do, before you talk to me. Go do it!" (Open Plane Quests and find the quest you are trying to complete. Quests with lines connecting must be done in order).';
             case 'no_matching_command':
                 return '"Huh?! What do you want, child!?! I don\'t have all day for these games, child! Spit it out!" ' . $npc->real_name . ' Seems annoyed by you. Maybe you misspoke?';
+            case 'cant_afford_conjuring':
+                return '"Why do these poor people always come to me?"
+                ' . $npc->real_name . ' is not pleased with your lack of funds. try again when you can afford to be so brave.';
             default:
                 return '';
         }

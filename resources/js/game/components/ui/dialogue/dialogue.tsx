@@ -38,7 +38,7 @@ export default class Dialogue extends React.Component<DialogueTypes, any> {
                         >
                             <Dialog.Overlay className="fixed inset-0" />
                         </Transition.Child>
-                        
+
                         <Transition.Child
                             as={Fragment}
                             enter="ease-out duration-300"

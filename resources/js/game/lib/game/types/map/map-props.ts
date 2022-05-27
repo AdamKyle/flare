@@ -18,4 +18,6 @@ export default interface MapProps {
     is_automaton_running: boolean;
 
     automation_completed_at: number;
+
+    show_celestial_fight_button: (id: number | null) => void;
 }

@@ -20,9 +20,9 @@ export default class CharacterFactions extends React.Component<any, any> {
     }
 
     componentDidMount() {
-        if (this.props.character_id !== null) {
-            watchForDarkModeTableChange(this);
+        watchForDarkModeTableChange(this);
 
+        if (this.props.character_id !== null && this.props.finished_loading) {
             (new Ajax()).setRoute('character-sheet/' + this.props.character_id + '/factions').doAjaxCall('get', (result: AxiosResponse) => {
                 this.setState({
                     loading: false,

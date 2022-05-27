@@ -24,6 +24,7 @@ use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Events\UpdateActionsBroadcast;
+use App\Game\Maps\Events\UpdateMapBroadcast;
 use App\Game\Maps\Events\UpdateMapDetailsBroadcast;
 use App\Game\Maps\Events\UpdateMonsterList;
 use App\Game\Maps\Services\Common\CanPlayerMassEmbezzle;
@@ -646,7 +647,7 @@ class MovementService {
 
         event(new UpdateCharacterStatus($character));
 
-        event(new UpdateMapDetailsBroadcast($character->map()->with('gameMap')->first(), $character->user, $this, false, $pctCommand));
+        event(new UpdateMapBroadcast($character->user, $this->locationService->getLocationData($character)));
     }
 
     /**

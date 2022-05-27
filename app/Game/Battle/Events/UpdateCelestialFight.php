@@ -21,14 +21,29 @@ class UpdateCelestialFight implements ShouldBroadcastNow {
     /**
      * Create a new event instance.
      *
-     * @param CelestialFight $celestialFight
-     * @param bool $closeCelestialFight
+     * @param array $logs
+     * @param string $characterName
+     * @param CelestialFight|null $celestialFight
      */
-    public function __construct(CelestialFight $celestialFight = null, bool $closeCelestialFight = false) {
+    public function __construct(array $logs, string $characterName, CelestialFight $celestialFight = null) {
         $this->data = [
-            'close_fight'            => $closeCelestialFight,
             'monster_current_health' => is_null($celestialFight) ? 0 : $celestialFight->current_health,
+            'celestial_fight_over'   => is_null($celestialFight),
         ];
+
+        if (is_null($celestialFight)) {
+            $this->data['who_killed'] = [
+                'message' => is_null($celestialFight) ? $characterName . ' has slaughtered the feral beast!' : '',
+                'type'    => 'enemy-action',
+            ];
+        }
+
+        if (!is_null($celestialFight)) {
+            $this->data['who_killed'] = [
+                'message' => 'Slippery bastard got away! ' . $characterName . ' was unable to kill the creature. Quick after it!',
+                'type'    => 'enemy-action',
+            ];
+        }
     }
 
     /**

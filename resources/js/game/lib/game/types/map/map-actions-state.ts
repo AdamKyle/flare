@@ -19,4 +19,6 @@ export default interface MapActionsState {
     show_location_details: boolean;
 
     show_traverse: boolean;
+
+    show_conjuration: boolean;
 }

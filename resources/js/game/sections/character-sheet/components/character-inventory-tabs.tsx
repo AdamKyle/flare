@@ -51,14 +51,16 @@ export default class CharacterInventoryTabs extends React.Component<CharacterInv
     componentDidMount() {
         watchForDarkModeInventoryChange(this);
 
-        (new Ajax()).setRoute('character/'+this.props.character_id+'/inventory').doAjaxCall('get', (result: AxiosResponse) => {
-            this.setState({
-                loading: false,
-                inventory: result.data,
-            });
-        }, (error: AxiosError) => {
-            console.log(error);
-        })
+        if (this.props.finished_loading) {
+            (new Ajax()).setRoute('character/'+this.props.character_id+'/inventory').doAjaxCall('get', (result: AxiosResponse) => {
+                this.setState({
+                    loading: false,
+                    inventory: result.data,
+                });
+            }, (error: AxiosError) => {
+                console.log(error);
+            })
+        }
 
         // @ts-ignore
         this.updateInventoryListener.listen('Game.Core.Events.CharacterInventoryUpdateBroadCastEvent', (event: any) => {

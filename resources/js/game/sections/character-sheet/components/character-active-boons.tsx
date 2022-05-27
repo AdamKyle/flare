@@ -24,8 +24,9 @@ export default class CharacterActiveBoons extends React.Component<any, any> {
     }
 
     componentDidMount() {
-        if (this.props.character_id !== null) {
-            watchForDarkModeTableChange(this);
+        watchForDarkModeTableChange(this);
+
+        if (this.props.finished_loading && this.props.character_id !== null) {
 
             (new Ajax()).setRoute('character-sheet/' + this.props.character_id + '/active-boons').doAjaxCall('get', (result: AxiosResponse) => {
                 this.setState({

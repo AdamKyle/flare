@@ -4,6 +4,7 @@ namespace App\Game\Battle\Services;
 
 use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\ServerFight\MonsterPlayerFight;
+use App\Game\Maps\Events\UpdateMapBroadcast;
 use Facades\App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\CelestialFight;
 use App\Flare\Models\Character;
@@ -21,7 +22,7 @@ class CelestialFightService {
 
     private BattleEventHandler $battleEventHandler;
 
-    private  CharacterCacheData $characterCacheData;
+    private CharacterCacheData $characterCacheData;
 
     private MonsterPlayerFight $monsterPlayerFight;
 
@@ -61,20 +62,27 @@ class CelestialFightService {
         $result = $this->monsterPlayerFight->setUpFight($character, [
             'attack_type' => $attackType,
             'selected_monster_id' => $celestialFight->monster_id
-        ])->fightMonster();
+        ])->fightMonster(true);
 
         if ($result) {
 
-            $this->handleMonsterDeath($character, $celestialFight, $characterInCelestialFight);
+            $characterHealth = $characterInCelestialFight->character_max_health;
+
+            $this->handleMonsterDeath($character, $celestialFight);
 
             return $this->successResult([
                 'logs' => $this->monsterPlayerFight->getBattleMessages(),
+                'health' => [
+                    'character_health' => $characterHealth,
+                    'monster_health'   => 0,
+                ]
             ]);
         }
 
         $characterHealth = $this->monsterPlayerFight->getCharacterHealth();
+        $characterHealth = $characterHealth <= 0 ? 0 : $characterHealth;
 
-        if ($characterHealth > 0) {
+        if ($characterHealth <= 0) {
             $this->battleEventHandler->processDeadCharacter($character);
         }
 
@@ -84,8 +92,17 @@ class CelestialFightService {
 
         $this->moveCelestial($character, $celestialFight);
 
+        $celestialFight            = $celestialFight->refresh();
+        $logs                      = $this->monsterPlayerFight->getBattleMessages();
+
+        event(new UpdateCelestialFight($logs, $character->name, $celestialFight));
+
         return $this->successResult([
-            'logs' => $this->monsterPlayerFight->getBattleMessages(),
+            'logs'      => $this->monsterPlayerFight->getBattleMessages(),
+            'health' => [
+                'character_health' => $characterHealth,
+                'monster_health'   => $celestialFight->current_health,
+            ]
         ]);
     }
 
@@ -99,22 +116,18 @@ class CelestialFightService {
             'fight' => [
                 'character' =>[
                     'max_health'     => $characterInCelestialFight->character_max_health,
-                    'current_health' => $characterInCelestialFight->character_max_health,
+                    'current_health' => $characterInCelestialFight->character_current_health,
                 ],
                 'monster' => [
                     'max_health'     => $celestialFight->max_health,
                     'current_health' => $celestialFight->current_health,
-                ]
+                ],
             ],
         ]);
     }
 
-    protected function handleMonsterDeath(Character $character, CelestialFight $celestialFight, CharacterInCelestialFight $characterInCelestialFight) {
-        event(new UpdateCelestialFight(null, true));
-
-        $celestialFight->delete();
-
-        $characterInCelestialFight->delete();
+    protected function handleMonsterDeath(Character $character, CelestialFight $celestialFight) {
+        event(new UpdateCelestialFight($this->monsterPlayerFight->getBattleMessages(), $character->name,null));
 
         event(new ServerMessageEvent($character->user, 'You received: ' . $celestialFight->monster->shards . ' shards! Shards can only be used in Alchemy.'));
 
@@ -123,6 +136,10 @@ class CelestialFightService {
         event(new GlobalMessageEvent($character->name . ' has slain the '.$celestialFight->monster->name.'! They have been rewarded with a godly gift!'));
 
         $this->characterCacheData->deleteCharacterSheet($character);
+
+        CharacterInCelestialFight::where('celestial_fight_id', $celestialFight->id)->delete();
+
+        $celestialFight->delete();
     }
 
     protected function updateCharacterInFight(Character $character, CharacterInCelestialFight $characterInCelestialFight) {
@@ -137,14 +154,12 @@ class CelestialFightService {
     }
 
     protected function moveCelestial(Character $character, CelestialFight $celestialFight) {
-        $monster              = $celestialFight->monster;
-        $healthRange          = explode('-', $monster->health_range);
-        $currentMonsterHealth = rand($healthRange[0], $healthRange[1]);
+        $monster = $celestialFight->monster;
 
         $celestialFight->update([
             'x_position'      => CoordinatesCache::getFromCache()['x'][rand(CoordinatesCache::getFromCache()['x'][0], (count(CoordinatesCache::getFromCache()['x']) - 1))],
             'y_position'      => CoordinatesCache::getFromCache()['y'][rand(CoordinatesCache::getFromCache()['y'][0], (count(CoordinatesCache::getFromCache()['y']) - 1))],
-            'current_health'  => $currentMonsterHealth,
+            'current_health'  => $celestialFight->current_health,
         ]);
 
         event(new GlobalMessageEvent($character->name . ' Has caused: ' . $monster->name . ' to flee to the far ends of Tlessa (use /pct or /pc to find the new coordinates).'));

@@ -47,7 +47,7 @@ class MonsterPlayerFight {
         $this->tookTooLong        = false;
     }
 
-    public function setUpFight(Character $character, array $params) {
+    public function setUpFight(Character $character, array $params): MonsterPlayerFight {
         $this->character = $character;
         $this->monster   = $this->fetchMonster($character->map->gameMap->name, $params['selected_monster_id']);
         $this->attackType = $params['attack_type'];
@@ -156,6 +156,23 @@ class MonsterPlayerFight {
     }
 
     protected function fetchMonster(string $mapName, int $monsterId): array {
+
+        $regularMonster = $this->fetchRegularMonster($mapName, $monsterId);
+
+        if (!is_null($regularMonster)) {
+            return $regularMonster;
+        }
+
+        $celestial = $this->fetchCelestial($mapName, $monsterId);
+
+        if (!is_null($celestial)) {
+            return $celestial;
+        }
+
+        return [];
+    }
+
+    protected function fetchRegularMonster(string $mapName, int $monsterId) {
         if (!Cache::has('monsters')) {
             resolve(BuildMonsterCacheService::class)->buildCache();
         }
@@ -168,7 +185,23 @@ class MonsterPlayerFight {
             }
         }
 
-        return [];
+        return null;
+    }
+
+    protected function fetchCelestial(string $mapName, int $monsterId) {
+        if (!Cache::has('celestials')) {
+            resolve(BuildMonsterCacheService::class)->buildCelesetialCache();
+        }
+
+        $monsters = Cache::get('celestials')[$mapName];
+
+        foreach ($monsters as $monster) {
+            if ($monster['id'] === $monsterId) {
+                return $monster;
+            }
+        }
+
+        return null;
     }
 
     protected function mergeMessages(array $messages) {

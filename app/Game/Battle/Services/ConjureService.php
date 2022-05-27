@@ -6,7 +6,10 @@ use App\Flare\Models\GameMap;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Transformers\CharacterTopBarTransformer;
 use App\Flare\Values\MapNameValue;
+use App\Game\Battle\Events\UpdateCelestialFight;
+use App\Game\Maps\Events\UpdateMapBroadcast;
 use App\Game\Maps\Events\UpdateMapDetailsBroadcast;
+use App\Game\Maps\Services\LocationService;
 use App\Game\Maps\Services\MovementService;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
@@ -132,12 +135,12 @@ class ConjureService {
         if ($type->isPrivate()) {
             event(new GlobalMessageEvent($monster->name . ' has been conjured to the ' . $plane . ' plane.'));
 
-            broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('location_of_conjure', $npc, $celestialFight), true));
+            broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('location_of_conjure', $npc, $celestialFight)));
         } else if ($type->isPublic()) {
             event(new GlobalMessageEvent( $monster->name . ' has been conjured to the ' . $plane . ' plane at (x/y): ' . $x . '/' . $y));
         }
 
-        event(new UpdateMapDetailsBroadcast($character->map, $character->user, resolve(MovementService::class)));
+        event(new UpdateMapBroadcast($character->user, resolve(LocationService::class)->getLocationData($character->refresh())));
 
         if ($damagedKingdom) {
             $this->damageKingdom($kingdom, $character, $this->getDamageAmount());
@@ -150,6 +153,23 @@ class ConjureService {
 
     public function getYPosition(): int {
         return CoordinatesCache::getFromCache()['y'][rand(CoordinatesCache::getFromCache()['y'][0], (count(CoordinatesCache::getFromCache()['y']) - 1))];
+    }
+
+    public function canConjure(Character $character, Npc $npc, string $type): bool {
+
+        if (CelestialFight::where('character_id', $character->id)->get()->isNotEmpty()) {
+            event(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('already_conjured', $npc)));
+
+            return false;
+        }
+
+        if ($type === 'public' && CelestialFight::where('type', CelestialConjureType::PUBLIC)->get()->isNotEmpty()) {
+            event(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('public_exists', $npc)));
+
+            return false;
+        }
+
+        return true;
     }
 
     public function canAfford(Monster $monster, Character $character) {

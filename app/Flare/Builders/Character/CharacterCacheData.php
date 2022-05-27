@@ -28,9 +28,10 @@ class CharacterCacheData {
 
     public function getCachedCharacterData(Character $character, string $key): mixed {
         if (Cache::has('character-sheet-' . $character->id)) {
-            $cache = Cache::get('character-sheet-' . $character->id);
+            $cache      = Cache::get('character-sheet-' . $character->id);
+            $cacheLevel = (int) str_replace(',', '', $cache['level']);
 
-            if ($character->level != $cache['level']) {
+            if ($cacheLevel != $character->level) {
                 $cache = $this->characterSheetCache($character);
             }
         } else {

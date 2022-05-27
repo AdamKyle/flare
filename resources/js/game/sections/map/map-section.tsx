@@ -96,6 +96,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
     }
 
     setStateFromData(data: any, callback?: () => void) {
+
         let state = {...MapStateManager.setState(data), ...{loading: false, map_id: data.character_map.game_map.id}};
 
         state.port_location = getPortLocation(state);
@@ -111,6 +112,8 @@ export default class MapSection extends React.Component<MapProps, MapState> {
 
         // @ts-ignore
         this.setState(state, () => {
+            this.props.show_celestial_fight_button(data.celestial_id)
+
             if (typeof callback !== 'undefined') {
                 return callback();
             }

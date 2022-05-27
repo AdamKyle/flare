@@ -33,7 +33,6 @@ class CelestialBattleController extends Controller {
 
     public function celestialMonsters(Character $character) {
         $celestialBeings = Monster::select('name', 'gold_cost', 'gold_dust_cost', 'id')
-                                  ->where('published', true)
                                   ->where('is_celestial_entity', true)
                                   ->where('game_map_id', $character->map->game_map_id)
                                   ->orderBy('max_level', 'asc')
@@ -45,17 +44,9 @@ class CelestialBattleController extends Controller {
     }
 
     public function conjure(ConjureRequest $request, Character $character) {
-        $npc     = Npc::where('type', NpcTypes::SUMMONER)->first();
+        $npc = Npc::where('type', NpcTypes::SUMMONER)->first();
 
-        if (CelestialFight::where('character_id', $character->id)->get()->isNotEmpty()) {
-            broadcast(new ServerMessageEvent($character->user, $this->npcServerMessage->build('already_conjured', $npc), true));
-
-            return response()->json([], 200);
-        }
-
-        if ($request->type === 'public' && CelestialFight::where('type', CelestialConjureType::PUBLIC)->get()->isNotEmpty()) {
-            broadcast(new ServerMessageEvent($character->user, $this->npcServerMessage->build('public_exists', $npc), true));
-
+        if (!$this->conjureService->canConjure($character, $npc, $request->type)) {
             return response()->json([], 200);
         }
 
@@ -66,7 +57,7 @@ class CelestialBattleController extends Controller {
 
             $this->conjureService->conjure($monster, $character, $request->type);
         } else {
-            broadcast(new ServerMessageEvent($character->user, $this->npcServerMessage->build('cant_afford_conjuring', $npc), true));
+            event(new ServerMessageEvent($character->user, $this->npcServerMessage->build('cant_afford_conjuring', $npc)));
 
             return response()->json([], 200);
         }
@@ -76,13 +67,13 @@ class CelestialBattleController extends Controller {
 
     public function fetchCelestialFight(Character $character, CelestialFight $celestialFight) {
         if ($character->is_dead) {
-            broadcast(new ServerMessageEvent($character->user, 'You are dead and cannot participate.'));
+            event(new ServerMessageEvent($character->user, 'You are dead and cannot participate.'));
 
             return response()->json([], 200);
         }
 
         if (!$character->can_adventure) {
-            broadcast(new ServerMessageEvent($character->user, 'You are adventuring and cannot participate.'));
+            event(new ServerMessageEvent($character->user, 'You are adventuring and cannot participate.'));
 
             return response()->json([], 200);
         }
@@ -98,7 +89,8 @@ class CelestialBattleController extends Controller {
                 'monster' => [
                     'max_health'     => $celestialFight->max_health,
                     'current_health' => $celestialFight->current_health,
-                ]
+                ],
+                'monster_name' =>$celestialFight->monster->name
             ],
         ], 200);
     }

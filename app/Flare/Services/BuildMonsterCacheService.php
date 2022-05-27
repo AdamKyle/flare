@@ -37,13 +37,69 @@ class BuildMonsterCacheService {
                 $this->monster
             );
 
+
             $monstersCache[$gameMap->name] = $this->manager->createData($monsters)->toArray();
         }
 
+        $monstersCache = $monstersCache + $this->manageMonsters($monstersCache);
+
+        Cache::put('monsters', $monstersCache);
+    }
+
+    public function buildCelesetialCache() {
+        $monstersCache = [];
+
+        Cache::delete('monsters');
+
+        foreach (GameMap::all() as $gameMap) {
+            $monsters =  new Collection(
+                Monster::where('is_celestial_entity', true)
+                    ->where('game_map_id', $gameMap->id)
+                    ->get(),
+                $this->monster
+            );
+
+            $monstersCache[$gameMap->name] = $this->manager->createData($monsters)->toArray();
+        }
+
+        Cache::put('celestials', $monstersCache);
+    }
+
+    public function fetchMonsterCache(string $planeName) {
+        $cache = Cache::get('monsters');
+
+        if (is_null($cache)) {
+            $this->buildCache();
+        }
+
+        return Cache::get('monsters')[$planeName];
+    }
+
+    public function fetchMonsterFromCache(string $planeName, string $monsterName) {
+        $cache = Cache::get('monsters');
+
+        if (is_null($cache)) {
+            $this->buildCache();
+        }
+
+        return collect(Cache::get('monsters')[$planeName])->where('name', $monsterName)->first();
+    }
+
+    public function fetchCelestialsFromCache(string $planeName, string $monsterName) {
+        $cache = Cache::get('celestials');
+
+        if (is_null($cache)) {
+            $this->buildCelesetialCache();
+        }
+
+        return collect(Cache::get('celestials')[$planeName])->where('name', $monsterName)->first();
+    }
+
+    protected function manageMonsters(array $monstersCache): array {
         foreach (Location::whereNotNull('enemy_strength_type')->get() as $location) {
             $monsters = Monster::where('is_celestial_entity', false)
-                      ->where('game_map_id', $location->game_map_id)
-                      ->get();
+                ->where('game_map_id', $location->game_map_id)
+                ->get();
 
             switch ($location->enemy_strength_type) {
                 case LocationEffectValue::INCREASE_STATS_BY_HUNDRED_THOUSAND:
@@ -70,27 +126,7 @@ class BuildMonsterCacheService {
             $monstersCache[$location->name] = $this->manager->createData($monsters)->toArray();
         }
 
-        Cache::put('monsters', $monstersCache);
-    }
-
-    public function fetchMonsterCache(string $planeName) {
-        $cache = Cache::get('monsters');
-
-        if (is_null($cache)) {
-            $this->buildCache();
-        }
-
-        return Cache::get('monsters')[$planeName];
-    }
-
-    public function fetchMonsterFromCache(string $planeName, string $monsterName) {
-        $cache = Cache::get('monsters');
-
-        if (is_null($cache)) {
-            $this->buildCache();
-        }
-
-        return collect(Cache::get('monsters')[$planeName])->where('name', $monsterName)->first();
+        return $monstersCache;
     }
 
     protected function transformMonsterForLocation(DBCollection $monsters, int $increaseStatsBy, float $increasePercentageBy): IlluminateCollection {

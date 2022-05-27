@@ -7,4 +7,6 @@ export default interface ActionsProps {
     character: CharacterType;
     character_statuses: CharacterStatusType | null;
     currencies?: CharacterCurrenciesType;
+    celestial_id: number;
+    update_celestial: (celestialId: number|null) => void
 }

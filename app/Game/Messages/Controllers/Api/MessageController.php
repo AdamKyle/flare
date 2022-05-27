@@ -202,6 +202,11 @@ class MessageController extends Controller {
     public function publicEntity(PublicEntityRequest $request, PctService $pctService) {
         $user = auth()->user();
 
+        if ($user->character->currentAutomations->isNotEmpty()) {
+            broadcast(new ServerMessageEvent($user, 'You are to preoccupied to do this. (You cannot be Exploring).'));
+            return response()->json([], 200);
+        }
+
         if (!$user->character->can_move || !$user->character->can_adventure || $user->character->is_dead) {
             broadcast(new ServerMessageEvent($user, 'You are to preoccupied to do this. (You must be able to move and cannot be dead).'));
             return response()->json([], 200);

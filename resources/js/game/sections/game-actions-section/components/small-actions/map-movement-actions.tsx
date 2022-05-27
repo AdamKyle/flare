@@ -186,8 +186,6 @@ export default class MapMovementActions extends React.Component<any, any> {
             state.npc_kingdom_id = foundNpcKingdom[0].id;
         }
 
-        console.log(state);
-
         if (state.location === null && state.player_kingdom_id === null && state.enemy_kingdom_id === null && state.npc_kingdom_id === null) {
             return;
         }

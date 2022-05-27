@@ -15,6 +15,8 @@ export default interface GameState {
 
     loading: boolean;
 
+    finished_loading: boolean;
+
     secondary_loading_title: string;
 
     percentage_loaded: number;
@@ -24,4 +26,6 @@ export default interface GameState {
     kingdoms: KingdomDetails[] | [];
 
     quests: QuestType | null;
+
+    celestial_id: number;
 }

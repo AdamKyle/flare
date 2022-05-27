@@ -71,7 +71,13 @@ export default class InfoTab extends React.Component<InfoTabProps, InfoTabState>
 
                 {
                     this.state.open_info ?
-                        <AdditionalInfoModal is_open={this.state.open_info} manage_modal={this.manageInfoDialogue.bind(this)} title={'Additional Information'} character={this.props.character}/>
+                        <AdditionalInfoModal
+                            is_open={this.state.open_info}
+                            manage_modal={this.manageInfoDialogue.bind(this)}
+                            title={'Additional Information'}
+                            character={this.props.character}
+                            finished_loading={true}
+                        />
                     : null
                 }
             </Fragment>

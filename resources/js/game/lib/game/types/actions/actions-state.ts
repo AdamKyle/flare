@@ -23,6 +23,8 @@ export default interface ActionsState {
 
     show_exploration?: boolean;
 
+    show_celestial_fight?: boolean;
+
     /**
      * These are for Smaller Actions Component.
      */

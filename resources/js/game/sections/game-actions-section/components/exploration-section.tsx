@@ -202,7 +202,6 @@ export default class ExplorationSection extends React.Component<any, any> {
     }
 
     render() {
-        console.log(this.props.character.can_attack);
         return(
             <Fragment>
                 {
