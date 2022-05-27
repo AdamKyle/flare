@@ -4,6 +4,7 @@ namespace App\Flare\ServerFight\Fight\CharacterAttacks;
 
 use App\Flare\Models\Character;
 use App\Flare\ServerFight\BattleBase;
+use App\Flare\ServerFight\BattleMessages;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\AlchemistsRavenousDream;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\DoubleAttack;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\DoubleCast;
@@ -12,7 +13,7 @@ use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\HammerSmash;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\TripleAttack;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\VampireThirst;
 
-class SpecialAttacks extends BattleBase {
+class SpecialAttacks extends BattleMessages {
 
     private int $characterHealth;
 
@@ -87,9 +88,9 @@ class SpecialAttacks extends BattleBase {
     public function hammerSmash(Character $character, array $attackData) {
         $hammerSmash = resolve(HammerSmash::class);
 
-        $hammerSmash->setCharacterHealth($this->characterHealth)
-                    ->setMonsterHealth($this->monsterHealth)
-                    ->handleHammerSmash($character, $attackData);
+        $hammerSmash->setCharacterHealth($this->characterHealth);
+        $hammerSmash->setMonsterHealth($this->monsterHealth);
+        $hammerSmash->handleHammerSmash($character, $attackData);
 
         $this->mergeMessages($hammerSmash->getMessages());
 
@@ -102,9 +103,9 @@ class SpecialAttacks extends BattleBase {
     public function alchemistsRavenousRage(Character $character, array $attackData) {
         $alchemistsRavenousDream = resolve(AlchemistsRavenousDream::class);
 
-        $alchemistsRavenousDream->setCharacterHealth($this->characterHealth)
-                                ->setMonsterHealth($this->monsterHealth)
-                                ->handleAttack($character, $attackData);
+        $alchemistsRavenousDream->setCharacterHealth($this->characterHealth);
+        $alchemistsRavenousDream->setMonsterHealth($this->monsterHealth);
+        $alchemistsRavenousDream->handleAttack($character, $attackData);
 
         $this->mergeMessages($alchemistsRavenousDream->getMessages());
 
@@ -117,9 +118,9 @@ class SpecialAttacks extends BattleBase {
     public function tripleAttack(Character $character, array $attackData) {
         $tripleAttack = resolve(TripleAttack::class);
 
-        $tripleAttack->setCharacterHealth($this->characterHealth)
-                      ->setMonsterHealth($this->monsterHealth)
-                      ->handleAttack($character, $attackData);
+        $tripleAttack->setCharacterHealth($this->characterHealth);
+        $tripleAttack->setMonsterHealth($this->monsterHealth);
+        $tripleAttack->handleAttack($character, $attackData);
 
         $this->mergeMessages($tripleAttack->getMessages());
 
@@ -132,9 +133,9 @@ class SpecialAttacks extends BattleBase {
     public function doubleDamage(Character $character, array $attackData) {
         $doubleAttack = resolve(DoubleAttack::class);
 
-        $doubleAttack->setCharacterHealth($this->characterHealth)
-                     ->setMonsterHealth($this->monsterHealth)
-                     ->handleAttack($character, $attackData);
+        $doubleAttack->setCharacterHealth($this->characterHealth);
+        $doubleAttack->setMonsterHealth($this->monsterHealth);
+        $doubleAttack->handleAttack($character, $attackData);
 
         $this->mergeMessages($doubleAttack->getMessages());
 
@@ -147,9 +148,9 @@ class SpecialAttacks extends BattleBase {
     public function doubleCast(Character $character, array $attackData) {
         $doubleCast = resolve(DoubleCast::class);
 
-        $doubleCast->setCharacterHealth($this->characterHealth)
-                   ->setMonsterHealth($this->monsterHealth)
-                   ->handleAttack($character, $attackData);
+        $doubleCast->setCharacterHealth($this->characterHealth);
+        $doubleCast->setMonsterHealth($this->monsterHealth);
+        $doubleCast->handleAttack($character, $attackData);
 
         $this->mergeMessages($doubleCast->getMessages());
 
@@ -162,8 +163,8 @@ class SpecialAttacks extends BattleBase {
     public function doubleHeal(Character $character, array $attackData) {
         $doubleCast = resolve(DoubleHeal::class);
 
-        $doubleCast->setCharacterHealth($this->characterHealth)
-                   ->handleHeal($character, $attackData);
+        $doubleCast->setCharacterHealth($this->characterHealth);
+        $doubleCast->handleHeal($character, $attackData);
 
         $this->mergeMessages($doubleCast->getMessages());
 
@@ -175,9 +176,9 @@ class SpecialAttacks extends BattleBase {
     public function vampireThirst(Character $character, array $attackData) {
         $thirst = resolve(VampireThirst::class);
 
-        $thirst->setCharacterHealth($this->characterHealth)
-               ->setMonsterHealth($this->monsterHealth)
-               ->handleAttack($character, $attackData);
+        $thirst->setCharacterHealth($this->characterHealth);
+        $thirst->setMonsterHealth($this->monsterHealth);
+        $thirst->handleAttack($character, $attackData);
 
         $this->mergeMessages($thirst->getMessages());
 

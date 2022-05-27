@@ -8,38 +8,6 @@ use App\Flare\ServerFight\BattleBase;
 
 class HammerSmash extends BattleBase {
 
-    private int $characterHealth;
-
-    private int $monsterHealth;
-
-    private CharacterCacheData $characterCacheData;
-
-    public function __construct(CharacterCacheData $characterCacheData) {
-        parent::__construct();
-
-        $this->characterCacheData = $characterCacheData;
-    }
-
-    public function setCharacterHealth(int $characterHealth): HammerSmash {
-        $this->characterHealth = $characterHealth;
-
-        return $this;
-    }
-
-    public function setMonsterHealth(int $monsterHealth): HammerSmash {
-        $this->monsterHealth = $monsterHealth;
-
-        return $this;
-    }
-
-    public function getCharacterHealth(): int {
-        return $this->characterHealth;
-    }
-
-    public function getMonsterHealth(): int {
-        return $this->monsterHealth;
-    }
-
     public function handleHammerSmash(Character $character, array $attackData) {
         $extraActionData = $this->characterCacheData->getCachedCharacterData($character, 'extra_action_chance');
 

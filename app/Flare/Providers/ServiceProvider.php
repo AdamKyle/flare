@@ -19,6 +19,7 @@ use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Middleware\IsCharacterLoggedInMiddleware;
 use App\Flare\Middleware\IsCharacterWhoTheySayTheyAreMiddleware;
 use App\Flare\Middleware\IsGloballyTimedOut;
+use App\Flare\ServerFight\BattleBase;
 use App\Flare\ServerFight\Fight\Affixes;
 use App\Flare\ServerFight\Fight\Ambush;
 use App\Flare\ServerFight\Fight\Attack;
@@ -45,6 +46,8 @@ use App\Flare\ServerFight\Fight\Voidance;
 use App\Flare\ServerFight\Monster\BuildMonster;
 use App\Flare\ServerFight\Monster\ServerMonster;
 use App\Flare\ServerFight\MonsterPlayerFight;
+use App\Flare\ServerFight\Pvp\PvpAttack;
+use App\Flare\ServerFight\Pvp\SetUpFight;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Services\CanUserEnterSiteService;
@@ -56,6 +59,7 @@ use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Transformers\InventoryTransformer;
 use App\Flare\Transformers\OtherKingdomTransformer;
 use App\Flare\Transformers\UsableItemTransformer;
+use App\Game\Battle\Services\PvpService;
 use App\Game\Core\Services\CharacterService;
 use App\Game\Kingdoms\Service\KingdomResourcesService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
@@ -444,7 +448,7 @@ class ServiceProvider extends ApplicationServiceProvider
             return new DoubleHeal($app->make(CharacterCacheData::class));
         });
 
-        $this->app->bind(VampireThirst::class, function($app) {
+        $this->app->bind(VampireThirst::class, function() {
             return new VampireThirst($app->make(CharacterCacheData::class));
         });
 
@@ -460,6 +464,17 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(CharacterDeletion::class, function($app) {
             return new CharacterDeletion($app->make(KingdomResourcesService::class));
+        });
+
+        $this->app->bind(SetUpFight::class, function($app) {
+            return new SetUpFight($app->make(CharacterCacheData::class));
+        });
+
+        $this->app->bind(PvpAttack::class, function($app) {
+            return new PvpAttack(
+                $app->make(CharacterCacheData::class),
+                $app->make(SetUpFight::class)
+            );
         });
     }
 
@@ -480,6 +495,5 @@ class ServiceProvider extends ApplicationServiceProvider
 
         // Blade Components - Cross System:
         Blade::component('item-display-color', ItemDisplayColor::class);
-        Blade::component('adventure-logs', AdventureLogs::class);
     }
 }

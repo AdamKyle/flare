@@ -13,15 +13,9 @@ use App\Flare\ServerFight\Monster\ServerMonster;
 
 class Defend extends BattleBase {
 
-    private int $monsterHealth;
-
-    private int $characterHealth;
-
     private array $attackData;
 
     private bool $isVoided;
-
-    private CharacterCacheData $characterCacheData;
 
     private Entrance $entrance;
 
@@ -32,25 +26,12 @@ class Defend extends BattleBase {
     private SpecialAttacks $specialAttacks;
 
     public function __construct(CharacterCacheData $characterCacheData, Entrance $entrance, CanHit $canHit, Affixes $affixes, SpecialAttacks $specialAttacks) {
-        parent::__construct();
+        parent::__construct($characterCacheData);
 
-        $this->characterCacheData = $characterCacheData;
         $this->entrance           = $entrance;
         $this->canHit             = $canHit;
         $this->affixes            = $affixes;
         $this->specialAttacks     = $specialAttacks;
-    }
-
-    public function setMonsterHealth(int $monsterHealth): Defend {
-        $this->monsterHealth = $monsterHealth;
-
-        return $this;
-    }
-
-    public function setCharacterHealth(int $characterHealth): Defend {
-        $this->characterHealth = $characterHealth;
-
-        return $this;
     }
 
     public function setCharacterAttackData(Character $character, bool $isVoided): Defend {
@@ -89,14 +70,6 @@ class Defend extends BattleBase {
     public function resetMessages() {
         $this->clearMessages();
         $this->entrance->clearMessages();
-    }
-
-    public function getMonsterHealth() {
-        return $this->monsterHealth;
-    }
-
-    public function getCharacterHealth() {
-        return $this->characterHealth;
     }
 
     protected function secondaryAttack(Character $character, ServerMonster $monster) {

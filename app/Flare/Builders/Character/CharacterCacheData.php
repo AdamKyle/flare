@@ -8,6 +8,7 @@ use Cache;
 use App\Flare\Models\Character;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
+use PHPUnit\Runner\Exception;
 
 class CharacterCacheData {
 
@@ -45,6 +46,25 @@ class CharacterCacheData {
         if (Cache::has('character-sheet-' . $character->id)) {
             return Cache::delete('character-sheet-' . $character->id);
         }
+    }
+
+    public function getCharacterSheetCache(Character $character): array {
+        if (Cache::has('character-sheet-' . $character->id)) {
+            return Cache::get('character-sheet-' . $character->id);
+        }
+
+        return $this->characterSheetCache($character);
+    }
+
+    public function updateCharacterSheetCache(Character $character, array $data) {
+        if (Cache::has('character-sheet-' . $character->id)) {
+            return Cache::put('character-sheet-' . $character->id, $data);
+        }
+
+        // If the cache doesn't exist, create it, set it.
+        $this->characterSheetCache($character);
+
+        $this->updateCharacterSheetCache($character, $data);
     }
 
     public function characterSheetCache(Character $character): array {

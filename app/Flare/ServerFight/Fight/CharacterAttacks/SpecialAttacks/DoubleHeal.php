@@ -9,29 +9,6 @@ use App\Flare\ServerFight\BattleBase;
 
 class DoubleHeal extends BattleBase {
 
-    private int $characterHealth;
-
-    private CharacterCacheData $characterCacheData;
-
-    public function __construct(CharacterCacheData $characterCacheData)
-    {
-        parent::__construct();
-
-        $this->characterCacheData = $characterCacheData;
-    }
-
-    public function setCharacterHealth(int $characterHealth): DoubleHeal
-    {
-        $this->characterHealth = $characterHealth;
-
-        return $this;
-    }
-
-    public function getCharacterHealth(): int
-    {
-        return $this->characterHealth;
-    }
-
     public function handleHeal(Character $character, array $attackData) {
         $extraActionData = $this->characterCacheData->getCachedCharacterData($character, 'extra_action_chance');
 

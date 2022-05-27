@@ -280,8 +280,10 @@ export default class ExplorationSection extends React.Component<any, any> {
 
                                 {
                                     this.state.loading ?
-                                        <LoadingProgressBar />
-                                        : null
+                                        <div className='w-1/2 ml-auto mr-auto'>
+                                            <LoadingProgressBar />
+                                        </div>
+                                    : null
                                 }
 
                                 <div className='relative top-[24px] italic'>

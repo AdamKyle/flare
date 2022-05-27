@@ -9,12 +9,8 @@ use App\Flare\ServerFight\Monster\ServerMonster;
 
 class Affixes extends BattleBase {
 
-    private CharacterCacheData $characterCacheData;
-
     public function __construct(CharacterCacheData $characterCacheData) {
-        parent::__construct();
-
-        $this->characterCacheData = $characterCacheData;
+        parent::__construct($characterCacheData);
     }
 
     public function getCharacterAffixDamage(Character $character, ServerMonster $monster, array $attackData): int {

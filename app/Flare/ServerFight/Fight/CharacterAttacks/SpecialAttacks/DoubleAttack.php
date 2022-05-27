@@ -9,43 +9,6 @@ use App\Flare\ServerFight\BattleBase;
 
 class DoubleAttack extends BattleBase {
 
-    private int $characterHealth;
-
-    private int $monsterHealth;
-
-    private CharacterCacheData $characterCacheData;
-
-    public function __construct(CharacterCacheData $characterCacheData)
-    {
-        parent::__construct();
-
-        $this->characterCacheData = $characterCacheData;
-    }
-
-    public function setCharacterHealth(int $characterHealth): DoubleAttack
-    {
-        $this->characterHealth = $characterHealth;
-
-        return $this;
-    }
-
-    public function setMonsterHealth(int $monsterHealth): DoubleAttack
-    {
-        $this->monsterHealth = $monsterHealth;
-
-        return $this;
-    }
-
-    public function getCharacterHealth(): int
-    {
-        return $this->characterHealth;
-    }
-
-    public function getMonsterHealth(): int
-    {
-        return $this->monsterHealth;
-    }
-
     public function handleAttack(Character $character, array $attackData) {
         $extraActionData = $this->characterCacheData->getCachedCharacterData($character, 'extra_action_chance');
 

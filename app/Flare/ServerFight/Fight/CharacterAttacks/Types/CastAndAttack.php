@@ -13,15 +13,9 @@ use App\Flare\ServerFight\Monster\ServerMonster;
 class CastAndAttack extends BattleBase
 {
 
-    private int $monsterHealth;
-
-    private int $characterHealth;
-
     private array $attackData;
 
     private bool $isVoided;
-
-    private CharacterCacheData $characterCacheData;
 
     private Entrance $entrance;
 
@@ -35,28 +29,13 @@ class CastAndAttack extends BattleBase
 
     public function __construct(CharacterCacheData $characterCacheData, Entrance $entrance, CanHit $canHit, Affixes $affixes, WeaponType $weaponType, CastType $castType)
     {
-        parent::__construct();
+        parent::__construct($characterCacheData);
 
-        $this->characterCacheData = $characterCacheData;
         $this->entrance           = $entrance;
         $this->canHit             = $canHit;
         $this->affixes            = $affixes;
         $this->weaponType         = $weaponType;
         $this->castType           = $castType;
-    }
-
-    public function setMonsterHealth(int $monsterHealth): CastAndAttack
-    {
-        $this->monsterHealth = $monsterHealth;
-
-        return $this;
-    }
-
-    public function setCharacterHealth(int $characterHealth): CastAndAttack
-    {
-        $this->characterHealth = $characterHealth;
-
-        return $this;
     }
 
     public function setCharacterAttackData(Character $character, bool $isVoided): CastAndAttack
@@ -72,16 +51,6 @@ class CastAndAttack extends BattleBase
     {
         $this->clearMessages();
         $this->entrance->clearMessages();
-    }
-
-    public function getMonsterHealth()
-    {
-        return $this->monsterHealth;
-    }
-
-    public function getCharacterHealth()
-    {
-        return $this->characterHealth;
     }
 
     public function handleAttack(Character $character, ServerMonster $monster) {
@@ -209,10 +178,10 @@ class CastAndAttack extends BattleBase
     protected function handleWeaponAttack(Character $character, ServerMonster $monster) {
         $weaponDamage = $this->attackData['weapon_damage'];
 
-        $this->weaponType->setMonsterHealth($this->monsterHealth)
-                         ->setCharacterHealth($this->characterHealth)
-                         ->setCharacterAttackData($character, $this->isVoided)
-                         ->weaponDamage($character, $monster, $weaponDamage);
+        $this->weaponType->setMonsterHealth($this->monsterHealth);
+        $this->weaponType->setCharacterHealth($this->characterHealth);
+        $this->weaponType->setCharacterAttackData($character, $this->isVoided);
+        $this->weaponType->weaponDamage($character, $monster->getName(), $weaponDamage);
 
         $this->mergeMessages($this->weaponType->getMessages());
 
@@ -225,10 +194,10 @@ class CastAndAttack extends BattleBase
     protected function handleCastAttack(Character $character, ServerMonster $monster) {
         $spellDamage = $this->attackData['spell_damage'];
 
-        $this->castType->setMonsterHealth($this->monsterHealth)
-                       ->setCharacterHealth($this->characterHealth)
-                       ->setCharacterAttackData($character, $this->isVoided)
-                       ->spellDamage($character, $monster, $spellDamage, $this->entrance->isEnemyEntranced());
+        $this->castType->setMonsterHealth($this->monsterHealth);
+        $this->castType->setCharacterHealth($this->characterHealth);
+        $this->castType->setCharacterAttackData($character, $this->isVoided);
+        $this->castType->spellDamage($character, $monster, $spellDamage, $this->entrance->isEnemyEntranced());
 
         $this->mergeMessages($this->castType->getMessages());
 

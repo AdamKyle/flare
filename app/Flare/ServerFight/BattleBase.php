@@ -2,31 +2,43 @@
 
 namespace App\Flare\ServerFight;
 
-class BattleBase {
+use App\Flare\Builders\Character\CharacterCacheData;
 
-    private array $battleMessages;
+class BattleBase extends BattleMessages {
 
-    public function __construct() {
-        $this->battleMessages = [];
+    protected int $characterHealth;
+
+    protected int $monsterHealth;
+
+    protected CharacterCacheData $characterCacheData;
+
+    public function __construct(CharacterCacheData $characterCacheData)
+    {
+        parent::__construct();
+
+        $this->characterCacheData = $characterCacheData;
     }
 
-    public function addMessage(string $message, string $type) {
-        $this->battleMessages[] = [
-            'message' => $message,
-            'type'    => $type,
-        ];
+    public function setCharacterHealth(int $characterHealth)
+    {
+        $this->characterHealth = $characterHealth;
     }
 
-    public function mergeMessages(array $messages) {
-        $this->battleMessages = [...$this->battleMessages, ...$messages];
+    public function setMonsterHealth(int $monsterHealth)
+    {
+        $this->monsterHealth = $monsterHealth;
     }
 
-    public function getMessages() {
-        return $this->battleMessages;
+    public function getCharacterHealth(): int
+    {
+        return $this->characterHealth;
     }
 
-    public function clearMessages() {
-        $this->battleMessages = [];
+    public function getMonsterHealth(): int
+    {
+        return $this->monsterHealth;
     }
+
+
 
 }

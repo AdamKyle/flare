@@ -10,13 +10,7 @@ use App\Flare\ServerFight\Monster\ServerMonster;
 
 class MonsterAttack extends BattleBase {
 
-    private int $characterHealth;
-
-    private int $monsterHealth;
-
     private bool $isVoided;
-
-    private CharacterCacheData $characterCacheData;
 
     private PlayerHealing $playerHealing;
 
@@ -26,38 +20,17 @@ class MonsterAttack extends BattleBase {
 
 
     public function __construct(CharacterCacheData $characterCacheData, PlayerHealing $playerHealing, Entrance $entrance, CanHit $canHit) {
-        parent::__construct();
+        parent::__construct($characterCacheData);
 
-        $this->characterCacheData = $characterCacheData;
         $this->entrance           = $entrance;
         $this->canHit             = $canHit;
         $this->playerHealing      = $playerHealing;
-    }
-
-    public function setCharacterHealth(int $characterHealth): MonsterAttack {
-        $this->characterHealth = $characterHealth;
-
-        return $this;
-    }
-
-    public function setMonsterHealth(int $monsterHealth): MonsterAttack {
-        $this->monsterHealth = $monsterHealth;
-
-        return $this;
     }
 
     public function setIsCharacterVoided(bool $isVoided): MonsterAttack {
         $this->isVoided = $isVoided;
 
         return $this;
-    }
-
-    public function getCharacterHealth() {
-        return $this->characterHealth;
-    }
-
-    public function getMonsterHealth() {
-        return $this->monsterHealth;
     }
 
     public function monsterAttack(ServerMonster $monster, Character $character, string $previousAttackType) {
@@ -71,9 +44,9 @@ class MonsterAttack extends BattleBase {
     protected function playerHealing(ServerMonster $monster, Character $character, string $previousAttackType) {
         $previousAttackType = $this->characterCacheData->getDataFromAttackCache($character, $previousAttackType);
 
-        $this->playerHealing->setMonsterHealth($this->monsterHealth)
-                            ->setCharacterHealth($this->characterHealth)
-                            ->healingPhase($character, $monster, $previousAttackType, $this->isVoided);
+        $this->playerHealing->setMonsterHealth($this->monsterHealth);
+        $this->playerHealing->setCharacterHealth($this->characterHealth);
+        $this->playerHealing->healingPhase($character, $monster, $previousAttackType, $this->isVoided);
 
         $this->characterHealth = $this->playerHealing->getCharacterHealth();
         $characterHealth       = $this->characterCacheData->getCachedCharacterData($character, 'health');

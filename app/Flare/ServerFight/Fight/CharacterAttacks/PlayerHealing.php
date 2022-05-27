@@ -10,39 +10,12 @@ use App\Flare\ServerFight\Monster\ServerMonster;
 
 class PlayerHealing extends BattleBase {
 
-    private CharacterCacheData $characterCacheData;
-
     private Affixes $affixes;
 
-    private int $characterHealth;
-
-    private int $monsterHealth;
-
     public function __construct(CharacterCacheData $characterCacheData, Affixes $affixes) {
-        parent::__construct();
+        parent::__construct($characterCacheData);
 
-        $this->characterCacheData = $characterCacheData;
-        $this->affixes            = $affixes;
-    }
-
-    public function setCharacterHealth(int $characterHealth): PlayerHealing {
-        $this->characterHealth = $characterHealth;
-
-        return $this;
-    }
-
-    public function setMonsterHealth(int $monsterHealth): PlayerHealing {
-        $this->monsterHealth = $monsterHealth;
-
-        return $this;
-    }
-
-    public function getMonsterHealth(): int {
-        return $this->monsterHealth;
-    }
-
-    public function getCharacterHealth(): int {
-        return $this->characterHealth;
+        $this->affixes = $affixes;
     }
 
     public function healingPhase(Character $character, ServerMonster $monster, array $attackType, bool $isVoided) {

@@ -6,10 +6,11 @@ use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
 use App\Flare\ServerFight\BattleBase;
+use App\Flare\ServerFight\BattleMessages;
 use App\Flare\ServerFight\Monster\ServerMonster;
 use App\Flare\Values\MapNameValue;
 
-class Voidance extends BattleBase {
+class Voidance extends BattleMessages {
 
     private bool $characterIsVoided;
 

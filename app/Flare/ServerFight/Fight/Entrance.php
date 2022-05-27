@@ -9,16 +9,13 @@ use App\Flare\ServerFight\Monster\ServerMonster;
 
 class Entrance extends BattleBase {
 
-    private CharacterCacheData $characterCacheData;
-
     private bool $isEnemyEntranced;
 
     private bool $isCharacterEntranced;
 
     public function __construct(CharacterCacheData $characterCacheData) {
-        parent::__construct();
+        parent::__construct($characterCacheData);
 
-        $this->characterCacheData   = $characterCacheData;
         $this->isEnemyEntranced     = false;
         $this->isCharacterEntranced = false;
     }

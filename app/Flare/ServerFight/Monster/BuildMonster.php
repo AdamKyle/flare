@@ -2,15 +2,13 @@
 
 namespace App\Flare\ServerFight\Monster;
 
-use App\Flare\ServerFight\BattleBase;
+use App\Flare\ServerFight\BattleMessages;
 
-class BuildMonster extends BattleBase {
+class BuildMonster extends BattleMessages {
 
     private ServerMonster $serverMonster;
 
     public function __construct(ServerMonster $serverMonster) {
-        parent::__construct();
-
         $this->serverMonster = $serverMonster;
     }
 
@@ -26,8 +24,6 @@ class BuildMonster extends BattleBase {
     }
 
     public function canMonsterHaveStatsReduced(array $monster, float $resistanceReduction, bool $canBeResisted): bool {
-        $resistanceReduction = $resistanceReduction;
-
         if ($canBeResisted) {
             return true;
         }

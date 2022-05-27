@@ -56,11 +56,11 @@ class Attack {
         return $this;
     }
 
-    public function mergeBattleMessages(array $messages) {
+    public function mergeBattleMessages(array $messages): void {
         $this->battleMessages = [...$this->battleMessages, ...$messages];
     }
 
-    public function resetBattleMessages() {
+    public function resetBattleMessages(): void {
         $this->battleMessages = [];
     }
 
@@ -72,11 +72,11 @@ class Attack {
         return $this->battleMessages;
     }
 
-    public function getCharacterHealth() {
+    public function getCharacterHealth(): int {
         return $this->characterHealth;
     }
 
-    public function getMonsterHealth() {
+    public function getMonsterHealth(): int {
         return $this->monsterHealth;
     }
 
@@ -124,10 +124,10 @@ class Attack {
         }
 
         if ($whoAttacks === 'monster') {
-            $this->monsterAttack->setIsCharacterVoided($this->isCharacterVoided)
-                                ->setCharacterHealth($this->characterHealth)
-                                ->setMonsterHealth($this->monsterHealth)
-                                ->monsterAttack($serverMonster, $character, $attackType);
+            $this->monsterAttack->setIsCharacterVoided($this->isCharacterVoided);
+            $this->monsterAttack->setCharacterHealth($this->characterHealth);
+            $this->monsterAttack->setMonsterHealth($this->monsterHealth);
+            $this->monsterAttack->monsterAttack($serverMonster, $character, $attackType);
 
             $this->mergeBattleMessages($this->monsterAttack->getMessages());
 

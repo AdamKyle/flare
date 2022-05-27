@@ -9,14 +9,10 @@ use App\Flare\ServerFight\Monster\ServerMonster;
 
 class Ambush extends BattleBase {
 
-    private CharacterCacheData $characterCacheData;
-
     private array $healthObject;
 
     public function __construct(CharacterCacheData $characterCacheData) {
-        parent::__construct();
-
-        $this->characterCacheData = $characterCacheData;
+        parent::__construct($characterCacheData);
     }
 
     public function handleAmbush(Character $character, ServerMonster $monster, bool $isCharacterVoided = false): Ambush {

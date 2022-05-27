@@ -6,6 +6,7 @@ use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Builders\RandomItemDropBuilder;
 use App\Flare\ServerFight\MonsterPlayerFight;
+use App\Flare\ServerFight\Pvp\PvpAttack;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Services\CharacterRewardService;
 use App\Flare\Transformers\CharacterAttackTransformer;
@@ -18,6 +19,7 @@ use App\Game\Battle\Jobs\BattleAttackHandler;
 use App\Game\Battle\Services\BattleDrop;
 use App\Game\Battle\Services\BattleRewardProcessing;
 use App\Game\Battle\Services\CelestialFightService;
+use App\Game\Battle\Services\PvpService;
 use App\Game\Core\Services\DropCheckService;
 use App\Game\Core\Services\GoldRush;
 use App\Game\Skills\Services\DisenchantService;
@@ -78,6 +80,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(CelestialFightService::class, function($app) {
             return new CelestialFightService($app->make(BattleEventHandler::class), $app->make(CharacterCacheData::class), $app->make(MonsterPlayerFight::class));
+        });
+
+        $this->app->bind(PvpService::class, function($app) {
+            return new PvpService($app->make(PvpAttack::class));
         });
 
         $this->commands([

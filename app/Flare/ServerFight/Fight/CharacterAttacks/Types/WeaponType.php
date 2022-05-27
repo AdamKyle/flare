@@ -13,15 +13,10 @@ use App\Flare\ServerFight\Monster\ServerMonster;
 
 class WeaponType extends BattleBase {
 
-    private int $monsterHealth;
-
-    private int $characterHealth;
-
     private array $attackData;
 
     private bool $isVoided;
 
-    private CharacterCacheData $characterCacheData;
 
     private Entrance $entrance;
 
@@ -32,25 +27,12 @@ class WeaponType extends BattleBase {
     private SpecialAttacks $specialAttacks;
 
     public function __construct(CharacterCacheData $characterCacheData, Entrance $entrance, CanHit $canHit, Affixes $affixes, SpecialAttacks $specialAttacks) {
-        parent::__construct();
+        parent::__construct($characterCacheData);
 
-        $this->characterCacheData = $characterCacheData;
         $this->entrance           = $entrance;
         $this->canHit             = $canHit;
         $this->affixes            = $affixes;
         $this->specialAttacks     = $specialAttacks;
-    }
-
-    public function setMonsterHealth(int $monsterHealth): WeaponType {
-        $this->monsterHealth = $monsterHealth;
-
-        return $this;
-    }
-
-    public function setCharacterHealth(int $characterHealth): WeaponType {
-        $this->characterHealth = $characterHealth;
-
-        return $this;
     }
 
     public function setCharacterAttackData(Character $character, bool $isVoided): WeaponType {
@@ -70,7 +52,7 @@ class WeaponType extends BattleBase {
         $weaponDamage = $this->attackData['weapon_damage'];
 
         if ($this->entrance->isEnemyEntranced()) {
-            $this->weaponAttack($character, $serverMonster, $weaponDamage);
+            $this->weaponAttack($character, $serverMonster->getName(), $weaponDamage);
 
             return $this;
         }
@@ -78,7 +60,7 @@ class WeaponType extends BattleBase {
         if ($this->canHit->canPlayerAutoHit($character)) {
             $this->addMessage('You dance along in the shadows, the enemy doesn\'t see you. Strike now!', 'regular');
 
-            $this->weaponAttack($character, $serverMonster, $weaponDamage);
+            $this->weaponAttack($character, $serverMonster->getName(), $weaponDamage);
 
             return $this;
         }
@@ -88,7 +70,7 @@ class WeaponType extends BattleBase {
             if ($serverMonster->getMonsterStat('ac') > $weaponDamage) {
                 $this->addMessage('Your weapon was blocked!', 'enemy-action');
             } else {
-                $this->weaponAttack($character, $serverMonster, $weaponDamage);
+                $this->weaponAttack($character, $serverMonster->getName(), $weaponDamage);
             }
         } else {
             $this->addMessage('Your attack missed!', 'enemy-action');
@@ -102,14 +84,6 @@ class WeaponType extends BattleBase {
     public function resetMessages() {
         $this->clearMessages();
         $this->entrance->clearMessages();
-    }
-
-    public function getMonsterHealth() {
-        return $this->monsterHealth;
-    }
-
-    public function getCharacterHealth() {
-        return $this->characterHealth;
     }
 
     public function weaponAttack(Character $character, ServerMonster $monster, int $weaponDamage) {
@@ -164,7 +138,7 @@ class WeaponType extends BattleBase {
         $this->affixes->clearMessages();
     }
 
-    public function weaponDamage(Character $character, ServerMonster $monster, int $weaponDamage) {
+    public function weaponDamage(Character $character, string $monsterName, int $weaponDamage) {
         $criticality = $this->characterCacheData->getCachedCharacterData($character, 'skills')['criticality'];
 
         if (rand(1, 100) > (100 - 100 * $criticality)) {
@@ -177,7 +151,7 @@ class WeaponType extends BattleBase {
 
         $this->monsterHealth -= $totalDamage;
 
-        $this->addMessage('Your weapon hits ' . $monster->getName() . ' for: ' . number_format($totalDamage), 'player-action');
+        $this->addMessage('Your weapon hits ' . $monsterName . ' for: ' . number_format($totalDamage), 'player-action');
 
         $this->specialAttacks->setCharacterHealth($this->characterHealth)
                              ->setMonsterHealth($this->monsterHealth)
