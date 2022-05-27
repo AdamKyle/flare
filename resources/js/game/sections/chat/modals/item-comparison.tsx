@@ -12,7 +12,6 @@ import ComparisonSection
 import {
     watchForChatDarkModeComparisonChange,
 } from "../../../lib/game/dark-mode-watcher";
-import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
 
 export default class ItemComparison extends React.Component<any, any> {
 
@@ -35,6 +34,7 @@ export default class ItemComparison extends React.Component<any, any> {
         (new Ajax()).setRoute('character/'+this.props.character_id+'/inventory/comparison-from-chat').setParameters({
             slot_id: this.props.slot_id,
         }).doAjaxCall('get', (result: AxiosResponse) => {
+            console.log(result.data);
             this.setState({
                 loading: false,
                 comparison_details: result.data.comparison_data,
@@ -93,7 +93,7 @@ export default class ItemComparison extends React.Component<any, any> {
     }
 
 
-    isGridSize(size: number, itemToEquip: InventoryComparisonAdjustment) {
+    isGridSize(size: number, itemToEquip: InventoryComparisonAdjustment): boolean {
         switch(size) {
             case 4 :
                 return itemToEquip.affix_count === 0 && itemToEquip.holy_stacks_applied === 0 && !itemToEquip.is_unique
@@ -150,7 +150,6 @@ export default class ItemComparison extends React.Component<any, any> {
                                         dark_charts={this.state.dark_charts}
                                         usable_sets={this.state.usable_sets}
                                         slot_id={this.props.slot_id}
-                                        view_port={this.props.view_port}
                                         is_automation_running={this.props.is_automation_running}
                                     />
                             }

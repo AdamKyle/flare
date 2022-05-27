@@ -359,7 +359,8 @@ class CharacterInventoryController extends Controller {
                     'inventory' => $characterInventoryService->fetchCharacterInventory(),
                     'equipped'  => $characterInventoryService->fetchEquipped(),
                     'sets'      => $characterInventoryService->getCharacterInventorySets(),
-                ]
+                ],
+                'message'       => 'Equipped item.'
             ]);
 
         } catch(EquipItemException $e) {

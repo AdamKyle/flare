@@ -1,30 +1,9 @@
 import InventoryComparisonAdjustment from "./inventory-comparison-adjustment";
+import ComparisonDetails from "../inventory/comparison-details";
 
 export default interface InventoryItemComparisonState {
 
-    comparison_details: {
-        characterId: number;
-
-        bowEquipped: boolean;
-
-        hammerEquipped: boolean;
-
-        setEquipped: boolean;
-
-        setIndex: number;
-
-        slotId: number;
-
-        slotPosition: string | null;
-
-        staveEquipped: boolean;
-
-        type: string;
-
-        itemToEquip: InventoryComparisonAdjustment;
-
-        details: InventoryComparisonAdjustment[] | [];
-    } | null;
+    comparison_details: ComparisonDetails | null;
 
     show_equip_modal: boolean;
 
