@@ -286,7 +286,7 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                     <PrimaryButton disabled={this.state.is_movement_disabled || this.props.is_dead} button_label={'South'} on_click={() => this.move('south')} />
                     <PrimaryButton disabled={this.state.is_movement_disabled || this.props.is_dead} button_label={'West'} on_click={() => this.move('west')} />
                     <PrimaryButton disabled={this.state.is_movement_disabled || this.props.is_dead} button_label={'East'} on_click={() => this.move('east')} />
-                    <PrimaryButton disabled={this.state.is_movement_disabled || this.props.is_dead} button_label={'Traverse'} on_click={() => this.traverse()} />
+                    <PrimaryButton disabled={this.state.is_movement_disabled || this.props.is_dead || this.props.is_automation_running} button_label={'Traverse'} on_click={() => this.traverse()} />
                 </div>
 
                 {

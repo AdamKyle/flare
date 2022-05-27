@@ -19,13 +19,11 @@ use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\NpcTypes;
 use App\Game\Battle\Services\ConjureService;
-use App\Game\Core\Events\UpdateAttackStats;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Maps\Events\MoveTimeOutEvent;
-use App\Game\Maps\Events\UpdateActionsBroadcast;
 use App\Game\Maps\Events\UpdateMapBroadcast;
-use App\Game\Maps\Events\UpdateMapDetailsBroadcast;
+use App\Game\Maps\Events\UpdateDuelAtPosition;
 use App\Game\Maps\Events\UpdateMonsterList;
 use App\Game\Maps\Services\Common\CanPlayerMassEmbezzle;
 use App\Game\Maps\Services\Common\LiveCharacterCount;
@@ -609,6 +607,8 @@ class MovementService {
 
         $this->updateCharacterMovementTimeOut($character);
 
+        // event(new UpdateDuelAtPosition($character->user));
+
         return $this->successResult($this->locationService->getLocationData($character));
     }
 
@@ -647,7 +647,7 @@ class MovementService {
 
         event(new UpdateCharacterStatus($character));
 
-        event(new UpdateMapBroadcast($character->user, $this->locationService->getLocationData($character)));
+        event(new UpdateMapBroadcast($character->user));
     }
 
     /**

@@ -20,6 +20,11 @@ Broadcast::channel('update-map-plane-{userId}', function($user, $userId) {
    return $user->id === (int) $userId;
 });
 
+// When player moves and the duel button should update.
+broadCast::channel('update-duel', function($user) {
+    return $user;
+});
+
 // When the plane count of characters changes.
 Broadcast::channel('global-character-count-plane', function($user) {
     return $user;
@@ -38,5 +43,4 @@ Broadcast::channel('npc-kingdoms-update', function($user) {
 // When a enemy kingdoms morale gets updated.
 broadCast::channel('enemy-kingdom-morale-update', function($user) {
     return $user;
-
 });

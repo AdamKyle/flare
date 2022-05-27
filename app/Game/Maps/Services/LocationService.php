@@ -2,8 +2,10 @@
 
 namespace App\Game\Maps\Services;
 
+use App\Flare\Models\Map;
 use App\Flare\Values\LocationEffectValue;
 use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Game\Maps\Events\UpdateDuelAtPosition;
 use Illuminate\Support\Collection;
 use Storage;
 use League\Fractal\Manager;
@@ -58,6 +60,9 @@ class LocationService {
 
         // In case automation is running, this way the timer updates.
         event(new UpdateCharacterStatus($character));
+
+        // Update duel positions.
+        event(new UpdateDuelAtPosition($character->user));
 
         return [
             'map_url'                => Storage::disk('maps')->url($character->map_url),

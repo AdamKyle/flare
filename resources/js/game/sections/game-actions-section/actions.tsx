@@ -19,6 +19,8 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
 
     private actionsManager: ActionsManager;
 
+    private duelOptions: any;
+
     private monsterUpdate: any;
 
     constructor(props: ActionsProps) {
@@ -36,6 +38,7 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
             crafting_type: null,
             show_exploration: false,
             show_celestial_fight: false,
+            duel_characters: [],
         }
 
         // @ts-ignore
@@ -46,6 +49,9 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
 
         // @ts-ignore
         this.monsterUpdate = Echo.private('update-monsters-list-' + this.props.character.user_id);
+
+        // @ts-ignore
+        this.duelOptions = Echo.join('update-duel');
 
         this.actionsManager = new ActionsManager(this);
     }
@@ -74,6 +80,13 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
                monsters: event.monsters,
                monster_to_fight: null,
            })
+        });
+
+        // @ts-ignore
+        this.duelOptions.listen('Game.Maps.Events.UpdateDuelAtPosition', (event: any) => {
+            this.setState({
+                duel_characters: event.characters,
+            });
         });
     }
 
@@ -137,6 +150,10 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
         return this.actionsManager.cannotCraft();
     }
 
+    manageDuel() {
+
+    }
+
     render() {
         return (
             <div className='lg:px-4'>
@@ -160,6 +177,13 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
                                             <SuccessOutlineButton button_label={'Fight Celestial!'} on_click={this.manageFightCelestial.bind(this)} additional_css={'w-1/2'} disabled={this.props.character.is_dead || this.props.character.is_automation_running} />
                                         </div>
                                     : null
+                                }
+                                {
+                                    typeof this.state.duel_characters !== 'undefined' && this.state.duel_characters.length > 0 ?
+                                        <div className='mb-4'>
+                                            <SuccessOutlineButton button_label={'Duel!'} on_click={this.manageDuel.bind(this)} additional_css={'w-1/2'} disabled={this.props.character.is_dead || this.props.character.is_automation_running} />
+                                        </div>
+                                        : null
                                 }
                             </div>
                             <div className='border-b-2 block border-b-gray-300 dark:border-b-gray-600 my-3 md:hidden'></div>

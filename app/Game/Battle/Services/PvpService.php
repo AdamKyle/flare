@@ -21,7 +21,7 @@ class PvpService {
         $yPositionMatches = $attackerMap->character_position_y === $defenderMap->character_position_y;
         $samePlane        = $attackerMap->game_map_id          === $defenderMap->game_map_id;
 
-        return $xPositionMatches && $yPositionMatches && $samePlane;
+        return $xPositionMatches && $yPositionMatches && $samePlane && $defender->currentAutomations->isEmpty();
     }
 
     public function attack(Character $attacker, Character $defender) {
