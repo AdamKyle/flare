@@ -97,5 +97,4 @@ class LoginController extends Controller
 
         return $this->sendFailedLoginResponse($request);
     }
-
 }
