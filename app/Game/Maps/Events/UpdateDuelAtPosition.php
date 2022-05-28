@@ -36,7 +36,6 @@ class UpdateDuelAtPosition implements ShouldBroadcastNow
 
         $data = Map::where('character_position_x', $user->character->map->character_position_x)
                                ->where('character_position_y', $user->character->map->character_position_y)
-                               ->where('character_id', '!=', $user->character->id)
                                ->join('characters', function($join) {
                                    $join->on('characters.id', '=', 'maps.character_id');
                                })->select('characters.id as id', 'characters.name as name')->get();

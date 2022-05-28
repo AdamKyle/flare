@@ -24,6 +24,13 @@ class PvpService {
         return $xPositionMatches && $yPositionMatches && $samePlane && $defender->currentAutomations->isEmpty();
     }
 
+    public function getHealthObject(Character $attacker, Character $defender) {
+        return [
+            'attacker_health' => $this->pvpAttack->cache()->getCachedCharacterData($attacker, 'health'),
+            'defender_health' => $this->pvpAttack->cache()->getCachedCharacterData($defender, 'health'),
+        ];
+    }
+
     public function attack(Character $attacker, Character $defender) {
         $this->pvpAttack->setUpPvpFight($attacker, $defender);
     }

@@ -33,6 +33,7 @@ class CharacterCacheData {
             $cacheLevel = (int) str_replace(',', '', $cache['level']);
 
             if ($cacheLevel != $character->level) {
+
                 $cache = $this->characterSheetCache($character);
             }
         } else {

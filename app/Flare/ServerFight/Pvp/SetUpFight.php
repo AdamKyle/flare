@@ -4,6 +4,7 @@ namespace App\Flare\ServerFight\Pvp;
 
 use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Models\Character;
+use PHPUnit\TextUI\Exception;
 
 class SetUpFight extends PvpMessages {
 
@@ -19,15 +20,26 @@ class SetUpFight extends PvpMessages {
 
     public function setUp(Character $attacker, Character $defender) {
 
-        $this->reduceSkills($attacker, $defender, self::ATTACKER);
-        $this->reduceSkills($defender, $attacker, self::DEFENDER);
+        $attackerResult = $this->reduceSkills($attacker, $defender, self::ATTACKER);
+        $defenderResult = $this->reduceSkills($defender, $attacker, self::DEFENDER);
+
+        if ($attackerResult) {
+            $this->addAttackerMessage('You caused the enemy to thrash around like a lunatic. Skills Reduced!', 'player-action');
+            $this->addDefenderMessage($attacker->name . ' Causes you to thrash around blindly. (Core Skills reduced!)', 'enemy-action');
+        }
+
+        if ($defenderResult) {
+            $this->addDefenderMessage('You caused the enemy to thrash around like a lunatic. Skills Reduced!', 'player-action');
+            $this->addAttackerMessage($defender->name . ' Causes you to thrash around blindly. (Core Skills reduced!)', 'enemy-action');
+        }
     }
 
     public function reduceSkills(Character $attacker, Character $defender, string $type) {
         $skillReduction = $this->characterCacheData->getCachedCharacterData($attacker, 'skill_reduction');
 
         if ($skillReduction > 0.0) {
-            $defenderCache  = $this->characterCacheData->getCachedCharacterData($defender);
+
+            $defenderCache = $this->characterCacheData->getCharacterSheetCache($defender);
 
             foreach($defenderCache['skills'] as $skillName => $value) {
                 $value = $value - $skillReduction;
@@ -41,43 +53,10 @@ class SetUpFight extends PvpMessages {
 
             $this->characterCacheData->updateCharacterSheetCache($defender, $defenderCache);
 
-            if ($type === self::ATTACKER) {
-                $this->createMessages([
-                    [
-                        'message' => $attacker->name . ' Causes you to thrash around blindly. (Core Skills reduced!)',
-                        'type'    => 'enemy-action'
-                    ],
-                    [
-                        'message' => 'You caused the enemy to thrash around like a lunatic. Skills Reduced!',
-                        'type'    => 'player-action'
-                    ]
-                ], self::ATTACKER);
-            } else {
-                $this->createMessages([
-                    [
-                        'message' => $defender->name . ' Causes you to thrash around blindly. (Core Skills reduced!)',
-                        'type'    => 'enemy-action'
-                    ],
-                    [
-                        'message' => 'You caused the enemy to thrash around like a lunatic. Skills Reduced!',
-                        'type'    => 'player-action'
-                    ]
-                ], self::DEFENDER);
-            }
+            return true;
         }
+
+        return false;
     }
 
-    protected function createMessages(array $messageObject, string $type) {
-        if ($type === self::ATTACKER) {
-            $this->addDefenderMessage($messageObject[0]['message'], $messageObject[0]['type']);
-            $this->addAttackerMessage($messageObject[1]['message'], $messageObject[1]['type']);
-
-            return;
-        }
-
-        if ($type === self::DEFENDER) {
-            $this->addAttackerMessage($messageObject[0]['message'], $messageObject[0]['type']);
-            $this->addDefenderMessage($messageObject[1]['message'], $messageObject[1]['type']);
-        }
-    }
 }

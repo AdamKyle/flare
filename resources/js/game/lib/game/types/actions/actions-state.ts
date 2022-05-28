@@ -27,6 +27,8 @@ export default interface ActionsState {
 
     duel_characters?: {id: number, name: string}[] | [];
 
+    show_duel_fight?: boolean;
+
     /**
      * These are for Smaller Actions Component.
      */

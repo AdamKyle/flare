@@ -9,7 +9,8 @@ import ActionsManager from "../../lib/game/actions/actions-manager";
 import SuccessOutlineButton from "../../components/ui/buttons/success-outline-button";
 import MainActionSection from "./components/main-action-section";
 import ExplorationSection from "./components/exploration-section";
- import CelestialFight from "./components/celestial-fight";
+import CelestialFight from "./components/celestial-fight";
+import DuelPlayer from "./components/duel-player";
 
 export default class Actions extends React.Component<ActionsProps, ActionsState> {
 
@@ -38,6 +39,7 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
             crafting_type: null,
             show_exploration: false,
             show_celestial_fight: false,
+            show_duel_fight: false,
             duel_characters: [],
         }
 
@@ -151,7 +153,9 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
     }
 
     manageDuel() {
-
+        this.setState({
+            show_duel_fight: !this.state.show_duel_fight
+        });
     }
 
     render() {
@@ -164,15 +168,19 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
                         <div className='grid md:grid-cols-4'>
                             <div className='md:col-start-1 md:col-span-1'>
                                 {
-                                    !this.state.show_exploration ?
+                                    !this.state.show_exploration && !this.state.show_duel_fight ?
                                         <DropDown menu_items={this.actionsManager.buildCraftingList(this.openCrafting.bind(this))} button_title={'Craft/Enchant'} disabled={this.state.character?.is_dead || this.cannotCraft()} selected_name={this.actionsManager.getSelectedCraftingOption()}/>
                                     : null
                                 }
-                                <div className='mb-4'>
-                                    <SuccessOutlineButton button_label={'Exploration'} on_click={this.manageExploration.bind(this)} additional_css={'w-1/2'} disabled={this.props.character.is_dead} />
-                                </div>
                                 {
-                                    this.props.celestial_id !== 0 && !this.state.show_exploration ?
+                                    !this.state.show_duel_fight ?
+                                        <div className='mb-4'>
+                                            <SuccessOutlineButton button_label={'Exploration'} on_click={this.manageExploration.bind(this)} additional_css={'w-1/2'} disabled={this.props.character.is_dead} />
+                                        </div>
+                                    : null
+                                }
+                                {
+                                    this.props.celestial_id !== 0 && (!this.state.show_exploration && !this.state.show_duel_fight) ?
                                         <div className='mb-4'>
                                             <SuccessOutlineButton button_label={'Fight Celestial!'} on_click={this.manageFightCelestial.bind(this)} additional_css={'w-1/2'} disabled={this.props.character.is_dead || this.props.character.is_automation_running} />
                                         </div>
@@ -199,21 +207,27 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
                                                             update_celestial={this.props.update_celestial}
                                             />
                                         :
-                                            <MainActionSection monsters={this.state.monsters}
-                                                               attack_time_out={this.state.attack_time_out}
-                                                               crafting_type={this.state.crafting_type}
-                                                               character={this.state.character}
-                                                               character_revived={this.state.character_revived}
-                                                               is_same_monster={this.state.is_same_monster}
-                                                               monster_to_fight={this.state.monster_to_fight}
-                                                               set_selected_monster={this.setSelectedMonster.bind(this)}
-                                                               remove_crafting_type={this.removeCraftingType.bind(this)}
-                                                               cannot_craft={this.cannotCraft()}
-                                                               revive={this.revive.bind(this)}
-                                                               set_attack_timeOut={this.setAttackTimeOut.bind(this)}
-                                                               reset_same_monster={this.resetSameMonster.bind(this)}
-                                                               reset_revived={this.resetRevived.bind(this)}
-                                            />
+                                            this.state.show_duel_fight ?
+                                                <DuelPlayer characters={this.state.duel_characters}
+                                                            character={this.state.character}
+                                                            manage_pvp={this.manageDuel.bind(this)}
+                                                />
+                                            :
+                                                <MainActionSection monsters={this.state.monsters}
+                                                                   attack_time_out={this.state.attack_time_out}
+                                                                   crafting_type={this.state.crafting_type}
+                                                                   character={this.state.character}
+                                                                   character_revived={this.state.character_revived}
+                                                                   is_same_monster={this.state.is_same_monster}
+                                                                   monster_to_fight={this.state.monster_to_fight}
+                                                                   set_selected_monster={this.setSelectedMonster.bind(this)}
+                                                                   remove_crafting_type={this.removeCraftingType.bind(this)}
+                                                                   cannot_craft={this.cannotCraft()}
+                                                                   revive={this.revive.bind(this)}
+                                                                   set_attack_timeOut={this.setAttackTimeOut.bind(this)}
+                                                                   reset_same_monster={this.resetSameMonster.bind(this)}
+                                                                   reset_revived={this.resetRevived.bind(this)}
+                                                />
                                 }
 
 

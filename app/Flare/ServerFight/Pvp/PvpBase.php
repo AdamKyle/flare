@@ -3,6 +3,7 @@
 namespace App\Flare\ServerFight\Pvp;
 
 use App\Flare\Builders\Character\CharacterCacheData;
+use App\Flare\Models\Character;
 use App\Flare\ServerFight\BattleMessages;
 
 class PvpBase {
@@ -19,15 +20,19 @@ class PvpBase {
         $this->characterCacheData = $characterCacheData;
     }
 
-    public function setAttacker(Character $attacker) {
-        $this->attacker = $this->attacker;
+    public function cache(): CharacterCacheData {
+        return $this->characterCacheData;
     }
 
-    public function setDefender(Character $character) {
+    public function setAttacker(Character $attacker): void {
+        $this->attacker = $attacker;
+    }
+
+    public function setDefender(Character $character): void {
         $this->defender = $character;
     }
 
-    public function setAttackerHealth(int $attackerHealth = null) {
+    public function setAttackerHealth(int $attackerHealth = null): void {
         if (!is_null($attackerHealth)) {
             $this->attackerHealth = $attackerHealth;
 
@@ -37,7 +42,7 @@ class PvpBase {
         $this->attackerHealth = $this->characterCacheData->getCachedCharacterData($this->attacker);
     }
 
-    public function setDefenderHealth(int $defenderHealth = null) {
+    public function setDefenderHealth(int $defenderHealth = null): void {
         if (!is_null($defenderHealth)) {
             $this->defenderHealth = $defenderHealth;
 
@@ -55,7 +60,7 @@ class PvpBase {
         return $this->defenderHealth;
     }
 
-    public function deleteCharacterCache() {
+    public function deleteCharacterCache(): void {
         $this->characterCacheData->deleteCharacterSheet($this->attacker);
         $this->characterCacheData->deleteCharacterSheet($this->defender);
     }
