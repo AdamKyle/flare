@@ -56,7 +56,7 @@ class PvpBattleController extends Controller {
             ], 422);
         }
 
-        $response = $this->pvpService->attack($character, $defender);
+        $response = $this->pvpService->attack($character, $defender, $request->attack_type);
 
         $responseStatus = $response['status'];
 

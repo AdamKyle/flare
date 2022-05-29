@@ -38,7 +38,7 @@ class PvpMessages {
         return $this->defenderMessages;
     }
 
-    public function clearMessages() {
+    public function clearPvpMessage() {
         $this->attackerMessages = [];
         $this->defenderMessages = [];
     }

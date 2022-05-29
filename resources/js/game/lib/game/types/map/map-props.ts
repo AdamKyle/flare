@@ -20,4 +20,6 @@ export default interface MapProps {
     automation_completed_at: number;
 
     show_celestial_fight_button: (id: number | null) => void;
+
+    set_character_position: (position: {x: number, y: number, game_map_id?: number}) => void;
 }

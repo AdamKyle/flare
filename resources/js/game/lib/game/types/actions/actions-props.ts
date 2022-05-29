@@ -9,4 +9,5 @@ export default interface ActionsProps {
     currencies?: CharacterCurrenciesType;
     celestial_id: number;
     update_celestial: (celestialId: number|null) => void
+    character_position: {x: number, y: number, game_map_id?: number} | null;
 }

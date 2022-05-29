@@ -448,7 +448,7 @@ class ServiceProvider extends ApplicationServiceProvider
             return new DoubleHeal($app->make(CharacterCacheData::class));
         });
 
-        $this->app->bind(VampireThirst::class, function() {
+        $this->app->bind(VampireThirst::class, function($app) {
             return new VampireThirst($app->make(CharacterCacheData::class));
         });
 
@@ -467,13 +467,18 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
         $this->app->bind(SetUpFight::class, function($app) {
-            return new SetUpFight($app->make(CharacterCacheData::class));
+            return new SetUpFight(
+                $app->make(CharacterCacheData::class),
+                $app->make(Voidance::class),
+                $app->make(Ambush::class)
+            );
         });
 
         $this->app->bind(PvpAttack::class, function($app) {
             return new PvpAttack(
                 $app->make(CharacterCacheData::class),
-                $app->make(SetUpFight::class)
+                $app->make(SetUpFight::class),
+                $app->make(BaseCharacterAttack::class),
             );
         });
     }

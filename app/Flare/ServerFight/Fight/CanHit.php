@@ -43,6 +43,35 @@ class CanHit {
         return ($playerToHit + $playerToHit * $characterAccuracy) > ($enemyAgi + $enemyAgi * $enemyDodge);
     }
 
+    public function canPlayerHitPlayer(Character $attacker, Character $defender, bool $isPlayerVoided) {
+        $defenderAgi       = $this->characterCacheData->getCachedCharacterData($defender, 'agi_modded');
+        $characterToHit    = $this->characterCacheData->getCachedCharacterData($attacker, 'to_hit_stat');
+        $statValue         = $this->characterCacheData->getCachedCharacterData($attacker, $isPlayerVoided ? $characterToHit : $characterToHit . '_modded');
+        $characterAccuracy = $this->characterCacheData->getCachedCharacterData($attacker, 'skills')['accuracy'];
+        $enemyDodge        = $this->characterCacheData->getCachedCharacterData($defender, 'skills')['dodge'];
+
+        if ($enemyDodge >= 1) {
+            return false;
+        }
+
+        if ($characterAccuracy >= 1) {
+            return false;
+        }
+
+        $playerToHit = $statValue * 0.20;
+        $enemyAgi    = $defenderAgi * 0.20;
+
+        if ($playerToHit < 50) {
+            $playerToHit = $statValue;
+        }
+
+        if ($enemyAgi < 50) {
+            $enemyAgi = $defenderAgi;
+        }
+
+        return ($playerToHit + $playerToHit * $characterAccuracy) > ($enemyAgi + $enemyAgi * $enemyDodge);
+    }
+
     public function canPlayerAutoHit(Character $character): bool {
         if (!$character->classType()->isThief()) {
             return false;

@@ -4,6 +4,7 @@ namespace App\Flare\ServerFight\Pvp;
 
 use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Models\Character;
+use App\Flare\ServerFight\Fight\CharacterAttacks\BaseCharacterAttack;
 
 class PvpAttack extends PvpBase {
 
@@ -14,26 +15,66 @@ class PvpAttack extends PvpBase {
         'defender' => [],
     ];
 
-    public function __construct(CharacterCacheData $characterCacheData, SetUpFight $setUpFight) {
+    private $healthObject = [
+        'attacker_health' => 0,
+        'defender_health' => 0,
+    ];
+
+    private BaseCharacterAttack $characterAttack;
+
+    public function __construct(CharacterCacheData $characterCacheData, SetUpFight $setUpFight, BaseCharacterAttack $characterAttack) {
         parent::__construct($characterCacheData);
 
-        $this->setUpFight = $setUpFight;
+        $this->setUpFight      = $setUpFight;
+        $this->characterAttack = $characterAttack;
     }
 
     public function getMessages() {
         return $this->battleMessages;
     }
 
-    public function setUpPvpFight(Character $attacker, Character $defender) {
-        $this->setUpFight->setUp($attacker, $defender);
+    public function getHealthObject() {
+        return $this->healthObject;
+    }
+
+    public function setUpPvpFight(Character $attacker, Character $defender, array $healthObject): array {
+        $healthObject = $this->setUpFight->setUp($attacker, $defender, $healthObject);
 
         $this->mergeMessages($this->setUpFight->getAttackerMessages(), 'attacker');
         $this->mergeMessages($this->setUpFight->getDefenderMessages(), 'defender');
 
-        dd($this->battleMessages);
+        return $healthObject;
+    }
+
+    public function attackPlayer(Character $attacker, Character $defender, array $healthObject, string $attackType) {
+        $response = $this->characterAttack->doPvpAttack($attacker, $defender, $healthObject, $this->setUpFight->isAttackerVoided(), $attackType);
+
+        $this->mergeMessages($response->getAttackerMessages(), 'attacker');
+        $this->mergeMessages($response->getDefenderMessages(), 'defender');
+
+        $defenderHealth = $response->getMonsterHealth();
+        $attackerHealth = $response->getCharacterHealth();
+
+        if ($defenderHealth < 0) {
+            $defenderHealth = 0;
+
+            $this->healthObject = [
+                'attacker_health' => $attackerHealth,
+                'defender_health' => $defenderHealth,
+            ];
+
+            return true;
+        }
+
+        $this->healthObject = [
+            'attacker_health' => $attackerHealth,
+            'defender_health' => $defenderHealth,
+        ];
+
+        return false;
     }
 
     protected function mergeMessages(array $messages, string $key) {
-        $this->battleMessages[$key] = [...$this->battleMessages[$key], $messages];
+        $this->battleMessages[$key] = [...$this->battleMessages[$key], ...$messages];
     }
 }

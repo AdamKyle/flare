@@ -7,6 +7,8 @@ export default interface MapState {
 
     map_id: number | 0;
 
+    game_map_id: number | 0;
+
     map_position: {x: number, y: number};
 
     character_position: {x: number, y: number};

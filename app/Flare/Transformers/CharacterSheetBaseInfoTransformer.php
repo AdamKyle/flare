@@ -120,7 +120,6 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
             'ambush_resistance'           => $characterTrinketsInformation->getAmbushResistanceChance($character),
             'counter_resistance'          => $characterTrinketsInformation->getCounterResistanceChance($character),
             'voided_weapon_attack'        => $characterInformation->getTotalWeaponDamage(false),
-            'artifact_annulment'          => $characterInformation->getTotalDeduction('artifact_annulment'),
             'spell_evasion'               => $characterInformation->getTotalDeduction('spell_evasion'),
             'affix_damage_reduction'      => $characterInformation->getTotalDeduction('affix_damage_reduction'),
             'healing_reduction'           => $characterInformation->getTotalDeduction('healing_reduction'),

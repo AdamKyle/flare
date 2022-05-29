@@ -6,6 +6,8 @@ export default interface MapState {
 
     map_position: {x: number, y: number};
 
+    game_map_id: number;
+
     character_position: {x: number, y: number};
 
     locations: LocationDetails[] | null;

@@ -60,6 +60,7 @@ export default class Game extends React.Component<GameProps, GameState> {
             character: null,
             kingdoms: [],
             quests: null,
+            position: null,
         }
 
         // @ts-ignore
@@ -137,6 +138,12 @@ export default class Game extends React.Component<GameProps, GameState> {
         this.setState({character_currencies: currencies});
     }
 
+    setCharacterPosition(position: {x: number, y: number, game_map_id?: number}) {
+        this.setState({
+            position: position,
+        })
+    }
+
     updateCharacterQuests(quests: QuestType) {
         this.setState({
             quests: quests
@@ -202,6 +209,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                                                 currencies={this.state.character_currencies}
                                                 celestial_id={this.state.celestial_id}
                                                 update_celestial={this.updateCelestial.bind(this)}
+                                                character_position={this.state.position}
                                             />
                                         :
                                             <Actions
@@ -210,6 +218,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                                                 character_statuses={this.state.character_status}
                                                 celestial_id={this.state.celestial_id}
                                                 update_celestial={this.updateCelestial.bind(this)}
+                                                character_position={this.state.position}
                                             />
                                     }
                                 </BasicCard>
@@ -226,6 +235,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                                     is_automaton_running={this.state.character.is_automation_running}
                                     automation_completed_at={this.state.character.automation_completed_at}
                                     show_celestial_fight_button={this.updateCelestial.bind(this)}
+                                    set_character_position={this.setCharacterPosition.bind(this)}
                                 />
                             </BasicCard>
                         </div>

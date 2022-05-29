@@ -60,6 +60,7 @@ class Character extends Model
         'gold_dust',
         'shards',
         'copper_coins',
+        'killed_in_pvp',
     ];
 
     /**
@@ -79,6 +80,7 @@ class Character extends Model
         'is_npc'                      => 'boolean',
         'is_test'                     => 'boolean',
         'is_attack_automation_locked' => 'boolean',
+        'killed_in_pvp'               => 'boolean',
         'can_move_again_at'           => 'datetime',
         'can_attack_again_at'         => 'datetime',
         'can_craft_again_at'          => 'datetime',

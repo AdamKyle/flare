@@ -28,4 +28,6 @@ export default interface GameState {
     quests: QuestType | null;
 
     celestial_id: number;
+
+    position: {x: number, y: number, game_map_id?: number} | null,
 }

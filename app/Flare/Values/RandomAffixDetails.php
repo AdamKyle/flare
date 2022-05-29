@@ -12,6 +12,7 @@ class RandomAffixDetails {
     const BASIC     = 10000000000;
     const MEDIUM    = 50000000000;
     const LEGENDARY = 100000000000;
+    const MYTHIC    = 500000000000;
 
 
     /**
@@ -21,6 +22,7 @@ class RandomAffixDetails {
         0 => self::BASIC,
         1 => self::MEDIUM,
         3 => self::LEGENDARY,
+        4 => self:: MYTHIC,
     ];
 
     /**
@@ -44,6 +46,8 @@ class RandomAffixDetails {
                 return [30, 50];
             case self::LEGENDARY:
                 return [60, 75];
+            case self::MYTHIC:
+                return [75, 100];
             case self::BASIC:
             default:
                 return [10, 25];
@@ -56,6 +60,8 @@ class RandomAffixDetails {
                 return [5000, 8000];
             case self::LEGENDARY:
                 return [10000, 20000];
+            case self::MYTHIC:
+                return [30000, 50000];
             case self::BASIC:
             default:
                 return [1000, 4000];
@@ -72,6 +78,10 @@ class RandomAffixDetails {
 
     public function paidHundredBillion(): bool {
         return $this->value === self::LEGENDARY;
+    }
+
+    public function paidFiveHundredBillion(): bool {
+        return $this->value === self::MYTHIC;
     }
 
     public static function names(): array {

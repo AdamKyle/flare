@@ -35,6 +35,33 @@ class Ambush extends BattleBase {
         return $this->healthObject;
     }
 
+    public function attackerAmbushesDefender(Character $attacker, Character $defender, bool $isAttackerVoided, array $healthObject): array {
+
+        $attackerAmbushChance     = $this->characterCacheData->getCachedCharacterData($attacker, 'ambush_chance');
+        $defenderAmbushResistance = $this->characterCacheData->getCachedCharacterData($defender, 'ambush_resistance_chance');
+
+        if ($this->canPlayerAmbushMonster($attackerAmbushChance, $defenderAmbushResistance)) {
+            $this->addAttackerMessage('You get the jump on the enemy!');
+
+            $baseStat = $this->characterCacheData->getCachedCharacterData($attacker, $isAttackerVoided ? 'voided_base_stat' : 'base_stat');
+            $damage   = $baseStat * 2;
+
+            $healthObject['defender_health'] -= $damage;
+
+            if ($healthObject['defender_health'] <= 0) {
+                $healthObject['defender_health'] = 0;
+
+                $this->addAttackerMessage('Through plotting and planning, you slit the your enemies throat from behind. (Ambush!): ' . $damage, 'player-action');
+                $this->addDefenderMessage($attacker->name . ' Got the jump on you! now your throats slit and your dead ... You took: ' . $damage . ' damage.', 'enemy-action');
+            } else {
+                $this->addAttackerMessage('Through plotting and planning, you get the jump on the enemy! (Ambush!): ' . $damage, 'player-action');
+                $this->addDefenderMessage($attacker->name . ' Got the jump on you! You took: ' . $damage . ' damage.', 'enemy-action');
+            }
+        }
+
+        return $healthObject;
+    }
+
     public function playerAmbushesMonster(Character $character, ServerMonster $serverMonster, bool $isPlayerVoided) {
         $characterAmbushResistance = $this->characterCacheData->getCachedCharacterData($character, 'ambush_resistance_chance');
         $characterAmbushChance     = $this->characterCacheData->getCachedCharacterData($character, 'ambush_chance');

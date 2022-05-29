@@ -1,5 +1,6 @@
 import {CharacterType} from "../../character/character-type";
 import MonsterType from "./monster/monster-type";
+import PvpCharactersType from "../pvp-characters-type";
 
 export default interface ActionsState {
 
@@ -25,9 +26,13 @@ export default interface ActionsState {
 
     show_celestial_fight?: boolean;
 
-    duel_characters?: {id: number, name: string}[] | [];
+    duel_characters?: PvpCharactersType[] | [];
+
+    characters_for_dueling?: PvpCharactersType[] | [];
 
     show_duel_fight?: boolean;
+
+    character_position?: {x: number; y: number, game_map_id?: number} | null;
 
     /**
      * These are for Smaller Actions Component.

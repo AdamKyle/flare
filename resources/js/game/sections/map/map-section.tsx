@@ -37,6 +37,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
             character_position: {
                 x: 0, y: 0
             },
+            game_map_id: 0,
             bottom_bounds: 0,
             right_bounds: 0,
             locations: null,
@@ -113,6 +114,12 @@ export default class MapSection extends React.Component<MapProps, MapState> {
         // @ts-ignore
         this.setState(state, () => {
             this.props.show_celestial_fight_button(data.celestial_id)
+
+            let position: {x: number, y: number, game_map_id?: number} = state.character_position;
+
+            position.game_map_id = state.game_map_id;
+
+            this.props.set_character_position(position);
 
             if (typeof callback !== 'undefined') {
                 return callback();

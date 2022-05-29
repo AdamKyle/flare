@@ -32,6 +32,17 @@ class CharacterAttack {
         $this->defend        = $defend;
     }
 
+    public function pvpAttack(Character $attacker, Character $defender, bool $isAttackerVoided, array $healthObject): CharacterAttack {
+        $this->weaponType->setCharacterHealth($healthObject['attacker_health']);
+        $this->weaponType->setMonsterHealth($healthObject['defender_health']);
+        $this->weaponType->setCharacterAttackData($attacker, $isAttackerVoided);
+        $this->weaponType->doPvpWeaponAttack($attacker, $defender, $isAttackerVoided);
+
+        $this->type = $this->weaponType;
+
+        return $this;
+    }
+
     public function attack(Character $character, ServerMonster $monster, bool $isPlayerVoided, int $characterHealth, int $monsterHealth): CharacterAttack {
         $this->weaponType->setCharacterHealth($characterHealth);
         $this->weaponType->setMonsterHealth($monsterHealth);
@@ -89,6 +100,14 @@ class CharacterAttack {
 
     public function getMessages() {
         return $this->type->getMessages();
+    }
+
+    public function getAttackerMessages() {
+        return $this->type->getAttackerMessages();
+    }
+
+    public function getDefenderMessages() {
+        return $this->type->getDefenderMessages();
     }
 
     public function resetMessages() {

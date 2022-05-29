@@ -102,6 +102,8 @@ class MessageController extends Controller {
             $x     = $character->map->character_position_x;
             $y     = $character->map->character_position_y;
 
+            $pvpKilled = $character->killed_in_pvp;
+
             switch ($character->map->gameMap->name) {
                 case 'Surface':
                     $mapName = 'SUR';
@@ -128,8 +130,8 @@ class MessageController extends Controller {
             $color = (new MapChatColor($character->map->gameMap->name))->getColor();
 
             $message->color      = $color;
-            $message->x_position = $x;
-            $message->y_position = $y;
+            $message->x_position = $pvpKilled ? 0 : $x;
+            $message->y_position = $pvpKilled ? 0 : $y;
 
             $message->save();
         }

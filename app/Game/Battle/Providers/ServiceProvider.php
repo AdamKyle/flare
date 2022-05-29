@@ -22,6 +22,7 @@ use App\Game\Battle\Services\CelestialFightService;
 use App\Game\Battle\Services\PvpService;
 use App\Game\Core\Services\DropCheckService;
 use App\Game\Core\Services\GoldRush;
+use App\Game\Maps\Values\MapTileValue;
 use App\Game\Skills\Services\DisenchantService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
@@ -83,7 +84,12 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
         $this->app->bind(PvpService::class, function($app) {
-            return new PvpService($app->make(PvpAttack::class));
+            return new PvpService(
+                $app->make(PvpAttack::class),
+                $app->make(RandomAffixGenerator::class),
+                $app->make(BattleEventHandler::class),
+                $app->make(MapTileValue::class),
+            );
         });
 
         $this->commands([

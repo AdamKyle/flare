@@ -11,6 +11,7 @@ import MainActionSection from "./components/main-action-section";
 import ExplorationSection from "./components/exploration-section";
 import CelestialFight from "./components/celestial-fight";
 import DuelPlayer from "./components/duel-player";
+ import {isEqual} from "lodash";
 
 export default class Actions extends React.Component<ActionsProps, ActionsState> {
 
@@ -41,6 +42,8 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
             show_celestial_fight: false,
             show_duel_fight: false,
             duel_characters: [],
+            characters_for_dueling: [],
+            character_position: null,
         }
 
         // @ts-ignore
@@ -87,13 +90,60 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
         // @ts-ignore
         this.duelOptions.listen('Game.Maps.Events.UpdateDuelAtPosition', (event: any) => {
             this.setState({
-                duel_characters: event.characters,
+                characters_for_dueling: event.characters,
             });
         });
     }
 
     componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<ActionsState>, snapshot?: any) {
         this.actionsManager.actionComponentUpdated(this.state, this.props)
+
+        if (typeof this.state.characters_for_dueling === 'undefined' || typeof this.state.duel_characters === 'undefined') {
+            return;
+        }
+
+        if (this.props.character_position !== null && this.state.characters_for_dueling.length > 0 && this.state.duel_characters.length == 0) {
+            if (typeof this.props.character_position.game_map_id === 'undefined') {
+                return;
+            }
+
+            const characters = this.state.characters_for_dueling.filter((character: any) => {
+                return character.character_position_x === this.props.character_position?.x &&
+                    character.character_position_y === this.props.character_position?.y &&
+                    character.game_map_id === this.props.character_position?.game_map_id &&
+                    character.name !== this.props.character.name;
+            });
+
+            if (characters.length === 0) {
+                return;
+            }
+
+            this.setState({
+                duel_characters: characters,
+                character_position: this.props.character_position
+            });
+        }
+
+        if (this.props.character_position !== null && this.state.character_position !== null &&
+            this.state.characters_for_dueling.length > 0 && this.state.duel_characters.length > 0)
+        {
+            if (typeof this.props.character_position.game_map_id === 'undefined') {
+                return;
+            }
+
+            const characters = this.state.characters_for_dueling.filter((character: any) => {
+                return character.character_position_x === this.props.character_position?.x &&
+                    character.character_position_y === this.props.character_position?.y &&
+                    character.game_map_id === this.props.character_position?.game_map_id &&
+                    character.name !== this.props.character.name;
+            });
+
+            if (!isEqual(this.state.duel_characters, characters)) {
+                this.setState({
+                    duel_characters: characters
+                });
+            }
+        }
     }
 
     manageExploration() {
@@ -159,6 +209,7 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
     }
 
     render() {
+        console.log(this.state.duel_characters);
         return (
             <div className='lg:px-4'>
                 {

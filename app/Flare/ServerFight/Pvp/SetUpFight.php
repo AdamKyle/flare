@@ -4,22 +4,66 @@ namespace App\Flare\ServerFight\Pvp;
 
 use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Models\Character;
+use App\Flare\ServerFight\Fight\Ambush;
+use App\Flare\ServerFight\Fight\Voidance;
 use PHPUnit\TextUI\Exception;
 
 class SetUpFight extends PvpMessages {
 
     private CharacterCacheData $characterCacheData;
 
+    private Voidance $voidance;
+
+    private Ambush $ambush;
+
     const ATTACKER = 'attacker';
 
     CONST DEFENDER = 'defender';
 
-    public function __construct(CharacterCacheData $characterCacheData) {
+    private $isAttackerVoided = false;
+
+    public function __construct(CharacterCacheData $characterCacheData, Voidance $voidance, Ambush $ambush) {
         $this->characterCacheData = $characterCacheData;
+        $this->voidance           = $voidance;
+        $this->ambush             = $ambush;
     }
 
-    public function setUp(Character $attacker, Character $defender) {
+    public function setUp(Character $attacker, Character $defender, array $healthObject): array {
+        $this->reducePlayerSkills($attacker, $defender);
+        $this->handleVoidance($attacker, $defender);
 
+        return $this->handleAmbush($attacker, $defender, $healthObject, $this->voidance->isPlayerVoided());
+    }
+
+    public function isAttackerVoided(): bool {
+        return $this->isAttackerVoided;
+    }
+
+    public function handleAmbush(Character $attacker, Character $defender, array $healthObject, bool $isAttackerVoided): array {
+        $healthObject = $this->ambush->attackerAmbushesDefender($attacker, $defender, $isAttackerVoided, $healthObject);
+
+        $this->mergeAttackerMessages($this->ambush->getAttackerMessages());
+
+        $this->mergeDefenderMessages($this->ambush->getDefenderMessages());
+
+        $this->ambush->clearPvpMessage();
+
+        return $healthObject;
+    }
+
+    public function handleVoidance(Character $attacker, Character $defender) {
+        $this->voidance->pvpVoid($attacker, $defender, $this->characterCacheData);
+
+        $this->mergeAttackerMessages($this->voidance->getAttackerMessages());
+
+        $this->mergeDefenderMessages($this->voidance->getDefenderMessages());
+
+        $this->voidance->clearPvpMessage();
+
+        $this->isAttackerVoided = $this->voidance->isPlayerVoided();
+    }
+
+    public function reducePlayerSkills(Character $attacker, Character $defender) {
         $attackerResult = $this->reduceSkills($attacker, $defender, self::ATTACKER);
         $defenderResult = $this->reduceSkills($defender, $attacker, self::DEFENDER);
 

@@ -28,6 +28,20 @@ class Entrance extends BattleBase {
         return $this->isEnemyEntranced;
     }
 
+    public function attackerEntrancesDefender(Character $attacker, array $attackType, bool $isAttackerVoided) {
+        if ($attackType['affixes']['entrancing_chance'] > 0.0 && !$isAttackerVoided) {
+            if ($this->canAttackerEntranceDefender($attackType)) {
+                $this->addAttackerMessage('You managed to entrance the enemy in your mesmerizing stare! (Entranced!)', 'player-action');
+                $this->addDefenderMessage($attacker->name . ' has caught you in their web of magics! (Entranced!)', 'enemy-action');
+
+                $this->isEnemyEntranced = true;
+            } else {
+                $this->addAttackerMessage('The enemy is dazed by your enchantments!', 'enemy-action');
+                $this->addDefenderMessage('You evade ' . $attacker->name . ' entrancing enchantments!', 'player-action');
+            }
+        }
+    }
+
     public function playerEntrance(Character $character, ServerMonster $monster, array $attackType) {
         if ($attackType['affixes']['entrancing_chance'] > 0.0) {
             if ($this->canPlayerEntranceMonster($character, $monster, $attackType)) {
@@ -48,6 +62,22 @@ class Entrance extends BattleBase {
         } else {
             $this->addMessage('You resist the alluring entrancing enchantments on your enemy!', 'player-action');
         }
+    }
+
+    protected function canAttackerEntranceDefender(array $attackType) {
+        if ($attackType['affixes']['cant_be_resisted']) {
+            return true;
+        }
+
+        $chance = $attackType['affixes']['entrancing_chance'];
+
+        if ($chance > 1) {
+            return true;
+        }
+
+        $roll = rand(1, 100);
+
+        return ($roll + $roll * $chance) > 50;
     }
 
     protected function canPlayerEntranceMonster(Character $character, ServerMonster $monster, array $attackType): bool {
