@@ -9,6 +9,8 @@ class BuildMonster extends BattleMessages {
     private ServerMonster $serverMonster;
 
     public function __construct(ServerMonster $serverMonster) {
+        parent::__construct();
+
         $this->serverMonster = $serverMonster;
     }
 

@@ -25,6 +25,8 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
 
     private monsterUpdate: any;
 
+    private pvpUpdate: any;
+
     constructor(props: ActionsProps) {
         super(props);
 
@@ -44,6 +46,7 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
             duel_characters: [],
             characters_for_dueling: [],
             character_position: null,
+            duel_fight_info: null,
         }
 
         // @ts-ignore
@@ -54,6 +57,9 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
 
         // @ts-ignore
         this.monsterUpdate = Echo.private('update-monsters-list-' + this.props.character.user_id);
+
+        // @ts-ignore
+        this.pvpUpdate = Echo.private('update-pvp-attack-' + this.props.character.user_id);
 
         // @ts-ignore
         this.duelOptions = Echo.join('update-duel');
@@ -91,6 +97,14 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
         this.duelOptions.listen('Game.Maps.Events.UpdateDuelAtPosition', (event: any) => {
             this.setState({
                 characters_for_dueling: event.characters,
+            });
+        });
+
+        // @ts-ignore
+        this.pvpUpdate.listen('Game.Battle.Events.UpdateCharacterPvpAttack', (event: any) => {
+            this.setState({
+                show_duel_fight: true,
+                duel_fight_info: event.data,
             });
         });
     }
@@ -208,8 +222,13 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
         });
     }
 
+    resetDuelData() {
+        this.setState({
+            duel_fight_info: null,
+        });
+    }
+
     render() {
-        console.log(this.state.duel_characters);
         return (
             <div className='lg:px-4'>
                 {
@@ -260,8 +279,10 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
                                         :
                                             this.state.show_duel_fight ?
                                                 <DuelPlayer characters={this.state.duel_characters}
+                                                            duel_data={this.state.duel_fight_info}
                                                             character={this.state.character}
                                                             manage_pvp={this.manageDuel.bind(this)}
+                                                            reset_duel_data={this.resetDuelData.bind(this)}
                                                 />
                                             :
                                                 <MainActionSection monsters={this.state.monsters}

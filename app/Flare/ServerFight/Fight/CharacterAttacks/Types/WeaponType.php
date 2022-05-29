@@ -84,7 +84,7 @@ class WeaponType extends BattleBase {
         $weaponDamage = $this->attackData['weapon_damage'];
 
         if ($this->entrance->isEnemyEntranced()) {
-            $this->weaponAttack($character, $serverMonster->getName(), $weaponDamage);
+            $this->weaponAttack($character, $serverMonster, $weaponDamage);
 
             return $this;
         }
@@ -92,7 +92,7 @@ class WeaponType extends BattleBase {
         if ($this->canHit->canPlayerAutoHit($character)) {
             $this->addMessage('You dance along in the shadows, the enemy doesn\'t see you. Strike now!', 'regular');
 
-            $this->weaponAttack($character, $serverMonster->getName(), $weaponDamage);
+            $this->weaponAttack($character, $serverMonster, $weaponDamage);
 
             return $this;
         }
@@ -102,7 +102,7 @@ class WeaponType extends BattleBase {
             if ($serverMonster->getMonsterStat('ac') > $weaponDamage) {
                 $this->addMessage('Your weapon was blocked!', 'enemy-action');
             } else {
-                $this->weaponAttack($character, $serverMonster->getName(), $weaponDamage);
+                $this->weaponAttack($character, $serverMonster, $weaponDamage);
             }
         } else {
             $this->addMessage('Your attack missed!', 'enemy-action');
@@ -124,7 +124,7 @@ class WeaponType extends BattleBase {
     }
 
     public function weaponAttack(Character $character, ServerMonster $monster, int $weaponDamage) {
-        $this->weaponDamage($character, $monster, $weaponDamage);
+        $this->weaponDamage($character, $monster->getName(), $weaponDamage);
         $this->secondaryAttack($character, $monster);
     }
 
@@ -219,8 +219,8 @@ class WeaponType extends BattleBase {
 
         $this->monsterHealth -= $totalDamage;
 
-        $this->addAttackerMessage('Your weapon slices at the enemies flesh for: ' . number_format($totalDamage), 'player_action');
-        $this->addDefenderMessage($attacker->name . ' strikes you with their weapon for: ' . number_format($totalDamage), 'player_action');
+        $this->addAttackerMessage('Your weapon slices at the enemies flesh for: ' . number_format($totalDamage), 'player-action');
+        $this->addDefenderMessage($attacker->name . ' strikes you with their weapon for: ' . number_format($totalDamage), 'player-action');
 
         $this->specialAttacks->setCharacterHealth($this->characterHealth)
                              ->setMonsterHealth($this->monsterHealth)

@@ -85,5 +85,15 @@ Broadcast::channel('update-character-attacks-{userId}', function ($user, $userId
     return $user->id === (int) $userId;
 });
 
+// When the character pvp status changes (they were attacked)
+Broadcast::channel('update-pvp-attack-{userId}', function ($user, $userId) {
+    return $user->id === (int) $userId;
+});
+
+// When the character pvp status changes (they were attacked - status messages and so on.)
+Broadcast::channel('update-pvp-info-{userId}', function ($user, $userId) {
+    return $user->id === (int) $userId;
+});
+
 
 

@@ -63,6 +63,12 @@ class PvpAttack extends PvpBase {
                 'defender_health' => $defenderHealth,
             ];
 
+            $defenderMessages = $this->getMessages()['defender'];
+            $defenderMessages[] = [
+                'message' => 'You have been slain and must revive',
+                'type'    => 'enemy-action',
+            ];
+
             return true;
         }
 
@@ -72,6 +78,14 @@ class PvpAttack extends PvpBase {
         ];
 
         return false;
+    }
+
+    public function getAttackerHealth(): int {
+        return $this->healthObject['attacker_health'];
+    }
+
+    public function getDefenderHealth(): int {
+        return $this->healthObject['defender_health'];
     }
 
     protected function mergeMessages(array $messages, string $key) {

@@ -8,6 +8,8 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\ServerFight\Pvp\PvpAttack;
 use App\Flare\Values\RandomAffixDetails;
+use App\Game\Battle\Events\UpdateCharacterPvpAttack;
+use App\Game\Battle\Events\UpdateCharacterPvpInfo;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Messages\Events\GlobalMessageEvent;
@@ -59,16 +61,48 @@ class PvpService {
             event(new ServerMessageEvent($attacker->user, 'You have killed: ' . $defender->name));
             event(new ServerMessageEvent($defender->user, 'You have been killed by: ' . $attacker->name));
 
+            $this->battleEventHandler->processDeadCharacter($defender);
+
+            $this->updateAttackerPvpInfo($attacker, $healthObject, $defender->id);
+            $this->updateDefenderPvpInfo($defender, $healthObject, $attacker->id, $this->pvpAttack->getDefenderHealth());
+
             $this->pvpAttack->cache()->deleteCharacterSheet($attacker);
             $this->pvpAttack->cache()->deleteCharacterSheet($defender);
 
-            $this->battleEventHandler->processDeadCharacter($defender);
-
             return;
         }
+
+        $this->updateAttackerPvpInfo($attacker, $healthObject, $defender->id, $this->pvpAttack->getDefenderHealth());
+        $this->updateDefenderPvpInfo($defender, $healthObject, $attacker->id, $this->pvpAttack->getDefenderHealth());
     }
 
-    protected function handleDefenderDeath(Character $defender) {
+    protected function updateAttackerPvpInfo(Character $attacker, array $healthObject, int $defenderId, int $remainingDefenderHealth = 0) {
+        event(new UpdateCharacterPvpAttack($attacker->user, [
+            'health_object' => [
+                'attacker_max_health' => $healthObject['attacker_health'],
+                'attacker_health'     => $this->pvpAttack->getAttackerHealth(),
+                'defender_health'     => $healthObject['defender_health'],
+                'defender_max_health' => $remainingDefenderHealth,
+            ],
+            'messages'    => $this->pvpAttack->getMessages()['attacker'],
+            'attacker_id' => $defenderId,
+        ]));
+    }
+
+    protected function updateDefenderPvpInfo(Character $defender, array $healthObject, int $attackerId, int $remainingDefenderHealth = 0) {
+        event(new UpdateCharacterPvpAttack($defender->user, [
+            'health_object' => [
+                'attacker_max_health' => $healthObject['defender_health'],
+                'attacker_health'     => $remainingDefenderHealth,
+                'defender_health'     => $this->pvpAttack->getAttackerHealth(),
+                'defender_max_health' => $healthObject['attacker_health'],
+            ],
+            'messages'    => $this->pvpAttack->getMessages()['defender'],
+            'attacker_id' => $attackerId,
+        ]));
+    }
+
+    protected function handleDefenderDeath(Character $attacker, Character $defender) {
         $defender->update([
             'killed_in_pvp' => true,
         ]);
@@ -79,7 +113,7 @@ class PvpService {
 
         RemoveKilledInPvpFromUser::dispatch($defender)->delay(now()->addMinutes(2));
 
-
+        $this->updateDefenderPvpInfo($defender, $attacker->id);
     }
 
     protected function handleReward(Character $attacker) {

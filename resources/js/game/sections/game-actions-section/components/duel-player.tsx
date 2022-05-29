@@ -8,6 +8,7 @@ import AttackButton from "../../../components/ui/buttons/attack-button";
 import HealthMeters from "./health-meters";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import DangerButton from "../../../components/ui/buttons/danger-button";
+import {BattleMessage} from "../../../lib/game/actions/battle/types/battle-message-type";
 
 export default class DuelPlayer extends React.Component<any, any> {
 
@@ -23,6 +24,21 @@ export default class DuelPlayer extends React.Component<any, any> {
             defender_max_health: 0,
             defender_health: 0,
             battle_messages: [],
+        }
+    }
+
+    componentDidUpdate() {
+        if (this.props.duel_data !== null) {
+            this.setState({
+                character_id: this.props.duel_data.attacker_id,
+                attacker_max_health: this.props.duel_data.health_object.attacker_max_health,
+                attacker_health: this.props.duel_data.health_object.attacker_health,
+                defender_max_health: this.props.duel_data.health_object.defender_max_health,
+                defender_health: this.props.duel_data.health_object.defender_health,
+                battle_messages: this.props.duel_data.messages,
+            }, () => {
+                this.props.reset_duel_data();
+            });
         }
     }
 
@@ -104,9 +120,9 @@ export default class DuelPlayer extends React.Component<any, any> {
                 attack_type: type,
             }).doAjaxCall('post', (result: AxiosResponse) => {
                 this.setState({
-                    attacker_health: result.data.attacker_health,
-                    defender_health: result.data.defender_health,
-                    battle_messages: result.data.battle_message,
+                    // attacker_health: result.data.attacker_health,
+                    // defender_health: result.data.defender_health,
+                    // battle_messages: result.data.battle_message,
                     preforming_action: false,
                 });
             });
@@ -114,7 +130,37 @@ export default class DuelPlayer extends React.Component<any, any> {
     }
 
     renderBattleMessages() {
-        return [];
+        if (this.props.is_small && this.state.battle_messages.length > 0) {
+            const message = this.state.battle_messages.filter((battleMessage: BattleMessage) => battleMessage.message.includes('resurrect') || battleMessage.message.includes('has been defeated!'))
+
+            if (message.length > 0) {
+                return <p className='text-red-500 dark:text-red-400'>{message[0].message}</p>
+            } else {
+                return <p className='text-blue-500 dark:text-blue-400'>Attack child!</p>
+            }
+        }
+
+        return this.state.battle_messages.filter((value: BattleMessage, index: number, self: BattleMessage[]) => {
+            return index === self.findIndex((t: BattleMessage) => {
+                return t.message === value.message && t.type === value.type;
+            });
+        }).map((battleMessage: BattleMessage) => {
+            return <p className={clsx(
+                {
+                    'text-green-700 dark:text-green-400': this.typeCheck(battleMessage.type, 'player-action')
+                }, {
+                    'text-red-500 dark:text-red-400': this.typeCheck(battleMessage.type, 'enemy-action')
+                }, {
+                    'text-blue-500 dark:text-blue-400': this.typeCheck(battleMessage.type, 'regular')
+                }
+            )}>
+                {battleMessage.message}
+            </p>
+        });
+    }
+
+    typeCheck(battleType: 'regular' | 'player-action' | 'enemy-action', type: 'regular' | 'player-action' | 'enemy-action'): boolean {
+        return battleType === type;
     }
 
     revive() {
@@ -122,6 +168,7 @@ export default class DuelPlayer extends React.Component<any, any> {
     }
 
     render() {
+        console.log(this.state);
         return (
             <div className='mt-2 md:ml-[120px]'>
                 <div className='grid grid-cols-3 gap-2'>
