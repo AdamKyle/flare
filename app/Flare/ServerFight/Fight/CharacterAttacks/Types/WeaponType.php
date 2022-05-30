@@ -220,7 +220,7 @@ class WeaponType extends BattleBase {
         $this->monsterHealth -= $totalDamage;
 
         $this->addAttackerMessage('Your weapon slices at the enemies flesh for: ' . number_format($totalDamage), 'player-action');
-        $this->addDefenderMessage($attacker->name . ' strikes you with their weapon for: ' . number_format($totalDamage), 'player-action');
+        $this->addDefenderMessage($attacker->name . ' strikes you with their weapon for: ' . number_format($totalDamage), 'enemy-action');
 
         $this->specialAttacks->setCharacterHealth($this->characterHealth)
                              ->setMonsterHealth($this->monsterHealth)

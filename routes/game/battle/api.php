@@ -14,6 +14,7 @@ Route::middleware(['auth', 'is.character.who.they.say.they.are', 'throttle:150,2
 
         Route::get('/attack-player/get-health/{character}', ['uses' => 'Api\PvpBattleController@getHealth']);
         Route::post('/attack-player/{character}', ['uses' => 'Api\PvpBattleController@fightCharacter']);
+        Route::post('/pvp/revive/{character}', ['uses' => 'Api\PvpBattleController@revive']);
     });
 
     Route::middleware(['throttle:fighting', 'is.globally.timed.out', 'is.character.exploring'])->group(function() {

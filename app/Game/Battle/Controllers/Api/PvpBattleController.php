@@ -60,4 +60,12 @@ class PvpBattleController extends Controller {
 
         return response()->json();
     }
+
+    public function revive(Character $character) {
+        $this->pvpService->battleEventHandler()->processRevive($character);
+
+        $this->pvpService->cache()->updatePlayerHealth($character, $this->pvpService->cache()->getCachedCharacterData($character, 'health'));
+
+        return response()->json();
+    }
 }

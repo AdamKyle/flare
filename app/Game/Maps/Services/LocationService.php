@@ -2,6 +2,7 @@
 
 namespace App\Game\Maps\Services;
 
+use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Models\Map;
 use App\Flare\Values\LocationEffectValue;
 use App\Game\Battle\Events\UpdateCharacterStatus;
@@ -26,7 +27,12 @@ class LocationService {
     /**
      * @var CoordinatesCache $coordinatesCache
      */
-    private $coordinatesCache;
+    private CoordinatesCache $coordinatesCache;
+
+    /**
+     * @var CharacterCacheData $characterCacheData
+     */
+    private CharacterCacheData $characterCacheData;
 
     /**
      * @var Location $location | null
@@ -40,9 +46,11 @@ class LocationService {
 
     /**
      * @param CoordinatesCache $coordinatesCache
+     * @param CharacterCacheData $characterCacheData
      */
-    public function __construct(CoordinatesCache $coordinatesCache) {
+    public function __construct(CoordinatesCache $coordinatesCache, CharacterCacheData $characterCacheData) {
         $this->coordinatesCache   = $coordinatesCache;
+        $this->characterCacheData = $characterCacheData;
     }
 
     /**
@@ -63,6 +71,8 @@ class LocationService {
 
         // Update duel positions.
         event(new UpdateDuelAtPosition($character->user));
+
+        $this->characterCacheData->removeFromPvpCache($character);
 
         return [
             'map_url'                => Storage::disk('maps')->url($character->map_url),

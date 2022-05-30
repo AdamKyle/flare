@@ -1,7 +1,7 @@
 import React, {Fragment} from "react";
 import Select from "react-select";
 import PrimaryButton from "../../../components/ui/buttons/primary-button";
-import {AxiosResponse} from "axios";
+import {AxiosResponse, AxiosError} from "axios";
 import Ajax from "../../../lib/ajax/ajax";
 import clsx from "clsx";
 import AttackButton from "../../../components/ui/buttons/attack-button";
@@ -97,9 +97,9 @@ export default class DuelPlayer extends React.Component<any, any> {
                 defender_id: this.state.character_id
             }).doAjaxCall('get', (result: AxiosResponse) => {
                 this.setState({
-                    attacker_max_health: result.data.attacker_health,
+                    attacker_max_health: result.data.attacker_max_health,
                     attacker_health: result.data.attacker_health,
-                    defender_max_health: result.data.defender_health,
+                    defender_max_health: result.data.defender_max_health,
                     defender_health: result.data.defender_health,
                     preforming_action: false,
                 });
@@ -108,7 +108,7 @@ export default class DuelPlayer extends React.Component<any, any> {
     }
 
     attackHidden() {
-        return this.state.attacker_max_health === 0 || this.state.defender_max_health === 0;
+        return this.state.attacker_max_health === 0 || this.state.defender_max_health === 0 || this.props.characters.length === 0;
     }
 
     attack(type: string) {
@@ -120,9 +120,6 @@ export default class DuelPlayer extends React.Component<any, any> {
                 attack_type: type,
             }).doAjaxCall('post', (result: AxiosResponse) => {
                 this.setState({
-                    // attacker_health: result.data.attacker_health,
-                    // defender_health: result.data.defender_health,
-                    // battle_messages: result.data.battle_message,
                     preforming_action: false,
                 });
             });
@@ -164,11 +161,18 @@ export default class DuelPlayer extends React.Component<any, any> {
     }
 
     revive() {
-
+        this.setState({
+            preforming_action: true,
+        }, () => {
+            (new Ajax()).setRoute('pvp/revive/' + this.props.character.id).doAjaxCall('post', (result: AxiosResponse) => {
+                this.setState({
+                    preforming_action: false,
+                })
+            }, (error: AxiosError) => {});
+        });
     }
 
     render() {
-        console.log(this.state);
         return (
             <div className='mt-2 md:ml-[120px]'>
                 <div className='grid grid-cols-3 gap-2'>
@@ -190,6 +194,13 @@ export default class DuelPlayer extends React.Component<any, any> {
                 <p className='my-4 text-sm text-gray-700 dark:text-gray-300 w-2/3'>
                     <strong>Please note</strong>: The character could move at any moment. If they do and theres no one here, the entire duel section will vanish.
                 </p>
+                {
+                    this.props.characters.length === 0 ?
+                        <p className='my-4 text-sm text-center text-red-700 dark:text-red-500 w-2/3'>
+                            No one left to fight child. Best be on your way. Click: Leave Fight.
+                        </p>
+                    : null
+                }
                 <div className='md:ml-[-100px]'>
                     <div className={clsx('mt-4 mb-4 text-xs text-center', {
                         'hidden': this.attackHidden()
@@ -203,7 +214,7 @@ export default class DuelPlayer extends React.Component<any, any> {
                             className="fas fa-external-link-alt"></i></a>
                     </div>
                     {
-                        this.state.defender_max_health > 0 ?
+                        this.state.defender_max_health > 0 && this.props.characters.length > 0 ?
                             <div className={clsx('mb-4 max-w-md m-auto', {
                                 'mt-4': this.attackHidden()
                             })}>

@@ -2,6 +2,7 @@
 
 namespace App\Game\Maps\Providers;
 
+use App\Flare\Builders\Character\CharacterCacheData;
 use League\Fractal\Manager;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Flare\Cache\CoordinatesCache;
@@ -58,6 +59,7 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(LocationService::class, function($app) {
             return new LocationService(
                 $app->make(CoordinatesCache::class),
+                $app->make(CharacterCacheData::class),
             );
         });
 

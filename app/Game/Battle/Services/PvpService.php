@@ -2,6 +2,8 @@
 
 namespace App\Game\Battle\Services;
 
+use Cache;
+use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Jobs\RemoveKilledInPvpFromUser;
 use App\Flare\Models\Character;
@@ -9,8 +11,8 @@ use App\Flare\Models\Item;
 use App\Flare\ServerFight\Pvp\PvpAttack;
 use App\Flare\Values\RandomAffixDetails;
 use App\Game\Battle\Events\UpdateCharacterPvpAttack;
-use App\Game\Battle\Events\UpdateCharacterPvpInfo;
 use App\Game\Battle\Handlers\BattleEventHandler;
+use App\Game\Maps\Events\UpdateMapBroadcast;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -32,6 +34,14 @@ class PvpService {
         $this->mapTileValue         = $mapTileValue;
     }
 
+    public function battleEventHandler(): BattleEventHandler {
+        return $this->battleEventHandler;
+    }
+
+    public function cache(): CharacterCacheData {
+        return $this->pvpAttack->cache();
+    }
+
     public function isDefenderAtPlayersLocation(Character $attacker, Character $defender) {
         $attackerMap = $attacker->map;
         $defenderMap = $defender->map;
@@ -44,9 +54,26 @@ class PvpService {
     }
 
     public function getHealthObject(Character $attacker, Character $defender) {
+        $cache = $this->pvpAttack->cache()->fetchPvpCacheObject($attacker, $defender);
+
+        // We need a clean cache object.
+        $this->pvpAttack->cache()->deleteCharacterSheet($attacker);
+        $this->pvpAttack->cache()->deleteCharacterSheet($defender);
+
+        if (!is_null($cache)) {
+            return [
+                'attacker_health'     => $cache['attacker_health'],
+                'attacker_max_health' => $this->pvpAttack->cache()->getCachedCharacterData($attacker, 'health'),
+                'defender_health'     => $cache['defender_health'],
+                'defender_max_health' => $this->pvpAttack->cache()->getCachedCharacterData($defender, 'health'),
+            ];
+        }
+
         return [
-            'attacker_health' => $this->pvpAttack->cache()->getCachedCharacterData($attacker, 'health'),
-            'defender_health' => $this->pvpAttack->cache()->getCachedCharacterData($defender, 'health'),
+            'attacker_health'     => $this->pvpAttack->cache()->getCachedCharacterData($attacker, 'health'),
+            'attacker_max_health' => $this->pvpAttack->cache()->getCachedCharacterData($attacker, 'health'),
+            'defender_health'     => $this->pvpAttack->cache()->getCachedCharacterData($defender, 'health'),
+            'defender_max_health' => $this->pvpAttack->cache()->getCachedCharacterData($defender, 'health'),
         ];
     }
 
@@ -69,11 +96,22 @@ class PvpService {
             $this->pvpAttack->cache()->deleteCharacterSheet($attacker);
             $this->pvpAttack->cache()->deleteCharacterSheet($defender);
 
+            $this->pvpAttack->cache()->removeFromPvpCache($attacker);
+            $this->pvpAttack->cache()->removeFromPvpCache($defender);
+
+            $this->handleDefenderDeath($attacker, $defender);
+
             return;
         }
 
+        $this->updateCacheHealthForPVPFight($attacker, $defender);
+
         $this->updateAttackerPvpInfo($attacker, $healthObject, $defender->id, $this->pvpAttack->getDefenderHealth());
         $this->updateDefenderPvpInfo($defender, $healthObject, $attacker->id, $this->pvpAttack->getDefenderHealth());
+    }
+
+    protected function updateCacheHealthForPVPFight(Character $attacker, Character $defender) {
+        $this->pvpAttack->cache()->setPvpData($attacker, $defender, $this->pvpAttack->getAttackerHealth(), $this->pvpAttack->getDefenderHealth());
     }
 
     protected function updateAttackerPvpInfo(Character $attacker, array $healthObject, int $defenderId, int $remainingDefenderHealth = 0) {
@@ -112,8 +150,6 @@ class PvpService {
         event(new ServerMessageEvent($defender->user, 'You were safely moved away from your current location. You cannot be targeted by pvp for 2 minutes and, during that time, your location will be masked in chat.'));
 
         RemoveKilledInPvpFromUser::dispatch($defender)->delay(now()->addMinutes(2));
-
-        $this->updateDefenderPvpInfo($defender, $attacker->id);
     }
 
     protected function handleReward(Character $attacker) {
@@ -181,6 +217,10 @@ class PvpService {
 
             return $this->movePlayerToNewLocation($character->refresh(), $cache);
         }
+
+        $character = $character->refresh();
+
+        event(new UpdateMapBroadcast($character->user));
 
         return $character->refresh();
     }

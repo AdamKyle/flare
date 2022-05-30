@@ -2,6 +2,7 @@
 
 namespace App\Flare\Jobs;
 
+use App\Game\Maps\Events\UpdateDuelAtPosition;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -34,6 +35,8 @@ class RemoveKilledInPvpFromUser implements ShouldQueue
         $this->character->update([
             'killed_in_pvp' => false,
         ]);
+
+        event(new UpdateDuelAtPosition($this->character->user));
 
         event(new ServerMessageEvent($this->character->user, 'You pvp safety net has ended. Your location will show again in chat.'));
     }

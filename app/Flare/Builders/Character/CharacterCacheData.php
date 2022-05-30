@@ -10,7 +10,7 @@ use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
 use PHPUnit\Runner\Exception;
 
-class CharacterCacheData {
+class CharacterCacheData extends CharacterPvpCacheData {
 
     private CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer;
 

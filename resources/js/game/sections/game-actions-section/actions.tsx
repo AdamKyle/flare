@@ -134,7 +134,8 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
 
             this.setState({
                 duel_characters: characters,
-                character_position: this.props.character_position
+                character_position: this.props.character_position,
+                show_duel_fight: characters.length > 0 ? this.state.show_duel_fight : false,
             });
         }
 
