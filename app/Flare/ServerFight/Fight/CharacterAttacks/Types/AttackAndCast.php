@@ -14,9 +14,9 @@ use App\Flare\ServerFight\Monster\ServerMonster;
 class AttackAndCast extends BattleBase
 {
 
-    private array $attackData;
+    protected array $attackData;
 
-    private bool $isVoided;
+    protected bool $isVoided;
 
     private Entrance $entrance;
 

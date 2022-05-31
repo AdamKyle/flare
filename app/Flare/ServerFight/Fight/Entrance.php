@@ -9,14 +9,14 @@ use App\Flare\ServerFight\Monster\ServerMonster;
 
 class Entrance extends BattleBase {
 
-    private bool $isEnemyEntranced;
+    private bool $enemyEntranced;
 
     private bool $isCharacterEntranced;
 
     public function __construct(CharacterCacheData $characterCacheData) {
         parent::__construct($characterCacheData);
 
-        $this->isEnemyEntranced     = false;
+        $this->enemyEntranced       = false;
         $this->isCharacterEntranced = false;
     }
 
@@ -25,7 +25,7 @@ class Entrance extends BattleBase {
     }
 
     public function isEnemyEntranced() {
-        return $this->isEnemyEntranced;
+        return $this->enemyEntranced;
     }
 
     public function attackerEntrancesDefender(Character $attacker, array $attackType, bool $isAttackerVoided) {
@@ -34,7 +34,7 @@ class Entrance extends BattleBase {
                 $this->addAttackerMessage('You managed to entrance the enemy in your mesmerizing stare! (Entranced!)', 'player-action');
                 $this->addDefenderMessage($attacker->name . ' has caught you in their web of magics! (Entranced!)', 'enemy-action');
 
-                $this->isEnemyEntranced = true;
+                $this->enemyEntranced = true;
             } else {
                 $this->addAttackerMessage('The enemy is dazed by your enchantments!', 'enemy-action');
                 $this->addDefenderMessage('You evade ' . $attacker->name . ' entrancing enchantments!', 'player-action');
@@ -47,7 +47,7 @@ class Entrance extends BattleBase {
             if ($this->canPlayerEntranceMonster($character, $monster, $attackType)) {
                 $this->addMessage('The enemy is dazed by your enchantments!', 'player-action');
 
-                $this->isEnemyEntranced = true;
+                $this->enemyEntranced = true;
             } else {
                 $this->addMessage('The enemy resists your entrancing enchantments!', 'enemy-action');
             }

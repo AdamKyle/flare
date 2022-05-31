@@ -15,25 +15,18 @@ use App\Flare\ServerFight\Monster\ServerMonster;
 class CastType extends BattleBase
 {
 
-    private array $attackData;
-
-    private bool $isVoided;
-
     private Entrance $entrance;
 
     private CanHit $canHit;
 
-    private SecondaryAttacks $secondaryAttacks;
-
     private SpecialAttacks $specialAttacks;
 
-    public function __construct(CharacterCacheData $characterCacheData, Entrance $entrance, CanHit $canHit, SecondaryAttacks $secondaryAttacks, SpecialAttacks $specialAttacks)
+    public function __construct(CharacterCacheData $characterCacheData, Entrance $entrance, CanHit $canHit, SpecialAttacks $specialAttacks)
     {
         parent::__construct($characterCacheData);
 
         $this->entrance           = $entrance;
         $this->canHit             = $canHit;
-        $this->secondaryAttacks   = $secondaryAttacks;
         $this->specialAttacks     = $specialAttacks;
     }
 
@@ -138,41 +131,11 @@ class CastType extends BattleBase
         $this->secondaryAttack($character, $monster);
     }
 
-    protected function secondaryAttack(Character $character, ServerMonster $monster = null, float $affixReduction = 0.0, bool $isPvp = false) {
-        if (!$this->isVoided) {
-
-            $this->secondaryAttacks->setMonsterHealth($this->monsterHealth);
-            $this->secondaryAttacks->setCharacterHealth($this->characterHealth);
-            $this->secondaryAttacks->setAttackData($this->attackData);
-
-
-            $this->secondaryAttacks->affixLifeStealingDamage($character, $monster, $affixReduction, $isPvp);
-            $this->secondaryAttacks->affixDamage($character, $monster, $affixReduction, $isPvp);
-            $this->secondaryAttacks->ringDamage($isPvp);
-
-            if ($isPvp) {
-                $this->mergeAttackerMessages($this->secondaryAttacks->getAttackerMessages());
-                $this->mergeDefenderMessages($this->secondaryAttacks->getDefenderMessages());
-            } else {
-                $this->secondaryAttacks->mergeMessages($this->secondaryAttacks->getMessages());
-            }
-
-            $this->secondaryAttacks->clearMessages();
-
-        } else {
-            if ($isPvp) {
-                $this->addAttackerMessage('You are voided, none of your rings or enchantments fire ...', 'enemy-action');
-            } else {
-                $this->addMessage('You are voided, none of your rings or enchantments fire ...', 'enemy-action');
-            }
-        }
-    }
-
     public function pvpSpellDamage(Character $attacker, Character $defender, int $spellDamage, bool $outSideEntrance = false) {
         $defenderSpellEvasion = $this->characterCacheData->getCachedCharacterData($defender, 'spell_evasion');
 
         if (!$outSideEntrance) {
-            if (!$this->entrance->isEnemyEntranced()) {
+            if (!$this->isEnemyEntranced) {
                 if ($defenderSpellEvasion > 1) {
                     $this->addAttackerMessage('The enemy evades your magic!', 'enemy-action');
                     $this->addDefenderMessage('Your rings glow and you manage to evade the enemies spells.', 'player-action');

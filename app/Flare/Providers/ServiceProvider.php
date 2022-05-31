@@ -344,7 +344,6 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CharacterCacheData::class),
                 $app->make(Entrance::class),
                 $app->make(CanHit::class),
-                $app->make(SecondaryAttacks::class),
                 $app->make(SpecialAttacks::class),
             );
         });
@@ -354,7 +353,6 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CharacterCacheData::class),
                 $app->make(Entrance::class),
                 $app->make(CanHit::class),
-                $app->make(SecondaryAttacks::class),
                 $app->make(SpecialAttacks::class),
             );
         });

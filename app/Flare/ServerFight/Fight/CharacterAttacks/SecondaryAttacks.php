@@ -10,7 +10,7 @@ use App\Flare\ServerFight\Monster\ServerMonster;
 
 class SecondaryAttacks extends BattleBase {
 
-    private array $attackData;
+    private bool $isCharacterVoided = false;
 
     private Affixes $affixes;
 
@@ -22,6 +22,33 @@ class SecondaryAttacks extends BattleBase {
 
     public function setAttackData(array $attackData) {
         $this->attackData = $attackData;
+    }
+
+    public function setIsCharacterVoided(bool $voided) {
+        $this->isVoided = $voided;
+    }
+
+    public function setIsEnemyEntranced(bool $entranced) {
+        $this->isEnemyEntranced = $entranced;
+    }
+
+    public function doSecondaryAttack(Character $character, ServerMonster $monster = null, float $affixReduction = 0.0, bool $isPvp = false) {
+        if (!$this->isVoided) {
+
+            if ($this->isEnemyEntranced) {
+                $affixReduction = 0.0;
+            }
+
+            $this->affixLifeStealingDamage($character, $monster, $affixReduction, $isPvp);
+            $this->affixDamage($character, $monster, $affixReduction, $isPvp);
+            $this->ringDamage($isPvp);
+        } else {
+            if ($isPvp) {
+                $this->addAttackerMessage('You are voided, none of your rings or enchantments fire ...', 'enemy-action');
+            } else {
+                $this->addMessage('You are voided, none of your rings or enchantments fire ...', 'enemy-action');
+            }
+        }
     }
 
     public function affixDamage(Character $character, ServerMonster $monster = null, float $defenderDamageReduction = 0.0, bool $isPvp = false) {
@@ -45,7 +72,7 @@ class SecondaryAttacks extends BattleBase {
             $damage = $damage - $damage * $defenderDamageReduction;
 
             $this->addAttackerMessage('The enemy is able to reduce the damage of your (damaging, resistible/non resistible) enchantment damage to: ' . number_format($damage), 'enemy-action');
-            $this->addDefenderMessage('You manage to scour up some strength and resist the (damaging, resistible/non resistible) enchantment damage coming in to: ' . number_format($damage), 'regular');
+            $this->addDefenderMessage('You manage resist the (damaging, resistible/non resistible) enchantment damage coming in to: ' . number_format($damage), 'regular');
         }
 
         if ($damage > 0) {
@@ -79,7 +106,7 @@ class SecondaryAttacks extends BattleBase {
 
         $damage = $this->monsterHealth * $lifeStealing;
 
-        if ($isPvp) {
+        if ($isPvp && $affixDamageReduction > 0.0) {
             $damage = $damage - $damage * $affixDamageReduction;
 
             $this->addAttackerMessage('The enemy reduced your life stealing enchantments damage to: ' . number_format($damage), 'enemy-action');

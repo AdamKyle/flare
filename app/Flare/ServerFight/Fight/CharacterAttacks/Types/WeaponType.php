@@ -14,24 +14,17 @@ use App\Flare\ServerFight\Monster\ServerMonster;
 
 class WeaponType extends BattleBase {
 
-    private array $attackData;
-
-    private bool $isVoided;
-
     private Entrance $entrance;
 
     private CanHit $canHit;
 
-    private SecondaryAttacks $secondaryAttacks;
-
     private SpecialAttacks $specialAttacks;
 
-    public function __construct(CharacterCacheData $characterCacheData, Entrance $entrance, CanHit $canHit, SecondaryAttacks $secondaryAttacks, SpecialAttacks $specialAttacks) {
+    public function __construct(CharacterCacheData $characterCacheData, Entrance $entrance, CanHit $canHit, SpecialAttacks $specialAttacks) {
         parent::__construct($characterCacheData);
 
         $this->entrance           = $entrance;
         $this->canHit             = $canHit;
-        $this->secondaryAttacks   = $secondaryAttacks;
         $this->specialAttacks     = $specialAttacks;
     }
 
@@ -58,7 +51,7 @@ class WeaponType extends BattleBase {
         }
 
         if ($this->canHit->canPlayerHitPlayer($attacker, $defender, $isAttackerVoided)) {
-            if ($this->characterCacheData->getCachedCharacterData($defender, 'ac') > $weaponDamage) {
+            if ($this->canBlock($weaponDamage, $this->getPvpCharacterAc($defender))) {
                 $this->addAttackerMessage('Your attack was blocked', 'enemy-action');
                 $this->addDefenderMessage('You managed to block the enemies attack', 'player-action');
 
@@ -84,6 +77,8 @@ class WeaponType extends BattleBase {
         $weaponDamage = $this->attackData['weapon_damage'];
 
         if ($this->entrance->isEnemyEntranced()) {
+            $this->isEnemyEntranced = true;
+
             $this->weaponAttack($character, $serverMonster, $weaponDamage);
 
             return $this;
@@ -99,7 +94,7 @@ class WeaponType extends BattleBase {
 
         if ($this->canHit->canPlayerHitMonster($character, $serverMonster, $this->isVoided)) {
 
-            if ($serverMonster->getMonsterStat('ac') > $weaponDamage) {
+            if ($this->canBlock($weaponDamage, $serverMonster->getMonsterStat('ac'))) {
                 $this->addMessage('Your weapon was blocked!', 'enemy-action');
             } else {
                 $this->weaponAttack($character, $serverMonster, $weaponDamage);
@@ -126,36 +121,6 @@ class WeaponType extends BattleBase {
     public function weaponAttack(Character $character, ServerMonster $monster, int $weaponDamage) {
         $this->weaponDamage($character, $monster->getName(), $weaponDamage);
         $this->secondaryAttack($character, $monster);
-    }
-
-    protected function secondaryAttack(Character $character, ServerMonster $monster = null, float $affixReduction = 0.0, bool $isPvp = false) {
-        if (!$this->isVoided) {
-
-            $this->secondaryAttacks->setMonsterHealth($this->monsterHealth);
-            $this->secondaryAttacks->setCharacterHealth($this->characterHealth);
-            $this->secondaryAttacks->setAttackData($this->attackData);
-
-
-            $this->secondaryAttacks->affixLifeStealingDamage($character, $monster, $affixReduction, $isPvp);
-            $this->secondaryAttacks->affixDamage($character, $monster, $affixReduction, $isPvp);
-            $this->secondaryAttacks->ringDamage($isPvp);
-
-            if ($isPvp) {
-                $this->mergeAttackerMessages($this->secondaryAttacks->getAttackerMessages());
-                $this->mergeDefenderMessages($this->secondaryAttacks->getDefenderMessages());
-            } else {
-                $this->secondaryAttacks->mergeMessages($this->secondaryAttacks->getMessages());
-            }
-
-            $this->secondaryAttacks->clearMessages();
-
-        } else {
-            if ($isPvp) {
-                $this->addAttackerMessage('You are voided, none of your rings or enchantments fire ...', 'enemy-action');
-            } else {
-                $this->addMessage('You are voided, none of your rings or enchantments fire ...', 'enemy-action');
-            }
-        }
     }
 
     public function pvpWeaponDamage(Character $attacker, int $weaponDamage) {

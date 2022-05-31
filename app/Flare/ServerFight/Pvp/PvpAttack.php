@@ -68,6 +68,11 @@ class PvpAttack extends PvpBase {
                 'type'    => 'enemy-action',
             ]], 'defender');
 
+            $this->mergeMessages([[
+                'message' => 'You have slaughtered the player. They have been moved away.',
+                'type'    => 'enemy-action',
+            ]], 'attacker');
+
             return true;
         }
 
@@ -78,6 +83,11 @@ class PvpAttack extends PvpBase {
                 'message' => 'You have been slain and must revive',
                 'type'    => 'enemy-action',
             ]], 'attacker');
+
+            $this->mergeMessages([[
+                'message' => 'You have slaughtered the player. They have been moved away.',
+                'type'    => 'enemy-action',
+            ]], 'defender');
         }
 
         $this->healthObject = [

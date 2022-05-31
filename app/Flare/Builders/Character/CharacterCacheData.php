@@ -26,7 +26,7 @@ class CharacterCacheData extends CharacterPvpCacheData {
     }
 
     public function getCharacterDefenceAc(Character $character) {
-        Cache::pull('character-defence-' . $character->id);
+        return Cache::get('character-defence-' . $character->id);
     }
 
     public function getDataFromAttackCache(Character $character, string $attackType): array {
