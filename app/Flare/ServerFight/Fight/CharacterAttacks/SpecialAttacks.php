@@ -65,23 +65,23 @@ class SpecialAttacks extends BattleMessages {
         }
     }
 
-    public function doCastDamageSpecials(Character $character, array $attackData) {
+    public function doCastDamageSpecials(Character $character, array $attackData, bool $isPvp = false) {
         if ($character->classType()->isHeretic()) {
-            $this->doubleCast($character, $attackData);
+            $this->doubleCast($character, $attackData, $isPvp);
         }
 
         if ($character->classType()->isVampire()) {
-            return $this->vampireThirst($character, $attackData);
+            return $this->vampireThirst($character, $attackData, $isPvp);
         }
     }
 
-    public function doCastHealSpecials(Character $character, array $attackData) {
+    public function doCastHealSpecials(Character $character, array $attackData, bool $isPvp = false) {
         if ($character->classType()->isProphet()) {
-            $this->doubleHeal($character, $attackData);
+            $this->doubleHeal($character, $attackData, $isPvp);
         }
 
         if ($character->classType()->isVampire()) {
-            return $this->vampireThirst($character, $attackData);
+            return $this->vampireThirst($character, $attackData, $isPvp);
         }
     }
 

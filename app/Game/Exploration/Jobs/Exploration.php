@@ -15,6 +15,7 @@ use App\Game\Exploration\Events\ExplorationTimeOut;
 use App\Game\Exploration\Events\ExplorationLogUpdate;
 use App\Game\Exploration\Handlers\RewardHandler;
 use App\Game\Exploration\Services\EncounterService;
+use App\Game\Maps\Events\UpdateDuelAtPosition;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -47,6 +48,8 @@ class Exploration implements ShouldQueue
         if ($this->shouldBail($automation)) {
             $this->endAutomation($automation);
 
+            event(new UpdateDuelAtPosition($this->character->user));
+
             return;
         }
 
@@ -76,6 +79,8 @@ class Exploration implements ShouldQueue
         $automation->delete();
 
         $response->deleteCharacterCache($this->character);
+
+        event(new UpdateDuelAtPosition($this->character->user));
 
         event(new ExplorationLogUpdate($this->character->user, 'Something went wrong with automation. Could not process fight. Automation Canceled.'));
 

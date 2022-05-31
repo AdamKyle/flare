@@ -187,6 +187,7 @@ class PvpService {
         $item->update([
             'item_prefix_id' => $prefix->id,
             'item_suffix_id' => $suffix->id,
+            'is_mythic'      => true,
         ]);
 
         return $item->refresh();
@@ -203,6 +204,8 @@ class PvpService {
             'character_position_x' => $x[rand(0, count($x) - 1)],
             'character_position_y' => $y[rand(0, count($y) - 1)],
         ]);
+
+        $character = $character->refresh();
 
         if (!$this->mapTileValue->canWalkOnWater($character, $character->map->character_position_x, $character->map->character_position_y) ||
             !$this->mapTileValue->canWalkOnDeathWater($character, $character->map->character_position_x, $character->map->character_position_y) ||

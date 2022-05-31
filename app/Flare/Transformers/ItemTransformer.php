@@ -85,6 +85,7 @@ class ItemTransformer extends TransformerAbstract {
             'devouring_darkness'               => $item->devouring_darkness,
             'ambush_resistance'                => $item->ambush_resistance,
             'counter_resistance'               => $item->counter_resistance,
+            'is_mythic'                        => $item->is_mythic,
         ];
     }
 }

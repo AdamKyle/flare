@@ -20,21 +20,23 @@ export default class ItemNameColorationButton extends React.Component<ItemNameCo
     render() {
         return (
             <button className={clsx({
-                'text-red-700 dark:text-red-500': this.props.item.type === 'trinket'
+                'text-red-700 dark:text-red-500': this.props.item.type === 'trinket' && !this.props.item.is_mythic
             }, {
-                'text-green-700 dark:text-green-600': this.props.item.is_unique && this.props.item.type !== 'trinket'
+                'text-green-700 dark:text-green-600': this.props.item.is_unique && this.props.item.type !== 'trinket' && !this.props.item.is_mythic
             },{
-                'text-sky-700 dark:text-sky-300': this.props.item.has_holy_stacks_applied > 0 && !this.props.item.is_unique && this.props.item.type !== 'trinket'
+                'text-sky-700 dark:text-sky-300': this.props.item.has_holy_stacks_applied > 0 && !this.props.item.is_unique && this.props.item.type !== 'trinket' && !this.props.item.is_mythic
             },{
-                'text-orange-400 dark:text-orange-300': this.props.item.type === 'quest' && !this.props.item.is_unique
+                'text-orange-400 dark:text-orange-300': this.props.item.type === 'quest' && !this.props.item.is_unique && !this.props.item.is_mythic
             },{
-                'text-pink-500 dark:text-pink-300': this.props.item.type === 'alchemy' && !this.props.item.is_unique
+                'text-pink-500 dark:text-pink-300': this.props.item.type === 'alchemy' && !this.props.item.is_unique && !this.props.item.is_mythic
             },{
-                'text-gray-600 dark:text-gray-300': this.props.item.attached_affixes_count === 0 && !this.props.item.is_unique && this.props.item.type !== 'alchemy' && this.props.item.type !== 'quest' && this.props.item.has_holy_stacks_applied === 0 && this.props.item.type !== 'trinket'
+                'text-gray-600 dark:text-gray-300': this.props.item.attached_affixes_count === 0 && !this.props.item.is_unique && this.props.item.type !== 'alchemy' && this.props.item.type !== 'quest' && this.props.item.has_holy_stacks_applied === 0 && this.props.item.type !== 'trinket' && !this.props.item.is_mythic
             },{
-                'text-blue-500': this.props.item.attached_affixes_count === 1 && !this.props.item.is_unique && this.props.item.type !== 'alchemy' && this.props.item.type !== 'quest' && this.props.item.has_holy_stacks_applied === 0 && this.props.item.type !== 'trinket'
+                'text-blue-500': this.props.item.attached_affixes_count === 1 && !this.props.item.is_unique && this.props.item.type !== 'alchemy' && this.props.item.type !== 'quest' && this.props.item.has_holy_stacks_applied === 0 && this.props.item.type !== 'trinket' && !this.props.item.is_mythic
             },{
-                'text-fuchsia-800 dark:text-fuchsia-300': this.props.item.attached_affixes_count === 2 && !this.props.item.is_unique && this.props.item.type !== 'alchemy' && this.props.item.type !== 'quest' && this.props.item.has_holy_stacks_applied === 0 && this.props.item.type !== 'trinket'
+                'text-fuchsia-800 dark:text-fuchsia-300': this.props.item.attached_affixes_count === 2 && !this.props.item.is_unique && this.props.item.type !== 'alchemy' && this.props.item.type !== 'quest' && this.props.item.has_holy_stacks_applied === 0 && this.props.item.type !== 'trinket' && !this.props.item.is_mythic
+            }, {
+                'text-amber-600 dark:text-amber-500': this.props.item.is_mythic
             })} onClick={() => this.viewItem()}>{this.props.item.item_name}</button>
         )
     }

@@ -73,6 +73,7 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
                 affix_count: this.state.comparison_details.itemToEquip.affix_count,
                 is_unique: this.state.comparison_details.itemToEquip.is_unique,
                 holy_stacks_applied: this.state.comparison_details.itemToEquip.holy_stacks_applied,
+                is_mythic: this.state.comparison_details.itemToEquip.is_mythic,
             }} /> <span className='pl-3'>(Type: {capitalize(this.state.comparison_details.itemToEquip.type)})</span>
             </Fragment>
         )

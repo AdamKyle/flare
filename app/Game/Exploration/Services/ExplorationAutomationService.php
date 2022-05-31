@@ -11,6 +11,7 @@ use App\Flare\Models\Character;
 use App\Game\Exploration\Events\ExplorationLogUpdate;
 use App\Game\Exploration\Events\ExplorationTimeOut;
 use App\Game\Exploration\Jobs\Exploration;
+use App\Game\Maps\Events\UpdateDuelAtPosition;
 
 class ExplorationAutomationService {
 
@@ -46,6 +47,8 @@ class ExplorationAutomationService {
         event(new ExplorationLogUpdate($character->user, 'The exploration will begin in 5 minutes. Every 5 minutes you will encounter the enemy up to a maximum of 8 times in a single "encounter"'));
 
         event(new ExplorationTimeOut($character->user, now()->diffInSeconds($automation->completed_at)));
+
+        event(new UpdateDuelAtPosition($character->refresh()->user));
 
         $this->startAutomation($character, $automation->id, $params['attack_type']);
     }

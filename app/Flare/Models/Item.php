@@ -89,6 +89,7 @@ class Item extends Model
         'ambush_resistance',
         'counter_chance',
         'counter_resistance',
+        'is_mythic',
     ];
 
     /**
@@ -136,6 +137,7 @@ class Item extends Model
         'ignores_caps'                     => 'boolean',
         'stat_increase'                    => 'boolean',
         'can_use_on_other_items'           => 'boolean',
+        'is_mythic'                        => 'boolean',
         'kingdom_damage'                   => 'float',
         'lasts_for'                        => 'integer',
         'increase_stat_by'                 => 'float',

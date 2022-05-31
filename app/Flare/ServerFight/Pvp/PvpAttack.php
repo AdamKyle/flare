@@ -38,6 +38,11 @@ class PvpAttack extends PvpBase {
     }
 
     public function setUpPvpFight(Character $attacker, Character $defender, array $healthObject): array {
+
+        if ($this->cache()->pvpCacheExists($attacker, $defender)) {
+            return $this->cache()->fetchPvpCacheObject($attacker, $defender);
+        }
+
         $healthObject = $this->setUpFight->setUp($attacker, $defender, $healthObject);
 
         $this->mergeMessages($this->setUpFight->getAttackerMessages(), 'attacker');
@@ -55,21 +60,24 @@ class PvpAttack extends PvpBase {
         $defenderHealth = $response->getMonsterHealth();
         $attackerHealth = $response->getCharacterHealth();
 
-        if ($defenderHealth < 0) {
+        if ($defenderHealth <= 0) {
             $defenderHealth = 0;
 
-            $this->healthObject = [
-                'attacker_health' => $attackerHealth,
-                'defender_health' => $defenderHealth,
-            ];
-
-            $defenderMessages = $this->getMessages()['defender'];
-            $defenderMessages[] = [
+            $this->mergeMessages([[
                 'message' => 'You have been slain and must revive',
                 'type'    => 'enemy-action',
-            ];
+            ]], 'defender');
 
             return true;
+        }
+
+        if ($attackerHealth <= 0) {
+            $attackerHealth = 0;
+
+            $this->mergeMessages([[
+                'message' => 'You have been slain and must revive',
+                'type'    => 'enemy-action',
+            ]], 'attacker');
         }
 
         $this->healthObject = [

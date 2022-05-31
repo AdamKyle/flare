@@ -14,9 +14,9 @@ class CharacterPvpCacheData {
             $pvpCache = [];
 
             $pvpCache[] = [
-                'attacker_id' => $attacker->id,
-                'defender_id' => $defender->id,
-                'attacker_health' => $attackerHealth,
+                'attacker_id'      => $attacker->id,
+                'defender_id'      => $defender->id,
+                'attacker_health'  => $attackerHealth,
                 'defender_health'  => $defenderHealth,
             ];
 
@@ -28,15 +28,19 @@ class CharacterPvpCacheData {
         foreach ($pvpCache as $index => $cache) {
             if ($cache['attacker_id'] === $attacker->id && $cache['defender_id'] === $defender->id) {
                 $pvpCache[$index] = [
+                    'attacker_id'     => $attacker->id,
+                    'defender_id'     => $defender->id,
                     'attacker_health' => $attackerHealth,
-                    'defender_health'  => $defenderHealth,
+                    'defender_health' => $defenderHealth,
                 ];
             }
 
             if ($cache['defender_id'] === $attacker->id && $cache['attacker_id'] === $defender->id) {
                 $pvpCache[$index] = [
-                    'attacker_health' => $attackerHealth,
-                    'defender_health'  => $defenderHealth,
+                    'attacker_id'     => $defender->id,
+                    'defender_id'     => $attacker->id,
+                    'attacker_health' => $defenderHealth,
+                    'defender_health' => $attacker,
                 ];
             }
         }
@@ -73,11 +77,18 @@ class CharacterPvpCacheData {
 
         foreach ($pvpCache as $index => $cache) {
             if ($cache['attacker_id'] === $attacker->id && $cache['defender_id'] === $defender->id) {
-                return $cache[$index];
+                return $pvpCache[$index];
             }
 
             if ($cache['defender_id'] === $attacker->id && $cache['attacker_id'] === $defender->id) {
-                return $cache[$index];
+                $cache = $pvpCache[$index];
+
+                return [
+                    'attacker_id'      => $attacker->id,
+                    'defender_id'      => $defender->id,
+                    'attacker_health'  => $cache['defender_health'],
+                    'defender_health'  => $cache['attacker_health'],
+                ];
             }
         }
     }
@@ -91,11 +102,11 @@ class CharacterPvpCacheData {
 
         foreach ($pvpCache as $index => $cache) {
             if ($cache['attacker_id'] === $character->id) {
-                unset($cache[$index]);
+                unset($pvpCache[$index]);
             }
 
             if ($cache['defender_id'] === $character->id) {
-                unset($cache[$index]);
+                unset($pvpCache[$index]);
             }
         }
 
@@ -112,17 +123,43 @@ class CharacterPvpCacheData {
         foreach ($pvpCache as $index => $cache) {
             if ($cache['attacker_id'] === $character->id) {
                 $pvpCache[$index] = [
-                    'attacker_health' => $health,
+                    'attacker_id'      => $character->id,
+                    'defender_id'      => $cache['defender_id'],
+                    'attacker_health'  => $health,
+                    'defender_health'  => $cache['defender_health'],
                 ];
             }
 
             if ($cache['defender_id'] === $character->id) {
                 $pvpCache[$index] = [
+                    'attacker_id'      => $cache['attacker_id'],
+                    'defender_id'      => $character->id,
+                    'attacker_health'  => $cache['attacker_health'],
                     'defender_health'  => $health,
                 ];
             }
         }
 
         Cache::put('pvp-cache', $pvpCache);
+    }
+
+    public function pvpCacheExists(Character $attacker, Character $defender): bool {
+        $pvpCache = Cache::get('pvp-cache');
+
+        if (is_null($pvpCache)) {
+            return false;
+        }
+
+        foreach ($pvpCache as $cache) {
+            if ($cache['attacker_id'] === $attacker->id && $cache['defender_id'] === $defender->id) {
+                return true;
+            }
+
+            if ($cache['defender_id'] === $attacker->id && $cache['attacker_id'] === $defender->id) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

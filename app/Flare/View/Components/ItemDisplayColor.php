@@ -52,6 +52,8 @@ class ItemDisplayColor extends Component
                 $this->color = 'quest-item';
             } elseif ($this->item->usable || $this->item->can_use_on_other_items) {
                 $this->color = 'usable-item';
+            } elseif($this->item->is_mythic) {
+                $this->color = 'mythic-unique';
             } else {
                 $this->color = 'normal-item';
             }

@@ -68,13 +68,13 @@ class BaseCharacterAttack {
                 $response = $this->characterAttack->pvpAttack($character, $defender, $isPlayerVoided, $healthObject);
                 break;
             case 'cast':
-                //$response = $this->characterAttack->cast($character, $monster, $isPlayerVoided, $this->characterHealth, $this->monsterHealth);
+                $response = $this->characterAttack->pvpCast($character, $defender, $isPlayerVoided, $healthObject);
                 break;
             case 'attack_and_cast':
-                //$response = $this->characterAttack->attackAndCast($character, $monster, $isPlayerVoided, $this->characterHealth, $this->monsterHealth);
+                $response = $this->characterAttack->pvpAttackAndCast($character, $defender, $isPlayerVoided, $healthObject);
                 break;
             case 'cast_and_attack':
-                //$response = $this->characterAttack->castAndAttack($character, $monster, $isPlayerVoided, $this->characterHealth, $this->monsterHealth);
+                $response = $this->characterAttack->pvpCastAndAttack($character, $defender, $isPlayerVoided, $healthObject);
                 break;
             case 'defend':
                 //$response = $this->characterAttack->defend($character, $monster, $isPlayerVoided, $this->characterHealth, $this->monsterHealth);

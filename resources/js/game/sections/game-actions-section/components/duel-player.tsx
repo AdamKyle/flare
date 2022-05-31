@@ -8,6 +8,7 @@ import AttackButton from "../../../components/ui/buttons/attack-button";
 import HealthMeters from "./health-meters";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import DangerButton from "../../../components/ui/buttons/danger-button";
+import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
 import {BattleMessage} from "../../../lib/game/actions/battle/types/battle-message-type";
 
 export default class DuelPlayer extends React.Component<any, any> {
@@ -24,6 +25,22 @@ export default class DuelPlayer extends React.Component<any, any> {
             defender_max_health: 0,
             defender_health: 0,
             battle_messages: [],
+            error_message: null,
+        }
+    }
+
+    componentDidMount() {
+        if (this.props.duel_data !== null) {
+            this.setState({
+                character_id: this.props.duel_data.attacker_id,
+                attacker_max_health: this.props.duel_data.health_object.attacker_max_health,
+                attacker_health: this.props.duel_data.health_object.attacker_health,
+                defender_max_health: this.props.duel_data.health_object.defender_max_health,
+                defender_health: this.props.duel_data.health_object.defender_health,
+                battle_messages: this.props.duel_data.messages,
+            }, () => {
+                this.props.reset_duel_data();
+            });
         }
     }
 
@@ -92,6 +109,7 @@ export default class DuelPlayer extends React.Component<any, any> {
     fight() {
         this.setState({
             preforming_action: true,
+            error_message: null,
         }, () => {
             (new Ajax()).setRoute('attack-player/get-health/' + this.props.character.id).setParameters({
                 defender_id: this.state.character_id
@@ -113,7 +131,8 @@ export default class DuelPlayer extends React.Component<any, any> {
 
     attack(type: string) {
         this.setState({
-            preforming_action: true
+            preforming_action: true,
+            error_message: null,
         }, () => {
             (new Ajax()).setRoute('attack-player/' + this.props.character.id).setParameters({
                 defender_id: this.state.character_id,
@@ -122,6 +141,15 @@ export default class DuelPlayer extends React.Component<any, any> {
                 this.setState({
                     preforming_action: false,
                 });
+            }, (error: AxiosError) => {
+                if (typeof error.response !== 'undefined') {
+                    const data = error.response.data;
+                    console.log(data);
+                    this.setState({
+                        error_message: data.message,
+                        preforming_action: false,
+                    })
+                }
             });
         });
     }
@@ -175,7 +203,14 @@ export default class DuelPlayer extends React.Component<any, any> {
     render() {
         return (
             <div className='mt-2 md:ml-[120px]'>
-                <div className='grid grid-cols-3 gap-2'>
+                {
+                    this.state.error_message !== null ?
+                        <DangerAlert>
+                            {this.state.error_message}
+                        </DangerAlert>
+                    : null
+                }
+                <div className='mt-2 grid grid-cols-3 gap-2'>
                     <div className='cols-start-1 col-span-2'>
                         <Select
                             onChange={this.setCharacterToFight.bind(this)}
@@ -201,7 +236,7 @@ export default class DuelPlayer extends React.Component<any, any> {
                         </p>
                     : null
                 }
-                <div className='md:ml-[-100px]'>
+                <div className='md:ml-[-160px]'>
                     <div className={clsx('mt-4 mb-4 text-xs text-center', {
                         'hidden': this.attackHidden()
                     })}>

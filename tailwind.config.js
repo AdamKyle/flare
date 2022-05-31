@@ -126,12 +126,10 @@ module.exports = {
           ...colors.pink,
           DEFAULT: '#fdf2f8'
         },
-        social: {
-          facebook: "#3b5998",
-          twitter: "#1da1f2",
-          pinterest: "#bd081c",
-          whatsapp: "#25d366",
-        },
+        amber: {
+          ...colors.amber,
+          DEFAULT: '#fffbeb'
+        }
       },
       spacing: {
         "1/1": "100%",

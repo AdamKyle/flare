@@ -22,6 +22,8 @@ class SetUpFight extends PvpMessages {
 
     private $isAttackerVoided = false;
 
+    private $isEnemyVoided    = false;
+
     public function __construct(CharacterCacheData $characterCacheData, Voidance $voidance, Ambush $ambush) {
         $this->characterCacheData = $characterCacheData;
         $this->voidance           = $voidance;
@@ -37,6 +39,10 @@ class SetUpFight extends PvpMessages {
 
     public function isAttackerVoided(): bool {
         return $this->isAttackerVoided;
+    }
+
+    public function isEnemyVoided(): bool {
+        return $this->isEnemyVoided;
     }
 
     public function handleAmbush(Character $attacker, Character $defender, array $healthObject, bool $isAttackerVoided): array {
@@ -61,6 +67,8 @@ class SetUpFight extends PvpMessages {
         $this->voidance->clearPvpMessage();
 
         $this->isAttackerVoided = $this->voidance->isPlayerVoided();
+
+        $this->isEnemyVoided    = $this->voidance->isEnemyVoided();
     }
 
     public function reducePlayerSkills(Character $attacker, Character $defender) {

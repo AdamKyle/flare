@@ -102,6 +102,7 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
 
         // @ts-ignore
         this.pvpUpdate.listen('Game.Battle.Events.UpdateCharacterPvpAttack', (event: any) => {
+            console.log(event);
             this.setState({
                 show_duel_fight: true,
                 duel_fight_info: event.data,
@@ -120,6 +121,8 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
             if (typeof this.props.character_position.game_map_id === 'undefined') {
                 return;
             }
+
+            console.log('here ....')
 
             const characters = this.state.characters_for_dueling.filter((character: any) => {
                 return character.character_position_x === this.props.character_position?.x &&
@@ -230,6 +233,7 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
     }
 
     render() {
+        console.log(this.state);
         return (
             <div className='lg:px-4'>
                 {

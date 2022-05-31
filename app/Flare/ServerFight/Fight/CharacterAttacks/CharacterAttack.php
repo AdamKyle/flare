@@ -54,6 +54,17 @@ class CharacterAttack {
         return $this;
     }
 
+    public function pvpCast(Character $attacker, Character $defender, bool $isAttackerVoided, array $healthObject): CharacterAttack {
+        $this->castType->setCharacterHealth($healthObject['attacker_health']);
+        $this->castType->setMonsterHealth($healthObject['defender_health']);
+        $this->castType->setCharacterAttackData($attacker, $isAttackerVoided);
+        $this->castType->pvpCastAttack($attacker, $defender);
+
+        $this->type = $this->castType;
+
+        return $this;
+    }
+
     public function cast(Character $character, ServerMonster $monster, bool $isPlayerVoided, int $characterHealth, int $monsterHealth): CharacterAttack {
         $this->castType->setCharacterHealth($characterHealth);
         $this->castType->setMonsterHealth($monsterHealth);
@@ -65,6 +76,17 @@ class CharacterAttack {
         return $this;
     }
 
+    public function pvpAttackAndCast(Character $attacker, Character $defender, bool $isAttackerVoided, array $healthObject): CharacterAttack {
+        $this->attackAndCast->setCharacterHealth($healthObject['attacker_health']);
+        $this->attackAndCast->setMonsterHealth($healthObject['defender_health']);
+        $this->attackAndCast->setCharacterAttackData($attacker, $isAttackerVoided);
+        $this->attackAndCast->handlePvpAttack($attacker, $defender);
+
+        $this->type = $this->attackAndCast;
+
+        return $this;
+    }
+
     public function attackAndCast(Character $character, ServerMonster $monster, bool $isPlayerVoided, int $characterHealth, int $monsterHealth): CharacterAttack {
         $this->attackAndCast->setCharacterHealth($characterHealth);
         $this->attackAndCast->setMonsterHealth($monsterHealth);
@@ -72,6 +94,17 @@ class CharacterAttack {
         $this->attackAndCast->handleAttack($character, $monster);
 
         $this->type = $this->attackAndCast;
+
+        return $this;
+    }
+
+    public function pvpCastAndAttack(Character $attacker, Character $defender, bool $isAttackerVoided, array $healthObject): CharacterAttack {
+        $this->castAndAttack->setCharacterHealth($healthObject['attacker_health']);
+        $this->castAndAttack->setMonsterHealth($healthObject['defender_health']);
+        $this->castAndAttack->setCharacterAttackData($attacker, $isAttackerVoided);
+        $this->castAndAttack->handlePvpAttack($attacker, $defender);
+
+        $this->type = $this->castAndAttack;
 
         return $this;
     }

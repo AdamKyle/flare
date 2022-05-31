@@ -7,6 +7,7 @@ use App\Flare\Models\Character;
 use App\Flare\ServerFight\BattleBase;
 use App\Flare\ServerFight\Fight\Affixes;
 use App\Flare\ServerFight\Fight\CanHit;
+use App\Flare\ServerFight\Fight\CharacterAttacks\SecondaryAttacks;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks;
 use App\Flare\ServerFight\Fight\Entrance;
 use App\Flare\ServerFight\Monster\ServerMonster;
@@ -17,21 +18,20 @@ class WeaponType extends BattleBase {
 
     private bool $isVoided;
 
-
     private Entrance $entrance;
 
     private CanHit $canHit;
 
-    private Affixes $affixes;
+    private SecondaryAttacks $secondaryAttacks;
 
     private SpecialAttacks $specialAttacks;
 
-    public function __construct(CharacterCacheData $characterCacheData, Entrance $entrance, CanHit $canHit, Affixes $affixes, SpecialAttacks $specialAttacks) {
+    public function __construct(CharacterCacheData $characterCacheData, Entrance $entrance, CanHit $canHit, SecondaryAttacks $secondaryAttacks, SpecialAttacks $specialAttacks) {
         parent::__construct($characterCacheData);
 
         $this->entrance           = $entrance;
         $this->canHit             = $canHit;
-        $this->affixes            = $affixes;
+        $this->secondaryAttacks   = $secondaryAttacks;
         $this->specialAttacks     = $specialAttacks;
     }
 
@@ -58,7 +58,7 @@ class WeaponType extends BattleBase {
         }
 
         if ($this->canHit->canPlayerHitPlayer($attacker, $defender, $isAttackerVoided)) {
-            if ($this->characterCacheData->getCachedCharacterData($defender, 'ac') > $weaponDamage) {
+            if ($this->characterCacheData->getCachedCharacterData($defender, 'ac')) {
                 $this->addAttackerMessage('Your attack was blocked', 'enemy-action');
                 $this->addDefenderMessage('You managed to block the enemies attack', 'player-action');
 
@@ -130,84 +130,30 @@ class WeaponType extends BattleBase {
 
     protected function secondaryAttack(Character $character, ServerMonster $monster = null, float $affixReduction = 0.0, bool $isPvp = false) {
         if (!$this->isVoided) {
-            $this->affixLifeStealingDamage($character, $monster, $affixReduction, $isPvp);
-            $this->affixDamage($character, $monster, $affixReduction, $isPvp);
-            $this->ringDamage($isPvp);
+
+            $this->secondaryAttacks->setMonsterHealth($this->monsterHealth);
+            $this->secondaryAttacks->setCharacterHealth($this->characterHealth);
+            $this->secondaryAttacks->setAttackData($this->attackData);
+
+
+            $this->secondaryAttacks->affixLifeStealingDamage($character, $monster, $affixReduction, $isPvp);
+            $this->secondaryAttacks->affixDamage($character, $monster, $affixReduction, $isPvp);
+            $this->secondaryAttacks->ringDamage($isPvp);
+
+            if ($isPvp) {
+                $this->mergeAttackerMessages($this->secondaryAttacks->getAttackerMessages());
+                $this->mergeDefenderMessages($this->secondaryAttacks->getDefenderMessages());
+            } else {
+                $this->secondaryAttacks->mergeMessages($this->secondaryAttacks->getMessages());
+            }
+
+            $this->secondaryAttacks->clearMessages();
+
         } else {
-            $this->addMessage('You are voided, none of your rings or enchantments fire ...', 'enemy-action');
-        }
-    }
-
-    protected function affixDamage(Character $character, ServerMonster $monster = null, float $defenderDamageReduction = 0.0, bool $isPvp = false) {
-
-        $resistance = 0.0;
-
-        if (!is_null($monster)) {
-            $resistance = $monster->getMonsterStat('affix_resistance');
-        }
-
-        $damage = $this->affixes->getCharacterAffixDamage($character, $resistance, $this->attackData, $isPvp);
-
-        if (!$isPvp) {
-            $this->mergeMessages($this->affixes->getMessages());
-        } else {
-            $this->mergeAttackerMessages($this->affixes->getAttackerMessages());
-            $this->mergeDefenderMessages($this->affixes->getDefenderMessages());
-        }
-
-        if ($isPvp) {
-            $damage = $damage - $damage * $defenderDamageReduction;
-
-            $this->addAttackerMessage('The enemy is able to reduce the damage of your affixes to: ' . number_format($damage), 'enemy-action');
-            $this->addDefenderMessage('You manage to scour up some strength and resist the damage coming in to: ' . number_format($damage), 'regular');
-        }
-
-        if ($damage > 0) {
-            $this->monsterHealth -= $damage;
-        }
-
-        $this->affixes->clearMessages();
-    }
-
-    protected function affixLifeStealingDamage(Character $character, ServerMonster $monster = null, float $affixDamageReduction = 0.0, bool $isPvp = false) {
-        if ($this->monsterHealth <= 0) {
-            return;
-        }
-
-        $resistance = 0.0;
-
-        if (!is_null($monster)) {
-            $resistance = $monster->getMonsterStat('affix_resistance');
-        }
-
-        $lifeStealing = $this->affixes->getAffixLifeSteal($character, $this->attackData, $resistance, $isPvp);
-
-        if (!$isPvp) {
-            $this->mergeMessages($this->affixes->getMessages());
-        } else {
-            $this->mergeAttackerMessages($this->affixes->getAttackerMessages());
-            $this->mergeDefenderMessages($this->affixes->getDefenderMessages());
-        }
-
-        $this->affixes->clearMessages();
-
-        $damage = $this->monsterHealth * $lifeStealing;
-
-        if ($isPvp) {
-            $damage = $damage - $damage * $affixDamageReduction;
-
-            $this->addAttackerMessage('The defender reduced your enchantments damage to: ' . number_format($damage), 'enemy-action');
-            $this->addDefenderMessage('You manage, by the skin of your teeth, to use the last of your magics to reduce their enchantment damage to: ' . number_format($damage), 'regular');
-        }
-
-        if ($damage > 0) {
-            $this->monsterHealth   -= $damage;
-            $this->characterHealth += $damage;
-
-            $maxCharacterHealth = $this->characterCacheData->getCachedCharacterData($character, 'health');
-
-            if ($this->characterHealth >= $maxCharacterHealth) {
-                $this->characterHealth = $maxCharacterHealth;
+            if ($isPvp) {
+                $this->addAttackerMessage('You are voided, none of your rings or enchantments fire ...', 'enemy-action');
+            } else {
+                $this->addMessage('You are voided, none of your rings or enchantments fire ...', 'enemy-action');
             }
         }
     }
@@ -267,19 +213,5 @@ class WeaponType extends BattleBase {
         }
 
         return $weaponDamage;
-    }
-
-    protected function ringDamage(bool $ispvp = false) {
-        $ringDamage = $this->attackData['ring_damage'];
-
-        if ($ringDamage > 0) {
-            $this->monsterHealth -= ($ringDamage - $ringDamage * $this->attackData['damage_deduction']);
-
-            $this->addMessage('Your rings hit for: ' . number_format($ringDamage), 'player-action', $ispvp);
-
-            if ($ispvp) {
-                $this->addDefenderMessage('The enemies rings glow and lash out for: ' . number_format($ringDamage), 'enemy-action');
-            }
-        }
     }
 }

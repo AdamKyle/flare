@@ -7,6 +7,7 @@ use App\Flare\Models\Character;
 use App\Flare\ServerFight\BattleBase;
 use App\Flare\ServerFight\Fight\Affixes;
 use App\Flare\ServerFight\Fight\CanHit;
+use App\Flare\ServerFight\Fight\CharacterAttacks\SecondaryAttacks;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks;
 use App\Flare\ServerFight\Fight\Entrance;
 use App\Flare\ServerFight\Monster\ServerMonster;
@@ -22,17 +23,17 @@ class CastType extends BattleBase
 
     private CanHit $canHit;
 
-    private Affixes $affixes;
+    private SecondaryAttacks $secondaryAttacks;
 
     private SpecialAttacks $specialAttacks;
 
-    public function __construct(CharacterCacheData $characterCacheData, Entrance $entrance, CanHit $canHit, Affixes $affixes, SpecialAttacks $specialAttacks)
+    public function __construct(CharacterCacheData $characterCacheData, Entrance $entrance, CanHit $canHit, SecondaryAttacks $secondaryAttacks, SpecialAttacks $specialAttacks)
     {
         parent::__construct($characterCacheData);
 
         $this->entrance           = $entrance;
         $this->canHit             = $canHit;
-        $this->affixes            = $affixes;
+        $this->secondaryAttacks   = $secondaryAttacks;
         $this->specialAttacks     = $specialAttacks;
     }
 
@@ -48,6 +49,35 @@ class CastType extends BattleBase
     public function resetMessages() {
         $this->clearMessages();
         $this->entrance->clearMessages();
+    }
+
+    public function pvpCastAttack(Character $attacker, Character $defender) {
+        $this->entrance->attackerEntrancesDefender($attacker, $this->attackData, $this->isVoided);
+
+        $this->mergeAttackerMessages($this->entrance->getAttackerMessages());
+        $this->mergeDefenderMessages($this->entrance->getDefenderMessages());
+
+        $spellDamage = $this->attackData['spell_damage'];
+
+        if ($this->entrance->isEnemyEntranced()) {
+            $this->pvpSpellDamage($attacker, $defender, $spellDamage);
+
+            return $this;
+        }
+
+        if ($this->canHit->canPlayerCastSpellOnPlayer($attacker, $defender, $this->isVoided)) {
+            if ($this->characterCacheData->getCachedCharacterData($defender, 'ac') > $spellDamage) {
+                $this->addAttackerMessage('Your spell was blocked!', 'enemy-action');
+            } else {
+                $this->pvpSpellDamage($attacker, $defender, $spellDamage);
+            }
+        } else {
+            $this->addAttackerMessage('Your spell fizzled and failed!', 'enemy-action');
+
+            $this->secondaryAttack($attacker, null, $this->characterCacheData->getCachedCharacterData($defender, 'affix_damage_reduction'), true);
+        }
+
+        return $this;
     }
 
     public function castAttack(Character $character, ServerMonster $monster) {
@@ -75,7 +105,7 @@ class CastType extends BattleBase
 
         if ($this->canHit->canPlayerCastSpell($character, $monster, $this->isVoided)) {
             if ($monster->getMonsterStat('ac') > $spellDamage) {
-                $this->addMessage('Your weapon was blocked!', 'enemy-action');
+                $this->addMessage('Your spell was blocked!', 'enemy-action');
             } else {
                 $this->doSpellDamage($character, $monster, $spellDamage);
             }
@@ -88,6 +118,16 @@ class CastType extends BattleBase
         return $this;
     }
 
+    public function doPvpSpellDamage(Character $attacker, Character $defender, int $spellDamage) {
+        if ($spellDamage > 0) {
+            $this->pvpSpellDamage($attacker, $defender, $spellDamage);
+        }
+
+        $this->heal($attacker, true);
+
+        $this->secondaryAttack($attacker, null, $this->characterCacheData->getCachedCharacterData($defender, 'affix_damage_reduction'), true);
+    }
+
     public function doSpellDamage(Character $character, ServerMonster $monster, int $spellDamage, bool $entranced = false) {
         if ($spellDamage > 0) {
             $this->spellDamage($character, $monster, $spellDamage, $entranced);
@@ -98,62 +138,83 @@ class CastType extends BattleBase
         $this->secondaryAttack($character, $monster);
     }
 
-    protected function secondaryAttack(Character $character, ServerMonster $monster) {
+    protected function secondaryAttack(Character $character, ServerMonster $monster = null, float $affixReduction = 0.0, bool $isPvp = false) {
         if (!$this->isVoided) {
-            $this->affixLifeStealingDamage($character, $monster);
-            $this->affixDamage($character, $monster);
-            $this->ringDamage();
+
+            $this->secondaryAttacks->setMonsterHealth($this->monsterHealth);
+            $this->secondaryAttacks->setCharacterHealth($this->characterHealth);
+            $this->secondaryAttacks->setAttackData($this->attackData);
+
+
+            $this->secondaryAttacks->affixLifeStealingDamage($character, $monster, $affixReduction, $isPvp);
+            $this->secondaryAttacks->affixDamage($character, $monster, $affixReduction, $isPvp);
+            $this->secondaryAttacks->ringDamage($isPvp);
+
+            if ($isPvp) {
+                $this->mergeAttackerMessages($this->secondaryAttacks->getAttackerMessages());
+                $this->mergeDefenderMessages($this->secondaryAttacks->getDefenderMessages());
+            } else {
+                $this->secondaryAttacks->mergeMessages($this->secondaryAttacks->getMessages());
+            }
+
+            $this->secondaryAttacks->clearMessages();
+
         } else {
-            $this->addMessage('You are voided, none of your rings or enchantments fire ...', 'enemy-action');
+            if ($isPvp) {
+                $this->addAttackerMessage('You are voided, none of your rings or enchantments fire ...', 'enemy-action');
+            } else {
+                $this->addMessage('You are voided, none of your rings or enchantments fire ...', 'enemy-action');
+            }
         }
     }
 
+    public function pvpSpellDamage(Character $attacker, Character $defender, int $spellDamage, bool $outSideEntrance = false) {
+        $defenderSpellEvasion = $this->characterCacheData->getCachedCharacterData($defender, 'spell_evasion');
 
-    protected function affixDamage(Character $character, ServerMonster $monster) {
-        $damage = $this->affixes->getCharacterAffixDamage($character, $monster, $this->attackData);
+        if (!$outSideEntrance) {
+            if (!$this->entrance->isEnemyEntranced()) {
+                if ($defenderSpellEvasion > 1) {
+                    $this->addAttackerMessage('The enemy evades your magic!', 'enemy-action');
+                    $this->addDefenderMessage('Your rings glow and you manage to evade the enemies spells.', 'player-action');
 
-        if ($damage > 0) {
-            $this->monsterHealth -= $damage;
-        }
+                    return;
+                }
 
-        $this->mergeMessages($this->affixes->getMessages());
+                $evasion = 100 - (100 - 100 * $defenderSpellEvasion);
 
-        $this->affixes->clearMessages();
-    }
-
-    protected function affixLifeStealingDamage(Character $character, ServerMonster $monster) {
-        if ($this->monsterHealth <= 0) {
-            return;
-        }
-
-        $lifeStealing = $this->affixes->getAffixLifeSteal($character, $monster, $this->attackData);
-
-        $damage = $monster->getHealth() * $lifeStealing;
-
-        if ($damage > 0) {
-            $this->monsterHealth   -= $damage;
-            $this->characterHealth += $damage;
-
-            $maxCharacterHealth = $this->characterCacheData->getCachedCharacterData($character, 'health');
-
-            if ($this->characterHealth >= $maxCharacterHealth) {
-                $this->characterHealth = $maxCharacterHealth;
+                if (rand(1, 100) > $evasion) {
+                    $this->addAttackerMessage('The enemy evades your magic!', 'enemy-action');
+                    $this->addDefenderMessage('Your rings glow and you manage to evade the enemies spells.', 'player-action');
+                }
             }
         }
 
-        $this->mergeMessages($this->affixes->getMessages());
+        $criticality = $this->characterCacheData->getCachedCharacterData($attacker, 'skills')['criticality'];
 
-        $this->affixes->clearMessages();
-    }
+        if (rand(1, 100) > (100 - 100 * $criticality)) {
+            $this->addAttackerMessage('Your magic radiates across the plane. Even The Creator is terrified! (Critical strike!)', 'player-action');
 
-    protected function ringDamage() {
-        $ringDamage = $this->attackData['ring_damage'];
-
-        if ($ringDamage > 0) {
-            $this->monsterHealth -= ($ringDamage - $ringDamage * $this->attackData['damage_deduction']);
-
-            $this->addMessage('Your rings hit for: ' . number_format($ringDamage), 'player-action');
+            $spellDamage *= 2;
         }
+
+        $totalDamage = $spellDamage - $spellDamage * $this->attackData['damage_deduction'];
+
+        $this->monsterHealth -= $totalDamage;
+
+        $this->addAttackerMessage('Your damage spell(s) hits ' . $defender->name . ' for: ' . number_format($totalDamage), 'player-action');
+        $this->addDefenderMessage($attacker->name . ' begins to cast their magics, the crackle in the air is electrifying. Their magics fly towards you for: ' . number_format($totalDamage), 'enemy-action');
+
+        $this->specialAttacks->setCharacterHealth($this->characterHealth)
+                             ->setMonsterHealth($this->monsterHealth)
+                             ->doCastDamageSpecials($attacker, $this->attackData, true);
+
+        $this->mergeAttackerMessages($this->specialAttacks->getAttackerMessages());
+        $this->mergeDefenderMessages($this->specialAttacks->getDefenderMessages());
+
+        $this->characterHealth = $this->specialAttacks->getCharacterHealth();
+        $this->monsterHealth   = $this->specialAttacks->getMonsterHealth();
+
+        $this->specialAttacks->clearMessages();
     }
 
     public function spellDamage(Character $character, ServerMonster $monster, int $spellDamage, bool $entranced = false) {
@@ -202,14 +263,18 @@ class CastType extends BattleBase
         $this->specialAttacks->clearMessages();
     }
 
-    public function heal(Character $character) {
+    public function heal(Character $character, bool $isPvp = false) {
         $healFor = $this->attackData['heal_for'];
 
         if ($healFor > 0) {
             $criticality = $this->characterCacheData->getCachedCharacterData($character, 'skills')['criticality'];
 
             if (rand(1, 100) > (100 - 100 * $criticality)) {
-                $this->addMessage('The heavens open and your wounds start to heal over (Critical heal!)', 'player-action');
+                if ($isPvp) {
+                    $this->addAttackerMessage('The heavens open and your wounds start to heal over (Critical heal!)', 'player-action');
+                } else {
+                    $this->addMessage('The heavens open and your wounds start to heal over (Critical heal!)', 'player-action');
+                }
 
                 $healFor *= 2;
             }
@@ -220,13 +285,31 @@ class CastType extends BattleBase
                 $this->characterHealth = $this->characterCacheData->getCachedCharacterData($character, 'health');
             }
 
-            $this->addMessage('Your healing spell(s) heals you for: ' . number_format($healFor), 'player-action');
+            if ($isPvp) {
+                $this->addAttackerMessage('Your healing spell(s) heals you for: ' . number_format($healFor), 'player-action');
+            } else {
+                $this->addMessage('Your healing spell(s) heals you for: ' . number_format($healFor), 'player-action');
+            }
 
-            $this->specialAttacks->doCastHealSpecials($character, $this->attackData);
+
+            $this->specialAttacks->setCharacterHealth($this->characterHealth)
+                                 ->setMonsterHealth($this->monsterHealth)
+                                 ->doCastHealSpecials($character, $this->attackData, $isPvp);
 
             $this->characterHealth = $this->specialAttacks->getCharacterHealth();
 
-            $this->mergeMessages($this->specialAttacks->getMessages());
+            if ($isPvp) {
+                $this->mergeAttackerMessages($this->specialAttacks->getAttackerMessages());
+                $this->mergeDefenderMessages($this->specialAttacks->getDefenderMessages());
+
+                $this->characterHealth = $this->specialAttacks->getCharacterHealth();
+                $this->monsterHealth   = $this->specialAttacks->getMonsterHealth();
+
+                $this->specialAttacks->clearMessages();
+            } else {
+                $this->mergeMessages($this->specialAttacks->getMessages());
+            }
+
 
             $this->specialAttacks->clearMessages();
         }

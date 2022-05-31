@@ -77,6 +77,7 @@ export default class ItemComparison extends React.Component<any, any> {
                     type: this.state.comparison_details.itemToEquip.type,
                     affix_count: this.state.comparison_details.itemToEquip.affix_count,
                     is_unique: this.state.comparison_details.itemToEquip.is_unique,
+                    is_mythic: this.state.comparison_details.itemToEquip.is_mythic,
                     holy_stacks_applied: this.state.comparison_details.itemToEquip.holy_stacks_applied,
                 }} /> <span className='pl-3'>(Type: {capitalize(this.state.comparison_details.itemToEquip.type)})</span>
             </Fragment>

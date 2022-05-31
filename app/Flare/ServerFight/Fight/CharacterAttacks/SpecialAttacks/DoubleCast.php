@@ -42,7 +42,7 @@ class DoubleCast extends BattleBase {
         $this->addMessage('Your spell(s) hits for: ' . number_format($damage), 'player-action', $isPvp);
 
         if ($isPvp) {
-            $this->addDefenderMessage('The enemies spels fly at you, the energy in the air is electifyingly terrifying: ' . number_format($damage));
+            $this->addDefenderMessage('The enemies spells fly at you, the energy in the air is electrifyingly terrifying: ' . number_format($damage), 'enemy-action');
         }
     }
 }

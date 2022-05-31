@@ -1,11 +1,5 @@
 import React from "react";
 import Dialogue from "../../../../../../components/ui/dialogue/dialogue";
-import {EquipPositions} from "../../../../../../lib/game/character-sheet/helpers/inventory/equip-positions";
-import PrimaryButton from "../../../../../../components/ui/buttons/primary-button";
-import {capitalize} from "lodash";
-import EquipModalProps from "../../../../../../lib/game/character-sheet/types/modal/equip-modal-props";
-import MoveModalProps from "../../../../../../lib/game/character-sheet/types/modal/move-modal-props";
-import DropDown from "../../../../../../components/ui/drop-down/drop-down";
 import ItemNameColorationText from "../../../../../../components/ui/item-name-coloration-text";
 import SellModalProps from "../../../../../../lib/game/character-sheet/types/modal/sell-modal-props";
 import {formatNumber} from "../../../../../../lib/game/format-number";
@@ -43,6 +37,7 @@ export default class SellItemModal extends React.Component<SellModalProps, any> 
                         type: this.props.item.type,
                         affix_count: this.props.item.affix_count,
                         is_unique: this.props.item.is_unique,
+                        is_mythic: this.props.item.is_mythic,
                         holy_stacks_applied: this.props.item.holy_stacks_applied,
                 }} />
                 </h3>

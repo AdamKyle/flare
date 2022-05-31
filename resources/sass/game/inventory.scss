@@ -66,7 +66,15 @@
   color: #e32ca4;
 
   &:hover, &:visited, &:focus {
-    color: #e32ca4;;
+    color: #e32ca4;
+  }
+}
+
+.mythic-unique {
+  color: #e3572c;
+
+  &:hover, &:visited, &:focus {
+    color: #e36c2c;
   }
 }
 

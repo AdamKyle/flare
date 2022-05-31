@@ -117,7 +117,7 @@ class CanHit {
     }
 
     public function canPlayerCastSpell(Character $character, ServerMonster $monster, bool $isPlayerVoided) {
-        $defenderAgi       = $monster->getMonsterStat('agi');
+        $defenderAgi       = $monster->getMonsterStat('agi_modded');
         $characterToHit    = $this->characterCacheData->getCachedCharacterData($character, 'to_hit_stat');
         $statValue         = $this->characterCacheData->getCachedCharacterData($character, $isPlayerVoided ? $characterToHit : $characterToHit . '_modded');
         $characterAccuracy = $this->characterCacheData->getCachedCharacterData($character, 'skills')['casting_accuracy'];
@@ -143,6 +143,35 @@ class CanHit {
         }
 
         return ($playerToHit + $playerToHit * $characterAccuracy) > ($enemyAgi + $enemyAgi * $enemyDodge);
+    }
+
+    public function canPlayerCastSpellOnPlayer(Character $attacker, Character $defender, bool $isPlayerVoided) {
+        $defenderAgi       = $this->characterCacheData->getCachedCharacterData($defender, 'agi_modded');
+        $characterToHit    = $this->characterCacheData->getCachedCharacterData($attacker, 'to_hit_stat');
+        $statValue         = $this->characterCacheData->getCachedCharacterData($attacker, $isPlayerVoided ? $characterToHit : $characterToHit . '_modded');
+        $characterAccuracy = $this->characterCacheData->getCachedCharacterData($attacker, 'skills')['casting_accuracy'];
+        $defenderDodge     = $this->characterCacheData->getCachedCharacterData($defender, 'skills')['dodge'];
+
+        if ($characterAccuracy >= 1) {
+            return true;
+        }
+
+        if ($defenderDodge >= 1) {
+            return false;
+        }
+
+        $playerToHit = $statValue * 0.20;
+        $enemyAgi    = $defenderAgi * 0.20;
+
+        if ($playerToHit < 50) {
+            $playerToHit = $statValue;
+        }
+
+        if ($enemyAgi < 50) {
+            $enemyAgi = $defenderAgi;
+        }
+
+        return ($playerToHit + $playerToHit * $characterAccuracy) > ($enemyAgi + $enemyAgi * $defenderDodge);
     }
 
     public function canMonsterCastSpell(Character $character, ServerMonster $monster, bool $isPlayerVoided) {

@@ -10,6 +10,8 @@ export default interface InventoryComparisonAdjustment {
 
     is_unique: boolean;
 
+    is_mythic: boolean;
+
     holy_stacks_applied: number;
 
     damage_adjustment: number;

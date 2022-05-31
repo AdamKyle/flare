@@ -37,7 +37,7 @@ class Affixes extends BattleBase {
                     $this->addMessage('Your (non resistible) enchantments glow with rage. Your enemy cowers: ' . number_format($totalDamage), 'player-action', $isPvp);
 
                     if ($isPvp) {
-                        $this->addDefenderMessage('The enemy lashes out with rage. Their enchantments bathe you in hate doing: ' . number_format($totalDamage + $nonStackingDamage), 'enemy-action');
+                        $this->addDefenderMessage('The enemy lashes out with rage (non resistible damage). Their enchantments bathe you in hate doing: ' . number_format($totalDamage + $nonStackingDamage), 'enemy-action');
                     }
 
                     return $totalDamage;

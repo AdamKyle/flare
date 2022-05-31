@@ -27,6 +27,7 @@ use App\Flare\ServerFight\Fight\CanHit;
 use App\Flare\ServerFight\Fight\CharacterAttacks\BaseCharacterAttack;
 use App\Flare\ServerFight\Fight\CharacterAttacks\CharacterAttack;
 use App\Flare\ServerFight\Fight\CharacterAttacks\PlayerHealing;
+use App\Flare\ServerFight\Fight\CharacterAttacks\SecondaryAttacks;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\AlchemistsRavenousDream;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\DoubleAttack;
@@ -331,12 +332,19 @@ class ServiceProvider extends ApplicationServiceProvider
             return new Affixes($app->make(CharacterCacheData::class));
         });
 
+        $this->app->bind(SecondaryAttacks::class, function($app) {
+            return new SecondaryAttacks(
+                $app->make(CharacterCacheData::class),
+                $app->make(Affixes::class)
+            );
+        });
+
         $this->app->bind(WeaponType::class, function($app) {
             return new WeaponType(
                 $app->make(CharacterCacheData::class),
                 $app->make(Entrance::class),
                 $app->make(CanHit::class),
-                $app->make(Affixes::class),
+                $app->make(SecondaryAttacks::class),
                 $app->make(SpecialAttacks::class),
             );
         });
@@ -346,7 +354,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CharacterCacheData::class),
                 $app->make(Entrance::class),
                 $app->make(CanHit::class),
-                $app->make(Affixes::class),
+                $app->make(SecondaryAttacks::class),
                 $app->make(SpecialAttacks::class),
             );
         });
@@ -356,7 +364,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CharacterCacheData::class),
                 $app->make(Entrance::class),
                 $app->make(CanHit::class),
-                $app->make(Affixes::class),
+                $app->make(SecondaryAttacks::class),
                 $app->make(WeaponType::class),
                 $app->make(CastType::class),
             );
@@ -367,7 +375,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CharacterCacheData::class),
                 $app->make(Entrance::class),
                 $app->make(CanHit::class),
-                $app->make(Affixes::class),
+                $app->make(SecondaryAttacks::class),
                 $app->make(WeaponType::class),
                 $app->make(CastType::class),
             );

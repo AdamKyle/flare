@@ -10,6 +10,8 @@ export default interface InventoryDetails {
 
     is_unique: boolean;
 
+    is_mythic: boolean;
+
     item_name: string;
 
     description: string;

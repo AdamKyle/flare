@@ -10,5 +10,7 @@ export default interface ItemNameColorationTextProps {
         is_unique: boolean;
 
         holy_stacks_applied: number;
+
+        is_mythic: boolean;
     }
 }

@@ -21,13 +21,18 @@ class PlayerHealing extends BattleBase {
     public function healingPhase(Character $character, ServerMonster $monster, array $attackType, bool $isVoided) {
         if ($this->characterHealth <= 0) {
             if ($this->ressurect($character, $attackType)) {
-                $this->lifeSteal($character, $monster, $attackType);
+
+                if (!$isVoided) {
+                    $this->lifeSteal($character, $attackType);
+                }
 
                 return;
             }
         }
 
-        $this->lifeSteal($character, $monster, $attackType);
+        if (!$isVoided) {
+            $this->lifeSteal($character, $attackType);
+        }
     }
 
     protected function ressurect(Character $character, array $attackType): bool {
@@ -44,8 +49,8 @@ class PlayerHealing extends BattleBase {
         return false;
     }
 
-    protected function lifeSteal(Character $character, ServerMonster $monster, array $attackType) {
-        $damage = $this->affixes->getAffixLifeSteal($character, $monster, $attackType);
+    protected function lifeSteal(Character $character, array $attackType) {
+        $damage = $this->affixes->getAffixLifeSteal($character, $attackType, $this->monsterHealth);
 
         $this->monsterHealth -= $damage;
         $this->characterHealth += $damage;

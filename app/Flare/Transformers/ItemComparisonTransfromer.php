@@ -51,6 +51,7 @@ class ItemComparisonTransfromer extends TransformerAbstract {
             'spell_evasion'                    => $item->spell_evasion,
             'artifact_annulment'               => $item->artifact_annulment,
             'is_unique'                        => $this->isUnique($item),
+            'is_mythic'                        => $item->is_mythic,
             'affix_count'                      => $item->affix_count,
             'min_cost'                         => SellItemCalculator::fetchMinPrice($item),
             'holy_level'                       => $item->holy_level,
