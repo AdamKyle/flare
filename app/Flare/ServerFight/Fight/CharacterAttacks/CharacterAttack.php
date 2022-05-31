@@ -120,6 +120,17 @@ class CharacterAttack {
         return $this;
     }
 
+    public function pvpDefend(Character $attacker, Character $defender, bool $isAttackerVoided, array $healthObject): CharacterAttack {
+        $this->defend->setCharacterHealth($healthObject['attacker_health']);
+        $this->defend->setMonsterHealth($healthObject['defender_health']);
+        $this->defend->setCharacterAttackData($attacker, $isAttackerVoided);
+        $this->defend->pvpDefend($attacker, $defender);
+
+        $this->type = $this->defend;
+
+        return $this;
+    }
+
     public function defend(Character $character, ServerMonster $monster, bool $isPlayerVoided, int $characterHealth, int $monsterHealth): CharacterAttack {
         $this->defend->setCharacterHealth($characterHealth);
         $this->defend->setMonsterHealth($monsterHealth);

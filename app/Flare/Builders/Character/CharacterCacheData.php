@@ -21,6 +21,14 @@ class CharacterCacheData extends CharacterPvpCacheData {
         $this->characterSheetBaseInfoTransformer = $characterInformationBuilder;
     }
 
+    public function setCharacterDefendAc(Character $character, int $defence) {
+        Cache::put('character-defence-' . $character->id, $defence);
+    }
+
+    public function getCharacterDefenceAc(Character $character) {
+        Cache::pull('character-defence-' . $character->id);
+    }
+
     public function getDataFromAttackCache(Character $character, string $attackType): array {
         $characterAttackData = Cache::get('character-attack-data-' . $character->id);
 
@@ -44,6 +52,8 @@ class CharacterCacheData extends CharacterPvpCacheData {
     }
 
     public function deleteCharacterSheet(Character $character) {
+        Cache::delete('character-defence-' . $character->id);
+
         if (Cache::has('character-sheet-' . $character->id)) {
             return Cache::delete('character-sheet-' . $character->id);
         }

@@ -7,6 +7,7 @@ use App\Flare\Models\Character;
 use App\Flare\ServerFight\BattleBase;
 use App\Flare\ServerFight\Fight\Affixes;
 use App\Flare\ServerFight\Fight\CanHit;
+use App\Flare\ServerFight\Fight\CharacterAttacks\SecondaryAttacks;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks;
 use App\Flare\ServerFight\Fight\Entrance;
 use App\Flare\ServerFight\Monster\ServerMonster;
@@ -21,16 +22,16 @@ class Defend extends BattleBase {
 
     private CanHit $canHit;
 
-    private Affixes $affixes;
+    private SecondaryAttacks $secondaryAttacks;
 
     private SpecialAttacks $specialAttacks;
 
-    public function __construct(CharacterCacheData $characterCacheData, Entrance $entrance, CanHit $canHit, Affixes $affixes, SpecialAttacks $specialAttacks) {
+    public function __construct(CharacterCacheData $characterCacheData, Entrance $entrance, CanHit $canHit, SecondaryAttacks $secondaryAttacks, SpecialAttacks $specialAttacks) {
         parent::__construct($characterCacheData);
 
         $this->entrance           = $entrance;
         $this->canHit             = $canHit;
-        $this->affixes            = $affixes;
+        $this->secondaryAttacks   = $secondaryAttacks;
         $this->specialAttacks     = $specialAttacks;
     }
 
@@ -42,21 +43,35 @@ class Defend extends BattleBase {
         return $this;
     }
 
+    public function pvpDefend(Character $attacker, Character $defender): Defend {
+        $this->entrance->attackerEntrancesDefender($attacker, $this->attackData, $this->isVoided);
+
+        $this->mergeAttackerMessages($this->entrance->getAttackerMessages());
+        $this->mergeDefenderMessages($this->entrance->getDefenderMessages());
+
+        $this->characterCacheData->setCharacterDefendAc($attacker, $this->attackData['defence']);
+
+        if ($this->entrance->isEnemyEntranced()) {
+
+            $this->secondaryAttack($attacker, null, $this->characterCacheData->getCachedCharacterData($defender, 'affix_damage_reduction'), true);
+
+            return $this;
+        }
+
+        $this->secondaryAttack($attacker, null, $this->characterCacheData->getCachedCharacterData($defender, 'affix_damage_reduction'), true);
+
+        return $this;
+    }
+
     public function defend(Character $character, ServerMonster $serverMonster): Defend {
 
         $this->entrance->playerEntrance($character, $serverMonster, $this->attackData);
 
         $this->mergeMessages($this->entrance->getMessages());
 
+        $this->characterCacheData->setCharacterDefendAc($character, $this->attackData['defence']);
+
         if ($this->entrance->isEnemyEntranced()) {
-            $this->secondaryAttack($character, $serverMonster);
-
-            return $this;
-        }
-
-        if ($this->canHit->canPlayerAutoHit($character)) {
-            $this->addMessage('You dance along in the shadows, the enemy doesn\'t see you. Strike now!', 'regular');
-
             $this->secondaryAttack($character, $serverMonster);
 
             return $this;
@@ -72,76 +87,54 @@ class Defend extends BattleBase {
         $this->entrance->clearMessages();
     }
 
-    protected function secondaryAttack(Character $character, ServerMonster $monster) {
+    protected function secondaryAttack(Character $character, ServerMonster $monster = null, float $affixReduction = 0.0, bool $isPvp = false) {
         if (!$this->isVoided) {
-            $this->affixLifeStealingDamage($character, $monster);
-            $this->affixDamage($character, $monster);
-            $this->ringDamage();
+
+            $this->secondaryAttacks->setMonsterHealth($this->monsterHealth);
+            $this->secondaryAttacks->setCharacterHealth($this->characterHealth);
+            $this->secondaryAttacks->setAttackData($this->attackData);
+
+
+            $this->secondaryAttacks->affixLifeStealingDamage($character, $monster, $affixReduction, $isPvp);
+            $this->secondaryAttacks->affixDamage($character, $monster, $affixReduction, $isPvp);
+            $this->secondaryAttacks->ringDamage($isPvp);
+
+            if ($isPvp) {
+                $this->mergeAttackerMessages($this->secondaryAttacks->getAttackerMessages());
+                $this->mergeDefenderMessages($this->secondaryAttacks->getDefenderMessages());
+            } else {
+                $this->secondaryAttacks->mergeMessages($this->secondaryAttacks->getMessages());
+            }
+
+            $this->secondaryAttacks->clearMessages();
+
         } else {
-            $this->addMessage('You are voided, none of your rings or enchantments fire ...', 'enemy-action');
-        }
-
-        $this->vampireSpecial($character, $this->attackData);
-    }
-
-    protected function affixDamage(Character $character, ServerMonster $monster) {
-        $damage = $this->affixes->getCharacterAffixDamage($character, $monster, $this->attackData);
-
-        if ($damage > 0) {
-            $this->monsterHealth -= $damage;
-        }
-
-        $this->mergeMessages($this->affixes->getMessages());
-
-        $this->affixes->clearMessages();
-    }
-
-    protected function affixLifeStealingDamage(Character $character, ServerMonster $monster) {
-        if ($this->monsterHealth <= 0) {
-            return;
-        }
-
-        $lifeStealing = $this->affixes->getAffixLifeSteal($character, $monster, $this->attackData);
-
-        $damage = $monster->getHealth() * $lifeStealing;
-
-        if ($damage > 0) {
-            $this->monsterHealth   -= $damage;
-            $this->characterHealth += $damage;
-
-            $maxCharacterHealth = $this->characterCacheData->getCachedCharacterData($character, 'health');
-
-            if ($this->characterHealth >= $maxCharacterHealth) {
-                $this->characterHealth = $maxCharacterHealth;
+            if ($isPvp) {
+                $this->addAttackerMessage('You are voided, none of your rings or enchantments fire ...', 'enemy-action');
+            } else {
+                $this->addMessage('You are voided, none of your rings or enchantments fire ...', 'enemy-action');
             }
         }
 
-        $this->mergeMessages($this->affixes->getMessages());
-
-        $this->affixes->clearMessages();
+        $this->vampireSpecial($character, $this->attackData, $isPvp);
     }
 
-    protected function ringDamage() {
-        $ringDamage = $this->attackData['ring_damage'];
-
-        if ($ringDamage > 0) {
-            $this->monsterHealth -= ($ringDamage - $ringDamage * $this->attackData['damage_deduction']);
-
-            $this->addMessage('Your rings hit for: ' . number_format($ringDamage), 'player-action');
-        }
-    }
-
-    protected function vampireSpecial(Character $character, array $attackData) {
+    protected function vampireSpecial(Character $character, array $attackData, bool $isPvp = false) {
         if ($character->classType()->isVampire()) {
             $this->specialAttacks
                  ->setCharacterHealth($this->characterHealth)
                  ->setMonsterHealth($this->monsterHealth)
-                 ->vampireThirst($character, $attackData);
+                 ->vampireThirst($character, $attackData, $isPvp);
 
             $this->characterHealth = $this->specialAttacks->getCharacterHealth();
             $this->monsterHealth   = $this->specialAttacks->getMonsterHealth();
 
-            $this->mergeMessages($this->specialAttacks->getMessages());
+            if (!$isPvp) {
+                $this->mergeMessages($this->specialAttacks->getMessages());
+            } else {
+                $this->mergeAttackerMessages($this->specialAttacks->getAttackerMessages());
+                $this->mergeDefenderMessages($this->specialAttacks->getDefenderMessages());
+            }
 
             $this->specialAttacks->clearMessages();
         }

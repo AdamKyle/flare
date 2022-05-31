@@ -58,7 +58,7 @@ class WeaponType extends BattleBase {
         }
 
         if ($this->canHit->canPlayerHitPlayer($attacker, $defender, $isAttackerVoided)) {
-            if ($this->characterCacheData->getCachedCharacterData($defender, 'ac')) {
+            if ($this->characterCacheData->getCachedCharacterData($defender, 'ac') > $weaponDamage) {
                 $this->addAttackerMessage('Your attack was blocked', 'enemy-action');
                 $this->addDefenderMessage('You managed to block the enemies attack', 'player-action');
 

@@ -77,7 +77,7 @@ class BaseCharacterAttack {
                 $response = $this->characterAttack->pvpCastAndAttack($character, $defender, $isPlayerVoided, $healthObject);
                 break;
             case 'defend':
-                //$response = $this->characterAttack->defend($character, $monster, $isPlayerVoided, $this->characterHealth, $this->monsterHealth);
+                $response = $this->characterAttack->pvpDefend($character, $defender, $isPlayerVoided, $healthObject);
                 break;
             default:
                 $this->battleMessages[] = ['message' => 'No Attack Type Supplied. Attack Failed for character.', 'event-action'];

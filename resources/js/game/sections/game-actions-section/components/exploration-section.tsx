@@ -180,8 +180,6 @@ export default class ExplorationSection extends React.Component<any, any> {
                 selected_monster_id: this.state.monster_selected.id,
                 attack_type: this.state.attack_type,
             }).doAjaxCall('post', (result: AxiosResponse) => {
-                console.log(result.data)
-
                 this.setState({
                     loading: false,
                 });

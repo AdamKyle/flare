@@ -49,7 +49,6 @@ export default class LocationModal extends React.Component<LocationModalPros, Lo
     }
 
     render() {
-        console.log(this.props.location);
         return (
             <Dialogue is_open={this.props.is_open}
                       handle_close={this.props.handle_close}

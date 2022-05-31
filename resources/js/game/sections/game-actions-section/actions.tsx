@@ -122,8 +122,6 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
                 return;
             }
 
-            console.log('here ....')
-
             const characters = this.state.characters_for_dueling.filter((character: any) => {
                 return character.character_position_x === this.props.character_position?.x &&
                     character.character_position_y === this.props.character_position?.y &&
@@ -233,7 +231,6 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
     }
 
     render() {
-        console.log(this.state);
         return (
             <div className='lg:px-4'>
                 {
