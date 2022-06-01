@@ -21,8 +21,7 @@ class CastType extends BattleBase
 
     private SpecialAttacks $specialAttacks;
 
-    public function __construct(CharacterCacheData $characterCacheData, Entrance $entrance, CanHit $canHit, SpecialAttacks $specialAttacks)
-    {
+    public function __construct(CharacterCacheData $characterCacheData, Entrance $entrance, CanHit $canHit, SpecialAttacks $specialAttacks) {
         parent::__construct($characterCacheData);
 
         $this->entrance           = $entrance;
@@ -30,8 +29,7 @@ class CastType extends BattleBase
         $this->specialAttacks     = $specialAttacks;
     }
 
-    public function setCharacterAttackData(Character $character, bool $isVoided): CastType
-    {
+    public function setCharacterAttackData(Character $character, bool $isVoided): CastType{
 
         $this->attackData = $this->characterCacheData->getDataFromAttackCache($character, $isVoided ? 'voided_cast' : 'cast');
         $this->isVoided = $isVoided;
@@ -45,15 +43,27 @@ class CastType extends BattleBase
     }
 
     public function pvpCastAttack(Character $attacker, Character $defender) {
-        $this->entrance->attackerEntrancesDefender($attacker, $this->attackData, $this->isVoided);
-
-        $this->mergeAttackerMessages($this->entrance->getAttackerMessages());
-        $this->mergeDefenderMessages($this->entrance->getDefenderMessages());
 
         $spellDamage = $this->attackData['spell_damage'];
 
-        if ($this->entrance->isEnemyEntranced()) {
+        if (!$this->isEnemyEntranced) {
+            $this->doPvpEntrance($attacker, $this->entrance);
+
+            if ($this->isEnemyEntranced) {
+                $this->pvpSpellDamage($attacker, $defender, $spellDamage);
+
+                if ($this->allowSecondaryAttacks) {
+                    $this->secondaryAttack($attacker, null, $this->characterCacheData->getCachedCharacterData($defender, 'affix_damage_reduction'), true);
+                }
+
+                return $this;
+            }
+        } else if ($this->isEnemyEntranced) {
             $this->pvpSpellDamage($attacker, $defender, $spellDamage);
+
+            if ($this->allowSecondaryAttacks) {
+                $this->secondaryAttack($attacker, null, $this->characterCacheData->getCachedCharacterData($defender, 'affix_damage_reduction'), true);
+            }
 
             return $this;
         }
@@ -63,30 +73,39 @@ class CastType extends BattleBase
                 $this->addAttackerMessage('Your spell was blocked!', 'enemy-action');
             } else {
                 $this->pvpSpellDamage($attacker, $defender, $spellDamage);
+
+                if ($this->allowSecondaryAttacks) {
+                    $this->secondaryAttack($attacker, null, $this->characterCacheData->getCachedCharacterData($defender, 'affix_damage_reduction'), true);
+                }
             }
         } else {
             $this->addAttackerMessage('Your spell fizzled and failed!', 'enemy-action');
 
-            $this->secondaryAttack($attacker, null, $this->characterCacheData->getCachedCharacterData($defender, 'affix_damage_reduction'), true);
+            if ($this->allowSecondaryAttacks) {
+                $this->secondaryAttack($attacker, null, $this->characterCacheData->getCachedCharacterData($defender, 'affix_damage_reduction'), true);
+            }
         }
 
         return $this;
     }
 
     public function castAttack(Character $character, ServerMonster $monster) {
-        $this->entrance->playerEntrance($character, $monster, $this->attackData);
-
-        $this->mergeMessages($this->entrance->getMessages());
 
         $spellDamage = $this->attackData['spell_damage'];
 
-        if ($this->entrance->isEnemyEntranced()) {
-            $this->doSpellDamage($character, $monster, $spellDamage, true);
+        if (!$this->isEnemyEntranced) {
 
+            $this->doEnemyEntrance($character, $monster, $this->entrance);
+
+            if ($this->isEnemyEntranced) {
+                $this->doSpellDamage($character, $monster, $spellDamage, true);
+                return $this;
+            }
+
+        } else if ($this->isEnemyEntranced) {
+            $this->doSpellDamage($character, $monster, $spellDamage, true);
             return $this;
         }
-
-        $this->mergeMessages($this->entrance->getMessages());
 
         if ($this->canHit->canPlayerAutoHit($character)) {
             $this->addMessage('You dance along in the shadows, the enemy doesn\'t see you. Strike now!', 'regular');
@@ -105,7 +124,9 @@ class CastType extends BattleBase
         } else {
             $this->addMessage('Your spell fizzled and failed!', 'enemy-action');
 
-            $this->secondaryAttack($character, $monster);
+            if ($this->allowSecondaryAttacks) {
+                $this->secondaryAttack($character, $monster);
+            }
         }
 
         return $this;
@@ -118,7 +139,9 @@ class CastType extends BattleBase
 
         $this->heal($attacker, true);
 
-        $this->secondaryAttack($attacker, null, $this->characterCacheData->getCachedCharacterData($defender, 'affix_damage_reduction'), true);
+        if ($this->allowSecondaryAttacks) {
+            $this->secondaryAttack($attacker, null, $this->characterCacheData->getCachedCharacterData($defender, 'affix_damage_reduction'), true);
+        }
     }
 
     public function doSpellDamage(Character $character, ServerMonster $monster, int $spellDamage, bool $entranced = false) {
@@ -128,7 +151,9 @@ class CastType extends BattleBase
 
         $this->heal($character);
 
-        $this->secondaryAttack($character, $monster);
+        if ($this->allowSecondaryAttacks) {
+            $this->secondaryAttack($character, $monster);
+        }
     }
 
     public function pvpSpellDamage(Character $attacker, Character $defender, int $spellDamage, bool $outSideEntrance = false) {
@@ -276,5 +301,30 @@ class CastType extends BattleBase
 
             $this->specialAttacks->clearMessages();
         }
+    }
+
+    protected function entrancePlayer(Character $attacker, Character $defender, int $spellDamage) {
+        $this->entrance->attackerEntrancesDefender($attacker, $this->attackData, $this->isVoided);
+
+        $this->mergeAttackerMessages($this->entrance->getAttackerMessages());
+        $this->mergeDefenderMessages($this->entrance->getDefenderMessages());
+
+        return $this->doEntrancePvpDamage($attacker, $defender, $spellDamage);
+    }
+
+    protected function doEntrancePvpDamage($attacker, $defender, $spellDamage) {
+        if ($this->entrance->isEnemyEntranced()) {
+            $this->isEnemyEntranced = true;
+
+            $this->pvpSpellDamage($attacker, $defender, $spellDamage);
+
+            if ($this->allowSecondaryAttacks) {
+                $this->secondaryAttack($attacker, null, $this->characterCacheData->getCachedCharacterData($defender, 'affix_damage_reduction'), true);
+            }
+
+            return true;
+        }
+
+        return false;
     }
 }

@@ -36,26 +36,31 @@ class WeaponType extends BattleBase {
         return $this;
     }
 
-    public function doPvpWeaponAttack(Character $attacker, Character $defender, bool $isAttackerVoided): WeaponType {
-        $this->entrance->attackerEntrancesDefender($attacker, $this->attackData, $isAttackerVoided);
-
-        $this->mergeAttackerMessages($this->entrance->getAttackerMessages());
-        $this->mergeDefenderMessages($this->entrance->getDefenderMessages());
-
+    public function doPvpWeaponAttack(Character $attacker, Character $defender): WeaponType {
         $weaponDamage = $this->attackData['weapon_damage'];
 
-        if ($this->entrance->isEnemyEntranced()) {
+        if (!$this->isEnemyEntranced) {
+            $this->doPvpEntrance($attacker, $this->entrance);
+
+            if ($this->isEnemyEntranced) {
+                $this->pvpWeaponAttack($attacker, $defender, $weaponDamage);
+
+                return $this;
+            }
+        } else if ($this->isEnemyEntranced) {
             $this->pvpWeaponAttack($attacker, $defender, $weaponDamage);
 
             return $this;
         }
 
-        if ($this->canHit->canPlayerHitPlayer($attacker, $defender, $isAttackerVoided)) {
+        if ($this->canHit->canPlayerHitPlayer($attacker, $defender, $this->isVoided)) {
             if ($this->canBlock($weaponDamage, $this->getPvpCharacterAc($defender))) {
                 $this->addAttackerMessage('Your attack was blocked', 'enemy-action');
                 $this->addDefenderMessage('You managed to block the enemies attack', 'player-action');
 
-                $this->secondaryAttack($attacker, null, $this->characterCacheData->getCachedCharacterData($attacker, 'affix_damage_reduction'));
+                if ($this->allowSecondaryAttacks) {
+                    $this->secondaryAttack($attacker, null, $this->characterCacheData->getCachedCharacterData($attacker, 'affix_damage_reduction'));
+                }
 
                 return $this;
             }
@@ -70,17 +75,19 @@ class WeaponType extends BattleBase {
 
     public function doWeaponAttack(Character $character, ServerMonster $serverMonster): WeaponType {
 
-        $this->entrance->playerEntrance($character, $serverMonster, $this->attackData);
-
-        $this->mergeMessages($this->entrance->getMessages());
-
         $weaponDamage = $this->attackData['weapon_damage'];
 
-        if ($this->entrance->isEnemyEntranced()) {
-            $this->isEnemyEntranced = true;
+        if (!$this->isEnemyEntranced) {
 
+            $this->doEnemyEntrance($character, $serverMonster, $this->entrance);
+
+            if ($this->isEnemyEntranced) {
+                $this->weaponAttack($character, $serverMonster, $weaponDamage);
+                return $this;
+            }
+
+        } else if ($this->isEnemyEntranced) {
             $this->weaponAttack($character, $serverMonster, $weaponDamage);
-
             return $this;
         }
 
@@ -102,7 +109,9 @@ class WeaponType extends BattleBase {
         } else {
             $this->addMessage('Your attack missed!', 'enemy-action');
 
-            $this->secondaryAttack($character, $serverMonster);
+            if ($this->allowSecondaryAttacks) {
+                $this->secondaryAttack($character, $serverMonster);
+            }
         }
 
         return $this;
@@ -115,12 +124,18 @@ class WeaponType extends BattleBase {
 
     public function pvpWeaponAttack(Character $attacker, Character $defender, int $weaponDamage) {
         $this->pvpWeaponDamage($attacker, $weaponDamage);
-        $this->secondaryAttack($attacker, null, $this->characterCacheData->getCachedCharacterData($defender, 'affix_damage_reduction'), true);
+
+        if ($this->allowSecondaryAttacks) {
+            $this->secondaryAttack($attacker, null, $this->characterCacheData->getCachedCharacterData($defender, 'affix_damage_reduction'), true);
+        }
     }
 
     public function weaponAttack(Character $character, ServerMonster $monster, int $weaponDamage) {
         $this->weaponDamage($character, $monster->getName(), $weaponDamage);
-        $this->secondaryAttack($character, $monster);
+
+        if ($this->allowSecondaryAttacks) {
+            $this->secondaryAttack($character, $monster);
+        }
     }
 
     public function pvpWeaponDamage(Character $attacker, int $weaponDamage) {

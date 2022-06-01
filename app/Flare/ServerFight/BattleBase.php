@@ -5,6 +5,7 @@ namespace App\Flare\ServerFight;
 use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Models\Character;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SecondaryAttacks;
+use App\Flare\ServerFight\Fight\Entrance;
 use App\Flare\ServerFight\Monster\ServerMonster;
 
 class BattleBase extends BattleMessages {
@@ -18,6 +19,8 @@ class BattleBase extends BattleMessages {
     protected bool $isVoided;
 
     protected bool $isEnemyEntranced = false;
+
+    protected bool $allowSecondaryAttacks = true;
 
     protected CharacterCacheData $characterCacheData;
 
@@ -46,6 +49,35 @@ class BattleBase extends BattleMessages {
     public function getMonsterHealth(): int
     {
         return $this->monsterHealth;
+    }
+
+    public function doNotAllowSecondaryAttacks() {
+        $this->allowSecondaryAttacks = false;
+    }
+
+    public function setEntranced() {
+        $this->isEnemyEntranced = true;
+    }
+
+    protected function doPvpEntrance(Character $attacker, Entrance $entrance) {
+        $entrance->attackerEntrancesDefender($attacker, $this->attackData, $this->isVoided);
+
+        $this->mergeAttackerMessages($entrance->getAttackerMessages());
+        $this->mergeDefenderMessages($entrance->getDefenderMessages());
+
+        if ($entrance->isEnemyEntranced()) {
+            $this->isEnemyEntranced = true;
+        }
+    }
+
+    protected function doEnemyEntrance(Character $character, ServerMonster $monster, Entrance $entrance) {
+        $entrance->playerEntrance($character, $monster, $this->attackData);
+
+        $this->mergeMessages($entrance->getMessages());
+
+        if ($entrance->isEnemyEntranced()) {
+            $this->isEnemyEntranced = true;
+        }
     }
 
     protected function secondaryAttack(Character $character, ServerMonster $monster = null, float $affixReduction = 0.0, bool $isPvp = false) {
