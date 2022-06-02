@@ -52,7 +52,10 @@ class PvpAttack extends PvpBase {
     }
 
     public function attackPlayer(Character $attacker, Character $defender, array $healthObject, string $attackType) {
-        $response = $this->characterAttack->doPvpAttack($attacker, $defender, $healthObject, $this->setUpFight->isAttackerVoided(), $attackType);
+        $attackerVoided = $this->setUpFight->isAttackerVoided();
+        $defenderVoided = $this->setUpFight->isEnemyVoided();
+
+        $response = $this->characterAttack->doPvpAttack($attacker, $defender, $healthObject, $attackerVoided, $defenderVoided, $attackType);
 
         $this->mergeMessages($response->getAttackerMessages(), 'attacker');
         $this->mergeMessages($response->getDefenderMessages(), 'defender');

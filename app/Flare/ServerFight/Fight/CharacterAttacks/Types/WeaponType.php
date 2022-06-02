@@ -2,12 +2,11 @@
 
 namespace App\Flare\ServerFight\Fight\CharacterAttacks\Types;
 
+use App\Falre\ServerFight\Fight\CharacterAttacks\Counter;
 use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Models\Character;
 use App\Flare\ServerFight\BattleBase;
-use App\Flare\ServerFight\Fight\Affixes;
 use App\Flare\ServerFight\Fight\CanHit;
-use App\Flare\ServerFight\Fight\CharacterAttacks\SecondaryAttacks;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks;
 use App\Flare\ServerFight\Fight\Entrance;
 use App\Flare\ServerFight\Monster\ServerMonster;
@@ -123,9 +122,9 @@ class WeaponType extends BattleBase {
     }
 
     public function pvpWeaponAttack(Character $attacker, Character $defender, int $weaponDamage) {
-        $this->pvpWeaponDamage($attacker, $weaponDamage);
+        $this->pvpWeaponDamage($attacker, $defender, $weaponDamage);
 
-        if ($this->allowSecondaryAttacks) {
+        if ($this->allowSecondaryAttacks && !$this->abortCharacterIsDead) {
             $this->secondaryAttack($attacker, null, $this->characterCacheData->getCachedCharacterData($defender, 'affix_damage_reduction'), true);
         }
     }
@@ -133,12 +132,20 @@ class WeaponType extends BattleBase {
     public function weaponAttack(Character $character, ServerMonster $monster, int $weaponDamage) {
         $this->weaponDamage($character, $monster->getName(), $weaponDamage);
 
+        $this->doMonsterCounter($character, $monster);
+
+        if ($this->characterHealth <= 0) {
+            $this->abortCharacterIsDead = true;
+
+            return;
+        }
+
         if ($this->allowSecondaryAttacks) {
             $this->secondaryAttack($character, $monster);
         }
     }
 
-    public function pvpWeaponDamage(Character $attacker, int $weaponDamage) {
+    public function pvpWeaponDamage(Character $attacker, Character $defender, int $weaponDamage) {
         $weaponDamage = $this->getCriticalityDamage($attacker, $weaponDamage);
 
         $totalDamage = $weaponDamage - $weaponDamage * $this->attackData['damage_deduction'];
@@ -147,6 +154,17 @@ class WeaponType extends BattleBase {
 
         $this->addAttackerMessage('Your weapon slices at the enemies flesh for: ' . number_format($totalDamage), 'player-action');
         $this->addDefenderMessage($attacker->name . ' strikes you with their weapon for: ' . number_format($totalDamage), 'enemy-action');
+
+        $this->pvpCounter($attacker, $defender);
+
+        if ($this->characterHealth <= 0) {
+            $this->addDefenderMessage('You manage to kill the enemy in your counter Attack!', 'enemy-action');
+            $this->addAttackerMessage('You were slaughtered by the counter attack!', 'enemy-action');
+
+            $this->abortCharacterIsDead = true;
+
+            return;
+        }
 
         $this->specialAttacks->setCharacterHealth($this->characterHealth)
                              ->setMonsterHealth($this->monsterHealth)

@@ -133,6 +133,7 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
     }
 
     removeFromSet(id: number) {
+        console.log(this.state.selected_set);
         let setId: any = this.props.savable_sets.filter((set) => {
             return set.name === this.state.selected_set;
         });

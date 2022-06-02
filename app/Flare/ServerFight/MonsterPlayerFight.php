@@ -106,6 +106,7 @@ class MonsterPlayerFight {
         $this->mergeMessages($this->buildMonster->getMessages());
 
         $isPlayerVoided = $this->voidance->isPlayerVoided();
+        $isEnemyVoided  = $this->voidance->isEnemyVoided();
 
         $ambush = $this->ambush->handleAmbush($this->character, $monster, $isPlayerVoided);
 
@@ -133,6 +134,7 @@ class MonsterPlayerFight {
 
         $this->attack->setHealth($ambush->getHealthObject())
                      ->setIsCharacterVoided($isPlayerVoided)
+                     ->setIsEnemyVoided($isEnemyVoided)
                      ->onlyAttackOnce($onlyOnce)
                      ->attack($this->character, $monster, $this->attackType, 'character');
 

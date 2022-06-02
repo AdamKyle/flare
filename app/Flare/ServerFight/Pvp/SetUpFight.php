@@ -32,6 +32,7 @@ class SetUpFight extends PvpMessages {
 
     public function setUp(Character $attacker, Character $defender, array $healthObject): array {
         $this->reducePlayerSkills($attacker, $defender);
+        $this->reduceResistances($attacker, $defender);
         $this->handleVoidance($attacker, $defender);
 
         return $this->handleAmbush($attacker, $defender, $healthObject, $this->voidance->isPlayerVoided());
@@ -72,21 +73,72 @@ class SetUpFight extends PvpMessages {
     }
 
     public function reducePlayerSkills(Character $attacker, Character $defender) {
-        $attackerResult = $this->reduceSkills($attacker, $defender, self::ATTACKER);
-        $defenderResult = $this->reduceSkills($defender, $attacker, self::DEFENDER);
+        $attackerResult = $this->reduceSkills($attacker, $defender);
+        $defenderResult = $this->reduceSkills($defender, $attacker);
 
         if ($attackerResult) {
-            $this->addAttackerMessage('You caused the enemy to thrash around like a lunatic. Skills Reduced!', 'player-action');
-            $this->addDefenderMessage($attacker->name . ' Causes you to thrash around blindly. (Core Skills reduced!)', 'enemy-action');
+            $this->addAttackerMessage('You caused the enemy to thrash around like a lunatic. Skills reduced!', 'player-action');
+            $this->addDefenderMessage($attacker->name . ' Causes you to thrash around blindly. (Core skills reduced!)', 'enemy-action');
         }
 
         if ($defenderResult) {
-            $this->addDefenderMessage('You caused the enemy to thrash around like a lunatic. Skills Reduced!', 'player-action');
-            $this->addAttackerMessage($defender->name . ' Causes you to thrash around blindly. (Core Skills reduced!)', 'enemy-action');
+            $this->addDefenderMessage('You caused the enemy to thrash around like a lunatic. Skills reduced!', 'player-action');
+            $this->addAttackerMessage($defender->name . ' Causes you to thrash around blindly. (Core skills reduced!)', 'enemy-action');
         }
     }
 
-    public function reduceSkills(Character $attacker, Character $defender, string $type) {
+    public function reduceCharacterResistances(Character $attacker, Character $defender) {
+        $attackerResult = $this->reduceResistances($attacker, $defender);
+        $defenderResult = $this->reduceResistances($defender, $attacker);
+
+        if ($attackerResult) {
+            $this->addAttackerMessage('You make the enemy shudder in fear. Resistances reduced!', 'player-action');
+            $this->addDefenderMessage($attacker->name . ' Causes you to cry out in agony (Core resistances reduced!)', 'enemy-action');
+        }
+
+        if ($defenderResult) {
+            $this->addDefenderMessage('You make the enemy shudder in fear. Resistances reduced!', 'player-action');
+            $this->addAttackerMessage($defender->name . ' Causes you to cry out in agony (Core resistances reduced!)', 'enemy-action');
+        }
+    }
+
+    protected function reduceResistances(Character $attacker, Character $defender,) {
+        $attackerResistanceReduction = $this->characterCacheData->getCachedCharacterData($attacker, 'resistance_reduction');
+
+        if ($attackerResistanceReduction > 0.0) {
+            $defenderCache = $this->characterCacheData->getCharacterSheetCache($defender);
+
+            foreach($defenderCache as $attributeName => $value) {
+                switch ($attributeName) {
+                    case 'devouring_light_res':
+                    case 'devouring_darkness_res':
+                    case 'ambush_resistance':
+                    case 'counter_resistance':
+                    case 'spell_evasion':
+                    case 'affix_damage_reduction':
+                    case 'healing_reduction':
+                        $defenderCache[$attributeName] = $this->adjustValue($value, $attackerResistanceReduction);
+                    default:
+                }
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    protected function adjustValue(float $value, float $reduction): float {
+        $newValue = $value - $reduction;
+
+        if ($newValue < 0.0) {
+            return 0.0;
+        }
+
+        return $newValue;
+    }
+
+    protected function reduceSkills(Character $attacker, Character $defender) {
         $skillReduction = $this->characterCacheData->getCachedCharacterData($attacker, 'skill_reduction');
 
         if ($skillReduction > 0.0) {

@@ -89,7 +89,6 @@ export default class CanHitCheck extends BattleBase {
   }
 
   toHitCalculation(toHit, agi, accuracy, dodge) {
-
     if (accuracy >= 1) {
       return true;
     }

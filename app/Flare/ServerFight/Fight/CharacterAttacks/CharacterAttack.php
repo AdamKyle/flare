@@ -32,11 +32,12 @@ class CharacterAttack {
         $this->defend        = $defend;
     }
 
-    public function pvpAttack(Character $attacker, Character $defender, bool $isAttackerVoided, array $healthObject): CharacterAttack {
+    public function pvpAttack(Character $attacker, Character $defender, bool $isAttackerVoided, bool $isEnemyVoided, array $healthObject): CharacterAttack {
         $this->weaponType->setCharacterHealth($healthObject['attacker_health']);
         $this->weaponType->setMonsterHealth($healthObject['defender_health']);
         $this->weaponType->setCharacterAttackData($attacker, $isAttackerVoided);
-        $this->weaponType->doPvpWeaponAttack($attacker, $defender, $isAttackerVoided);
+        $this->weaponType->setIsEnemyVoided($isEnemyVoided);
+        $this->weaponType->doPvpWeaponAttack($attacker, $defender);
 
         $this->type = $this->weaponType;
 
@@ -54,10 +55,11 @@ class CharacterAttack {
         return $this;
     }
 
-    public function pvpCast(Character $attacker, Character $defender, bool $isAttackerVoided, array $healthObject): CharacterAttack {
+    public function pvpCast(Character $attacker, Character $defender, bool $isAttackerVoided, bool $isEnemyVoided, array $healthObject): CharacterAttack {
         $this->castType->setCharacterHealth($healthObject['attacker_health']);
         $this->castType->setMonsterHealth($healthObject['defender_health']);
         $this->castType->setCharacterAttackData($attacker, $isAttackerVoided);
+        $this->castType->setIsEnemyVoided($isEnemyVoided);
         $this->castType->pvpCastAttack($attacker, $defender);
 
         $this->type = $this->castType;
@@ -76,10 +78,11 @@ class CharacterAttack {
         return $this;
     }
 
-    public function pvpAttackAndCast(Character $attacker, Character $defender, bool $isAttackerVoided, array $healthObject): CharacterAttack {
+    public function pvpAttackAndCast(Character $attacker, Character $defender, bool $isAttackerVoided, bool $isEnemyVoided, array $healthObject): CharacterAttack {
         $this->attackAndCast->setCharacterHealth($healthObject['attacker_health']);
         $this->attackAndCast->setMonsterHealth($healthObject['defender_health']);
         $this->attackAndCast->setCharacterAttackData($attacker, $isAttackerVoided);
+        $this->attackAndCast->setIsEnemyVoided($isEnemyVoided);
         $this->attackAndCast->handlePvpAttack($attacker, $defender);
 
         $this->type = $this->attackAndCast;
@@ -98,10 +101,11 @@ class CharacterAttack {
         return $this;
     }
 
-    public function pvpCastAndAttack(Character $attacker, Character $defender, bool $isAttackerVoided, array $healthObject): CharacterAttack {
+    public function pvpCastAndAttack(Character $attacker, Character $defender, bool $isAttackerVoided, bool $isEnemyVoided, array $healthObject): CharacterAttack {
         $this->castAndAttack->setCharacterHealth($healthObject['attacker_health']);
         $this->castAndAttack->setMonsterHealth($healthObject['defender_health']);
         $this->castAndAttack->setCharacterAttackData($attacker, $isAttackerVoided);
+        $this->castAndAttack->setIsEnemyVoided($isEnemyVoided);
         $this->castAndAttack->handlePvpAttack($attacker, $defender);
 
         $this->type = $this->castAndAttack;
@@ -120,10 +124,11 @@ class CharacterAttack {
         return $this;
     }
 
-    public function pvpDefend(Character $attacker, Character $defender, bool $isAttackerVoided, array $healthObject): CharacterAttack {
+    public function pvpDefend(Character $attacker, Character $defender, bool $isAttackerVoided, bool $isEnemyVoided, array $healthObject): CharacterAttack {
         $this->defend->setCharacterHealth($healthObject['attacker_health']);
         $this->defend->setMonsterHealth($healthObject['defender_health']);
         $this->defend->setCharacterAttackData($attacker, $isAttackerVoided);
+        $this->defend->setIsEnemyVoided($isEnemyVoided);
         $this->defend->pvpDefend($attacker, $defender);
 
         $this->type = $this->defend;

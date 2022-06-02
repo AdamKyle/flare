@@ -21,6 +21,10 @@ export default class BattleBase {
         this.battle_messages = [];
     }
 
+    getIsCharacterDead() {
+        return this.character_is_dead;
+    }
+
     addMessage(message: string, type: 'regular' | 'player-action' | 'enemy-action'): void {
         this.battle_messages.push({
             message: message,

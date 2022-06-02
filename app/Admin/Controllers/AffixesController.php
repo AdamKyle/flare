@@ -2,7 +2,7 @@
 
 namespace App\Admin\Controllers;
 
-use App\Admin\Import\Affixes\AffixesImport;
+use App\Admin\Import\Affixes\GuideQuests;
 use App\Admin\Requests\AffixManagementRequest;
 use App\Flare\Models\GameSkill;
 use Illuminate\Http\Request;
@@ -104,7 +104,7 @@ class AffixesController extends Controller {
      * @codeCoverageIgnore
      */
     public function importData(AffixesImportRequest $request) {
-        Excel::import(new AffixesImport, $request->affixes_import);
+        Excel::import(new GuideQuests, $request->affixes_import);
 
         return redirect()->back()->with('success', 'imported affix data.');
     }

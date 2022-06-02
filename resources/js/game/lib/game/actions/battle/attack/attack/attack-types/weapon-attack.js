@@ -41,7 +41,11 @@ export default class WeaponAttack extends BattleBase {
     if (canHitCheck.getCanAutoHit()) {
       this.mergeMessages(canHitCheck.getBattleMessages());
 
-      this.attackWithWeapon(attackData, false, canHitCheck.getCanAutoHit());
+      const status = this.attackWithWeapon(attackData, false, canHitCheck.getCanAutoHit());
+
+      if (!status) {
+        return this.setState();
+      }
 
       this.useItems(attackData, this.attacker.class);
 
@@ -51,7 +55,11 @@ export default class WeaponAttack extends BattleBase {
     if (canEntrance ) {
       this.mergeMessages(canEntranceEnemy.getBattleMessages());
 
-      this.attackWithWeapon(attackData, canEntrance, false);
+      const status = this.attackWithWeapon(attackData, canEntrance, false);
+
+      if (!status) {
+        return this.setState();
+      }
 
       this.useItems(attackData, this.attacker.class);
 
@@ -117,18 +125,20 @@ export default class WeaponAttack extends BattleBase {
 
     this.addMessage('Your weapon hits ' + this.defender.name + ' for: ' + formatNumber(totalDamage), 'player-action');
 
-    if (this.monsterHealth > 0 && !isEntranced) {
+    if (this.monsterHealth > 0) {
       const healthObject = this.handleCounter(this.attacker, this.defender, this.characterCurrentHealth, this.monsterHealth, 'enemy', this.voided);
 
       this.characterCurrentHealth = healthObject.character_health;
       this.monsterHealth = healthObject.monster_health;
 
       if (this.characterCurrentHealth <= 0  || this.monsterHealth <= 0) {
-        return;
+        return false;
       }
     }
 
     this.extraAttacks(attackData);
+
+    return true;
   }
 
   useItems(attackData, attackerClass) {

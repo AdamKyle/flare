@@ -155,10 +155,15 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::post('/admin/guide-quests/store', ['as' => 'admin.guide-quests.store', 'uses' => 'GuideQuestsController@store']);
     Route::post('/admin/guide-quests/{guideQuest}/delete', ['as' => 'admin.guide-quests.delete', 'uses' => 'GuideQuestsController@delete']);
 
+    Route::post('/admin/guide-quests/export-data', ['as' => 'admin.guide-quests.export-data', 'uses' => 'GuideQuestsController@export']);
+    Route::post('/admin/guide-quests/import-data', ['as' => 'admin.guide-quests.import-data', 'uses' => 'GuideQuestsController@import']);
+
     Route::get('/admin/guide-quests', ['as' => 'admin.guide-quests', 'uses' => 'GuideQuestsController@index']);
     Route::get('/admin/guide-quests/create', ['as' => 'admin.guide-quests.create', 'uses' => 'GuideQuestsController@create']);
     Route::get('/admin/guide-quests/edit/{guideQuest}', ['as' => 'admin.guide-quests.edit', 'uses' => 'GuideQuestsController@edit']);
     Route::get('/admin/guide-quests/show/{guideQuest}', ['as' => 'admin.guide-quests.show', 'uses' => 'GuideQuestsController@show']);
+    Route::get('/admin/guide-quests/export', ['as' => 'admin.guide-quests.export', 'uses' => 'GuideQuestsController@exportGuideQuests']);
+    Route::get('/admin/guide-quests/import', ['as' => 'admin.guide-quests.import', 'uses' => 'GuideQuestsController@importGuideQuests']);
 
     Route::post('/admin/information-management/export', ['as' => 'admin.info-management.export', 'uses' => 'InformationController@export']);
     Route::post('/admin/information-management/import', ['as' => 'admin.info-management.import', 'uses' => 'InformationController@import']);

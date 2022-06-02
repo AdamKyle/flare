@@ -3,6 +3,7 @@
 namespace App\Flare\Providers;
 
 
+use App\Falre\ServerFight\Fight\CharacterAttacks\Counter;
 use App\Flare\Builders\AffixAttributeBuilder;
 use App\Flare\Builders\Character\AttackDetails\CharacterAffixInformation;
 use App\Flare\Builders\Character\AttackDetails\CharacterHealthInformation;
@@ -330,6 +331,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(Affixes::class, function($app) {
             return new Affixes($app->make(CharacterCacheData::class));
+        });
+
+        $this->app->bind(Counter::class, function($app) {
+            return new Counter($app->make(CharacterCacheData::class));
         });
 
         $this->app->bind(SecondaryAttacks::class, function($app) {

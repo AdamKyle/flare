@@ -190,7 +190,13 @@ export default class Attack extends BattleBase {
 
     this.battle_messages         = [...this.battle_messages, ...useItems.getBattleMessage()];
 
-    this.state.characterCurrentHealth = useItems.getCharacterCurrentHealth();
+    let characterNewHealth = useItems.getCharacterCurrentHealth();
+
+    if (parseInt(characterNewHealth.toFixed(2)) > this.characterMaxHealth) {
+      characterNewHealth = this.characterMaxHealth
+    }
+
+    this.state.characterCurrentHealth = characterNewHealth;
     this.state.monsterCurrentHealth   = useItems.getMonsterCurrentHealth();
   }
 

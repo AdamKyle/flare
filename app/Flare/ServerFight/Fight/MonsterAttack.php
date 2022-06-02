@@ -10,8 +10,6 @@ use App\Flare\ServerFight\Monster\ServerMonster;
 
 class MonsterAttack extends BattleBase {
 
-    private bool $isVoided;
-
     private PlayerHealing $playerHealing;
 
     private Entrance $entrance;
@@ -35,8 +33,17 @@ class MonsterAttack extends BattleBase {
 
     public function monsterAttack(ServerMonster $monster, Character $character, string $previousAttackType) {
         $this->attackPlayer($monster, $character);
-        $this->fireEnchantments($monster, $character);
-        $this->castSpells($monster, $character, $previousAttackType);
+
+        $this->doPlayerCounterMonster($character, $monster);
+
+        if ($this->monsterHealth <= 0) {
+            return;
+        }
+
+        if (!$this->isEnemyVoided) {
+            $this->fireEnchantments($monster, $character);
+            $this->castSpells($monster, $character, $previousAttackType);
+        }
 
         $this->playerHealing($monster, $character, $previousAttackType);
     }
@@ -69,6 +76,20 @@ class MonsterAttack extends BattleBase {
             $this->addMessage($monster->getName() . ' grows enraged and lashes out with all fury! (Critical Strike!)', 'regular');
 
             $attack *= 2;
+        }
+
+        $playerCachedDefence = $this->characterCacheData->getCharacterDefenceAc($character);
+
+        if (is_null($playerCachedDefence)) {
+            $ac = $this->characterCacheData->getCachedCharacterData($character, 'ac');
+        } else {
+            $ac = $playerCachedDefence;
+        }
+
+        if ($ac > $attack) {
+            $this->addMessage('You blocked the enemies attack!', 'enemy-action');
+
+            return;
         }
 
         $this->characterHealth -= $attack;

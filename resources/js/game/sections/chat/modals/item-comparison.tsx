@@ -34,7 +34,6 @@ export default class ItemComparison extends React.Component<any, any> {
         (new Ajax()).setRoute('character/'+this.props.character_id+'/inventory/comparison-from-chat').setParameters({
             slot_id: this.props.slot_id,
         }).doAjaxCall('get', (result: AxiosResponse) => {
-            console.log(result.data);
             this.setState({
                 loading: false,
                 comparison_details: result.data.comparison_data,

@@ -2,16 +2,20 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Exports\GuideQuests\GuideQuestsExport;
+
+use App\Admin\Import\GuideQuests\GuideQuests;
 use App\Admin\Requests\GuideQuestManagement;
+use App\Admin\Requests\GuideQuestsImport;
 use App\Admin\Services\GuideQuestService;
 use App\Flare\Models\GuideQuest;
-use Illuminate\Http\Request;
+
 use App\Http\Controllers\Controller;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
 use App\Flare\Models\Quest;
-use App\Flare\Models\GameClass;
+use Maatwebsite\Excel\Facades\Excel;
 
 class GuideQuestsController extends Controller {
 
@@ -23,6 +27,27 @@ class GuideQuestsController extends Controller {
 
     public function index() {
         return view('admin.guide-quests.index');
+    }
+
+    public function export() {
+        $response = Excel::download(new GuideQuestsExport(), 'guide-quests.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+        ob_end_clean();
+
+        return $response;
+    }
+
+    public function import(GuideQuestsImport $request) {
+        Excel::import(new GuideQuests, $request->guide_quests_import);
+
+        return redirect()->back()->with('success', 'imported guide quest data.');
+    }
+
+    public function exportGuideQuests() {
+        return view('admin.guide-quests.export');
+    }
+
+    public function importGuideQuests() {
+        return view('admin.guide-quests.import');
     }
 
     public function show(GuideQuest $guideQuest) {

@@ -19,11 +19,12 @@ class QuestsTable extends DataTableComponent {
 
     public function columns(): array {
         return [
-            Column::make('Name')->format(function ($value, $row) {
+            Column::make('Name')->searchable()->format(function ($value, $row) {
                 $guideQuest = GuideQuest::where('name', $value)->first()->id;
 
                 return '<a href="/admin/guide-quests/show/'. $guideQuest.'">'.$row->name . '</a>';
             })->html(),
+            Column::make('Reward Level', 'reward_level')->sortable(),
             Column::make('Actions')->label(
                 fn($row, Column $column) => view('admin.guide-quests.partials.table.delete-action')->withRow($row)
             ),

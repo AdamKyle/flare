@@ -119,6 +119,8 @@ class Exploration implements ShouldQueue
     protected function fightAutomationMonster(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, array $params) {
         $fightResponse = $response->fightMonster();
 
+        dump($response->getBattleMessages());
+
         if (!$fightResponse) {
 
             $automation->delete();

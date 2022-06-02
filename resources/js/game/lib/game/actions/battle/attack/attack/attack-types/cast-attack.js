@@ -39,7 +39,11 @@ export default class CastAttack extends BattleBase {
     if (canHitCheck.getCanAutoHit()) {
       this.mergeMessages(canHitCheck.getBattleMessages());
 
-      this.attackWithSpells(attackData, false, true);
+      const status = this.attackWithSpells(attackData, false, true);
+
+      if (!status) {
+        return this.setState();
+      }
 
       if (attackData.heal_for > 0) {
         this.healWithSpells(attackData);
@@ -53,7 +57,11 @@ export default class CastAttack extends BattleBase {
     if (canEntrance) {
       this.mergeMessages(canEntranceEnemy.getBattleMessages());
 
-      this.attackWithSpells(attackData, true, false);
+      const status = this.attackWithSpells(attackData, true, false);
+
+      if (!status) {
+        return this.setState();
+      }
 
       if (attackData.heal_for > 0) {
         this.healWithSpells(attackData);
@@ -81,7 +89,11 @@ export default class CastAttack extends BattleBase {
           return this.setState();
         }
 
-        this.attackWithSpells(attackData, false, false);
+        const status = this.attackWithSpells(attackData, false, false);
+
+        if (!status) {
+          return this.setState();
+        }
 
         this.healWithSpells(attackData);
 
@@ -124,7 +136,7 @@ export default class CastAttack extends BattleBase {
     if (evasion > 1.0 && !isEntranced) {
       this.addMessage('The enemy evades your magic!', 'enemy-action')
 
-      return;
+      return true;
     }
 
     const bonus = this.attacker.skills.casting_accuracy;
@@ -133,7 +145,7 @@ export default class CastAttack extends BattleBase {
     if (roll < dc && dc > 0 && !isEntranced) {
       this.addMessage('The enemy evades your magic!', 'enemy-action')
 
-      return;
+      return true;
     }
 
     const skillBonus = this.attacker.skills.criticality;
@@ -153,45 +165,24 @@ export default class CastAttack extends BattleBase {
 
     this.addMessage('Your damage spell(s) hits ' + this.defender.name + ' for: ' + formatNumber(damage.toFixed(0)), 'player-action');
 
-    if (this.monsterHealth > 0 && !isEntranced) {
+    if (this.monsterHealth > 0) {
       const healthObject = this.handleCounter(this.attacker, this.defender, this.characterCurrentHealth, this.monsterHealth, 'enemy', this.voided);
 
       this.characterCurrentHealth = healthObject.character_health;
       this.monsterHealth = healthObject.monster_health;
 
-      if (this.characterCurrentHealth <= 0 || this.monsterHealth <= 0) {
-        return;
+      if (this.monsterHealth <= 0) {
+        return true;
+      }
+
+      if (this.characterCurrentHealth <= 0) {
+        return false;
       }
     }
 
     this.extraAttacks(attackData);
-  }
 
-  enemyCounterCastAttack() {
-    if (this.monsterHealth > 0) {
-      const counterHandler = new CounterHandler();
-
-      const healthObject = counterHandler.enemyCounter(this.defender, this.attacker, this.voided, this.monsterHealth, this.characterCurrentHealth);
-
-      this.characterCurrentHealth = healthObject.character_health;
-      this.monsterHealth = healthObject.monster_health;
-
-      this.battleMessages = [...this.battleMessages, ...counterHandler.getMessages()];
-
-      counterHandler.resetMessages();
-
-      if (this.monsterHealth <= 0) {
-        this.addMessage('Your counter of their counter has slaughtered the enemy!', 'enemy-action');
-
-        return;
-      }
-
-      if (this.characterCurrentHealth <= 0) {
-        this.addMessage('The enemies counter has slaughtered you!', 'enemy-action');
-
-        return;
-      }
-    }
+    return true;
   }
 
   healWithSpells(attackData) {

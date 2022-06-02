@@ -5,7 +5,7 @@ namespace Tests\Unit\Admin\Imports;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Maatwebsite\Excel\Facades\Excel;
 use Tests\TestCase;
-use App\Admin\Import\Affixes\AffixesImport;
+use App\Admin\Import\Affixes\GuideQuests;
 use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateItemAffix;
 
@@ -22,7 +22,7 @@ class AffixesImportTest extends TestCase {
             'name' => 'Weapon Crafting'
         ]);
 
-        Excel::import(new AffixesImport, resource_path('data-imports/affixes.xlsx'));
+        Excel::import(new GuideQuests, resource_path('data-imports/affixes.xlsx'));
 
         $this->assertTrue(true);
     }

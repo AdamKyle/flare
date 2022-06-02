@@ -28,6 +28,10 @@ class CharacterTrinketsInformation {
             $ambushChance += $slot->item->ambush_chance;
         }
 
+        if ($ambushChance > 0.95) {
+            return 0.95;
+        }
+
         return $ambushChance;
     }
 
@@ -48,6 +52,10 @@ class CharacterTrinketsInformation {
 
         foreach ($equipped as $slot) {
             $ambushResistance += $slot->item->ambush_resistance;
+        }
+
+        if ($ambushResistance > 0.95) {
+            return 0.95;
         }
 
         return $ambushResistance;
@@ -72,6 +80,10 @@ class CharacterTrinketsInformation {
             $counterChance += $slot->item->counter_chance;
         }
 
+        if ($counterChance > 0.95) {
+            return 0.95;
+        }
+
         return $counterChance;
     }
 
@@ -92,6 +104,10 @@ class CharacterTrinketsInformation {
 
         foreach ($equipped as $slot) {
             $counterResistance += $slot->item->counter_resistance;
+        }
+
+        if ($counterResistance > 0.95) {
+            return 0.95;
         }
 
         return $counterResistance;

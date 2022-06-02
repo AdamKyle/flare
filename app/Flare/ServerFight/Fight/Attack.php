@@ -10,6 +10,8 @@ class Attack {
 
     private bool $isCharacterVoided;
 
+    private bool $isEnemyVoided = false;
+
     private int $characterHealth;
 
     private int $monsterHealth;
@@ -39,6 +41,12 @@ class Attack {
     public function setIsCharacterVoided(bool $isVoided): Attack {
         $this->isCharacterVoided = $isVoided;
         $this->attackCounter     = 0;
+
+        return $this;
+    }
+
+    public function setIsEnemyVoided(bool $isVoided): Attack {
+        $this->isEnemyVoided = $isVoided;
 
         return $this;
     }
@@ -127,6 +135,7 @@ class Attack {
             $this->monsterAttack->setIsCharacterVoided($this->isCharacterVoided);
             $this->monsterAttack->setCharacterHealth($this->characterHealth);
             $this->monsterAttack->setMonsterHealth($this->monsterHealth);
+            $this->monsterAttack->setIsEnemyVoided($this->isEnemyVoided);
             $this->monsterAttack->monsterAttack($serverMonster, $character, $attackType);
 
             $this->mergeBattleMessages($this->monsterAttack->getMessages());

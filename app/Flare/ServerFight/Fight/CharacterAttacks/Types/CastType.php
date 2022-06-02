@@ -149,6 +149,14 @@ class CastType extends BattleBase
             $this->spellDamage($character, $monster, $spellDamage, $entranced);
         }
 
+        $this->doMonsterCounter($character, $monster);
+
+        if ($this->characterHealth <= 0) {
+            $this->abortCharacterIsDead = true;
+
+            return;
+        }
+
         $this->heal($character);
 
         if ($this->allowSecondaryAttacks) {
@@ -191,6 +199,14 @@ class CastType extends BattleBase
 
         $this->addAttackerMessage('Your damage spell(s) hits ' . $defender->name . ' for: ' . number_format($totalDamage), 'player-action');
         $this->addDefenderMessage($attacker->name . ' begins to cast their magics, the crackle in the air is electrifying. Their magics fly towards you for: ' . number_format($totalDamage), 'enemy-action');
+
+        $this->pvpCounter($attacker, $defender);
+
+        if ($this->abortCharacterIsDead) {
+            return;
+        }
+
+        $this->heal($attacker, $defender, true);
 
         $this->specialAttacks->setCharacterHealth($this->characterHealth)
                              ->setMonsterHealth($this->monsterHealth)
@@ -251,8 +267,19 @@ class CastType extends BattleBase
         $this->specialAttacks->clearMessages();
     }
 
-    public function heal(Character $character, bool $isPvp = false) {
+    public function heal(Character $character, Character $defender = null, bool $isPvp = false) {
         $healFor = $this->attackData['heal_for'];
+
+        if (!is_null($defender) && $isPvp) {
+            $reduction = $this->characterCacheData->getCachedCharacterData($defender, 'healing_reduction');
+
+            if ($reduction > 0.0) {
+                $healFor -= $healFor * $reduction;
+
+                $this->addDefenderMessage('You manage to reduce the enemies ability to heal fully!', 'player-action');
+                $this->addAttackerMessage('Your healing prayers and spells seem weaker in the face of your enemy!', 'enemy-action');
+            }
+        }
 
         if ($healFor > 0) {
             $criticality = $this->characterCacheData->getCachedCharacterData($character, 'skills')['criticality'];

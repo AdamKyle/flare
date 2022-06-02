@@ -2,6 +2,7 @@
 
 namespace App\Flare\ServerFight;
 
+use App\Flare\ServerFight\Fight\CharacterAttacks\Counter;
 use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Models\Character;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SecondaryAttacks;
@@ -18,36 +19,35 @@ class BattleBase extends BattleMessages {
 
     protected bool $isVoided;
 
+    protected bool $isEnemyVoided;
+
     protected bool $isEnemyEntranced = false;
 
     protected bool $allowSecondaryAttacks = true;
 
+    protected bool $abortCharacterIsDead = false;
+
     protected CharacterCacheData $characterCacheData;
 
-    public function __construct(CharacterCacheData $characterCacheData)
-    {
+    public function __construct(CharacterCacheData $characterCacheData) {
         parent::__construct();
 
         $this->characterCacheData = $characterCacheData;
     }
 
-    public function setCharacterHealth(int $characterHealth)
-    {
+    public function setCharacterHealth(int $characterHealth) {
         $this->characterHealth = $characterHealth;
     }
 
-    public function setMonsterHealth(int $monsterHealth)
-    {
+    public function setMonsterHealth(int $monsterHealth) {
         $this->monsterHealth = $monsterHealth;
     }
 
-    public function getCharacterHealth(): int
-    {
+    public function getCharacterHealth(): int {
         return $this->characterHealth;
     }
 
-    public function getMonsterHealth(): int
-    {
+    public function getMonsterHealth(): int {
         return $this->monsterHealth;
     }
 
@@ -57,6 +57,10 @@ class BattleBase extends BattleMessages {
 
     public function setEntranced() {
         $this->isEnemyEntranced = true;
+    }
+
+    public function setIsEnemyVoided(bool $isVoided) {
+        $this->isEnemyVoided = $isVoided;
     }
 
     protected function doPvpEntrance(Character $attacker, Entrance $entrance) {
@@ -101,6 +105,58 @@ class BattleBase extends BattleMessages {
         $secondaryAttacks->clearMessages();
     }
 
+    protected function pvpCounter(Character $attacker, Character $defender) {
+        $counter = resolve(Counter::class);
+
+        $counter->setCharacterHealth($this->characterHealth);
+        $counter->setMonsterHealth($this->monsterHealth);
+        $counter->setIsEnemyVoided($this->isEnemyVoided);
+        $counter->setIsAttackerVoided($this->isVoided);
+        $counter->pvpCounter($attacker, $defender);
+
+        $this->mergeAttackerMessages($counter->getAttackerMessages());
+        $this->mergeDefenderMessages($counter->getDefenderMessages());
+
+        $this->characterhealth = $counter->getCharacterHealth();
+        $this->monsterHealth   = $counter->getMonsterHealth();
+
+        $counter->clearMessages();
+    }
+
+    protected function doMonsterCounter(Character $character, ServerMonster $monster) {
+        $counter = resolve(Counter::class);
+
+        $counter->setCharacterHealth($this->characterHealth);
+        $counter->setMonsterHealth($this->monsterHealth);
+        $counter->setIsAttackerVoided($this->isVoided);
+        $counter->monsterCounter($character, $monster);
+
+        $this->mergeAttackerMessages($counter->getAttackerMessages());
+        $this->mergeDefenderMessages($counter->getDefenderMessages());
+
+        $this->characterhealth = $counter->getCharacterHealth();
+        $this->monsterHealth   = $counter->getMonsterHealth();
+
+        $counter->clearMessages();
+    }
+
+    protected function doPlayerCounterMonster(Character $character, ServerMonster $monster) {
+        $counter = resolve(Counter::class);
+
+        $counter->setCharacterHealth($this->characterHealth);
+        $counter->setMonsterHealth($this->monsterHealth);
+        $counter->setIsAttackerVoided($this->isVoided);
+        $counter->playerCounter($character, $monster);
+
+        $this->mergeAttackerMessages($counter->getAttackerMessages());
+        $this->mergeDefenderMessages($counter->getDefenderMessages());
+
+        $this->characterhealth = $counter->getCharacterHealth();
+        $this->monsterHealth   = $counter->getMonsterHealth();
+
+        $counter->clearMessages();
+    }
+
     protected function getPvpCharacterAc(Character $defender) {
         $defence = $this->characterCacheData->getCharacterDefenceAc($defender);
 
@@ -112,6 +168,6 @@ class BattleBase extends BattleMessages {
     }
 
     protected function canBlock(int $damage, int $ac) {
-        return $damage > $ac;
+        return $ac > $damage;
     }
 }
