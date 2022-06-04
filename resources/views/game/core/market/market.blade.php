@@ -1,18 +1,35 @@
 @extends('layouts.app')
 
 @section('content')
-    <x-core.page-title
-        title="Market"
-        route="{{route('game')}}"
-        link="Game"
-        color="primary"
-    ></x-core.page-title>
-    <div class="mb-2 alert alert-info">
-        You can click on the row in the table to open the modal to buy or browse.
-    </div>
-    <div class="row">
-        <div class="col-md-12">
-            <div id="market"></div>
-        </div>
-    </div>
+    <x-core.layout.info-container>
+        <x-core.page-title
+            title="Market"
+            route="{{route('game')}}"
+            link="Game"
+            color="primary"
+        ></x-core.page-title>
+
+        <div id="market-listings" style="height: 300px;"></div>
+
+        @livewire('market.all-listings')
+    </x-core.layout.info-container>
+
+    @push('scripts')
+        <!-- Charting library -->
+        <script src="https://unpkg.com/echarts/dist/echarts.min.js"></script>
+        <!-- Chartisan -->
+        <script src="https://unpkg.com/@chartisan/echarts/dist/chartisan_echarts.js"></script>
+        <!-- Your application script -->
+        <script>
+            const chart = new Chartisan({
+                el: '#market-listings',
+                url: "@chart('market_board_history')",
+                hooks: new ChartisanHooks()
+                    .legend()
+                    .colors()
+                    .tooltip()
+                    .datasets([{ type: 'line', fill: false }]),
+            });
+        </script>
+    @endpush
 @endsection

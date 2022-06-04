@@ -1,0 +1,43 @@
+.two-enchant {
+  @apply text-fuchsia-800 dark:text-fuchsia-300
+}
+
+.one-enchant {
+    @apply text-blue-500
+}
+
+.trinket {
+    @apply text-red-700 dark:text-red-600
+}
+
+.regular-item {
+  @apply text-gray-600 dark:text-gray-300
+}
+
+.unique-item {
+  @apply text-green-700 dark:text-green-600;
+}
+
+.holy-item {
+  @apply text-sky-700 dark:text-sky-300
+}
+
+.trinket {
+  @apply text-red-700 dark:text-red-600;
+}
+
+.quest-item {
+  @apply text-orange-400 dark:text-orange-300;
+}
+
+.usable-item {
+  color: #e32ca4;
+
+  &:hover, &:visited, &:focus {
+    color: #e32ca4;
+  }
+}
+
+.mythic-unique {
+  @apply text-amber-600 dark:text-amber-500;
+}

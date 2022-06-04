@@ -32,7 +32,7 @@ use App\Game\Core\Services\CharacterInventoryService;
 use App\Game\Core\Requests\MoveItemRequest;
 use App\Game\Core\Services\InventorySetService;
 
-class CharacterInventoryController extends Controller {
+class  CharacterInventoryController extends Controller {
 
     private $characterInventoryService;
 

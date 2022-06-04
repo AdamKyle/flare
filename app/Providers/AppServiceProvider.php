@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
-use Illuminate\Pagination\Paginator;
+use App\Charts\CreateHistoryForItem;
+use App\Charts\MarketBoardHistory;
+use ConsoleTVs\Charts\Registrar as Charts;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -22,8 +24,14 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(Charts $charts)
     {
+
+        $charts->register([
+            MarketBoardHistory::class,
+            CreateHistoryForItem::class,
+        ]);
+
         \Response::macro('attachment', function ($content, $fileName) {
 
             $headers = [
@@ -32,7 +40,6 @@ class AppServiceProvider extends ServiceProvider
             ];
 
             return \Response::make($content, 200, $headers);
-
         });
     }
 }

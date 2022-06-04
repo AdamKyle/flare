@@ -248,7 +248,7 @@ class  MarketController extends Controller {
         $totalPrice = ($listing->listed_price * 1.05);
 
         if (!($character->gold > $totalPrice)) {
-            return response()->json(['message' => 'You don\'t have the gold to purchase this item.'], 422);
+            return response()->json(['message' => 'You don\'t have the gold to purchase this item (We add 5% tax to the purchase).'], 422);
         }
 
         $character->update([

@@ -70,6 +70,23 @@
                         <dt>Affix Dmg. Reduction</dt>
                         <dd>{{$item->affix_damage_reduction * 100}} %</dd>
                     </dl>
+                    <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                    <div class="mt-4">
+                        <div class="mb-4">
+                            @if (!is_null($item->itemPrefix))
+                                <x-core.buttons.orange-button data-target="#affix-details-{{$item->itemPrefix->id}}" data-toggle="modal">
+                                    View {{$item->itemPrefix->name}} Prefix
+                                </x-core.buttons.orange-button>
+                            @endif
+                        </div>
+                        <div class="mb-4">
+                            @if (!is_null($item->itemSuffix))
+                                <x-core.buttons.orange-button data-target="#affix-details-{{$item->itemSuffix->id}}" data-toggle="modal">
+                                    View {{$item->itemSuffix->name}} Suffix
+                                </x-core.buttons.orange-button>
+                            @endif
+                        </div>
+                    </div>
                 </div>
             </div>
         </x-core.cards.card-with-title>
@@ -322,3 +339,12 @@
         </div>
     @endif
 </div>
+
+@if (!is_null($item->itemPrefix))
+    @include('game.items.affix_details', ['itemAffix' => $item->itemPrefix])
+@endif
+
+@if (!is_null($item->itemSuffix))
+    @include('game.items.affix_details', ['itemAffix' => $item->itemSuffix])
+@endif
+

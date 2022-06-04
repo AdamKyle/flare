@@ -162,7 +162,10 @@ class ShopController extends Controller {
             return redirect()->to(route('game.shop.buy', ['character' => $character->id]))->with('error', 'Comparison cache has expired. Please click compare again. Cache expires after 10 minutes');
         }
 
-        return view('game.shop.comparison', $cache);
+        return view('game.core.comparison.comparison', [
+            'itemToEquip' => $cache,
+            'route' => route('game.shop.buy-and-replace', ['character' => $character->id])
+        ]);
     }
 
     public function buyAndReplace(ShopReplaceItemValidation $request, Character $character) {
