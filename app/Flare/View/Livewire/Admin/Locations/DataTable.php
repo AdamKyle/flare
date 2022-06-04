@@ -5,12 +5,11 @@ namespace App\Flare\View\Livewire\Admin\Locations;
 use Livewire\Component;
 use App\Flare\Models\Location;
 use Livewire\WithPagination;
-use App\Flare\View\Livewire\Core\DataTables\WithSorting;
 
 class DataTable extends Component
 {
 
-    use WithPagination, WithSorting;
+    use WithPagination;
 
     public $adventureId = null;
     public $search      = '';

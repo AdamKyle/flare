@@ -4,14 +4,16 @@
     <x-core.layout.info-container>
         <x-core.page-title
             title="{{$guideQuest->name}}"
-            route="{{route('admin.guide-quests')}}"
-            color="success" link="Guide Quests"
+            route="{{auth()->user()->hasRole('admin') ? route('admin.guide-quests') : route('completed.guide-quests', ['user' => auth()->user()->id])}}"
+            color="success" link="{{auth()->user()->hasRole('admin') ? 'Guide Quests' : 'Back'}}"
         >
-            <x-core.buttons.link-buttons.primary-button
-                href="{{route('admin.guide-quests.edit', ['guideQuest' => $guideQuest->id])}}"
-            >
-                Edit Quest
-            </x-core.buttons.link-buttons.primary-button>
+            @if (auth()->user()->hasRole('admin'))
+                <x-core.buttons.link-buttons.primary-button
+                    href="{{route('admin.guide-quests.edit', ['guideQuest' => $guideQuest->id])}}"
+                >
+                    Edit Quest
+                </x-core.buttons.link-buttons.primary-button>
+            @endif
         </x-core.page-title>
 
         <x-core.cards.card>

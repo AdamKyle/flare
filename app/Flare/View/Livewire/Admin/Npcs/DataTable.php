@@ -5,12 +5,11 @@ namespace App\Flare\View\Livewire\Admin\Npcs;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Flare\Models\Npc;
-use App\Flare\View\Livewire\Core\DataTables\WithSorting;
 use App\Flare\Values\NpcTypes;
 
 class DataTable extends Component {
 
-    use WithPagination, WithSorting;
+    use WithPagination;
 
     public $search      = '';
     public $sortField   = 'name';

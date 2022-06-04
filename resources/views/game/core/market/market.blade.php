@@ -9,6 +9,10 @@
             color="primary"
         ></x-core.page-title>
 
+        <x-core.alerts.info-alert title="ATTN!">
+            This table is not live.
+        </x-core.alerts.info-alert>
+
         <div id="market-listings" style="height: 300px;"></div>
 
         @livewire('market.all-listings')

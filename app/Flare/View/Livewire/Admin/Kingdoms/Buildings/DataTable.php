@@ -5,12 +5,10 @@ namespace App\Flare\View\Livewire\Admin\Kingdoms\Buildings;
 use App\Flare\Models\GameBuilding;
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Flare\View\Livewire\Core\DataTables\WithSorting;
 
 class DataTable extends Component
 {
     use WithPagination;
-    use WithSorting;
 
     protected $paginationTheme = 'bootstrap';
 

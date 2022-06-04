@@ -97,6 +97,9 @@
                         <input type="hidden" value="{{$slotId}}" name="slot_id" />
                         <input type="hidden" value="{{$itemToEquip['default_position']}}" name="position" />
                         <input type="hidden" value="{{$itemToEquip['id']}}" name="item_id_to_buy" />
+                        @if (isset($listingId))
+                            <input type="hidden" value="{{$listingId}}" name="market_board_id" />
+                        @endif
                         <x-core.buttons.primary-button>
                             Equip
                         </x-core.buttons.primary-button>

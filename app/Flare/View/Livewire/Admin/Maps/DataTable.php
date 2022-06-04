@@ -5,11 +5,10 @@ namespace App\Flare\View\Livewire\Admin\Maps;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Flare\Models\GameMap;
-use App\Flare\View\Livewire\Core\DataTables\WithSorting;
 
 class DataTable extends Component
 {
-    use WithPagination, WithSorting;
+    use WithPagination;
 
     public $search    = '';
     public $sortField = 'id';

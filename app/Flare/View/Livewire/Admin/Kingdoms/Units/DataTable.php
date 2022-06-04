@@ -4,8 +4,7 @@ namespace App\Flare\View\Livewire\Admin\Kingdoms\Units;
 
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameBuildingUnit;
-use App\Flare\Models\GameUnit;
-use App\Flare\View\Livewire\Core\DataTables\WithSorting;
+use App\Flare\Models\GameUnit;;
 use Illuminate\Support\Collection;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -13,7 +12,6 @@ use Livewire\WithPagination;
 class DataTable extends Component
 {
     use WithPagination;
-    use WithSorting;
 
     protected $paginationTheme = 'bootstrap';
 

@@ -3,7 +3,7 @@
         <p class="mt-3 mb-3">This quest belongs to an NPC, whom you must be on the same place as to complete.</p>
         <p class="mb-3">To complete all a quest all you have to do is on the same plane, then click Quests tab, click the quest, click complete.</p>
         <p class="mb-3">You must have the required items, currencies and/or faction points needed.</p>
-
+        <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
         <dl>
             <dt>Quest Name:</dt>
             <dd>{{$quest->name}}</dd>
@@ -27,7 +27,7 @@
             </dd>
             @if ($quest->npc->must_be_at_same_location)
                 <dt>Npc X/Y:</dt>
-                <dd>{{$quest->npc->x_position}}/{{$quest->npc->y_position}} <strong>{{$quest->npc->gameMap->name}}</strong> (You must be here to interact with the npc)</dd>
+                <dd>{{$quest->npc->x_position}}/{{$quest->npc->y_position}} <strong>{{$quest->npc->gameMap->name}}</strong> (You will be moved to this location upon handing in the quest.)</dd>
             @endif
             <dt>Required Item:</dt>
             <dd>
@@ -93,9 +93,9 @@
         </dl>
     </div>
     <div>
-        <dl>
-            <p class="mt-3 mb-3">Upon completing the quest you will receive:</p>
+        <p class="mt-3 mb-3">Upon completing the quest you will receive:</p>
 
+        <dl>
             @if (!is_null($quest->reward_item))
                 <dt>Reward Item:</dt>
                 <dd>

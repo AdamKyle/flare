@@ -51,10 +51,6 @@
                 <span class="fas fa-file-invoice-dollar"></span>
                 Visit Market
             </a>
-            <a href="{{route('game.market.sell')}}">
-                <span class="fas fa-hand-holding-usd"></span>
-                Sell Items
-            </a>
             <a href="{{route('game.current-listings', [
                 'character' => auth()->user()->character->id
             ])}}">
@@ -67,12 +63,12 @@
     <!-- Quests -->
     <div class="menu-detail" data-menu="quests">
         <div class="menu-detail-wrapper">
-            <a href="#">
+            <a href="{{route('completed.quests', ['user' => auth()->user()])}}">
                 <span class="fas fa-feather"></span>
                 Completed Quests
             </a>
             @if (auth()->user()->guide_enabled)
-                <a href="#">
+                <a href="{{route('completed.guide-quests', ['user' => auth()->user()])}}">
                     <span class="fas fa-feather"></span>
                     Completed Guide Quests
                 </a>
