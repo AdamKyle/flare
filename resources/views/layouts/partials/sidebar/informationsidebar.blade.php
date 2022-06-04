@@ -45,10 +45,6 @@
                 <span class="text-sm fas fa-cogs"></span>
                 Player Settings
             </a>
-            <a href="{{route('info.page', ['pageName' => 'notifications'])}}">
-                <span class="text-sm far fa-bell"></span>
-                Notifications
-            </a>
             <a href="{{route('info.page', ['pageName' => 'chat-commands'])}}">
                 <span class="text-sm far fa-comment-dots"></span>
                 Chat Commands
@@ -254,7 +250,7 @@
                 Lists
             </a>
             <div id="menueLists" class="collapse open">
-                <a href="{{route('info.page.monsters-list')}}">
+                <a href="{{route('info.page', ['pageName' => 'monsters'])}}">
                     <span class="ra ra-broken-skull"></span>
                     Monsters
                 </a>

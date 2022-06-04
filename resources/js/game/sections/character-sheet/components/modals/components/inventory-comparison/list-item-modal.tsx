@@ -6,6 +6,8 @@ import Ajax from "../../../../../../lib/ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
 import ComponentLoading from "../../../../../../components/ui/loading/component-loading";
 import {DateTime} from "luxon";
+import InfoAlert from "../../../../../../components/ui/alerts/simple-alerts/info-alert";
+import { formatNumber } from "../../../../../../lib/game/format-number";
 
 export default class ListItemModal extends React.Component<any, any> {
 
@@ -20,10 +22,14 @@ export default class ListItemModal extends React.Component<any, any> {
     }
 
     componentDidMount() {
+        if (this.props.item.min_cost > 0) {
+            this.setState({
+                listed_value: this.props.item.min_cost
+            });
+        }
+
         (new Ajax()).setRoute('market-board/items').setParameters({
-            params: {
-                item_id: this.props.item.id
-            }
+            item_id: this.props.item.id
         }).doAjaxCall('get', (result: AxiosResponse) => {
             const data = result.data.items.map((item: { listed_at: string, listed_price: number }) => {
                 return {
@@ -67,7 +73,7 @@ export default class ListItemModal extends React.Component<any, any> {
             })
         }, (error: AxiosError) => {
 
-        })
+        });
     }
 
     listItem() {
@@ -77,9 +83,16 @@ export default class ListItemModal extends React.Component<any, any> {
     }
 
     setListedPrice(e: React.ChangeEvent<HTMLInputElement>) {
+
+        let value = parseInt(e.target.value) || '';
+
+        if (this.props.item.min_cost > value) {
+            value = this.props.item.min_cost;
+        }
+
         this.setState({
-            listed_value: parseInt(e.target.value) || 0,
-        })
+            listed_value: value,
+        });
     }
 
     render() {
@@ -88,7 +101,7 @@ export default class ListItemModal extends React.Component<any, any> {
                       handle_close={this.props.manage_modal}
                       title={'List item on market'}
                       secondary_actions={{
-                          secondary_button_disabled: this.state.listed_value <= 0,
+                          secondary_button_disabled: this.state.listed_value <= 0 || this.state.listed_value === '',
                           secondary_button_label: 'List item',
                           handle_action: () => this.listItem()
                       }}
@@ -100,10 +113,18 @@ export default class ListItemModal extends React.Component<any, any> {
                         <Fragment>
                             <h3 className='mb-4 mt-4'><ItemNameColorationText item={{...this.props.item, ['name']: this.props.item.affix_name}} /></h3>
                             <MarketBoardLineChart dark_chart={this.props.dark_charts} data={this.state.data} key_for_value={'price'} />
-                            <p className='text-xs text-gray-700 dark:text-gray-500'>If the chart above states 0, then this item has never been listed before or there is no current listing for it.</p>
+                            <p className='text-xs text-gray-700 dark:text-gray-500 mb-4'>If the chart above states 0, then this item has never been listed before or there is no current listing for it.</p>
+                            {
+                                this.props.item.min_cost > 0 ?
+                                    <InfoAlert>
+                                        Item has a min value of: {formatNumber(this.props.item.min_cost)} Gold.
+                                    </InfoAlert>
+                                : null
+                            }
                             <div className="mb-5 mt-5">
                                 <label className="label block mb-2" htmlFor="list-for">List For</label>
                                 <input id="list-for" type="number" className="form-control" name="list-for" value={this.state.listed_value} autoFocus onChange={this.setListedPrice.bind(this)}/>
+                                <p className='text-xs text-gray-700 dark:text-gray-500'>If the value is set for you, this means the item cannot be sold for less that listed price.</p>
                             </div>
                         </Fragment>
                 }

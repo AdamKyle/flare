@@ -11,7 +11,7 @@
             <div class="modal-footer">
                 <div class="flex ltr:ml-auto rtl:mr-auto">
                     <div class="mr-4">
-                        <x-core.buttons.danger-button>Cancel</x-core.buttons.danger-button>
+                        <x-core.buttons.danger-button data-dismiss="modal">Cancel</x-core.buttons.danger-button>
                     </div>
 
                     @if (isset($formId))

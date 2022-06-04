@@ -9,5 +9,9 @@ export default interface ComparisonSectionState {
 
     show_list_item_modal: boolean;
 
+    show_item_details: boolean;
+
     item_to_sell: InventoryComparisonAdjustment|null;
+
+    item_to_show: InventoryComparisonAdjustment|null;
 }

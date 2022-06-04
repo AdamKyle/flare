@@ -14,6 +14,7 @@ import PrimaryButton from "../../components/ui/buttons/primary-button";
 import MapMovementActions from "./components/small-actions/map-movement-actions";
 import ExplorationSection from "./components/exploration-section";
 import WarningAlert from "../../components/ui/alerts/simple-alerts/warning-alert";
+import CelestialFight from "./components/celestial-fight";
 
 export default class SmallerActions extends React.Component<ActionsProps, ActionsState> {
 
@@ -137,6 +138,15 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
             });
         }
 
+        console.log(this.props.celestial_id);
+
+        if (this.props.celestial_id !== 0 && this.props.celestial_id !== null) {
+            options.push({
+                label: 'Celestial Fight',
+                value: 'celestial-fight'
+            });
+        }
+
         return options;
     }
 
@@ -183,6 +193,12 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
     }
 
     closeExplorationSection() {
+        this.setState({
+            selected_action: null,
+        })
+    }
+
+    manageFightCelestial() {
         this.setState({
             selected_action: null,
         })
@@ -307,9 +323,23 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
                 <button type='button' onClick={this.closeMapSection.bind(this)} className='text-red-600 dark:text-red-500 absolute right-[5px] top-[5px]'>
                     <i className="fas fa-times-circle"></i>
                 </button>
-                <MapMovementActions character={this.props.character} update_map_timer={this.updateMapTimer.bind(this)} currencies={this.props.currencies} is_automation_running={this.props.character.is_automation_running}/>
+                <MapMovementActions character={this.props.character}
+                                    update_map_timer={this.updateMapTimer.bind(this)}
+                                    currencies={this.props.currencies}
+                                    is_automation_running={this.props.character.is_automation_running}
+                />
             </Fragment>
         );
+    }
+
+    showCelestialFight() {
+        return (
+            <CelestialFight character={this.props.character}
+                            manage_celestial_fight={this.manageFightCelestial.bind(this)}
+                            celestial_id={this.props.celestial_id}
+                            update_celestial={this.props.update_celestial}
+            />
+        )
     }
 
     buildSection() {
@@ -322,6 +352,8 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
                 return this.showCrafting();
             case 'map-movement':
                 return this.showMapMovement();
+            case 'celestial-fight':
+                return this.showCelestialFight();
             default:
                 return null;
         }

@@ -162,30 +162,34 @@ export default class QuestDetailsModal extends React.Component<any, any> {
             <Fragment>
                 {
                     item.drop_location_id !== null ?
-                        <InfoAlert>
-                            <p>Some items, such as this one, only drop when you are at a special location. These locations
-                                increase enemy strength making them more of a challenge.</p>
-                            <p>These items have a 1/1,000,000 chance to drop. Your looting skill is capped at 45% here.</p>
-                            <p>
-                                <strong>These items will not drop if you are using Exploration. You must manually farm these quest items.</strong>
-                            </p>
-                        </InfoAlert>
-                        : null
+                        <div className='mb-4'>
+                            <InfoAlert>
+                                <p className='mb-2'>Some items, such as this one, only drop when you are at a special location. These locations
+                                    increase enemy strength making them more of a challenge.</p>
+                                <p className='mb-2'>These items have a 1/1,000,000 chance to drop. Your looting skill is capped at 45% here.</p>
+                                <p>
+                                    <strong>These items will not drop if you are using Exploration. You must manually farm these quest items.</strong>
+                                </p>
+                            </InfoAlert>
+                        </div>
+                    : null
                 }
                 {
                     item.required_monster !== null ?
                         item.required_monster.is_celestial_entity ?
-                            <InfoAlert>
-                                <p>
-                                    Some quests such as this one may have you fighting a Celestial entity. You can check the <a href="/information/npcs" target="_blank">help docs (NPC's)</a> to find out, based on which plane,
-                                    which Summoning NPC you ned to speak to inorder to conjure the entity, there is only one per plane.
-                                </p>
-                                <p>
-                                    Celestial Entities below Dungeons plane, will not be included in the weekly spawn.
-                                </p>
-                            </InfoAlert>
-                            : null
+                            <div className='mb-4'>
+                                <InfoAlert>
+                                    <p className='mb-2'>
+                                        Some quests such as this one may have you fighting a Celestial entity. You can check the <a href="/information/npcs" target="_blank">help docs (NPC's)</a> to find out, based on which plane,
+                                        which Summoning NPC you ned to speak to inorder to conjure the entity, there is only one per plane.
+                                    </p>
+                                    <p>
+                                        Celestial Entities below Dungeons plane, will not be included in the weekly spawn.
+                                    </p>
+                                </InfoAlert>
+                            </div>
                         : null
+                    : null
                 }
                 <dl>
                     {

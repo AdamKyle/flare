@@ -56,8 +56,10 @@ class MonstersTable extends DataTableComponent {
             Column::make('Name')->searchable()->format(function ($value, $row) {
                 $monsterId = Monster::where('name', $value)->first()->id;
 
-                if (auth()->user()->hasRole('Admin')) {
-                    return '<a href="/admin/monsters/'. $monsterId.'">'.$row->name . '</a>';
+                if (!is_null(auth()->user())) {
+                    if (auth()->user()->hasRole('Admin')) {
+                        return '<a href="/admin/monsters/' . $monsterId . '">' . $row->name . '</a>';
+                    }
                 }
 
                 return '<a href="/monsters/'. $monsterId.'" >'.$row->name . '</a>';

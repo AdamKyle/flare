@@ -9,6 +9,7 @@ export default class ItemNameColorationText extends React.Component<ItemNameColo
     }
 
     render() {
+        console.log(this.props.item);
         return (
             <span className={clsx({
                 'text-red-700 dark:text-red-600': this.props.item.type === 'trinket' && !this.props.item.is_mythic

@@ -55,6 +55,12 @@ export default class InfoSection extends React.Component<any, any> {
         },{
             label: 'Classes',
             value: 'admin.classes.classes-table',
+        },{
+            label: 'Monsters',
+            value: 'admin.monsters.monsters-table',
+        },{
+            label: 'Quest items',
+            value: 'info.quest-items.quest-items-table',
         }];
     }
 

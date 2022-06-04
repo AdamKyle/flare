@@ -2,6 +2,7 @@ import React, {Fragment} from "react";
 import {formatNumber} from "../../../../../lib/game/format-number";
 import ItemAffixDetails from "./item-affix-details";
 import ItemHolyDetails from "./item-holy-details";
+import OrangeButton from "../../../../../components/ui/buttons/orange-button";
 
 export default class ItemDetails extends React.Component<any, any> {
 
@@ -104,25 +105,26 @@ export default class ItemDetails extends React.Component<any, any> {
                                     <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                                     <h4 className='text-sky-600 dark:text-sky-500'>Attached Affixes</h4>
                                     <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                                    <dl>
-                                        {
-                                            this.props.item.item_prefix !== null ?
-                                                <Fragment>
-                                                    <dt>Attached Prefix</dt>
-                                                    <dd><button type='button' className='text-orange-600 dark:text-orange-500 hover:text-orange-700 dark:hover:text-orange-300' onClick={() => this.manageAffixModal(this.props.item.item_prefix)}>{this.props.item.item_prefix.name}</button></dd>
-                                                </Fragment>
-                                            : null
-                                        }
-
-                                        {
-                                            this.props.item.item_suffix !== null ?
-                                                <Fragment>
-                                                    <dt>Attached Suffix</dt>
-                                                    <dd><button type='button' className='text-orange-600 dark:text-orange-500 hover:text-orange-700 dark:hover:text-orange-300' onClick={() => this.manageAffixModal(this.props.item.item_suffix)}>{this.props.item.item_suffix.name}</button></dd>
-                                                </Fragment>
-                                            : null
-                                        }
-                                    </dl>
+                                    <div className='mt-4'>
+                                        <div className={"mb-4"}>
+                                            {
+                                                this.props.item.item_prefix !== null ?
+                                                    <OrangeButton button_label={this.props.item.item_prefix.name}
+                                                                  on_click={() => this.manageAffixModal(this.props.item.item_prefix)}
+                                                                  additional_css={'w-1/2'}/>
+                                                    : null
+                                            }
+                                        </div>
+                                        <div>
+                                            {
+                                                this.props.item.item_suffix !== null ?
+                                                    <OrangeButton button_label={this.props.item.item_suffix.name}
+                                                                  on_click={() => this.manageAffixModal(this.props.item.item_suffix)}
+                                                                  additional_css={'w-1/2'}/>
+                                                    : null
+                                            }
+                                        </div>
+                                    </div>
                                 </Fragment>
                             : null
                         }

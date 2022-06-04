@@ -16,6 +16,7 @@ import WarningAlert from "../../../../../../components/ui/alerts/simple-alerts/w
 import ComparisonSectionProps from "../../../../../../lib/game/character-sheet/types/modal/comparison-section-props";
 import ComparisonSectionState
     from "../../../../../../lib/game/character-sheet/types/modal/comparison-section-state";
+import InventoryUseDetails from "../../inventory-item-details";
 
 export default class ComparisonSection extends React.Component<ComparisonSectionProps, ComparisonSectionState> {
 
@@ -28,6 +29,8 @@ export default class ComparisonSection extends React.Component<ComparisonSection
             show_sell_modal: false,
             show_list_item_modal: false,
             item_to_sell: null,
+            item_to_show: null,
+            show_item_details: false,
         }
     }
 
@@ -47,6 +50,13 @@ export default class ComparisonSection extends React.Component<ComparisonSection
         this.setState({
             show_sell_modal: !this.state.show_sell_modal,
             item_to_sell: typeof item === 'undefined' ? null : item,
+        })
+    }
+
+    manageViewItemDetails(item?: InventoryComparisonAdjustment) {
+        this.setState({
+            show_item_details: !this.state.show_item_details,
+            item_to_show: typeof item === 'undefined' ? null : item,
         })
     }
 
@@ -152,11 +162,12 @@ export default class ComparisonSection extends React.Component<ComparisonSection
                     'mt-6 grid grid-cols-1 w-full gap-2 md:m-auto',
                     {
                         'md:w-3/4': this.props.is_large_modal,
-                        'md:grid-cols-6': this.props.is_grid_size(6, this.props.comparison_details.itemToEquip),
-                        'md:grid-cols-4': this.props.is_grid_size(4, this.props.comparison_details.itemToEquip),
+                        'md:grid-cols-7': this.props.is_grid_size(7, this.props.comparison_details.itemToEquip),
+                        'md:grid-cols-5': this.props.is_grid_size(5, this.props.comparison_details.itemToEquip),
                         'hidden': this.props.comparison_details.itemToEquip.type === 'quest',
                     }
                 )}>
+                    <PrimaryOutlineButton button_label={'Details'} on_click={() => this.manageViewItemDetails(this.props.comparison_details.itemToEquip)} disabled={this.props.is_action_loading}/>
                     <PrimaryOutlineButton button_label={'Equip'} on_click={this.manageEquipModal.bind(this)} disabled={this.props.is_action_loading || this.props.is_automation_running}/>
                     <PrimaryOutlineButton button_label={'Move'} on_click={this.manageMoveModalModal.bind(this)} disabled={this.props.is_action_loading}/>
                     <SuccessOutlineButton button_label={'Sell'} on_click={() => this.manageSellModal(this.props.comparison_details.itemToEquip)} disabled={this.props.is_action_loading}/>
@@ -225,6 +236,17 @@ export default class ComparisonSection extends React.Component<ComparisonSection
                             list_item={this.listItem.bind(this)}
                             item={this.state.item_to_sell}
                             dark_charts={this.props.dark_charts}
+                        />
+                    : null
+                }
+
+                {
+                    this.state.show_item_details && this.state.item_to_show !== null ?
+                        <InventoryUseDetails
+                            character_id={this.props.character_id}
+                            item_id={this.state.item_to_show.id}
+                            is_open={this.state.show_item_details}
+                            manage_modal={this.manageViewItemDetails.bind(this)}
                         />
                     : null
                 }

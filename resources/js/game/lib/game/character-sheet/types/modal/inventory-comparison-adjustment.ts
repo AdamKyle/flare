@@ -2,6 +2,8 @@ export default interface InventoryComparisonAdjustment {
 
     [index: string]: number|string|boolean;
 
+    id: number;
+
     affix_name: string;
 
     type: string;

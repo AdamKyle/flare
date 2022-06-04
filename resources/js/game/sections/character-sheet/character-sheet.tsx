@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment } from "react";
 import BasicCard from "../../components/ui/cards/basic-card";
 import CharacterTabs from "./components/character-tabs";
 import CharacterSkillsTabs from "./components/character-skills-tabs";
@@ -6,11 +6,64 @@ import CharacterInventoryTabs from "./components/character-inventory-tabs";
 import CharacterSheetProps from "../../lib/game/character-sheet/types/character-sheet-props";
 import DangerAlert from "../../components/ui/alerts/simple-alerts/danger-alert";
 import WarningAlert from "../../components/ui/alerts/simple-alerts/warning-alert";
+import Select from "react-select";
 
 export default class CharacterSheet extends React.Component<CharacterSheetProps, any> {
 
     constructor(props: CharacterSheetProps) {
         super(props);
+
+        this.state = {
+            show_inventory_section: false,
+            show_skills_section: false,
+            show_top_section: false,
+        }
+    }
+
+    showSection() {
+        if (typeof this.props.view_port === 'undefined') {
+            return true;
+        }
+
+        return this.props.view_port > 1600;
+    }
+
+    showCloseButton() {
+        if (typeof this.props.view_port === 'undefined') {
+            return false;
+        }
+
+        return this.props.view_port < 1600
+    }
+
+    showTopSection() {
+        this.setState({
+            show_top_section: !this.state.show_top_section
+        });
+    }
+
+    showSelectedSection(data: any) {
+        switch(data.value) {
+            case 'inventory':
+                return this.manageInventoryManagement();
+            case 'skills':
+                return this.manageSkillsManagement();
+            default:
+                return;
+
+        }
+    }
+
+    manageInventoryManagement() {
+        this.setState({
+            show_inventory_section: !this.state.show_inventory_section
+        });
+    }
+
+    manageSkillsManagement() {
+        this.setState({
+            show_skills_section: !this.state.show_skills_section
+        });
     }
 
     render() {
@@ -42,55 +95,139 @@ export default class CharacterSheet extends React.Component<CharacterSheetProps,
                 }
 
                 <div className='flex flex-col lg:flex-row w-full gap-2'>
-                    <BasicCard additionalClasses={'overflow-y-auto lg:w-1/2'}>
-                        <CharacterTabs character={this.props.character} finished_loading={this.props.finished_loading} />
-                    </BasicCard>
-                    <BasicCard additionalClasses={'overflow-y-auto lg:w-1/2 md:max-h-[225px]'}>
-                        <div className='grid lg:grid-cols-2 gap-2'>
-                            <div>
-                                <dl>
-                                    <dt>Gold:</dt>
-                                    <dd>{this.props.character.gold}</dd>
-                                    <dt>Gold Dust:</dt>
-                                    <dd>{this.props.character.gold_dust}</dd>
-                                    <dt>Shards:</dt>
-                                    <dd>{this.props.character.shards}</dd>
-                                    <dt>Copper Coins:</dt>
-                                    <dd>{this.props.character.copper_coins}</dd>
-                                </dl>
-                            </div>
-                            <div className='border-b-2 block lg:hidden border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                            <div>
-                                <dl>
-                                    <dt>Inventory Max:</dt>
-                                    <dd>{this.props.character.inventory_max}</dd>
-                                    <dt>Inventory Count:</dt>
-                                    <dd>{this.props.character.inventory_count}</dd>
-                                </dl>
-                                <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                                <dl>
-                                    <dt>Damage Stat:</dt>
-                                    <dd>{this.props.character.damage_stat}</dd>
-                                    <dt>To Hit:</dt>
-                                    <dd>Accuracy, {this.props.character.to_hit_stat}</dd>
-                                    <dt>Class Bonus:</dt>
-                                    <dd>{(this.props.character.extra_action_chance.chance * 100).toFixed(2)}%</dd>
-                                </dl>
-                                <p className='mt-4'>
-                                    For more information about class bonus please see <a href='/information/races-and-classes' target='_blank'>Races and Classes Help <i
-                                    className="fas fa-external-link-alt"></i></a>
-                                </p>
-                            </div>
-                        </div>
-                    </BasicCard>
+                    {
+                        this.showSection() || this.state.show_top_section ?
+                            <Fragment>
+                                <BasicCard additionalClasses={'overflow-y-auto lg:w-1/2'}>
+                                    {
+                                        this.showCloseButton() ?
+                                            <div className='text-right cursor-pointer text-red-500 position top-[-10px]'>
+                                                <button onClick={this.showTopSection.bind(this)}><i className="fas fa-minus-circle"></i></button>
+                                            </div>
+                                        : null
+                                    }
+                                    <CharacterTabs
+                                        character={this.props.character}
+                                        finished_loading={this.props.finished_loading}
+                                        view_port={this.props.view_port}
+                                    />
+                                </BasicCard>
+                                <BasicCard additionalClasses={'overflow-y-auto lg:w-1/2 md:max-h-[225px]'}>
+                                    <div className='grid lg:grid-cols-2 gap-2'>
+                                        <div>
+                                            <dl>
+                                                <dt>Gold:</dt>
+                                                <dd>{this.props.character.gold}</dd>
+                                                <dt>Gold Dust:</dt>
+                                                <dd>{this.props.character.gold_dust}</dd>
+                                                <dt>Shards:</dt>
+                                                <dd>{this.props.character.shards}</dd>
+                                                <dt>Copper Coins:</dt>
+                                                <dd>{this.props.character.copper_coins}</dd>
+                                            </dl>
+                                        </div>
+                                        <div className='border-b-2 block lg:hidden border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                                        <div>
+                                            <dl>
+                                                <dt>Inventory Max:</dt>
+                                                <dd>{this.props.character.inventory_max}</dd>
+                                                <dt>Inventory Count:</dt>
+                                                <dd>{this.props.character.inventory_count}</dd>
+                                            </dl>
+                                            <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                                            <dl>
+                                                <dt>Damage Stat:</dt>
+                                                <dd>{this.props.character.damage_stat}</dd>
+                                                <dt>To Hit:</dt>
+                                                <dd>Accuracy, {this.props.character.to_hit_stat}</dd>
+                                                <dt>Class Bonus:</dt>
+                                                <dd>{(this.props.character.extra_action_chance.chance * 100).toFixed(2)}%</dd>
+                                            </dl>
+                                            <p className='mt-4'>
+                                                For more information about class bonus please see <a href='/information/races-and-classes' target='_blank'>Races and Classes Help <i
+                                                className="fas fa-external-link-alt"></i></a>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </BasicCard>
+                            </Fragment>
+                        :
+                            <Fragment>
+                                <BasicCard additionalClasses={'overflow-y-auto lg:w-1/2'}>
+                                    <span className='relative top-[10px]'><strong>Character Details</strong></span>
+                                    <div className='text-right cursor-pointer text-blue-500 relative top-[-12px]'>
+                                        <button onClick={this.showTopSection.bind(this)}><i className="fas fa-plus-circle"></i></button>
+                                    </div>
+                                </BasicCard>
+                            </Fragment>
+                    }
+
                 </div>
                 <div className='flex flex-col lg:flex-row gap-2 w-full mt-2'>
-                    <BasicCard additionalClasses={'overflow-y-auto lg:w-1/2 lg:h-fit'}>
-                        <CharacterSkillsTabs character_id={this.props.character.id} is_dead={this.props.character.is_dead} is_automation_running={this.props.character.is_automation_running} finished_loading={this.props.finished_loading}/>
-                    </BasicCard>
-                    <BasicCard additionalClasses={'overflow-y-auto lg:w-1/2 lg:h-fit'}>
-                        <CharacterInventoryTabs character_id={this.props.character.id} is_dead={this.props.character.is_dead} user_id={this.props.character.user_id} is_automation_running={this.props.character.is_automation_running} finished_loading={this.props.finished_loading}/>
-                    </BasicCard>
+                    {
+                        this.showSection() || this.state.show_skills_section ?
+                            <BasicCard additionalClasses={'overflow-y-auto lg:w-1/2 lg:h-fit'}>
+                                {
+                                    this.showCloseButton() ?
+                                        <div className='text-right cursor-pointer text-red-500 position top-[-10px]'>
+                                            <button onClick={this.manageSkillsManagement.bind(this)}><i className="fas fa-minus-circle"></i></button>
+                                        </div>
+                                    : null
+                                }
+                                <CharacterSkillsTabs character_id={this.props.character.id}
+                                                     is_dead={this.props.character.is_dead}
+                                                     is_automation_running={this.props.character.is_automation_running}
+                                                     finished_loading={this.props.finished_loading}
+                                />
+                            </BasicCard>
+                        : null
+                    }
+
+                    {
+                        this.showSection() || this.state.show_inventory_section ?
+                            <BasicCard additionalClasses={'overflow-y-auto lg:w-1/2 lg:h-fit'}>
+                                {
+                                    this.showCloseButton() ?
+                                        <div className='text-right cursor-pointer text-red-500 position top-[-10px]'>
+                                            <button onClick={this.manageInventoryManagement.bind(this)}><i className="fas fa-minus-circle"></i></button>
+                                        </div>
+                                    : null
+                                }
+
+                                <CharacterInventoryTabs character_id={this.props.character.id}
+                                                        is_dead={this.props.character.is_dead}
+                                                        user_id={this.props.character.user_id}
+                                                        is_automation_running={this.props.character.is_automation_running}
+                                                        finished_loading={this.props.finished_loading}
+                                />
+                            </BasicCard>
+                        : null
+                    }
+
+                    {
+                        !this.showSection() && !this.state.show_inventory_section && !this.state.show_skills_section ?
+                            <Select
+                                onChange={this.showSelectedSection.bind(this)}
+                                options={[
+                                    {
+                                        label: 'Inventory Management',
+                                        value: 'inventory',
+                                    },
+                                    {
+                                        label: 'Skill Management',
+                                        value: 'skills',
+                                    }
+                                ]}
+                                menuPosition={'absolute'}
+                                menuPlacement={'bottom'}
+                                styles={{menuPortal: (base: any) => ({...base, zIndex: 9999, color: '#000000'})}}
+                                menuPortalTarget={document.body}
+                                value={[
+                                    {label: 'Please Select', value: ''}
+                                ]}
+                            />
+                        : null
+                    }
                 </div>
             </div>
         );

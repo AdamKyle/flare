@@ -15,6 +15,8 @@ import MovePlayer from "../../../../lib/game/map/ajax/move-player";
 import ViewLocationDetailsModal from "../../../components/actions/modals/view-location-details-modal";
 import TraverseModal from "../../../components/actions/modals/traverse-modal";
 import WarningAlert from "../../../../components/ui/alerts/simple-alerts/warning-alert";
+import PurpleButton from "../../../../components/ui/buttons/purple-button";
+import Conjuration from "../../../components/actions/modals/conjuration";
 
 export default class MapMovementActions extends React.Component<any, any> {
 
@@ -44,6 +46,7 @@ export default class MapMovementActions extends React.Component<any, any> {
             open_teleport_modal: false,
             location: null,
             show_location_details: false,
+            show_conjuration: false,
         }
 
         // @ts-ignore
@@ -232,9 +235,23 @@ export default class MapMovementActions extends React.Component<any, any> {
         })
     }
 
+    conjure() {
+        this.setState({
+            show_conjuration: true,
+        });
+    }
+
+    closeConjure() {
+        this.setState({
+            show_conjuration: false,
+        });
+    }
+
     teleportPlayer(data: {x: number, y: number, cost: number, timeout: number}) {
         (new MovePlayer(this)).teleportPlayer(data, this.props.character.id, this.props.view_port);
     }
+
+
 
     render() {
         return  (
@@ -271,6 +288,11 @@ export default class MapMovementActions extends React.Component<any, any> {
                                                       on_click={this.manageViewLocation.bind(this)} />
                                     : null
                                 }
+
+                                <PurpleButton button_label={'Conjure Celestial'}
+                                              on_click={() => this.conjure()}
+                                              disabled={this.state.is_movement_disabled || this.props.is_dead || this.props.is_automation_running}
+                                />
 
                                 <PrimaryOutlineButton button_label={'Teleport'}
                                                       on_click={this.manageTeleport.bind(this)}
@@ -323,6 +345,17 @@ export default class MapMovementActions extends React.Component<any, any> {
                             handle_close={this.manageTraverse.bind(this)}
                             character_id={this.props.character.id}
                             map_id={this.state.map_id}
+                        />
+                    : null
+                }
+
+                {
+                    this.state.show_conjuration ?
+                        <Conjuration is_open={this.state.show_conjuration}
+                                     handle_close={this.closeConjure.bind(this)}
+                                     title={'Conjuration'}
+                                     currencie={this.props.currencies}
+                                     character_id={this.props.character.id}
                         />
                     : null
                 }

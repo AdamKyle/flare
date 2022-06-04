@@ -91,9 +91,9 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
 
     isGridSize(size: number, itemToEquip: InventoryComparisonAdjustment) {
         switch(size) {
-            case 4 :
+            case 5 :
                 return itemToEquip.affix_count === 0 && itemToEquip.holy_stacks_applied === 0 && !itemToEquip.is_unique
-            case 6 :
+            case 7 :
                 return itemToEquip.affix_count > 0 || itemToEquip.holy_stacks_applied > 0 || itemToEquip.is_unique
             default:
                 return false;

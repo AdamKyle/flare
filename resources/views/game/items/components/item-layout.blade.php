@@ -1,9 +1,15 @@
 @php
     $backUrl = route('items.list');
 
-    if (!auth()->user()->hasRole('Admin')) {
-        $backUrl = route('game.shop.buy', ['character' => auth()->user()->character->id]);
+    if (is_null(auth()->user())) {
+        $backUrl = url()->previous();
+    } else {
+        if (!auth()->user()->hasRole('Admin')) {
+            $backUrl = route('game.shop.buy', ['character' => auth()->user()->character->id]);
+        }
     }
+
+
 @endphp
 
 <h2 class="mt-2 font-light">
@@ -12,20 +18,22 @@
 
 <div class="relative">
     <div class="float-right">
-        @if (auth()->user()->hasRole('Admin'))
-            <x-core.buttons.link-buttons.success-button
-                href="{{$backUrl}}"
-                css="tw-ml-2"
-            >
-                Back
-            </x-core.buttons.link-buttons.success-button>
-            <x-core.buttons.link-buttons.primary-button
-                href="{{route('items.edit', ['item' => $item->id])}}"
-                css="tw-ml-2"
-            >
-                Edit Item
-            </x-core.buttons.link-buttons.primary-button>
-        @endif
+        @auth
+            @if (auth()->user()->hasRole('Admin'))
+                <x-core.buttons.link-buttons.success-button
+                    href="{{$backUrl}}"
+                    css="tw-ml-2"
+                >
+                    Back
+                </x-core.buttons.link-buttons.success-button>
+                <x-core.buttons.link-buttons.primary-button
+                    href="{{route('items.edit', ['item' => $item->id])}}"
+                    css="tw-ml-2"
+                >
+                    Edit Item
+                </x-core.buttons.link-buttons.primary-button>
+            @endif
+        @endauth
     </div>
 </div>
 

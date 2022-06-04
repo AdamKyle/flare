@@ -121,11 +121,11 @@
 
 </x-core.cards.card>
 
-<x-core.cards.card-with-title title="Cast, Artifacts and Affixes">
-    <x-core.alerts.info-alert>
+<x-core.cards.card-with-title title="Cast and Affixes">
+    <x-core.alerts.info-alert title="Cating Help">
         <p class="mb-4">
-            All monsters can cast to some degree, have artifacts, affixes and can heal. Here you will see the details corresponding to that.
-            There are a couple things to keep in mind, however:
+            All monsters can cast to some degree, affixes and can heal. Here you will see the details corresponding to that.
+            There are a couple of things to keep in mind, however:
         </p>
         <ul class="mb-4 list-disc ml-[20px]">
             <li>
@@ -139,10 +139,6 @@
                 This is where stat reducing affixes can come in handy. You can reduce the enemy's durability so they cannot heal as much.
             </li>
         </ul>
-        <p class="mb-4">
-            There is a quest chain you can do that rewards you at the end with a new item that will annul the enemy's affixes, artifacts, spells
-            and ability to heal.
-        </p>
     </x-core.alerts.info-alert>
     <dl class="mt-3">
         <dt>Max Cast For</dt>
@@ -159,7 +155,7 @@
 </x-core.cards.card-with-title>
 <hr />
 <x-core.cards.card-with-title title="Ambush & Counter">
-    <x-core.alerts.info-alert>
+    <x-core.alerts.info-alert title="Ambush and Counter Info">
         <p class="mb-4">
             Some monsters, specifically those who live in Purgatory, will have what is known as Ambush and Counter Stats.
             Ambush allows the enemy to attempt to get the jump on you doing 2x their normal weapon attack. Counter allows the enemy to counter
@@ -186,7 +182,7 @@
 @if ($monster->is_celestial_entity)
     <hr />
     <x-core.cards.card-with-title title="Celestial Conjuration Cost">
-        <x-core.alerts.info-alert>
+        <x-core.alerts.info-alert title="Conjuration Help">
             <p class="mb-4">This is a celestial entity which can only be conjured via a special NPC. You can learn more about those <a href="/information/celestials">here</a>.</p>
             <p class="mb-4">This creature will have a cost in <strong>Gold</strong> and <strong>Gold Dust</strong> and can be summoned either privately or publicly.</p>
             <p class="mb-4">These Creatures can also give quest rewards when defeated, as well as other items.</p>

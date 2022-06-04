@@ -6,4 +6,6 @@ export default interface CharacterSheetProps {
 
     finished_loading: boolean;
 
+    view_port?: number;
+
 }

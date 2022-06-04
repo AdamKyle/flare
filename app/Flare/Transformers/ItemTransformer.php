@@ -69,7 +69,7 @@ class ItemTransformer extends TransformerAbstract {
             'affix_damage_reduction'           => $item->affix_damage_reduction,
             'increase_skill_bonus_by'          => $item->increase_skill_bonus_by,
             'increase_skill_training_bonus_by' => $item->increase_skill_training_bonus_by,
-            'unique'                           => $this->isUnique($item),
+            'is_unique'                        => $this->isUnique($item),
             'min_cost'                         => SellItemCalculator::fetchMinPrice($item),
             'holy_level'                       => $item->holy_level,
             'holy_stacks'                      => $item->holy_stacks,

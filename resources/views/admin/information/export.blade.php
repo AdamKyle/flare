@@ -3,7 +3,7 @@
 @section('content')
     <x-core.layout.info-container>
         <x-core.cards.card-with-title
-            title="Export Items"
+            title="Export Information Pages"
             buttons="true"
             backUrl="{{route('admin.info-management')}}"
         >
