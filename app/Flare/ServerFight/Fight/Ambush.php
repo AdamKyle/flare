@@ -41,7 +41,7 @@ class Ambush extends BattleBase {
         $defenderAmbushResistance = $this->characterCacheData->getCachedCharacterData($defender, 'ambush_resistance_chance');
 
         if ($this->canPlayerAmbushMonster($attackerAmbushChance, $defenderAmbushResistance)) {
-            $this->addAttackerMessage('You get the jump on the enemy!');
+            $this->addAttackerMessage('You get the jump on the enemy!', 'player-action');
 
             $baseStat = $this->characterCacheData->getCachedCharacterData($attacker, $isAttackerVoided ? 'voided_base_stat' : 'base_stat');
             $damage   = $baseStat * 2;

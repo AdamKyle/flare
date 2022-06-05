@@ -15,6 +15,7 @@ import MapMovementActions from "./components/small-actions/map-movement-actions"
 import ExplorationSection from "./components/exploration-section";
 import WarningAlert from "../../components/ui/alerts/simple-alerts/warning-alert";
 import CelestialFight from "./components/celestial-fight";
+import DuelPlayer from "./components/duel-player";
 
 export default class SmallerActions extends React.Component<ActionsProps, ActionsState> {
 
@@ -25,6 +26,10 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
     private mapTimeOut: any;
 
     private monsterUpdate: any;
+
+    private pvpUpdate: any;
+
+    private duelOptions: any;
 
     private actionsManager: ActionsManager;
 
@@ -45,6 +50,10 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
             crafting_type: null,
             movement_time_out: 0,
             automation_time_out: 0,
+            characters_for_dueling: [],
+            duel_characters: [],
+            show_duel_fight: false,
+            duel_fight_info: null,
         }
 
         // @ts-ignore
@@ -58,6 +67,12 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
 
         // @ts-ignore
         this.monsterUpdate = Echo.private('update-monsters-list-' + this.props.character.user_id);
+
+        // @ts-ignore
+        this.pvpUpdate = Echo.private('update-pvp-attack-' + this.props.character.user_id);
+
+        // @ts-ignore
+        this.duelOptions = Echo.join('update-duel');
 
         this.actionsManager = new ActionsManager(this);
     }
@@ -96,6 +111,21 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
             })
         });
 
+        // @ts-ignore
+        this.duelOptions.listen('Game.Maps.Events.UpdateDuelAtPosition', (event: any) => {
+            this.setState({
+                characters_for_dueling: event.characters,
+            }, () => this.setDuelCharacters() );
+        });
+
+        // @ts-ignore
+        this.pvpUpdate.listen('Game.Battle.Events.UpdateCharacterPvpAttack', (event: any) => {
+            this.setState({
+                show_duel_fight: true,
+                duel_fight_info: event.data,
+            });
+        });
+
         if (!this.props.character.can_move) {
             this.setState({
                 movement_time_out: this.props.character.can_move_again_at,
@@ -116,7 +146,28 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
     showAction(data: any) {
         this.setState({
             selected_action: data.value,
+        }, () => {
+            if (data.value === 'pvp-fight') {
+                this.setState({
+                    show_duel_fight: true
+                });
+            }
         });
+    }
+
+    setDuelCharacters() {
+        if (typeof this.state.characters_for_dueling !== 'undefined') {
+            const characters = this.state.characters_for_dueling.filter((character) => {
+                return character.character_position_x === this.props.character_position?.x &&
+                       character.character_position_y === this.props.character_position?.y &&
+                       character.game_map_id === this.props.character_position?.game_map_id &&
+                       character.name !== this.props.character.name
+            });
+
+            this.setState({
+                duel_characters: characters,
+            });
+        }
     }
 
     buildOptions() {
@@ -138,7 +189,12 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
             });
         }
 
-        console.log(this.props.celestial_id);
+       if (typeof this.state.duel_characters !== 'undefined' && this.state.duel_characters.length > 0) {
+           options.push({
+               label: 'Pvp Fight',
+               value: 'pvp-fight'
+           });
+       }
 
         if (this.props.celestial_id !== 0 && this.props.celestial_id !== null) {
             options.push({
@@ -236,6 +292,19 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
 
     resetRevived() {
         this.actionsManager.resetRevived();
+    }
+
+    manageDuel() {
+        this.setState({
+            selected_action: null,
+            show_duel_fight: !this.state.show_duel_fight,
+        });
+    }
+
+    resetDuelData() {
+        this.setState({
+            duel_fight_info: null,
+        });
     }
 
     createMonster() {
@@ -342,6 +411,17 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
         )
     }
 
+    showDuelFight() {
+        return (
+            <DuelPlayer characters={this.state.duel_characters}
+                        duel_data={this.state.duel_fight_info}
+                        character={this.props.character}
+                        manage_pvp={this.manageDuel.bind(this)}
+                        reset_duel_data={this.resetDuelData.bind(this)}
+            />
+        )
+    }
+
     buildSection() {
         switch(this.state.selected_action) {
             case 'fight':
@@ -354,6 +434,8 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
                 return this.showMapMovement();
             case 'celestial-fight':
                 return this.showCelestialFight();
+            case 'pvp-fight':
+                return this.showDuelFight();
             default:
                 return null;
         }
@@ -365,7 +447,12 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
               {
                   this.state.selected_action !== null ?
                       <Fragment>
-                          {this.buildSection()}
+                          {
+                              this.state.show_duel_fight ?
+                                  this.showDuelFight()
+                              :
+                                  this.buildSection()
+                          }
                       </Fragment>
                   :
                       <Fragment>
@@ -379,15 +466,20 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
                                   </div>
                               : null
                           }
-                      <Select
-                          onChange={this.showAction.bind(this)}
-                          options={this.buildOptions()}
-                          menuPosition={'absolute'}
-                          menuPlacement={'bottom'}
-                          styles={{menuPortal: (base: any) => ({...base, zIndex: 9999, color: '#000000'})}}
-                          menuPortalTarget={document.body}
-                          value={this.defaultSelectedAction()}
-                      />
+                          {
+                              this.state.show_duel_fight ?
+                                  this.showDuelFight()
+                              :
+                                  <Select
+                                      onChange={this.showAction.bind(this)}
+                                      options={this.buildOptions()}
+                                      menuPosition={'absolute'}
+                                      menuPlacement={'bottom'}
+                                      styles={{menuPortal: (base: any) => ({...base, zIndex: 9999, color: '#000000'})}}
+                                      menuPortalTarget={document.body}
+                                      value={this.defaultSelectedAction()}
+                                  />
+                          }
                       </Fragment>
               }
 

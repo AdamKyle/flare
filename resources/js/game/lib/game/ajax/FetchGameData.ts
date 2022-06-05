@@ -61,7 +61,9 @@ export default class FetchGameData {
                 is_dead: result.data.sheetis_dead,
                 automation_locked: result.data.sheet.automation_locked,
                 is_silenced: result.data.sheet.is_silenced,
-            }
+            },
+        }, () => {
+            this.component.setCharacterPosition(result.data.sheet.base_position)
         });
     }
 

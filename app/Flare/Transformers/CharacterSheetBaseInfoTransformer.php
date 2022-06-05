@@ -130,6 +130,11 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
                 'all_stat_reduction' => $characterInformation->findPrefixStatReductionAffix(),
                 'stat_reduction'     => $characterInformation->findSuffixStatReductionAffixes(),
             ],
+            'base_position' => [
+              'x' => $character->map->character_position_x,
+              'y' => $character->map->character_position_y,
+              'game_map_id' => $character->map->game_map_id,
+            ],
         ];
     }
 
