@@ -13,6 +13,7 @@ use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Quests\Events\UnlockSkillEvent;
 
 class NpcQuestRewardHandler {
 
@@ -110,7 +111,9 @@ class NpcQuestRewardHandler {
 
         $this->npcServerMessage($npc, $character, 'skill_unlocked');
 
-        broadcast(new ServerMessageEvent($character->user, 'Unlocked: ' . $gameSkill->name . ' This skill can now be leveled!'));
+        event(new ServerMessageEvent($character->user, 'Unlocked: ' . $gameSkill->name . ' This skill can now be leveled!'));
+
+        event(new UnlockSkillEvent($character->user));
     }
 
     public function giveGold(Character $character, Quest $quest, Npc $npc) {

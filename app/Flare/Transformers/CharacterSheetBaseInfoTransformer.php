@@ -116,7 +116,8 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
             'devouring_light_res'         => $holyStacks->fetchDevouringResistanceBonus($character),
             'devouring_darkness_res'      => $holyStacks->fetchDevouringResistanceBonus($character),
             'is_alchemy_locked'           => $this->isAlchemyLocked($character),
-            'can_use_work_bench'          => $this->canUseWorkBench($character),
+            'can_use_work_bench'          => false,
+            'can_access_queen'            => false,
             'ambush_resistance'           => $characterTrinketsInformation->getAmbushResistanceChance($character),
             'counter_resistance'          => $characterTrinketsInformation->getCounterResistanceChance($character),
             'voided_weapon_attack'        => $characterInformation->getTotalWeaponDamage(false),
@@ -140,15 +141,6 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
 
     public function isAlchemyLocked(Character $character): bool {
         return Skill::where('character_id', $character->id)->where('game_skill_id', GameSkill::where('type', SkillTypeValue::ALCHEMY)->first()->id)->first()->is_locked;
-    }
-
-    public function canUseWorkBench(Character $character): bool {
-        $characterXPosition = $character->map->character_position_x;
-        $characterYPosition = $character->map->character_position_y;
-
-        $location = Location::where('x', $characterXPosition)->where('y', $characterYPosition)->where('name', 'Purgatory Smiths House')->first();
-
-        return !is_null($location);
     }
 
     protected function getTimeLeftOnAutomation(Character $character) {

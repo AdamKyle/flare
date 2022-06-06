@@ -31,6 +31,10 @@ export default class Game extends React.Component<GameProps, GameState> {
 
     private forceNameChange: any;
 
+    private unlockAlchemySkill: any;
+
+    private updateCraftingTypes: any;
+
     constructor(props: GameProps) {
         super(props)
 
@@ -77,6 +81,12 @@ export default class Game extends React.Component<GameProps, GameState> {
 
         // @ts-ignore
         this.forceNameChange = Echo.private('force-name-change-' + this.props.userId);
+
+        // @ts-ignore
+        this.unlockAlchemySkill = Echo.private('unlock-skill-' + this.props.userId);
+
+        // @ts-ignore
+        this.updateCraftingTypes = Echo.private('update-location-base-crafting-options-' + this.props.userId);
     }
 
     componentDidMount() {
@@ -128,6 +138,29 @@ export default class Game extends React.Component<GameProps, GameState> {
                 character: {...this.state.character, ...event.attack}
             });
         });
+
+        // @ts-ignore
+        this.unlockAlchemySkill.listen('Game.Quests.Events.UnlockSkillEvent', () => {
+            const character = JSON.parse(JSON.stringify(this.state.character));
+
+            character.is_alchemy_locked = false;
+
+            this.setState({
+                character: character
+            });
+        });
+
+        // @ts-ignore
+        this.updateCraftingTypes.listen('Game.Maps.Events.UpdateLocationBasedCraftingOptions', (event: any) => {
+            const character = JSON.parse(JSON.stringify(this.state.character));
+
+            character.can_use_work_bench = event.canUseWorkBench;
+            character.can_access_queen = event.canUseQueenOfHearts;
+
+            this.setState({
+                character: character
+            });
+        })
     }
 
     updateCharacterStatus(characterStatus: any): void {

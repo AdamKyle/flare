@@ -12,6 +12,7 @@ import ExplorationSection from "./components/exploration-section";
 import CelestialFight from "./components/celestial-fight";
 import DuelPlayer from "./components/duel-player";
  import {isEqual} from "lodash";
+ import {CraftingOptions} from "../../lib/game/types/actions/crafting-type-options";
 
 export default class Actions extends React.Component<ActionsProps, ActionsState> {
 
@@ -112,6 +113,16 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
     componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<ActionsState>, snapshot?: any) {
         this.actionsManager.actionComponentUpdated(this.state, this.props)
 
+        if (this.state.crafting_type !== null) {
+            if (this.state.crafting_type === 'queen' && !this.props.character.can_access_queen) {
+                this.setState({crafting_type: null});
+            }
+
+            if (this.state.crafting_type === 'workbench' && !this.props.character.can_use_work_bench) {
+                this.setState({crafting_type: null});
+            }
+        }
+
         if (typeof this.state.characters_for_dueling === 'undefined' || typeof this.state.duel_characters === 'undefined') {
             return;
         }
@@ -176,7 +187,7 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
         })
     }
 
-    openCrafting(type: 'craft' | 'enchant' | 'alchemy' | 'workbench' | 'trinketry' | null) {
+    openCrafting(type: CraftingOptions) {
         this.actionsManager.setCraftingType(type);
     }
 

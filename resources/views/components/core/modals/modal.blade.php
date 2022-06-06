@@ -16,7 +16,7 @@
 
                     @if (isset($formId))
                         <x-core.buttons.primary-button onclick="event.preventDefault();
-                               document.getElementById('character-deletion').submit();">{{$formActionTitle}}</x-core.buttons.primary-button>
+                               document.getElementById('{{$formId}}').submit();">{{$formActionTitle}}</x-core.buttons.primary-button>
                     @endif
                 </div>
             </div>

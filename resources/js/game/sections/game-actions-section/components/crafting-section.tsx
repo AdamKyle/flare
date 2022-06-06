@@ -4,6 +4,7 @@ import Enchanting from "./crafting-sections/enchanting";
 import Alchemy from "./crafting-sections/alchemy";
 import WorkBench from "./crafting-sections/work-bench";
 import Trinketry from "./crafting-sections/trinketry";
+import QueenOfHearts from "./crafting-sections/queen-of-hearts";
 
 export default class CraftingSection extends React.Component<any, any> {
 
@@ -23,6 +24,8 @@ export default class CraftingSection extends React.Component<any, any> {
                 return <WorkBench character_id={this.props.character_id} remove_crafting={this.props.remove_crafting} cannot_craft={this.props.cannot_craft} />
             case 'trinketry':
                 return <Trinketry character_id={this.props.character_id} remove_crafting={this.props.remove_crafting} cannot_craft={this.props.cannot_craft} />
+            case 'queen':
+                return <QueenOfHearts character_id={this.props.character_id} remove_crafting={this.props.remove_crafting} cannot_craft={this.props.cannot_craft} />
             default:
                 return null;
         }

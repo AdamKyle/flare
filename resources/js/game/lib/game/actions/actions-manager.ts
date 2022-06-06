@@ -5,6 +5,7 @@ import {AxiosError, AxiosResponse} from "axios";
 import ActionsProps from "../types/actions/actions-props";
 import {capitalize, isEqual} from "lodash";
 import ActionsState from "../types/actions/actions-state";
+import {CraftingOptions} from "../types/actions/crafting-type-options";
 
 export default class ActionsManager {
 
@@ -41,7 +42,7 @@ export default class ActionsManager {
         }
     }
 
-    setCraftingType(type: 'craft' | 'enchant' | 'alchemy' | 'workbench' | 'trinketry' | null) {
+    setCraftingType(type: CraftingOptions) {
         this.component.setState({
             crafting_type: type,
         });
@@ -120,7 +121,7 @@ export default class ActionsManager {
         return this.component.state.crafting_time_out > 0 || !this.component.props.character_statuses?.can_craft || this.component.props.character_statuses?.is_dead
     }
 
-    buildCraftingList(handler: (type: 'craft' | 'enchant' | 'alchemy' | 'workbench' | 'trinketry' | null) => void) {
+    buildCraftingList(handler: (type: CraftingOptions) => void) {
         const options = [
             {
                 name: 'Craft',
@@ -151,15 +152,31 @@ export default class ActionsManager {
             if (typeof options[2] !== 'undefined') {
                 options.splice(3, 0, {
                     name: 'Workbench',
-                    icon_class: 'ra ra-anvil',
+                    icon_class: 'ra ra-brandy-bottle',
                     on_click: () => handler('workbench'),
                 })
             } else {
                 options.splice(2, 0, {
                     name: 'Workbench',
-                    icon_class: 'ra ra-anvil',
+                    icon_class: 'ra ra-brandy-bottle',
                     on_click: () => handler('workbench'),
                 });
+            }
+        }
+
+        if (this.component.props.character.can_access_queen) {
+            if (typeof options[2] !== 'undefined') {
+                options.splice(3, 0, {
+                    name: 'Queen of Hearts',
+                    icon_class: 'ra  ra-hearts',
+                    on_click: () => handler('queen'),
+                })
+            } else {
+                options.splice(2, 0, {
+                    name: 'Queen of Hearts',
+                    icon_class: 'ra ra-hearts',
+                    on_click: () => handler('queen'),
+                })
             }
         }
 

@@ -2,6 +2,7 @@ import {CharacterType} from "../../character/character-type";
 import MonsterType from "./monster/monster-type";
 import PvpCharactersType from "../pvp-characters-type";
 import DuelType from "./duel-type";
+import {CraftingOptions} from "./crafting-type-options";
 
 export default interface ActionsState {
 
@@ -21,7 +22,7 @@ export default interface ActionsState {
 
     character_revived: boolean;
 
-    crafting_type: 'craft' | 'enchant' | 'alchemy' | 'workbench' | 'trinketry' | null;
+    crafting_type: CraftingOptions;
 
     show_exploration?: boolean;
 

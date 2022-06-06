@@ -7,6 +7,7 @@ use App\Flare\Models\Map;
 use App\Flare\Values\LocationEffectValue;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Maps\Events\UpdateDuelAtPosition;
+use App\Game\Maps\Events\UpdateLocationBasedCraftingOptions;
 use Illuminate\Support\Collection;
 use Storage;
 use League\Fractal\Manager;
@@ -71,6 +72,9 @@ class LocationService {
 
         // Update duel positions.
         event(new UpdateDuelAtPosition($character->user));
+
+        // Uopdate location based crafting options:
+        event(new UpdateLocationBasedCraftingOptions($character->user));
 
         $this->characterCacheData->removeFromPvpCache($character);
 

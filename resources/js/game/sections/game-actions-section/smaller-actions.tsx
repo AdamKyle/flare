@@ -16,6 +16,7 @@ import ExplorationSection from "./components/exploration-section";
 import WarningAlert from "../../components/ui/alerts/simple-alerts/warning-alert";
 import CelestialFight from "./components/celestial-fight";
 import DuelPlayer from "./components/duel-player";
+import {CraftingOptions} from "../../lib/game/types/actions/crafting-type-options";
 
 export default class SmallerActions extends React.Component<ActionsProps, ActionsState> {
 
@@ -220,7 +221,7 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
         }];
     }
 
-    setCraftingType(type: 'craft' | 'enchant' | 'alchemy' | 'workbench' | 'trinketry' | null) {
+    setCraftingType(type: CraftingOptions) {
         this.setState({
             crafting_type: type,
         });

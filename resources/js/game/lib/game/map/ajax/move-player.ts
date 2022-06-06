@@ -137,7 +137,7 @@ export default class MovePlayer {
             return location.reload();
         }
 
-        return generateServerMessage('cannot_walk_on_water');
+        return generateServerMessage('cannot_walk_here', response.data.message);
     }
 }
 

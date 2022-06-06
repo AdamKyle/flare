@@ -44,3 +44,8 @@ Broadcast::channel('npc-kingdoms-update', function($user) {
 broadCast::channel('enemy-kingdom-morale-update', function($user) {
     return $user;
 });
+
+// When we need to update crafting options based on location
+broadCast::channel('update-location-base-crafting-options-{userId}', function($user, $userId) {
+    return $user->id === (int) $userId;
+});

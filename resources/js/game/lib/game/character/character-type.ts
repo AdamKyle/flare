@@ -162,4 +162,6 @@ export interface CharacterType {
     can_move: boolean;
 
     can_move_again_at: number;
+
+    can_access_queen: boolean;
 }
