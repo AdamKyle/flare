@@ -244,6 +244,10 @@
                     <span class="fas fa-cross"></span>
                     Holy Items
                 </a>
+                <a href="{{route('info.page', ['pageName' => 'trinketry'])}}">
+                    <span class="ra ra-fire-shield"></span>
+                    Trinkets
+                </a>
             </div>
             <a href="#no-link" class="active" data-toggle="collapse" data-target="#menueLists">
                 <span class="collapse-indicator la la-arrow-circle-down"></span>

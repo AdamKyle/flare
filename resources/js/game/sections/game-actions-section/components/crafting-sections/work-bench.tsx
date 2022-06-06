@@ -172,6 +172,8 @@ export default class WorkBench extends React.Component<any, any> {
                                   on_click={this.clearCrafting.bind(this)}
                                   additional_css={'ml-2'}
                                   disabled={this.state.loading || this.props.cannot_craft} />
+                    <a href='/information/holy-items' target='_blank' className='ml-2'>Help <i
+                        className="fas fa-external-link-alt"></i></a>
                 </div>
             </Fragment>
         );

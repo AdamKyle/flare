@@ -120,7 +120,7 @@ export default class Trinketry extends React.Component<any, any> {
                                   on_click={this.clearCrafting.bind(this)}
                                   additional_css={'ml-2'}
                                   disabled={this.state.loading || this.props.cannot_craft} />
-                    <a href='/information/ambush-and-counter' target='_blank' className='ml-2'>Help <i
+                    <a href='/information/trinketry' target='_blank' className='ml-2'>Help <i
                         className="fas fa-external-link-alt"></i></a>
                 </div>
             </Fragment>
