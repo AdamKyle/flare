@@ -61,6 +61,15 @@ export default class InfoSection extends React.Component<any, any> {
         },{
             label: 'Quest items',
             value: 'info.quest-items.quest-items-table',
+        },{
+            label: 'Crafting Books',
+            value: 'info.quest-items.crafting-books-table'
+        },{
+            label: 'Craftable Items',
+            value: 'info.items.craftable-items-table',
+        },{
+            label: 'Enchantments',
+            value: 'admin.affixes.affixes-table'
         }];
     }
 

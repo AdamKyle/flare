@@ -53,9 +53,11 @@ class HolyItemService {
             'gold_dust' => $character->gold_dust - $cost,
         ]);
 
-        $this->applyStack($itemSlot, $alchemySlot);
+        $slot = $this->applyStack($itemSlot, $alchemySlot);
 
         $character = $character->refresh();
+
+        event(new ServerMessageEvent($character->user, 'Applied Holy Oil to: ' . $slot->item->affix_name, $slot->id));
 
         event(new UpdateTopBarEvent($character));
 

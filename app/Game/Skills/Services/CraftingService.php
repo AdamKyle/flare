@@ -162,6 +162,7 @@ class CraftingService {
                     ->where('skill_level_required', '<=', $skill->level)
                     ->whereNull('item_prefix_id')
                     ->whereNull('item_suffix_id')
+                    ->doesntHave('appliedHolyStacks')
                     ->orderBy('cost', 'asc');
 
         if (in_array($craftingType, $twoHandedWeapons)) {

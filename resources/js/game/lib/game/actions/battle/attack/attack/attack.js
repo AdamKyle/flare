@@ -127,6 +127,10 @@ export default class Attack extends BattleBase {
     this.characterCurrentHealth = this.state.characterCurrentHealth;
     this.monsterCurrentHealth   = this.state.monsterCurrentHealth;
 
+    if (parseInt(this.characterCurrentHealth) > this.characterMaxHealth) {
+      this.characterCurrentHealth = this.characterMaxHealth;
+    }
+
     if (this.isMonsterDead()) {
       if (type === 'player') {
         this.addMessage(defender.name + ' has been defeated!', 'enemy-action');
@@ -192,8 +196,8 @@ export default class Attack extends BattleBase {
 
     let characterNewHealth = useItems.getCharacterCurrentHealth();
 
-    if (parseInt(characterNewHealth.toFixed(2)) > this.characterMaxHealth) {
-      characterNewHealth = this.characterMaxHealth
+    if (parseInt(characterNewHealth) > parseInt(this.characterMaxHealth)) {
+      characterNewHealth = parseInt(this.characterMaxHealth)
     }
 
     this.state.characterCurrentHealth = characterNewHealth;

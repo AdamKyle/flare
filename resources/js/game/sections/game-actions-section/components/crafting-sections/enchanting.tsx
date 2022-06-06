@@ -163,7 +163,7 @@ export default class Enchanting extends React.Component<any, any> {
         }
 
         return {
-            label: 'Please select enchantment.',
+            label: 'Please select '+type+' enchantment.',
             value: 0,
         }
     }

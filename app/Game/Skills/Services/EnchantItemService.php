@@ -115,13 +115,15 @@ class EnchantItemService {
      */
     protected function enchantItem(Item $item, ItemAffix $affix) {
         if (!is_null($this->item)) {
-            $this->item->{'item_' . $affix->type . '_id'} = $affix->id;
-
-            $this->item->save();
+            $this->cloneItem($this->item, $affix);
 
             return;
         }
 
+        $this->cloneItem($item, $affix);
+    }
+
+    protected function cloneItem(Item $item, ItemAffix $affix) {
         $clonedItem = $item->duplicate();
 
         $clonedItem->{'item_' . $affix->type . '_id'} = $affix->id;
@@ -129,7 +131,6 @@ class EnchantItemService {
         $clonedItem->parent_id                        = $item->id;
 
         $clonedItem->save();
-
 
         $this->item = $this->applyHolyStacks($item, $clonedItem);
     }
@@ -142,9 +143,11 @@ class EnchantItemService {
      * @return Item
      */
     protected function applyHolyStacks(Item $oldItem, Item $item): Item {
+        dump('applying stacks');
         if ($oldItem->appliedHolyStacks()->count() > 0) {
-
+            dump('old item has stacks');
             foreach ($oldItem->appliedHolyStacks as $stack) {
+                dump('applying stack');
                 $stackAttributes = $stack->getAttributes();
 
                 $stackAttributes['item_id'] = $item->id;
@@ -152,6 +155,8 @@ class EnchantItemService {
                 $item->appliedHolyStacks()->create($stackAttributes);
             }
         }
+
+        dump($item->refresh()->appliedHolyStacks);
 
         return $item->refresh();
     }
@@ -162,10 +167,16 @@ class EnchantItemService {
      * @return int
      */
     protected function getCountOfMatchingItems(): int {
-        return Item::where('name', $this->item->name)
-                        ->where('item_prefix_id', $this->item->item_prefix_id)
-                        ->where('item_suffix_id', $this->item->item_suffix_id)
-                        ->count();
+        // Holy stacks are random, so we want a matching
+        // item only if this item has no stacks on it.
+        if ($this->item->appliedHolyStacks()->count() === 0) {
+            return Item::where('name', $this->item->name)
+                ->where('item_prefix_id', $this->item->item_prefix_id)
+                ->where('item_suffix_id', $this->item->item_suffix_id)
+                ->count();
+        }
+
+        return 0;
     }
 
     /**
