@@ -54,17 +54,9 @@ export default class QueenOfHearts extends React.Component<any, any> {
     }
 
     setReRollOption(data: any) {
-        if (data.value === 'prefix' || data.value === 'suffix') {
-            this.setState({
-                reroll_options: {...this.state.reroll_options, ...{reroll_option: data.value}},
-                reroll_cost: {gold_dust_dust: 10000, shards: 100}
-            });
-        } else {
-            this.setState({
-                reroll_options: {...this.state.reroll_options, ...{reroll_option: data.value}},
-                reroll_cost: {gold_dust_dust: 20000, shards: 200}
-            });
-        }
+        this.setState({
+            reroll_options: {...this.state.reroll_options, ...{reroll_option: data.value}},
+        }, () => this.calculateCost());
     }
 
     setItemForReRoll(data: any) {
@@ -76,18 +68,9 @@ export default class QueenOfHearts extends React.Component<any, any> {
     setAttributeToReRoll(data: any) {
         const cost = JSON.parse(JSON.stringify(this.state.reroll_cost));
 
-        if (data.value !== 'everything') {
-            cost.gold_dust_cost += 100
-            cost.shards += 100;
-        } else {
-            cost.gold_dust_cost += 500
-            cost.shards += 500;
-        }
-
         this.setState({
             reroll_options: {...this.state.reroll_options, ...{attribute: data.value}},
-            reroll_cost: cost,
-        });
+        }, () => this.calculateCost());
     }
 
     initialOptions() {
@@ -219,6 +202,28 @@ export default class QueenOfHearts extends React.Component<any, any> {
                     preforming_action: false,
                 });
             }, (error: AxiosError) => {console.log(error)})
+        });
+    }
+
+    calculateCost() {
+        let goldDustCost = 1000;
+        let shards       = 100;
+
+        if (this.state.reroll_options.reroll_option === 'all-enchantments') {
+            goldDustCost *= 2;
+            shards       *= 2;
+        }
+
+        if (this.state.reroll_options.attribute === 'everything') {
+            goldDustCost += 500;
+            shards       += 500;
+        }
+
+        this.setState({
+            reroll_cost: {
+                gold_dust_dust: goldDustCost,
+                shards: shards,
+            },
         });
     }
 

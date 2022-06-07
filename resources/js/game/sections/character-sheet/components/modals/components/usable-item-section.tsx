@@ -40,9 +40,9 @@ export default class UsableItemSection extends React.Component<any, any> {
                             <div className='grid grid-cols-2 gap-2'>
                                 <div>
                                     {
-                                        this.props.item.stat_increase > 0 ?
+                                        this.props.item.stat_increase > 0.0 ?
                                             <dl>
-                                                <dt>All Stat ncrease %</dt>
+                                                <dt>All Stat increase %</dt>
                                                 <dd className='text-green-700 dark:text-green-600'>{(this.props.item.stat_increase * 100).toFixed(2)}%</dd>
                                             </dl>
                                         :

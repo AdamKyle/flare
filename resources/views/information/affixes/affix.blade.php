@@ -10,5 +10,5 @@
         </div>
     </div>
     <hr />
-    @include('admin.affixes.partials.affix-details', ['itemAffix' => $itemAffix])
+    @include('admin.affixes.affix', ['itemAffix' => $itemAffix])
 @endsection
