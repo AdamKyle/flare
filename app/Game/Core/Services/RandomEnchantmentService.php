@@ -7,6 +7,7 @@ use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Models\Item as ItemModel;
+use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\RandomAffixDetails;
 use Illuminate\Support\Collection;
 
@@ -67,30 +68,8 @@ class RandomEnchantmentService {
         $nonUniqueSlots = $this->fetchNonUniqueItems($character);
 
         return [
-            'slots' => $uniqueSlots,
+            'unique_slots'     => $uniqueSlots,
             'non_unique_slots' => $nonUniqueSlots,
-            'valuations' => [
-                '10,000,000,000' => [
-                    'damage_range'     => (new RandomAffixDetails(RandomAffixDetails::BASIC))->getDamageRange(),
-                    'percentage_range' => (new RandomAffixDetails(RandomAffixDetails::BASIC))->getPercentageRange(),
-                    'type'             => 'basic',
-                ],
-                '50,000,000,000' => [
-                    'damage_range'     => (new RandomAffixDetails(RandomAffixDetails::MEDIUM))->getDamageRange(),
-                    'percentage_range' => (new RandomAffixDetails(RandomAffixDetails::MEDIUM))->getPercentageRange(),
-                    'type'             => 'medium',
-                ],
-                '100,000,000,000' => [
-                    'damage_range'     => (new RandomAffixDetails(RandomAffixDetails::LEGENDARY))->getDamageRange(),
-                    'percentage_range' => (new RandomAffixDetails(RandomAffixDetails::LEGENDARY))->getPercentageRange(),
-                    'type'             => 'legendary',
-                ],
-            ],
-            'has_gold'            => $character->gold >= RandomAffixDetails::BASIC,
-            'has_inventory_room'  => !$character->isInventoryFull(),
-            'character_gold'      => $character->gold,
-            'character_gold_dust' => $character->gold_dust,
-            'character_shards'    => $character->shards,
         ];
     }
 
@@ -112,6 +91,12 @@ class RandomEnchantmentService {
                 return $slot;
             }
         })->values();
+    }
+
+    public function isPlayerInHell(Character $character): bool {
+        return $character->inventory->slots->filter(function($slot) {
+            return $slot->item->effect === ItemEffectsValue::QUEEN_OF_HEARTS;
+        })->isNotEmpty() && $character->map->gameMap->mapType()->isHell();
     }
 
     protected function generateRandomAffixForRandom(Character $character, int $amount): Item {

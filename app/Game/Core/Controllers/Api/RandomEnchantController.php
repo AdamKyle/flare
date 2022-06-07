@@ -59,29 +59,20 @@ class RandomEnchantController extends Controller {
 
         $item = $this->randomEnchantmentService->generateForType($character, $request->type);
 
-        $character->inventory->slots()->create([
+        $slot = $character->inventory->slots()->create([
             'inventory_id' => $character->inventory->id,
             'item_id'      => $item->id,
         ]);
 
         $character = $character->refresh();
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
-
-        event(new CharacterInventoryDetailsUpdate($character->user));
-
         event(new UpdateTopBarEvent($character));
 
         event(new UpdateQueenOfHeartsPanel($character->user, $this->randomEnchantmentService->fetchDataForApi($character)));
 
-        broadcast(new ServerMessageEvent($character->user, 'The Queen of Hearts blushes, smiles and bats her eye lashes at you as she hands you, from out of nowhere, a new shiny object: ' . $item->affix_name, true));
+        broadcast(new ServerMessageEvent($character->user, 'The Queen of Hearts blushes, smiles and bats her eye lashes at you as she hands you, from out of nowhere, a new shiny object: ' . $item->affix_name, $slot->id));
 
-        return response()->json([
-            'item'      => $item,
-            'gold'      => $character->gold,
-            'gold_dust' => $character->gold_dust,
-            'shards'    => $character->shards,
-        ], 200);
+        return response()->json();
     }
 
     public function reRoll(ReRollRandomEnchantment $request, Character $character) {
@@ -93,13 +84,13 @@ class RandomEnchantController extends Controller {
             return response()->json(['message' => 'Where did you put that item, child? Ooooh hooo hooo hooo! Are you playing hide and seek with it? (Unique does not exist.)'], 422);
         }
 
-        if (!$this->reRollEnchantmentService->doesReRollCostMatch($request->selected_reroll_type, $request->selected_affix, $request->gold_dust_cost, $request->shard_cost)) {
-            event (new GlobalMessageEvent($character->name . ' has pissed off the Queen of Hearts with their cheating ways. Their shards and gold dust cost did not match! The Creator is watching you, child!'));
+        if (!$this->randomEnchantmentService->isPlayerInHell($character)) {
+            event (new GlobalMessageEvent($character->name . ' has pissed off the Queen of Hearts with their cheating ways. They attempted to access her while not in Hell and/or with out the required item.'));
 
-            return response()->json(['message' => 'No! You\'re a very bad person! (stop cheating)'], 422);
+            return response()->json(['message' => 'Invalid location to use that.'], 422);
         }
 
-        if ($character->gold_dust < $request->gold_dust_cost || $character->shards < $request->shard_cost) {
+        if (!$this->reRollEnchantmentService->canAfford($character, $request->selected_reroll_type, $request->selected_affix)) {
             return response()->json(['message' => 'What! No! Child! I don\'t like poor people. I don\'t even date poor men! Oh this is so saddening, child! (You don\'t have enough currency, you made the Queen sad.)'], 422);
         }
 
@@ -107,19 +98,14 @@ class RandomEnchantController extends Controller {
             $character,
             $slot,
             $request->selected_affix,
-            $request->selected_reroll_type,
-            $request->gold_dust_cost,
-            $request->shard_cost
+            $request->selected_reroll_type
         );
 
         $character = $character->refresh();
 
-        return response()->json([
-            'gold'      => $character->gold,
-            'gold_dust' => $character->gold_dust,
-            'shards'    => $character->shards,
-            'message'   => 'The Queen has re-rolled: ' . $slot->item->affix_name . ' Check your inventory to see the new stats.',
-        ], 200);
+        event(new ServerMessageEvent($character->user, 'The Queen has re-rolled: ' . $slot->item->affix_name, $slot->id));
+
+        return response()->json($this->randomEnchantmentService->fetchDataForApi($character));
     }
 
     public function moveAffixes(MoveRandomEnchantment $request, Character $character) {

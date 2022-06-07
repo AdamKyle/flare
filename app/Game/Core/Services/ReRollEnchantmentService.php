@@ -21,6 +21,10 @@ class ReRollEnchantmentService {
 
     private RandomEnchantmentService $randomEnchantmentService;
 
+    private int $goldDust;
+
+    private int $shardCost;
+
     private $functionMap = [
         'base'       => [
             'setCoreModifiers',
@@ -50,33 +54,49 @@ class ReRollEnchantmentService {
         $this->randomEnchantmentService = $randomEnchantmentService;
     }
 
-    public function doesReRollCostMatch(string $type, string $selectedAffix, int $suppliedGoldDust, int $suppliedShards): bool {
+    public function canAfford(Character $character, string $type, string $selectedAffix): bool {
+        $goldDust = $this->getGoldDustCost($character, $type, $selectedAffix);
+        $shards   = $this->getShardsCost($character, $type, $selectedAffix);
+
+        return $character->gold_dust > $goldDust && $character->shards > $shards;
+    }
+
+    protected function getGoldDustCost(Character $character, string $type, string $selectedAffix): int {
         $goldDust = 10000;
-        $shards   = 100;
 
         if ($selectedAffix === 'all-enchantments') {
             $goldDust *= 2;
-            $shards   *= 2;
         }
 
         if ($type === 'everything') {
-            $goldDust *= 2;
-            $shards   *= 2;
+            $goldDust += 500;
         } else {
-            $goldDust += $goldDust * .166666;
-            $shards   += $shards * .166666;
+            $goldDust += 100;
         }
 
-        $goldDust = (int) round($goldDust);
-        $shards   = (int) round($shards);
-
-        return $goldDust === $suppliedGoldDust && $shards === $suppliedShards;
+        return $this->goldDust = $goldDust;
     }
 
-    public function reRoll(Character $character, InventorySlot $slot, string $affixType, string $reRollType, int $goldDustCost, int $shardCost) {
+    protected function getShardsCost(Character $character, string $type, string $selectedAffix): int {
+        $shardCost = 10000;
+
+        if ($selectedAffix === 'all-enchantments') {
+            $shardCost *= 2;
+        }
+
+        if ($type === 'everything') {
+            $shardCost += 500;
+        } else {
+            $shardCost += 100;
+        }
+
+        return $this->shardCost = $shardCost;
+    }
+
+    public function reRoll(Character $character, InventorySlot $slot, string $affixType, string $reRollType) {
         $character->update([
-            'gold_dust' => $character->gold_dust - $goldDustCost,
-            'shards'    => $character->shards - $shardCost,
+            'gold_dust' => $character->gold_dust - $this->goldDust,
+            'shards'    => $character->shards - $this->shardCost,
         ]);
 
         $duplicateItem = $this->doReRoll($character, $slot->item, $affixType, $reRollType);
@@ -89,9 +109,7 @@ class ReRollEnchantmentService {
 
         event(new UpdateTopBarEvent($character));
 
-        event(new UpdateQueenOfHeartsPanel($character->user, $this->randomEnchantmentService->fetchDataForApi($character)));
-
-        event(new ServerMessageEvent($character->user, 'Ooooh hoo hoo hoo! I have done it, child! I have made the modifications and I think you\'ll be happy! Oh child, I am so happy! Ooh hoo hoo hoo!', true));
+        event(new ServerMessageEvent($character->user, 'Ooooh hoo hoo hoo! I have done it, child! I have made the modifications and I think you\'ll be happy! Oh child, I am so happy! Ooh hoo hoo hoo!'));
     }
 
     public function doReRoll(Character $character, Item $item, string $affixType, string $reRollType) {
@@ -104,6 +122,8 @@ class ReRollEnchantmentService {
         foreach ($affixes as $affix) {
             $this->changeAffix($character, $duplicateItem, $affix, $reRollType);
         }
+
+        $duplicateItem = $duplicateItem->refresh();
 
         $duplicateItem->update([
             'market_sellable' => true,
@@ -306,7 +326,7 @@ class ReRollEnchantmentService {
                                                               ->setCharacterSkills($character->skills);
         if ($changeType === 'everything') {
             $changes = $affixAttributeBuilder->buildAttributes($itemAffix->type, $itemAffix->cost);
-
+            dump($changes);
             unset($changes['name']);
         } else {
             $changes = [];
