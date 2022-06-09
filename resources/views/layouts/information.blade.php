@@ -39,6 +39,8 @@
     <script src="https://cdn.jsdelivr.net/gh/mcstudios/glightbox/dist/js/glightbox.min.js"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
+    <script src={{mix('js/dark-mode.js')}} type="text/javascript"></script>
+
     @stack('head')
 </head>
 @php

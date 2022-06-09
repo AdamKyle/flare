@@ -82,8 +82,10 @@ class ItemsTable extends DataTableComponent {
             Column::make('Name')->searchable()->format(function ($value, $row) {
                 $itemId = Item::where('name', $value)->first()->id;
 
-                if (auth()->user()->hasRole('Admin')) {
-                    return '<a href="/admin/items/'. $itemId.'">'.$row->name . '</a>';
+                if (!is_null(auth()->user())) {
+                    if (auth()->user()->hasRole('Admin')) {
+                        return '<a href="/admin/items/'. $itemId.'">'.$row->name . '</a>';
+                    }
                 }
 
                 return '<a href="/items/'. $itemId.'" >'.$row->name . '</a>';
@@ -106,12 +108,17 @@ class ItemsTable extends DataTableComponent {
             }),
         ];
 
-        if (!auth()->user()->hasRole('Admin')) {
-            $columns[] = Column::make('Actions')->label(
-                fn($row, Column $column)  => view('admin.items.table-components.shop-actions-section', [
-                    'character' => auth()->user()->character
-                ])->withRow($row)
-            );
+        if (!is_null(auth()->user())) {
+            if (!auth()->user()->hasRole('Admin')) {
+                $columns[] = Column::make('Actions')->label(
+                    fn($row, Column $column) => view('admin.items.table-components.shop-actions-section', [
+                        'character' => auth()->user()->character
+                    ])->withRow($row)
+                );
+            } else {
+                $columns[] = Column::make('Min Crafting Lv.', 'skill_level_required')->sortable();
+                $columns[] = Column::make('Trivial Crafting Lv.', 'skill_level_trivial')->sortable();
+            }
         } else {
             $columns[] = Column::make('Min Crafting Lv.', 'skill_level_required')->sortable();
             $columns[] = Column::make('Trivial Crafting Lv.', 'skill_level_trivial')->sortable();

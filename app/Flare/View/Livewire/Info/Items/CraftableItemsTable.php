@@ -57,10 +57,6 @@ class CraftableItemsTable extends DataTableComponent
             Column::make('Name')->searchable()->format(function ($value, $row) {
                 $itemId = Item::where('name', $value)->first()->id;
 
-                if (auth()->user()->hasRole('Admin')) {
-                    return '<a href="/admin/items/'. $itemId.'">'.$row->name . '</a>';
-                }
-
                 return '<a href="/items/'. $itemId.'" >'.$row->name . '</a>';
             })->html(),
             Column::make('Type')->searchable()->format(function ($value) {

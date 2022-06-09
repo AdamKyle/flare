@@ -112,8 +112,10 @@ class AffixesTable extends DataTableComponent {
             Column::make('Name')->format(function ($value, $row) {
                 $affixId = ItemAffix::where('name', $value)->first()->id;
 
-                if (auth()->user()->hasRole('Admin')) {
-                    return '<a href="/admin/affixes/'. $affixId.'">'.$row->name . '</a>';
+                if (!is_null(auth()->user())) {
+                    if (auth()->user()->hasRole('Admin')) {
+                        return '<a href="/admin/affixes/'. $affixId.'">'.$row->name . '</a>';
+                    }
                 }
 
                 return '<a href="/information/affix/'. $affixId.'" target="_blank">  <i class="fas fa-external-link-alt"></i> '.$row->name . '</a>';
