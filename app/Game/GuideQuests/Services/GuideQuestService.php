@@ -47,7 +47,7 @@ class GuideQuestService {
         if ($character->isInventoryFull()) {
             event(new ServerMessageEvent($character->user, 'Failed to give you quest reward item. Inventory is full.'));
         } else {
-            $this->rewardItem($character);
+            $this->rewardItem($character, $quest->reward_level);
         }
 
         $gold = $character->gold + ($quest->reward_level * 1000);
@@ -118,13 +118,9 @@ class GuideQuestService {
         return $canHandIn;
     }
 
-    protected function rewardItem(Character $character): Character {
+    protected function rewardItem(Character $character, int $rewardLevel): Character {
 
-        $level = $character->level / 100;
-
-        if ($level < 1) {
-            $level = 1;
-        }
+        $level = $rewardLevel;
 
         $fetchItem = Item::whereNotIn('type', ['quest', 'alchemy', 'trinket'])
                          ->whereNull('item_prefix_id')
@@ -158,7 +154,7 @@ class GuideQuestService {
 
             $slot = $character->refresh()->inventory->slots()->where('item_id', $fetchItem->id)->first();
 
-            event(new ServerMessageEvent($character->user, 'The Guide rewarded you with: ' . $fetchItem->affix_name . '. (Its the enchantments you care about child ...)', $slot->id));
+            event(new ServerMessageEvent($character->user, 'The Guide rewarded you with: ' . $fetchItem->affix_name . '. "Here child, this might do something, or nothing."', $slot->id));
         }
 
         return $character->refresh();

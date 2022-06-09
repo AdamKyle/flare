@@ -143,11 +143,11 @@ class EnchantItemService {
      * @return Item
      */
     protected function applyHolyStacks(Item $oldItem, Item $item): Item {
-        dump('applying stacks');
+
         if ($oldItem->appliedHolyStacks()->count() > 0) {
-            dump('old item has stacks');
+
             foreach ($oldItem->appliedHolyStacks as $stack) {
-                dump('applying stack');
+
                 $stackAttributes = $stack->getAttributes();
 
                 $stackAttributes['item_id'] = $item->id;
@@ -155,8 +155,6 @@ class EnchantItemService {
                 $item->appliedHolyStacks()->create($stackAttributes);
             }
         }
-
-        dump($item->refresh()->appliedHolyStacks);
 
         return $item->refresh();
     }

@@ -16,6 +16,7 @@ export default class WorkBench extends React.Component<any, any> {
             loading: true,
             selected_item: null,
             selected_alchemy_item: null,
+            selected_item_name: null,
             inventory_items: [],
             alchemy_items: [],
         }
@@ -50,6 +51,16 @@ export default class WorkBench extends React.Component<any, any> {
                     loading: false,
                     inventory_items: result.data.items,
                     alchemy_items: result.data.alchemy_items,
+                }, () => {
+                    const foundItem = this.state.inventory_items.filter((slot: any) => {
+                        return slot.item.name === this.state.selected_item_name;
+                    });
+
+                    if (foundItem.length > 0) {
+                        this.setState({
+                            selected_item: foundItem[0].item.id,
+                        })
+                    }
                 });
             }, (error: AxiosError) => {
 
@@ -60,6 +71,16 @@ export default class WorkBench extends React.Component<any, any> {
     setItem(data: any) {
         this.setState({
             selected_item: parseInt(data.value)
+        }, () => {
+            const foundItem = this.state.inventory_items.filter((slot: any) => {
+                return slot.item.id === parseInt(data.value);
+            });
+
+            if (foundItem.length > 0) {
+                this.setState({
+                    selected_item_name: foundItem[0].item.affix_name
+                });
+            }
         });
     }
 
@@ -167,7 +188,7 @@ export default class WorkBench extends React.Component<any, any> {
                 </div>
 
                 <div className={'text-center md:ml-[-100px] mt-3 mb-3'}>
-                    <PrimaryButton button_label={'Transmute'} on_click={this.applyHolyOil.bind(this)} disabled={this.isApplyButtonDisabled()} />
+                    <PrimaryButton button_label={'Apply Oil'} on_click={this.applyHolyOil.bind(this)} disabled={this.isApplyButtonDisabled()} />
                     <DangerButton button_label={'Remove'}
                                   on_click={this.clearCrafting.bind(this)}
                                   additional_css={'ml-2'}

@@ -4,6 +4,7 @@ namespace App\Game\Core\Services;
 
 
 use App\Flare\Models\SetSlot;
+use App\Flare\Transformers\UsableItemTransformer;
 use Cache;
 
 use League\Fractal\Manager;
@@ -45,7 +46,7 @@ class ComparisonService {
 
         $viewData = [
             'details'        => [],
-            'itemToEquip'    => $this->buildItemDetails($itemToEquip),
+            'itemToEquip'    => $itemToEquip->item->type === 'alchemy' ? $this->buildUsableItemDetails($itemToEquip) : $this->buildItemDetails($itemToEquip),
             'type'           => $service->getType($itemToEquip->item, $type),
             'slotId'         => $itemToEquip->id,
             'characterId'    => $character->id,
@@ -156,6 +157,16 @@ class ComparisonService {
 
     protected function buildItemDetails(InventorySlot $slot): array {
         $item = new FractalItem($slot->item, new ItemComparisonTransfromer);
+
+        $item = (new Manager())->createData($item)->toArray()['data'];
+
+        $item['slot_id'] = $slot->id;
+
+        return $item;
+    }
+
+    protected function buildUsableItemDetails(InventorySlot $slot): array {
+        $item = new FractalItem($slot->item, new UsableItemTransformer);
 
         $item = (new Manager())->createData($item)->toArray()['data'];
 

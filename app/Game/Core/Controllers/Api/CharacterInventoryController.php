@@ -366,7 +366,7 @@ class  CharacterInventoryController extends Controller {
         } catch(EquipItemException $e) {
             return response()->json([
                 'message' => $e->getMessage()
-            ]);
+            ], 422);
         }
     }
 

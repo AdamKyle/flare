@@ -7,7 +7,7 @@
             route="{{auth()->user()->hasRole('admin') ? route('admin.guide-quests') : route('completed.guide-quests', ['user' => auth()->user()->id])}}"
             color="success" link="{{auth()->user()->hasRole('admin') ? 'Guide Quests' : 'Back'}}"
         >
-            @if (auth()->user()->hasRole('admin'))
+            @if (auth()->user()->hasRole('Admin'))
                 <x-core.buttons.link-buttons.primary-button
                     href="{{route('admin.guide-quests.edit', ['guideQuest' => $guideQuest->id])}}"
                 >

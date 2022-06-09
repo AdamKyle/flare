@@ -116,12 +116,12 @@ class AlchemyService {
     private function attemptToPickUpItem(Character $character, Item $item): bool {
         if (!$character->isInventoryFull()) {
 
-            $character->inventory->slots()->create([
+            $slot = $character->inventory->slots()->create([
                 'item_id'      => $item->id,
                 'inventory_id' => $character->inventory->id,
             ]);
 
-            event(new ServerMessageEvent($character->user, 'transmuted', $item->name));
+            event(new GameServerMessageEvent($character->user, 'You manage to create: ' . $item->name . ' from gold dust!', $slot->id));
 
             return true;
         }

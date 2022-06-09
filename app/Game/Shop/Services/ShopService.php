@@ -35,7 +35,9 @@ class ShopService {
             }
         }
 
-        $cost = $itemsToSell->sum('item.cost');
+        foreach ($itemsToSell as $slot) {
+            $cost += SellItemCalculator::fetchSalePriceWithAffixes($slot->item);
+        }
 
         $ids = $itemsToSell->pluck('id');
 

@@ -127,6 +127,7 @@ class Item extends Model
         'move_time_out_mod_bonus'          => 'float',
         'can_craft'                        => 'boolean',
         'can_resurrect'                    => 'boolean',
+        'randomly_generated'               => 'boolean',
         'skill_level_required'             => 'integer',
         'skill_level_trivial'              => 'integer',
         'craft_only'                       => 'boolean',
@@ -256,16 +257,21 @@ class Item extends Model
     }
 
     public function getIsUniqueAttribute() {
-
-        if (!is_null($this->itemSuffix)) {
-            return $this->itemSuffix->randomly_generated;
-        }
+        $value = false;
 
         if (!is_null($this->itemPrefix)) {
-            return $this->itemPrefix->randomly_generated;
+            $value = $this->itemPrefix->randomly_generated;
         }
 
-        return false;
+        if ($value) {
+            return $value;
+        }
+
+        if (!is_null($this->itemSuffix)) {
+            $value = $this->itemSuffix->randomly_generated;
+        }
+
+        return $value;
     }
 
     public function getRequiredMonsterAttribute() {

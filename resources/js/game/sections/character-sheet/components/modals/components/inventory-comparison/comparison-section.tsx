@@ -17,6 +17,7 @@ import ComparisonSectionProps from "../../../../../../lib/game/character-sheet/t
 import ComparisonSectionState
     from "../../../../../../lib/game/character-sheet/types/modal/comparison-section-state";
 import InventoryUseDetails from "../../inventory-item-details";
+import DangerAlert from "../../../../../../components/ui/alerts/simple-alerts/danger-alert";
 
 export default class ComparisonSection extends React.Component<ComparisonSectionProps, ComparisonSectionState> {
 
@@ -31,6 +32,7 @@ export default class ComparisonSection extends React.Component<ComparisonSection
             item_to_sell: null,
             item_to_show: null,
             show_item_details: false,
+            error_message: null,
         }
     }
 
@@ -146,6 +148,13 @@ export default class ComparisonSection extends React.Component<ComparisonSection
                         <WarningAlert additional_css={'mb-4'}>
                             <p>You are exploring. Some actions have been disabled.</p>
                         </WarningAlert>
+                    : null
+                }
+                {
+                    this.state.error_message !== null ?
+                        <DangerAlert additional_css={'mb-4'}>
+                            {this.state.error_message}
+                        </DangerAlert>
                     : null
                 }
                 {

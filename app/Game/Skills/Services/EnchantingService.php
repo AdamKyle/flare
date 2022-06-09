@@ -210,7 +210,6 @@ class EnchantingService {
             $affix = ItemAffix::find($affixId);
 
             if (is_null($affix)) {
-                dump('even here?');
                 continue;
             }
 
@@ -228,7 +227,7 @@ class EnchantingService {
                     event(new ServerMessageEvent($character->user, 'to_easy_to_craft'));
                     $this->sentToEasyMessage = true;
                 }
-                dump('should be here twice ...');
+
                 $this->processedEnchant($slot, $affix, $character, $enchantingSkill, true);
 
                 $this->wasTooEasy = true;
@@ -242,14 +241,11 @@ class EnchantingService {
              */
             if (!$this->wasTooEasy) {
                 if (!$this->processedEnchant($slot, $affix, $character, $enchantingSkill)) {
-                    dump('am I here?');
+
                     return;
                 }
             }
         }
-
-        dump('Final item');
-        dump($slot->refresh()->item->appliedHolyStacks);
     }
 
     protected function processedEnchant(InventorySlot $slot, ItemAffix $affix, Character $character, Skill $enchantingSkill, bool $tooEasy = false) {

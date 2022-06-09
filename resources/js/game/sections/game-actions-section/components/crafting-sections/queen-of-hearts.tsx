@@ -6,6 +6,8 @@ import {AxiosError, AxiosResponse} from "axios";
 import LoadingProgressBar from "../../../../components/ui/progress-bars/loading-progress-bar";
 import Ajax from "../../../../lib/ajax/ajax";
 import {formatNumber} from "../../../../lib/game/format-number";
+import {ceil} from "lodash";
+import DangerAlert from "../../../../components/ui/alerts/simple-alerts/danger-alert";
 
 export default class QueenOfHearts extends React.Component<any, any> {
     constructor(props: any) {
@@ -19,6 +21,11 @@ export default class QueenOfHearts extends React.Component<any, any> {
                 reroll_option: null,
                 attribute: null,
             },
+            move_options: {
+                unique_id: null,
+                item_to_move_to_id: null,
+                affix_to_move: null,
+            },
             preforming_action: false,
             character_uniques: [],
             character_non_uniques: [],
@@ -26,7 +33,12 @@ export default class QueenOfHearts extends React.Component<any, any> {
                 gold_dust_dust: 0,
                 shards: 0,
             },
+            movement_cost: {
+                gold_dust_dust: 0,
+                shards: 0,
+            },
             loading: true,
+            error_message: null,
         }
     }
 
@@ -66,11 +78,29 @@ export default class QueenOfHearts extends React.Component<any, any> {
     }
 
     setAttributeToReRoll(data: any) {
-        const cost = JSON.parse(JSON.stringify(this.state.reroll_cost));
-
         this.setState({
             reroll_options: {...this.state.reroll_options, ...{attribute: data.value}},
         }, () => this.calculateCost());
+    }
+
+    setSelectedItemToMove(data: any) {
+        this.setState({
+            move_options: {...this.state.move_options, ...{unique_id: data.value}}
+        });
+    }
+
+    setAffixTypeToMove(data: any) {
+        this.setState({
+            move_options: {...this.state.move_options, ...{affix_to_move: data.value}}
+        }, () => {
+            this.calculateMovementCost();
+        });
+    }
+
+    setItemToMove(data: any) {
+        this.setState({
+            move_options: {...this.state.move_options, ...{item_to_move_to_id: data.value}}
+        });
     }
 
     initialOptions() {
@@ -124,8 +154,44 @@ export default class QueenOfHearts extends React.Component<any, any> {
         }];
     }
 
+    moveEnchantOptions() {
+        let foundSelected = this.state.character_uniques.filter((unique: any) => {
+            return unique.id === this.state.move_options.unique_id
+        });
+
+        if (foundSelected.length === 0) {
+            return [];
+        }
+
+        foundSelected = foundSelected[0];
+        const options = [];
+
+        if (foundSelected.item.item_prefix !== null) {
+            options.push({
+                label: 'Prefix',
+                value: 'prefix',
+            });
+        }
+
+        if (foundSelected.item.item_suffix !== null) {
+            options.push({
+                label: 'Suffix',
+                value: 'suffix',
+            });
+        }
+
+        if (foundSelected.item.affix_count > 1) {
+            options.push({
+                label: 'Both',
+                value: 'all-enchantments',
+            });
+        }
+
+        return options;
+    }
+
     getSelectedReRollOption() {
-        const foundSelected = this.reRollOptions().filter((option: {label: string, value: string}) => {
+        const foundSelected = this.reRollOptions().filter((option: any) => {
             return option.value === this.state.reroll_options.reroll_option
         });
 
@@ -134,6 +200,18 @@ export default class QueenOfHearts extends React.Component<any, any> {
         }
 
         return {label: 'Please select what to re-roll', value: null};
+    }
+
+    getAffixToMove() {
+        const foundSelected = this.moveEnchantOptions().filter((option: any) => {
+            return option.value === this.state.move_options.affix_to_move
+        });
+
+        if (foundSelected.length > 0) {
+            return {label: foundSelected[0].label, value: foundSelected[0].value};
+        }
+
+        return {label: 'Please select what to move', value: null};
     }
 
     itemsForReRoll() {
@@ -191,6 +269,54 @@ export default class QueenOfHearts extends React.Component<any, any> {
         return {label: 'Please select what attributes to re-roll', value: null};
     }
 
+    getSelectedUnique() {
+        const foundSelected = this.state.character_uniques.filter((unique: any) => {
+            return unique.id === this.state.move_options.unique_id
+        });
+
+        if (foundSelected.length > 0) {
+            return {label: foundSelected[0].item.affix_name, value: foundSelected[0].id};
+        }
+
+        return {label: 'Please select unique', value: ''}
+    }
+
+    itemsToMoveTo() {
+        const items = [...this.state.character_uniques, ...this.state.character_non_uniques];
+
+        return items.map((item: any) => {
+            return  {
+                label: item.item.affix_name,
+                value: item.id
+            }
+        }).filter((item: any) => {
+            return item.value !== this.state.move_options.unique_id
+        });
+    }
+
+    getSelectedItemToMove() {
+        const items = [...this.state.character_uniques, ...this.state.character_non_uniques];
+
+        const foundSelected = items.filter((unique: any) => {
+            return unique.id === this.state.move_options.item_to_move_to_id
+        });
+
+        if (foundSelected.length > 0) {
+            return {label: foundSelected[0].item.affix_name, value: foundSelected[0].id};
+        }
+
+        return {label: 'Please select unique', value: ''}
+    }
+
+    uniquesToMove() {
+        return this.state.character_uniques.map((unique: any) => {
+            return {
+                label: unique.item.affix_name,
+                value: unique.id,
+            }
+        })
+    }
+
     buyItem() {
         this.setState({
             preforming_action: true,
@@ -201,7 +327,15 @@ export default class QueenOfHearts extends React.Component<any, any> {
                 this.setState({
                     preforming_action: false,
                 });
-            }, (error: AxiosError) => {console.log(error)})
+            }, (error: AxiosError) => {
+                if (typeof error.response !== 'undefined') {
+                    const response = error.response;
+
+                    this.setState({
+                        error_message: response.data.message,
+                    });
+                }
+            })
         });
     }
 
@@ -227,6 +361,45 @@ export default class QueenOfHearts extends React.Component<any, any> {
         });
     }
 
+    calculateMovementCost() {
+        let goldDust = 0;
+        let shards   = 0;
+
+        if (this.state.move_options.unique_id !== null && this.state.move_options.affix_to_move !== null) {
+            let foundSelected = this.state.character_uniques.filter((unique: any) => {
+                return unique.id === this.state.move_options.unique_id
+            });
+
+            if (foundSelected.length > 0) {
+                foundSelected = foundSelected[0];
+            }
+
+            if (this.state.move_options.affix_to_move === 'all-enchantments') {
+
+                if (foundSelected.item.item_prefix !== null) {
+                    goldDust += foundSelected.item.item_prefix.cost;
+                }
+
+                if (foundSelected.item.item_prefix !== null) {
+                    goldDust += foundSelected.item.item_suffix.cost;
+                }
+            } else {
+                goldDust += foundSelected.item['item_' + this.state.move_options.affix_to_move].cost
+            }
+        }
+
+        if (goldDust > 0) {
+            shards = parseInt(ceil(goldDust * .00000002).toFixed(0));
+        }
+
+        this.setState({
+            movement_cost: {
+                gold_dust_dust: goldDust,
+                shards: shards,
+            },
+        });
+    }
+
     reRoll() {
         this.setState({
             preforming_action: true,
@@ -241,7 +414,45 @@ export default class QueenOfHearts extends React.Component<any, any> {
                     character_uniques: result.data.unique_slots,
                     character_non_uniques: result.data.non_unique_slots
                 });
-            }, (error: AxiosError) => {console.log(error)})
+            }, (error: AxiosError) => {
+                if (typeof error.response !== 'undefined') {
+                    const response = error.response;
+
+                    this.setState({
+                        error_message: response.data.message,
+                        preforming_action: false,
+                    });
+                }
+            })
+        });
+    }
+
+    moveAffixes() {
+        this.setState({
+            preforming_action: true,
+        }, () => {
+            (new Ajax()).setRoute('character/'+this.props.character_id+'/random-enchant/move').setParameters({
+                selected_slot_id: this.state.move_options.unique_id,
+                selected_secondary_slot_id: this.state.move_options.item_to_move_to_id,
+                selected_affix: this.state.move_options.affix_to_move
+            }).doAjaxCall('post', (result: AxiosResponse) => {
+                this.setState({
+                    preforming_action: false,
+                    character_uniques: result.data.unique_slots,
+                    character_non_uniques: result.data.non_unique_slots
+                });
+            }, (error: AxiosError) => {
+                if (typeof error.response !== 'undefined') {
+                    const response = error.response;
+
+                    this.clearAll();
+
+                    this.setState({
+                        error_message: response.data.message,
+                        preforming_action: false,
+                    });
+                }
+            })
         });
     }
 
@@ -256,7 +467,12 @@ export default class QueenOfHearts extends React.Component<any, any> {
             reroll_cost: {
                 gold_dust: 0,
                 shards: 0,
-            }
+            },
+            move_options: {
+                unique_id: null,
+                item_to_move_to_id: null,
+                affix_to_move: null,
+            },
         })
     }
 
@@ -270,6 +486,14 @@ export default class QueenOfHearts extends React.Component<any, any> {
                             this.state.loading ?
                                 <LoadingProgressBar />
                                 : null
+                        }
+
+                        {
+                            this.state.error_message !== null ?
+                                <DangerAlert additional_css={'mb-4 mt-2'}>
+                                    {this.state.error_message}
+                                </DangerAlert>
+                            : null
                         }
 
                         {
@@ -301,8 +525,6 @@ export default class QueenOfHearts extends React.Component<any, any> {
                                         menuPortalTarget={document.body}
                                         value={this.getSelectedBuyValue()}
                                     />
-                                    <p className='mt-2'>These items can roll with one or two uniques and all aspects are randomly rolled.
-                                    The more expensive, the better.</p>
                                 </Fragment>
                             : null
                         }
@@ -331,7 +553,6 @@ export default class QueenOfHearts extends React.Component<any, any> {
                                                     menuPortalTarget={document.body}
                                                     value={this.getSelectedReRollOption()}
                                                 />
-                                                <p className='mt-2'>Here you can re-roll one or both of the affixes attached to the item.</p>
                                             </div>
                                         : null
                                     }
@@ -348,15 +569,12 @@ export default class QueenOfHearts extends React.Component<any, any> {
                                                     menuPortalTarget={document.body}
                                                     value={this.getSelectedAttributeOption()}
                                                 />
-                                                <p className='mt-2'>Here you can re-roll specific aspects, or all aspects of the affix.</p>
-                                                <p className='mt-2'>Cost is calculated based on Number of Affixes to re-roll plus 100 GD and shards for
-                                                    the selected attribute <strong>or</strong> plus 500 GD and Shards for all attributes</p>
                                                 {
                                                     this.state.reroll_options.reroll_option !== null ?
                                                         <p className='mt-2 text-orange-600 dark:text-orange-500'>
                                                             <strong>Gold Dust Cost</strong>: {formatNumber(this.state.reroll_cost.gold_dust_dust)}, <strong>Shards Cost</strong>: {formatNumber(this.state.reroll_cost.shards)}
                                                         </p>
-                                                        : null
+                                                    : null
                                                 }
                                             </div>
                                             : null
@@ -364,6 +582,62 @@ export default class QueenOfHearts extends React.Component<any, any> {
 
                                 </Fragment>
                                 : null
+                        }
+
+                        {
+                            this.state.initial_action === 'move-enchants' ?
+                                <Fragment>
+                                    <Select
+                                        onChange={this.setSelectedItemToMove.bind(this)}
+                                        options={this.uniquesToMove()}
+                                        menuPosition={'absolute'}
+                                        menuPlacement={'bottom'}
+                                        styles={{menuPortal: (base) => ({...base, zIndex: 9999, color: '#000000'})}}
+                                        menuPortalTarget={document.body}
+                                        value={this.getSelectedUnique()}
+                                    />
+
+                                    {
+                                        this.state.move_options.unique_id !== null && this.state.move_options.unique_id !== '' ?
+                                            <div className='mt-2'>
+                                                <Select
+                                                    onChange={this.setAffixTypeToMove.bind(this)}
+                                                    options={this.moveEnchantOptions()}
+                                                    menuPosition={'absolute'}
+                                                    menuPlacement={'bottom'}
+                                                    styles={{menuPortal: (base) => ({...base, zIndex: 9999, color: '#000000'})}}
+                                                    menuPortalTarget={document.body}
+                                                    value={this.getAffixToMove()}
+                                                />
+                                            </div>
+                                        : null
+                                    }
+
+                                    {
+                                        this.state.move_options.affix_to_move !== null && this.state.move_options.affix_to_move !== '' ?
+                                            <div className='mt-2'>
+                                                <Select
+                                                    onChange={this.setItemToMove.bind(this)}
+                                                    options={this.itemsToMoveTo()}
+                                                    menuPosition={'absolute'}
+                                                    menuPlacement={'bottom'}
+                                                    styles={{menuPortal: (base) => ({...base, zIndex: 9999, color: '#000000'})}}
+                                                    menuPortalTarget={document.body}
+                                                    value={this.getSelectedItemToMove()}
+                                                />
+                                            </div>
+                                        : null
+                                    }
+
+                                    {
+                                        this.state.movement_cost.gold_dust !== 0 && this.state.movement_cost.shards !== 0 ?
+                                            <p className='mt-2 text-orange-600 dark:text-orange-500'>
+                                                <strong>Gold Dust Cost</strong>: {formatNumber(this.state.movement_cost.gold_dust_dust)}, <strong>Shards Cost</strong>: {formatNumber(this.state.movement_cost.shards)}
+                                            </p>
+                                        : null
+                                    }
+                                </Fragment>
+                            : null
                         }
 
                         {
@@ -385,13 +659,19 @@ export default class QueenOfHearts extends React.Component<any, any> {
                     {
                         this.state.initial_action === 're-roll-item' ?
                             <PrimaryButton button_label={'Re roll'} on_click={this.reRoll.bind(this)} disabled={!(this.state.reroll_options.item_selected !== null && this.state.reroll_options.reroll_option !== null && this.state.reroll_options.attribute !== null) || this.state.preforming_action} />
-                            : null
+                        : null
+                    }
+
+                    {
+                        this.state.initial_action === 'move-enchants' ?
+                            <PrimaryButton button_label={'Move Enchants'} on_click={this.moveAffixes.bind(this)} disabled={!(this.state.move_options.unique_id !== null && this.state.move_options.item_to_move_to_id !== null && this.state.move_options.affix_to_move !== null) || this.state.preforming_action} />
+                        : null
                     }
 
                     {
                         this.state.initial_action !== null ?
                             <PrimaryButton button_label={'Change Action'} on_click={this.clearAll.bind(this)} disabled={this.state.preforming_action} additional_css={'ml-2'}/>
-                            : null
+                        : null
                     }
 
                     <DangerButton button_label={'Remove Queen'} on_click={this.props.remove_crafting} disabled={this.state.preforming_action} additional_css={'ml-2'}/>

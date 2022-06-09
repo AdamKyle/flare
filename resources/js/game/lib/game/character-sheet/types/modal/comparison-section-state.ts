@@ -14,4 +14,6 @@ export default interface ComparisonSectionState {
     item_to_sell: InventoryComparisonAdjustment|null;
 
     item_to_show: InventoryComparisonAdjustment|null;
+
+    error_message: string|null;
 }

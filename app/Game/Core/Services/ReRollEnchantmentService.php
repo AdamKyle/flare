@@ -31,6 +31,8 @@ class ReRollEnchantmentService {
             'setDamageDetails',
             'setClassBonus',
             'setSkillBonuses',
+            'setLifeStealingAmount',
+            'setEntrancingAmount',
         ],
         'stats'      => [
             'increaseStats',
@@ -43,6 +45,8 @@ class ReRollEnchantmentService {
         'damage'     => [
             'setDamageDetails',
             'setDevouringLight',
+            'setLifeStealingAmount',
+            'setEntrancingAmount',
         ],
         'resistance' => [
             'setReductions',
@@ -127,19 +131,26 @@ class ReRollEnchantmentService {
 
         $duplicateItem->update([
             'market_sellable' => true,
+            'is_mythic'       => $item->is_mythic,
         ]);
 
         return $duplicateItem->refresh();
     }
 
-    public function doesMovementCostMatch(int $selectedItemToMoveId, string $selectedAffix, int $suppliedGold, int $suppliedShards): bool {
-        $cost = 0;
+    public function canAffordMovementCost(Character $character, int $selectedItemToMoveId, string $selectedAffix) {
+        $costs = $this->getMovementCosts($selectedItemToMoveId, $selectedAffix);
 
+        return $character->gold >= $costs['gold_cost'] && $character->shards >= $costs['shards_cost'];
+    }
+
+    public function getMovementCosts(int $selectedItemToMoveId, string $selectedAffix): array {
         $item = Item::find($selectedItemToMoveId);
 
         if (is_null($item)) {
             return false;
         }
+
+        $cost = 0;
 
         if ($selectedAffix === 'all-enchantments') {
             if (!is_null($item->item_prefix_id)) {
@@ -157,13 +168,18 @@ class ReRollEnchantmentService {
 
         $shardCost = (int) round($shardCost);
 
-        return $cost === $suppliedGold && $shardCost === $suppliedShards;
+        return [
+            'gold_cost'   => $cost,
+            'shards_cost' => $shardCost,
+        ];
     }
 
-    public function moveAffixes(Character $character, InventorySlot $slot, InventorySlot $secondarySlot, string $affixType, int $goldCost, int $shardCost) {
+    public function moveAffixes(Character $character, InventorySlot $slot, InventorySlot $secondarySlot, string $affixType) {
+        $costs = $this->getMovementCosts($slot->item_id, $affixType);
+
         $character->update([
-            'gold'    => $character->gold - $goldCost,
-            'shards'  => $character->shards - $shardCost,
+            'gold'    => $character->gold - $costs['gold_cost'],
+            'shards'  => $character->shards - $costs['shards_cost'],
         ]);
 
         $duplicateSecondaryItem = $secondarySlot->item->duplicate();
@@ -248,6 +264,11 @@ class ReRollEnchantmentService {
             }
         }
 
+        $duplicateSecondaryItem->update([
+            'is_market_sellable' => true,
+            'is_mythic'          => $slot->item->is_mythic,
+        ]);
+
         $secondarySlot->update([
             'item_id' => $duplicateSecondaryItem->id,
         ]);
@@ -256,9 +277,7 @@ class ReRollEnchantmentService {
 
         event(new UpdateTopBarEvent($character));
 
-        event(new UpdateQueenOfHeartsPanel($character->user, $this->randomEnchantmentService->fetchDataForApi($character)));
-
-        event(new ServerMessageEvent($character->user, 'Ooooh hoo hoo hoo! I have done as thou have requested, my lovely, beautiful, gorgeous child! Oh look at how powerful you are!', true));
+        event(new ServerMessageEvent($character->user, 'Ooooh hoo hoo hoo! I have done as thou have requested, my lovely, beautiful, gorgeous child! Oh look at how powerful you are!'));
 
         if ($deletedAll) {
             event(new GlobalMessageEvent($character->name . ' Makes the Queen of Hearts glow so bright, thousands of demons in Hell are banished by her beauty and power alone!'));
@@ -271,6 +290,10 @@ class ReRollEnchantmentService {
         if ($deletedNone) {
             event(new GlobalMessageEvent($character->name . ' Makes the Queen of Hearts blush! She is attracted to them now.'));
         }
+
+        $slot = $secondarySlot->refresh();
+
+        event(new ServerMessageEvent($character->user, 'The Queen has moved thr affixes and created the item: ' . $slot->item->affix_name, $slot->id));
     }
 
     /**
@@ -326,7 +349,7 @@ class ReRollEnchantmentService {
                                                               ->setCharacterSkills($character->skills);
         if ($changeType === 'everything') {
             $changes = $affixAttributeBuilder->buildAttributes($itemAffix->type, $itemAffix->cost);
-            dump($changes);
+
             unset($changes['name']);
         } else {
             $changes = [];

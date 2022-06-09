@@ -117,7 +117,7 @@ class CanHit {
     }
 
     public function canPlayerCastSpell(Character $character, ServerMonster $monster, bool $isPlayerVoided) {
-        $defenderAgi       = $monster->getMonsterStat('agi_modded');
+        $defenderAgi       = $monster->getMonsterStat('agi');
         $characterToHit    = $this->characterCacheData->getCachedCharacterData($character, 'to_hit_stat');
         $statValue         = $this->characterCacheData->getCachedCharacterData($character, $isPlayerVoided ? $characterToHit : $characterToHit . '_modded');
         $characterAccuracy = $this->characterCacheData->getCachedCharacterData($character, 'skills')['casting_accuracy'];

@@ -33,7 +33,11 @@ export default class InventoryComparisonActions {
 
                         component.props.manage_modal();
                     }, (error: AxiosError) => {
-
+                        if (typeof error.response !== 'undefined') {
+                            component.setState({error_message: error.response.data.message}, () => {
+                                component.props.set_action_loading();
+                            })
+                        }
                     });
     }
 

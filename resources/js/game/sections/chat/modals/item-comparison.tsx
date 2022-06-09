@@ -12,6 +12,7 @@ import ComparisonSection
 import {
     watchForChatDarkModeComparisonChange,
 } from "../../../lib/game/dark-mode-watcher";
+import UsableItemSection from "../../character-sheet/components/modals/components/usable-item-section";
 
 export default class ItemComparison extends React.Component<any, any> {
 
@@ -120,6 +121,8 @@ export default class ItemComparison extends React.Component<any, any> {
             )
         }
 
+
+
         return (
             <Dialogue is_open={this.props.is_open}
                       handle_close={this.props.manage_modal}
@@ -139,19 +142,23 @@ export default class ItemComparison extends React.Component<any, any> {
                                         {this.state.error_message}
                                     </div>
                                 :
-                                    <ComparisonSection
-                                        is_large_modal={this.isLargeModal()}
-                                        is_grid_size={this.isGridSize.bind(this)}
-                                        comparison_details={this.state.comparison_details}
-                                        set_action_loading={this.setStatusToLoading.bind(this)}
-                                        is_action_loading={this.state.action_loading}
-                                        manage_modal={this.props.manage_modal}
-                                        character_id={this.props.character_id}
-                                        dark_charts={this.state.dark_charts}
-                                        usable_sets={this.state.usable_sets}
-                                        slot_id={this.props.slot_id}
-                                        is_automation_running={this.props.is_automation_running}
-                                    />
+
+                                    this.state.comparison_details.itemToEquip.type === 'alchemy' ?
+                                        <UsableItemSection item={this.state.comparison_details.itemToEquip} />
+                                   :
+                                        <ComparisonSection
+                                            is_large_modal={this.isLargeModal()}
+                                            is_grid_size={this.isGridSize.bind(this)}
+                                            comparison_details={this.state.comparison_details}
+                                            set_action_loading={this.setStatusToLoading.bind(this)}
+                                            is_action_loading={this.state.action_loading}
+                                            manage_modal={this.props.manage_modal}
+                                            character_id={this.props.character_id}
+                                            dark_charts={this.state.dark_charts}
+                                            usable_sets={this.state.usable_sets}
+                                            slot_id={this.props.slot_id}
+                                            is_automation_running={this.props.is_automation_running}
+                                        />
                             }
                         </Fragment>
 

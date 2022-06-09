@@ -10,8 +10,6 @@ use App\Flare\Models\Item;
 
 class ItemComparisonTransfromer extends TransformerAbstract {
 
-    use IsItemUnique;
-
     /**
      * Gets the response data for the character sheet
      *
@@ -50,7 +48,7 @@ class ItemComparisonTransfromer extends TransformerAbstract {
             'resurrection_chance'              => $item->resurrection_chance,
             'spell_evasion'                    => $item->spell_evasion,
             'artifact_annulment'               => $item->artifact_annulment,
-            'is_unique'                        => $this->isUnique($item),
+            'is_unique'                        => $item->is_unique,
             'is_mythic'                        => $item->is_mythic,
             'affix_count'                      => $item->affix_count,
             'min_cost'                         => SellItemCalculator::fetchMinPrice($item),

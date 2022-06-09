@@ -109,6 +109,12 @@ class RandomEnchantController extends Controller {
     }
 
     public function moveAffixes(MoveRandomEnchantment $request, Character $character) {
+        if (!$this->randomEnchantmentService->isPlayerInHell($character)) {
+            event (new GlobalMessageEvent($character->name . ' has pissed off the Queen of Hearts with their cheating ways. They attempted to access her while not in Hell and/or with out the required item.'));
+
+            return response()->json(['message' => 'Invalid location to use that.'], 422);
+        }
+
         $slot = $character->inventory->slots->filter(function($slot) use ($request) {
             return $slot->id === $request->selected_slot_id;
         })->first();
@@ -117,14 +123,13 @@ class RandomEnchantController extends Controller {
             return $slot->id === $request->selected_secondary_slot_id;
         })->first();
 
+
         if (is_null($slot) || is_null($secondSlot)) {
             return response()->json(['message' => 'Where did you put those items, child? Ooooh hooo hooo hooo! Are you playing hide and seek with it? (Either the unique or the requested item does not exist.)'], 422);
         }
 
-        if (!$this->reRollEnchantmentService->doesMovementCostMatch($slot->item->id, $request->selected_affix, $request->gold_cost, $request->shard_cost)) {
-            event (new GlobalMessageEvent($character->name . ' has pissed off the Queen of Hearts with their cheating ways. Their shards and gold dust cost did not match! The Creator is watching you, child!'));
-
-            return response()->json(['message' => 'No! You\'re a very bad person! (stop cheating)'], 422);
+        if (!$this->reRollEnchantmentService->canAffordMovementCost($character, $slot->item->id, $request->selected_affix)) {
+            return response()->json(['message' => 'Child, you are so poor ...'], 422);
         }
 
         if ($character->gold < $request->gold_cost || $character->shards < $request->shard_cost) {
@@ -136,17 +141,8 @@ class RandomEnchantController extends Controller {
             $slot,
             $secondSlot,
             $request->selected_affix,
-            $request->gold_cost,
-            $request->shard_cost
         );
 
-        return response()->json([
-            'gold'      => $character->gold,
-            'gold_dust' => $character->gold_dust,
-            'shards'    => $character->shards,
-            'message'   => 'The Queen has moved the stats from one item to the other. Check your inventory for the new unique.',
-        ], 200);
+        return response()->json($this->randomEnchantmentService->fetchDataForApi($character));
     }
-
-
 }
