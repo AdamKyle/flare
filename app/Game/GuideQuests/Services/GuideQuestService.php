@@ -83,18 +83,28 @@ class GuideQuestService {
 
         $canHandIn = false;
 
+        $attributes = [];
+
         if (!is_null($quest->required_level)) {
-            $canHandIn = $character->level >= $quest->required_level;
+            if ($character->level >= $quest->required_level) {
+                $attributes[] = 'required_level';
+            }
         }
 
-        if ($quest->required_skill !== null) {
-            $canHandIn = $character->skills()->where('game_skill_id', $quest->required_skill)->first()->level >= $quest->required_skill_level;
+        if (!is_null($quest->required_skill)) {
+            $requiredSkill = $character->skills()->where('game_skill_id', $quest->required_skill)->first();
+
+            if ($requiredSkill->level >= $quest->required_skill_level) {
+                $attributes[] = 'required_skill';
+            }
         }
 
         if (!is_null($quest->required_faction_id)) {
             $faction = $character->factions()->where('game_map_id', $quest->required_faction_id)->first();
 
-            $canHandIn = $faction->current_level >= $quest->required_faction_level;
+            if ($faction->current_level >= $quest->required_faction_level) {
+                $attributes[] = 'required_faction_id';
+            }
         }
 
         if (!is_null($quest->required_game_map_id)) {
@@ -103,19 +113,58 @@ class GuideQuestService {
             $canHandIn = $character->inventory->slots->filter(function($slot) use($gameMap) {
                 return $slot->item->type === 'quest' && $slot->item->id === $gameMap->map_required_item->id;
             })->isNotEmpty();
+
+            if ($canHandIn) {
+                $attributes[] = 'required_game_map_id';
+            }
         }
 
         if (!is_null($quest->required_quest_id)) {
             $canHandIn = !is_null($character->questsCompleted()->where('quest_id', $quest->id)->first());
+
+            if ($canHandIn) {
+                $attributes[] = 'required_quest_id';
+            }
         }
 
         if (!is_null($quest->required_quest_item_id)) {
             $canHandIn = $character->inventory->slots->filter(function($slot) use($quest) {
                 return $slot->item->type === 'quest' && $slot->item->id === $quest->required_quest_item_id;
             })->isNotEmpty();
+
+            if ($canHandIn) {
+                $attributes[] = 'required_quest_item_id';
+            }
         }
 
-        return $canHandIn;
+        if (!empty($attributes)) {
+            $requiredAttributes = $this->requiredAttributeNames($quest);
+            dump($requiredAttributes, $attributes);
+            return $attributes === $requiredAttributes;
+        }
+
+        return false;
+    }
+
+    protected function requiredAttributeNames(GuideQuest $quest): array {
+
+        $requiredAttributes = [];
+
+        $attributes = $quest->getAttributes();
+
+        foreach ($attributes as $key => $value) {
+            if ($key === 'required_skill') {
+                continue;
+            }
+
+            if (str_contains($key, 'required') !== false) {
+                if (!is_null($attributes[$key])) {
+                    $requiredAttributes[] = $key;
+                }
+            }
+        }
+
+        return $requiredAttributes;
     }
 
     protected function rewardItem(Character $character, int $rewardLevel): Character {

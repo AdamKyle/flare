@@ -39,6 +39,14 @@ class PctService {
             $message = 'Child! I am processing your request.';
             broadcast(new ServerMessageEvent($character->user, $message));
 
+            $character->map()->update([
+                'character_position_x' => $x,
+                'character_position_y' => $y
+            ]);
+
+            $message = 'Child! ' . $this->celestialName  .' is at (X/Y): '. $x .'/'. $y. ' on the: '. $map->name .'Plane. I have teleported you there free of charge!';
+            broadcast(new ServerMessageEvent($this->character->user, $message));
+
             PCTTeleport::dispatch($character, $x, $y, $celestialFight->monster->name, $map->name);
         } else {
 

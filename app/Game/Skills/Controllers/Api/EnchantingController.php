@@ -43,10 +43,10 @@ class  EnchantingController extends Controller {
 
         $cost = $this->enchantingService->getCostOfEnchantment($request->affix_ids, $slot->item->id);
 
-        if ($cost > $character->gold || !$cost) {
+        if ($cost > $character->gold || $cost === 0) {
             event(new ServerMessageEvent($character->user, 'Not enough gold to enchant that.'));
 
-            return response()->json();
+            return response()->json($this->enchantingService->fetchAffixes($character->refresh()));
         }
 
         $timeOut = $this->enchantingService->timeForEnchanting($slot->item);

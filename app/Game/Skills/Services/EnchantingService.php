@@ -109,16 +109,16 @@ class EnchantingService {
      * @param int $itemId
      * @return bool
      */
-    public function getCostOfEnchantment(array $enchantmentIds, int $itemId): bool {
+    public function getCostOfEnchantment(array $enchantmentIds, int $itemId): int {
         $itemAffixes   = ItemAffix::findMany($enchantmentIds);
         $itemToEnchant = Item::find($itemId);
 
         if (is_null($itemAffixes)) {
-            return false;
+            return 0;
         }
 
         if (is_null($itemToEnchant)) {
-            return false;
+            return 0;
         }
 
         $cost = $itemAffixes->sum('cost');

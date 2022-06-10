@@ -3,7 +3,6 @@
 namespace App\Game\Maps\Services;
 
 use App\Flare\Cache\CoordinatesCache;
-use App\Flare\Events\ServerMessageEvent;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\CelestialFight;
@@ -23,7 +22,6 @@ use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Events\UpdateMapBroadcast;
-use App\Game\Maps\Events\UpdateDuelAtPosition;
 use App\Game\Maps\Events\UpdateMonsterList;
 use App\Game\Maps\Services\Common\CanPlayerMassEmbezzle;
 use App\Game\Maps\Services\Common\LiveCharacterCount;
@@ -236,6 +234,15 @@ class MovementService {
         }
 
         $this->traverseService->travel($mapId, $character);
+
+        $character = $character->refresh();
+
+        $params = [
+            'character_position_x' => $character->map->character_position_x,
+            'character_position_y' => $character->map->character_position_y,
+        ];
+
+        $this->giveLocationReward($character, $params);
 
         return $this->successResult();
     }
@@ -461,6 +468,11 @@ class MovementService {
 
         $this->teleportCharacter($character, $timeout, $cost, $pctCommand);
 
+        $this->giveLocationReward($character, [
+            'character_position_x' => $x,
+            'character_position_y' => $y,
+        ]);
+
         return $this->successResult($this->locationService->getLocationData($character));
     }
 
@@ -599,6 +611,7 @@ class MovementService {
      * @return array
      */
     protected function moveCharacter(Character $character, array $params, ?Location $lockedLocation): array {
+        dump($params);
         $character->map->update($params);
 
         $character = $character->refresh();
@@ -607,9 +620,20 @@ class MovementService {
 
         $this->updateCharacterMovementTimeOut($character);
 
-        // event(new UpdateDuelAtPosition($character->user));
+        $this->giveLocationReward($character, $params);
 
         return $this->successResult($this->locationService->getLocationData($character));
+    }
+
+    protected function giveLocationReward(Character $character, array $params) {
+        $characterLocation = Location::where('x', $params['character_position_x'])
+            ->where('y', $params['character_position_y'])
+            ->where('game_map_id', $character->map->game_map_id)
+            ->first();
+
+        if (!is_null($characterLocation)) {
+            $this->giveQuestReward($characterLocation, $character);
+        }
     }
 
 
@@ -638,6 +662,7 @@ class MovementService {
             'can_move_again_at' => $timeout === 0 ? null : now()->addMinutes($timeout),
         ]);
 
+
         $character = $character->refresh();
 
         if ($timeout !== 0) {
@@ -664,24 +689,20 @@ class MovementService {
             })->first();
 
             if (is_null($item)) {
-                if ($character->isInventoryFull()) {
-                    event(new ServerMessageEvent($character->user, 'inventory_full'));
-                } else {
-                    $character->inventory->slots()->create([
-                        'inventory_id' => $character->inventory->id,
-                        'item_id'      => $location->questRewardItem->id,
-                    ]);
+                $slot = $character->inventory->slots()->create([
+                    'inventory_id' => $character->inventory->id,
+                    'item_id'      => $location->questRewardItem->id,
+                ]);
 
-                    $questItem = $location->questRewardItem;
+                $questItem = $location->questRewardItem;
 
-                    if (!is_null($questItem->effect)) {
-                        $message = $character->name . ' has found: ' . $questItem->affix_name;
+                if (!is_null($questItem->effect)) {
+                    $message = $character->name . ' has found: ' . $questItem->affix_name;
 
-                        broadcast(new GlobalMessageEvent($message));
-                    }
-
-                    event(new ServerMessageEvent($character->user, 'found_item', $questItem->affix_name));
+                    broadcast(new GlobalMessageEvent($message));
                 }
+
+                event(new GameServerMessageEvent($character->user, 'You found: ' . $questItem->affix_name, $slot->id));
             }
         }
     }

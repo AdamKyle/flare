@@ -244,19 +244,19 @@ export default class MonsterAttack extends BattleBase {
         healFor = healFor * 2;
       }
 
-      if (defenderHealingReduction > 0) {
+      if (defenderHealingReduction > 0.0) {
         healFor = healFor - healFor * defenderHealingReduction;
       }
 
       if (healFor > 1) {
         this.currentMonsterHealth = this.currentMonsterHealth + healFor;
 
-        if (defenderHealingReduction > 0) {
+        if (defenderHealingReduction > 0.0) {
           this.addMessage('Your rings negate some of the enemy\'s healing power.', 'player-action');
         }
 
         this.addMessage(attacker.name + '\'s healing spells wash over them for: ' + formatNumber(healFor.toFixed(0)), 'enemy-action');
-      } else {
+      } else if (defenderHealingReduction > 0.0) {
         this.addMessage('Your rings negate all of the enemy\'s healing power.', 'player-action');
       }
     }

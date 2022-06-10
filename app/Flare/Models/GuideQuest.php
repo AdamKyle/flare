@@ -74,7 +74,7 @@ class GuideQuest extends Model
     }
 
     public function getQuestItemNameAttribute() {
-        $questItem = Item::where('type', 'quest')->where('id', $this->quest_item_id)->first();
+        $questItem = Item::where('type', 'quest')->where('id', $this->required_quest_item_id)->first();
 
         if (!is_null($questItem)) {
             return $questItem->affix_name;

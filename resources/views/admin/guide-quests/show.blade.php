@@ -51,7 +51,7 @@
                             <dt>Required Quest</dt>
                             <dd>{{$guideQuest->quest_name}}</dd>
                         @endif
-                        @if (!is_null($guideQuest->quest_item_name))
+                        @if (!is_null($guideQuest->required_quest_item_id))
                             <dt>Required Quest Item</dt>
                             <dd>{{$guideQuest->quest_item_name}}</dd>
                         @endif
