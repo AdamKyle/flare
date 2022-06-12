@@ -282,7 +282,7 @@ class TraverseService {
      * @param int $mapId
      * @param Character $character
      */
-    protected function updateActions(int $mapId, Character $character, GameMap $oldGameMap) {
+    public function updateActions(int $mapId, Character $character, GameMap $oldGameMap) {
         $user         = $character->user;
         $gameMap      = GameMap::find($mapId);
 
@@ -350,7 +350,7 @@ class TraverseService {
      * @param Character $character
      */
     protected function updateMap(Character $character) {
-        event(new UpdateMapBroadcast($character->user, $this->locationService->getLocationData($character->refresh())));
+        event(new UpdateMapBroadcast($character->user));
     }
 
     /**

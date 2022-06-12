@@ -6,6 +6,7 @@ import ActionsProps from "../types/actions/actions-props";
 import {capitalize, isEqual} from "lodash";
 import ActionsState from "../types/actions/actions-state";
 import {CraftingOptions} from "../types/actions/crafting-type-options";
+import {getTimeLeftInSeconds} from "./convert-time";
 
 export default class ActionsManager {
 
@@ -20,7 +21,8 @@ export default class ActionsManager {
             this.component.setState({
                 character: props.character,
                 monsters: result.data.monsters,
-                attack_time_out: props.character.can_attack_again_at !== null ? props.character.can_attack_again_at : 0,
+                attack_time_out: props.character.can_attack_again_at !== null ? getTimeLeftInSeconds(props.character.can_attack_again_at) : 0,
+                crafting_time_out: props.character.can_craft_again_at !== null ? getTimeLeftInSeconds(props.character.can_craft_again_at) : 0,
                 loading: false,
             })
         }, (error: AxiosError) => {

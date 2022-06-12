@@ -611,7 +611,6 @@ class MovementService {
      * @return array
      */
     protected function moveCharacter(Character $character, array $params, ?Location $lockedLocation): array {
-        dump($params);
         $character->map->update($params);
 
         $character = $character->refresh();
@@ -702,7 +701,7 @@ class MovementService {
                     broadcast(new GlobalMessageEvent($message));
                 }
 
-                event(new GameServerMessageEvent($character->user, 'You found: ' . $questItem->affix_name, $slot->id));
+                event(new GameServerMessageEvent($character->user, 'You found: ' . $questItem->affix_name, $slot->id, true));
             }
         }
     }

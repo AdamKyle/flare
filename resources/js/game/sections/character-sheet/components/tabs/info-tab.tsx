@@ -5,6 +5,7 @@ import InfoTabProps from "../../../../lib/game/character-sheet/types/tabs/info-t
 import {formatNumber} from "../../../../lib/game/format-number";
 import OrangeButton from "../../../../components/ui/buttons/orange-button";
 import InfoTabState from "../../../../lib/game/character-sheet/types/tabs/info-tab-state";
+import CharacterResistances from "../modals/character-resistances";
 
 export default class InfoTab extends React.Component<InfoTabProps, InfoTabState> {
 
@@ -13,12 +14,19 @@ export default class InfoTab extends React.Component<InfoTabProps, InfoTabState>
 
         this.state = {
             open_info: false,
+            open_resistances: false,
         }
     }
 
     manageInfoDialogue() {
         this.setState({
             open_info: !this.state.open_info
+        })
+    }
+
+    manageResistancesDialogue() {
+        this.setState({
+            open_resistances: !this.state.open_resistances
         })
     }
 
@@ -56,8 +64,13 @@ export default class InfoTab extends React.Component<InfoTabProps, InfoTabState>
                         </dl>
                     </div>
                 </div>
-                <div className='mt-4'>
-                    <OrangeButton button_label={'Additional Information'} on_click={this.manageInfoDialogue.bind(this)} />
+                <div className='grid md:grid-cols-1 w-full md:w-[35%]'>
+                    <div className='mt-4'>
+                        <OrangeButton button_label={'Additional Information'} on_click={this.manageInfoDialogue.bind(this)} additional_css='w-1/2' />
+                    </div>
+                    <div className='mt-4'>
+                        <OrangeButton button_label={'Resistances'} on_click={this.manageResistancesDialogue.bind(this)} additional_css={'w-1/2'}/>
+                    </div>
                 </div>
                 <div className='relative top-[24px]'>
                     <div className="flex justify-between mb-1">
@@ -75,6 +88,18 @@ export default class InfoTab extends React.Component<InfoTabProps, InfoTabState>
                             is_open={this.state.open_info}
                             manage_modal={this.manageInfoDialogue.bind(this)}
                             title={'Additional Information'}
+                            character={this.props.character}
+                            finished_loading={true}
+                        />
+                    : null
+                }
+
+                {
+                    this.state.open_resistances ?
+                        <CharacterResistances
+                            is_open={this.state.open_resistances}
+                            manage_modal={this.manageResistancesDialogue.bind(this)}
+                            title={'Resistance Info'}
                             character={this.props.character}
                             finished_loading={true}
                         />

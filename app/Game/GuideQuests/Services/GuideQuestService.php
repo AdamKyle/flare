@@ -95,7 +95,7 @@ class GuideQuestService {
             $requiredSkill = $character->skills()->where('game_skill_id', $quest->required_skill)->first();
 
             if ($requiredSkill->level >= $quest->required_skill_level) {
-                $attributes[] = 'required_skill';
+                $attributes[] = 'required_skill_level';
             }
         }
 
@@ -139,7 +139,7 @@ class GuideQuestService {
 
         if (!empty($attributes)) {
             $requiredAttributes = $this->requiredAttributeNames($quest);
-            dump($requiredAttributes, $attributes);
+
             return $attributes === $requiredAttributes;
         }
 

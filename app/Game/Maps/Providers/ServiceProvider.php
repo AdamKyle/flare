@@ -3,6 +3,7 @@
 namespace App\Game\Maps\Providers;
 
 use App\Flare\Builders\Character\CharacterCacheData;
+use App\Game\Maps\Services\PctService;
 use League\Fractal\Manager;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Flare\Cache\CoordinatesCache;
@@ -43,6 +44,13 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(MapTileValue::class, function($app) {
             return new MapTileValue();
+        });
+
+        $this->app->bind(PctService::class, function($app) {
+            return new PctService(
+                $app->make(TraverseService::class),
+                $app->make(MapTileValue::class),
+            );
         });
 
         $this->app->bind(TraverseService::class, function($app) {

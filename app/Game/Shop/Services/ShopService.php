@@ -35,6 +35,8 @@ class ShopService {
             }
         }
 
+        $cost = 0;
+
         foreach ($itemsToSell as $slot) {
             $cost += SellItemCalculator::fetchSalePriceWithAffixes($slot->item);
         }

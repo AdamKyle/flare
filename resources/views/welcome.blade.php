@@ -130,7 +130,7 @@
         </div>
 
         <div class="grid lg:grid-cols-3 gap-3 mt-20 w-full lg:w-2/3 m-auto">
-            <x-core.cards.card css="hover:bg-gray-100 dark:hover:bg-gray-800 hover:drop-shadow-md hover:cursor-pointer">
+            <x-core.cards.card-with-hover>
                 <div class="flex justify-center items-center">
                     <div class="w-1/5 text-7xl">
                         <i class="ra ra-anvil text-primary-600 relative top-[10px] right-[10px]"></i>
@@ -144,8 +144,8 @@
                         <p>No need to gather. You can just start crafting! Find tomes to get xp bonuses!</p>
                     </div>
                 </div>
-            </x-core.cards.card>
-            <x-core.cards.card css="hover:bg-gray-100 dark:hover:bg-gray-800 hover:drop-shadow-md hover:cursor-pointer">
+            </x-core.cards.card-with-hover>
+            <x-core.cards.card-with-hover>
                 <div class="flex justify-center items-center">
                     <div class="w-1/5 text-7xl">
                         <i class="ra ra-forging text-primary-600 relative top-[10px] right-[10px]"></i>
@@ -159,8 +159,8 @@
                         <p>All you need is to destroy an item with an affix on it for the recipe! How easy is that!</p>
                     </div>
                 </div>
-            </x-core.cards.card>
-            <x-core.cards.card css="hover:bg-gray-100 dark:hover:bg-gray-800 hover:drop-shadow-md hover:cursor-pointer">
+            </x-core.cards.card-with-hover>
+            <x-core.cards.card-with-hover>
                 <div class="flex justify-center items-center">
                     <div class="w-1/5 text-7xl">
                         <i class="ra ra-wooden-sign text-primary-600 relative top-[10px] right-[10px]"></i>
@@ -174,7 +174,55 @@
                         <p>Buy and sell from the market board. Craft and Enchant items for others and make a profit!</p>
                     </div>
                 </div>
-            </x-core.cards.card>
+            </x-core.cards.card-with-hover>
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-3 mt-2 w-full lg:w-2/3 m-auto">
+            <x-core.cards.card-with-hover>
+                <div class="flex justify-center items-center">
+                    <div class="w-1/5 text-7xl">
+                        <i class="fas fa-calendar-alt text-primary-600 relative top-[10px] right-[10px]"></i>
+                    </div>
+                    <div class="w-4/5">
+                        <h5>
+                            <a href="{{route('info.page', [
+                                'pageName' => 'events',
+                            ])}}">Participate in events!</a>
+                        </h5>
+                        <p>Tlessa always has an event running. Find out about events today!</p>
+                    </div>
+                </div>
+            </x-core.cards.card-with-hover>
+            <x-core.cards.card-with-hover>
+                <div class="flex justify-center items-center">
+                    <div class="w-1/5 text-7xl">
+                        <i class="ra ra-bone-bite text-primary-600 relative top-[10px] right-[10px]"></i>
+                    </div>
+                    <div class="w-4/5">
+                        <h5>
+                            <a href="{{route('info.page', [
+                                'pageName' => 'player-vs-player',
+                            ])}}">Pvp</a>
+                        </h5>
+                        <p>Fight other players for a chance to earn a mythic unique. Participate in monthly pvp tournaments.</p>
+                    </div>
+                </div>
+            </x-core.cards.card-with-hover>
+            <x-core.cards.card-with-hover>
+                <div class="flex justify-center items-center">
+                    <div class="w-1/5 text-7xl">
+                        <i class="ra ra-compass text-primary-600 relative top-[10px] right-[10px]"></i>
+                    </div>
+                    <div class="w-4/5">
+                        <h5>
+                            <a href="{{route('info.page', [
+                                        'pageName' => 'the-guide',
+                                    ])}}">The Guide</a>
+                        </h5>
+                        <p>New Player? Enable the guide during registration to help you out and learn about the game!</p>
+                    </div>
+                </div>
+            </x-core.cards.card-with-hover>
         </div>
 
         <div class="w-full lg:w-2/4 mx-auto mt-10 lg:mt-20 mb-10">

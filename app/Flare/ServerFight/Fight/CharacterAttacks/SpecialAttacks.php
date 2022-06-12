@@ -10,6 +10,7 @@ use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\DoubleAttack;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\DoubleCast;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\DoubleHeal;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\HammerSmash;
+use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\ThiefBackStab;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\TripleAttack;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\VampireThirst;
 
@@ -49,19 +50,23 @@ class SpecialAttacks extends BattleMessages {
         }
 
         if ($character->classType()->isArcaneAlchemist()) {
-            return $this->alchemistsRavenousRage($character, $attackData);
+            return $this->alchemistsRavenousRage($character, $attackData, $isPvp);
         }
 
         if ($character->classType()->isRanger()) {
-            return $this->tripleAttack($character, $attackData);
+            return $this->tripleAttack($character, $attackData, $isPvp);
         }
 
         if ($character->classType()->isFighter()) {
-            return $this->doubleDamage($character, $attackData);
+            return $this->doubleDamage($character, $attackData, $isPvp);
         }
 
         if ($character->classType()->isVampire()) {
-            return $this->vampireThirst($character, $attackData);
+            return $this->vampireThirst($character, $attackData, $isPvp);
+        }
+
+        if ($isPvp && $character->classType()->isThief()) {
+            return $this->thiefBackStab($character, $attackData);
         }
     }
 
@@ -83,6 +88,30 @@ class SpecialAttacks extends BattleMessages {
         if ($character->classType()->isVampire()) {
             return $this->vampireThirst($character, $attackData, $isPvp);
         }
+    }
+
+    /**
+     * This attack can only be fired during pvp.
+     *
+     * This replaces the thieves shadow dance special for pvp.
+     *
+     * @param Character $character
+     * @param array $attackData
+     * @return void
+     */
+    public function thiefBackStab(Character $character, array $attackData) {
+        $thievesBackStab = resolve(ThiefBackStab::class);
+
+        $thievesBackStab->setCharacterHealth($this->characterHealth);
+        $thievesBackStab->setMonsterHealth($this->monsterHealth);
+        $thievesBackStab->backstab($character, $attackData);
+
+        $this->mergeMessages($thievesBackStab->getMessages());
+
+        $this->characterHealth = $thievesBackStab->getCharacterHealth();
+        $this->monsterHealth   = $thievesBackStab->getMonsterHealth();
+
+        $thievesBackStab->clearMessages();
     }
 
     public function hammerSmash(Character $character, array $attackData, bool $isPvp = false) {

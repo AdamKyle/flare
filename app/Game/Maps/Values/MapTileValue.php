@@ -83,6 +83,10 @@ class MapTileValue {
             return false;
         }
 
+        if (!$this->canWalkOnPurgatoryWater($character, $x, $y)) {
+            return false;
+        }
+
         return true;
     }
 
@@ -147,6 +151,26 @@ class MapTileValue {
         }
 
         // We are not death water
+        return true;
+    }
+
+    /**
+     * Can we walk on purgatory water?
+     *
+     * No we cannot if we are on purgatory water.
+     *
+     * @param Character $character
+     * @param int $x
+     * @param int $y
+     * @return bool
+     */
+    public function canWalkOnPurgatoryWater(Character $character, int $x, int $y) {
+        $color = $this->getTileColor($character, $x, $y);
+
+        if ($this->isPurgatoryWater((int) $color)) {
+            return false;
+        }
+
         return true;
     }
 }

@@ -34,6 +34,7 @@ use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\AlchemistsRaveno
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\DoubleAttack;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\DoubleCast;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\DoubleHeal;
+use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\ThiefBackStab;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\TripleAttack;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\VampireThirst;
 use App\Flare\ServerFight\Fight\CharacterAttacks\Types\AttackAndCast;
@@ -461,6 +462,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(VampireThirst::class, function($app) {
             return new VampireThirst($app->make(CharacterCacheData::class));
+        });
+
+        $this->app->bind(ThiefBackStab::class, function($app) {
+            return new ThiefBackStab($app->make(CharacterCacheData::class));
         });
 
         $this->app->bind(MonsterPlayerFight::class, function($app) {
