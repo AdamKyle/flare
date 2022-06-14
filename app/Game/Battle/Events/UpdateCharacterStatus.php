@@ -4,7 +4,10 @@ namespace App\Game\Battle\Events;
 
 use App\Flare\Models\CelestialFight;
 use App\Flare\Models\Character;
+use App\Flare\Models\Event;
+use App\Flare\Models\MonthlyPvpParticipant;
 use App\Flare\Values\AutomationType;
+use App\Flare\Values\EventType;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Queue\SerializesModels;
@@ -29,7 +32,6 @@ class UpdateCharacterStatus implements ShouldBroadcastNow {
      */
     public function __construct(Character $character) {
         $character = $character->refresh();
-
         $this->characterStatuses = [
             'can_attack'              => $character->can_attack,
             'can_attack_again_at'     => $character->can_attack_again_at,
@@ -40,6 +42,7 @@ class UpdateCharacterStatus implements ShouldBroadcastNow {
             'automation_completed_at' => $this->getTimeLeftOnAutomation($character),
             'is_silenced'             => $character->is_silenced,
             'can_move'                => $character->can_move,
+            'can_register_for_pvp'    => !is_null(Event::where('type', EventType::MONTHLY_PVP)->first()) && is_null(MonthlyPvpParticipant::where('character_id', $character->id)->first()) && $character->level >= 301
         ];
 
         $this->user = $character->user;

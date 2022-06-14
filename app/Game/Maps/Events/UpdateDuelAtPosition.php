@@ -38,7 +38,8 @@ class UpdateDuelAtPosition implements ShouldBroadcastNow
         $data = Map::where('game_map_id', $user->character->map->game_map_id)
                    ->join('characters', function($join) {
                        $join->on('characters.id', '=', 'maps.character_id')
-                            ->where('characters.killed_in_pvp', '=', false);
+                            ->where('characters.killed_in_pvp', '=', false)
+                            ->where('characters.level', '>=', 301);
                    })->select('characters.id as id', 'characters.name as name', 'maps.character_position_x', 'maps.character_position_y', 'maps.game_map_id as game_map_id')
                      ->get();
 

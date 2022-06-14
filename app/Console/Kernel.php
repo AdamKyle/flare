@@ -76,6 +76,9 @@ class Kernel extends ConsoleKernel {
 
         // Weekly Celestial Rate is increased to 80% spawn chance on Wednesdays at 1 pm America Edmonton time.
         $schedule->command('weekly:celestial-spawn')->weeklyOn(3, '13:00')->timezone(config('app.timezone'));
+
+        // Monthly PVP Alert at 8 am - Lets players sign up for pvp.
+        $schedule->command('monthly:pvp')->lastDayOfMonth('08:00')->timezone(config('app.timezone'));
     }
 
     /**

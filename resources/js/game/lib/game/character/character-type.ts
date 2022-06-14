@@ -77,6 +77,8 @@ export interface CharacterType {
 
     is_automation_running: boolean;
 
+    can_register_for_pvp: boolean;
+
     race: string;
 
     class: string;

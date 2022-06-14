@@ -19,15 +19,15 @@
                     <span>Enable Guide</span>
                 </label>
             </div>
-            <div class="border-b-blue-500 rounded-md p-2 bg-blue-200">
+            <x-core.alerts.info-alert title="ATTN!">
                 <p class="mb-2">By selecting this you are asking to be guided through the game. The idea of The Guide is we do not hand hold you. We give you
-                enough to get going and to complete the quest objectives. It is up to you, while interacting with the features the quest want's you to, to then click the help
-                links and read more about the feature.
+                    enough to get going and to complete the quest objectives. It is up to you, while interacting with the features the quest want's you to, to then click the help
+                    links and read more about the feature.
                 </p>
                 <p class="mb-2">You can review your completed guide quests by opening the sidebar,
                     clicking Quest Log and clicking on Completed guide quests.
                 </p>
-            </div>
+            </x-core.alerts.info-alert>
         </div>
 
         <x-core.buttons.primary-button type="submit">Update Guide Settings.</x-core.buttons.primary-button>

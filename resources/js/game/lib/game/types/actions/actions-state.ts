@@ -24,6 +24,8 @@ export default interface ActionsState {
 
     crafting_type: CraftingOptions;
 
+    show_join_pvp?: boolean;
+
     show_exploration?: boolean;
 
     show_celestial_fight?: boolean;

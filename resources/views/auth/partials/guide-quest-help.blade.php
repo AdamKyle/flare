@@ -27,8 +27,6 @@
     </p>
     <p class="mb-4 text-red-500 font-bold italic">
         Once enabled, Guide Quests cannot be shut off. The Modal that initiates the quests is not designed to be annoying (it won't always pop up, after the first time, it's up to you to open and initiate the next quest). Players will have access to their guide quests
-        under their quest log to refer to "simple" how to's. For detailed explanations, players can always refer to the <a href="/information/home">Help Docs</a>. Throughout the game there are various links
-        that reference the help docs for detailed info. The Guide does not go into in-depth explanation of mechanics, just the "how to access, what it does and how to complete the quest". We give you enough to complete the job, it's up to you to
-        reference the comprehensive help docs for more info or ask in chat or discord.
+        under their quest log to refer to "simple" how to's. For detailed explanations, players can always refer to the <a href="/information/home">Help Docs</a>.
     </p>
 </x-core.modals.modal>

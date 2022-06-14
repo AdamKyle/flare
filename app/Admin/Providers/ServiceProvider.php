@@ -6,8 +6,10 @@ use App\Admin\Requests\QuestManagement;
 use App\Admin\Services\GuideQuestService;
 use App\Admin\Services\InfoPageService;
 use App\Admin\Services\ItemsService;
+use App\Admin\Services\LocationService;
 use App\Admin\Services\QuestService;
 use App\Charts\AllCharacterGoldChart;
+use App\Flare\Cache\CoordinatesCache;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use ConsoleTVs\Charts\Registrar as Charts;
 use App\Admin\Console\Commands\CreateAdminAccount;
@@ -57,6 +59,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(GuideQuestService::class, function() {
             return new GuideQuestService();
+        });
+
+        $this->app->bind(LocationService::class, function($app) {
+            return new LocationService($app->make(CoordinatesCache::class));
         });
 
         $this->commands([CreateAdminAccount::class, GiveKingdomsToNpcs::class]);

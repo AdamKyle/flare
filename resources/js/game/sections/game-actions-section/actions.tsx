@@ -13,6 +13,8 @@ import CelestialFight from "./components/celestial-fight";
 import DuelPlayer from "./components/duel-player";
  import {isEqual} from "lodash";
  import {CraftingOptions} from "../../lib/game/types/actions/crafting-type-options";
+ import SkyOutlineButton from "../../components/ui/buttons/sky-outline-button";
+ import JoinPvp from "./components/join-pvp";
 
 export default class Actions extends React.Component<ActionsProps, ActionsState> {
 
@@ -48,6 +50,7 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
             characters_for_dueling: [],
             character_position: null,
             duel_fight_info: null,
+            show_join_pvp: false,
         }
 
         // @ts-ignore
@@ -135,7 +138,8 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
             const characters = this.state.characters_for_dueling.filter((character: any) => {
                 return character.character_position_x === this.props.character_position?.x &&
                        character.character_position_y === this.props.character_position?.y &&
-                       character.game_map_id === this.props.character_position?.game_map_id
+                       character.game_map_id === this.props.character_position?.game_map_id &&
+                       character.name !== this.props.character.name
             });
 
             if (characters.length === 0) {
@@ -237,6 +241,12 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
         });
     }
 
+    manageJoinPvp() {
+        this.setState({
+            show_join_pvp: !this.state.show_join_pvp
+        });
+    }
+
     resetDuelData() {
         this.setState({
             duel_fight_info: null,
@@ -278,46 +288,69 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
                                         </div>
                                         : null
                                 }
+                                {
+                                    this.props.character.can_register_for_pvp ?
+                                        <div className='mb-4'>
+                                            <SkyOutlineButton button_label={'Join PVP'} on_click={this.manageJoinPvp.bind(this)} additional_css={'w-1/2'} disabled={this.props.character.is_dead} />
+                                        </div>
+                                    : null
+                                }
                             </div>
                             <div className='border-b-2 block border-b-gray-300 dark:border-b-gray-600 my-3 md:hidden'></div>
                             <div className='md:col-start-2 md:col-span-3 mt-1'>
+
                                 {
                                     this.state.show_exploration ?
                                         <ExplorationSection character={this.state.character} manage_exploration={this.manageExploration.bind(this)} monsters={this.state.monsters} />
-                                    :
-                                        this.state.show_celestial_fight ?
-                                            <CelestialFight character={this.state.character}
-                                                            manage_celestial_fight={this.manageFightCelestial.bind(this)}
-                                                            celestial_id={this.props.celestial_id}
-                                                            update_celestial={this.props.update_celestial}
-                                            />
-                                        :
-                                            this.state.show_duel_fight ?
-                                                <DuelPlayer characters={this.state.duel_characters}
-                                                            duel_data={this.state.duel_fight_info}
-                                                            character={this.state.character}
-                                                            manage_pvp={this.manageDuel.bind(this)}
-                                                            reset_duel_data={this.resetDuelData.bind(this)}
-                                                />
-                                            :
-                                                <MainActionSection monsters={this.state.monsters}
-                                                                   attack_time_out={this.state.attack_time_out}
-                                                                   crafting_type={this.state.crafting_type}
-                                                                   character={this.state.character}
-                                                                   character_revived={this.state.character_revived}
-                                                                   is_same_monster={this.state.is_same_monster}
-                                                                   monster_to_fight={this.state.monster_to_fight}
-                                                                   set_selected_monster={this.setSelectedMonster.bind(this)}
-                                                                   remove_crafting_type={this.removeCraftingType.bind(this)}
-                                                                   cannot_craft={this.cannotCraft()}
-                                                                   revive={this.revive.bind(this)}
-                                                                   set_attack_timeOut={this.setAttackTimeOut.bind(this)}
-                                                                   reset_same_monster={this.resetSameMonster.bind(this)}
-                                                                   reset_revived={this.resetRevived.bind(this)}
-                                                />
+                                    : null
                                 }
 
+                                {
+                                    this.state.show_celestial_fight ?
+                                        <CelestialFight character={this.state.character}
+                                                        manage_celestial_fight={this.manageFightCelestial.bind(this)}
+                                                        celestial_id={this.props.celestial_id}
+                                                        update_celestial={this.props.update_celestial}
+                                        />
+                                    : null
+                                }
 
+                                {
+                                    this.state.show_duel_fight ?
+                                        <DuelPlayer characters={this.state.duel_characters}
+                                                    duel_data={this.state.duel_fight_info}
+                                                    character={this.state.character}
+                                                    manage_pvp={this.manageDuel.bind(this)}
+                                                    reset_duel_data={this.resetDuelData.bind(this)}
+                                        />
+                                    : null
+                                }
+
+                                {
+                                    this.state.show_join_pvp ?
+                                        <JoinPvp manage_section={this.manageJoinPvp.bind(this)} character_id={this.props.character.id}/>
+                                    : null
+                                }
+
+                                {
+                                    !this.state.show_exploration && !this.state.show_celestial_fight && !this.state.show_duel_fight && !this.state.show_join_pvp ?
+                                        <MainActionSection monsters={this.state.monsters}
+                                                           attack_time_out={this.state.attack_time_out}
+                                                           crafting_type={this.state.crafting_type}
+                                                           character={this.state.character}
+                                                           character_revived={this.state.character_revived}
+                                                           is_same_monster={this.state.is_same_monster}
+                                                           monster_to_fight={this.state.monster_to_fight}
+                                                           set_selected_monster={this.setSelectedMonster.bind(this)}
+                                                           remove_crafting_type={this.removeCraftingType.bind(this)}
+                                                           cannot_craft={this.cannotCraft()}
+                                                           revive={this.revive.bind(this)}
+                                                           set_attack_timeOut={this.setAttackTimeOut.bind(this)}
+                                                           reset_same_monster={this.resetSameMonster.bind(this)}
+                                                           reset_revived={this.resetRevived.bind(this)}
+                                        />
+                                    : null
+                                }
                             </div>
                         </div>
                 }

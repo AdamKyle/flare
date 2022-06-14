@@ -412,7 +412,7 @@ class MovementService {
         $canTeleportToWater      = $this->mapTile->canWalkOnWater($character, $x, $y);
         $canTeleportToDeathWater = $this->mapTile->canWalkOnDeathWater($character, $x, $y);
         $canTeleportToMagma      = $this->mapTile->canWalkOnMagma($character, $x, $y);
-        $lockedLocation          = Location::where('x', $x)->where('y', $y)->where('game_map_id', $character->map->game_map_id)->whereNotNull('required_quest_item_id')->first();
+        $location                = Location::where('x', $x)->where('y', $y)->where('game_map_id', $character->map->game_map_id)->first();
 
         if (!$canTeleportToWater && $this->mapTile->isWaterTile($this->mapTile->getTileColor($character, $x, $y))) {
             $item = Item::where('effect', ItemEffectsValue::WALK_ON_WATER)->first();
@@ -436,12 +436,20 @@ class MovementService {
             return $this->errorResult('You would slip away into the void if you tried to go that way, child!');
         }
 
-        if (!is_null($lockedLocation)) {
-            $item = Item::where('id', $lockedLocation->required_quest_item_id)->first();
-            $slot = $character->inventory->slots()->where('item_id', $item->id)->first();
+        if (!is_null($location)) {
 
-            if (is_null($slot)) {
-                return $this->errorResult('Cannot enter this location without a ' . $item->name);
+            if (!$location->can_players_enter) {
+                return $this->errorResult('You cannot enter this location. This is the PVP arena that is only open once per month.');
+            }
+
+            $item = Item::where('id', $location->required_quest_item_id)->first();
+
+            if (!is_null($item)) {
+                $slot = $character->inventory->slots()->where('item_id', $item->id)->first();
+
+                if (is_null($slot)) {
+                    return $this->errorResult('Cannot enter this location without a ' . $item->name);
+                }
             }
         }
 
@@ -482,7 +490,6 @@ class MovementService {
      * Moves the character from one port to another assuming they can.
      *
      * @param Character $character
-     * @param Location $location
      * @param array $params
      * @return array
      */

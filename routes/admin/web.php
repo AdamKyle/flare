@@ -23,16 +23,7 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::get('/admin/locations/create', ['as' => 'locations.create', 'uses' => 'LocationsController@create']);
     Route::get('/admin/location/{location}', ['as' => 'locations.location', 'uses' => 'LocationsController@show']);
     Route::get('/admin/locations/{location}/edit', ['as' => 'location.edit', 'uses' => 'LocationsController@edit']);
-
-    Route::get('/admin/adventures', ['as' => 'adventures.list', 'uses' => 'AdventuresController@index']);
-    Route::get('/admin/adventures/{adventure}/floor-descriptions', ['as' => 'adventure.floor_descriptions', 'uses' => 'AdventuresController@floorDescriptions']);
-    Route::post('/admin/adventures/{adventure}/floor-descriptions', ['as' => 'post.adventure.floor_descriptions', 'uses' => 'AdventuresController@saveFloorDescriptions']);
-    Route::get('/admin/adventures/create', ['as' => 'adventures.create', 'uses' => 'AdventuresController@create']);
-    Route::post('/admin/adventures/{adventure}/publish', ['as' => 'adventure.publish', 'uses' => 'AdventuresController@publish']);
-    Route::get('/admin/adventures/{adventure}', ['as' => 'adventures.adventure', 'uses' => 'AdventuresController@show']);
-    Route::get('/admin/adventures/{adventure}/edit', ['as' => 'adventure.edit', 'uses' => 'AdventuresController@edit']);
-    Route::post('/admin/adventures/store', ['as' => 'adventures.store', 'uses' => 'AdventuresController@store']);
-    Route::post('/admin/adventures/{adventure}/update', ['as' => 'adventure.update', 'uses' => 'AdventuresController@update']);
+    Route::post('/admin/locations/store', ['as' => 'locations.store', 'uses' => 'LocationsController@store']);
 
     Route::get('/admin/monsters/export-monsters', ['as' => 'monsters.export', 'uses' => 'MonstersController@exportItems']);
     Route::get('/admin/monsters/import-monsters', ['as' => 'monsters.import', 'uses' => 'MonstersController@importItems']);

@@ -15,9 +15,9 @@
                     <span>Unit Recruitment</span>
                 </label>
             </div>
-            <div class="border-b-blue-500 rounded-md p-2 bg-blue-200">
+            <x-core.alerts.info-alert title="ATTN!">
                 By selecting this, you are saying you want chat notifications about unit recruitment for all kingdoms.
-            </div>
+            </x-core.alerts.info-alert>
         </div>
         <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
 
@@ -30,9 +30,9 @@
                     <span>Building Upgrades</span>
                 </label>
             </div>
-            <div class="border-b-blue-500 rounded-md p-2 bg-blue-200">
+            <x-core.alerts.info-alert title="ATTN!">
                 By selecting this, you are saying you want chat notifications about building upgrades for all kingdoms.
-            </div>
+            </x-core.alerts.info-alert>
         </div>
         <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
 
@@ -45,9 +45,9 @@
                     <span>Buildings Rebuilt</span>
                 </label>
             </div>
-            <div class="border-b-blue-500 rounded-md p-2 bg-blue-200">
+            <x-core.alerts.info-alert title="ATTN!">
                 By selecting this, you are saying you want chat notifications about buildings that finished being rebuilt, for all kingdoms.
-            </div>
+            </x-core.alerts.info-alert>
         </div>
         <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
 
@@ -60,9 +60,9 @@
                     <span>Hourly Kingdom Notices</span>
                 </label>
             </div>
-            <div class="border-b-blue-500 rounded-md p-2 bg-blue-200">
+            <x-core.alerts.info-alert title="ATTN!">
                 By selecting this, you are saying you want chat notifications for when the hourly reset happens.
-            </div>
+            </x-core.alerts.info-alert>
         </div>
         <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
 

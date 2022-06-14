@@ -23,10 +23,10 @@
                             <span>Auto Disenchant?</span>
                         </label>
                     </div>
-                    <div class="border-b-blue-500 rounded-md p-2 bg-blue-200">
+                    <x-core.alerts.info-alert title="ATTN!">
                         By selecting this you are saying you want to auto disenchant items as they drop instead of collecting them.
                         <strong>New players are advised to not enable this as the low level drops can be useful to you</strong>.
-                    </div>
+                    </x-core.alerts.info-alert>
                 </div>
                 <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                 <div class="grid md:grid-cols-2 gap-4 mb-4">
@@ -35,12 +35,12 @@
                             <label class="label block mb-2" for="auto_disenchant_amount">Auto Disenchant Amount </label>
                             <select class="form-control" name="auto_disenchant_amount" id="auto_disenchant_amount" value="{{$user->auto_disenchant_amount}}">
                                 <option value="">Please select</option>
-                                <option value="all" {{is_null($user->auto_disenchant_amount) ? 'selected' : ''}}>All</option>
-                                <option value="1-billion" {{is_null($user->auto_disenchant_amount) ? 'selected' : ''}}>Keep items with value of 1 Billion</option>
+                                <option value="all" {{$user->auto_disenchant_amount === 'all' ? 'selected' : ''}}>All</option>
+                                <option value="1-billion" {{$user->auto_disenchant_amount === '1-billion' ? 'selected' : ''}}>Keep items with value of 1 Billion</option>
                             </select>
                         </div>
                     </div>
-                    <div class="border-b-blue-500 rounded-md p-2 bg-blue-200">
+                    <x-core.alerts.info-alert title="ATTN!">
                         <p class="mb-4">
                             Choosing <strong>Disenchant All</strong> will ignore the items value and just disenchant it.
                         </p>
@@ -52,7 +52,7 @@
                             If you are slightly under geared and head to Shadow Plane, select the last option to get the gear you want. Remember, any item
                             and any affix can drop in combination in the Shadow Plane as long as the creature is 10 levels higher than you.
                         </p>
-                    </div>
+                    </x-core.alerts.info-alert>
                 </div>
 
                 <x-core.buttons.primary-button type="submit">

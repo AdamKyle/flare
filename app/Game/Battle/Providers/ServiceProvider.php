@@ -19,6 +19,7 @@ use App\Game\Battle\Jobs\BattleAttackHandler;
 use App\Game\Battle\Services\BattleDrop;
 use App\Game\Battle\Services\BattleRewardProcessing;
 use App\Game\Battle\Services\CelestialFightService;
+use App\Game\Battle\Services\MonthlyPvpService;
 use App\Game\Battle\Services\PvpService;
 use App\Game\Core\Services\DropCheckService;
 use App\Game\Core\Services\GoldRush;
@@ -90,6 +91,10 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(BattleEventHandler::class),
                 $app->make(MapTileValue::class),
             );
+        });
+
+        $this->app->bind(MonthlyPvpService::class, function($app) {
+            return new MonthlyPvpService();
         });
 
         $this->commands([

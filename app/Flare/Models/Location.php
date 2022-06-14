@@ -24,6 +24,7 @@ class Location extends Model
         'required_quest_item_id',
         'description',
         'is_port',
+        'can_players_enter',
         'enemy_strength_type',
         'x',
         'y',
@@ -41,6 +42,7 @@ class Location extends Model
         'type'                => 'integer',
         'enemy_strength_type' => 'string',
         'is_port'             => 'boolean',
+        'can_players_enter'   => 'boolean',
     ];
 
     public function questRewardItem() {

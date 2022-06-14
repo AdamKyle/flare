@@ -2,10 +2,8 @@
 
 namespace App\Flare\Transformers;
 
-
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameSkill;
-use App\Flare\Models\Location;
 use App\Flare\Models\Skill;
 use App\Flare\Values\AutomationType;
 use App\Game\Skills\Values\SkillTypeValue;
@@ -37,7 +35,6 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
         $castingAccuracySkill         = Skill::where('game_skill_id', GameSkill::where('name', 'Casting Accuracy')->first()->id)->where('character_id', $character->id)->first();
         $dodgeSkill                   = Skill::where('game_skill_id', GameSkill::where('name', 'Dodge')->first()->id)->where('character_id', $character->id)->first();
         $criticalitySkill             = Skill::where('game_skill_id', GameSkill::where('name', 'Criticality')->first()->id)->where('character_id', $character->id)->first();
-
 
         return [
             'id'                          => $character->id,

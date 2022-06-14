@@ -5,7 +5,7 @@ const tailwindcssDir = require("tailwindcss-dir")();
 
 module.exports = {
   mode: 'jit',
-  purge: [
+  content: [
     './resources/**/*.{js,vue,blade.php,jsx,tsx}',
   ],
   darkMode: "class",

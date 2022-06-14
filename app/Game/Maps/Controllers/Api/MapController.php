@@ -69,6 +69,11 @@ class MapController extends Controller {
                 event(new ServerMessageEvent($character->user, 'No. You are currently auto battling and the monsters here are different. Stop auto battling, then enter, then begin again.'));
                 return response()->json(['message' => 'You\'re too busy.'], 422);
             }
+
+            if (!$location->can_players_enter) {
+                event(new ServerMessageEvent($character->user, 'You cannot enter this location. This is the PVP arena that is only open once per month.'));
+                return response()->json(['message' => 'Not allowed to enter.'], 422);
+            }
         }
 
         $response = $movementService->updateCharacterPosition($character, $request->all());

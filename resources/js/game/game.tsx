@@ -126,6 +126,7 @@ export default class Game extends React.Component<GameProps, GameState> {
 
         // @ts-ignore
         this.characterStatus.listen('Game.Battle.Events.UpdateCharacterStatus', (event: any) => {
+            console.log(event);
             this.setState({
                 character_status: event.characterStatuses,
                 character: {...this.state.character, ...event.characterStatuses}

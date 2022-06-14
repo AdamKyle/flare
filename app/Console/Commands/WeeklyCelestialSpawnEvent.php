@@ -2,6 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Flare\Models\Event;
+use App\Flare\Values\EventType;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use Cache;
 use Illuminate\Console\Command;
@@ -41,6 +43,12 @@ class WeeklyCelestialSpawnEvent extends Command
 
         Cache::put('celestial-spawn-rate', .8);
         Cache::put('celestial-event-date', now()->addDay());
+
+        Event::create([
+            'type'       => EventType::WEEKLY_CELESTIALS,
+            'started_at' => now(),
+            'ends_at'    => now()->addDay()
+        ]);
 
         SpawnCancelingJob::dispatch()->delay(now()->addMinutes(15))->onConnection('weekly_spawn');
 

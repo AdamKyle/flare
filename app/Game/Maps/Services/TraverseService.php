@@ -215,18 +215,9 @@ class TraverseService {
         $newXPosition = $character->map->character_position_x;
         $newYPosition = $character->map->character_position_y;
 
-        // @codeCoverageIgnoreStart
-        //
-        // Ignore this aspect as it's really hard to mock without messing up the tile value mock.
         if ($newXPosition !== $xPosition || $newYPosition !== $yPosition) {
-
-            $color = $this->mapTileValue->getTileColor($character, $xPosition, $yPosition);
-
-            if ($this->mapTileValue->isWaterTile($color) || $this->mapTileValue->isDeathWaterTile($color) || $this->mapTileValue->isMagma($color)) {
-                event(new ServerMessageEvent($character->user, 'moved-location', 'Your character was moved as you are missing the appropriate quest item.'));
-            }
+            event(new ServerMessageEvent($character->user, 'moved-location', 'Your character was moved as you are missing the appropriate quest item or were not allowed to enter the area.'));
         }
-        // @codeCoverageIgnoreEnd
     }
 
     /**
@@ -240,14 +231,14 @@ class TraverseService {
      */
     protected function changeLocation(Character $character, array $cache) {
 
+        $x = $cache['x'];
+        $y = $cache['y'];
+
         if (!$this->mapTileValue->canWalkOnWater($character, $character->map->character_position_x, $character->map->character_position_y) ||
             !$this->mapTileValue->canWalkOnDeathWater($character, $character->map->character_position_x, $character->map->character_position_y) ||
             !$this->mapTileValue->canWalkOnMagma($character, $character->map->character_position_x, $character->map->character_position_y) ||
             $this->mapTileValue->isPurgatoryWater($this->mapTileValue->getTileColor($character, $character->map->character_position_x, $character->map->character_position_y))
         ) {
-
-            $x = $cache['x'];
-            $y = $cache['y'];
 
             $character->map()->update([
                 'character_position_x' => $x[rand(0, count($x) - 1)],
@@ -255,6 +246,19 @@ class TraverseService {
             ]);
 
             return $this->changeLocation($character->refresh(), $cache);
+        }
+
+        $location = Location::where('x', $character->map->character_position_x)->where('y', $character->map->character_position_y)->where('game_map_id', $character->map->game_map_id)->first();
+
+        if (!is_null($location)) {
+            if (!$location->can_players_enter) {
+                $character->map()->update([
+                    'character_position_x' => $x[rand(0, count($x) - 1)],
+                    'character_position_y' => $y[rand(0, count($y) - 1)],
+                ]);
+
+                return $this->changeLocation($character->refresh(), $cache);
+            }
         }
 
         return $character->refresh();

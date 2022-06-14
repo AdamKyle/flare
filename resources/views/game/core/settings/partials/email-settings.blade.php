@@ -18,10 +18,10 @@
                     <span>Building Upgrade Email</span>
                 </label>
             </div>
-            <div class="border-b-blue-500 rounded-md p-2 bg-blue-200">
+            <x-core.alerts.info-alert title="ATTN!">
                 <p class="mb-2">By selecting this, you are saying that, when any building in your queue finishes, you'll get an email.</p>
                 <p><strong>Note</strong>: Multiple buildings in queue? You'll get multiple emails, one for each that finishes.</p>
-            </div>
+            </x-core.alerts.info-alert>
         </div>
         <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
         <div class="grid grid-cols-2 gap-4">
@@ -33,10 +33,10 @@
                     <span>Building Upgrade Email</span>
                 </label>
             </div>
-            <div class="border-b-blue-500 rounded-md p-2 bg-blue-200">
+            <x-core.alerts.info-alert title="ATTN!">
                 <p class="mb-2">By Selecting this, you are saying that, when a building is rebuilt you would like to receive an email.</p>
                 <p><strong>Note</strong>: Multiple buildings in queue? You'll get multiple emails, one for each.</p>
-            </div>
+            </x-core.alerts.info-alert>
         </div>
         <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
         <div class="grid grid-cols-2 gap-4">
@@ -48,10 +48,10 @@
                     <span>Kingdom Attack Email(s)</span>
                 </label>
             </div>
-            <div class="border-b-blue-500 rounded-md p-2 bg-blue-200">
+            <x-core.alerts.info-alert title="ATTN!">
                 By Selecting this, you are saying that, if your kingdom is attacked, if you lost an attack, if you were successful in an attack or took a kingdom,
                 or even if you lost your kingdom, you will receive an email.
-            </div>
+            </x-core.alerts.info-alert>
         </div>
 
         <x-core.buttons.primary-button type="submit">
