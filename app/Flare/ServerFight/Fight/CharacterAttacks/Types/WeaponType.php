@@ -67,6 +67,10 @@ class WeaponType extends BattleBase {
             $this->pvpWeaponAttack($attacker, $defender, $weaponDamage);
         } else {
             $this->addAttackerMessage('Your attack missed!', 'enemy-action');
+
+            if ($this->allowSecondaryAttacks) {
+                $this->secondaryAttack($attacker, null, $this->characterCacheData->getCachedCharacterData($attacker, 'affix_damage_reduction'));
+            }
         }
 
         return $this;

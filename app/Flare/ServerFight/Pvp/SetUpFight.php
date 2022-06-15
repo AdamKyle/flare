@@ -47,7 +47,7 @@ class SetUpFight extends PvpMessages {
     }
 
     public function handleAmbush(Character $attacker, Character $defender, array $healthObject, bool $isAttackerVoided): array {
-        $healthObject = $this->ambush->attackerAmbushesDefender($attacker, $defender, $isAttackerVoided, $healthObject);
+        $healthObject = $this->ambush->attackerAmbushesDefender($attacker, $defender, $isAttackerVoided, $healthObject, true);
 
         $this->mergeAttackerMessages($this->ambush->getAttackerMessages());
 

@@ -2,6 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Flare\Models\Event;
+use App\Flare\Values\EventType;
 use App\Game\Battle\Services\MonthlyPvpService;
 use Illuminate\Console\Command;
 
@@ -27,6 +29,8 @@ class StartMonthlyPvpEvent extends Command
      * @return int
      */
     public function handle(MonthlyPvpService $monthlyPvpService) {
+        Event::where('type', EventType::MONTHLY_PVP)->delete();
+
         $monthlyPvpService->moveParticipatingPlayers();
     }
 }

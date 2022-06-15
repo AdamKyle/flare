@@ -120,7 +120,7 @@ class GuideQuestService {
         }
 
         if (!is_null($quest->required_quest_id)) {
-            $canHandIn = !is_null($character->questsCompleted()->where('quest_id', $quest->id)->first());
+            $canHandIn = !is_null($character->questsCompleted()->where('quest_id', $quest->required_quest_id)->first());
 
             if ($canHandIn) {
                 $attributes[] = 'required_quest_id';

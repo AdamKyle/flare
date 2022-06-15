@@ -90,15 +90,23 @@ class EnchantingService {
      * @param Character $character
      * @return array
      */
-    public function fetchAffixes(Character $character): array {
+    public function fetchAffixes(Character $character, bool $ignoreTrinkets = false): array {
         $characterInfo   = $this->characterInformationBuilder->setCharacter($character);;
         $enchantingSkill = $this->getEnchantingSkill($character);
 
         $characterInventoryService = $this->characterInventoryService->setCharacter($character);
 
+        $inventory = $characterInventoryService->getInventoryForType('inventory');
+
+        if ($ignoreTrinkets) {
+            $inventory = array_values(array_filter($inventory, function($item) {
+                return $item['type'] !== 'trinket';
+            }));
+        }
+
         return [
             'affixes'             => $this->getAvailableAffixes($characterInfo, $enchantingSkill),
-            'character_inventory' => $characterInventoryService->getInventoryForType('inventory'),
+            'character_inventory' => $inventory,
         ];
     }
 

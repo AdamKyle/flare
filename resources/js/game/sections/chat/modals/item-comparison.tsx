@@ -138,7 +138,7 @@ export default class ItemComparison extends React.Component<any, any> {
                         <Fragment>
                             {
                                 this.state.error_message !== null ?
-                                    <div className='mx-4 text-red-500 text-center text-lg'>
+                                    <div className='mx-4 text-red-500 dark:text-red-400 text-center text-lg'>
                                         {this.state.error_message}
                                     </div>
                                 :

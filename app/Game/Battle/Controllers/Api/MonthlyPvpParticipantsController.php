@@ -10,6 +10,7 @@ use App\Flare\Values\NpcTypes;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Request\CelestialFightRequest;
 use App\Game\Battle\Request\ConjureRequest;
+use App\Game\Battle\Request\MonthlyPvpFight;
 use App\Game\Battle\Request\PvpFight;
 use App\Game\Battle\Request\PvpFightInfo;
 use App\Game\Battle\Services\CelestialFightService;
@@ -25,14 +26,14 @@ use App\Game\Messages\Events\ServerMessageEvent;
 class MonthlyPvpParticipantsController extends Controller {
 
 
-    public function join(Character $character) {
+    public function join(MonthlyPvpFight $request, Character $character) {
         $characterInFight = MonthlyPvpParticipant::where('character_id', $character->id)->first();
 
         if (!is_null($characterInFight)) {
             return response()->json(['message' => 'You are already registered.'], 422);
         }
 
-        MonthlyPvpParticipant::create(['character_id' => $character->id]);
+        MonthlyPvpParticipant::create(['character_id' => $character->id, 'attack_type' => $request->attack_type]);
 
         event(new UpdateCharacterStatus($character));
 

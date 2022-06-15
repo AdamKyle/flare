@@ -19,6 +19,7 @@ use App\Game\Battle\Jobs\BattleAttackHandler;
 use App\Game\Battle\Services\BattleDrop;
 use App\Game\Battle\Services\BattleRewardProcessing;
 use App\Game\Battle\Services\CelestialFightService;
+use App\Game\Battle\Services\MonthlyPvpFightService;
 use App\Game\Battle\Services\MonthlyPvpService;
 use App\Game\Battle\Services\PvpService;
 use App\Game\Core\Services\DropCheckService;
@@ -93,8 +94,14 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
+        $this->app->bind(MonthlyPvpFightService::class, function($app) {
+            return new MonthlyPvpFightService($app->make(PvpService::class), $app->make(RandomAffixGenerator::class));
+        });
+
         $this->app->bind(MonthlyPvpService::class, function($app) {
-            return new MonthlyPvpService();
+            return new MonthlyPvpService(
+                $app->make(MonthlyPvpFightService::class)
+            );
         });
 
         $this->commands([

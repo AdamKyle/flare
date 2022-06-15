@@ -61,6 +61,8 @@ export default class Crafting extends React.Component<any, any> {
     changeType() {
         this.setState({
             selected_type: null,
+            selected_item: null,
+            craftable_items: [],
         });
     }
 

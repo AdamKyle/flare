@@ -27,7 +27,7 @@ class  EnchantingController extends Controller {
     }
 
     public function fetchAffixes(Character $character) {
-        return response()->json($this->enchantingService->fetchAffixes($character), 200);
+        return response()->json($this->enchantingService->fetchAffixes($character, true), 200);
     }
 
     public function enchant(EnchantingValidation $request, Character $character) {

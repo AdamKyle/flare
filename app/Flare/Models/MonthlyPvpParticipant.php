@@ -19,6 +19,7 @@ class MonthlyPvpParticipant extends Model
      */
     protected $fillable = [
         'character_id',
+        'attack_type',
     ];
 
     public function character() {

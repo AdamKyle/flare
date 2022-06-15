@@ -25,7 +25,7 @@ class MonthlyPvPEvent extends Command
      *
      * @var string
      */
-    protected $description = 'Starts the Pvp Event';
+    protected $description = 'Allows player to register for the pvp event.';
 
     /**
      * Execute the console command.

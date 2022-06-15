@@ -7,7 +7,7 @@
 }
 
 .trinket {
-    @apply text-red-700 dark:text-red-600
+    @apply text-red-700 dark:text-red-400
 }
 
 .regular-item {

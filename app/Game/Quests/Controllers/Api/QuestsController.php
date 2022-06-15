@@ -63,6 +63,8 @@ class QuestsController extends Controller {
 
         unset($response['status']);
 
+        $response['message'] = 'You completed the quest: ' . $quest->name . '. Above is the updated story for the quest.';
+
         return response()->json($response);
 
 

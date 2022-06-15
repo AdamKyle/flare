@@ -11,12 +11,12 @@ class RandomAffixGenerator {
     /**
      * @var AffixAttributeBuilder $affixAttributeBuilder
      */
-    private $affixAttributeBuilder;
+    private AffixAttributeBuilder $affixAttributeBuilder;
 
     /**
      * @var Character $character
      */
-    private $character;
+    private Character $character;
 
     /**
      * @var int $amountPaid
@@ -32,6 +32,7 @@ class RandomAffixGenerator {
 
     /**
      * @param Character $character
+     * @return RandomAffixGenerator
      */
     public function setCharacter(Character $character): RandomAffixGenerator {
         $this->character = $character;
@@ -43,6 +44,7 @@ class RandomAffixGenerator {
      * Sets the paid amount and sets basic details.
      *
      * @param int $amount
+     * @return RandomAffixGenerator
      * @throws \Exception
      */
     public function setPaidAmount(int $amount = 0): RandomAffixGenerator {

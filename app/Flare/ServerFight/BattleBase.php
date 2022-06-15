@@ -17,9 +17,9 @@ class BattleBase extends BattleMessages {
 
     protected array $attackData;
 
-    protected bool $isVoided;
+    protected bool $isVoided = false;
 
-    protected bool $isEnemyVoided;
+    protected bool $isEnemyVoided = false;
 
     protected bool $isEnemyEntranced = false;
 

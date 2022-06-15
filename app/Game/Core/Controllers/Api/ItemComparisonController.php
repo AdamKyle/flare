@@ -49,6 +49,10 @@ class ItemComparisonController extends Controller {
             return response()->json(['message' => 'Item does not exist  ...'], 404);
         }
 
+        if ($itemToEquip->equipped) {
+            return response()->json(['message' => 'Item is no longer in your inventory.'], 404);
+        }
+
         $type = $itemToEquip->item->type;
 
         if ($type === 'spell-healing' || $type === 'spell-damage') {

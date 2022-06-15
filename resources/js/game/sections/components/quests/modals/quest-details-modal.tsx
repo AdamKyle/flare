@@ -72,8 +72,6 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                 delete data.message;
 
                 this.props.update_quests(data);
-
-                this.props.handle_close();
             }, (error: AxiosError) => {
 
                 if (typeof error.response !== 'undefined') {

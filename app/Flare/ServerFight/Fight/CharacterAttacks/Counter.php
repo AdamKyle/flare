@@ -25,8 +25,17 @@ class Counter extends BattleBase {
         $attackerCounterResistance = $this->characterCacheData->getCachedCharacterData($attacker, 'counter_resistance');
         $defenderCounterChance     = $this->characterCacheData->getCachedCharacterData($defender, 'counter_chance');
 
+        if ($defenderCounterChance <= 0.0) {
+            return false;
+        }
+
         $defenderCounterChance -= $attackerCounterResistance;
-        $canCounter             = $this->canCounter($defenderCounterChance);
+
+        if ($defenderCounterChance <= 0.0) {
+            $defenderCounterChance = 0.05;
+        }
+
+        $canCounter = $this->canCounter($defenderCounterChance);
 
         if (!$canCounter) {
             return;

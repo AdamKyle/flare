@@ -35,12 +35,12 @@ class Ambush extends BattleBase {
         return $this->healthObject;
     }
 
-    public function attackerAmbushesDefender(Character $attacker, Character $defender, bool $isAttackerVoided, array $healthObject): array {
+    public function attackerAmbushesDefender(Character $attacker, Character $defender, bool $isAttackerVoided, array $healthObject, bool $isPvp = false): array {
 
         $attackerAmbushChance     = $this->characterCacheData->getCachedCharacterData($attacker, 'ambush_chance');
         $defenderAmbushResistance = $this->characterCacheData->getCachedCharacterData($defender, 'ambush_resistance_chance');
 
-        if ($this->canPlayerAmbushMonster($attackerAmbushChance, $defenderAmbushResistance)) {
+        if ($this->canPlayerAmbushMonster($attackerAmbushChance, $defenderAmbushResistance, $isPvp)) {
             $this->addAttackerMessage('You get the jump on the enemy!', 'player-action');
 
             $baseStat = $this->characterCacheData->getCachedCharacterData($attacker, $isAttackerVoided ? 'voided_base_stat' : 'base_stat');
@@ -48,11 +48,13 @@ class Ambush extends BattleBase {
 
             $healthObject['defender_health'] -= $damage;
 
+            $damage = number_format($damage);
+
             if ($healthObject['defender_health'] <= 0) {
                 $healthObject['defender_health'] = 0;
 
                 $this->addAttackerMessage('Through plotting and planning, you slit the your enemies throat from behind. (Ambush!): ' . $damage, 'player-action');
-                $this->addDefenderMessage($attacker->name . ' Got the jump on you! now your throats slit and your dead ... You took: ' . $damage . ' damage.', 'enemy-action');
+                $this->addDefenderMessage($attacker->name . ' Got the jump on you! now your throats slit and your (possibly) dead ... You took: ' . $damage . ' damage.', 'enemy-action');
             } else {
                 $this->addAttackerMessage('Through plotting and planning, you get the jump on the enemy! (Ambush!): ' . $damage, 'player-action');
                 $this->addDefenderMessage($attacker->name . ' Got the jump on you! You took: ' . $damage . ' damage.', 'enemy-action');
@@ -112,7 +114,7 @@ class Ambush extends BattleBase {
         }
     }
 
-    public function canPlayerAmbushMonster(float $ambushChance, float $monsterAmbushResistance): bool {
+    public function canPlayerAmbushMonster(float $ambushChance, float $monsterAmbushResistance, bool $isPvp = false): bool {
         if ($monsterAmbushResistance >= 1) {
             return false;
         }
@@ -121,7 +123,15 @@ class Ambush extends BattleBase {
             return true;
         }
 
+        if ($ambushChance <= 0.0) {
+            return false;
+        }
+
         $chance = $ambushChance - $monsterAmbushResistance;
+
+        if ($chance <= 0.0 && $isPvp) {
+            $chance = 0.05;
+        }
 
         return rand (1, 100) > (100 - 100 * $chance);
     }

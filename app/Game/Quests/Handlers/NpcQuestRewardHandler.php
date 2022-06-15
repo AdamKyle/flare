@@ -80,11 +80,11 @@ class NpcQuestRewardHandler {
             if ($effectType->getCopperCoins()) {
                 broadcast(new GlobalMessageEvent('Lighting streaks across the skies, blackness fills the skies. A thunderous roar is heard across the land.'));
 
-                broadcast(new ServerMessageEvent($character->user, 'Careful, child. You seem to have angered The Creator. Are you prepared?', true));
+                broadcast(new ServerMessageEvent($character->user, 'Careful, child. You seem to have angered The Creator. Are you prepared?'));
             }
         }
 
-        $character->inventory->slots()->create([
+        $slot = $character->inventory->slots()->create([
             'inventory_id' => $character->inventory->id,
             'item_id'      => $quest->reward_item,
         ]);
@@ -95,7 +95,7 @@ class NpcQuestRewardHandler {
 
         $this->npcServerMessage($npc, $character, 'given_item');
 
-        broadcast(new ServerMessageEvent($character->user, 'Received: ' . $quest->rewardItem->name, false));
+        broadcast(new ServerMessageEvent($character->user, 'Received: ' . $quest->rewardItem->name, $slot->id));
     }
 
     public function unlockSkill(Quest $quest, Character $character, Npc $npc) {
@@ -168,7 +168,7 @@ class NpcQuestRewardHandler {
     }
 
     public function npcServerMessage(Npc $npc, Character $character, string $type): void {
-        broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build($type, $npc), true));
+        broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build($type, $npc)));
     }
 
     public function updateCharacterAttackDataCache(Character $character) {

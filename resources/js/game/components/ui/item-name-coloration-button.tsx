@@ -20,7 +20,7 @@ export default class ItemNameColorationButton extends React.Component<ItemNameCo
     render() {
         return (
             <button className={clsx({
-                'text-red-700 dark:text-red-500': this.props.item.type === 'trinket' && !this.props.item.is_mythic
+                'text-red-700 dark:text-red-400': this.props.item.type === 'trinket' && !this.props.item.is_mythic
             }, {
                 'text-green-700 dark:text-green-600': this.props.item.is_unique && this.props.item.type !== 'trinket' && !this.props.item.is_mythic
             },{

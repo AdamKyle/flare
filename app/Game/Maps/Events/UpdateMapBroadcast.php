@@ -32,7 +32,8 @@ class UpdateMapBroadcast implements ShouldBroadcastNow
      * @param User $user
      */
     public function __construct(User $user) {
-        $this->mapDetails = resolve(LocationService::class)->getLocationData($user->character);
+        $character        = $user->character->refresh();
+        $this->mapDetails = resolve(LocationService::class)->getLocationData($character);
         $this->user       = $user;
     }
 

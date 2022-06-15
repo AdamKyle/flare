@@ -77,37 +77,68 @@ class PvpService {
         ];
     }
 
-    public function attack(Character $attacker, Character $defender, string $attackType) {
-        $healthObject = $this->pvpAttack->setUpPvpFight($attacker, $defender, $this->getHealthObject($attacker, $defender));
+    public function getRemainingAttackerHealth(): int {
+        return $this->pvpAttack->getAttackerHealth();
+    }
+
+    public function getRemainingDefenderHealth(): int {
+        return $this->pvpAttack->getDefenderHealth();
+    }
+
+    public function attack(Character $attacker, Character $defender, string $attackType, bool $ignoreSetUp = false): bool {
+
+        if (!$ignoreSetUp) {
+            $healthObject = $this->pvpAttack->setUpPvpFight($attacker, $defender, $this->getHealthObject($attacker, $defender));
+        } else {
+            $healthObject = $this->getHealthObject($attacker, $defender);
+        }
+
+        if ($healthObject['defender_health'] <= 0) {
+            $this->processBattleWin($attacker, $defender, $healthObject);
+
+            return true;
+        }
+
+        if ($healthObject['attacker_health'] <= 0) {
+            $this->processBattleWin($defender, $attacker, $healthObject);
+
+            return false;
+        }
 
         $result = $this->pvpAttack->attackPlayer($attacker, $defender, $healthObject, $attackType);
 
         if ($result) {
-            $this->handleReward($attacker);
+            $this->processBattleWin($attacker, $defender, $healthObject);
 
-            event(new ServerMessageEvent($attacker->user, 'You have killed: ' . $defender->name));
-            event(new ServerMessageEvent($defender->user, 'You have been killed by: ' . $attacker->name));
-
-            $this->battleEventHandler->processDeadCharacter($defender);
-
-            $this->updateAttackerPvpInfo($attacker, $healthObject, $defender->id);
-            $this->updateDefenderPvpInfo($defender, $healthObject, $attacker->id, $this->pvpAttack->getDefenderHealth());
-
-            $this->pvpAttack->cache()->deleteCharacterSheet($attacker);
-            $this->pvpAttack->cache()->deleteCharacterSheet($defender);
-
-            $this->pvpAttack->cache()->removeFromPvpCache($attacker);
-            $this->pvpAttack->cache()->removeFromPvpCache($defender);
-
-            $this->handleDefenderDeath($attacker, $defender);
-
-            return;
+            return true;
         }
 
         $this->updateCacheHealthForPVPFight($attacker, $defender);
 
         $this->updateAttackerPvpInfo($attacker, $healthObject, $defender->id, $this->pvpAttack->getDefenderHealth());
         $this->updateDefenderPvpInfo($defender, $healthObject, $attacker->id, $this->pvpAttack->getDefenderHealth());
+
+        return false;
+    }
+
+    protected function processBattleWin(Character $attacker, Character $defender, array $healthObject) {
+        $this->handleReward($attacker);
+
+        event(new ServerMessageEvent($attacker->user, 'You have killed: ' . $defender->name));
+        event(new ServerMessageEvent($defender->user, 'You have been killed by: ' . $attacker->name));
+
+        $this->battleEventHandler->processDeadCharacter($defender);
+
+        $this->updateAttackerPvpInfo($attacker, $healthObject, $defender->id);
+        $this->updateDefenderPvpInfo($defender, $healthObject, $attacker->id, $this->pvpAttack->getDefenderHealth());
+
+        $this->pvpAttack->cache()->deleteCharacterSheet($attacker);
+        $this->pvpAttack->cache()->deleteCharacterSheet($defender);
+
+        $this->pvpAttack->cache()->removeFromPvpCache($attacker);
+        $this->pvpAttack->cache()->removeFromPvpCache($defender);
+
+        $this->handleDefenderDeath($attacker, $defender);
     }
 
     protected function updateCacheHealthForPVPFight(Character $attacker, Character $defender) {
