@@ -117,7 +117,7 @@ class BattleBase extends BattleMessages {
         $this->mergeAttackerMessages($counter->getAttackerMessages());
         $this->mergeDefenderMessages($counter->getDefenderMessages());
 
-        $this->characterhealth = $counter->getCharacterHealth();
+        $this->characterHealth = $counter->getCharacterHealth();
         $this->monsterHealth   = $counter->getMonsterHealth();
 
         $counter->clearMessages();

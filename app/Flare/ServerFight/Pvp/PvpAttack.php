@@ -60,8 +60,8 @@ class PvpAttack extends PvpBase {
         $this->mergeMessages($response->getAttackerMessages(), 'attacker');
         $this->mergeMessages($response->getDefenderMessages(), 'defender');
 
-        $defenderHealth = $response->getMonsterHealth();
         $attackerHealth = $response->getCharacterHealth();
+        $defenderHealth = $response->getMonsterHealth();
 
         if ($defenderHealth <= 0) {
             $defenderHealth = 0;
@@ -75,8 +75,6 @@ class PvpAttack extends PvpBase {
                 'message' => 'You have slaughtered the player. They have been moved away.',
                 'type'    => 'enemy-action',
             ]], 'attacker');
-
-            return true;
         }
 
         if ($attackerHealth <= 0) {
@@ -85,20 +83,18 @@ class PvpAttack extends PvpBase {
             $this->mergeMessages([[
                 'message' => 'You have been slain and must revive',
                 'type'    => 'enemy-action',
-            ]], 'attacker');
+            ]], 'defender');
 
             $this->mergeMessages([[
                 'message' => 'You have slaughtered the player. They have been moved away.',
                 'type'    => 'enemy-action',
-            ]], 'defender');
+            ]], 'attacker');
         }
 
         $this->healthObject = [
             'attacker_health' => $attackerHealth,
             'defender_health' => $defenderHealth,
         ];
-
-        return false;
     }
 
     public function getAttackerHealth(): int {

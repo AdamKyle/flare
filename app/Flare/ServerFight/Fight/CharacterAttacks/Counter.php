@@ -44,8 +44,9 @@ class Counter extends BattleBase {
         if ($weaponDamage > $attackerAc) {
             $this->characterHealth -= $weaponDamage;
 
-            $this->addDefenderMessage('You counter the enemies attack for: ' . number_format($weaponDamage), 'enemy-action');
-            $this->addAttackerMessage('You were countered in your attack for: '. number_format($weaponDamage), 'enemy-action');
+            $this->addAttackerMessage('You counter the enemies attack for: ' . number_format($weaponDamage), 'player-action');
+            $this->addDefenderMessage('You were countered in your attack for: '. number_format($weaponDamage), 'enemy-action');
+
         } else {
             $this->addDefenderMessage('Your counter as blocked!', 'enemy-action');
         }
@@ -100,6 +101,7 @@ class Counter extends BattleBase {
     }
 
     protected function canCounter($chance) {
+
         if ($chance > 0.0) {
             $roll = rand(1, 100);
             $roll = $roll + $roll * $chance;

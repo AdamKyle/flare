@@ -156,14 +156,14 @@ class WeaponType extends BattleBase {
 
         $this->monsterHealth -= $totalDamage;
 
-        $this->addAttackerMessage('Your weapon slices at the enemies flesh for: ' . number_format($totalDamage), 'player-action');
-        $this->addDefenderMessage($attacker->name . ' strikes you with their weapon for: ' . number_format($totalDamage), 'enemy-action');
+        $this->addDefenderMessage('Your weapon slices at the enemies flesh for: ' . number_format($totalDamage), 'player-action');
+        $this->addAttackerMessage($attacker->name . ' strikes you with their weapon for: ' . number_format($totalDamage), 'enemy-action');
 
         $this->pvpCounter($attacker, $defender);
 
         if ($this->characterHealth <= 0) {
-            $this->addDefenderMessage('You manage to kill the enemy in your counter Attack!', 'enemy-action');
-            $this->addAttackerMessage('You were slaughtered by the counter attack!', 'enemy-action');
+            $this->addAttackerMessage('You manage to kill the enemy in your counter Attack!', 'player-action');
+            $this->addDefenderMessage('You were slaughtered by the counter attack!', 'enemy-action');
 
             $this->abortCharacterIsDead = true;
 
@@ -174,8 +174,8 @@ class WeaponType extends BattleBase {
                              ->setMonsterHealth($this->monsterHealth)
                              ->doWeaponSpecials($attacker, $this->attackData, true);
 
-        $this->mergeAttackerMessages($this->specialAttacks->getAttackerMessages());
-        $this->mergeDefenderMessages($this->specialAttacks->getDefenderMessages());
+        $this->mergeAttackerMessages($this->specialAttacks->getDefenderMessages());
+        $this->mergeDefenderMessages($this->specialAttacks->getAttackerMessages());
 
         $this->characterHealth = $this->specialAttacks->getCharacterHealth();
         $this->monsterHealth   = $this->specialAttacks->getMonsterHealth();

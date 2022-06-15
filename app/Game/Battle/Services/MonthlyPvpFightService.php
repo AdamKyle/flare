@@ -19,12 +19,25 @@ use Illuminate\Database\Eloquent\Collection;
 
 class MonthlyPvpFightService {
 
-    private bool $firstRun = false;
+    /**
+     * @var int $counter
+     */
+    private int $counter = 0;
 
+    /**
+     * @var PvpService $pvpService
+     */
     private PvpService $pvpService;
 
+    /**
+     * @var RandomAffixGenerator $randomAffixGenerator
+     */
     private RandomAffixGenerator $randomAffixGenerator;
 
+    /**
+     * @param PvpService $pvpService
+     * @param RandomAffixGenerator $randomAffixGenerator
+     */
     public function __construct(PvpService $pvpService, RandomAffixGenerator $randomAffixGenerator) {
         $this->pvpService           = $pvpService;
         $this->randomAffixGenerator = $randomAffixGenerator;
@@ -114,6 +127,8 @@ class MonthlyPvpFightService {
 
         event(new ServerMessageEvent($character->user,'You are rewarded with a Mythic Unique: ' . $item->affix_name . ' This item has been given to you regardless of how full your inventory is.', $slot->id));
 
+        event(new ServerMessageEvent($character->user,'Rewarded with : 50,000,000 Gold!'));
+
         event(new ServerMessageEvent($character->user,'You can move from the location now. The arena is closed. Come again next month!'));
     }
 
@@ -156,7 +171,7 @@ class MonthlyPvpFightService {
         $attacker = $participants[0];
         $defender = $participants[1];
 
-        $result = $this->pvpService->attack($attacker->character, $defender->character, $attacker->attack_type);
+        $result = $this->pvpService->attack($attacker->character, $defender->character, $attacker->attack_type, false, true);
 
         $this->handleResult($defender, $attacker, $result);
     }
@@ -175,9 +190,6 @@ class MonthlyPvpFightService {
         if ($result) {
             $this->updateLosersCharacterStatus($defender->character);
         } else {
-
-            $this->firstRun = false;
-
             $this->repeatFight($defender, $attacker);
         }
     }
@@ -190,9 +202,15 @@ class MonthlyPvpFightService {
      * @return void
      */
     protected function repeatFight(MonthlyPvpParticipant $attacker, MonthlyPvpParticipant $defender) {
-        $result = $this->pvpService->attack($attacker->character, $defender->character, $attacker->attack_type, true);
+        if ($this->counter >= 10) {
+            dump('Counter hit: ' . $this->counter);
+        }
+
+        $result = $this->pvpService->attack($attacker->character, $defender->character, $attacker->attack_type, true, true);
 
         $this->handleResult($defender, $attacker, $result);
+
+        $this->counter++;
     }
 
     /**

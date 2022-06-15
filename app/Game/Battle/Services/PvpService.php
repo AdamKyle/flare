@@ -85,7 +85,7 @@ class PvpService {
         return $this->pvpAttack->getDefenderHealth();
     }
 
-    public function attack(Character $attacker, Character $defender, string $attackType, bool $ignoreSetUp = false): bool {
+    public function attack(Character $attacker, Character $defender, string $attackType, bool $ignoreSetUp = false, bool $ignoreNonWinningMessages = false): bool {
 
         if (!$ignoreSetUp) {
             $healthObject = $this->pvpAttack->setUpPvpFight($attacker, $defender, $this->getHealthObject($attacker, $defender));
@@ -115,8 +115,10 @@ class PvpService {
 
         $this->updateCacheHealthForPVPFight($attacker, $defender);
 
-        $this->updateAttackerPvpInfo($attacker, $healthObject, $defender->id, $this->pvpAttack->getDefenderHealth());
-        $this->updateDefenderPvpInfo($defender, $healthObject, $attacker->id, $this->pvpAttack->getDefenderHealth());
+        if (!$ignoreNonWinningMessages) {
+            $this->updateAttackerPvpInfo($attacker, $healthObject, $defender->id, $this->pvpAttack->getDefenderHealth());
+            $this->updateDefenderPvpInfo($defender, $healthObject, $attacker->id, $this->pvpAttack->getDefenderHealth());
+        }
 
         return false;
     }
@@ -161,10 +163,10 @@ class PvpService {
     protected function updateDefenderPvpInfo(Character $defender, array $healthObject, int $attackerId, int $remainingDefenderHealth = 0) {
         event(new UpdateCharacterPvpAttack($defender->user, [
             'health_object' => [
-                'attacker_max_health' => $healthObject['defender_health'],
-                'attacker_health'     => $remainingDefenderHealth,
-                'defender_health'     => $this->pvpAttack->getAttackerHealth(),
-                'defender_max_health' => $healthObject['attacker_health'],
+                'attacker_max_health' => $healthObject['attacker_health'],
+                'attacker_health'     => $this->pvpAttack->getAttackerHealth(),
+                'defender_health'     => $remainingDefenderHealth,
+                'defender_max_health' => $healthObject['defender_health'],
             ],
             'messages'    => $this->pvpAttack->getMessages()['defender'],
             'attacker_id' => $attackerId,

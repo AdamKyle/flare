@@ -54,7 +54,7 @@ class MonthlyPvpService {
            }
         });
 
-        event(new GlobalMessageEvent('ATTN! Participants for monthly pvp have been moved. Now is the time to check your gear. Battle starts in 5 minutes!!!'));
+        event(new GlobalMessageEvent('ATTN! Participants for monthly pvp have been moved. Battle is about to begin'));
 
         /**
          * TODO: This will be a job set to execute in 5 minutes.
