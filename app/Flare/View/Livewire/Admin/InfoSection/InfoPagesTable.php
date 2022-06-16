@@ -17,7 +17,7 @@ class InfoPagesTable extends DataTableComponent {
     public function columns(): array
     {
         return [
-            Column::make('Page Name', 'page_name')->format(function ($value, $row) {
+            Column::make('Page Name', 'page_name')->searchable()->format(function ($value, $row) {
                 $infoPageId = InfoPage::where('page_name', $value)->first()->id;
 
 

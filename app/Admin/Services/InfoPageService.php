@@ -53,8 +53,8 @@ class InfoPageService {
 
     public function deleteStoredImages(array $sections, string $pageName) {
         foreach ($sections as $section) {
-            if (!is_null($section['content_image_path']) && $section['content_image_path'] !== 'null') {
-                Storage::disk('info-sections-images')->delete('/' . $pageName . $sections['content_image_path']);
+            if (!is_null($section['content_image_path'])) {
+                Storage::disk('info-sections-images')->delete('/' . $pageName . $section['content_image_path']);
             }
         }
     }

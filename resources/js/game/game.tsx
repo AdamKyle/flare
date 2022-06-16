@@ -16,6 +16,7 @@ import GameChat from "./sections/chat/game-chat";
 import ForceNameChange from "./sections/force-name-change/force-name-change";
 import SmallerActions from "./sections/game-actions-section/smaller-actions";
 import QuestType from "./lib/game/types/quests/quest-type";
+import ScreenRefresh from './sections/screen-refresh/screen-refresh';
 
 export default class Game extends React.Component<GameProps, GameState> {
 
@@ -222,6 +223,9 @@ export default class Game extends React.Component<GameProps, GameState> {
 
         return (
             <Fragment>
+
+                <ScreenRefresh user_id={this.state.character.user_id} />
+
                 <Tabs tabs={this.tabs}>
                     <TabPanel key={'game'}>
                         <div className="grid lg:grid-cols-3 gap-3">

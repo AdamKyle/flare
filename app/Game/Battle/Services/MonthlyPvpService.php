@@ -2,27 +2,27 @@
 
 namespace App\Game\Battle\Services;
 
+use App\Admin\Events\RefreshUserScreenEvent;
 use App\Flare\Models\Character;
-use App\Flare\Models\User;
+use App\Flare\Models\CharacterAutomation;
+use App\Flare\Values\AutomationType;
+use App\Game\Battle\Jobs\MonthlyPvpFight;
 use  Illuminate\Database\Eloquent\Builder;
 use App\Flare\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Flare\Models\MonthlyPvpParticipant;
 use App\Flare\Values\UserOnlineValue;
-use App\Game\Battle\Events\UpdateCharacterStatus;
-use App\Game\Maps\Events\UpdateMapBroadcast;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Flare\Models\Location;
 
 class MonthlyPvpService {
 
-    private MonthlyPvpFightService $monthlyPvpFightService;
-
-    public function __construct(MonthlyPvpFightService $monthlyPvpFightService) {
-        $this->monthlyPvpFightService = $monthlyPvpFightService;
-    }
-
-    public function moveParticipatingPlayers() {
+    /**
+     * Move all participating players.
+     *
+     * @return void
+     */
+    public function moveParticipatingPlayers(): void {
 
         if (MonthlyPvpParticipant::all()->isEmpty()) {
             event(new GlobalMessageEvent('The Creator is sad, no one want to participate in monthly PVP :( Maybe next month! Shiny rewards yo!'));
@@ -40,7 +40,9 @@ class MonthlyPvpService {
 
         $users = $query->pluck('user_id')->toArray();
 
-        $usersInFight = User::whereIn('id', $users);
+        $usersInFight = Character::whereIn('user_id', $users)->join('monthly_pvp_participants', function($join) {
+            $join->on('monthly_pvp_participants.character_id', '=', 'characters.id');
+        })->select('characters.*');
 
         if (!$this->doWeHaveEnoughRegisteredPlayersOnline($usersInFight)) {
             return;
@@ -48,18 +50,15 @@ class MonthlyPvpService {
 
         event(new GlobalMessageEvent('ATTN! Monthly pvp is about to start! Moving all participants!'));
 
-        $usersInFight->chunkById(100, function($users) {
-           foreach ($users as $user) {
-               $this->movePlayerToNewLocation($user->character);
+        $usersInFight->chunkById(100, function($characters) {
+           foreach ($characters as $character) {
+               $this->movePlayerToNewLocation($character);
            }
         });
 
-        event(new GlobalMessageEvent('ATTN! Participants for monthly pvp have been moved. Battle is about to begin'));
+        event(new GlobalMessageEvent('ATTN! Participants for monthly pvp have been moved. Battle is about to begin in 2 minutes. Please stand by!'));
 
-        /**
-         * TODO: This will be a job set to execute in 5 minutes.
-         */
-        $this->monthlyPvpFightService->setFirstRun()->startPvp();
+        MonthlyPvpFight::dispatch($usersInFight->get())->delay(now()->addMinutes(2));
     }
 
     /**
@@ -87,10 +86,6 @@ class MonthlyPvpService {
      * @return bool
      */
     protected function doWeHaveEnoughRegisteredPlayersOnline(Builder $usersInFight): bool {
-        $usersInFight = $usersInFight->get()->filter(function($user) {
-            return !is_null($user->character);
-        });
-
         if ($usersInFight->count() < 2) {
             event(new GlobalMessageEvent('The monthly pvp event has been called off because of: Lack of players registered. There must always be at least two people to participate. Better luck next month!'));
 
@@ -122,14 +117,20 @@ class MonthlyPvpService {
             'can_move'   => false,
         ]);
 
+        CharacterAutomation::create([
+            'character_id'                   => $character->id,
+            'type'                           => AutomationType::PVP_MONTHLY,
+            'started_at'                     => now(),
+            'completed_at'                   => now()->addMinutes(60),
+        ]);
+
         $character = $character->refresh();
 
         CharacterAttackTypesCacheBuilder::dispatch($character)->delay(now()->addSeconds(2));
 
-        event(new UpdateMapBroadcast($character->user));
 
-        event(new UpdateCharacterStatus($character));
+        event(new ServerMessageEvent($character->user, 'You have been moved to the Arena! You have a moment to adjust your gear. You are considered to be in Automation'));
 
-        event(new ServerMessageEvent($character->user, 'You have been moved to the Arena! You have a moment to adjust your gear. You cannot move, cannot fight.'));
+        event(new RefreshUserScreenEvent($character->user));
     }
 }

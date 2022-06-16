@@ -3,6 +3,7 @@
 namespace App\Game\Battle\Services;
 
 use Cache;
+use Facades\App\Flare\Builders\BuildMythicItem;
 use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Jobs\RemoveKilledInPvpFromUser;
@@ -19,17 +20,14 @@ use App\Game\Messages\Events\ServerMessageEvent;
 
 class PvpService {
 
-    private RandomAffixGenerator $randomAffixGenerator;
-
     private PvpAttack $pvpAttack;
 
     private BattleEventHandler $battleEventHandler;
 
     private MapTileValue $mapTileValue;
 
-    public function __construct(PvpAttack $pvpAttack, RandomAffixGenerator $randomAffixGenerator, BattleEventHandler $battleEventHandler, MapTileValue $mapTileValue) {
+    public function __construct(PvpAttack $pvpAttack, BattleEventHandler $battleEventHandler, MapTileValue $mapTileValue) {
         $this->pvpAttack            = $pvpAttack;
-        $this->randomAffixGenerator = $randomAffixGenerator;
         $this->battleEventHandler   = $battleEventHandler;
         $this->mapTileValue         = $mapTileValue;
     }
@@ -189,7 +187,7 @@ class PvpService {
         $rand = rand(1, 1000000);
 
         if ($rand > 999995) {
-            $item = $this->fetchMythicItem($attacker);
+            $item = BuildMythicItem::fetchMythicItem($attacker);
 
             if (!$attacker->isInventoryFull()) {
                 $slot = $attacker->inventory->slots()->create([
@@ -202,28 +200,6 @@ class PvpService {
                 event(new ServerMessageEvent($attacker->user, 'You found: ' . $item->affix_name . ' on the enemies corpse!', $slot->id));
             }
         }
-    }
-
-    private function fetchMythicItem(Character $attacker): Item {
-        $prefix = $this->randomAffixGenerator->setCharacter($attacker)
-                                             ->setPaidAmount(RandomAffixDetails::MYTHIC)
-                                             ->generateAffix('prefix');
-
-        $suffix = $this->randomAffixGenerator->setCharacter($attacker)
-                                             ->setPaidAmount(RandomAffixDetails::MYTHIC)
-                                             ->generateAffix('suffix');
-
-        $item = Item::inRandomOrder()->first();
-
-        $item = $item->duplicate();
-
-        $item->update([
-            'item_prefix_id' => $prefix->id,
-            'item_suffix_id' => $suffix->id,
-            'is_mythic'      => true,
-        ]);
-
-        return $item->refresh();
     }
 
     private function movePlayerToNewLocation(Character $character): Character {

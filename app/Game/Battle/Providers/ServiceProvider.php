@@ -2,6 +2,7 @@
 
 namespace App\Game\Battle\Providers;
 
+use App\Flare\Builders\BuildMythicItem;
 use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Builders\RandomItemDropBuilder;
@@ -88,20 +89,17 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(PvpService::class, function($app) {
             return new PvpService(
                 $app->make(PvpAttack::class),
-                $app->make(RandomAffixGenerator::class),
                 $app->make(BattleEventHandler::class),
                 $app->make(MapTileValue::class),
             );
         });
 
         $this->app->bind(MonthlyPvpFightService::class, function($app) {
-            return new MonthlyPvpFightService($app->make(PvpService::class), $app->make(RandomAffixGenerator::class));
+            return new MonthlyPvpFightService($app->make(PvpService::class), $app->make(ConjureService::class));
         });
 
         $this->app->bind(MonthlyPvpService::class, function($app) {
-            return new MonthlyPvpService(
-                $app->make(MonthlyPvpFightService::class)
-            );
+            return new MonthlyPvpService();
         });
 
         $this->commands([

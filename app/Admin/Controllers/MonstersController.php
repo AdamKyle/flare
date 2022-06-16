@@ -7,6 +7,7 @@ use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
 use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Traits\Controllers\MonstersShowInformation;
+use App\Flare\Values\CelestialType;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -42,17 +43,19 @@ class MonstersController extends Controller {
 
     public function create() {
         return view('admin.monsters.manage', [
-            'monster' => null,
-            'gameMaps'   => GameMap::all(),
-            'questItems' => Item::where('type', 'quest')->get(),
+            'monster'        => null,
+            'gameMaps'       => GameMap::all(),
+            'questItems'     => Item::where('type', 'quest')->get(),
+            'celestialTypes' => CelestialType::getNamedValues(),
         ]);
     }
 
     public function edit(Monster $monster) {
         return view('admin.monsters.manage', [
-            'monster'    => $monster,
-            'gameMaps'   => GameMap::all(),
-            'questItems' => Item::where('type', 'quest')->get(),
+            'monster'        => $monster,
+            'gameMaps'       => GameMap::all(),
+            'questItems'     => Item::where('type', 'quest')->get(),
+            'celestialTypes' => CelestialType::getNamedValues(),
         ]);
     }
 

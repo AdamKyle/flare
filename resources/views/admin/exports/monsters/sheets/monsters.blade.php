@@ -42,7 +42,7 @@
         <th>quest_item_id</th>
         <th>quest_item_drop_chance</th>
         <th>game_map_id</th>
-
+        <th>celestial_type</th>
     </tr>
     </thead>
     <tbody>
@@ -89,6 +89,7 @@
             <td>{{(!is_null($monster->questItem)) ? $monster->questItem->id : null}}</td>
             <td>{{$monster->quest_item_drop_chance}}</td>
             <td>{{$monster->game_map_id}}</td>
+            <td>{{$monster->celestial_type}}</td>
         </tr>
     @endforeach
     </tbody>

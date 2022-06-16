@@ -2,6 +2,8 @@
 
 namespace App\Game\Core\Services;
 
+use Facades\App\Flare\Builders\BuildMythicItem;
+use App\Flare\Values\CelestialType;
 use App\Game\Battle\Services\BattleDrop;
 use Facades\App\Flare\Calculators\DropCheckCalculator;
 use App\Flare\Models\Adventure;
@@ -57,6 +59,7 @@ class DropCheckService {
      * @param Monster $monster
      * @param Adventure|null $adventure
      * @return void
+     * @throws \Exception
      */
     public function process(Character $character, Monster $monster, Adventure $adventure = null) {
         $this->lootingChance  = $character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
@@ -79,6 +82,26 @@ class DropCheckService {
                                              ->setLootingChance($this->lootingChance);
 
         $this->handleDropChance($character);
+
+        if ($monster->celestial_type === CelestialType::KING_CELESTIAL) {
+            $this->handleMythicDrop($character);
+        }
+    }
+
+    /**
+     * See if the player can have a mythic drop.
+     *
+     * @param Character $character
+     * @return void
+     */
+    public function handleMythicDrop(Character $character) {
+        $canGetDrop = $this->canHaveMythic();
+
+        if ($canGetDrop) {
+            $mythic = BuildMythicItem::fetchMythicItem($character);
+
+            $this->battleDrop->giveMythicItem($character, $mythic);
+        }
     }
 
     /**
@@ -86,6 +109,7 @@ class DropCheckService {
      *
      * @param Character $character
      * @return void
+     * @throws \Exception
      */
     public function handleDropChance(Character $character) {
         $canGetDrop = $this->canHaveDrop();
@@ -111,6 +135,24 @@ class DropCheckService {
                                             ->where('y', $map->character_position_y)
                                             ->where('game_map_id', $map->game_map_id)
                                             ->first();
+    }
+
+    /**
+     * Can we get the mythic item?
+     *
+     * @return bool
+     */
+    protected function canHaveMythic(): bool {
+        $chance = $this->lootingChance;
+
+        if ($chance > 0.15) {
+            $chance = 0.15;
+        }
+
+        $roll = rand(1, 1000000000);
+        $roll = $roll + $roll * $chance;
+
+        return $roll > 999995;
     }
 
     /**

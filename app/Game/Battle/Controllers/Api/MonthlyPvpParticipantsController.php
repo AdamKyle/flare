@@ -30,7 +30,13 @@ class MonthlyPvpParticipantsController extends Controller {
         $characterInFight = MonthlyPvpParticipant::where('character_id', $character->id)->first();
 
         if (!is_null($characterInFight)) {
-            return response()->json(['message' => 'You are already registered.'], 422);
+            $characterInFight->update([
+                'attack_type' => $request->attack_type
+            ]);
+
+            event(new ServerMessageEvent($character->user, 'Updated your pvp attack type for tonight.'));
+
+            return response()->json();
         }
 
         MonthlyPvpParticipant::create(['character_id' => $character->id, 'attack_type' => $request->attack_type]);

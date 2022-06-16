@@ -11,11 +11,14 @@ class AutomationType {
 
     const EXPLORING = 0;
 
+    const PVP_MONTHLY = 1;
+
     /**
      * @var int[] $values
      */
     protected static $values = [
         0 => self::EXPLORING,
+        1 => self::PVP_MONTHLY,
     ];
 
     /**
@@ -38,6 +41,13 @@ class AutomationType {
      */
     public function isExploring(): bool {
         return $this->value === self::EXPLORING;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isInPvpMonthly(): bool {
+        return $this->value === self::PVP_MONTHLY;
     }
 
 }

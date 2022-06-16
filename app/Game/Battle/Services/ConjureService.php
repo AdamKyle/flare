@@ -5,6 +5,7 @@ namespace App\Game\Battle\Services;
 use App\Flare\Models\GameMap;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Transformers\CharacterTopBarTransformer;
+use App\Flare\Values\CelestialType;
 use App\Flare\Values\MapNameValue;
 use App\Game\Battle\Events\UpdateCelestialFight;
 use App\Game\Maps\Events\UpdateMapBroadcast;
@@ -69,7 +70,11 @@ class ConjureService {
             GameMap::where('name', MapNameValue::PURGATORY)->first()->id
         ];
 
-        $monster = Monster::where('is_celestial_entity', true)->whereNotIn('game_map_id', $invalidMaps)->inRandomOrder()->first();
+        $monster = Monster::where('is_celestial_entity', true)
+                          ->whereNotIn('game_map_id', $invalidMaps)
+                          ->where('celestial_type', '!=', CelestialType::KING_CELESTIAL)
+                          ->inRandomOrder()
+                          ->first();
 
         $healthRange          = explode('-', $monster->health_range);
         $currentMonsterHealth = rand($healthRange[0], $healthRange[1]) + 10;

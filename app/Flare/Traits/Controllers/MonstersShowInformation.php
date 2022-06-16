@@ -18,16 +18,18 @@ trait MonstersShowInformation {
      * @return View|Factory
      */
     public function renderMonsterShow(Monster $monster, $viewName = 'admin.monsters.monster'): View|Factory {
-        $quest = null;
+        $quest     = null;
+        $questItem = null;
 
         if (!is_null($monster->questItem)) {
-            $quest = Quest::where('item_id', $monster->questItem->id)->first();
+            $quest     = Quest::where('item_id', $monster->questItem->id)->first();
+            $questItem = $this->itemShowDetails($monster->questItem);
         }
 
         return view($viewName, [
             'monster'   => $monster,
             'quest'     => $quest,
-            'questItem' => $this->itemShowDetails($monster->questItem),
+            'questItem' => $questItem,
         ]);
     }
 }

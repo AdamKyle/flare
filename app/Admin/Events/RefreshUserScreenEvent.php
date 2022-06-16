@@ -20,7 +20,12 @@ class RefreshUserScreenEvent implements ShouldBroadcastNow
      *
      * @var User $user
      */
-    public $user;
+    private User $user;
+
+    /**
+     * @var bool $refresh
+     */
+    public bool $refresh = true;
 
     /**
      * Create a new event instance.
@@ -28,8 +33,7 @@ class RefreshUserScreenEvent implements ShouldBroadcastNow
      * @param User $user
      * @return void
      */
-    public function __construct(User $user)
-    {
+    public function __construct(User $user) {
         $this->user = $user;
     }
 
@@ -38,8 +42,7 @@ class RefreshUserScreenEvent implements ShouldBroadcastNow
      *
      * @return Channel|array
      */
-    public function broadcastOn()
-    {
+    public function broadcastOn() {
         return new PrivateChannel('refresh-listener-' . $this->user->id);
     }
 }

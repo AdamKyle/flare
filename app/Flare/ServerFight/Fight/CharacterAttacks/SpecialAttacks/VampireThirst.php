@@ -21,6 +21,11 @@ class VampireThirst extends BattleBase {
         $dur    = $this->characterCacheData->getCachedCharacterData($character, 'dur_modded');
         $damage = $dur + $dur * 0.15;
 
+        // If we are fighting celestials only use 50%.
+        if (!$isPvp) {
+            $damage = (int) ceil($damage / 2);
+        }
+
         $this->addMessage('There is a thirst, child, it\'s in your soul! Lash out and kill!', 'regular', $isPvp);
 
         if ($attackData['damage_deduction'] > 0.0) {

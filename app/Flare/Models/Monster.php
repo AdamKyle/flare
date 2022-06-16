@@ -59,6 +59,7 @@ class Monster extends Model
         'dodge',
         'criticality',
         'shards',
+        'celestial_type',
     ];
 
     /**
@@ -75,6 +76,7 @@ class Monster extends Model
         'int'                       => 'integer',
         'ac'                        => 'integer',
         'gold'                      => 'integer',
+        'celestial_type'            => 'integer',
         'drop_check'                => 'float',
         'max_level'                 => 'integer',
         'quest_item_drop_chance'    => 'float',

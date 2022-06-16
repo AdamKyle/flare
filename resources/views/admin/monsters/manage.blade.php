@@ -39,7 +39,7 @@
                             <div>
                                 <h3 class="mb-3">Details</h3>
                                 <x-core.forms.input :model="$monster" label="Health Range:" modelKey="health_range" name="health_range"/>
-                                <x-core.forms.input :model="$monster" label="Health Range:" modelKey="attack_range" name="attack_range"/>
+                                <x-core.forms.input :model="$monster" label="Attack Range:" modelKey="attack_range" name="attack_range"/>
                                 <x-core.forms.input :model="$monster" label="Armour Class:" modelKey="ac" name="ac"/>
                                 <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                                 <h3 class="mb-3">Reward Info</h3>
@@ -49,6 +49,7 @@
                                 <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                                 <h3 class="mb-3">Celestial Info</h3>
                                 <x-core.forms.check-box :model="$monster" label="Is Celestial Entity?" modelKey="is_celestial_entity" name="is_celestial_entity" />
+                                <x-core.forms.key-value-select :model="$monster" label="Celestial Type (Optional):" modelKey="celestial_type" name="celestial_type" :options="$celestialTypes" />
                                 <x-core.forms.input :model="$monster" label="Gold Cost Per Summon:" modelKey="gold_cost" name="gold_cost"/>
                                 <x-core.forms.input :model="$monster" label="Gold Dust Cost per Summon:" modelKey="gold_dust_cost" name="gold_dust_cost"/>
                                 <x-core.forms.input :model="$monster" label="Shards Reward Per kill:" modelKey="shards" name="shards"/>

@@ -3,12 +3,14 @@
 namespace App\Game\Battle\Services;
 
 
-use App\Flare\Builders\RandomAffixGenerator;
+use App\Flare\Models\Monster;
+use App\Flare\Values\CelestialType;
+use Exception;
+use Facades\App\Flare\Builders\BuildMythicItem;
 use App\Flare\Models\Character;
-use App\Flare\Models\Item;
+use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\MonthlyPvpParticipant;
 use App\Flare\Values\MaxCurrenciesValue;
-use App\Flare\Values\RandomAffixDetails;
 use App\Flare\Values\UserOnlineValue;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Core\Events\UpdateTopBarEvent;
@@ -25,31 +27,32 @@ class MonthlyPvpFightService {
     private int $counter = 0;
 
     /**
+     * @var Collection $participants
+     */
+    private Collection $participants;
+
+    /**
      * @var PvpService $pvpService
      */
     private PvpService $pvpService;
 
     /**
-     * @var RandomAffixGenerator $randomAffixGenerator
+     * @var ConjureService $conjureService
      */
-    private RandomAffixGenerator $randomAffixGenerator;
+    private ConjureService $conjureService;
 
     /**
      * @param PvpService $pvpService
-     * @param RandomAffixGenerator $randomAffixGenerator
+     * @param ConjureService $conjureService
      */
-    public function __construct(PvpService $pvpService, RandomAffixGenerator $randomAffixGenerator) {
-        $this->pvpService           = $pvpService;
-        $this->randomAffixGenerator = $randomAffixGenerator;
+    public function __construct(PvpService $pvpService, ConjureService $conjureService) {
+        $this->pvpService     = $pvpService;
+        $this->conjureService = $conjureService;
     }
 
-    /**
-     * Sets the flag for the first run through.
-     *
-     * @return $this
-     */
-    public function setFirstRun(): MonthlyPvpFightService {
-        $this->firstRun = true;
+    public function setRegisteredParticipants(Collection $participants): MonthlyPvpFightService
+    {
+        $this->participants = $participants;
 
         return $this;
     }
@@ -58,13 +61,13 @@ class MonthlyPvpFightService {
      * Starts pvp.
      *
      * @return bool
-     * @throws \Exception
+     * @throws Exception
      */
     public function startPvp(): bool {
-        $userIds = $this->gatherEligiblePlayers();
+        $this->filterParticipants();
 
-        if (count($userIds) >= 2) {
-            $participants = $this->reOrderCharactersByLevel($userIds);
+        if (count($this->participants) >= 2) {
+            $participants = $this->reOrderCharactersByLevel($this->participants->pluck('id')->toArray());
 
             if ($participants->count() >= 2) {
                 $this->fight($participants);
@@ -74,6 +77,8 @@ class MonthlyPvpFightService {
                 }
             } else {
                 $this->lastPlayerStanding($participants[0]->character);
+
+                $this->conjureTheKings($participants[0]->character);
 
                 MonthlyPvpParticipant::truncate();
 
@@ -89,16 +94,32 @@ class MonthlyPvpFightService {
     }
 
     /**
+     * Conjure the celestial kings as public entities.
+     *
+     * @param Character $character
+     * @return void
+     */
+    protected function conjureTheKings(Character $character): void {
+        event(new GlobalMessageEvent('The kings awaken. The ground rumbles!'));
+
+        foreach (Monster::where('celestial_type', CelestialType::KING_CELESTIAL)->get() as $monster) {
+            $this->conjureService->conjure($monster, $character, 'public');
+        }
+
+        event(new GlobalMessageEvent('Christ children of Tlessa! The Celestial Kings have escaped their prisons. Quick slaughter them for a chance at mythical items!'));
+    }
+
+    /**
      * Reward the last player standing.
      *
      * @param Character $character
      * @return void
-     * @throws \Exception
+     * @throws Exception
      */
     protected function lastPlayerStanding(Character $character) {
         event(new GlobalMessageEvent('Congratulation to: ' . $character->name . ' for winning this months pvp! The Creator smiles upon them with a beautiful [ MYTHIC ] gift!'));
 
-        $item = $this->fetchMythicItem($character);
+        $item = BuildMythicItem::fetchMythicItem($character);
 
         $slot = $character->inventory->slots()->create([
             'inventory_id' => $character->inventory->id,
@@ -117,6 +138,8 @@ class MonthlyPvpFightService {
             'can_attack' => true,
         ]);
 
+        CharacterAutomation::where('character_id', $character->id)->delete();
+
         $character = $character->refresh();
 
         event(new UpdateCharacterStatus($character));
@@ -130,35 +153,6 @@ class MonthlyPvpFightService {
         event(new ServerMessageEvent($character->user,'Rewarded with : 50,000,000 Gold!'));
 
         event(new ServerMessageEvent($character->user,'You can move from the location now. The arena is closed. Come again next month!'));
-    }
-
-    /**
-     * Build Mythic Item for winner.
-     *
-     * @param Character $character
-     * @return Item
-     * @throws \Exception
-     */
-    private function fetchMythicItem(Character $character): Item {
-        $prefix = $this->randomAffixGenerator->setCharacter($character)
-            ->setPaidAmount(RandomAffixDetails::MYTHIC)
-            ->generateAffix('prefix');
-
-        $suffix = $this->randomAffixGenerator->setCharacter($character)
-            ->setPaidAmount(RandomAffixDetails::MYTHIC)
-            ->generateAffix('suffix');
-
-        $item = Item::inRandomOrder()->first();
-
-        $item = $item->duplicate();
-
-        $item->update([
-            'item_prefix_id' => $prefix->id,
-            'item_suffix_id' => $suffix->id,
-            'is_mythic'      => true,
-        ]);
-
-        return $item->refresh();
     }
 
     /**
@@ -214,6 +208,29 @@ class MonthlyPvpFightService {
     }
 
     /**
+     * Kick inactive player.
+     *
+     * @param Character $character
+     * @return void
+     */
+    protected function kickCheacterWhoLoggedOut(Character $character) {
+        $character->update([
+            'can_move'   => true,
+            'can_attack' => true,
+        ]);
+
+        CharacterAutomation::where('character_id', $character->id)->delete();
+
+        MonthlyPvpParticipant::where('character_id', $character->id)->delete();
+
+        $character = $character->refresh();
+
+        event(new UpdateCharacterStatus($character));
+
+        event(new UpdateMapBroadcast($character->user));
+    }
+
+    /**
      * Mark the loser as can attack and move.
      *
      * @param Character $character
@@ -241,6 +258,8 @@ class MonthlyPvpFightService {
             'gold' => $gold
         ]);
 
+        CharacterAutomation::where('character_id', $character->id)->delete();
+
         $character = $character->refresh();
 
         event(new UpdateTopBarEvent($character));
@@ -253,13 +272,10 @@ class MonthlyPvpFightService {
     }
 
     /**
-     * @param array $userIds
+     * @param array $characterIds
      * @return Collection
      */
-    protected function reOrderCharactersByLevel(array $userIds): Collection {
-
-        $characterIds = Character::whereIn('user_id', $userIds)->pluck('id');
-
+    protected function reOrderCharactersByLevel(array $characterIds): Collection {
         return MonthlyPvpParticipant::whereIn('character_id', $characterIds)->join('characters', function($join) {
             $join->on('characters.id', '=', 'monthly_pvp_participants.character_id');
         })->orderBy('characters.level', 'asc')->select('monthly_pvp_participants.*')->get();
@@ -268,11 +284,20 @@ class MonthlyPvpFightService {
     /**
      * @return array
      */
-    protected function gatherEligiblePlayers(): array {
+    protected function filterParticipants(): array {
         $query = (new UserOnlineValue())->getUsersOnlineQuery();
 
         if ($query->count() >= 2) {
-            return $query->pluck('user_id')->toArray();
+            $registeredUsers = $query->pluck('user_id')->toArray();
+
+            $this->participants = $this->participants->filter(function($participant) use ($registeredUsers) {
+                if (in_array($participant->user_id, $registeredUsers)) {
+                    return $participant;
+                }
+
+                $this->kickCheacterWhoLoggedOut($participant);
+
+            })->values();
         }
 
         return [];

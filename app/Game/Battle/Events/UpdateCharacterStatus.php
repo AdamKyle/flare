@@ -38,11 +38,11 @@ class UpdateCharacterStatus implements ShouldBroadcastNow {
             'can_craft'               => $character->can_craft,
             'can_craft_again_at'      => $character->can_craft_again_at,
             'is_dead'                 => $character->is_dead,
-            'is_automation_running'   => $character->currentAutomations()->where('type', AutomationType::EXPLORING)->get()->isNotEmpty(),
+            'is_automation_running'   => $character->currentAutomations()->where('character_id', $character->id)->get()->isNotEmpty(),
             'automation_completed_at' => $this->getTimeLeftOnAutomation($character),
             'is_silenced'             => $character->is_silenced,
             'can_move'                => $character->can_move,
-            'can_register_for_pvp'    => !is_null(Event::where('type', EventType::MONTHLY_PVP)->first()) && is_null(MonthlyPvpParticipant::where('character_id', $character->id)->first()) && $character->level >= 301
+            'can_register_for_pvp'    => !is_null(Event::where('type', EventType::MONTHLY_PVP)->first()) && $character->level >= 301
         ];
 
         $this->user = $character->user;

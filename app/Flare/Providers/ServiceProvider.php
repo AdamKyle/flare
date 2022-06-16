@@ -5,6 +5,7 @@ namespace App\Flare\Providers;
 
 use App\Falre\ServerFight\Fight\CharacterAttacks\Counter;
 use App\Flare\Builders\AffixAttributeBuilder;
+use App\Flare\Builders\BuildMythicItem;
 use App\Flare\Builders\Character\AttackDetails\CharacterAffixInformation;
 use App\Flare\Builders\Character\AttackDetails\CharacterHealthInformation;
 use App\Flare\Builders\Character\AttackDetails\CharacterLifeStealing;
@@ -496,6 +497,10 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(SetUpFight::class),
                 $app->make(BaseCharacterAttack::class),
             );
+        });
+
+        $this->app->bind(BuildMythicItem::class, function($app) {
+            new BuildMythicItem($app->make(RandomAffixGenerator::class));
         });
     }
 

@@ -103,6 +103,10 @@ class BattleDrop {
         return null;
     }
 
+    public function giveMythicItem(Character $character, Item $item) {
+        $this->giveItemToPlayer($character, $item);
+    }
+
     /**
      * Handles the monsters quest drop.
      *
@@ -188,6 +192,10 @@ class BattleDrop {
         return $drop;
     }
 
+    /**
+     * @param Character $character
+     * @return int
+     */
     protected function getMaxLevelBasedOnPlane(Character $character): int {
         $characterLevel = $character->level;
 
@@ -320,7 +328,7 @@ class BattleDrop {
      * @param Item $item
      * @return void
      */
-    private function giveItemToPlayer(Character $character, Item $item) {
+    private function giveItemToPlayer(Character $character, Item $item, bool $isMythic = false) {
         if ($this->canHaveItem($character, $item)) {
             $character->inventory->slots()->create([
                 'item_id' => $item->id,
@@ -339,6 +347,10 @@ class BattleDrop {
                 $slot = $character->refresh()->inventory->slots()->where('item_id', $item->id)->first();
 
                 event(new GameServerMessage($character->user, 'You found: ' . $item->affix_name . ' on the enemies corpse.', $slot->id));
+
+                if ($isMythic) {
+                    event(new GlobalMessageEvent($character->name . ' Has found a mythical item on the king!'));
+                }
             }
         }
     }
