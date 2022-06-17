@@ -3,14 +3,11 @@
 namespace App\Game\Battle\Services;
 
 use Cache;
-use Facades\App\Flare\Builders\BuildMythicItem;
+use App\Flare\Builders\BuildMythicItem;
 use App\Flare\Builders\Character\CharacterCacheData;
-use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Jobs\RemoveKilledInPvpFromUser;
 use App\Flare\Models\Character;
-use App\Flare\Models\Item;
 use App\Flare\ServerFight\Pvp\PvpAttack;
-use App\Flare\Values\RandomAffixDetails;
 use App\Game\Battle\Events\UpdateCharacterPvpAttack;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Maps\Events\UpdateMapBroadcast;
@@ -20,16 +17,37 @@ use App\Game\Messages\Events\ServerMessageEvent;
 
 class PvpService {
 
+    /**
+     * @var PvpAttack $pvpAttack
+     */
     private PvpAttack $pvpAttack;
 
+    /**
+     * @var BattleEventHandler $battleEventHandler
+     */
     private BattleEventHandler $battleEventHandler;
 
+    /**
+     * @var MapTileValue $mapTileValue
+     */
     private MapTileValue $mapTileValue;
 
-    public function __construct(PvpAttack $pvpAttack, BattleEventHandler $battleEventHandler, MapTileValue $mapTileValue) {
+    /**
+     * @var BuildMythicItem $buildMythicItem
+     */
+    private BuildMythicItem $buildMythicItem;
+
+    /**
+     * @param PvpAttack $pvpAttack
+     * @param BattleEventHandler $battleEventHandler
+     * @param MapTileValue $mapTileValue
+     * @param BuildMythicItem $buildMythicItem
+     */
+    public function __construct(PvpAttack $pvpAttack, BattleEventHandler $battleEventHandler, MapTileValue $mapTileValue, BuildMythicItem $buildMythicItem) {
         $this->pvpAttack            = $pvpAttack;
         $this->battleEventHandler   = $battleEventHandler;
         $this->mapTileValue         = $mapTileValue;
+        $this->buildMythicItem      = $buildMythicItem;
     }
 
     public function battleEventHandler(): BattleEventHandler {
@@ -187,7 +205,7 @@ class PvpService {
         $rand = rand(1, 1000000);
 
         if ($rand > 999995) {
-            $item = BuildMythicItem::fetchMythicItem($attacker);
+            $item = $this->buildMythicItem->fetchMythicItem($attacker);
 
             if (!$attacker->isInventoryFull()) {
                 $slot = $attacker->inventory->slots()->create([

@@ -8,22 +8,17 @@ use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Builders\RandomItemDropBuilder;
 use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Flare\ServerFight\Pvp\PvpAttack;
-use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Services\CharacterRewardService;
-use App\Flare\Transformers\CharacterAttackTransformer;
-use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Transformers\CharacterTopBarTransformer;
 use App\Game\Battle\Console\Commands\ClearCelestials;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Handlers\FactionHandler;
-use App\Game\Battle\Jobs\BattleAttackHandler;
 use App\Game\Battle\Services\BattleDrop;
 use App\Game\Battle\Services\BattleRewardProcessing;
 use App\Game\Battle\Services\CelestialFightService;
 use App\Game\Battle\Services\MonthlyPvpFightService;
 use App\Game\Battle\Services\MonthlyPvpService;
 use App\Game\Battle\Services\PvpService;
-use App\Game\Core\Services\DropCheckService;
 use App\Game\Core\Services\GoldRush;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Skills\Services\DisenchantService;
@@ -91,11 +86,16 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(PvpAttack::class),
                 $app->make(BattleEventHandler::class),
                 $app->make(MapTileValue::class),
+                $app->make(BuildMythicItem::class)
             );
         });
 
         $this->app->bind(MonthlyPvpFightService::class, function($app) {
-            return new MonthlyPvpFightService($app->make(PvpService::class), $app->make(ConjureService::class));
+            return new MonthlyPvpFightService(
+                $app->make(PvpService::class),
+                $app->make(ConjureService::class),
+                $app->make(BuildMythicItem::class)
+            );
         });
 
         $this->app->bind(MonthlyPvpService::class, function($app) {

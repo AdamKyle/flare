@@ -28,7 +28,7 @@ class BuildMythicItem {
      * @return Item
      * @throws Exception
      */
-    private function fetchMythicItem(Character $character): Item {
+    public function fetchMythicItem(Character $character): Item {
         $prefix = $this->randomAffixGenerator->setCharacter($character)
             ->setPaidAmount(RandomAffixDetails::MYTHIC)
             ->generateAffix('prefix');

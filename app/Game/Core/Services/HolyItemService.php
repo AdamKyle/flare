@@ -85,6 +85,7 @@ class HolyItemService {
 
             $newItem->update([
                 'market_sellable' => true,
+                'is_mythic'       => $itemSlot->item->is_mythic
             ]);
 
             $newItem->appliedHolyStacks()->create([

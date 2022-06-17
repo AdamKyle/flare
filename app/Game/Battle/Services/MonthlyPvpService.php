@@ -106,6 +106,9 @@ class MonthlyPvpService {
     protected function movePlayerToNewLocation(Character $character): void {
         $location = Location::where('can_players_enter', false)->first();
 
+        // Delete previous and existing automations.
+        CharacterAutomation::where('character_id', $character->id)->delete();
+
         $character->map()->update([
             'character_position_x' => $location->x,
             'character_position_y' => $location->y,

@@ -6,7 +6,7 @@ namespace App\Game\Battle\Services;
 use App\Flare\Models\Monster;
 use App\Flare\Values\CelestialType;
 use Exception;
-use Facades\App\Flare\Builders\BuildMythicItem;
+use App\Flare\Builders\BuildMythicItem;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\MonthlyPvpParticipant;
@@ -42,16 +42,27 @@ class MonthlyPvpFightService {
     private ConjureService $conjureService;
 
     /**
+     * @var BuildMythicItem $buildMythicItem
+     */
+    private BuildMythicItem $buildMythicItem;
+
+    /**
      * @param PvpService $pvpService
      * @param ConjureService $conjureService
      */
-    public function __construct(PvpService $pvpService, ConjureService $conjureService) {
-        $this->pvpService     = $pvpService;
-        $this->conjureService = $conjureService;
+    public function __construct(PvpService $pvpService, ConjureService $conjureService, BuildMythicItem $buildMythicItem) {
+        $this->pvpService      = $pvpService;
+        $this->conjureService  = $conjureService;
+        $this->buildMythicItem = $buildMythicItem;
     }
 
-    public function setRegisteredParticipants(Collection $participants): MonthlyPvpFightService
-    {
+    /**
+     * Set the registered participants.
+     *
+     * @param Collection $participants
+     * @return $this
+     */
+    public function setRegisteredParticipants(Collection $participants): MonthlyPvpFightService {
         $this->participants = $participants;
 
         return $this;
@@ -119,7 +130,7 @@ class MonthlyPvpFightService {
     protected function lastPlayerStanding(Character $character) {
         event(new GlobalMessageEvent('Congratulation to: ' . $character->name . ' for winning this months pvp! The Creator smiles upon them with a beautiful [ MYTHIC ] gift!'));
 
-        $item = BuildMythicItem::fetchMythicItem($character);
+        $item = $this->buildMythicItem->fetchMythicItem($character);
 
         $slot = $character->inventory->slots()->create([
             'inventory_id' => $character->inventory->id,

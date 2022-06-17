@@ -37,6 +37,6 @@ class StartMonthlyPvpEvent extends Command
         Arena. Finally after being moved and before the fight, your screen will refresh
         automatically to close any open dialogues and so on. You have 15 minutes to prepare for PVP. All PVP attacks have been locked!'));
 
-        MonthlyPvpAutomation::dispatch()->delay(now()->addMinutes(15));
+        MonthlyPvpAutomation::dispatch()->delay(now()->addMinutes(1));
     }
 }

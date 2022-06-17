@@ -500,7 +500,7 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
         $this->app->bind(BuildMythicItem::class, function($app) {
-            new BuildMythicItem($app->make(RandomAffixGenerator::class));
+            return new BuildMythicItem($app->make(RandomAffixGenerator::class));
         });
     }
 

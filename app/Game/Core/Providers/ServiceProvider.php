@@ -2,6 +2,7 @@
 
 namespace App\Game\Core\Providers;
 
+use App\Flare\Builders\BuildMythicItem;
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Services\CharacterRewardService;
@@ -60,6 +61,7 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(DropCheckService::class, function($app) {
             return new DropCheckService(
                 $app->make(BattleDrop::class),
+                $app->make(BuildMythicItem::class)
             );
         });
 

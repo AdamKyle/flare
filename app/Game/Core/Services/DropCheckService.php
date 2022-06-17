@@ -2,7 +2,7 @@
 
 namespace App\Game\Core\Services;
 
-use Facades\App\Flare\Builders\BuildMythicItem;
+use App\Flare\Builders\BuildMythicItem;
 use App\Flare\Values\CelestialType;
 use App\Game\Battle\Services\BattleDrop;
 use Facades\App\Flare\Calculators\DropCheckCalculator;
@@ -36,6 +36,11 @@ class DropCheckService {
     private $locationWithEffect;
 
     /**
+     * @var BuildMythicItem $buildMythicItem
+     */
+    private $buildMythicItem;
+
+    /**
      * @var float $lootingChance
      */
     private $lootingChance = 0.0;
@@ -45,11 +50,13 @@ class DropCheckService {
      */
     private $gameMapBonus = 0.0;
 
+
     /**
      * @param BattleDrop $battleDrop
      */
-    public function __construct(BattleDrop $battleDrop) {
-        $this->battleDrop = $battleDrop;
+    public function __construct(BattleDrop $battleDrop, BuildMythicItem $buildMythicItem) {
+        $this->battleDrop      = $battleDrop;
+        $this->buildMythicItem = $buildMythicItem;
     }
 
     /**
@@ -98,7 +105,7 @@ class DropCheckService {
         $canGetDrop = $this->canHaveMythic();
 
         if ($canGetDrop) {
-            $mythic = BuildMythicItem::fetchMythicItem($character);
+            $mythic = $this->buildMythicItem->fetchMythicItem($character);
 
             $this->battleDrop->giveMythicItem($character, $mythic);
         }

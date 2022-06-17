@@ -103,8 +103,15 @@ class BattleDrop {
         return null;
     }
 
+    /**
+     * Give player a mythical item.
+     *
+     * @param Character $character
+     * @param Item $item
+     * @return void
+     */
     public function giveMythicItem(Character $character, Item $item) {
-        $this->giveItemToPlayer($character, $item);
+        $this->giveItemToPlayer($character, $item, true);
     }
 
     /**
