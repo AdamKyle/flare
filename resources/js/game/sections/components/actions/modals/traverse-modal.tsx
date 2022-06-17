@@ -17,6 +17,7 @@ export default class TraverseModal extends React.Component<any, any> {
             loading: true,
             game_maps: [],
             is_traversing: false,
+            error_message: null,
             map: 0,
         }
     }
@@ -28,7 +29,14 @@ export default class TraverseModal extends React.Component<any, any> {
                 loading: false,
             })
         }, (error: AxiosError) => {
+            if (typeof error.response !== 'undefined') {
+                const response = error.response;
 
+                this.setState({
+                    loading: false,
+                    error_message: response.data.message,
+                });
+            }
         });
     }
 
@@ -77,7 +85,14 @@ export default class TraverseModal extends React.Component<any, any> {
 
             this.props.handle_close();
         }, (error: AxiosError) => {
+            if (typeof error.response !== 'undefined') {
+                const response = error.response;
 
+                this.setState({
+                    is_traversing: false,
+                    error_message: response.data.message,
+                });
+            }
         });
     }
 
@@ -126,6 +141,12 @@ export default class TraverseModal extends React.Component<any, any> {
                                         />
                                 }
                             </div>
+
+                            {
+                                this.state.error_message !== null ?
+                                    <p className='mt-4 mb-4 text-red-500 dark:text-red-400'>{this.state.error_message}</p>
+                                : null
+                            }
 
                             {
                                 this.state.is_traversing ?
