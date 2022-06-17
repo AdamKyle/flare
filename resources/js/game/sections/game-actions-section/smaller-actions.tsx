@@ -17,6 +17,7 @@ import WarningAlert from "../../components/ui/alerts/simple-alerts/warning-alert
 import CelestialFight from "./components/celestial-fight";
 import DuelPlayer from "./components/duel-player";
 import {CraftingOptions} from "../../lib/game/types/actions/crafting-type-options";
+import JoinPvp from "./components/join-pvp";
 
 export default class SmallerActions extends React.Component<ActionsProps, ActionsState> {
 
@@ -54,6 +55,7 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
             characters_for_dueling: [],
             duel_characters: [],
             show_duel_fight: false,
+            show_join_pvp: false,
             duel_fight_info: null,
         }
 
@@ -158,6 +160,7 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
 
     setDuelCharacters() {
         if (typeof this.state.characters_for_dueling !== 'undefined') {
+            console.log(this.state.characters_for_dueling);
             const characters = this.state.characters_for_dueling.filter((character) => {
                 return character.character_position_x === this.props.character_position?.x &&
                        character.character_position_y === this.props.character_position?.y &&
@@ -201,6 +204,13 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
             options.push({
                 label: 'Celestial Fight',
                 value: 'celestial-fight'
+            });
+        }
+
+        if (this.props.character.can_register_for_pvp) {
+            options.push({
+                label: 'Join Monthly PVP',
+                value: 'join-monthly-pvp'
             });
         }
 
@@ -299,6 +309,13 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
         this.setState({
             selected_action: null,
             show_duel_fight: !this.state.show_duel_fight,
+        });
+    }
+
+    manageJoinPvp() {
+        this.setState({
+            selected_action: null,
+            show_join_pvp: !this.state.show_join_pvp,
         });
     }
 
@@ -423,6 +440,12 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
         )
     }
 
+    showJoinPVP() {
+        return (
+            <JoinPvp manage_section={this.manageJoinPvp.bind(this)} character_id={this.props.character.id}/>
+        )
+    }
+
     buildSection() {
         switch(this.state.selected_action) {
             case 'fight':
@@ -437,6 +460,8 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
                 return this.showCelestialFight();
             case 'pvp-fight':
                 return this.showDuelFight();
+            case 'join-monthly-pvp':
+                return this.showJoinPVP();
             default:
                 return null;
         }

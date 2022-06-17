@@ -76,8 +76,8 @@ export default class JoinPvp extends React.Component<any, any> {
     render() {
         return (
             <div className='mt-2 md:ml-[120px]'>
-                <div className='mt-2 grid grid-cols-3 gap-2'>
-                    <div className='cols-start-1 col-span-2'>
+                <div className='mt-2 grid md:grid-cols-3 gap-2'>
+                    <div className='md:cols-start-1 md:col-span-2'>
                         <p className='mb-4'>
                             Here you can choose to join in the monthly PVP event. It is suggested you read this
                             <a href='/information/monthly-pvp-event' target='_blank' className='ml-2'>Help Document <i
@@ -100,7 +100,7 @@ export default class JoinPvp extends React.Component<any, any> {
                             : null
                         }
                         <PrimaryButton button_label={'Join Tonight\'s Event!'} on_click={this.joinPvp.bind(this)} additional_css={'mt-4'} disabled={this.state.attack_type === null} />
-                        <DangerButton button_label={'Close Section'} on_click={this.props.manage_section} additional_css={'mt-4 ml-4'} />
+                        <DangerButton button_label={'Close Section'} on_click={this.props.manage_section} additional_css={'mt-4 md:mt-0 md:mt-4 md:ml-4'} />
                     </div>
                 </div>
             </div>
