@@ -123,7 +123,7 @@ export default class Skills extends React.Component<SkillsProps, any> {
                     this.props.is_automation_running ?
                         <div className='mb-4'>
                             <WarningAlert>
-                                Exploration is running. You cannot train or stop training skills.
+                                Automation is running. You cannot train or stop training skills.
                             </WarningAlert>
                         </div>
                         : null

@@ -274,7 +274,7 @@ export default class MapMovementActions extends React.Component<any, any> {
                                 this.props.character.is_automation_running ?
                                     <div className='my-2'>
                                         <WarningAlert>
-                                            Exploration is running, You cannot teleport. <a href='/information/exploration' target='_blank'>See Exploration Help <i
+                                            Automation is running, You cannot teleport. <a href='/information/automation' target='_blank'>See Automation Help <i
                                             className="fas fa-external-link-alt"></i></a> for more details.
                                         </WarningAlert>
                                     </div>

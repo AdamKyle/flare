@@ -236,7 +236,7 @@
                     <span class="ra ra-explosion"></span>
                     Disenchanting
                 </a>
-                <a href="{{route('info.page', ['pageName' => 'usable-items'])}}">
+                <a href="{{route('info.page', ['pageName' => 'alchemy'])}}">
                     <span class="ra ra-round-bottom-flask"></span>
                     Alchemy (Usable items)
                 </a>

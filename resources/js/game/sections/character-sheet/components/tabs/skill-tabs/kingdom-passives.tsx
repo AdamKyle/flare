@@ -130,7 +130,7 @@ export default class KingdomPassives extends React.Component<any, any> {
                                 this.props.is_automation_running ?
                                     <div className='mb-4'>
                                         <WarningAlert>
-                                            Exploration is running. You cannot manage your passive skills.
+                                            Automation is running. You cannot manage your passive skills.
                                         </WarningAlert>
                                     </div>
                                 : null

@@ -146,7 +146,7 @@ export default class ComparisonSection extends React.Component<ComparisonSection
                 {
                     this.props.is_automation_running ?
                         <WarningAlert additional_css={'mb-4'}>
-                            <p>You are exploring. Some actions have been disabled.</p>
+                            <p>Automation is running. Some actions have been disabled.</p>
                         </WarningAlert>
                     : null
                 }

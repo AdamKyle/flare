@@ -89,7 +89,7 @@ class UsableItemTransformer extends TransformerAbstract {
             'agi_mod'                          => $item->agi_mod,
             'focus_mod'                        => $item->focus_mod,
             'usable'                           => $item->usable,
-            'stat_increase'                    => $item->stat_increase,
+            'stat_increase'                    => $item->increase_stat_by,
         ];
     }
 }

@@ -70,6 +70,9 @@ export default class InfoSection extends React.Component<any, any> {
         },{
             label: 'Enchantments',
             value: 'admin.affixes.affixes-table'
+        },{
+            label: 'Alchemy Items',
+            value: 'info.alchemy-items.alchemy-items-table',
         }];
     }
 
