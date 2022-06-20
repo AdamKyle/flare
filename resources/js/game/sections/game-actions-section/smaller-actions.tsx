@@ -160,7 +160,6 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
 
     setDuelCharacters() {
         if (typeof this.state.characters_for_dueling !== 'undefined') {
-            console.log(this.state.characters_for_dueling);
             const characters = this.state.characters_for_dueling.filter((character) => {
                 return character.character_position_x === this.props.character_position?.x &&
                        character.character_position_y === this.props.character_position?.y &&

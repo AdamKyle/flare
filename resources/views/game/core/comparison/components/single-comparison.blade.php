@@ -1,6 +1,6 @@
 @php
     $invalidFields = ['name', 'position', 'is_unique', 'affix_count', 'holy_stacks_applied'];
-    $nonFloat      = ['damage_adjustment', 'ac_adjustment', 'base_ac_adjustment', 'healing_adjustment'];
+    $nonFloat      = ['damage_adjustment', 'damage', 'ac_adjustment', 'base_ac_adjustment', 'healing_adjustment'];
 @endphp
 
 <dl>

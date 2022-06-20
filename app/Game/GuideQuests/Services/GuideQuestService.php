@@ -45,20 +45,34 @@ class GuideQuestService {
         }
 
         if ($character->isInventoryFull()) {
-            event(new ServerMessageEvent($character->user, 'Failed to give you quest reward item. Inventory is full.'));
-        } else {
-            $this->rewardItem($character, $quest->reward_level);
+            event(new ServerMessageEvent($character->user, 'Your inventory is full. This item was given to you regardless.'));
         }
 
-        $gold = $character->gold + ($quest->reward_level * 1000);
+        $this->rewardItem($character, $quest->reward_level);
+
+        $gold      = $character->gold + ($quest->reward_level * 1000);
+        $goldDust  = $character->gold_dust + $quest->gold_dust_reward;
+        $shards    = $character->shards + $quest->shards_reward;
 
         if ($gold >= MaxCurrenciesValue::MAX_GOLD) {
             $gold = MaxCurrenciesValue::MAX_GOLD;
         }
 
+        if ($goldDust >= MaxCurrenciesValue::MAX_GOLD_DUST) {
+            $goldDust = MaxCurrenciesValue::MAX_GOLD_DUST;
+        }
+
+        if ($shards >= MaxCurrenciesValue::MAX_SHARDS) {
+            $shards = MaxCurrenciesValue::MAX_SHARDS;
+        }
+
         event(new ServerMessageEvent($character->user, 'Rewarded with: ' . number_format(($quest->reward_level * 1000)) . ' Gold.'));
 
-        $character->update(['gold' => $gold]);
+        $character->update([
+            'gold'      => $gold,
+            'gold_dust' => $goldDust,
+            'shards'    => $shards,
+        ]);
 
         QuestsCompleted::create([
             'character_id' => $character->id,
@@ -103,7 +117,7 @@ class GuideQuestService {
             $faction = $character->factions()->where('game_map_id', $quest->required_faction_id)->first();
 
             if ($faction->current_level >= $quest->required_faction_level) {
-                $attributes[] = 'required_faction_id';
+                $attributes[] = 'required_faction_level';
             }
         }
 
@@ -154,6 +168,10 @@ class GuideQuestService {
 
         foreach ($attributes as $key => $value) {
             if ($key === 'required_skill') {
+                continue;
+            }
+
+            if ($key === 'required_faction_id') {
                 continue;
             }
 

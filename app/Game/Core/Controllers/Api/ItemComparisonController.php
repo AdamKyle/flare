@@ -43,10 +43,15 @@ class ItemComparisonController extends Controller {
 
     public function compareItemFromChat(ComparisonFromChatValidate $request, Character $character) {
         $inventory   = Inventory::where('character_id', $character->id)->first();
-        $itemToEquip = InventorySlot::where('inventory_id', $inventory->id)->where('id', $request->slot_id)->first();
+        $itemToEquip = InventorySlot::where('inventory_id', $inventory->id)->where('id', $request->id)->first();
 
         if (is_null($itemToEquip)) {
-            return response()->json(['message' => 'Item does not exist  ...'], 404);
+
+            $itemToEquip = InventorySlot::where('inventory_id', $inventory->id)->where('item_id', $request->id)->first();
+
+            if (is_null($itemToEquip)) {
+                return response()->json(['message' => 'Item does not exist  ...'], 404);
+            }
         }
 
         if ($itemToEquip->equipped) {

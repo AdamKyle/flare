@@ -18,7 +18,11 @@
         });
 
         window['{{$name}}'].on('text-change', function() {
-            document.getElementById('{{$name}}').value = window['{{$name}}'].getText();
+            @if ($type === 'html')
+                document.getElementById('{{$name}}').value = window['{{$name}}'].root.innerHTML;
+            @else
+                document.getElementById('{{$name}}').value = window['{{$name}}'].getText();
+            @endif
         });
     </script>
 @endpush

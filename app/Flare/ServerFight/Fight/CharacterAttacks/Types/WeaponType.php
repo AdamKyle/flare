@@ -77,7 +77,6 @@ class WeaponType extends BattleBase {
     }
 
     public function doWeaponAttack(Character $character, ServerMonster $serverMonster): WeaponType {
-
         $weaponDamage = $this->attackData['weapon_damage'];
 
         if (!$this->isEnemyEntranced) {

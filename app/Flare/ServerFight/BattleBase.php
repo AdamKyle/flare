@@ -95,11 +95,14 @@ class BattleBase extends BattleMessages {
 
         $secondaryAttacks->doSecondaryAttack($character, $monster, $affixReduction, $isPvp);
 
+        $this->monsterHealth   = $secondaryAttacks->getMonsterHealth();
+        $this->characterHealth = $secondaryAttacks->getCharacterHealth();
+
         if ($isPvp) {
             $this->mergeAttackerMessages($secondaryAttacks->getAttackerMessages());
             $this->mergeDefenderMessages($secondaryAttacks->getDefenderMessages());
         } else {
-            $secondaryAttacks->mergeMessages($secondaryAttacks->getMessages());
+            $this->mergeMessages($secondaryAttacks->getMessages());
         }
 
         $secondaryAttacks->clearMessages();

@@ -432,6 +432,26 @@ class Item extends Model
     }
 
     /**
+     * Can get attributes off the attached affix.
+     *
+     * @param string $attribute
+     * @return float
+     */
+    public function getAffixAttribute(string $attribute): float {
+        $base = 0.0;
+
+        if (!is_null($this->itemPrefix)) {
+            $base += $this->itemPrefix->{$attribute};
+        }
+
+        if (!is_null($this->itemSuffix)) {
+            $base += $this->itemSuffix->{$attribute};
+        }
+
+        return $base;
+    }
+
+    /**
      * Gets the total percentage increase for a stat.
      *
      * @return float

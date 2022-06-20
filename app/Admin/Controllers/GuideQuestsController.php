@@ -69,6 +69,8 @@ class GuideQuestsController extends Controller {
     public function store(GuideQuestManagement $request) {
         $params = $this->guideQuestService->cleanRequest($request->all());
 
+        $params['instructions'] = str_replace('<p><br></p>', '', $params['instructions']);
+
         $guideQuest = GuideQuest::updateOrCreate(['id' => $params['id']], $params);
 
         return response()->redirectToRoute('admin.guide-quests.show', ['guideQuest' => $guideQuest->id])->with('success', 'Saved Guide Quest');

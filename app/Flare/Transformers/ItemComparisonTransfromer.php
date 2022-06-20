@@ -61,6 +61,18 @@ class ItemComparisonTransfromer extends TransformerAbstract {
             'ambush_resistance_chance'         => $item->ambush_resistance,
             'counter_chance'                   => $item->counter_chance,
             'counter_resistance_chance'        => $item->counter_resistance,
+            'str_reduction'                    => $item->getAffixAttribute('str_reduction'),
+            'dur_reduction'                    => $item->getAffixAttribute('dur_reduction'),
+            'dex_reduction'                    => $item->getAffixAttribute('dex_reduction'),
+            'chr_reduction'                    => $item->getAffixAttribute('chr_reduction'),
+            'int_reduction'                    => $item->getAffixAttribute('int_reduction'),
+            'agi_reduction'                    => $item->getAffixAttribute('agi_reduction'),
+            'focus_reduction'                  => $item->getAffixAttribute('focus_reduction'),
+            'reduces_enemy_stats'              => $item->getAffixAttribute('reduces_enemy_stats'),
+            'steal_life_amount'                => $item->getAffixAttribute('steal_life_amount'),
+            'entranced_chance'                 => $item->getAffixAttribute('entranced_chance'),
+            'damage'                           => $item->getAffixAttribute('damage'),
+            'class_bonus'                      => $item->getAffixAttribute('class_bonus'),
         ];
     }
 }

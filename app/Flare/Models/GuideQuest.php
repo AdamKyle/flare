@@ -26,6 +26,8 @@ class GuideQuest extends Model
         'required_quest_id',
         'required_quest_item_id',
         'reward_level',
+        'gold_dust_reward',
+        'shards_reward',
     ];
 
     /**
@@ -43,6 +45,8 @@ class GuideQuest extends Model
         'required_quest_id'      => 'integer',
         'required_quest_item_id' => 'integer',
         'reward_level'           => 'integer',
+        'gold_dust_reward'       => 'integer',
+        'shards_reward'          => 'integer',
     ];
 
     protected $appends = [

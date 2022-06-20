@@ -47,20 +47,14 @@ export default class ServerMessages extends React.Component<ServerMessagesCompon
 
                 {
                     this.state.view_item && this.state.slot_id !== 0 ?
-                        this.state.is_quest_item ?
-                            <InventoryUseDetails character_id={this.props.character_id}
-                                                 item_id={this.state.slot_id}
-                                                 is_open={this.state.view_item}
-                                                 manage_modal={this.viewItem.bind(this)} />
-                        :
-                            <ItemComparison
-                                is_open={this.state.view_item}
-                                manage_modal={this.viewItem.bind(this)}
-                                character_id={this.props.character_id}
-                                slot_id={this.state.slot_id}
-                                view_port={this.props.view_port}
-                                is_automation_running={this.props.is_automation_running}
-                            />
+                        <ItemComparison
+                            is_open={this.state.view_item}
+                            manage_modal={this.viewItem.bind(this)}
+                            character_id={this.props.character_id}
+                            slot_id={this.state.slot_id}
+                            view_port={this.props.view_port}
+                            is_automation_running={this.props.is_automation_running}
+                        />
                     : null
                 }
             </Fragment>

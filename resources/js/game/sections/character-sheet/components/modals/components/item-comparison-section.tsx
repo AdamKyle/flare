@@ -26,8 +26,8 @@ export default class ItemComparisonSection extends React.Component<any, any> {
     }
 
     renderChange(details: InventoryComparisonAdjustment, itemToEquip?: InventoryComparisonAdjustment) {
-        const invalidFields     = ['id', 'min_cost', 'skill_level_req', 'skill_level_trivial', 'holy_level', 'holy_stack_devouring_darkness', 'holy_stack_stat_bonus', 'holy_stacks', 'holy_stacks_applied', 'cost', 'shop_cost', 'slot_id', 'affix_count', 'is_unique'];
-        const wholeNumberValues = ['damage_adjustment', 'ac_adjustment', 'healing_adjustment', 'base_damage', 'base_ac', 'holy_stacks', 'holy_stacks_applied'];
+        const invalidFields     = ['id', 'min_cost', 'skill_level_req', 'skill_level_trivial', 'holy_level', 'holy_stacks', 'holy_stacks_applied', 'reduces_enemy_stats', 'cost', 'shop_cost', 'slot_id', 'affix_count', 'is_unique'];
+        const wholeNumberValues = ['damage_adjustment', 'damage', 'ac_adjustment', 'healing_adjustment', 'base_damage', 'base_ac', 'holy_stacks', 'holy_stacks_applied'];
 
         let elements = Object.keys(details).map((key) => {
             if (!invalidFields.includes(key)) {
@@ -81,8 +81,8 @@ export default class ItemComparisonSection extends React.Component<any, any> {
     }
 
     renderItemToEquip(itemToEquip: InventoryComparisonAdjustment) {
-        const invalidFields     = ['id', 'min_cost', 'skill_level_req', 'skill_level_trivial', 'cost', 'shop_cost', 'slot_id', 'holy_level', 'affix_count', 'is_unique'];
-        const wholeNumberValues = ['damage_adjustment', 'ac_adjustment', 'healing_adjustment', 'base_damage', 'base_ac', 'holy_stacks', 'holy_stacks_applied'];
+        const invalidFields     = ['id', 'min_cost', 'skill_level_req', 'skill_level_trivial', 'reduces_enemy_stats', 'cost', 'shop_cost', 'slot_id', 'holy_level', 'affix_count', 'is_unique'];
+        const wholeNumberValues = ['damage_adjustment', 'damage', 'ac_adjustment', 'healing_adjustment', 'base_damage', 'base_ac', 'holy_stacks', 'holy_stacks_applied'];
 
         return Object.keys(itemToEquip).map((key) => {
             if (!invalidFields.includes(key)) {

@@ -142,7 +142,7 @@ export default class DuelPlayer extends React.Component<any, any> {
             }, (error: AxiosError) => {
                 if (typeof error.response !== 'undefined') {
                     const data = error.response.data;
-                    console.log(data);
+
                     this.setState({
                         error_message: data.message,
                         preforming_action: false,

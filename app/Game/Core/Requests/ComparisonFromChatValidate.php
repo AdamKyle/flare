@@ -24,7 +24,7 @@ class ComparisonFromChatValidate extends FormRequest
     public function rules()
     {
         return [
-            'slot_id' => 'required',
+            'id' => 'required',
         ];
     }
 

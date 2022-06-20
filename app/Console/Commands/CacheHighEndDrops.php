@@ -45,8 +45,22 @@ class CacheHighEndDrops extends Command
     public function handle()
     {
 
-        $prefixItems = Item::inRandomOrder()->where('cost', '<=', 4000000000)->whereHas('itemPrefix')->take(100)->pluck('id')->toArray();
-        $suffixItems = Item::inRandomOrder()->where('cost', '<=', 4000000000)->whereHas('itemSuffix')->take(100)->pluck('id')->toArray();
+        Cache::delete('highend-droppable-items');
+
+        $prefixItems = Item::inRandomOrder()->where('cost', '<=', 4000000000)->where('is_mythic', false)->whereHas('itemPrefix')->take(100)->get();
+        $suffixItems = Item::inRandomOrder()->where('cost', '<=', 4000000000)->where('is_mythic', false)->whereHas('itemSuffix')->take(100)->get();
+
+        $prefixItems = $prefixItems->filter(function($prefix) {
+            if (!$prefix->is_unique) {
+                return $prefix;
+            }
+        })->pluck('id')->toArray();
+
+        $suffixItems = $suffixItems->filter(function($suffix) {
+            if (!$suffix->is_unique) {
+                return $suffix;
+            }
+        })->pluck('id')->toArray();
 
         $this->itemIds = array_merge($suffixItems, $prefixItems);
 

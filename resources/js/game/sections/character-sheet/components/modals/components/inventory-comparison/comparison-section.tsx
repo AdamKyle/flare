@@ -166,11 +166,6 @@ export default class ComparisonSection extends React.Component<ComparisonSection
                 }
 
                 <ItemComparisonSection comparison_details={this.props.comparison_details} />
-                <p className='mt-4 mb-4'>
-                    Are you investigating the item's attached prefixes and affixes? An item may be worse for you, but
-                    click details to see attached affixes, you can then click those for even further details to see what the affix does.
-                    It might say its worse for you, but the affixes can make a bug difference, damage, life stealing, reduction so on ...
-                </p>
                 <div className='border-b-2 mt-6 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                 <div className={clsx(
                     'mt-6 grid grid-cols-1 w-full gap-2 md:m-auto',

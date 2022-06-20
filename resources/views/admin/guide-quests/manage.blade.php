@@ -18,8 +18,8 @@
                         <h3 class="mb-3">Basic Info</h3>
                         <x-core.forms.input :model="$guideQuest" label="Name:" modelKey="name" name="name" />
                         <x-core.forms.input :model="$guideQuest" label="Reward Level:" modelKey="reward_level" name="reward_level" />
-                        <x-core.forms.quill-editor :model="$guideQuest" label="Guide Text:" modelKey="intro_text" name="intro_text" quillId="intro-text"/>
-                        <x-core.forms.quill-editor :model="$guideQuest" label="Instructions:" modelKey="instructions" name="instructions" quillId="quest-instructions"/>
+                        <x-core.forms.quill-editor type="normal" :model="$guideQuest" label="Guide Text:" modelKey="intro_text" name="intro_text" quillId="intro-text"/>
+                        <x-core.forms.quill-editor type="html" :model="$guideQuest" label="Instructions:" modelKey="instructions" name="instructions" quillId="quest-instructions"/>
                     </x-core.form-wizard.content>
 
                     <x-core.form-wizard.content target="tab-style-2-2">
@@ -40,6 +40,12 @@
                                 <x-core.forms.key-value-select :model="$guideQuest" label="Required Quest Item:" modelKey="required_quest_item_id" name="required_quest_item_id" :options="$questItems"/>
                             </div>
                         </div>
+
+                        <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+
+                        <h3 class="mb-3">Currency Rewards</h3>
+                        <x-core.forms.input :model="$guideQuest" label="Gold Dust Reward:" modelKey="gold_dust_reward" name="gold_dust_reward" />
+                        <x-core.forms.input :model="$guideQuest" label="Shards Reward:" modelKey="shards_reward" name="shards_reward" />
 
                     </x-core.form-wizard.content>
                 </x-core.form-wizard.contents>

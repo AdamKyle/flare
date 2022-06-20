@@ -111,10 +111,6 @@ class ItemComparison {
         return $toCompare->spell_evasion - $equipped->spell_evasion;
     }
 
-    public function getArtifactAnnulmentAdjustment(Item $toCompare, Item $equipped): int {
-        return $toCompare->artifact_annulment - $equipped->artifact_annulment;
-    }
-
     public function getAmbushChanceAdjustment(Item $toCompare, Item $equipped): int {
         return $toCompare->ambush_chance - $equipped->ambush_chance;
     }
@@ -158,7 +154,6 @@ class ItemComparison {
             'focus_adjustment',
             'fight_time_out_mod_adjustment',
             'spell_evasion_adjustment',
-            'artifact_annulment_adjustment',
             'res_chance_adjustment',
             'ambush_chance_adjustment',
             'ambush_resistance_adjustment',
@@ -184,8 +179,44 @@ class ItemComparison {
             }
         }
 
+        $result = $this->getAffixComparisons($toCompare, $foundPosition->item, $result);
+
         if (!empty($result)) {
             $result['name'] = $foundPosition->item->affix_name;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get Affix Comparisons.
+     *
+     * @param Item $toCompare
+     * @param Item $equippedItem
+     * @param array $result
+     * @return array
+     */
+    protected function getAffixComparisons(Item $toCompare, Item $equippedItem, array $result): array {
+        $attributes = [
+            'str_reduction',
+            'dur_reduction',
+            'dex_reduction',
+            'chr_reduction',
+            'int_reduction',
+            'agi_reduction',
+            'focus_reduction',
+            'reduces_enemy_stats',
+            'steal_life_amount',
+            'entranced_chance',
+            'damage',
+            'class_bonus',
+        ];
+
+        foreach ($attributes as $attribute) {
+            $toEquipAttribute  = $toCompare->getAffixAttribute($attribute);
+            $equippedAttribute = $equippedItem->getAffixAttribute($attribute);
+
+            $result[$attribute] = ($toEquipAttribute - $equippedAttribute);
         }
 
         return $result;

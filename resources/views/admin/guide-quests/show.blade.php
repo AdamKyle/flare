@@ -30,7 +30,7 @@
                     </p>
                     <h3 class="text-sky-600 dark:text-sky-500">Requirements</h3>
                     <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                    <dl>
+                    <dl class='mb-5'>
                         @if (!is_null($guideQuest->required_level))
                             <dt>Required Player Level</dt>
                             <dd>{{$guideQuest->required_level}}</dd>
@@ -56,6 +56,14 @@
                             <dd>{{$guideQuest->quest_item_name}}</dd>
                         @endif
                     </dl>
+                    <h3 class="text-sky-600 dark:text-sky-500">Currency Rewards</h3>
+                    <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                    <dl>
+                        <dt>Gold Dust Reward</dt>
+                        <dd>{{is_null($guideQuest->gold_dust_reward) ? 0 : number_format($guideQuest->gold_dust_reward)}}</dd>
+                        <dt>Shards Reward</dt>
+                        <dd>{{is_null($guideQuest->shards_reward) ? 0 : number_format($guideQuest->shards_reward)}}</dd>
+                    </dl>
                 </div>
                 <div class='block md:hidden border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                 <div>
@@ -68,8 +76,8 @@
 
                     <div class="border-1 rounded-sm p-2 bg-slate-300 dark:bg-slate-700 max-h-[250px] overflow-x-scroll">
                         <h3 class="mb-4">Instructions</h3>
-                        <div>
-                            {!! nl2br($guideQuest->instructions) !!}
+                        <div class="guide-quest-instructions">
+                            {!! $guideQuest->instructions !!}
                         </div>
                     </div>
                 </div>

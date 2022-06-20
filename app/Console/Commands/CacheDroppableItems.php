@@ -45,8 +45,22 @@ class CacheDroppableItems extends Command
     public function handle()
     {
 
-        $prefixes = Item::inRandomOrder()->where('can_drop', true)->whereHas('itemPrefix')->take(100)->pluck('id')->toArray();
-        $suffixes = Item::inRandomOrder()->where('can_drop', true)->whereHas('itemSuffix')->take(100)->pluck('id')->toArray();
+        Cache::delete('droppable-items');
+
+        $prefixes = Item::inRandomOrder()->where('can_drop', true)->where('is_mythic', false)->whereHas('itemPrefix')->take(100)->get();
+        $suffixes = Item::inRandomOrder()->where('can_drop', true)->where('is_mythic', false)->whereHas('itemSuffix')->take(100)->get();
+
+        $prefixes = $prefixes->filter(function($prefix) {
+            if (!$prefix->is_unique) {
+                return $prefix;
+            }
+        })->pluck('id')->toArray();
+
+        $suffixes = $suffixes->filter(function($suffix) {
+            if (!$suffix->is_unique) {
+                return $suffix;
+            }
+        })->pluck('id')->toArray();
 
         $this->itemIds = array_merge($prefixes, $suffixes);
 

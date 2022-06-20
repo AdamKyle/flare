@@ -284,7 +284,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                                 is_automation_running={this.props.is_automaton_running}
                     />
                 </div>
-                <div className={'mt-3'}>
+                <div className={'mt-4'}>
                     {
                         this.state.automation_time_out !== 0 && this.state.time_left !== 0 ?
 

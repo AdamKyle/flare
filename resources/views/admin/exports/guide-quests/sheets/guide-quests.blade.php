@@ -14,6 +14,8 @@
             <th>required_quest_id</th>
             <th>required_quest_item_id</th>
             <th>reward_level</th>
+            <th>gold_dust_reward</th>
+            <th>shards_reward</th>
         </tr>
     </thead>
     <tbody>
@@ -32,6 +34,8 @@
                 <td>{{$guideQuest->required_quest_id}}</td>
                 <td>{{$guideQuest->required_quest_item_id}}</td>
                 <td>{{$guideQuest->reward_level}}</td>
+                <td>{{$guideQuest->gold_dust_reward}}</td>
+                <td>{{$guideQuest->shards_reward}}</td>
             </tr>
         @endforeach
     </tbody>
