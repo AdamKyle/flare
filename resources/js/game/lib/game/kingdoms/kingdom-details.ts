@@ -1,7 +1,11 @@
+import BuildingDetails from "./building-details";
+
 export default interface KingdomDetails {
     building_cost_reduction: number;
 
     building_queue: [];
+
+    buildings: BuildingDetails[] | [];
 
     building_time_reduction: number;
 
@@ -21,7 +25,7 @@ export default interface KingdomDetails {
 
     current_stone: number;
 
-    current_units: []
+    current_units: [];
 
     current_wood: number;
 
@@ -61,9 +65,9 @@ export default interface KingdomDetails {
 
     unit_cost_reduction: number;
 
-    unit_movement: []
+    unit_movement: [];
 
-    unit_queue: []
+    unit_queue: [];
 
     unit_time_reduction: number;
 

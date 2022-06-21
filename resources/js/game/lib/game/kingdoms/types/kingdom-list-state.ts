@@ -7,4 +7,6 @@ export default interface KingdomListState {
     dark_tables: boolean;
 
     kingdoms: KingdomDetails[] | [],
+
+    selected_kingdom: KingdomDetails | null;
 }

@@ -291,9 +291,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                         </BasicCard>
                     </TabPanel>
                     <TabPanel key={'kingdoms'}>
-                        <BasicCard>
-                            <KingdomsList my_kingdoms={this.state.kingdoms} />
-                        </BasicCard>
+                        <KingdomsList my_kingdoms={this.state.kingdoms} view_port={this.state.view_port}/>
                     </TabPanel>
                 </Tabs>
 
