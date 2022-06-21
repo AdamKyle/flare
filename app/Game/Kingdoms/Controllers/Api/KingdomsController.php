@@ -116,31 +116,29 @@ class KingdomsController extends Controller
 
             return response()->json([
                 'message' => 'You can settle another kingdom in: ' . now()->diffInMinutes($character->can_settle_again_at) . ' Minutes.'
-            ], 200);
+            ], 422);
         }
 
         if ($character->map->gameMap->mapType()->isPurgatory()) {
             return response()->json([
                 'message' => 'Child, this is not place to be a King or Queen, The Creator would destroy anything you build down here.'
-            ], 200);
+            ], 422);
         }
 
         $kingdom = Kingdom::where('name', $request->name)->where('game_map_id', $character->map->game_map_id)->first();
 
         if (!is_null($kingdom)) {
-            return response()->json(['message' => 'Name is taken'], 422);
+            return response()->json(['message' => 'Name is already taken'], 422);
         }
 
-        $kingdomService->setParams($request->all(), $character);
-
-        if (!$kingdomService->canSettle($request->x_position, $request->y_position, $character)) {
+        if (!$kingdomService->canSettle($character)) {
             return response()->json([
-                'message' => 'Cannot settle here.'
-            ], 200);
+                'message' => $kingdomService->getErrorMessage()
+            ], 422);
         }
 
-        if ($kingdomService->canAfford($request->kingdom_amount, $character)) {
-            $amount = $request->kingdom_amount * 10000;
+        if ($kingdomService->canAfford($character)) {
+            $amount = $character->kingdoms->count() * 10000;
 
             $character->update([
                 'gold' => $character->gold - $amount,
@@ -153,7 +151,7 @@ class KingdomsController extends Controller
             ], 200);
         }
 
-        $kingdomService->createKingdom($character);
+        $kingdomService->createKingdom($character, $request->name);
 
         return response()->json($kingdomService->addKingdomToMap($character), 200);
     }

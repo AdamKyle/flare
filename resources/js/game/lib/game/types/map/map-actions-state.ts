@@ -21,4 +21,6 @@ export default interface MapActionsState {
     show_traverse: boolean;
 
     show_conjuration: boolean;
+
+    open_settle_kingdom_modal: boolean;
 }

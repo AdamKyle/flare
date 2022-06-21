@@ -26,17 +26,20 @@ class KingdomService {
     /**
      * @var KingdomBuilder $builder
      */
-    private $builder;
+    private KingdomBuilder$builder;
 
-    private $kingdomTransformer;
+    private KingdomTransformer $kingdomTransformer;
 
-    private $manager;
+    private Manager $manager;
+
+    private string $errorMessage;
 
     /**
      * constructor
      *
      * @param KingdomBuilder $builder
-     * @return void
+     * @param KingdomTransformer $kingdomTransformer
+     * @param Manager $manager
      */
     public function __construct(KingdomBuilder $builder, KingdomTransformer $kingdomTransformer, Manager $manager) {
         $this->builder            = $builder;
@@ -45,26 +48,14 @@ class KingdomService {
     }
 
     /**
-     * Sets the params for the kingdom.
-     *
-     * @param array $params
-     * @param Character $character
-     * @return void
-     */
-    public function setParams(array $params, Character $character): void {
-        $params['color'] = $character->map->gameMap->kingdom_color;
-
-        $this->builder->setRequestAttributes($params);
-    }
-
-    /**
      * Creates the kingdom for the character.
      *
      * @param Character $character
+     * @param string $name
      * @return Kingdom
      */
-    public function createKingdom(Character $character): Kingdom {
-        $kingdom = $this->builder->createKingdom($character);
+    public function createKingdom(Character $character, string $name): Kingdom {
+        $kingdom = $this->builder->createKingdom($character, $name, $character->map->gameMap->kingdom_color);
 
         $kingdom = $this->assignKingdomBuildings($kingdom);
 
@@ -74,26 +65,39 @@ class KingdomService {
     }
 
     /**
+     * @return string
+     */
+    public function getErrorMessage(): string {
+        return $this->errorMessage;
+    }
+
+    /**
      * Can the character settle here?
      *
-     * No if there is a kingdom there.
-     * No if there is a location there.
+     * - No if there is a kingdom there.
+     * - No if there is a location there.
      *
-     * @param int $x
-     * @param int $y
      * @param Character $character
      * @return bool
      */
-    public function canSettle(int $x, int $y, Character $character): bool {
+    public function canSettle(Character $character): bool {
+        $x = $character->map->character_position_x;
+        $y = $character->map->character_position_y;
+
         $kingdom = Kingdom::where('x_position', $x)->where('y_position', $y)->where('game_map_id', $character->map->game_map_id)->first();
 
         if (!is_null($kingdom)) {
+
+            $this->errorMessage = 'You are not allowed to settle on top of another kingdom.';
+
             return false;
         }
 
         $location = Location::where('x', $x)->where('y', $y)->where('game_map_id', $character->map->game_map_id)->first();
 
         if (!is_null($location)) {
+            $this->errorMessage = 'You are too close to this location, you must be two steps away in any direction.';
+
             return false;
         }
 
@@ -106,18 +110,27 @@ class KingdomService {
         $downLeft  = Location::where('x', $x - 16)->where('y', $y + 16)->where('game_map_id', $character->map->game_map_id)->first();
         $downRight = Location::where('x', $x + 16)->where('y', $y + 16)->where('game_map_id', $character->map->game_map_id)->first();
 
-        return (is_null($up) && is_null($down) && is_null($left) && is_null($right) &&
+        $canSettle = (is_null($up) && is_null($down) && is_null($left) && is_null($right) &&
             is_null($upLeft) && is_null($upRight) && is_null($downLeft) && is_null($downRight));
+
+        if (!$canSettle) {
+            $this->errorMessage = 'You are too close to this location, you must be two steps away in any direction.';
+
+            return false;
+        }
+
+        return $canSettle;
     }
 
     /**
      * Can you afford to settle here?
      *
-     * @param int $amount
      * @param Character $character
      * @return bool
      */
-    public function canAfford(int $amount, Character $character): bool {
+    public function canAfford(Character $character): bool {
+        $amount = $character->kingdoms->count();
+
         if ($amount > 0) {
             $amount *= 10000;
 
@@ -168,7 +181,9 @@ class KingdomService {
             // @codeCoverageIgnoreEnd
         }
 
-        return [];
+        return [
+            'message' => 'Settled a new kingdom! Check your Kingdoms tab.',
+        ];
     }
 
     /**

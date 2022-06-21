@@ -135,20 +135,20 @@ export default class TeleportModal extends React.Component<SetSailModalProps, Se
                           secondary_button_label: 'Set Sail',
                       }}
             >
-                <div className='flex items-center'>
-                    <label className='w-[50px]'>Ports</label>
-                    <div className='w-2/3'>
-                        <Select
-                            onChange={this.setPortData.bind(this)}
-                            options={this.buildSetSailOptions()}
-                            menuPosition={'absolute'}
-                            menuPlacement={'bottom'}
-                            styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999, color: '#000000' }) }}
-                            menuPortalTarget={document.body}
-                            value={this.getDefaultPortValue()}
-                        />
-                    </div>
+            <div className='flex items-center'>
+                <label className='w-[50px]'>Ports</label>
+                <div className='w-2/3'>
+                    <Select
+                        onChange={this.setPortData.bind(this)}
+                        options={this.buildSetSailOptions()}
+                        menuPosition={'absolute'}
+                        menuPlacement={'bottom'}
+                        styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999, color: '#000000' }) }}
+                        menuPortalTarget={document.body}
+                        value={this.getDefaultPortValue()}
+                    />
                 </div>
+            </div>
                 <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                 <dl>
                     <dt>Cost in Gold:</dt>

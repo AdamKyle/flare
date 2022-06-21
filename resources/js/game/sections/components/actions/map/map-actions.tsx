@@ -10,6 +10,11 @@ import SetSailModal from "../modals/set-sail-modal";
 import TraverseModal from "../modals/traverse-modal";
 import PurpleButton from "../../../../components/ui/buttons/purple-button";
 import Conjuration from "../modals/conjuration";
+import SuccessButton from "../../../../components/ui/buttons/success-button";
+import SettleKingdomModal from "../modals/settle-kingdom-modal";
+import LocationDetails from "../../../../lib/game/map/types/location-details";
+import PlayerKingdomsDetails from "../../../../lib/game/types/map/player-kingdoms-details";
+import NpcKingdomsDetails from "../../../../lib/game/types/map/npc-kingdoms-details";
 
 export default class MapActions extends React.Component<MapActionsProps, MapActionsState> {
 
@@ -27,6 +32,7 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
             open_set_sail_modal: false,
             show_traverse: false,
             show_conjuration: false,
+            open_settle_kingdom_modal: false,
         }
     }
 
@@ -60,6 +66,26 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
         } else if (this.state.npc_kingdom_id !== null) {
             this.handleNpcKingdomsChange();
         }
+    }
+
+    canSettleHere() {
+        const locations = this.props.locations.filter((location: LocationDetails) => {
+            return location.x === this.props.character_position.x && location.y === this.props.character_position.y;
+        });
+
+        const playerKingdom = this.props.player_kingdoms.filter((playerKingdom: PlayerKingdomsDetails) => {
+            return playerKingdom.x_position === this.props.character_position.x && playerKingdom.y_position === this.props.character_position.y;
+        });
+
+        const enemyKingdoms = this.props.enemy_kingdoms.filter((enemyKingdom: PlayerKingdomsDetails) => {
+            return enemyKingdom.x_position === this.props.character_position.x && enemyKingdom.y_position === this.props.character_position.y;
+        });
+
+        const npcKingdoms = this.props.npc_kingdoms.filter((npcKingdom: NpcKingdomsDetails) => {
+            return npcKingdom.x_position === this.props.character_position.x && npcKingdom.y_position === this.props.character_position.y;
+        });
+
+        return (locations.length === 0 && playerKingdom.length === 0 && enemyKingdoms.length === 0 && npcKingdoms.length === 0);
     }
 
     handlePlayerKingdomChange() {
@@ -207,6 +233,12 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
         });
     }
 
+    manageSettleModal() {
+        this.setState({
+            open_settle_kingdom_modal: !this.state.open_settle_kingdom_modal,
+        });
+    }
+
     setSail() {
         this.manageSetSailModal();
     }
@@ -262,7 +294,7 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                             {
                                 this.props.port_location !== null ?
                                     <SuccessOutlineButton additional_css={'text-center col-start-1 col-end-1'} button_label={'Set Sail'} on_click={this.setSail.bind(this)} disabled={this.state.is_movement_disabled || this.props.is_dead || this.props.is_automation_running}/>
-                                    : null
+                                : null
                             }
 
                             <SuccessOutlineButton additional_css={'text-center col-start-2 col-end-2'}
@@ -278,6 +310,11 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                     <div className='flex items-center'>
                         {this.renderViewDetailsButton()}
                         <PurpleButton button_label={'Conjure'} on_click={() => this.conjure()} disabled={this.state.is_movement_disabled || this.props.is_dead || this.props.is_automation_running} additional_css={'ml-2'}/>
+                        {
+                            this.canSettleHere() ?
+                                <SuccessButton additional_css={'text-center ml-2'} button_label={'Settle'} on_click={this.manageSettleModal.bind(this)} disabled={this.state.is_movement_disabled || this.props.is_dead || this.props.is_automation_running}/>
+                            : null
+                        }
                     </div>
                 </div>
                 <div className='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 hidden sm:block'></div>
@@ -363,6 +400,17 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                             map_id={this.props.map_id}
                         />
                     : null
+                }
+
+                {
+                    this.state.open_settle_kingdom_modal ?
+                        <SettleKingdomModal
+                            is_open={this.state.open_settle_kingdom_modal}
+                            handle_close={this.manageSettleModal.bind(this)}
+                            character_id={this.props.character_id}
+                            map_id={this.props.map_id}
+                        />
+                        : null
                 }
             </Fragment>
         )

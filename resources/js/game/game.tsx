@@ -17,6 +17,7 @@ import ForceNameChange from "./sections/force-name-change/force-name-change";
 import SmallerActions from "./sections/game-actions-section/smaller-actions";
 import QuestType from "./lib/game/types/quests/quest-type";
 import ScreenRefresh from './sections/screen-refresh/screen-refresh';
+import KingdomsList from "./sections/kingdoms/kingdoms-list";
 
 export default class Game extends React.Component<GameProps, GameState> {
 
@@ -50,7 +51,7 @@ export default class Game extends React.Component<GameProps, GameState> {
             name: 'Quests'
         }, {
             key: 'kingdoms',
-            name: 'Kingdom'
+            name: 'Kingdoms'
         }]
 
         this.state = {
@@ -127,7 +128,6 @@ export default class Game extends React.Component<GameProps, GameState> {
 
         // @ts-ignore
         this.characterStatus.listen('Game.Battle.Events.UpdateCharacterStatus', (event: any) => {
-            console.log(event);
             this.setState({
                 character_status: event.characterStatuses,
                 character: {...this.state.character, ...event.characterStatuses}
@@ -292,7 +292,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                     </TabPanel>
                     <TabPanel key={'kingdoms'}>
                         <BasicCard>
-                            <p>Kingdoms</p>
+                            <KingdomsList my_kingdoms={this.state.kingdoms} />
                         </BasicCard>
                     </TabPanel>
                 </Tabs>

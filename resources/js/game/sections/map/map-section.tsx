@@ -25,6 +25,10 @@ export default class MapSection extends React.Component<MapProps, MapState> {
 
     private explorationTimeOut: any;
 
+    private globalMapUpdate: any;
+
+    private kingdomsUpdate: any;
+
     constructor(props: MapProps) {
         super(props);
 
@@ -40,12 +44,12 @@ export default class MapSection extends React.Component<MapProps, MapState> {
             game_map_id: 0,
             bottom_bounds: 0,
             right_bounds: 0,
-            locations: null,
+            locations: [],
             port_location: null,
             loading: true,
-            player_kingdoms: null,
-            enemy_kingdoms: null,
-            npc_kingdoms: null,
+            player_kingdoms: [],
+            enemy_kingdoms: [],
+            npc_kingdoms: [],
             coordinates: null,
             can_player_move: true,
             characters_on_map: 0,
@@ -55,6 +59,12 @@ export default class MapSection extends React.Component<MapProps, MapState> {
 
         // @ts-ignore
         this.mapTimeOut         = Echo.private('show-timeout-move-' + this.props.user_id);
+
+        // @ts-ignore
+        this.globalMapUpdate    = Echo.private('global-map-update');
+
+        // @ts-ignore
+        this.kingdomsUpdate     = Echo.private('add-kingdom-to-map-' + this.props.user_id);
 
         // @ts-ignore
         this.explorationTimeOut = Echo.private('exploration-timeout-' + this.props.user_id);
@@ -89,9 +99,22 @@ export default class MapSection extends React.Component<MapProps, MapState> {
             this.setStateFromData(event.mapDetails);
         });
 
+        this.globalMapUpdate.listen('Game.Kingdoms.Events.UpdateGlobalMap', (event: any) => {
+            this.setState({
+                enemy_kingdoms: {...this.state.enemy_kingdoms, ...event.otherKingdoms},
+            });
+        });
+
         this.explorationTimeOut.listen('Game.Exploration.Events.ExplorationTimeOut', (event: any) => {
             this.setState({
                 automation_time_out: event.forLength,
+            });
+        });
+
+        this.kingdomsUpdate.listen('Game.Kingdoms.Events.AddKingdomToMap', (event: any) => {
+            this.setState({
+                npc_kingdoms: [...this.state.npc_kingdoms, ...event.npcKingdoms],
+                player_kingdoms: [...this.state.player_kingdoms, ...event.myKingdoms]
             });
         });
     }

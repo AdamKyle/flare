@@ -25,9 +25,6 @@ class KingdomsSettleRequest extends FormRequest
     {
         return [
             'name'           => 'required|min:5|max:30',
-            'x_position'     => 'required|integer',
-            'y_position'     => 'required|integer',
-            'kingdom_amount' => 'required|integer',
         ];
     }
 
@@ -36,9 +33,6 @@ class KingdomsSettleRequest extends FormRequest
             'name.required'           => 'Name is required.',
             'name.max'                => 'Name can only be 30 characters long.',
             'name.min'                => 'Name must be 5 characters long at least.',
-            'x_position.required'     => 'Missing x position.',
-            'y_position.required'     => 'Missing y position.',
-            'kingdom_amount.required' => 'Missing current kingdom amount',
         ];
     }
 }

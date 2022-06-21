@@ -17,17 +17,17 @@ export default interface MapState {
 
     right_bounds:  number,
 
-    locations: LocationDetails[] | null;
+    locations: LocationDetails[] | [];
 
     port_location: LocationDetails | null;
 
     loading: boolean;
 
-    player_kingdoms: PlayerKingdomsDetails[] | null;
+    player_kingdoms: PlayerKingdomsDetails[] | [];
 
-    enemy_kingdoms: PlayerKingdomsDetails[] | null;
+    enemy_kingdoms: PlayerKingdomsDetails[] | [];
 
-    npc_kingdoms: NpcKingdomsDetails[] | null;
+    npc_kingdoms: NpcKingdomsDetails[] | [];
 
     coordinates: {x: number[], y: number[]} | null;
 

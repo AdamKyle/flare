@@ -46,7 +46,10 @@ class MonthlyPvPEvent extends Command
                 $user = User::find($session->user_id);
 
                 if (!is_null($user->character)) {
-                    event(new UpdateCharacterStatus($user->character));
+
+                    if ($user->character->level >= 301) {
+                        event(new UpdateCharacterStatus($user->character));
+                    }
                 }
             }
         });

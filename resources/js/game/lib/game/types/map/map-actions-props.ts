@@ -1,5 +1,6 @@
 import LocationDetails from "../../map/types/location-details";
 import NpcKingdomsDetails from "./npc-kingdoms-details";
+import PlayerKingdomsDetails from "./player-kingdoms-details";
 
 export default interface MapActionsProps {
 
@@ -15,13 +16,13 @@ export default interface MapActionsProps {
 
     players_on_map: number;
 
-    locations: LocationDetails[] | null;
+    locations: LocationDetails[] | [];
 
-    npc_kingdoms: NpcKingdomsDetails[] | null;
+    npc_kingdoms: NpcKingdomsDetails[] | [];
 
-    player_kingdoms: {id: number, x_position: number, y_position: number, color: string, character_id: number, name: string}[] | null;
+    player_kingdoms: PlayerKingdomsDetails[] | [];
 
-    enemy_kingdoms: {id: number, x_position: number, y_position: number, color: string, character_id: number, name: string}[] | null;
+    enemy_kingdoms: PlayerKingdomsDetails[] | [];
 
     port_location: LocationDetails| null;
 

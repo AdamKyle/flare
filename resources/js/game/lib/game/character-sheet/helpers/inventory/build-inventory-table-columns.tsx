@@ -5,6 +5,14 @@ import ActionsInterface from "./actions-interface";
 import InventoryDetails from "../../types/inventory/inventory-details";
 import UsableItemsDetails from "../../types/inventory/usable-items-details";
 
+/**
+ * Build Inventory Table Columns
+ *
+ * @param component
+ * @param clickAction
+ * @param componentName
+ * @constructor
+ */
 export const BuildInventoryTableColumns = (component?: ActionsInterface, clickAction?: (item?: InventoryDetails | UsableItemsDetails) => any, componentName?: string) => {
     const columns = [
         {
@@ -58,6 +66,12 @@ export const BuildInventoryTableColumns = (component?: ActionsInterface, clickAc
     return columns;
 }
 
+/**
+ * Build A limited set of columns.
+ *
+ * @param component
+ * @param onClick
+ */
 export const buildLimitedColumns = (component?: ActionsInterface, onClick?: (item?: InventoryDetails | UsableItemsDetails) => any) => {
         const columns = [
             {

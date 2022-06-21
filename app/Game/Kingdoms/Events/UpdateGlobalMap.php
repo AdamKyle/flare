@@ -20,12 +20,7 @@ class UpdateGlobalMap implements ShouldBroadcastNow
     /**
      * @var array $otherKingdoms
      */
-    public $otherKingdoms;
-
-    /**
-     * @var string $mapName
-     */
-    public $mapName;
+    public array $otherKingdoms;
 
     /**
      * Create a new event instance.
@@ -33,7 +28,6 @@ class UpdateGlobalMap implements ShouldBroadcastNow
      * @param Character $character
      */
     public function __construct(Character $character) {
-        $this->mapName       = $character->map->gameMap->name;
         $this->otherKingdoms = $this->getEnemyKingdoms($character, true);
     }
 
@@ -42,8 +36,7 @@ class UpdateGlobalMap implements ShouldBroadcastNow
      *
      * @return Channel|array
      */
-    public function broadcastOn()
-    {
+    public function broadcastOn() {
         return new PresenceChannel('global-map-update');
     }
 }

@@ -7,29 +7,18 @@ use App\Flare\Models\Kingdom;
 
 class KingdomBuilder {
 
-    /**
-     * @var array $kingdom
-     */
-    private $kingdom;
-
-    /**
-     * Creates the base params for the kingdom based off the request.
-     *
-     * @param array $params
-     * @return void
-     */
-    public function setRequestAttributes(array $params): void {
-        $this->kingdom = $params;
-    }
 
     /**
      * Creates the kingdom
      *
      * @param Character $character
+     * @param string $name
      * @return Kingdom
      */
-    public function createKingdom(Character $character): Kingdom {
+    public function createKingdom(Character $character, string $name, string $color): Kingdom {
         $kingdom = [
+            'name'                    => $name,
+            'color'                   => $color,
             'character_id'            => $character->id,
             'game_map_id'             => $character->map->gameMap->id,
             'max_stone'               => 2000,
@@ -45,9 +34,11 @@ class KingdomBuilder {
             'current_morale'          => .50,
             'max_morale'              => .50,
             'treasury'                => 0,
+            'x_position'              => $character->map->character_position_x,
+            'y_position'              => $character->map->character_position_y,
             'last_walked'             => now(),
         ];
 
-        return Kingdom::create(array_merge($kingdom, $this->kingdom));
+        return Kingdom::create($kingdom);
     }
 }

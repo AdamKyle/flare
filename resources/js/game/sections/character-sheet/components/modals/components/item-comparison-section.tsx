@@ -57,9 +57,7 @@ export default class ItemComparisonSection extends React.Component<any, any> {
         if (elements.length === 0 && typeof itemToEquip !== 'undefined') {
             return (
                 <Fragment>
-                    <dl>
-                        {this.renderChange(itemToEquip)}
-                    </dl>
+                    <p>This item is identical to the one you have equipped.</p>
                 </Fragment>
             );
         }
@@ -113,7 +111,7 @@ export default class ItemComparisonSection extends React.Component<any, any> {
     renderTwoComparisons() {
         if (this.props.comparison_details !== null) {
             return (
-                <div className='grid w-full lg:grid-cols-2 md:m-auto max-h-[350px] overflow-x-scroll lg:max-h-max lg:overflow-x-visible'>
+                <div className='grid w-full lg:grid-cols-2 md:m-auto max-h-[150px] overflow-x-scroll lg:max-h-max lg:overflow-x-visible'>
                     <div>
                         <div className={'font-light pb-3'}>
                             <ItemNameColorationText item={this.props.comparison_details.details[0]} />
@@ -138,7 +136,7 @@ export default class ItemComparisonSection extends React.Component<any, any> {
     renderSingleComparison() {
         if (this.props.comparison_details !== null) {
             return (
-                <div>
+                <div className='max-h-[150px] overflow-x-scroll lg:max-h-max lg:overflow-x-visible'>
                     <div className={'font-light pb-3'}>
                         <ItemNameColorationText item={this.props.comparison_details.details[0]} />
                     </div>
@@ -156,7 +154,7 @@ export default class ItemComparisonSection extends React.Component<any, any> {
         }
 
         return (
-            <div>
+            <div className='max-h-[150px] md:max-h-full overflow-x-scroll lg:max-h-max lg:overflow-x-visible'>
                 <dl>
                     {this.renderItemToEquip(this.props.comparison_details.itemToEquip)}
                 </dl>

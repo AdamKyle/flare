@@ -27,6 +27,13 @@ class MonthlyPvpParticipantsController extends Controller {
 
 
     public function join(MonthlyPvpFight $request, Character $character) {
+
+        if ($character->level < 301) {
+            event(new ServerMessageEvent($character->user, 'You need to be at least level 301 to participate.'));
+
+            return response()->json();
+        }
+
         $characterInFight = MonthlyPvpParticipant::where('character_id', $character->id)->first();
 
         if (!is_null($characterInFight)) {
