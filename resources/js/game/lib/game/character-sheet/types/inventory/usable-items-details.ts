@@ -1,4 +1,6 @@
-export default interface UsableItemsDetails {
+import DataTableBaseData from "../../../../ui/types/tables/data-table-base-data";
+
+export default interface UsableItemsDetails extends DataTableBaseData {
     affects_skill_type: number;
 
     id: number;

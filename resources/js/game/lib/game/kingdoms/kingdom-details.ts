@@ -1,6 +1,7 @@
 import BuildingDetails from "./building-details";
+import DataTableBaseData from "../../ui/types/tables/data-table-base-data";
 
-export default interface KingdomDetails {
+export default interface KingdomDetails extends DataTableBaseData {
     building_cost_reduction: number;
 
     building_queue: [];

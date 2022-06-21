@@ -1,4 +1,6 @@
-export default interface SkillType {
+import DataTableBaseData from "../../../../ui/types/tables/data-table-base-data";
+
+export default interface SkillType extends DataTableBaseData {
 
     id: number;
 

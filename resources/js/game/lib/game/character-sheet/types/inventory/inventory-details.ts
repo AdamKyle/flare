@@ -1,4 +1,6 @@
-export default interface InventoryDetails {
+import DataTableBaseData from "../../../../ui/types/tables/data-table-base-data";
+
+export default interface InventoryDetails extends DataTableBaseData {
 
     attached_affixes_count: number;
 
