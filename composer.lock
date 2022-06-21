@@ -1930,22 +1930,22 @@
         },
         {
             "name": "guzzlehttp/guzzle",
-            "version": "7.4.4",
+            "version": "7.4.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/guzzle.git",
-                "reference": "e3ff079b22820c2029d4c2a87796b6a0b8716ad8"
+                "reference": "1dd98b0564cb3f6bd16ce683cb755f94c10fbd82"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/e3ff079b22820c2029d4c2a87796b6a0b8716ad8",
-                "reference": "e3ff079b22820c2029d4c2a87796b6a0b8716ad8",
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/1dd98b0564cb3f6bd16ce683cb755f94c10fbd82",
+                "reference": "1dd98b0564cb3f6bd16ce683cb755f94c10fbd82",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "guzzlehttp/promises": "^1.5",
-                "guzzlehttp/psr7": "^1.8.3 || ^2.1",
+                "guzzlehttp/psr7": "^1.9 || ^2.4",
                 "php": "^7.2.5 || ^8.0",
                 "psr/http-client": "^1.0",
                 "symfony/deprecation-contracts": "^2.2 || ^3.0"
@@ -2034,7 +2034,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/guzzle/issues",
-                "source": "https://github.com/guzzle/guzzle/tree/7.4.4"
+                "source": "https://github.com/guzzle/guzzle/tree/7.4.5"
             },
             "funding": [
                 {
@@ -2050,7 +2050,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-06-09T21:39:15+00:00"
+            "time": "2022-06-20T22:16:13+00:00"
         },
         {
             "name": "guzzlehttp/promises",
@@ -2138,16 +2138,16 @@
         },
         {
             "name": "guzzlehttp/psr7",
-            "version": "2.3.0",
+            "version": "2.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/psr7.git",
-                "reference": "83260bb50b8fc753c72d14dc1621a2dac31877ee"
+                "reference": "13388f00956b1503577598873fffb5ae994b5737"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/psr7/zipball/83260bb50b8fc753c72d14dc1621a2dac31877ee",
-                "reference": "83260bb50b8fc753c72d14dc1621a2dac31877ee",
+                "url": "https://api.github.com/repos/guzzle/psr7/zipball/13388f00956b1503577598873fffb5ae994b5737",
+                "reference": "13388f00956b1503577598873fffb5ae994b5737",
                 "shasum": ""
             },
             "require": {
@@ -2171,7 +2171,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.3-dev"
+                    "dev-master": "2.4-dev"
                 }
             },
             "autoload": {
@@ -2233,7 +2233,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/psr7/issues",
-                "source": "https://github.com/guzzle/psr7/tree/2.3.0"
+                "source": "https://github.com/guzzle/psr7/tree/2.4.0"
             },
             "funding": [
                 {
@@ -2249,7 +2249,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-06-09T08:26:02+00:00"
+            "time": "2022-06-20T21:43:11+00:00"
         },
         {
             "name": "http-interop/http-factory-guzzle",
@@ -2467,16 +2467,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v9.17.0",
+            "version": "v9.18.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "091e287678ac723c591509ca6374e4ded4a99b1c"
+                "reference": "93a1296bca43c1ca8dcb5df8f97107e819a71499"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/091e287678ac723c591509ca6374e4ded4a99b1c",
-                "reference": "091e287678ac723c591509ca6374e4ded4a99b1c",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/93a1296bca43c1ca8dcb5df8f97107e819a71499",
+                "reference": "93a1296bca43c1ca8dcb5df8f97107e819a71499",
                 "shasum": ""
             },
             "require": {
@@ -2488,7 +2488,7 @@
                 "fruitcake/php-cors": "^1.2",
                 "laravel/serializable-closure": "^1.0",
                 "league/commonmark": "^2.2",
-                "league/flysystem": "^3.0",
+                "league/flysystem": "^3.0.16",
                 "monolog/monolog": "^2.0",
                 "nesbot/carbon": "^2.53.1",
                 "php": "^8.0.2",
@@ -2564,7 +2564,7 @@
                 "pda/pheanstalk": "^4.0",
                 "phpstan/phpstan": "^1.4.7",
                 "phpunit/phpunit": "^9.5.8",
-                "predis/predis": "^1.1.9",
+                "predis/predis": "^1.1.9|^2.0",
                 "symfony/cache": "^6.0"
             },
             "suggest": {
@@ -2590,7 +2590,7 @@
                 "nyholm/psr7": "Required to use PSR-7 bridging features (^1.2).",
                 "pda/pheanstalk": "Required to use the beanstalk queue driver (^4.0).",
                 "phpunit/phpunit": "Required to use assertions and run tests (^9.5.8).",
-                "predis/predis": "Required to use the predis connector (^1.1.9).",
+                "predis/predis": "Required to use the predis connector (^1.1.9|^2.0).",
                 "psr/http-message": "Required to allow Storage::put to accept a StreamInterface (^1.0).",
                 "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^6.0|^7.0).",
                 "symfony/cache": "Required to PSR-6 cache bridge (^6.0).",
@@ -2642,7 +2642,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2022-06-07T15:09:32+00:00"
+            "time": "2022-06-21T14:40:11+00:00"
         },
         {
             "name": "laravel/helpers",
@@ -2702,16 +2702,16 @@
         },
         {
             "name": "laravel/horizon",
-            "version": "v5.9.7",
+            "version": "v5.9.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/horizon.git",
-                "reference": "a98150769dc970972c30219662fe0e64259b733f"
+                "reference": "71291b2dc8172f46a8a503aee97b80d9a4139cdf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/horizon/zipball/a98150769dc970972c30219662fe0e64259b733f",
-                "reference": "a98150769dc970972c30219662fe0e64259b733f",
+                "url": "https://api.github.com/repos/laravel/horizon/zipball/71291b2dc8172f46a8a503aee97b80d9a4139cdf",
+                "reference": "71291b2dc8172f46a8a503aee97b80d9a4139cdf",
                 "shasum": ""
             },
             "require": {
@@ -2731,11 +2731,11 @@
                 "mockery/mockery": "^1.0",
                 "orchestra/testbench": "^6.0|^7.0",
                 "phpunit/phpunit": "^9.0",
-                "predis/predis": "^1.1"
+                "predis/predis": "^1.1|^2.0"
             },
             "suggest": {
                 "ext-redis": "Required to use the Redis PHP driver.",
-                "predis/predis": "Required when not using the Redis PHP driver (^1.1)."
+                "predis/predis": "Required when not using the Redis PHP driver (^1.1|^2.0)."
             },
             "type": "library",
             "extra": {
@@ -2773,9 +2773,9 @@
             ],
             "support": {
                 "issues": "https://github.com/laravel/horizon/issues",
-                "source": "https://github.com/laravel/horizon/tree/v5.9.7"
+                "source": "https://github.com/laravel/horizon/tree/v5.9.8"
             },
-            "time": "2022-04-20T18:07:08+00:00"
+            "time": "2022-06-08T13:23:36+00:00"
         },
         {
             "name": "laravel/serializable-closure",
@@ -6369,21 +6369,21 @@
         },
         {
             "name": "react/promise-stream",
-            "version": "v1.3.0",
+            "version": "v1.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/promise-stream.git",
-                "reference": "3ebd94fe0d8edbf44937948af28d02d5437e9949"
+                "reference": "ef05517b99e4363beaa7993d4e2d6c50f1b22a09"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/promise-stream/zipball/3ebd94fe0d8edbf44937948af28d02d5437e9949",
-                "reference": "3ebd94fe0d8edbf44937948af28d02d5437e9949",
+                "url": "https://api.github.com/repos/reactphp/promise-stream/zipball/ef05517b99e4363beaa7993d4e2d6c50f1b22a09",
+                "reference": "ef05517b99e4363beaa7993d4e2d6c50f1b22a09",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3",
-                "react/promise": "^2.1 || ^1.2",
+                "react/promise": "^3 || ^2.1 || ^1.2",
                 "react/stream": "^1.0 || ^0.7 || ^0.6 || ^0.5 || ^0.4.6"
             },
             "require-dev": {
@@ -6439,7 +6439,7 @@
             ],
             "support": {
                 "issues": "https://github.com/reactphp/promise-stream/issues",
-                "source": "https://github.com/reactphp/promise-stream/tree/v1.3.0"
+                "source": "https://github.com/reactphp/promise-stream/tree/v1.4.0"
             },
             "funding": [
                 {
@@ -6451,7 +6451,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2021-10-18T10:47:09+00:00"
+            "time": "2022-06-20T10:36:51+00:00"
         },
         {
             "name": "react/promise-timer",
