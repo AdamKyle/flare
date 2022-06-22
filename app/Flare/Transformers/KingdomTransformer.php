@@ -53,7 +53,6 @@ class KingdomTransformer extends TransformerAbstract {
             'gold_bars'                 => $kingdom->gold_bars,
             'building_queue'            => $kingdom->buildingsQueue,
             'unit_queue'                => $kingdom->unitsQueue,
-            'current_units'             => $kingdom->units,
             'unit_movement'             => $kingdom->unitsMovementQueue,
             'treasury_defence'          => $kingdom->treasury / KingdomMaxValue::MAX_TREASURY,
             'passive_defence'           => $kingdom->fetchDefenceBonusFromPassive(),
@@ -85,7 +84,7 @@ class KingdomTransformer extends TransformerAbstract {
      * @return \League\Fractal\Resource\Collection
      */
     public function includeUnits(Kingdom $kingdom) {
-        $units = $kingdom->units;
+        $units = GameUnit::all();
 
         return $this->collection($units, new UnitTransformer());
     }

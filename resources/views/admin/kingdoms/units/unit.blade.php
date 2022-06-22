@@ -1,31 +1,26 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="tw-mt-10 tw-mb-10 tw-w-full lg:tw-w-3/5 tw-m-auto">
-        <x-core.page-title
-          title="{{$unit->name}}"
-          route="{{url()->previous()}}"
-          color="primary"
-          link="Back"
-        >
-            @guest
-            @else
-                @if (auth()->user()->hasRole('Admin'))
-                    <x-core.buttons.link-buttons.primary-button
-                        href="{{route('units.edit', [
-                            'gameUnit' => $unit->id
-                        ])}}"
-                        css="tw-ml-2"
-                    >Edit</x-core.buttons.link-buttons.primary-button>
-                @endif
-            @endguest
-        </x-core.page-title>
+    <x-core.layout.info-container>
+        @php
+            $backUrl = route('units.list');
 
-        <hr />
-        <x-core.cards.card>
+            if (!auth()->user()->hasRole('Admin')) {
+                $backUrl = '/information/kingdom-units';
+            }
+        @endphp
+        {{-- Spacer div. --}}
+        <div class="pb-10"></div>
+        <x-core.cards.card-with-title
+            title="{{$unit->name}}"
+            buttons="true"
+            backUrl="{{$backUrl}}"
+            editUrl="{{route('units.edit', ['gameUnit' => $unit->id])}}"
+        >
             @include('admin.kingdoms.units.partials.unit-attributes', [
                 'unit' => $unit
             ])
-        </x-core.cards.card>
-    </div>
+        </x-core.cards.card-with-title>
+    </x-core.layout.info-container>
+
 @endsection

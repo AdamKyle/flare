@@ -1,14 +1,17 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="row page-titles">
-        <div class="col-md-6 align-self-left">
-            <h4 class="mt-3">Units</h4>
-        </div>
-        <div class="col-md-6 align-self-right">
-            <a href="{{route('home')}}" class="btn btn-success float-right ml-2">Home</a>
-            <a href="{{route('units.create')}}" class="btn btn-primary float-right ml-2">Create</a>
-        </div>
-    </div>
-    @livewire('admin.kingdoms.units.data-table')
+    <x-core.page-title
+        title="Kingdom Units"
+        route="{{route('home')}}"
+        color="success" link="Home"
+    >
+        <x-core.buttons.link-buttons.primary-button
+            href="{{route('units.create')}}"
+            css="tw-ml-2"
+        >
+            Create Unit
+        </x-core.buttons.link-buttons.primary-button>
+    </x-core.page-title>
+    @livewire('admin.kingdoms.units.units-table')
 @endsection
