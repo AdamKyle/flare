@@ -84,17 +84,17 @@
                     <dd><strong>Increases Population</strong>:</dd>
                     <dd>{{!is_null($building->increase_population_amount) ? $building->increase_population_amount : 0}}</dd>
                     <dd><strong>Increases Wood</strong>:</dd>
-                    <dd>{{!is_null($building->future_increase_wood_amount) ? $building->future_increase_wood_amount : 0}}</dd>
+                    <dd>{{!is_null($building->increase_wood_amount) ? $building->increase_wood_amount : 0}}</dd>
                     <dd><strong>Increases Clay</strong>:</dd>
-                    <dd>{{!is_null($building->future_increase_clay_amount) ? $building->future_increase_clay_amount : 0}}</dd>
+                    <dd>{{!is_null($building->increase_clay_amount) ? $building->increase_clay_amount : 0}}</dd>
                     <dd><strong>Increases Stone</strong>:</dd>
-                    <dd>{{!is_null($building->future_increase_stone_amount) ? $building->future_increase_stone_amount : 0}}</dd>
+                    <dd>{{!is_null($building->increase_stone_amount) ? $building->increase_stone_amount : 0}}</dd>
                     <dd><strong>Increases Iron</strong>:</dd>
-                    <dd>{{!is_null($building->future_increase_iron_amount) ? $building->future_increase_iron_amount : 0}}</dd>
+                    <dd>{{!is_null($building->increase_iron_amount) ? $building->increase_iron_amount : 0}}</dd>
                     <dd><strong>Increases Durability</strong>:</dd>
-                    <dd>{{!is_null($building->future_increase_durability_amount) ? $building->future_increase_durability_amount : 0}}</dd>
+                    <dd>{{!is_null($building->increase_durability_amount) ? $building->increase_durability_amount : 0}}</dd>
                     <dd><strong>Increases Defense</strong>:</dd>
-                    <dd>{{!is_null($building->future_increase_defence_amount) ? $building->future_increase_defence_amount : 0}}</dd>
+                    <dd>{{!is_null($building->increase_defence_amount) ? $building->increase_defence_amount : 0}}</dd>
                 </dl>
             </div>
             <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
