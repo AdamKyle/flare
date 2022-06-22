@@ -16,7 +16,6 @@ class UnitTransformer extends TransformerAbstract {
      * @return mixed
      */
     public function transform(GameUnit $unit) {
-
         return [
             'id'                   => $unit->id,
             'name'                 => $unit->name,
