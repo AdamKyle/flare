@@ -6,6 +6,7 @@ import Select from "react-select";
 import BuildingsTable from "./buildings/buildings-table";
 import BuildingDetails from "../../lib/game/kingdoms/building-details";
 import BuildingInformation from "./buildings/building-information";
+import BuildingInQueueDetails from "../../lib/game/kingdoms/building-in-queue-details";
 
 export default class SmallKingdom extends React.Component<KingdomProps, any> {
 
@@ -17,6 +18,20 @@ export default class SmallKingdom extends React.Component<KingdomProps, any> {
             which_selected: null,
             view_building: null,
         }
+    }
+
+    isInQueue() {
+        if (this.state.view_building === null) {
+            return false;
+        }
+
+        if (this.props.kingdom.building_queue.length > 0) {
+            return false;
+        }
+
+        return this.props.kingdom.building_queue.filter((queue: BuildingInQueueDetails) => {
+            return queue.building_id === this.state.view_building.id
+        }).length > 0;
     }
 
     manageKingdomDetails() {
@@ -53,13 +68,24 @@ export default class SmallKingdom extends React.Component<KingdomProps, any> {
 
                 {
                     this.state.view_building !== null ?
-                        <BuildingInformation building={this.state.view_building} close={this.viewSelectedBuilding.bind(this)} />
+                        <BuildingInformation building={this.state.view_building}
+                                             close={this.viewSelectedBuilding.bind(this)}
+                                             update_kingdoms={this.props.update_kingdoms}
+                                             kingdom_building_time_reduction={this.props.kingdom.building_time_reduction}
+                                             kingdom_building_cost_reduction={this.props.kingdom.building_cost_reduction}
+                                             kingdom_iron_cost_reduction={this.props.kingdom.iron_cost_reduction}
+                                             kingdom_building_pop_cost_reduction={this.props.kingdom.population_cost_reduction}
+                                             kingdom_current_population={this.props.kingdom.current_population}
+                                             character_id={this.props.kingdom.character_id}
+                                             is_in_queue={this.isInQueue()}
+                        />
                     :
 
                         <BasicCard additionalClasses={'overflow-x-auto'}>
                             <BuildingsTable buildings={this.props.kingdom.buildings}
                                             dark_tables={this.props.dark_tables}
                                             view_building={this.viewSelectedBuilding.bind(this)}
+                                            buildings_in_queue={this.props.kingdom.building_queue}
                             />
                         </BasicCard>
                 }

@@ -29,7 +29,7 @@ export default class BuildingsTable extends React.Component<BuildingsTableProps,
     render() {
         return (
             <Table data={this.props.buildings}
-                   columns={buildBuildingsColumns(this.viewBuilding.bind(this))}
+                   columns={buildBuildingsColumns(this.viewBuilding.bind(this), this.props.buildings_in_queue)}
                    dark_table={this.props.dark_tables}
                    conditional_row_styles={this.createConditionalRowStyles()}
             />

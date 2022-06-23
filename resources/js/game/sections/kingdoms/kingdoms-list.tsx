@@ -51,6 +51,22 @@ export default class KingdomsList extends React.Component<KingdomListProps, King
         });
     }
 
+    updateKingdoms(kingdom: KingdomDetails) {
+        const index = this.state.kingdoms.findIndex((king: KingdomDetails) => {
+            return king.id === kingdom.id
+        })
+
+        if (index !== -1) {
+            const kingdoms = JSON.parse(JSON.stringify(this.state.kingdoms));
+
+            kingdoms[index] = kingdom;
+
+            this.setState({
+                kingdoms: kingdoms,
+            });
+        }
+    }
+
     render() {
         if (this.state.loading) {
             return (
@@ -65,9 +81,9 @@ export default class KingdomsList extends React.Component<KingdomListProps, King
                     {
                         this.state.selected_kingdom ?
                             this.props.view_port < 1600 ?
-                                <SmallKingdom close_details={this.closeKingdomDetails.bind(this)} kingdom={this.state.selected_kingdom} dark_tables={this.state.dark_tables} />
+                                <SmallKingdom update_kingdoms={this.updateKingdoms.bind(this)} close_details={this.closeKingdomDetails.bind(this)} kingdom={this.state.selected_kingdom} dark_tables={this.state.dark_tables} />
                             :
-                                <Kingdom close_details={this.closeKingdomDetails.bind(this)} kingdom={this.state.selected_kingdom} dark_tables={this.state.dark_tables} />
+                                <Kingdom update_kingdoms={this.updateKingdoms.bind(this)} close_details={this.closeKingdomDetails.bind(this)} kingdom={this.state.selected_kingdom} dark_tables={this.state.dark_tables} />
                         :
                             <BasicCard additionalClasses={'overflow-x-scroll'}>
                                 <Table data={this.state.kingdoms} columns={buildKingdomsColumns(this.viewKingdomDetails.bind(this))} dark_table={this.state.dark_tables}/>

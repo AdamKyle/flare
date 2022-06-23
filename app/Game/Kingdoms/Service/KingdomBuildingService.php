@@ -14,6 +14,7 @@ use App\Game\Kingdoms\Events\UpdateKingdom;
 use App\Game\Kingdoms\Jobs\RebuildBuilding;
 use App\Game\Kingdoms\Jobs\UpgradeBuilding;
 use App\Game\Kingdoms\Jobs\UpgradeBuildingWithGold;
+use App\Game\Kingdoms\Values\BuildingCosts;
 use App\Game\Kingdoms\Values\UnitCosts;
 use App\Game\Skills\Values\SkillTypeValue;
 use Carbon\Carbon;
@@ -226,7 +227,7 @@ class KingdomBuildingService {
         $kingdom   = $building->kingdom;
 
         // Add population cost to the total cost if we need it.
-        $cost = $this->calculateGoldNeeded($character, $kingdom, $params);
+        $cost = $this->calculateGoldNeeded($character, $building, $kingdom, $params);
 
         if ($character->gold < $cost) {
             return false;
@@ -308,11 +309,11 @@ class KingdomBuildingService {
         return 100 - ceil($elapsedTime/$totalTime);
     }
 
-    protected function calculateGoldNeeded(Character $character, Kingdom $kingdom, array $params): int {
-        $population        = $params['pop_required'];
+    protected function calculateGoldNeeded(Character $character, KingdomBuilding $building, Kingdom $kingdom, array $params): int {
+        $population        = $building->required_population;
         $costForAdditional = 0;
         $costReduction     = $kingdom->fetchBuildingCostReduction();
-        $costToUpgrade     = $params['cost_to_upgrade'];
+        $costToUpgrade     = (new BuildingCosts($building->name))->fetchCost() * $params['to_level'];
 
         if ($kingdom->current_population < $population) {
             $costForAdditional  = ($population - $kingdom->current_population) * (new UnitCosts(UnitCosts::PERSON))->fetchCost();

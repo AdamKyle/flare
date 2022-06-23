@@ -1,6 +1,9 @@
 import DataTableBaseData from "../../ui/types/tables/data-table-base-data";
+import UnitDetails from "./unit-details";
 
 export default interface BuildingDetails extends DataTableBaseData {
+
+    [key:string]: number|string|boolean|null|UnitDetails[]|[];
 
     base_clay_cost: number;
 
@@ -97,4 +100,6 @@ export default interface BuildingDetails extends DataTableBaseData {
     wood_cost: number;
 
     wood_increase: number;
+
+    units: UnitDetails[]|[];
 }

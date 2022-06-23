@@ -5,6 +5,7 @@ namespace App\Game\Kingdoms\Controllers\Api;
 use App\Flare\Models\UnitMovementQueue;
 use App\Flare\Transformers\BasicKingdomTransformer;
 use App\Flare\Transformers\OtherKingdomTransformer;
+use App\Game\Kingdoms\Requests\KingdomUpgradeBuildingRequest;
 use App\Game\Kingdoms\Service\KingdomResourcesService;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use Illuminate\Http\Request;
@@ -177,19 +178,10 @@ class KingdomsController extends Controller
         return response()->json([], 200);
     }
 
-    public function upgradeKingdomBuilding(Request $request, Character $character, KingdomBuilding $building, KingdomBuildingService $buildingService)
-    {
+    public function upgradeKingdomBuilding(KingdomUpgradeBuildingRequest $request, Character $character, KingdomBuilding $building, KingdomBuildingService $buildingService) {
 
         if ($request->paying_with_gold) {
-            $request->validate([
-                'cost_to_upgrade' => 'required|integer',
-                'how_many_levels' => 'required|integer',
-                'pop_required' => 'required|integer',
-                'time' => 'required|integer',
-            ]);
-
             $paid = $buildingService->upgradeBuildingWithGold($building, $request->all());
-
 
             if (!$paid) {
                 return response()->json([
@@ -220,13 +212,13 @@ class KingdomsController extends Controller
         $kingdom = new Item($kingdom->refresh(), $this->kingdom);
         $kingdom = $this->manager->createData($kingdom)->toArray();
 
-        event(new UpdateKingdom($character->user, $kingdom));
-
-        return response()->json([], 200);
+        return response()->json([
+            'message' => 'Building is in the process of upgrading!',
+            'kingdom' => $kingdom,
+        ], 200);
     }
 
-    public function rebuildKingdomBuilding(Character $character, KingdomBuilding $building, KingdomBuildingService $buildingService)
-    {
+    public function rebuildKingdomBuilding(Character $character, KingdomBuilding $building, KingdomBuildingService $buildingService) {
         if (ResourceValidation::shouldRedirectRebuildKingdomBuilding($building, $building->kingdom)) {
             return response()->json([
                 'message' => "You don't have the resources."

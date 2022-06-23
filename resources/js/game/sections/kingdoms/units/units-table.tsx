@@ -1,21 +1,22 @@
 import React from "react";
 import Table from "../../../components/ui/data-tables/table";
-import BuildingDetails from "../../../lib/game/kingdoms/building-details";
-import {buildBuildingsColumns} from "../../../lib/game/kingdoms/build-buildings-columns";
+import UnitsTableProps from "../../../lib/game/kingdoms/types/units-table-props";
+import {BuildUnitsColumns} from "../../../lib/game/kingdoms/build-units-columns";
+import UnitDetails from "../../../lib/game/kingdoms/unit-details";
 
-export default class UnitsTable extends React.Component<any, any> {
+export default class UnitsTable extends React.Component<UnitsTableProps, any> {
 
     constructor(props: any) {
         super(props);
     }
 
-    viewBuilding(building: BuildingDetails) {
-        console.log(building);
+    viewUnit(unit: UnitDetails) {
+        console.log(unit);
     }
 
     render() {
         return (
-            <Table data={this.props.buildings} columns={buildBuildingsColumns(this.viewBuilding.bind(this))} dark_table={this.props.dark_tables}/>
+            <Table data={this.props.units} columns={BuildUnitsColumns(this.viewUnit.bind(this))} dark_table={this.props.dark_tables}/>
         )
     }
 }

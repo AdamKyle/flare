@@ -157,19 +157,19 @@ class KingdomBuilding extends Model
     }
 
     public function getBaseWoodCostAttribute() {
-        return $this->gameBuilding->wood_cost;;
+        return $this->gameBuilding->wood_cost;
     }
 
     public function getBaseClayCostAttribute() {
-        return $this->gameBuilding->clay_cost;;
+        return $this->gameBuilding->clay_cost;
     }
 
     public function getBaseStoneCostAttribute() {
-        return $this->gameBuilding->stone_cost;;
+        return $this->gameBuilding->stone_cost;
     }
 
     public function getBaseIronCostAttribute() {
-        return $this->gameBuilding->iron_cost;;
+        return $this->gameBuilding->iron_cost;
     }
 
     public function getPopulationIncreaseAttribute() {

@@ -1,12 +1,16 @@
 import BuildingDetails from "./building-details";
 import DataTableBaseData from "../../ui/types/tables/data-table-base-data";
+import UnitDetails from "./unit-details";
+import BuildingInQueueDetails from "./building-in-queue-details";
 
 export default interface KingdomDetails extends DataTableBaseData {
     building_cost_reduction: number;
 
-    building_queue: [];
+    building_queue: BuildingInQueueDetails[]|[];
 
     buildings: BuildingDetails[] | [];
+
+    units: UnitDetails[] | [];
 
     building_time_reduction: number;
 
