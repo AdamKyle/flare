@@ -1,5 +1,4 @@
 import React, {Fragment} from "react";
-import KingdomProps from "../../lib/game/kingdoms/types/kingdom-details-props";
 import KingdomDetailsProps from "../../lib/game/kingdoms/types/kingdom-details-props";
 import {formatNumber} from "../../lib/game/format-number";
 
@@ -10,8 +9,6 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
 
     calculateTotalDefence(): number {
         const kingdom = this.props.kingdom;
-
-        console.log(kingdom);
 
         return kingdom.walls_defence + kingdom.treasury_defence +
                kingdom.gold_bars_defence + kingdom.passive_defence +

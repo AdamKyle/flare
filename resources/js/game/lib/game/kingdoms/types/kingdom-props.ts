@@ -7,6 +7,4 @@ export default interface KingdomProps {
     kingdom: KingdomDetails;
 
     dark_tables: boolean;
-
-    update_kingdoms: (kingdom: KingdomDetails) => void;
 }

@@ -9,6 +9,7 @@ import KingdomListState from "../../lib/game/kingdoms/types/kingdom-list-state";
 import BasicCard from "../../components/ui/cards/basic-card";
 import Kingdom from "./kingdom";
 import SmallKingdom from "./small-kingdom";
+import {isEqual} from "lodash";
 
 export default class KingdomsList extends React.Component<KingdomListProps, KingdomListState> {
 
@@ -18,7 +19,6 @@ export default class KingdomsList extends React.Component<KingdomListProps, King
         this.state = {
             loading: true,
             dark_tables: false,
-            kingdoms: [],
             selected_kingdom: null,
         }
     }
@@ -26,17 +26,34 @@ export default class KingdomsList extends React.Component<KingdomListProps, King
     componentDidMount() {
         watchForDarkModeTableChange(this);
 
-        this.setState({
-            kingdoms: this.props.my_kingdoms,
-        }, () => {
-            const self = this;
+        const self = this;
 
-            setTimeout(function(){
-                self.setState({
-                    loading: false,
-                })
-            }, 500);
+        setTimeout(function(){
+            self.setState({
+                loading: false,
+            })
+        }, 500);
+    }
+
+    componentDidUpdate() {
+
+        const foundKingdom = this.props.my_kingdoms.filter((kingdom: KingdomDetails) => {
+            if (this.state.selected_kingdom === null) {
+                return;
+            }
+
+            return kingdom.id === this.state.selected_kingdom.id;
         });
+
+        if (foundKingdom.length > 0) {
+            const kingdom: KingdomDetails = foundKingdom[0];
+
+            if (!isEqual(kingdom, this.state.selected_kingdom)) {
+                this.setState({
+                    selected_kingdom: kingdom
+                })
+            }
+        }
     }
 
     viewKingdomDetails(kingdom: KingdomDetails) {
@@ -49,22 +66,6 @@ export default class KingdomsList extends React.Component<KingdomListProps, King
         this.setState({
             selected_kingdom: null,
         });
-    }
-
-    updateKingdoms(kingdom: KingdomDetails) {
-        const index = this.state.kingdoms.findIndex((king: KingdomDetails) => {
-            return king.id === kingdom.id
-        })
-
-        if (index !== -1) {
-            const kingdoms = JSON.parse(JSON.stringify(this.state.kingdoms));
-
-            kingdoms[index] = kingdom;
-
-            this.setState({
-                kingdoms: kingdoms,
-            });
-        }
     }
 
     render() {
@@ -81,12 +82,12 @@ export default class KingdomsList extends React.Component<KingdomListProps, King
                     {
                         this.state.selected_kingdom ?
                             this.props.view_port < 1600 ?
-                                <SmallKingdom update_kingdoms={this.updateKingdoms.bind(this)} close_details={this.closeKingdomDetails.bind(this)} kingdom={this.state.selected_kingdom} dark_tables={this.state.dark_tables} />
+                                <SmallKingdom close_details={this.closeKingdomDetails.bind(this)} kingdom={this.state.selected_kingdom} dark_tables={this.state.dark_tables} />
                             :
-                                <Kingdom update_kingdoms={this.updateKingdoms.bind(this)} close_details={this.closeKingdomDetails.bind(this)} kingdom={this.state.selected_kingdom} dark_tables={this.state.dark_tables} />
+                                <Kingdom close_details={this.closeKingdomDetails.bind(this)} kingdom={this.state.selected_kingdom} dark_tables={this.state.dark_tables} />
                         :
                             <BasicCard additionalClasses={'overflow-x-scroll'}>
-                                <Table data={this.state.kingdoms} columns={buildKingdomsColumns(this.viewKingdomDetails.bind(this))} dark_table={this.state.dark_tables}/>
+                                <Table data={this.props.my_kingdoms} columns={buildKingdomsColumns(this.viewKingdomDetails.bind(this))} dark_table={this.state.dark_tables}/>
                             </BasicCard>
                     }
                 </Fragment>

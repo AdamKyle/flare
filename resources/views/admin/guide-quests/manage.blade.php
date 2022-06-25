@@ -38,6 +38,12 @@
                                 <x-core.forms.key-value-select :model="$guideQuest" label="Required Plane Access:" modelKey="required_game_map_id" name="required_game_map_id" :options="$gameMaps"/>
                                 <x-core.forms.key-value-select :model="$guideQuest" label="Required Quest (Complete):" modelKey="required_quest_id" name="required_quest_id" :options="$quests"/>
                                 <x-core.forms.key-value-select :model="$guideQuest" label="Required Quest Item:" modelKey="required_quest_item_id" name="required_quest_item_id" :options="$questItems"/>
+
+                                <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                                <h3 class="mb-3">Kingdom Requirements</h3>
+                                <x-core.forms.input :model="$guideQuest" label="Required Kingdoms #:" modelKey="required_kingdoms" name="required_kingdoms" />
+                                <x-core.forms.input :model="$guideQuest" label="Required Kingdom Level:" modelKey="required_kingdom_level" name="required_kingdom_level" />
+                                <x-core.forms.input :model="$guideQuest" label="Required Kingdom Units:" modelKey="required_kingdom_units" name="required_kingdom_units" />
                             </div>
                         </div>
 

@@ -18,6 +18,7 @@ import SmallerActions from "./sections/game-actions-section/smaller-actions";
 import QuestType from "./lib/game/types/quests/quest-type";
 import ScreenRefresh from './sections/screen-refresh/screen-refresh';
 import KingdomsList from "./sections/kingdoms/kingdoms-list";
+import KingdomDetails from "./lib/game/kingdoms/kingdom-details";
 
 export default class Game extends React.Component<GameProps, GameState> {
 
@@ -36,6 +37,8 @@ export default class Game extends React.Component<GameProps, GameState> {
     private unlockAlchemySkill: any;
 
     private updateCraftingTypes: any;
+
+    private kingdomUpdates: any;
 
     constructor(props: GameProps) {
         super(props)
@@ -89,6 +92,9 @@ export default class Game extends React.Component<GameProps, GameState> {
 
         // @ts-ignore
         this.updateCraftingTypes = Echo.private('update-location-base-crafting-options-' + this.props.userId);
+
+        // @ts-ignore
+        this.kingdomUpdates = Echo.private('update-kingdom-' + this.props.userId);
     }
 
     componentDidMount() {
@@ -163,6 +169,13 @@ export default class Game extends React.Component<GameProps, GameState> {
                 character: character
             });
         })
+
+        // @ts-ignore
+        this.kingdomUpdates.listen('Game.Kingdoms.Events.UpdateKingdom', (event: { kingdom: KingdomDetails[]|[] }) => {
+            this.setState({
+                kingdoms: event.kingdom,
+            });
+        });
     }
 
     updateCharacterStatus(characterStatus: any): void {

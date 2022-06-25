@@ -4,6 +4,7 @@ namespace App\Flare\Transformers;
 
 
 use App\Game\Kingdoms\Values\BuildingCosts;
+use App\Game\Kingdoms\Values\UnitCosts;
 use League\Fractal\TransformerAbstract;
 use App\Flare\Models\KingdomBuilding;
 
@@ -73,6 +74,7 @@ class KingdomBuildingTransformer extends TransformerAbstract {
             'future_durability_increase'  => $building->future_durability,
             'max_level'                   => $building->gameBuilding->max_level,
             'upgrade_cost'                => (new BuildingCosts($building->gameBuilding->name))->fetchCost(),
+            'additional_pop_cost'         => (new UnitCosts(UnitCosts::PERSON))->fetchCost(),
         ];
     }
 }

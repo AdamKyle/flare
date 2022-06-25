@@ -102,4 +102,6 @@ export default interface BuildingDetails extends DataTableBaseData {
     wood_increase: number;
 
     units: UnitDetails[]|[];
+
+    additional_pop_cost: number;
 }

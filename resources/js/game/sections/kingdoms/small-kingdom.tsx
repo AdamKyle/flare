@@ -70,11 +70,10 @@ export default class SmallKingdom extends React.Component<KingdomProps, any> {
                     this.state.view_building !== null ?
                         <BuildingInformation building={this.state.view_building}
                                              close={this.viewSelectedBuilding.bind(this)}
-                                             update_kingdoms={this.props.update_kingdoms}
                                              kingdom_building_time_reduction={this.props.kingdom.building_time_reduction}
                                              kingdom_building_cost_reduction={this.props.kingdom.building_cost_reduction}
                                              kingdom_iron_cost_reduction={this.props.kingdom.iron_cost_reduction}
-                                             kingdom_building_pop_cost_reduction={this.props.kingdom.population_cost_reduction}
+                                             kingdom_population_cost_reduction={this.props.kingdom.population_cost_reduction}
                                              kingdom_current_population={this.props.kingdom.current_population}
                                              character_id={this.props.kingdom.character_id}
                                              is_in_queue={this.isInQueue()}

@@ -10,7 +10,7 @@ use Illuminate\Queue\SerializesModels;
 use App\Flare\Models\Character;
 use App\Game\Battle\Handlers\BattleEventHandler;
 
-class BattleAttackHandler implements ShouldQueue
+class  BattleAttackHandler implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 

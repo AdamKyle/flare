@@ -55,6 +55,18 @@
                             <dt>Required Quest Item</dt>
                             <dd>{{$guideQuest->quest_item_name}}</dd>
                         @endif
+                        @if (!is_null($guideQuest->required_kingdoms))
+                            <dt>Required Kingdom Amount</dt>
+                            <dd>{{$guideQuest->required_kingdoms}}</dd>
+                        @endif
+                        @if (!is_null($guideQuest->required_kingdom_level))
+                            <dt>Required Kingdom Building Level (combined)</dt>
+                            <dd>{{$guideQuest->required_kingdom_level}}</dd>
+                        @endif
+                        @if (!is_null($guideQuest->required_kingdom_units))
+                            <dt>Required Kingdom Units (combined)</dt>
+                            <dd>{{$guideQuest->required_kingdom_units}}</dd>
+                        @endif
                     </dl>
                     <h3 class="text-sky-600 dark:text-sky-500">Currency Rewards</h3>
                     <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>

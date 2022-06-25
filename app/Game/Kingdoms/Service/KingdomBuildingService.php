@@ -230,10 +230,13 @@ class KingdomBuildingService {
         $cost = $this->calculateGoldNeeded($character, $building, $kingdom, $params);
 
         if ($character->gold < $cost) {
-            return false;
+            return 0;
         }
 
-        $newAmount =  $kingdom->current_population - $params['pop_required'];
+        $popNeeded = $building->base_population * $params['to_level'];
+        $popNeeded = $popNeeded - $popNeeded * $building->kingdom->fetchPopulationCostReduction();
+
+        $newAmount =  $kingdom->current_population - $popNeeded;
 
         if ($newAmount < 0) {
             $newAmount = 0;
@@ -251,18 +254,18 @@ class KingdomBuildingService {
 
         event(new UpdateTopBarEvent($character->refresh()));
 
-        return true;
+        return $cost;
     }
 
-    public function processUpgradeWithGold(KingdomBuilding $building, array $params) {
+    public function processUpgradeWithGold(KingdomBuilding $building, int $amountPaid, int $toLevel) {
 
         $character = $building->kingdom->character;
 
-        $minutes = $this->calculateBuildingTimeReduction($building, $params['time']);
+        $minutes = $this->calculateBuildingTimeReduction($building, $toLevel);
 
         $timeToComplete = now()->addMinutes($minutes);
 
-        $toLevel = $params['how_many_levels'] + $building->level;
+        $toLevel = $toLevel + $building->level;
 
         if ($toLevel > $building->gameBuilding->max_level) {
             $toLevel = $building->gameBuilding->max_level;
@@ -276,20 +279,32 @@ class KingdomBuildingService {
             'completed_at'   => $timeToComplete,
             'started_at'     => now(),
             'paid_with_gold' => true,
-            'paid_amount'    => $params['cost_to_upgrade'],
+            'paid_amount'    => $amountPaid,
         ]);
 
         if ($minutes > 15) {
             $timeToComplete = now()->addMinutes(15);
         }
 
-        UpgradeBuildingWithGold::dispatch($building, $character->user, $queue->id, $params['how_many_levels'])->delay($timeToComplete);
+        UpgradeBuildingWithGold::dispatch($building, $character->user, $queue->id, $toLevel)->delay($timeToComplete);
     }
 
-    protected function calculateBuildingTimeReduction(KingdomBuilding $building, int $time = 0)  {
+    protected function calculateBuildingTimeReduction(KingdomBuilding $building, int $toLevel)  {
         $skillBonus = $building->kingdom->character->skills->filter(function($skill) {
             return $skill->baseSkill->type === SkillTypeValue::EFFECTS_KINGDOM;
         })->first()->building_time_reduction;
+
+        $time         = 0;
+        $currentLevel = $building->level;
+
+        for ($i = $toLevel; $i > 0; $i--) {
+            $toBuild = ($currentLevel + 1) + $building->gameBuilding->time_to_build;
+            $toBuild += $toBuild + $toBuild * $building->gameBuilding->time_increase_amount;
+
+            $time += $toBuild;
+
+            $currentLevel++;
+        }
 
         if ($time > 0) {
             return $time;

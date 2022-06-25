@@ -11,12 +11,28 @@ export default class UnitsTable extends React.Component<UnitsTableProps, any> {
     }
 
     viewUnit(unit: UnitDetails) {
-        console.log(unit);
+        this.props.view_unit(unit);
+    }
+
+    createConditionalRowStyles() {
+        return [
+            {
+                when: (row: UnitDetails) => row.required_building_level < row.recruited_from.level,
+                style: {
+                    backgroundColor: '#f87171',
+                    color: 'white',
+                }
+            }
+        ];
     }
 
     render() {
         return (
-            <Table data={this.props.units} columns={BuildUnitsColumns(this.viewUnit.bind(this))} dark_table={this.props.dark_tables}/>
+            <Table data={this.props.units}
+                   conditional_row_styles={this.createConditionalRowStyles()}
+                   columns={BuildUnitsColumns(this.viewUnit.bind(this), this.props.units_in_queue)}
+                   dark_table={this.props.dark_tables}
+            />
         )
     }
 }

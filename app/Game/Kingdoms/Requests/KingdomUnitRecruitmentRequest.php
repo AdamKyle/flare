@@ -25,8 +25,7 @@ class KingdomUnitRecruitmentRequest extends FormRequest
     {
         return [
             'amount'           => 'required|integer',
-            'recruitment_type' => 'required|in:recruit-normally,recruit-with-gold',
-            'total_cost'       => 'required|integer',
+            'recruitment_type' => 'required|in:gold,resources',
         ];
     }
 

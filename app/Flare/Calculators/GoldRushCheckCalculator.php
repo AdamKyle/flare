@@ -16,25 +16,14 @@ class GoldRushCheckCalculator {
      *
      * @param Monster $monster
      * @param float $gameMapBonus
-     * @param Adventure|null $adventure | null
      * @return bool
      */
-    public function fetchGoldRushChance(Monster $monster, float $gameMapBonus = 0.0, Adventure $adventure = null) {
-        $adventureBonus = $this->getAdventureGoldRushChance($adventure);
+    public function fetchGoldRushChance(Monster $monster, float $gameMapBonus = 0.0) {
+        $bonus = $gameMapBonus;
 
-        $bonus = $adventureBonus + $gameMapBonus;
-
-        $roll = rand(1, 1000);
+        $roll = rand(1, 5000);
         $roll += ceil($roll * $bonus);
 
-        return $roll > 975;
-    }
-
-    protected function getAdventureGoldRushChance(Adventure $adventure = null): float {
-        if (!is_null($adventure)) {
-            return $adventure->gold_rush_chance;
-        }
-
-        return 0.0;
+        return $roll > 4999;
     }
 }

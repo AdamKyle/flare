@@ -14,6 +14,7 @@ import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-aler
 import DangerButton from "../../../components/ui/buttons/danger-button";
 import {upperFirst} from "lodash";
 import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
+import TimeHelpModal from "../modals/time-help-modal";
 
 export default class BuildingInformation extends React.Component<BuildingInformationProps, any> {
 
@@ -32,6 +33,7 @@ export default class BuildingInformation extends React.Component<BuildingInforma
             time_needed: 0,
             error_message: null,
             success_message: null,
+            show_time_help: false,
         }
     }
 
@@ -40,6 +42,13 @@ export default class BuildingInformation extends React.Component<BuildingInforma
             upgrade_section: data.value,
             paying_with_gold: data.value === 'gold' ? true : false,
         });
+    }
+
+
+    manageHelpDialogue() {
+        this.setState({
+            show_time_help: !this.state.show_time_help,
+        })
     }
 
     closeSection() {
@@ -58,8 +67,10 @@ export default class BuildingInformation extends React.Component<BuildingInforma
 
         toLevel = Math.abs(toLevel);
 
-        if (toLevel > (this.props.building.max_level - this.props.building.level)) {
-            toLevel = this.props.building.max_level;
+        const maxLevel = (this.props.building.max_level - this.props.building.level);
+
+        if (toLevel > maxLevel) {
+            toLevel = maxLevel;
         }
 
         this.setState({
@@ -70,18 +81,21 @@ export default class BuildingInformation extends React.Component<BuildingInforma
     }
 
     calculateGoldAndPopulation() {
+        if (typeof this.props.kingdom_building_cost_reduction === 'undefined') {
+            return 0;
+        }
+
         let populationNeeded     = this.props.building.population_required * this.state.to_level;
-        populationNeeded         = populationNeeded - populationNeeded * this.props.kingdom_building_pop_cost_reduction
+        populationNeeded         = populationNeeded - populationNeeded * this.props.kingdom_population_cost_reduction
         let requiresAdditional   = false;
-        let cost                 = 0;
+        let cost: number;
         let additionalCost       = 0;
         let additionalPopulation = 0;
-        let timeNeeded           = this.props.building.raw_time_to_build;
 
         if (this.props.kingdom_current_population < populationNeeded) {
             requiresAdditional = true;
 
-            additionalCost       = (populationNeeded - this.props.kingdom_current_population) * this.props.building.upgrade_cost;
+            additionalCost       = (populationNeeded - this.props.kingdom_current_population) * this.props.building.additional_pop_cost;
             additionalPopulation = (populationNeeded - this.props.kingdom_current_population);
         }
 
@@ -90,19 +104,37 @@ export default class BuildingInformation extends React.Component<BuildingInforma
         cost           = cost - cost * this.props.kingdom_building_cost_reduction;
         additionalCost = additionalCost - additionalCost * this.props.kingdom_building_cost_reduction;
 
-        for (let i = this.state.to_level; i > 0; i--) {
-            timeNeeded = timeNeeded + timeNeeded * this.props.building.raw_time_increase;
-        }
-
-        timeNeeded = timeNeeded - timeNeeded * this.props.kingdom_building_time_reduction;
-
         this.setState({
             cost_in_gold: (cost + additionalCost),
             show_additional_population_message: requiresAdditional,
             additional_population_cost: additionalCost,
             additional_population_needed: additionalPopulation,
-            time_needed: timeNeeded,
+            time_needed: formatNumber(this.calculateTimeNeeded().toFixed(0)),
         });
+    }
+
+    calculateVieTime() {
+        return this.calculateTimeNeeded(1);
+    }
+
+    calculateTimeNeeded(levels?: number) {
+        let buildingCurrentLevel   = this.props.building.level;
+        const levelsToPurchase     = typeof levels !== 'undefined' ? levels : this.state.to_level;
+        let time                   = 0;
+
+        for (let i = levelsToPurchase; i > 0; i--) {
+            const newLevel = buildingCurrentLevel + 1;
+
+            let toBuild = newLevel + this.props.building.raw_time_to_build;
+
+            toBuild = (toBuild + toBuild * this.props.building.raw_time_increase)
+
+            time += toBuild;
+
+            buildingCurrentLevel++;
+        }
+
+        return time - time * this.props.kingdom_building_time_reduction;
     }
 
     upgradeBuilding() {
@@ -116,10 +148,7 @@ export default class BuildingInformation extends React.Component<BuildingInforma
                 to_level: this.state.to_level !== '' ? this.state.to_level : 1,
                 paying_with_gold: this.state.paying_with_gold,
             }).doAjaxCall('post', (response: AxiosResponse) => {
-                console.log(response.data);
-
                 this.setState({loading: false, success_message: response.data.message});
-                this.props.update_kingdoms(response.data.kingdom);
             }, (error: AxiosError) => {
                 if (typeof error.response !== 'undefined') {
                     const response = error.response;
@@ -182,6 +211,25 @@ export default class BuildingInformation extends React.Component<BuildingInforma
         });
     }
 
+    calculateResourceCostWithReductions(cost: number, is_population: boolean, is_iron: boolean): string {
+
+        if (typeof this.props.kingdom_building_cost_reduction === 'undefined') {
+            console.error('this.props.kingdom_building_cost_reduction is undefined.');
+
+            return 'ERROR';
+        }
+
+        if (is_iron) {
+            cost = cost - cost * this.props.kingdom_iron_cost_reduction;
+        }
+
+        if (is_population) {
+            cost = cost - cost * this.props.kingdom_population_cost_reduction;
+        }
+
+        return formatNumber((cost - cost * this.props.kingdom_building_cost_reduction).toFixed(0))
+    }
+
     renderResourceUpgrade() {
         return (
             <Fragment>
@@ -199,34 +247,11 @@ export default class BuildingInformation extends React.Component<BuildingInforma
                         </DangerAlert>
                         : null
                 }
-                <div className={'grid grid-cols-2 gap-4'}>
-                    <div>
-                        <h3>After Level Up</h3>
-                        <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
-                        <dl>
-                            {this.renderFutureResourceValues()}
-                        </dl>
-                    </div>
-                    <div className='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
-                    <div>
-                        <h3>Cost To Level</h3>
-                        <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
-                        <dl>
-                            <dt>Wood Cost</dt>
-                            <dd>{this.props.building.wood_cost}</dd>
-                            <dt>Clay Cost</dt>
-                            <dd>{this.props.building.clay_cost}</dd>
-                            <dt>Stone Cost</dt>
-                            <dd>{this.props.building.stone_cost}</dd>
-                            <dt>Iron Cost</dt>
-                            <dd>{this.props.building.iron_cost}</dd>
-                            <dt>Population Cost</dt>
-                            <dd>{this.props.building.population_required}</dd>
-                            <dt>Time To Build (Minutes)</dt>
-                            <dd>{this.props.building.time_increase}</dd>
-                        </dl>
-                    </div>
-                </div>
+                <h3>After Level Up</h3>
+                <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                <dl className='mb-5'>
+                    {this.renderFutureResourceValues()}
+                </dl>
                 {
                     this.state.loading ?
                         <LoadingProgressBar />
@@ -265,7 +290,7 @@ export default class BuildingInformation extends React.Component<BuildingInforma
                     this.state.show_additional_population_message ?
                         <div className='mt-4'>
                             <WarningAlert>
-                                You require additional population, therefore, you will have an additional population cost.
+                                You require additional population, therefore, you will have an additional population cost. This cost is reflected in your Gold Cost.
                             </WarningAlert>
                         </div>
                     : null
@@ -282,7 +307,16 @@ export default class BuildingInformation extends React.Component<BuildingInforma
                         'text-red-500 dark:text-red-400': this.state.additional_population_cost > 0
                     })}>{formatNumber(this.state.additional_population_needed)}</dd>
                     <dt>Time Needed (Minutes)</dt>
-                    <dd>{formatNumber((this.state.time_needed))}</dd>
+                    <dd className='flex items-center'>
+                        <span>{formatNumber(this.state.time_needed)}</span>
+                        <div>
+                            <div className='ml-2'>
+                                <button type={"button"} onClick={() => this.manageHelpDialogue()} className='text-blue-500 dark:text-blue-300'>
+                                    <i className={'fas fa-info-circle'}></i> Help
+                                </button>
+                            </div>
+                        </div>
+                    </dd>
                 </dl>
                 {
                     this.state.loading ?
@@ -308,92 +342,104 @@ export default class BuildingInformation extends React.Component<BuildingInforma
 
     render() {
         return (
-            <BasicCard>
-                <div className='text-right cursor-pointer text-red-500'>
-                    <button onClick={() => this.props.close()}><i className="fas fa-minus-circle"></i></button>
-                </div>
+            <Fragment>
+                <BasicCard>
+                    <div className='text-right cursor-pointer text-red-500'>
+                        <button onClick={() => this.props.close()}><i className="fas fa-minus-circle"></i></button>
+                    </div>
+                    {
+                        this.props.building.is_locked ?
+                            <InfoAlert>
+                                You must train the appropriate Kingdom Passive skill to unlock this building.
+                                The skill name is the same s this building name.
+                            </InfoAlert>
+                        : null
+                    }
+                    <div className={'grid md:grid-cols-2 gap-4 mb-4 mt-4'}>
+                        <div>
+                            <h3>Basic Info</h3>
+                            <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                            <dl>
+                                <dt>Level:</dt>
+                                <dd>{this.props.building.level}/{this.props.building.max_level}</dd>
+                                <dt>Durability:</dt>
+                                <dd>{formatNumber(this.props.building.current_durability)}/{formatNumber(this.props.building.max_durability)}</dd>
+                                <dt>Defence:</dt>
+                                <dd>{formatNumber(this.props.building.current_defence)}</dd>
+                                <dt>Morale Loss (per hour):</dt>
+                                <dd>{(this.props.building.morale_decrease * 100).toFixed(2)}%</dd>
+                                <dt>Morale Gain (per hour):</dt>
+                                <dd>{(this.props.building.morale_increase * 100).toFixed(2)}%</dd>
+                            </dl>
+                        </div>
+                        <div className='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                        <div>
+                            <h3>Upgrade Costs (For 1 Level)</h3>
+                            <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                            {
+                                this.props.building.is_maxed ?
+                                    <p>Building is already max level.</p>
+                                :
+                                    this.props.is_in_queue ?
+                                        <p>Building is currently in queue</p>
+                                    :
+                                        <Fragment>
+                                            <dl className='mb-5'>
+                                                <dt>Stone Cost:</dt>
+                                                <dd>{this.calculateResourceCostWithReductions(this.props.building.stone_cost, false, false)}</dd>
+                                                <dt>Clay Cost:</dt>
+                                                <dd>{this.calculateResourceCostWithReductions(this.props.building.clay_cost, false, false)}</dd>
+                                                <dt>Wood Cost:</dt>
+                                                <dd>{this.calculateResourceCostWithReductions(this.props.building.wood_cost, false, false)}</dd>
+                                                <dt>Iron Cost:</dt>
+                                                <dd>{this.calculateResourceCostWithReductions(this.props.building.iron_cost, false, true)}</dd>
+                                                <dt>Population Cost:</dt>
+                                                <dd>{this.calculateResourceCostWithReductions(this.props.building.population_required, true, false)}</dd>
+                                                <dt>Time till next level:</dt>
+                                                <dd>{formatNumber(this.calculateVieTime().toFixed(2))} Minutes</dd>
+                                            </dl>
+
+                                            {
+                                                this.state.upgrade_section !== null ?
+                                                    this.renderSelectedSection()
+                                                :
+                                                    <Select
+                                                        onChange={this.showSelectedForm.bind(this)}
+                                                        options={[
+                                                            {
+                                                                label: 'Upgrade with gold',
+                                                                value: 'gold',
+                                                            },
+                                                            {
+                                                                label: 'Upgrade with resources',
+                                                                value: 'resources',
+                                                            }
+                                                        ]}
+                                                        menuPosition={'absolute'}
+                                                        menuPlacement={'bottom'}
+                                                        styles={{menuPortal: (base: any) => ({...base, zIndex: 9999, color: '#000000'})}}
+                                                        menuPortalTarget={document.body}
+                                                        value={[
+                                                            {label: 'Please Select Upgrade Path', value: ''}
+                                                        ]}
+                                                    />
+                                            }
+                                        </Fragment>
+                            }
+                        </div>
+                    </div>
+                </BasicCard>
                 {
-                    this.props.building.is_locked ?
-                        <InfoAlert>
-                            You must train the appropriate Kingdom Passive skill to unlock this building.
-                            The skill name is the same s this building name.
-                        </InfoAlert>
+                    this.state.show_time_help ?
+                        <TimeHelpModal
+                            is_in_minutes={true}
+                            is_in_seconds={false}
+                            manage_modal={this.manageHelpDialogue.bind(this)}
+                            time={this.state.time_needed}
+                        />
                     : null
                 }
-                <div className={'grid md:grid-cols-2 gap-4 mb-4 mt-4'}>
-                    <div>
-                        <h3>Basic Info</h3>
-                        <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
-                        <dl>
-                            <dt>Level:</dt>
-                            <dd>{this.props.building.level}/{this.props.building.max_level}</dd>
-                            <dt>Durability:</dt>
-                            <dd>{formatNumber(this.props.building.current_durability)}/{formatNumber(this.props.building.max_durability)}</dd>
-                            <dt>Defence:</dt>
-                            <dd>{formatNumber(this.props.building.current_defence)}</dd>
-                            <dt>Morale Loss (per hour):</dt>
-                            <dd>{(this.props.building.morale_decrease * 100).toFixed(2)}%</dd>
-                            <dt>Morale Gain (per hour):</dt>
-                            <dd>{(this.props.building.morale_increase * 100).toFixed(2)}%</dd>
-                        </dl>
-                    </div>
-                    <div className='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
-                    <div>
-                        <h3>Upgrade Costs (For 1 Level)</h3>
-                        <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
-                        {
-                            this.props.building.is_maxed ?
-                                <p>Building is already max level.</p>
-                            :
-                                this.props.is_in_queue ?
-                                    <p>Building is currently in queue</p>
-                                :
-                                    <Fragment>
-                                        <dl className='mb-5'>
-                                            <dt>Stone Cost:</dt>
-                                            <dd>{formatNumber(this.props.building.stone_cost)}</dd>
-                                            <dt>Clay Cost:</dt>
-                                            <dd>{formatNumber(this.props.building.clay_cost)}</dd>
-                                            <dt>Wood Cost:</dt>
-                                            <dd>{formatNumber(this.props.building.wood_cost)}</dd>
-                                            <dt>Iron Cost:</dt>
-                                            <dd>{formatNumber(this.props.building.iron_cost)}</dd>
-                                            <dt>Population Cost:</dt>
-                                            <dd>{formatNumber(this.props.building.population_required)}</dd>
-                                            <dt>Time till next level:</dt>
-                                            <dd>{formatNumber(this.props.building.time_increase)} Minutes</dd>
-                                        </dl>
-
-                                        {
-                                            this.state.upgrade_section !== null ?
-                                                this.renderSelectedSection()
-                                            :
-                                                <Select
-                                                    onChange={this.showSelectedForm.bind(this)}
-                                                    options={[
-                                                        {
-                                                            label: 'Upgrade with gold',
-                                                            value: 'gold',
-                                                        },
-                                                        {
-                                                            label: 'Upgrade with resources',
-                                                            value: 'resources',
-                                                        }
-                                                    ]}
-                                                    menuPosition={'absolute'}
-                                                    menuPlacement={'bottom'}
-                                                    styles={{menuPortal: (base: any) => ({...base, zIndex: 9999, color: '#000000'})}}
-                                                    menuPortalTarget={document.body}
-                                                    value={[
-                                                        {label: 'Please Select Upgrade Path', value: ''}
-                                                    ]}
-                                                />
-                                        }
-                                    </Fragment>
-                        }
-                    </div>
-                </div>
-            </BasicCard>
+            </Fragment>
         )
     }
 }

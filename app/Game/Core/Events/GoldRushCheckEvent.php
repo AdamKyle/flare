@@ -36,10 +36,9 @@ class GoldRushCheckEvent
      * @param Adventure $adventure | null
      * @return void
      */
-    public function __construct(Character $character, Monster $monster, Adventure $adventure = null)
+    public function __construct(Character $character, Monster $monster)
     {
         $this->character = $character;
         $this->monster   = $monster;
-        $this->adventure = $adventure;
     }
 }

@@ -5,6 +5,7 @@ namespace App\Game\Kingdoms\Controllers\Api;
 use App\Flare\Models\UnitMovementQueue;
 use App\Flare\Transformers\BasicKingdomTransformer;
 use App\Flare\Transformers\OtherKingdomTransformer;
+use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
 use App\Game\Kingdoms\Requests\KingdomUpgradeBuildingRequest;
 use App\Game\Kingdoms\Service\KingdomResourcesService;
 use App\Game\Messages\Events\GlobalMessageEvent;
@@ -53,13 +54,16 @@ class KingdomsController extends Controller
 
     private $kingdomService;
 
-    public function __construct(Manager $manager, KingdomTransformer $kingdom, KingdomService $kingdomService)
+    private UpdateKingdomHandler $updateKingdomHandler;
+
+    public function __construct(Manager $manager, KingdomTransformer $kingdom, KingdomService $kingdomService, UpdateKingdomHandler $updateKingdomHandler)
     {
         $this->middleware('is.character.dead')->except(['getAttackLogs', 'getCharacterInfoForKingdom', 'getOtherKingdomInfo', 'getKingdomsList']);
 
         $this->manager = $manager;
         $this->kingdom = $kingdom;
         $this->kingdomService = $kingdomService;
+        $this->updateKingdomHandler = $updateKingdomHandler;
     }
 
     public function getCharacterInfoForKingdom(Kingdom $kingdom, Character $character, BasicKingdomTransformer $basicKingdomTransformer) {
@@ -183,13 +187,13 @@ class KingdomsController extends Controller
         if ($request->paying_with_gold) {
             $paid = $buildingService->upgradeBuildingWithGold($building, $request->all());
 
-            if (!$paid) {
+            if ($paid === 0) {
                 return response()->json([
                     'message' => 'You cannot afford this upgrade.'
                 ], 422);
             }
 
-            $buildingService->processUpgradeWithGold($building, $request->all());
+            $buildingService->processUpgradeWithGold($building, $paid, $request->to_level);
         } else {
             if (ResourceValidation::shouldRedirectKingdomBuilding($building, $building->kingdom)) {
                 return response()->json([
@@ -208,13 +212,10 @@ class KingdomsController extends Controller
             $buildingService->upgradeKingdomBuilding($building, $character);
         }
 
-        $kingdom = $building->kingdom;
-        $kingdom = new Item($kingdom->refresh(), $this->kingdom);
-        $kingdom = $this->manager->createData($kingdom)->toArray();
+        $this->updateKingdomHandler->refreshPlayersKingdoms($character->refresh());
 
         return response()->json([
             'message' => 'Building is in the process of upgrading!',
-            'kingdom' => $kingdom,
         ], 200);
     }
 
@@ -246,14 +247,6 @@ class KingdomsController extends Controller
             ], 422);
         }
 
-        $currentAmount = $kingdom->units()->where('game_unit_id', $gameUnit->id)->sum('amount');
-
-        if ($currentAmount >= KingdomMaxValue::MAX_UNIT) {
-            return response()->json([
-                'message' => 'Too many units'
-            ], 422);
-        }
-
         if ($request->amount <= 0) {
             return response()->json([
                 'message' => 'Too few units to recruit.'
@@ -263,7 +256,7 @@ class KingdomsController extends Controller
 
         $paidGold = false;
 
-        if ($request->recruitment_type === 'recruit-normally') {
+        if ($request->recruitment_type === 'resources') {
             if (ResourceValidation::shouldRedirectUnits($gameUnit, $kingdom, $request->amount)) {
                 return response()->json([
                     'message' => "You don't have the resources."

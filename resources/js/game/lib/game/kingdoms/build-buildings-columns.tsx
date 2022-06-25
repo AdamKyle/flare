@@ -47,7 +47,7 @@ export const buildBuildingsColumns = (onClick: (building: BuildingDetails) => vo
             minWidth: '300px',
             cell: (row: BuildingDetails) => <Fragment>
                 <div className='w-full'>
-                    <TimerProgressBar time_remaining={fetchTimeRemaining(row.id, buildingsInQueue)} time_out_label={'upgrading'} />
+                    <TimerProgressBar time_remaining={fetchTimeRemaining(row.id, buildingsInQueue)} time_out_label={'Building'} />
                 </div>
             </Fragment>,
             omit: buildingsInQueue.length === 0

@@ -1,15 +1,18 @@
-import React from "react";
+import React, {Fragment} from "react";
 import {formatNumber} from "../format-number";
 import BuildingDetails from "./building-details";
 import clsx from "clsx";
 import UnitDetails from "./unit-details";
+import UnitsInQueue from "./units-in-queue";
+import TimerProgressBar from "../../../components/ui/progress-bars/timer-progress-bar";
+import {DateTime} from "luxon";
 
 /**
  * Build the columns for the units table.
  *
  * @param onClick
  */
-export const BuildUnitsColumns = (onClick: (units: UnitDetails) => void) => {
+export const BuildUnitsColumns = (onClick: (units: UnitDetails) => void, unitsInQueue: UnitsInQueue[]|[]) => {
     return [
         {
             name: 'Name',
@@ -38,5 +41,42 @@ export const BuildUnitsColumns = (onClick: (units: UnitDetails) => void) => {
             selector: (row: UnitDetails) => row.defence,
             cell: (row: UnitDetails) => formatNumber(row.defence),
         },
+        {
+            name: 'Upgrade Time Left',
+            minWidth: '300px',
+            cell: (row: BuildingDetails) => <Fragment>
+                <div className='w-full'>
+                    <TimerProgressBar time_remaining={fetchTimeRemaining(row.id, unitsInQueue)} time_out_label={'Training'} />
+                </div>
+            </Fragment>,
+            omit: unitsInQueue.length === 0
+        }
     ];
+}
+
+const fetchTimeRemaining = (unitId: number, unitsInQueue: UnitsInQueue[]|[]) => {
+    let foundUnit = unitsInQueue.filter((unit: UnitsInQueue) => {
+        return unit.id === unitId
+    });
+
+    if (foundUnit.length > 0) {
+        const unitInQueue: UnitsInQueue = foundUnit[0];
+
+        const start = DateTime.now();
+        const end = DateTime.fromISO(unitInQueue.completed_at);
+
+        const difference = end.diff(start, ["seconds"])
+
+        if (typeof difference === 'undefined') {
+            return 0;
+        }
+
+        if (typeof difference.seconds === 'undefined') {
+            return 0;
+        }
+
+        return parseInt(difference.seconds.toFixed(0));
+    }
+
+    return 0;
 }

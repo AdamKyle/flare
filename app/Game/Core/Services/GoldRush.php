@@ -18,7 +18,7 @@ class GoldRush {
 
         $gameMapBonus = $this->getGameMapBonus($character);
 
-        if (GoldRushCheckCalculator::fetchGoldRushChance($monster, $gameMapBonus, $adventure)) {
+        if (GoldRushCheckCalculator::fetchGoldRushChance($monster, $gameMapBonus)) {
             $this->giveGoldRush($character);
         }
     }

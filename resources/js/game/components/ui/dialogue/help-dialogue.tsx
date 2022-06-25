@@ -1,5 +1,6 @@
 import React from "react";
 import Dialogue from "./dialogue";
+import clsx from "clsx";
 
 export default class HelpDialogue extends React.Component<any, any> {
 
@@ -19,7 +20,7 @@ export default class HelpDialogue extends React.Component<any, any> {
                       title={this.props.title}
                       secondary_actions={null}
             >
-                <div className='max-h-[375px] overflow-x-scroll'>
+                <div className={clsx({'max-h-[425px] overflow-x-scroll' : typeof this.props.no_scrolling === 'undefined'})}>
                     {this.props.children}
                 </div>
             </Dialogue>

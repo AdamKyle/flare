@@ -9,8 +9,6 @@ export default interface UnitDetails extends DataTableBaseData {
 
     can_heal: boolean;
 
-    can_recruit_more: null;
-
     clay_cost: number;
 
     cost_per_unit: number;
@@ -23,15 +21,13 @@ export default interface UnitDetails extends DataTableBaseData {
 
     description: string;
 
-    heal_percentage: null;
+    heal_percentage: number|null;
 
     id: number;
 
     iron_cost: number;
 
-    kd_max: number|null;
-
-    max_amount: number|null;
+    max_amount: number;
 
     name: string;
 
@@ -51,5 +47,5 @@ export default interface UnitDetails extends DataTableBaseData {
 
     required_building_level: number;
 
-
+    additional_pop_cost: number;
 }
