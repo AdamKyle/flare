@@ -2,22 +2,17 @@
 
 namespace App\Game\Kingdoms\Service;
 
-use App\Game\Messages\Events\ServerMessageEvent;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\Location;
-use App\Flare\Transformers\KingdomTransformer;
+use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\KingdomCache;
 use App\Game\Kingdoms\Builders\KingdomBuilder;
 use App\Game\Kingdoms\Events\AddKingdomToMap;
 use App\Game\Kingdoms\Events\UpdateGlobalMap;
-use App\Game\Kingdoms\Events\UpdateKingdom;
 use App\Game\Messages\Events\GlobalMessageEvent;
-
 
 class KingdomService {
 
@@ -28,23 +23,25 @@ class KingdomService {
      */
     private KingdomBuilder$builder;
 
-    private KingdomTransformer $kingdomTransformer;
+    /**
+     * @var UpdateKingdomHandler $updateKingdomHandle
+     */
+    private updateKingdomHandler $updateKingdomHandle;
 
-    private Manager $manager;
-
+    /**
+     * @var string $errorMessage
+     */
     private string $errorMessage;
 
     /**
      * constructor
      *
      * @param KingdomBuilder $builder
-     * @param KingdomTransformer $kingdomTransformer
-     * @param Manager $manager
+     * @param UpdateKingdomHandler $updateKingdomHandler
      */
-    public function __construct(KingdomBuilder $builder, KingdomTransformer $kingdomTransformer, Manager $manager) {
-        $this->builder            = $builder;
-        $this->kingdomTransformer = $kingdomTransformer;
-        $this->manager            = $manager;
+    public function __construct(KingdomBuilder $builder, UpdateKingdomHandler $updateKingdomHandler) {
+        $this->builder             = $builder;
+        $this->updateKingdomHandler = $updateKingdomHandler;
     }
 
     /**
@@ -181,6 +178,8 @@ class KingdomService {
             // @codeCoverageIgnoreEnd
         }
 
+        $this->updateKingdomHandler->refreshPlayersKingdoms($character->refresh());
+
         return [
             'message' => 'Settled a new kingdom! Check your Kingdoms tab.',
         ];
@@ -206,14 +205,17 @@ class KingdomService {
             'gold' => $character->gold + $amountToEmbezzle
         ]);
 
-        $kingdom  = new Item($kingdom->refresh(), $this->kingdomTransformer);
-
-        $kingdom  = $this->manager->createData($kingdom)->toArray();
+        $this->updateKingdomHandler->refreshPlayersKingdoms($character->refresh());
 
         event(new UpdateTopBarEvent($character->refresh()));
-        event(new UpdateKingdom($character->user, $kingdom));
     }
 
+    /**
+     * Assign default buildings to kingdom.
+     *
+     * @param Kingdom $kingdom
+     * @return Kingdom
+     */
     protected function assignKingdomBuildings(Kingdom $kingdom): Kingdom {
         $character = $kingdom->character;
 

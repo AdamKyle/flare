@@ -2,6 +2,7 @@ import BuildingDetails from "./building-details";
 import DataTableBaseData from "../../ui/types/tables/data-table-base-data";
 import UnitDetails from "./unit-details";
 import BuildingInQueueDetails from "./building-in-queue-details";
+import CurrentUnitDetails from "./current-unit-details";
 
 export default interface KingdomDetails extends DataTableBaseData {
     building_cost_reduction: number;
@@ -30,7 +31,7 @@ export default interface KingdomDetails extends DataTableBaseData {
 
     current_stone: number;
 
-    current_units: [];
+    current_units: CurrentUnitDetails[] | [];
 
     current_wood: number;
 

@@ -169,13 +169,8 @@ class KingdomsController extends Controller
 
         $kingdomService->addKingdomToCache($kingdom->character, $kingdom);
 
-        $kingdomData = new Item($kingdom->refresh(), $this->kingdom);
+        $this->updateKingdomHandler->refreshPlayersKingdoms($character->refresh);
 
-        $kingdomData = $this->manager->createData($kingdomData)->toArray();
-
-        $character = $character->refresh();
-
-        event(new UpdateKingdom($character->user, $kingdomData));
         event(new UpdateGlobalMap($character));
         event(new AddKingdomToMap($character));
 
@@ -239,8 +234,7 @@ class KingdomsController extends Controller
         return response()->json([], 200);
     }
 
-    public function recruitUnits(KingdomUnitRecruitmentRequest $request, Kingdom $kingdom, GameUnit $gameUnit, UnitService $service)
-    {
+    public function recruitUnits(KingdomUnitRecruitmentRequest $request, Kingdom $kingdom, GameUnit $gameUnit, UnitService $service) {
         if ($request->amount > KingdomMaxValue::MAX_UNIT) {
             return response()->json([
                 'message' => 'Too many units'
@@ -265,7 +259,6 @@ class KingdomsController extends Controller
 
             $service->updateKingdomResources($kingdom, $gameUnit, $request->amount);
         } else {
-
             $amount              = $gameUnit->required_population * $request->amount;
             $populationReduction = $kingdom->fetchPopulationCostReduction();
 
@@ -277,16 +270,12 @@ class KingdomsController extends Controller
                 ], 422);
             }
 
-            $newAmount = $kingdom->current_population - $amount;
-
-            if ($newAmount < 0) {
-                $newAmount = 0;
-            }
-
             $service->updateCharacterGold($kingdom, $gameUnit, $request->amount);
 
+            $newPop = $kingdom->current_population - $amount;
+
             $kingdom->update([
-                'current_population' => $newAmount
+                'current_population' => $newPop > 0 ? $newPop : 0
             ]);
 
             $paidGold = true;
@@ -296,13 +285,11 @@ class KingdomsController extends Controller
 
         $character = $kingdom->character;
 
-        $kingdom = new Item($kingdom, $this->kingdom);
+        $this->updateKingdomHandler->refreshPlayersKingdoms($character->refresh());
 
-        $kingdom = $this->manager->createData($kingdom)->toArray();
-
-        event(new UpdateKingdom($character->user, $kingdom));
-
-        return response()->json($kingdom, 200);
+        return response()->json([
+            'message' => 'Your units are being trained by the best of the best!',
+        ]);
     }
 
     public function cancelRecruit(Request $request, UnitService $service)

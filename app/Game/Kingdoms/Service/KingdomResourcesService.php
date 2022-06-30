@@ -14,9 +14,11 @@ use App\Game\Core\Traits\KingdomCache;
 use App\Game\Kingdoms\Events\UpdateEnemyKingdomsMorale;
 use App\Game\Kingdoms\Events\UpdateGlobalMap;
 use App\Game\Kingdoms\Events\UpdateNPCKingdoms;
+use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
 use App\Game\Kingdoms\Jobs\KingdomSettlementLockout;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 use App\Game\Maps\Events\UpdateMapDetailsBroadcast;
+use App\Game\Maps\Services\LocationService;
 use App\Game\Maps\Services\MovementService;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Skills\Values\SkillTypeValue;
@@ -34,22 +36,11 @@ class KingdomResourcesService {
 
     use KingdomCache;
 
-    /**
-     * @var Kingdom $kingdom
-     */
-    private $kingdom;
+    private UpdateKingdomHandler $updateKingdomHandler;
 
-    /**
-     * @var Manager $manager
-     */
-    private $manager;
+    private MovementService $movementService;
 
-    /**
-     * @var KingdomTransformer $kingdomTransformer
-     */
-    private $kingdomTransformer;
-
-    private $movementService;
+    private LocationService $locationService;
 
     /**
      * @var array $kingdomsUpdated
@@ -61,14 +52,14 @@ class KingdomResourcesService {
     /**
      * constructor
      *
-     * @param Manager $manager
-     * @param KingdomTransformer $kingdomTransformer
-     * @return void
+     * @param UpdateKingdomHandler $updateKingdomHandler
+     * @param MovementService $movementService
+     * @param LocationService $locationService
      */
-    public function __construct(Manager $manager, KingdomTransformer $kingdomTransformer, MovementService $movementService) {
-        $this->manager            = $manager;
-        $this->kingdomTransformer = $kingdomTransformer;
-        $this->movementService    = $movementService;
+    public function __construct(UpdateKingdomHandler $updateKingdomHandler, MovementService $movementService, LocationService $locationService) {
+        $this->updateKingdomHandler = $updateKingdomHandler;
+        $this->movementService      = $movementService;
+        $this->locationService      = $locationService;
     }
 
     /**
@@ -215,7 +206,7 @@ class KingdomResourcesService {
         broadcast(new UpdateGlobalMap($character));
 
         if (!$deletingAccount) {
-            broadcast(new UpdateMapDetailsBroadcast($character->map, $character->user, $this->movementService, true));
+            broadcast(new UpdateMapDetailsBroadcast($character->map, $character->user, $this->locationService));
         }
     }
 
@@ -262,8 +253,7 @@ class KingdomResourcesService {
             'current_morale'     => 0.10,
             'treasury'           => 0,
             'last_walked'        => now(),
-            'current_population' => $newPopulation,
-            'current_morale'     => 0.50,
+            'current_population' => $newPopulation
         ]);
 
         $kingdom = $kingdom->refresh();
@@ -701,10 +691,7 @@ class KingdomResourcesService {
 
             broadcast(new UpdateEnemyKingdomsMorale($kingdom));
 
-            $kingdom = new Item($kingdom, $this->kingdomTransformer);
-            $kingdom = $this->manager->createData($kingdom)->toArray();
-
-            event(new UpdateKingdom($user, $kingdom));
+            $this->updateKingdomHandler->refreshPlayersKingdoms($user->character->refresh());
 
             if ($user->show_kingdom_update_messages) {
                 $serverMessage = $this->kingdom->name . ' Has updated it\'s resources at Location (x/y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position . ' on the: ' . $this->kingdom->gameMap->name . ' plane.';

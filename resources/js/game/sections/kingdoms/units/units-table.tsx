@@ -30,7 +30,7 @@ export default class UnitsTable extends React.Component<UnitsTableProps, any> {
         return (
             <Table data={this.props.units}
                    conditional_row_styles={this.createConditionalRowStyles()}
-                   columns={BuildUnitsColumns(this.viewUnit.bind(this), this.props.units_in_queue)}
+                   columns={BuildUnitsColumns(this.viewUnit.bind(this), this.props.units_in_queue, this.props.current_units)}
                    dark_table={this.props.dark_tables}
             />
         )

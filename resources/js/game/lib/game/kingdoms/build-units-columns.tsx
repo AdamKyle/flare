@@ -6,13 +6,14 @@ import UnitDetails from "./unit-details";
 import UnitsInQueue from "./units-in-queue";
 import TimerProgressBar from "../../../components/ui/progress-bars/timer-progress-bar";
 import {DateTime} from "luxon";
+import CurrentUnitDetails from "./current-unit-details";
 
 /**
  * Build the columns for the units table.
  *
  * @param onClick
  */
-export const BuildUnitsColumns = (onClick: (units: UnitDetails) => void, unitsInQueue: UnitsInQueue[]|[]) => {
+export const BuildUnitsColumns = (onClick: (units: UnitDetails) => void, unitsInQueue: UnitsInQueue[]|[], currentUnits: CurrentUnitDetails[]|[]) => {
     return [
         {
             name: 'Name',
@@ -30,6 +31,10 @@ export const BuildUnitsColumns = (onClick: (units: UnitDetails) => void, unitsIn
         {
             name: 'Recruited From',
             selector: (row: UnitDetails) => row.recruited_from.name,
+        },
+        {
+            name: 'Amount',
+            cell: (row: BuildingDetails) => renderAmount(row.id, currentUnits),
         },
         {
             name: 'Attack',
@@ -52,6 +57,20 @@ export const BuildUnitsColumns = (onClick: (units: UnitDetails) => void, unitsIn
             omit: unitsInQueue.length === 0
         }
     ];
+}
+
+const renderAmount = (unitId: number, currentUnits: CurrentUnitDetails[]|[]) => {
+    const foundUnitDetails = currentUnits.filter((unit: CurrentUnitDetails) => {
+        return unit.game_unit_id === unitId;
+    });
+
+    if (foundUnitDetails.length > 0) {
+        let unitDetails: CurrentUnitDetails = foundUnitDetails[0];
+
+        return unitDetails.amount;
+    }
+
+    return 0;
 }
 
 const fetchTimeRemaining = (unitId: number, unitsInQueue: UnitsInQueue[]|[]) => {

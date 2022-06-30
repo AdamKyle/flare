@@ -118,7 +118,7 @@ class KingdomBuildingService {
             'current_clay'       => $newClay > 0 ? $newClay : 0,
             'current_stone'      => $newStone > 0 ? $newStone : 0,
             'current_iron'       => $newIron > 0 ? $newIron : 0,
-            'current_population' => $newPop
+            'current_population' => $newPop > 0 ? $newPop : 0,
         ]);
 
         return $building->kingdom->refresh();

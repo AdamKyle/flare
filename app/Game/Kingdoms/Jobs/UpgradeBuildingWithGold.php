@@ -6,6 +6,7 @@ use App\Flare\Jobs\SendOffEmail;
 use App\Flare\Mail\GenericMail;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Models\BuildingInQueue;
+use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -79,7 +80,7 @@ class UpgradeBuildingWithGold implements ShouldQueue
      * @param KingdomTransformer $kingdomTransformer
      * @return void
      */
-    public function handle(Manager $manager, KingdomTransformer $kingdomTransformer)
+    public function handle(UpdateKingdomHandler $updateKingdomHandler)
     {
 
         $queue = BuildingInQueue::find($this->queueId);
@@ -111,7 +112,7 @@ class UpgradeBuildingWithGold implements ShouldQueue
 
         // Upgrade the building as many times as we need.
         for ($i = 1; $i <= $this->levels; $i++) {
-            $this->upgradeBuilding($manager, $kingdomTransformer, $queue);
+            $this->upgradeBuilding($updateKingdomHandler, $queue);
         }
 
         $characterId   = $this->building->kingdom->character_id;
@@ -121,26 +122,19 @@ class UpgradeBuildingWithGold implements ShouldQueue
                                         ->where('character_id', $characterId)
                                         ->first();
 
-        $kingdom = Kingdom::find($this->building->kingdom_id);
-        $kingdom = new Item($kingdom, $kingdomTransformer);
-        $kingdom = $manager->createData($kingdom)->toArray();
-
-        event(new UpdateKingdom($this->user, $kingdom));
-
         if (!is_null($buildingInQue)) {
             $buildingInQue->delete();
         } else {
             // @codeCoverageIgnoreStart
             $adminUser = User::with('roles')->whereHas('roles', function($q) { $q->where('name', 'Admin'); })->first();
-            $message   = 'Building queue failed to clear: Building Id: ' . $this->building->id . ' KingdomId: ' . $this->building->kingdom_id;
+            $message   = 'Building queue failed to clear: Building Id: ' . $this->building->id . ' KingdomId: ' . $this->building->kingdom_id . '. Reason: Could not find queue.';
 
             SendOffEmail::dispatch($adminUser, (new GenericMail($adminUser, $message, 'Failed To Clear Building Queue')))->delay(now()->addMinutes(1));
             // @codeCoverageIgnoreEnd
         }
-
     }
 
-    protected function upgradeBuilding(Manager $manager, KingdomTransformer $kingdomTransformer, BuildingInQueue $queue) {
+    protected function upgradeBuilding(UpdateKingdomHandler $updateKingdomHandler, BuildingInQueue $queue) {
         $level = $this->building->level + 1;
 
         if ($this->building->gives_resources) {
@@ -186,10 +180,8 @@ class UpgradeBuildingWithGold implements ShouldQueue
         if (UserOnlineValue::isOnline($this->user)) {
             $kingdom = Kingdom::find($this->building->kingdom_id);
             $plane   = $kingdom->gameMap->name;
-            $kingdom = new Item($kingdom, $kingdomTransformer);
-            $kingdom = $manager->createData($kingdom)->toArray();
 
-            event(new UpdateKingdom($this->user, $kingdom));
+            $updateKingdomHandler->refreshPlayersKingdoms($this->building->kingdom->character->refresh());
 
             $x = $this->building->kingdom->x_position;
             $y = $this->building->kingdom->y_position;

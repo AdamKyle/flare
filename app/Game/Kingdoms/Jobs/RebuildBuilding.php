@@ -2,6 +2,7 @@
 
 namespace App\Game\Kingdoms\Jobs;
 
+use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
 use Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -62,7 +63,7 @@ class RebuildBuilding implements ShouldQueue
      * @param KingdomTransformer $kingdomTransformer
      * @return void
      */
-    public function handle(Manager $manager, KingdomTransformer $kingdomTransformer)
+    public function handle(UpdateKingdomHandler $updateKingdomHandler)
     {
 
         $queue = BuildingInQueue::find($this->queueId);
@@ -95,10 +96,7 @@ class RebuildBuilding implements ShouldQueue
             $y       = $kingdom->y_position;
             $plane   = $kingdom->gameMap->name;
 
-            $kingdom = new Item($kingdom, $kingdomTransformer);
-            $kingdom = $manager->createData($kingdom)->toArray();
-
-            event(new UpdateKingdom($this->user, $kingdom));
+            $updateKingdomHandler->refreshPlayersKingdoms($this->user->character->refresh());
 
             if ($this->user->show_building_rebuilt_messages) {
                 $message = $this->building->name . ' finished being rebuilt for kingdom: ' .

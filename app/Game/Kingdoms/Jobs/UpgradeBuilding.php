@@ -6,6 +6,7 @@ use App\Flare\Jobs\SendOffEmail;
 use App\Flare\Mail\GenericMail;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Models\BuildingInQueue;
+use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -72,7 +73,7 @@ class UpgradeBuilding implements ShouldQueue
      * @param KingdomTransformer $kingdomTransformer
      * @return void
      */
-    public function handle(Manager $manager, KingdomTransformer $kingdomTransformer)
+    public function handle(UpdateKingdomHandler $updateKingdomHandler)
     {
 
         $queue = BuildingInQueue::find($this->queueId);
@@ -160,10 +161,8 @@ class UpgradeBuilding implements ShouldQueue
         if (UserOnlineValue::isOnline($this->user)) {
             $kingdom = Kingdom::find($this->building->kingdom_id);
             $plane   = $kingdom->gameMap->name;
-            $kingdom = new Item($kingdom, $kingdomTransformer);
-            $kingdom = $manager->createData($kingdom)->toArray();
 
-            event(new UpdateKingdom($this->user, $kingdom));
+            $updateKingdomHandler->refreshPlayersKingdoms($this->user->character->refresh());
 
             $x = $this->building->kingdom->x_position;
             $y = $this->building->kingdom->y_position;

@@ -99,12 +99,18 @@ class UnitService {
         $populationRequired = ($gameUnit->required_population * $amount);
         $populationRequired -= $populationRequired * ($kingdomUnitCostReduction + $populationCostReduction);
 
+        $newWood  = $kingdom->current_wood - $woodRequired;
+        $newClay  = $kingdom->current_clay - $clayRequired;
+        $newStone = $kingdom->current_stone - $stoneRequired;
+        $newIron  = $kingdom->current_iron - $ironRequired;
+        $newPop   = $kingdom->current_population - $populationRequired;
+
         $kingdom->update([
-            'current_wood'       => $kingdom->current_wood - $woodRequired,
-            'current_clay'       => $kingdom->current_clay - $clayRequired,
-            'current_stone'      => $kingdom->current_stone - $stoneRequired,
-            'current_iron'       => $kingdom->current_iron - $ironRequired,
-            'current_population' => $kingdom->current_population - $populationRequired,
+            'current_wood'       => $newWood > 0 ? $newWood : 0,
+            'current_clay'       => $newClay > 0 ? $newClay : 0,
+            'current_stone'      => $newStone > 0 ? $newStone : 0,
+            'current_iron'       => $newIron > 0 ? $newIron : 0,
+            'current_population' => $newPop > 0 ? $newPop : 0,
         ]);
 
         return $kingdom->refresh();

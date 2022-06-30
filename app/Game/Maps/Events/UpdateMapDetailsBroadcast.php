@@ -35,11 +35,9 @@ class UpdateMapDetailsBroadcast implements ShouldBroadcastNow
      *
      * @param Map $map
      * @param User $user
-     * @param MovementService $service
-     * @param bool $updateKingdoms
+     * @param LocationService $service
      */
-    public function __construct(Map $map, User $user, LocationService $service,)
-    {
+    public function __construct(Map $map, User $user, LocationService $service) {
         $this->map_data = $service->getLocationData($user->character);
         $this->user     = $user;
     }
@@ -49,8 +47,7 @@ class UpdateMapDetailsBroadcast implements ShouldBroadcastNow
      *
      * @return Channel|array
      */
-    public function broadcastOn()
-    {
+    public function broadcastOn() {
         return new PrivateChannel('update-map-' . $this->user->id);
     }
 }

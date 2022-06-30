@@ -51,7 +51,6 @@ export default class UnitInformation extends React.Component<UnitInformationProp
      }
 
      calculateTimeRequired(baseTime: number, amount: number) {
-         console.log(amount, this.state.amount_to_recruit);
          const time = baseTime * amount;
 
          return (time - time * this.props.kingdom_building_time_reduction).toFixed(0);
@@ -345,32 +344,35 @@ export default class UnitInformation extends React.Component<UnitInformationProp
                              }
                          </dl>
                          {
-                             this.props.kingdom_current_population === 0 ?
-                                 <p className='mb-5 mt-5'>You have no population to recruit units with.</p>
+                             this.props.is_in_queue ?
+                                 <p className='mb-5 mt-5'>You must wait for the units recruitment to end.</p>
                              :
-                                 this.state.upgrade_section !== null ?
-                                     this.renderSelectedSection()
+                                 this.props.kingdom_current_population === 0 ?
+                                     <p className='mb-5 mt-5'>You have no population to recruit units with.</p>
                                  :
-                                     <Select
-                                         onChange={this.showSelectedForm.bind(this)}
-                                         options={[
-                                             {
-                                                 label: 'Recruit with gold',
-                                                 value: 'gold',
-                                             },
-                                             {
-                                                 label: 'Recruit with resources',
-                                                 value: 'resources',
-                                             }
-                                         ]}
-                                         menuPosition={'absolute'}
-                                         menuPlacement={'bottom'}
-                                         styles={{menuPortal: (base: any) => ({...base, zIndex: 9999, color: '#000000'})}}
-                                         menuPortalTarget={document.body}
-                                         value={[
-                                             {label: 'Please Select Recruit Path', value: ''}
-                                         ]}
-                                     />
+                                     this.state.upgrade_section !== null ?
+                                         this.renderSelectedSection()
+                                     :
+                                         <Select
+                                             onChange={this.showSelectedForm.bind(this)}
+                                             options={[
+                                                 {
+                                                     label: 'Recruit with gold',
+                                                     value: 'gold',
+                                                 },
+                                                 {
+                                                     label: 'Recruit with resources',
+                                                     value: 'resources',
+                                                 }
+                                             ]}
+                                             menuPosition={'absolute'}
+                                             menuPlacement={'bottom'}
+                                             styles={{menuPortal: (base: any) => ({...base, zIndex: 9999, color: '#000000'})}}
+                                             menuPortalTarget={document.body}
+                                             value={[
+                                                 {label: 'Please Select Recruit Path', value: ''}
+                                             ]}
+                                         />
                          }
                      </div>
                  </div>

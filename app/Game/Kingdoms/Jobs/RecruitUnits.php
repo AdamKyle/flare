@@ -4,6 +4,7 @@ namespace App\Game\Kingdoms\Jobs;
 
 use App\Flare\Mail\GenericMail;
 use App\Flare\Events\ServerMessageEvent;
+use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -71,7 +72,7 @@ class RecruitUnits implements ShouldQueue
      * @param KingdomTransformer $kingdomTransformer
      * @return void
      */
-    public function handle(Manager $manager, KingdomTransformer $kingdomTransformer)
+    public function handle(UpdateKingdomHandler $updateKingdomHandler)
     {
 
         $queue = UnitInQueue::find($this->queueId);
@@ -136,10 +137,7 @@ class RecruitUnits implements ShouldQueue
         $plane   = $kingdom->gameMap->name;
 
         if (UserOnlineValue::isOnline($user)) {
-            $kingdom = new Item($kingdom, $kingdomTransformer);
-            $kingdom = $manager->createData($kingdom)->toArray();
-
-            event(new UpdateKingdom($user, $kingdom));
+            $updateKingdomHandler->refreshPlayersKingdoms($user->character->refresh());
 
             if ($user->show_unit_recruitment_messages) {
                 $message = $this->unit->name . ' finished recruiting for kingdom: ' .

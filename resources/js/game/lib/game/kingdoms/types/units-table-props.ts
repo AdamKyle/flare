@@ -1,5 +1,6 @@
 import UnitDetails from "../unit-details";
 import UnitsInQueue from "../units-in-queue";
+import CurrentUnitDetails from "../current-unit-details";
 
 export default interface UnitsTableProps {
 
@@ -10,4 +11,6 @@ export default interface UnitsTableProps {
     view_unit: (unit?: UnitDetails) => void;
 
     units_in_queue: UnitsInQueue[]|[]
+
+    current_units: CurrentUnitDetails[]|[]
 }

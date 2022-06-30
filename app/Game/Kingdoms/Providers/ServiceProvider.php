@@ -5,6 +5,7 @@ namespace App\Game\Kingdoms\Providers;
 use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
 use App\Game\Kingdoms\Middleware\DoesKingdomBelongToAuthorizedUser;
 use App\Game\Kingdoms\Service\UseItemsService;
+use App\Game\Maps\Services\LocationService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Game\Kingdoms\Builders\AttackBuilder;
 use App\Game\Kingdoms\Builders\AttackedKingdomBuilder;
@@ -64,8 +65,7 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(KingdomService::class, function($app) {
             return new KingdomService(
                 $app->make(KingdomBuilder::class),
-                $app->make(KingdomTransformer::class),
-                $app->make(Manager::class),
+                $app->make(UpdateKingdomHandler::class),
             );
         });
 
@@ -75,9 +75,9 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(KingdomResourcesService::class, function($app) {
             return new KingdomResourcesService(
-                $app->make(Manager::class),
-                $app->make(KingdomTransformer::class),
-                $app->make(MovementService::class)
+                $app->make(UpdateKingdomHandler::class),
+                $app->make(MovementService::class),
+                $app->make(LocationService::class)
             );
         });
 

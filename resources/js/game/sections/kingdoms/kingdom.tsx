@@ -11,6 +11,7 @@ import Tabs from "../../components/ui/tabs/tabs";
 import TabPanel from "../../components/ui/tabs/tab-panel";
 import UnitDetails from "../../lib/game/kingdoms/unit-details";
 import UnitInformation from "./units/unit-information";
+import UnitsInQueue from "../../lib/game/kingdoms/units-in-queue";
 
 export default class Kingdom extends React.Component<KingdomProps, any> {
 
@@ -62,19 +63,17 @@ export default class Kingdom extends React.Component<KingdomProps, any> {
     }
 
     isUnitInQueue() {
-        if (this.state.building_to_view === null) {
+        if (this.state.unit_to_view === null) {
             return false;
         }
 
-        if (this.props.kingdom.building_queue.length === 0) {
+        if (this.props.kingdom.unit_queue.length === 0) {
             return false;
         }
 
-        return false
-
-        // return this.props.kingdom.building_queue.filter((queue: BuildingInQueueDetails) => {
-        //     return queue.building_id === this.state.building_to_view.id
-        // }).length > 0;
+        return this.props.kingdom.unit_queue.filter((queue: UnitsInQueue) => {
+            return queue.game_unit_id === this.state.unit_to_view.id
+        }).length > 0;
     }
 
     render() {
@@ -131,6 +130,7 @@ export default class Kingdom extends React.Component<KingdomProps, any> {
                                             dark_tables={this.props.dark_tables}
                                             view_unit={this.manageViewUnit.bind(this)}
                                             units_in_queue={this.props.kingdom.unit_queue}
+                                            current_units={this.props.kingdom.current_units}
                                 />
                             </TabPanel>
                         </Tabs>
