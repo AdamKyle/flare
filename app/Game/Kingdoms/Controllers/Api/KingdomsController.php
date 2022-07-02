@@ -202,7 +202,7 @@ class KingdomsController extends Controller
                 ], 422);
             }
 
-            $buildingService->updateKingdomResourcesForKingdomBuildingUpgrade($building);
+//            $buildingService->updateKingdomResourcesForKingdomBuildingUpgrade($building);
 
             $buildingService->upgradeKingdomBuilding($building, $character);
         }

@@ -29,11 +29,6 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
                             <dd>{
                                 (this.props.kingdom.current_morale * 100).toFixed(2) + '/100 %'
                             }</dd>
-                            <dt>Population</dt>
-                            <dd>{
-                                formatNumber(this.props.kingdom.current_population ) + '/' +
-                                formatNumber(this.props.kingdom.max_population)
-                            }</dd>
                             <dt>Treasury</dt>
                             <dd>{
                                 formatNumber(this.props.kingdom.treasury)
@@ -57,6 +52,11 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
                             <dd>{formatNumber(this.props.kingdom.current_wood) + '/' + formatNumber(this.props.kingdom.max_wood)}</dd>
                             <dt>Iron</dt>
                             <dd>{formatNumber(this.props.kingdom.current_iron) + '/' + formatNumber(this.props.kingdom.max_iron)}</dd>
+                            <dt>Population</dt>
+                            <dd>{
+                                formatNumber(this.props.kingdom.current_population ) + '/' +
+                                formatNumber(this.props.kingdom.max_population)
+                            }</dd>
                         </dl>
                     </div>
                 </div>

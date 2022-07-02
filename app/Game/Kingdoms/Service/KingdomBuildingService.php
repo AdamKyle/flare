@@ -45,7 +45,7 @@ class KingdomBuildingService {
      * @return void
      */
     public function upgradeKingdomBuilding(KingdomBuilding $building, Character $character): void {
-        $timeToComplete = now()->addMinutes($this->calculateBuildingTimeReduction($building, ($building->level + 1)));
+        $timeToComplete = now()->addMinutes($this->calculateBuildingTimeReduction($building));
 
         $queue = BuildingInQueue::create([
             'character_id' => $character->id,
@@ -289,25 +289,15 @@ class KingdomBuildingService {
         UpgradeBuildingWithGold::dispatch($building, $character->user, $queue->id, $toLevel)->delay($timeToComplete);
     }
 
-    protected function calculateBuildingTimeReduction(KingdomBuilding $building, int $toLevel)  {
+    protected function calculateBuildingTimeReduction(KingdomBuilding $building, int $toLevel = 1)  {
         $skillBonus = $building->kingdom->character->skills->filter(function($skill) {
             return $skill->baseSkill->type === SkillTypeValue::EFFECTS_KINGDOM;
         })->first()->building_time_reduction;
 
-        $time         = 0;
-        $currentLevel = $building->level;
+        if ($toLevel > 1) {
+            $time = $building->fetchTimeForMultipleLevels($toLevel);
 
-        for ($i = $toLevel; $i > 0; $i--) {
-            $toBuild = ($currentLevel + 1) + $building->gameBuilding->time_to_build;
-            $toBuild += $toBuild + $toBuild * $building->gameBuilding->time_increase_amount;
-
-            $time += $toBuild;
-
-            $currentLevel++;
-        }
-
-        if ($time > 0) {
-            return $time;
+            return floor($time - $time * $skillBonus);
         }
 
         return floor($building->time_increase - $building->time_increase * $skillBonus);

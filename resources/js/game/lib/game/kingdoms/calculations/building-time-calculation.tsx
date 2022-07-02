@@ -24,20 +24,13 @@ export default class BuildingTimeCalculation {
     calculateTimeNeeded(building: BuildingDetails, toLevel: number, timeReduction: number, levels?: number) {
         let buildingCurrentLevel   = building.level;
         const levelsToPurchase     = typeof levels !== 'undefined' ? levels : toLevel;
-        let time                   = 0;
+        const totalLevels          = buildingCurrentLevel + levelsToPurchase
+        const rawTimeIncrease      = building.raw_time_to_build;
+        let time;
 
-        for (let i = levelsToPurchase; i > 0; i--) {
-            const newLevel = buildingCurrentLevel + 1;
+        time = totalLevels + rawTimeIncrease;
+        time = time + time * building.raw_time_increase;
 
-            let toBuild = newLevel + building.raw_time_to_build;
-
-            toBuild = (toBuild + toBuild * building.raw_time_increase)
-
-            time += toBuild;
-
-            buildingCurrentLevel++;
-        }
-
-        return time - time * timeReduction;
+        return Math.floor(time - time * timeReduction);
     }
 }

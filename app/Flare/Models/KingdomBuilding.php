@@ -192,6 +192,18 @@ class KingdomBuilding extends Model
         return $time;
     }
 
+    public function fetchTimeForMultipleLevels(int $level): int {
+        $nextLevel    = $this->level + $level;
+        $timeIncrease = $this->gameBuilding->time_to_build;
+        $time         = $nextLevel + $timeIncrease;
+        $time         = $time + $time * $this->gameBuilding->time_increase_amount;
+
+        $now  = now();
+        $time = $now->diffInMinutes($now->copy()->addMinutes($time));
+
+        return $time;
+    }
+
     public function getRebuildTimeAttribute() {
         $time = ($this->level * $this->gameBuilding->time_to_build);
 
