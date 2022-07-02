@@ -6,6 +6,7 @@ use App\Flare\Models\UnitMovementQueue;
 use App\Flare\Transformers\BasicKingdomTransformer;
 use App\Flare\Transformers\OtherKingdomTransformer;
 use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
+use App\Game\Kingdoms\Requests\CancelBuildingRequest;
 use App\Game\Kingdoms\Requests\KingdomUpgradeBuildingRequest;
 use App\Game\Kingdoms\Service\KingdomResourcesService;
 use App\Game\Messages\Events\GlobalMessageEvent;
@@ -202,7 +203,7 @@ class KingdomsController extends Controller
                 ], 422);
             }
 
-//            $buildingService->updateKingdomResourcesForKingdomBuildingUpgrade($building);
+            $buildingService->updateKingdomResourcesForKingdomBuildingUpgrade($building);
 
             $buildingService->upgradeKingdomBuilding($building, $character);
         }
@@ -315,12 +316,7 @@ class KingdomsController extends Controller
         return response()->json([], 200);
     }
 
-    public function removeKingdomBuildingFromQueue(Request $request, KingdomBuildingService $service)
-    {
-
-        $request->validate([
-            'queue_id' => 'required|integer',
-        ]);
+    public function removeKingdomBuildingFromQueue(CancelBuildingRequest $request, KingdomBuildingService $service) {
 
         $queue = BuildingInQueue::find($request->queue_id);
 
@@ -336,7 +332,9 @@ class KingdomsController extends Controller
             ], 422);
         }
 
-        return response()->json([], 200);
+        return response()->json([
+            'message' => 'Building has been removed from queue. Some resources or gold was given back to you based on percentage of time left.'
+        ], 200);
     }
 
     public function embezzle(KingdomEmbezzleRequest $request, Kingdom $kingdom, KingdomService $kingdomService)

@@ -11,6 +11,7 @@ use App\Flare\Models\Kingdom;
 use App\Flare\Transformers\KingdomTransformer;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Kingdoms\Events\UpdateKingdom;
+use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
 use App\Game\Kingdoms\Jobs\RebuildBuilding;
 use App\Game\Kingdoms\Jobs\UpgradeBuilding;
 use App\Game\Kingdoms\Jobs\UpgradeBuildingWithGold;
@@ -33,6 +34,18 @@ class KingdomBuildingService {
      * @var mixed $totalResources
      */
     private $totalResources;
+
+    /**
+     * @var UpdateKingdomHandler
+     */
+    private UpdateKingdomHandler $updateKingdomHandler;
+
+    /**
+     * @param UpdateKingdomHandler $updateKingdomHandler
+     */
+    public function __construct(UpdateKingdomHandler $updateKingdomHandler) {
+        $this->updateKingdomHandler = $updateKingdomHandler;
+    }
 
     /**
      * Upgrades the building.
@@ -84,6 +97,7 @@ class KingdomBuildingService {
      * Updates the kingdoms resources based on building cost.
      *
      * @param KingdomBuilding $building
+     * @param bool $ignorePop
      * @return Kingdom
      */
     public function updateKingdomResourcesForKingdomBuildingUpgrade(KingdomBuilding $building, bool $ignorePop = false): Kingdom {
@@ -160,7 +174,7 @@ class KingdomBuildingService {
      * Can return false if there is not enough time left or too little resources given back.
      *
      * @codeCoverageIgnore
-     * @param KingdomBuildingInQueue $queue
+     * @param BuildingInQueue $queue
      * @param Manager $manager
      * @param KingdomTransformer $transformer
      * @return bool
@@ -204,13 +218,7 @@ class KingdomBuildingService {
 
         $queue->delete();
 
-        $user    = $kingdom->character->user;
-
-        $kingdom = new Item($kingdom, $transformer);
-
-        $kingdom = $manager->createData($kingdom)->toArray();
-
-        event(new UpdateKingdom($user, $kingdom));
+        $this->updateKingdomHandler->refreshPlayersKingdoms($kingdom->character->refresh());
 
         return true;
     }

@@ -5,14 +5,16 @@ import clsx from "clsx";
 import BuildingInQueueDetails from "./building-in-queue-details";
 import TimerProgressBar from "../../../components/ui/progress-bars/timer-progress-bar";
 import {DateTime} from "luxon";
+import DangerLinkButton from "../../../components/ui/buttons/danger-link-button";
 
 /**
  * Build the columns for the buildings table.
  *
  * @param onClick
+ * @param cancelBuilding
  * @param buildingsInQueue
  */
-export const buildBuildingsColumns = (onClick: (building: BuildingDetails) => void, buildingsInQueue: BuildingInQueueDetails[]|[]) => {
+export const buildBuildingsColumns = (onClick: (building: BuildingDetails) => void, cancelBuilding: (queueId: number|null) => void, buildingsInQueue: BuildingInQueueDetails[]|[]) => {
     return [
         {
             name: 'Name',
@@ -46,13 +48,39 @@ export const buildBuildingsColumns = (onClick: (building: BuildingDetails) => vo
             name: 'Upgrade Time Left',
             minWidth: '300px',
             cell: (row: BuildingDetails) => <Fragment>
-                <div className='w-full'>
+                <div className='w-full mt-2'>
                     <TimerProgressBar time_remaining={fetchTimeRemaining(row.id, buildingsInQueue)} time_out_label={'Building'} />
+                    {
+                        fetchTimeRemaining(row.id, buildingsInQueue) > 0 ?
+                            <div className='mb-2 mt-4'>
+                                <button className={
+                                    'hover:text-red-500 text-red-700 dark:text-red-500 dark:hover:text-red-400 ' +
+                                    'disabled:text-red-400 dark:disabled:bg-red-400 disabled:line-through ' +
+                                    'focus:outline-none focus-visible:ring-2 focus-visible:ring-red-200 dark:focus-visible:ring-white ' +
+                                    'focus-visible:ring-opacity-75'
+                                } onClick={() => cancelBuilding(findBuildingInQueue(row.id, buildingsInQueue))}>Cancel</button>
+                            </div>
+                        : null
+                    }
                 </div>
             </Fragment>,
             omit: buildingsInQueue.length === 0
         }
     ];
+}
+
+const findBuildingInQueue = (buildingId: number, buildingsInQueue: BuildingInQueueDetails[]|[]) => {
+    let foundBuilding = buildingsInQueue.filter((building: BuildingInQueueDetails) => {
+        return building.building_id === buildingId
+    });
+
+    if (foundBuilding.length > 0) {
+        const buildingInQueue: BuildingInQueueDetails = foundBuilding[0];
+
+        return buildingInQueue.id;
+    }
+
+    return null;
 }
 
 
