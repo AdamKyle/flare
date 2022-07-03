@@ -4,6 +4,7 @@ namespace App\Game\Kingdoms\Providers;
 
 use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
 use App\Game\Kingdoms\Middleware\DoesKingdomBelongToAuthorizedUser;
+use App\Game\Kingdoms\Service\KingdomSettleService;
 use App\Game\Kingdoms\Service\UseItemsService;
 use App\Game\Maps\Services\LocationService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
@@ -58,13 +59,16 @@ class ServiceProvider extends ApplicationServiceProvider
             return new KingdomBuildingService($app->make(UpdateKingdomHandler::class));
         });
 
+        $this->app->bind(KingdomSettleService::class, function($app) {
+            return new KingdomSettleService($app->make(KingdomBuilder::class));
+        });
+
         $this->app->bind(UnitService::class, function($app) {
             return new UnitService($app->make(UpdateKingdomHandler::class));
         });
 
         $this->app->bind(KingdomService::class, function($app) {
             return new KingdomService(
-                $app->make(KingdomBuilder::class),
                 $app->make(UpdateKingdomHandler::class),
             );
         });

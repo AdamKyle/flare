@@ -10,6 +10,7 @@ use App\Game\Kingdoms\Requests\CancelBuildingRequest;
 use App\Game\Kingdoms\Requests\CancelUnitRequest;
 use App\Game\Kingdoms\Requests\KingdomUpgradeBuildingRequest;
 use App\Game\Kingdoms\Service\KingdomResourcesService;
+use App\Game\Kingdoms\Service\KingdomSettleService;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use Illuminate\Http\Request;
 use League\Fractal\Manager;
@@ -52,30 +53,35 @@ class KingdomsController extends Controller
 
     private $manager;
 
-    private $kingdom;
-
     private $kingdomService;
+
+    private KingdomTransformer $kingdomTransformer;
 
     private UpdateKingdomHandler $updateKingdomHandler;
 
-    public function __construct(Manager $manager, KingdomTransformer $kingdom, KingdomService $kingdomService, UpdateKingdomHandler $updateKingdomHandler)
+    private BasicKingdomTransformer $basicKingdomTransformer;
+
+    private KingdomSettleService $kingdomSettleService;
+
+    public function __construct(Manager $manager, KingdomTransformer $kingdomTransformer, KingdomService $kingdomService, UpdateKingdomHandler $updateKingdomHandler, KingdomSettleService $kingdomSettleService)
     {
         $this->middleware('is.character.dead')->except(['getAttackLogs', 'getCharacterInfoForKingdom', 'getOtherKingdomInfo', 'getKingdomsList']);
 
-        $this->manager = $manager;
-        $this->kingdom = $kingdom;
-        $this->kingdomService = $kingdomService;
+        $this->manager              = $manager;
+        $this->kingdomTransformer   = $kingdomTransformer;
+        $this->kingdomService       = $kingdomService;
         $this->updateKingdomHandler = $updateKingdomHandler;
+        $this->kingdomSettleService = $kingdomSettleService;
     }
 
-    public function getCharacterInfoForKingdom(Kingdom $kingdom, Character $character, BasicKingdomTransformer $basicKingdomTransformer) {
+    public function getCharacterInfoForKingdom(Kingdom $kingdom, Character $character) {
         $kingdom = Kingdom::where('character_id', $character->id)->where('id', $kingdom->id)->first();
 
         if (is_null($kingdom)) {
             return response()->json(['message' => 'Kingdom not found.'], 422);
         }
 
-        $kingdom = new Item($kingdom, $basicKingdomTransformer);
+        $kingdom = new Item($kingdom, $this->basicKingdomTransformer);
         $kingdom = $this->manager->createData($kingdom)->toArray();
 
         return response()->json($kingdom);
@@ -88,63 +94,54 @@ class KingdomsController extends Controller
         return response()->json($kingdom);
     }
 
-    public function getKingdomsList(Character $character, KingdomTransformer $kingdomTransformer) {
-        $kingdoms = new Collection($character->kingdoms, $kingdomTransformer);
-
+    public function getKingdomsList(Character $character) {
         return response()->json(
-            $this->manager->createData($kingdoms)->toArray()
+            $this->manager->createData(
+                new Collection($character->kingdoms, $this->kingdomTransformer)
+            )->toArray()
         );
     }
 
-    public function getLocationData(Character $character, Kingdom $kingdom)
-    {
-        $kingdom = new Item($kingdom, $this->kingdom);
-
+    public function getLocationData(Character $character, Kingdom $kingdom) {
         return response()->json(
-            $this->manager->createData($kingdom)->toArray(),
-            200
+            $this->manager->createData(
+                new Item($kingdom, $this->kingdomTransformer)
+            )->toArray(),
         );
     }
 
-    public function getAttackLogs(User $user)
-    {
+    public function getAttackLogs(User $user) {
         $logs = $user->character->kingdomAttackLogs()->where('published', true)->get();
 
         return response()->json([
-            'logs' => $logs,
+            'logs'         => $logs,
             'character_id' => $user->character->id
-        ], 200);
+        ]);
     }
 
-    public function settle(KingdomsSettleRequest $request, Character $character, KingdomService $kingdomService)
-    {
+    public function settle(KingdomsSettleRequest $request, Character $character) {
 
-        if (!is_null($character->can_settle_again_at)) {
+        $result = $this->kingdomSettleService->settlePreCheck($character, $request->name);
 
+        if (!empty($result)) {
             return response()->json([
-                'message' => 'You can settle another kingdom in: ' . now()->diffInMinutes($character->can_settle_again_at) . ' Minutes.'
+                'message' => $result['message']
             ], 422);
         }
 
-        if ($character->map->gameMap->mapType()->isPurgatory()) {
+        if (!$this->kingdomSettleService->canSettle($character)) {
             return response()->json([
-                'message' => 'Child, this is not place to be a King or Queen, The Creator would destroy anything you build down here.'
+                'message' => $this->kingdomSettleService->getErrorMessage()
             ], 422);
         }
 
-        $kingdom = Kingdom::where('name', $request->name)->where('game_map_id', $character->map->game_map_id)->first();
-
-        if (!is_null($kingdom)) {
-            return response()->json(['message' => 'Name is already taken'], 422);
-        }
-
-        if (!$kingdomService->canSettle($character)) {
+        if (!$this->kingdomSettleService->canAfford()) {
             return response()->json([
-                'message' => $kingdomService->getErrorMessage()
+                'message' => 'You don\'t have the gold.',
             ], 422);
         }
 
-        if ($kingdomService->canAfford($character)) {
+        if ($this->kingdomSettleService->canAfford($character)) {
             $amount = $character->kingdoms->count() * 10000;
 
             $character->update([
@@ -152,31 +149,26 @@ class KingdomsController extends Controller
             ]);
 
             event(new UpdateTopBarEvent($character->refresh()));
-        } else {
-            return response()->json([
-                'message' => 'You don\'t have the gold.',
-            ], 200);
         }
 
-        $kingdomService->createKingdom($character, $request->name);
+        $this->kingdomSettleService->createKingdom($character, $request->name);
 
-        return response()->json($kingdomService->addKingdomToMap($character), 200);
+        return response()->json($this->kingdomSettleService->addKingdomToMap($character), 200);
     }
 
-    public function rename(KingdomRenameRequest $request, Kingdom $kingdom, KingdomService $kingdomService)
-    {
+    public function rename(KingdomRenameRequest $request, Kingdom $kingdom) {
         $kingdom->update($request->all());
 
-        $character = $kingdom->character;
+        $character = $kingdom->character->refresh();
 
-        $kingdomService->addKingdomToCache($kingdom->character, $kingdom);
+        $this->kingdomSettleService->addKingdomToCache($character, $kingdom);
 
-        $this->updateKingdomHandler->refreshPlayersKingdoms($character->refresh);
+        $this->updateKingdomHandler->refreshPlayersKingdoms($character);
 
         event(new UpdateGlobalMap($character));
         event(new AddKingdomToMap($character));
 
-        return response()->json([], 200);
+        return response()->json();
     }
 
     public function upgradeKingdomBuilding(KingdomUpgradeBuildingRequest $request, Character $character, KingdomBuilding $building, KingdomBuildingService $buildingService) {
