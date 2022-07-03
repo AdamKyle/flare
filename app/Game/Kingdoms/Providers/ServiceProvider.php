@@ -59,7 +59,7 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
         $this->app->bind(UnitService::class, function($app) {
-            return new UnitService;
+            return new UnitService($app->make(UpdateKingdomHandler::class));
         });
 
         $this->app->bind(KingdomService::class, function($app) {

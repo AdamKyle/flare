@@ -13,7 +13,7 @@ import CurrentUnitDetails from "./current-unit-details";
  *
  * @param onClick
  */
-export const BuildUnitsColumns = (onClick: (units: UnitDetails) => void, unitsInQueue: UnitsInQueue[]|[], currentUnits: CurrentUnitDetails[]|[]) => {
+export const BuildUnitsColumns = (onClick: (units: UnitDetails) => void, cancelUnitRecruitment: (queueId: number| null) => void, unitsInQueue: UnitsInQueue[]|[], currentUnits: CurrentUnitDetails[]|[]) => {
     return [
         {
             name: 'Name',
@@ -50,13 +50,39 @@ export const BuildUnitsColumns = (onClick: (units: UnitDetails) => void, unitsIn
             name: 'Upgrade Time Left',
             minWidth: '300px',
             cell: (row: BuildingDetails) => <Fragment>
-                <div className='w-full'>
+                <div className='w-full mt-4'>
                     <TimerProgressBar time_remaining={fetchTimeRemaining(row.id, unitsInQueue)} time_out_label={'Training'} />
+                    {
+                        fetchTimeRemaining(row.id, unitsInQueue) > 0 ?
+                            <div className='mt-2 mb-4'>
+                                <button className={
+                                    'hover:text-red-500 text-red-700 dark:text-red-500 dark:hover:text-red-400 ' +
+                                    'disabled:text-red-400 dark:disabled:bg-red-400 disabled:line-through ' +
+                                    'focus:outline-none focus-visible:ring-2 focus-visible:ring-red-200 dark:focus-visible:ring-white ' +
+                                    'focus-visible:ring-opacity-75'
+                                } onClick={() => cancelUnitRecruitment(findUnitInQueue(row.id, unitsInQueue))}>Cancel</button>
+                            </div>
+                        : null
+                    }
                 </div>
             </Fragment>,
             omit: unitsInQueue.length === 0
         }
     ];
+}
+
+const findUnitInQueue = (unitId: number, unitsInQueue: UnitsInQueue[]|[])  => {
+    const foundQueue = unitsInQueue.filter((queue: UnitsInQueue) => {
+        return queue.game_unit_id === unitId;
+    });
+
+    if (foundQueue.length > 0) {
+        const queue: UnitsInQueue = foundQueue[0];
+
+        return queue.id;
+    }
+
+    return null;
 }
 
 const renderAmount = (unitId: number, currentUnits: CurrentUnitDetails[]|[]) => {
@@ -75,7 +101,7 @@ const renderAmount = (unitId: number, currentUnits: CurrentUnitDetails[]|[]) => 
 
 const fetchTimeRemaining = (unitId: number, unitsInQueue: UnitsInQueue[]|[]) => {
     let foundUnit = unitsInQueue.filter((unit: UnitsInQueue) => {
-        return unit.id === unitId
+        return unit.game_unit_id === unitId
     });
 
     if (foundUnit.length > 0) {

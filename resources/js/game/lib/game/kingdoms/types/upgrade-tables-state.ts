@@ -1,4 +1,4 @@
-export default interface BuildingsTableState {
+export default interface UpgradeTablesState {
 
     success_message: string | null;
 

@@ -44,7 +44,7 @@ export default class UnitInformation extends React.Component<UnitInformationProp
          }
 
          if (is_population) {
-             cost = cost - cost - this.props.kingdom_population_cost_reduction;
+             cost = (cost - cost * this.props.kingdom_population_cost_reduction);
          }
 
          return (cost - cost * this.props.unit_cost_reduction).toFixed(0);
@@ -130,11 +130,7 @@ export default class UnitInformation extends React.Component<UnitInformationProp
     }
 
     getAmount() {
-         if (this.state.upgrade_section === 'resources') {
-             return parseInt(this.state.amount_to_recruit) || 1;
-         }
-
-         return 1;
+        return parseInt(this.state.amount_to_recruit) || 1;
     }
 
      renderSelectedSection() {

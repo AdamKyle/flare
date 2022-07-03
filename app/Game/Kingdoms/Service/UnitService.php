@@ -10,6 +10,7 @@ use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\UnitInQueue;
 use App\Flare\Transformers\KingdomTransformer;
+use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
 use App\Game\Kingdoms\Jobs\RecruitUnits;
 use App\Game\Kingdoms\Values\UnitCosts;
 use App\Game\Skills\Values\SkillTypeValue;
@@ -30,6 +31,18 @@ class UnitService {
     private $totalResources;
 
     /**
+     * @var UpdateKingdomHandler $updateKingdomHandler
+     */
+    private UpdateKingdomHandler $updateKingdomHandler;
+
+    /**
+     * @param UpdateKingdomHandler $updateKingdomHandler
+     */
+    public function __construct(UpdateKingdomHandler $updateKingdomHandler) {
+        $this->updateKingdomHandler = $updateKingdomHandler;
+    }
+
+    /**
      * Recruit a specific unit for a kingdom
      *
      * Will dispatch a job delayed for an amount of time.
@@ -37,6 +50,7 @@ class UnitService {
      * @param Kingdom $kingdom
      * @param GameUnit $gameUnit
      * @param int $amount
+     * @throws \Exception
      */
     public function recruitUnits(Kingdom $kingdom, GameUnit $gameUnit, int $amount, bool $paidGold = false) {
         $character        = $kingdom->character;
@@ -122,6 +136,7 @@ class UnitService {
      * @param Kingdom $kingdom
      * @param GameUnit $gameUnit
      * @param int $amount
+     * @throws \Exception
      */
     public function updateCharacterGold(Kingdom $kingdom, GameUnit $gameUnit, int $amount) {
         $character         = $kingdom->character;
@@ -147,10 +162,9 @@ class UnitService {
      * Can return false if resources gained back are too little.
      *
      * @param UnitInQueue $queue
-     * @param Manager $manager
-     * @param KingdomTransformer $transformer
+     * @return bool
      */
-    public function cancelRecruit(UnitInQueue $queue, Manager $manager, KingdomTransformer $transformer): bool {
+    public function cancelRecruit(UnitInQueue $queue): bool {
 
         $kingdom = $queue->kingdom;
         $user    = $kingdom->character->user;
@@ -184,11 +198,7 @@ class UnitService {
 
         $queue->delete();
 
-        $kingdom  = new Item($kingdom->refresh(), $transformer);
-
-        $kingdom = $manager->createData($kingdom)->toArray();
-
-        event(new UpdateKingdom($user, $kingdom));
+        $this->updateKingdomHandler->refreshPlayersKingdoms($kingdom->character->refresh());
 
         return true;
     }

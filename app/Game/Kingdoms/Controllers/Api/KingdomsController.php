@@ -7,6 +7,7 @@ use App\Flare\Transformers\BasicKingdomTransformer;
 use App\Flare\Transformers\OtherKingdomTransformer;
 use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
 use App\Game\Kingdoms\Requests\CancelBuildingRequest;
+use App\Game\Kingdoms\Requests\CancelUnitRequest;
 use App\Game\Kingdoms\Requests\KingdomUpgradeBuildingRequest;
 use App\Game\Kingdoms\Service\KingdomResourcesService;
 use App\Game\Messages\Events\GlobalMessageEvent;
@@ -293,11 +294,7 @@ class KingdomsController extends Controller
         ]);
     }
 
-    public function cancelRecruit(Request $request, UnitService $service)
-    {
-        $request->validate([
-            'queue_id' => 'required|integer',
-        ]);
+    public function cancelRecruit(CancelUnitRequest $request, UnitService $service) {
 
         $queue = UnitInQueue::find($request->queue_id);
 
@@ -305,7 +302,7 @@ class KingdomsController extends Controller
             return response()->json(['message' => 'Invalid Input.'], 422);
         }
 
-        $cancelled = $service->cancelRecruit($queue, $this->manager, $this->kingdom);
+        $cancelled = $service->cancelRecruit($queue);
 
         if (!$cancelled) {
             return response()->json([
@@ -313,7 +310,9 @@ class KingdomsController extends Controller
             ], 422);
         }
 
-        return response()->json([], 200);
+        return response()->json([
+            'message' => 'Your units have been disbanded. You got a % of some of the cost back in either resources or gold.'
+        ]);
     }
 
     public function removeKingdomBuildingFromQueue(CancelBuildingRequest $request, KingdomBuildingService $service) {

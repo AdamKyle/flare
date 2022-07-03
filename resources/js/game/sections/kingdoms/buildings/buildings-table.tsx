@@ -6,11 +6,11 @@ import BuildingsTableProps from "resources/js/game/lib/game/kingdoms/types/build
 import {AxiosError, AxiosResponse} from "axios";
 import Ajax from "../../../lib/ajax/ajax";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
-import BuildingsTableState from "../../../lib/game/kingdoms/types/buildings-table-state";
+import UpgradeTablesState from "../../../lib/game/kingdoms/types/upgrade-tables-state";
 import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
 import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
 
-export default class BuildingsTable extends React.Component<BuildingsTableProps, BuildingsTableState> {
+export default class BuildingsTable extends React.Component<BuildingsTableProps, UpgradeTablesState> {
 
     constructor(props: BuildingsTableProps) {
         super(props);
