@@ -58,7 +58,7 @@ class UnitService {
     public function handlePayment(GameUnit $gameUnit, Kingdom $kingdom, string $recruitmentType, int $amount): array {
         if ($recruitmentType === 'resources') {
             if (ResourceValidation::shouldRedirectUnits($gameUnit, $kingdom, $amount)) {
-                return $this->errorResult(["You don't have the resources."]);
+                return $this->errorResult("You don't have the resources.");
             }
 
             $this->updateKingdomResources($kingdom, $gameUnit, $amount);
@@ -69,7 +69,7 @@ class UnitService {
             $amount = ceil($amount - $amount * $populationReduction);
 
             if ($amount > $kingdom->current_population) {
-                return $this->errorResult(["You don't have enough population to purchase with gold alone."]);
+                return $this->errorResult("You don't have enough population to purchase with gold alone.");
             }
 
             $this->updateCharacterGold($kingdom, $gameUnit, $amount);
@@ -94,9 +94,10 @@ class UnitService {
      * @param Kingdom $kingdom
      * @param GameUnit $gameUnit
      * @param int $amount
+     * @param bool $paidGold
      * @throws Exception
      */
-    public function recruitUnits(Kingdom $kingdom, GameUnit $gameUnit, int $amount, bool $paidGold = false) {
+    public function recruitUnits(Kingdom $kingdom, GameUnit $gameUnit, int $amount, bool $paidGold = false): void {
         $character        = $kingdom->character;
         $totalTime        = $gameUnit->time_to_recruit * $amount;
         $totalTime        = $totalTime - $totalTime * $this->fetchTimeReduction($character)->unit_time_reduction;
@@ -247,6 +248,12 @@ class UnitService {
         return true;
     }
 
+    /**
+     * Calculate elapsed time percent.
+     *
+     * @param UnitInQueue $queue
+     * @return int
+     */
     protected function calculateElapsedTimePercent(UnitInQueue $queue): int {
         $startedAt   = Carbon::parse($queue->started_at);
         $completedAt = Carbon::parse($queue->completed_at);
@@ -262,7 +269,13 @@ class UnitService {
         return 100 - (100 - ceil($elapsedTime/$totalTime));
     }
 
-    protected function resourceCalculation(UnitInQueue $queue) {
+    /**
+     * Calculate resources needed.
+     *
+     * @param UnitInQueue $queue
+     * @return void
+     */
+    protected function resourceCalculation(UnitInQueue $queue): void {
         $start   = Carbon::parse($queue->started_at)->timestamp;
         $end     = Carbon::parse($queue->completed_at)->timestamp;
         $current = Carbon::parse(now())->timestamp;
@@ -271,12 +284,26 @@ class UnitService {
         $this->totalResources = 1 - $this->completed;
     }
 
+    /**
+     * Fetch the time reduction for recruitment.
+     *
+     * @param Character $character
+     * @return Skill
+     */
     protected function fetchTimeReduction(Character $character): Skill  {
         return $character->skills->filter(function($skill) {
             return $skill->baseSkill->type === SkillTypeValue::EFFECTS_KINGDOM;
         })->first();
     }
 
+    /**
+     * Give back some resources when we cancel the recruitment.
+     *
+     * @param Kingdom $kingdom
+     * @param GameUnit $unit
+     * @param UnitInQueue $queue
+     * @return Kingdom
+     */
     protected function updateKingdomAfterCancellation(Kingdom $kingdom, GameUnit $unit, UnitInQueue $queue): Kingdom {
         $kingdom->update([
             'current_wood'       => $kingdom->current_wood + (($unit->wood_cost * $queue->amount) * $this->totalResources),

@@ -41,6 +41,8 @@ export default interface BuildingDetails extends DataTableBaseData {
 
     id: number;
 
+    game_building_id: number;
+
     iron_cost: number;
 
     iron_increase: number;
@@ -104,4 +106,6 @@ export default interface BuildingDetails extends DataTableBaseData {
     units: UnitDetails[]|[];
 
     additional_pop_cost: number;
+
+    building_name: string;
 }

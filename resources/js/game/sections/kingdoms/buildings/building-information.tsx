@@ -73,6 +73,7 @@ export default class BuildingInformation extends React.Component<BuildingInforma
                                         kingdom_population_cost_reduction={this.props.kingdom_population_cost_reduction}
                                         kingdom_current_population={this.props.kingdom_current_population}
                                         kingdom_building_cost_reduction={this.props.kingdom_building_cost_reduction}
+                                        is_in_queue={this.props.is_in_queue}
 
                 />
             case 'resources':
@@ -80,6 +81,7 @@ export default class BuildingInformation extends React.Component<BuildingInforma
                     character_id={this.props.character_id}
                     building={this.props.building}
                     remove_section={this.removeSelection.bind(this)}
+                    is_in_queue={this.props.is_in_queue}
                 />
             default:
                 return null;
@@ -97,7 +99,7 @@ export default class BuildingInformation extends React.Component<BuildingInforma
                         this.props.building.is_locked ?
                             <InfoAlert>
                                 You must train the appropriate Kingdom Passive skill to unlock this building.
-                                The skill name is the same s this building name.
+                                The skill name is the same as this building name.
                             </InfoAlert>
                         : null
                     }
@@ -149,26 +151,28 @@ export default class BuildingInformation extends React.Component<BuildingInforma
                                                 this.state.upgrade_section !== null ?
                                                     this.renderSelectedSection()
                                                 :
-                                                    <Select
-                                                        onChange={this.showSelectedForm.bind(this)}
-                                                        options={[
-                                                            {
-                                                                label: 'Upgrade with gold',
-                                                                value: 'gold',
-                                                            },
-                                                            {
-                                                                label: 'Upgrade with resources',
-                                                                value: 'resources',
-                                                            }
-                                                        ]}
-                                                        menuPosition={'absolute'}
-                                                        menuPlacement={'bottom'}
-                                                        styles={{menuPortal: (base: any) => ({...base, zIndex: 9999, color: '#000000'})}}
-                                                        menuPortalTarget={document.body}
-                                                        value={[
-                                                            {label: 'Please Select Upgrade Path', value: ''}
-                                                        ]}
-                                                    />
+                                                    !this.props.is_in_queue ?
+                                                        <Select
+                                                            onChange={this.showSelectedForm.bind(this)}
+                                                            options={[
+                                                                {
+                                                                    label: 'Upgrade with gold',
+                                                                    value: 'gold',
+                                                                },
+                                                                {
+                                                                    label: 'Upgrade with resources',
+                                                                    value: 'resources',
+                                                                }
+                                                            ]}
+                                                            menuPosition={'absolute'}
+                                                            menuPlacement={'bottom'}
+                                                            styles={{menuPortal: (base: any) => ({...base, zIndex: 9999, color: '#000000'})}}
+                                                            menuPortalTarget={document.body}
+                                                            value={[
+                                                                {label: 'Please Select Upgrade Path', value: ''}
+                                                            ]}
+                                                        />
+                                                    : null
                                             }
                                         </Fragment>
                             }

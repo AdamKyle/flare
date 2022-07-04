@@ -168,10 +168,11 @@ export default class UpgradeWithGold extends React.Component<any, any> {
                         </DangerAlert>
                         : null
                 }
+
                 <div className='flex items-center mb-5'>
                     <label className='w-[50px]'>Levels</label>
                     <div className='w-2/3'>
-                        <input type='text' value={this.state.to_level} onChange={this.setGoldLevels.bind(this)} className='form-control' disabled={this.state.loading} />
+                        <input type='text' value={this.state.to_level} onChange={this.setGoldLevels.bind(this)} className='form-control' disabled={this.state.loading || this.props.is_in_queue} />
                     </div>
                 </div>
                 {
@@ -211,7 +212,7 @@ export default class UpgradeWithGold extends React.Component<any, any> {
                         <LoadingProgressBar />
                         : null
                 }
-                <PrimaryButton button_label={'Purchase Levels'} additional_css={'mr-2'} on_click={this.upgradeBuilding.bind(this)} disabled={this.state.to_level <= 0 || this.state.loading}/>
+                <PrimaryButton button_label={'Purchase Levels'} additional_css={'mr-2'} on_click={this.upgradeBuilding.bind(this)} disabled={this.state.to_level <= 0 || this.state.loading || this.props.is_in_queue}/>
                 <DangerButton button_label={'Cancel'} on_click={this.props.remove_section} disabled={this.state.loading}/>
             </Fragment>
         )

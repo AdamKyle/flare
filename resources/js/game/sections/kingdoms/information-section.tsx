@@ -19,7 +19,7 @@ export default class InformationSection extends React.Component<InformationSecti
                                         kingdom_population_cost_reduction={this.props.cost_reduction.kingdom_population_cost_reduction}
                                         kingdom_current_population={this.props.cost_reduction.kingdom_current_population}
                                         character_id={this.props.character_id}
-                                        is_in_queue={this.props.queue.is_unit_in_queue}
+                                        is_in_queue={this.props.queue.is_building_in_queue}
             />
         }
 
@@ -35,6 +35,7 @@ export default class InformationSection extends React.Component<InformationSecti
                                     character_id={this.props.character_id}
                                     is_in_queue={this.props.queue.is_unit_in_queue}
                                     kingdom_id={this.props.kingdom_id}
+                                    buildings={this.props.buildings}
             />
         }
 

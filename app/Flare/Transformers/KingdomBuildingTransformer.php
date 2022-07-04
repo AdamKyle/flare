@@ -28,6 +28,7 @@ class KingdomBuildingTransformer extends TransformerAbstract {
         return [
             'id'                          => $building->id,
             'kingdom_id'                  => $building->kingdom_id,
+            'game_building_id'            => $building->gameBuilding->id,
             'name'                        => $building->name,
             'description'                 => $building->description,
             'level'                       => $building->level,

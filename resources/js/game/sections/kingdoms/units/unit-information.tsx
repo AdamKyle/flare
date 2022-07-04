@@ -12,6 +12,10 @@ import {parseInt} from "lodash";
 import TimeHelpModal from "../modals/time-help-modal";
 import Ajax from "../../../lib/ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
+import RecruitWithGold from "./recruit-with-gold";
+import RecruitWithResources from "./recruit-with-resources";
+import UnitDetails from "../../../lib/game/kingdoms/unit-details";
+import BuildingDetails from "../../../lib/game/kingdoms/building-details";
 
 export default class UnitInformation extends React.Component<UnitInformationProps, any> {
      constructor(props: UnitInformationProps) {
@@ -50,12 +54,6 @@ export default class UnitInformation extends React.Component<UnitInformationProp
          return (cost - cost * this.props.unit_cost_reduction).toFixed(0);
      }
 
-     calculateTimeRequired(baseTime: number, amount: number) {
-         const time = baseTime * amount;
-
-         return (time - time * this.props.kingdom_building_time_reduction).toFixed(0);
-     }
-
     setGoldAmount(e: React.ChangeEvent<HTMLInputElement>) {
 
          if (typeof this.props.unit_cost_reduction === 'undefined') {
@@ -85,29 +83,11 @@ export default class UnitInformation extends React.Component<UnitInformationProp
          })
     }
 
-    setResourceAmount(e: React.ChangeEvent<HTMLInputElement>) {
-
-        if (typeof this.props.unit_cost_reduction === 'undefined') {
-            this.setState({
-                error_message: 'Cannot determine cost. Unit Cost Reduction Is Undefined.'
-            });
-
-            return;
-        }
-
-        const value = e.target.value;
-
-        const amount = this.getAmountToRecruit(value);
-
-        if (amount === 0) {
-            return;
-        }
-
-        const timeNeeded = this.props.unit.time_to_recruit * amount;
+    setResourceAmount(amount: number, timeNeeded: number) {
 
         this.setState({
             amount_to_recruit: amount,
-            time_needed: (timeNeeded - timeNeeded * this.props.kingdom_building_time_reduction),
+            time_needed: Math.ceil(timeNeeded),
         })
     }
 
@@ -136,9 +116,26 @@ export default class UnitInformation extends React.Component<UnitInformationProp
      renderSelectedSection() {
          switch(this.state.upgrade_section) {
              case 'gold':
-                 return this.renderGoldSection();
+                 return <RecruitWithGold
+                     kingdom_id={this.props.kingdom_id}
+                     character_id={this.props.character_id}
+                     unit={this.props.unit}
+                     unit_cost_reduction={this.props.unit_cost_reduction}
+                     kingdom_building_time_reduction={this.props.kingdom_building_time_reduction}
+                     manage_help_dialogue={this.manageHelpDialogue.bind(this)}
+                     remove_selection={this.removeSelection.bind(this)}
+                 />
              case 'resources':
-                 return this.renderResourceSection();
+                 return <RecruitWithResources
+                     kingdom_id={this.props.kingdom_id}
+                     character_id={this.props.character_id}
+                     unit={this.props.unit}
+                     unit_cost_reduction={this.props.unit_cost_reduction}
+                     kingdom_building_time_reduction={this.props.kingdom_building_time_reduction}
+                     manage_help_dialogue={this.manageHelpDialogue.bind(this)}
+                     remove_selection={this.removeSelection.bind(this)}
+                     set_resource_amount={this.setResourceAmount.bind(this)}
+                 />;
              default:
                  return null;
          }
@@ -162,9 +159,10 @@ export default class UnitInformation extends React.Component<UnitInformationProp
         })
     }
 
-    manageHelpDialogue() {
+    manageHelpDialogue(amountToRecruit?: number) {
          this.setState({
              show_time_help: !this.state.show_time_help,
+             amount_to_recruit: typeof amountToRecruit !== 'undefined' ? amountToRecruit : 0,
          })
     }
 
@@ -193,55 +191,18 @@ export default class UnitInformation extends React.Component<UnitInformationProp
         });
     }
 
-    renderGoldSection() {
-         return (
-             <Fragment>
-                 {
-                     this.state.success_message !== null ?
-                         <SuccessAlert additional_css={'mb-5'}>
-                             {this.state.success_message}
-                         </SuccessAlert>
-                         : null
-                 }
-                 {
-                     this.state.error_message !== null ?
-                         <DangerAlert additional_css={'mb-5'}>
-                             {this.state.error_message}
-                         </DangerAlert>
-                         : null
-                 }
-                 <div className='flex items-center mb-5'>
-                     <label className='w-[50px] mr-4'>Amount</label>
-                     <div className='w-2/3'>
-                         <input type='text' value={this.state.amount_to_recruit} onChange={this.setGoldAmount.bind(this)} className='form-control' disabled={this.state.loading} />
-                     </div>
-                 </div>
-                 <dl className='mt-4 mb-4'>
-                     <dt>Gold Cost</dt>
-                     <dd>{formatNumber(this.state.cost_in_gold)}</dd>
-                     <dt>
-                         Time Needed (Seconds)
-                     </dt>
-                     <dd className='flex items-center'>
-                         <span>{formatNumber(this.state.time_needed)}</span>
-                         <div>
-                             <div className='ml-2'>
-                                 <button type={"button"} onClick={() => this.manageHelpDialogue()} className='text-blue-500 dark:text-blue-300'>
-                                     <i className={'fas fa-info-circle'}></i> Help
-                                 </button>
-                             </div>
-                         </div>
-                     </dd>
-                 </dl>
-                 {
-                     this.state.loading ?
-                         <LoadingProgressBar />
-                         : null
-                 }
-                 <PrimaryButton button_label={'Purchase Units'} additional_css={'mr-2'} on_click={this.recruitUnits.bind(this)} disabled={this.state.amount_to_recruit <= 0 || this.state.loading}/>
-                 <DangerButton button_label={'Cancel'} on_click={this.removeSelection.bind(this)} disabled={this.state.loading}/>
-             </Fragment>
-         )
+    cannotBeRecruited(unit: UnitDetails) {
+        const building = this.props.buildings.filter((building: BuildingDetails) => {
+            return building.game_building_id === unit.recruited_from.game_building_id;
+        });
+
+        if (building.length === 0) {
+            return false;
+        }
+
+        const foundBuilding: BuildingDetails = building[0];
+
+        return foundBuilding.level < unit.required_building_level;
     }
 
     renderResourceSection() {
@@ -264,7 +225,7 @@ export default class UnitInformation extends React.Component<UnitInformationProp
                 <div className='flex items-center mb-5'>
                     <label className='w-[50px] mr-4'>Amount</label>
                     <div className='w-2/3'>
-                        <input type='text' value={this.state.amount_to_recruit} onChange={this.setResourceAmount.bind(this)} className='form-control' disabled={this.state.loading} />
+                        <input type='text' value={this.state.amount_to_recruit} onChange={() => {}} className='form-control' disabled={this.state.loading} />
                     </div>
                 </div>
                 {
@@ -285,6 +246,16 @@ export default class UnitInformation extends React.Component<UnitInformationProp
                  <div className='text-right cursor-pointer text-red-500'>
                      <button onClick={() => this.props.close()}><i className="fas fa-minus-circle"></i></button>
                  </div>
+                 {
+                     this.cannotBeRecruited(this.props.unit) ?
+                         <div className='mt-4 mb-4'>
+                             <DangerAlert>
+                                 You must Train: {this.props.unit.recruited_from.building_name} to level: {this.props.unit.required_building_level} before
+                                 you can recruit these units.
+                             </DangerAlert>
+                         </div>
+                     : null
+                 }
                  <div className={'grid md:grid-cols-2 gap-4 mb-4 mt-4'}>
                      <div>
                          <h3>Basic Info</h3>
@@ -336,39 +307,41 @@ export default class UnitInformation extends React.Component<UnitInformationProp
                                          </div>
                                      </dd>
                                  :
-                                     <dl>{formatNumber(this.calculateTimeRequired(this.props.unit.time_to_recruit, this.getAmount()))}</dl>
+                                     <dl>{formatNumber(this.state.time_needed)}</dl>
                              }
                          </dl>
                          {
-                             this.props.is_in_queue ?
-                                 <p className='mb-5 mt-5'>You must wait for the units recruitment to end.</p>
-                             :
-                                 this.props.kingdom_current_population === 0 ?
-                                     <p className='mb-5 mt-5'>You have no population to recruit units with.</p>
+                             this.cannotBeRecruited(this.props.unit) ?
+                                 null
+                             : this.props.is_in_queue ?
+                                     <p className='mb-5 mt-5'>You must wait for the units recruitment to end.</p>
                                  :
-                                     this.state.upgrade_section !== null ?
-                                         this.renderSelectedSection()
+                                     this.props.kingdom_current_population === 0 ?
+                                         <p className='mb-5 mt-5'>You have no population to recruit units with.</p>
                                      :
-                                         <Select
-                                             onChange={this.showSelectedForm.bind(this)}
-                                             options={[
-                                                 {
-                                                     label: 'Recruit with gold',
-                                                     value: 'gold',
-                                                 },
-                                                 {
-                                                     label: 'Recruit with resources',
-                                                     value: 'resources',
-                                                 }
-                                             ]}
-                                             menuPosition={'absolute'}
-                                             menuPlacement={'bottom'}
-                                             styles={{menuPortal: (base: any) => ({...base, zIndex: 9999, color: '#000000'})}}
-                                             menuPortalTarget={document.body}
-                                             value={[
-                                                 {label: 'Please Select Recruit Path', value: ''}
-                                             ]}
-                                         />
+                                         this.state.upgrade_section !== null ?
+                                             this.renderSelectedSection()
+                                         :
+                                             <Select
+                                                 onChange={this.showSelectedForm.bind(this)}
+                                                 options={[
+                                                     {
+                                                         label: 'Recruit with gold',
+                                                         value: 'gold',
+                                                     },
+                                                     {
+                                                         label: 'Recruit with resources',
+                                                         value: 'resources',
+                                                     }
+                                                 ]}
+                                                 menuPosition={'absolute'}
+                                                 menuPlacement={'bottom'}
+                                                 styles={{menuPortal: (base: any) => ({...base, zIndex: 9999, color: '#000000'})}}
+                                                 menuPortalTarget={document.body}
+                                                 value={[
+                                                     {label: 'Please Select Recruit Path', value: ''}
+                                                 ]}
+                                             />
                          }
                      </div>
                  </div>
@@ -379,7 +352,7 @@ export default class UnitInformation extends React.Component<UnitInformationProp
                              is_in_minutes={false}
                              is_in_seconds={true}
                              manage_modal={this.manageHelpDialogue.bind(this)}
-                             time={this.calculateTimeRequired(this.props.unit.time_to_recruit, this.state.amount_to_recruit === '' ? 1 : this.state.amount_to_recruit)}
+                             time={this.state.time_needed}
                          />
                      : null
                  }

@@ -31,7 +31,7 @@ export default class BuildingsTable extends React.Component<BuildingsTableProps,
             {
                 when: (row: BuildingDetails) => row.is_locked,
                 style: {
-                    backgroundColor: '#f87171',
+                    backgroundColor: '#f4a0a0',
                     color: 'white',
                 }
             }

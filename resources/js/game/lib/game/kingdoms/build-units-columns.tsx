@@ -13,7 +13,7 @@ import CurrentUnitDetails from "./current-unit-details";
  *
  * @param onClick
  */
-export const BuildUnitsColumns = (onClick: (units: UnitDetails) => void, cancelUnitRecruitment: (queueId: number| null) => void, unitsInQueue: UnitsInQueue[]|[], currentUnits: CurrentUnitDetails[]|[]) => {
+export const BuildUnitsColumns = (onClick: (units: UnitDetails) => void, cancelUnitRecruitment: (queueId: number| null) => void, unitsInQueue: UnitsInQueue[]|[], currentUnits: CurrentUnitDetails[]|[], buildings: BuildingDetails[]|[]) => {
     return [
         {
             name: 'Name',
@@ -21,8 +21,8 @@ export const BuildUnitsColumns = (onClick: (units: UnitDetails) => void, cancelU
             cell: (row: UnitDetails) =>
                 <button onClick={() => onClick(row)}
                         className={clsx({
-                            'text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-500': true,
-                            'text-white underline': false
+                            'text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-500': !cannotBeRecruited(row, buildings),
+                            'text-white underline': cannotBeRecruited(row, buildings)
                         })}
                 >
                     {row.name}
@@ -69,6 +69,20 @@ export const BuildUnitsColumns = (onClick: (units: UnitDetails) => void, cancelU
             omit: unitsInQueue.length === 0
         }
     ];
+}
+
+const cannotBeRecruited = (unit: UnitDetails, buildings: BuildingDetails[] | []) => {
+    const building = buildings.filter((building: BuildingDetails) => {
+        return building.game_building_id === unit.recruited_from.game_building_id;
+    });
+
+    if (building.length === 0) {
+        return false;
+    }
+
+    const foundBuilding: BuildingDetails = building[0];
+
+    return foundBuilding.level < unit.required_building_level;
 }
 
 const findUnitInQueue = (unitId: number, unitsInQueue: UnitsInQueue[]|[])  => {

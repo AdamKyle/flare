@@ -32,12 +32,20 @@ class GameBuildingUnit extends Model
         'required_level' => 'integer',
     ];
 
+    protected $appends = [
+        'building_name'
+    ];
+
     public function gameBuilding() {
         return $this->belongsTo(GameBuilding::class);
     }
 
     public function gameUnit() {
         return $this->hasOne(GameUnit::class, 'id', 'game_unit_id');
+    }
+
+    public function getBuildingNameAttribute() {
+        return $this->gameBuilding->name;
     }
 
     protected static function newFactory() {

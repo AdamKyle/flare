@@ -96,6 +96,7 @@ export default class UpgradeWithResources extends React.Component<any, any> {
                         </DangerAlert>
                         : null
                 }
+
                 <h3>After Level Up</h3>
                 <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                 <dl className='mb-5'>
@@ -106,7 +107,7 @@ export default class UpgradeWithResources extends React.Component<any, any> {
                         <LoadingProgressBar />
                         : null
                 }
-                <PrimaryButton button_label={'Upgrade'} additional_css={'mr-2'} on_click={this.upgradeBuilding.bind(this)} disabled={this.state.loading}/>
+                <PrimaryButton button_label={'Upgrade'} additional_css={'mr-2'} on_click={this.upgradeBuilding.bind(this)} disabled={this.state.loading || this.props.is_in_queue}/>
                 <DangerButton button_label={'Cancel'} on_click={this.props.remove_section.bind(this)} disabled={this.state.loading}/>
             </Fragment>
         )

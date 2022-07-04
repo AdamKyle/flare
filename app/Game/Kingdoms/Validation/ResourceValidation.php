@@ -47,10 +47,10 @@ class ResourceValidation {
      * @return bool
      */
     public function shouldRedirectUnits(GameUnit $unit, Kingdom $kingdom, int $amount): bool {
-        return ($kingdom->current_wood < $this->getUnitCost($kingdom, ($unit->wood_cost * $amount))) &&
-               ($kingdom->current_clay < $this->getUnitCost($kingdom, ($unit->clay_cost * $amount))) &&
-               ($kingdom->current_stone < $this->getUnitCost($kingdom, ($unit->stone_cost * $amount))) &&
-               ($kingdom->current_iron < $this->getUnitCost($kingdom, ($unit->iron_cost * $amount), false, true)) &&
+        return ($kingdom->current_wood < $this->getUnitCost($kingdom, ($unit->wood_cost * $amount))) ||
+               ($kingdom->current_clay < $this->getUnitCost($kingdom, ($unit->clay_cost * $amount))) ||
+               ($kingdom->current_stone < $this->getUnitCost($kingdom, ($unit->stone_cost * $amount))) ||
+               ($kingdom->current_iron < $this->getUnitCost($kingdom, ($unit->iron_cost * $amount), false, true)) ||
                ($kingdom->current_population < $this->getUnitCost($kingdom, ($unit->required_population * $amount), true));
     }
 

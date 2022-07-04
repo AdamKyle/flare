@@ -26,4 +26,6 @@ export default interface InformationSectionProps {
     character_id: number;
 
     kingdom_id: number;
+
+    buildings: BuildingDetails[] | [];
 }

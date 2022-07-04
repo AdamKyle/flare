@@ -34,6 +34,7 @@ export default class KingdomTabs extends React.Component<any, any> {
                     </TabPanel>
                     <TabPanel key={'units'}>
                         <UnitsTable units={this.props.kingdom.units}
+                                    buildings={this.props.kingdom.buildings}
                                     dark_tables={this.props.dark_tables}
                                     view_unit={this.props.manage_view_unit}
                                     units_in_queue={this.props.kingdom.unit_queue}

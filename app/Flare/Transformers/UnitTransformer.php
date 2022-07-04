@@ -35,11 +35,10 @@ class UnitTransformer extends TransformerAbstract {
             'iron_cost'               => $unit->iron_cost,
             'required_population'     => $unit->required_population,
             'time_to_recruit'         => $unit->time_to_recruit,
-            'current_amount'          => $unit->kingdom_current_amount,
             'max_amount'              => KingdomMaxValue::MAX_UNIT,
             'cost_per_unit'           => (new UnitCosts($unit->name))->fetchCost(),
             'pop_cost_gold'           => (new UnitCosts(UnitCosts::PERSON))->fetchCost(),
-            'recruited_from'          => GameBuildingUnit::where('game_unit_id', $unit->id)->first()->gameBuilding,
+            'recruited_from'          => GameBuildingUnit::where('game_unit_id', $unit->id)->first(),
             'required_building_level' => GameBuildingUnit::where('game_unit_id', $unit->id)->first()->required_level,
         ];
     }
