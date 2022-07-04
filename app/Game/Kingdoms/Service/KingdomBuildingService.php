@@ -175,11 +175,9 @@ class KingdomBuildingService {
      *
      * @codeCoverageIgnore
      * @param BuildingInQueue $queue
-     * @param Manager $manager
-     * @param KingdomTransformer $transformer
      * @return bool
      */
-    public function cancelKingdomBuildingUpgrade(BuildingInQueue $queue, Manager $manager, KingdomTransformer $transformer): bool {
+    public function cancelKingdomBuildingUpgrade(BuildingInQueue $queue): bool {
         $building = $queue->building;
         $kingdom  = $building->kingdom;
 
@@ -237,8 +235,8 @@ class KingdomBuildingService {
         // Add population cost to the total cost if we need it.
         $cost = $this->calculateGoldNeeded($character, $building, $kingdom, $params);
 
-        if ($character->gold < $cost) {
-            return 0;
+        if ($cost > $character->gold) {
+            return false;
         }
 
         $popNeeded = $building->base_population * $params['to_level'];
@@ -262,7 +260,7 @@ class KingdomBuildingService {
 
         event(new UpdateTopBarEvent($character->refresh()));
 
-        return $cost;
+        return true;
     }
 
     public function processUpgradeWithGold(KingdomBuilding $building, int $amountPaid, int $toLevel) {
@@ -323,17 +321,21 @@ class KingdomBuildingService {
     }
 
     protected function calculateGoldNeeded(Character $character, KingdomBuilding $building, Kingdom $kingdom, array $params): int {
-        $population        = $building->required_population;
+
+        $populationNeeded  = $building->required_population * $params['to_level'];
+        $populationNeeded  = $populationNeeded - $populationNeeded * $kingdom->fetchPopulationCostReduction();
+        $currentPopulation = $kingdom->current_population;
         $costForAdditional = 0;
         $costReduction     = $kingdom->fetchBuildingCostReduction();
-        $costToUpgrade     = (new BuildingCosts($building->name))->fetchCost() * $params['to_level'];
 
-        if ($kingdom->current_population < $population) {
-            $costForAdditional  = ($population - $kingdom->current_population) * (new UnitCosts(UnitCosts::PERSON))->fetchCost();
-            $costForAdditional -= $costForAdditional * $costReduction;
+        if ($currentPopulation < $populationNeeded) {
+            $costForAdditional  = ($populationNeeded - $kingdom->current_population) * (new UnitCosts(UnitCosts::PERSON))->fetchCost();
         }
 
-        $costToUpgrade -= $costToUpgrade * $costReduction;
+        $costToUpgrade      = $populationNeeded * (new BuildingCosts($building->gameBuilding->name))->fetchCost();
+        $costToUpgrade     -= $costToUpgrade * $costReduction;
+
+        $costForAdditional -= $costForAdditional * $costReduction;
 
         return $costToUpgrade + $costForAdditional;
     }

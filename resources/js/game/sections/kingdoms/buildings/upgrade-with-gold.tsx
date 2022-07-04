@@ -52,7 +52,17 @@ export default class UpgradeWithGold extends React.Component<any, any> {
                 to_level: this.state.to_level,
                 paying_with_gold: true
             }).doAjaxCall('post', (response: AxiosResponse) => {
-                this.setState({loading: false, success_message: response.data.message});
+                this.setState({
+                    loading: false,
+                    success_message: response.data.message,
+                    to_level: '',
+                    paying_with_gold: false,
+                    cost_in_gold: 0,
+                    show_additional_population_message: false,
+                    additional_population_cost: 0,
+                    additional_population_needed: 0,
+                    time_needed: 0,
+                });
             }, (error: AxiosError) => {
                 if (typeof error.response !== 'undefined') {
                     const response = error.response;

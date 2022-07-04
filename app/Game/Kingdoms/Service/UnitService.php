@@ -5,6 +5,7 @@ namespace App\Game\Kingdoms\Service;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\Skill;
+use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Kingdoms\Events\UpdateKingdom;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
@@ -15,10 +16,14 @@ use App\Game\Kingdoms\Jobs\RecruitUnits;
 use App\Game\Kingdoms\Values\UnitCosts;
 use App\Game\Skills\Values\SkillTypeValue;
 use Carbon\Carbon;
+use Exception;
+use Facades\App\Game\Kingdoms\Validation\ResourceValidation;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
 
 class UnitService {
+
+    use ResponseBuilder;
 
     /**
      * @var mixed $completed
@@ -43,6 +48,45 @@ class UnitService {
     }
 
     /**
+     * @param GameUnit $gameUnit
+     * @param Kingdom $kingdom
+     * @param string $recruitmentType
+     * @param int $amount
+     * @return array
+     * @throws Exception
+     */
+    public function handlePayment(GameUnit $gameUnit, Kingdom $kingdom, string $recruitmentType, int $amount): array {
+        if ($recruitmentType === 'resources') {
+            if (ResourceValidation::shouldRedirectUnits($gameUnit, $kingdom, $amount)) {
+                return $this->errorResult(["You don't have the resources."]);
+            }
+
+            $this->updateKingdomResources($kingdom, $gameUnit, $amount);
+        } else {
+            $amount              = $gameUnit->required_population * $amount;
+            $populationReduction = $kingdom->fetchPopulationCostReduction();
+
+            $amount = ceil($amount - $amount * $populationReduction);
+
+            if ($amount > $kingdom->current_population) {
+                return $this->errorResult(["You don't have enough population to purchase with gold alone."]);
+            }
+
+            $this->updateCharacterGold($kingdom, $gameUnit, $amount);
+
+            $newPop = $kingdom->current_population - $amount;
+
+            $kingdom->update([
+                'current_population' => $newPop > 0 ? $newPop : 0
+            ]);
+
+            $this->paidGold = true;
+        }
+
+        return [];
+    }
+
+    /**
      * Recruit a specific unit for a kingdom
      *
      * Will dispatch a job delayed for an amount of time.
@@ -50,7 +94,7 @@ class UnitService {
      * @param Kingdom $kingdom
      * @param GameUnit $gameUnit
      * @param int $amount
-     * @throws \Exception
+     * @throws Exception
      */
     public function recruitUnits(Kingdom $kingdom, GameUnit $gameUnit, int $amount, bool $paidGold = false) {
         $character        = $kingdom->character;
@@ -136,7 +180,7 @@ class UnitService {
      * @param Kingdom $kingdom
      * @param GameUnit $gameUnit
      * @param int $amount
-     * @throws \Exception
+     * @throws Exception
      */
     public function updateCharacterGold(Kingdom $kingdom, GameUnit $gameUnit, int $amount) {
         $character         = $kingdom->character;
