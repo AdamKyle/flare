@@ -3,15 +3,9 @@ import BasicCard from "../../../components/ui/cards/basic-card";
 import UnitInformationProps from "../../../lib/game/kingdoms/types/unit-information-props";
 import {formatNumber} from "../../../lib/game/format-number";
 import Select from "react-select";
-import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
 import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
-import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
-import PrimaryButton from "../../../components/ui/buttons/primary-button";
-import DangerButton from "../../../components/ui/buttons/danger-button";
 import {parseInt} from "lodash";
 import TimeHelpModal from "../modals/time-help-modal";
-import Ajax from "../../../lib/ajax/ajax";
-import {AxiosError, AxiosResponse} from "axios";
 import RecruitWithGold from "./recruit-with-gold";
 import RecruitWithResources from "./recruit-with-resources";
 import UnitDetails from "../../../lib/game/kingdoms/unit-details";
@@ -54,35 +48,6 @@ export default class UnitInformation extends React.Component<UnitInformationProp
          return (cost - cost * this.props.unit_cost_reduction).toFixed(0);
      }
 
-    setGoldAmount(e: React.ChangeEvent<HTMLInputElement>) {
-
-         if (typeof this.props.unit_cost_reduction === 'undefined') {
-             this.setState({
-                 error_message: 'Cannot determine cost. Unit Cost Reduction Is Undefined.'
-             });
-
-             return;
-         }
-
-         const value = e.target.value;
-
-         const amount = this.getAmountToRecruit(value);
-
-         if (amount === 0) {
-             return;
-         }
-
-         const goldCost = this.props.unit.cost_per_unit * amount;
-         const timeNeeded = this.props.unit.time_to_recruit * amount;
-
-         this.setState({
-             amount_to_recruit: amount,
-             cost_in_gold: (goldCost - goldCost * this.props.unit_cost_reduction),
-             time_needed: (timeNeeded - timeNeeded * this.props.kingdom_building_time_reduction),
-             paying_with_gold: true,
-         })
-    }
-
     setResourceAmount(amount: number, timeNeeded: number) {
 
         this.setState({
@@ -91,54 +56,8 @@ export default class UnitInformation extends React.Component<UnitInformationProp
         })
     }
 
-    getAmountToRecruit(numberToRecruit: string) {
-        let amount = parseInt(numberToRecruit) || 0;
-
-        if (amount === 0) {
-            return 0;
-        }
-
-        amount = Math.abs(amount);
-
-        const currentMax = this.props.unit.max_amount;
-
-        if (amount > currentMax) {
-            amount = currentMax;
-        }
-
-        return amount;
-    }
-
     getAmount() {
         return parseInt(this.state.amount_to_recruit) || 1;
-    }
-
-     renderSelectedSection() {
-         switch(this.state.upgrade_section) {
-             case 'gold':
-                 return <RecruitWithGold
-                     kingdom_id={this.props.kingdom_id}
-                     character_id={this.props.character_id}
-                     unit={this.props.unit}
-                     unit_cost_reduction={this.props.unit_cost_reduction}
-                     kingdom_building_time_reduction={this.props.kingdom_building_time_reduction}
-                     manage_help_dialogue={this.manageHelpDialogue.bind(this)}
-                     remove_selection={this.removeSelection.bind(this)}
-                 />
-             case 'resources':
-                 return <RecruitWithResources
-                     kingdom_id={this.props.kingdom_id}
-                     character_id={this.props.character_id}
-                     unit={this.props.unit}
-                     unit_cost_reduction={this.props.unit_cost_reduction}
-                     kingdom_building_time_reduction={this.props.kingdom_building_time_reduction}
-                     manage_help_dialogue={this.manageHelpDialogue.bind(this)}
-                     remove_selection={this.removeSelection.bind(this)}
-                     set_resource_amount={this.setResourceAmount.bind(this)}
-                 />;
-             default:
-                 return null;
-         }
     }
 
     showSelectedForm(data: any) {
@@ -166,31 +85,6 @@ export default class UnitInformation extends React.Component<UnitInformationProp
          })
     }
 
-    recruitUnits() {
-        this.setState({
-            error_message: null,
-            success_message: null,
-            loading: true,
-        }, () => {
-
-            (new Ajax()).setRoute('kingdoms/'+this.props.kingdom_id+'/recruit-units/' + this.props.unit.id).setParameters({
-                amount: this.state.amount_to_recruit === '' ? 1 : this.state.amount_to_recruit,
-                recruitment_type: this.state.upgrade_section,
-            }).doAjaxCall('post', (response: AxiosResponse) => {
-                this.setState({loading: false, success_message: response.data.message});
-            }, (error: AxiosError) => {
-                if (typeof error.response !== 'undefined') {
-                    const response = error.response;
-
-                    this.setState({
-                        loading: false,
-                        error_message: response.data.message
-                    });
-                }
-            });
-        });
-    }
-
     cannotBeRecruited(unit: UnitDetails) {
         const building = this.props.buildings.filter((building: BuildingDetails) => {
             return building.game_building_id === unit.recruited_from.game_building_id;
@@ -205,38 +99,32 @@ export default class UnitInformation extends React.Component<UnitInformationProp
         return foundBuilding.level < unit.required_building_level;
     }
 
-    renderResourceSection() {
-        return (
-            <Fragment>
-                {
-                    this.state.success_message !== null ?
-                        <SuccessAlert additional_css={'mb-5'}>
-                            {this.state.success_message}
-                        </SuccessAlert>
-                        : null
-                }
-                {
-                    this.state.error_message !== null ?
-                        <DangerAlert additional_css={'mb-5'}>
-                            {this.state.error_message}
-                        </DangerAlert>
-                        : null
-                }
-                <div className='flex items-center mb-5'>
-                    <label className='w-[50px] mr-4'>Amount</label>
-                    <div className='w-2/3'>
-                        <input type='text' value={this.state.amount_to_recruit} onChange={() => {}} className='form-control' disabled={this.state.loading} />
-                    </div>
-                </div>
-                {
-                    this.state.loading ?
-                        <LoadingProgressBar />
-                        : null
-                }
-                <PrimaryButton button_label={'Recruit Units'} additional_css={'mr-2'} on_click={this.recruitUnits.bind(this)} disabled={this.state.amount_to_recruit <= 0 || this.state.loading}/>
-                <DangerButton button_label={'Cancel'} on_click={this.removeSelection.bind(this)} disabled={this.state.loading}/>
-            </Fragment>
-        )
+    renderSelectedSection() {
+        switch(this.state.upgrade_section) {
+            case 'gold':
+                return <RecruitWithGold
+                    kingdom_id={this.props.kingdom_id}
+                    character_id={this.props.character_id}
+                    unit={this.props.unit}
+                    unit_cost_reduction={this.props.unit_cost_reduction}
+                    kingdom_building_time_reduction={this.props.kingdom_building_time_reduction}
+                    manage_help_dialogue={this.manageHelpDialogue.bind(this)}
+                    remove_selection={this.removeSelection.bind(this)}
+                />
+            case 'resources':
+                return <RecruitWithResources
+                    kingdom_id={this.props.kingdom_id}
+                    character_id={this.props.character_id}
+                    unit={this.props.unit}
+                    unit_cost_reduction={this.props.unit_cost_reduction}
+                    kingdom_building_time_reduction={this.props.kingdom_building_time_reduction}
+                    manage_help_dialogue={this.manageHelpDialogue.bind(this)}
+                    remove_selection={this.removeSelection.bind(this)}
+                    set_resource_amount={this.setResourceAmount.bind(this)}
+                />;
+            default:
+                return null;
+        }
     }
 
      render() {
