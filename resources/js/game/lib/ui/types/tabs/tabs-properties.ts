@@ -8,4 +8,6 @@ export default interface TabProperties {
 
     when_tab_changes?: (key: string) => void;
 
+    disabled?: boolean;
+
 }

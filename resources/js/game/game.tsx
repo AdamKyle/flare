@@ -239,7 +239,7 @@ export default class Game extends React.Component<GameProps, GameState> {
 
                 <ScreenRefresh user_id={this.state.character.user_id} />
 
-                <Tabs tabs={this.tabs}>
+                <Tabs tabs={this.tabs} disabled={!this.state.finished_loading}>
                     <TabPanel key={'game'}>
                         <div className="grid lg:grid-cols-3 gap-3">
                             <div className="w-full col-span-3 lg:col-span-2">

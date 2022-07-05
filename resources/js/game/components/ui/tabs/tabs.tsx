@@ -36,7 +36,7 @@ export default class Tabs extends React.Component<TabProperties, {}> {
                             'w-full py-2.5 text-sm font-medium focus:outline-none text-slate-800 dark:text-slate-200 text-center',
                             {'border-b-2 border-blue-500 dark:border-blue-400': selected},
                             {'hover:border-blue-500 hover:border-b-2 dark:hover:border-blue-400': !selected}
-                        )}>
+                        )} disabled={typeof this.props.disabled !== 'undefined' ? this.props.disabled : false}>
                             {this.renderIcon(tab, selected)}
                         </button>
                     }

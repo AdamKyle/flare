@@ -44,7 +44,7 @@ class KingdomSettleController extends Controller {
             ], 422);
         }
 
-        if (!$this->kingdomSettleService->canAfford()) {
+        if (!$this->kingdomSettleService->canAfford($character)) {
             return response()->json([
                 'message' => 'You don\'t have the gold.',
             ], 422);

@@ -2,25 +2,32 @@
 
 namespace App\Game\Kingdoms\Service;
 
-use App\Game\Core\Traits\ResponseBuilder;
-use App\Game\Kingdoms\Events\AddKingdomToMap;
-use App\Game\Kingdoms\Events\UpdateGlobalMap;
-use App\Game\Messages\Events\GlobalMessageEvent;
+use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
 use Cache;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\Location;
+use App\Game\Core\Traits\KingdomCache;
+use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Kingdoms\Events\AddKingdomToMap;
+use App\Game\Kingdoms\Events\UpdateGlobalMap;
+use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Kingdoms\Builders\KingdomBuilder;
 
 class KingdomSettleService {
 
-    use ResponseBuilder;
+    use ResponseBuilder, KingdomCache;
 
     /**
      * @var KingdomBuilder $kingdomBuilder
      */
     private KingdomBuilder $kingdomBuilder;
+
+    /**
+     * @var UpdateKingdomHandler $updateKingdomHandler
+     */
+    private UpdateKingdomHandler $updateKingdomHandler;
 
     /**
      * @var string
@@ -29,9 +36,11 @@ class KingdomSettleService {
 
     /**
      * @param KingdomBuilder $kingdomBuilder
+     * @param UpdateKingdomHandler $updateKingdomHandler
      */
-    public function __construct(KingdomBuilder $kingdomBuilder) {
-        $this->kingdomBuilder = $kingdomBuilder;
+    public function __construct(KingdomBuilder $kingdomBuilder, UpdateKingdomHandler $updateKingdomHandler) {
+        $this->kingdomBuilder       = $kingdomBuilder;
+        $this->updateKingdomHandler = $updateKingdomHandler;
     }
 
     /**

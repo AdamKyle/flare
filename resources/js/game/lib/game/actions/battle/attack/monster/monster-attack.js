@@ -2,20 +2,21 @@ import CanEntranceEnemy from "../attack/attack-types/enchantments/can-entrance-e
 import CanHitCheck from "../attack/attack-types/can-hit-check";
 import AttackType from "../attack/attack-type";
 import UseItems from "../attack/attack-types/use-items";
-import {random} from "lodash";
+import {parseInt, random} from "lodash";
 import BattleBase from "../../battle-base";
 import {formatNumber} from "../../../../format-number";
 import Monster from "../../monster/monster";
 
 export default class MonsterAttack extends BattleBase {
 
-  constructor(attacker, defender, currentCharacterHealth, currentMonsterHealth) {
+  constructor(attacker, defender, currentCharacterHealth, currentMonsterHealth, maxMonsterHealth) {
     super();
 
     this.attacker               = attacker;
     this.defender               = defender;
     this.currentCharacterHealth = currentCharacterHealth;
     this.currentMonsterHealth   = currentMonsterHealth;
+    this.maxMonsterHealth       = maxMonsterHealth;
   }
 
   doAttack(previousAttackType, isCharacterVoided, isMonsterVoided) {
@@ -232,6 +233,7 @@ export default class MonsterAttack extends BattleBase {
   fireOffHealing(attacker) {
     if (attacker.max_healing > 0) {
       const defenderHealingReduction = this.defender.healing_reduction;
+      let monsterCurrentHealth       = parseInt(this.currentMonsterHealth) || 0;
       let healFor                    = Math.ceil(attacker.dur * attacker.max_healing);
 
       if (healFor < 0) {
@@ -249,7 +251,13 @@ export default class MonsterAttack extends BattleBase {
       }
 
       if (healFor > 1) {
-        this.currentMonsterHealth = this.currentMonsterHealth + healFor;
+        monsterCurrentHealth = monsterCurrentHealth + healFor;
+
+        if (monsterCurrentHealth > this.maxMonsterHealth) {
+          monsterCurrentHealth = parseInt(this.maxMonsterHealth) || 0;
+        }
+
+        this.currentMonsterHealth = monsterCurrentHealth;
 
         if (defenderHealingReduction > 0.0) {
           this.addMessage('Your rings negate some of the enemy\'s healing power.', 'player-action');

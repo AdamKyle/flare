@@ -60,7 +60,10 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
         $this->app->bind(KingdomSettleService::class, function($app) {
-            return new KingdomSettleService($app->make(KingdomBuilder::class));
+            return new KingdomSettleService(
+                $app->make(KingdomBuilder::class),
+                $app->make(UpdateKingdomHandler::class),
+            );
         });
 
         $this->app->bind(UnitService::class, function($app) {
