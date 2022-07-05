@@ -26,7 +26,7 @@ class ReBalanceAffixes extends Command
      *
      * @var string
      */
-    protected $description = 'Rebalances the affixes';
+    protected $description = 'Balances the affixes';
 
     /**
      * Create a new command instance.
@@ -99,7 +99,7 @@ class ReBalanceAffixes extends Command
             $affixes = ItemAffix::where($field, '>', 0)->where('randomly_generated', false)->orderBy('skill_level_required', 'asc')->get();
 
             $min = 0.01;
-            $max = 0.50;
+            $max = 0.25;
 
             $increments = $max / $affixes->count();
 
@@ -134,7 +134,7 @@ class ReBalanceAffixes extends Command
             $affixes = ItemAffix::where($field, '>', 0)->where('randomly_generated', false)->orderBy('skill_level_required', 'asc')->get();
 
             $min = 0.05;
-            $max = 0.75;
+            $max = 0.55;
 
             $increments = $max / $affixes->count();
 
@@ -164,6 +164,7 @@ class ReBalanceAffixes extends Command
             'base_damage_mod_bonus',
             'base_healing_mod_bonus',
             'base_ac_mod_bonus',
+            'steal_life_amount',
         ];
 
         foreach ($attributes as $field) {
@@ -171,7 +172,7 @@ class ReBalanceAffixes extends Command
             $affixes = ItemAffix::where($field, '>', 0)->where('randomly_generated', false)->orderBy('skill_level_required', 'asc')->get();
 
             $min = 0.01;
-            $max = 0.30;
+            $max = 0.20;
 
             $increments = $max / $affixes->count();
 
@@ -242,7 +243,7 @@ class ReBalanceAffixes extends Command
         $affixes = ItemAffix::where('randomly_generated', false)->orderBy('skill_level_required', 'asc')->get();
 
         $min = 100;
-        $max = 50000;
+        $max = 5000;
 
         $increments = round($max / $affixes->count());
 
@@ -269,8 +270,8 @@ class ReBalanceAffixes extends Command
 
             $affixes = ItemAffix::where($field, '>', 0)->where('randomly_generated', false)->orderBy('skill_level_required', 'asc')->get();
 
-            $min = 0.05;
-            $max = 0.50;
+            $min = 0.01;
+            $max = 0.08;
 
             $increments = $max / $affixes->count();
 
@@ -324,8 +325,8 @@ class ReBalanceAffixes extends Command
                 continue;
             }
 
-            $min = 0.05;
-            $max = 0.50;
+            $min = 0.01;
+            $max = 0.11;
 
             $increments = $max / $affixes->count();
 

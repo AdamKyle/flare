@@ -40,8 +40,11 @@ class SecondaryAttacks extends BattleBase {
             }
 
             $this->affixLifeStealingDamage($character, $monster, $affixReduction, $isPvp);
+            dump('After Life Stealing: ' . $this->monsterHealth);
             $this->affixDamage($character, $monster, $affixReduction, $isPvp);
+            dump('After Affix Damage: ' . $this->monsterHealth);
             $this->ringDamage($isPvp);
+            dump('After Ring Damage: ' . $this->monsterHealth);
         } else {
             if ($isPvp) {
                 $this->addAttackerMessage('You are voided, none of your rings or enchantments fire ...', 'enemy-action');
@@ -83,17 +86,22 @@ class SecondaryAttacks extends BattleBase {
     }
 
     public function affixLifeStealingDamage(Character $character, ServerMonster $monster = null, float $affixDamageReduction = 0.0, bool $isPvp = false) {
+
         if ($this->monsterHealth <= 0) {
             return;
         }
 
         $resistance = 0.0;
 
-        if (!is_null($monster)) {
+        if (!is_null($monster) && !$this->isEnemyEntranced) {
             $resistance = $monster->getMonsterStat('affix_resistance');
         }
 
-        $lifeStealing = $this->affixes->getAffixLifeSteal($character, $this->attackData, $resistance, $isPvp);
+        if ($this->isEnemyEntranced) {
+            $this->affixes->setEntranced();
+        }
+
+        $lifeStealingDamage = $this->affixes->getAffixLifeSteal($character, $this->attackData, $this->monsterHealth, $resistance, $isPvp);
 
         if (!$isPvp) {
             $this->mergeMessages($this->affixes->getMessages());
@@ -104,18 +112,16 @@ class SecondaryAttacks extends BattleBase {
 
         $this->affixes->clearMessages();
 
-        $damage = $this->monsterHealth * $lifeStealing;
-
         if ($isPvp && $affixDamageReduction > 0.0) {
-            $damage = $damage - $damage * $affixDamageReduction;
+            $lifeStealingDamage = $lifeStealingDamage - $lifeStealingDamage * $affixDamageReduction;
 
-            $this->addAttackerMessage('The enemy reduced your life stealing enchantments damage to: ' . number_format($damage), 'enemy-action');
-            $this->addDefenderMessage('You manage, by the skin of your teeth, to use the last of your magics to reduce their life stealing (enchantment) damage to: ' . number_format($damage), 'regular');
+            $this->addAttackerMessage('The enemy reduced your life stealing enchantments damage to: ' . number_format($lifeStealingDamage), 'enemy-action');
+            $this->addDefenderMessage('You manage, by the skin of your teeth, to use the last of your magics to reduce their life stealing (enchantment) damage to: ' . number_format($lifeStealingDamage), 'regular');
         }
 
-        if ($damage > 0) {
-            $this->monsterHealth   -= $damage;
-            $this->characterHealth += $damage;
+        if ($lifeStealingDamage > 0) {
+            $this->monsterHealth   -= $lifeStealingDamage;
+            $this->characterHealth += $lifeStealingDamage;
 
             $maxCharacterHealth = $this->characterCacheData->getCachedCharacterData($character, 'health');
 

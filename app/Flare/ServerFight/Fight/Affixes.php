@@ -48,8 +48,7 @@ class Affixes extends BattleBase {
         return 0;
     }
 
-    public function getAffixLifeSteal(Character $character, array $attackData, int $monsterHealth, float $resistance = 0.0, bool $isPvp = false): float {
-
+    public function getAffixLifeSteal(Character $character, array $attackData, int $monsterHealth, float $resistance = 0.0, bool $isPvp = false): int {
         if (!$monsterHealth > 0) {
             return 0;
         }
@@ -69,7 +68,7 @@ class Affixes extends BattleBase {
 
         $damage = $monsterHealth * $affixLifeStealing;
 
-        if ($cantBeResisted) {
+        if ($cantBeResisted || $this->isEnemyEntranced) {
 
             $this->addMessage('The enemy\'s blood flows through the air and gives you life: ' . number_format($damage), 'player-action', $isPvp);
 
@@ -77,12 +76,13 @@ class Affixes extends BattleBase {
                 $this->addDefenderMessage('Your blood seeps from the pores in your flesh, you scream in agony taking: ' . number_format($damage) . ' damage.', 'enemy-action');
             }
 
-            return $affixLifeStealing;
+            return $damage;
         }
 
-        $dc = 100 - 100 * $resistance;
+        $dc   = 50 + 50 * $resistance;
+        $roll = rand(1, 100);
 
-        if ($dc <= 0 || rand(1, 100) > $dc) {
+        if ($roll < $dc) {
             $this->addMessage('The enemy resists your attempt to steal it\'s life.', 'enemy-action');
         } else {
             $this->addMessage('The enemy\'s blood flows through the air and gives you life: ' . number_format($damage), 'player-action', $isPvp);
@@ -91,7 +91,7 @@ class Affixes extends BattleBase {
                 $this->addDefenderMessage('Your blood seeps from the pores in your flesh, you scream in agony taking: ' . number_format($damage) . ' damage.', 'enemy-action');
             }
 
-            return $affixLifeStealing;
+            return $damage;
         }
 
         return 0;

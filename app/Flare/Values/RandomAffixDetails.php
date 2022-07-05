@@ -43,28 +43,28 @@ class RandomAffixDetails {
     public function getPercentageRange(): array {
         switch($this->value) {
             case self::MEDIUM:
-                return [30, 50];
+                return [4, 16];
             case self::LEGENDARY:
-                return [60, 75];
+                return [16, 32];
             case self::MYTHIC:
-                return [75, 100];
+                return [32, 48];
             case self::BASIC:
             default:
-                return [10, 25];
+                return [1, 4];
         }
     }
 
     public function getDamageRange(): array {
         switch($this->value) {
             case self::MEDIUM:
-                return [5000, 8000];
+                return [500, 2500];
             case self::LEGENDARY:
-                return [10000, 20000];
+                return [2500, 5000];
             case self::MYTHIC:
-                return [30000, 50000];
+                return [5000, 9999];
             case self::BASIC:
             default:
-                return [1000, 4000];
+                return [100, 500];
         }
     }
 

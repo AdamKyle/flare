@@ -49,7 +49,16 @@ class IncreaseMaxLevel extends Command
                'last_leg'       => 3400
            ]);
        } else {
+
+           if ($config->max_level >= 9999) {
+               return;
+           }
+
            $maxLevel = $config->max_level + 100;
+
+           if ($maxLevel > 9999) {
+               $maxLevel = 9999;
+           }
 
            $config->update([
                'max_level' => $maxLevel,
@@ -59,6 +68,10 @@ class IncreaseMaxLevel extends Command
            ]);
 
            event(new GlobalMessageEvent('Max level has been increased by 100 levels! refresh to see the increase.'));
+
+           if ($maxLevel === 9999) {
+               event(new GlobalMessageEvent('Max level is now 9999. Max level will no longer increase past today.'));
+           }
        }
     }
 }

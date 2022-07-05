@@ -1,5 +1,4 @@
 import Damage from "../damage";
-import {random} from "lodash";
 import BattleBase from "../../../battle-base";
 
 export default class CanHitCheck extends BattleBase {
@@ -28,9 +27,7 @@ export default class CanHitCheck extends BattleBase {
       }
     }
 
-    let defenderDodge    = defender.dodge
-
-    return this.toHitCalculation(attacker.to_hit_base, defender.agi, attacker.skills.accuracy, defenderDodge);
+    return this.toHitCalculation(attacker.to_hit_base, defender.agi, attacker.skills.accuracy, defender.dodge);
   }
 
   canCast(attacker, defender) {
@@ -66,8 +63,18 @@ export default class CanHitCheck extends BattleBase {
   }
 
   canMonsterHit(attacker, defender) {
+    let monsterToHit    = attacker.to_hit_base * .20;
+    let defenderAgi     = defender.agi * 0.20;
     let monsterAccuracy = attacker.accuracy;
-    let defenderDodge   = defender.dodge;
+    let defenderDodge   = defender.skills.dodge;
+
+    if (monsterToHit < 50) {
+      monsterToHit = attacker.to_hit_base;
+    }
+
+    if (defenderAgi < 50) {
+      defenderAgi = defender.agi;
+    }
 
     if (monsterAccuracy > 1.0) {
       return true;
@@ -77,7 +84,7 @@ export default class CanHitCheck extends BattleBase {
       return false;
     }
 
-    return this.toHitCalculation(attacker.to_hit_base, attacker.agi, monsterAccuracy, defenderDodge);
+    return this.toHitCalculation(monsterToHit, defenderAgi, monsterAccuracy, defenderDodge);
   }
 
   getBattleMessages () {

@@ -24,6 +24,7 @@ export default class MonsterAttack extends BattleBase {
     let damage    = (new Monster(this.attacker)).attack();
 
     if (this.entrancesEnemy(monster, this.defender, isCharacterVoided, isMonsterVoided)) {
+
       if (this.canDoCritical(monster)) {
         this.addMessage(monster.name + ' grows enraged and lashes out with all fury! (Critical Strike!)', 'regular')
 

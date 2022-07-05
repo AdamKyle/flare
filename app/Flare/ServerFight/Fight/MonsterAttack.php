@@ -32,7 +32,10 @@ class MonsterAttack extends BattleBase {
     }
 
     public function monsterAttack(ServerMonster $monster, Character $character, string $previousAttackType) {
-        $this->attackPlayer($monster, $character);
+
+        if ($this->canHit->canMonsterHitPlayer($character, $monster, $this->isVoided)) {
+            $this->attackPlayer($monster, $character);
+        }
 
         $this->doPlayerCounterMonster($character, $monster);
 

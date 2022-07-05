@@ -185,10 +185,9 @@
                     The first time they can fire is during the attack and the second time is after the enemy's round if you or
                     the enemy is still alive.
                 </p>
-                <p class="mb-4">The chance aspect depends on the enemy's affix resistance, assuming you do not have the appropriate quest item.</p>
                 <p class="mb-4">
                     If you are <strong>not</strong> a vampire, these affixes will
-                    <strong>NOT</strong> stack. Instead we will use your highest and it will only fire after the enemy attack.
+                    <strong>NOT</strong> stack. Instead, we will use your highest, and it will only fire after the enemy attack.
                 </p>
                 <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                 <dl>
