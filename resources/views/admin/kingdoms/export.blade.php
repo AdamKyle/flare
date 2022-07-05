@@ -1,35 +1,22 @@
 @extends('layouts.app')
 
 @section('content')
-    <x-core.page-title title="Export Kingdom Data" route="{{route('home')}}" color="success" link="Home">
-    </x-core.page-title>
-
-    <x-cards.card>
-        <div class="alert alert-warning">
-            <p>
-                <strong>Please note</strong>: Editing the contents of the exported excel is not recommended. It is recommended that you
-                make your changes in the system and then export to later import into production or to keep as a backup.
-            </p>
-
-            <p>
-                Should anything go wrong with the import, changes will be rolled back.
-            </p>
-
-            <p>
-                <strong>Do not</strong> use this to make changes to your kingdoms. If there is kingdom data already in the database your import
-                will fail. Make changes in the system instead.
-            </p>
-
-            <p>
-                The following export will export all kingdom data, including buildings, units and units assigned to buildings.
-            </p>
-        </div>
-
-        <div class="text-center mt-4">
-            <form method="POST" action="{{ route('kingdoms.export-data') }}">
+    <x-core.layout.info-container>
+        <x-core.cards.card-with-title
+            title="Export Kingdom Data"
+            buttons="true"
+            backUrl="{{route('home')}}"
+        >
+            <x-core.alerts.warning-alert title="ATTN!">
+                <p class="mt-4 mb-4">
+                    Export both buildings, units and the building -> unit relationships.
+                    It is not suggested you make edits to these excell files.
+                </p>
+            </x-core.alerts.warning-alert>
+            <form method="POST" action="{{ route('kingdoms.export-data') }}" class="mb-4 text-center">
                 @csrf
-                <button type="submit" class="btn btn-primary">Export</button>
+                <x-core.buttons.primary-button type="submit">Export Kingdom Data</x-core.buttons.primary-button>
             </form>
-        </div>
-    </x-cards.card>
+        </x-core.cards.card-with-title>
+    </x-core.layout.info-container>
 @endsection
