@@ -17,9 +17,8 @@ export default class ItemAffixDetails extends React.Component<any, any> {
                       large_modal={true}
             >
                 <div className='max-h-[350px] overflow-y-scroll'>
-                    <p className='mb-4 mt-4'>
-                        {this.props.affix.description}
-                    </p>
+                    <div className='mb-4 mt-4 text-sky-700 dark:text-sky-500' dangerouslySetInnerHTML={{__html: this.props.affix.description}} />
+
                     <div className='grid md:grid-cols-2 gap-3'>
                         <div>
                             <h4 className='text-sky-600 dark:text-sky-500'>Stats</h4>

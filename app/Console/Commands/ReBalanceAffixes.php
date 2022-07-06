@@ -3,12 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Flare\Builders\AffixAttributeBuilder;
-use App\Flare\Models\InventorySlot;
-use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
-use App\Flare\Models\SetSlot;
 use App\Flare\Values\RandomAffixDetails;
-use App\Game\Core\Services\ReRollEnchantmentService;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -74,7 +70,7 @@ class ReBalanceAffixes extends Command
         $amountPaid             = new RandomAffixDetails($affix->cost);
 
         $affixAttributeBuilder =  $affixAttributeBuilder->setPercentageRange($amountPaid->getPercentageRange())
-                                                        ->setDamageRange($amountPaid->getDamageRange());
+            ->setDamageRange($amountPaid->getDamageRange());
 
         $attributes = $affixAttributeBuilder->buildAttributes($affix->type, $affix->cost, true);
 
@@ -99,7 +95,7 @@ class ReBalanceAffixes extends Command
             $affixes = ItemAffix::where($field, '>', 0)->where('randomly_generated', false)->orderBy('skill_level_required', 'asc')->get();
 
             $min = 0.01;
-            $max = 0.25;
+            $max = 0.50;
 
             $increments = $max / $affixes->count();
 
@@ -133,8 +129,8 @@ class ReBalanceAffixes extends Command
 
             $affixes = ItemAffix::where($field, '>', 0)->where('randomly_generated', false)->orderBy('skill_level_required', 'asc')->get();
 
-            $min = 0.01;
-            $max = 0.25;
+            $min = 0.05;
+            $max = 0.75;
 
             $increments = $max / $affixes->count();
 
@@ -164,7 +160,6 @@ class ReBalanceAffixes extends Command
             'base_damage_mod_bonus',
             'base_healing_mod_bonus',
             'base_ac_mod_bonus',
-            'steal_life_amount',
         ];
 
         foreach ($attributes as $field) {
@@ -172,7 +167,7 @@ class ReBalanceAffixes extends Command
             $affixes = ItemAffix::where($field, '>', 0)->where('randomly_generated', false)->orderBy('skill_level_required', 'asc')->get();
 
             $min = 0.01;
-            $max = 0.25;
+            $max = 0.30;
 
             $increments = $max / $affixes->count();
 
@@ -243,7 +238,7 @@ class ReBalanceAffixes extends Command
         $affixes = ItemAffix::where('randomly_generated', false)->orderBy('skill_level_required', 'asc')->get();
 
         $min = 100;
-        $max = 5000;
+        $max = 50000;
 
         $increments = round($max / $affixes->count());
 
@@ -270,8 +265,8 @@ class ReBalanceAffixes extends Command
 
             $affixes = ItemAffix::where($field, '>', 0)->where('randomly_generated', false)->orderBy('skill_level_required', 'asc')->get();
 
-            $min = 0.01;
-            $max = 0.08;
+            $min = 0.05;
+            $max = 0.50;
 
             $increments = $max / $affixes->count();
 
@@ -325,8 +320,8 @@ class ReBalanceAffixes extends Command
                 continue;
             }
 
-            $min = 0.01;
-            $max = 0.15;
+            $min = 0.05;
+            $max = 0.50;
 
             $increments = $max / $affixes->count();
 

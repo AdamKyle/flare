@@ -20,6 +20,7 @@ class ItemComparisonTransfromer extends TransformerAbstract {
 
         return [
             'id'                               => $item->id,
+            'description'                      => $item->description,
             'affix_name'                       => $item->affix_name,
             'base_damage'                      => $item->getTotalDamage(),
             'base_ac'                          => $item->getTotalDefence(),

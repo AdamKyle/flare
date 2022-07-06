@@ -4,6 +4,7 @@ namespace App\Game\Core\Services;
 
 
 use App\Flare\Models\SetSlot;
+use App\Flare\Transformers\ItemTransformer;
 use App\Flare\Transformers\UsableItemTransformer;
 use Cache;
 
@@ -156,7 +157,11 @@ class ComparisonService {
     }
 
     protected function buildItemDetails(InventorySlot $slot): array {
-        $item = new FractalItem($slot->item, new ItemComparisonTransfromer);
+        if ($slot->item->type === 'quest') {
+            $item = new FractalItem($slot->item, new ItemTransformer);
+        } else {
+            $item = new FractalItem($slot->item, new ItemComparisonTransfromer);
+        }
 
         $item = (new Manager())->createData($item)->toArray()['data'];
 
