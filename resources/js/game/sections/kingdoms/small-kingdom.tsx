@@ -8,6 +8,7 @@ import BuildingDetails from "../../lib/game/kingdoms/building-details";
 import BuildingInformation from "./buildings/building-information";
 import BuildingInQueueDetails from "../../lib/game/kingdoms/building-in-queue-details";
 import SmallBuildingsSection from "./buildings/small-buildings-section";
+import SmallUnitsSection from "./units/small-units-section";
 
 export default class SmallKingdom extends React.Component<KingdomProps, any> {
 
@@ -57,6 +58,12 @@ export default class SmallKingdom extends React.Component<KingdomProps, any> {
         switch(this.state.which_selected) {
             case 'buildings':
                 return <SmallBuildingsSection
+                    kingdom={this.props.kingdom}
+                    dark_tables={this.props.dark_tables}
+                    close_selected={this.closeSelected.bind(this)}
+                />
+            case 'units':
+                return <SmallUnitsSection
                     kingdom={this.props.kingdom}
                     dark_tables={this.props.dark_tables}
                     close_selected={this.closeSelected.bind(this)}

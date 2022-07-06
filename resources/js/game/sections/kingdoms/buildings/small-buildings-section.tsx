@@ -44,7 +44,7 @@ export default class SmallBuildingsSection extends React.Component<SmallBuilding
             <Fragment>
 
                 <div className='text-right cursor-pointer  text-red-500 mb-4'>
-                    <button onClick={this.props.close_selected.bind(this)}><i className="fas fa-minus-circle"></i></button>
+                    <button onClick={this.props.close_selected}><i className="fas fa-minus-circle"></i></button>
                 </div>
 
                 {
