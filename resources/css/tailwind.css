@@ -50,6 +50,7 @@ dd {
     margin-left: auto;
     width: 50%;
     margin-bottom: 4px;
+    padding-left: 5px;
 }
 
 .loading-progress-bar {

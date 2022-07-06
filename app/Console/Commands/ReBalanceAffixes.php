@@ -133,8 +133,8 @@ class ReBalanceAffixes extends Command
 
             $affixes = ItemAffix::where($field, '>', 0)->where('randomly_generated', false)->orderBy('skill_level_required', 'asc')->get();
 
-            $min = 0.05;
-            $max = 0.55;
+            $min = 0.01;
+            $max = 0.25;
 
             $increments = $max / $affixes->count();
 
@@ -172,7 +172,7 @@ class ReBalanceAffixes extends Command
             $affixes = ItemAffix::where($field, '>', 0)->where('randomly_generated', false)->orderBy('skill_level_required', 'asc')->get();
 
             $min = 0.01;
-            $max = 0.20;
+            $max = 0.25;
 
             $increments = $max / $affixes->count();
 
@@ -326,7 +326,7 @@ class ReBalanceAffixes extends Command
             }
 
             $min = 0.01;
-            $max = 0.11;
+            $max = 0.15;
 
             $increments = $max / $affixes->count();
 

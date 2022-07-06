@@ -269,7 +269,7 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                           handle_action: this.handInQuest.bind(this),
                       }}
                       title={this.buildTitle()}
-                      large_modal={true}
+                      large_modal={false}
             >
                 {
                     this.state.loading ?

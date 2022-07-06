@@ -43,14 +43,14 @@ class RandomAffixDetails {
     public function getPercentageRange(): array {
         switch($this->value) {
             case self::MEDIUM:
-                return [4, 16];
+                return [8, 16];
             case self::LEGENDARY:
                 return [16, 32];
             case self::MYTHIC:
                 return [32, 48];
             case self::BASIC:
             default:
-                return [1, 4];
+                return [1, 8];
         }
     }
 
