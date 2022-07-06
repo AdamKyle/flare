@@ -17,6 +17,9 @@ import TraverseModal from "../../../components/actions/modals/traverse-modal";
 import WarningAlert from "../../../../components/ui/alerts/simple-alerts/warning-alert";
 import PurpleButton from "../../../../components/ui/buttons/purple-button";
 import Conjuration from "../../../components/actions/modals/conjuration";
+import NpcKingdomsDetails from "../../../../lib/game/types/map/npc-kingdoms-details";
+import SuccessButton from "../../../../components/ui/buttons/success-button";
+import SettleKingdomModal from "../../../components/actions/modals/settle-kingdom-modal";
 
 export default class MapMovementActions extends React.Component<any, any> {
 
@@ -74,6 +77,26 @@ export default class MapMovementActions extends React.Component<any, any> {
 
     canSeeViewLocationDetailsButton() {
         return this.state.location !== null || this.state.player_kingdom_id !== null || this.state.enemy_kingdom_id !== null || this.state.npc_kingdom_id !== null;
+    }
+
+    canSettleHere() {
+        const locations = this.state.locations.filter((location: LocationDetails) => {
+            return location.x === this.state.character_position.x && location.y === this.state.character_position.y;
+        });
+
+        const playerKingdom = this.state.player_kingdoms.filter((playerKingdom: PlayerKingdomsDetails) => {
+            return playerKingdom.x_position === this.state.character_position.x && playerKingdom.y_position === this.state.character_position.y;
+        });
+
+        const enemyKingdoms = this.state.enemy_kingdoms.filter((enemyKingdom: PlayerKingdomsDetails) => {
+            return enemyKingdom.x_position === this.state.character_position.x && enemyKingdom.y_position === this.state.character_position.y;
+        });
+
+        const npcKingdoms = this.state.npc_kingdoms.filter((npcKingdom: NpcKingdomsDetails) => {
+            return npcKingdom.x_position === this.state.character_position.x && npcKingdom.y_position === this.state.character_position.y;
+        });
+
+        return (locations.length === 0 && playerKingdom.length === 0 && enemyKingdoms.length === 0 && npcKingdoms.length === 0);
     }
 
     setLocationData() {
@@ -251,7 +274,11 @@ export default class MapMovementActions extends React.Component<any, any> {
         (new MovePlayer(this)).teleportPlayer(data, this.props.character.id, this.props.view_port);
     }
 
-
+    manageSettleModal() {
+        this.setState({
+            open_settle_kingdom_modal: !this.state.open_settle_kingdom_modal,
+        });
+    }
 
     render() {
         return  (
@@ -286,6 +313,12 @@ export default class MapMovementActions extends React.Component<any, any> {
                                     this.canSeeViewLocationDetailsButton() ?
                                         <OrangeButton button_label={'View Location'}
                                                       on_click={this.manageViewLocation.bind(this)} />
+                                    : null
+                                }
+
+                                {
+                                    this.canSettleHere() ?
+                                        <SuccessButton additional_css={'text-center ml-2'} button_label={'Settle'} on_click={this.manageSettleModal.bind(this)} disabled={this.state.is_movement_disabled || this.props.is_dead || this.props.is_automation_running}/>
                                     : null
                                 }
 
@@ -358,6 +391,17 @@ export default class MapMovementActions extends React.Component<any, any> {
                                      character_id={this.props.character.id}
                         />
                     : null
+                }
+
+                {
+                    this.state.open_settle_kingdom_modal ?
+                        <SettleKingdomModal
+                            is_open={this.state.open_settle_kingdom_modal}
+                            handle_close={this.manageSettleModal.bind(this)}
+                            character_id={this.props.character.id}
+                            map_id={this.state.map_id}
+                        />
+                        : null
                 }
             </Fragment>
         )

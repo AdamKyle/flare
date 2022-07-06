@@ -7,6 +7,7 @@ import BuildingsTable from "./buildings/buildings-table";
 import BuildingDetails from "../../lib/game/kingdoms/building-details";
 import BuildingInformation from "./buildings/building-information";
 import BuildingInQueueDetails from "../../lib/game/kingdoms/building-in-queue-details";
+import SmallBuildingsSection from "./buildings/small-buildings-section";
 
 export default class SmallKingdom extends React.Component<KingdomProps, any> {
 
@@ -52,50 +53,14 @@ export default class SmallKingdom extends React.Component<KingdomProps, any> {
         })
     }
 
-    viewSelectedBuilding(building?: BuildingDetails) {
-        this.setState({
-            view_building: typeof building !== 'undefined' ? building : null,
-        });
-    }
-
-    renderBuildings() {
-        return (
-            <Fragment>
-
-                <div className='text-right cursor-pointer  text-red-500 mb-4'>
-                    <button onClick={this.closeSelected.bind(this)}><i className="fas fa-minus-circle"></i></button>
-                </div>
-
-                {
-                    this.state.view_building !== null ?
-                        <BuildingInformation building={this.state.view_building}
-                                             close={this.viewSelectedBuilding.bind(this)}
-                                             kingdom_building_time_reduction={this.props.kingdom.building_time_reduction}
-                                             kingdom_building_cost_reduction={this.props.kingdom.building_cost_reduction}
-                                             kingdom_iron_cost_reduction={this.props.kingdom.iron_cost_reduction}
-                                             kingdom_population_cost_reduction={this.props.kingdom.population_cost_reduction}
-                                             kingdom_current_population={this.props.kingdom.current_population}
-                                             character_id={this.props.kingdom.character_id}
-                                             is_in_queue={this.isInQueue()}
-                        />
-                    :
-
-                        <BasicCard additionalClasses={'overflow-x-auto'}>
-                            <BuildingsTable buildings={this.props.kingdom.buildings}
-                                            dark_tables={this.props.dark_tables}
-                                            view_building={this.viewSelectedBuilding.bind(this)}
-                                            buildings_in_queue={this.props.kingdom.building_queue}
-                            />
-                        </BasicCard>
-                }
-            </Fragment>
-        )
-    }
-
     renderSelected() {
         switch(this.state.which_selected) {
             case 'buildings':
-                return this.renderBuildings();
+                return <SmallBuildingsSection
+                    kingdom={this.props.kingdom}
+                    dark_tables={this.props.dark_tables}
+                    close_selected={this.closeSelected.bind(this)}
+                />
             default:
                 return null
         }
