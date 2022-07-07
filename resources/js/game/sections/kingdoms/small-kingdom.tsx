@@ -74,10 +74,6 @@ export default class SmallKingdom extends React.Component<KingdomProps, any> {
     }
 
     render() {
-        if (this.state.which_selected !== null) {
-            return this.renderSelected();
-        }
-
         return (
             <Fragment>
                 <BasicCard>
@@ -104,26 +100,31 @@ export default class SmallKingdom extends React.Component<KingdomProps, any> {
                 </BasicCard>
 
                 <div className='mt-4'>
-                    <Select
-                        onChange={this.showSelected.bind(this)}
-                        options={[
-                            {
-                                label: 'Building Management',
-                                value: 'buildings',
-                            },
-                            {
-                                label: 'Unit Management',
-                                value: 'units',
-                            }
-                        ]}
-                        menuPosition={'absolute'}
-                        menuPlacement={'bottom'}
-                        styles={{menuPortal: (base: any) => ({...base, zIndex: 9999, color: '#000000'})}}
-                        menuPortalTarget={document.body}
-                        value={[
-                            {label: 'Please Select Section', value: ''}
-                        ]}
-                    />
+                    {
+                        this.state.which_selected !== null ?
+                            this.renderSelected()
+                        :
+                            <Select
+                                onChange={this.showSelected.bind(this)}
+                                options={[
+                                    {
+                                        label: 'Building Management',
+                                        value: 'buildings',
+                                    },
+                                    {
+                                        label: 'Unit Management',
+                                        value: 'units',
+                                    }
+                                ]}
+                                menuPosition={'absolute'}
+                                menuPlacement={'bottom'}
+                                styles={{menuPortal: (base: any) => ({...base, zIndex: 9999, color: '#000000'})}}
+                                menuPortalTarget={document.body}
+                                value={[
+                                    {label: 'Please Select Section', value: ''}
+                                ]}
+                            />
+                    }
                 </div>
             </Fragment>
         )

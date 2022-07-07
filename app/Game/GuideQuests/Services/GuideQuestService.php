@@ -183,6 +183,14 @@ class GuideQuestService {
             }
         }
 
+        if (!is_null($quest->required_passive_skill) && !is_null($quest->required_passive_level)) {
+            $requiredSkill = $character->passiveSkills()->where('passive_skill_id', $quest->required_passive_skill)->first();
+
+            if ($requiredSkill->current_level >= $quest->required_passive_level) {
+                $attributes[] = 'required_passive_level';
+            }
+        }
+
         if (!empty($attributes)) {
             $requiredAttributes = $this->requiredAttributeNames($quest);
 
@@ -200,6 +208,10 @@ class GuideQuestService {
 
         foreach ($attributes as $key => $value) {
             if ($key === 'required_skill') {
+                continue;
+            }
+
+            if ($key === 'required_passive_skill') {
                 continue;
             }
 

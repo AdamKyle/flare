@@ -35,6 +35,10 @@ class GuideQuestsSheet implements ToCollection {
             $data['required_skill_level'] = null;
         }
 
+        if (!is_null($data['required_passive_skill']) && is_null($data['required_skill'])) {
+            $data['required_passive_level'] = null;
+        }
+
         if (!is_null($data['required_faction_level']) && is_null($data['required_faction_id'])) {
             $data['required_faction_id'] = null;
         }

@@ -291,6 +291,7 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
     }
 
     updateMapTimer(movement_time_out: number) {
+        console.log(movement_time_out);
         this.setState({
             movement_time_out: movement_time_out
         });

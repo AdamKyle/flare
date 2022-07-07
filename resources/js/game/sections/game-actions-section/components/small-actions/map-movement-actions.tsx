@@ -50,6 +50,7 @@ export default class MapMovementActions extends React.Component<any, any> {
             location: null,
             show_location_details: false,
             show_conjuration: false,
+            time_left: null,
         }
 
         // @ts-ignore
@@ -59,8 +60,6 @@ export default class MapMovementActions extends React.Component<any, any> {
     componentDidMount() {
         (new Ajax()).setRoute('map/' + this.props.character.id)
             .doAjaxCall('get', (result: AxiosResponse) => {
-                this.props.update_map_timer(result.data.time_left);
-
                 this.setStateFromData(result.data, this.setLocationData.bind(this));
             }, (err: AxiosError) => {
 
@@ -73,6 +72,16 @@ export default class MapMovementActions extends React.Component<any, any> {
 
     componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any) {
         this.setLocationData()
+
+        if (this.state.time_left !== null && this.state.time_left !== 0) {
+            const timeLeft = this.state.time_left;
+
+            this.setState({
+                time_left: null
+            }, () => {
+                this.props.update_map_timer(timeLeft);
+            });
+        }
     }
 
     canSeeViewLocationDetailsButton() {

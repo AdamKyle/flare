@@ -24,17 +24,20 @@ export default class SmallBuildingsSection extends React.Component<SmallBuilding
     }
 
     isInQueue() {
+
         if (this.state.view_building === null) {
             return false;
         }
 
-        if (this.props.kingdom.building_queue.length > 0) {
+        if (this.props.kingdom.building_queue.length === 0) {
             return false;
         }
 
+        const self = this;
+
         return this.props.kingdom.building_queue.filter((queue: BuildingInQueueDetails) => {
-            if (this.state.view_building !== null) {
-                return queue.building_id === this.state.view_building.id
+            if (self.state.view_building !== null) {
+                return queue.building_id === self.state.view_building.id
             }
         }).length > 0;
     }

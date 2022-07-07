@@ -28,6 +28,8 @@ class GuideQuest extends Model
         'required_kingdoms',
         'required_kingdom_level',
         'required_kingdom_units',
+        'required_passive_skill',
+        'required_passive_level',
         'reward_level',
         'gold_dust_reward',
         'shards_reward',
@@ -50,6 +52,8 @@ class GuideQuest extends Model
         'required_kingdoms'      => 'integer',
         'required_kingdom_level' => 'integer',
         'required_kingdom_units' => 'integer',
+        'required_passive_skill' => 'integer',
+        'required_passive_level' => 'integer',
         'reward_level'           => 'integer',
         'gold_dust_reward'       => 'integer',
         'shards_reward'          => 'integer',
@@ -61,6 +65,7 @@ class GuideQuest extends Model
         'game_map_name',
         'quest_name',
         'quest_item_name',
+        'passive_name',
     ];
 
     public function getSkillNameAttribute() {
@@ -78,6 +83,16 @@ class GuideQuest extends Model
 
         if (!is_null($quest)) {
             return $quest->name;
+        }
+
+        return null;
+    }
+
+    public function getPassiveNameAttribute() {
+        $passive = PassiveSkill::find($this->required_passive_skill);
+
+        if (!is_null($passive)) {
+            return $passive->name;
         }
 
         return null;

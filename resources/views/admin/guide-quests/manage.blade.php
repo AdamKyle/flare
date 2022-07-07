@@ -44,6 +44,8 @@
                                 <x-core.forms.input :model="$guideQuest" label="Required Kingdoms #:" modelKey="required_kingdoms" name="required_kingdoms" />
                                 <x-core.forms.input :model="$guideQuest" label="Required Kingdom Level:" modelKey="required_kingdom_level" name="required_kingdom_level" />
                                 <x-core.forms.input :model="$guideQuest" label="Required Kingdom Units:" modelKey="required_kingdom_units" name="required_kingdom_units" />
+                                <x-core.forms.key-value-select :model="$guideQuest" label="Required Passive:" modelKey="required_passive_skill" name="required_passive_skill" :options="$passives"/>
+                                <x-core.forms.input :model="$guideQuest" label="Required Passive Level:" modelKey="required_passive_level" name="required_passive_level" />
                             </div>
                         </div>
 
