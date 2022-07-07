@@ -5,6 +5,7 @@ import {AxiosResponse} from "axios";
 import Ajax from "../../../../lib/ajax/ajax";
 import ComponentLoading from "../../../../components/ui/loading/component-loading";
 import ItemDetails from "./components/item-details";
+import InventoryQuestItemDetails from "./components/inventory-quest-item-details";
 
 export default class InventoryUseDetails extends React.Component<any, any> {
     constructor(props: any) {
@@ -35,13 +36,21 @@ export default class InventoryUseDetails extends React.Component<any, any> {
         return <ItemNameColorationText item={this.state.item} />;
     }
 
+    largeModal() {
+        if (this.state.item !== null) {
+            return this.state.item.type !== 'quest';
+        }
+
+        return false;
+    }
+
     render() {
         return (
             <Dialogue is_open={this.props.is_open}
                       handle_close={this.props.manage_modal}
                       title={this.modalTitle()}
                       secondary_actions={null}
-                      large_modal={true}
+                      large_modal={this.largeModal()}
                       additional_dialogue_css={'top-[110px]'}
             >
                 <div className="mb-5 relative">
@@ -52,7 +61,12 @@ export default class InventoryUseDetails extends React.Component<any, any> {
                             </div>
                         :
                             <Fragment>
-                                <ItemDetails item={this.state.item} />
+                                {
+                                    this.state.item.type === 'quest' ?
+                                        <InventoryQuestItemDetails item={this.state.item} />
+                                    :
+                                        <ItemDetails item={this.state.item} />
+                                }
                             </Fragment>
                     }
                 </div>

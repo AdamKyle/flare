@@ -242,9 +242,17 @@ class  CharacterInventoryController extends Controller {
 
         event(new UpdateTopBarEvent($character));
 
-        $this->updateCharacterAttackDataCache($character);
+        $inventory = $this->characterInventoryService->setCharacter($character);
 
-        return response()->json(['message' => $setName . ' is now equipped (equipment has been moved to the set)']);
+        return response()->json([
+            'message'   => $setName . ' is now equipped (equipment has been moved to the set)',
+            'inventory' => [
+                'sets'            => $inventory->getInventoryForType('sets')['sets'],
+                'usable_sets'     => $inventory->getInventoryForType('usable_sets'),
+                'savable_sets'    => $inventory->getInventoryForType('savable_sets'),
+                'set_is_equipped' => true,
+            ]
+        ]);
     }
 
     public function removeFromSet(RemoveItemRequest $request, Character $character, InventorySetService $inventorySetService) {

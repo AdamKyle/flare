@@ -13,7 +13,7 @@ import {
     watchForChatDarkModeComparisonChange,
 } from "../../../lib/game/dark-mode-watcher";
 import UsableItemSection from "../../character-sheet/components/modals/components/usable-item-section";
-import ItemDetails from "../../character-sheet/components/modals/components/item-details";
+import InventoryQuestItemDetails from "../../character-sheet/components/modals/components/inventory-quest-item-details";
 
 export default class ItemComparison extends React.Component<any, any> {
 
@@ -88,7 +88,11 @@ export default class ItemComparison extends React.Component<any, any> {
     isLargeModal() {
 
         if (this.state.comparison_details !== null) {
-            return this.state.comparison_details.details.length === 2;
+            if (this.state.comparison_details.itemToEquip.type !== 'quest') {
+                return this.state.comparison_details.details.length === 2;
+            }
+
+            return false;
         }
 
         return false;
@@ -122,14 +126,12 @@ export default class ItemComparison extends React.Component<any, any> {
             )
         }
 
-
-
         return (
             <Dialogue is_open={this.props.is_open}
                       handle_close={this.props.manage_modal}
                       title={this.buildTitle()}
                       secondary_actions={null}
-                      large_modal={this.state.error_message === null}
+                      large_modal={this.state.error_message === null && this.isLargeModal()}
                       primary_button_disabled={this.state.action_loading}
             >
                 {
@@ -148,7 +150,7 @@ export default class ItemComparison extends React.Component<any, any> {
                                         <UsableItemSection item={this.state.comparison_details.itemToEquip} />
                                    :
                                         this.state.comparison_details.itemToEquip.type === 'quest' ?
-                                            <ItemDetails item={this.state.comparison_details.itemToEquip} />
+                                            <InventoryQuestItemDetails item={this.state.comparison_details.itemToEquip} />
                                         :
                                             <ComparisonSection
                                                 is_large_modal={this.isLargeModal()}

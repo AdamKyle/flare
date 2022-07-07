@@ -165,13 +165,16 @@ class BattleDrop {
         if ($items->isNotEmpty()) {
 
             foreach ($items as $item) {
-                $chance = 999999;
-                $roll   = rand(1, 1000000);
+                if ($this->canHaveItem($character, $item)) {
+                    $chance = 999999;
+                    $roll = rand(1, 1000000);
+                    $roll = $roll + $roll * $lootingChance;
 
-                $roll = $roll + $roll * $lootingChance;
+                    if ($roll > $chance) {
+                        $this->attemptToPickUpItem($character, $item);
 
-                if ($roll > $chance && $this->canHaveItem($character, $item)) {
-                    $this->attemptToPickUpItem($character, $item);
+                        return;
+                    }
 
                     return;
                 }

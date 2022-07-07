@@ -69,6 +69,8 @@ export default class EquippedTable extends React.Component<EquippedInventoryTabP
                 this.setState({
                     loading: false,
                     success_message: result.data.message,
+                }, () => {
+                    this.props.update_inventory(result.data.inventory);
                 })
             }, (error: AxiosError) => {
 
