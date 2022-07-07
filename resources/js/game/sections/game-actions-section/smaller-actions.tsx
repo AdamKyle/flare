@@ -33,6 +33,8 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
 
     private duelOptions: any;
 
+    private explorationTimeOut: any;
+
     private actionsManager: ActionsManager;
 
     constructor(props: ActionsProps) {
@@ -67,6 +69,9 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
 
         // @ts-ignore
         this.mapTimeOut     = Echo.private('show-timeout-move-' + this.props.character.user_id);
+
+        // @ts-ignore
+        this.explorationTimeOut = Echo.private('exploration-timeout-' + this.props.character.user_id);
 
         // @ts-ignore
         this.monsterUpdate = Echo.private('update-monsters-list-' + this.props.character.user_id);
@@ -129,6 +134,13 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
             });
         });
 
+        // @ts-ignore
+        this.explorationTimeOut.listen('Game.Exploration.Events.ExplorationTimeOut', (event: any) => {
+            this.setState({
+                automation_time_out: event.forLength,
+            });
+        });
+
         if (!this.props.character.can_move) {
             this.setState({
                 movement_time_out: this.props.character.can_move_again_at,
@@ -180,12 +192,14 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
         },{
             label: 'Craft',
             value: 'craft'
-        }, {
-            label: 'Map Movement',
-            value: 'map-movement'
         }];
 
         if (!this.props.character.is_automation_running) {
+            options.push({
+                label: 'Map Movement',
+                value: 'map-movement'
+            });
+
             options.unshift({
                 label: 'Fight',
                 value: 'fight'

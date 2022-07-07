@@ -3,12 +3,10 @@ import BasicCard from "../../components/ui/cards/basic-card";
 import KingdomProps from "../../lib/game/kingdoms/types/kingdom-props";
 import KingdomDetails from "./kingdom-details";
 import Select from "react-select";
-import BuildingsTable from "./buildings/buildings-table";
-import BuildingDetails from "../../lib/game/kingdoms/building-details";
-import BuildingInformation from "./buildings/building-information";
 import BuildingInQueueDetails from "../../lib/game/kingdoms/building-in-queue-details";
 import SmallBuildingsSection from "./buildings/small-buildings-section";
 import SmallUnitsSection from "./units/small-units-section";
+import DangerButton from "../../components/ui/buttons/danger-button";
 
 export default class SmallKingdom extends React.Component<KingdomProps, any> {
 
@@ -104,26 +102,31 @@ export default class SmallKingdom extends React.Component<KingdomProps, any> {
                         this.state.which_selected !== null ?
                             this.renderSelected()
                         :
-                            <Select
-                                onChange={this.showSelected.bind(this)}
-                                options={[
-                                    {
-                                        label: 'Building Management',
-                                        value: 'buildings',
-                                    },
-                                    {
-                                        label: 'Unit Management',
-                                        value: 'units',
-                                    }
-                                ]}
-                                menuPosition={'absolute'}
-                                menuPlacement={'bottom'}
-                                styles={{menuPortal: (base: any) => ({...base, zIndex: 9999, color: '#000000'})}}
-                                menuPortalTarget={document.body}
-                                value={[
-                                    {label: 'Please Select Section', value: ''}
-                                ]}
-                            />
+                            <Fragment>
+                                <Select
+                                    onChange={this.showSelected.bind(this)}
+                                    options={[
+                                        {
+                                            label: 'Building Management',
+                                            value: 'buildings',
+                                        },
+                                        {
+                                            label: 'Unit Management',
+                                            value: 'units',
+                                        }
+                                    ]}
+                                    menuPosition={'absolute'}
+                                    menuPlacement={'bottom'}
+                                    styles={{menuPortal: (base: any) => ({...base, zIndex: 9999, color: '#000000'})}}
+                                    menuPortalTarget={document.body}
+                                    value={[
+                                        {label: 'Please Select Section', value: ''}
+                                    ]}
+                                />
+                                <div className='grid gap-3'>
+                                    <DangerButton button_label={'Close'} on_click={this.props.close_details} additional_css={'mt-4'} />
+                                </div>
+                            </Fragment>
                     }
                 </div>
             </Fragment>
