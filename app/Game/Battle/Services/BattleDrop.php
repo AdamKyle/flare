@@ -259,7 +259,7 @@ class BattleDrop {
             }
         }
 
-        return $this->getDrop('droppable-items');
+        return null;
     }
 
     /**

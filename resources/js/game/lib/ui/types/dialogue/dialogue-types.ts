@@ -10,13 +10,13 @@ export default interface DialogueTypes {
         secondary_button_disabled: boolean;
         secondary_button_label: string;
         handle_action: (args: any) => void;
-    } | null
+    } | null;
 
     tertiary_actions?: {
         tertiary_button_disabled: boolean;
         tertiary_button_label: string;
         handle_action: (args: any) => void;
-    } | null
+    } | null;
 
     title: string | JSX.Element;
 

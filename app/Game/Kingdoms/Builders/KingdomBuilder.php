@@ -37,6 +37,7 @@ class KingdomBuilder {
             'x_position'              => $character->map->character_position_x,
             'y_position'              => $character->map->character_position_y,
             'last_walked'             => now(),
+            'protected_until'         => $character->kingdoms()->count() === 0 ? now()->addDays(7) : null,
         ];
 
         return Kingdom::create($kingdom);

@@ -78,7 +78,7 @@ class QuestHandlerService {
             $foundItem = $this->fetchRequiredItem($quest, $character);
 
             if (is_null($foundItem)) {
-                $this->bailMessage = 'You are missing a required item. Check the requirements tab.';
+                $this->bailMessage = 'You are missing a required item. Check the Required To Complete tab.';
 
                 return true;
             }
@@ -88,7 +88,7 @@ class QuestHandlerService {
             $secondaryItem = $this->fetchSecondaryRequiredItem($quest, $character);
 
             if (is_null($secondaryItem)) {
-                $this->bailMessage = 'You are missing a secondary required item. Check the requirements tab.';
+                $this->bailMessage = 'You are missing a secondary required item. Check the Required To Complete tab.';
 
                 return true;
             }
@@ -96,7 +96,7 @@ class QuestHandlerService {
 
         if ($this->questHasCurrenciesRequirement($quest)) {
             if (!$this->canPay($character, $quest)) {
-                $this->bailMessage = 'You don\'t have the currencies required. Check the requirements tab.';
+                $this->bailMessage = 'You don\'t have the currencies required. Check the Required To Complete tab.';
 
                 return true;
             }
@@ -104,7 +104,7 @@ class QuestHandlerService {
 
         if ($this->questRequiresPlaneAccess($quest)) {
             if (!$this->hasPlaneAccess($quest, $character)) {
-                $this->bailMessage = 'You do not have proper plane access to finish this quest. Check the requirements tab.';
+                $this->bailMessage = 'You do not have proper plane access to finish this quest. Check the Required To Complete tab.';
 
                 return true;
             }
@@ -112,7 +112,7 @@ class QuestHandlerService {
 
         if ($this->questHasFactionRequirement($quest)) {
             if (!$this->hasMetFactionRequirement($character, $quest)) {
-                $this->bailMessage = 'You are missing the required Faction Level needed to complete this quest. Check the requirements tab.';
+                $this->bailMessage = 'You are missing the required Faction Level needed to complete this quest. Check the Required To Complete tab.';
 
                 return true;
             }

@@ -107,6 +107,34 @@ class KingdomResourcesService {
 
                 if ($this->kingdom->current_population > $this->kingdom->max_population) {
                     $this->angryNpc();
+
+                    return;
+                }
+
+                if (!is_null($this->kingdom->protected_until)) {
+                    $difference = now()->diffInDays($this->kingdom->protected_until) ;
+
+                    if ($difference > 7) {
+                        event(new ServerMessageEvent(
+                            $this->kingdom->character->user,
+                            'Protection has worn off of kingdom: ' . $this->kingdom->name .
+                            ' located at: (X/Y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position .
+                            ' on the: ' . $this->kingdom->gameMap->name . ' plane.'
+                        ));
+
+                        $this->kingdom->update([
+                            'protected_until' => null
+                        ]);
+
+                        $this->kingdom = $this->kingdom->refresh();
+                    } else if ($difference === 7 && !$this->doNotNotify) {
+                        event(new ServerMessageEvent(
+                            $this->kingdom->character->user,
+                            'Protection will wear off tomorrow for kingdom: ' . $this->kingdom->name .
+                            ' located at: (X/Y): ' . $this->kingdom->x_position . '/' . $this->kingdom->y_position .
+                            ' on the: ' . $this->kingdom->gameMap->name . ' plane.'
+                        ));
+                    }
                 }
 
                 $this->increaseCurrentResource();

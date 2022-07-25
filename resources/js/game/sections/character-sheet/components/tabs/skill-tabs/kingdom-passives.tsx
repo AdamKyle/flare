@@ -55,7 +55,7 @@ export default class KingdomPassives extends React.Component<any, any> {
         });
     }
 
-    findSkillInTraining(passive: any) {
+    findSkillInTraining(passive: any): void {
 
         if (passive.started_at !== null) {
             this.setState({
@@ -64,7 +64,9 @@ export default class KingdomPassives extends React.Component<any, any> {
         } else {
             if (passive.children.length > 0) {
 
-                passive.children.forEach((child: any) => {
+                for (let i = 0; i < passive.children.length; i++) {
+                    const child: any = passive.children[i];
+
                     if (child.started_at !== null) {
                         return this.setState({
                             skill_in_training: child,
@@ -72,7 +74,7 @@ export default class KingdomPassives extends React.Component<any, any> {
                     } else {
                         return this.findSkillInTraining(child);
                     }
-                });
+                }
             } else {
                 return this.setState({
                     skill_in_training: null,

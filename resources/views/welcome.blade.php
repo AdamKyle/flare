@@ -35,8 +35,8 @@
                 <div class="text-center mt-4 md:mt-0 md:text-left">
                     <h2 class="mb-5 font-thin md:text-4xl lg:text-5xl dark:text-gray-300 text-gray-800">A world of possibilities</h2>
                     <div class="mb-10 dark:text-gray-300 text-gray-800">
-                        <p class="mt-2 mb-4">Tlessa offers a lot for the average player to do, from crafting, enchanting, gear progression, quests, monsters, kingdoms to manage and to take, there is more to do here
-                        including but not limited to: Reach level 4000+, Fight Epic Celestials, Go on Adventures, Get Faction Points for unique and so much more.</p>
+                        <p class="mt-2 mb-4">Tlessa offers a lot for the average player to do, from crafting, enchanting, gear progression, quests, monsters, kingdoms to manage and to take. There is more to do here
+                        including but not limited to: Reach level 4000+, Fight epic Celestials, Get Faction Points for Uniques, Complete over 60 quests and so much more.</p>
                         <p class="mb-4"><strong>Best part?</strong> it's all free! Just requires time investment, as little or as much as you want</p>
                     </div>
                 </div>
@@ -56,7 +56,7 @@
                             ])}}">Equip your character!</a>
                         </h5>
                         <p>
-                            Buy/sell weapons, armor, rings, artifacts and more and out fit your character
+                            Buy/sell weapons, armor, rings and more to out fit your character
                             for the road ahead. Who knows what beasties you might find!
                         </p>
                     </div>
@@ -75,7 +75,7 @@
                         </h5>
                         <p>
                             Settle, Manage and wage war against other players! You can use Kingdom passives to train new skills to unlock new buildings
-                            and units that give your kingdom even more power!
+                            and units that give your kingdoms even more power!
                         </p>
                     </div>
                 </div>
@@ -104,7 +104,7 @@
             <div class="md:flex md:items-center text-center md:text-left">
                 <div>
                     <h2 class="mb-5 font-thin md:text-4xl lg:text-5xl dark:text-gray-300 text-gray-800">See where you're going!</h2>
-                    <p class="mb-10 dark:text-gray-300 text-gray-800">Adventure on a map by clicking the action buttons. Certain locations will have adventures and some you can set sail from, such as ports!</p>
+                    <p class="mb-10 dark:text-gray-300 text-gray-800">Adventure on a map by clicking the action buttons. Set sail from one port to the other, traverse t other planes of existence!</p>
 
                     <x-core.buttons.link-buttons.primary-button href="{{route('info.page', [
                             'pageName' => 'map',
@@ -156,7 +156,7 @@
                                 'pageName' => 'enchanting',
                             ])}}">Enchant Gear!</a>
                         </h5>
-                        <p>All you need is to destroy an item with an affix on it for the recipe! How easy is that!</p>
+                        <p>With over 400 enchantments, there isn't anything you can't make for your character!</p>
                     </div>
                 </div>
             </x-core.cards.card-with-hover>
@@ -204,7 +204,7 @@
                                 'pageName' => 'player-vs-player',
                             ])}}">Pvp</a>
                         </h5>
-                        <p>Fight other players for a chance to earn a mythic unique. Participate in monthly pvp tournaments.</p>
+                        <p>Fight other players for a chance to earn a Mythic Unique. Participate in monthly pvp tournaments.</p>
                     </div>
                 </div>
             </x-core.cards.card-with-hover>

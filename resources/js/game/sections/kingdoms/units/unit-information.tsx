@@ -49,10 +49,9 @@ export default class UnitInformation extends React.Component<UnitInformationProp
      }
 
     setResourceAmount(amount: number, timeNeeded: number) {
-
         this.setState({
             amount_to_recruit: amount,
-            time_needed: Math.ceil(timeNeeded),
+            time_needed: parseInt(timeNeeded.toFixed(0)) || 0,
         })
     }
 
@@ -78,10 +77,10 @@ export default class UnitInformation extends React.Component<UnitInformationProp
         })
     }
 
-    manageHelpDialogue(amountToRecruit?: number) {
+    manageHelpDialogue(timeNeeded?: number) {
          this.setState({
              show_time_help: !this.state.show_time_help,
-             amount_to_recruit: typeof amountToRecruit !== 'undefined' ? amountToRecruit : 0,
+             time_needed: typeof timeNeeded !== 'undefined' ? timeNeeded : this.state.time_needed,
          })
     }
 
@@ -96,7 +95,7 @@ export default class UnitInformation extends React.Component<UnitInformationProp
 
         const foundBuilding: BuildingDetails = building[0];
 
-        return foundBuilding.level < unit.required_building_level;
+        return foundBuilding.level < unit.required_building_level || foundBuilding.is_locked;
     }
 
     renderSelectedSection() {
@@ -139,7 +138,8 @@ export default class UnitInformation extends React.Component<UnitInformationProp
                          <div className='mt-4 mb-4'>
                              <DangerAlert>
                                  You must Train: {this.props.unit.recruited_from.building_name} to level: {this.props.unit.required_building_level} before
-                                 you can recruit these units.
+                                 you can recruit these units. Should the building already meet the level, make sure the building is unlocked.
+                                 You can see this in the buildings tab.
                              </DangerAlert>
                          </div>
                      : null
@@ -155,7 +155,7 @@ export default class UnitInformation extends React.Component<UnitInformationProp
                              <dd>{this.props.unit.attack}</dd>
                              <dt>Defence</dt>
                              <dd>{this.props.unit.defence}</dd>
-                             <dt>Heal % (For on unit. Stacks.)</dt>
+                             <dt>Heal % (For one unit. Stacks.)</dt>
                              <dd>{this.props.unit.heal_percentage !== null ? (this.props.unit.heal_percentage * 100).toFixed(0) : 0}%</dd>
                              <dt>Good for attacking?</dt>
                              <dd>{this.props.unit.attacker ? 'Yes' : 'No'}</dd>

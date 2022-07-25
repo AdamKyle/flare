@@ -33,6 +33,8 @@ export default class ComparisonSection extends React.Component<ComparisonSection
             item_to_show: null,
             show_item_details: false,
             error_message: null,
+            show_loading_label: false,
+            loading_label: null,
         }
     }
 
@@ -71,15 +73,20 @@ export default class ComparisonSection extends React.Component<ComparisonSection
 
     equipItem(type: string, position?: string) {
 
-        this.props.set_action_loading();
+        this.setState({
+            show_loading_label: true,
+            loading_label: 'Equipping set and recalculating your stats (this can take a few seconds) ...'
+        }, () => {
+            this.props.set_action_loading();
 
-        const params = {
-            position: position,
-            slot_id: this.props.slot_id,
-            equip_type: type,
-        };
+            const params = {
+                position: position,
+                slot_id: this.props.slot_id,
+                equip_type: type,
+            };
 
-        (new InventoryComparisonActions()).equipItem(this, params);
+            (new InventoryComparisonActions()).equipItem(this, params);
+        });
     }
 
     moveItem(setId: number) {
@@ -200,7 +207,7 @@ export default class ComparisonSection extends React.Component<ComparisonSection
 
                 {
                     this.props.is_action_loading ?
-                        <LoadingProgressBar />
+                        <LoadingProgressBar show_label={this.state.show_loading_label} label={this.state.loading_label} />
                     : null
                 }
 

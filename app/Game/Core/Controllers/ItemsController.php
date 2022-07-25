@@ -2,14 +2,10 @@
 
 namespace App\Game\Core\Controllers;
 
-use App\Flare\Models\Character;
-use App\Flare\Models\GameSkill;
 use App\Game\Core\Requests\UseMultipleItemsRequest;
 use App\Game\Core\Services\UseItemService;
-use App\Game\Skills\Values\SkillTypeValue;
 use App\Http\Controllers\Controller;
 use League\Fractal\Manager;
-use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Models\Item;
 use App\Flare\Traits\Controllers\ItemsShowInformation;
 

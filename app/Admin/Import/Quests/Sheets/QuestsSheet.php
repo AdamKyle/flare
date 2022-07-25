@@ -6,6 +6,7 @@ use App\Flare\Models\GameMap;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
 use App\Flare\Models\Npc;
+use App\Flare\Models\PassiveSkill;
 use App\Flare\Models\Quest;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
@@ -27,7 +28,7 @@ class QuestsSheet implements ToCollection {
     }
 
     protected function returnCleanItem(array $quest) {
-        $npc = Npc::where('real_name', $quest['npc_id'])->first();
+        $npc = Npc::find($quest['npc_id']);
 
         if (is_null($npc)) {
             return [];
@@ -101,10 +102,8 @@ class QuestsSheet implements ToCollection {
         } else {
             $map = GameMap::find($quest['faction_game_map_id']);
 
-            if (is_null($quest)) {
+            if (is_null($map)) {
                 $quest['faction_game_map_id'] = null;
-            } else {
-                $quest['faction_game_map_id'] = $map->id;
             }
         }
 
@@ -114,6 +113,16 @@ class QuestsSheet implements ToCollection {
 
         if (!isset($quest['is_parent'])) {
             $quest['is_parent'] = false;
+        }
+
+        if (!isset($quest['required_passive_skill'])) {
+            $quest['required_passive_level'] = null;
+        } else {
+            $passive = PassiveSkill::find($quest['required_passive_skill']);
+
+            if (is_null($passive)) {
+                $quest['required_passive_level'] = null;
+            }
         }
 
         return $quest;

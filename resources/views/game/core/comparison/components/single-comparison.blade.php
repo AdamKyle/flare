@@ -15,7 +15,16 @@
 <dl>
     @foreach($details as $key => $value)
         @if (!in_array($key, $invalidFields))
-            @if ($value <=> 0)
+            @if (is_array($value))
+                @foreach ($value as $attachedSkill)
+                    <dt>Affects Skill:</dt>
+                    <dd>{{$attachedSkill['skill_name']}}</dd>
+                    <dt>Skill XP Bonus:</dt>
+                    <dd class="{{$attachedSkill['skill_training_bonus'] > 0 ? 'text-green-700 dark:text-green-600' : 'text-red-700 dark:text-red-600'}}">{{$attachedSkill['skill_training_bonus'] * 100}}%</dd>
+                    <dt>Skill Bonus:</dt>
+                    <dd class="{{$attachedSkill['skill_bonus'] > 0 ? 'text-green-700 dark:text-green-600' : 'text-red-700 dark:text-red-600'}}">{{$attachedSkill['skill_bonus'] * 100}}%</dd>
+                @endforeach
+            @elseif ($value <=> 0)
                 <dt>{{ucFirst(str_replace('_', ' ', $key))}}</dt>
                 @if (in_array($key, $nonFloat))
                     <dd class="{{$value > 0 ? 'text-green-700 dark:text-green-600' : 'text-red-700 dark:text-red-600'}}">{{number_format($value)}}</dd>

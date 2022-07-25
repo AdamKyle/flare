@@ -1,7 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-
     <x-core.layout.info-container>
         <x-core.cards.card-with-title
             title="Import Items"

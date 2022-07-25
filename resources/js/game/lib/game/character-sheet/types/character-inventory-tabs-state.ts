@@ -8,4 +8,6 @@ export default interface CharacterInventoryTabsState {
     loading: boolean;
 
     inventory: Inventory | null;
+
+    disable_tabs: boolean;
 }

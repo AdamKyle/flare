@@ -11,6 +11,7 @@ import WarningAlert from "../../../../components/ui/alerts/simple-alerts/warning
 import OtherKingdomModalProps from "../../../../lib/game/types/map/kingdom-pins/modals/other-kingdom-modal-props";
 import KingdomDetails from "../../../../lib/game/map/types/kingdom-details";
 import KingdomHelpModal from "./kingdom-help-modal";
+import PrimaryButton from "../../../../components/ui/buttons/primary-button";
 
 export default class OtherKingdomModal extends React.Component<OtherKingdomModalProps, KingdomModalState> {
 
@@ -31,10 +32,6 @@ export default class OtherKingdomModal extends React.Component<OtherKingdomModal
         }
     }
 
-    attackKingdom(kingdom?: KingdomDetails | null) {
-        console.log(kingdom);
-    }
-
     componentDidMount() {
         (new Ajax()).setRoute('kingdoms/other/'+this.props.kingdom_id).doAjaxCall('get', (result: AxiosResponse) => {
             const kingdomData = result.data;
@@ -50,8 +47,12 @@ export default class OtherKingdomModal extends React.Component<OtherKingdomModal
         });
     }
 
-    teleportDisabled() {
-        return this.state.cost === 0 || !this.state.can_afford || !this.props.can_move || this.props.is_dead;
+    attackKingdom(kingdom?: KingdomDetails | null) {
+        console.log(kingdom);
+    }
+
+    purchaseKingdom() {
+        console.log(this.state.kingdom_details);
     }
 
     handleTeleport() {
@@ -65,6 +66,10 @@ export default class OtherKingdomModal extends React.Component<OtherKingdomModal
         }
 
         this.props.handle_close();
+    }
+
+    teleportDisabled() {
+        return this.state.cost === 0 || !this.state.can_afford || !this.props.can_move || this.props.is_dead;
     }
 
     buildTitle() {
@@ -194,6 +199,7 @@ export default class OtherKingdomModal extends React.Component<OtherKingdomModal
                                             <dt>Gold Bars:</dt>
                                             <dd>{formatNumber(this.state.kingdom_details?.gold_bars)}</dd>
                                         </dl>
+                                        <PrimaryButton button_label={'Purchase NPC Kingdom'} on_click={this.purchaseKingdom.bind(this)} additional_css={'mt-4'} />
                                     </div>
                                 </div>
                                 {
@@ -229,7 +235,8 @@ export default class OtherKingdomModal extends React.Component<OtherKingdomModal
                                                                 <dd>{this.state.time_out}</dd>
                                                             </dl>
                                                         </Fragment>
-                                                        : <WarningAlert>
+                                                    :
+                                                        <WarningAlert>
                                                             You are too close to the location to be able to teleport.
                                                         </WarningAlert>
                                                 }

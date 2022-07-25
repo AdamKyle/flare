@@ -10,4 +10,6 @@ export default interface SetsInventoryTabProps extends CoreInventoryTabProps {
     set_name_equipped: string;
 
     is_automation_running: boolean;
+
+    disable_tabs: () => void;
 }

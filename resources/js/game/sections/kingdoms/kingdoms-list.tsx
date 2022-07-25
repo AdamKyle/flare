@@ -68,6 +68,18 @@ export default class KingdomsList extends React.Component<KingdomListProps, King
         });
     }
 
+    createConditionalRowStyles() {
+        return [
+            {
+                when: (row: KingdomDetails) => row.is_protected !== null,
+                style: {
+                    backgroundColor: '#49b4fd',
+                    color: 'white',
+                }
+            }
+        ];
+    }
+
     render() {
         if (this.state.loading) {
             return (
@@ -87,7 +99,11 @@ export default class KingdomsList extends React.Component<KingdomListProps, King
                                 <Kingdom close_details={this.closeKingdomDetails.bind(this)} kingdom={this.state.selected_kingdom} dark_tables={this.state.dark_tables} />
                         :
                             <BasicCard additionalClasses={'overflow-x-scroll'}>
-                                <Table data={this.props.my_kingdoms} columns={buildKingdomsColumns(this.viewKingdomDetails.bind(this))} dark_table={this.state.dark_tables}/>
+                                <Table data={this.props.my_kingdoms}
+                                       columns={buildKingdomsColumns(this.viewKingdomDetails.bind(this))}
+                                       dark_table={this.state.dark_tables}
+                                       conditional_row_styles={this.createConditionalRowStyles()}
+                                />
                             </BasicCard>
                     }
                 </Fragment>

@@ -144,8 +144,8 @@ export default class CharacterSheet extends React.Component<CharacterSheetProps,
                                                 <dd>{(this.props.character.extra_action_chance.chance * 100).toFixed(2)}%</dd>
                                             </dl>
                                             <p className='mt-4'>
-                                                For more information about class bonus please see <a href='/information/races-and-classes' target='_blank'>Races and Classes Help <i
-                                                className="fas fa-external-link-alt"></i></a>
+                                                Make sure you read up on your <a href={'/information/class/' + this.props.character.class_id} target='_blank'>class <i
+                                                className="fas fa-external-link-alt"></i></a> for tips and tricks.
                                             </p>
                                         </div>
                                     </div>
@@ -199,6 +199,7 @@ export default class CharacterSheet extends React.Component<CharacterSheetProps,
                                                         user_id={this.props.character.user_id}
                                                         is_automation_running={this.props.character.is_automation_running}
                                                         finished_loading={this.props.finished_loading}
+                                                        update_disable_tabs={this.props.update_disable_tabs}
                                 />
                             </BasicCard>
                         : null

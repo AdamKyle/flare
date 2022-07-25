@@ -79,9 +79,10 @@ class AffixesTable extends DataTableComponent {
             'fight_time_out_mod_bonus' => 'Fight Timeout Modifiers',
             'move_time_out_mod_bonus'  => 'Move Timeout Modifiers',
             'devouring_light'          => 'Devouring Light',
+            'entranced_chance'         => 'Entrances Enemy',
             'steal_life_amount'        => 'Steal Life',
             'damage'                   => 'Damage',
-            'irresistible_damage'      => 'Is Irresistible Damage?',
+            'irresistible_damage'      => 'Irresistible Damage',
             'damage_can_stack'         => 'Stacking Damage',
             'Weapon Crafting'          => 'Weapon Crafting',
             'Armour Crafting'          => 'Armour Crafting',
@@ -109,7 +110,7 @@ class AffixesTable extends DataTableComponent {
 
     public function columns(): array {
         return [
-            Column::make('Name')->format(function ($value, $row) {
+            Column::make('Name')->searchable()->format(function ($value, $row) {
                 $affixId = ItemAffix::where('name', $value)->first()->id;
 
                 if (!is_null(auth()->user())) {

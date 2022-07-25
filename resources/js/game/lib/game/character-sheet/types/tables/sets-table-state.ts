@@ -20,4 +20,8 @@ export default interface SetsTableState {
     item_id: number | null;
 
     view_item: boolean;
+
+    loading_label: string | null;
+
+    show_loading_label: boolean;
 }

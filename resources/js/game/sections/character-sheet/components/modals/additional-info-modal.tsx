@@ -41,7 +41,7 @@ export default class AdditionalInfoModal extends React.Component<AdditionalInfoM
             >
                 <Tabs tabs={this.tabs} full_width={true}>
                     <TabPanel key={'stats'}>
-                        <div className='grid lg:grid-cols-2 gap-2'>
+                        <div className='grid lg:grid-cols-2 gap-2 overflow-x-scroll h-[150px] lg:h-[175px]'>
                             <div>
                                 <dl>
                                     <dt>Raw Str</dt>
@@ -80,6 +80,38 @@ export default class AdditionalInfoModal extends React.Component<AdditionalInfoM
                                 </dl>
                             </div>
                         </div>
+                        <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                        <div className='grid lg:grid-cols-2 gap-2'>
+                            <div>
+                                <dl>
+                                    <dt>Weapon Damage</dt>
+                                    <dd>{formatNumber(this.props.character.weapon_attack)}</dd>
+                                    <dt>Ring Damage</dt>
+                                    <dd>{formatNumber(this.props.character.ring_damage)}</dd>
+                                    <dt>Spell Damage</dt>
+                                    <dd>{formatNumber(this.props.character.spell_damage)}</dd>
+                                    <dt>Healing Amount</dt>
+                                    <dd>{formatNumber(this.props.character.healing_amount)}</dd>
+                                </dl>
+                            </div>
+                            <div className='border-b-2 block lg:hidden border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                            <div>
+                                <dl>
+                                    <dt>Voided Weapon Damage <sup>*</sup></dt>
+                                    <dd>{formatNumber(this.props.character.voided_weapon_attack)}</dd>
+                                    <dt>Voided Ring Damage <sup>*</sup></dt>
+                                    <dd>{formatNumber(this.props.character.voided_ring_damage)}</dd>
+                                    <dt>Voided Spell Damage <sup>*</sup></dt>
+                                    <dd>{formatNumber(this.props.character.voided_spell_damage)}</dd>
+                                    <dt>Voided Healing Amount <sup>*</sup></dt>
+                                    <dd>{formatNumber(this.props.character.voided_healing_amount)}</dd>
+                                </dl>
+                            </div>
+                        </div>
+                        <p className='mt-4 mb-2'>
+                            <sup>*</sup> For more information please see <a href='/information/voidance' target='_blank'>Voidance Help <i
+                            className="fas fa-external-link-alt"></i></a>
+                        </p>
                     </TabPanel>
                     <TabPanel key={'holy'}>
                         <dl>

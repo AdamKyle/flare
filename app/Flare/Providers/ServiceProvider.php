@@ -18,6 +18,7 @@ use App\Flare\Builders\Character\AttackDetails\CharacterAttackInformation;
 use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Builders\Character\ClassDetails\ClassBonuses;
 use App\Flare\Builders\RandomAffixGenerator;
+use App\Flare\Handlers\UpdateCharacterAttackTypes;
 use App\Flare\Middleware\IsCharacterLoggedInMiddleware;
 use App\Flare\Middleware\IsCharacterWhoTheySayTheyAreMiddleware;
 use App\Flare\Middleware\IsGloballyTimedOut;
@@ -501,6 +502,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(BuildMythicItem::class, function($app) {
             return new BuildMythicItem($app->make(RandomAffixGenerator::class));
+        });
+
+        $this->app->bind(UpdateCharacterAttackTypes::class, function($app) {
+            return new UpdateCharacterAttackTypes($app->make(BuildCharacterAttackTypes::class));
         });
     }
 

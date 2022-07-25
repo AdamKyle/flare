@@ -141,7 +141,7 @@ export default class RecruitWithGold extends React.Component<any, any> {
                         <span>{formatNumber(this.state.time_needed)}</span>
                         <div>
                             <div className='ml-2'>
-                                <button type={"button"} onClick={() => this.props.manage_help_dialogue(this.state.amount_to_recruit)} className='text-blue-500 dark:text-blue-300'>
+                                <button type={"button"} onClick={() => this.props.manage_help_dialogue(this.state.time_needed)} className='text-blue-500 dark:text-blue-300'>
                                     <i className={'fas fa-info-circle'}></i> Help
                                 </button>
                             </div>

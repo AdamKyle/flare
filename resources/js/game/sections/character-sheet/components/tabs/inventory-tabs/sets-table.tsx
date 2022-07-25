@@ -35,6 +35,8 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
             search_string: '',
             item_id: null,
             view_item: false,
+            loading_label: null,
+            show_loading_label: false,
         }
     }
 
@@ -117,14 +119,20 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
         }
 
         this.setState({
-            loading: true
+            loading: true,
+            show_loading_label: true,
+            loading_label: 'Equipping set and recalculating your stats (this can take a few seconds) ...'
         }, () => {
+            this.props.disable_tabs();
+
             (new Ajax()).setRoute('character/'+this.props.character_id+'/inventory-set/equip/' + setId).doAjaxCall('post', (result: AxiosResponse) => {
                 this.setState({
                     loading: false,
                     success_message: result.data.message,
                 }, () => {
                     this.props.update_inventory(result.data.inventory);
+
+                    this.props.disable_tabs();
                 });
             }, (error: AxiosError) => {
 
@@ -133,7 +141,6 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
     }
 
     removeFromSet(id: number) {
-        console.log(this.state.selected_set);
         let setId: any = this.props.savable_sets.filter((set) => {
             return set.name === this.state.selected_set;
         });
@@ -236,7 +243,7 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
 
         actions.push({
             name: 'Rename set',
-            icon_class: 'ra ra-crossed-swords',
+            icon_class: 'fas fa-edit',
             on_click: () => this.manageRenameSet()
         })
 
@@ -244,14 +251,14 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
             if (this.state.selected_set !== this.props.set_name_equipped && this.props.sets[this.state.selected_set].items.length > 0) {
                 actions.push({
                     name: 'Empty set',
-                    icon_class: 'ra ra-crossed-swords',
+                    icon_class: 'fas fa-eraser',
                     on_click: () => this.emptySet()
                 });
 
                 if (!this.cannotEquipSet()) {
                     actions.push({
                         name: 'Equip set',
-                        icon_class: 'ra ra-crossed-swords',
+                        icon_class: 'ra ra-muscle-fat',
                         on_click: () => this.equipSet()
                     });
                 }
@@ -276,7 +283,7 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
     }
 
     buttonsDisabled() {
-        return this.state.selected_set === this.props.set_name_equipped || this.props.is_dead || this.props.is_automation_running
+        return this.state.selected_set === this.props.set_name_equipped || this.props.is_dead || this.props.is_automation_running || this.state.loading
     }
 
     cannotEquipSet(setName?: string) {
@@ -341,10 +348,10 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
                 }
                 <div className='flex items-center'>
                     <div>
-                        <DropDown menu_items={this.buildMenuItems()} button_title={'Sets'} selected_name={this.state.selected_set} secondary_selected={this.props.set_name_equipped} disabled={this.props.is_dead}  />
+                        <DropDown menu_items={this.buildMenuItems()} button_title={'Sets'} selected_name={this.state.selected_set} secondary_selected={this.props.set_name_equipped} disabled={this.props.is_dead || this.state.loading}  />
                     </div>
                     <div className='ml-2'>
-                        <DropDown menu_items={this.buildActionsDropDown()} button_title={'Actions'} disabled={this.props.is_dead}  />
+                        <DropDown menu_items={this.buildActionsDropDown()} button_title={'Actions'} disabled={this.props.is_dead || this.state.loading}  />
                     </div>
                     <div className='ml-2'>
                         {
@@ -361,8 +368,8 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
 
                 {
                     this.state.loading ?
-                        <LoadingProgressBar />
-                        : null
+                        <LoadingProgressBar show_label={this.state.show_loading_label} label={this.state.loading_label} />
+                    : null
                 }
 
 

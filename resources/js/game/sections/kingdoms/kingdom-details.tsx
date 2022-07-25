@@ -1,6 +1,9 @@
 import React, {Fragment} from "react";
 import KingdomDetailsProps from "../../lib/game/kingdoms/types/kingdom-details-props";
 import {formatNumber} from "../../lib/game/format-number";
+import PrimaryOutlineButton from "../../components/ui/buttons/primary-outline-button";
+import DangerOutlineButton from "../../components/ui/buttons/danger-outline-button";
+import SkyOutlineButton from "../../components/ui/buttons/sky-outline-button";
 
 export default class KingdomDetails extends React.Component<KingdomDetailsProps, any> {
     constructor(props: KingdomDetailsProps) {
@@ -61,23 +64,36 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
                     </div>
                 </div>
                 <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
-                <div>
-                    <h3>Defence Break Down</h3>
-                    <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
-                    <dl>
-                        <dt>Wall Defence</dt>
-                        <dd>{(this.props.kingdom.walls_defence * 100).toFixed(2)}%</dd>
-                        <dt>Treasury Defence</dt>
-                        <dd>{(this.props.kingdom.treasury_defence * 100).toFixed(2)}%</dd>
-                        <dt>Gold Bars Defence</dt>
-                        <dd>{(this.props.kingdom.gold_bars_defence * 100).toFixed(2)}%</dd>
-                        <dt>Passive Defence</dt>
-                        <dd>{(this.props.kingdom.passive_defence * 100).toFixed(2)}%</dd>
-                        <dt>Defence Bonus</dt>
-                        <dd>{(this.props.kingdom.defence_bonus * 100).toFixed(2)}%</dd>
-                        <dt>Total Defence</dt>
-                        <dd>{(this.calculateTotalDefence() * 100).toFixed(2)}%</dd>
-                    </dl>
+                <div className='grid md:grid-cols-2 gap-4'>
+                    <div>
+                        <h3>Defence Break Down</h3>
+                        <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                        <dl>
+                            <dt>Wall Defence</dt>
+                            <dd>{(this.props.kingdom.walls_defence * 100).toFixed(2)}%</dd>
+                            <dt>Treasury Defence</dt>
+                            <dd>{(this.props.kingdom.treasury_defence * 100).toFixed(2)}%</dd>
+                            <dt>Gold Bars Defence</dt>
+                            <dd>{(this.props.kingdom.gold_bars_defence * 100).toFixed(2)}%</dd>
+                            <dt>Passive Defence</dt>
+                            <dd>{(this.props.kingdom.passive_defence * 100).toFixed(2)}%</dd>
+                            <dt>Defence Bonus</dt>
+                            <dd>{(this.props.kingdom.defence_bonus * 100).toFixed(2)}%</dd>
+                            <dt>Total Defence</dt>
+                            <dd>{(this.calculateTotalDefence() * 100).toFixed(2)}%</dd>
+                        </dl>
+                    </div>
+                    <div className='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                    <div>
+                        <h3>Kingdom Actions</h3>
+                        <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                        <div className='grid md:grid-cols-1 gap-4'>
+                            <PrimaryOutlineButton button_label={'Buy Population'} on_click={() => {}} />
+                            <SkyOutlineButton button_label={'Manage Gold Bars'} on_click={() => {}} />
+                            <SkyOutlineButton button_label={'Manage Treasury'} on_click={() => {}} />
+                            <DangerOutlineButton button_label={'Abandon Kingdom'} on_click={() => {}} />
+                        </div>
+                    </div>
                 </div>
             </Fragment>
 

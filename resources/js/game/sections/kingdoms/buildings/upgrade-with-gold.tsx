@@ -106,6 +106,7 @@ export default class UpgradeWithGold extends React.Component<any, any> {
 
         let populationNeeded     = this.props.building.population_required * this.state.to_level;
         populationNeeded         = populationNeeded - populationNeeded * this.props.kingdom_population_cost_reduction
+
         let requiresAdditional   = false;
         let cost: number;
         let additionalCost       = 0;

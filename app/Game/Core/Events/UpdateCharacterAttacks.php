@@ -33,7 +33,7 @@ class UpdateCharacterAttacks implements ShouldBroadcastNow
     public function __construct(User $user, array $characterAttacks, )
     {
         $this->characterAttacks = $characterAttacks;
-        $this->user           = $user;
+        $this->user             = $user;
     }
 
     /**

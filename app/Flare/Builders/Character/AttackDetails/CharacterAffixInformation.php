@@ -140,7 +140,6 @@ class CharacterAffixInformation {
 
             if (!is_null($slot->item->item_prefix_id) && $slot->equipped) {
                 return $this->getDamageAffixSlot($slot, 'itemPrefix', $canStack);
-
             }
 
             if (!is_null($slot->item->item_suffix_id) && $slot->equipped) {
@@ -251,7 +250,9 @@ class CharacterAffixInformation {
             if ($slot->item->{$prefixType}->damage > 0 && $slot->item->{$prefixType}->damage_can_stack) {
                 return $slot;
             }
-        } else if ($slot->item->{$prefixType}->damage > 0 && !$slot->item->{$prefixType}->damage_can_stack) {
+        }
+
+        if ($slot->item->{$prefixType}->damage > 0 && !$slot->item->{$prefixType}->damage_can_stack) {
             return $slot;
         }
 

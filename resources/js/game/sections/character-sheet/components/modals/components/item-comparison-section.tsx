@@ -8,6 +8,7 @@ import TabPanel from "../../../../../components/ui/tabs/tab-panel";
 import {formatNumber} from "../../../../../lib/game/format-number";
 import ItemNameColorationText from "../../../../../components/ui/item-name-coloration-text";
 import ItemDetails from "./item-details";
+import ItemsAttachedSkills from "../../../../../lib/game/character-sheet/types/modal/items-attached-skills";
 
 export default class ItemComparisonSection extends React.Component<any, any> {
 
@@ -69,6 +70,35 @@ export default class ItemComparisonSection extends React.Component<any, any> {
             </Fragment>
         );
 
+        const skills = details.skills.map((skill: ItemsAttachedSkills) => {
+            return (
+                <Fragment>
+                    <dt>Affects Skill:</dt>
+                    <dd>{skill.skill_name}</dd>
+                    <dt>XP Bonus:</dt>
+                    <dd className={clsx(
+                        {
+                            'text-green-600 dark:text-green-500': skill.skill_training_bonus > 0
+                        },
+                        {
+                            'text-red-600 dark:text-red-400': skill.skill_training_bonus < 0
+                        }
+                    )}>{this.renderPercent(skill.skill_training_bonus)}</dd>
+                    <dt>Skill Bonus:</dt>
+                    <dd className={clsx(
+                        {
+                            'text-green-600 dark:text-green-500': skill.skill_bonus > 0
+                        },
+                        {
+                            'text-red-600 dark:text-red-400': skill.skill_bonus < 0
+                        }
+                    )}>{this.renderPercent(skill.skill_bonus)}</dd>
+                </Fragment>
+            )
+        });
+
+        elements = [...elements, ...skills];
+
         return (
             <Fragment>
                 <dl>
@@ -82,7 +112,7 @@ export default class ItemComparisonSection extends React.Component<any, any> {
         const invalidFields     = ['id', 'min_cost', 'skill_level_req', 'skill_level_trivial', 'reduces_enemy_stats', 'cost', 'shop_cost', 'slot_id', 'holy_level', 'affix_count', 'is_unique'];
         const wholeNumberValues = ['damage_adjustment', 'damage', 'ac_adjustment', 'healing_adjustment', 'base_damage', 'base_ac', 'holy_stacks', 'holy_stacks_applied', 'base_healing'];
 
-        return Object.keys(itemToEquip).map((key) => {
+        let elements = Object.keys(itemToEquip).map((key) => {
             if (!invalidFields.includes(key)) {
                 if (itemToEquip[key] > 0) {
                     return (
@@ -98,7 +128,7 @@ export default class ItemComparisonSection extends React.Component<any, any> {
                             )}>{
                                 wholeNumberValues.includes(key) ?
                                     this.formatWholeNumber(itemToEquip[key])
-                                    :
+                                :
                                     this.renderPercent(itemToEquip[key])
                             }</dd>
                         </Fragment>
@@ -106,6 +136,35 @@ export default class ItemComparisonSection extends React.Component<any, any> {
                 }
             }
         });
+
+        const skills = itemToEquip.skills.map((skill: ItemsAttachedSkills) => {
+            return (
+                <Fragment>
+                    <dt>Affects Skill:</dt>
+                    <dd>{skill.skill_name}</dd>
+                    <dt>XP Bonus:</dt>
+                    <dd className={clsx(
+                        {
+                            'text-green-600 dark:text-green-500': skill.skill_training_bonus > 0
+                        },
+                        {
+                            'text-red-600 dark:text-red-400': skill.skill_training_bonus < 0
+                        }
+                    )}>{this.renderPercent(skill.skill_training_bonus)}</dd>
+                    <dt>Skill Bonus:</dt>
+                    <dd className={clsx(
+                        {
+                            'text-green-600 dark:text-green-500': skill.skill_bonus > 0
+                        },
+                        {
+                            'text-red-600 dark:text-red-400': skill.skill_bonus < 0
+                        }
+                    )}>{this.renderPercent(skill.skill_bonus)}</dd>
+                </Fragment>
+            )
+        });
+
+        return [...elements, ...skills];
     }
 
     renderTwoComparisons() {
@@ -182,7 +241,7 @@ export default class ItemComparisonSection extends React.Component<any, any> {
         )
     }
 
-    formatPosition(position: string|number|boolean) {
+    formatPosition(position: string|number|boolean|object|[]) {
         if (typeof position === 'string') {
             return capitalize(position.split('-').join(' '));
         }
@@ -190,7 +249,7 @@ export default class ItemComparisonSection extends React.Component<any, any> {
         return position;
     }
 
-    formatWholeNumber(value: string|number|boolean) {
+    formatWholeNumber(value: string|number|boolean|object|[]) {
         if (typeof value === 'number') {
             return formatNumber(value);
         }

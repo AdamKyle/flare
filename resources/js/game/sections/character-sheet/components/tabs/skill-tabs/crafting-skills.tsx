@@ -3,6 +3,7 @@ import Table from "../../../../../components/ui/data-tables/table";
 import SkillType from "../../../../../lib/game/character-sheet/types/skills/skill-type";
 import CraftingSkillsProps from "../../../../../lib/game/character-sheet/types/skills/tables/crafting-skills-props";
 import SkillInformation from "../../modals/skills/skill-information";
+import InfoAlert from "../../../../../components/ui/alerts/simple-alerts/info-alert";
 
 export default class CraftingSkills extends React.Component<CraftingSkillsProps, any> {
 
@@ -50,6 +51,12 @@ export default class CraftingSkills extends React.Component<CraftingSkillsProps,
     render() {
         return(
             <Fragment>
+                <div className='mb-4'>
+                    <InfoAlert>
+                        This section will not update in real time.
+                    </InfoAlert>
+                </div>
+
                 <Table columns={this.buildColumns()} data={this.props.crafting_skills} dark_table={this.props.dark_table} />
 
                 {

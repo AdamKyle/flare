@@ -240,7 +240,7 @@
                     <span class="ra ra-round-bottom-flask"></span>
                     Alchemy (Usable items)
                 </a>
-                <a href="{{route('info.page', ['pageName' => 'random-enchants'])}}">
+                <a href="{{route('info.page', ['pageName' => 'random-enchantments'])}}">
                     <span class="ra ra-fairy-wand"></span>
                     Random Enchantments (Uniques)
                 </a>

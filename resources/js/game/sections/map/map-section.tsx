@@ -97,6 +97,8 @@ export default class MapSection extends React.Component<MapProps, MapState> {
 
         this.traverseUpdate.listen('Game.Maps.Events.UpdateMapBroadcast', (event: any) => {
             this.setStateFromData(event.mapDetails);
+
+            this.props.update_character_quests_plane(event.mapDetails.character_map.game_map.name)
         });
 
         this.globalMapUpdate.listen('Game.Kingdoms.Events.UpdateGlobalMap', (event: any) => {

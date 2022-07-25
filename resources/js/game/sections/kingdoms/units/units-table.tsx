@@ -50,7 +50,23 @@ export default class UnitsTable extends React.Component<UnitsTableProps, Upgrade
 
         const foundBuilding: BuildingDetails = building[0];
 
-        return foundBuilding.level < unit.required_building_level;
+        return foundBuilding.level < unit.required_building_level || foundBuilding.is_locked;
+    }
+
+    getOrderedUnits(units: UnitDetails[]|[]) {
+        const reOrderedUnits = [];
+
+        for (let i = 0; i < units.length; i++) {
+            const unit: UnitDetails = units[i];
+
+            if (this.cannotBeRecruited(unit)) {
+                reOrderedUnits.push(unit);
+            } else {
+                reOrderedUnits.unshift(unit);
+            }
+        }
+
+        return reOrderedUnits;
     }
 
     cancelUnitRecruitment(queueId: number | null) {
@@ -112,7 +128,7 @@ export default class UnitsTable extends React.Component<UnitsTableProps, Upgrade
                         </div>
                         : null
                 }
-                <Table data={this.props.units}
+                <Table data={this.getOrderedUnits(this.props.units)}
                        conditional_row_styles={this.createConditionalRowStyles()}
                        columns={BuildUnitsColumns(this.viewUnit.bind(this), this.cancelUnitRecruitment.bind(this), this.props.units_in_queue, this.props.current_units, this.props.buildings)}
                        dark_table={this.props.dark_tables}

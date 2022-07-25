@@ -2,6 +2,7 @@
 
 namespace App\Game\Shop\Controllers;
 
+use App\Flare\Jobs\CharacterAttackTypesCacheBuilder;
 use Cache;
 use Illuminate\Http\Request;
 use League\Fractal\Manager;
@@ -200,18 +201,8 @@ class ShopController extends Controller {
             ->setCharacter($character)
             ->replaceItem();
 
-        $this->updateCharacterAttackDataCache($character);
+        CharacterAttackTypesCacheBuilder::dispatch($character);
 
         return redirect()->to(route('game.shop.buy', ['character' => $character]))->with('success', 'Purchased and equipped: ' . $item->affix_name . '.');
-    }
-
-    protected function updateCharacterAttackDataCache(Character $character) {
-        $this->buildCharacterAttackTypes->buildCache($character);
-
-        $characterData = new ResourceItem($character->refresh(), $this->characterSheetBaseInfoTransformer);
-
-        $characterData = $this->manager->createData($characterData)->toArray();
-
-        event(new UpdateBaseCharacterInformation($character->user, $characterData));
     }
 }

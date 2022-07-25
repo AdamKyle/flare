@@ -239,7 +239,7 @@ class KingdomBuildingService {
             return false;
         }
 
-        $popNeeded = $building->base_population * $params['to_level'];
+        $popNeeded = $building->required_population * $params['to_level'];
         $popNeeded = $popNeeded - $popNeeded * $building->kingdom->fetchPopulationCostReduction();
 
         $newAmount =  $kingdom->current_population - $popNeeded;

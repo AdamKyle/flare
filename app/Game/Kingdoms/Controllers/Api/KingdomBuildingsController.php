@@ -81,7 +81,6 @@ class KingdomBuildingsController extends Controller
         if ($request->paying_with_gold) {
             $paid = $this->kingdomBuildingService->upgradeBuildingWithGold($building, $request->all());
 
-            dump('was Paid: ' . $paid);
             if (!$paid) {
                 return response()->json([
                     'message' => 'You cannot afford this upgrade.'

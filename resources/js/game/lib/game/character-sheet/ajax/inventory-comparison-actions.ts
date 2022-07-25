@@ -6,13 +6,13 @@ import ComparisonSection
 
 type EquipParams = { position?: string, slot_id: number, equip_type: string };
 
-type MoveItemParams = {move_to_set: number; slot_id: string | number | boolean | undefined};
+type MoveItemParams = {move_to_set: number; slot_id: string | number | boolean | object | []};
 
-type SellItem = {slot_id: string | number | boolean | undefined};
+type SellItem = {slot_id: string | number | boolean | object | []};
 
 type DestroyItem = SellItem;
 
-type ListItem = {list_for: number; slot_id: string | number | boolean | undefined};
+type ListItem = {list_for: number; slot_id: string | number | boolean | object | []};
 
 export default class InventoryComparisonActions {
 

@@ -67,6 +67,8 @@ class KingdomTransformer extends TransformerAbstract {
             'defence_bonus'             => $kingdom->fetchKingdomDefenceBonus(),
             'unit_time_reduction'       => $this->fetchTimeReductionBonus($kingdom, 'unit_time_reduction'),
             'building_time_reduction'   => $this->fetchTimeReductionBonus($kingdom, 'building_time_reduction'),
+            'is_protected'              => !is_null($kingdom->protected_until),
+            'protected_days_left'       => !is_null($kingdom->protected_until) ? now()->diffInDays($kingdom->protected_until) : 0,
         ];
     }
 

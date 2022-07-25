@@ -128,7 +128,7 @@ class InventorySetService {
                 $data = $this->setPositionEquipData($slot, $data, 'left-hand', 'right-hand');
             }
 
-            if ($slot->item->type === 'bow') {
+            if (in_array($slot->item->type, ['bow', 'hammer', 'stave'])) {
                 $data[$slot->id] = [
                     'item_id' => $slot->item->id,
                     'equipped' => true,
@@ -144,8 +144,8 @@ class InventorySetService {
                 $data = $this->setPositionEquipData($slot, $data, 'spell-one', 'spell-two');
             }
 
-            if ($slot->item->type === 'artifact') {
-                $data = $this->setPositionEquipData($slot, $data, 'artifact-one', 'artifact-two');
+            if ($slot->item->type === 'trinket') {
+                $data = $this->setPositionEquipData($slot, $data, 'trinket-one', 'trinket-two');
             }
 
             if (in_array($slot->item->default_position, $armourPositions)) {

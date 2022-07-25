@@ -9,4 +9,6 @@ export default interface CharacterInventoryTabsProps {
     is_automation_running: boolean;
 
     finished_loading: boolean;
+
+    update_disable_tabs?: () => void;
 }

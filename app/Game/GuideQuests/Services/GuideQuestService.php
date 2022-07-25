@@ -157,16 +157,10 @@ class GuideQuestService {
             }
         }
 
-        if (!is_null($quest->required_kingdoms)) {
-            if ($character->kingdoms->count() >= $quest->required_kingdoms) {
-                $attributes[] = 'required_kingdoms';
-            }
-        }
-
         if (!is_null($quest->required_kingdom_level)) {
             foreach ($character->kingdoms as $kingdom) {
                 if ($kingdom->buildings->sum('level') >= $quest->required_kingdom_level) {
-                    $attributes[] = 'required_kingdoms';
+                    $attributes[] = 'required_kingdom_level';
 
                     break;
                 }
@@ -176,7 +170,7 @@ class GuideQuestService {
         if (!is_null($quest->required_kingdom_units)) {
             foreach ($character->kingdoms as $kingdom) {
                 if ($kingdom->units->sum('amount') >= $quest->required_kingdom_units) {
-                    $attributes[] = 'required_kingdoms';
+                    $attributes[] = 'required_kingdom_units';
 
                     break;
                 }

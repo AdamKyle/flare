@@ -8,35 +8,36 @@ class ValidEquipPositionsValue {
 
     /**
      * Get positions for an item
-     * 
+     *
      * @param Item $item
      * @return array
      */
     public function getPositions(Item $item): array {
         if (!is_null($item->default_position)) {
-            return [];
+            if (!in_array($item->default_position, ['stave', 'bow', 'hammer'])) {
+                return [];
+            }
         }
 
         $positions = [];
 
         switch($item->type) {
             case 'weapon':
-                $positions = ['left-hand', 'right-hand'];
-                break;
+            case 'stave':
+            case 'bow':
+            case 'hammer':
             case 'shield':
                 $positions = ['left-hand', 'right-hand'];
                 break;
             case 'spell-damage':
-                $positions = ['spell-one', 'spell-two'];
-                break;
             case 'spell-healing':
                 $positions = ['spell-one', 'spell-two'];
                 break;
             case 'ring':
                 $positions = ['ring-one', 'ring-two'];
                 break;
-            case 'artifact':
-                $positions = ['artifact-one', 'artifact-two'];
+            case 'trinket':
+                $positions = ['trinket-one', 'trinket-two'];
                 break;
             default:
                 break;

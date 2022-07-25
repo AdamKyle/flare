@@ -29,4 +29,6 @@ export default interface GameState {
     celestial_id: number;
 
     position: {x: number, y: number, game_map_id?: number} | null,
+
+    disable_tabs: boolean;
 }

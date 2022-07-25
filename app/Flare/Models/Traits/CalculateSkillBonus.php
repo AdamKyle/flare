@@ -22,19 +22,16 @@ trait CalculateSkillBonus {
 
 
         if (!is_null($item->itemPrefix)) {
+
             if ($this->matchesSkillOnItem($item->itemPrefix, $skill)) {
                 $baseSkillTraining += !is_null($item->itemPrefix->{$skillAttribute}) ? $item->itemPrefix->{$skillAttribute} : 0;
-            } else if (!is_null($item->itemPrefix->{$skillAttribute})) {
-                $baseSkillTraining += $item->itemPrefix->{$skillAttribute};
             }
         }
 
         if (!is_null($item->itemSuffix)) {
+
             if ($this->matchesSkillOnItem($item->itemSuffix, $skill)) {
                 $baseSkillTraining += !is_null($item->itemSuffix->{$skillAttribute}) ? $item->itemSuffix->{$skillAttribute} : 0;
-            } else if (!is_null($item->itemSuffix->{$skillAttribute})) {
-
-                $baseSkillTraining += $item->itemSuffix->{$skillAttribute};
             }
         }
 

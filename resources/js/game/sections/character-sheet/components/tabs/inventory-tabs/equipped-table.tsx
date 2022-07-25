@@ -56,7 +56,7 @@ export default class EquippedTable extends React.Component<EquippedInventoryTabP
     }
 
     actions(row: InventoryDetails): JSX.Element {
-        return <DangerButton button_label={'Unequip'} on_click={() => this.unequip(row.slot_id)} disabled={this.props.is_dead || this.props.is_automation_running} />
+        return <DangerButton button_label={'Unequip'} on_click={() => this.unequip(row.slot_id)} disabled={this.props.is_dead || this.props.is_automation_running || this.state.loading} />
     }
 
     assignToSet(label: string) {
@@ -116,6 +116,8 @@ export default class EquippedTable extends React.Component<EquippedInventoryTabP
         this.setState({
             loading: true,
         }, () => {
+            this.props.disable_tabs();
+
             (new Ajax()).setRoute('character/'+this.props.character_id+'/inventory/unequip-all').setParameters({
                 is_set_equipped: this.props.is_set_equipped,
             }).doAjaxCall('post', (result: AxiosResponse) => {
@@ -124,6 +126,8 @@ export default class EquippedTable extends React.Component<EquippedInventoryTabP
                     success_message: result.data.message
                 }, () => {
                     this.props.update_inventory(result.data.inventory);
+
+                    this.props.disable_tabs();
                 });
             }, (error: AxiosError) => {
 
@@ -174,12 +178,12 @@ export default class EquippedTable extends React.Component<EquippedInventoryTabP
                             <input type='text' name='search' className='form-control' onChange={this.search.bind(this)} placeholder={'search'}/>
                         </div>
                         <div className='ml-2'>
-                            <DangerButton button_label={'Unequip All'} on_click={this.unequipAll.bind(this)} disabled={this.props.is_dead || this.state.data.length === 0 || this.props.is_automation_running} />
+                            <DangerButton button_label={'Unequip All'} on_click={this.unequipAll.bind(this)} disabled={this.props.is_dead || this.state.data.length === 0 || this.props.is_automation_running || this.state.loading} />
                         </div>
                         {
                             this.hasEmptySet() ?
                                 <div className='ml-2'>
-                                    <DropDown menu_items={this.buildMenuItems()} button_title={'Assign to Set'} disabled={this.props.is_dead || this.props.is_automation_running} />
+                                    <DropDown menu_items={this.buildMenuItems()} button_title={'Assign to Set'} disabled={this.props.is_dead || this.props.is_automation_running || this.state.loading} />
                                 </div>
                             : null
                         }
@@ -194,7 +198,7 @@ export default class EquippedTable extends React.Component<EquippedInventoryTabP
                     </div>
                     {
                         this.state.loading ?
-                            <LoadingProgressBar />
+                            <LoadingProgressBar show_label={true} label={'Unequipping items and recalculating your stats (this can take a few seconds) ...'} />
                         : null
                     }
                 </div>

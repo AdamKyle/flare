@@ -70,6 +70,7 @@ export default class Game extends React.Component<GameProps, GameState> {
             kingdoms: [],
             quests: null,
             position: null,
+            disable_tabs: false,
         }
 
         // @ts-ignore
@@ -178,6 +179,12 @@ export default class Game extends React.Component<GameProps, GameState> {
         });
     }
 
+    updateDisabledTabs() {
+        this.setState({
+            disable_tabs: !this.state.disable_tabs,
+        });
+    }
+
     updateCharacterStatus(characterStatus: any): void {
         this.setState({character_status: characterStatus});
     }
@@ -196,6 +203,18 @@ export default class Game extends React.Component<GameProps, GameState> {
         this.setState({
             quests: quests
         });
+    }
+
+    updateQuestPlane(plane: string) {
+        if (this.state.quests !== null) {
+            const quests: QuestType = JSON.parse(JSON.stringify(this.state.quests));
+
+            quests.player_plane = plane;
+
+            this.setState({
+                quests: quests
+            });
+        }
     }
 
     updateCelestial(celestialId: number | null) {
@@ -239,7 +258,7 @@ export default class Game extends React.Component<GameProps, GameState> {
 
                 <ScreenRefresh user_id={this.state.character.user_id} />
 
-                <Tabs tabs={this.tabs} disabled={!this.state.finished_loading}>
+                <Tabs tabs={this.tabs} disabled={!this.state.finished_loading || this.state.disable_tabs}>
                     <TabPanel key={'game'}>
                         <div className="grid lg:grid-cols-3 gap-3">
                             <div className="w-full col-span-3 lg:col-span-2">
@@ -287,6 +306,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                                     automation_completed_at={this.state.character.automation_completed_at}
                                     show_celestial_fight_button={this.updateCelestial.bind(this)}
                                     set_character_position={this.setCharacterPosition.bind(this)}
+                                    update_character_quests_plane={this.updateQuestPlane.bind(this)}
                                 />
                             </BasicCard>
                         </div>
@@ -296,6 +316,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                             character={this.state.character}
                             finished_loading={this.state.finished_loading}
                             view_port={this.state.view_port}
+                            update_disable_tabs={this.updateDisabledTabs.bind(this)}
                         />
                     </TabPanel>
                     <TabPanel key={'quests'}>

@@ -422,10 +422,10 @@ export default class Damage extends BattleBase {
 
         let totalAttack = Math.round(attacker.dur_modded + attacker.dur_modded * 0.15);
 
-        if (attackData.damage_reduction > 0.0) {
+        if (damageDeduction > 0.0) {
           this.addMessage('The Plane weakens your ability to do full damage!', 'enemy-action');
 
-          totalAttack -= totalAttack * attackData.damage_reduction;
+          totalAttack -= totalAttack * damageDeduction;
         }
 
         monsterCurrentHealth   = monsterCurrentHealth - totalAttack;

@@ -30,7 +30,7 @@ export const BuildUnitsColumns = (onClick: (units: UnitDetails) => void, cancelU
         },
         {
             name: 'Recruited From',
-            selector: (row: UnitDetails) => row.recruited_from.name,
+            selector: (row: UnitDetails) => row.recruited_from.building_name
         },
         {
             name: 'Amount',
@@ -82,7 +82,7 @@ const cannotBeRecruited = (unit: UnitDetails, buildings: BuildingDetails[] | [])
 
     const foundBuilding: BuildingDetails = building[0];
 
-    return foundBuilding.level < unit.required_building_level;
+    return foundBuilding.level < unit.required_building_level || foundBuilding.is_locked;
 }
 
 const findUnitInQueue = (unitId: number, unitsInQueue: UnitsInQueue[]|[])  => {

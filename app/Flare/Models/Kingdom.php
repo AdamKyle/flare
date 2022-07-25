@@ -47,6 +47,7 @@ class Kingdom extends Model implements Auditable
         'published',
         'npc_owned',
         'last_walked',
+        'protected_until',
         'updated_at'
     ];
 
@@ -76,6 +77,7 @@ class Kingdom extends Model implements Auditable
         'published'          => 'boolean',
         'npc_owned'          => 'boolean',
         'last_walked'        => 'datetime',
+        'protected_until'    => 'datetime',
     ];
 
     /**

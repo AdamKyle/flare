@@ -182,10 +182,54 @@ class ItemComparison {
         $result = $this->getAffixComparisons($toCompare, $foundPosition->item, $result);
 
         if (!empty($result)) {
-            $result['name'] = $foundPosition->item->affix_name;
+            $result['name']   = $foundPosition->item->affix_name;
+            $result['skills'] = $this->addSkillComparison($toCompare, $foundPosition->item, $result);
         }
 
         return $result;
+    }
+
+    /**
+     * Compares skills on attached affixes.
+     *
+     * @param Item $toCompare
+     * @param Item $equippedItem
+     * @param array $result
+     * @return array
+     */
+    protected function addSkillComparison(Item $toCompare, Item $equippedItem, array $result): array {
+        $toCompareSkills = $toCompare->getItemSkills();
+        $equippedItemSkills = $equippedItem->getItemSkills();
+
+        if (empty($toCompareSkills) && !empty($equippedItemSkills)) {
+
+            foreach ($equippedItemSkills as $index => $skill) {
+                $equippedItemSkills[$index]['skill_training_bonus'] = -$equippedItemSkills[$index]['skill_training_bonus'];
+                $equippedItemSkills[$index]['skill_bonus']          = -$equippedItemSkills[$index]['skill_bonus'];
+            }
+
+            return $equippedItemSkills;
+        }
+
+        if (!empty($toCompareSkills) && empty($equippedItemSkills)) {
+            return $toCompareSkills;
+        }
+
+        $comparison = [];
+
+        foreach ($toCompareSkills as $index => $skillDetails) {
+            if ($skillDetails['skill_name'] === $equippedItemSkills[$index]['skill_name']) {
+                $comparison[] = [
+                    'skill_name'           => $skillDetails['skill_name'],
+                    'skill_training_bonus' => $skillDetails['skill_training_bonus'] - $equippedItemSkills[$index]['skill_training_bonus'],
+                    'skill_bonus'          => $skillDetails['skill_bonus'] - $equippedItemSkills[$index]['skill_bonus'],
+                ];
+            } else {
+                $comparison[] = $skillDetails;
+            }
+        }
+
+        return $comparison;
     }
 
     /**

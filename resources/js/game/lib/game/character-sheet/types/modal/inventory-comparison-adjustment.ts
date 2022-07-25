@@ -1,6 +1,8 @@
+import ItemsAttachedSkills from "./items-attached-skills";
+
 export default interface InventoryComparisonAdjustment {
 
-    [index: string]: number|string|boolean;
+    [index: string]: number|string|boolean|object|[];
 
     id: number;
 
@@ -61,4 +63,6 @@ export default interface InventoryComparisonAdjustment {
     counter_resistance_adjustment: number;
 
     cost: number;
+
+    skills: ItemsAttachedSkills[] | [];
 }

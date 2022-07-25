@@ -176,7 +176,7 @@ class CharacterInformationBuilder {
      * @throws \Exception
      */
     public function buildTotalAttack(): int {
-        return $this->getTotalWeaponDamage() + $this->getTotalSpellDamage() + $this->getTotalRingDamage();
+        return $this->getTotalWeaponDamage() + $this->getTotalRingDamage();
     }
 
     /**
@@ -205,17 +205,6 @@ class CharacterInformationBuilder {
      */
     public function buildHealFor(bool $voided = false): int {
         return $this->character->getHeathInformation()->buildHealFor($voided);
-    }
-
-    /**
-     * Does the character have any artifacts?
-     *
-     * @return bool
-     */
-    public function hasArtifacts(): bool {
-        return $this->fetchInventory()->filter(function ($slot) {
-            return $slot->item->type === 'artifact' && $slot->equipped;
-        })->isNotEmpty();
     }
 
     /**

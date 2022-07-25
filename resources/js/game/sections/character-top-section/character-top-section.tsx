@@ -100,8 +100,8 @@ export default class CharacterTopSection extends React.Component<CharacterTopSec
 
                 <div className='grid lg:grid-cols-4'>
                     <span className={'mb-2 sm:mb-0'}><strong>Name</strong>: {this.props.character.name}</span>
-                    <span className={'mb-2 sm:mb-0'}><strong>Race</strong>: {this.props.character.race}</span>
-                    <span className={'mb-2 sm:mb-0'}><strong>Class</strong>: {this.props.character.class}</span>
+                    <span className={'mb-2 sm:mb-0'}><strong>Race</strong>: <a href={"/information/race/" + this.props.character.race_id} target='_blank'>{this.props.character.race}</a></span>
+                    <span className={'mb-2 sm:mb-0'}><strong>Class</strong>: <a href={"/information/class/" + this.props.character.class_id} target='_blank'>{this.props.character.class}</a></span>
                     <span className={'mb-2 sm:mb-0'}><strong>Gold</strong>: {this.props.character.gold}</span>
                 </div>
                 <div className='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 hidden sm:block'></div>

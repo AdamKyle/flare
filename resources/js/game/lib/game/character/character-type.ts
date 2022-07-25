@@ -166,4 +166,25 @@ export interface CharacterType {
     can_move_again_at: number;
 
     can_access_queen: boolean;
+
+    race_id: number;
+
+    class_id: number;
+
+    weapon_attack: number;
+
+    voided_weapon_attack: number;
+
+    ring_damage: number;
+
+    voided_ring_damage: number;
+
+    spell_damage: number;
+
+    voided_spell_damage: number;
+
+    healing_amount: number;
+
+    voided_healing_amount: number;
+
 }

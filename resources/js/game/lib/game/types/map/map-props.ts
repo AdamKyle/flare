@@ -22,4 +22,6 @@ export default interface MapProps {
     show_celestial_fight_button: (id: number | null) => void;
 
     set_character_position: (position: {x: number, y: number, game_map_id?: number}) => void;
+
+    update_character_quests_plane: (plane: string) => void;
 }

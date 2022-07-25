@@ -390,18 +390,9 @@ class CharacterInventoryService {
      */
     public function setInventory(string $type): CharacterInventoryService {
 
+        $useArray = !in_array($type, ['body','shield','leggings','feet','sleeves','helmet','gloves']);
 
-        if (in_array($type, ['weapon', 'bow', 'stave', 'hammer']) && empty($this->position)) {
-            $this->positions = ['right-hand', 'left-hand'];
-        }
-
-        if (empty($this->positions)) {
-            $this->inventory =  $this->getInventory($type);
-
-            return $this;
-        }
-
-        $this->inventory = $this->getInventory($type, true);
+        $this->inventory = $this->getInventory($type, $useArray);
 
         return $this;
     }
@@ -417,7 +408,6 @@ class CharacterInventoryService {
 
         if ($inventory->isEmpty()) {
             $equippedSet = $this->character->inventorySets()->where('is_equipped', true)->first();
-
             if (!is_null($equippedSet)) {
                 $inventory = $equippedSet->slots->filter(function($slot) use($type, $useArray) {
                     if ($useArray) {

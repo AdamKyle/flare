@@ -143,13 +143,9 @@ class WeaponType extends BattleBase {
             return;
         }
 
-        dump('Before Secondary Attack: ' . $this->monsterHealth);
-
         if ($this->allowSecondaryAttacks) {
             $this->secondaryAttack($character, $monster);
         }
-
-        dump('After Secondary Attack: ' . $this->monsterHealth);
     }
 
     public function pvpWeaponDamage(Character $attacker, Character $defender, int $weaponDamage) {

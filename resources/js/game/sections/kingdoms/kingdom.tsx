@@ -8,6 +8,7 @@ import UnitDetails from "../../lib/game/kingdoms/unit-details";
 import UnitsInQueue from "../../lib/game/kingdoms/units-in-queue";
 import KingdomTabs from "./tabs/kingdom-tabs";
 import InformationSection from "./information-section";
+import InfoAlert from "../../components/ui/alerts/simple-alerts/info-alert";
 
 export default class Kingdom extends React.Component<KingdomProps, any> {
 
@@ -73,6 +74,13 @@ export default class Kingdom extends React.Component<KingdomProps, any> {
     render() {
         return (
             <Fragment>
+                {
+                    this.props.kingdom.is_protected ?
+                        <InfoAlert additional_css={'mt-4 mb-4'}>
+                            Your kingdom is under protection from attacks for the next: {this.props.kingdom.protected_days_left} day(s).
+                        </InfoAlert>
+                    : null
+                }
                 <div className='grid md:grid-cols-2 gap-4'>
                     <BasicCard additionalClasses={'max-h-[600px]'}>
                         <div className='text-right cursor-pointer text-red-500'>

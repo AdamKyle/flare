@@ -73,28 +73,12 @@ class ServiceProvider extends ApplicationServiceProvider
             return new ItemComparison();
         });
 
-        $this->app->bind(AdventureRewardService::class, function($app) {
-            return new AdventureRewardService(
-                $app->make(CharacterService::class),
-                $app->make(CharacterRewardService::class),
-                $app->make(BuildCharacterAttackTypes::class),
-                $app->make(CharacterXPService::class),
-                $app->make(InventorySetService::class),
-                $app->make(RandomAffixGenerator::class),
-                $app->make(DisenchantService::class),
-            );
-        });
-
         $this->app->bind(CharacterInventoryService::class, function($app) {
             return new CharacterInventoryService(
                 $app->make(InventoryTransformer::class),
                 $app->make(UsableItemTransformer::class),
                 $app->make(Manager::class)
             );
-        });
-
-        $this->app->bind(ShopService::class, function($app) {
-            return new ShopService();
         });
 
         $this->app->bind(UseItemService::class, function($app) {

@@ -8,6 +8,7 @@ import TimeHelpModal from "../modals/time-help-modal";
 import UpgradeWithGold from "./upgrade-with-gold";
 import UpgradeWithResources from "./upgrade-with-resources";
 import BuildingTimeCalculation from "../../../lib/game/kingdoms/calculations/building-time-calculation";
+import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
 
 export default class BuildingInformation extends React.Component<BuildingInformationProps, any> {
 
@@ -97,10 +98,10 @@ export default class BuildingInformation extends React.Component<BuildingInforma
                     </div>
                     {
                         this.props.building.is_locked ?
-                            <InfoAlert>
+                            <DangerAlert>
                                 You must train the appropriate Kingdom Passive skill to unlock this building.
                                 The skill name is the same as this building name.
-                            </InfoAlert>
+                            </DangerAlert>
                         : null
                     }
                     <div className={'grid md:grid-cols-2 gap-4 mb-4 mt-4'}>
@@ -151,7 +152,7 @@ export default class BuildingInformation extends React.Component<BuildingInforma
                                                 this.state.upgrade_section !== null ?
                                                     this.renderSelectedSection()
                                                 :
-                                                    !this.props.is_in_queue ?
+                                                    !this.props.is_in_queue && !this.props.building.is_locked ?
                                                         <Select
                                                             onChange={this.showSelectedForm.bind(this)}
                                                             options={[

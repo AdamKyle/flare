@@ -124,9 +124,10 @@ export default class GuideQuest extends React.Component<any, any> {
                                     { this.state.quest_data.faction_name !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get Faction: {this.state.quest_data.faction_name} to level: {this.state.quest_data.required_faction_level}</li> : null }
                                     { this.state.quest_data.required_game_map_id !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get Access to: {this.state.quest_data.game_map_name}</li> : null }
                                     { this.state.quest_data.required_quest_item_id !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get Quest Item: {this.state.quest_data.quest_item_name}</li> : null }
-                                    { this.state.quest_data.kingdoms !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Required Kingdom #: {this.state.quest_data.required_kingdoms}</li> : null }
+                                    { this.state.quest_data.required_kingdoms !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Required Kingdom #: {this.state.quest_data.required_kingdoms}</li> : null }
                                     { this.state.quest_data.required_kingdom_level !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Required Buildings Level (Combined): {this.state.quest_data.required_kingdom_level}</li> : null }
                                     { this.state.quest_data.required_kingdom_units !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Required Units Amount (Combined): {this.state.quest_data.required_kingdom_units}</li> : null }
+                                    { this.state.quest_data.passive_name !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get Passive Skill: {this.state.quest_data.passive_name} to level: {this.state.quest_data.required_passive_skill}</li> : null }
                                 </ul>
                             </div>
 

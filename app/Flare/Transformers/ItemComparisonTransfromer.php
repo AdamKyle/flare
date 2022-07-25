@@ -74,6 +74,7 @@ class ItemComparisonTransfromer extends TransformerAbstract {
             'entranced_chance'                 => $item->getAffixAttribute('entranced_chance'),
             'damage'                           => $item->getAffixAttribute('damage'),
             'class_bonus'                      => $item->getAffixAttribute('class_bonus'),
+            'skills'                           => $item->getItemSkills(),
         ];
     }
 }

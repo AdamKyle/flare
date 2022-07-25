@@ -7,6 +7,7 @@ use App\Flare\Builders\Character\AttackDetails\CharacterTrinketsInformation;
 use App\Flare\Builders\Character\ClassDetails\HolyStacks;
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Models\GameSkill;
+use App\Flare\Models\Skill;
 use App\Flare\Values\ClassAttackValue;
 use App\Flare\Models\Character;
 
@@ -24,6 +25,11 @@ class CharacterAttackTransformer extends BaseTransformer {
         $characterHealthInformation   = resolve(CharacterHealthInformation::class)->setCharacter($character);
         $holyStacks                   = resolve(HolyStacks::class);
         $characterTrinketsInformation = resolve(CharacterTrinketsInformation::class);
+
+        $accuracySkill                = Skill::where('game_skill_id', GameSkill::where('name', 'Accuracy')->first()->id)->where('character_id', $character->id)->first();
+        $castingAccuracySkill         = Skill::where('game_skill_id', GameSkill::where('name', 'Casting Accuracy')->first()->id)->where('character_id', $character->id)->first();
+        $dodgeSkill                   = Skill::where('game_skill_id', GameSkill::where('name', 'Dodge')->first()->id)->where('character_id', $character->id)->first();
+        $criticalitySkill             = Skill::where('game_skill_id', GameSkill::where('name', 'Criticality')->first()->id)->where('character_id', $character->id)->first();
 
         return [
             'inventory_max'               => $character->inventory_max,
@@ -46,6 +52,13 @@ class CharacterAttackTransformer extends BaseTransformer {
             'agi_modded'                  => round($characterInformation->statMod('agi')),
             'focus_modded'                => round($characterInformation->statMod('focus')),
             'weapon_attack'               => round($characterInformation->getTotalWeaponDamage()),
+            'voided_weapon_attack'        => round($characterInformation->getTotalWeaponDamage(false)),
+            'ring_damage'                 => round($characterInformation->getTotalRingDamage()),
+            'voided_ring_damage'          => round($characterInformation->getTotalRingDamage(true)),
+            'spell_damage'                => round($characterInformation->getTotalSpellDamage()),
+            'voided_spell_damage'         => round($characterInformation->getTotalSpellDamage(true)),
+            'healing_amount'              => round($characterInformation->buildHealFor()),
+            'voided_healing_amount'       => round($characterInformation->buildHealFor(true)),
             'devouring_light'             => round($characterInformation->getDevouringLight()),
             'devouring_darkness'          => round($characterInformation->getDevouringDarkness()),
             'extra_action_chance'         => (new ClassAttackValue($character))->buildAttackData(),
@@ -60,7 +73,12 @@ class CharacterAttackTransformer extends BaseTransformer {
             'ambush_resistance_chance'    => $characterTrinketsInformation->getAmbushResistanceChance($character),
             'counter_chance'              => $characterTrinketsInformation->getCounterChance($character),
             'counter_resistance_chance'   => $characterTrinketsInformation->getCounterResistanceChance($character),
-            'skills'                      => $character->skills()->whereIn('game_skill_id', GameSkill::whereIn('name', ['Accuracy', 'Dodge', 'Casting Accuracy', 'Criticality'])->pluck('id')->toArray())->get(),
+            'skills'                      => [
+                'accuracy'         => $accuracySkill->skill_bonus,
+                'casting_accuracy' => $castingAccuracySkill->skill_bonus,
+                'dodge'            => $dodgeSkill->skill_bonus,
+                'criticality'      => $criticalitySkill->skill_bonus,
+            ],
             'devouring_light_res'         => $holyStacks->fetchDevouringResistanceBonus($character),
             'devouring_darkness_res'      => $holyStacks->fetchDevouringResistanceBonus($character),
             'ambush_resistance'           => $characterTrinketsInformation->getAmbushResistanceChance($character),

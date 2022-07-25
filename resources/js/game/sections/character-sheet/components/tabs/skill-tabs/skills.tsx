@@ -10,6 +10,7 @@ import TrainSkill from "../../modals/skills/train-skill";
 import {AxiosError, AxiosResponse} from "axios";
 import Ajax from "../../../../../lib/ajax/ajax";
 import WarningAlert from "../../../../../components/ui/alerts/simple-alerts/warning-alert";
+import InfoAlert from "../../../../../components/ui/alerts/simple-alerts/info-alert";
 
 export default class Skills extends React.Component<SkillsProps, any> {
 
@@ -128,6 +129,12 @@ export default class Skills extends React.Component<SkillsProps, any> {
                         </div>
                         : null
                 }
+
+                <div className='mb-4'>
+                    <InfoAlert>
+                        This section will not update in real time.
+                    </InfoAlert>
+                </div>
 
                 <Table columns={this.buildColumns()} data={this.props.trainable_skills} dark_table={this.props.dark_table} />
 

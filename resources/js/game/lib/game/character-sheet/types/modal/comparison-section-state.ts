@@ -16,4 +16,8 @@ export default interface ComparisonSectionState {
     item_to_show: InventoryComparisonAdjustment|null;
 
     error_message: string|null;
+
+    show_loading_label: boolean;
+
+    loading_label: string|null;
 }

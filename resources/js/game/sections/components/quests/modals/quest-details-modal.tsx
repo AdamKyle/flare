@@ -257,6 +257,14 @@ export default class QuestDetailsModal extends React.Component<any, any> {
         return npcPlaneAccess
     }
 
+    getText(text: string|null): string {
+        if (text === null) {
+            return '';
+        }
+
+        return text.replace(/\n/g, "<br/>")
+    }
+
     render() {
         const npcPLaneAccess = this.fetchNpcPlaneAccess();
 
@@ -295,14 +303,6 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                                                 <dt>Must be at same location?</dt>
                                                 <dd>{this.state.quest_details.npc.must_be_at_same_location ? 'Yes' : 'No'}</dd>
                                             </dl>
-                                            <div className='my-4 max-h-[160px] overflow-x-scroll border border-slate-200 dark:border-slate-700 rounded-md bg-slate-200 dark:bg-slate-700 p-4'>
-                                                {
-                                                    this.props.is_quest_complete ?
-                                                        <div dangerouslySetInnerHTML={{__html: this.state.quest_details.after_completion_description.replace(/\n/g, "<br/>")}}></div>
-                                                   :
-                                                        <div dangerouslySetInnerHTML={{__html: this.state.quest_details.before_completion_description.replace(/\n/g, "<br/>")}}></div>
-                                                }
-                                            </div>
                                         </div>
                                         {
                                             npcPLaneAccess !== null ?
@@ -315,6 +315,14 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                                             : null
                                         }
 
+                                    </div>
+                                    <div className='my-4 max-h-[160px] overflow-x-scroll border border-slate-200 dark:border-slate-700 rounded-md bg-slate-200 dark:bg-slate-700 p-4'>
+                                        {
+                                            this.props.is_quest_complete ?
+                                                <div dangerouslySetInnerHTML={{__html: this.getText(this.state.quest_details.after_completion_description)}}></div>
+                                                :
+                                                <div dangerouslySetInnerHTML={{__html: this.getText(this.state.quest_details.before_completion_description)}}></div>
+                                        }
                                     </div>
                                 </TabPanel>
                                 <TabPanel key={'required-to-complete'}>

@@ -14,6 +14,14 @@ export default class Ajax implements AjaxInterface {
             this.getRequest(this.route, this.params).then((result: AxiosResponse) => {
                 return successCallBack(result);
             }).catch((error: AxiosError) => {
+                if (typeof error.response !== 'undefined') {
+                    const response = error.response;
+
+                    if (response.status === 401) {
+                        window.location.reload();
+                    }
+                }
+
                 return errorCallBack(error);
             });
         }
@@ -22,6 +30,14 @@ export default class Ajax implements AjaxInterface {
             this.postRequest(this.route, this.params).then((result: AxiosResponse) => {
                 return successCallBack(result);
             }).catch((error: AxiosError) => {
+                if (typeof error.response !== 'undefined') {
+                    const response = error.response;
+
+                    if (response.status === 401) {
+                        window.location.reload();
+                    }
+                }
+
                 return errorCallBack(error);
             });
         }

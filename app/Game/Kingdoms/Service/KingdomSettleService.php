@@ -3,6 +3,7 @@
 namespace App\Game\Kingdoms\Service;
 
 use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
+use App\Game\Messages\Events\ServerMessageEvent;
 use Cache;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameBuilding;
@@ -157,6 +158,12 @@ class KingdomSettleService {
         $kingdom = $this->assignKingdomBuildings($kingdom);
 
         $this->addKingdomToCache($character, $kingdom);
+
+        $character = $character->refresh();
+
+        if ($character->kingdoms()->count() === 1) {
+            event(new ServerMessageEvent($character->user, 'Your kingdom is under protection for 7 days.'));
+        }
 
         return $kingdom;
     }

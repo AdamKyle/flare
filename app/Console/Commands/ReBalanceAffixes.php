@@ -237,7 +237,7 @@ class ReBalanceAffixes extends Command
     public function reBalanceDamage() {
         $affixes = ItemAffix::where('randomly_generated', false)->orderBy('skill_level_required', 'asc')->get();
 
-        $min = 100;
+        $min = 1;
         $max = 50000;
 
         $increments = round($max / $affixes->count());

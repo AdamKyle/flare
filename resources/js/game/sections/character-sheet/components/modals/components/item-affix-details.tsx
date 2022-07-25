@@ -134,10 +134,10 @@ export default class ItemAffixDetails extends React.Component<any, any> {
                             </dl>
 
                             <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                            <h4 className='text-sky-600 dark:text-sky-500'>Life Stealing</h4>
+                            <h4 className='text-sky-600 dark:text-sky-500'>Entrance</h4>
                             <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                             <dl>
-                                <dt>Entrancing Chance:</dt>
+                                <dt>Chance:</dt>
                                 <dd>{(this.props.affix.entranced_chance * 100).toFixed(2)}%</dd>
                             </dl>
 

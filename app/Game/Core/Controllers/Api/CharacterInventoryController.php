@@ -2,7 +2,9 @@
 
 namespace App\Game\Core\Controllers\Api;
 
+use App\Flare\Handlers\UpdateCharacterAttackTypes;
 use App\Flare\Models\SetSlot;
+use Exception;
 use League\Fractal\Resource\Item as FractalItem;
 use App\Flare\Events\UpdateCharacterAttackEvent;
 use App\Flare\Jobs\CharacterAttackTypesCacheBuilder;
@@ -38,7 +40,7 @@ class  CharacterInventoryController extends Controller {
 
     private $characterTransformer;
 
-    private $buildCharacterAttackTypes;
+    private $updateCharacterAttackTypes;
 
     private $enchantingService;
 
@@ -46,15 +48,15 @@ class  CharacterInventoryController extends Controller {
 
     public function __construct(CharacterInventoryService $characterInventoryService,
                                 CharacterSheetBaseInfoTransformer $characterTransformer,
-                                BuildCharacterAttackTypes $buildCharacterAttackTypes,
+                                UpdateCharacterAttackTypes $updateCharacterAttackTypes,
                                 EnchantingService $enchantingService,
                                 Manager $manager) {
 
-        $this->characterInventoryService = $characterInventoryService;
-        $this->characterTransformer      = $characterTransformer;
-        $this->buildCharacterAttackTypes = $buildCharacterAttackTypes;
-        $this->enchantingService         = $enchantingService;
-        $this->manager                   = $manager;
+        $this->characterInventoryService  = $characterInventoryService;
+        $this->characterTransformer       = $characterTransformer;
+        $this->updateCharacterAttackTypes = $updateCharacterAttackTypes;
+        $this->enchantingService          = $enchantingService;
+        $this->manager                    = $manager;
     }
 
     public function inventory(Character $character) {
@@ -487,7 +489,7 @@ class  CharacterInventoryController extends Controller {
         $characterInventoryService = $this->characterInventoryService->setCharacter($character);
 
         $inventoryName = 'Set ' . $setIndex + 1;
-        $set = InventorySet::where('is_equipped', true)->first();
+        $set = $inventorySet->refresh();
 
         if (!is_null($set->name)) {
             $inventoryName = $set->name;
@@ -592,11 +594,9 @@ class  CharacterInventoryController extends Controller {
      *
      * @param Character $character
      * @return void
+     * @throws Exception
      */
-    protected function updateCharacterAttackDataCache(Character $character) {
-
-        CharacterAttackTypesCacheBuilder::dispatch($character);
-
-        event(new UpdateCharacterAttackEvent($character));
+    protected function updateCharacterAttackDataCache(Character $character): void {
+        $this->updateCharacterAttackTypes->updateCache($character);
     }
 }

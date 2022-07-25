@@ -40,11 +40,11 @@ class SecondaryAttacks extends BattleBase {
             }
 
             $this->affixLifeStealingDamage($character, $monster, $affixReduction, $isPvp);
-            dump('After Life Stealing: ' . $this->monsterHealth);
+
             $this->affixDamage($character, $monster, $affixReduction, $isPvp);
-            dump('After Affix Damage: ' . $this->monsterHealth);
+
             $this->ringDamage($isPvp);
-            dump('After Ring Damage: ' . $this->monsterHealth);
+
         } else {
             if ($isPvp) {
                 $this->addAttackerMessage('You are voided, none of your rings or enchantments fire ...', 'enemy-action');
