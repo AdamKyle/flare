@@ -157,7 +157,7 @@ class KingdomSettleService {
 
         $kingdom = $this->assignKingdomBuildings($kingdom);
 
-        $this->addKingdomToCache($character, $kingdom);
+        $this->addKingdomToCache($character, $kingdom->refresh());
 
         $character = $character->refresh();
 
@@ -166,6 +166,55 @@ class KingdomSettleService {
         }
 
         return $kingdom;
+    }
+
+    /**
+     * Purchase a kingdom from the NPC.
+     *
+     * @param Character $character
+     * @param int $kingdomId
+     * @param string $name
+     * @return Kingdom|null
+     */
+    public function purchaseKingdom(Character $character, int $kingdomId, string $name): ?Kingdom {
+        $kingdom = Kingdom::where('id', $kingdomId)->where('npc_owned', true)->first();
+
+        if (is_null($kingdom)) {
+            return null;
+        }
+
+        $underProtection = false;
+
+        if ($character->kingdoms()->count() === 0) {
+            $underProtection = true;
+        }
+
+        $params = [
+            'character_id'    => $character->id,
+            'npc_owned'       => false,
+            'protected_until' => $underProtection ? now()->addDays(7) : null,
+            'last_walked'     => now(),
+        ];
+
+        if ($kingdom->name !== $name) {
+            $params['name'] = $name;
+        }
+
+        $kingdom->update($params);
+
+        $this->addKingdomToCache($character, $kingdom->refresh());
+
+        if ($underProtection) {
+            event(new ServerMessageEvent($character->user, 'Your kingdom is under protection for 7 days.'));
+        }
+
+        event(new ServerMessageEvent($character->user, 'Kingdom Purchased.'));
+
+        event(new ServerMessageEvent($character->user, 'The Old Man smiles at you. "Thank you child! This kingdom is all yours now."'));
+
+        event(new UpdateGlobalMap($character));
+
+        return $kingdom->refresh();
     }
 
     /**
@@ -242,33 +291,7 @@ class KingdomSettleService {
     public function addKingdomToMap(Character $character): array {
         event(new AddKingdomToMap($character));
 
-        broadcast(new UpdateGlobalMap($character));
-
-        $count = $character->refresh()->kingdoms()->count();
-
-        if ($count === 100) {
-            // @codeCoverageIgnoreStart
-            $message = $character->name . ' Has settled their 100th kingdom. They are becoming unstoppable!';
-
-            broadcast(new GlobalMessageEvent($message));
-            // @codeCoverageIgnoreEnd
-        }
-
-        if ($count === 500) {
-            // @codeCoverageIgnoreStart
-            $message = $character->name . ' Has settled their 500th kingdom. The lands choke under their grip.';
-
-            broadcast(new GlobalMessageEvent($message));
-            // @codeCoverageIgnoreEnd
-        }
-
-        if ($count === 1000) {
-            // @codeCoverageIgnoreStart
-            $message = $character->name . ' Has settled their 1000th kingdom. Even The Creator trembles in fear.';
-
-            broadcast(new GlobalMessageEvent($message));
-            // @codeCoverageIgnoreEnd
-        }
+        event(new UpdateGlobalMap($character));
 
         $this->updateKingdomHandler->refreshPlayersKingdoms($character->refresh());
 

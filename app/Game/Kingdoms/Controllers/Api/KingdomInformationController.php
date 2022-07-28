@@ -58,7 +58,7 @@ class KingdomInformationController extends Controller{
      * @return JsonResponse
      */
     public function getCharacterInfoForKingdom(Kingdom $kingdom, Character $character): JsonResponse {
-        $kingdom = Kingdom::where('character_id', $character->id)->where('id', $kingdom->id)->first();
+        $kingdom = Kingdom::where('id', $kingdom->id)->first();
 
         if (is_null($kingdom)) {
             return response()->json(['message' => 'Kingdom not found.'], 422);

@@ -44,7 +44,7 @@ export default class CelestialFight extends React.Component<any, any> {
                 loading: false,
             })
         }, (error: AxiosError) => {
-            console.log(error);
+            console.error(error);;
         });
 
         this.celestialFight.listen('Game.Battle.Events.UpdateCelestialFight', (event: any) => {
@@ -77,7 +77,7 @@ export default class CelestialFight extends React.Component<any, any> {
                         monster_health: result.data.health.monster_health,
                     })
                 }, (error: AxiosError) => {
-                    console.log(error);
+                    console.error(error);;
                 });
         });
 
@@ -97,7 +97,7 @@ export default class CelestialFight extends React.Component<any, any> {
                                 preforming_action: false,
                             })
                         }, (error: AxiosError) => {
-                            console.log(error);
+                            console.error(error);;
                         });
         });
     }

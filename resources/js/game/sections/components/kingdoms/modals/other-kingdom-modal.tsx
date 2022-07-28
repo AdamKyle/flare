@@ -12,6 +12,7 @@ import OtherKingdomModalProps from "../../../../lib/game/types/map/kingdom-pins/
 import KingdomDetails from "../../../../lib/game/map/types/kingdom-details";
 import KingdomHelpModal from "./kingdom-help-modal";
 import PrimaryButton from "../../../../components/ui/buttons/primary-button";
+import PurchaseNpcKingdom from "../../actions/modals/purchase-npc-kingdom";
 
 export default class OtherKingdomModal extends React.Component<OtherKingdomModalProps, KingdomModalState> {
 
@@ -29,6 +30,7 @@ export default class OtherKingdomModal extends React.Component<OtherKingdomModal
             kingdom_details: null,
             show_help: false,
             help_type: '',
+            show_purchase_modal: false,
         }
     }
 
@@ -43,7 +45,7 @@ export default class OtherKingdomModal extends React.Component<OtherKingdomModal
             this.setState(state);
 
         }, (error: AxiosError) => {
-            console.log(error);
+            console.error(error);
         });
     }
 
@@ -51,8 +53,16 @@ export default class OtherKingdomModal extends React.Component<OtherKingdomModal
         console.log(kingdom);
     }
 
-    purchaseKingdom() {
-        console.log(this.state.kingdom_details);
+    managePurchaseKingdom(closeParentModel: boolean) {
+        console.log('should be here');
+        this.setState({
+            show_purchase_modal: !this.state.show_purchase_modal,
+        }, () => {
+            console.log('close the parent:', closeParentModel);
+            if (closeParentModel) {
+                this.props.handle_close();
+            }
+        });
     }
 
     handleTeleport() {
@@ -81,6 +91,8 @@ export default class OtherKingdomModal extends React.Component<OtherKingdomModal
                 title = 'NPC Owned';
             } else if (this.props.is_enemy_kingdom) {
                 title = 'Enemy';
+            } else {
+                title = 'Yours';
             }
 
             return kingdomDetails.name + ' ['+ title +'] (X/Y): ' + kingdomDetails.x_position + '/' + kingdomDetails.y_position;
@@ -88,8 +100,6 @@ export default class OtherKingdomModal extends React.Component<OtherKingdomModal
 
         return 'Error: Could not build title.';
     }
-
-
 
     manageHelpDialogue(type: 'wall_defence' | 'treas_defence' | 'gb_defence' | 'passive_defence' | 'total_defence' | 'teleport_details') {
         this.setState({
@@ -109,7 +119,7 @@ export default class OtherKingdomModal extends React.Component<OtherKingdomModal
                           handle_action: this.handleTeleport.bind(this),
                       }}
                       tertiary_actions={{
-                          tertiary_button_disabled: this.props.is_automation_running || this.props.is_dead,
+                          tertiary_button_disabled: this.props.is_automation_running || this.props.is_dead || !this.props.is_enemy_kingdom,
                           tertiary_button_label: 'Attack Kingdom',
                           handle_action: () => this.attackKingdom(this.state.kingdom_details),
                       }}
@@ -199,7 +209,15 @@ export default class OtherKingdomModal extends React.Component<OtherKingdomModal
                                             <dt>Gold Bars:</dt>
                                             <dd>{formatNumber(this.state.kingdom_details?.gold_bars)}</dd>
                                         </dl>
-                                        <PrimaryButton button_label={'Purchase NPC Kingdom'} on_click={this.purchaseKingdom.bind(this)} additional_css={'mt-4'} />
+                                        {
+                                            this.state.kingdom_details?.npc_owned ?
+                                                <PrimaryButton button_label={'Purchase NPC Kingdom'}
+                                                               on_click={() => this.managePurchaseKingdom(false)}
+                                                               additional_css={'mt-4'}
+                                                               disabled={this.props.is_automation_running || this.props.is_dead}
+                                                />
+                                            : null
+                                        }
                                     </div>
                                 </div>
                                 {
@@ -249,6 +267,19 @@ export default class OtherKingdomModal extends React.Component<OtherKingdomModal
                             {
                                 this.state.show_help ?
                                     <KingdomHelpModal manage_modal={this.manageHelpDialogue.bind(this)} type={this.state.help_type}/>
+                                : null
+                            }
+
+                            {
+                                this.state.show_purchase_modal && this.state.kingdom_details !== null ?
+                                    <PurchaseNpcKingdom
+                                        is_open={this.state.show_purchase_modal}
+                                        handle_close={this.managePurchaseKingdom.bind(this)}
+                                        character_id={this.props.character_id}
+                                        map_id={this.state.kingdom_details.game_map_id}
+                                        kingdom_id={this.state.kingdom_details.id}
+                                        kingdom_name={this.state.kingdom_details.name}
+                                    />
                                 : null
                             }
                         </Fragment>

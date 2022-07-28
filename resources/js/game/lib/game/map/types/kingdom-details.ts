@@ -17,6 +17,8 @@ export default interface KingdomDetails {
 
     gold_bars_defence: number;
 
+    game_map_id: number;
+
     id: number;
 
     max_clay: number;

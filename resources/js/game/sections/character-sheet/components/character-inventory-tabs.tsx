@@ -59,7 +59,7 @@ export default class CharacterInventoryTabs extends React.Component<CharacterInv
                     inventory: result.data,
                 });
             }, (error: AxiosError) => {
-                console.log(error);
+                console.error(error);;
             })
         }
 

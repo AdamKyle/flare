@@ -260,6 +260,7 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
     }
 
     closeViewLocation() {
+        console.log('called');
         this.setState({
             show_location_details: false,
         });
@@ -387,6 +388,9 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                                                    can_move={this.props.can_player_move}
                                                    is_automation_running={this.props.is_automation_running}
                                                    is_dead={this.props.is_dead}
+                                                   character_position={this.props.character_position}
+                                                   currencies={this.props.currencies}
+                                                   teleport_player={this.props.teleport_player}
                          />
                      : null
                 }

@@ -176,7 +176,7 @@ export default class FightSection extends React.Component<FightSectionProps, any
             }).doAjaxCall('post', (result: AxiosResponse) => {
                 // this.props.set_attack_time_out(result.data.time_out);
             }, (error: AxiosError) => {
-                console.log(error);
+                console.error(error);;
             });
         }
     }

@@ -34,7 +34,7 @@ export default class CharacterActiveBoons extends React.Component<any, any> {
                     boons: result.data.active_boons,
                 });
             }, (error: AxiosError) => {
-                console.log(error);
+                console.error(error);;
             })
         }
     }

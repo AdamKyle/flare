@@ -29,7 +29,7 @@ export default class CharacterFactions extends React.Component<any, any> {
                     factions: result.data.factions,
                 });
             }, (error: AxiosError) => {
-                console.log(error);
+                console.error(error);;
             })
         }
     }

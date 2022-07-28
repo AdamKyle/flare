@@ -86,6 +86,7 @@ export default class KingdomModal extends React.Component<KingdomModalProps, Kin
                           secondary_button_label: 'Teleport',
                           handle_action: this.handleTeleport.bind(this),
                       }}
+                      large_modal={true}
             >
                 {
                     this.state.loading ?
@@ -120,8 +121,8 @@ export default class KingdomModal extends React.Component<KingdomModalProps, Kin
                                     </div>
                                 </div>
                                 <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                                <div className='lg:grid lg:grid-cols-3'>
-                                    <div className='lg:col-start-1 lg:col-span-3 lg:col-span-2'>
+                                <div className='lg:grid lg:grid-cols-2'>
+                                    <div>
                                         <dl>
                                             <dt>
                                                 <div className='flex items-center mb-4'>
@@ -202,7 +203,7 @@ export default class KingdomModal extends React.Component<KingdomModalProps, Kin
                                         </dl>
                                         <div className='border-b-2 block border-b-gray-300 dark:border-b-gray-600 my-3 md:hidden'></div>
                                     </div>
-                                    <div className='lg:col-start-3 lg:col-end-3'>
+                                    <div>
                                         <dl>
                                             <dt>Treasure:</dt>
                                             <dd>{formatNumber(this.state.kingdom_details?.treasury)}</dd>
@@ -254,7 +255,6 @@ export default class KingdomModal extends React.Component<KingdomModalProps, Kin
                                             </div>
                                         </Fragment>
                                     : null
-
                                 }
                             </div>
                         </Fragment>

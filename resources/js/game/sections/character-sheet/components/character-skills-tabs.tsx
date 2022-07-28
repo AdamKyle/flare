@@ -47,7 +47,7 @@ export default class CharacterSkillsTabs extends React.Component<CharacterSkillT
                     loading: false,
                 });
             }, (error: AxiosError) => {
-                console.log(error);
+                console.error(error);;
             });
         }
     }

@@ -5,7 +5,6 @@ import MapState from "../../lib/game/types/map/map-state";
 import MapProps from '../../lib/game/types/map/map-props';
 import Ajax from "../../lib/ajax/ajax";
 import Location from "../components/locations/location";
-import MapActions from "../components/actions/map/map-actions";
 import Kingdoms from "../components/kingdoms/kingdoms";
 import TimerProgressBar from "../../components/ui/progress-bars/timer-progress-bar";
 import EnemyKingdoms from "../components/kingdoms/enemy-kingdoms";
@@ -61,7 +60,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
         this.mapTimeOut         = Echo.private('show-timeout-move-' + this.props.user_id);
 
         // @ts-ignore
-        this.globalMapUpdate    = Echo.private('global-map-update');
+        this.globalMapUpdate    = Echo.join('global-map-update');
 
         // @ts-ignore
         this.kingdomsUpdate     = Echo.private('add-kingdom-to-map-' + this.props.user_id);
@@ -103,7 +102,8 @@ export default class MapSection extends React.Component<MapProps, MapState> {
 
         this.globalMapUpdate.listen('Game.Kingdoms.Events.UpdateGlobalMap', (event: any) => {
             this.setState({
-                enemy_kingdoms: {...this.state.enemy_kingdoms, ...event.otherKingdoms},
+                enemy_kingdoms: event.otherKingdoms,
+                npc_kingdoms: event.npcKingdoms,
             });
         });
 
@@ -115,8 +115,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
 
         this.kingdomsUpdate.listen('Game.Kingdoms.Events.AddKingdomToMap', (event: any) => {
             this.setState({
-                npc_kingdoms: [...this.state.npc_kingdoms, ...event.npcKingdoms],
-                player_kingdoms: [...this.state.player_kingdoms, ...event.myKingdoms]
+                player_kingdoms: event.myKingdoms
             });
         });
     }
@@ -200,12 +199,17 @@ export default class MapSection extends React.Component<MapProps, MapState> {
         }
     }
 
-    getStyle(): { backgroundImage: string, height: number, backgroundRepeat: string, width?: number } {
-        if ((this.props.view_port > 770 && this.props.view_port < 1600) || this.props.view_port >= 1920) {
+    getStyle(): { backgroundImage: string, height: number, backgroundRepeat?: string, width?: number } {
+        console.log(this.props.view_port);
+        if (this.props.view_port >= 1600 && this.props.view_port <= 1920) {
+            return {backgroundImage: `url("${this.state.map_url}")`, height: 500};
+        }
+
+        if (this.props.view_port >= 1920) {
             return {backgroundImage: `url("${this.state.map_url}")`, backgroundRepeat: 'no-repeat', height: 500};
         }
 
-        return {backgroundImage: `url("${this.state.map_url}")`, backgroundRepeat: 'no-repeat', height: 500, width: 500};
+        return {backgroundImage: `url("${this.state.map_url}")`, height: 500, width: 500};
     }
 
     handleMovePlayer(direction: string) {
@@ -288,26 +292,6 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                     </Draggable>
                 </div>
                 <div className='mt-4'>
-                    <MapActions move_player={this.handleMovePlayer.bind(this)}
-                                teleport_player={this.handleTeleportPlayer.bind(this)}
-                                set_sail={this.handleSetSail.bind(this)}
-                                can_player_move={this.state.can_player_move}
-                                players_on_map={this.state.characters_on_map}
-                                port_location={this.state.port_location}
-                                ports={this.fetchPorts()}
-                                coordinates={this.state.coordinates}
-                                character_position={this.state.character_position}
-                                currencies={this.props.currencies}
-                                locations={this.state.locations}
-                                player_kingdoms={this.state.player_kingdoms}
-                                character_id={this.props.character_id}
-                                enemy_kingdoms={this.state.enemy_kingdoms}
-                                npc_kingdoms={this.state.npc_kingdoms}
-                                view_port={this.props.view_port}
-                                is_dead={this.props.is_dead}
-                                map_id={this.state.map_id}
-                                is_automation_running={this.props.is_automaton_running}
-                    />
                 </div>
                 <div className={'mt-4'}>
                     {

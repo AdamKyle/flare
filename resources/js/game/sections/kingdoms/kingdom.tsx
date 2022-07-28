@@ -52,7 +52,6 @@ export default class Kingdom extends React.Component<KingdomProps, any> {
 
 
         return this.props.kingdom.building_queue.filter((queue: BuildingInQueueDetails) => {
-            console.log(queue.building_id, this.state.building_to_view.id);
             return queue.building_id === this.state.building_to_view.id
         }).length > 0;
     }

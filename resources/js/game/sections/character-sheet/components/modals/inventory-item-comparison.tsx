@@ -56,7 +56,7 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
                 comparison_details: result.data,
             })
         }, (error: AxiosError) => {
-            console.log(error);
+            console.error(error);;
         })
     }
 

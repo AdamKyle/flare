@@ -50,7 +50,7 @@ export default class QueenOfHearts extends React.Component<any, any> {
                     character_uniques: result.data.unique_slots,
                     character_non_uniques: result.data.non_unique_slots
                 });
-            }, (error: AxiosError) => {console.log(error)});
+            }, (error: AxiosError) => {console.error(error);});
     }
 
     setInitialOption(data: any) {

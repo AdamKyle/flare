@@ -151,8 +151,6 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
                chat.length = 500;
            }
 
-           console.log(event);
-
            if (event.name === 'Admin') {
                chat.unshift({
                    message: event.message.message,

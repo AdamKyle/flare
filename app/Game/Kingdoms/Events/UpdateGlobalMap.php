@@ -23,12 +23,22 @@ class UpdateGlobalMap implements ShouldBroadcastNow
     public array $otherKingdoms;
 
     /**
+     * @var array $npcKingdoms;
+     */
+    public array $npcKingdoms;
+
+    /**
      * Create a new event instance.
      *
      * @param Character $character
      */
     public function __construct(Character $character) {
         $this->otherKingdoms = $this->getEnemyKingdoms($character, true);
+        $this->npcKingdoms   = Kingdom::select('id', 'x_position', 'y_position', 'npc_owned', 'name')
+                                      ->whereNull('character_id')
+                                      ->where('game_map_id', $character->map->game_map_id)
+                                      ->where('npc_owned', true)
+                                      ->get()->toArray();
     }
 
     /**

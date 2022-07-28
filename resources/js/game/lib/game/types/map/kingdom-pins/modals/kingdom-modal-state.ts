@@ -10,4 +10,6 @@ export default interface KingdomModalState extends LocationModalState {
     show_help: boolean;
 
     help_type: string;
+
+    show_purchase_modal?: boolean;
 }

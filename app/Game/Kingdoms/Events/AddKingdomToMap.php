@@ -40,11 +40,6 @@ class AddKingdomToMap implements ShouldBroadcastNow
     {
         $this->user        = $character->user;
         $this->myKingdoms  = $this->getKingdoms($character);
-        $this->npcKingdoms = Kingdom::select('x_position', 'y_position', 'id', 'name', 'npc_owned')
-                                     ->whereNull('character_id')
-                                     ->where('game_map_id', $character->map->game_map_id)
-                                     ->get()
-                                     ->toArray();
     }
 
     /**

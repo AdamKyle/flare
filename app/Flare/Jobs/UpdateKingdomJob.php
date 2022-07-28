@@ -16,6 +16,7 @@ use App\Game\Core\Traits\UpdateMarketBoard;
 use App\Game\Kingdoms\Events\UpdateGlobalMap;
 use App\Game\Kingdoms\Events\UpdateNPCKingdoms;
 use App\Game\Kingdoms\Service\KingdomResourcesService;
+use App\Game\Kingdoms\Service\KingdomUpdateService;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use Exception;
 use Illuminate\Support\Collection;
@@ -47,7 +48,7 @@ class UpdateKingdomJob implements ShouldQueue
         $this->kingdom = $kingdom;
     }
 
-    public function handle(KingdomResourcesService $kingdomResourcesService) {
-        $kingdomResourcesService->setKingdom($this->kingdom)->updateKingdom();
+    public function handle(KingdomUpdateService $kingdomUpdateService) {
+        $kingdomUpdateService->setKingdom($this->kingdom)->updateKingdom();
     }
 }

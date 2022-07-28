@@ -26,7 +26,7 @@ export default class ViewLocationDetailsModal extends React.Component<ViewLocati
                 this.setState({
                     is_open: false,
                 }, () => {
-                    this.props.close_modal();
+                    this.closeModal();
                 })
             }
         }
@@ -35,7 +35,7 @@ export default class ViewLocationDetailsModal extends React.Component<ViewLocati
     buildModalData() {
         if (this.props.location !== null && this.state.is_open) {
             return <LocationModal is_open={this.state.is_open}
-                                  handle_close={this.props.close_modal}
+                                  handle_close={this.closeModal.bind(this)}
                                   title={this.props.location.name + ' (X/Y): ' + this.props.location.x + '/' + this.props.location.y}
                                   location={this.props.location}
                                   hide_secondary_button={true}
@@ -48,7 +48,7 @@ export default class ViewLocationDetailsModal extends React.Component<ViewLocati
         if (this.props.kingdom_id !== null && this.state.is_open) {
             return <KingdomModal
                 is_open={this.state.is_open}
-                handle_close={this.props.close_modal}
+                handle_close={this.closeModal.bind(this)}
                 kingdom_id={this.props.kingdom_id}
                 character_id={this.props.character_id}
                 hide_secondary={false}
@@ -69,7 +69,7 @@ export default class ViewLocationDetailsModal extends React.Component<ViewLocati
 
             return <OtherKingdomModal
                 is_open={this.state.is_open}
-                handle_close={this.props.close_modal}
+                handle_close={this.closeModal.bind(this)}
                 kingdom_id={kingdomId}
                 character_id={this.props.character_id}
                 hide_secondary={true}
@@ -84,7 +84,14 @@ export default class ViewLocationDetailsModal extends React.Component<ViewLocati
     }
 
     closeModal() {
-        this.props.close_modal()
+        console.log('Am I ever called?');
+        this.setState({
+            is_open: false,
+        }, () => {
+            console.log('I should be here....');
+            this.props.close_modal()
+        })
+
     }
 
     render() {

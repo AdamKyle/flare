@@ -305,7 +305,6 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
     }
 
     updateMapTimer(movement_time_out: number) {
-        console.log(movement_time_out);
         this.setState({
             movement_time_out: movement_time_out
         });
@@ -428,6 +427,7 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
                                     update_map_timer={this.updateMapTimer.bind(this)}
                                     currencies={this.props.currencies}
                                     is_automation_running={this.props.character.is_automation_running}
+                                    character_position={this.props.character_position}
                 />
             </Fragment>
         );

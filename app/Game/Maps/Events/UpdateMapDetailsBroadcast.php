@@ -16,8 +16,7 @@ Use App\Flare\Models\User;
 use App\Flare\Models\Map;
 use App\Game\Maps\Services\MovementService;
 
-class UpdateMapDetailsBroadcast implements ShouldBroadcastNow
-{
+class UpdateMapDetailsBroadcast implements ShouldBroadcastNow {
     use Dispatchable, InteractsWithSockets, SerializesModels, KingdomCache, CanPlayerMassEmbezzle;
 
     /**
@@ -28,7 +27,7 @@ class UpdateMapDetailsBroadcast implements ShouldBroadcastNow
     /**
      * @var User $user
      */
-    private $user;
+    private User $user;
 
     /**
      * Create a new event instance.
@@ -39,7 +38,8 @@ class UpdateMapDetailsBroadcast implements ShouldBroadcastNow
      */
     public function __construct(Map $map, User $user, LocationService $service) {
         $this->map_data = $service->getLocationData($user->character);
-        $this->user     = $user;
+
+        $this->user = $user;
     }
 
     /**

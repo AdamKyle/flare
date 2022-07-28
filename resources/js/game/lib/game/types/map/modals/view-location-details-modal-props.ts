@@ -22,4 +22,15 @@ export default interface ViewLocationDetailsModalProps {
     is_automation_running: boolean;
 
     is_dead: boolean;
+
+    currencies?: {
+        gold: number,
+        shards: number,
+        gold_dust: number,
+        copper_coins: number,
+    };
+
+    character_position: {x: number, y: number};
+
+    teleport_player: (data: {x: number, y: number, cost: number, timeout: number}) => void;
 }

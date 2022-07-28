@@ -10,7 +10,7 @@ use App\Game\Kingdoms\Service\KingdomSettleService;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Kingdoms\Requests\KingdomsSettleRequest;
 
-class KingdomSettleController extends Controller {
+class NpcKingdomController extends Controller {
 
     /**
      * @var KingdomSettleService $kingdomSettleService
@@ -29,26 +29,20 @@ class KingdomSettleController extends Controller {
      * @param Character $character
      * @return JsonResponse
      */
-    public function settle(KingdomsSettleRequest $request, Character $character): JsonResponse {
-
-        $result = $this->kingdomSettleService->settlePreCheck($character, $request->name);
-
-        if (!empty($result)) {
-            return response()->json([
-                'message' => $result['message']
-            ], 422);
-        }
-
-        if (!$this->kingdomSettleService->canSettle($character)) {
-            return response()->json([
-                'message' => $this->kingdomSettleService->getErrorMessage()
-            ], 422);
-        }
+    public function purchase(KingdomsSettleRequest $request, Character $character): JsonResponse {
 
         if (!$this->kingdomSettleService->canAfford($character)) {
             return response()->json([
-                'message' => 'You don\'t have the gold.',
+                'message' => 'You don\'t have the gold to purchase this.',
             ], 422);
+        }
+
+        $kingdom = $this->kingdomSettleService->purchaseKingdom($character, $request->kingdom_id, $request->name);
+
+        if (is_null($kingdom)) {
+            return response()->json([
+                'message' => 'Cannot purchase this.'
+            ]);
         }
 
         $amount = $character->kingdoms->count() * 10000;
@@ -57,9 +51,9 @@ class KingdomSettleController extends Controller {
             'gold' => $character->gold - $amount,
         ]);
 
-        event(new UpdateTopBarEvent($character->refresh()));
+        $character = $character->refresh();
 
-        $this->kingdomSettleService->createKingdom($character, $request->name);
+        event(new UpdateTopBarEvent($character));
 
         return response()->json($this->kingdomSettleService->addKingdomToMap($character), 200);
     }

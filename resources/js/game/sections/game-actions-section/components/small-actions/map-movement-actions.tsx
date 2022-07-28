@@ -376,6 +376,9 @@ export default class MapMovementActions extends React.Component<any, any> {
                                                   can_move={this.props.character.can_move}
                                                   is_automation_running={this.props.is_automation_running}
                                                   is_dead={this.props.character.is_dead}
+                                                  character_position={this.props.character_position}
+                                                  currencies={this.props.currencies}
+                                                  teleport_player={this.teleportPlayer.bind(this)}
                         />
                     : null
                 }

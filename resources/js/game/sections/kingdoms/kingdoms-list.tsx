@@ -71,7 +71,7 @@ export default class KingdomsList extends React.Component<KingdomListProps, King
     createConditionalRowStyles() {
         return [
             {
-                when: (row: KingdomDetails) => row.is_protected !== null,
+                when: (row: KingdomDetails) => row.is_protected,
                 style: {
                     backgroundColor: '#49b4fd',
                     color: 'white',

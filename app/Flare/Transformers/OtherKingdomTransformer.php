@@ -26,6 +26,7 @@ class OtherKingdomTransformer extends TransformerAbstract {
         return [
             'id'                 => $kingdom->id,
             'name'               => $kingdom->name,
+            'game_map_id'        => $kingdom->game_map_id,
             'x_position'         => $kingdom->x_position,
             'y_position'         => $kingdom->y_position,
             'current_morale'     => $kingdom->current_morale,

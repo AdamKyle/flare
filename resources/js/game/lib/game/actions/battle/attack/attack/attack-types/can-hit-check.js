@@ -26,7 +26,7 @@ export default class CanHitCheck extends BattleBase {
         return true;
       }
     }
-    console.log(attacker.skills);
+
     return this.toHitCalculation(attacker.to_hit_base, defender.agi, attacker.skills.accuracy, defender.dodge);
   }
 
