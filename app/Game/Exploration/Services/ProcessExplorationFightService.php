@@ -92,7 +92,7 @@ class ProcessExplorationFightService {
 
 
         if ($this->fightService->getMonsterHealth() <= 0) {
-            event(new ExplorationLogUpdate($character->user, 'Your survived to fight another day, killing the fiend before you with such rage and vigor! Off to the next one!'));
+            event(new ExplorationLogUpdate($character->user, 'You survived to fight another day, killing the fiend before you with such rage and vigor! Off to the next one!'));
 
             BattleAttackHandler::dispatch($character->id, $automation->monster_id, true)->onQueue('default_long');
         }

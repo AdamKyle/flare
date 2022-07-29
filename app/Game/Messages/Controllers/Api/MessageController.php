@@ -54,7 +54,12 @@ class MessageController extends Controller {
                             ->transform(function($message) {
                                 $message->x    = $message->x_position;
                                 $message->y    = $message->y_position;
-                                $message->name = $message->user->hasRole('Admin') ? 'Admin' : $message->user->character->name;
+
+                                if (is_null($message->user->character)) {
+                                    $message->name = '????';
+                                } else {
+                                    $message->name = $message->user->hasRole('Admin') ? 'Admin' : $message->user->character->name;
+                                }
 
                                 switch ($message->color) {
                                     case '#ffffff':

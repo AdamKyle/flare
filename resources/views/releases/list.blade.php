@@ -13,7 +13,7 @@
                 <div class="row">
                     <div class="col-md-12 mt-3">
                         @forelse($releases as $release)
-                            <x-cards.card-with-title title="Version: {{$release->version}}, {{$release->name}}">
+                            <x-cards.card-with-title title="Version: {{$release->version}}, {{$release->name}}, Published on: {{$release->created_at->format('M d Y')}}">
                                 <h3 class="mb-3 mt-2"></h3>
                                 @markdown($release->body)
                                 <hr />
