@@ -39,7 +39,7 @@
         "localforage": "^1.10.0",
         "luxon": "^1.26.0",
         "mjml": "^4.9.0",
-        "moment": "^2.28.0",
+        "moment": "^2.29.4",
         "postcss-custom-properties": "^11.0.0",
         "postcss-import": "^14.0.2",
         "postcss-nested": "^5.0.5",
