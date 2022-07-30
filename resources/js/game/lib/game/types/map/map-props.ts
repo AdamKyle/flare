@@ -1,3 +1,5 @@
+import CharacterCurrenciesDetails from "../character-currencies-details";
+
 export default interface MapProps {
 
     user_id: number,
@@ -6,12 +8,7 @@ export default interface MapProps {
 
     view_port: number,
 
-    currencies?: {
-        gold: number,
-        shards: number,
-        gold_dust: number,
-        copper_coins: number,
-    };
+    currencies: CharacterCurrenciesDetails;
 
     is_dead: boolean;
 

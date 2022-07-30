@@ -10,7 +10,7 @@ export default interface GameState {
 
     character_status: CharacterStatusType | null;
 
-    character_currencies?: CharacterCurrenciesType;
+    character_currencies: CharacterCurrenciesType | null;
 
     loading: boolean;
 

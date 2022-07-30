@@ -1,5 +1,4 @@
 import CharacterMapDetails from "../types/character-map-details";
-import CharacterMapLocationDetails from "../types/character-map-location-details";
 import LocationDetails from "../types/location-details";
 
 export default interface MapData {

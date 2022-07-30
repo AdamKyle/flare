@@ -6,18 +6,18 @@ import MapProps from '../../lib/game/types/map/map-props';
 import Ajax from "../../lib/ajax/ajax";
 import Location from "../components/locations/location";
 import Kingdoms from "../components/kingdoms/kingdoms";
-import TimerProgressBar from "../../components/ui/progress-bars/timer-progress-bar";
 import EnemyKingdoms from "../components/kingdoms/enemy-kingdoms";
 import MovePlayer from "../../lib/game/map/ajax/move-player";
 import MapStateManager from "../../lib/game/map/state/map-state-manager";
 import NpcKingdoms from "../components/kingdoms/npc-kingdoms";
 import ComponentLoading from "../../components/ui/loading/component-loading";
-// @ts-ignore
-import Draggable from 'react-draggable/build/web/react-draggable.min';
 import MapData from "../../lib/game/map/request-types/MapData";
 import {getStyle, playerIconPosition} from "../../lib/game/map/map-management";
 import MapTimer from "./map-timer";
 import DirectionalMovement from "./actions/directional-movement";
+import MapActions from "./actions/map-actions";
+// @ts-ignore
+import Draggable from 'react-draggable/build/web/react-draggable.min';
 
 export default class MapSection extends React.Component<MapProps, MapState> {
 
@@ -78,7 +78,6 @@ export default class MapSection extends React.Component<MapProps, MapState> {
     componentDidMount() {
         (new Ajax()).setRoute('map/' + this.props.character_id)
                     .doAjaxCall('get', (result: AxiosResponse) => {
-            console.log(result.data);
             this.setStateFromData(result.data, () => {
                 if (this.props.automation_completed_at !== 0) {
                     this.setState({
@@ -140,7 +139,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
     }
 
     handleTeleportPlayer(data: {x: number, y: number, cost: number, timeout: number}) {
-        (new MovePlayer(this)).teleportPlayer(data, this.props.character_id, this.props.view_port);
+        (new MovePlayer(this)).teleportPlayer(data, this.props.character_id, this.setStateFromData.bind(this));
     }
 
     handleSetSail(data: {x: number, y: number, cost: number, timeout: number}) {
@@ -213,6 +212,22 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                     </Draggable>
                 </div>
                 <div className='mt-4'>
+                    <MapActions
+                        character_id={this.props.character_id}
+                        can_move={this.state.can_player_move}
+                        is_dead={this.props.is_dead}
+                        is_automation_running={this.props.is_automaton_running}
+                        port_location={this.state.port_location}
+                        locations={this.state.locations}
+                        player_kingdoms={this.state.player_kingdoms}
+                        enemy_kingdoms={this.state.enemy_kingdoms}
+                        npc_kingdoms={this.state.npc_kingdoms}
+                        character_position={this.state.character_position}
+                        character_currencies={this.props.currencies}
+                        coordinates={this.state.coordinates}
+                        view_port={this.props.view_port}
+                        update_map_state={this.setStateFromData.bind(this)}
+                    />
                     <DirectionalMovement
                         character_position={this.state.character_position}
                         map_position={this.state.map_position}

@@ -7,6 +7,8 @@ import MapStateManager from "../state/map-state-manager";
 import {getPortLocation} from "../location-helpers";
 import {getNewXPosition, getNewYPosition} from "../map-position";
 import DirectionalMovement from "../../../../sections/map/actions/directional-movement";
+import MapActions from "../../../../sections/map/actions/map-actions";
+import MapData from "../request-types/MapData";
 
 export default class MovePlayer {
 
@@ -65,31 +67,13 @@ export default class MovePlayer {
         })
     }
 
-    teleportPlayer(data: {x: number, y: number, cost: number, timeout: number}, characterId: number, viewPort?: number) {
+    teleportPlayer(data: {x: number, y: number, cost: number, timeout: number},
+                   characterId: number,
+                   updateMapState: (data: MapData, callback?: () => void) => void)
+    {
         (new Ajax()).setRoute('map/teleport/' + characterId).setParameters(data)
             .doAjaxCall('post', (result: AxiosResponse) => {
-                if (typeof viewPort !== 'undefined') {
-                    let state = {...MapStateManager.setState(result.data), ...this.component.state};
-
-                    state.character_position.x = data.x;
-                    state.character_position.y = data.y;
-
-                    state.port_location = getPortLocation(state);
-
-                    state.map_position = {
-                        x: getNewXPosition(state.character_position.x, state.map_position.x, viewPort),
-                        y: getNewYPosition(state.character_position.y, state.map_position.y, viewPort)
-                    }
-
-                    this.component.setState(state);
-                } else {
-                    let state = {...MapStateManager.setMapMovementActionsState(result.data), ...this.component.state};
-
-                    state.character_position.x = data.x;
-                    state.character_position.y = data.y;
-
-                    this.component.setState(state);
-                }
+                updateMapState(result.data);
             }, (error: AxiosError) => {
                 this.handleErrors(error);
             });

@@ -11,8 +11,6 @@ export default interface TeleportModalProps  {
 
     handle_close: () => void;
 
-    handle_action: (args: any) => void;
-
     title: string;
 
     coordinates: {x: number[], y: number[]} | null;

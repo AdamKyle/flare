@@ -3,14 +3,12 @@ import Dialogue from "../../../../components/ui/dialogue/dialogue";
 import TeleportModalProps from "../../../../lib/game/types/map/modals/teleport-modal-props";
 import Select from "react-select";
 import clsx from "clsx";
-import PopOverContainer from "../../../../components/ui/popover/pop-over-container";
 import {fetchCost} from "../../../../lib/game/map/teleportion-costs";
 import {formatNumber} from "../../../../lib/game/format-number";
-import TeleportModalState from "../../../../lib/game/types/map/modals/teleport-modal-state";
 import {viewPortWatcher} from "../../../../lib/view-port-watcher";
-import QuestHelpModal from "../../quests/modals/quest-help-modal";
 import TeleportHelpModal from "./teleport-help-modal";
-
+import ManageTeleportModalState from "../../../../lib/game/map/state/manage-teleport-modal-state";
+import TeleportModalState from "../../../../lib/game/types/map/modals/teleport-modal-state";
 
 export default class TeleportModal extends React.Component<TeleportModalProps, TeleportModalState> {
 
@@ -39,45 +37,7 @@ export default class TeleportModal extends React.Component<TeleportModalProps, T
     componentDidMount() {
         viewPortWatcher(this);
 
-        if (this.props.locations !== null) {
-            const foundLocation = this.props.locations.filter((location) => location.x === this.props.character_position.x && location.y === this.props.character_position.y);
-
-            if (foundLocation.length > 0) {
-                this.setState({
-                    current_location: foundLocation[0],
-                });
-            }
-        }
-
-        if (this.props.player_kingdoms !== null) {
-            const foundKingdom = this.props.player_kingdoms.filter((kingdom) => kingdom.x_position === this.props.character_position.x && kingdom.y_position === this.props.character_position.y);
-
-            if (foundKingdom.length > 0) {
-                this.setState({
-                    current_player_kingdom: foundKingdom[0],
-                });
-            }
-        }
-
-        if (this.props.enemy_kingdoms !== null) {
-            const foundKingdom = this.props.enemy_kingdoms.filter((kingdom) => kingdom.x_position === this.props.character_position.x && kingdom.y_position === this.props.character_position.y);
-
-            if (foundKingdom.length > 0) {
-                this.setState({
-                    current_enemy_kingdom: foundKingdom[0],
-                });
-            }
-        }
-
-        if (this.props.npc_kingdoms !== null) {
-            const foundKingdom = this.props.npc_kingdoms.filter((kingdom) => kingdom.x_position === this.props.character_position.x && kingdom.y_position === this.props.character_position.y);
-
-            if (foundKingdom.length > 0) {
-                this.setState({
-                    current_npc_kingdom: foundKingdom[0],
-                });
-            }
-        }
+        (new ManageTeleportModalState(this)).updateTeleportModalState();
     }
 
     componentDidUpdate() {
@@ -91,45 +51,7 @@ export default class TeleportModal extends React.Component<TeleportModalProps, T
             return;
         }
 
-        if (this.state.current_location === null) {
-            const foundLocation = this.props.locations.filter((location) => location.x === this.props.character_position.x && location.y === this.props.character_position.y);
-
-            if (foundLocation.length > 0) {
-                this.setState({
-                    current_location: foundLocation[0],
-                });
-            }
-        }
-
-        if (this.state.current_player_kingdom === null && this.props.player_kingdoms !== null) {
-            const foundKingdom = this.props.player_kingdoms.filter((kingdom) => kingdom.x_position === this.props.character_position.x && kingdom.y_position === this.props.character_position.y);
-
-            if (foundKingdom.length > 0) {
-                this.setState({
-                    current_player_kingdom: foundKingdom[0],
-                });
-            }
-        }
-
-        if (this.state.current_enemy_kingdom === null && this.props.enemy_kingdoms !== null) {
-            const foundKingdom = this.props.enemy_kingdoms.filter((kingdom) => kingdom.x_position === this.props.character_position.x && kingdom.y_position === this.props.character_position.y);
-
-            if (foundKingdom.length > 0) {
-                this.setState({
-                    current_enemy_kingdom: foundKingdom[0],
-                });
-            }
-        }
-
-        if (this.state.current_npc_kingdom === null && this.props.npc_kingdoms !== null) {
-            const foundKingdom = this.props.npc_kingdoms.filter((kingdom) => kingdom.x_position === this.props.character_position.x && kingdom.y_position === this.props.character_position.y);
-
-            if (foundKingdom.length > 0) {
-                this.setState({
-                    current_npc_kingdom: foundKingdom[0],
-                });
-            }
-        }
+        (new ManageTeleportModalState(this)).updateTeleportModalState();
     }
 
     manageHelpDialogue() {

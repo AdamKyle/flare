@@ -62,7 +62,7 @@ export default class Game extends React.Component<GameProps, GameState> {
             character_status: null,
             loading: true,
             finished_loading: false,
-            character_currencies: undefined,
+            character_currencies: null,
             secondary_loading_title: 'Fetching character sheet ...',
             percentage_loaded: 0,
             celestial_id: 0,
@@ -250,6 +250,10 @@ export default class Game extends React.Component<GameProps, GameState> {
         }
 
         if (this.state.character === null) {
+            return this.renderLoading();
+        }
+
+        if (this.state.character_currencies === null) {
             return this.renderLoading();
         }
 

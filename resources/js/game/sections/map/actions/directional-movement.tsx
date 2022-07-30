@@ -11,28 +11,10 @@ export default class DirectionalMovement extends React.Component<DirectionalMove
         super(props);
 
         this.state = {
-            is_movement_disabled: false,
             show_traverse: false,
         }
     }
 
-    componentDidMount() {
-        this.setState({
-            is_movement_disabled: this.props.can_move
-        })
-    }
-
-    componentDidUpdate(prevProps: Readonly<DirectionalMovementProps>, prevState: Readonly<DirectionalMovementState>, snapshot?: any) {
-        if (!this.state.is_movement_disabled && !this.props.can_move) {
-            this.setState({
-                is_movement_disabled: true,
-            })
-        } else if (this.state.is_movement_disabled && this.props.can_move) {
-            this.setState({
-                is_movement_disabled: false,
-            });
-        }
-    }
 
     move(direction: string) {
         this.props.update_can_move(false);
@@ -56,24 +38,24 @@ export default class DirectionalMovement extends React.Component<DirectionalMove
         return (
             <Fragment>
                 <div className='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 hidden sm:block'></div>
-                <div className='grid gap-2 lg:grid-cols-5 lg:gap-4'>
-                    <PrimaryOutlineButton disabled={this.state.is_movement_disabled || this.props.is_dead}
+                <div className='grid gap-2 grid-cols-5 gap-4'>
+                    <PrimaryOutlineButton disabled={!this.props.can_move || this.props.is_dead}
                                    button_label={'North'}
                                    on_click={() => this.move('north')}
                     />
-                    <PrimaryOutlineButton disabled={this.state.is_movement_disabled || this.props.is_dead}
+                    <PrimaryOutlineButton disabled={!this.props.can_move || this.props.is_dead}
                                    button_label={'South'}
                                    on_click={() => this.move('south')}
                     />
-                    <PrimaryOutlineButton disabled={this.state.is_movement_disabled || this.props.is_dead}
+                    <PrimaryOutlineButton disabled={!this.props.can_move || this.props.is_dead}
                                    button_label={'West'}
                                    on_click={() => this.move('west')}
                     />
-                    <PrimaryOutlineButton disabled={this.state.is_movement_disabled || this.props.is_dead}
+                    <PrimaryOutlineButton disabled={!this.props.can_move || this.props.is_dead}
                                    button_label={'East'}
                                    on_click={() => this.move('east')}
                     />
-                    <PrimaryOutlineButton disabled={this.state.is_movement_disabled || this.props.is_dead || this.props.is_automation_running}
+                    <PrimaryOutlineButton disabled={!this.props.can_move || this.props.is_dead || this.props.is_automation_running}
                                    button_label={'Traverse'}
                                    on_click={() => this.traverse()}
                     />

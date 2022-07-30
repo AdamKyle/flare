@@ -1,6 +1,9 @@
 import MapState from "../types/map/map-state";
 import MapStateManager from './state/map-state';
 import LocationDetails from "./types/location-details";
+import PlayerKingdomsDetails from "../types/map/player-kingdoms-details";
+import NpcKingdomsDetails from "../types/map/npc-kingdoms-details";
+import MapActions from "../../../sections/map/actions/map-actions";
 
 /**
  * Gets the current port that the player is on.
@@ -22,4 +25,29 @@ export const getPortLocation = (mapState: MapState | MapStateManager): LocationD
     }
 
     return null;
+}
+
+/**
+ * Can the player settle at their current location?
+ *
+ * @param component
+ */
+export const canSettleHere = (component: MapActions) => {
+    const locations = component.props.locations.filter((location: LocationDetails) => {
+        return location.x === component.props.character_position.x && location.y === component.props.character_position.y;
+    });
+
+    const playerKingdom = component.props.player_kingdoms.filter((playerKingdom: PlayerKingdomsDetails) => {
+        return playerKingdom.x_position === component.props.character_position.x && playerKingdom.y_position === component.props.character_position.y;
+    });
+
+    const enemyKingdoms = component.props.enemy_kingdoms.filter((enemyKingdom: PlayerKingdomsDetails) => {
+        return enemyKingdom.x_position === component.props.character_position.x && enemyKingdom.y_position === component.props.character_position.y;
+    });
+
+    const npcKingdoms = component.props.npc_kingdoms.filter((npcKingdom: NpcKingdomsDetails) => {
+        return npcKingdom.x_position === component.props.character_position.x && npcKingdom.y_position === component.props.character_position.y;
+    });
+
+    return (locations.length === 0 && playerKingdom.length === 0 && enemyKingdoms.length === 0 && npcKingdoms.length === 0);
 }
