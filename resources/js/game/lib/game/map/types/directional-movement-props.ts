@@ -17,4 +17,8 @@ export default interface DirectionalMovementProps {
     character_id: number;
 
     map_id: number;
+
+    can_move: boolean;
+
+    update_can_move: (canMove: boolean) => void;
 }

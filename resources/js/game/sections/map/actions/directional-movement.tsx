@@ -16,12 +16,28 @@ export default class DirectionalMovement extends React.Component<DirectionalMove
         }
     }
 
-    move(direction: string) {
+    componentDidMount() {
         this.setState({
-            is_movement_disabled: true,
-        }, () => {
-            this.handleMovePlayer(direction);
-        });
+            is_movement_disabled: this.props.can_move
+        })
+    }
+
+    componentDidUpdate(prevProps: Readonly<DirectionalMovementProps>, prevState: Readonly<DirectionalMovementState>, snapshot?: any) {
+        if (!this.state.is_movement_disabled && !this.props.can_move) {
+            this.setState({
+                is_movement_disabled: true,
+            })
+        } else if (this.state.is_movement_disabled && this.props.can_move) {
+            this.setState({
+                is_movement_disabled: false,
+            });
+        }
+    }
+
+    move(direction: string) {
+        this.props.update_can_move(false);
+
+        this.handleMovePlayer(direction);
     }
 
     traverse() {

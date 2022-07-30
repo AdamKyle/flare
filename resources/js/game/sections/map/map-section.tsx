@@ -127,6 +127,12 @@ export default class MapSection extends React.Component<MapProps, MapState> {
         MapStateManager.manageState(data, this, callback);
     }
 
+    updateCanMove(canMove: boolean) {
+        this.setState({
+            can_player_move: canMove,
+        })
+    }
+
     handleDrag(e: MouseEvent, position: {x: number, y: number}) {
         this.setState(dragMap(
             position, this.state.bottom_bounds, this.state.right_bounds
@@ -216,6 +222,8 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                         character_id={this.props.character_id}
                         map_id={this.state.map_id}
                         update_map_state={this.setStateFromData.bind(this)}
+                        can_move={this.state.can_player_move}
+                        update_can_move={this.updateCanMove.bind(this)}
                     />
                 </div>
                 <div className={'mt-4'}>
