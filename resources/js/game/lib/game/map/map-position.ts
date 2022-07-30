@@ -5,6 +5,8 @@
  * @param mapPositionY
  * @type [{characterY: number, mapPositionY: number}]
  */
+import MapSection from "../../../sections/map/map-section";
+
 export const getNewYPosition = (characterY: number, mapPositionY: number, viewPort: number): number => {
 
     if (characterY < 320) {
@@ -78,4 +80,35 @@ export const dragMap = (position: {x: number, y: number}, bottomBounds: number, 
         bottom_bounds: bottomMapBounds,
         right_bounds: rightMapBounds,
     }
+}
+
+/**
+ * Uses the map component props to fetch the bound sof the map.
+ *
+ * @param component
+ */
+export const fetchLeftBounds = (component: MapSection): number => {
+
+    if (component.props.view_port >= 1920) {
+        return 0;
+    }
+
+    if (component.props.view_port < 400) {
+        return -260;
+    }
+
+    if (component.props.view_port < 600) {
+        return -210;
+    }
+
+
+    if (component.props.view_port < 990) {
+        return -110;
+    }
+
+    if (component.props.view_port < 1024) {
+        return 0;
+    }
+
+    return -110
 }

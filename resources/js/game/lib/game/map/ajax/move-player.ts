@@ -6,6 +6,7 @@ import {AxiosError, AxiosResponse} from "axios";
 import MapStateManager from "../state/map-state-manager";
 import {getPortLocation} from "../location-helpers";
 import {getNewXPosition, getNewYPosition} from "../map-position";
+import DirectionalMovement from "../../../../sections/map/actions/directional-movement";
 
 export default class MovePlayer {
 
@@ -35,7 +36,7 @@ export default class MovePlayer {
         return this;
     }
 
-    movePlayer(characterId: number, direction: string, viewPort: number) {
+    movePlayer(characterId: number, direction: string, component: DirectionalMovement) {
 
         if (this.characterPosition === null || this.mapPosition === null) {
 
@@ -58,18 +59,7 @@ export default class MovePlayer {
             character_position_x: playerPosition.x,
             character_position_y: playerPosition.y,
         }).doAjaxCall('post', (result: AxiosResponse) => {
-            let state = {...MapStateManager.setState(result.data), ...this.component.state};
-
-            state.character_position.x = playerPosition.x;
-            state.character_position.y = playerPosition.y;
-
-            state.port_location = getPortLocation(state);
-            state.map_position = {
-                x: getNewXPosition(state.character_position.x, state.map_position.x, viewPort),
-                y: getNewYPosition(state.character_position.y, state.map_position.y, viewPort)
-            }
-
-            this.component.setState(state);
+            component.props.update_map_state(result.data);
         }, (error: AxiosError) => {
             this.handleErrors(error);
         })

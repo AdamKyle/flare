@@ -33,9 +33,9 @@ class SkillTypeValue {
 
     const EFFECTS_SPELL_EVASION           = 11;
 
-    const EFFECTS_ARTIFACT_ANNULMENT      = 12;
+    const EFFECTS_KINGDOM                 = 12;
 
-    const EFFECTS_KINGDOM                 = 13;
+    const EFFECTS_CLASS                   = 13;
 
     /**
      * @var string[] $values
@@ -53,9 +53,8 @@ class SkillTypeValue {
         self::EFFECTS_UNIT_RECRUITMENT_TIMER  => 9,
         self::EFFECTS_UNIT_MOVEMENT_TIMER     => 10,
         self::EFFECTS_SPELL_EVASION           => 11,
-        self::EFFECTS_ARTIFACT_ANNULMENT      => 12,
-        self::EFFECTS_KINGDOM                 => 13,
-
+        self::EFFECTS_KINGDOM                 => 12,
+        self::EFFECTS_CLASS                   => 13,
     ];
 
     public static $namedValues = [
@@ -71,9 +70,8 @@ class SkillTypeValue {
         9  => 'Effects Unit Recruitment Timers',
         10 => 'Effects Unit Movement Timers',
         11 => 'Effects Spell Evasion',
-        12 => 'Effects Artifact Annulment',
-        13 => 'Effects the kingdom in some way'
-
+        12 => 'Effects Kingdoms',
+        13 => 'Effects Class',
     ];
 
     /**

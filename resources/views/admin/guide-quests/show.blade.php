@@ -4,8 +4,8 @@
     <x-core.layout.info-container>
         <x-core.page-title
             title="{{$guideQuest->name}}"
-            route="{{auth()->user()->hasRole('admin') ? route('admin.guide-quests') : route('completed.guide-quests', ['user' => auth()->user()->id])}}"
-            color="success" link="{{auth()->user()->hasRole('admin') ? 'Guide Quests' : 'Back'}}"
+            route="{{auth()->user()->hasRole('Admin') ? route('admin.guide-quests') : route('completed.guide-quests', ['user' => auth()->user()->id])}}"
+            color="success" link="{{auth()->user()->hasRole('Admin') ? 'Guide Quests' : 'Back'}}"
         >
             @if (auth()->user()->hasRole('Admin'))
                 <x-core.buttons.link-buttons.primary-button

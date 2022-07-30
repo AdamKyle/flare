@@ -1,6 +1,6 @@
 import React, {Fragment} from "react";
 import {AxiosError, AxiosResponse} from "axios";
-import {dragMap, getNewXPosition, getNewYPosition} from "../../lib/game/map/map-position";
+import {dragMap, fetchLeftBounds} from "../../lib/game/map/map-position";
 import MapState from "../../lib/game/types/map/map-state";
 import MapProps from '../../lib/game/types/map/map-props';
 import Ajax from "../../lib/ajax/ajax";
@@ -12,9 +12,12 @@ import MovePlayer from "../../lib/game/map/ajax/move-player";
 import MapStateManager from "../../lib/game/map/state/map-state-manager";
 import NpcKingdoms from "../components/kingdoms/npc-kingdoms";
 import ComponentLoading from "../../components/ui/loading/component-loading";
-import {getPortLocation} from "../../lib/game/map/location-helpers";
 // @ts-ignore
 import Draggable from 'react-draggable/build/web/react-draggable.min';
+import MapData from "../../lib/game/map/request-types/MapData";
+import {getStyle, playerIconPosition} from "../../lib/game/map/map-management";
+import MapTimer from "./map-timer";
+import DirectionalMovement from "./actions/directional-movement";
 
 export default class MapSection extends React.Component<MapProps, MapState> {
 
@@ -75,7 +78,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
     componentDidMount() {
         (new Ajax()).setRoute('map/' + this.props.character_id)
                     .doAjaxCall('get', (result: AxiosResponse) => {
-
+            console.log(result.data);
             this.setStateFromData(result.data, () => {
                 if (this.props.automation_completed_at !== 0) {
                     this.setState({
@@ -120,102 +123,14 @@ export default class MapSection extends React.Component<MapProps, MapState> {
         });
     }
 
-    setStateFromData(data: any, callback?: () => void) {
-
-        let state = {...MapStateManager.setState(data), ...{loading: false, map_id: data.character_map.game_map.id}};
-
-        state.port_location = getPortLocation(state);
-
-        state.map_position = {
-            x: getNewXPosition(state.character_position.x, state.map_position.x, this.props.view_port),
-            y: getNewYPosition(state.character_position.y, state.map_position.y, this.props.view_port),
-        }
-
-        if (state.time_left !== 0) {
-            state.can_player_move = false;
-        }
-
-        // @ts-ignore
-        this.setState(state, () => {
-            this.props.show_celestial_fight_button(data.celestial_id)
-
-            let position: {x: number, y: number, game_map_id?: number} = state.character_position;
-
-            position.game_map_id = state.game_map_id;
-
-            this.props.set_character_position(position);
-
-            if (typeof callback !== 'undefined') {
-                return callback();
-            }
-        });
+    setStateFromData(data: MapData, callback?: () => void) {
+        MapStateManager.manageState(data, this, callback);
     }
 
-    fetchLeftBounds(): number {
-
-        if (this.props.view_port >= 1920) {
-            return 0;
-        }
-
-        if (this.props.view_port < 400) {
-            return -260;
-        }
-
-        if (this.props.view_port < 600) {
-            return -210;
-        }
-
-
-        if (this.props.view_port < 990) {
-            return -110;
-        }
-
-        if (this.props.view_port < 1024) {
-            return 0;
-        }
-
-        return -110
-    }
-
-    fetchPorts() {
-
-        if (this.state.locations === null) {
-            return null;
-        }
-
-        return this.state.locations.filter((location) => location.is_port);
-    }
-
-    handleDrag(e: any, position: {x: number, y: number}) {
+    handleDrag(e: MouseEvent, position: {x: number, y: number}) {
         this.setState(dragMap(
             position, this.state.bottom_bounds, this.state.right_bounds
         ));
-    }
-
-    playerIcon(): {top: string, left: string} {
-        return {
-            top: this.state.character_position.y + 'px',
-            left: this.state.character_position.x + 'px',
-        }
-    }
-
-    getStyle(): { backgroundImage: string, height: number, backgroundRepeat?: string, width?: number } {
-        console.log(this.props.view_port);
-        if (this.props.view_port >= 1600 && this.props.view_port <= 1920) {
-            return {backgroundImage: `url("${this.state.map_url}")`, height: 500};
-        }
-
-        if (this.props.view_port >= 1920) {
-            return {backgroundImage: `url("${this.state.map_url}")`, backgroundRepeat: 'no-repeat', height: 500};
-        }
-
-        return {backgroundImage: `url("${this.state.map_url}")`, height: 500, width: 500};
-    }
-
-    handleMovePlayer(direction: string) {
-        (new MovePlayer(this)).setCharacterPosition(this.state.character_position)
-                              .setMapPosition(this.state.map_position)
-                              .movePlayer(this.props.character_id, direction, this.props.view_port);
     }
 
     handleTeleportPlayer(data: {x: number, y: number, cost: number, timeout: number}) {
@@ -236,7 +151,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                 <div className='overflow-hidden max-h-[300px]'>
                     <Draggable
                         position={this.state.map_position}
-                        bounds={{top: -200, left: this.fetchLeftBounds(), right: this.state.right_bounds, bottom: this.state.bottom_bounds}}
+                        bounds={{top: -200, left: fetchLeftBounds(this), right: this.state.right_bounds, bottom: this.state.bottom_bounds}}
                         handle=".handle"
                         defaultPosition={{x: 0, y: 0}}
                         grid={[16, 16]}
@@ -245,7 +160,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                     >
                         <div>
                             <div className='handle game-map'
-                                 style={this.getStyle()}>
+                                 style={getStyle(this)}>
 
                                 <Location locations={this.state.locations}
                                           character_position={this.state.character_position}
@@ -286,33 +201,25 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                                              is_automation_running={this.props.is_automaton_running}
                                 />
 
-                                <div className="map-x-pin" style={this.playerIcon()}></div>
+                                <div className="map-x-pin" style={playerIconPosition(this)}></div>
                             </div>
                         </div>
                     </Draggable>
                 </div>
                 <div className='mt-4'>
+                    <DirectionalMovement
+                        character_position={this.state.character_position}
+                        map_position={this.state.map_position}
+                        view_port={this.props.view_port}
+                        is_dead={this.props.is_dead}
+                        is_automation_running={this.props.is_automaton_running}
+                        character_id={this.props.character_id}
+                        map_id={this.state.map_id}
+                        update_map_state={this.setStateFromData.bind(this)}
+                    />
                 </div>
                 <div className={'mt-4'}>
-                    {
-                        this.state.automation_time_out !== 0 && this.state.time_left !== 0 ?
-
-                            <Fragment>
-                                <div className='grid grid-cols-2 gap-2'>
-                                    <div>
-                                        <TimerProgressBar time_remaining={this.state.time_left} time_out_label={'Movement Timeout'}/>
-                                    </div>
-                                    <div>
-                                        <TimerProgressBar time_remaining={this.state.automation_time_out} time_out_label={'Exploration'}/>
-                                    </div>
-                                </div>
-                            </Fragment>
-                        :
-                            <Fragment>
-                                <TimerProgressBar time_remaining={this.state.automation_time_out} time_out_label={'Exploration'}/>
-                                <TimerProgressBar time_remaining={this.state.time_left} time_out_label={'Movement Timeout'}/>
-                            </Fragment>
-                    }
+                    <MapTimer time_left={this.state.time_left} automation_time_out={this.state.automation_time_out} />
                 </div>
             </Fragment>
         )

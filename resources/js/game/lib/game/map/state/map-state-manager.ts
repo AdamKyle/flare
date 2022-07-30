@@ -1,14 +1,48 @@
 import MapState from "./map-state";
 import { DateTime } from "luxon";
+import MapData from "../request-types/MapData";
+import MapSection from "../../../../sections/map/map-section";
+import {getPortLocation} from "../location-helpers";
+import {getNewXPosition, getNewYPosition} from "../map-position";
 
 export default class MapStateManager {
+
+    static manageState(data: MapData, component: MapSection, callback?: () => void) {
+        let state = {...this.setState(data), ...{loading: false, map_id: data.character_map.game_map.id}};
+
+        state.port_location = getPortLocation(state);
+
+        state.map_position = {
+            x: getNewXPosition(state.character_position.x, state.map_position.x, component.props.view_port),
+            y: getNewYPosition(state.character_position.y, state.map_position.y, component.props.view_port),
+        }
+
+        if (state.time_left !== 0) {
+            state.can_player_move = false;
+        }
+
+        // @ts-ignore
+        component.setState(state, () => {
+            component.props.show_celestial_fight_button(data.celestial_id)
+
+            let position: {x: number, y: number, game_map_id?: number} = state.character_position;
+
+            position.game_map_id = state.game_map_id;
+
+            component.props.set_character_position(position);
+
+            if (typeof callback !== 'undefined') {
+                return callback();
+            }
+        });
+    }
 
     /**
      * Sets the state of the Map component base don the data from the api call.
      *
      * @param data
      */
-    static setState(data: any): MapState {
+    static setState(data: MapData): MapState {
         return {
             map_url: data.map_url,
             game_map_id: data.character_map.game_map_id,
