@@ -13,11 +13,11 @@ export default interface KingdomModalProps {
 
     teleport_player?: (data: {x: number, y: number, cost: number, timeout: number}) => void;
 
-    hide_secondary: boolean;
-
     can_move: boolean;
 
     is_automation_running: boolean;
 
     is_dead: boolean;
+
+    show_top_section: boolean;
 }

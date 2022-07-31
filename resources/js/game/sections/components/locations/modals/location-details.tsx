@@ -33,7 +33,7 @@ export default class LocationDetails extends React.Component<LocationDetailsProp
                             <div className='flex items-center mb-4'>
                                 <h4>Special Location Details</h4>
                                 <div>
-                                    <button type={"button"} onClick={this.manageHelpDialogue.bind(this)} className='text-blue-500 dark:text-blue-300'>
+                                    <button type={"button"} onClick={this.manageHelpDialogue.bind(this)} className='text-blue-500 dark:text-blue-300 ml-2'>
                                         <i className={'fas fa-info-circle'}></i> Help
                                     </button>
                                 </div>

@@ -75,12 +75,12 @@ export default class Kingdoms extends React.Component<KingdomProps, KingdomState
                                       character_position={this.props.character_position}
                                       teleport_player={this.teleportPlayer.bind(this)}
                                       handle_close={this.closeKingdomModal.bind(this)}
-                                      hide_secondary={false}
                                       can_move={this.props.can_move}
                                       is_automation_running={this.props.is_automation_running}
                                       is_dead={this.props.is_dead}
+                                      show_top_section={true}
                         />
-                        : null
+                    : null
                 }
             </Fragment>
         );

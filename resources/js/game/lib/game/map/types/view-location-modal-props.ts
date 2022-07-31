@@ -9,4 +9,7 @@ export default interface ViewLocationModalProps {
     npc_kingdom_id: number | null;
 
     location: LocationDetails | null;
+
+    handle_close: () => void;
 }
+

@@ -1,9 +1,9 @@
 import React, {Fragment} from "react";
 import EnemyKingdomPin from "./enemy-kingdom-pin";
 import KingdomProps from "../../../lib/game/types/map/kingdom-pins/kingdom-props";
-import OtherKingdomModal from "./modals/other-kingdom-modal";
 import KingdomState from "../../../lib/game/types/map/kingdom-pins/kingdom-state";
 import {viewPortWatcher} from "../../../lib/view-port-watcher";
+import KingdomModal from "./modals/kingdom-modal";
 
 export default class EnemyKingdoms extends React.Component<KingdomProps, KingdomState> {
 
@@ -69,20 +69,19 @@ export default class EnemyKingdoms extends React.Component<KingdomProps, Kingdom
 
                 {
                     this.state.open_kingdom_modal ?
-                        <OtherKingdomModal is_open={this.state.open_kingdom_modal}
-                                           kingdom_id={this.state.kingdom_id}
-                                           character_id={this.props.character_id}
-                                           currencies={this.props.currencies}
-                                           character_position={this.props.character_position}
-                                           teleport_player={this.teleportPlayer.bind(this)}
-                                           handle_close={this.closeKingdomModal.bind(this)}
-                                           is_enemy_kingdom={true}
-                                           hide_secondary={false}
-                                           can_move={this.props.can_move}
-                                           is_automation_running={this.props.is_automation_running}
-                                           is_dead={this.props.is_dead}
+                        <KingdomModal is_open={this.state.open_kingdom_modal}
+                                      kingdom_id={this.state.kingdom_id}
+                                      character_id={this.props.character_id}
+                                      currencies={this.props.currencies}
+                                      character_position={this.props.character_position}
+                                      teleport_player={this.teleportPlayer.bind(this)}
+                                      handle_close={this.closeKingdomModal.bind(this)}
+                                      can_move={this.props.can_move}
+                                      is_automation_running={this.props.is_automation_running}
+                                      is_dead={this.props.is_dead}
+                                      show_top_section={false}
                         />
-                        : null
+                    : null
                 }
             </Fragment>
         );
