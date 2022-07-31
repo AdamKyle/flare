@@ -17,6 +17,20 @@ th {
     @apply pl-[10px];
 }
 
+#perPage {
+    width: 50px;
+    margin-top: -10px;
+    margin-left: 10px;
+}
+
+.prose :where(tbody td:first-child, tfoot td:first-child):not(:where([class~="not-prose"] *)) {
+    @apply p-[10px] !important;
+}
+
+.prose :where(thead th:first-child):not(:where([class~="not-prose"] *)) {
+    @apply pl-[10px] !important;
+}
+
 .glightbox {
     img {
         @apply max-w-3xl mx-auto mt-3 mb-3;

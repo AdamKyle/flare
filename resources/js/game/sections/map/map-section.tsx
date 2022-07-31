@@ -223,6 +223,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                         coordinates={this.state.coordinates}
                         view_port={this.props.view_port}
                         update_map_state={this.setStateFromData.bind(this)}
+                        map_id={this.state.map_id}
                     />
                     <DirectionalMovement
                         character_position={this.state.character_position}

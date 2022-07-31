@@ -10,6 +10,8 @@ export default interface MapActionsState {
 
     open_conjure: boolean;
 
+    open_settle_modal: boolean;
+
     player_kingdom_id: number | null;
 
     enemy_kingdom_id: number | null;
@@ -17,4 +19,5 @@ export default interface MapActionsState {
     npc_kingdom_id: number | null;
 
     location: LocationDetails | null;
+
 }

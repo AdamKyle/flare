@@ -9,6 +9,7 @@ import MovePlayer from "../../../lib/game/map/ajax/move-player";
 import SetSailModal from "../../components/actions/modals/set-sail-modal";
 import LocationDetails from "../../../lib/game/map/types/location-details";
 import Conjuration from "../../components/actions/modals/conjuration";
+import SettleKingdomModal from "../../components/actions/modals/settle-kingdom-modal";
 
 export default class MapActions extends React.Component<MapActionsProps, MapActionsState> {
     constructor(props: MapActionsProps) {
@@ -19,6 +20,7 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
             open_teleport_modal: false,
             open_set_sail: false,
             open_conjure: false,
+            open_settle_modal: false,
             player_kingdom_id: null,
             enemy_kingdom_id: null,
             npc_kingdom_id: null,
@@ -82,6 +84,12 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
         })
     }
 
+    manageSettleModal() {
+        this.setState({
+            open_settle_modal: !this.state.open_settle_modal,
+        })
+    }
+
     render() {
         return (
             <Fragment>
@@ -89,7 +97,7 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                     <PrimaryOutlineButton button_label={'View Location Details'}
                                           on_click={this.manageViewLocation.bind(this)} />
                     <PrimaryOutlineButton button_label={'Settle Kingdom'}
-                                          on_click={() => {}}
+                                          on_click={this.manageSettleModal.bind(this)}
                                           disabled={this.canSettleKingdom()}/>
                     <PrimaryOutlineButton button_label={'Set Sail'}
                                           on_click={this.manageSetSailModal.bind(this)}
@@ -139,6 +147,18 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                                        character_position={this.props.character_position}
                                        currencies={this.props.character_currencies}
                                        ports={this.ports()}
+                        />
+                        : null
+                }
+
+                {
+                    this.state.open_settle_modal ?
+                        <SettleKingdomModal
+                            is_open={this.state.open_settle_modal}
+                            handle_close={this.manageSettleModal.bind(this)}
+                            character_id={this.props.character_id}
+                            map_id={this.props.map_id}
+                            can_settle={this.canSettleKingdom()}
                         />
                         : null
                 }

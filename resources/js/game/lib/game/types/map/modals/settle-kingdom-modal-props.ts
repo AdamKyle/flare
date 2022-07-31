@@ -1,6 +1,3 @@
-import {ClassArray, ClassDictionary} from "clsx";
-import LocationDetails from "../../../map/types/location-details";
-
 export default interface SettleKingdomModalProps  {
 
     is_open: boolean;
@@ -11,5 +8,5 @@ export default interface SettleKingdomModalProps  {
 
     map_id: number;
 
-
+    can_settle: boolean;
 }

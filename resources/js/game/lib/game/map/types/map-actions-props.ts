@@ -33,4 +33,6 @@ export default interface MapActionsProps {
     character_id: number;
 
     update_map_state: (data: MapData, callback?: () => void) => void;
+
+    map_id: number;
 }

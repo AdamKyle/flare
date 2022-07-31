@@ -6,9 +6,10 @@ import Ajax from "../../../../lib/ajax/ajax";
 import LoadingProgressBar from "../../../../components/ui/progress-bars/loading-progress-bar";
 import DangerAlert from "../../../../components/ui/alerts/simple-alerts/danger-alert";
 import SuccessAlert from "../../../../components/ui/alerts/simple-alerts/success-alert";
+import SettleKingdomModalState from "../../../../lib/game/types/map/modals/settle-kingdom-modal-state";
 
 
-export default class SettleKingdomModal extends React.Component<SettleKingdomModalProps, any> {
+export default class SettleKingdomModal extends React.Component<SettleKingdomModalProps, SettleKingdomModalState> {
 
     constructor(props: SettleKingdomModalProps) {
         super(props);
@@ -27,11 +28,15 @@ export default class SettleKingdomModal extends React.Component<SettleKingdomMod
         });
     }
 
+    canSettleHere(): boolean {
+        return this.state.kingdom_name.length < 5 ||  this.state.kingdom_name.length > 30 || this.state.loading || this.props.can_settle;
+    }
+
     settleKingdom() {
         this.setState({
             loading: true,
-            error_message: null,
-            success_message: null,
+            error_message: '',
+            success_message: '',
         }, () => {
             (new Ajax()).setRoute('kingdoms/'+this.props.character_id+'/settle').setParameters({
                 name: this.state.kingdom_name
@@ -53,7 +58,6 @@ export default class SettleKingdomModal extends React.Component<SettleKingdomMod
         });
     }
 
-
     render() {
         return (
             <Dialogue is_open={this.props.is_open}
@@ -61,7 +65,7 @@ export default class SettleKingdomModal extends React.Component<SettleKingdomMod
                       title={'Settle New Kingdom'}
                       secondary_actions={{
                           handle_action: this.settleKingdom.bind(this),
-                          secondary_button_disabled: (this.state.kingdom_name.length < 5 ||  this.state.kingdom_name.length > 30 || this.state.loading),
+                          secondary_button_disabled: this.canSettleHere(),
                           secondary_button_label: 'Settle',
                       }}
             >
