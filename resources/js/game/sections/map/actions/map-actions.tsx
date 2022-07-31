@@ -60,6 +60,10 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
         return !this.props.can_move || this.props.is_dead || this.props.is_automation_running;
     }
 
+    canViewLocation(): boolean {
+        return this.state.location !== null || this.state.player_kingdom_id !== null || this.state.enemy_kingdom_id !== null || this.state.npc_kingdom_id !== null;
+    }
+
     manageViewLocation() {
         this.setState({
             show_location_details: !this.state.show_location_details,
@@ -95,7 +99,9 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
             <Fragment>
                 <div className='grid grid-cols-5 gap-2'>
                     <PrimaryOutlineButton button_label={'View Location Details'}
-                                          on_click={this.manageViewLocation.bind(this)} />
+                                          on_click={this.manageViewLocation.bind(this)}
+                                          disabled={!this.canViewLocation()}
+                    />
                     <PrimaryOutlineButton button_label={'Settle Kingdom'}
                                           on_click={this.manageSettleModal.bind(this)}
                                           disabled={this.canSettleKingdom()}/>

@@ -9,7 +9,7 @@ import KingdomModalState from "../../../../lib/game/types/map/kingdom-pins/modal
 import {formatNumber, percent} from "../../../../lib/game/format-number";
 import clsx from "clsx";
 import WarningAlert from "../../../../components/ui/alerts/simple-alerts/warning-alert";
-import PopOverContainer from "../../../../components/ui/popover/pop-over-container";
+import KingdomHelpModal from "./kingdom-help-modal";
 
 export default class KingdomModal extends React.Component<KingdomModalProps, KingdomModalState> {
 
@@ -66,6 +66,13 @@ export default class KingdomModal extends React.Component<KingdomModalProps, Kin
         this.props.handle_close();
     }
 
+    manageHelpDialogue(type: 'wall_defence' | 'treas_defence' | 'gb_defence' | 'passive_defence' | 'total_defence' | 'teleport_details') {
+        this.setState({
+            show_help: !this.state.show_help,
+            help_type: type,
+        });
+    }
+
     buildTitle() {
         if (this.state.kingdom_details !== null) {
             const kingdomDetails = this.state.kingdom_details;
@@ -86,7 +93,6 @@ export default class KingdomModal extends React.Component<KingdomModalProps, Kin
                           secondary_button_label: 'Teleport',
                           handle_action: this.handleTeleport.bind(this),
                       }}
-                      large_modal={true}
             >
                 {
                     this.state.loading ?
@@ -124,82 +130,72 @@ export default class KingdomModal extends React.Component<KingdomModalProps, Kin
                                 <div className='lg:grid lg:grid-cols-2'>
                                     <div>
                                         <dl>
-                                            <dt>
+                                            <dt>Wall Defence</dt>
+                                            <dd>
                                                 <div className='flex items-center mb-4'>
-                                                    Wall Defence
+                                                    {percent(this.state.kingdom_details?.walls_defence)}%
                                                     <div>
-                                                        <PopOverContainer icon={'fas fa-info-circle'} icon_label={'Help'} additional_css={'left-[150px] md:left-0'}>
-                                                            <h3>Wall Defence Bonus</h3>
-                                                            <p className='my-2'>
-                                                                This is calculated by your wall level divided wall max level to give the kingdom additional defence bonus towards attacking
-                                                                units and items that are dropped on your kingdoms.
-                                                            </p>
-                                                        </PopOverContainer>
+                                                        <div className='ml-2'>
+                                                            <button type={"button"} onClick={() => this.manageHelpDialogue('wall_defence')} className='text-blue-500 dark:text-blue-300'>
+                                                                <i className={'fas fa-info-circle'}></i> Help
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </dt>
-                                            <dd>{percent(this.state.kingdom_details?.walls_defence)}%</dd>
-                                            <dt>
+                                            </dd>
+                                            <dt>Treas. Defence</dt>
+                                            <dd>
                                                 <div className='flex items-center mb-4'>
-                                                    Treas. Defence
+                                                    {percent(this.state.kingdom_details?.treasury_defence)}%
                                                     <div>
-                                                        <PopOverContainer icon={'fas fa-info-circle'} icon_label={'Help'} additional_css={'left-[150px] md:left-0'}>
-                                                            <h3>Treasury Defence Bonus</h3>
-                                                            <p className='my-2'>
-                                                                This is calculated by dividing the amount of treasure by the max you can store: 2 Billion Gold.
-                                                                This defence bonus is then added to walls and the other bonuses below to give the kingdom an over all defence bonus.
-                                                            </p>
-                                                        </PopOverContainer>
+                                                        <div className='ml-2'>
+                                                            <button type={"button"} onClick={() => this.manageHelpDialogue('treas_defence')} className='text-blue-500 dark:text-blue-300'>
+                                                                <i className={'fas fa-info-circle'}></i> Help
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </dt>
-                                            <dd>{percent(this.state.kingdom_details?.treasury_defence)}%</dd>
-                                            <dt>
+                                            </dd>
+                                            <dt>GB. Defence</dt>
+                                            <dd>
                                                 <div className='flex items-center mb-4'>
-                                                    GB. Defence
+                                                    {percent(this.state.kingdom_details?.gold_bars_defence)}%
+
                                                     <div>
-                                                        <PopOverContainer icon={'fas fa-info-circle'} icon_label={'Help'} additional_css={'left-[150px] md:left-0'}>
-                                                            <h3>Gold Bars Defence Bonus</h3>
-                                                            <p className='my-2'>
-                                                                This is the amount of gold bars you have divided by the amount you can have which is 1000 at a cost of 2 billion each.
-                                                                Gold bars can only be purchased in kingdoms where you have the <a href='/information/kingdom-passive-skills' target='_blank'>
-                                                                Goblin Bank <i className="fas fa-external-link-alt"></i></a> building unlocked. This is then added to other defence bonuses you have.
-                                                            </p>
-                                                        </PopOverContainer>
+                                                        <div className='ml-2'>
+                                                            <button type={"button"} onClick={() => this.manageHelpDialogue('gb_defence')} className='text-blue-500 dark:text-blue-300'>
+                                                                <i className={'fas fa-info-circle'}></i> Help
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </dt>
-                                            <dd>{percent(this.state.kingdom_details?.gold_bars_defence)}%</dd>
-                                            <dt>
+                                            </dd>
+                                            <dt>Passive Defence</dt>
+                                            <dd>
                                                 <div className='flex items-center mb-4'>
-                                                    Passive Defence
+                                                    {percent(this.state.kingdom_details?.passive_defence)}%
                                                     <div>
-                                                        <PopOverContainer icon={'fas fa-info-circle'} icon_label={'Help'} additional_css={'left-[150px] md:left-0'}>
-                                                            <h3>Passive Defence Bonus</h3>
-                                                            <p className='my-2'>
-                                                                By training <a href='/information/kingdom-passive-skills' target='_blank'>passive skills<i className="fas fa-external-link-alt"></i></a> Your kingdom can unlock additional defence
-                                                                bonus for yur kingdom. This is then applied to all other defence bonuses.
-                                                            </p>
-                                                        </PopOverContainer>
+                                                        <div className='ml-2'>
+                                                            <button type={"button"} onClick={() => this.manageHelpDialogue('passive_defence')} className='text-blue-500 dark:text-blue-300'>
+                                                                <i className={'fas fa-info-circle'}></i> Help
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </dt>
-                                            <dd>{percent(this.state.kingdom_details?.passive_defence)}%</dd>
-                                            <dt>
+                                            </dd>
+                                            <dt>Total Defence</dt>
+                                            <dd>
                                                 <div className='flex items-center mb-4'>
-                                                    Total Defence
+                                                    {percent(this.state.kingdom_details?.defence_bonus)}%
                                                     <div>
-                                                        <PopOverContainer icon={'fas fa-info-circle'} icon_label={'Help'} additional_css={'left-[150px] md:left-0'}>
-                                                            <h3>Total Defence Bonus</h3>
-                                                            <p className='my-2'>
-                                                                This is the total and combined defence your kingdom has. If another player sends cannons towards you, your defence will be capped at 45% regardless if
-                                                                it is higher then that. Defence bonus mostly protects against users using items on your kingdom that can do up to 100% in damage for a single one.
-                                                            </p>
-                                                        </PopOverContainer>
+                                                        <div className='ml-2'>
+                                                            <button type={"button"} onClick={() => this.manageHelpDialogue('total_defence')} className='text-blue-500 dark:text-blue-300'>
+                                                                <i className={'fas fa-info-circle'}></i> Help
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </dt>
-                                            <dd>{percent(this.state.kingdom_details?.defence_bonus)}%</dd>
+                                            </dd>
                                         </dl>
                                         <div className='border-b-2 block border-b-gray-300 dark:border-b-gray-600 my-3 md:hidden'></div>
                                     </div>
@@ -223,14 +219,11 @@ export default class KingdomModal extends React.Component<KingdomModalProps, Kin
                                                             <div className='flex items-center mb-4'>
                                                                 <h4>Teleport Details</h4>
                                                                 <div>
-                                                                    <PopOverContainer icon={'fas fa-info-circle'} icon_label={'Help'} additional_css={'left-[150px] md:left-0'}>
-                                                                        <h3>Teleportation</h3>
-                                                                        <p className='my-2'>
-                                                                            This location will let you teleport to it for a fee and a timeout in minutes. If you have trained the skill <a href='/information/skill-information' target='_blank'>
-                                                                            Quick Feet <i className="fas fa-external-link-alt"></i></a> to a high enough level then the timer will reduce the time before you can move again by a % down to a maximum of 1 minute.
-                                                                            If the teleport button is disabled, you cannot afford to travel.
-                                                                        </p>
-                                                                    </PopOverContainer>
+                                                                    <div className='ml-2'>
+                                                                        <button type={"button"} onClick={() => this.manageHelpDialogue('teleport_details')} className='text-blue-500 dark:text-blue-300'>
+                                                                            <i className={'fas fa-info-circle'}></i> Help
+                                                                        </button>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                             <dl>
@@ -248,7 +241,8 @@ export default class KingdomModal extends React.Component<KingdomModalProps, Kin
                                                                 <dd>{this.state.time_out}</dd>
                                                             </dl>
                                                         </Fragment>
-                                                        : <WarningAlert>
+                                                    :
+                                                        <WarningAlert>
                                                             You are too close to the location to be able to teleport.
                                                         </WarningAlert>
                                                 }
@@ -258,6 +252,12 @@ export default class KingdomModal extends React.Component<KingdomModalProps, Kin
                                 }
                             </div>
                         </Fragment>
+                }
+
+                {
+                    this.state.show_help ?
+                        <KingdomHelpModal manage_modal={this.manageHelpDialogue.bind(this)} type={this.state.help_type}/>
+                        : null
                 }
             </Dialogue>
         );

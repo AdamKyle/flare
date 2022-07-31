@@ -1,12 +1,12 @@
 import React, {Fragment} from "react";
 import Dialogue from "../../../../components/ui/dialogue/dialogue";
 import {LocationModalPros} from "../../../../lib/game/types/map/location-pins/modals/location-modal-pros";
-import PopOverContainer from "../../../../components/ui/popover/pop-over-container";
 import {fetchCost} from "../../../../lib/game/map/teleportion-costs";
 import {formatNumber} from "../../../../lib/game/format-number";
 import clsx from "clsx";
 import WarningAlert from "../../../../components/ui/alerts/simple-alerts/warning-alert";
 import LocationModalState from "../../../../lib/game/types/map/location-pins/modals/location-modal-state";
+import SpecialLocationHelpModal from "./special-location-help-modal";
 
 export default class LocationModal extends React.Component<LocationModalPros, LocationModalState> {
 
@@ -15,6 +15,7 @@ export default class LocationModal extends React.Component<LocationModalPros, Lo
 
         this.state = {
             can_afford: false,
+            open_help_dialogue: false,
             distance: 0,
             cost: 0,
             time_out: 0,
@@ -48,6 +49,12 @@ export default class LocationModal extends React.Component<LocationModalPros, Lo
         return this.state.cost === 0 || !this.state.can_afford || !this.props.can_move || this.props.is_automation_running || this.props.is_dead;
     }
 
+    manageHelpDialogue() {
+        this.setState({
+            open_help_dialogue: !this.state.open_help_dialogue
+        })
+    }
+
     render() {
         return (
             <Dialogue is_open={this.props.is_open}
@@ -68,18 +75,9 @@ export default class LocationModal extends React.Component<LocationModalPros, Lo
                             <div className='flex items-center mb-4'>
                                 <h4>Special Location Details</h4>
                                 <div>
-                                <PopOverContainer icon={'fas fa-info-circle'} icon_label={'Help'} additional_css={'left-[150px] md:left-0'}>
-                                    <h3>Special Locations</h3>
-                                    <p className='my-2'>
-                                        This is a special location which contains the same monsters you have been fighting but they are much stronger here.
-                                        Players will want to have <a href={"/information/voidance"} target='_blank'>Devouring Darkness and Light <i className="fas fa-external-link-alt"></i></a> <a href={"/information/quest-items"} target='_blank'>Quest items <i className="fas fa-external-link-alt"></i> </a>
-                                        Which you can get from completing various: <a href={"/information/quests"} target='_blank'>Quests <i className="fas fa-external-link-alt"></i></a> with in the game.
-                                    </p>
-                                    <p>
-                                        These places offer specific quest items that drop at a 1/1,000,000 chance with your looting skill bonus capped at 45%. You can read more about
-                                        special locations and see their drops by reading: <a href={"/information/special-locations"} target='_blank'>Special Locations <i className="fas fa-external-link-alt"></i></a>.
-                                    </p>
-                                </PopOverContainer>
+                                    <button type={"button"} onClick={this.manageHelpDialogue.bind(this)} className='text-blue-500 dark:text-blue-300'>
+                                        <i className={'fas fa-info-circle'}></i> Help
+                                    </button>
                                 </div>
                             </div>
                             <p className={'mb-4'}>
@@ -116,6 +114,12 @@ export default class LocationModal extends React.Component<LocationModalPros, Lo
                         <WarningAlert>
                             You are too close to the location to be able to teleport.
                         </WarningAlert>
+                }
+
+                {
+                    this.state.open_help_dialogue ?
+                        <SpecialLocationHelpModal manage_modal={this.manageHelpDialogue.bind(this)} />
+                    : null
                 }
             </Dialogue>
         )

@@ -56,7 +56,7 @@ export default class KingdomHelpModal extends React.Component<any, any> {
     renderPassiveDefence() {
         return (
             <p className='my-2'>
-                By training <a href='/information/kingdom-passive-skills' target='_blank'>passive skills<i className="fas fa-external-link-alt"></i></a> Your kingdom can unlock additional defence
+                By training <a href='/information/kingdom-passive-skills' target='_blank'>passive skills <i className="fas fa-external-link-alt"></i></a> Your kingdom can unlock additional defence
                 bonus for yur kingdom. This is then applied to all other defence bonuses.
             </p>
         )

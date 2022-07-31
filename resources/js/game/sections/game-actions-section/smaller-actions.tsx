@@ -8,12 +8,9 @@ import ActionsManager from "../../lib/game/actions/actions-manager";
 import MonsterSelection from "./components/monster-selection";
 import FightSection from "./components/fight-section";
 import DropDown from "../../components/ui/drop-down/drop-down";
-import clsx from "clsx";
-import TimerProgressBar from "../../components/ui/progress-bars/timer-progress-bar";
 import PrimaryButton from "../../components/ui/buttons/primary-button";
 import MapMovementActions from "./components/small-actions/map-movement-actions";
 import ExplorationSection from "./components/exploration-section";
-import WarningAlert from "../../components/ui/alerts/simple-alerts/warning-alert";
 import CelestialFight from "./components/celestial-fight";
 import DuelPlayer from "./components/duel-player";
 import {CraftingOptions} from "../../lib/game/types/actions/crafting-type-options";
@@ -483,81 +480,15 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
 
     render() {
         return(
-          <Fragment>
-              {
-                  this.state.selected_action !== null ?
-                      <Fragment>
-                          {
-                              this.state.show_duel_fight ?
-                                  this.showDuelFight()
-                              :
-                                  this.buildSection()
-                          }
-                      </Fragment>
-                  :
-                      <Fragment>
-                          {
-                              this.props.character.is_automation_running ?
-                                  <div className='my-2'>
-                                      <WarningAlert>
-                                          Automation is running, You cannot fight monsters. <a href='/information/automation' target='_blank'>See Automation Help <i
-                                          className="fas fa-external-link-alt"></i></a> for more details.
-                                      </WarningAlert>
-                                  </div>
-                              : null
-                          }
-                          {
-                              this.state.show_duel_fight ?
-                                  this.showDuelFight()
-                              :
-                                  <Select
-                                      onChange={this.showAction.bind(this)}
-                                      options={this.buildOptions()}
-                                      menuPosition={'absolute'}
-                                      menuPlacement={'bottom'}
-                                      styles={{menuPortal: (base: any) => ({...base, zIndex: 9999, color: '#000000'})}}
-                                      menuPortalTarget={document.body}
-                                      value={this.defaultSelectedAction()}
-                                  />
-                          }
-                      </Fragment>
-              }
-
-              <div className='relative top-[18px] bottom-[10px]'>
-                  <div className={clsx('grid gap-2', {
-                      'md:grid-cols-2': this.state.attack_time_out !== 0 && this.state.crafting_time_out !== 0
-                  })}>
-                      <div>
-                          <TimerProgressBar time_remaining={this.state.attack_time_out} time_out_label={'Attack Timeout'} update_time_remaining={this.updateTimer.bind(this)} />
-                      </div>
-                      <div>
-                          <TimerProgressBar time_remaining={this.state.crafting_time_out} time_out_label={'Crafting Timeout'} update_time_remaining={this.updateCraftingTimer.bind(this)} />
-                      </div>
-                  </div>
-              </div>
-
-              <div className='relative top-[18px]'>
-                  <div className={clsx('grid gap-2', {
-                      'md:grid-cols-2': this.state.movement_time_out !== 0 && this.state.automation_time_out !== 0
-                  })}>
-                      {
-                          typeof this.state.movement_time_out !== 'undefined'?
-                              <div>
-                                  <TimerProgressBar time_remaining={this.state.movement_time_out} time_out_label={'Movement Timeout'} />
-                              </div>
-                          : null
-                      }
-
-                      {
-                          typeof this.state.automation_time_out !== 'undefined'?
-                              <div>
-                                  <TimerProgressBar time_remaining={this.state.automation_time_out} time_out_label={'Exploration'} />
-                              </div>
-                              : null
-                      }
-                  </div>
-              </div>
-          </Fragment>
+            <Select
+                onChange={this.showAction.bind(this)}
+                options={this.buildOptions()}
+                menuPosition={'absolute'}
+                menuPlacement={'bottom'}
+                styles={{menuPortal: (base: any) => ({...base, zIndex: 9999, color: '#000000'})}}
+                menuPortalTarget={document.body}
+                value={this.defaultSelectedAction()}
+            />
         );
     }
 }

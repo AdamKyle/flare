@@ -1,6 +1,8 @@
 export default interface LocationModalState {
     can_afford: boolean;
 
+    open_help_dialogue?: boolean;
+
     distance: number;
 
     cost: number;
