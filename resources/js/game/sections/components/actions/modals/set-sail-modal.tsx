@@ -9,9 +9,11 @@ import SetSailModalProps from "../../../../lib/game/types/map/modals/set-sail-mo
 import SetSailModalState from "../../../../lib/game/types/map/modals/set-sail-modal-state";
 import {viewPortWatcher} from "../../../../lib/view-port-watcher";
 import TeleportHelpModal from "./teleport-help-modal";
+import SetSailComponent from "../../../../lib/game/map/components/set-sail-component";
 
+export default class SetSailModal extends React.Component<SetSailModalProps, SetSailModalState> {
 
-export default class TeleportModal extends React.Component<SetSailModalProps, SetSailModalState> {
+    private setSailComponent: SetSailComponent;
 
     constructor(props: SetSailModalProps) {
         super(props);
@@ -33,20 +35,14 @@ export default class TeleportModal extends React.Component<SetSailModalProps, Se
             view_port: null,
             show_help: false,
         }
+
+        this.setSailComponent = new SetSailComponent(this);
     }
 
     componentDidMount() {
         viewPortWatcher(this);
 
-        if (this.props.ports !== null) {
-            const foundLocation = this.props.ports.filter((port) => port.x === this.props.character_position.x && port.y === this.props.character_position.y);
-
-            if (foundLocation.length > 0) {
-                this.setState({
-                    current_port: foundLocation[0],
-                });
-            }
-        }
+        this.setSailComponent.setInitialCurrentSelectedPort();
     }
 
     componentDidUpdate() {
@@ -54,15 +50,7 @@ export default class TeleportModal extends React.Component<SetSailModalProps, Se
             return;
         }
 
-        if (this.state.current_port === null) {
-            const foundLocation = this.props.ports.filter((port) => port.x === this.props.character_position.x && port.y === this.props.character_position.y);
-
-            if (foundLocation.length > 0) {
-                this.setState({
-                    current_port: foundLocation[0],
-                });
-            }
-        }
+        this.setSailComponent.updateSelectedCurrentPort();
 
         if (this.state.view_port !== null) {
             if (this.state.view_port < 1600) {
@@ -71,51 +59,12 @@ export default class TeleportModal extends React.Component<SetSailModalProps, Se
         }
     }
 
-    getDefaultPortValue() {
-        if (this.state.current_port !== null) {
-            return {label: this.state.current_port.name + ' (X/Y): ' + this.state.current_port.x + '/' + this.state.current_port.y, value: this.state.current_port.id}
-        }
-
-        return  {value: 0, label: ''};
-    }
-
     setPortData(data: any) {
-        if (this.props.ports !== null) {
-            const foundLocation = this.props.ports.filter((ports) => ports.id === data.value);
-
-            if (foundLocation.length > 0) {
-                this.setState({
-                    x_position: foundLocation[0].x,
-                    y_position: foundLocation[0].y,
-                    current_location: foundLocation[0],
-                    current_player_kingdom: null,
-                    current_enemy_kingdom: null
-                }, () => {
-                    this.setState(fetchCost(this.state.x_position, this.state.y_position, this.state.character_position, this.props.currencies));
-                });
-            }
-        }
-    }
-
-    buildSetSailOptions(): {value: number, label: string}[]|[] {
-        if (this.props.ports !== null) {
-            return this.props.ports.map((port) => {
-                return {label: port.name + ' (X/Y): ' + port.x + '/' + port.y, value: port.id}
-            });
-        }
-
-        return [];
+        this.setSailComponent.setSelectedPortData(data);
     }
 
     setSail() {
-        this.props.set_sail({
-            x: this.state.x_position,
-            y: this.state.y_position,
-            cost: this.state.cost,
-            timeout: this.state.time_out
-        });
-
-         this.props.handle_close();
+        this.setSailComponent.setSail();
     }
 
     manageHelpDialogue() {
@@ -140,12 +89,12 @@ export default class TeleportModal extends React.Component<SetSailModalProps, Se
                 <div className='w-2/3'>
                     <Select
                         onChange={this.setPortData.bind(this)}
-                        options={this.buildSetSailOptions()}
+                        options={this.setSailComponent.buildSetSailOptions()}
                         menuPosition={'absolute'}
                         menuPlacement={'bottom'}
                         styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999, color: '#000000' }) }}
                         menuPortalTarget={document.body}
-                        value={this.getDefaultPortValue()}
+                        value={this.setSailComponent.getDefaultPortValue()}
                     />
                 </div>
             </div>
@@ -177,7 +126,7 @@ export default class TeleportModal extends React.Component<SetSailModalProps, Se
                 {
                     this.state.show_help ?
                         <TeleportHelpModal manage_modal={this.manageHelpDialogue.bind(this)} />
-                        : null
+                    : null
                 }
             </Dialogue>
         )

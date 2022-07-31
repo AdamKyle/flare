@@ -6,6 +6,8 @@ import MapActionsState from "../../../lib/game/map/types/map-actions-state";
 import ViewLocationState from "../../../lib/game/map/state/view-location-state";
 import TeleportModal from "../../components/actions/modals/teleport-modal";
 import MovePlayer from "../../../lib/game/map/ajax/move-player";
+import SetSailModal from "../../components/actions/modals/set-sail-modal";
+import LocationDetails from "../../../lib/game/map/types/location-details";
 
 export default class MapActions extends React.Component<MapActionsProps, MapActionsState> {
     constructor(props: MapActionsProps) {
@@ -14,6 +16,7 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
         this.state = {
             show_location_details: false,
             open_teleport_modal: false,
+            open_set_sail: false,
             player_kingdom_id: null,
             enemy_kingdom_id: null,
             npc_kingdom_id: null,
@@ -33,8 +36,24 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
         (new MovePlayer(this)).teleportPlayer(data, this.props.character_id, this.props.update_map_state);
     }
 
-    canSettleKingdom() {
+    setSail(data: {x: number, y: number, cost: number, timeout: number}) {
+        (new MovePlayer(this)).setSail(data, this.props.character_id, this.props.view_port, this.props.update_map_state);
+    }
+
+    ports(): LocationDetails[]|[] {
+        return this.props.locations.filter((location: LocationDetails) => location.is_port);
+    }
+
+    canSettleKingdom(): boolean {
         return !this.props.can_move || this.props.is_dead || this.props.is_automation_running || !canSettleHere(this);
+    }
+
+    canSetSail(): boolean {
+        return !this.props.can_move || this.props.is_dead || this.props.is_automation_running || this.props.port_location === null;
+    }
+
+    canTeleport(): boolean {
+        return !this.props.can_move || this.props.is_dead || this.props.is_automation_running;
     }
 
     manageViewLocation() {
@@ -49,6 +68,12 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
         })
     }
 
+    manageSetSailModal() {
+        this.setState({
+            open_set_sail: !this.state.open_set_sail,
+        })
+    }
+
     render() {
         return (
             <Fragment>
@@ -59,11 +84,11 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                                           on_click={() => {}}
                                           disabled={this.canSettleKingdom()}/>
                     <PrimaryOutlineButton button_label={'Set Sail'}
-                                          on_click={() => {}}
-                                          disabled={!this.props.can_move || this.props.is_dead || this.props.is_automation_running || this.props.port_location === null}/>
+                                          on_click={this.manageSetSailModal.bind(this)}
+                                          disabled={this.canSetSail()}/>
                     <PrimaryOutlineButton button_label={'Teleport'}
                                           on_click={this.manageTeleportModal.bind(this)}
-                                          disabled={!this.props.can_move || this.props.is_dead || this.props.is_automation_running}/>
+                                          disabled={this.canTeleport()}/>
                 </div>
 
                 {
@@ -82,6 +107,19 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                                        npc_kingdoms={this.props.npc_kingdoms}
                         />
                     : null
+                }
+
+                {
+                    this.state.open_set_sail ?
+                        <SetSailModal  is_open={this.state.open_set_sail}
+                                       set_sail={this.setSail.bind(this)}
+                                       handle_close={this.manageSetSailModal.bind(this)}
+                                       title={'Set Sail'}
+                                       character_position={this.props.character_position}
+                                       currencies={this.props.character_currencies}
+                                       ports={this.ports()}
+                        />
+                        : null
                 }
             </Fragment>
         )

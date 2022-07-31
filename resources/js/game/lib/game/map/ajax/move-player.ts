@@ -79,22 +79,13 @@ export default class MovePlayer {
             });
     }
 
-    setSail(data: {x: number, y: number, cost: number, timeout: number}, characterId: number, viewPort: number) {
+    setSail(data: {x: number, y: number, cost: number, timeout: number},
+            characterId: number, viewPort: number,
+            updateMapState: (data: MapData, callback?: () => void) => void
+        ) {
         (new Ajax()).setRoute('map/set-sail/' + characterId).setParameters(data)
             .doAjaxCall('post', (result: AxiosResponse) => {
-                let state = {...MapStateManager.setState(result.data), ...this.component.state};
-
-                state.character_position.x = data.x;
-                state.character_position.y = data.y;
-
-                state.port_location = getPortLocation(state);
-
-                state.map_position = {
-                    x: getNewXPosition(state.character_position.x, state.map_position.x, viewPort),
-                    y: getNewYPosition(state.character_position.y, state.map_position.y, viewPort)
-                }
-
-                this.component.setState(state);
+                updateMapState(result.data);
             }, (error: AxiosError) => {
                 this.handleErrors(error);
             });

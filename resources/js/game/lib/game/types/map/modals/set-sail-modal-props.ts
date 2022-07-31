@@ -7,8 +7,6 @@ export default interface SetSailModalProps  {
 
     handle_close: () => void;
 
-    handle_action: (args: any) => void;
-
     title: string;
 
     character_position: { x: number, y: number },

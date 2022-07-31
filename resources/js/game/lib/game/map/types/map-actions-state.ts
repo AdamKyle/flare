@@ -6,6 +6,8 @@ export default interface MapActionsState {
 
     open_teleport_modal: boolean;
 
+    open_set_sail: boolean;
+
     player_kingdom_id: number | null;
 
     enemy_kingdom_id: number | null;

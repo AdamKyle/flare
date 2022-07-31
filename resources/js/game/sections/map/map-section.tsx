@@ -142,10 +142,6 @@ export default class MapSection extends React.Component<MapProps, MapState> {
         (new MovePlayer(this)).teleportPlayer(data, this.props.character_id, this.setStateFromData.bind(this));
     }
 
-    handleSetSail(data: {x: number, y: number, cost: number, timeout: number}) {
-        (new MovePlayer(this)).setSail(data, this.props.character_id, this.props.view_port);
-    }
-
     render() {
         if (this.state.loading) {
             return <ComponentLoading />
