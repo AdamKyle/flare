@@ -40,7 +40,7 @@ Broadcast::channel('update-units-in-movement-{userId}', function($user, $userId)
    return $user->id === (int) $userId;
 });
 
-// When the user does too many actions.
+// When the user does too many map-actions.
 Broadcast::channel('global-timeout-{userId}', function($user, $userId) {
     return $user->id === (int) $userId;
 });

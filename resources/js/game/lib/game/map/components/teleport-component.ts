@@ -1,4 +1,4 @@
-import TeleportModal from "../../../../sections/components/actions/modals/teleport-modal";
+import TeleportModal from "../../../../sections/components/map-actions/modals/teleport-modal";
 import {fetchCost} from "../teleportion-costs";
 import LocationDetails from "../types/location-details";
 import PlayerKingdomsDetails from "../../types/map/player-kingdoms-details";

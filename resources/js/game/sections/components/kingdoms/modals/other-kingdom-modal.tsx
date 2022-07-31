@@ -12,7 +12,7 @@ import OtherKingdomModalProps from "../../../../lib/game/types/map/kingdom-pins/
 import KingdomDetails from "../../../../lib/game/map/types/kingdom-details";
 import KingdomHelpModal from "./kingdom-help-modal";
 import PrimaryButton from "../../../../components/ui/buttons/primary-button";
-import PurchaseNpcKingdom from "../../actions/modals/purchase-npc-kingdom";
+import PurchaseNpcKingdom from "../../map-actions/modals/purchase-npc-kingdom";
 
 export default class OtherKingdomModal extends React.Component<OtherKingdomModalProps, KingdomModalState> {
 

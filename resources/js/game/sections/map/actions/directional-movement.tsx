@@ -1,7 +1,7 @@
 import React, {Fragment} from "react";
 import MovePlayer from "../../../lib/game/map/ajax/move-player";
 import PrimaryOutlineButton from "../../../components/ui/buttons/primary-outline-button";
-import TraverseModal from "../../components/actions/modals/traverse-modal";
+import TraverseModal from "../../components/map-actions/modals/traverse-modal";
 import DirectionalMovementProps from "../../../lib/game/map/types/directional-movement-props";
 import DirectionalMovementState from "../../../lib/game/map/types/directional-movement-state";
 

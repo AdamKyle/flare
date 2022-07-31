@@ -68,12 +68,12 @@ export default class Dialogue extends React.Component<DialogueTypes, any> {
                                         <DangerButton button_label={'Cancel'} on_click={this.closeModal.bind(this)} disabled={this.props.primary_button_disabled} />
 
                                         {
-                                            this.props.secondary_actions !== null ?
+                                            typeof this.props.secondary_actions !== 'undefined' && this.props.secondary_actions !== null ?
                                                 <PrimaryButton additional_css={'float-right'} button_label={this.props.secondary_actions.secondary_button_label} on_click={this.props.secondary_actions.handle_action} disabled={this.props.secondary_actions.secondary_button_disabled}/>
                                             : null
                                         }
                                         {
-                                            typeof this.props.tertiary_actions !== 'undefined' && this.props.tertiary_actions !== null ?
+                                            typeof this.props.tertiary_actions !== 'undefined' ?
                                                 <PrimaryButton additional_css={'mr-2 float-right'} button_label={this.props.tertiary_actions.tertiary_button_label} on_click={this.props.tertiary_actions.handle_action} disabled={this.props.tertiary_actions.tertiary_button_disabled} />
                                             : null
                                         }

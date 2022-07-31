@@ -40,7 +40,6 @@ export default class EquipModal extends React.Component<EquipModalProps, any> {
             <Dialogue is_open={this.props.is_open}
                       handle_close={this.props.manage_modal}
                       title={'Select Position'}
-                      secondary_actions={null}
             >
                 {
                     EquipPositions.isTwoHanded(this.props.item_to_equip.type) ?

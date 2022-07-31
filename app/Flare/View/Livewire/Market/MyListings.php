@@ -28,7 +28,7 @@ class MyListings extends DataTableComponent {
                 fn($value, $row, Column $column) => number_format($value)
             )->searchable()->sortable(),
             Column::make('Actions')->label(
-                fn($row, Column $column)  => view('game.core.market.partials.market-my-actions-section', [
+                fn($row, Column $column)  => view('game.core.market.partials.market-my-map-actions-section', [
                     'row' => $row
                 ])
             )

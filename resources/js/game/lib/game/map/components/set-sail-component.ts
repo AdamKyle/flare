@@ -1,4 +1,4 @@
-import SetSailModal from "../../../../sections/components/actions/modals/set-sail-modal";
+import SetSailModal from "../../../../sections/components/map-actions/modals/set-sail-modal";
 import LocationDetails from "../types/location-details";
 import SetSailModalProps from "../../types/map/modals/set-sail-modal-props";
 import {fetchCost} from "../teleportion-costs";

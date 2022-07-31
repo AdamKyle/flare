@@ -29,7 +29,7 @@ class AllListings extends DataTableComponent {
                 fn($value, $row, Column $column) => number_format($value)
             )->searchable()->sortable(),
             Column::make('Actions')->label(
-                fn($row, Column $column)  => view('game.core.market.partials.market-actions-section', [
+                fn($row, Column $column)  => view('game.core.market.partials.market-map-actions-section', [
                     'character' => auth()->user()->character,
                     'value'     => $row->item,
                     'row'       => $row

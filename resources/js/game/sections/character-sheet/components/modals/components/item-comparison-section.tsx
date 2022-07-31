@@ -7,7 +7,6 @@ import Tabs from "../../../../../components/ui/tabs/tabs";
 import TabPanel from "../../../../../components/ui/tabs/tab-panel";
 import {formatNumber} from "../../../../../lib/game/format-number";
 import ItemNameColorationText from "../../../../../components/ui/item-name-coloration-text";
-import ItemDetails from "./item-details";
 import ItemsAttachedSkills from "../../../../../lib/game/character-sheet/types/modal/items-attached-skills";
 
 export default class ItemComparisonSection extends React.Component<any, any> {

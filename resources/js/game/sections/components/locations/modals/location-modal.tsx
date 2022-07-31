@@ -7,6 +7,7 @@ import clsx from "clsx";
 import WarningAlert from "../../../../components/ui/alerts/simple-alerts/warning-alert";
 import LocationModalState from "../../../../lib/game/types/map/location-pins/modals/location-modal-state";
 import SpecialLocationHelpModal from "./special-location-help-modal";
+import LocationDetails from "./location-details";
 
 export default class LocationModal extends React.Component<LocationModalPros, LocationModalState> {
 
@@ -66,33 +67,7 @@ export default class LocationModal extends React.Component<LocationModalPros, Lo
                           handle_action: this.handleTeleport.bind(this),
                       }}
             >
-                <p className='my-3'>{this.props.location.description}</p>
-                {
-                    this.props.location.increase_enemy_percentage_by !== null &&
-                    this.props.location.increase_enemy_percentage_by !== null ?
-                        <Fragment>
-                            <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                            <div className='flex items-center mb-4'>
-                                <h4>Special Location Details</h4>
-                                <div>
-                                    <button type={"button"} onClick={this.manageHelpDialogue.bind(this)} className='text-blue-500 dark:text-blue-300'>
-                                        <i className={'fas fa-info-circle'}></i> Help
-                                    </button>
-                                </div>
-                            </div>
-                            <p className={'mb-4'}>
-                                Places like this can increase the enemies stats and resistances as well as skills. It is essential that players craft appropriate resistance
-                                and stat reduction gear to survive harder creatures here.
-                            </p>
-                            <dl className={'mb-4'}>
-                                <dt>Increase Core Stats By: </dt>
-                                <dd>{formatNumber(this.props.location.increases_enemy_stats_by)}</dd>
-                                <dt>Increase Percentage Based Values By: </dt>
-                                <dd>{(this.props.location.increase_enemy_percentage_by * 100).toFixed(0)}%</dd>
-                            </dl>
-                        </Fragment>
-                    : null
-                }
+                <LocationDetails location={this.props.location} />
 
                 {
                     this.state.cost > 0 ?

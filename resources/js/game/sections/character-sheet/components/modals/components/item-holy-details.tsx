@@ -36,7 +36,6 @@ export default class ItemHolyDetails extends React.Component<any, any> {
             <Dialogue is_open={this.props.is_open}
                       handle_close={this.props.manage_modal}
                       title='Holy Break Down'
-                      secondary_actions={null}
             >
                 <div className='max-h-[350px] overflow-y-scroll'>
                     {this.renderStacks()}

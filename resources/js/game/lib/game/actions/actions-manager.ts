@@ -17,7 +17,7 @@ export default class ActionsManager {
     }
 
     initialFetch(props: ActionsProps) {
-        (new Ajax()).setRoute('actions/' + props.character_id).doAjaxCall('get', (result: AxiosResponse) => {
+        (new Ajax()).setRoute('map-actions/' + props.character_id).doAjaxCall('get', (result: AxiosResponse) => {
             this.component.setState({
                 character: props.character,
                 monsters: result.data.monsters,

@@ -118,7 +118,7 @@ class BattleControllerApiTest extends TestCase
         $user     = $this->character->getUser();
 
         $response = $this->actingAs($user)
-                         ->json('GET', '/api/actions', [
+                         ->json('GET', '/api/map-actions', [
                              'user_id' => $user->id
                          ])
                          ->response;
@@ -143,7 +143,7 @@ class BattleControllerApiTest extends TestCase
         resolve(BuildMonsterCacheService::class)->buildCache();
 
         $response = $this->actingAs($user)
-                         ->json('GET', '/api/actions', [
+                         ->json('GET', '/api/map-actions', [
                              'user_id' => $user->id
                          ])
                          ->response;
@@ -157,7 +157,7 @@ class BattleControllerApiTest extends TestCase
     }
 
     public function testWhenNotLoggedInCannotGetActions() {
-        $response = $this->json('GET', '/api/actions', [
+        $response = $this->json('GET', '/api/map-actions', [
                              'user_id' => 1
                          ])
                          ->response;

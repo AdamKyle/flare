@@ -218,7 +218,7 @@ class AttackService {
 
 
     /**
-     * Handles settler actions.
+     * Handles settler map-actions.
      *
      * Either reduces the morale of the kingdom, takes the kingdom or if the last unit, results in a lost attack.
      *

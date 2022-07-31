@@ -6,7 +6,7 @@ export default interface DialogueTypes {
 
     primary_button_disabled?: boolean;
 
-    secondary_actions: {
+    secondary_actions?: {
         secondary_button_disabled: boolean;
         secondary_button_label: string;
         handle_action: (args: any) => void;
@@ -16,7 +16,7 @@ export default interface DialogueTypes {
         tertiary_button_disabled: boolean;
         tertiary_button_label: string;
         handle_action: (args: any) => void;
-    } | null;
+    };
 
     title: string | JSX.Element;
 

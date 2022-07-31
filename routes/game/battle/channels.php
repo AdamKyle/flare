@@ -16,8 +16,8 @@ Broadcast::channel('character-is-dead-{userId}', function ($user, $userId) {
 	return $user->id === (int) $userId;
 });
 
-// When the actions needed to be updated.
-Broadcast::channel('update-actions-{userId}', function ($user, $userId) {
+// When the map-actions needed to be updated.
+Broadcast::channel('update-map-actions-{userId}', function ($user, $userId) {
    return $user->id === (int) $userId;
 });
 

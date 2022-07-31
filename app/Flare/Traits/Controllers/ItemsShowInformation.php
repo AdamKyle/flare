@@ -47,19 +47,19 @@ trait ItemsShowInformation {
             }
 
             if ($effect->labyrinth()) {
-                $effects = 'Use Traverse (beside movement actions) to traverse to Labyrinth plane';
+                $effects = 'Use Traverse (beside movement map-actions) to traverse to Labyrinth plane';
             }
 
             if ($effect->dungeon()) {
-                $effects = 'Use Traverse (beside movement actions) to traverse to Dungeons plane';
+                $effects = 'Use Traverse (beside movement map-actions) to traverse to Dungeons plane';
             }
 
             if ($effect->hell()) {
-                $effects = 'Use Traverse (beside movement actions) to traverse to Hell plane';
+                $effects = 'Use Traverse (beside movement map-actions) to traverse to Hell plane';
             }
 
             if ($effect->purgatory()) {
-                $effects = 'Use Traverse (beside movement actions) to traverse to Purgatory plane (only while in Hell at the location: Tear in the Fabric of Time (X/Y: 208/64))';
+                $effects = 'Use Traverse (beside movement map-actions) to traverse to Purgatory plane (only while in Hell at the location: Tear in the Fabric of Time (X/Y: 208/64))';
             }
 
             if ($effect->canMassEmbezzle()) {

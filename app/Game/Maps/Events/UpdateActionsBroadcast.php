@@ -50,6 +50,6 @@ class UpdateActionsBroadcast implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('update-actions-' . $this->user->id);
+        return new PrivateChannel('update-map-actions-' . $this->user->id);
     }
 }

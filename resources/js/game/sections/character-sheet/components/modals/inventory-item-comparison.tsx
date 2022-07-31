@@ -105,7 +105,6 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
                 <Dialogue is_open={this.props.is_open}
                           handle_close={this.props.manage_modal}
                           title={'You are dead'}
-                          secondary_actions={null}
                           large_modal={false}
                           primary_button_disabled={false}
                 >
@@ -118,7 +117,6 @@ export default class InventoryItemComparison extends React.Component<InventoryIt
             <Dialogue is_open={this.props.is_open}
                       handle_close={this.props.manage_modal}
                       title={this.buildTitle()}
-                      secondary_actions={null}
                       large_modal={true}
                       primary_button_disabled={this.state.action_loading}
             >

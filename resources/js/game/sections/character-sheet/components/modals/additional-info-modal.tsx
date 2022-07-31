@@ -37,7 +37,6 @@ export default class AdditionalInfoModal extends React.Component<AdditionalInfoM
             <Dialogue is_open={this.props.is_open}
                       handle_close={this.props.manage_modal}
                       title={this.props.title}
-                      secondary_actions={null}
             >
                 <Tabs tabs={this.tabs} full_width={true}>
                     <TabPanel key={'stats'}>

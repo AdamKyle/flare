@@ -57,7 +57,6 @@ export default class SkillInformation extends React.Component<any, any> {
             <Dialogue is_open={this.props.is_open}
                       handle_close={this.props.manage_modal}
                       title={this.props.skill.name}
-                      secondary_actions={null}
             >
                 {
                     this.props.skill.is_locked ?

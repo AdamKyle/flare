@@ -586,7 +586,7 @@ class MovementService {
     }
 
     /**
-     * Update character actions.
+     * Update character map-actions.
      *
      * @param int $mapId
      * @param Character $character

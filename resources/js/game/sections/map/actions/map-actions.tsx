@@ -4,12 +4,13 @@ import MapActionsProps from "../../../lib/game/map/types/map-actions-props";
 import {canSettleHere} from "../../../lib/game/map/location-helpers";
 import MapActionsState from "../../../lib/game/map/types/map-actions-state";
 import ViewLocationState from "../../../lib/game/map/state/view-location-state";
-import TeleportModal from "../../components/actions/modals/teleport-modal";
+import TeleportModal from "../../components/map-actions/modals/teleport-modal";
 import MovePlayer from "../../../lib/game/map/ajax/move-player";
-import SetSailModal from "../../components/actions/modals/set-sail-modal";
+import SetSailModal from "../../components/map-actions/modals/set-sail-modal";
 import LocationDetails from "../../../lib/game/map/types/location-details";
-import Conjuration from "../../components/actions/modals/conjuration";
-import SettleKingdomModal from "../../components/actions/modals/settle-kingdom-modal";
+import Conjuration from "../../components/map-actions/modals/conjuration";
+import SettleKingdomModal from "../../components/map-actions/modals/settle-kingdom-modal";
+import ViewLocationModal from "../../components/map-actions/modals/view-location-modal";
 
 export default class MapActions extends React.Component<MapActionsProps, MapActionsState> {
     constructor(props: MapActionsProps) {
@@ -167,6 +168,17 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                             can_settle={this.canSettleKingdom()}
                         />
                         : null
+                }
+
+                {
+                    this.state.show_location_details ?
+                        <ViewLocationModal
+                            player_kingdom_id={this.state.player_kingdom_id}
+                            enemy_kingdom_id={this.state.enemy_kingdom_id}
+                            npc_kingdom_id={this.state.npc_kingdom_id}
+                            location={this.state.location}
+                        />
+                    : null
                 }
             </Fragment>
         )

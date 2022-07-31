@@ -22,7 +22,6 @@ export default class CharacterResistances extends React.Component<AdditionalInfo
             <Dialogue is_open={this.props.is_open}
                       handle_close={this.props.manage_modal}
                       title={this.props.title}
-                      secondary_actions={null}
             >
                 <div>
                     <p className='mb-4'>

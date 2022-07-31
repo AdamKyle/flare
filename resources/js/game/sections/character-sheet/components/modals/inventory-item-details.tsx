@@ -49,7 +49,6 @@ export default class InventoryUseDetails extends React.Component<any, any> {
             <Dialogue is_open={this.props.is_open}
                       handle_close={this.props.manage_modal}
                       title={this.modalTitle()}
-                      secondary_actions={null}
                       large_modal={this.largeModal()}
                       additional_dialogue_css={'top-[110px]'}
             >

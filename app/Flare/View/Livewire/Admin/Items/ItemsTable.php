@@ -111,7 +111,7 @@ class ItemsTable extends DataTableComponent {
         if (!is_null(auth()->user())) {
             if (!auth()->user()->hasRole('Admin')) {
                 $columns[] = Column::make('Actions')->label(
-                    fn($row, Column $column) => view('admin.items.table-components.shop-actions-section', [
+                    fn($row, Column $column) => view('admin.items.table-components.shop-map-actions-section', [
                         'character' => auth()->user()->character
                     ])->withRow($row)
                 );

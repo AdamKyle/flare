@@ -281,7 +281,7 @@ class TraverseService {
     }
 
     /**
-     * Update character actions.
+     * Update character map-actions.
      *
      * @param int $mapId
      * @param Character $character
@@ -338,7 +338,7 @@ class TraverseService {
     }
 
     /**
-     * Update the actions cache.
+     * Update the map-actions cache.
      *
      * @param Character $character
      * @param float $deduction
