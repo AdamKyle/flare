@@ -8,6 +8,8 @@ export default interface MapActionsState {
 
     open_set_sail: boolean;
 
+    open_conjure: boolean;
+
     player_kingdom_id: number | null;
 
     enemy_kingdom_id: number | null;

@@ -8,6 +8,7 @@ import TeleportModal from "../../components/actions/modals/teleport-modal";
 import MovePlayer from "../../../lib/game/map/ajax/move-player";
 import SetSailModal from "../../components/actions/modals/set-sail-modal";
 import LocationDetails from "../../../lib/game/map/types/location-details";
+import Conjuration from "../../components/actions/modals/conjuration";
 
 export default class MapActions extends React.Component<MapActionsProps, MapActionsState> {
     constructor(props: MapActionsProps) {
@@ -17,6 +18,7 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
             show_location_details: false,
             open_teleport_modal: false,
             open_set_sail: false,
+            open_conjure: false,
             player_kingdom_id: null,
             enemy_kingdom_id: null,
             npc_kingdom_id: null,
@@ -52,7 +54,7 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
         return !this.props.can_move || this.props.is_dead || this.props.is_automation_running || this.props.port_location === null;
     }
 
-    canTeleport(): boolean {
+    canDoAction(): boolean {
         return !this.props.can_move || this.props.is_dead || this.props.is_automation_running;
     }
 
@@ -74,10 +76,16 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
         })
     }
 
+    manageConjureModal() {
+        this.setState({
+            open_conjure: !this.state.open_conjure,
+        })
+    }
+
     render() {
         return (
             <Fragment>
-                <div className='grid grid-cols-4 gap-2'>
+                <div className='grid grid-cols-5 gap-2'>
                     <PrimaryOutlineButton button_label={'View Location Details'}
                                           on_click={this.manageViewLocation.bind(this)} />
                     <PrimaryOutlineButton button_label={'Settle Kingdom'}
@@ -88,8 +96,21 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                                           disabled={this.canSetSail()}/>
                     <PrimaryOutlineButton button_label={'Teleport'}
                                           on_click={this.manageTeleportModal.bind(this)}
-                                          disabled={this.canTeleport()}/>
+                                          disabled={this.canDoAction()}/>
+                    <PrimaryOutlineButton button_label={'Conjure'}
+                                          on_click={this.manageConjureModal.bind(this)}
+                                          disabled={this.canDoAction()}/>
                 </div>
+
+                {
+                    this.state.open_conjure ?
+                        <Conjuration is_open={this.state.open_conjure}
+                                     handle_close={this.manageConjureModal.bind(this)}
+                                     title={'Conjuration'}
+                                     character_id={this.props.character_id}
+                        />
+                    : null
+                }
 
                 {
                     this.state.open_teleport_modal ?
