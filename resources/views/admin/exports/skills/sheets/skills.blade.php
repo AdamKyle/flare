@@ -11,6 +11,9 @@
         <th>base_ac_mod_bonus_per_level</th>
         <th>fight_time_out_mod_bonus_per_level</th>
         <th>move_time_out_mod_bonus_per_level</th>
+        <th>unit_time_reduction</th>
+        <th>building_time_reduction</th>
+        <th>unit_movement_time_reduction</th>
         <th>can_monsters_have_skill</th>
         <th>can_train</th>
         <th>skill_bonus_per_level</th>
@@ -31,6 +34,9 @@
             <td>{{$skill->base_ac_mod_bonus_per_level}}</td>
             <td>{{$skill->fight_time_out_mod_bonus_per_level}}</td>
             <td>{{$skill->move_time_out_mod_bonus_per_level}}</td>
+            <th>{{$skill->unit_time_reduction}}</th>
+            <th>{{$skill->building_time_reduction}}</th>
+            <th>{{$skill->unit_movement_time_reduction}}</th>
             <td>{{$skill->can_monsters_have_skill}}</td>
             <td>{{$skill->can_train}}</td>
             <td>{{$skill->skill_bonus_per_level}}</td>

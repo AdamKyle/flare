@@ -77,6 +77,7 @@ export default class Kingdom extends React.Component<KingdomProps, any> {
                     this.props.kingdom.is_protected ?
                         <InfoAlert additional_css={'mt-4 mb-4'}>
                             Your kingdom is under protection from attacks for the next: {this.props.kingdom.protected_days_left} day(s).
+                            This value does not include today.
                         </InfoAlert>
                     : null
                 }
