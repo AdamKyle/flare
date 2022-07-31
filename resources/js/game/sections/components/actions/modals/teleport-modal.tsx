@@ -3,14 +3,16 @@ import Dialogue from "../../../../components/ui/dialogue/dialogue";
 import TeleportModalProps from "../../../../lib/game/types/map/modals/teleport-modal-props";
 import Select from "react-select";
 import clsx from "clsx";
-import {fetchCost} from "../../../../lib/game/map/teleportion-costs";
 import {formatNumber} from "../../../../lib/game/format-number";
 import {viewPortWatcher} from "../../../../lib/view-port-watcher";
 import TeleportHelpModal from "./teleport-help-modal";
 import ManageTeleportModalState from "../../../../lib/game/map/state/manage-teleport-modal-state";
 import TeleportModalState from "../../../../lib/game/types/map/modals/teleport-modal-state";
+import TeleportComponent from "../../../../lib/game/map/components/teleport-component";
 
 export default class TeleportModal extends React.Component<TeleportModalProps, TeleportModalState> {
+
+    private teleportComponent: TeleportComponent;
 
     constructor(props: TeleportModalProps) {
         super(props);
@@ -32,6 +34,8 @@ export default class TeleportModal extends React.Component<TeleportModalProps, T
             view_port: null,
             show_help: false,
         }
+
+        this.teleportComponent = new TeleportComponent(this);
     }
 
     componentDidMount() {
@@ -60,182 +64,40 @@ export default class TeleportModal extends React.Component<TeleportModalProps, T
         })
     }
 
-    getDefaultLocationValue() {
-        if (this.state.current_location !== null) {
-            return {label: this.state.current_location.name + ' (X/Y): ' + this.state.current_location.x + '/' + this.state.current_location.y, value: this.state.current_location.id}
-        }
-
-        return  {value: 0, label: ''};
-    }
-
-    getDefaultPlayerKingdomValue() {
-        if (this.state.current_player_kingdom !== null) {
-            return {label: this.state.current_player_kingdom.name + ' (X/Y): ' + this.state.current_player_kingdom.x_position + '/' + this.state.current_player_kingdom.y_position, value: this.state.current_player_kingdom.id}
-        }
-
-        return  {value: 0, label: ''};
-    }
-
-    getDefaultEnemyKingdomValue() {
-        if (this.state.current_enemy_kingdom !== null) {
-            return {label: this.state.current_enemy_kingdom.name + ' (X/Y): ' + this.state.current_enemy_kingdom.x_position + '/' + this.state.current_enemy_kingdom.y_position, value: this.state.current_enemy_kingdom.id}
-        }
-
-        return  {value: 0, label: ''};
-    }
-
-    getDefaultNPCKingdomValue() {
-        if (this.state.current_npc_kingdom !== null) {
-            return {label: this.state.current_npc_kingdom.name + ' (X/Y): ' + this.state.current_npc_kingdom.x_position + '/' + this.state.current_npc_kingdom.y_position, value: this.state.current_npc_kingdom.id}
-        }
-
-        return  {value: 0, label: ''};
-    }
-
     setXPosition(data: any) {
-        this.setState({
-            x_position: data.value,
-            current_location: null,
-            current_player_kingdom: null,
-            current_enemy_kingdom: null,
-            current_npc_kingdom: null,
-        }, () => {
-            let state = fetchCost(this.state.x_position, this.state.y_position, this.state.character_position, this.props.currencies);
-
-            this.setState(state);
-        });
-    }
-
-    setLocationData(data: any) {
-        if (this.props.locations !== null) {
-            const foundLocation = this.props.locations.filter((location) => location.id === data.value);
-
-            if (foundLocation.length > 0) {
-                this.setState({
-                    x_position: foundLocation[0].x,
-                    y_position: foundLocation[0].y,
-                    current_location: foundLocation[0],
-                    current_player_kingdom: null,
-                    current_enemy_kingdom: null,
-                    current_npc_kingdom: null,
-                }, () => {
-                    this.setState(fetchCost(this.state.x_position, this.state.y_position, this.state.character_position, this.props.currencies));
-                });
-            }
-        }
-    }
-
-    setMyKingdomData(data: any) {
-        if (this.props.player_kingdoms !== null) {
-            const foundKingdom = this.props.player_kingdoms.filter((location) => location.id === data.value);
-
-            if (foundKingdom.length > 0) {
-                this.setState({
-                    x_position: foundKingdom[0].x_position,
-                    y_position: foundKingdom[0].y_position,
-                    current_player_kingdom: foundKingdom[0],
-                    current_location: null,
-                    current_enemy_kingdom: null,
-                    current_npc_kingdom: null,
-                }, () => {
-                    this.setState(fetchCost(this.state.x_position, this.state.y_position, this.state.character_position, this.props.currencies));
-                });
-            }
-        }
-    }
-
-    setEnemyKingdomData(data: any) {
-        if (this.props.enemy_kingdoms !== null) {
-            const foundKingdom = this.props.enemy_kingdoms.filter((location) => location.id === data.value);
-
-            if (foundKingdom.length > 0) {
-                this.setState({
-                    x_position: foundKingdom[0].x_position,
-                    y_position: foundKingdom[0].y_position,
-                    current_player_kingdom: null,
-                    current_location: null,
-                    current_enemy_kingdom: foundKingdom[0],
-                    current_npc_kingdom: null,
-                }, () => {
-                    this.setState(fetchCost(this.state.x_position, this.state.y_position, this.state.character_position, this.props.currencies));
-                });
-            }
-        }
-    }
-
-    setNPCKingdomData(data: any) {
-        if (this.props.npc_kingdoms !== null) {
-            const foundKingdom = this.props.npc_kingdoms.filter((location) => location.id === data.value);
-
-            if (foundKingdom.length > 0) {
-                this.setState({
-                    x_position: foundKingdom[0].x_position,
-                    y_position: foundKingdom[0].y_position,
-                    current_player_kingdom: null,
-                    current_location: null,
-                    current_enemy_kingdom: null,
-                    current_npc_kingdom: foundKingdom[0]
-                }, () => {
-                    this.setState(fetchCost(this.state.x_position, this.state.y_position, this.state.character_position, this.props.currencies));
-                });
-            }
-        }
+        this.teleportComponent.setSelectedXPosition(data);
     }
 
     setYPosition(data: any) {
-        this.setState({
-            y_position: data.value,
-            current_location: null,
-            current_player_kingdom: null,
-        }, () => {
-            this.setState(fetchCost(this.state.x_position,  data.value, this.state.character_position, this.props.currencies));
-        });
+        this.teleportComponent.setSelectedYPosition(data);
     }
 
-    buildLocationOptions(): {value: number, label: string}[]|[] {
-        if (this.props.locations !== null) {
-            return this.props.locations.map((location) => {
-                return {label: location.name + ' (X/Y): ' + location.x + '/' + location.y, value: location.id}
-            });
-        }
-
-        return [];
+    setLocationData(data: any) {
+        this.teleportComponent.setSelectedLocationData(data);
     }
 
-    buildMyKingdomsOptions(): {value: number, label: string}[]|[] {
-        if (this.props.player_kingdoms !== null) {
-            return this.props.player_kingdoms.map((kingdom) => {
-                return {label: kingdom.name + ' (X/Y): ' + kingdom.x_position + '/' + kingdom.y_position, value: kingdom.id}
-            });
-        }
-
-        return [];
+    setMyKingdomData(data: any) {
+        this.teleportComponent.setSelectedMyKingdomData(data);
     }
 
-    buildEnemyKingdomOptions(): {value: number, label: string}[]|[] {
-        if (this.props.enemy_kingdoms !== null) {
-            return this.props.enemy_kingdoms.map((kingdom) => {
-                return {label: kingdom.name + ' (X/Y): ' + kingdom.x_position + '/' + kingdom.y_position, value: kingdom.id}
-            });
-        }
-
-        return [];
+    setEnemyKingdomData(data: any) {
+        this.teleportComponent.setSelectedEnemyKingdomData(data);
     }
 
-    buildNpcKingdomOptions(): {value: number, label: string}[]|[] {
-        if (this.props.npc_kingdoms !== null) {
-            return this.props.npc_kingdoms.map((kingdom) => {
-                return {label: kingdom.name + ' (X/Y): ' + kingdom.x_position + '/' + kingdom.y_position, value: kingdom.id}
-            });
-        }
-
-        return [];
+    setNPCKingdomData(data: any) {
+        this.teleportComponent.setSelectedNPCKingdomData(data);
     }
 
     convertToSelectable(data: number[]): any {
-        return data.map((d) => {
-            return {label: d.toString(), value: d}
-        });
+        return this.teleportComponent.buildCoordinatesOptions(data);
+    }
+
+    showMyKingdomSelect() {
+        if (this.props.player_kingdoms === null) {
+            return false
+        }
+
+        return this.props.player_kingdoms.length > 0;
     }
 
     teleportPlayer() {
@@ -247,15 +109,6 @@ export default class TeleportModal extends React.Component<TeleportModalProps, T
         });
 
          this.props.handle_close();
-    }
-
-    showMyKingdomSelect() {
-
-        if (this.props.player_kingdoms === null) {
-            return false
-        }
-
-        return this.props.player_kingdoms.length > 0;
     }
 
     render() {
@@ -314,12 +167,12 @@ export default class TeleportModal extends React.Component<TeleportModalProps, T
                         <div className='w-2/3'>
                             <Select
                                 onChange={this.setLocationData.bind(this)}
-                                options={this.buildLocationOptions()}
+                                options={this.teleportComponent.buildLocationOptions()}
                                 menuPosition={'absolute'}
                                 menuPlacement={'bottom'}
                                 styles={{menuPortal: (base) => ({...base, zIndex: 9999, color: '#000000'})}}
                                 menuPortalTarget={document.body}
-                                value={this.getDefaultLocationValue()}
+                                value={this.teleportComponent.getDefaultLocationValue()}
                             />
                         </div>
                     </div>
@@ -330,12 +183,12 @@ export default class TeleportModal extends React.Component<TeleportModalProps, T
                                 <div className='w-2/3'>
                                     <Select
                                         onChange={this.setMyKingdomData.bind(this)}
-                                        options={this.buildMyKingdomsOptions()}
+                                        options={this.teleportComponent.buildMyKingdomsOptions()}
                                         menuPosition={'absolute'}
                                         menuPlacement={'bottom'}
                                         styles={{menuPortal: (base) => ({...base, zIndex: 9999, color: '#000000'})}}
                                         menuPortalTarget={document.body}
-                                        value={this.getDefaultPlayerKingdomValue()}
+                                        value={this.teleportComponent.getDefaultPlayerKingdomValue()}
                                     />
                                 </div>
                             </div>
@@ -348,12 +201,12 @@ export default class TeleportModal extends React.Component<TeleportModalProps, T
                     <div className='w-2/3'>
                         <Select
                             onChange={this.setEnemyKingdomData.bind(this)}
-                            options={this.buildEnemyKingdomOptions()}
+                            options={this.teleportComponent.buildEnemyKingdomOptions()}
                             menuPosition={'absolute'}
                             menuPlacement={'bottom'}
                             styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999, color: '#000000' }) }}
                             menuPortalTarget={document.body}
-                            value={this.getDefaultEnemyKingdomValue()}
+                            value={this.teleportComponent.getDefaultEnemyKingdomValue()}
                         />
                     </div>
                 </div>
@@ -363,12 +216,12 @@ export default class TeleportModal extends React.Component<TeleportModalProps, T
                     <div className='w-2/3'>
                         <Select
                             onChange={this.setNPCKingdomData.bind(this)}
-                            options={this.buildNpcKingdomOptions()}
+                            options={this.teleportComponent.buildNpcKingdomOptions()}
                             menuPosition={'absolute'}
                             menuPlacement={'bottom'}
                             styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999, color: '#000000' }) }}
                             menuPortalTarget={document.body}
-                            value={this.getDefaultNPCKingdomValue()}
+                            value={this.teleportComponent.getDefaultNPCKingdomValue()}
                         />
                     </div>
                 </div>
