@@ -1,7 +1,7 @@
 import React from "react";
 import Dialogue from "../../../../../../components/ui/dialogue/dialogue";
 import LocationDetailsProps
-    from "../../../../../../lib/game/types/map/modals/components/view-location/location-details-props";
+    from "../../../../../../lib/game/types/map/modals/components/view-details/location-details-props";
 import LocationInformation from '../../../../../components/locations/modals/location-details';
 
 export default class LocationDetails extends React.Component<LocationDetailsProps, any> {

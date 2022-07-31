@@ -29,9 +29,11 @@ export default class KingdomModal extends React.Component<KingdomModalProps, Kin
     updateLoading(kingdomDetails: KingdomDetailsType) {
         const costState = fetchCost(kingdomDetails.x_position, kingdomDetails.y_position, this.props.character_position, this.props.currencies);
 
-        const state = {...costState, ...{loading: false, x: kingdomDetails.x_position, y: kingdomDetails.y_position, title: this.buildTitle(kingdomDetails)}};
+        const newState = {...costState, ...{loading: false, x: kingdomDetails.x_position, y: kingdomDetails.y_position, title: this.buildTitle(kingdomDetails)}};
 
-        this.setState(state);
+        const state = JSON.parse(JSON.stringify(this.state));
+
+        this.setState({...state, ...newState});
     }
 
     teleportDisabled(): boolean {
@@ -52,7 +54,18 @@ export default class KingdomModal extends React.Component<KingdomModalProps, Kin
     }
 
     buildTitle(kingdomDetails: KingdomDetailsType) {
-        return kingdomDetails.name + ' (X/Y): ' + kingdomDetails.x_position + '/' + kingdomDetails.y_position;
+
+        const title = kingdomDetails.name + ' (X/Y): ' + kingdomDetails.x_position + '/' + kingdomDetails.y_position;
+
+        if (kingdomDetails.is_npc_owned) {
+            return title + ' [NPC Owned]';
+        }
+
+        if (kingdomDetails.is_enemy_kingdom) {
+            return title + ' [Enemy]';
+        }
+
+        return title;
     }
 
     render() {

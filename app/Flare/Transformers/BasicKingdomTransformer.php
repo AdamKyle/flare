@@ -2,6 +2,7 @@
 
 namespace App\Flare\Transformers;
 
+use App\Flare\Models\Character;
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameBuildingUnit;
 use App\Flare\Models\GameUnit;
@@ -15,6 +16,23 @@ use App\Flare\Models\Kingdom;
 use Illuminate\Support\Collection;
 
 class BasicKingdomTransformer extends TransformerAbstract {
+
+    /**
+     * @var Character $character
+     */
+    private Character $character;
+
+    /**
+     * Set the character.
+     *
+     * @param Character $character
+     * @return $this
+     */
+    public function setCharacter(Character $character): BasicKingdomTransformer {
+        $this->character = $character;
+
+        return $this;
+    }
 
     /**
      * Gets the response data for the character sheet
@@ -42,12 +60,13 @@ class BasicKingdomTransformer extends TransformerAbstract {
             'max_morale'         => $kingdom->max_morale,
             'treasury'           => $kingdom->treasury,
             'gold_bars'          => $kingdom->gold_bars,
-            'treasury_defence'   => $kingdom->treasury / KingdomMaxValue::MAX_TREASURY,
             'passive_defence'    => $kingdom->fetchDefenceBonusFromPassive(),
             'treasury_defence'   => $kingdom->fetchTreasuryDefenceBonus(),
             'walls_defence'      => $kingdom->getWallsDefence(),
             'gold_bars_defence'  => $kingdom->fetchGoldBarsDefenceBonus(),
             'defence_bonus'      => $kingdom->fetchKingdomDefenceBonus(),
+            'is_npc_owned'       => $kingdom->npc_owned,
+            'is_enemy_kingdom'   => !$kingdom->npc_owned ? $kingdom->character_id !== $this->character->id : false,
         ];
     }
 }

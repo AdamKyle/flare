@@ -64,18 +64,9 @@ class KingdomInformationController extends Controller{
             return response()->json(['message' => 'Kingdom not found.'], 422);
         }
 
-        $kingdom = new Item($kingdom, $this->basicKingdomTransformer);
-        $kingdom = $this->manager->createData($kingdom)->toArray();
+        $transformer = $this->basicKingdomTransformer->setCharacter($character);
 
-        return response()->json($kingdom);
-    }
-
-    /**
-     * @param Kingdom $kingdom
-     * @return JsonResponse
-     */
-    public function getOtherKingdomInfo(Kingdom $kingdom): JsonResponse {
-        $kingdom = new Item($kingdom, $this->otherKingdomTransformer);
+        $kingdom = new Item($kingdom, $transformer);
         $kingdom = $this->manager->createData($kingdom)->toArray();
 
         return response()->json($kingdom);

@@ -48,4 +48,8 @@ export default interface KingdomDetails {
     y_position: number;
 
     npc_owned: boolean;
+
+    is_npc_owned: boolean;
+
+    is_enemy_kingdom: boolean;
 }

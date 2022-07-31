@@ -10,6 +10,8 @@ export default interface ViewLocationModalProps {
 
     location: LocationDetails | null;
 
+    character_id: number;
+
     handle_close: () => void;
 }
 
