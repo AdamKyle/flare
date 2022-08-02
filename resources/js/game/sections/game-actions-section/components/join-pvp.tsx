@@ -99,8 +99,14 @@ export default class JoinPvp extends React.Component<any, any> {
                                 <LoadingProgressBar />
                             : null
                         }
-                        <PrimaryButton button_label={'Join Tonight\'s Event!'} on_click={this.joinPvp.bind(this)} additional_css={'mt-4'} disabled={this.state.attack_type === null} />
-                        <DangerButton button_label={'Close Section'} on_click={this.props.manage_section} additional_css={'mt-4 md:mt-0 md:mt-4 md:ml-4'} />
+                        <PrimaryButton button_label={'Join Tonight\'s Event!'}
+                                       on_click={this.joinPvp.bind(this)}
+                                       additional_css={'mt-4'}
+                                       disabled={this.state.attack_type === null}
+                        />
+                        <DangerButton button_label={'Close Section'}
+                                      on_click={this.props.manage_section}
+                                      additional_css={'mt-4 md:mt-0 md:mt-4 ml-4'} />
                     </div>
                 </div>
             </div>

@@ -89,26 +89,9 @@ export const dragMap = (position: {x: number, y: number}, bottomBounds: number, 
  */
 export const fetchLeftBounds = (component: MapSection): number => {
 
-    if (component.props.view_port >= 1920) {
-        return 0;
+    if (component.props.view_port <= 1600 && component.props.view_port < 1920) {
+        return -50;
     }
 
-    if (component.props.view_port < 400) {
-        return -260;
-    }
-
-    if (component.props.view_port < 600) {
-        return -210;
-    }
-
-
-    if (component.props.view_port < 990) {
-        return -110;
-    }
-
-    if (component.props.view_port < 1024) {
-        return 0;
-    }
-
-    return -110
+    return 0;
 }

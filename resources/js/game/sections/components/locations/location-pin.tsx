@@ -13,13 +13,13 @@ export default class LocationPin extends React.Component<LocationPinProps, {}> {
 
   render() {
       return (
-          <div
+          <button
               key={this.props.location.id}
               data-location-id={this.props.location.id}
               className={this.props.pin_class}
               style={{top: this.props.location.y, left: this.props.location.x}}
               onClick={this.openLocationInformation.bind(this)}>
-          </div>
+          </button>
       )
   }
 }

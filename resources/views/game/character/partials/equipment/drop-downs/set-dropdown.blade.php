@@ -1,6 +1,6 @@
 <div class="dropdown">
     <button class="btn btn-primary dropdown-toggle" type="button" id="actionsButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        Actions
+        Actions_2
     </button>
     <div class="dropdown-menu" aria-labelledby="actionsButton">
         <form id="remove-from-set-{{$slot->id}}" action="{{route('game.remove.from.set', ['character' => $character])}}" method="POST" style="display: none">

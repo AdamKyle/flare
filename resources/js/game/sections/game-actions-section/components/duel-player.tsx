@@ -61,9 +61,11 @@ export default class DuelPlayer extends React.Component<any, any> {
 
     buildCharacters() {
         return this.props.characters.map((character: {id: number, name: string}) => {
-            return {
-                label: character.name,
-                value: character.id,
+            if (character.id !== this.props.character.id) {
+                return {
+                    label: character.name,
+                    value: character.id,
+                }
             }
         }).filter((selectOptions: {label: string, value: number} | undefined) => typeof selectOptions !== 'undefined');
     }

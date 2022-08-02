@@ -3,7 +3,7 @@ export default interface HealthMeterProps {
 
     name: string;
 
-    current_health: number;
+    current_health: number|undefined;
 
-    max_health: number;
+    max_health: number|undefined;
 }

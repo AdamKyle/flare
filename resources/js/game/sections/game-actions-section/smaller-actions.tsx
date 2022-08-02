@@ -1,22 +1,19 @@
-import React, { Fragment } from "react";
-import ActionsProps from "../../lib/game/types/actions/actions-props";
-import ActionsState from "../../lib/game/types/actions/actions-state";
-import {capitalize} from "lodash";
+import React, {Fragment} from "react";
 import Select from "react-select";
-import CraftingSection from "./components/crafting-section";
-import ActionsManager from "../../lib/game/actions/actions-manager";
-import MonsterSelection from "./components/monster-selection";
-import FightSection from "./components/fight-section";
-import DropDown from "../../components/ui/drop-down/drop-down";
-import PrimaryButton from "../../components/ui/buttons/primary-button";
-import MapMovementActions from "./components/small-actions/map-movement-actions";
-import ExplorationSection from "./components/exploration-section";
-import CelestialFight from "./components/celestial-fight";
-import DuelPlayer from "./components/duel-player";
-import {CraftingOptions} from "../../lib/game/types/actions/crafting-type-options";
+import clsx from "clsx";
+import SmallActionsState from "../../lib/game/types/actions/small-actions-state";
+import SmallActionsManager from "../../lib/game/actions/small-actions-manager";
+import MonsterActions from "./components/small-actions/monster-actions";
+import ActionsTimers from "./components/actions-timers";
+import SmallCraftingSection from "./components/small-actions/small-crafting-section";
+import SmallExplorationSection from "./components/small-actions/small-exploration-section";
 import JoinPvp from "./components/join-pvp";
+import MapTimer from "../map/map-timer";
+import DuelPlayer from "./components/duel-player";
+import SmallMapMovementActions from "./components/small-actions/small-map-movement-actions";
+import SmallActionsProps from "../../lib/game/types/actions/small-actions-props";
 
-export default class SmallerActions extends React.Component<ActionsProps, ActionsState> {
+export default class SmallerActions extends React.Component<SmallActionsProps, SmallActionsState> {
 
     private attackTimeOut: any;
 
@@ -32,30 +29,43 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
 
     private explorationTimeOut: any;
 
-    private actionsManager: ActionsManager;
+    private smallActionsManager: SmallActionsManager;
 
-    constructor(props: ActionsProps) {
+    constructor(props: SmallActionsProps) {
         super(props);
 
         this.state = {
             selected_action: null,
-            loading: true,
-            is_same_monster: false,
-            character: null,
             monsters: [],
-            monster_to_fight: null,
+            characters_for_dueling: [],
             attack_time_out: 0,
             crafting_time_out: 0,
-            character_revived: false,
-            can_player_move: true,
-            crafting_type: null,
-            movement_time_out: 0,
             automation_time_out: 0,
-            characters_for_dueling: [],
-            duel_characters: [],
+            movement_time_left: 0,
+            crafting_type: null,
+            duel_fight_info: null,
+            loading: true,
+            show_exploration: false,
+            show_celestial_fight: false,
             show_duel_fight: false,
             show_join_pvp: false,
-            duel_fight_info: null,
+            // loading: true,
+            // is_same_monster: false,
+            // character: null,
+            // monsters: [],
+            // monster_to_fight: null,
+            // attack_time_out: 0,
+            // crafting_time_out: 0,
+            // character_revived: false,
+            // can_player_move: true,
+            // crafting_type: null,
+            // movement_time_out: 0,
+            // automation_time_out: 0,
+            // characters_for_dueling: [],
+            // duel_characters: [],
+            // show_duel_fight: false,
+            // show_join_pvp: false,
+            // duel_fight_info: null,
         }
 
         // @ts-ignore
@@ -79,12 +89,12 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
         // @ts-ignore
         this.duelOptions = Echo.join('update-duel');
 
-        this.actionsManager = new ActionsManager(this);
+        this.smallActionsManager = new SmallActionsManager(this);
     }
 
     componentDidMount() {
 
-        this.actionsManager.initialFetch(this.props);
+        this.smallActionsManager.initialFetch();
 
         // @ts-ignore
         this.attackTimeOut.listen('Game.Core.Events.ShowTimeOutEvent', (event: any) => {
@@ -103,8 +113,7 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
         // @ts-ignore
         this.mapTimeOut.listen('Game.Maps.Events.ShowTimeOutEvent', (event: any) => {
             this.setState({
-                movement_time_out: event.forLength,
-                can_player_move: event.canMove,
+                movement_time_left: event.forLength,
             });
         });
 
@@ -112,15 +121,12 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
         this.monsterUpdate.listen('App.Game.Maps.Events.UpdateMonsterList', (event: any) => {
             this.setState({
                 monsters: event.monster,
-                monster_to_fight: null,
             })
         });
 
-        // @ts-ignore
+        // // @ts-ignore
         this.duelOptions.listen('Game.Maps.Events.UpdateDuelAtPosition', (event: any) => {
-            this.setState({
-                characters_for_dueling: event.characters,
-            }, () => this.setDuelCharacters() );
+            this.smallActionsManager.setCharactersForDueling(event.characters);
         });
 
         // @ts-ignore
@@ -131,124 +137,28 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
             });
         });
 
-        // @ts-ignore
+        // // @ts-ignore
         this.explorationTimeOut.listen('Game.Exploration.Events.ExplorationTimeOut', (event: any) => {
             this.setState({
                 automation_time_out: event.forLength,
             });
         });
-
-        if (!this.props.character.can_move) {
-            this.setState({
-                movement_time_out: this.props.character.can_move_again_at,
-            });
-        }
-
-        if (this.props.character.is_automation_running) {
-            this.setState({
-                automation_time_out: this.props.character.automation_completed_at,
-            });
-        }
-    }
-
-    componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<ActionsState>, snapshot?: any) {
-        this.actionsManager.actionComponentUpdated(this.state, this.props)
     }
 
     showAction(data: any) {
+        this.smallActionsManager.setSelectedAction(data);
+    }
+
+    updateAttackTimer(timeLeft: number) {
         this.setState({
-            selected_action: data.value,
-        }, () => {
-            if (data.value === 'pvp-fight') {
-                this.setState({
-                    show_duel_fight: true
-                });
-            }
+            attack_time_out: timeLeft
         });
     }
 
-    setDuelCharacters() {
-        if (typeof this.state.characters_for_dueling !== 'undefined') {
-            const characters = this.state.characters_for_dueling.filter((character) => {
-                return character.character_position_x === this.props.character_position?.x &&
-                       character.character_position_y === this.props.character_position?.y &&
-                       character.game_map_id === this.props.character_position?.game_map_id &&
-                       character.name !== this.props.character.name
-            });
-
-            this.setState({
-                duel_characters: characters,
-            });
-        }
-    }
-
-    buildOptions() {
-        const options = [{
-            label: 'Exploration',
-            value: 'explore'
-        },{
-            label: 'Craft',
-            value: 'craft'
-        }];
-
-        if (!this.props.character.is_automation_running) {
-            options.push({
-                label: 'Map Movement',
-                value: 'map-movement'
-            });
-
-            options.unshift({
-                label: 'Fight',
-                value: 'fight'
-            });
-        }
-
-       if (typeof this.state.duel_characters !== 'undefined' && this.state.duel_characters.length > 0) {
-           options.push({
-               label: 'Pvp Fight',
-               value: 'pvp-fight'
-           });
-       }
-
-        if (this.props.celestial_id !== 0 && this.props.celestial_id !== null) {
-            options.push({
-                label: 'Celestial Fight',
-                value: 'celestial-fight'
-            });
-        }
-
-        if (this.props.character.can_register_for_pvp) {
-            options.push({
-                label: 'Join Monthly PVP',
-                value: 'join-monthly-pvp'
-            });
-        }
-
-        return options;
-    }
-
-    defaultSelectedAction() {
-        if (this.state.selected_action !== null) {
-            return [{
-                label: capitalize(this.state.selected_action),
-                value: this.state.selected_action,
-            }];
-        }
-
-        return [{
-            label: 'Please Select Action',
-            value: '',
-        }];
-    }
-
-    setCraftingType(type: CraftingOptions) {
+    updateCraftingTimer(timeLeft: number) {
         this.setState({
-            crafting_type: type,
+            crafting_time_out: timeLeft
         });
-    }
-
-    removeCraftingType() {
-        this.actionsManager.removeCraftingSection();
     }
 
     closeMonsterSection() {
@@ -274,46 +184,13 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
             selected_action: null,
         })
     }
-
-    manageFightCelestial() {
-        this.setState({
-            selected_action: null,
-        })
-    }
-
-    setSelectedMonster(monster: any) {
-        this.actionsManager.setSelectedMonster(monster);
-    }
-
-    resetSameMonster() {
-        this.actionsManager.resetSameMonster();
-    }
-
-    revive() {
-        this.actionsManager.revive(this.props.character_id);
-    }
-
-    setAttackTimeOut(attack_time_out: number) {
-        this.actionsManager.setAttackTimeOut(attack_time_out);
-    }
-
-    updateTimer() {
-        this.actionsManager.updateTimer();
-    }
-
-    updateMapTimer(movement_time_out: number) {
-        this.setState({
-            movement_time_out: movement_time_out
-        });
-    }
-
-    updateCraftingTimer() {
-        this.actionsManager.updateCraftingTimer();
-    }
-
-    resetRevived() {
-        this.actionsManager.resetRevived();
-    }
+    //
+    // closeFightCelestialSection() {
+    //     this.setState({
+    //         selected_action: null,
+    //     })
+    // }
+    //
 
     manageDuel() {
         this.setState({
@@ -337,112 +214,63 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
 
     createMonster() {
         return (
-            <Fragment>
-                <button type='button' onClick={this.closeMonsterSection.bind(this)} className='text-red-600 dark:text-red-500 absolute right-[5px] top-[5px]'>
-                    <i className="fas fa-times-circle"></i>
-                </button>
-                <MonsterSelection monsters={this.state.monsters}
-                                  update_monster={this.setSelectedMonster.bind(this)}
-                                  timer_running={this.state.attack_time_out > 0}
-                                  character={this.state.character}
-                />
-
-                {
-                    this.state.character?.is_dead ?
-                        <div className='text-center my-4'>
-                            <PrimaryButton button_label={'Revive'} on_click={this.revive.bind(this)} additional_css={'mb-4'} disabled={!this.props.character_statuses?.can_attack}/>
-                            <p>
-                                You are dead. Please Revive.
-                            </p>
-                        </div>
-                        : null
-                }
-
-                {
-                    this.state.monster_to_fight !== null ?
-                        <FightSection
-                            set_attack_time_out={this.setAttackTimeOut.bind(this)}
-                            monster_to_fight={this.state.monster_to_fight}
-                            character={this.state.character}
-                            is_same_monster={this.state.is_same_monster}
-                            reset_same_monster={this.resetSameMonster.bind(this)}
-                            character_revived={this.state.character_revived}
-                            reset_revived={this.resetRevived.bind(this)}
+            <MonsterActions monsters={this.state.monsters}
+                            character={this.props.character}
+                            close_monster_section={this.closeMonsterSection.bind(this)}
+                            character_statuses={this.props.character_status}
                             is_small={true}
-                        />
-                        : null
-                }
-            </Fragment>
+            />
         );
     }
 
     showCrafting() {
         return (
-            <Fragment>
-                <button type='button' onClick={this.closeCraftingSection.bind(this)} className='text-red-600 dark:text-red-500 absolute right-[5px] top-[5px]'>
-                    <i className="fas fa-times-circle"></i>
-                </button>
-
-                {
-                    this.state.crafting_type !== null ?
-                        <CraftingSection remove_crafting={this.removeCraftingType.bind(this)}
-                                         type={this.state.crafting_type}
-                                         character_id={this.props.character.id}
-                                         cannot_craft={this.actionsManager.cannotCraft()}/>
-                    :
-                        <Fragment>
-                            <DropDown menu_items={this.actionsManager.buildCraftingList(this.setCraftingType.bind(this))}
-                                      button_title={'Craft/Enchant'} disabled={this.state.character?.is_dead || this.actionsManager.cannotCraft()}
-                                      selected_name={this.actionsManager.getSelectedCraftingOption()}/>
-                        </Fragment>
-                }
-            </Fragment>
-
+            <SmallCraftingSection
+                close_crafting_section={this.closeCraftingSection.bind(this)}
+                character={this.props.character}
+                character_status={this.props.character_status}
+                crafting_time_out={this.state.crafting_time_out}
+            />
         );
     }
 
     renderExploration() {
         return (
-            <Fragment>
-                <button type='button' onClick={this.closeExplorationSection.bind(this)} className='text-red-600 dark:text-red-500 absolute right-[5px] top-[5px]'>
-                    <i className="fas fa-times-circle"></i>
-                </button>
-
-                <ExplorationSection character={this.state.character} manage_exploration={this.closeExplorationSection.bind(this)} monsters={this.state.monsters} />
-            </Fragment>
-
+            <SmallExplorationSection
+                close_exploration_section={this.closeExplorationSection.bind(this)}
+                character={this.props.character}
+                monsters={this.state.monsters}
+            />
         );
     }
 
     showMapMovement() {
         return (
-            <Fragment>
-                <button type='button' onClick={this.closeMapSection.bind(this)} className='text-red-600 dark:text-red-500 absolute right-[5px] top-[5px]'>
-                    <i className="fas fa-times-circle"></i>
-                </button>
-                <MapMovementActions character={this.props.character}
-                                    update_map_timer={this.updateMapTimer.bind(this)}
-                                    currencies={this.props.currencies}
-                                    is_automation_running={this.props.character.is_automation_running}
-                                    character_position={this.props.character_position}
-                />
-            </Fragment>
+            <SmallMapMovementActions
+                close_map_section={this.closeMapSection.bind(this)}
+                update_celestial={(id: number | null) => {}}
+                view_port={500}
+                character={this.props.character}
+                character_currencies={this.props.character_currencies}
+                update_plane_quests={this.props.update_plane_quests}
+                update_character_position={this.props.update_character_position}
+            />
         );
     }
-
-    showCelestialFight() {
-        return (
-            <CelestialFight character={this.props.character}
-                            manage_celestial_fight={this.manageFightCelestial.bind(this)}
-                            celestial_id={this.props.celestial_id}
-                            update_celestial={this.props.update_celestial}
-            />
-        )
-    }
-
+    //
+    // showCelestialFight() {
+    //     return (
+    //         <CelestialFight character={this.props.character}
+    //                         manage_celestial_fight={this.manageFightCelestial.bind(this)}
+    //                         celestial_id={this.props.celestial_id}
+    //                         update_celestial={this.props.update_celestial}
+    //         />
+    //     )
+    // }
+    //
     showDuelFight() {
         return (
-            <DuelPlayer characters={this.state.duel_characters}
+            <DuelPlayer characters={this.state.characters_for_dueling}
                         duel_data={this.state.duel_fight_info}
                         character={this.props.character}
                         manage_pvp={this.manageDuel.bind(this)}
@@ -467,8 +295,8 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
                 return this.showCrafting();
             case 'map-movement':
                 return this.showMapMovement();
-            case 'celestial-fight':
-                return this.showCelestialFight();
+            // case 'celestial-fight':
+            //     return this.showCelestialFight();
             case 'pvp-fight':
                 return this.showDuelFight();
             case 'join-monthly-pvp':
@@ -480,15 +308,31 @@ export default class SmallerActions extends React.Component<ActionsProps, Action
 
     render() {
         return(
-            <Select
-                onChange={this.showAction.bind(this)}
-                options={this.buildOptions()}
-                menuPosition={'absolute'}
-                menuPlacement={'bottom'}
-                styles={{menuPortal: (base: any) => ({...base, zIndex: 9999, color: '#000000'})}}
-                menuPortalTarget={document.body}
-                value={this.defaultSelectedAction()}
-            />
+            <Fragment>
+                {
+                    this.state.selected_action !== null ?
+                        this.buildSection()
+                    :
+                        <Select
+                            onChange={this.showAction.bind(this)}
+                            options={this.smallActionsManager.buildOptions()}
+                            menuPosition={'absolute'}
+                            menuPlacement={'bottom'}
+                            styles={{menuPortal: (base: any) => ({...base, zIndex: 9999, color: '#000000'})}}
+                            menuPortalTarget={document.body}
+                            value={this.smallActionsManager.defaultSelectedAction()}
+                        />
+                }
+
+                <ActionsTimers attack_time_out={this.state.attack_time_out}
+                               crafting_time_out={this.state.crafting_time_out}
+                               update_attack_timer={this.updateAttackTimer.bind(this)}
+                               update_crafting_timer={this.updateCraftingTimer.bind(this)}
+                />
+                <div className='mt-4'>
+                    <MapTimer time_left={this.state.movement_time_left} automation_time_out={this.state.automation_time_out} />
+                </div>
+            </Fragment>
         );
     }
 }

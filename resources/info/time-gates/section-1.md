@@ -8,7 +8,7 @@ You can switch pages, log out, log in - they are still running - assuming they h
 
 All timers will be visible to players. You can close a panel that has a timer and re-open it, and it will still be running.
 
-## Actions and Timers
+## Actions_2 and Timers
 
 Crafting, Attacking, Adventuring, Moving, Setting Sail, Enchanting, Fighting and Teleporting all currently have timers. Each one varies depending on what it is the timer is for. 
 

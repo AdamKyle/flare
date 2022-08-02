@@ -145,7 +145,7 @@
             <div id="menuMapActions" class="collapse open">
                 <a href="{{route('info.page', ['pageName' => 'movement'])}}">
                     <span class="far fa-compass"></span>
-                    Movement Actions
+                    Movement Actions_2
                 </a>
                 <a href="{{route('info.page', ['pageName' => 'teleport'])}}">
                     <span class="ra ra-player-teleport"></span>

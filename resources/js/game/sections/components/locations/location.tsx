@@ -23,7 +23,7 @@ export default class Location extends React.Component<LocationProps, LocationSta
 
     componentDidUpdate() {
         if (this.state.view_port !== null) {
-            if (this.state.view_port < 1600 && this.state.open_location_modal) {
+            if (this.state.view_port < 600 && this.state.open_location_modal) {
                 this.setState({
                     location: null,
                     open_location_modal: false,

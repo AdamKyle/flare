@@ -3,6 +3,7 @@ import CharacterCurrenciesType from "../character/character-currencies-type";
 import CharacterStatusType from "../character/character-status-type";
 import QuestType from "./quests/quest-type";
 import KingdomDetails from "../kingdoms/kingdom-details";
+import PositionType from "./map/position-type";
 
 export default interface GameState {
 
@@ -28,7 +29,7 @@ export default interface GameState {
 
     celestial_id: number;
 
-    position: {x: number, y: number, game_map_id?: number} | null,
+    position: PositionType | null,
 
     disable_tabs: boolean;
 }

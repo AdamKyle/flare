@@ -45,7 +45,7 @@ class LoginMessage implements ShouldQueue
         $celestialEvent = Event::where('type', EventType::WEEKLY_CELESTIALS)->first();
 
         if (!is_null($pvpEvent)) {
-            event(new ServerMessageEvent($user, 'Monthly pvp will begin tonight at 7pm GMT-6. Actions area has been updated to show a new button: Join PVP. Click this and follow the steps to be registered to participate. Registration will be open till 6:30pm GMT-6.'));
+            event(new ServerMessageEvent($user, 'Monthly pvp will begin tonight at 7pm GMT-6. Actions_2 area has been updated to show a new button: Join PVP. Click this and follow the steps to be registered to participate. Registration will be open till 6:30pm GMT-6.'));
         }
 
         if (!is_null($celestialEvent)) {

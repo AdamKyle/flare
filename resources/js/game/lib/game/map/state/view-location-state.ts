@@ -19,7 +19,7 @@ export default class ViewLocationState {
     }
 
     /**
-     * Update the Map Actions state with location based data.
+     * Update the Map Actions_2 state with location based data.
      */
     public updateActionState() {
         this.updateViewLocationData();

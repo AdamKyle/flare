@@ -11,6 +11,7 @@ import LocationDetails from "../../../lib/game/map/types/location-details";
 import Conjuration from "../../components/map-actions/modals/conjuration";
 import SettleKingdomModal from "../../components/map-actions/modals/settle-kingdom-modal";
 import ViewLocationModal from "../../components/map-actions/modals/view-location-modal";
+import clsx from "clsx";
 
 export default class MapActions extends React.Component<MapActionsProps, MapActionsState> {
     constructor(props: MapActionsProps) {
@@ -98,7 +99,9 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
     render() {
         return (
             <Fragment>
-                <div className='grid grid-cols-5 gap-2'>
+                <div className={clsx('grid md:grid-cols-5 gap-2', {
+                    'h-[125px] overflow-x-scroll': this.props.view_port <= 500
+                })}>
                     <PrimaryOutlineButton button_label={'View Location Details'}
                                           on_click={this.manageViewLocation.bind(this)}
                                           disabled={!this.canViewLocation()}

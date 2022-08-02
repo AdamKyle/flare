@@ -10,8 +10,9 @@ import AmbushHandler
     from "../../../lib/game/actions/battle/attack/attack/attack-types/ambush-and-counter/AmbushHandler";
 import Ajax from "../../../lib/ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
+import FightSectionState from "../../../lib/game/types/actions/fight-section-state";
 
-export default class FightSection extends React.Component<FightSectionProps, any> {
+export default class FightSection extends React.Component<FightSectionProps, FightSectionState> {
 
     private battle_messages: BattleMessage[];
 
@@ -119,7 +120,6 @@ export default class FightSection extends React.Component<FightSectionProps, any
     }
 
     renderBattleMessages() {
-
         if (this.props.is_small && this.state.battle_messages.length > 0) {
             const message = this.state.battle_messages.filter((battleMessage: BattleMessage) => battleMessage.message.includes('resurrect') || battleMessage.message.includes('has been defeated!'))
 
@@ -173,21 +173,24 @@ export default class FightSection extends React.Component<FightSectionProps, any
                 is_character_dead: attackState.characterCurrentHealth <= 0,
                 is_defender_dead: attackState.monsterCurrentHealth <= 0,
                 monster_id: this.state.monster_to_fight_id,
-            }).doAjaxCall('post', (result: AxiosResponse) => {
-                // this.props.set_attack_time_out(result.data.time_out);
-            }, (error: AxiosError) => {
-                console.error(error);;
-            });
+            }).doAjaxCall('post', (result: AxiosResponse) => {},
+                (error: AxiosError) => {
+                    console.error(error);
+                });
         }
     }
 
     attackButtonDisabled() {
+        if (typeof this.state.character_current_health === 'undefined') {
+            return true;
+        }
+
         return this.state.monster_current_health <= 0 || this.state.character_current_health <= 0 || this.props.character?.is_dead || !this.props.character?.can_attack
     }
 
     render() {
         return (
-            <Fragment>
+            <div className={clsx({'ml-[-125px]': !this.props.is_small})}>
                 <div className={clsx('mt-4 mb-4 text-xs text-center', {
                     'hidden': this.attackButtonDisabled()
                 })}>
@@ -204,15 +207,15 @@ export default class FightSection extends React.Component<FightSectionProps, any
                         <div className={clsx('mb-4 max-w-md m-auto', {
                             'mt-4': this.attackButtonDisabled()
                         })}>
-                            <HealthMeters is_enemy={true} name={this.props.monster_to_fight.name} current_health={parseInt(this.state.monster_current_health)} max_health={this.state.monster_max_health} />
-                            <HealthMeters is_enemy={false} name={this.props.character.name} current_health={parseInt(this.state.character_current_health)} max_health={this.state.character_max_health} />
+                            <HealthMeters is_enemy={true} name={this.props.monster_to_fight.name} current_health={this.state.monster_current_health} max_health={this.state.monster_max_health} />
+                            <HealthMeters is_enemy={false} name={this.props.character.name} current_health={this.state.character_current_health} max_health={this.state.character_max_health} />
                         </div>
                     : null
                 }
                 <div className='italic text-center'>
                     {this.renderBattleMessages()}
                 </div>
-            </Fragment>
+            </div>
         )
     }
 

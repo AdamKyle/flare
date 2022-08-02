@@ -2,79 +2,79 @@ import React from "react";
 import Select from "react-select";
 import PrimaryButton from "../../../components/ui/buttons/primary-button";
 import {isEqual} from "lodash";
+import MonsterType from "../../../lib/game/types/actions/monster/monster-type";
+import ComponentLoading from "../../../components/ui/loading/component-loading";
+import MonsterSelectionProps from "../../../lib/game/types/actions/components/monster-selection-props";
+import MonsterSelectionState from "../../../lib/game/types/actions/components/monster-selection-state";
 
-export default class MonsterSelection extends React.Component<any, any> {
+export default class MonsterSelection extends React.Component<MonsterSelectionProps, MonsterSelectionState> {
 
-    constructor(props: any) {
+    constructor(props: MonsterSelectionProps) {
         super(props);
 
         this.state = {
-            selected_monster: null,
-            attack_disabled: true,
-        }
-
-    }
-
-    componentDidUpdate(prevProps: any, prevState: any) {
-        if (!isEqual(this.props.monsters, prevProps.monsters) && this.state.selected_monster !== null) {
-            this.setState({
-                selected_monster: null,
-                attack_disabled: true,
-            });
+            monster_to_fight: null,
         }
     }
 
     setMonsterToFight(data: any) {
-        const foundMonster = this.props.monsters.filter((monster: any) => monster.id === parseInt(data.value));
+        const monster: MonsterType|null = this.findMonster(data.value);
 
-        if (foundMonster.length > 0) {
+        if (monster !== null) {
             this.setState({
-                selected_monster: foundMonster[0],
-                attack_disabled: false,
-            });
-        } else {
-            this.setState({
-                selected_monster: null,
-                attack_disabled: true,
-            }, () => {
-                this.props.update_monster(null);
+                monster_to_fight: monster,
             });
         }
     }
 
     buildMonsters() {
-        let monsters = this.props.monsters.map((monster: any) => {
+        if (this.props.monsters === null) {
+            return [{label: '', value: 0}];
+        }
+
+        return this.props.monsters.map((monster: MonsterType) => {
             return {label: monster.name, value: monster.id};
         });
-
-        monsters.unshift({
-            label: 'Please Select', value: 0,
-        });
-
-        return monsters;
     }
 
-    defaultMonster() {
+    defaultMonster(): {label: string, value: number}[] {
 
-        if (this.state.selected_monster !== null) {
-            return {
-                label: this.state.selected_monster.name,
-                value: this.state.selected_monster.id,
+        if (this.state.monster_to_fight !== null) {
+            const monster: MonsterType|null = this.findMonster(this.state.monster_to_fight.id);
+
+            if (monster !== null) {
+                return [{ label: monster.name, value: monster.id}];
             }
         }
 
-        return {
-            label: 'Please Select Monster',
-            value: 0,
+        return [{label: 'Please Select', value: 0}];
+    }
+
+    findMonster(monsterId: number): MonsterType|null {
+        const foundMonster: MonsterType[]|[] = this.props.monsters.filter((monster: MonsterType) => {
+            return monster.id === monsterId;
+        })
+
+        if (foundMonster.length > 0) {
+            return foundMonster[0];
         }
+
+        return null;
+    }
+
+    isAttackDisabled() {
+        if (this.props.character === null) {
+            return false;
+        }
+
+        return this.props.character.is_dead ||
+            this.props.character.is_automation_running ||
+            !this.props.character.can_attack ||
+            this.state.monster_to_fight === null;
     }
 
     attack() {
-        this.props.update_monster(this.state.selected_monster);
-    }
-
-    attackDisabled() {
-        return this.state.attack_disabled || this.props.timer_running || this.props.character.is_dead || !this.props.character.can_attack
+        this.props.update_monster_to_fight(this.state.monster_to_fight);
     }
 
     render() {
@@ -93,11 +93,11 @@ export default class MonsterSelection extends React.Component<any, any> {
                         />
                     </div>
                     <div className='cols-start-3 cols-end-3'>
-                        <PrimaryButton button_label={'Attack'} on_click={this.attack.bind(this)} disabled={this.attackDisabled()}/>
+                        <PrimaryButton button_label={'Attack'} on_click={this.attack.bind(this)} disabled={this.isAttackDisabled()}/>
                     </div>
                 </div>
             </div>
-        )
+        );
     }
 
 }

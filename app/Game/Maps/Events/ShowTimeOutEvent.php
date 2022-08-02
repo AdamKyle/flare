@@ -17,7 +17,7 @@ class ShowTimeOutEvent implements ShouldBroadcastNow
     /**
      * @var User
      */
-    public $user;
+    private $user;
 
     /**
      * @var bool $activateBar

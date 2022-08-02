@@ -1,116 +1,149 @@
-import Actions from "../../../sections/game-actions-section/actions";
-import SmallerActions from "../../../sections/game-actions-section/smaller-actions";
 import Ajax from "../../ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
-import ActionsProps from "../types/actions/actions-props";
-import {capitalize, isEqual} from "lodash";
-import ActionsState from "../types/actions/actions-state";
+import {capitalize} from "lodash";
 import {CraftingOptions} from "../types/actions/crafting-type-options";
 import {getTimeLeftInSeconds} from "./convert-time";
+import Actions from "../../../sections/game-actions-section/actions";
+import PvpCharactersType from "../types/pvp-characters-type";
 
 export default class ActionsManager {
 
-    private component: Actions | SmallerActions;
+    private component: Actions;
 
-    constructor(component: Actions | SmallerActions) {
+    constructor(component: Actions) {
         this.component = component;
     }
 
-    initialFetch(props: ActionsProps) {
-        (new Ajax()).setRoute('map-actions/' + props.character_id).doAjaxCall('get', (result: AxiosResponse) => {
+    /**
+     * Initial Ajax call for the actions component.
+     *
+     * @param props
+     */
+    initialFetch() {
+        const props = this.component.props;
+
+        (new Ajax()).setRoute('map-actions/' + props.character.id).doAjaxCall('get', (result: AxiosResponse) => {
             this.component.setState({
-                character: props.character,
                 monsters: result.data.monsters,
                 attack_time_out: props.character.can_attack_again_at !== null ? getTimeLeftInSeconds(props.character.can_attack_again_at) : 0,
                 crafting_time_out: props.character.can_craft_again_at !== null ? getTimeLeftInSeconds(props.character.can_craft_again_at) : 0,
                 loading: false,
             })
         }, (error: AxiosError) => {
-
+            console.error(error);
         });
     }
 
-    actionComponentUpdated(state: ActionsState, props: ActionsProps) {
-        if (state.character?.is_dead && !props.character.is_dead) {
+    /**
+     * When the component updates let's update the state.
+     */
+    public updateStateOnComponentUpdate() {
+        this.setCraftingTypeOnUpdate();
+        this.setDuelingStateOnUpdate();
+    }
+
+    public setCharactersForDueling(eventCharactersForDueling: PvpCharactersType[]) {
+        let charactersForDueling: PvpCharactersType[]|[] = [];
+        const props = this.component.props;
+
+        if (props.character_position !== null) {
+            charactersForDueling = eventCharactersForDueling.filter((character: PvpCharactersType) => {
+                if (props.character_position !== null) {
+                    if (character.id !== props.character.id &&
+                        character.character_position_x === props.character_position.x &&
+                        character.character_position_y === props.character_position.y) {
+                        return character;
+                    }
+                }
+            });
+
             this.component.setState({
-                character_revived: true,
+                characters_for_dueling: charactersForDueling,
             })
         }
+    }
 
-        if (!isEqual(props.character, state.character)) {
+    /**
+     * Set the crafting type upon component update.
+     */
+    private setCraftingTypeOnUpdate() {
+        const state = this.component.state;
+        const props = this.component.props;
+
+        if (state.crafting_type !== null) {
+            if (state.crafting_type === 'queen' && !props.character.can_access_queen) {
+                this.component.setState({crafting_type: null});
+            }
+
+            if (state.crafting_type === 'workbench' && !props.character.can_use_work_bench) {
+                this.component.setState({crafting_type: null});
+            }
+        }
+    }
+
+    /**
+     * Set the dueling state upon component update.
+     *
+     * @private
+     */
+    private setDuelingStateOnUpdate() {
+        const props = this.component.props;
+        const state = this.component.state;
+
+        if (props.character_position !== null && state.characters_for_dueling.length > 0 && state.characters_for_dueling.length == 0) {
+            console.log('here?');
+            if (typeof props.character_position.game_map_id === 'undefined') {
+                return;
+            }
+
+            const characters = state.characters_for_dueling.filter((character: any) => {
+                return character.character_position_x === props.character_position?.x &&
+                    character.character_position_y === props.character_position?.y &&
+                    character.game_map_id === props.character_position?.game_map_id
+            });
+
+            if (characters.length === 0) {
+                return;
+            }
+
             this.component.setState({
-                character: props.character
+                characters_for_dueling: characters,
             });
         }
     }
 
+    /**
+     * Set the crafting type.
+     *
+     * @param type
+     */
     setCraftingType(type: CraftingOptions) {
         this.component.setState({
             crafting_type: type,
         });
     }
 
+    /**
+     * Remove Crafting
+     */
     removeCraftingSection() {
         this.component.setState({
             crafting_type: null,
         });
     }
 
-    setSelectedMonster(monster: any|null) {
-        let isSameMonster = false;
-
-        if (monster === null) {
-            return;
-        }
-
-        if (monster.id === this.component.state.monster_to_fight?.id) {
-            isSameMonster = true;
-        }
-
-        this.component.setState({
-            monster_to_fight: monster,
-            is_same_monster: isSameMonster,
-        });
-    }
-
-    resetSameMonster() {
-        this.component.setState({
-            is_same_monster: false,
-        });
-    }
-
-    revive(characterId: number | null) {
-        (new Ajax()).setRoute('battle-revive/' + characterId).doAjaxCall('post', (result: AxiosResponse) => {
-
-        }, (error: AxiosError) => {
-
-        });
-    }
-
-    setAttackTimeOut(attackTimeOut: number) {
-        this.component.setState({
-            attack_time_out: attackTimeOut
-        });
-    }
-
-    updateTimer() {
-        this.component.setState({
-            attack_time_out: 0,
-        })
-    }
-
+    /**
+     * Update the crafting timeout to 0
+     */
     updateCraftingTimer() {
         this.component.setState({
             crafting_time_out: 0,
         })
     }
 
-    resetRevived() {
-        this.component.setState({
-            character_revived: false
-        });
-    }
-
+    /**
+     * Get the selected crafting type.
+     */
     getSelectedCraftingOption() {
         if (this.component.state.crafting_type !== null) {
             return capitalize(this.component.state.crafting_type);
@@ -119,10 +152,21 @@ export default class ActionsManager {
         return '';
     }
 
-    cannotCraft() {
-        return this.component.state.crafting_time_out > 0 || !this.component.props.character_statuses?.can_craft || this.component.props.character_statuses?.is_dead
+    /**
+     * Are we not allowed to craft?
+     */
+    cannotCraft(): boolean {
+        const state = this.component.state;
+        const props = this.component.props;
+
+        return state.crafting_time_out > 0 || !props.character_status.can_craft || props.character_status.is_dead;
     }
 
+    /**
+     * Build the crafting list.
+     *
+     * @param handler
+     */
     buildCraftingList(handler: (type: CraftingOptions) => void) {
         const options = [
             {

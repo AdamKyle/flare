@@ -10,4 +10,6 @@ export default interface TabProperties {
 
     disabled?: boolean;
 
+    additonal_css?: string;
+
 }

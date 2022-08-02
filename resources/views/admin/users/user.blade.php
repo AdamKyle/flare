@@ -55,7 +55,7 @@
             </div>
 
             <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-            <h3 class="text-sky-600 dark:text-sky-500">Administrator Actions</h3>
+            <h3 class="text-sky-600 dark:text-sky-500">Administrator Actions_2</h3>
             <div class="accordion border border-gray-300 dark:border-gray-900 rounded-xl mt-5">
                 <h5 class="border-t border-gray-300 dark:border-gray-900 p-5" data-toggle="collapse" data-target="#accordion-2">
                     Force Name Change

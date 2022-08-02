@@ -3,7 +3,7 @@ import MonsterType from "./monster/monster-type";
 
 export default interface FightSectionProps {
 
-    character: CharacterType|null;
+    character: CharacterType;
 
     monster_to_fight: MonsterType;
 

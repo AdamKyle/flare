@@ -66,8 +66,8 @@ You can do the following while each of the time-outs is playing out. At any time
 
 - **Moving**: Applies 10 second timeout. You can do everything but embark on adventures.
 - **Adventuring**: Timer dependent on total levels of adventure. You can do nothing related to your character, movement, attacking or anything else including shopping, market boards, movement and so on. You are otherwise occupied.
-- **Sailing**: Timer dependent on distance. Actions are treated the same as moving.
-- **Teleport**: Timer dependent on distance. Actions are treated the same as moving.
+- **Sailing**: Timer dependent on distance. Actions_2 are treated the same as moving.
+- **Teleport**: Timer dependent on distance. Actions_2 are treated the same as moving.
 
 ## Regarding quest items and locations
 

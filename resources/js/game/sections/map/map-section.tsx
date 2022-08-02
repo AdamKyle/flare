@@ -18,6 +18,7 @@ import DirectionalMovement from "./actions/directional-movement";
 import MapActions from "./actions/map-actions";
 // @ts-ignore
 import Draggable from 'react-draggable/build/web/react-draggable.min';
+import clsx from "clsx";
 
 export default class MapSection extends React.Component<MapProps, MapState> {
 
@@ -225,6 +226,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                         update_map_state={this.setStateFromData.bind(this)}
                         map_id={this.state.map_id}
                     />
+                    <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
                     <DirectionalMovement
                         character_position={this.state.character_position}
                         map_position={this.state.map_position}
@@ -238,7 +240,9 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                         update_can_move={this.updateCanMove.bind(this)}
                     />
                 </div>
-                <div className={'mt-4'}>
+                <div className={clsx('mt-4', {
+                    'hidden': this.props.disable_bottom_timer,
+                })}>
                     <MapTimer time_left={this.state.time_left} automation_time_out={this.state.automation_time_out} />
                 </div>
             </Fragment>

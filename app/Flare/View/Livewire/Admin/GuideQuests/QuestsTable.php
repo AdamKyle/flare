@@ -25,7 +25,7 @@ class QuestsTable extends DataTableComponent {
                 return '<a href="/admin/guide-quests/show/'. $guideQuest.'">'.$row->name . '</a>';
             })->html(),
             Column::make('Reward Level', 'reward_level')->sortable(),
-            Column::make('Actions')->label(
+            Column::make('Actions_2')->label(
                 fn($row, Column $column) => view('admin.guide-quests.partials.table.delete-action')->withRow($row)
             ),
         ];

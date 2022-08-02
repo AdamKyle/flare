@@ -37,6 +37,10 @@ export default class HealthMeters extends React.Component<HealthMeterProps, any>
     }
 
     healthPercent() {
+        if (typeof this.props.current_health === 'undefined' || typeof this.props.max_health === 'undefined') {
+            return 0;
+        }
+
         const percentage = (this.props.current_health / this.props.max_health);
 
         if (percentage > 1.0) {

@@ -1,4 +1,5 @@
 import CharacterCurrenciesDetails from "../character-currencies-details";
+import PositionType from "./position-type";
 
 export default interface MapProps {
 
@@ -18,7 +19,9 @@ export default interface MapProps {
 
     show_celestial_fight_button: (id: number | null) => void;
 
-    set_character_position: (position: {x: number, y: number, game_map_id?: number}) => void;
+    set_character_position: (position: PositionType) => void;
 
     update_character_quests_plane: (plane: string) => void;
+
+    disable_bottom_timer: boolean;
 }

@@ -31,7 +31,7 @@
                         Notes
                     </x-data-tables.header-row>
                     <x-data-tables.header-row>
-                        Actions
+                        Actions_2
                     </x-data-tables.header-row>
                 </x-data-tables.header>
                 <x-data-tables.body>

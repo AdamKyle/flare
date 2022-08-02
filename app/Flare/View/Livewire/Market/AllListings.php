@@ -28,7 +28,7 @@ class AllListings extends DataTableComponent {
             Column::make('Listed For', 'listed_price')->format(
                 fn($value, $row, Column $column) => number_format($value)
             )->searchable()->sortable(),
-            Column::make('Actions')->label(
+            Column::make('Actions_2')->label(
                 fn($row, Column $column)  => view('game.core.market.partials.market-map-actions-section', [
                     'character' => auth()->user()->character,
                     'value'     => $row->item,

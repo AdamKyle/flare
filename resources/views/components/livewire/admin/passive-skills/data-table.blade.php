@@ -43,7 +43,7 @@
       @auth
         @if (auth()->user()->hasRole('Admin'))
           <x-data-tables.header-row>
-            Actions
+            Actions_2
           </x-data-tables.header-row>
         @endif
       @endauth

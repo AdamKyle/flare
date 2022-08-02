@@ -1,6 +1,6 @@
 <div class="dropdown">
     <button class="btn btn-primary dropdown-toggle" type="button" id="actionsButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        Actions
+        Actions_2
     </button>
     <div class="dropdown-menu" aria-labelledby="actionsButton">
         @if ($slot->item->usable && !$slot->item->damages_kingdoms)

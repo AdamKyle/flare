@@ -48,7 +48,11 @@ export default class Tabs extends React.Component<TabProperties, {}> {
     render() {
         return(
             <Tab.Group>
-                <Tab.List className={clsx("w-full grid gap-2 content-center", {'md:w-1/3': !this.props.full_width}, {'grid-cols-4': this.props.tabs.length === 4}, {'grid-cols-3': this.props.tabs.length === 3}, {'grid-cols-2': this.props.tabs.length === 2})}>
+                <Tab.List className={clsx("w-full grid gap-2 content-center " + this.props.additonal_css,
+                    {'md:w-1/3': !this.props.full_width}, {'grid-cols-4': this.props.tabs.length === 4},
+                    {'grid-cols-3': this.props.tabs.length === 3},
+                    {'grid-cols-2': this.props.tabs.length === 2})}
+                >
                     {this.renderEachTab()}
                 </Tab.List>
                 <Tab.Panels className="mt-5">

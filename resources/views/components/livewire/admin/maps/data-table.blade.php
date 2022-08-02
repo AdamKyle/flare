@@ -29,7 +29,7 @@
           field="characters_using"
         />
         <x-data-tables.header-row>
-          Actions
+          Actions_2
         </x-data-tables.header-row>
       @endguest
     </x-data-tables.header>

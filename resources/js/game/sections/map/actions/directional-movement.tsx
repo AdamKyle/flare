@@ -4,6 +4,7 @@ import PrimaryOutlineButton from "../../../components/ui/buttons/primary-outline
 import TraverseModal from "../../components/map-actions/modals/traverse-modal";
 import DirectionalMovementProps from "../../../lib/game/map/types/directional-movement-props";
 import DirectionalMovementState from "../../../lib/game/map/types/directional-movement-state";
+import clsx from "clsx";
 
 export default class DirectionalMovement extends React.Component<DirectionalMovementProps, DirectionalMovementState> {
 
@@ -38,7 +39,9 @@ export default class DirectionalMovement extends React.Component<DirectionalMove
         return (
             <Fragment>
                 <div className='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 hidden sm:block'></div>
-                <div className='grid gap-2 grid-cols-5 gap-4'>
+                <div className={clsx('grid gap-2 md:grid-cols-5 gap-4', {
+                    'h-[125px] overflow-x-scroll': this.props.view_port <= 500
+                })}>
                     <PrimaryOutlineButton disabled={!this.props.can_move || this.props.is_dead}
                                    button_label={'North'}
                                    on_click={() => this.move('north')}

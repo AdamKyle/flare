@@ -60,7 +60,7 @@ export default class TimerProgressBar extends React.Component<TimerProgressBarPr
                         });
 
                         if (typeof this.props.update_time_remaining !== 'undefined') {
-                            this.props.update_time_remaining();
+                            this.props.update_time_remaining(0);
                         }
 
                         clearInterval(this.interval);

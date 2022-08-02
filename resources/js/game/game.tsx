@@ -8,7 +8,6 @@ import MapSection from "./sections/map/map-section";
 import GameState from "./lib/game/types/game-state";
 import CharacterTopSection from "./sections/character-top-section/character-top-section";
 import Quests from "./sections/components/quests/quests";
-import Actions from "./sections/game-actions-section/actions";
 import ManualProgressBar from "./components/ui/progress-bars/manual-progress-bar";
 import FetchGameData from "./lib/game/ajax/FetchGameData";
 import CharacterSheet from "./sections/character-sheet/character-sheet";
@@ -19,6 +18,8 @@ import QuestType from "./lib/game/types/quests/quest-type";
 import ScreenRefresh from './sections/screen-refresh/screen-refresh';
 import KingdomsList from "./sections/kingdoms/kingdoms-list";
 import KingdomDetails from "./lib/game/kingdoms/kingdom-details";
+import Actions from "./sections/game-actions-section/actions";
+import PositionType from "./lib/game/types/map/position-type";
 
 export default class Game extends React.Component<GameProps, GameState> {
 
@@ -193,7 +194,7 @@ export default class Game extends React.Component<GameProps, GameState> {
         this.setState({character_currencies: currencies});
     }
 
-    setCharacterPosition(position: {x: number, y: number, game_map_id?: number}) {
+    setCharacterPosition(position: PositionType) {
         this.setState({
             position: position,
         })
@@ -257,14 +258,22 @@ export default class Game extends React.Component<GameProps, GameState> {
             return this.renderLoading();
         }
 
+        if (this.state.character_status === null) {
+            return this.renderLoading();
+        }
+
         return (
             <Fragment>
 
                 <ScreenRefresh user_id={this.state.character.user_id} />
 
-                <Tabs tabs={this.tabs} disabled={!this.state.finished_loading || this.state.disable_tabs}>
+                <Tabs tabs={this.tabs} disabled={!this.state.finished_loading || this.state.disable_tabs} additonal_css={clsx({
+                    'ml-[40px]': this.state.view_port >= 1600
+                })}>
                     <TabPanel key={'game'}>
-                        <div className="grid lg:grid-cols-3 gap-3">
+                        <div className={clsx("grid lg:grid-cols-3 gap-3", {
+                            'ml-[40px]': this.state.view_port >= 1600
+                        })}>
                             <div className="w-full col-span-3 lg:col-span-2">
                                 <BasicCard additionalClasses={'mb-10'}>
                                     <CharacterTopSection character={this.state.character}
@@ -273,33 +282,34 @@ export default class Game extends React.Component<GameProps, GameState> {
                                                          update_character_currencies={this.updateCharacterCurrencies.bind(this)}
                                     />
                                 </BasicCard>
-                                <BasicCard additionalClasses={'min-h-60'}>
+                                <BasicCard additionalClasses={clsx('min-h-60', {
+                                    'max-w-[500px] ml-auto mr-auto': this.state.view_port < 1600
+                                })}>
                                     {
                                         this.state.view_port < 1600 ?
                                             <SmallerActions
-                                                character_id={this.props.characterId}
                                                 character={this.state.character}
-                                                character_statuses={this.state.character_status}
-                                                currencies={this.state.character_currencies}
+                                                character_status={this.state.character_status}
+                                                character_position={this.state.position}
+                                                character_currencies={this.state.character_currencies}
                                                 celestial_id={this.state.celestial_id}
                                                 update_celestial={this.updateCelestial.bind(this)}
-                                                character_position={this.state.position}
+                                                update_plane_quests={this.updateQuestPlane.bind(this)}
+                                                update_character_position={this.setCharacterPosition.bind(this)}
                                             />
                                         :
                                             <Actions
-                                                character_id={this.props.characterId}
                                                 character={this.state.character}
-                                                character_statuses={this.state.character_status}
+                                                character_status={this.state.character_status}
+                                                character_position={this.state.position}
                                                 celestial_id={this.state.celestial_id}
                                                 update_celestial={this.updateCelestial.bind(this)}
-                                                character_position={this.state.position}
                                             />
                                     }
                                 </BasicCard>
                             </div>
-                            <BasicCard additionalClasses={clsx('hidden lg:block md:mt-0 lg:col-start-3 lg:col-end-3 max-h-[600px]', {
-                                'max-h-[624px]': this.state.character.is_dead,
-                                'max-w-[500px]': this.state.view_port > 1920,
+                            <BasicCard additionalClasses={clsx('hidden lg:block md:mt-0 lg:col-start-3 lg:col-end-3 max-h-[600px] max-w-[500px]', {
+                                'max-h-[624px]': this.state.character.is_dead
                             })}>
                                 <MapSection
                                     user_id={this.props.userId}
@@ -312,6 +322,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                                     show_celestial_fight_button={this.updateCelestial.bind(this)}
                                     set_character_position={this.setCharacterPosition.bind(this)}
                                     update_character_quests_plane={this.updateQuestPlane.bind(this)}
+                                    disable_bottom_timer={false}
                                 />
                             </BasicCard>
                         </div>

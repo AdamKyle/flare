@@ -22,7 +22,7 @@ export default class NpcKingdoms extends React.Component<NpcKingdomProps, any> {
 
     componentDidUpdate() {
         if (this.state.view_port !== null) {
-            if (this.state.view_port < 1600 && this.state.open_kingdom_modal) {
+            if (this.state.view_port < 600 && this.state.open_kingdom_modal) {
                 this.setState({
                     kingdom_id: 0,
                     open_kingdom_modal: false,

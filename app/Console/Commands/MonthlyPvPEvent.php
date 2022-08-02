@@ -33,7 +33,7 @@ class MonthlyPvPEvent extends Command
      * @return int
      */
     public function handle() {
-        event(new GlobalMessageEvent('Monthly pvp will begin tonight shortly after 6:30 GMT-6. Actions area has been updated to show a new button: Join PVP. Click this and follow the steps to be registered to participate. Registration will be open till 6:30pm GMT-6 (10 Hours, 30 Minutes from now)'));
+        event(new GlobalMessageEvent('Monthly pvp will begin tonight shortly after 6:30 GMT-6. Actions_2 area has been updated to show a new button: Join PVP. Click this and follow the steps to be registered to participate. Registration will be open till 6:30pm GMT-6 (10 Hours, 30 Minutes from now)'));
 
         Event::create([
             'type'       => EventType::MONTHLY_PVP,

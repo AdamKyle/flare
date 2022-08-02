@@ -1,19 +1,15 @@
 import {CharacterType} from "../../character/character-type";
 import CharacterStatusType from "../../character/character-status-type";
-import CharacterCurrenciesType from "../../character/character-currencies-type";
+import PositionType from "../map/position-type";
 
 export default interface ActionsProps {
-    character_id : number;
-
     character: CharacterType;
 
-    character_statuses: CharacterStatusType | null;
+    character_status: CharacterStatusType;
 
-    currencies?: CharacterCurrenciesType;
+    character_position: PositionType | null;
 
     celestial_id: number;
 
-    update_celestial: (celestialId: number|null) => void;
-
-    character_position: {x: number, y: number, game_map_id?: number} | null;
+    update_celestial: (celestialId: number | null) => void;
 }
