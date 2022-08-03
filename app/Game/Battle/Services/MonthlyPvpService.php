@@ -131,7 +131,6 @@ class MonthlyPvpService {
 
         CharacterAttackTypesCacheBuilder::dispatch($character)->delay(now()->addSeconds(2));
 
-
         event(new ServerMessageEvent($character->user, 'You have been moved to the Arena! You have a moment to adjust your gear. You are considered to be in Automation'));
 
         event(new RefreshUserScreenEvent($character->user));

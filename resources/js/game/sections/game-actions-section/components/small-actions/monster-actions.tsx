@@ -73,7 +73,7 @@ export default class MonsterActions extends React.Component<MonsterActionsProps,
 
                 {
                     this.props.character.is_dead ?
-                        <div className='text-center my-4'>
+                        <div className='text-center my-4 ml-[-140px]'>
                             <PrimaryButton button_label={'Revive'}
                                            on_click={this.revive.bind(this)}
                                            additional_css={'mb-4'}

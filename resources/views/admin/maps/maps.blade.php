@@ -1,16 +1,19 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container-fluid">
-    <div class="row page-titles">
-        <div class="col-md-6 align-self-right">
-            <h4 class="mt-2">Maps</h4>
-        </div>
-        <div class="col-md-6 align-self-right">
-            <a href="{{route('home')}}" class="btn btn-success float-right ml-2">Home</a>
-            <a href="{{route('maps.upload')}}" class="btn btn-primary float-right ml-2">Upload New</a>
-        </div>
+    <div class="container-fluid">
+        <x-core.page-title
+            title="Game Maps"
+            route="{{route('home')}}"
+            color="success" link="Home"
+        >
+            <x-core.buttons.link-buttons.primary-button
+                href="{{route('maps.upload')}}"
+                css="tw-ml-2"
+            >
+                Upload New Map
+            </x-core.buttons.link-buttons.primary-button>
+        </x-core.page-title>
+        @livewire('admin.maps.maps-table')
     </div>
-    @livewire('admin.maps.data-table')
-</div>
 @endsection

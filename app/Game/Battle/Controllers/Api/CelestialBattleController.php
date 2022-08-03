@@ -34,6 +34,7 @@ class CelestialBattleController extends Controller {
     public function celestialMonsters(Character $character) {
         $celestialBeings = Monster::select('name', 'gold_cost', 'gold_dust_cost', 'id')
                                   ->where('is_celestial_entity', true)
+                                  ->whereNull('celestial_type')
                                   ->where('game_map_id', $character->map->game_map_id)
                                   ->orderBy('max_level', 'asc')
                                   ->get();

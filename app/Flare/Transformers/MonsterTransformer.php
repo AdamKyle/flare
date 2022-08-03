@@ -17,8 +17,8 @@ class MonsterTransformer extends TransformerAbstract {
      */
     public function transform(Monster $monster) {
 
-        $shouldIncrease = $this->shouldIncreaseStats($monster);
-        $increaseAmount = $monster->gameMap->enemy_stat_bonus;
+        $shouldIncrease              = $this->shouldIncreaseStats($monster);
+        $increaseAmount              = $monster->gameMap->enemy_stat_bonus;
 
         return [
             'id'                        => $monster->id,
@@ -51,10 +51,10 @@ class MonsterTransformer extends TransformerAbstract {
             'entrancing_chance'         => $shouldIncrease ? $this->increaseValue($monster->entrancing_chance, $increaseAmount) : $monster->entrancing_chance,
             'devouring_light_chance'    => $shouldIncrease ? $this->increaseValue($monster->devouring_light_chance, $increaseAmount) : $monster->devouring_light_chance,
             'devouring_darkness_chance' => $shouldIncrease ? $this->increaseValue($monster->devouring_darkness_chance, $increaseAmount) : $monster->devouring_darkness_chance,
-            'ambush_chance'             => $shouldIncrease ? $this->increaseValue($monster->ambush_chance, $increaseAmount) : $monster->ambush_chance,
-            'ambush_resistance_chance'  => $shouldIncrease ? $this->increaseValue($monster->ambush_resistance, $increaseAmount) : $monster->ambush_resistance,
-            'counter_chance'            => $shouldIncrease ? $this->increaseValue($monster->counter_chance, $increaseAmount) : $monster->counter_chance,
-            'counter_resistance_chance' => $shouldIncrease ? $this->increaseValue($monster->counter_resistance, $increaseAmount) : $monster->counter_resistance,
+            'ambush_chance'             => $monster->ambush_chance,
+            'ambush_resistance_chance'  => $monster->ambush_resistance,
+            'counter_chance'            => $monster->counter_chance,
+            'counter_resistance_chance' => $monster->counter_resistance,
             'increases_damage_by'       => $monster->gameMap->enemy_stat_bonus,
         ];
     }
@@ -77,6 +77,8 @@ class MonsterTransformer extends TransformerAbstract {
 
         switch($monster->gameMap->name) {
             case 'Shadow Plane':
+            case 'Hell':
+            case 'Purgatory':
                 $increase = true;
                 break;
             default:

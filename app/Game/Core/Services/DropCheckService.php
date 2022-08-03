@@ -5,8 +5,9 @@ namespace App\Game\Core\Services;
 use App\Flare\Builders\BuildMythicItem;
 use App\Flare\Values\CelestialType;
 use App\Game\Battle\Services\BattleDrop;
+use Exception;
 use Facades\App\Flare\Calculators\DropCheckCalculator;
-use App\Flare\Models\Adventure;
+use Facades\App\Flare\RandomNumber\RandomNumberGenerator;
 use App\Flare\Models\Character;
 use App\Flare\Models\Location;
 use App\Flare\Models\Map;
@@ -24,11 +25,6 @@ class DropCheckService {
      * @var Monster $monster
      */
     private $monster;
-
-    /**
-     * @var Adventure $adventure
-     */
-    private $adventure;
 
     /**
      * @var Location $locationWithEffect
@@ -64,14 +60,12 @@ class DropCheckService {
      *
      * @param Character $character
      * @param Monster $monster
-     * @param Adventure|null $adventure
      * @return void
-     * @throws \Exception
+     * @throws Exception
      */
-    public function process(Character $character, Monster $monster, Adventure $adventure = null) {
+    public function process(Character $character, Monster $monster) {
         $this->lootingChance  = $character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
         $this->monster        = $monster;
-        $this->adventure      = $adventure;
 
         $gameMap              = $character->map->gameMap;
         $characterMap         = $character->map;
@@ -116,10 +110,10 @@ class DropCheckService {
      *
      * @param Character $character
      * @return void
-     * @throws \Exception
+     * @throws Exception
      */
     public function handleDropChance(Character $character) {
-        $canGetDrop = $this->canHaveDrop();
+        $canGetDrop = $this->canHaveDrop($character);
 
         $this->battleDrop->handleDrop($character, $canGetDrop);
 
@@ -156,25 +150,26 @@ class DropCheckService {
             $chance = 0.15;
         }
 
-        $roll = rand(1, 1000000000);
+        $roll = RandomNumberGenerator::generateRandomNumber(1, 50 , 1, 100);
         $roll = $roll + $roll * $chance;
 
-        return $roll > 999995;
+        return $roll > 99;
     }
 
     /**
      * Can we have the drop?
      *
+     * @param Character $character
      * @return bool
-     * @throws \Exception
+     * @throws Exception
      */
-    protected function canHaveDrop(): bool {
+    protected function canHaveDrop(Character $character): bool {
         if (!is_null($this->locationWithEffect)) {
             $dropRate   = new LocationEffectValue($this->locationWithEffect->enemy_strength_type);
 
             return DropCheckCalculator::fetchLocationDropChance($dropRate->fetchDropRate());
         }
 
-        return DropCheckCalculator::fetchDropCheckChance($this->monster, $this->lootingChance, $this->gameMapBonus, $this->adventure);
+        return DropCheckCalculator::fetchDropCheckChance($this->monster, $character->level, $this->lootingChance, $this->gameMapBonus);
     }
 }

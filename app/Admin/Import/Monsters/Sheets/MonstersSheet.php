@@ -18,11 +18,11 @@ class MonstersSheet implements ToCollection {
 
                 $monster = $this->returnCleanMonster($originalMonster);
 
-                if (is_null($monster) || !isset($monster['id'])) {
+                if (is_null($monster) || !isset($monster['name'])) {
                     continue;
                 }
 
-                $foundMonster = Monster::find($monster['id']);
+                $foundMonster = Monster::where('name', $monster['name'])->first();
 
                 if (is_null($foundMonster)) {
                     Monster::create($monster);

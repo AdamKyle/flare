@@ -3,21 +3,20 @@
 namespace App\Game\Battle\Services;
 
 
+use Exception;
+use Illuminate\Database\Eloquent\Collection;
 use App\Flare\Models\Monster;
 use App\Flare\Values\CelestialType;
-use Exception;
 use App\Flare\Builders\BuildMythicItem;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\MonthlyPvpParticipant;
 use App\Flare\Values\MaxCurrenciesValue;
-use App\Flare\Values\UserOnlineValue;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Maps\Events\UpdateMapBroadcast;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
-use Illuminate\Database\Eloquent\Collection;
 
 class MonthlyPvpFightService {
 
@@ -49,6 +48,7 @@ class MonthlyPvpFightService {
     /**
      * @param PvpService $pvpService
      * @param ConjureService $conjureService
+     * @param BuildMythicItem $buildMythicItem
      */
     public function __construct(PvpService $pvpService, ConjureService $conjureService, BuildMythicItem $buildMythicItem) {
         $this->pvpService      = $pvpService;
@@ -75,8 +75,6 @@ class MonthlyPvpFightService {
      * @throws Exception
      */
     public function startPvp(): bool {
-        $this->filterParticipants();
-
         if (count($this->participants) >= 2) {
             $participants = $this->reOrderCharactersByLevel($this->participants->pluck('id')->toArray());
 
@@ -292,25 +290,4 @@ class MonthlyPvpFightService {
         })->orderBy('characters.level', 'asc')->select('monthly_pvp_participants.*')->get();
     }
 
-    /**
-     * @return array
-     */
-    protected function filterParticipants(): array {
-        $query = (new UserOnlineValue())->getUsersOnlineQuery();
-
-        if ($query->count() >= 2) {
-            $registeredUsers = $query->pluck('user_id')->toArray();
-
-            $this->participants = $this->participants->filter(function($participant) use ($registeredUsers) {
-                if (in_array($participant->user_id, $registeredUsers)) {
-                    return $participant;
-                }
-
-                $this->kickCheacterWhoLoggedOut($participant);
-
-            })->values();
-        }
-
-        return [];
-    }
 }

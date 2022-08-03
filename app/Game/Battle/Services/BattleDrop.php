@@ -2,9 +2,10 @@
 
 namespace App\Game\Battle\Services;
 
+use Illuminate\Support\Facades\Cache;
+use Facades\App\Flare\RandomNumber\RandomNumberGenerator;
 use App\Flare\Builders\RandomItemDropBuilder;
 use App\Flare\Events\ServerMessageEvent;
-use App\Flare\Models\Adventure;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Models\Location;
@@ -17,15 +18,10 @@ use App\Game\Skills\Services\DisenchantService;
 use Facades\App\Flare\Calculators\DropCheckCalculator;
 use Facades\App\Flare\Calculators\SellItemCalculator;
 use App\Game\Messages\Events\ServerMessageEvent as GameServerMessage;
-use Illuminate\Support\Facades\Cache;
 
 class BattleDrop {
 
     use CanHaveQuestItem;
-
-    const ROLL = 1000000000;
-
-    const GENERATE_RANDOM_ITEM = 999999999;
 
     private $randomItemDropBuilder;
 
@@ -34,8 +30,6 @@ class BattleDrop {
     private $monster;
 
     private $locationWithEffect;
-
-    private $adventure;
 
     private $gameMapBonus;
 
@@ -64,12 +58,6 @@ class BattleDrop {
         return $this;
     }
 
-    public function setAdventure(Adventure $adventure = null): BattleDrop {
-        $this->adventure = $adventure;
-
-        return $this;
-    }
-
     public function setLootingChance(float $lootingChance = 0.0): BattleDrop {
         $this->lootingChance = $lootingChance;
 
@@ -84,7 +72,8 @@ class BattleDrop {
      *
      * @param Character $character
      * @param bool $canGetDrop
-     * @return void
+     * @param bool $returnItem
+     * @return Item|null
      */
     public function handleDrop(Character $character, bool $canGetDrop, bool $returnItem = false): ?Item {
         if ($canGetDrop) {
@@ -124,7 +113,7 @@ class BattleDrop {
      */
     public function handleMonsterQuestDrop(Character $character, bool $returnItem = false): ?Item {
         if (!is_null($this->monster->quest_item_id)) {
-            $canGetQuestItem = DropCheckCalculator::fetchQuestItemDropCheck($this->monster, $this->lootingChance, $this->gameMapBonus, $this->adventure);
+            $canGetQuestItem = DropCheckCalculator::fetchQuestItemDropCheck($this->monster, $character->level, $this->lootingChance, $this->gameMapBonus);
 
             if ($canGetQuestItem && !$returnItem) {
                 $this->attemptToPickUpItem($character, $this->monster->questItem);
@@ -147,7 +136,7 @@ class BattleDrop {
         $automation = $character->currentAutomations()->where('type', AutomationType::EXPLORING)->first();
 
         if (!is_null($automation)) {
-            return; // Characters cannot use automation to get these.
+            return;
         }
 
         $characterLevel  = $character->level;
@@ -166,8 +155,8 @@ class BattleDrop {
 
             foreach ($items as $item) {
                 if ($this->canHaveItem($character, $item)) {
-                    $chance = 999999;
-                    $roll = rand(1, 1000000);
+                    $chance = 99;
+                    $roll = RandomNumberGenerator::generateRandomNumber(1, 50, 1, 100);;
                     $roll = $roll + $roll * $lootingChance;
 
                     if ($roll > $chance) {

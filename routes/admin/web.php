@@ -13,8 +13,8 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::get('/admin/chat-logs', ['as' => 'admin.chat-logs', 'uses' => 'AdminController@chatLogs']);
 
     Route::get('/admin/maps', ['as' => 'maps', 'uses' => 'MapsController@index']);
-    Route::get('/admin/maps/{gameMap}/add-bonuses', ['as' => 'map.bonuses', 'uses' => 'MapsController@createBonuses']);
-    Route::get('/admin/maps/{gameMap}/view-bonuses', ['as' => 'view.map.bonuses', 'uses' => 'MapsController@viewBonuses']);
+    Route::get('/admin/maps/{gameMap}', ['as' => 'map', 'uses' => 'MapsController@show']);
+    Route::get('/admin/maps/{gameMap}/add-bonuses', ['as' => 'map.bonuses', 'uses' => 'MapsController@manageBonuses']);
     Route::get('/admin/maps/upload', ['as' => 'maps.upload', 'uses' => 'MapsController@uploadMap']);
     Route::post('/admin/maps/process-upload', ['as' => 'upload.map', 'uses' => 'MapsController@upload']);
     Route::post('/admin/maps/{gameMap}/post-bonuses', ['as' => 'add.map.bonuses', 'uses' => 'MapsController@postBonuses']);

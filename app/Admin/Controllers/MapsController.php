@@ -2,10 +2,12 @@
 
 namespace App\Admin\Controllers;
 
-use App\Flare\Models\Location;
-use Illuminate\Http\Request;
 use Storage;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Flare\Models\Item;
+use App\Flare\Models\Location;
+use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Models\GameMap;
 use App\Admin\Requests\MapUploadValidation;
 
@@ -14,6 +16,23 @@ class MapsController extends Controller {
     public function index() {
         return view('admin.maps.maps', [
             'maps' => GameMap::all()
+        ]);
+    }
+
+    public function show(GameMap $gameMap) {
+        $effects = match ($gameMap->name) {
+            'Labyrinth'    => ItemEffectsValue::LABYRINTH,
+            'Dungeons'     => ItemEffectsValue::DUNGEON,
+            'Shadow Plane' => ItemEffectsValue::SHADOWPLANE,
+            'Hell'         => ItemEffectsValue::HELL,
+            'Purgatory'    => ItemEffectsValue::PURGATORY,
+            default        => '',
+        };
+
+        return view('admin.maps.map', [
+            'map'        => $gameMap,
+            'itemNeeded' => Item::where('effect', $effects)->first(),
+            'mapUrl'     => Storage::disk('maps')->url($gameMap->path),
         ]);
     }
 
@@ -34,17 +53,14 @@ class MapsController extends Controller {
         return redirect()->route('maps')->with('success', $request->name . ' uploaded successfully.');
     }
 
-    public function createBonuses(GameMap $gameMap) {
-        return view('admin.maps.create-bonuses', ['gameMap' => $gameMap, 'locations' => Location::all()]);
-    }
-
-    public function viewBonuses(GameMap $gameMap) {
-        return view('admin.maps.view-bonuses', ['gameMap' => $gameMap]);
+    public function manageBonuses(GameMap $gameMap) {
+        return view('admin.maps.manage-bonuses', ['gameMap' => $gameMap, 'locations' => Location::all()]);
     }
 
     public function postBonuses(Request $request, GameMap $gameMap) {
+        dump($request->all());
         $gameMap->update($request->all());
 
-        return redirect()->route('maps')->with('success', $gameMap->name . ' now has bonuses.');
+        return redirect()->route('map', ['gameMap' => $gameMap->id])->with('success', $gameMap->name . ' now has bonuses.');
     }
 }

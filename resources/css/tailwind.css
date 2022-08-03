@@ -5,18 +5,6 @@
 @import "./item-colors.css";
 @import "./guide-quests-admin.css";
 
-input[type=text] {
-    @apply pl-2 mr-2;
-}
-
-td {
-    @apply p-[10px];
-}
-
-th {
-    @apply pl-[10px];
-}
-
 #perPage {
     width: 50px;
     margin-top: -10px;

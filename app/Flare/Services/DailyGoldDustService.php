@@ -3,6 +3,7 @@
 namespace App\Flare\Services;
 
 use Cache;
+use Facades\App\Flare\RandomNumber\RandomNumberGenerator;
 use App\Flare\Events\ServerMessageEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
@@ -12,11 +13,11 @@ use App\Game\Messages\Events\GlobalMessageEvent;
 class DailyGoldDustService {
 
     /**
-     * 999,999 (1% chance)
+     * 99 (1% chance)
      *
      * @var int $lottoChance
      */
-    private $lottoChance = 999999;
+    private $lottoChance = 99;
 
     /**
      * Lotto max that a player can win.
@@ -25,6 +26,12 @@ class DailyGoldDustService {
      */
     private $lottoMax    = 1000000;
 
+    /**
+     * Handle the daily gold dust lotto.
+     *
+     * @param Character $character
+     * @return void
+     */
     public function handleDailyLottery(Character $character) {
 
         if ($this->rollForLottery() > $this->lottoChance) {
@@ -34,12 +41,23 @@ class DailyGoldDustService {
         }
     }
 
+    /**
+     * Roll for the lottery.
+     *
+     * @return int
+     */
     protected function rollForLottery(): int {
-        return rand(1, 1000000);
+        return RandomNumberGenerator::generateRandomNumber(1, 50 ,100);
     }
 
+    /**
+     * Handle giving regular gold dust.
+     *
+     * @param Character $character
+     * @return void
+     */
     protected function handleRegularDailyGoldDust(Character $character) {
-        $amount = rand(1,100);
+        $amount = rand(1,1000);
 
         $newAmount = $character->gold_dust + $this->lottoMax;
 
@@ -58,6 +76,12 @@ class DailyGoldDustService {
         event(new UpdateTopBarEvent($character));
     }
 
+    /**
+     * Handle the daily gold dust winner.
+     *
+     * @param Character $character
+     * @return void
+     */
     protected function handleWonDailyLottery(Character $character) {
         event(new GlobalMessageEvent($character->name . 'has won the daily Gold Dust Lottery!'));
 
