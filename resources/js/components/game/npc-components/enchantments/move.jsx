@@ -178,7 +178,7 @@ export default class Move extends React.Component {
       cost += item.item_prefix_id !== null ? item.item_prefix.cost : 0;
       cost += item.item_suffix_id !== null ? item.item_suffix.cost : 0;
     } else {
-      cost += item['item_' + formOptions.selected_affix + '_id'] !== null ? item['item_' + formOptions.selected_affix + '_id'].cost : 0
+      cost += item['item_' + formOptions.selected_affix] !== null ? item['item_' + formOptions.selected_affix].cost : 0
     }
 
     let shardCost = cost * .00000002;
@@ -189,6 +189,8 @@ export default class Move extends React.Component {
 
     formOptions.gold_cost = parseInt(cost.toFixed(0));
     formOptions.shard_cost = parseInt(shardCost.toFixed(0));
+
+    console.log(formOptions);
 
     if (cost > this.props.currencies.gold) {
       return this.setState({
