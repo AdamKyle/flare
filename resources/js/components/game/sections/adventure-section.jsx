@@ -4,6 +4,8 @@ import AdventureEmbark from './modals/adventure-embark';
 import TimeOutBar from '../timeout/timeout-bar';
 import Card from '../components/templates/card';
 import ContentLoader, {Facebook} from 'react-content-loader';
+import AlertInfo from "../components/base/alert-info";
+import AlertWarning from "../components/base/alert-warning";
 
 export default class AdventureActions extends React.Component {
 
@@ -231,6 +233,17 @@ export default class AdventureActions extends React.Component {
         close={this.hideAdventure.bind(this)}
         otherClasses="p-3"
       >
+        <AlertWarning icon={"fas fa-exclamation-triangle"} title={"Going away soon"}>
+          <p>
+            There are known issues with adventure rewards not properly processing. Adventures will be removed in 1.2
+            It is suggested players use <a href='/information/exploration' target='_blank'>Exploration <i className="fas fa-external-link-alt"></i></a> to automate their fighting experience. If you cannot collect the adventure rewards,
+            head to Adventure Log (look for <i className='ra ra-trail'></i> in the sidebar and click Completed Adventures) and find the one that you recently completed.
+          </p>
+          <p>
+            Delete this log to allow adventures to re-open for you. Again, <strong>use Exploration</strong> as opposed to adventures. Rewards are given to you automatically
+            and you can even get quest items, unless you are at a <a href={"/information/special-locations"} target='_blank'>Special Location <i className="fas fa-external-link-alt"></i></a>.
+          </p>
+        </AlertWarning>
         {this.state.tookToLong ?
           <div className="alert alert-info">Your adventure took too long, you decided to flee. You gained no items or
             loot. You can review the logs <a href="/current-adventure/">here</a>.</div> : null}

@@ -12,6 +12,14 @@
 
             <div class="card">
                 <div class="card-body">
+                    @if (config('app.disabled_reg_and_login'))
+                        <x-core.alerts.info-alert title="ATTN!">
+                            Deepest apologizes, however Planes of Tlessa is currently down for maintenance and unlike other deployments,
+                            this one has had to disable the Registration and Login for a short time. We promise to be back up and running soon
+                            and hope to see you all in-game soon. For more info, please check <a href="https://discord.gg/hcwdqJUerh" target="_blank">Discord.</a>
+                        </x-core.alerts.info-alert>
+                    @endif
+
                     <form method="POST" action="{{ route('register') }}">
                         @csrf
 

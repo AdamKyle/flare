@@ -30,7 +30,6 @@ export default class InventorySectionDropDowns extends React.Component {
   }
 
   render() {
-    console.log(this.props.item);
     return (
       <>
         <Dropdown>

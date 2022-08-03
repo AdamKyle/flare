@@ -33,12 +33,18 @@ NPC Quests will never allow you to go over the cap, even if you just a bit under
 
 Gold dust is gained by [disenchanting](/information/disenchanting) items and completing [quests](/information/quests). 
 
-Gold dust is used for conjuring, be it public or private, [celestial entities](/information/celestials). Gold dust is also used in creating alchemical items.
+Gold Dust can also be obtained from the Daily Gold Dust Lottery which happens every day at 12:00PM GMT-6. We select one random character to win 10,000 Gold Dust.
 
-You can have Two Billion Gold Dust at any one time. If you have over you won't be able to do quests and Celestials that are killed will not give you gold dust.
+Every one else gets between 1 and 100 Gold Dust.
 
-NPC Quests will never allow you to go over the cap, even if you just a bit under.
+Gold dust is used for conjuring, be it public or private, [celestial entities](/information/celestials). Gold dust is also used in creating [Alchemical items](/information/usable-items)
+as well as [Quests](/information/quests).
 
+You can have Two Billion Gold Dust at any one time.
+
+If you are at Max (or slightly under) and you fight Celestials or hand in Quests, you will be given the max amount allowed.
+
+ie, a player with 1,999,999,999 who hands in a quest that rewards Gold Dust, will be at max, even if the quest gives you 10k.
 
 ## Crystal Shards (Crys. Shards or Shards)
 

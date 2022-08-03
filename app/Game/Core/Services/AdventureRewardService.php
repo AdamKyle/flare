@@ -386,23 +386,11 @@ class AdventureRewardService {
         }
 
         if (!empty($items)) {
-            $jobs = [];
 
             foreach ($items as $index => $item) {
-                if ($index !== 0) {
-                    $item = Item::find($item['id']);
+                $item = Item::find($item['id']);
 
-                    if (!is_null($item)) {
-                        $jobs[] = new HandleAdventureRewardItems($character, $item, $characterSet);
-                        unset($items[$index]);
-                    }
-                }
-            }
-
-            $item = Item::find($items[0]['id']);
-
-            if (!is_null($item)) {
-                HandleAdventureRewardItems::withChain($jobs)->dispatch($character, $item, $characterSet);
+                HandleAdventureRewardItems::dispatch($character, $item, $characterSet)->onConnection('long_running');
             }
 
             event(new ServerMessageEvent($character->user, 'Items are currently processing and will be with you shortly. Pay attention to chat, we will respect your disenchanting and selected over flow set.'));

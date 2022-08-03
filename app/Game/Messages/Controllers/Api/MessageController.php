@@ -56,7 +56,11 @@ class MessageController extends Controller {
                                 $message->y    = $message->y_position;
 
                                 if (is_null($message->user->character)) {
-                                    $message->name = '????';
+                                    if ($message->user->hasRole('Admin')) {
+                                        $message->name = 'Admin';
+                                    } else {
+                                        $message->name = '????';
+                                    }
                                 } else {
                                     $message->name = $message->user->hasRole('Admin') ? 'Admin' : $message->user->character->name;
                                 }

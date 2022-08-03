@@ -43,7 +43,7 @@ export default class Chat extends React.Component {
       result.data.forEach((message) => {
         let newMessage = message;
 
-        newMessage['from_god'] = this.isGod(message.user);
+        newMessage['from_god'] = this.isGod(newMessage);
 
         messages.push(newMessage);
       });
@@ -63,11 +63,11 @@ export default class Chat extends React.Component {
     });
 
     this.echo.listen('Game.Messages.Events.MessageSentEvent', (event) => {
-
+      console.log(event);
       const message = event.message;
       message['user'] = event.user;
       message['name'] = event.name;
-      message['from_god'] = this.isGod(event.user);
+      message['from_god'] = this.isGod(event);
       message['x'] = event.x;
       message['y'] = event.y;
       message['map'] = event.mapName;
@@ -79,7 +79,7 @@ export default class Chat extends React.Component {
       this.setState({
         messages: messages
       }, () => {
-        if (!this.isGod(event.user)) {
+        if (typeof this.props.updateChatTabIcon !== 'undefined') {
           this.props.updateChatTabIcon(false);
         }
       });
@@ -97,7 +97,7 @@ export default class Chat extends React.Component {
       this.setState({
         messages: messages,
       }, () => {
-        if (!this.isGod(event.user)) {
+        if (!this.isGod(event)) {
           this.props.updateChatTabIcon(false);
         }
       });
@@ -161,20 +161,12 @@ export default class Chat extends React.Component {
     });
   }
 
-  isGod(user) {
-    if (typeof user === 'undefined') {
-      return false;
+  isGod(event) {
+    if (event.name === 'Admin') {
+      return true;
     }
 
-    if (!user.hasOwnProperty('roles')) {
-      return false;
-    }
-
-    if (isEmpty(user.roles)) {
-      return false;
-    }
-
-    return user.roles.filter(r => r.name === 'Admin').length > 0
+    return false
   }
 
   buildErrorMessage(customMessage) {

@@ -19,7 +19,7 @@ class MessageSentEvent implements ShouldBroadcastNow
     /**
      * @var User $user
      */
-    public $user;
+    private $user;
 
     /**
      * @var Message $message

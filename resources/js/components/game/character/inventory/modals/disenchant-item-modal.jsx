@@ -57,8 +57,6 @@ export default class DisenchantItemModal extends React.Component {
   }
 
   render() {
-    console.log(this.props.item);
-
     return (
       <Modal
         show={this.props.open}

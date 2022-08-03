@@ -58,9 +58,12 @@ class DeLevelCharacter extends Command
 
                for ($i = $diffInLevels; $i > 0; $i--) {
                    $character->update($this->createValueObject($character));
+
+                   $this->line('Character: ' . $character->name . ' Had their level fixed.');
                }
 
                resolve(BuildCharacterAttackTypes::class)->buildCache($character);
+
            }
         });
     }

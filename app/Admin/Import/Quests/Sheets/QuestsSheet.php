@@ -27,7 +27,7 @@ class QuestsSheet implements ToCollection {
     }
 
     protected function returnCleanItem(array $quest) {
-        $npc = Npc::where('real_name', $quest['npc_id'])->first();
+        $npc = Npc::find($quest['npc_id'])->first();
 
         if (is_null($npc)) {
             return [];

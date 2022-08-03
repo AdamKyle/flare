@@ -14,13 +14,13 @@ class CharacterIsDeadBroadcastEvent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
- 
+
     public $isDead = false;
 
     /**
      * @var User $users
      */
-    public $user;
+    private $user;
 
     /**
      * Create a new event instance.

@@ -34,11 +34,10 @@ class ProcessAdventure implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param Character $character
-     * @param Adventure $adventure
-     * @param string $name
+     * @param int $characterId
+     * @param int $adventureId
      * @param int $currentLevel
-     * @return void
+     * @param string $attackType
      */
     public function __construct(
         int $characterId,

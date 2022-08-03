@@ -28,6 +28,9 @@ tasks:
   yarn:run:prod:
     script:
       - 'cd {{release_path}} && yarn run prod'
+  artisan:fetch:tag-data:
+    script:
+      - 'cd {{release_path}} && php artisan fetch:tag-data'
 
 after:
   deploy:failed: deploy:unlock

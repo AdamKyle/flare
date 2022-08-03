@@ -31,8 +31,7 @@ class HandleAdventureRewardItems implements ShouldQueue
      * @param Character $character
      * @return void
      */
-    public function __construct(Character $character, Item $item, ?InventorySet $set = null)
-    {
+    public function __construct(Character $character, Item $item, ?InventorySet $set = null) {
         $this->character    = $character;
         $this->item         = $item;
         $this->inventorySet = $set;

@@ -104,16 +104,7 @@ return [
         ]
     ],
     'currencies'        => [],
-    'quests'            => [
-        [
-            'livewire'            => true,
-            'view'                => 'admin.quests.data-table',
-            'only'                => null,
-            'insert_before_table' => null,
-            'type'                => null,
-            'craft_only'          => false,
-        ]
-    ],
+    'quests'            => [],
     'usable-items'      => [
         [
             'livewire'            => true,

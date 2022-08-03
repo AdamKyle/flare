@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Flare\Jobs\DailyGoldDustJob;
 use App\Flare\Models\Character;
+use App\Flare\Services\DailyGoldDustService;
 use Illuminate\Console\Command;
 use Facades\App\Flare\Values\UserOnlineValue;
 
@@ -36,10 +37,24 @@ class DailyRandomGoldDust extends Command
     /**
      * Execute the console command.
      */
-    public function handle() {
-        Character::chunkById(100, function($characters) {
+    public function handle(DailyGoldDustService $dailyGoldDustService) {
+        $characterIds = Character::pluck('id')->toArray();
+
+        $maxCharacters = count($characterIds) - 1;
+
+        $randomIndex = rand(0, $maxCharacters);
+
+        $characterWhoWon = $characterIds[$randomIndex];
+
+        $character = Character::find($characterWhoWon);
+
+        $dailyGoldDustService->handleWonDailyLottery($character);
+
+        Character::chunkById(100, function($characters) use ($characterWhoWon, $dailyGoldDustService) {
             foreach ($characters as $character) {
-                DailyGoldDustJob::dispatch($character)->onConnection('character_daily');
+                if ($character->id !== $characterWhoWon) {
+                    $dailyGoldDustService->handleRegularDailyGoldDust($character);
+                }
             }
         });
     }
