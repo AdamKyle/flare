@@ -2,13 +2,11 @@
 
 namespace App\Flare\Mail;
 
-use App\Admin\Mail\UnBanRequestMail;
 use Illuminate\Bus\Queueable;
 use Asahasrabuddhe\LaravelMJML\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use App\Flare\Models\User;
 
-class GenericMail extends Mailable
+class MailHandler extends Mailable
 {
     use Queueable, SerializesModels;
 
