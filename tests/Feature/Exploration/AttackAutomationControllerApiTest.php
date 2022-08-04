@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Automation;
+namespace Tests\Feature\Exploration;
 
 use App\Flare\Values\AttackTypeValue;
 use App\Game\Exploration\Jobs\Exploration;
