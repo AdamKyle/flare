@@ -292,7 +292,7 @@ export default class Move extends React.Component {
               <dd>{this.formatNumber(this.props.currencies.gold)}</dd>
               <dt>Your Shards:</dt>
               <dd>{this.formatNumber(this.props.currencies.shards)}</dd>
-              <dt>Cost (Gold Dust)</dt>
+              <dt>Cost (Gold)</dt>
               <dd className={this.state.canMove ? 'text-success' : 'text-danger'}>{this.formatNumber(this.state.formOptions.gold_cost)}</dd>
               <dt>Cost (Shards)</dt>
               <dd className={this.state.canMove ? 'text-success' : 'text-danger'}>{this.formatNumber(this.state.formOptions.shard_cost)}</dd>
