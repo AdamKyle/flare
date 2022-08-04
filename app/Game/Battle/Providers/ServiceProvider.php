@@ -9,6 +9,7 @@ use App\Flare\Builders\RandomItemDropBuilder;
 use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Flare\ServerFight\Pvp\PvpAttack;
 use App\Flare\Services\CharacterRewardService;
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Transformers\CharacterTopBarTransformer;
 use App\Game\Battle\Console\Commands\ClearCelestials;
 use App\Game\Battle\Handlers\BattleEventHandler;
@@ -73,7 +74,9 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(BattleEventHandler::class, function($app) {
             return new BattleEventHandler(
-                $app->make(BattleRewardProcessing::class)
+                $app->make(BattleRewardProcessing::class),
+                $app->make(Manager::class),
+                $app->make(CharacterSheetBaseInfoTransformer::class),
             );
         });
 

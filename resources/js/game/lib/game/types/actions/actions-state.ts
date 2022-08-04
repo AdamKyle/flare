@@ -7,6 +7,8 @@ export default interface ActionsState {
 
     characters_for_dueling: PvpCharactersType[]|[];
 
+    pvp_characters_on_map: PvpCharactersType[]|[];
+
     attack_time_out: number;
 
     crafting_time_out: number;

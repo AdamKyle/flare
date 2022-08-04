@@ -296,6 +296,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                                                 update_celestial={this.updateCelestial.bind(this)}
                                                 update_plane_quests={this.updateQuestPlane.bind(this)}
                                                 update_character_position={this.setCharacterPosition.bind(this)}
+                                                view_port={this.state.view_port}
                                             />
                                         :
                                             <Actions
@@ -308,7 +309,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                                     }
                                 </BasicCard>
                             </div>
-                            <BasicCard additionalClasses={clsx('hidden lg:block md:mt-0 lg:col-start-3 lg:col-end-3 max-h-[600px] max-w-[500px]', {
+                            <BasicCard additionalClasses={clsx('hidden lg:block md:mt-0 lg:col-start-3 lg:col-end-3 max-h-[610px] max-w-[555px]', {
                                 'max-h-[624px]': this.state.character.is_dead
                             })}>
                                 <MapSection

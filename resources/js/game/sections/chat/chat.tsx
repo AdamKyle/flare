@@ -139,6 +139,14 @@ export default class Chat extends React.Component<ChatComponentProps, ChatCompon
         this.props.set_tab_to_updated('server-messages');
     }
 
+    renderLocation(message: any) {
+        if (message.x === 0 && message.y === 0) {
+            return <i className="fas fa-skull"></i>
+        }
+
+        return '[' + message.map_name + ' ' + message.x + '/' + message.y + ']'
+    }
+
     renderChatMessages() {
         const self = this;
 
@@ -146,7 +154,7 @@ export default class Chat extends React.Component<ChatComponentProps, ChatCompon
             switch (message.type) {
                 case 'chat':
                     return <li style={{color: message.color}} className='mb-2 break-all md:break-normal'>
-                        [{message.map_name} {message.x}/{message.y}] <button type='button' className='underline' onClick={() => self.privateMessage(message.character_name)}>{message.character_name}</button>: {message.message}
+                        {self.renderLocation(message)} <button type='button' className='underline' onClick={() => self.privateMessage(message.character_name)}>{message.character_name}</button>: {message.message}
                     </li>
                 case 'private-message-sent':
                     return <li className='text-fuchsia-400 italic mb-2 break-all md:break-normal'>{message.message}</li>

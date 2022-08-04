@@ -45,7 +45,6 @@ export default class PurchaseNpcKingdom extends React.Component<PurchaseNpcKingd
                 this.setState({
                     loading: false,
                 }, () => {
-                    console.log('purchased');
                     this.props.handle_close(true);
                 })
             }, (error: AxiosError) => {

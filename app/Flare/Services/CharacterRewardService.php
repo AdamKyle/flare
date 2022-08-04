@@ -28,22 +28,27 @@ class CharacterRewardService {
     /**
      * @var Character $character
      */
-    private $character;
+    private Character $character;
+
+    /**
+     * @var CharacterService $characterService
+     */
+    private CharacterService $characterService;
 
     /**
      * @var CharacterXPService $characterXpService
      */
-    private $characterXpService;
+    private CharacterXPService $characterXpService;
 
     /**
      * @var Manager $manager
      */
-    private $manager;
+    private Manager $manager;
 
     /**
      * @var CharacterSheetBaseInfoTransformer  $characterSheetBaseInfoTransformer
      */
-    private $characterSheetBaseInfoTransformer;
+    private CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer;
 
     /**
      * Constructor

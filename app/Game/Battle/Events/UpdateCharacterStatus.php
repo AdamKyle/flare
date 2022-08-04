@@ -42,7 +42,8 @@ class UpdateCharacterStatus implements ShouldBroadcastNow {
             'automation_completed_at' => $this->getTimeLeftOnAutomation($character),
             'is_silenced'             => $character->is_silenced,
             'can_move'                => $character->can_move,
-            'can_register_for_pvp'    => !is_null(Event::where('type', EventType::MONTHLY_PVP)->first()) && $character->level >= 301
+            'can_register_for_pvp'    => !is_null(Event::where('type', EventType::MONTHLY_PVP)->first()) && $character->level >= 301,
+            'killed_in_pvp'           => $character->killed_in_pvp,
         ];
 
         $this->user = $character->user;

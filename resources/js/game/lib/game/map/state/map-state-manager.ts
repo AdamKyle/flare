@@ -45,6 +45,7 @@ export default class MapStateManager {
     static setState(data: MapData): MapState {
         return {
             map_url: data.map_url,
+            map_name: data.character_map.game_map.name,
             game_map_id: data.character_map.game_map_id,
             map_position: {
                 x: data.character_map.position_x, y: data.character_map.position_y

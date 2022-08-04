@@ -35,6 +35,7 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
         this.state = {
             monsters: [],
             characters_for_dueling: [],
+            pvp_characters_on_map: [],
             attack_time_out: 0,
             crafting_time_out: 0,
             crafting_type: null,
@@ -90,7 +91,10 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
 
         // @ts-ignore
         this.duelOptions.listen('Game.Maps.Events.UpdateDuelAtPosition', (event: any) => {
-            this.actionsManager.setCharactersForDueling(event.characters);
+            this.setState({
+                pvp_characters_on_map: event.characters,
+                characters_for_dueling: [],
+            });
         });
 
         // @ts-ignore
@@ -100,6 +104,12 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
                 duel_fight_info: event.data,
             });
         });
+    }
+
+    componentDidUpdate(prevProps: Readonly<ActionsProps>, prevState: Readonly<ActionsState>, snapshot?: any) {
+        if (this.state.pvp_characters_on_map.length > 0 && this.state.characters_for_dueling.length === 0) {
+            this.actionsManager.setCharactersForDueling(this.state.pvp_characters_on_map);
+        }
     }
 
     openCrafting(type: CraftingOptions) {
@@ -161,8 +171,6 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
             return <ComponentLoading />
         }
 
-        console.log(this.state.characters_for_dueling, this.state.show_exploration);
-
         return (
             <div>
                 <div className='grid md:grid-cols-4'>
@@ -200,7 +208,7 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
                         {
                             this.state.characters_for_dueling.length > 0 && !this.state.show_exploration && !this.state.show_join_pvp && !this.state.show_celestial_fight ?
                                 <div className='mb-4'>
-                                    <SuccessOutlineButton button_label={'Duel!'} on_click={this.manageDuel.bind(this)} additional_css={'w-1/2'} disabled={this.props.character.is_dead || this.props.character.is_automation_running} />
+                                    <SuccessOutlineButton button_label={'Duel!'} on_click={this.manageDuel.bind(this)} additional_css={'w-1/2'} disabled={this.props.character.is_dead || this.props.character.is_automation_running || this.props.character.killed_in_pvp} />
                                 </div>
                             : null
                         }

@@ -38,11 +38,11 @@ export const getNewXPosition = (characterX: number, mapPositionX: number, viewPo
             return 0;
         }
 
-        if (viewPort <= 1024) {
-            return -150;
+        if (viewPort <= 1600) {
+            return -50;
         }
 
-        return -100;
+        return 0;
     }
 
     return mapPositionX;

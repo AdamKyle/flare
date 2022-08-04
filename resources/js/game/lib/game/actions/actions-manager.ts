@@ -49,13 +49,15 @@ export default class ActionsManager {
         if (props.character_position !== null) {
             charactersForDueling = eventCharactersForDueling.filter((character: PvpCharactersType) => {
                 if (props.character_position !== null) {
-                    if (character.id !== props.character.id &&
-                        character.character_position_x === props.character_position.x &&
-                        character.character_position_y === props.character_position.y) {
+                    if (character.id !== props.character.id) {
                         return character;
                     }
                 }
             });
+
+            if (charactersForDueling.length === 0) {
+                return;
+            }
 
             this.component.setState({
                 characters_for_dueling: charactersForDueling,
@@ -91,7 +93,6 @@ export default class ActionsManager {
         const state = this.component.state;
 
         if (props.character_position !== null && state.characters_for_dueling.length > 0 && state.characters_for_dueling.length == 0) {
-            console.log('here?');
             if (typeof props.character_position.game_map_id === 'undefined') {
                 return;
             }

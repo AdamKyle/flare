@@ -79,7 +79,6 @@ class DropCheckService {
         $this->battleDrop = $this->battleDrop->setMonster($this->monster)
                                              ->setSpecialLocation($this->locationWithEffect)
                                              ->setGameMapBonus($this->gameMapBonus)
-                                             ->setAdventure($this->adventure )
                                              ->setLootingChance($this->lootingChance);
 
         $this->handleDropChance($character);

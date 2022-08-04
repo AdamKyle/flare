@@ -139,14 +139,6 @@ class BattleDrop {
             return;
         }
 
-        $characterLevel  = $character->level;
-        $monsterMaxLevel = $this->monster->max_level;
-        $levelDifference = $monsterMaxLevel - $characterLevel;
-
-        if (!($levelDifference >= 10)) {
-            return; // The monster must be 10 levels or higher than the character for this to drop.
-        }
-
         $lootingChance = $this->lootingChance > 0.45 ? 0.45 : $this->lootingChance;
 
         $items = Item::where('drop_location_id', $this->locationWithEffect->id)->where('type', 'quest')->get();
@@ -155,7 +147,7 @@ class BattleDrop {
 
             foreach ($items as $item) {
                 if ($this->canHaveItem($character, $item)) {
-                    $chance = 99;
+                    $chance = 95;
                     $roll = RandomNumberGenerator::generateRandomNumber(1, 50, 1, 100);;
                     $roll = $roll + $roll * $lootingChance;
 

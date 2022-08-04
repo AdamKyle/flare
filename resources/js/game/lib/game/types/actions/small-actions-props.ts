@@ -8,4 +8,6 @@ export default interface SmallActionsProps extends ActionsProps {
     update_plane_quests: (plane: string) => void;
 
     update_character_position: (position: PositionType) => void;
+
+    view_port: number;
 }

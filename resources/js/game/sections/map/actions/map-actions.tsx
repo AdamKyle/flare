@@ -99,9 +99,7 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
     render() {
         return (
             <Fragment>
-                <div className={clsx('grid md:grid-cols-5 gap-2', {
-                    'h-[125px] overflow-x-scroll': this.props.view_port <= 500
-                })}>
+                <div className='grid md:grid-cols-5 gap-2'>
                     <PrimaryOutlineButton button_label={'View Location Details'}
                                           on_click={this.manageViewLocation.bind(this)}
                                           disabled={!this.canViewLocation()}

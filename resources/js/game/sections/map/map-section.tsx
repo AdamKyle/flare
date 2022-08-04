@@ -16,9 +16,9 @@ import {getStyle, playerIconPosition} from "../../lib/game/map/map-management";
 import MapTimer from "./map-timer";
 import DirectionalMovement from "./actions/directional-movement";
 import MapActions from "./actions/map-actions";
+import clsx from "clsx";
 // @ts-ignore
 import Draggable from 'react-draggable/build/web/react-draggable.min';
-import clsx from "clsx";
 
 export default class MapSection extends React.Component<MapProps, MapState> {
 
@@ -38,6 +38,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
         this.state = {
             map_url: '',
             map_id: 0,
+            map_name: '',
             map_position: {
                 x: 0, y: 0
             },
@@ -209,6 +210,19 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                     </Draggable>
                 </div>
                 <div className='mt-4'>
+                    <div className='my-4 grid grid-cols-2 gap-2'>
+                        <div>
+                            X/Y: {this.state.character_position.x} / {this.state.character_position.y}
+                        </div>
+                        <div>
+                            Plane: {this.state.map_name}
+                        </div>
+                    </div>
+                    <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
+                    <div>
+                        Character on Plane: {this.state.characters_on_map}
+                    </div>
+                    <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
                     <MapActions
                         character_id={this.props.character_id}
                         can_move={this.state.can_player_move}
@@ -226,7 +240,9 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                         update_map_state={this.setStateFromData.bind(this)}
                         map_id={this.state.map_id}
                     />
-                    <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
+                    <div className={clsx('border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2', {
+                        'hidden' : this.props.view_port >= 1600
+                    })}></div>
                     <DirectionalMovement
                         character_position={this.state.character_position}
                         map_position={this.state.map_position}

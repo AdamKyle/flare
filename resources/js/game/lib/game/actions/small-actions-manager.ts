@@ -45,20 +45,26 @@ export default class SmallActionsManager {
         let charactersForDueling: PvpCharactersType[]|[] = [];
         const props = this.component.props;
 
+        if (eventCharactersForDueling.length === 0) {
+            return;
+        }
+
         if (props.character_position !== null) {
             charactersForDueling = eventCharactersForDueling.filter((character: PvpCharactersType) => {
                 if (props.character_position !== null) {
-                    if (character.id !== props.character.id &&
-                        character.character_position_x === props.character_position.x &&
-                        character.character_position_y === props.character_position.y) {
+                    if (character.id !== props.character.id) {
                         return character;
                     }
                 }
             });
 
+            if (charactersForDueling.length === 0) {
+                return;
+            }
+
             this.component.setState({
                 characters_for_dueling: charactersForDueling,
-            })
+            });
         }
     }
 
@@ -127,7 +133,7 @@ export default class SmallActionsManager {
             });
         }
 
-        if (state.characters_for_dueling.length > 0) {
+        if (state.characters_for_dueling.length > 0 && !props.character.killed_in_pvp) {
             options.push({
                 label: 'Pvp Fight',
                 value: 'pvp-fight'

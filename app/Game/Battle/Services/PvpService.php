@@ -2,6 +2,7 @@
 
 namespace App\Game\Battle\Services;
 
+use App\Game\Maps\Events\UpdateDuelAtPosition;
 use Cache;
 use App\Flare\Builders\BuildMythicItem;
 use App\Flare\Builders\Character\CharacterCacheData;
@@ -121,10 +122,20 @@ class PvpService {
             return false;
         }
 
-        $result = $this->pvpAttack->attackPlayer($attacker, $defender, $healthObject, $attackType);
+        $this->pvpAttack->attackPlayer($attacker, $defender, $healthObject, $attackType);
 
-        if ($result) {
+        if ($this->pvpAttack->getDefenderHealth() <= 0) {
             $this->processBattleWin($attacker, $defender, $healthObject);
+
+            event(new UpdateDuelAtPosition($defender->user));
+
+            return true;
+        }
+
+        if ($this->pvpAttack->getAttackerHealth() <= 0) {
+            $this->processBattleWin($defender, $attacker, $healthObject);
+
+            event(new UpdateDuelAtPosition($attacker->user));
 
             return true;
         }
@@ -156,7 +167,7 @@ class PvpService {
         $this->pvpAttack->cache()->removeFromPvpCache($attacker);
         $this->pvpAttack->cache()->removeFromPvpCache($defender);
 
-        $this->handleDefenderDeath($attacker, $defender);
+        $this->handleDefenderDeath($defender);
     }
 
     protected function updateCacheHealthForPVPFight(Character $attacker, Character $defender) {
@@ -189,7 +200,7 @@ class PvpService {
         ]));
     }
 
-    protected function handleDefenderDeath(Character $attacker, Character $defender) {
+    protected function handleDefenderDeath(Character $defender) {
         $defender->update([
             'killed_in_pvp' => true,
         ]);

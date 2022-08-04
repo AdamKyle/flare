@@ -29,7 +29,6 @@ export default class Conjuration extends React.Component<ConjureModalProps, Conj
     componentDidMount() {
         (new Ajax()).setRoute('celestial-beings/' + this.props.character_id)
                     .doAjaxCall('get', (response: AxiosResponse) => {
-                        console.log(response.data);
                         this.setState({
                             loading: false,
                             celestials: response.data.celestial_monsters,

@@ -1,6 +1,5 @@
 import React, {Fragment} from "react";
 import Select from "react-select";
-import clsx from "clsx";
 import SmallActionsState from "../../lib/game/types/actions/small-actions-state";
 import SmallActionsManager from "../../lib/game/actions/small-actions-manager";
 import MonsterActions from "./components/small-actions/monster-actions";
@@ -12,6 +11,7 @@ import MapTimer from "../map/map-timer";
 import DuelPlayer from "./components/duel-player";
 import SmallMapMovementActions from "./components/small-actions/small-map-movement-actions";
 import SmallActionsProps from "../../lib/game/types/actions/small-actions-props";
+import {isEqual} from "lodash";
 
 export default class SmallerActions extends React.Component<SmallActionsProps, SmallActionsState> {
 
@@ -38,6 +38,7 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
             selected_action: null,
             monsters: [],
             characters_for_dueling: [],
+            pvp_characters_on_map: [],
             attack_time_out: 0,
             crafting_time_out: 0,
             automation_time_out: 0,
@@ -49,23 +50,6 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
             show_celestial_fight: false,
             show_duel_fight: false,
             show_join_pvp: false,
-            // loading: true,
-            // is_same_monster: false,
-            // character: null,
-            // monsters: [],
-            // monster_to_fight: null,
-            // attack_time_out: 0,
-            // crafting_time_out: 0,
-            // character_revived: false,
-            // can_player_move: true,
-            // crafting_type: null,
-            // movement_time_out: 0,
-            // automation_time_out: 0,
-            // characters_for_dueling: [],
-            // duel_characters: [],
-            // show_duel_fight: false,
-            // show_join_pvp: false,
-            // duel_fight_info: null,
         }
 
         // @ts-ignore
@@ -126,7 +110,10 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
 
         // // @ts-ignore
         this.duelOptions.listen('Game.Maps.Events.UpdateDuelAtPosition', (event: any) => {
-            this.smallActionsManager.setCharactersForDueling(event.characters);
+            this.setState({
+                pvp_characters_on_map: event.characters,
+                characters_for_dueling: [],
+            })
         });
 
         // @ts-ignore
@@ -143,6 +130,12 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
                 automation_time_out: event.forLength,
             });
         });
+    }
+
+    componentDidUpdate(prevProps: Readonly<SmallActionsProps>, prevState: Readonly<SmallActionsState>, snapshot?: any) {
+        if (this.state.pvp_characters_on_map.length > 0 && this.state.characters_for_dueling.length === 0) {
+            this.smallActionsManager.setCharactersForDueling(this.state.pvp_characters_on_map);
+        }
     }
 
     showAction(data: any) {
@@ -249,7 +242,7 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
             <SmallMapMovementActions
                 close_map_section={this.closeMapSection.bind(this)}
                 update_celestial={(id: number | null) => {}}
-                view_port={500}
+                view_port={this.props.view_port}
                 character={this.props.character}
                 character_currencies={this.props.character_currencies}
                 update_plane_quests={this.props.update_plane_quests}

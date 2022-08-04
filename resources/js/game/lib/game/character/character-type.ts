@@ -187,4 +187,6 @@ export interface CharacterType {
 
     voided_healing_amount: number;
 
+    killed_in_pvp: boolean;
+
 }

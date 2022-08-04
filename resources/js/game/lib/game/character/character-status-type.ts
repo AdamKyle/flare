@@ -12,4 +12,6 @@ export default interface CharacterStatusType {
     automation_locked: boolean;
 
     is_silenced: boolean;
+
+    killed_in_pvp: boolean;
 }

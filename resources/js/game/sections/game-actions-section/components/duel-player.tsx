@@ -226,12 +226,9 @@ export default class DuelPlayer extends React.Component<any, any> {
                         <PrimaryButton button_label={'Attack'} on_click={this.fight.bind(this)} disabled={this.props.character.is_automation_running || this.props.character.is_dead || this.state.character_id === 0}/>
                     </div>
                 </div>
-                <p className='my-4 text-sm text-gray-700 dark:text-gray-300 w-2/3'>
-                    <strong>Please note</strong>: The character could move at any moment. If they do and theres no one here, the entire duel section will vanish.
-                </p>
                 {
                     this.props.characters.length === 0 ?
-                        <p className='my-4 text-sm text-center text-red-700 dark:text-red-500 w-2/3'>
+                        <p className='mt-4 text-sm text-center text-red-700 dark:text-red-500 w-2/3'>
                             No one left to fight child. Best be on your way. Click: Leave Fight.
                         </p>
                     : null
@@ -265,7 +262,7 @@ export default class DuelPlayer extends React.Component<any, any> {
                             </div>
                             : null
                     }
-                    <div className='italic text-center mb-4'>
+                    <div className='italic text-center my-4'>
                         {this.renderBattleMessages()}
                     </div>
                     <div className='text-center'>

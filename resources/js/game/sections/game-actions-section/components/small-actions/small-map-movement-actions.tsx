@@ -11,14 +11,6 @@ export default class SmallMapMovementActions extends React.Component<SmallMapSec
         super(props);
     }
 
-    setCharacterPosition(position: PositionType) {
-        console.log(position)
-    }
-
-    updateQuestPlane(plane: string) {
-        console.log(plane)
-    }
-
     render() {
         return (
             <Fragment>

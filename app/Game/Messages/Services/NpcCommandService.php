@@ -11,19 +11,15 @@ use App\Flare\Values\NpcComponentsValue;
 use App\Flare\Values\NpcTypes;
 use App\Flare\Values\AutomationType;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
-use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
-use App\Game\Messages\Handlers\NpcKingdomHandler;
 use App\Game\Messages\Jobs\ProcessNPCCommands;
 
 class NpcCommandService {
 
-    private $npcKingdomHandler;
 
     private $npcServerMessageBuilder;
 
-    public function __construct(NpcKingdomHandler $npcKingdomHandler, NpcServerMessageBuilder $npcServerMessageBuilder) {
-        $this->npcKingdomHandler       = $npcKingdomHandler;
+    public function __construct(NpcServerMessageBuilder $npcServerMessageBuilder) {
         $this->npcServerMessageBuilder = $npcServerMessageBuilder;
     }
 
@@ -52,20 +48,6 @@ class NpcCommandService {
         $type = new NpcTypes($npc->type);
 
         if (!$this->canInteract($character, $npc)) {
-            return;
-        }
-
-        if ($type->isKingdomHolder()) {
-            $took = $this->npcKingdomHandler->takeKingdom($character, $npc);
-
-            if ($took) {
-                $message = $character->name . ' Has paid The Old Man for a kingdom on the ' . $character->map->gameMap->name . ' plane.';
-                $messageType = 'took_kingdom';
-
-                broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build($messageType, $npc), true));
-                broadcast(new GlobalMessageEvent($message));
-            }
-
             return;
         }
 
