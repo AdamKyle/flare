@@ -8,6 +8,15 @@
                 <h2 class="uppercase">Begin your journey</h2>
                 <h4 class="uppercase">Let's roll that character up!</h4>
             </div>
+
+            @if (config('app.disabled_reg_and_login'))
+                <x-core.alerts.info-alert title="ATTN!">
+                    Deepest apologizes, however Planes of Tlessa is currently down for maintenance and unlike other deployments,
+                    this one has had to disable the Registration and Login for a short time. We promise to be back up and running soon
+                    and hope to see you all in-game soon. For more info, please check <a href="https://discord.gg/hcwdqJUerh" target="_blank">Discord.</a>
+                </x-core.alerts.info-alert>
+            @endif
+
             <x-core.cards.form-card css="mt-5 p-5 md:p-10" method="POST" action="{{ route('register') }}">
                 @csrf
                 <div class="mb-5">

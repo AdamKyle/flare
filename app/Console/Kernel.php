@@ -44,10 +44,20 @@ class Kernel extends ConsoleKernel {
         $schedule->command('update:kingdom')->hourly()->timezone(config('app.timezone'));
 
         // Refresh the droppable items.
-        $schedule->command('cache:droppable-items')->everySixHours()->timezone(config('app.timezone'));
+        $schedule->command('cache:droppable-items')->everyThreeHours()->timezone(config('app.timezone'));
 
         // Refresh the high-end droppable items.
         $schedule->command('cache:high-end-items')->everyThreeHours()->timezone(config('app.timezone'));
+
+        // Refresh the cache, rebuild character attack data, update kingdoms and remove duplicate quest items.
+        // Runs Daily at 2 am.
+        $schedule->command('clear-and-rebuild:cache')->dailyAt('02:00')->timezone(config('app.timezone'));
+
+        // Give people a chance to win daily lottery for gold dust
+        $schedule->command('daily:gold-dust')->dailyAt('12:00')->timezone(config('app.timezone'));
+
+        // Weekly Celestial Rate is increased to 80% spawn chance on Wednesdays at 1 pm America Edmonton time.
+        $schedule->command('weekly:celestial-spawn')->weeklyOn(3, '13:00')->timezone(config('app.timezone'));
 
         // Clear the celestials every hour.
         $schedule->command('clear:celestials')->hourly()->timezone(config('app.timezone'));

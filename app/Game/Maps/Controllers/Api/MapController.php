@@ -138,6 +138,7 @@ class MapController extends Controller {
         }
 
         $data = [
+            'quests'           => Cache::get('all-quests'),
             'completed_quests' => $character->questsCompleted()->pluck('quest_id'),
             'map_name'         => $character->map->gameMap->name,
         ];

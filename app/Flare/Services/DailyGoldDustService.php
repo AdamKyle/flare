@@ -12,54 +12,18 @@ use App\Game\Messages\Events\GlobalMessageEvent;
 
 class DailyGoldDustService {
 
-    /**
-     * 99 (1% chance)
-     *
-     * @var int $lottoChance
-     */
-    private $lottoChance = 99;
+    const LOTTO_MAX = 10000;
 
     /**
-     * Lotto max that a player can win.
-     *
-     * @var int $lottoMax
-     */
-    private $lottoMax    = 1000000;
-
-    /**
-     * Handle the daily gold dust lotto.
+     * Handle regular amounts of gold dust.
      *
      * @param Character $character
      * @return void
      */
-    public function handleDailyLottery(Character $character) {
+    public function handleRegularDailyGoldDust(Character $character) {
+        $amount = rand(1, 100);
 
-        if ($this->rollForLottery() > $this->lottoChance) {
-            $this->handleWonDailyLottery($character);
-        } else {
-            $this->handleRegularDailyGoldDust($character);
-        }
-    }
-
-    /**
-     * Roll for the lottery.
-     *
-     * @return int
-     */
-    protected function rollForLottery(): int {
-        return RandomNumberGenerator::generateRandomNumber(1, 50 ,100);
-    }
-
-    /**
-     * Handle giving regular gold dust.
-     *
-     * @param Character $character
-     * @return void
-     */
-    protected function handleRegularDailyGoldDust(Character $character) {
-        $amount = rand(1,1000);
-
-        $newAmount = $character->gold_dust + $this->lottoMax;
+        $newAmount = $character->gold_dust + $amount;
 
         if ($newAmount >= MaxCurrenciesValue::MAX_GOLD_DUST) {
             $newAmount = MaxCurrenciesValue::MAX_GOLD_DUST;
@@ -77,15 +41,17 @@ class DailyGoldDustService {
     }
 
     /**
-     * Handle the daily gold dust winner.
+     * Handle the winner  of daily gold dust.
      *
      * @param Character $character
      * @return void
      */
-    protected function handleWonDailyLottery(Character $character) {
-        event(new GlobalMessageEvent($character->name . 'has won the daily Gold Dust Lottery!'));
+    public function handleWonDailyLottery(Character $character) {
+        event(new GlobalMessageEvent($character->name . 'has won the daily Gold Dust Lottery!
+        (Gold Dust is used in Alchemy and Quests - See Help section -> (hover over person icon inn help section) Currencies, for more info)'
+        ));
 
-        $newAmount = $character->gold_dust + $this->lottoMax;
+        $newAmount = $character->gold_dust + self::LOTTO_MAX;
 
         if ($newAmount >= MaxCurrenciesValue::MAX_GOLD_DUST) {
             $newAmount = MaxCurrenciesValue::MAX_GOLD_DUST;
@@ -97,11 +63,8 @@ class DailyGoldDustService {
 
         $character = $character->refresh();
 
-        event(new ServerMessageEvent($character->user, 'lotto_max', $this->lottoMax));
+        event(new ServerMessageEvent($character->user, 'lotto_max', self::LOTTO_MAX));
 
         event(new UpdateTopBarEvent($character));
-
-        Cache::put('won-lotto', now());
     }
-
 }
