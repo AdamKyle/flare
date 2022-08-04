@@ -190,8 +190,6 @@ export default class Move extends React.Component {
     formOptions.gold_cost = parseInt(cost.toFixed(0));
     formOptions.shard_cost = parseInt(shardCost.toFixed(0));
 
-    console.log(formOptions);
-
     if (cost > this.props.currencies.gold) {
       return this.setState({
         errorMessage: 'No no no! I wont play these poor people games with you, child! (not enough gold).',

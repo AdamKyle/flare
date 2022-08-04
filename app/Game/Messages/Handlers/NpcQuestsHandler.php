@@ -98,6 +98,10 @@ class NpcQuestsHandler {
 
                 $finishedAtLeastOneQuest = true;
             }
+
+            if ($finishedAtLeastOneQuest) {
+                return true;
+            }
         }
 
         return $finishedAtLeastOneQuest;
