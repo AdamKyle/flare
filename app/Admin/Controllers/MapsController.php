@@ -58,7 +58,6 @@ class MapsController extends Controller {
     }
 
     public function postBonuses(Request $request, GameMap $gameMap) {
-        dump($request->all());
         $gameMap->update($request->all());
 
         return redirect()->route('map', ['gameMap' => $gameMap->id])->with('success', $gameMap->name . ' now has bonuses.');

@@ -40,7 +40,6 @@ class SettingsControllerTest extends TestCase
         $this->actingAs($user)->visitRoute('user.settings', [
             'user' => $user,
         ])->see('Account Settings')->submitForm('Update Email Settings', [
-            'adventure_email'         => true,
             'upgraded_building_email' => false,
             'rebuilt_building_email'  => false,
             'kingdom_attack_email'    => false,
@@ -48,7 +47,6 @@ class SettingsControllerTest extends TestCase
 
         $user = $user->refresh();
 
-        $this->assertTrue($user->adventure_email);
         $this->assertFalse($user->upgraded_building_email);
         $this->assertFalse($user->rebuilt_building_email);
         $this->assertFalse($user->kingdom_attack_email);

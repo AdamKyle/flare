@@ -271,8 +271,6 @@ class KingdomBuildingService {
 
         $timeToComplete = now()->addMinutes($minutes);
 
-        $toLevel = $toLevel + $building->level;
-
         if ($toLevel > $building->gameBuilding->max_level) {
             $toLevel = $building->gameBuilding->max_level;
         }

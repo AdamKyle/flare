@@ -2,26 +2,21 @@
 
 namespace App\Game\Kingdoms\Jobs;
 
-use App\Flare\Jobs\SendOffEmail;
-use App\Flare\Mail\GenericMail;
-use App\Flare\Events\ServerMessageEvent;
-use App\Flare\Models\BuildingInQueue;
-use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
+use App\Game\Kingdoms\Service\UpdateKingdom;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;;
+use Illuminate\Queue\SerializesModels;
+use Facades\App\Flare\Values\UserOnlineValue;
+use App\Flare\Events\ServerMessageEvent;
+use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\User;
 use App\Flare\Models\KingdomBuilding;
 use App\Flare\Models\Kingdom;
-use App\Flare\Transformers\KingdomTransformer;
-use App\Game\Kingdoms\Events\UpdateKingdom;
 use App\Game\Kingdoms\Mail\UpgradedBuilding;
-use Facades\App\Flare\Values\UserOnlineValue;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item;
-use Mail;
+
 
 class UpgradeBuildingWithGold implements ShouldQueue
 {
@@ -76,12 +71,10 @@ class UpgradeBuildingWithGold implements ShouldQueue
     /**
      * Execute the job.
      *
-     * @param Manager $manager
-     * @param KingdomTransformer $kingdomTransformer
+     * @param UpdateKingdom $updateKingdom
      * @return void
      */
-    public function handle(UpdateKingdomHandler $updateKingdomHandler)
-    {
+    public function handle(UpdateKingdom $updateKingdom): void {
 
         $queue = BuildingInQueue::find($this->queueId);
 
@@ -112,7 +105,7 @@ class UpgradeBuildingWithGold implements ShouldQueue
 
         // Upgrade the building as many times as we need.
         for ($i = 1; $i <= $this->levels; $i++) {
-            $this->upgradeBuilding($updateKingdomHandler, $queue);
+            $this->upgradeBuilding($queue);
         }
 
         $characterId   = $this->building->kingdom->character_id;
@@ -122,19 +115,22 @@ class UpgradeBuildingWithGold implements ShouldQueue
                                         ->where('character_id', $characterId)
                                         ->first();
 
+        $kingdom = $buildingInQue->building->kingdom->refresh();
+
         if (!is_null($buildingInQue)) {
             $buildingInQue->delete();
-        } else {
-            // @codeCoverageIgnoreStart
-            $adminUser = User::with('roles')->whereHas('roles', function($q) { $q->where('name', 'Admin'); })->first();
-            $message   = 'Building queue failed to clear: Building Id: ' . $this->building->id . ' KingdomId: ' . $this->building->kingdom_id . '. Reason: Could not find queue.';
-
-            SendOffEmail::dispatch($adminUser, (new GenericMail($adminUser, $message, 'Failed To Clear Building Queue')))->delay(now()->addMinutes(1));
-            // @codeCoverageIgnoreEnd
         }
+
+        $updateKingdom->updateKingdom($kingdom);
     }
 
-    protected function upgradeBuilding(UpdateKingdomHandler $updateKingdomHandler, BuildingInQueue $queue) {
+    /**
+     * Upgrade the building.
+     *
+     * @param BuildingInQueue $queue
+     * @return void
+     */
+    protected function upgradeBuilding(BuildingInQueue $queue): void {
         $level = $this->building->level + 1;
 
         if ($this->building->gives_resources) {
@@ -176,12 +172,9 @@ class UpgradeBuildingWithGold implements ShouldQueue
             ]);
         }
 
-
         if (UserOnlineValue::isOnline($this->user)) {
             $kingdom = Kingdom::find($this->building->kingdom_id);
             $plane   = $kingdom->gameMap->name;
-
-            $updateKingdomHandler->refreshPlayersKingdoms($this->building->kingdom->character->refresh());
 
             $x = $this->building->kingdom->x_position;
             $y = $this->building->kingdom->y_position;
@@ -203,7 +196,12 @@ class UpgradeBuildingWithGold implements ShouldQueue
         }
     }
 
-    protected function getResourceType() {
+    /**
+     * Get resource type.
+     *
+     * @return mixed
+     */
+    protected function getResourceType(): mixed {
         foreach($this->resourceTypes as $type) {
             if ($this->building->{'increase_in_' . $type} !== 0.0) {
                 return $type;

@@ -2,29 +2,26 @@
 
 namespace App\Game\Kingdoms\Jobs;
 
-use App\Flare\Jobs\SendOffEmail;
-use App\Flare\Mail\GenericMail;
-use App\Flare\Events\ServerMessageEvent;
-use App\Flare\Models\BuildingInQueue;
-use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
+use App\Game\Kingdoms\Service\UpdateKingdom;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;;
+use Illuminate\Queue\SerializesModels;
+use League\Fractal\Manager;
+use App\Flare\Events\ServerMessageEvent;
+use App\Flare\Models\BuildingInQueue;
+use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
 use App\Flare\Models\User;
 use App\Flare\Models\KingdomBuilding;
 use App\Flare\Models\Kingdom;
 use App\Flare\Transformers\KingdomTransformer;
-use App\Game\Kingdoms\Events\UpdateKingdom;
 use App\Game\Kingdoms\Mail\UpgradedBuilding;
 use Facades\App\Flare\Values\UserOnlineValue;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item;
-use Mail;
 
-class UpgradeBuilding implements ShouldQueue
-{
+
+class UpgradeBuilding implements ShouldQueue {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
@@ -73,7 +70,7 @@ class UpgradeBuilding implements ShouldQueue
      * @param KingdomTransformer $kingdomTransformer
      * @return void
      */
-    public function handle(UpdateKingdomHandler $updateKingdomHandler)
+    public function handle(UpdateKingdomHandler $updateKingdomHandler, UpdateKingdom $updateKingdom)
     {
 
         $queue = BuildingInQueue::find($this->queueId);
@@ -149,14 +146,9 @@ class UpgradeBuilding implements ShouldQueue
 
         if (!is_null($buildingInQue)) {
             $buildingInQue->delete();
-        } else {
-            // @codeCoverageIgnoreStart
-            $adminUser = User::with('roles')->whereHas('roles', function($q) { $q->where('name', 'Admin'); })->first();
-            $message   = 'Building queue failed to clear: Building Id: ' . $this->building->id . ' KingdomId: ' . $this->building->kingdom_id;
-
-            SendOffEmail::dispatch($adminUser, (new GenericMail($adminUser, $message, 'Failed To Clear Building Queue')))->delay(now()->addMinutes(1));
-            // @codeCoverageIgnoreEnd
         }
+
+        $updateKingdom->updateKingdom($building->kingdom->refresh());
 
         if (UserOnlineValue::isOnline($this->user)) {
             $kingdom = Kingdom::find($this->building->kingdom_id);

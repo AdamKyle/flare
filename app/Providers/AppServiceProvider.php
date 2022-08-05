@@ -2,10 +2,11 @@
 
 namespace App\Providers;
 
+use Mail;
+use Illuminate\Support\ServiceProvider;
 use App\Charts\CreateHistoryForItem;
 use App\Charts\MarketBoardHistory;
 use ConsoleTVs\Charts\Registrar as Charts;
-use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -31,6 +32,10 @@ class AppServiceProvider extends ServiceProvider
             MarketBoardHistory::class,
             CreateHistoryForItem::class,
         ]);
+
+        if ($this->app->environment('local')) {
+            Mail::alwaysTo(env('DEFAULT_LOCAL_EMAIL'));
+        }
 
         \Response::macro('attachment', function ($content, $fileName) {
 

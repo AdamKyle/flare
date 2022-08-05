@@ -55,13 +55,8 @@ class GenericMail extends Mailable
      */
     public function build()
     {
-        $mail = $this->from(config('mail.username'), 'Planes of Tlessa')
+       return $this->from(config('mail.username'), 'Planes of Tlessa')
                     ->subject($this->genericSubject)
-                    ->mjml('flare.email.generic_mail', [
-                        'user'           => $this->user,
-                        'genericMessage' => $this->genericMessage,
-                        'genericSubject' => $this->genericSubject,
-                        'dontShowLogin'  => $this->dontShowLogin
-                    ]);
+                    ->view('flare.email.generic-email');
     }
 }

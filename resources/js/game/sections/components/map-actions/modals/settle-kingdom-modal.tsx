@@ -82,7 +82,14 @@ export default class SettleKingdomModal extends React.Component<SettleKingdomMod
                 <div className='flex items-center mb-5'>
                     <label className='w-[50px]'>Name</label>
                     <div className='w-2/3'>
-                        <input type='text' value={this.state.kingdom_name} onChange={this.setName.bind(this)} className='form-control' disabled={this.state.loading} />
+                        <input type='text'
+                               value={this.state.kingdom_name}
+                               onChange={this.setName.bind(this)}
+                               className='form-control'
+                               disabled={this.state.loading}
+                               minLength={5}
+                               maxLength={30}
+                        />
                     </div>
                 </div>
                 {

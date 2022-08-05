@@ -72,7 +72,6 @@ class User extends Authenticatable
         'is_banned'                      => 'boolean',
         'unbanned_at'                    => 'datetime',
         'timeout_until'                  => 'datetime',
-        'adventure_email'                => 'boolean',
         'is_test'                        => 'boolean',
         'upgraded_building_email'        => 'boolean',
         'kingdoms_update_email'          => 'boolean',

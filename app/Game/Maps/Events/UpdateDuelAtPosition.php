@@ -51,8 +51,6 @@ class UpdateDuelAtPosition implements ShouldBroadcastNow
                                        'maps.character_position_y',
                                        'maps.game_map_id as game_map_id',
                             )->get();
-
-            dump($data->count());
         }
 
         $this->characters = $data;

@@ -36,8 +36,6 @@ class UserFactory extends Factory
             'ip_address'              => '127.0.0.1',
             'banned_reason'           => null,
             'un_ban_request'          => null,
-            'adventure_email'         => true,
-            'is_test'                 => true,
             'upgraded_building_email' => true,
             'rebuilt_building_email'  => true,
             'kingdom_attack_email'    => true,

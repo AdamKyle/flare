@@ -43,10 +43,12 @@ class UpgradedBuilding extends Mailable
     public function build()
     {
         return $this->from(config('mail.username'), 'Planes of Tlessa')
-                    ->subject('Upgraded Building')
-                    ->mjml('game.core.kingdoms.mail.upgraded', [
-                        'user'        => $this->user,
-                        'building'    => $this->building,
+                    ->subject('Upgraded Building!')
+                    ->view('game.emails.kingdoms.building-upgrade', [
+                        'user'          => $this->user,
+                        'dontShowLogin' => false,
+                        'building'      => $this->building,
+                        'title'         => 'Upgraded Building!'
                     ]);
     }
 }

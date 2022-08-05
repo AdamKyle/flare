@@ -173,9 +173,27 @@ export default class Game extends React.Component<GameProps, GameState> {
         })
 
         // @ts-ignore
-        this.kingdomUpdates.listen('Game.Kingdoms.Events.UpdateKingdom', (event: { kingdom: KingdomDetails[]|[] }) => {
+        this.kingdomUpdates.listen('Game.Kingdoms.Events.UpdateKingdom', (event: { kingdom: KingdomDetails }) => {
+            const eventKingdom = event.kingdom;
+
+            if (Array.isArray(eventKingdom)) {
+                this.setState({
+                    kingdoms: {...this.state.kingdoms, ...eventKingdom}
+                });
+
+                return;
+            }
+
+            let currentKingdoms  = JSON.parse(JSON.stringify(this.state.kingdoms));
+
+            const index = currentKingdoms.findIndex((kingdom: KingdomDetails) => kingdom.id === eventKingdom.id);
+
+            if (index > -1) {
+                currentKingdoms[index] = eventKingdom;
+            }
+
             this.setState({
-                kingdoms: event.kingdom,
+                kingdoms: currentKingdoms,
             });
         });
     }

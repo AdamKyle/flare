@@ -7,6 +7,7 @@ use App\Game\Kingdoms\Middleware\DoesKingdomBelongToAuthorizedUser;
 use App\Game\Kingdoms\Service\KingdomSettleService;
 use App\Game\Kingdoms\Service\KingdomUpdateService;
 use App\Game\Kingdoms\Service\UseItemsService;
+use App\Game\Kingdoms\Service\UpdateKingdom;
 use App\Game\Maps\Services\LocationService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Game\Kingdoms\Builders\AttackBuilder;
@@ -181,6 +182,13 @@ class ServiceProvider extends ApplicationServiceProvider
             return new UseItemsService(
                 $app->make(KingdomHandler::class),
                 $app->make(NotifyHandler::class)
+            );
+        });
+
+        $this->app->bind(UpdateKingdom::class, function($app) {
+            return new UpdateKingdom(
+                $app->make(KingdomTransformer::class),
+                $app->make(Manager::class)
             );
         });
 
