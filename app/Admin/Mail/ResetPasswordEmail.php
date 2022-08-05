@@ -3,7 +3,7 @@
 namespace App\Admin\Mail;
 
 use Illuminate\Bus\Queueable;
-use Asahasrabuddhe\LaravelMJML\Mail\Mailable;
+use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
 class ResetPasswordEmail extends Mailable
@@ -34,7 +34,7 @@ class ResetPasswordEmail extends Mailable
     {
         return $this->from(config('mail.username'), 'Planes of Tlessa Admin')
                     ->subject('Password Reset Requested')
-                    ->mjml('admin.email.password_reset', [
+                    ->view('admin.email.admin-reset-user-password', [
                         'token' => $this->token,
                     ]);
     }
