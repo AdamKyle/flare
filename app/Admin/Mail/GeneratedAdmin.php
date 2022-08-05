@@ -3,7 +3,7 @@
 namespace App\Admin\Mail;
 
 use Illuminate\Bus\Queueable;
-use Asahasrabuddhe\LaravelMJML\Mail\Mailable;
+use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use App\Flare\Models\User;
 
@@ -44,9 +44,9 @@ class GeneratedAdmin extends Mailable
     {
         return $this->from(config('mail.username'), 'Planes of Tlessa')
                     ->subject('Game Administrator Account Created')
-                    ->mjml('admin.mail.admin_generated', [
-                        'user'  => $this->user,
-                        'token' => $this->token,
+                    ->view('admin.email.admin-generated-email', [
+                        'user'          => $this->user,
+                        'token'         => $this->token,
                     ]);
     }
 }

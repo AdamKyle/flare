@@ -64,8 +64,6 @@ class ClearCelestials extends Command
                     event(new GlobalMessageEvent($monster->name . ' has vanished from the '.$monster->gameMap->name.' plane (hourly reset).'));
 
                     $fight->delete();
-
-                    event(new UpdateCelestialFight(null, true));
                 }
             });
         }

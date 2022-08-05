@@ -58,7 +58,7 @@ class RegistrationControllerTest extends TestCase
             ->see('Character Name')
             ->see('Password')
             ->see('Confirm Password')
-            ->see('Character Info')
+            ->see('Character Creation')
             ->see('Character Name')
             ->see('Choose a Race')
             ->see('Choose a class')

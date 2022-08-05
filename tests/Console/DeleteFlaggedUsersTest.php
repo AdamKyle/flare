@@ -2,25 +2,25 @@
 
 namespace Tests\Console;
 
-
-use App\Flare\Jobs\AccountDeletionJob;
-use App\Flare\Models\GameMap;
-use App\Flare\Models\UserSiteAccessStatistics;
-use App\Flare\Values\NpcTypes;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 use Tests\Setup\Character\CharacterFactory;
-use Tests\Traits\CreateAdventure;
 use Tests\Traits\CreateGameSkill;
+use Tests\Traits\CreateItem;
 use Tests\Traits\CreateNpc;
 use Tests\Traits\CreateRole;
 use Tests\Traits\CreateUser;
+use App\Flare\Jobs\AccountDeletionJob;
+use App\Flare\Models\GameMap;
+use App\Flare\Models\UserSiteAccessStatistics;
+use App\Flare\Values\NpcTypes;
+
 
 class DeleteFlaggedUsersTest extends TestCase
 {
-    use RefreshDatabase, CreateUser, CreateRole, CreateGameSkill, CreateAdventure, CreateNpc;
+    use RefreshDatabase, CreateUser, CreateRole, CreateGameSkill, CreateNpc, CreateItem;
 
     public function setUp(): void {
         parent::setUp();
@@ -32,7 +32,6 @@ class DeleteFlaggedUsersTest extends TestCase
             ->equipStartingEquipment()
             ->createMarketListing()
             ->assignSkill($this->createGameSkill())
-            ->createAdventureLog($this->createNewAdventure())
             ->inventorySetManagement()
             ->createInventorySets(10)
             ->putItemInSet($this->createItem(), 0)

@@ -2,11 +2,11 @@
 
 namespace App\Game\Kingdoms\Mail;
 
-use App\Flare\Models\KingdomBuilding;
 use Illuminate\Bus\Queueable;
-use Asahasrabuddhe\LaravelMJML\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Mail\Mailable;
 use App\Flare\Models\User;
+use App\Flare\Models\KingdomBuilding;
 
 class UpgradedBuilding extends Mailable
 {

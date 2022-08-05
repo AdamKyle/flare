@@ -2,10 +2,11 @@
 
 namespace Tests\Setup\Character;
 
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Cache;
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\Item;
-use App\Flare\Models\MarketBoard;
 use App\Flare\Models\Quest;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Values\AttackTypeValue;
@@ -13,11 +14,7 @@ use App\Flare\Values\AutomationType;
 use App\Game\Core\Values\FactionLevel;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use App\Game\Skills\Values\SkillTypeValue;
-use Illuminate\Support\Facades\Cache;
-use Str;
-use Illuminate\Database\Eloquent\Collection;
 use App\Flare\Models\GameMap;
-use App\Flare\Models\Adventure;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\User;
@@ -508,28 +505,6 @@ class CharacterFactory {
             }
         });
 
-
-        return $this;
-    }
-
-    /**
-     * Create an adventure log based on an adventure.
-     *
-     * You can pass in additional options for the log
-     * to be created.
-     *
-     * @param Adventure $adventure
-     * @param array $options
-     */
-    public function createAdventureLog(Adventure $adventure, array $options = []): CharacterFactory {
-
-        $log = array_merge([
-            'in_progress'  => true,
-            'character_id' => $this->character->id,
-            'adventure_id' => $adventure->id,
-        ], $options);
-
-        $this->character->adventureLogs()->create($log);
 
         return $this;
     }

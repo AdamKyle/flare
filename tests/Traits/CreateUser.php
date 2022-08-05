@@ -12,7 +12,7 @@ trait CreateUser {
     }
 
     public function createAdmin(Role $role, array $options = []): User {
-        $user =  $this->createUser(array_merge($options, ['is_test' => false]));
+        $user =  $this->createUser(array_merge($options));
 
         $user->assignRole($role->name);
 

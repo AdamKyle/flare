@@ -25,7 +25,7 @@ class UpdateCelestialFight implements ShouldBroadcastNow {
      * @param string $characterName
      * @param CelestialFight|null $celestialFight
      */
-    public function __construct(array $logs, string $characterName, CelestialFight $celestialFight = null) {
+    public function __construct(string $characterName, CelestialFight $celestialFight = null) {
         $this->data = [
             'monster_current_health' => is_null($celestialFight) ? 0 : $celestialFight->current_health,
             'celestial_fight_over'   => is_null($celestialFight),

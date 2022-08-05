@@ -2,36 +2,29 @@
 
 namespace Tests\Feature;
 
-use App\Flare\Jobs\AccountDeletionJob;
 use Illuminate\Support\Facades\Queue;
-use Mail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Flare\Mail\GenericMail;
-use App\Flare\Models\Character;
-use App\Flare\Models\Inventory;
-use App\Flare\Models\InventorySet;
-use App\Flare\Models\Kingdom;
-use App\Flare\Models\Skill;
-use App\Flare\Models\User;
-use App\Flare\Models\UserSiteAccessStatistics;
-use App\Flare\Models\GameMap;
-use App\Flare\Values\NpcTypes;
 use Tests\TestCase;
 use Tests\Setup\Character\CharacterFactory;
-use Tests\Traits\CreateAdventure;
 use Tests\Traits\CreateGameSkill;
+use Tests\Traits\CreateItem;
 use Tests\Traits\CreateNpc;
 use Tests\Traits\CreateRole;
 use Tests\Traits\CreateUser;
+use App\Flare\Models\UserSiteAccessStatistics;
+use App\Flare\Models\GameMap;
+use App\Flare\Values\NpcTypes;
+use App\Flare\Jobs\AccountDeletionJob;
+
 
 class AccountDeletionControllerTest extends TestCase {
 
     use RefreshDatabase,
         CreateGameSkill,
-        CreateAdventure,
         CreateNpc,
         CreateUser,
-        CreateRole;
+        CreateRole,
+        CreateItem;
 
     private $character;
 
@@ -45,7 +38,6 @@ class AccountDeletionControllerTest extends TestCase {
             ->equipStartingEquipment()
             ->createMarketListing()
             ->assignSkill($this->createGameSkill())
-            ->createAdventureLog($this->createNewAdventure())
             ->inventorySetManagement()
             ->createInventorySets(10)
             ->putItemInSet($this->createItem(), 0)
