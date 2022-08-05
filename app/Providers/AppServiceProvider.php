@@ -2,11 +2,8 @@
 
 namespace App\Providers;
 
-use Mail;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\ServiceProvider;
-use App\Charts\CreateHistoryForItem;
-use App\Charts\MarketBoardHistory;
-use ConsoleTVs\Charts\Registrar as Charts;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -15,8 +12,7 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
-    {
+    public function register(): void {
 
     }
 
@@ -25,13 +21,7 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot(Charts $charts)
-    {
-
-        $charts->register([
-            MarketBoardHistory::class,
-            CreateHistoryForItem::class,
-        ]);
+    public function boot(): void {
 
         if ($this->app->environment('local')) {
             Mail::alwaysTo(env('DEFAULT_LOCAL_EMAIL'));

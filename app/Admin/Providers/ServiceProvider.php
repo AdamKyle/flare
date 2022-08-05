@@ -2,16 +2,13 @@
 
 namespace App\Admin\Providers;
 
-use App\Admin\Requests\QuestManagement;
+use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
+use App\Flare\Cache\CoordinatesCache;
 use App\Admin\Services\GuideQuestService;
 use App\Admin\Services\InfoPageService;
 use App\Admin\Services\ItemsService;
 use App\Admin\Services\LocationService;
 use App\Admin\Services\QuestService;
-use App\Charts\AllCharacterGoldChart;
-use App\Flare\Cache\CoordinatesCache;
-use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
-use ConsoleTVs\Charts\Registrar as Charts;
 use App\Admin\Console\Commands\CreateAdminAccount;
 use App\Admin\Middleware\IsAdminMiddleware;
 use App\Admin\Services\AssignSkillService;
@@ -27,8 +24,7 @@ class ServiceProvider extends ApplicationServiceProvider
      *
      * @return void
      */
-    public function register()
-    {
+    public function register(): void {
         $this->app->bind(ItemAffixService::class, function ($app) {
             return new ItemAffixService();
         });
@@ -73,14 +69,9 @@ class ServiceProvider extends ApplicationServiceProvider
      *
      * @return void
      */
-    public function boot(Charts $charts)
-    {
+    public function boot(): void {
 
         $router = $this->app['router'];
-
-        $charts->register([
-            AllCharacterGoldChart::class,
-        ]);
 
         $router->aliasMiddleware('is.admin', IsAdminMiddleware::class);
     }

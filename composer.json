@@ -13,7 +13,6 @@
         "beyondcode/laravel-websockets": "^1.13.1",
         "bkwld/cloner": "^3.9",
         "christianessl/landmap-generation": "^1.0",
-        "consoletvs/charts": "7.*",
         "deployer/deployer": "v7.0.0-rc.8",
         "doctrine/dbal": "^3.1",
         "graham-campbell/github": "^10.3",
@@ -40,7 +39,7 @@
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.8.1",
         "beyondcode/laravel-dump-server": "1.8.0",
-        "fzaninotto/faker": "dev-master",
+        "fakerphp/faker": "^1.20",
         "laravel/browser-kit-testing": "^6.1.0",
         "mockery/mockery": "^1.4.2",
         "nunomaduro/collision": "^6.1",
