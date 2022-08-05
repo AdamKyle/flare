@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       mysql-service:
-        image: mysql:8.1.9
+        image: mysql:8.0.29
         env:
           MYSQL_ROOT_PASSWORD: password
           MYSQL_DATABASE: flare_test
