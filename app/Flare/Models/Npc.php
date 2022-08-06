@@ -2,11 +2,11 @@
 
 namespace App\Flare\Models;
 
-use App\Flare\Values\NpcTypes;
-use Database\Factories\NpcFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Database\Factories\NpcFactory;
 use App\Flare\Models\Traits\WithSearch;
+use App\Flare\Values\NpcTypes;
 
 class Npc extends Model {
 
@@ -35,7 +35,7 @@ class Npc extends Model {
         'moves_around_map'         => 'boolean',
         'must_be_at_same_location' => 'boolean',
         'x_position'               => 'integer',
-        'x_position'               => 'integer',
+        'y_position'               => 'integer',
         'type'                     => 'integer',
     ];
 
@@ -49,10 +49,6 @@ class Npc extends Model {
 
     public function gameMapName(): string {
         return $this->gameMap->name;
-    }
-
-    public function commands() {
-        return $this->hasMany(NpcCommand::class, 'npc_id', 'id');
     }
 
     public function quests() {
