@@ -18,6 +18,8 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
 
     private globalMessage: any;
 
+    private npcMessage: any;
+
     private explorationMessage: any;
 
     constructor(props: GameChatProps) {
@@ -56,6 +58,9 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
 
         // @ts-ignore
         this.privateMessages = Echo.private('private-message-' + this.props.user_id);
+
+        // @ts-ignore
+        this.npcMessage = Echo.private('npc-message-' + this.props.user_id);
 
         // @ts-ignore
         this.globalMessage = Echo.join('global-message');
@@ -141,6 +146,20 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
                 server_messages: messages
             },() => {
                 this.setTabToUpdated('server-messages');
+            });
+        });
+
+        this.npcMessage.listen('Game.Messages.Events.NPCMessageEvent', (event: any) => {
+            const chat = JSON.parse(JSON.stringify(this.state.chat))
+
+            chat.unshift({
+                message: event.message,
+                character_name: event.npcName,
+                type: 'npc-message',
+            });
+
+            this.setState({
+                chat: chat,
             });
         });
 

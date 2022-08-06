@@ -13,36 +13,37 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use App\Flare\Models\User;
 use App\Game\Messages\Models\Message;
 
-class ServerMessageEvent implements ShouldBroadcastNow
-{
+class ServerMessageEvent implements ShouldBroadcastNow {
+
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
      * @var User $user
      */
-    private $user;
+    private User $user;
 
     /**
      * @var string message
      */
-    public $message;
+    public string $message;
 
     /**
      * @var int|null $id
      */
-    public $id;
+    public ?int $id;
 
-    public $isQuestItem;
+    /**
+     * @var bool $isQuestItem
+     */
+    public bool $isQuestItem;
 
     /**
      * ServerMessageEvent constructor.
      *
      * @param User $user
      * @param string $message
-     * @param bool $npc
-     * @param bool $isLink
-     * @param string|null $link
      * @param int|null $id
+     * @param bool $isQuestItem
      */
     public function __construct(User $user, string $message,  int $id = null, bool $isQuestItem = false) {
         $this->user        = $user;
@@ -56,8 +57,7 @@ class ServerMessageEvent implements ShouldBroadcastNow
      *
      * @return Channel|array
      */
-    public function broadcastOn()
-    {
+    public function broadcastOn(): Channel|array {
         return new PrivateChannel('server-message-' . $this->user->id);
     }
 }

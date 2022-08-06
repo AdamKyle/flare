@@ -170,6 +170,8 @@ export default class Chat extends React.Component<ChatComponentProps, ChatCompon
                     return <li className='text-yellow-300 text-xl bold mb-2 break-all md:break-normal'>{message.character_name}: {message.message}</li>
                 case 'global-message':
                     return <li className='text-yellow-400 bold italic mb-2 break-all md:break-normal'>{message.message}</li>
+                case 'npc-message':
+                    return <li className='text-sky-400 mb-2 break-all md:break-normal'>{message.message}</li>
                 default:
                     return null;
 

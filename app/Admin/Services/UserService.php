@@ -2,7 +2,6 @@
 
 namespace App\Admin\Services;
 
-use App\Admin\Events\ForceNameChangeEvent;
 use App\Admin\Events\UpdateAdminChatEvent;
 use App\Admin\Jobs\BanEmail;
 use App\Flare\Events\ServerMessageEvent;
@@ -12,7 +11,6 @@ use App\Admin\Events\RefreshUserScreenEvent;
 use App\Admin\Jobs\UpdateBannedUserJob;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Messages\Events\GlobalMessageEvent;
-use App\Game\Messages\Events\MessageSentEvent;
 
 
 class UserService {

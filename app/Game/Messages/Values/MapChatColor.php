@@ -20,6 +20,7 @@ class MapChatColor {
         $this->mapName = $mapName;
     }
 
+
     /**
      * Gets the chat color.
      *

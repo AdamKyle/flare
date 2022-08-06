@@ -3,22 +3,19 @@
 namespace App\Game\Messages\Events;
 
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Broadcasting\PresenceChannel;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
-
 use App\Flare\Models\User;
-use App\Game\Messages\Models\Message;
 
-class PrivateMessageEvent implements ShouldBroadcastNow
+class NPCMessageEvent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
-     * @var User $user
+     * @var User
      */
     private User $user;
 
@@ -28,27 +25,21 @@ class PrivateMessageEvent implements ShouldBroadcastNow
     public string $message;
 
     /**
-     * @var string $from
+     * @var string $npcName
      */
-    public string $from;
+    public string $npcName;
 
     /**
      * Create a new event instance.
      *
-     * @param User $from
      * @param User $user
      * @param string $message
-     * @return void
+     * @param string $npcName
      */
-    public function __construct(User $from, User $user, string $message) {
+    public function __construct(User $user, string $message, string $npcName) {
         $this->user    = $user;
         $this->message = $message;
-
-        if ($from->hasRole('Admin')) {
-            $this->from = 'The Creator';
-        } else {
-            $this->from = $from->character->name;
-        }
+        $this->npcName = $npcName;
     }
 
     /**
@@ -57,6 +48,6 @@ class PrivateMessageEvent implements ShouldBroadcastNow
      * @return Channel|array
      */
     public function broadcastOn(): Channel|array {
-        return new PrivateChannel('private-message-' . $this->user->id);
+        return new PrivateChannel('npc-message-' . $this->user->id);
     }
 }

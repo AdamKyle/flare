@@ -5,7 +5,6 @@ namespace App\Flare\Handlers;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Jobs\UpdateSilencedUserJob;
 use App\Flare\Models\User;
-use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Core\Events\UpdateTopBarEvent;
 
 class MessageThrottledHandler {

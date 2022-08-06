@@ -8,38 +8,34 @@ use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
-
 use App\Flare\Models\User;
 use App\Game\Messages\Models\Message;
 
-class MessageSentEvent implements ShouldBroadcastNow
-{
+class MessageSentEvent implements ShouldBroadcastNow {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
      * @var User $user
      */
-    private $user;
+    private User $user;
 
     /**
      * @var Message $message
      */
-    public $message;
+    public Message $message;
 
     /**
      * @var string $name
      */
-    public $name;
+    public string $name;
 
     /**
      * Create a new event instance.
      *
      * @param User $user
      * @param Message $message
-     * @return void
      */
-    public function __construct(User $user, Message $message)
-    {
+    public function __construct(User $user, Message $message) {
         if (is_null(auth()->user())) {
             return;
         }
@@ -53,8 +49,7 @@ class MessageSentEvent implements ShouldBroadcastNow
      *
      * @return Channel|array
      */
-    public function broadcastOn()
-    {
+    public function broadcastOn(): Channel|array {
         return new PresenceChannel('chat');
     }
 }

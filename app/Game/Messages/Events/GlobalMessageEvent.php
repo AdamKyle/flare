@@ -9,22 +9,21 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 
-class GlobalMessageEvent implements ShouldBroadcastNow
-{
+class GlobalMessageEvent implements ShouldBroadcastNow {
+
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
      * @var string $message
      */
-    public $message;
+    public string $message;
 
     /**
      * Create a new event instance.
      *
      * @param string $message
      */
-    public function __construct(string $message)
-    {
+    public function __construct(string $message) {
         $this->message = $message;
     }
 
@@ -33,8 +32,7 @@ class GlobalMessageEvent implements ShouldBroadcastNow
      *
      * @return Channel|array
      */
-    public function broadcastOn()
-    {
+    public function broadcastOn(): Channel|array {
         return new PresenceChannel('global-message');
     }
 }

@@ -4,7 +4,7 @@ namespace App\Game\Messages\Request;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class PublicEntityRequest extends FormRequest {
+class ServerMessageRequest extends FormRequest {
 
     /**
      * Determine if the user is authorized to make this request.
@@ -18,20 +18,12 @@ class PublicEntityRequest extends FormRequest {
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return string[]
+     * @return array
      */
     public function rules(): array {
         return [
-            'attempt_to_teleport' => 'required|boolean',
-        ];
-    }
-
-    /**
-     * @return string[]
-     */
-    public function messages(): array {
-        return [
-            'attempt_to_teleport.required' => 'Are you attempting to teleport?',
+            'custom_message' => 'nullable|string',
+            'type'           => 'nullable|string',
         ];
     }
 }

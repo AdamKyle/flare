@@ -4,14 +4,14 @@ namespace App\Game\Messages\Request;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class PublicEntityRequest extends FormRequest {
+class PublicMessageRequest extends FormRequest {
 
     /**
      * Determine if the user is authorized to make this request.
      *
      * @return bool
      */
-    public function authorize(): bool {
+    public function authorize() {
         return true;
     }
 
@@ -22,7 +22,7 @@ class PublicEntityRequest extends FormRequest {
      */
     public function rules(): array {
         return [
-            'attempt_to_teleport' => 'required|boolean',
+            'message' => 'required|string|max:240',
         ];
     }
 
@@ -31,7 +31,9 @@ class PublicEntityRequest extends FormRequest {
      */
     public function messages(): array {
         return [
-            'attempt_to_teleport.required' => 'Are you attempting to teleport?',
+            'message.required' => 'You cannot post empty messages.',
+            'message.string'   => 'Message must be a string.',
+            'message.max'      => 'Message is too long. Max is 240 characters.'
         ];
     }
 }

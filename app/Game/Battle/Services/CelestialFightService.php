@@ -127,7 +127,7 @@ class CelestialFightService {
     }
 
     protected function handleMonsterDeath(Character $character, CelestialFight $celestialFight) {
-        event(new UpdateCelestialFight($this->monsterPlayerFight->getBattleMessages(), $character->name,null));
+        event(new UpdateCelestialFight($character->name, $this->monsterPlayerFight));
 
         event(new ServerMessageEvent($character->user, 'You received: ' . $celestialFight->monster->shards . ' shards! Shards can only be used in Alchemy.'));
 
