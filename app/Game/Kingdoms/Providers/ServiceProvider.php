@@ -2,6 +2,8 @@
 
 namespace App\Game\Kingdoms\Providers;
 
+use App\Game\Kingdoms\Console\Commands\UpdateKingdoms;
+use App\Game\Kingdoms\Handlers\TooMuchPopulationHandler;
 use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
 use App\Game\Kingdoms\Middleware\DoesKingdomBelongToAuthorizedUser;
 use App\Game\Kingdoms\Service\KingdomSettleService;
@@ -90,9 +92,15 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
+        $this->app->bind(TooMuchPopulationHandler::class, function() {
+            return new TooMuchPopulationHandler();
+        });
+
         $this->app->bind(KingdomUpdateService::class, function($app) {
             return new KingdomUpdateService(
                 $app->make(GiveKingdomsToNpcHandler::class),
+                $app->make(TooMuchPopulationHandler::class),
+                $app->make(UpdateKingdom::class)
             );
         });
 
@@ -194,6 +202,7 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->commands([
             DeleteKingdomLogs::class,
+            UpdateKingdoms::class,
         ]);
     }
 

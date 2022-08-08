@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Game\Kingdoms\Console\Commands;
 
 use App\Flare\Jobs\UpdateKingdomJob;
 use Illuminate\Console\Command;
@@ -8,14 +8,14 @@ use App\Flare\Models\Kingdom;
 use App\Game\Kingdoms\Service\KingdomResourcesService;
 use Facades\App\Flare\Values\UserOnlineValue;
 
-class UpdateKingdom extends Command
+class UpdateKingdoms extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'update:kingdom';
+    protected $signature = 'update:kingdoms';
 
     /**
      * The console command description.

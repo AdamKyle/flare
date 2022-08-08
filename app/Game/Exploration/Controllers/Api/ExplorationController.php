@@ -17,10 +17,28 @@ use App\Game\Exploration\Services\ExplorationAutomationService;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
 use App\Game\Automation\Request\AttackAutomationStartRequest;
+use Illuminate\Http\JsonResponse;
 
 class ExplorationController extends Controller {
 
-    public function begin(ExplorationRequest $request, Character $character, ExplorationAutomationService $explorationAutomationService) {
+    /**
+     * @var ExplorationAutomationService
+     */
+    private  ExplorationAutomationService $explorationAutomationService;
+
+    /**
+     * @param ExplorationAutomationService $explorationAutomationService
+     */
+    public function __construct(ExplorationAutomationService $explorationAutomationService) {
+        $this->explorationAutomationService = $explorationAutomationService;
+    }
+
+    /**
+     * @param ExplorationRequest $request
+     * @param Character $character
+     * @return JsonResponse
+     */
+    public function begin(ExplorationRequest $request, Character $character): JsonResponse {
 
         if (!AttackTypeValue::attackTypeExists($request->attack_type)) {
             return response()->json([
@@ -34,15 +52,18 @@ class ExplorationController extends Controller {
             ], 422);
         }
 
-        $explorationAutomationService->beginAutomation($character, $request->all());
-
+        $this->explorationAutomationService->beginAutomation($character, $request->all());
 
         return response()->json([
             'message' => 'Exploration has started. Check the exploration tab (beside server messages) for update. The tab will every five minutes, rewards are handed to you or disenchanted automatically.'
         ]);
     }
 
-    public function stop(Character $character) {
+    /**
+     * @param Character $character
+     * @return JsonResponse
+     */
+    public function stop(Character $character): JsonResponse {
 
         $characterAutomation = CharacterAutomation::where('character_id', $character->id)->where('type', AutomationType::EXPLORING)->first();
 

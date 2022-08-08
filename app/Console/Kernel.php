@@ -6,7 +6,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use App\Console\Commands\CleanMarketHistory;
 use App\Console\Commands\MoveInfoFiles;
-use App\Console\Commands\UpdateKingdom;
+use App\Console\Commands\UpdateKingdoms;
 use Spatie\ShortSchedule\ShortSchedule;
 
 /**
@@ -22,7 +22,6 @@ class Kernel extends ConsoleKernel {
     protected $commands = [
         MoveInfoFiles::class,
         CleanMarketHistory::class,
-        UpdateKingdom::class,
     ];
 
     /**
@@ -40,9 +39,6 @@ class Kernel extends ConsoleKernel {
         // Delete the flagged users once a month.
         $schedule->command('delete:flagged-users')->monthly()->timezone(config('app.timezone'));
 
-        // Update kingdoms every hour.
-        $schedule->command('update:kingdom')->hourly()->timezone(config('app.timezone'));
-
         // Refresh the droppable items.
         $schedule->command('cache:droppable-items')->everyThreeHours()->timezone(config('app.timezone'));
 
@@ -53,17 +49,8 @@ class Kernel extends ConsoleKernel {
         // Runs Daily at 2 am.
         $schedule->command('clear-and-rebuild:cache')->dailyAt('02:00')->timezone(config('app.timezone'));
 
-        // Give people a chance to win daily lottery for gold dust
-        $schedule->command('daily:gold-dust')->dailyAt('12:00')->timezone(config('app.timezone'));
-
-        // Weekly Celestial Rate is increased to 80% spawn chance on Wednesdays at 1 pm America Edmonton time.
-        $schedule->command('weekly:celestial-spawn')->weeklyOn(3, '13:00')->timezone(config('app.timezone'));
-
         // Clear the celestials every hour.
         $schedule->command('clear:celestials')->hourly()->timezone(config('app.timezone'));
-
-        // Clean up enchanted items every week at 2am:
-        $schedule->command('clean:enchanted-items')->weeklyOn(7, '2:00')->timezone(config('app.timezone'));
 
         // Clean the market every three months starting at 2am.
         $schedule->command('clean:market-history')->cron('0 2 * */3 *')->timezone(config('app.timezone'));
@@ -81,6 +68,9 @@ class Kernel extends ConsoleKernel {
          * Game Events:
          */
 
+        // Update kingdoms every hour.
+        $schedule->command('update:kingdoms')->hourly()->timezone(config('app.timezone'));
+
         // Give people a chance to win daily lottery for gold dust
         $schedule->command('daily:gold-dust')->dailyAt('12:00')->timezone(config('app.timezone'));
 
@@ -89,6 +79,9 @@ class Kernel extends ConsoleKernel {
 
         // Monthly PVP Alert at 8 am - Lets players sign up for pvp.
         $schedule->command('monthly:pvp')->lastDayOfMonth('08:00')->timezone(config('app.timezone'));
+
+        // Give people a chance to win daily lottery for gold dust
+        $schedule->command('daily:gold-dust')->dailyAt('12:00')->timezone(config('app.timezone'));
     }
 
     /**

@@ -24,7 +24,7 @@ class UpdateKingdomTest extends TestCase
                                 ->assignBuilding()
                                 ->assignUnits();
 
-        $this->assertEquals(0, $this->artisan('update:kingdom'));
+        $this->assertEquals(0, $this->artisan('update:kingdoms'));
 
         Queue::assertPushed(UpdateKingdomJob::class);
 

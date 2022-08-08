@@ -37,7 +37,7 @@ class GameBuildingFactory extends Factory
             'clay_cost'                   => 10,
             'stone_cost'                  => 10,
             'iron_cost'                   => 10,
-            'increase_population_amount'  => 5,
+            'increase_population_amount'  => 100,
             'increase_morale_amount'      => 0.05,
             'decrease_morale_amount'      => 0.05,
             'increase_wood_amount'        => 100,

@@ -20,7 +20,6 @@ import KingdomsList from "./sections/kingdoms/kingdoms-list";
 import KingdomDetails from "./lib/game/kingdoms/kingdom-details";
 import Actions from "./sections/game-actions-section/actions";
 import PositionType from "./lib/game/types/map/position-type";
-import {generateServerMessage} from "./lib/ajax/generate-server-message";
 
 export default class Game extends React.Component<GameProps, GameState> {
 

@@ -3,18 +3,31 @@
 namespace App\Game\Kingdoms\Service;
 
 
+use Illuminate\Support\Facades\Mail;
+use Facades\App\Flare\Values\UserOnlineValue;
+use App\Flare\Mail\GenericMail;
+use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\Character;
+use App\Flare\Models\GameBuilding;
 use App\Flare\Models\Kingdom;
+use App\Flare\Models\KingdomBuilding;
+use App\Flare\Models\Skill;
 use App\Game\Kingdoms\Handlers\GiveKingdomsToNpcHandler;
+use App\Game\Kingdoms\Handlers\TooMuchPopulationHandler;
+use App\Game\Kingdoms\Handlers\Traits\DestroyKingdom;
+use App\Game\Kingdoms\Values\KingdomMaxValue;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Skills\Values\SkillTypeValue;
 
 class KingdomUpdateService {
+
+    use DestroyKingdom;
 
     /**
      * @var Kingdom
      */
-    private Kingdom $kingdom;
+    private ?Kingdom $kingdom;
 
     /**
      * @var Character|null $character
@@ -27,10 +40,27 @@ class KingdomUpdateService {
     private GiveKingdomsToNpcHandler $giveKingdomsToNpcHandler;
 
     /**
-     * @param GiveKingdomsToNpcHandler $giveKingdomsToNpcHandler
+     * @var TooMuchPopulationHandler $tooMuchPopulationHandler
      */
-    public function __construct(GiveKingdomsToNpcHandler $giveKingdomsToNpcHandler) {
+    private TooMuchPopulationHandler $tooMuchPopulationHandler;
+
+    /**
+     * @var UpdateKingdom $updateKingdom
+     */
+    private UpdateKingdom $updateKingdom;
+
+    /**
+     * @param GiveKingdomsToNpcHandler $giveKingdomsToNpcHandler
+     * @param TooMuchPopulationHandler $tooMuchPopulationHandler
+     * @param UpdateKingdom $updateKingdom
+     */
+    public function __construct(GiveKingdomsToNpcHandler $giveKingdomsToNpcHandler,
+                                TooMuchPopulationHandler $tooMuchPopulationHandler,
+                                UpdateKingdom $updateKingdom)
+    {
         $this->giveKingdomsToNpcHandler = $giveKingdomsToNpcHandler;
+        $this->tooMuchPopulationHandler = $tooMuchPopulationHandler;
+        $this->updateKingdom            = $updateKingdom;
     }
 
     /**
@@ -48,12 +78,45 @@ class KingdomUpdateService {
             $this->character = $this->kingdom->character;
         }
 
+        if ($this->kingdom->npc_owned) {
+            $this->character = null;
+        }
+
         return $this;
     }
 
+    /**
+     * Get the kingdom.
+     *
+     * - Can be null due to handing over to the NPC, Destroying it,
+     *   or the NPC kingdom being destroyed.
+     *
+     * @return Kingdom|null
+     */
+    public function getKingdom(): ?Kingdom {
+        if (is_null($this->kingdom)) {
+            return null;
+        }
+
+        return $this->kingdom;
+    }
+
+    /**
+     * Update a kingdom.
+     *
+     * @return void
+     */
     public function updateKingdom(): void {
 
         if (is_null($this->character)) {
+            $lastWalked = $this->getLastTimeWalked();
+
+            if ($lastWalked >= 30) {
+                $this->destroyNPCKingdom();
+            }
+
+            $this->kingdom = null;
+
             return;
         }
 
@@ -62,22 +125,63 @@ class KingdomUpdateService {
 
             event(new ServerMessageEvent($this->character->user, 'Your kingdom has been given over to the NPC: The Old Man. Kingdom has not been walked in 30 days or more.'));
 
-            $gameMapName = $this->kingdom->gameMap->name;
-            $xPosition   = $this->kingdom->x_position;
-            $yPosition   = $this->kingdom->y_position;
+            $gameMapName   = $this->kingdom->gameMap->name;
+            $xPosition     = $this->kingdom->x_position;
+            $yPosition     = $this->kingdom->y_position;
 
-            event(new GlobalMessageEvent('A kingdom on: ' . $gameMapName . 'at (X/Y): ' . $xPosition . '/' . $yPosition . ' has been neglected. The Old Man has taken it (New NPC Kingdom up for grabs).'));
+            $this->kingdom = null;
+
+            event(new GlobalMessageEvent('A kingdom on: ' . $gameMapName . ' at (X/Y): ' . $xPosition . '/' . $yPosition . ' has been neglected. The Old Man has taken it (New NPC Kingdom up for grabs).'));
 
             return;
         }
 
-        dump('Is the old man angry? (over populated).');
+        if ($this->isTheOldManAngry()) {
+            $this->tooMuchPopulationHandler->setKingdom($this->kingdom)->handleAngryNPC();
 
-        dump('Update Morale.');
+            $kingdom = $this->tooMuchPopulationHandler->getKingdom();
 
-        dump('Update Treasury.');
+            if (is_null($kingdom)) {
+                return;
+            }
 
-        dump('Update resources.');
+            $this->kingdom = $kingdom;
+        }
+
+        $this->healBuildingsByPercentage();
+
+        $this->updateKingdomMorale();
+
+        if (is_null($this->kingdom)) {
+             return;
+        }
+
+        $this->updateKingdomTreasury();
+
+        $this->updateKingdomResources();
+
+        $this->updateKingdomPopulation();
+
+        $this->alertUsersOfKingdomRemoval();
+    }
+
+    protected function destroyNPCKingdom(): void {
+        $this->destroyKingdom($this->kingdom);
+
+        $this->kingdom = null;
+    }
+
+    /**
+     * Is the current population greater than the max population?
+     *
+     * @return bool
+     */
+    protected function isTheOldManAngry(): bool {
+
+        $currentPopulation = $this->kingdom->current_population;
+        $maxPopulation     = $this->kingdom->max_population;
+
+        return $currentPopulation > $maxPopulation;
     }
 
     /**
@@ -89,7 +193,7 @@ class KingdomUpdateService {
      *
      * @return bool
      */
-    public function shouldGiveKingdomToNpc(): bool {
+    protected function shouldGiveKingdomToNpc(): bool {
         if (!$this->kingdom->npc_owned && is_null($this->kingdom->last_walked)) {
             return true;
         }
@@ -97,7 +201,7 @@ class KingdomUpdateService {
         if (!$this->kingdom->npc_owned && !is_null($this->kingdom->last_walked)) {
             $lastTimeWalked = $this->getLastTimeWalked();
 
-            if ($lastTimeWalked >= 30) {
+            if ($lastTimeWalked >= 90) {
                 return true;
             }
         }
@@ -110,12 +214,318 @@ class KingdomUpdateService {
      *
      * @return int
      */
-    public function getLastTimeWalked(): int {
+    protected function getLastTimeWalked(): int {
         return $this->kingdom->last_walked->diffInDays(now());
     }
 
-    public function updateKingdomMorale(): void {
+    /**
+     * Heal 5% of the damage buildings.
+     *
+     * - Only heals if the buildings are not in queue.
+     *
+     * @return void
+     */
+    protected function healBuildingsByPercentage(): void {
+        $buildings = $this->kingdom->buildings;
 
+        foreach ($buildings as $building) {
+            $isInQueue  = BuildingInQueue::where('building_id', $building->id)
+                                         ->where('kingdom_id', $this->kingdom->id)
+                                         ->first();
+
+            $currentDur = $building->current_durability;
+            $maxDur     = $building->max_durability;
+
+            if ($currentDur < $maxDur && is_null($isInQueue)) {
+                $currentDur = $currentDur + ($currentDur * 0.05);
+
+                $building->update([
+                    'current_durability' => ($currentDur > $maxDur) ? $maxDur : $currentDur
+                ]);
+            }
+        }
+
+        $this->kingdom = $this->kingdom->refresh();
+    }
+
+    /**
+     * Update the kingdom morale.
+     *
+     * - If a kingdom has not been walked in 30 days or more, it looses 10% of its morale.
+     * - If a kingdom has buildings whose durability is less than then the buildings max durability
+     *   and the building can increase/decrease the morale it will lose or gain morale based on the durability.
+     *
+     * @return void
+     */
+    protected function updateKingdomMorale(): void {
+        $lastWalked = $this->getLastTimeWalked();
+        $morale     = $this->kingdom->current_morale;
+        $character  = $this->kingdom->character;
+
+        if ($lastWalked >= 30) {
+            $morale -= 0.10;
+        }
+
+        event(new ServerMessageEvent(
+            $character->user,
+            $this->kingdom->name .
+            ' is losing morale, due to not being walked for more than 30 days, at Location (x/y): ' .
+            $this->kingdom->x_position . '/' . $this->kingdom->y_position . ' on the: ' .
+            $this->kingdom->gameMap->name . ' plane.'
+        ));
+
+        $morale = $this->reduceOrIncreaseMoraleForBuildings($morale);
+
+        if ($morale <= 0.0) {
+            $this->giveKingdomsToNpcHandler->giveKingdomToNPC($this->kingdom);
+
+            event(new ServerMessageEvent(
+                $character->user,
+                $this->kingdom->name .
+                ' Lost too much morale and has been given to the NPC at: ' .
+                $this->kingdom->x_position . '/' . $this->kingdom->y_position . ' on the: ' .
+                $this->kingdom->gameMap->name . ' plane.'
+            ));
+
+            event(new GlobalMessageEvent(
+                $this->kingdom->name .
+                ' Has crumbled into ruins. It is now up for grabs at: ' .
+                $this->kingdom->x_position . '/' . $this->kingdom->y_position . ' on the: ' .
+                $this->kingdom->gameMap->name . ' plane.'
+            ));
+
+            $this->kingdom = null;
+
+            return;
+        }
+
+        $this->kingdom->update([
+            'current_morale' => $morale > $this->kingdom->max_morale ? $this->kingdom->max_morale : ($morale < 0.0 ? 0 : $morale),
+        ]);
+
+        $this->kingdom->refresh();
+    }
+
+    /**
+     * Update the kingdom's treasury.
+     *
+     * - If the treasury is maxed or the morale is 0.0, we skip this.
+     * - We add the kingmanship (or skill that effects kingdoms) skill bonus to the amount to give.
+     * - We also divide the keep level by 100 to give an additional bonus.
+     *
+     * @return void
+     */
+    protected function updateKingdomTreasury(): void {
+        if (KingdomMaxValue::isTreasuryAtMax($this->kingdom)) {
+            return;
+        }
+
+        $character = $this->kingdom->character;
+
+        if ($this->kingdom->current_morale >= 0.50) {
+            $skill           = $this->getCharacterSkillThatEffectsKingdoms($character);
+            $keep            = $this->getTheKeepBuilding();
+            $currentTreasury = $this->kingdom->treasury;
+
+            $total = (int) ceil($currentTreasury + $currentTreasury * ($skill->skill_bonus + ($keep->level / 100)));
+
+            if ($total === 0) {
+                $total = 1;
+            }
+
+            $this->kingdom->update([
+                'treasury' => min($total, KingdomMaxValue::MAX_TREASURY)
+            ]);
+
+            $this->kingdom = $this->kingdom->refresh();
+        }
+    }
+
+    /**
+     * Updates a kingdom resources.
+     *
+     * - Updates for each resource: Wood, Clay, Stone and Iron
+     * - If the building does not give resources, move on.
+     * - If the buildings durability is 0 move on.
+     * - Finally increase the resource of the building.
+     *
+     * @return void
+     */
+    protected function updateKingdomResources(): void {
+        $resources = ['wood', 'clay', 'stone', 'iron'];
+
+        foreach($resources as $resource) {
+            $building = $this->kingdom->buildings->where('gives_resources', true)->where('increase_in_'.$resource)->first();
+
+            if (is_null($building)) {
+                continue;
+            }
+
+            if ($building->current_durability === 0) {
+                continue;
+            }
+
+            if (!is_null($building)) {
+                $this->increaseResource($building, $resource);
+            }
+        }
+
+        $this->kingdom = $this->kingdom->refresh();
+    }
+
+    /**
+     * Update the kingdom population.
+     *
+     * - Won't update if the Farm durability is below 0.
+     * - Gives partial population based on the durability of the farm building.
+     * - Gives full resources if the building durability is maxed.
+     *
+     * @return void
+     */
+    protected function updateKingdomPopulation(): void {
+        $building       = $this->kingdom->buildings->where('is_farm', true)->first();
+        $increaseAmount = $building->population_increase;
+        $currentPop     = $this->kingdom->current_population;
+        $maxPop         = $this->kingdom->max_population;
+        $currentDur     = $building->current_durability;
+        $maxDur         = $building->max_durability;
+
+        if ($building->current_durability === 0) {
+            return;
+        }
+
+        $percentage = $currentDur / $maxDur;
+
+        if ($percentage < 1) {
+            $newAmount = $currentPop + ($increaseAmount * $percentage);
+        }
+
+        if ($percentage >= 1) {
+            $newAmount = $currentPop + $increaseAmount;
+        }
+
+        $this->kingdom->update([
+            'current_population' => $newAmount > $maxPop ? $maxPop : $newAmount
+        ]);
+
+        $this->kingdom = $this->kingdom->refresh();
+    }
+
+    /**
+     * Reduce or increase the morale based on the building durability.
+     *
+     * - Skip the building if the building does not decrease and increase the morale.
+     *
+     * @param float $morale
+     * @return float
+     */
+    private function reduceOrIncreaseMoraleForBuildings(float $morale): float {
+        $buildings = $this->kingdom->buildings;
+
+        foreach ($buildings as $building) {
+
+            if (is_null($building->morale_increase) && is_null($building->morale_decrease)) {
+                continue;
+            }
+
+            $currentDurability = $building->current_durability;
+            $maxDurability     = $building->max_durability;
+
+            if ($currentDurability < $maxDurability) {
+                $morale -= $building->morale_decrease;
+
+            }
+
+            if ($currentDurability === $maxDurability) {
+                $morale += $building->morale_increase;
+            }
+        }
+
+        return $morale;
+    }
+
+    /**
+     * Increase the resources of the building.
+     *
+     * - If the building durability is not maxed, we take a percentage
+     *   based on the current dur / max dur and give a percentage of what the building would
+     *   give for resources.
+     *
+     * @param KingdomBuilding $building
+     * @param string $resource
+     * @return void
+     */
+    private function increaseResource(KingdomBuilding $building, string $resource): void {
+        $currentDurability = $building->current_durability;
+        $maxDurability     = $building->max_durability;
+        $percentage        = $currentDurability / $maxDurability;
+
+        $increaseAmount    = $building->{'increase_in_'.$resource};
+        $currentAmount     = $this->kingdom->{'current_' . $resource};
+        $maxAmount         = $this->kingdom->{'max_' . $resource};
+
+        if ($percentage < 1) {
+            $currentAmount += ($increaseAmount + $increaseAmount * $percentage);
+        }
+
+        if ($percentage === 1) {
+            $currentAmount +=  $increaseAmount;
+        }
+
+        $this->kingdom->{'current_' . $resource} = min($currentAmount, $maxAmount);
+        $this->kingdom->save();
+
+        $this->kingdom = $this->kingdom->refresh();
+    }
+
+    /**
+     * Fetches a skill which effects kingdoms.
+     *
+     * @param Character $character
+     * @return Skill
+     */
+    private function getCharacterSkillThatEffectsKingdoms(Character $character): Skill {
+        return $character->skills->filter(function($skill) {
+            return $skill->baseSkill->type === SkillTypeValue::EFFECTS_KINGDOM;
+        })->first();
+    }
+
+    /**
+     * Fetches the keep building.
+     *
+     * @return KingdomBuilding
+     */
+    private function getTheKeepBuilding(): KingdomBuilding {
+        return $this->kingdom->buildings()
+                    ->where('game_building_id', GameBuilding::where('name', 'Keep')->first()->id)
+                    ->first();
+    }
+
+    /**
+     * Alerts the player their kingdom was updated.
+     *
+     * - Will send server message if the player is only and has the setting enabled.
+     * - Will send email if the user is not online and has the setting enabled.
+     * - Updates the player kingdom.
+     *
+     * @return void
+     */
+    protected function alertUsersOfKingdomRemoval(): void {
+        $user = $this->kingdom->character->user;
+
+        if (UserOnlineValue::isOnline($user) && $user->show_kingdom_update_messages) {
+            $x       = $this->kingdom->x_position;
+            $y       = $this->kingdom->y_position;
+            $gameMap = $this->kingdom->gameMap;
+
+            event(new ServerMessageEvent(
+                $user,
+                $this->kingdom->name . ' Was updated per the hourly update at (X/Y): ' . $x . '/' . $y .
+                ' On plane: ' . $gameMap->name
+            ));
+        }
+
+        $this->updateKingdom->updateKingdom($this->kingdom);
     }
 
 }

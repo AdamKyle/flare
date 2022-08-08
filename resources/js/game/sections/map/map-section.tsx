@@ -16,9 +16,11 @@ import {getStyle, playerIconPosition} from "../../lib/game/map/map-management";
 import MapTimer from "./map-timer";
 import DirectionalMovement from "./actions/directional-movement";
 import MapActions from "./actions/map-actions";
+import NpcKingdomsDetails from "../../lib/game/types/map/npc-kingdoms-details";
 import clsx from "clsx";
 // @ts-ignore
 import Draggable from 'react-draggable/build/web/react-draggable.min';
+
 
 export default class MapSection extends React.Component<MapProps, MapState> {
 
@@ -31,6 +33,8 @@ export default class MapSection extends React.Component<MapProps, MapState> {
     private globalMapUpdate: any;
 
     private kingdomsUpdate: any;
+
+    private npcKingdomsUpdate: any;
 
     constructor(props: MapProps) {
         super(props);
@@ -75,6 +79,9 @@ export default class MapSection extends React.Component<MapProps, MapState> {
 
         // @ts-ignore
         this.traverseUpdate     = Echo.private('update-map-plane-' + this.props.user_id);
+
+        // @ts-ignore
+        this.npcKingdomsUpdate  = Echo.join('npc-kingdoms-update');
     }
 
     componentDidMount() {
@@ -122,6 +129,14 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                 player_kingdoms: event.myKingdoms
             });
         });
+
+        this.npcKingdomsUpdate.listen('Game.Kingdoms.Events.UpdateNPCKingdoms', (event: {npcKingdoms: NpcKingdomsDetails[]|[], mapName: string}) => {
+            if (this.state.map_name === event.mapName) {
+                this.setState({
+                    npc_kingdoms: [...this.state.npc_kingdoms, ...event.npcKingdoms]
+                });
+            }
+        })
     }
 
     setStateFromData(data: MapData, callback?: () => void) {
