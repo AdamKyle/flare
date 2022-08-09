@@ -26,16 +26,6 @@ class SettingsController extends Controller {
         ]);
     }
 
-    public function emailSettings(Request $request, User $user) {
-        $user->update([
-            'upgraded_building_email' => $request->has('upgraded_building_email') ? $request->upgraded_building_email : false,
-            'rebuilt_building_email'  => $request->has('rebuilt_building_email') ? $request->rebuilt_building_email : false,
-            'kingdom_attack_email'    => $request->has('kingdom_attack_email') ? $request->kingdom_attack_email : false,
-        ]);
-
-        return redirect()->back()->with('success', 'Updated email preferences.');
-    }
-
     public function chatSettings(request $request, User $user) {
 
         $user->update([
