@@ -66,6 +66,7 @@ use App\Flare\Transformers\OtherKingdomTransformer;
 use App\Flare\Transformers\UsableItemTransformer;
 use App\Game\Battle\Services\PvpService;
 use App\Game\Core\Services\CharacterService;
+use App\Game\Kingdoms\Handlers\GiveKingdomsToNpcHandler;
 use App\Game\Kingdoms\Service\KingdomResourcesService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Flare\Values\BaseStatValue;
@@ -481,7 +482,10 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
         $this->app->bind(CharacterDeletion::class, function($app) {
-            return new CharacterDeletion($app->make(KingdomResourcesService::class));
+            return new CharacterDeletion(
+                $app->make(GiveKingdomsToNpcHandler::class),
+                $app->make(CharacterBuilder::class),
+            );
         });
 
         $this->app->bind(SetUpFight::class, function($app) {

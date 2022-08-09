@@ -9,45 +9,44 @@ use App\Flare\Models\GameRace;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\User;
 
-class CreateCharacterEvent
-{
+class CreateCharacterEvent {
+
     use SerializesModels;
 
     /**
      * @var User $user
      */
-    public $user;
+    public User $user;
 
     /**
      * @var GameClass $class
      */
-    public $class;
+    public GameClass $class;
 
     /**
      * @var GameRace $race
      */
-    public $race;
-
-    /**
-     * @var string $characterName
-     */
-    public $characterName;
+    public GameRace $race;
 
     /**
      * @var GameMap $map
      */
-    public $map;
+    public GameMap $map;
+
+    /**
+     * @var string $characterName
+     */
+    public string $characterName;
 
     /**
      * Create a new event instance.
      *
-     * @param  User $user
+     * @param User $user
      * @param GameMap $map
      * @param Request $request
-     * @return void
+     * @param string|null $characterName
      */
-    public function __construct(User $user, GameMap $map, Request $request, string $characterName = null)
-    {
+    public function __construct(User $user, GameMap $map, Request $request, string $characterName = null) {
         $this->user          = $user;
         $this->race          = GameRace::find($request->race);
         $this->class         = GameClass::find($request->class);

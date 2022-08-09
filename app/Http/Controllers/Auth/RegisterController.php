@@ -2,47 +2,58 @@
 
 namespace App\Http\Controllers\Auth;
 
-use Cache;
-use App\Flare\Jobs\RegisterMessage;
-use App\Flare\Services\CanUserEnterSiteService;
-use App\Http\Controllers\Controller;
-use App\Flare\Models\User;;
+use Exception;
+use Illuminate\Contracts\Validation\Validator as RequestValidator;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+use Illuminate\View\View;
+use App\Http\Controllers\Controller;
 use App\Flare\Events\CreateCharacterEvent;
 use App\Flare\Models\GameRace;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameMap;
+use App\Flare\Models\User;
+use App\Flare\Jobs\RegisterMessage;
+use App\Flare\Services\CanUserEnterSiteService;
 
-class RegisterController extends Controller
-{
+class RegisterController extends Controller {
+
     /*
     |--------------------------------------------------------------------------
     | Register Controller
     |--------------------------------------------------------------------------
     |
     | This controller handles the registration of new users as well as their
-    | validation and creation. By default this controller uses a trait to
+    | validation and creation. By default, this controller uses a trait to
     | provide this functionality without requiring any additional code.
     |
     */
 
     use RegistersUsers;
 
-    protected $redirectTo = '/';
+    /**
+     * @var CanUserEnterSiteService $canUserEnterSiteService
+     */
+    private CanUserEnterSiteService $canUserEnterSiteService;
 
-    private $canUserEnterSiteService;
+    /**
+     * @var string
+     */
+    protected string $redirectTo = '/';
+
 
     /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct(CanUserEnterSiteService $canUserEnterSiteService)
-    {
+    public function __construct(CanUserEnterSiteService $canUserEnterSiteService) {
 
         $this->canUserEnterSiteService = $canUserEnterSiteService;
 
@@ -53,10 +64,9 @@ class RegisterController extends Controller
      * Get a validator for an incoming registration request.
      *
      * @param  array  $data
-     * @return \Illuminate\Contracts\Validation\Validator
+     * @return RequestValidator
      */
-    protected function validator(array $data)
-    {
+    protected function validator(array $data): RequestValidator {
         return Validator::make($data, [
             'email'        => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password'     => ['required', 'string', 'min:10', 'confirmed'],
@@ -69,23 +79,24 @@ class RegisterController extends Controller
     /**
      * Create a new user instance after a valid registration.
      *
-     * @param  array  $data
-     * @return \App\Flare\Models\User
+     * @param array $data
+     * @param string $ip
+     * @return User
+     * @throws Exception
      */
-    protected function create(array $data, string $ip)
-    {
+    protected function create(array $data, string $ip): User {
 
         $user = User::where('ip_address', $ip)->where('is_banned', true)->first();
 
         if ($user) {
             $until = !is_null($user->unbanned_at) ? $user->unbanned_at->format('l jS \\of F Y h:i:s A') . ' ' . $user->unbanned_at->timezoneName . '.' : 'Forever.';
 
-            throw new \Exception('You have been banned until: ' . $until);
+            throw new Exception('You have been banned until: ' . $until);
         }
 
         // Allows characters to create 10 accounts.
-        if (User::where('ip_address', $ip)->count() >= 10) {
-            throw new \Exception('You cannot register anymore characters.');
+        if (User::where('ip_address', $ip)->count() >= 10 && env('APP_ENV') !== 'local') {
+            throw new Exception('You cannot register anymore characters.');
         }
 
         return User::create([
@@ -100,11 +111,11 @@ class RegisterController extends Controller
     /**
      * Handle a registration request for the application.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return RedirectResponse
+     * @throws ValidationException
      */
-    public function register(Request $request)
-    {
+    public function register(Request $request): RedirectResponse {
         $map = GameMap::where('default', true)->first();
 
         if (is_null($map)) {
@@ -119,7 +130,7 @@ class RegisterController extends Controller
 
         try {
             $user = $this->create($request->all(), $request->ip());
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
 
@@ -142,10 +153,9 @@ class RegisterController extends Controller
     /**
      * Show the application registration form.
      *
-     * @return \Illuminate\Http\Response
+     * @return View
      */
-    public function showRegistrationForm()
-    {
+    public function showRegistrationForm(): View {
         return view('auth.register', [
             'races'   => GameRace::pluck('name', 'id'),
             'classes' => GameClass::pluck('name', 'id'),

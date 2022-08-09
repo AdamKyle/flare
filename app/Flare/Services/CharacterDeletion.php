@@ -2,25 +2,36 @@
 
 namespace App\Flare\Services;
 
+use App\Flare\Builders\CharacterBuilder;
 use App\Flare\Models\Character;
+use App\Flare\Models\GameClass;
+use App\Flare\Models\GameMap;
+use App\Flare\Models\GameRace;
 use App\Flare\Models\Inventory;
-use App\Flare\Models\Kingdom;
 use App\Flare\Models\MarketBoard;
-use App\Flare\Transformers\MarketItemsTransformer;
-use App\Game\Kingdoms\Service\KingdomResourcesService;
+use App\Flare\Models\User;
+use App\Game\Kingdoms\Handlers\GiveKingdomsToNpcHandler;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use League\Fractal\Manager;
 
 class CharacterDeletion {
 
-    private KingdomResourcesService $kingdomResourcesService;
+    private GiveKingdomsToNpcHandler $giveKingdomsToNpcHandler;
 
-    public function __construct(KingdomResourcesService $kingdomResourcesService) {
-        $this->kingdomResourcesService = $kingdomResourcesService;
+    private CharacterBuilder $characterBuilder;
+
+    public function __construct(GiveKingdomsToNpcHandler $giveKingdomsToNpcHandler, CharacterBuilder $characterBuilder) {
+        $this->giveKingdomsToNpcHandler = $giveKingdomsToNpcHandler;
+        $this->characterBuilder         = $characterBuilder;
     }
 
-    public function deleteCharacterFromUser(Character $character) {
+    public function deleteCharacterFromUser(Character $character, array $params = []) {
+        $user = $character->user;
+
+        foreach ($character->kingdoms as $kingdom) {
+            $this->giveKingdomsToNpcHandler->giveKingdomToNPC($kingdom);
+        }
+
         if (!is_null($character->inventory)) {
             $this->emptyCharacterInventory($character->inventory);
         }
@@ -31,16 +42,32 @@ class CharacterDeletion {
 
         $this->deleteCharacterMarketListings($character);
 
-        foreach ($character->kingdoms as $kingdom) {
-            $this->kingdomResourcesService->setKingdom($kingdom)->giveNPCKingdoms(false, true);
-        }
-
-        $character->skills()->delete();
-
         $this->deleteCharacter($character);
+
+        if (!empty($params)) {
+            $this->createCharacter($user->refresh(), $params);
+        }
     }
 
-    protected function deleteCharacterMarketListings(Character $character) {
+
+    protected function createCharacter(User $user, array $params): void {
+        $race  = GameRace::find($params['race_id']);
+        $class = GameClass::find($params['class_id']);
+        $map   = GameMap::where('default', true)->first();
+
+        $this->characterBuilder->setRace($race)
+                              ->setClass($class)
+                              ->createCharacter($user, $map, $params['name'])
+                              ->assignSkills()
+                              ->assignPassiveSkills()
+                              ->buildCharacterCache();
+
+        $user->refresh()->update([
+            'guide_enabled' => $params['guide']
+        ]);
+    }
+
+    protected function deleteCharacterMarketListings(Character $character): void {
 
         MarketBoard::where('character_id', $character->id)->chunkById(250, function($marketListings) {
             foreach ($marketListings as $marketListing) {
@@ -49,7 +76,7 @@ class CharacterDeletion {
         });
     }
 
-    protected function emptyCharacterInventory(Inventory $inventory) {
+    protected function emptyCharacterInventory(Inventory $inventory): void {
         foreach ($inventory->slots as $slot) {
             $slot->delete();
         }
@@ -57,7 +84,7 @@ class CharacterDeletion {
         $inventory->delete();
     }
 
-    protected function emptyCharacterInventorySets(Collection $inventorySets) {
+    protected function emptyCharacterInventorySets(Collection $inventorySets): void {
         foreach ($inventorySets as $set) {
             foreach ($set->slots as $slot) {
                 $slot->delete();
@@ -67,8 +94,7 @@ class CharacterDeletion {
         }
     }
 
-
-    protected function deleteCharacter(Character $character) {
+    protected function deleteCharacter(Character $character): void {
         $character->skills()->delete();
 
         $character->kingdomAttackLogs()->delete();

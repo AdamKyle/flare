@@ -2,8 +2,7 @@
 
 namespace App\Flare\Jobs;
 
-use DB;
-use Mail;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -25,23 +24,36 @@ class AccountDeletionJob implements ShouldQueue
     /**
      * @var User $user
      */
-    public $user;
+    protected User $user;
 
-    public $systemDeletion;
+    /**
+     * @var bool $emailUser
+     */
+    protected bool $emailUser;
+
 
     /**
      * Create a new job instance.
      *
      * @param User $user
+     * @param bool $emailUser
      */
-    public function __construct(User $user, bool $systemDeletion = false) {
-        $this->user           = $user;
-        $this->systemDeletion = $systemDeletion;
+    public function __construct(User $user, bool $emailUser = false) {
+        $this->user      = $user;
+        $this->emailUser = $emailUser;
     }
 
+    /**
+     * Delete the character and the associated user data.
+     *
+     * - Only email the user if they have manually deleted themselves.
+     *
+     * @param CharacterDeletion $characterDeletion
+     * @return void
+     */
     public function handle(CharacterDeletion $characterDeletion) {
         try {
-            $user = $this->user;
+            $user          = $this->user;
             $characterName = $user->character->name;
 
             $characterDeletion->deleteCharacterFromUser($user->character);
@@ -49,7 +61,7 @@ class AccountDeletionJob implements ShouldQueue
             $siteAccessStatistic = UserSiteAccessStatistics::orderBy('created_at', 'desc')->first();
 
             UserSiteAccessStatistics::create([
-                'amount_signed_in' => $siteAccessStatistic->amount_signed_in - 1,
+                'amount_signed_in'  => $siteAccessStatistic->amount_signed_in - 1,
                 'amount_registered' => $siteAccessStatistic->amount_registered - 1,
             ]);
 
@@ -59,23 +71,19 @@ class AccountDeletionJob implements ShouldQueue
 
             broadcast(new UpdateSiteStatisticsChart($adminUser));
 
-            if (!$this->systemDeletion) {
-                Mail::to($user)->send(new GenericMail($user, 'You requested your account to be deleted. We have done so, this is your final confirmation email.', 'Account Deletion', true));
+            if ($this->emailUser) {
+                $message = 'You have deleted your account. This your confirmation email that all your data, email,
+                password, character data and so on were deleted. I am sad to see you go and hope
+                you come back in the future!';
 
-                $user->delete();
+                Mail::to($user->email)->send(new GenericMail($user, $message, 'Account Deletion', true));
 
                 event(new GlobalMessageEvent('The Creator is sad today: ' . $characterName . ' has decided to call it quits. We wish them the best on their journeys'));
-            } else {
-                $message = 'Hello, your account was deleted due to account inactivity.
-                A player may only be inactive for 5 months at a time. You are of course welcome to come back at
-                any time and start a new character.';
-
-                Mail::to($user)->send(new GenericMail($user, $message, 'Automated Account Deletion', true));
-
-                $user->delete();
             }
+
+            $user->delete();
         } catch (\Exception $e) {
-            Log::info($e->getMessage());
+            Log::error($e->getMessage());
         }
     }
 }

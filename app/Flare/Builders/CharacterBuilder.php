@@ -14,28 +14,29 @@ use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Values\BaseStatValue;
 use App\Flare\Values\BaseSkillValue;
 use App\Game\Core\Values\FactionLevel;
+use Exception;
 
 class CharacterBuilder {
 
     /**
      * @var GameRace $race
      */
-    private $race;
+    private GameRace $race;
 
     /**
      * @var GameClass $class
      */
-    private $class;
+    private GameClass $class;
 
     /**
      * @var Character $character
      */
-    private $character;
+    private Character $character;
 
     /**
      * @var BuildCharacterAttackTypes $buildCharacterAttackTypes
      */
-    private $buildCharacterAttackTypes;
+    private BuildCharacterAttackTypes $buildCharacterAttackTypes;
 
     /**
      * @param BuildCharacterAttackTypes $buildCharacterAttackTypes
@@ -140,6 +141,8 @@ class CharacterBuilder {
 
         $this->assignFactions();
 
+        $this->character = $this->character->refresh();
+
         return $this;
     }
 
@@ -175,6 +178,8 @@ class CharacterBuilder {
             }
         }
 
+        $this->character = $this->character->refresh();
+
         return $this;
     }
 
@@ -206,6 +211,8 @@ class CharacterBuilder {
             }
         }
 
+        $this->character = $this->character->refresh();
+
         return $this;
     }
 
@@ -235,6 +242,7 @@ class CharacterBuilder {
 
     /**
      * @return $this
+     * @throws Exception
      */
     public function buildCharacterCache(): CharacterBuilder {
         $this->buildCharacterAttackTypes->buildCache($this->character);
@@ -248,6 +256,6 @@ class CharacterBuilder {
      * @return Character
      */
     public function character(): Character {
-        return $this->character->refresh();
+        return $this->character;
     }
 }

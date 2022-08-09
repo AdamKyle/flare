@@ -29,18 +29,21 @@
 
         </div>
 
-        <div class="grid md:grid-cols-2 gap-3 mt-5 w-full mt-10 mx-auto lg:w-2/3 md:mt-20 mb-20">
-            <img src="{{asset('promotion/game.png')}}" class="max-w-full lg:max-w-[74%]"/>
-            <div class="lg:flex lg:items-center">
-                <div class="text-center mt-4 md:mt-0 md:text-left">
-                    <h2 class="mb-5 font-thin md:text-4xl lg:text-5xl dark:text-gray-300 text-gray-800">A world of possibilities</h2>
-                    <div class="mb-10 dark:text-gray-300 text-gray-800">
-                        <p class="mt-2 mb-4">Tlessa offers a lot for the average player to do, from crafting, enchanting, gear progression, quests, monsters, kingdoms to manage and to take. There is more to do here
-                        including but not limited to: Reach level 4000+, Fight epic Celestials, Get Faction Points for Uniques, Complete over 60 quests and so much more.</p>
-                        <p class="mb-4"><strong>Best part?</strong> it's all free! Just requires time investment, as little or as much as you want</p>
-                    </div>
-                </div>
-            </div>
+        <img src="{{asset('promotion/game.png')}}" class="shadow rounded max-w-full h-auto align-middle border-none img-fluid max-w-[60%] my-4 m-auto"/>
+
+        <div class="text-center w-full lg:w-2/4 mx-auto mt-20">
+            <h2 class="mb-5 font-thin text-5xl dark:text-gray-300 text-gray-800">
+                <i class="fas fa-globe-americas"></i>
+                A World of Possibilities
+            </h2>
+            <p class="mb-10 dark:text-gray-300 text-gray-800">
+                Tlessa offers a lot for the average player to do, from crafting, enchanting, gear progression, quests, monsters, kingdoms to manage and to take. There is more to do here
+                including but not limited to: Reach level 4000+, Fight epic Celestials, Get Faction Points for Uniques, Complete over 60 quests and so much more
+            </p>
+
+            <p class="mb-10 dark:text-gray-300 text-gray-800">
+                <strong>Best part?</strong> it's all free! Just requires time investment, as little or as much as you want!
+            </p>
         </div>
 
         <div class="grid lg:grid-cols-3 gap-3 w-full lg:w-2/3 m-auto">
@@ -100,7 +103,7 @@
         </div>
 
         <div class="grid md:grid-cols-2 gap-3 mt-5 w-full mt-10 mx-auto lg:w-2/3 md:mt-20">
-            <img src="{{asset('promotion/map.png')}}" class="w-100 mb-5" />
+            <img src="{{asset('promotion/map.png')}}" class="shadow rounded max-w-full h-auto align-middle border-none img-fluid w-100 mb-5" />
             <div class="md:flex md:items-center text-center md:text-left">
                 <div>
                     <h2 class="mb-5 font-thin md:text-4xl lg:text-5xl dark:text-gray-300 text-gray-800">See where you're going!</h2>

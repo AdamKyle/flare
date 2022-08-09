@@ -6,6 +6,8 @@ use App\Flare\Mail\GenericMail;
 use App\Flare\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
+use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Output\ConsoleOutput;
 
 class FlagUsersForDeletion extends Command
 {
@@ -28,32 +30,31 @@ class FlagUsersForDeletion extends Command
      *
      * @return void
      */
-    public function __construct()
-    {
+    public function __construct() {
         parent::__construct();
     }
 
     /**
      * Execute the console command.
      *
-     * @return int
+     * @return void
      */
-    public function handle()
-    {
-        $users = User::whereDate('will_be_deleted', '<', now()->subMonths(5))->orWhereNull('last_logged_in');
+    public function handle(): void {
+        $users = User::whereNull('last_logged_in')
+                     ->orWhereDate('last_logged_in', '<', now()->subMonths(5))
+                     ->where('will_be_deleted', false)
+                     ->get();
 
-        $users->chunkById(100, function($users) {
-           foreach ($users as $user) {
-               $user->update([
-                   'will_be_deleted' => true,
-               ]);
+        $progressBar = new ProgressBar(new ConsoleOutput(), $users->count());
 
-               $accountDeletionMessages = 'Your account has not been logged into for a while (5+ months). As a result, next month your account will be deleted.
-               Do not worry, you can always come back and create a new account, log in today to prevent this, or log in and delete your account yourself.
-               If the system deletes your account, you will receive one more email next month to confirm this action was done.';
+        foreach($users as $user) {
+            $user->update([
+                'will_be_deleted' => true,
+            ]);
 
-               Mail::to($user->email)->send(new GenericMail($user, $accountDeletionMessages, 'You haven\'t logged in for a while', true));
-           }
-        });
+            $progressBar->advance();
+        }
+
+        $progressBar->finish();
     }
 }

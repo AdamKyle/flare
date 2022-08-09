@@ -19,6 +19,7 @@
 
             <x-core.cards.form-card css="mt-5 p-5 md:p-10" method="POST" action="{{ route('register') }}">
                 @csrf
+
                 <div class="mb-5">
                     <label class="label block mb-2" for="name">{{ __('E-Mail Address') }}</label>
                     <input id="name" type="email" class="form-control" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
@@ -110,7 +111,12 @@
                         <span>Enable Guide? <a href="#no-link" data-toggle="modal" data-target="#guide-explanation">(Help)</a></span>
                     </label>
                 </div>
-                <div class="flex">
+                <hr class="my-4" />
+                <div class="flex my-4">
+                    <a href="/information/account-deletion" css="rtl:ml-auto rtl:mr-auto">
+                        Account Deletion <i class="fas fa-external-link-alt"></i>
+                    </a>
+
                     <x-core.buttons.primary-button css="ltr:ml-auto rtl:mr-auto uppercase" type="submit">
                         Register
                     </x-core.buttons.primary-button>
