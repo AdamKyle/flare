@@ -105,11 +105,6 @@ class RebuildBuilding implements ShouldQueue
                 event(new ServerMessageEvent($this->user, 'building-repair-finished', $message));
             }
 
-        } else if ($this->user->rebuilt_building_email) {
-            Mail::to($this->user)->send(new RebuiltBuilding(
-                $this->user,
-                $this->building
-            ));
         }
     }
 }

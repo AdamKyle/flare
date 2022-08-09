@@ -180,19 +180,12 @@ class UpgradeBuildingWithGold implements ShouldQueue
             $y = $this->building->kingdom->y_position;
 
             if ($this->user->show_building_upgrade_messages) {
-                // @codeCoverageIgnoreStart
                 $message = $this->building->name . ' finished upgrading for kingdom: ' .
                     $this->building->kingdom->name . ' on plane: ' . $plane .
                     ' At (X/Y) ' . $x . '/' . $y . ' and is now level: ' . $level;
 
                 event(new ServerMessageEvent($this->user, 'building-upgrade-finished', $message));
-                // @codeCoverageIgnoreEnd
             }
-        } else if ($this->user->upgraded_building_email) {
-            Mail::to($this->user)->send(new UpgradedBuilding(
-                $this->user,
-                $this->building
-            ));
         }
     }
 
