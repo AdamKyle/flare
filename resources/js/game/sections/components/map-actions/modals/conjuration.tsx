@@ -20,7 +20,7 @@ export default class Conjuration extends React.Component<ConjureModalProps, Conj
         this.state = {
             loading: true,
             celestials: [],
-            selected_celestial: null,
+            selected_celestial_id: null,
             error_message: '',
             conjuring: false,
         }
@@ -37,7 +37,7 @@ export default class Conjuration extends React.Component<ConjureModalProps, Conj
     }
 
     conjure(privateConjure: boolean) {
-        if (this.state.selected_celestial === null) {
+        if (this.state.selected_celestial_id === null) {
             return this.setState({
                 error_message: 'Select a creature child, before doing that.'
             });
@@ -47,7 +47,7 @@ export default class Conjuration extends React.Component<ConjureModalProps, Conj
             conjuring: true,
         }, () => {
             (new Ajax()).setRoute('conjure/' + this.props.character_id).setParameters({
-                monster_id: this.state.selected_celestial,
+                monster_id: this.state.selected_celestial_id,
                 type: privateConjure ? 'private' : 'public',
             }).doAjaxCall('post', (result: AxiosResponse) => {
                 this.setState({
@@ -62,7 +62,7 @@ export default class Conjuration extends React.Component<ConjureModalProps, Conj
 
     setSelectedCelestial(data: any) {
         this.setState({
-            selected_celestial: data.value,
+            selected_celestial_id: data.value,
         });
     }
 
@@ -76,12 +76,12 @@ export default class Conjuration extends React.Component<ConjureModalProps, Conj
     }
 
     getSelectedCelestial(): {label: string, value: number} {
-
         const selectedCelestial = this.state.celestials.filter((celestial: CelestialType) =>  {
-            if (this.state.selected_celestial !== null) {
-                return celestial.id === this.state.selected_celestial.id
+            if (this.state.selected_celestial_id !== null) {
+                return celestial.id === this.state.selected_celestial_id
             }
         });
+
 
         if (selectedCelestial.length > 0) {
             const celestial = selectedCelestial[0];
@@ -106,13 +106,13 @@ export default class Conjuration extends React.Component<ConjureModalProps, Conj
                       title={this.props.title}
                       secondary_actions={{
                           handle_action: () => this.conjure(false),
-                          secondary_button_disabled: this.state.selected_celestial === null,
+                          secondary_button_disabled: this.state.selected_celestial_id === null,
                           secondary_button_label: 'Conjure',
                       }}
                       tertiary_actions={{
                           handle_action: () => this.conjure(true),
                           tertiary_button_label: 'Private Conjure',
-                          tertiary_button_disabled: this.state.selected_celestial === null,
+                          tertiary_button_disabled: this.state.selected_celestial_id === null,
                       }}
             >
                 {

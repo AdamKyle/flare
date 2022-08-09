@@ -12,6 +12,7 @@ import DuelPlayer from "./components/duel-player";
 import SmallMapMovementActions from "./components/small-actions/small-map-movement-actions";
 import SmallActionsProps from "../../lib/game/types/actions/small-actions-props";
 import {isEqual} from "lodash";
+import CelestialFight from "./components/celestial-fight";
 
 export default class SmallerActions extends React.Component<SmallActionsProps, SmallActionsState> {
 
@@ -177,13 +178,13 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
             selected_action: null,
         })
     }
-    //
-    // closeFightCelestialSection() {
-    //     this.setState({
-    //         selected_action: null,
-    //     })
-    // }
-    //
+
+    closeFightCelestialSection() {
+        this.setState({
+            selected_action: null,
+        })
+    }
+
 
     manageDuel() {
         this.setState({
@@ -250,17 +251,17 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
             />
         );
     }
-    //
-    // showCelestialFight() {
-    //     return (
-    //         <CelestialFight character={this.props.character}
-    //                         manage_celestial_fight={this.manageFightCelestial.bind(this)}
-    //                         celestial_id={this.props.celestial_id}
-    //                         update_celestial={this.props.update_celestial}
-    //         />
-    //     )
-    // }
-    //
+
+    showCelestialFight() {
+        return (
+            <CelestialFight character={this.props.character}
+                            manage_celestial_fight={this.closeFightCelestialSection.bind(this)}
+                            celestial_id={this.props.celestial_id}
+                            update_celestial={this.props.update_celestial}
+            />
+        )
+    }
+
     showDuelFight() {
         return (
             <DuelPlayer characters={this.state.characters_for_dueling}
@@ -288,8 +289,8 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
                 return this.showCrafting();
             case 'map-movement':
                 return this.showMapMovement();
-            // case 'celestial-fight':
-            //     return this.showCelestialFight();
+            case 'celestial-fight':
+                return this.showCelestialFight();
             case 'pvp-fight':
                 return this.showDuelFight();
             case 'join-monthly-pvp':

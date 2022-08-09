@@ -3,6 +3,7 @@
 namespace App\Game\Battle\Controllers\Api;
 
 use App\Flare\Models\CelestialFight;
+use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\CharacterInCelestialFight;
 use App\Flare\Models\Npc;
 use App\Flare\Values\NpcTypes;
@@ -73,8 +74,8 @@ class CelestialBattleController extends Controller {
             return response()->json([], 200);
         }
 
-        if (!$character->can_adventure) {
-            event(new ServerMessageEvent($character->user, 'You are adventuring and cannot participate.'));
+        if (CharacterAutomation::where('character_id', $character->id)->count() !== 0) {
+            event(new ServerMessageEvent($character->user, 'You are exploring and cannot participate.'));
 
             return response()->json([], 200);
         }
@@ -103,8 +104,8 @@ class CelestialBattleController extends Controller {
             return response()->json([], 200);
         }
 
-        if (!$character->can_adventure) {
-            broadcast(new ServerMessageEvent($character->user, 'You are adventuring and cannot participate.'));
+        if (CharacterAutomation::where('character_id', $character->id)->count() !== 0) {
+            event(new ServerMessageEvent($character->user, 'You are exploring and cannot participate.'));
 
             return response()->json([], 200);
         }

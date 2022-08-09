@@ -5,7 +5,7 @@ export default interface ConjureModalState {
 
     celestials: CelestialType[]|[];
 
-    selected_celestial: CelestialType | null;
+    selected_celestial_id: number | null;
 
     error_message: string;
 
