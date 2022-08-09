@@ -178,7 +178,7 @@ export default class Game extends React.Component<GameProps, GameState> {
 
             if (Array.isArray(eventKingdom)) {
                 this.setState({
-                    kingdoms: {...this.state.kingdoms, ...eventKingdom}
+                    kingdoms: eventKingdom
                 });
 
                 return;

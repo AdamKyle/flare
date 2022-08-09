@@ -36,7 +36,6 @@ export default class KingdomsList extends React.Component<KingdomListProps, King
     }
 
     componentDidUpdate() {
-
         const foundKingdom = this.props.my_kingdoms.filter((kingdom: KingdomDetails) => {
             if (this.state.selected_kingdom === null) {
                 return;
