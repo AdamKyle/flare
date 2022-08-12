@@ -33,6 +33,34 @@ class InformationController extends Controller {
         $data = json_decode(trim($request->file('info_import')->get()), true);
 
         foreach ($data as $key => $modelEntry) {
+            $displayOrder = 1;
+
+            foreach ($modelEntry['page_sections'] as $index => $section) {
+                if ($index === 0) {
+                    $displayOrder = $section['display_order'];
+
+                    unset($section['display_order']);
+
+                    $section['order'] = $displayOrder;
+
+                    $modelEntry['page_sections'][$index] = $section;
+
+                    $displayOrder++;
+
+                    continue;
+                }
+
+                if ($index !== 0) {
+                    unset($section['display_order']);
+
+                    $section['order'] = $displayOrder;
+
+                    $modelEntry['page_sections'][$index] = $section;
+
+                    $displayOrder++;
+                }
+            }
+
             InfoPage::updateOrCreate(['id' => $modelEntry['id']], $modelEntry);
         }
 
@@ -50,7 +78,7 @@ class InformationController extends Controller {
     public function page(InfoPage $infoPage) {
         $pageSections = $infoPage->page_sections;
 
-        usort($pageSections, function ($a, $b) {return $a['display_order'] > $b['display_order']; });
+        array_multisort(array_column($pageSections, 'order'), SORT_ASC, $pageSections);
 
         return view('admin.information.show', [
             'pageTitle' => ucfirst(str_replace('-', ' ', $infoPage->page_name)),

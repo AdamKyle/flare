@@ -1,7 +1,6 @@
 
 import React, {Fragment} from "react";
 import {formatNumber} from "../../../../../lib/game/format-number";
-import PopOverContainer from "../../../../../components/ui/popover/pop-over-container";
 import QuestHelpModal from "../quest-help-modal";
 
 export default class CurrencyRequirement extends React.Component<any, any> {

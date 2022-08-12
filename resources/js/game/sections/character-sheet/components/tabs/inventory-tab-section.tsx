@@ -2,7 +2,6 @@ import React, {Fragment} from "react";
 import DropDown from "../../../../components/ui/drop-down/drop-down";
 import InventoryTable from "./inventory-tabs/inventory-table";
 import UsableItemsTable from "./inventory-tabs/usable-items-table";
-import PopOverContainer from "../../../../components/ui/popover/pop-over-container";
 import InventoryDetails from "../../../../lib/game/character-sheet/types/inventory/inventory-details";
 import InventoryActionConfirmationModal from "../modals/inventory-action-confirmation-modal";
 import {isEqual} from "lodash";

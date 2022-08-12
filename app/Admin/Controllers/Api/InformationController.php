@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers\Api;
 
+use App\Admin\Requests\InformationManagementRequest;
 use App\Admin\Services\InfoPageService;
 use App\Flare\Models\InfoPage;
 use Illuminate\Http\Request;
@@ -27,15 +28,16 @@ class InformationController extends Controller {
         ]);
     }
 
-    public function storePage(Request $request) {
-        $this->infoPageService->createPage($request->all());
+    public function storePage(InformationManagementRequest $request) {
+        $page = $this->infoPageService->createPage($request->all());
 
         return response()->json([
-            'message' => $request['page_name'] . ' has been saved.',
+           'pageId' => $page->id
         ]);
     }
 
-    public function updatePage(Request $request) {
+    public function updatePage(InformationManagementRequest $request) {
+
         $page = InfoPage::find($request->page_id);
 
         if (is_null($page)) {
@@ -47,11 +49,15 @@ class InformationController extends Controller {
         $this->infoPageService->updatePage($page, $request->all());
 
         return response()->json([
-            'message' => $page->name . ' has been updated.',
-            'page'    => [
-                'page_name'     => $page->page_name,
-                'page_sections' => $this->infoPageService->formatForEditor($page->page_sections),
-            ]
+            'pageId' => $page->id,
+        ]);
+    }
+
+    public function deleteSection(Request $request, InfoPage $infoPage) {
+        $page = $this->infoPageService->deleteSectionFromPage($infoPage, $request->order);
+
+        return response()->json([
+            'sections' => $page->sections,
         ]);
     }
 

@@ -1,3 +1,5 @@
+import React from "react";
+
 export default interface DialogueTypes {
 
     is_open: boolean;
@@ -25,4 +27,6 @@ export default interface DialogueTypes {
     medium_modal?: boolean;
 
     additional_dialogue_css?: string;
+
+    children?: React.ReactNode;
 }

@@ -1,7 +1,8 @@
 import React from "react";
 import BasicCard from "../../../components/ui/cards/basic-card";
+import MessagesProps from "../../../lib/game/chat/components/messages-props";
 
-export default class Messages extends React.Component<any, any> {
+export default class Messages extends React.Component<MessagesProps, any> {
     constructor(props: any) {
         super(props);
     }

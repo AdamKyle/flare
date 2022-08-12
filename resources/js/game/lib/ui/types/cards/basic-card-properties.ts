@@ -1,4 +1,8 @@
+import React from "react";
+
 export default interface BasicCardProperties {
 
-    additionalClasses?: string
+    additionalClasses?: string;
+
+    children?: React.ReactNode;
 }

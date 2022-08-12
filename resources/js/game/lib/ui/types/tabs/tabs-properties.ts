@@ -1,3 +1,5 @@
+import React from "react";
+
 export default interface TabProperties {
 
     tabs: { key: string, name: string}[],
@@ -12,4 +14,5 @@ export default interface TabProperties {
 
     additonal_css?: string;
 
+    children?: React.ReactNode;
 }

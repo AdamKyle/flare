@@ -1,3 +1,5 @@
+import React from "react";
+
 export default interface ResizableBoxProps {
 
     width: number;
@@ -7,4 +9,6 @@ export default interface ResizableBoxProps {
     style?: {[key: string]: string};
 
     additional_css?: string;
+
+    children?: React.ReactNode;
 }

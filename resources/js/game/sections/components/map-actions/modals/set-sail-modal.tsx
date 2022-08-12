@@ -2,8 +2,6 @@ import React from "react";
 import Dialogue from "../../../../components/ui/dialogue/dialogue";
 import Select from "react-select";
 import clsx from "clsx";
-import PopOverContainer from "../../../../components/ui/popover/pop-over-container";
-import {fetchCost} from "../../../../lib/game/map/teleportion-costs";
 import {formatNumber} from "../../../../lib/game/format-number";
 import SetSailModalProps from "../../../../lib/game/types/map/modals/set-sail-modal-props";
 import SetSailModalState from "../../../../lib/game/types/map/modals/set-sail-modal-state";

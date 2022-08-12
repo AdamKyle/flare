@@ -40,7 +40,7 @@
                 <div class="grid lg:grid-cols-1 gap-3">
                     <x-core.buttons.primary-button css="ltr:ml-auto rtl:mr-auto uppercase" type="submit">Login!</x-core.buttons.primary-button>
 
-                    <a href="/information/account-deletion" class="ml-2">
+                    <a href="/information/account-deletion" class="ml-2" target="_blank">
                         Account Deletion <i class="fas fa-external-link-alt"></i>
                     </a>
                     <a class="ml-2" href="{{ route('password.request') }}">

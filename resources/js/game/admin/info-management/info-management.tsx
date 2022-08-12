@@ -1,15 +1,14 @@
 import React, {Fragment} from "react";
 import InfoSection from "./info-section/info-section";
-import PrimaryButton from "../../components/ui/buttons/primary-button";
 import DangerAlert from "../../components/ui/alerts/simple-alerts/danger-alert";
 import Ajax from "../../lib/ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
 import ManualProgressBar from "../../components/ui/progress-bars/manual-progress-bar";
 import SuccessAlert from "../../components/ui/alerts/simple-alerts/success-alert";
 import ComponentLoading from "../../components/ui/loading/component-loading";
-import BasicCard from "../../components/ui/cards/basic-card";
 import SuccessButton from "../../components/ui/buttons/success-button";
 import DangerButton from "../../components/ui/buttons/danger-button";
+import {cloneDeep, isEqual} from "lodash";
 
 export default class InfoManagement extends React.Component<any, any> {
 
@@ -47,72 +46,33 @@ export default class InfoManagement extends React.Component<any, any> {
         }
     }
 
-    createPage() {
-        if (this.state.page_name === '') {
-            return this.setState({
-                error_message: 'Page name needed.'
-            });
-        }
+    formatAndSendData(section: any, redirect: boolean) {
 
-        if (this.state.info_sections.length === 0) {
-            return this.setState({
-                error_message: 'Need at least one info section.'
-            });
-        }
+        const form = new FormData();
 
-        this.setState({
-            error_message: null,
-        }, () => {
-            this.formatAndSendData();
-        })
-    }
+        form.append('content', section.content);
+        form.append('live_wire_component', section.live_wire_component)
+        form.append('page_name', this.state.page_name);
+        form.append('order', section.order);
 
-    formatAndSendData() {
-        const sections = this.state.info_sections.map((section: any, index: number, elements: any[]) => {
-
-            const form = new FormData();
-
-            form.append('content', section.content);
+        if (section.content_image !== null) {
             form.append('content_image', section.content_image);
-            form.append('live_wire_component', section.live_wire_component)
-            form.append('page_name', this.state.page_name);
+        }
+
+        if (this.props.info_page_id !== 0) {
             form.append('page_id', this.props.info_page_id);
+        }
 
-            if (index === elements.length - 1) {
-                form.append('final_section', 'true');
-            } else {
-                form.append('final_section', 'false');
-            }
-
-            if (this.props.info_page_id !== 0) {
-                form.append('display_order', (index + 1).toString())
-            } else {
-                form.append('order', (index + 1).toString())
-            }
-
-            if (typeof section.delete !== 'undefined') {
-                form.append('delete', 'true');
-            }
-
-            return {
-                index: index + 1,
-                form_contents: form
-            };
-        });
-
-        this.postForms(sections);
+        this.postForm(form, redirect);
 
     }
 
-    postForms(sections: any[]) {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+    postForm(form: FormData, redirect: boolean) {
 
         this.setState({
             posting: true,
         }, () => {
-            sections.forEach((section: any, index: number) => {
-                this.post(section, sections.length, index);
-            });
+            this.post(form, redirect);
         });
     }
 
@@ -126,7 +86,7 @@ export default class InfoManagement extends React.Component<any, any> {
             }, (error: AxiosError) => {})
     }
 
-    post(section: any, length: number, index: number) {
+    post(form: FormData, redirect: boolean) {
         let url = 'admin/info-section/store-page';
 
         if (this.props.info_page_id !== 0) {
@@ -134,68 +94,89 @@ export default class InfoManagement extends React.Component<any, any> {
         }
 
         (new Ajax()).setRoute(url)
-            .setParameters(section.form_contents)
+            .setParameters(form)
             .doAjaxCall('post', (result: AxiosResponse) => {
-                if (length - 1 === index) {
-                    let sections = this.state.info_sections;
+                this.setState({
+                    posting: false,
+                });
 
-                    if (typeof result.data.page !== 'undefined') {
-                        sections = result.data.page.page_sections;
+                if (redirect) {
+                    window.location.href = '/admin/information-management/page/' + result.data.pageId;
+                }
+            }, (error: AxiosError) => {
+                this.setState({
+                    posting: false,
+                });
+
+                console.error(error);
+            });
+    }
+
+    deleteSection(order: number) {
+        (new Ajax()).setRoute('admin/info-section/delete-section/' + this.props.info_page_id)
+            .setParameters({
+                order: order
+            })
+            .doAjaxCall('post', (result: AxiosResponse) => {
+                const sections = result.data.sections;
+                const stateSections = JSON.parse(JSON.stringify(this.state.info_sections));
+
+                stateSections.forEach((stateSection: any, index: number) => {
+                    if (!isEqual(stateSection.content, sections[index].content)) {
+                        stateSections[index] = sections[index];
                     }
 
-                    return this.setState({
-                        posting: false,
-                        posting_index: 0,
-                        success_message: result.data.message,
-                        info_sections: sections,
-                    });
-                } else {
-                    this.setState({
-                        posting_index: this.state.posting_index + 1,
-                    });
-                }
+                    stateSections[index].order = parseInt(sections[index].order);
+                });
+
+                this.setState({
+                    info_sections: stateSections,
+                })
             }, (error: AxiosError) => {
 
             });
     }
 
     setInfoSections(index: number, content: any) {
-        if (this.state.info_sections.length === 0) {
-            const sections = [];
+        const sections = JSON.parse(JSON.stringify(this.state.info_sections));
 
-            sections.push(content);
+        sections[index] = content;
 
-            this.setState({
-                info_sections: sections
-            });
-        } else {
-            const infoSections = this.state.info_sections;
-
-            if (typeof infoSections[index] !== 'undefined') {
-                infoSections[index] = content;
-            } else {
-                infoSections.push(content);
-            }
-
-            this.setState({
-                info_sections: infoSections
-            });
-        }
+        this.setState({
+            info_sections: sections,
+        });
     }
 
     addSection() {
-        const infoSections = this.state.info_sections
+        const infoSections = cloneDeep(this.state.info_sections);
+        const order        = 1;
 
         infoSections.push({
             live_wire_component: null,
             content: null,
             content_image: null,
             is_new_section: true,
-        })
+            order: order,
+        });
+
+        if (infoSections.length > 1) {
+            const sectionToPublish = infoSections[infoSections.length - 2];
+
+            infoSections[infoSections.length - 1].order = parseInt(sectionToPublish.order)  + 1
+
+            this.formatAndSendData(sectionToPublish, false);
+        }
 
         this.setState({
             info_sections: infoSections,
         });
+    }
+
+    saveAndFinish() {
+        const infoSections  = JSON.parse(JSON.stringify(this.state.info_sections));
+        const sectionToSave = infoSections[infoSections.length - 1];
+
+        this.formatAndSendData(sectionToSave, true);
     }
 
     removeSection(index: number) {
@@ -203,10 +184,14 @@ export default class InfoManagement extends React.Component<any, any> {
             return;
         }
 
-        const infoSections = this.state.info_sections;
+        const infoSections = JSON.parse(JSON.stringify(this.state.info_sections));
 
         if (this.props.info_page_id !== 0 && typeof infoSections[index].is_new_section === 'undefined') {
-            infoSections[index]['delete'] = 'true';
+            const section = infoSections[index];
+
+            infoSections.splice(index, 1);
+
+            this.deleteSection(section.order);
         } else {
             infoSections.splice(index, 1);
         }
@@ -237,19 +222,14 @@ export default class InfoManagement extends React.Component<any, any> {
 
     renderContentSections() {
         return this.state.info_sections.map((infoSection: any, index: number, elements: any[]) => {
-            if (typeof infoSection.delete !== 'undefined') {
-                return (
-                    <BasicCard additionalClasses={'text-red-500 text-center mb-4'}>
-                        This section is slated to be deleted.
-                    </BasicCard>
-                );
-            }
 
             return <InfoSection index={index}
+                                sections_length={this.state.info_sections.length}
                                 content={infoSection}
                                 update_parent_element={this.setInfoSections.bind(this)}
                                 remove_section={this.removeSection.bind(this)}
                                 add_section={index === (elements.length - 1) ? this.addSection.bind(this) : null}
+                                save_and_finish={this.saveAndFinish.bind(this)}
             />
         });
     }
@@ -314,8 +294,6 @@ export default class InfoManagement extends React.Component<any, any> {
                 {
                     this.renderContentSections()
                 }
-
-                <PrimaryButton button_label={this.props.info_page_id !== 0 ? 'Update Page' : 'Create Page'} on_click={this.createPage.bind(this)} />
             </Fragment>
         )
     }

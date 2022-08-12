@@ -1,4 +1,4 @@
-import ReactDOM from "react-dom";
+import { createRoot } from 'react-dom/client';
 import React from "react";
 import Game from './game';
 import GameProps from "./lib/game/types/game-props";
@@ -15,8 +15,6 @@ if (game !== null) {
         characterId: character === null ? 0 : parseInt(character.content)
     }
 
-    ReactDOM.render(
-        <Game characterId={props.characterId} userId={props.userId} />,
-        game
-    );
+    const root = createRoot(game);
+    root.render(<Game characterId={props.characterId} userId={props.userId} />);
 }

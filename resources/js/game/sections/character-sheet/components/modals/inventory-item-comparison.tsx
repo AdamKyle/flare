@@ -6,7 +6,6 @@ import Ajax from "../../../../lib/ajax/ajax";
 import InventoryItemComparisonState
     from "../../../../lib/game/character-sheet/types/modal/inventory-item-comparison-state";
 import ItemNameColorationText from "../../../../components/ui/item-name-coloration-text";
-import {capitalize} from "lodash";
 import InventoryItemComparisonProps
     from "../../../../lib/game/character-sheet/types/modal/inventory-item-comparison-props";
 import InventoryComparisonAdjustment

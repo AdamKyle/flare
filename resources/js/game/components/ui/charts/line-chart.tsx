@@ -1,8 +1,6 @@
 import {AxisOptions, Chart} from "react-charts";
 import React from "react";
 import ResizableBox from "../resizable-box";
-import {SeriesFocusStatus, SeriesStyles} from "react-charts/types/types";
-import {DateTime} from "luxon";
 import MarketBoardLineChartProps from "../../../lib/ui/types/charts/market-board-line-chart-props";
 import MarketChartData from "../../../lib/game/character-sheet/types/charts/market-chart-data";
 
@@ -25,7 +23,7 @@ export const MarketBoardLineChart = (props: MarketBoardLineChartProps) => {
         []
     )
 
-    const getSeriesStyle = React.useCallback((series) => {
+    const getSeriesStyle = React.useCallback((series: any) => {
         return {
             fill: '#5597e2',
             stroke: '#5597e2',

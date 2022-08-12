@@ -293,7 +293,7 @@ class ReRollEnchantmentService {
 
         $slot = $secondarySlot->refresh();
 
-        event(new ServerMessageEvent($character->user, 'The Queen has moved thr affixes and created the item: ' . $slot->item->affix_name, $slot->id));
+        event(new ServerMessageEvent($character->user, 'The Queen has moved the affixes and created the item: ' . $slot->item->affix_name, $slot->id));
     }
 
     /**

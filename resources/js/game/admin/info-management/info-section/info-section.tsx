@@ -1,9 +1,12 @@
-import React from "react";
+import React, {Fragment} from "react";
 const ReactQuill = require('react-quill');
 import 'react-quill/dist/quill.snow.css';
 import BasicCard from "../../../components/ui/cards/basic-card";
 import Select from "react-select";
 import PrimaryButton from "../../../components/ui/buttons/primary-button";
+import {isEqual} from "lodash";
+import ComponentLoading from "../../../components/ui/loading/component-loading";
+import SuccessButton from "../../../components/ui/buttons/success-button";
 
 export default class InfoSection extends React.Component<any, any> {
 
@@ -11,18 +14,35 @@ export default class InfoSection extends React.Component<any, any> {
         super(props);
 
         this.state = {
-            content: null,
+            content: '',
             selected_live_wire_component: null,
             image_to_upload: null,
+            order: '',
+            loading: true,
         }
     }
 
     componentDidMount() {
-        this.setState({
-            content: this.props.content.content,
-            selected_live_wire_component: this.props.content.live_wire_component,
-            image_to_upload: null,
-        })
+
+        const self = this;
+
+        setTimeout(function(){
+            self.setState({
+                content: self.props.content.content,
+                selected_live_wire_component: self.props.content.live_wire_component,
+                image_to_upload: null,
+                order: self.props.content.order,
+                loading: false,
+            })
+        }, 500);
+    }
+
+    componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any) {
+        if (!isEqual(this.props.content.content, prevProps.content.content)) {
+            this.setState({
+                content: this.props.content.content,
+            });
+        }
     }
 
     setValue(data: any) {
@@ -39,6 +59,23 @@ export default class InfoSection extends React.Component<any, any> {
         }, () => {
             this.updateParentElement();
         })
+    }
+
+    setOrder(e: React.ChangeEvent<HTMLInputElement>) {
+        this.setState({
+            order: e.target.value
+        }, () => {
+            this.updateParentElement();
+        })
+    }
+
+    updateParentElement() {
+        this.props.update_parent_element(this.props.index, {
+            live_wire_component: this.state.selected_live_wire_component,
+            content: this.state.content,
+            content_image: this.state.image_to_upload,
+            order: this.state.order,
+        });
     }
 
     removeSection() {
@@ -100,15 +137,11 @@ export default class InfoSection extends React.Component<any, any> {
         }];
     }
 
-    updateParentElement() {
-        this.props.update_parent_element(this.props.index, {
-            live_wire_component: this.state.selected_live_wire_component,
-            content: this.state.content,
-            content_image: this.state.image_to_upload,
-        });
-    }
-
     render() {
+        if (this.state.loading) {
+            return <ComponentLoading />
+        }
+
         return (
             <BasicCard additionalClasses={'mb-4'}>
                 {
@@ -124,6 +157,11 @@ export default class InfoSection extends React.Component<any, any> {
                 <ReactQuill theme="snow" value={this.state.content} onChange={this.setValue.bind(this)}/>
 
                 <div className="my-5">
+                    <label className="label block mb-2">Order</label>
+                    <input type="number" className="form-control" onChange={this.setOrder.bind(this)} value={this.state.order} />
+                </div>
+
+                <div className="my-5">
                     <input type="file" className="form-control" onChange={this.setFileForUpload.bind(this)} />
                 </div>
 
@@ -137,13 +175,32 @@ export default class InfoSection extends React.Component<any, any> {
                     value={this.defaultSelectedAction()}
                 />
 
-                {
-                   this.props.add_section !== null ?
-                       <div className='text-right'>
-                           <PrimaryButton button_label={'Add Section'} on_click={this.props.add_section} additional_css={'mt-4'}/>
-                       </div>
-                   : null
-                }
+                <div className='flex mt-4 justify-end'>
+                    {
+                        this.props.sections_length === 1 && this.props.index === 0 ?
+                            <div className='float-right'>
+                                <SuccessButton button_label={'Save and Finish'} on_click={this.props.save_and_finish} additional_css={'mr-4'}/>
+                            </div>
+                        : null
+                    }
+
+                    {
+                        this.props.index !== 0 && this.props.add_section !== null ?
+                            <div className='float-right'>
+                                <SuccessButton button_label={'Save and Finish'} on_click={this.props.save_and_finish}
+                                               additional_css={'mr-4'}/>
+                            </div>
+                        : null
+                    }
+
+                    {
+                       this.props.add_section !== null ?
+                           <div className='float-right'>
+                               <PrimaryButton button_label={'Add Section'} on_click={this.props.add_section} additional_css={'mr-4'}/>
+                           </div>
+                       : null
+                    }
+                </div>
             </BasicCard>
         )
     }

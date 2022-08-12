@@ -2,7 +2,6 @@
 
 namespace App\Flare\Models;
 
-use Database\Factories\NpcFactory;
 use Database\Factories\QuestFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -84,7 +83,6 @@ class Quest extends Model {
             'secondaryItem.dropLocation',
             'requiredPlane',
             'npc',
-            'npc.commands',
             'npc.gameMap',
         );
     }

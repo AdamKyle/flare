@@ -2,7 +2,7 @@ import ItemsAttachedSkills from "./items-attached-skills";
 
 export default interface InventoryComparisonAdjustment {
 
-    [index: string]: number|string|boolean|object|[];
+    [index: string]: any;
 
     id: number;
 

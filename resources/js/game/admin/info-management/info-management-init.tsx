@@ -1,4 +1,4 @@
-import ReactDOM from "react-dom";
+import { createRoot } from 'react-dom/client';
 import React from "react";
 import InfoManagement from "./info-management";
 
@@ -26,8 +26,7 @@ if (infoManagementInit !== null) {
         }
     }
 
-    ReactDOM.render(
-        <InfoManagement user_id={props.userId} info_page_id={infoPageId} />,
-        infoManagementInit
-    );
+    const root = createRoot(infoManagementInit);
+
+    root.render(<InfoManagement user_id={props.userId} info_page_id={infoPageId} />);
 }

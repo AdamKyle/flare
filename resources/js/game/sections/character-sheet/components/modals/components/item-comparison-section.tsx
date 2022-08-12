@@ -25,9 +25,19 @@ export default class ItemComparisonSection extends React.Component<any, any> {
         }]
     }
 
+    renderWholeNumber(details: InventoryComparisonAdjustment, key: string) {
+        const wholeNumberValues = ['damage_adjustment', 'damage', 'ac_adjustment', 'healing_adjustment', 'base_damage', 'base_healing', 'base_ac', 'holy_stacks', 'holy_stacks_applied'];
+
+        if (wholeNumberValues.includes(key)) {
+            return this.formatWholeNumber(details[key]);
+        }
+
+        return this.renderPercent(details[key]);
+    }
+
     renderChange(details: InventoryComparisonAdjustment, itemToEquip?: InventoryComparisonAdjustment) {
         const invalidFields     = ['id', 'min_cost', 'skill_level_req', 'skill_level_trivial', 'holy_level', 'holy_stacks', 'holy_stacks_applied', 'reduces_enemy_stats', 'cost', 'shop_cost', 'slot_id', 'affix_count', 'is_unique'];
-        const wholeNumberValues = ['damage_adjustment', 'damage', 'ac_adjustment', 'healing_adjustment', 'base_damage', 'base_healing', 'base_ac', 'holy_stacks', 'holy_stacks_applied'];
+
 
         let elements = Object.keys(details).map((key) => {
             if (!invalidFields.includes(key)) {
@@ -43,10 +53,7 @@ export default class ItemComparisonSection extends React.Component<any, any> {
                                     'text-red-600 dark:text-red-400': details[key] < 0
                                 }
                             )}>{
-                                wholeNumberValues.includes(key) ?
-                                    this.formatWholeNumber(details[key])
-                                    :
-                                    this.renderPercent(details[key])
+                                this.renderWholeNumber(details, key)
                             }</dd>
                         </Fragment>
                     );
@@ -240,7 +247,7 @@ export default class ItemComparisonSection extends React.Component<any, any> {
         )
     }
 
-    formatPosition(position: string|number|boolean|object|[]) {
+    formatPosition(position: string|number) {
         if (typeof position === 'string') {
             return capitalize(position.split('-').join(' '));
         }
@@ -248,7 +255,7 @@ export default class ItemComparisonSection extends React.Component<any, any> {
         return position;
     }
 
-    formatWholeNumber(value: string|number|boolean|object|[]) {
+    formatWholeNumber(value: string|number) {
         if (typeof value === 'number') {
             return formatNumber(value);
         }

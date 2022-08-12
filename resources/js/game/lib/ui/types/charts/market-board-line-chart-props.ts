@@ -7,4 +7,5 @@ export default interface MarketBoardLineChartProps {
     key_for_value: string;
 
     dark_chart: boolean;
+
 }

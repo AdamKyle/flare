@@ -1,4 +1,4 @@
-import ReactDOM from "react-dom";
+import { createRoot } from 'react-dom/client';
 import React from "react";
 import GameChat from "../sections/chat/game-chat";
 
@@ -14,16 +14,15 @@ if (adminChat !== null) {
         userId: player === null ? 0 : parseInt(player.content),
     }
 
-    ReactDOM.render(
-        <GameChat
-            user_id={props.userId}
-            character_id={0}
-            is_silenced={false}
-            can_talk_again_at={null}
-            is_admin={true}
-            view_port={1600}
-            is_automation_running={false}
-        />,
-        adminChat
-    );
+    const root = createRoot(adminChat);
+
+    root.render(<GameChat
+        user_id={props.userId}
+        character_id={0}
+        is_silenced={false}
+        can_talk_again_at={null}
+        is_admin={true}
+        view_port={1600}
+        is_automation_running={false}
+    />);
 }

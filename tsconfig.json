@@ -13,9 +13,12 @@
         "noImplicitAny": true,
         // Bypass raising errors on `any` type
         "allowSyntheticDefaultImports": true,
+        "downlevelIteration": true,
         "allowJs": true,
         "lib": [
-            "ES2021.String", "dom"
+            "ES2021.String",
+            "dom",
+            "dom.iterable"
         ]
     },
     "include": ["resources/js/**/*"]  // Frontend paths pattern

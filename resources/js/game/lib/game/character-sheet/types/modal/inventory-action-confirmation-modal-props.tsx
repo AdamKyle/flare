@@ -1,4 +1,5 @@
 import InventoryDetails from "../inventory/inventory-details";
+import React from "react";
 
 export default interface InventoryActionConfirmationModalProps {
     is_open: boolean;
@@ -12,4 +13,6 @@ export default interface InventoryActionConfirmationModalProps {
     title: string;
 
     url: string;
+
+    children?: React.ReactNode;
 }

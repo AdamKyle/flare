@@ -5,7 +5,6 @@ import Ajax from "../../../../lib/ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
 import Tabs from "../../../../components/ui/tabs/tabs";
 import TabPanel from "../../../../components/ui/tabs/tab-panel";
-import PopOverContainer from "../../../../components/ui/popover/pop-over-container";
 import clsx from "clsx";
 import InfoAlert from "../../../../components/ui/alerts/simple-alerts/info-alert";
 import CurrencyRequirement from "./components/currency-requirement";

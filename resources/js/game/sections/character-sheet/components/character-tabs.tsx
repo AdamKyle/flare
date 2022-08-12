@@ -1,12 +1,9 @@
 import React, {Fragment} from "react";
 import Tabs from "../../../components/ui/tabs/tabs";
 import TabPanel from "../../../components/ui/tabs/tab-panel";
-import BasicCard from "../../../components/ui/cards/basic-card";
-import PopOverContainer from "../../../components/ui/popover/pop-over-container";
 import InfoTab from "./tabs/info-tab";
 import CharacterTabsProps from "../../../lib/game/character-sheet/types/character-tabs-props";
 import CharacterActiveBoons from "./character-active-boons";
-import InfoAlert from "../../../components/ui/alerts/simple-alerts/info-alert";
 import CharacterFactions from "./character-factions";
 
 export default class CharacterTabs extends React.Component<CharacterTabsProps, any> {

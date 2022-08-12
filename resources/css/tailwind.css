@@ -25,6 +25,10 @@
     }
 }
 
+.gdesc-inner {
+    display: none;
+}
+
 .scrolling-section {
     max-height: calc(100vh - 5rem);
     overflow-y: scroll;

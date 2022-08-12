@@ -11,5 +11,6 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::get('/admin/info-section/page', ['uses' => 'Api\InformationController@getPage']);
     Route::post('/admin/info-section/store-page', ['uses' => 'Api\InformationController@storePage']);
     Route::post('/admin/info-section/update-page', ['uses' => 'Api\InformationController@updatePage']);
+    Route::post('/admin/info-section/delete-section/{infoPage}', ['uses' => 'Api\InformationController@deleteSection']);
     Route::post('/admin/info-section/delete-page', ['uses' => 'Api\InformationController@deletePage']);
 });

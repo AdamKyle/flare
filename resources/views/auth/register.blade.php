@@ -113,7 +113,7 @@
                 </div>
                 <hr class="my-4" />
                 <div class="flex my-4">
-                    <a href="/information/account-deletion" css="rtl:ml-auto rtl:mr-auto">
+                    <a href="/information/account-deletion" css="rtl:ml-auto rtl:mr-auto" target="_blank">
                         Account Deletion <i class="fas fa-external-link-alt"></i>
                     </a>
 
