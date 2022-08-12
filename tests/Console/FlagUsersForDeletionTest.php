@@ -13,12 +13,11 @@ use Tests\TestCase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Traits\CreateUser;
 
-class FlagUsersForDeletionTest extends TestCase
-{
+class FlagUsersForDeletionTest extends TestCase {
+
     use RefreshDatabase, CreateUser;
 
-    public function testFlagsUsersForDeletion()
-    {
+    public function testFlagsUsersForDeletion() {
 
         Mail::fake();
 
@@ -28,16 +27,13 @@ class FlagUsersForDeletionTest extends TestCase
 
         $this->assertEquals(0, $this->artisan('flag:users-for-deletion'));
 
-        Mail::assertSent(GenericMail::class);
-
         $user = $user->refresh();
 
         $this->assertTrue($user->will_be_deleted);
 
     }
 
-    public function testDoesNotFlagValidUsers()
-    {
+    public function testDoesNotFlagValidUsers() {
 
         Mail::fake();
 
@@ -46,8 +42,6 @@ class FlagUsersForDeletionTest extends TestCase
         ]);
 
         $this->assertEquals(0, $this->artisan('flag:users-for-deletion'));
-
-        Mail::assertNotSent(GenericMail::class);
 
         $user = $user->refresh();
 

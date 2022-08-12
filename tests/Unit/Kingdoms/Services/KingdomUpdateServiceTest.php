@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Kingdoms\Services;
+namespace Tests\Unit\Kingdoms\Services;
 
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Models\GameMap;
