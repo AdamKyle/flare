@@ -16,12 +16,6 @@
         @endauth
     </x-core.page-title>
 
-    <div class="my-5">
-        <x-core.alerts.simple-info-alert>
-            All images can be clicked on to be made larger.
-        </x-core.alerts.simple-info-alert>
-    </div>
-
     <div class="prose dark:prose-invert min-w-full m-auto">
         @foreach($sections as $section)
 
@@ -42,7 +36,7 @@
                     <div>
                         <img src="{{Storage::disk('info-sections-images')->url($section['content_image_path'])}}" class="rounded-sm p-1 bg-white border max-w-[475px] cursor-pointer glightbox md:mt-[30px]" alt="image"/>
                         <div class="relative top-[-30px] text-gray-700 dark:text-white italic">
-                            All images can be clicked on to be made larger.
+                            Click/Tap me to make me larger.
                         </div>
                     </div>
                 </div>

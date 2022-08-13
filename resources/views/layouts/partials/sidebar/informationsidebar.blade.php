@@ -108,10 +108,6 @@
                 <span class="ra ra-helmet"></span>
                 Monthly Pvp Event
             </a>
-            <a href="{{route('info.page', ['pageName' => 'ambush-and-counter'])}}">
-                <span class="ra  ra-bat-sword"></span>
-                Combat
-            </a>
             <a href="{{route('info.page', ['pageName' => 'automation'])}}">
                 <span class="fas fa-user-clock"></span>
                 Automation
@@ -145,7 +141,7 @@
             <div id="menuMapActions" class="collapse open">
                 <a href="{{route('info.page', ['pageName' => 'movement'])}}">
                     <span class="far fa-compass"></span>
-                    Movement Actions_2
+                    Movement Actions
                 </a>
                 <a href="{{route('info.page', ['pageName' => 'teleport'])}}">
                     <span class="ra ra-player-teleport"></span>

@@ -55,8 +55,8 @@ export default class InfoManagement extends React.Component<any, any> {
         form.append('page_name', this.state.page_name);
         form.append('order', section.order);
 
-        if (section.content_image !== null) {
-            form.append('content_image', section.content_image);
+        if (section.content_image_path !== null) {
+            form.append('content_image', section.content_image_path);
         }
 
         if (this.props.info_page_id !== 0) {
@@ -64,7 +64,12 @@ export default class InfoManagement extends React.Component<any, any> {
         }
 
         this.postForm(form, redirect);
+    }
 
+    updateSection(index: number) {
+        const sectionToUpdate = cloneDeep(this.state.info_sections[index]);
+
+        this.formatAndSendData(sectionToUpdate, false);
     }
 
     postForm(form: FormData, redirect: boolean) {
@@ -119,7 +124,7 @@ export default class InfoManagement extends React.Component<any, any> {
             })
             .doAjaxCall('post', (result: AxiosResponse) => {
                 const sections = result.data.sections;
-                const stateSections = JSON.parse(JSON.stringify(this.state.info_sections));
+                const stateSections = cloneDeep(this.state.info_sections);
 
                 stateSections.forEach((stateSection: any, index: number) => {
                     if (!isEqual(stateSection.content, sections[index].content)) {
@@ -138,7 +143,7 @@ export default class InfoManagement extends React.Component<any, any> {
     }
 
     setInfoSections(index: number, content: any) {
-        const sections = JSON.parse(JSON.stringify(this.state.info_sections));
+        const sections = cloneDeep(this.state.info_sections);
 
         sections[index] = content;
 
@@ -154,7 +159,7 @@ export default class InfoManagement extends React.Component<any, any> {
         infoSections.push({
             live_wire_component: null,
             content: null,
-            content_image: null,
+            content_image_path: null,
             is_new_section: true,
             order: order,
         });
@@ -173,9 +178,9 @@ export default class InfoManagement extends React.Component<any, any> {
     }
 
     saveAndFinish() {
-        const infoSections  = JSON.parse(JSON.stringify(this.state.info_sections));
+        const infoSections  = cloneDeep(this.state.info_sections);
         const sectionToSave = infoSections[infoSections.length - 1];
-
+        console.log(sectionToSave);
         this.formatAndSendData(sectionToSave, true);
     }
 
@@ -184,7 +189,7 @@ export default class InfoManagement extends React.Component<any, any> {
             return;
         }
 
-        const infoSections = JSON.parse(JSON.stringify(this.state.info_sections));
+        const infoSections = cloneDeep(this.state.info_sections);
 
         if (this.props.info_page_id !== 0 && typeof infoSections[index].is_new_section === 'undefined') {
             const section = infoSections[index];
@@ -230,6 +235,7 @@ export default class InfoManagement extends React.Component<any, any> {
                                 remove_section={this.removeSection.bind(this)}
                                 add_section={index === (elements.length - 1) ? this.addSection.bind(this) : null}
                                 save_and_finish={this.saveAndFinish.bind(this)}
+                                update_section={this.updateSection.bind(this)}
             />
         });
     }

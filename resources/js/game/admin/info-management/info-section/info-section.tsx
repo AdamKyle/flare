@@ -7,6 +7,7 @@ import PrimaryButton from "../../../components/ui/buttons/primary-button";
 import {isEqual} from "lodash";
 import ComponentLoading from "../../../components/ui/loading/component-loading";
 import SuccessButton from "../../../components/ui/buttons/success-button";
+import OrangeButton from "../../../components/ui/buttons/orange-button";
 
 export default class InfoSection extends React.Component<any, any> {
 
@@ -73,7 +74,7 @@ export default class InfoSection extends React.Component<any, any> {
         this.props.update_parent_element(this.props.index, {
             live_wire_component: this.state.selected_live_wire_component,
             content: this.state.content,
-            content_image: this.state.image_to_upload,
+            content_image_path: this.state.image_to_upload,
             order: this.state.order,
         });
     }
@@ -176,6 +177,15 @@ export default class InfoSection extends React.Component<any, any> {
                 />
 
                 <div className='flex mt-4 justify-end'>
+
+                    {
+                        this.props.sections_length !== 1 && this.props.add_section === null ?
+                            <div className='float-right'>
+                                <OrangeButton button_label={'Update Section'} on_click={() => this.props.update_section(this.props.index)} additional_css={'mr-4'}/>
+                            </div>
+                        : null
+                    }
+
                     {
                         this.props.sections_length === 1 && this.props.index === 0 ?
                             <div className='float-right'>

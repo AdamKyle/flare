@@ -3,6 +3,7 @@
 namespace App\Flare\Builders;
 
 use App\Flare\Builders\Character\AttackDetails\CharacterAttackInformation;
+use App\Flare\Builders\Character\AttackDetails\DamageDetails\WeaponInformation;
 use App\Flare\Builders\Character\BaseCharacterInfo;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
@@ -16,19 +17,22 @@ class CharacterInformationBuilder {
     /**
      * @var BaseCharacterInfo $baseCharacterInfo
      */
-    private $baseCharacterInfo;
+    private BaseCharacterInfo $baseCharacterInfo;
 
     /**
      * @var CharacterAttackInformation $characterAttackInformation
      */
-    private $characterAttackInformation;
+    private CharacterAttackInformation $characterAttackInformation;
 
     /**
      * @var Character $character
      */
-    private $character;
+    private Character $character;
 
-    private $weaponInfo;
+    /**
+     * @var WeaponInformation $weaponInfo
+     */
+    private WeaponInformation $weaponInfo;
 
     /**
      * @param BaseCharacterInfo $baseCharacterInfo
@@ -176,7 +180,7 @@ class CharacterInformationBuilder {
      * @throws \Exception
      */
     public function buildTotalAttack(): int {
-        return $this->getTotalWeaponDamage() + $this->getTotalRingDamage();
+        return (int) $this->getTotalWeaponDamage() + $this->getTotalRingDamage();
     }
 
     /**
@@ -190,7 +194,7 @@ class CharacterInformationBuilder {
      * @throws \Exception
      */
     public function buildDefence(bool $voided = false): int {
-        return $this->baseCharacterInfo->buildDefence($this->character, $voided);
+        return (int) $this->baseCharacterInfo->buildDefence($this->character, $voided);
     }
 
 
@@ -204,7 +208,7 @@ class CharacterInformationBuilder {
      * @throws \Exception
      */
     public function buildHealFor(bool $voided = false): int {
-        return $this->character->getHeathInformation()->buildHealFor($voided);
+        return (int) $this->character->getHeathInformation()->buildHealFor($voided);
     }
 
     /**
@@ -247,7 +251,7 @@ class CharacterInformationBuilder {
      * @return int
      */
     public function getTotalAffixDamage(bool $canStack = true): int {
-        return $this->characterAttackInformation
+        return (int) $this->characterAttackInformation
             ->setCharacter($this->character)
             ->getTotalAffixDamage($canStack);
     }
@@ -260,7 +264,7 @@ class CharacterInformationBuilder {
      * @throws \Exception
      */
     public function getTotalWeaponDamage(bool $voided = false): int {
-        return $this->weaponInfo->getWeaponDamage($this->character, $voided);
+        return (int) $this->weaponInfo->getWeaponDamage($this->character, $voided);
     }
 
     /**
@@ -271,7 +275,7 @@ class CharacterInformationBuilder {
      * @throws \Exception
      */
     public function getTotalSpellDamage(bool $voided = false): int {
-        return $this->characterAttackInformation->getCharacterDamageInformation()->getSpellDamage($this->character, $voided);
+        return (int) $this->characterAttackInformation->getCharacterDamageInformation()->getSpellDamage($this->character, $voided);
     }
 
     /**
@@ -281,7 +285,7 @@ class CharacterInformationBuilder {
      * @return int
      */
     public function getTotalRingDamage(bool $voided = false): int {
-        return $this->characterAttackInformation->getCharacterDamageInformation()->getRingDamage($this->character, $voided);
+        return (int) $this->characterAttackInformation->getCharacterDamageInformation()->getRingDamage($this->character, $voided);
     }
 
     /**
@@ -303,7 +307,7 @@ class CharacterInformationBuilder {
      * @throws \Exception
      */
     public function damageModifiers(int $damage, bool $isVoided = false): int {
-        return $this->characterAttackInformation->getCharacterDamageInformation()->getWeaponInformation()->damageModifiers($this->character, $damage, $isVoided);
+        return (int) $this->characterAttackInformation->getCharacterDamageInformation()->getWeaponInformation()->damageModifiers($this->character, $damage, $isVoided);
     }
 
     /**
@@ -368,7 +372,7 @@ class CharacterInformationBuilder {
      * @return int
      */
     public function buildHealth(bool $voided = false): int {
-        return $this->baseCharacterInfo->buildHealth($this->character, $voided);
+        return (int) $this->baseCharacterInfo->buildHealth($this->character, $voided);
     }
 
     /**
@@ -404,7 +408,7 @@ class CharacterInformationBuilder {
      * @throws \Exception
      */
     public function calculateClassSpellDamage(int $spellDamage, bool $voided = false): int {
-        return $this->characterAttackInformation->getCharacterDamageInformation()->getDamageSpellInformation()->calculateClassSpellDamage($this->character, $spellDamage, $voided);
+        return (int) $this->characterAttackInformation->getCharacterDamageInformation()->getDamageSpellInformation()->calculateClassSpellDamage($this->character, $spellDamage, $voided);
     }
 
     /**

@@ -57,7 +57,7 @@ class InformationController extends Controller {
         $page = $this->infoPageService->deleteSectionFromPage($infoPage, $request->order);
 
         return response()->json([
-            'sections' => $page->sections,
+            'sections' => array_values($page->page_sections),
         ]);
     }
 

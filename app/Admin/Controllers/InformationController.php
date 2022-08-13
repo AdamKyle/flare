@@ -36,6 +36,10 @@ class InformationController extends Controller {
             $displayOrder = 1;
 
             foreach ($modelEntry['page_sections'] as $index => $section) {
+                if (!isset($section['display_order'])) {
+                    continue;
+                }
+
                 if ($index === 0) {
                     $displayOrder = $section['display_order'];
 

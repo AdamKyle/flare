@@ -43,13 +43,13 @@ class InfoPageController extends Controller
             abort(404);
         }
 
-        $pageSections = $page->page_sections;
+        $sections = $page->page_sections;
 
-        usort($pageSections, function ($a, $b) {return $a['display_order'] > $b['display_order']; });
+        array_multisort(array_column($sections, 'order'), SORT_ASC, $sections);
 
         return view('information.core', [
             'pageTitle' => ucfirst(str_replace('-', ' ', $page->page_name)),
-            'sections'  => $pageSections,
+            'sections'  => $sections,
             'pageId'    => $page->id,
         ]);
     }

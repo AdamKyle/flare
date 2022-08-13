@@ -68,12 +68,11 @@ class InfoPageService {
     }
 
     public function deleteSectionFromPage(InfoPage $page, int $order): InfoPage {
-
         $sections     = $page->page_sections;
         $sectionIndex = null;
 
         foreach ($sections as $index => $section) {
-            if ($section['order'] === $order) {
+            if ((int) $section['order'] === (int) $order) {
                 $sectionIndex = $index;
             }
         }
@@ -102,7 +101,7 @@ class InfoPageService {
         $sectionIndex    = null;
 
         foreach ($sections as $index => $section) {
-            if ($section['order'] === (int) $params['order']) {
+            if ((int) $section['order'] === (int) $params['order']) {
                 $sectionToUpdate = $section;
                 $sectionIndex    = $index;
 
@@ -118,7 +117,7 @@ class InfoPageService {
 
             $sectionToUpdate['content']             = $content;
             $sectionToUpdate['live_wire_component'] = $params['live_wire_component'];
-            $sectionToUpdate['order']               = $params['order'];
+            $sectionToUpdate['order']               = (int) $params['order'];
 
             $sections[$sectionIndex] = $sectionToUpdate;
 
@@ -154,7 +153,7 @@ class InfoPageService {
 
         foreach ($sections as $index => $section) {
             if (is_null($currentOrder) && $index === 0) {
-                $currentOrder = $section['order'] + 1;
+                $currentOrder = ((int) $section['order']) + 1;
 
                 continue;
             }
