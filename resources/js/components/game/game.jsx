@@ -62,6 +62,7 @@ export default class Game extends React.Component {
         my_kingdoms: [],
         can_attack: false,
         can_settle: false,
+        can_mass_embezzle: false,
         kingdom_to_attack: [],
         is_mine: false,
       },

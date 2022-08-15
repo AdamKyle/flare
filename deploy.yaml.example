@@ -25,7 +25,6 @@ tasks:
     - yarn:run:prod
     - artisan:fetch:tag-data
     - artisan:move:files
-    - move:maps
     - deploy:publish
   yarn:run:prod:
     script:
@@ -33,9 +32,6 @@ tasks:
   artisan:fetch:tag-data:
     script:
       - 'cd {{release_path}} && php artisan fetch:tag-data'
-  move:maps:
-    script:
-      - 'cd {{release_path}} && cp -R resources/backup/maps/ public/storage/'
   artisan:move:files:
       script:
         - 'cd {{release_path}} && php artisan move:files'

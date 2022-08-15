@@ -9,7 +9,7 @@ export default class MassEmbezzle extends React.Component {
     super(props);
 
     this.state = {
-      embezzleAmount: 0,
+      embezzleAmount: '',
       errorMessage: null,
     }
   }

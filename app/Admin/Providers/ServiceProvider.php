@@ -51,14 +51,11 @@ class ServiceProvider extends ApplicationServiceProvider
      *
      * @return void
      */
-    public function boot(Charts $charts)
+    public function boot()
     {
 
         $router = $this->app['router'];
 
-        $charts->register([
-            AllCharacterGoldChart::class,
-        ]);
 
         $router->aliasMiddleware('is.admin', IsAdminMiddleware::class);
     }

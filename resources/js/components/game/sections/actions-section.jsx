@@ -260,6 +260,8 @@ export default class ActionsSection extends React.Component {
       );
     }
 
+    console.log(this.props.kingdomData, this.props.kingdomData.my_kingdoms);
+
     return (
       <Card>
         <Tabs defaultActiveKey="actions" id="auto-config-tab-section">
