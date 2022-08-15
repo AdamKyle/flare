@@ -10,6 +10,9 @@ import {ceil} from "lodash";
 import DangerAlert from "../../../../components/ui/alerts/simple-alerts/danger-alert";
 
 export default class QueenOfHearts extends React.Component<any, any> {
+
+    private queenOfHearts: any;
+
     constructor(props: any) {
         super(props);
 
@@ -40,6 +43,9 @@ export default class QueenOfHearts extends React.Component<any, any> {
             loading: true,
             error_message: null,
         }
+
+        // @ts-ignore
+        this.queenOfHearts = Echo.private('update-queen-of-hearts-panel-' + this.props.user_id);
     }
 
     componentDidMount() {
@@ -51,6 +57,14 @@ export default class QueenOfHearts extends React.Component<any, any> {
                     character_non_uniques: result.data.non_unique_slots
                 });
             }, (error: AxiosError) => {console.error(error);});
+
+        // @ts-ignore
+        this.queenOfHearts.listen('Game.Core.Events.UpdateQueenOfHeartsPanel', (event: any) => {
+            this.setState({
+                character_uniques: event.panelData.unique_slots,
+                character_non_uniques: event.panelData.non_unique_slots
+            });
+        });
     }
 
     setInitialOption(data: any) {

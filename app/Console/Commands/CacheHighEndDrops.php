@@ -47,8 +47,17 @@ class CacheHighEndDrops extends Command
 
         Cache::delete('highend-droppable-items');
 
-        $prefixItems = Item::inRandomOrder()->where('cost', '<=', 4000000000)->where('is_mythic', false)->whereHas('itemPrefix')->take(100)->get();
-        $suffixItems = Item::inRandomOrder()->where('cost', '<=', 4000000000)->where('is_mythic', false)->whereHas('itemSuffix')->take(100)->get();
+        $prefixItems = Item::inRandomOrder()->where('cost', '<=', 4000000000)
+                                            ->where('is_mythic', false)
+                                            ->whereHas('itemPrefix')
+                                            ->take(100)
+                                            ->get();
+        
+        $suffixItems = Item::inRandomOrder()->where('cost', '<=', 4000000000)
+                                            ->where('is_mythic', false)
+                                            ->whereHas('itemSuffix')
+                                            ->take(100)
+                                            ->get();
 
         $prefixItems = $prefixItems->filter(function($prefix) {
             if (!$prefix->is_unique) {

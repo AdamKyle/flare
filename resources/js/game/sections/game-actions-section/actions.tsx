@@ -235,6 +235,7 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
                                                 remove_crafting={this.removeCraftingType.bind(this)}
                                                 type={this.state.crafting_type}
                                                 character_id={this.props.character.id}
+                                                user_id={this.props.character.user_id}
                                                 cannot_craft={this.actionsManager.cannotCraft()}
                                             />
                                         : null

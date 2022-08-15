@@ -49,14 +49,36 @@ class SkillsTable extends DataTableComponent {
         return [
             Column::make('id')->hideIf(true),
             Column::make('Name')->searchable()->format(function($value, $row) {
-                return '<a href="/admin/skill/'.$row->id.'">'.$value.'</a>';
+
+                if (is_null(auth()->user())) {
+                    return '<a href="/information/skill/'. $row->id.'">'.$row->name .'</a>';
+                }
+
+                if (!is_null(auth()->user())) {
+                    if (auth()->user()->hasRole('Admin')) {
+                        return '<a href="/admin/skill/'.$row->id.'">'.$value.'</a>';
+                    }
+                }
+
+                return '<a href="/information/skill/'. $row->id.'">'.$row->name .'</a>';
             })->html(),
             Column::make('Trainable?', 'can_train')->sortable()->format(function($value, $row) {
                 return $row->can_train ? 'Yes' : 'No';
             })->html(),
             Column::make('Game Class', 'game_class_id')->sortable()->format(function($value, $row) {
                 if (!is_null($row->game_class_id)) {
-                    return '<a href="/admin/classes/'.$row->game_class_id.'">'.$row->gameClass->name.'</a>';
+
+                    if (is_null(auth()->user())) {
+                        return '<a href="/information/class/'. $row->game_class_id.'">'.$row->gameClass->name.'</a>';
+                    }
+
+                    if (!is_null(auth()->user())) {
+                        if (auth()->user()->hasRole('Admin')) {
+                            return '<a href="/admin/classes/'.$row->game_class_id.'">'.$row->gameClass->name.'</a>';
+                        }
+                    }
+
+                    return '<a href="/information/class/'. $row->game_class_id.'">'.$row->gameClass->name.'</a>';
                 }
 
                 return 'N/A';

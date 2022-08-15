@@ -25,7 +25,7 @@ export default class CraftingSection extends React.Component<any, any> {
             case 'trinketry':
                 return <Trinketry character_id={this.props.character_id} remove_crafting={this.props.remove_crafting} cannot_craft={this.props.cannot_craft} />
             case 'queen':
-                return <QueenOfHearts character_id={this.props.character_id} remove_crafting={this.props.remove_crafting} cannot_craft={this.props.cannot_craft} />
+                return <QueenOfHearts character_id={this.props.character_id} remove_crafting={this.props.remove_crafting} cannot_craft={this.props.cannot_craft} user_id={this.props.user_id} />
             default:
                 return null;
         }

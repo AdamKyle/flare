@@ -46,7 +46,8 @@ class ReBalanceAffixes extends Command
         $this->reBalanceAttributes();
         $this->reBalanceFightAndMovementTimeOut();
         $this->reBalanceDevouringLight();
-        $this->reBalanceDamage();
+        $this->reBalanceNonStackingDamage();
+        $this->reBalanceStackingDamage();
         $this->reBalanceSkillBonuses();
 
         $this->rebalanceUniques($affixAttributeBuilder);
@@ -234,11 +235,38 @@ class ReBalanceAffixes extends Command
         }
     }
 
-    public function reBalanceDamage() {
-        $affixes = ItemAffix::where('randomly_generated', false)->orderBy('skill_level_required', 'asc')->get();
+    public function reBalanceStackingDamage() {
+        $affixes = ItemAffix::where('randomly_generated', false)
+                            ->where('damage_can_stack', true)
+                            ->orderBy('skill_level_required', 'asc')
+                            ->get();
 
-        $min = 1;
-        $max = 50000;
+        $min = 1000;
+        $max = 5000;
+
+        $increments = round($max / $affixes->count());
+
+        $values = range($min, $max, $increments);
+
+        foreach ($affixes as $index => $affix) {
+            if (isset($values[$index])) {
+                $affix->damage = $values[$index];
+            } else {
+                $affix->damage = $max;
+            }
+
+            $affix->save();
+        }
+    }
+
+    public function reBalanceNonStackingDamage() {
+        $affixes = ItemAffix::where('randomly_generated', false)
+                            ->where('damage_can_stack', false)
+                            ->where('irresistible_damage', true)
+                            ->orderBy('skill_level_required', 'asc')->get();
+
+        $min = 10;
+        $max = 1000;
 
         $increments = round($max / $affixes->count());
 

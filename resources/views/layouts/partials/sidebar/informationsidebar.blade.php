@@ -143,10 +143,6 @@
                     <span class="far fa-compass"></span>
                     Movement Actions
                 </a>
-                <a href="{{route('info.page', ['pageName' => 'teleport'])}}">
-                    <span class="ra ra-player-teleport"></span>
-                    Quests
-                </a>
                 <a href="{{route('info.page', ['pageName' => 'traverse'])}}">
                     <span class="ra ra-player-pyromaniac"></span>
                     Traverse Action
@@ -209,6 +205,10 @@
                 <a href="{{route('info.page', ['pageName' => 'quests'])}}">
                     <span class="ra ra-trophy"></span>
                     Quests
+                </a>
+                <a href="{{route('info.page', ['pageName' => 'guide-quests'])}}">
+                    <span class="ra ra-book"></span>
+                    Guide Quests
                 </a>
             </div>
             <a href="{{route('info.page', ['pageName' => 'market-board'])}}">

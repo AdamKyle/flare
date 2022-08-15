@@ -16,8 +16,8 @@ class RandomNumberGenerator {
      *
      * We use a mean and standard variance to determine the final number based on Min and Max.
      *
-     * @param float|int $m
-     * @param float|int $s
+     * @param float|int $mean
+     * @param float|int $standardVariance
      * @param int $min
      * @param int $max
      * @return float

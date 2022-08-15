@@ -48,10 +48,11 @@ export default class ActionsManager {
 
         if (props.character_position !== null) {
             charactersForDueling = eventCharactersForDueling.filter((character: PvpCharactersType) => {
-                if (props.character_position !== null) {
-                    if (character.id !== props.character.id) {
-                        return character;
-                    }
+                if (character.id !== props.character.id &&
+                    character.character_position_x === props.character.base_position.x &&
+                    character.character_position_y === props.character.base_position.y)
+                {
+                    return character;
                 }
             });
 

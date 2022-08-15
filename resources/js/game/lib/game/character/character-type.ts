@@ -1,3 +1,5 @@
+import PositionType from "../types/map/position-type";
+
 export interface CharacterType {
     id: number;
 
@@ -188,5 +190,7 @@ export interface CharacterType {
     voided_healing_amount: number;
 
     killed_in_pvp: boolean;
+
+    base_position: PositionType;
 
 }

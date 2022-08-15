@@ -47,6 +47,7 @@ export default class SmallCraftingSection extends React.Component<SmallCraftingS
                             remove_crafting={this.removeCraftingType.bind(this)}
                             type={this.state.crafting_type}
                             character_id={this.props.character.id}
+                            user_id={this.props.character.user_id}
                             cannot_craft={this.craftingSectionManager.cannotCraft()}
                         />
                     :

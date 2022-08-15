@@ -114,6 +114,12 @@ export default class InfoSection extends React.Component<any, any> {
         },{
             label: 'Alchemy Items',
             value: 'info.alchemy-items.alchemy-items-table',
+        },{
+            label: 'Skills',
+            value: 'admin.skills.skills-table',
+        },{
+            label: 'Maps',
+            value: 'admin.maps.maps-table',
         }];
     }
 
