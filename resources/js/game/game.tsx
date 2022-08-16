@@ -327,7 +327,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                                     }
                                 </BasicCard>
                             </div>
-                            <BasicCard additionalClasses={clsx('hidden lg:block md:mt-0 lg:col-start-3 lg:col-end-3 max-h-[610px] max-w-[555px]', {
+                            <BasicCard additionalClasses={clsx('hidden lg:block md:mt-0 lg:col-start-3 lg:col-end-3 max-h-[630px] max-w-[555px]', {
                                 'max-h-[624px]': this.state.character.is_dead
                             })}>
                                 <MapSection

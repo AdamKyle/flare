@@ -44,7 +44,12 @@ export default class ItemComparisonSection extends React.Component<any, any> {
                 if (typeof details[key] === 'number' && details[key] !== 0) {
                     return (
                         <Fragment>
-                            <dt>{capitalize(key.split('_').join(' '))}</dt>
+                            <dt>{
+                                key === 'damage' ?
+                                    'Affix Damage'
+                                :
+                                    capitalize(key.split('_').join(' '))
+                            }</dt>
                             <dd className={clsx(
                                 {
                                     'text-green-600 dark:text-green-500': details[key] > 0
@@ -123,7 +128,12 @@ export default class ItemComparisonSection extends React.Component<any, any> {
                 if (itemToEquip[key] > 0) {
                     return (
                         <Fragment>
-                            <dt>{capitalize(key.split('_').join(' '))}</dt>
+                            <dt>{
+                                key === 'damage' ?
+                                    'Affix Damage'
+                                    :
+                                    capitalize(key.split('_').join(' '))
+                            }</dt>
                             <dd className={clsx(
                                 {
                                     'text-green-600 dark:text-green-500': itemToEquip[key] > 0
@@ -239,7 +249,7 @@ export default class ItemComparisonSection extends React.Component<any, any> {
                     {
                         double ?
                             this.renderTwoComparisons()
-                            :
+                        :
                             this.renderSingleComparison()
                     }
                 </TabPanel>
@@ -274,9 +284,9 @@ export default class ItemComparisonSection extends React.Component<any, any> {
                     this.props.comparison_details.details.length > 0 ?
                         this.props.comparison_details.details.length === 2 ?
                             this.renderTabs(true)
-                            :
-                            this.renderTabs(false)
                         :
+                            this.renderTabs(false)
+                    :
                         this.renderSingleItem()
                 }
             </Fragment>

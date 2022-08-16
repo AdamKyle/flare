@@ -118,9 +118,8 @@ export default class TimerProgressBar extends React.Component<TimerProgressBarPr
                 <div className="flex justify-between mb-1">
                     <span className="text-base font-medium text-gray-800 dark:text-white">
                         {this.props.time_out_label}
-                        <i className="ml-2 fas fa-spinner fa-pulse"></i>
                     </span>
-                    <span className="text-sm font-medium text-gray-800 dark:text-white">{this.state.time_left_label} {this.state.label} left</span>
+                    <span className="text-sm font-medium text-gray-800 dark:text-white mt-[3px]">{this.state.time_left_label} {this.state.label} left</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-1.5 dark:bg-gray-700">
                     <div className={'h-1.5 rounded-full ' + (

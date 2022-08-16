@@ -72,6 +72,11 @@
                     <span class="ra ra-aura"></span>
                     Skills
                 </a>
+
+                <a href="{{route('info.page', ['pageName' => 'class-skills'])}}">
+                    <span class="ra ra-player-pyromaniac"></span>
+                    Class Skills
+                </a>
             </div>
 
             <a href="#no-link" class="active" data-toggle="collapse" data-target="#menueEquipment">

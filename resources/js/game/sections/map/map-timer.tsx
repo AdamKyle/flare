@@ -27,7 +27,7 @@ export default class MapTimer extends React.Component<MapTimerProps, {}> {
         return (
             <Fragment>
                 <TimerProgressBar time_remaining={this.props.automation_time_out} time_out_label={'Exploration'}/>
-                <TimerProgressBar time_remaining={this.props.time_left} time_out_label={'Movement Timeout'}/>
+                <TimerProgressBar time_remaining={this.props.time_left} time_out_label={'Movement'}/>
             </Fragment>
         );
     }

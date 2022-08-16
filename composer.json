@@ -13,7 +13,7 @@
         "beyondcode/laravel-websockets": "^1.13.1",
         "bkwld/cloner": "^3.9",
         "christianessl/landmap-generation": "^1.0",
-        "deployer/deployer": "v7.0.0-rc.8",
+        "deployer/deployer": "v7.0.0",
         "doctrine/dbal": "^3.1",
         "graham-campbell/github": "^10.3",
         "graham-campbell/markdown": "14.0.x-dev",

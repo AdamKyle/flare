@@ -33,38 +33,6 @@ class InformationController extends Controller {
         $data = json_decode(trim($request->file('info_import')->get()), true);
 
         foreach ($data as $key => $modelEntry) {
-            $displayOrder = 1;
-
-            foreach ($modelEntry['page_sections'] as $index => $section) {
-                if (!isset($section['display_order'])) {
-                    continue;
-                }
-
-                if ($index === 0) {
-                    $displayOrder = $section['display_order'];
-
-                    unset($section['display_order']);
-
-                    $section['order'] = $displayOrder;
-
-                    $modelEntry['page_sections'][$index] = $section;
-
-                    $displayOrder++;
-
-                    continue;
-                }
-
-                if ($index !== 0) {
-                    unset($section['display_order']);
-
-                    $section['order'] = $displayOrder;
-
-                    $modelEntry['page_sections'][$index] = $section;
-
-                    $displayOrder++;
-                }
-            }
-
             InfoPage::updateOrCreate(['id' => $modelEntry['id']], $modelEntry);
         }
 

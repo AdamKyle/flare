@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "26e278d2e485ca7f4622894969499558",
+    "content-hash": "ed7ed9d35b42a39898e6bcfee11b20c4",
     "packages": [
         {
             "name": "asahasrabuddhe/laravel-mjml",
@@ -422,20 +422,20 @@
         },
         {
             "name": "deployer/deployer",
-            "version": "v7.0.0-rc.8",
+            "version": "v7.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/deployphp/deployer.git",
-                "reference": "629973ee3d0ce78953b18500cba0695feec28c2b"
+                "reference": "04788d6c8ccbd985534fee1705175ea44e4213dd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/deployphp/deployer/zipball/629973ee3d0ce78953b18500cba0695feec28c2b",
-                "reference": "629973ee3d0ce78953b18500cba0695feec28c2b",
+                "url": "https://api.github.com/repos/deployphp/deployer/zipball/04788d6c8ccbd985534fee1705175ea44e4213dd",
+                "reference": "04788d6c8ccbd985534fee1705175ea44e4213dd",
                 "shasum": ""
             },
             "bin": [
-                "deployer.phar"
+                "dep"
             ],
             "type": "library",
             "notification-url": "https://packagist.org/downloads/",
@@ -461,7 +461,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-03-22T14:33:06+00:00"
+            "time": "2022-07-26T22:25:15+00:00"
         },
         {
             "name": "dflydev/dot-access-data",
@@ -2202,16 +2202,16 @@
         },
         {
             "name": "itsgoingd/clockwork",
-            "version": "v5.1.6",
+            "version": "v5.1.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/itsgoingd/clockwork.git",
-                "reference": "9df41432da1d8cb39c7fda383ddcc02231c83ff3"
+                "reference": "2cad6c75dc2b96cbfd48c0511bb035a4e328c17f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/itsgoingd/clockwork/zipball/9df41432da1d8cb39c7fda383ddcc02231c83ff3",
-                "reference": "9df41432da1d8cb39c7fda383ddcc02231c83ff3",
+                "url": "https://api.github.com/repos/itsgoingd/clockwork/zipball/2cad6c75dc2b96cbfd48c0511bb035a4e328c17f",
+                "reference": "2cad6c75dc2b96cbfd48c0511bb035a4e328c17f",
                 "shasum": ""
             },
             "require": {
@@ -2258,7 +2258,7 @@
             ],
             "support": {
                 "issues": "https://github.com/itsgoingd/clockwork/issues",
-                "source": "https://github.com/itsgoingd/clockwork/tree/v5.1.6"
+                "source": "https://github.com/itsgoingd/clockwork/tree/v5.1.7"
             },
             "funding": [
                 {
@@ -2266,7 +2266,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-04-12T21:35:47+00:00"
+            "time": "2022-08-14T21:23:22+00:00"
         },
         {
             "name": "knplabs/github-api",
@@ -3047,16 +3047,16 @@
         },
         {
             "name": "league/flysystem",
-            "version": "3.2.0",
+            "version": "3.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/flysystem.git",
-                "reference": "ed0ecc7f9b5c2f4a9872185846974a808a3b052a"
+                "reference": "81aea9e5217084c7850cd36e1587ee4aad721c6b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/ed0ecc7f9b5c2f4a9872185846974a808a3b052a",
-                "reference": "ed0ecc7f9b5c2f4a9872185846974a808a3b052a",
+                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/81aea9e5217084c7850cd36e1587ee4aad721c6b",
+                "reference": "81aea9e5217084c7850cd36e1587ee4aad721c6b",
                 "shasum": ""
             },
             "require": {
@@ -3117,7 +3117,7 @@
             ],
             "support": {
                 "issues": "https://github.com/thephpleague/flysystem/issues",
-                "source": "https://github.com/thephpleague/flysystem/tree/3.2.0"
+                "source": "https://github.com/thephpleague/flysystem/tree/3.2.1"
             },
             "funding": [
                 {
@@ -3133,7 +3133,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-07-26T07:26:36+00:00"
+            "time": "2022-08-14T20:48:34+00:00"
         },
         {
             "name": "league/fractal",

@@ -35,6 +35,15 @@ export default class EquipModal extends React.Component<EquipModalProps, any> {
         );
     }
 
+    replacesTwoHandedItem(): boolean {
+
+        if (this.props.is_bow_equipped || this.props.is_hammer_equipped || this.props.is_stave_equipped) {
+            return ['hammer', 'stave', 'bow'].includes(this.props.item_to_equip.type);
+        }
+
+        return false;
+    }
+
     render() {
         return (
             <Dialogue is_open={this.props.is_open}
@@ -54,7 +63,7 @@ export default class EquipModal extends React.Component<EquipModalProps, any> {
                 }
 
                 {
-                    this.props.is_bow_equipped || this.props.is_hammer_equipped || this.props.is_stave_equipped ?
+                    this.replacesTwoHandedItem() ?
                         <p className='mt-3 mb-3'>Equipping this item will remove your two handed equipped item.</p>
                     : null
                 }

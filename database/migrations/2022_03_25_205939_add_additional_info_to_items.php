@@ -18,7 +18,6 @@ class AddAdditionalInfoToItems extends Migration
             $table->decimal('ambush_resistance', 8, 4)->nullable()->default(0.0);
             $table->decimal('counter_chance', 8, 4)->nullable()->default(0.0);
             $table->decimal('counter_resistance', 8, 4)->nullable()->default(0.0);
-            $table->integer('copper_coin_cost')->nullable()->default(0);
         });
     }
 
@@ -34,7 +33,6 @@ class AddAdditionalInfoToItems extends Migration
             $table->dropColumn('ambush_resistance');
             $table->dropColumn('counter_chance');
             $table->dropColumn('counter_resistance');
-            $table->dropColumn('copper_coin_cost');
         });
     }
 }
