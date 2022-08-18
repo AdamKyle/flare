@@ -1465,9 +1465,9 @@
     fastq "^1.6.0"
 
 "@npmcli/arborist@*", "@npmcli/arborist@^5.0.0":
-  version "5.5.0"
-  resolved "https://registry.yarnpkg.com/@npmcli/arborist/-/arborist-5.5.0.tgz#e40f5379a900ef80c4a97c4e4ca0e9796b702861"
-  integrity sha512-+Qg3h+J0o4NQMpiC4JgllnrvwBJ1utSBWOTa2xsWqbbVAcPTdEwPV3V0BWEhhrx5zt3hRfIwv9TWmYBvyxd4aw==
+  version "5.6.0"
+  resolved "https://registry.yarnpkg.com/@npmcli/arborist/-/arborist-5.6.0.tgz#ace635279d0d548df164ac83464237fd5f0175ad"
+  integrity sha512-gM2AxWCaXTZRZnKOHT6uIUHTkvRf+UPU2iC/3nC1Bj21zemnoKyJh2NvcG69UCcfs+r1jpx6hZ0dL9s2yPssJQ==
   dependencies:
     "@isaacs/string-locale-compare" "^1.1.0"
     "@npmcli/installed-package-contents" "^1.0.7"
@@ -1616,9 +1616,9 @@
     infer-owner "^1.0.4"
 
 "@npmcli/query@^1.1.1":
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/@npmcli/query/-/query-1.1.1.tgz#462c4268473ae39e89d5fefbad94d9af7e1217c4"
-  integrity sha512-UF3I0fD94wzQ84vojMO2jDB8ibjRSTqhi8oz2mzVKiJ9gZHbeGlu9kzPvgHuGDK0Hf2cARhWtTfCDHNEwlL9hg==
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@npmcli/query/-/query-1.2.0.tgz#46468d583cf013aa92102970700f9555314aabe4"
+  integrity sha512-uWglsUM3PjBLgTSmZ3/vygeGdvWEIZ3wTUnzGFbprC/RtvQSaT+GAXu1DXmSFj2bD3oOZdcRm1xdzsV2z1YWdw==
   dependencies:
     npm-package-arg "^9.1.0"
     postcss-selector-parser "^6.0.10"
@@ -3026,9 +3026,9 @@ caniuse-api@^3.0.0:
     lodash.uniq "^4.5.0"
 
 caniuse-lite@^1.0.0, caniuse-lite@^1.0.30001109, caniuse-lite@^1.0.30001370, caniuse-lite@^1.0.30001373:
-  version "1.0.30001377"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001377.tgz#fa446cef27f25decb0c7420759c9ea17a2221a70"
-  integrity sha512-I5XeHI1x/mRSGl96LFOaSk528LA/yZG3m3iQgImGujjO8gotd/DL8QaI1R1h1dg5ATeI2jqPblMpKq4Tr5iKfQ==
+  version "1.0.30001378"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001378.tgz#3d2159bf5a8f9ca093275b0d3ecc717b00f27b67"
+  integrity sha512-JVQnfoO7FK7WvU4ZkBRbPjaot4+YqxogSDosHv0Hv5mWpUESmN+UubMU6L/hGz8QlQ2aY5U0vR6MOs6j/CXpNA==
 
 chalk@*:
   version "5.0.1"
@@ -4217,9 +4217,9 @@ ee-first@1.1.1:
   integrity sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==
 
 electron-to-chromium@^1.4.202:
-  version "1.4.221"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.221.tgz#1ff8425d257a8bfc8269d552a426993c5b525471"
-  integrity sha512-aWg2mYhpxZ6Q6Xvyk7B2ziBca4YqrCDlXzmcD7wuRs65pVEVkMT1u2ifdjpAQais2O2o0rW964ZWWWYRlAL/kw==
+  version "1.4.224"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.224.tgz#ecf2eed395cfedcbbe634658ccc4b457f7b254c3"
+  integrity sha512-dOujC5Yzj0nOVE23iD5HKqrRSDj2SD7RazpZS/b/WX85MtO6/LzKDF4TlYZTBteB+7fvSg5JpWh0sN7fImNF8w==
 
 elliptic@^6.5.3:
   version "6.5.4"
@@ -5768,9 +5768,9 @@ libnpmdiff@*:
     tar "^6.1.0"
 
 libnpmexec@*:
-  version "4.0.10"
-  resolved "https://registry.yarnpkg.com/libnpmexec/-/libnpmexec-4.0.10.tgz#854909123af9655026b42c6dd9ae18a7cf92785c"
-  integrity sha512-f2bMoQTlvAJaIVYt+iBEvZP7WTX+8jBLApxQKBkMfg6RTKhEtmW2gZ7C0jc4pEzboZzIwqHeUHcSekIyoE1N3A==
+  version "4.0.11"
+  resolved "https://registry.yarnpkg.com/libnpmexec/-/libnpmexec-4.0.11.tgz#3307fd7b683630268237936a921f5faadd5bfaef"
+  integrity sha512-uhkAWVT0pA1kVgqgTjIMVebOPl3PpIvVcRQ1IBV47ppVxmQr+JCjDahrV0K/0JUsKSVFozyGEEmg1Kz0HwRwzw==
   dependencies:
     "@npmcli/arborist" "^5.0.0"
     "@npmcli/ci-detect" "^2.0.0"
@@ -6039,9 +6039,9 @@ lru-cache@^6.0.0:
     yallist "^4.0.0"
 
 lru-cache@^7.4.4, lru-cache@^7.5.1, lru-cache@^7.7.1:
-  version "7.13.2"
-  resolved "https://registry.yarnpkg.com/lru-cache/-/lru-cache-7.13.2.tgz#bb5d3f1deea3f3a7a35c1c44345566a612e09cd0"
-  integrity sha512-VJL3nIpA79TodY/ctmZEfhASgqekbT574/c4j3jn4bKXbSCnTTCH/KltZyvL2GlV+tGSMtsWyem8DCX7qKTMBA==
+  version "7.14.0"
+  resolved "https://registry.yarnpkg.com/lru-cache/-/lru-cache-7.14.0.tgz#21be64954a4680e303a09e9468f880b98a0b3c7f"
+  integrity sha512-EIRtP1GrSJny0dqb50QXRUNBxHJhcpxHC++M5tD7RYbvLLn5KVWKsbyswSSqDuU15UFi3bgTQIY8nhDMeF6aDQ==
 
 luxon@^2.3.1:
   version "2.5.0"
@@ -6236,9 +6236,9 @@ minipass-collect@^1.0.2:
     minipass "^3.0.0"
 
 minipass-fetch@^2.0.3:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/minipass-fetch/-/minipass-fetch-2.1.0.tgz#ca1754a5f857a3be99a9271277246ac0b44c3ff8"
-  integrity sha512-H9U4UVBGXEyyWJnqYDCLp1PwD8XIkJ4akNHp1aGVI+2Ym7wQMlxDKi4IB4JbmyU+pl9pEs/cVrK6cOuvmbK4Sg==
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/minipass-fetch/-/minipass-fetch-2.1.1.tgz#9b39c047cf10af9bfa6f3a4d25ed88444be27a4c"
+  integrity sha512-/kgtXVGS10PTFET6dAbOBWQtgH+iDiI4NhRqAftojRlsOJhk0y45sVVxqCaRQC+AMFH7JkHiWpuKJKQ+mojKiA==
   dependencies:
     minipass "^3.1.6"
     minipass-sized "^1.0.3"
@@ -8045,9 +8045,9 @@ raw-body@2.5.1, raw-body@^2.3.2:
     unpipe "1.0.0"
 
 react-charts@^3.0.0-beta.36:
-  version "3.0.0-beta.47"
-  resolved "https://registry.yarnpkg.com/react-charts/-/react-charts-3.0.0-beta.47.tgz#9bdd0336c82298185f7a26c8abf53b87bf232054"
-  integrity sha512-eZRqI8wDSgIdqEyR1nW8UR4jR3Y0TBMAkfBCXWRoIe3s0iy4aBuwfNwgc3htpwCMyZWo2+MKvR5+JeT8ogR3sA==
+  version "3.0.0-beta.48"
+  resolved "https://registry.yarnpkg.com/react-charts/-/react-charts-3.0.0-beta.48.tgz#504a4b2cf9e4233bc0a887f46af0fc0984282572"
+  integrity sha512-D0etnyfKtpWioHc1UoWe1qiK9MQJG0AmGBsefXiv9tRpiMio7xObcxBYQplvHJrahI5/Fd0ni4KUJmfijYe6NA==
   dependencies:
     "@babel/runtime" "^7.14.6"
     "@types/d3-array" "^3.0.1"

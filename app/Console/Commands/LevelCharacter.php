@@ -62,7 +62,7 @@ class LevelCharacter extends Command
         $bar->start();
 
         for ($i = 1; $i <= $this->argument('levels'); $i++) {
-            $characterService->levelUpCharacter($character);
+            $characterService->levelUpCharacter($character, 0);
 
             $bar->advance();
         }
