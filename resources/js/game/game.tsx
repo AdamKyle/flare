@@ -219,6 +219,7 @@ export default class Game extends React.Component<GameProps, GameState> {
     }
 
     updateCharacterQuests(quests: QuestType) {
+        console.log('updating character quests: ', quests);
         this.setState({
             quests: quests
         });

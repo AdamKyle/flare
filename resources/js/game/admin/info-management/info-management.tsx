@@ -180,7 +180,7 @@ export default class InfoManagement extends React.Component<any, any> {
     saveAndFinish() {
         const infoSections  = cloneDeep(this.state.info_sections);
         const sectionToSave = infoSections[infoSections.length - 1];
-        console.log(sectionToSave);
+
         this.formatAndSendData(sectionToSave, true);
     }
 

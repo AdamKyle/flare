@@ -7,6 +7,10 @@ import KingdomTopSection from "./kingdom-top-section";
 import KingdomDetailsProps
     from "../../../../../lib/game/types/map/kingdom-pins/modals/components/kingdom-details-props";
 import ComponentLoading from "../../../../../components/ui/loading/component-loading";
+import PrimaryButton from "../../../../../components/ui/buttons/primary-button";
+import PrimaryOutlineButton from "../../../../../components/ui/buttons/primary-outline-button";
+import LoadingProgressBar from "../../../../../components/ui/progress-bars/loading-progress-bar";
+import DangerAlert from "../../../../../components/ui/alerts/simple-alerts/danger-alert";
 
 export default class KingdomDetails extends React.Component<KingdomDetailsProps, any> {
 
@@ -15,6 +19,8 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
 
         this.state = {
             kingdom_details: null,
+            action_loading: false,
+            error_message: '',
         }
     }
 
@@ -31,6 +37,40 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
         }, (error: AxiosError) => {
             console.error(error);
         });
+    }
+
+    purchaseKingdom() {
+        this.setState({
+            action_loading: true,
+            error_message: ''
+        }, () => {
+            this.props.update_action_in_progress();
+        });
+
+        (new Ajax()).setRoute('kingdoms/'+this.props.character_id+'/purchase-npc-kingdom')
+                    .setParameters({
+                        kingdom_id: this.props.kingdom_id
+                    })
+                    .doAjaxCall('post', (result: AxiosResponse) => {
+                        this.setState({action_loading: false}, () => {
+                            this.props.update_action_in_progress();
+                            this.props.close_modal();
+                        });
+                    }, (error: AxiosError) => {
+                        this.setState({action_loading: false}, () => { this.props.update_action_in_progress(); });
+
+                        if (typeof error.response !== 'undefined') {
+                            const response = error.response;
+
+                            if (response.status === 422) {
+                                this.setState({
+                                    error_message: response.data.message,
+                                });
+                            }
+                        }
+
+                        console.error(error);
+                    });
     }
 
     manageHelpDialogue(type: 'wall_defence' | 'treas_defence' | 'gb_defence' | 'passive_defence' | 'total_defence' | 'teleport_details') {
@@ -136,6 +176,13 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
                                 <dt>Gold Bars:</dt>
                                 <dd>{formatNumber(this.state.kingdom_details.gold_bars)}</dd>
                             </dl>
+                            {
+                                this.props.allow_purchase ?
+                                    <div className='mt-4 text-center'>
+                                        <PrimaryOutlineButton button_label={'Purchase Kingdom'} on_click={this.purchaseKingdom.bind(this)} />
+                                    </div>
+                                : null
+                            }
                         </div>
                     </div>
                 </div>
@@ -143,6 +190,20 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
                 {
                     this.state.show_help ?
                         <KingdomHelpModal manage_modal={this.manageHelpDialogue.bind(this)} type={this.state.help_type}/>
+                    : null
+                }
+
+                {
+                    this.state.error_message !== '' ?
+                        <DangerAlert additional_css={'my-4'}>
+                            {this.state.error_message}
+                        </DangerAlert>
+                    : null
+                }
+
+                {
+                    this.state.action_loading ?
+                        <LoadingProgressBar />
                     : null
                 }
             </Fragment>

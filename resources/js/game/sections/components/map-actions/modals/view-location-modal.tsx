@@ -27,7 +27,7 @@ export default class ViewLocationModal extends React.Component<ViewLocationModal
                                    character_id={this.props.character_id}
                                    show_top_section={false}
                                    handle_close={this.props.handle_close}
-            />
+                   />
         }
 
         if (this.props.npc_kingdom_id !== null) {
@@ -35,7 +35,7 @@ export default class ViewLocationModal extends React.Component<ViewLocationModal
                                    character_id={this.props.character_id}
                                    show_top_section={false}
                                    handle_close={this.props.handle_close}
-            />
+                  />
         }
 
         return null;

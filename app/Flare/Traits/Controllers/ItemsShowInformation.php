@@ -63,7 +63,7 @@ trait ItemsShowInformation {
             }
 
             if ($effect->canMassEmbezzle()) {
-                $effects = 'Lets you mass embezzle from all kingdoms on the plane, while in a kingdom you own. Does not work cross plane.';
+                $effects = 'Lets you mass embezzle from all kingdoms on the plane. Simply go to your kingdoms tab, click a kingdom and see the new Mass Embezzle option. Does not work cross plane.';
             }
 
             if ($effect->walkOnMagma()) {

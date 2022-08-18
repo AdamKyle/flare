@@ -8,5 +8,5 @@ export default interface CharacterTopSectionProps {
 
     update_character_currencies: (currencies: {gold: number, shards: number, gold_dust: number, copper_coins: number}) => void
 
-    character: CharacterType | null;
+    character: CharacterType;
 }

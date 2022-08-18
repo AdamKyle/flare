@@ -14,17 +14,18 @@ class LevelUpValue {
      * @param Character $character
      * @return array
      */
-    public function createValueObject(Character $character) {
+    public function createValueObject(Character $character, int $leftOverXP = 0) {
         return [
-            'level' => $character->level + 1,
-            'xp'    => 0,
-            'str'   => $this->addValue($character, 'str'),
-            'dur'   => $this->addValue($character, 'dur'),
-            'dex'   => $this->addValue($character, 'dex'),
-            'chr'   => $this->addValue($character, 'chr'),
-            'int'   => $this->addValue($character, 'int'),
-            'agi'   => $this->addValue($character, 'agi'),
-            'focus' => $this->addValue($character, 'focus'),
+            'level'   => $character->level + 1,
+            'xp'      => $leftOverXP,
+            'xp_next' => 100,
+            'str'     => $this->addValue($character, 'str'),
+            'dur'     => $this->addValue($character, 'dur'),
+            'dex'     => $this->addValue($character, 'dex'),
+            'chr'     => $this->addValue($character, 'chr'),
+            'int'     => $this->addValue($character, 'int'),
+            'agi'     => $this->addValue($character, 'agi'),
+            'focus'   => $this->addValue($character, 'focus'),
         ];
     }
 
@@ -34,10 +35,10 @@ class LevelUpValue {
      * Regular stats get +1 and the damage stat gets a +2
      *
      * @param Character $character
-     * @param string $currentStat
+     * @param string $currenStat
      * @return int
      */
-    private function addValue(Character $character, string $currenStat): int {
+    protected function addValue(Character $character, string $currenStat): int {
         if ($character->damage_stat === $currenStat) {
             return $character->{$currenStat} += 2;
         }

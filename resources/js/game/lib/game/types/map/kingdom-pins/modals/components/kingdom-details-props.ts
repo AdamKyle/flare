@@ -9,4 +9,10 @@ export default interface KingdomDetailsProps {
     update_loading: (kingdomDetails: KingdomDetails) => void;
 
     show_top_section: boolean;
+
+    allow_purchase: boolean;
+
+    update_action_in_progress: () => void;
+
+    close_modal: () => void;
 }

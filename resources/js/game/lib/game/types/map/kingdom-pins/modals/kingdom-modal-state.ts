@@ -7,4 +7,8 @@ export default interface KingdomModalState extends LocationModalState {
     show_purchase_modal?: boolean;
 
     title: string;
+
+    npc_owned: boolean;
+
+    action_in_progress: boolean;
 }

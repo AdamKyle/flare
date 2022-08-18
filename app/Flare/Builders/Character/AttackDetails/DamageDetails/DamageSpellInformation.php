@@ -63,7 +63,7 @@ class DamageSpellInformation {
 
         $damage = $this->calculateClassSpellDamage($character, $damage, $voided);
 
-        return $damage + $damage * $bonus;
+        return (int) ($damage + $damage * $bonus);
     }
 
     /**

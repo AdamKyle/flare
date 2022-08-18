@@ -13,11 +13,17 @@ export default class Quests extends React.Component<QuestsProps, QuestState> {
         super(props);
 
         this.state = {
-            quests: this.props.quest_details.quests,
+            quests: [],
             completed_quests: this.props.quest_details.completed_quests,
             current_plane: this.props.quest_details.player_plane,
             loading: false,
         }
+    }
+
+    componentDidMount() {
+        this.setState({
+           quests: this.props.quest_details.quests,
+        });
     }
 
     componentDidUpdate(prevProps: Readonly<QuestsProps>, prevState: Readonly<QuestState>, snapshot?: any) {
@@ -35,6 +41,11 @@ export default class Quests extends React.Component<QuestsProps, QuestState> {
     }
 
     render() {
+
+        if (this.state.quests.length === 0) {
+            return <ComponentLoading />
+        }
+
         return (
             <Fragment>
                 {

@@ -18,6 +18,7 @@ use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Services\CharacterService;
 use App\Game\Messages\Events\ServerMessageEvent as GameServerMessageEvent;
+use Exception;
 use Facades\App\Flare\Calculators\XPCalculator;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
@@ -83,18 +84,57 @@ class CharacterRewardService {
      * @param Monster $monster
      * @param Adventure|null $adventure | null
      * @return void
-     * @throws \Exception
+     * @throws Exception
      */
-    public function distributeGoldAndXp(Monster $monster, Adventure $adventure = null) {
+    public function distributeGoldAndXp(Monster $monster, Adventure $adventure = null): void {
         $this->distributeXP($monster, $adventure);
 
         if ($this->character->xp >= $this->character->xp_next) {
-            $this->handleCharacterLevelUp();
+            $leftOverXP = $this->character->xp - $this->character->xp_next;
+
+            if ($leftOverXP > 0) {
+                $this->handleLevelUps($leftOverXP);
+            }
+
+            if ($leftOverXP <= 0) {
+                $this->handleCharacterLevelUp(0);
+            }
+
         }
 
         $this->distributeGold($monster);
 
         $this->distributeCopperCoins($monster);
+    }
+
+    /**
+     * Handle instances where we could have multiple level ups.
+     *
+     * @param int $leftOverXP
+     * @return void
+     */
+    protected function handleLevelUps(int $leftOverXP): void {
+        $this->handleCharacterLevelUp($leftOverXP);
+
+        if ($leftOverXP >= $this->character->xp_next) {
+            $leftOverXP = $this->character->xp - $this->character->xp_next;
+
+            if ($leftOverXP > 0) {
+                $this->handleLevelUps($leftOverXP);
+            }
+
+            if ($leftOverXP <= 0) {
+                $this->handleLevelUps(0);
+            }
+        }
+
+        if ($leftOverXP < $this->character->xp_next) {
+            $this->character->update([
+                'xp' => $leftOverXP
+            ]);
+
+            $this->character = $this->character->refresh();
+        }
     }
 
     /**
@@ -180,10 +220,11 @@ class CharacterRewardService {
     /**
      * Handle character level up.
      *
+     * @param int $leftOverXP
      * @return void
      */
-    public function handleCharacterLevelUp() {
-        $this->characterService->levelUpCharacter($this->character);
+    public function handleCharacterLevelUp(int $leftOverXP): void {
+        $this->characterService->levelUpCharacter($this->character, $leftOverXP);
 
         $character = $this->character->refresh();
 
@@ -212,7 +253,7 @@ class CharacterRewardService {
      *
      * @param Monster $monster
      * @return void
-     * @throws \Exception
+     * @throws Exception
      */
     protected function distributeGold(Monster $monster) {
         $newGold       = $this->character->gold + $monster->gold;
@@ -232,7 +273,7 @@ class CharacterRewardService {
      *
      * @param Monster $monster
      * @return void
-     * @throws \Exception
+     * @throws Exception
      */
     protected function distributeCopperCoins(Monster $monster) {
         $item      = ItemModel::where('effect', ItemEffectsValue::GET_COPPER_COINS)->first();

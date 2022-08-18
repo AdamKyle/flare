@@ -1,6 +1,7 @@
 import React, {Fragment} from "react";
 import CharacterTopSectionProps from "../../lib/game/character-top-section/character-top-section-props";
 import CharacterTopSectionState from "../../lib/game/character-top-section/character-top-section-state";
+import {formatNumber} from "../../lib/game/format-number";
 
 export default class CharacterTopSection extends React.Component<CharacterTopSectionProps, CharacterTopSectionState> {
     constructor(props: CharacterTopSectionProps) {
@@ -28,13 +29,11 @@ export default class CharacterTopSection extends React.Component<CharacterTopSec
         }
     }
 
-    getXpPercentage(xp: number|undefined): number {
+    getXpPercentage(): number {
+        const xpNext    = this.props.character.xp_next;
+        const currentXP = this.props.character.xp;
 
-        if (typeof xp !== 'undefined') {
-            return xp;
-        }
-
-        return 0;
+        return (currentXP/xpNext) * 100;
     }
 
     abbreviateNumber(stat: number|undefined): string|number {
@@ -85,7 +84,7 @@ export default class CharacterTopSection extends React.Component<CharacterTopSec
                             <span className="text-xs font-medium text-orange-700 dark:text-white">{this.props.character.xp}/100</span>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-1.5 dark:bg-gray-700">
-                            <div className="bg-orange-600 h-1.5 rounded-full" style={{width: this.getXpPercentage(this.props.character.xp) + '%'}}></div>
+                            <div className="bg-orange-600 h-1.5 rounded-full" style={{width: this.getXpPercentage() + '%'}}></div>
                         </div>
                     </div>
                 </Fragment>
@@ -135,10 +134,10 @@ export default class CharacterTopSection extends React.Component<CharacterTopSec
                 <div className='relative top-[24px]'>
                     <div className="flex justify-between mb-1">
                         <span className="font-medium text-orange-700 dark:text-white text-xs">XP</span>
-                        <span className="text-xs font-medium text-orange-700 dark:text-white">{this.props.character.xp}/100</span>
+                        <span className="text-xs font-medium text-orange-700 dark:text-white">{this.props.character.xp}/{formatNumber(this.props.character.xp_next)}</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-1.5 dark:bg-gray-700">
-                        <div className="bg-orange-600 h-1.5 rounded-full" style={{width: this.getXpPercentage(this.props.character.xp) + '%'}}></div>
+                        <div className="bg-orange-600 h-1.5 rounded-full" style={{width: this.getXpPercentage() + '%'}}></div>
                     </div>
                 </div>
             </Fragment>

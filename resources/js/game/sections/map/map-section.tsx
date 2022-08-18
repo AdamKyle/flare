@@ -20,6 +20,7 @@ import NpcKingdomsDetails from "../../lib/game/types/map/npc-kingdoms-details";
 import clsx from "clsx";
 // @ts-ignore
 import Draggable from 'react-draggable/build/web/react-draggable.min';
+import PlayerKingdomsDetails from "../../lib/game/types/map/player-kingdoms-details";
 
 
 export default class MapSection extends React.Component<MapProps, MapState> {
@@ -112,9 +113,16 @@ export default class MapSection extends React.Component<MapProps, MapState> {
         });
 
         this.globalMapUpdate.listen('Game.Kingdoms.Events.UpdateGlobalMap', (event: any) => {
+            const playerKingdomsFilter = this.state.player_kingdoms.filter((playerKingdom: PlayerKingdomsDetails) => {
+                if (!event.npcKingdoms.some((kingdom: NpcKingdomsDetails) => kingdom.id === playerKingdom.id)) {
+                    return playerKingdom;
+                }
+            });
+
             this.setState({
-                enemy_kingdoms: event.otherKingdoms,
+                enemy_kingdoms: event.otherKingdoms.filter((kingdom: PlayerKingdomsDetails) => kingdom.character_id !== this.props.character_id),
                 npc_kingdoms: event.npcKingdoms,
+                player_kingdoms: playerKingdomsFilter,
             });
         });
 
@@ -133,7 +141,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
         this.npcKingdomsUpdate.listen('Game.Kingdoms.Events.UpdateNPCKingdoms', (event: {npcKingdoms: NpcKingdomsDetails[]|[], mapName: string}) => {
             if (this.state.map_name === event.mapName) {
                 this.setState({
-                    npc_kingdoms: [...this.state.npc_kingdoms, ...event.npcKingdoms]
+                    npc_kingdoms: event.npcKingdoms
                 });
             }
         })

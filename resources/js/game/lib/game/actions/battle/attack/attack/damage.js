@@ -103,7 +103,7 @@ export default class Damage extends BattleBase {
 
       let cowerMessage = 'cowers. (non resisted dmg): ';
 
-      if (cantResist) {
+      if (!cantResist) {
         cowerMessage = 'cowers: ';
       }
 

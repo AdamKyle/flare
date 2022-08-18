@@ -176,7 +176,7 @@ class KingdomSettleService {
      * @param string $name
      * @return Kingdom|null
      */
-    public function purchaseKingdom(Character $character, int $kingdomId, string $name): ?Kingdom {
+    public function purchaseKingdom(Character $character, int $kingdomId): ?Kingdom {
         $kingdom = Kingdom::where('id', $kingdomId)->where('npc_owned', true)->first();
 
         if (is_null($kingdom)) {
@@ -195,10 +195,6 @@ class KingdomSettleService {
             'protected_until' => $underProtection ? now()->addDays(7) : null,
             'last_walked'     => now(),
         ];
-
-        if ($kingdom->name !== $name) {
-            $params['name'] = $name;
-        }
 
         $kingdom->update($params);
 
