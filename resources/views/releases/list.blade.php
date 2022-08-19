@@ -1,9 +1,9 @@
-@extends('layouts.minimum-with-nav-bar')
+@extends('layouts.releases-layout')
 
 @section('content')
-    <x-core.layout.info-container>
+    <x-core.layout.smaller-container>
         <x-core.page-title
-            title="Releases"
+            title=""
             route="{{route('home')}}"
             color="success" link="Home"
         >
@@ -15,8 +15,6 @@
                 <div class="prose dark:prose-dark max-w-7xl mb-20 dark:text-white">
                     @markdown($release->body)
                 </div>
-                <hr />
-                <a href="{{$release->url}}" class="float-right btn btn-primary btn-sm">Read More <i class="fas fa-external-link-alt"></i></a>
             </x-core.cards.card-with-title>
         @empty
             <x-core.cards.card-with-title css="mb-5" title="No Releases">
@@ -24,6 +22,8 @@
             </x-core.cards.card-with-title>
         @endforelse
 
-        {{ $releases->links() }}
-    </x-core.layout.info-container>
+        <div class="pb-5">
+            {{ $releases->links() }}
+        </div>
+    </x-core.layout.smaller-container>
 @endsection
