@@ -94,7 +94,7 @@ export default class SmallKingdom extends React.Component<KingdomProps, any> {
                                     </div>
                                 </div>
 
-                                <KingdomDetails kingdom={this.props.kingdom} character_gold={this.props.character_gold} />
+                                <KingdomDetails kingdom={this.props.kingdom} character_gold={this.props.character_gold} close_details={this.props.close_details} />
                             </Fragment>
                     }
                 </BasicCard>

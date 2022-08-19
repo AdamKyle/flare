@@ -2,6 +2,8 @@
 
 namespace App\Game\Kingdoms\Controllers\Api;
 
+use App\Flare\Models\BuildingInQueue;
+use App\Flare\Models\UnitInQueue;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\UnitMovementQueue;
@@ -124,11 +126,25 @@ class KingdomsController extends Controller {
             ], 422);
         }
 
-        $unitsInMovement = UnitMovementQueue::where('from_kingdom_id', $kingdom->id)->orWhere('to_kingdom_id', $kingdom->id)->get();
+        $unitsInMovement = UnitMovementQueue::where('from_kingdom_id', $kingdom->id)->orWhere('to_kingdom_id', $kingdom->id)->count();
+        $buildingsInQueue = BuildingInQueue::where('kingdom_id', $kingdom->id)->where('character_id', auth()->user()->character->id)->count();
+        $unitsInQueue = UnitInQueue::where('kingdom_id', $kingdom->id)->where('character_id', auth()->user()->character->id)->count();
 
-        if ($unitsInMovement->isNotEmpty()) {
+        if ($unitsInMovement > 0) {
             return response()->json([
                 'message' => 'You either sent units that are currently moving, or an attack is incoming. Either way, there are units in movement from or to this kingdom and you cannot abandon it.'
+            ], 422);
+        }
+
+        if ($buildingsInQueue > 0) {
+            return response()->json([
+                'message' => 'You have buildings in queue. You cannot abandon a kingdom when people are hard at work!'
+            ], 422);
+        }
+
+        if ($unitsInQueue > 0) {
+            return response()->json([
+                'message' => 'You have units currently training. You cannot abandon a kingdom when people are training to fight for you.'
             ], 422);
         }
 

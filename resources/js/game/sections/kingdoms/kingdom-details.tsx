@@ -9,6 +9,7 @@ import BuyPopulationModal from "./modals/buy-population-modal";
 import BuildingDetails from "../../lib/game/kingdoms/building-details";
 import {buildBuildingsColumns} from "../../lib/game/kingdoms/build-buildings-columns";
 import GoblinBankModal from "./modals/goblin-bank-modal";
+import AbandonKingdomModal from "./modals/abadnon-kingdom-modal";
 
 export default class KingdomDetails extends React.Component<KingdomDetailsProps, any> {
     constructor(props: KingdomDetailsProps) {
@@ -18,6 +19,7 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
             show_change_name_modal: false,
             show_buy_pop_modal: false,
             show_goblin_bank: false,
+            show_abandon_kingdom: false,
         }
     }
 
@@ -45,6 +47,16 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
         this.setState({
             show_goblin_bank: !this.state.show_goblin_bank
         });
+    }
+
+    showAbandonKingdom() {
+        this.setState({
+            show_abandon_kingdom: !this.state.show_abandon_kingdom
+        })
+    }
+
+    abandonedKingdom() {
+        this.props.close_details();
     }
 
     canManageGoldBars(): boolean {
@@ -135,7 +147,7 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
                             <PrimaryOutlineButton button_label={'Buy Population'} on_click={this.showBuyPop.bind(this)} />
                             <SkyOutlineButton button_label={'Manage Gold Bars'} on_click={this.showGoblinBank.bind(this)}  disabled={this.canManageGoldBars()}/>
                             <SkyOutlineButton button_label={'Manage Treasury'} on_click={() => {}} />
-                            <DangerOutlineButton button_label={'Abandon Kingdom'} on_click={() => {}} />
+                            <DangerOutlineButton button_label={'Abandon Kingdom'} on_click={this.showAbandonKingdom.bind(this)} />
                         </div>
                     </div>
                 </div>
@@ -170,6 +182,16 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
                             character_gold={this.props.character_gold}
                             gold_bars={this.props.kingdom.gold_bars}
                             kingdom_id={this.props.kingdom.id}
+                        />
+                    : null
+                }
+
+                {
+                    this.state.show_abandon_kingdom ?
+                        <AbandonKingdomModal is_open={true}
+                                             handle_close={this.showAbandonKingdom.bind(this)}
+                                             handle_kingdom_close={this.props.close_details}
+                                             kingdom_id={this.props.kingdom.id}
                         />
                     : null
                 }

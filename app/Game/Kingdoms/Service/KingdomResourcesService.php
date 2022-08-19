@@ -46,7 +46,7 @@ class KingdomResourcesService {
      * Set the kingdom to be updated.
      *
      * @param Kingdom $kingdom
-     * @return KingdomResourceService
+     * @return KingdomResourcesService
      */
     public function setKingdom(Kingdom $kingdom): KingdomResourcesService {
         $this->kingdom = $kingdom;
@@ -103,9 +103,9 @@ class KingdomResourcesService {
         $kingdom = $kingdom->refresh();
 
         if (!is_null($character->can_settle_again_at)) {
-            $time = $character->can_settle_again_at->addMinutes(30);
+            $time = $character->can_settle_again_at->addMinutes(15);
         } else {
-            $time = now()->addMinutes(30);
+            $time = now()->addMinutes(15);
         }
 
         $character->update([
@@ -118,11 +118,15 @@ class KingdomResourcesService {
 
         $minutes = now()->diffInMinutes($time);
 
-        event(new GameServerMessageEvent($character->user, 'You have been locked out of making a new kingdom for: '. $minutes . ' Minutes.'));
+        event(new GameServerMessageEvent($character->user, 'You have been locked out of settling or purchasing a new kingdom for: '.
+            $minutes . ' Minutes. If you abandon another kingdom, we add 15 minutes to what ever time is left.
+            If you attempt to settle or purchase a king you will be told how much time you have left.'));
+
+        $this->updateKingdomHandler->refreshPlayersKingdoms($character);
 
         broadcast(new UpdateNPCKingdoms($kingdom->gameMap));
         broadcast(new UpdateGlobalMap($character));
-        broadcast(new UpdateMapDetailsBroadcast($character->map, $character->user, $this->movementService, true));
+        broadcast(new UpdateMapDetailsBroadcast($character->map, $character->user, $this->locationService));
     }
 
     protected function putUpdatedKingdomIntoCache(array $cache = []): array {

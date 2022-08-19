@@ -86,7 +86,7 @@ export default class Kingdom extends React.Component<KingdomProps, any> {
                         <div className='text-right cursor-pointer text-red-500'>
                             <button onClick={this.props.close_details}><i className="fas fa-minus-circle"></i></button>
                         </div>
-                        <KingdomDetails kingdom={this.props.kingdom} character_gold={this.props.character_gold} />
+                        <KingdomDetails kingdom={this.props.kingdom} character_gold={this.props.character_gold} close_details={this.props.close_details}/>
                     </BasicCard>
 
                     <div>
