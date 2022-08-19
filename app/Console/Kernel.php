@@ -4,25 +4,12 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
-use App\Console\Commands\CleanMarketHistory;
-use App\Console\Commands\MoveInfoFiles;
-use App\Console\Commands\UpdateKingdoms;
 use Spatie\ShortSchedule\ShortSchedule;
 
 /**
  * @codeCoverageIgnore
  */
 class Kernel extends ConsoleKernel {
-
-    /**
-     * The Artisan commands provided by your application.
-     *
-     * @var array
-     */
-    protected $commands = [
-        MoveInfoFiles::class,
-        CleanMarketHistory::class,
-    ];
 
     /**
      * Define the application's command schedule.
@@ -44,10 +31,6 @@ class Kernel extends ConsoleKernel {
 
         // Refresh the high-end droppable items.
         $schedule->command('cache:high-end-items')->everyThreeHours()->timezone(config('app.timezone'));
-
-        // Refresh the cache, rebuild character attack data, update kingdoms and remove duplicate quest items.
-        // Runs Daily at 2 am.
-        $schedule->command('clear-and-rebuild:cache')->dailyAt('02:00')->timezone(config('app.timezone'));
 
         // Clear the celestials every hour.
         $schedule->command('clear:celestials')->hourly()->timezone(config('app.timezone'));
