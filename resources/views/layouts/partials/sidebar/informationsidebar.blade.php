@@ -63,6 +63,10 @@
                 <span class="far fa-chart-bar"></span>
                 Character Stats
             </a>
+            <a href="{{route('info.page', ['pageName' => 'character-xp'])}}">
+                <i class="fas fa-chart-line"></i>
+                Character XP
+            </a>
             <a href="#no-link" class="active" data-toggle="collapse" data-target="#menueSkills">
                 <span class="collapse-indicator la la-arrow-circle-down"></span>
                 Skill Info

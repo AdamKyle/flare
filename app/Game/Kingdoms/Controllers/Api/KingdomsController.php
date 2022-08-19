@@ -2,30 +2,28 @@
 
 namespace App\Game\Kingdoms\Controllers\Api;
 
-use App\Flare\Models\UnitMovementQueue;
-use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
-use App\Game\Kingdoms\Service\KingdomResourcesService;
-use App\Game\Kingdoms\Service\KingdomSettleService;
-use App\Game\Messages\Events\GlobalMessageEvent;
 use Illuminate\Http\JsonResponse;
 use League\Fractal\Resource\Item;
 use App\Http\Controllers\Controller;
-use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Flare\Models\UnitMovementQueue;
 use App\Flare\Models\Kingdom;
+use App\Game\Kingdoms\Service\UpdateKingdom;
+use App\Game\Kingdoms\Service\KingdomResourcesService;
+use App\Game\Kingdoms\Service\KingdomSettleService;
+use App\Game\Messages\Events\GlobalMessageEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Kingdoms\Requests\PurchasePeopleRequest;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 use App\Game\Kingdoms\Values\UnitCosts;
 use App\Game\Kingdoms\Requests\KingdomRenameRequest;
-use App\Game\Kingdoms\Events\UpdateKingdom;
-use App\Game\Kingdoms\Events\AddKingdomToMap;
-use App\Game\Kingdoms\Events\UpdateGlobalMap;
+
 
 class KingdomsController extends Controller {
 
     /**
-     * @var UpdateKingdomHandler $updateKingdomHandler
+     * @var UpdateKingdom $updateKingdom
      */
-    private UpdateKingdomHandler $updateKingdomHandler;
+    private UpdateKingdom $updateKingdom;
 
     /**
      * @var KingdomSettleService $kingdomSettleService
@@ -38,16 +36,16 @@ class KingdomsController extends Controller {
     private KingdomResourcesService $kingdomResourceServer;
 
     /**
-     * @param UpdateKingdomHandler $updateKingdomHandler
+     * @param UpdateKingdom $updateKingdom
      * @param KingdomSettleService $kingdomSettleService
      * @param KingdomResourcesService $kingdomResourceServer
      */
-    public function __construct(UpdateKingdomHandler $updateKingdomHandler,
+    public function __construct(UpdateKingdom $updateKingdom,
                                 KingdomSettleService $kingdomSettleService,
                                 KingdomResourcesService $kingdomResourceServer)
     {
 
-        $this->updateKingdomHandler    = $updateKingdomHandler;
+        $this->updateKingdom           = $updateKingdom;
         $this->kingdomSettleService    = $kingdomSettleService;
         $this->kingdomResourceServer   = $kingdomResourceServer;
     }
@@ -58,16 +56,17 @@ class KingdomsController extends Controller {
      * @return JsonResponse
      */
     public function rename(KingdomRenameRequest $request, Kingdom $kingdom): JsonResponse {
+        $user = auth()->user();
+
+        if ($kingdom->character_id !== $user->character->id) {
+            return response()->json([
+                'message' => 'Not allowed to do that.'
+            ], 422);
+        }
+
         $kingdom->update($request->all());
 
-        $character = $kingdom->character->refresh();
-
-        $this->kingdomSettleService->addKingdomToCache($character, $kingdom);
-
-        $this->updateKingdomHandler->refreshPlayersKingdoms($character);
-
-        event(new UpdateGlobalMap($character));
-        event(new AddKingdomToMap($character));
+        $this->updateKingdom->updateKingdom($kingdom->refresh());
 
         return response()->json();
     }

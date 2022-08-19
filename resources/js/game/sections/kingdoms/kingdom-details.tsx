@@ -4,10 +4,15 @@ import {formatNumber} from "../../lib/game/format-number";
 import PrimaryOutlineButton from "../../components/ui/buttons/primary-outline-button";
 import DangerOutlineButton from "../../components/ui/buttons/danger-outline-button";
 import SkyOutlineButton from "../../components/ui/buttons/sky-outline-button";
+import ChangeNameModal from "./modals/change-name-modal";
 
 export default class KingdomDetails extends React.Component<KingdomDetailsProps, any> {
     constructor(props: KingdomDetailsProps) {
         super(props);
+
+        this.state = {
+            show_change_name_modal: false,
+        }
     }
 
     calculateTotalDefence(): number {
@@ -16,6 +21,12 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
         return kingdom.walls_defence + kingdom.treasury_defence +
                kingdom.gold_bars_defence + kingdom.passive_defence +
                kingdom.defence_bonus;
+    }
+
+    showChangeName() {
+        this.setState({
+            show_change_name_modal: !this.state.show_change_name_modal
+        });
     }
 
     render() {
@@ -88,6 +99,7 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
                         <h3>Kingdom Actions</h3>
                         <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                         <div className='grid md:grid-cols-1 gap-4'>
+                            <PrimaryOutlineButton button_label={'Change Name'} on_click={this.showChangeName.bind(this)} />
                             <PrimaryOutlineButton button_label={'Buy Population'} on_click={() => {}} />
                             <SkyOutlineButton button_label={'Manage Gold Bars'} on_click={() => {}} />
                             <SkyOutlineButton button_label={'Manage Treasury'} on_click={() => {}} />
@@ -95,6 +107,17 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
                         </div>
                     </div>
                 </div>
+
+                {
+                    this.state.show_change_name_modal ?
+                        <ChangeNameModal
+                            name={this.props.kingdom.name}
+                            kingdom_id={this.props.kingdom.id}
+                            is_open={true}
+                            handle_close={this.showChangeName.bind(this)}
+                        />
+                    : null
+                }
             </Fragment>
 
         )
