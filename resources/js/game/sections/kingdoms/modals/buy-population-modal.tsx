@@ -5,6 +5,8 @@ import LoadingProgressBar from "../../../components/ui/progress-bars/loading-pro
 import BuyPopulationModalProps from "../../../lib/game/kingdoms/types/modals/buy-population-modal-props";
 import BuyPopulationModalState from "../../../lib/game/kingdoms/types/modals/buy-population-modal-state";
 import { formatNumber } from "../../../lib/game/format-number";
+import Ajax from "../../../lib/ajax/ajax";
+import {AxiosError, AxiosResponse} from "axios";
 
 export default class BuyPopulationModal extends React.Component<BuyPopulationModalProps, BuyPopulationModalState> {
 
@@ -35,7 +37,32 @@ export default class BuyPopulationModal extends React.Component<BuyPopulationMod
     }
 
     buyPop() {
+        this.setState({
+            loading: true,
+        }, () => {
+            (new Ajax()).setParameters({
+                amount_to_purchase: this.state.total,
+            }).setRoute('kingdoms/purchase-people/' + this.props.kingdom.id)
+              .doAjaxCall('post', (result: AxiosResponse) => {
+                  this.setState({
+                      loading: false,
+                  }, () => {
+                      this.props.handle_close()
+                  });
+              }, (error: AxiosError) => {
+                  this.setState({ loading: false });
 
+                  if (typeof error.response !== 'undefined') {
+                      const response = error.response;
+
+                      if (response.status === 422) {
+                          this.setState({
+                              error_message: response.data.message
+                          });
+                      }
+                  }
+              });
+        });
     }
 
     render() {
@@ -43,9 +70,10 @@ export default class BuyPopulationModal extends React.Component<BuyPopulationMod
             <Dialogue is_open={this.props.is_open}
                       handle_close={this.props.handle_close}
                       title={'Buy Population'}
+                      primary_button_disabled={this.state.loading}
                       secondary_actions={{
                           handle_action: this.buyPop.bind(this),
-                          secondary_button_disabled: this.state.total === 0 || this.props.gold === 0 || this.state.cost > this.props.gold,
+                          secondary_button_disabled: this.state.total === 0 || this.props.gold === 0 || this.state.cost > this.props.gold || this.state.loading,
                           secondary_button_label: 'Buy Population',
                       }}
             >

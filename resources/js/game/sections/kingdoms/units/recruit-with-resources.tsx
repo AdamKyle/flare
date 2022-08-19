@@ -65,7 +65,13 @@ export default class RecruitWithResources extends React.Component<any, any> {
             return;
         }
 
-        const value = e.target.value;
+        const value = parseInt(e.target.value) || 0;
+
+        if (value === 0) {
+            return this.setState({
+                amount_to_recruit: '',
+            })
+        }
 
         const amount = this.getAmountToRecruit(value);
 
@@ -85,22 +91,20 @@ export default class RecruitWithResources extends React.Component<any, any> {
         });
     }
 
-    getAmountToRecruit(numberToRecruit: string) {
-        let amount = parseInt(numberToRecruit) || 0;
-
-        if (amount === 0) {
+    getAmountToRecruit(numberToRecruit: number) {
+        if (numberToRecruit === 0) {
             return 0;
         }
 
-        amount = Math.abs(amount);
+        numberToRecruit = Math.abs(numberToRecruit);
 
         const currentMax = this.props.unit.max_amount;
 
-        if (amount > currentMax) {
-            amount = currentMax;
+        if (numberToRecruit > currentMax) {
+            numberToRecruit = currentMax;
         }
 
-        return amount;
+        return numberToRecruit;
     }
 
     getAmount() {

@@ -6,6 +6,9 @@ import DangerOutlineButton from "../../components/ui/buttons/danger-outline-butt
 import SkyOutlineButton from "../../components/ui/buttons/sky-outline-button";
 import ChangeNameModal from "./modals/change-name-modal";
 import BuyPopulationModal from "./modals/buy-population-modal";
+import BuildingDetails from "../../lib/game/kingdoms/building-details";
+import {buildBuildingsColumns} from "../../lib/game/kingdoms/build-buildings-columns";
+import GoblinBankModal from "./modals/goblin-bank-modal";
 
 export default class KingdomDetails extends React.Component<KingdomDetailsProps, any> {
     constructor(props: KingdomDetailsProps) {
@@ -14,6 +17,7 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
         this.state = {
             show_change_name_modal: false,
             show_buy_pop_modal: false,
+            show_goblin_bank: false,
         }
     }
 
@@ -35,6 +39,26 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
         this.setState({
             show_buy_pop_modal: !this.state.show_buy_pop_modal
         });
+    }
+
+    showGoblinBank() {
+        this.setState({
+            show_goblin_bank: !this.state.show_goblin_bank
+        });
+    }
+
+    canManageGoldBars(): boolean {
+        let bankBuilding: BuildingDetails[]|BuildingDetails = this.props.kingdom.buildings.filter((building: BuildingDetails) => {
+            return building.name === 'Goblin Coin Bank';
+        });
+
+        if (bankBuilding.length === 0) {
+            return false;
+        }
+
+        bankBuilding = bankBuilding[0];
+
+        return bankBuilding.is_locked;
     }
 
     render() {
@@ -109,7 +133,7 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
                         <div className='grid md:grid-cols-1 gap-4'>
                             <PrimaryOutlineButton button_label={'Change Name'} on_click={this.showChangeName.bind(this)} />
                             <PrimaryOutlineButton button_label={'Buy Population'} on_click={this.showBuyPop.bind(this)} />
-                            <SkyOutlineButton button_label={'Manage Gold Bars'} on_click={() => {}} />
+                            <SkyOutlineButton button_label={'Manage Gold Bars'} on_click={this.showGoblinBank.bind(this)}  disabled={this.canManageGoldBars()}/>
                             <SkyOutlineButton button_label={'Manage Treasury'} on_click={() => {}} />
                             <DangerOutlineButton button_label={'Abandon Kingdom'} on_click={() => {}} />
                         </div>
@@ -134,6 +158,18 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
                             is_open={true}
                             handle_close={this.showBuyPop.bind(this)}
                             gold={this.props.character_gold}
+                        />
+                    : null
+                }
+
+                {
+                    this.state.show_goblin_bank ?
+                        <GoblinBankModal
+                            is_open={true}
+                            handle_close={this.showGoblinBank.bind(this)}
+                            character_gold={this.props.character_gold}
+                            gold_bars={this.props.kingdom.gold_bars}
+                            kingdom_id={this.props.kingdom.id}
                         />
                     : null
                 }

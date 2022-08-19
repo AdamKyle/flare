@@ -207,9 +207,9 @@ class UnitService {
      * Can return false if resources gained back are too little.
      *
      * @param UnitInQueue $queue
-     * @return bool
+     * @return Kingdom|null
      */
-    public function cancelRecruit(UnitInQueue $queue): bool {
+    public function cancelRecruit(UnitInQueue $queue): ?Kingdom {
 
         $kingdom = $queue->kingdom;
         $user    = $kingdom->character->user;
@@ -234,7 +234,7 @@ class UnitService {
             $this->resourceCalculation($queue);
 
             if (!($this->totalResources >= .10)) {
-                return false;
+                return null;
             }
 
             $unit    = $queue->unit;
@@ -245,7 +245,7 @@ class UnitService {
 
         $this->updateKingdomHandler->refreshPlayersKingdoms($kingdom->character->refresh());
 
-        return true;
+        return $kingdom;
     }
 
     /**

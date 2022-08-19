@@ -2,24 +2,18 @@
 
 namespace App\Game\Kingdoms\Jobs;
 
-use App\Flare\Mail\GenericMail;
-use App\Flare\Events\ServerMessageEvent;
-use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
+
+use App\Game\Kingdoms\Service\UpdateKingdom;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\UnitInQueue;
-use App\Flare\Transformers\KingdomTransformer;
-use App\Game\Kingdoms\Events\UpdateKingdom;
-use App\Game\Kingdoms\Mail\RecruitedUnits;
 use Facades\App\Flare\Values\UserOnlineValue;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item;
-use Mail;
 
 class RecruitUnits implements ShouldQueue
 {
@@ -68,11 +62,10 @@ class RecruitUnits implements ShouldQueue
     /**
      * Execute the job.
      *
-     * @param Manager $manager
-     * @param KingdomTransformer $kingdomTransformer
+     * @param UpdateKingdom $updateKingdom
      * @return void
      */
-    public function handle(UpdateKingdomHandler $updateKingdomHandler)
+    public function handle(UpdateKingdom $updateKingdom)
     {
 
         $queue = UnitInQueue::find($this->queueId);
@@ -131,13 +124,15 @@ class RecruitUnits implements ShouldQueue
         $queue->delete();
 
         $kingdom = $this->kingdom->refresh();
+
+        $updateKingdom->updateKingdom($kingdom);
+
         $x       = $kingdom->x_position;
         $y       = $kingdom->y_position;
         $user    = $kingdom->character->user;
         $plane   = $kingdom->gameMap->name;
 
         if (UserOnlineValue::isOnline($user)) {
-            $updateKingdomHandler->refreshPlayersKingdoms($user->character->refresh());
 
             if ($user->show_unit_recruitment_messages) {
                 $message = $this->unit->name . ' finished recruiting for kingdom: ' .

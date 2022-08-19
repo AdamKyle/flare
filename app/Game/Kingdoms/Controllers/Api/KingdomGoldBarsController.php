@@ -2,45 +2,27 @@
 
 namespace App\Game\Kingdoms\Controllers\Api;
 
-use App\Flare\Models\UnitMovementQueue;
-use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
-use App\Game\Kingdoms\Service\KingdomResourcesService;
-use App\Game\Kingdoms\Service\KingdomSettleService;
-use App\Game\Messages\Events\GlobalMessageEvent;
+use App\Game\Kingdoms\Service\UpdateKingdom;
 use Illuminate\Http\JsonResponse;
-use League\Fractal\Resource\Item;
 use App\Http\Controllers\Controller;
 use App\Game\Core\Events\UpdateTopBarEvent;
-use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Kingdoms\Jobs\MassEmbezzle;
-use App\Game\Kingdoms\Requests\KingdomDepositRequest;
 use App\Game\Kingdoms\Requests\PurchaseGoldBarsRequest;
-use App\Game\Kingdoms\Requests\PurchasePeopleRequest;
 use App\Game\Kingdoms\Requests\WithdrawGoldBarsRequest;
-use App\Game\Kingdoms\Values\KingdomMaxValue;
-use App\Game\Kingdoms\Values\UnitCosts;
-use App\Game\Kingdoms\Requests\KingdomRenameRequest;
-use App\Game\Kingdoms\Service\KingdomBuildingService;
-use App\Game\Kingdoms\Events\UpdateKingdom;
-use App\Game\Kingdoms\Requests\KingdomEmbezzleRequest;
-use App\Game\Kingdoms\Events\AddKingdomToMap;
-use App\Game\Kingdoms\Events\UpdateGlobalMap;
-use App\Game\Messages\Events\ServerMessageEvent;
 
 class KingdomGoldBarsController extends Controller {
 
     /**
-     * @var UpdateKingdomHandler $updateKingdomHandler
+     * @var UpdateKingdom $updateKingdom
      */
-    private UpdateKingdomHandler $updateKingdomHandler;
+    private UpdateKingdom $updateKingdom;
 
     /**
-     * @param UpdateKingdomHandler $updateKingdomHandler
+     * @param UpdateKingdom $updateKingdom
      */
-    public function __construct(UpdateKingdomHandler $updateKingdomHandler){
-        $this->updateKingdomHandler = $updateKingdomHandler;
+    public function __construct(UpdateKingdom $updateKingdom){
+        $this->updateKingdom = $updateKingdom;
     }
 
     /**
@@ -64,9 +46,7 @@ class KingdomGoldBarsController extends Controller {
         $newGoldBars = $amountToBuy + $kingdom->gold_bars;
 
         if ($newGoldBars > 1000) {
-            return response()->json([
-                'message' => 'Too many gold bars.'
-            ], 422);
+            $amountToBuy = $amountToBuy - $kingdom->gold_bars;
         }
 
         $cost = $amountToBuy * 2000000000;
@@ -85,15 +65,12 @@ class KingdomGoldBarsController extends Controller {
             'gold_bars' => $newGoldBars,
         ]);
 
-        $kingdom = new Item($kingdom->refresh(), $this->kingdom);
-
-        $kingdom = $this->manager->createData($kingdom)->toArray();
+        $this->updateKingdom->updateKingdom($kingdom->refresh());
 
         event(new UpdateTopBarEvent($character->refresh()));
-        event(new UpdateKingdom($character->user, $kingdom));
 
         return response()->json([
-            'message' => 'Purchased: ' . $amountToBuy . ' Gold bars.'
+            'message' => 'Purchased: ' . number_format($amountToBuy) . ' Gold bars.'
         ], 200);
     }
 
@@ -112,9 +89,7 @@ class KingdomGoldBarsController extends Controller {
         $amount = $request->amount_to_withdraw;
 
         if ($kingdom->gold_bars < $amount) {
-            return response()->json([
-                'message' => "You don't have enough bars to do that."
-            ], 422);
+            $amount = $kingdom->gold_bars;
         }
 
         $totalGold = $amount * 2000000000;
@@ -124,15 +99,7 @@ class KingdomGoldBarsController extends Controller {
 
         if ($newGold > MaxCurrenciesValue::MAX_GOLD) {
             return response()->json([
-                'message' => 'This would cause you to go over the max allowed gold. You cannot do that.'
-            ], 422);
-        }
-
-        $newAmount = $kingdom->gold_bars - $amount;
-
-        if ($newAmount < 0) {
-            return response()->json([
-                'message' => 'Child! You do not have that many gold bars!'
+                'message' => 'You would waste gold if you withdrew this amount.'
             ], 422);
         }
 
@@ -141,17 +108,17 @@ class KingdomGoldBarsController extends Controller {
         ]);
 
         $kingdom->update([
-            'gold_bars' => $newAmount,
+            'gold_bars' => $kingdom->gold_bars - $amount,
         ]);
 
         $character = $character->refresh();
 
         event(new UpdateTopBarEvent($character));
 
-        $this->updateKingdomHandler->refreshPlayersKingdoms($character);
+        $this->updateKingdom->updateKingdom($kingdom->refresh());
 
         return response()->json([
-            'message' => 'Exchanged: ' . $amount . ' Gold bars for: ' . $totalGold . ' Gold!',
+            'message' => 'Exchanged: ' . $amount . ' Gold bars for: ' . number_format($totalGold) . ' Gold!',
         ], 200);
     }
 }

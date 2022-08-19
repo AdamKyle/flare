@@ -139,8 +139,7 @@ export default class UnitInformation extends React.Component<UnitInformationProp
                          <div className='mt-4 mb-4'>
                              <DangerAlert>
                                  You must Train: {this.props.unit.recruited_from.building_name} to level: {this.props.unit.required_building_level} before
-                                 you can recruit these units. Should the building already meet the level, make sure the building is unlocked.
-                                 You can see this in the buildings tab.
+                                 you can recruit these units. Check the buildings tab. If the building is red, you must unlock the building before leveling it.
                              </DangerAlert>
                          </div>
                      : null

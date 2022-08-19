@@ -3,7 +3,6 @@
 namespace App\Game\Kingdoms\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
-use League\Fractal\Resource\Item;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\UnitMovementQueue;
 use App\Flare\Models\Kingdom;
@@ -107,12 +106,9 @@ class KingdomsController extends Controller {
             'current_population' => $newAmount,
         ]);
 
-        $kingdom = new Item($kingdom->refresh(), $this->kingdom);
-
-        $kingdom = $this->manager->createData($kingdom)->toArray();
+        $this->updateKingdom->updateKingdom($kingdom->refresh());
 
         event(new UpdateTopBarEvent($character->refresh()));
-        event(new UpdateKingdom($character->user, $kingdom));
 
         return response()->json([], 200);
     }

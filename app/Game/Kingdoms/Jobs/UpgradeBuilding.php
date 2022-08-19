@@ -70,7 +70,7 @@ class UpgradeBuilding implements ShouldQueue {
      * @param KingdomTransformer $kingdomTransformer
      * @return void
      */
-    public function handle(UpdateKingdomHandler $updateKingdomHandler, UpdateKingdom $updateKingdom)
+    public function handle(UpdateKingdom $updateKingdom)
     {
 
         $queue = BuildingInQueue::find($this->queueId);
@@ -153,8 +153,6 @@ class UpgradeBuilding implements ShouldQueue {
         if (UserOnlineValue::isOnline($this->user)) {
             $kingdom = Kingdom::find($this->building->kingdom_id);
             $plane   = $kingdom->gameMap->name;
-
-            $updateKingdomHandler->refreshPlayersKingdoms($this->user->character->refresh());
 
             $x = $this->building->kingdom->x_position;
             $y = $this->building->kingdom->y_position;
