@@ -1,3 +1,5 @@
+import CharacterCurrenciesDetails from "../../character-currencies-details";
+
 export default interface KingdomProps {
 
     kingdoms: {id: number, x_position: number, y_position: number, color: string, character_id: number}[] | null;
@@ -6,7 +8,7 @@ export default interface KingdomProps {
 
     character_position: {x: number, y: number};
 
-    currencies?: {gold: number, gold_dust: number, shards: number, copper_coins: number};
+    currencies?: CharacterCurrenciesDetails;
 
     teleport_player: (data: {x: number, y: number, cost: number, timeout: number}) => void;
 

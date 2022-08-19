@@ -75,6 +75,7 @@ export default class BuildingInformation extends React.Component<BuildingInforma
                                         kingdom_current_population={this.props.kingdom_current_population}
                                         kingdom_building_cost_reduction={this.props.kingdom_building_cost_reduction}
                                         is_in_queue={this.props.is_in_queue}
+                                        character_gold={this.props.character_gold}
 
                 />
             case 'resources':

@@ -109,6 +109,7 @@ export default class UnitInformation extends React.Component<UnitInformationProp
                     kingdom_building_time_reduction={this.props.kingdom_building_time_reduction}
                     manage_help_dialogue={this.manageHelpDialogue.bind(this)}
                     remove_selection={this.removeSelection.bind(this)}
+                    character_gold={this.props.character_gold}
                 />
             case 'resources':
                 return <RecruitWithResources

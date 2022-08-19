@@ -186,6 +186,8 @@ export default class UpgradeWithGold extends React.Component<any, any> {
                         : null
                 }
                 <dl className='mt-4 mb-4'>
+                    <dt>Gold On Hand</dt>
+                    <dd>{formatNumber(this.props.character_gold)}</dd>
                     <dt>Gold Cost</dt>
                     <dd>{formatNumber(this.state.cost_in_gold)}</dd>
                     <dt>Additional Population Cost</dt>
@@ -213,7 +215,7 @@ export default class UpgradeWithGold extends React.Component<any, any> {
                         <LoadingProgressBar />
                         : null
                 }
-                <PrimaryButton button_label={'Purchase Levels'} additional_css={'mr-2'} on_click={this.upgradeBuilding.bind(this)} disabled={this.state.to_level <= 0 || this.state.loading || this.props.is_in_queue}/>
+                <PrimaryButton button_label={'Purchase Levels'} additional_css={'mr-2'} on_click={this.upgradeBuilding.bind(this)} disabled={this.state.to_level <= 0 || this.state.loading || this.props.is_in_queue || this.state.cost_in_gold > this.props.character_gold}/>
                 <DangerButton button_label={'Cancel'} on_click={this.props.remove_section} disabled={this.state.loading}/>
             </Fragment>
         )

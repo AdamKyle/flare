@@ -5,4 +5,6 @@ export default interface KingdomListProps {
     my_kingdoms: KingdomDetails[] | [];
 
     view_port: number;
+
+    character_gold: number;
 }

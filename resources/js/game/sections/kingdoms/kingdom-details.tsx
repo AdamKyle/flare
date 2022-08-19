@@ -5,6 +5,7 @@ import PrimaryOutlineButton from "../../components/ui/buttons/primary-outline-bu
 import DangerOutlineButton from "../../components/ui/buttons/danger-outline-button";
 import SkyOutlineButton from "../../components/ui/buttons/sky-outline-button";
 import ChangeNameModal from "./modals/change-name-modal";
+import BuyPopulationModal from "./modals/buy-population-modal";
 
 export default class KingdomDetails extends React.Component<KingdomDetailsProps, any> {
     constructor(props: KingdomDetailsProps) {
@@ -12,6 +13,7 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
 
         this.state = {
             show_change_name_modal: false,
+            show_buy_pop_modal: false,
         }
     }
 
@@ -26,6 +28,12 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
     showChangeName() {
         this.setState({
             show_change_name_modal: !this.state.show_change_name_modal
+        });
+    }
+
+    showBuyPop() {
+        this.setState({
+            show_buy_pop_modal: !this.state.show_buy_pop_modal
         });
     }
 
@@ -100,7 +108,7 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
                         <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                         <div className='grid md:grid-cols-1 gap-4'>
                             <PrimaryOutlineButton button_label={'Change Name'} on_click={this.showChangeName.bind(this)} />
-                            <PrimaryOutlineButton button_label={'Buy Population'} on_click={() => {}} />
+                            <PrimaryOutlineButton button_label={'Buy Population'} on_click={this.showBuyPop.bind(this)} />
                             <SkyOutlineButton button_label={'Manage Gold Bars'} on_click={() => {}} />
                             <SkyOutlineButton button_label={'Manage Treasury'} on_click={() => {}} />
                             <DangerOutlineButton button_label={'Abandon Kingdom'} on_click={() => {}} />
@@ -115,6 +123,17 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
                             kingdom_id={this.props.kingdom.id}
                             is_open={true}
                             handle_close={this.showChangeName.bind(this)}
+                        />
+                    : null
+                }
+
+                {
+                    this.state.show_buy_pop_modal ?
+                        <BuyPopulationModal
+                            kingdom={this.props.kingdom}
+                            is_open={true}
+                            handle_close={this.showBuyPop.bind(this)}
+                            gold={this.props.character_gold}
                         />
                     : null
                 }

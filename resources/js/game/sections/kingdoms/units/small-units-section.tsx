@@ -66,6 +66,7 @@ export default class SmallUnitsSection extends React.Component<SmallUnitSectionP
                                          is_in_queue={this.isUnitInQueue()}
                                          kingdom_id={this.props.kingdom.id}
                                          buildings={this.props.kingdom.buildings}
+                                         character_gold={this.props.character_gold}
                         />
                         :
                         <BasicCard additionalClasses={'overflow-x-auto'}>

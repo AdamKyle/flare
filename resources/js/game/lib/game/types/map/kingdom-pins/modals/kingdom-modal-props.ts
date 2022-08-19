@@ -1,3 +1,5 @@
+import CharacterCurrenciesDetails from "../../../character-currencies-details";
+
 export default interface KingdomModalProps {
     is_open: boolean;
 
@@ -9,7 +11,7 @@ export default interface KingdomModalProps {
 
     character_position?: {x: number, y: number};
 
-    currencies?: {gold: number, gold_dust: number, shards: number, copper_coins: number};
+    currencies?: CharacterCurrenciesDetails;
 
     teleport_player?: (data: {x: number, y: number, cost: number, timeout: number}) => void;
 

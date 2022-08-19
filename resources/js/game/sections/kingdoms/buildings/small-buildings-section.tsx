@@ -61,6 +61,7 @@ export default class SmallBuildingsSection extends React.Component<SmallBuilding
                                              kingdom_current_population={this.props.kingdom.current_population}
                                              character_id={this.props.kingdom.character_id}
                                              is_in_queue={this.isInQueue()}
+                                             character_gold={this.props.character_gold}
                         />
                         :
 

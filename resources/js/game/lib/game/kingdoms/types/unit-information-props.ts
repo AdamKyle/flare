@@ -11,4 +11,6 @@ export default interface UnitInformationProps extends InformationPropsBase{
     close: (unit?: UnitDetails) => void;
 
     kingdom_id: number;
+
+    character_gold: number
 }

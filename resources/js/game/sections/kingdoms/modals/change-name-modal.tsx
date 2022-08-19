@@ -21,7 +21,8 @@ export default class ChangeNameModal extends React.Component<ChangeNameModalProp
 
     setName(e: React.ChangeEvent<HTMLInputElement>) {
         this.setState({
-            name: e.target.value
+            name: e.target.value,
+            error_message: '',
         });
     }
 

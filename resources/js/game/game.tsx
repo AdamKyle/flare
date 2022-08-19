@@ -20,6 +20,8 @@ import KingdomsList from "./sections/kingdoms/kingdoms-list";
 import KingdomDetails from "./lib/game/kingdoms/kingdom-details";
 import Actions from "./sections/game-actions-section/actions";
 import PositionType from "./lib/game/types/map/position-type";
+import {removeCommas} from "./lib/game/format-number";
+import CharacterCurrenciesType from "./lib/game/character/character-currencies-type";
 
 export default class Game extends React.Component<GameProps, GameState> {
 
@@ -208,7 +210,7 @@ export default class Game extends React.Component<GameProps, GameState> {
         this.setState({character_status: characterStatus});
     }
 
-    updateCharacterCurrencies(currencies: {gold: number, shards: number, gold_dust: number, copper_coins: number}): void {
+    updateCharacterCurrencies(currencies: CharacterCurrenciesType): void {
         this.setState({character_currencies: currencies});
     }
 
@@ -361,7 +363,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                         </BasicCard>
                     </TabPanel>
                     <TabPanel key={'kingdoms'}>
-                        <KingdomsList my_kingdoms={this.state.kingdoms} view_port={this.state.view_port}/>
+                        <KingdomsList my_kingdoms={this.state.kingdoms} view_port={this.state.view_port} character_gold={removeCommas(this.state.character_currencies.gold)} />
                     </TabPanel>
                 </Tabs>
 

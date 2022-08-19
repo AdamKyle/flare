@@ -59,12 +59,14 @@ export default class SmallKingdom extends React.Component<KingdomProps, any> {
                     kingdom={this.props.kingdom}
                     dark_tables={this.props.dark_tables}
                     close_selected={this.closeSelected.bind(this)}
+                    character_gold={this.props.character_gold}
                 />
             case 'units':
                 return <SmallUnitsSection
                     kingdom={this.props.kingdom}
                     dark_tables={this.props.dark_tables}
                     close_selected={this.closeSelected.bind(this)}
+                    character_gold={this.props.character_gold}
                 />
             default:
                 return null
@@ -92,7 +94,7 @@ export default class SmallKingdom extends React.Component<KingdomProps, any> {
                                     </div>
                                 </div>
 
-                                <KingdomDetails kingdom={this.props.kingdom} />
+                                <KingdomDetails kingdom={this.props.kingdom} character_gold={this.props.character_gold} />
                             </Fragment>
                     }
                 </BasicCard>

@@ -6,4 +6,6 @@ export default interface SmallResourceManagementProps {
     dark_tables: boolean;
 
     close_selected: () => void;
+
+    character_gold: number;
 }

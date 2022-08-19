@@ -5,4 +5,6 @@ export default interface BuildingInformationProps extends InformationPropsBase {
     building: BuildingDetails;
 
     close: (building?: BuildingDetails) => void;
+
+    character_gold: number;
 }

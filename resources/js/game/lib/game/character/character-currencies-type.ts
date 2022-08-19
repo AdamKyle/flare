@@ -1,9 +1,9 @@
 export default interface CharacterCurrenciesType {
-    gold: number;
+    gold: string;
 
-    shards: number;
+    shards: string;
 
-    gold_dust: number;
+    gold_dust: string;
 
-    copper_coins: number;
+    copper_coins: string;
 }

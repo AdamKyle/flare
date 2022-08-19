@@ -13,7 +13,10 @@
  *     time_out: number,
  * }
  */
-export const fetchCost = (xPosition: number, yPosition: number, characterPosition?: {x: number, y: number}, currencies?: {gold: number, gold_dust: number, shards: number}): {
+import CharacterCurrenciesDetails from "../types/character-currencies-details";
+import {removeCommas} from "../format-number";
+
+export const fetchCost = (xPosition: number, yPosition: number, characterPosition?: {x: number, y: number}, currencies?: CharacterCurrenciesDetails): {
     can_afford: boolean,
     distance: number,
     cost: number,
@@ -36,7 +39,7 @@ export const fetchCost = (xPosition: number, yPosition: number, characterPositio
     if (currencies == null) {
         canAfford = false;
     } else {
-        if (cost > currencies.gold) {
+        if (cost > removeCommas(currencies.gold)) {
             canAfford = false;
         }
     }

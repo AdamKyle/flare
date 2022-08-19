@@ -93,9 +93,17 @@ export default class KingdomsList extends React.Component<KingdomListProps, King
                     {
                         this.state.selected_kingdom ?
                             this.props.view_port < 1600 ?
-                                <SmallKingdom close_details={this.closeKingdomDetails.bind(this)} kingdom={this.state.selected_kingdom} dark_tables={this.state.dark_tables} />
+                                <SmallKingdom close_details={this.closeKingdomDetails.bind(this)}
+                                              kingdom={this.state.selected_kingdom}
+                                              dark_tables={this.state.dark_tables}
+                                              character_gold={this.props.character_gold}
+                                />
                             :
-                                <Kingdom close_details={this.closeKingdomDetails.bind(this)} kingdom={this.state.selected_kingdom} dark_tables={this.state.dark_tables} />
+                                <Kingdom close_details={this.closeKingdomDetails.bind(this)}
+                                         kingdom={this.state.selected_kingdom}
+                                         dark_tables={this.state.dark_tables}
+                                         character_gold={this.props.character_gold}
+                                />
                         :
                             <BasicCard additionalClasses={'overflow-x-scroll'}>
                                 <Table data={this.props.my_kingdoms}

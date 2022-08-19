@@ -1,5 +1,6 @@
 import {ClassArray, ClassDictionary} from "clsx";
 import LocationDetails from "../../../map/types/location-details";
+import CharacterCurrenciesDetails from "../../character-currencies-details";
 
 export default interface SetSailModalProps  {
 
@@ -11,12 +12,7 @@ export default interface SetSailModalProps  {
 
     character_position: { x: number, y: number },
 
-    currencies?: {
-        gold: number,
-        shards: number,
-        gold_dust: number,
-        copper_coins: number,
-    };
+    currencies?: CharacterCurrenciesDetails;
 
     ports: LocationDetails[] | null;
 

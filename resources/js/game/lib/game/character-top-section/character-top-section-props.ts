@@ -1,4 +1,5 @@
 import {CharacterType} from "../character/character-type";
+import CharacterCurrenciesDetails from "../types/character-currencies-details";
 
 export default interface CharacterTopSectionProps {
 
@@ -6,7 +7,7 @@ export default interface CharacterTopSectionProps {
 
     update_character_status: (characterStatus: {is_dead: boolean, can_adventure: boolean}) => void
 
-    update_character_currencies: (currencies: {gold: number, shards: number, gold_dust: number, copper_coins: number}) => void
+    update_character_currencies: (currencies: CharacterCurrenciesDetails) => void
 
     character: CharacterType;
 }

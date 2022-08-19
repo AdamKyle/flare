@@ -1,4 +1,5 @@
 import LocationDetails from "../../../../map/types/location-details";
+import CharacterCurrenciesDetails from "../../../character-currencies-details";
 
 export interface LocationModalPros {
     is_open: boolean;
@@ -11,7 +12,7 @@ export interface LocationModalPros {
 
     character_position?: {x: number, y: number};
 
-    currencies?: {gold: number, gold_dust: number, shards: number, copper_coins: number};
+    currencies?: CharacterCurrenciesDetails;
 
     teleport_player?: (data: {x: number, y: number, cost: number, timeout: number}) => void;
 

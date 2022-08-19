@@ -28,4 +28,6 @@ export default interface InformationSectionProps {
     kingdom_id: number;
 
     buildings: BuildingDetails[] | [];
+
+    character_gold: number;
 }
