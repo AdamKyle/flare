@@ -11,8 +11,9 @@ import {buildBuildingsColumns} from "../../lib/game/kingdoms/build-buildings-col
 import GoblinBankModal from "./modals/goblin-bank-modal";
 import AbandonKingdomModal from "./modals/abadnon-kingdom-modal";
 import ManageTreasuryModal from "./modals/manage-treasury-modal";
+import KingdomDetailsState from "../../lib/game/kingdoms/types/kingdom-details-state";
 
-export default class KingdomDetails extends React.Component<KingdomDetailsProps, any> {
+export default class KingdomDetails extends React.Component<KingdomDetailsProps, KingdomDetailsState> {
     constructor(props: KingdomDetailsProps) {
         super(props);
 
