@@ -1,12 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container justify-content-center">
-        <x-core.alerts.warning-alert title="Hmm....Not here...">
-            <p class="text-yellow-700 dark:text-gray-800 mb-5">Seems you are lost child! Let me guide you home.</p>
-            <x-core.buttons.link-buttons.primary-button href="/">
-                Take me home
-            </x-core.buttons.link-buttons.primary-button>
+    <x-core.layout.info-container>
+        <x-core.alerts.warning-alert title="What exactly are you looking for?" icon="fas fa-exclamation-triangle">
+            <p class="my-4">What ever it was child, it does not exist. <a href="/">Back home we go!</a></p>
         </x-core.alerts.warning-alert>
-    </div>
+    </x-core.layout.info-container>
 @endsection
