@@ -2,8 +2,9 @@
 
 namespace App\Flare\Providers;
 
-
-use App\Falre\ServerFight\Fight\CharacterAttacks\Counter;
+use Illuminate\Support\Facades\Blade;
+use League\Fractal\Manager;
+use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Flare\Builders\AffixAttributeBuilder;
 use App\Flare\Builders\BuildMythicItem;
 use App\Flare\Builders\Character\AttackDetails\CharacterAffixInformation;
@@ -22,7 +23,6 @@ use App\Flare\Handlers\UpdateCharacterAttackTypes;
 use App\Flare\Middleware\IsCharacterLoggedInMiddleware;
 use App\Flare\Middleware\IsCharacterWhoTheySayTheyAreMiddleware;
 use App\Flare\Middleware\IsGloballyTimedOut;
-use App\Flare\ServerFight\BattleBase;
 use App\Flare\ServerFight\Fight\Affixes;
 use App\Flare\ServerFight\Fight\Ambush;
 use App\Flare\ServerFight\Fight\Attack;
@@ -64,11 +64,6 @@ use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Transformers\InventoryTransformer;
 use App\Flare\Transformers\OtherKingdomTransformer;
 use App\Flare\Transformers\UsableItemTransformer;
-use App\Game\Battle\Services\PvpService;
-use App\Game\Core\Services\CharacterService;
-use App\Game\Kingdoms\Handlers\GiveKingdomsToNpcHandler;
-use App\Game\Kingdoms\Service\KingdomResourcesService;
-use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Flare\Values\BaseStatValue;
 use App\Flare\Builders\CharacterBuilder;
 use App\Flare\Builders\CharacterInformationBuilder;
@@ -89,8 +84,8 @@ use App\Flare\Transformers\UnitTransformer;
 use App\Flare\Values\BaseSkillValue;
 use App\Flare\View\Components\ItemDisplayColor;
 use App\Flare\Builders\Character\ClassDetails\HolyStacks;
-use Blade;
-use League\Fractal\Manager;
+use App\Game\Core\Services\CharacterService;
+use App\Game\Kingdoms\Handlers\GiveKingdomsToNpcHandler;
 
 class ServiceProvider extends ApplicationServiceProvider
 {
@@ -335,10 +330,6 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(Affixes::class, function($app) {
             return new Affixes($app->make(CharacterCacheData::class));
-        });
-
-        $this->app->bind(Counter::class, function($app) {
-            return new Counter($app->make(CharacterCacheData::class));
         });
 
         $this->app->bind(SecondaryAttacks::class, function($app) {

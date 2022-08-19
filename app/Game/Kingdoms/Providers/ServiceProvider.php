@@ -2,16 +2,9 @@
 
 namespace App\Game\Kingdoms\Providers;
 
-use App\Game\Kingdoms\Console\Commands\UpdateKingdoms;
-use App\Game\Kingdoms\Handlers\TooMuchPopulationHandler;
-use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
-use App\Game\Kingdoms\Middleware\DoesKingdomBelongToAuthorizedUser;
-use App\Game\Kingdoms\Service\KingdomSettleService;
-use App\Game\Kingdoms\Service\KingdomUpdateService;
-use App\Game\Kingdoms\Service\UseItemsService;
-use App\Game\Kingdoms\Service\UpdateKingdom;
-use App\Game\Maps\Services\LocationService;
+use League\Fractal\Manager;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
+use App\Flare\Transformers\KingdomTransformer;
 use App\Game\Kingdoms\Builders\AttackBuilder;
 use App\Game\Kingdoms\Builders\AttackedKingdomBuilder;
 use App\Game\Kingdoms\Builders\TookKingdomBuilder;
@@ -32,12 +25,20 @@ use App\Game\Kingdoms\Service\AttackService;
 use App\Game\Kingdoms\Service\KingdomBuildingService;
 use App\Game\Kingdoms\Service\KingdomService;
 use App\Game\Kingdoms\Service\UnitService;
-use App\Game\Kingdoms\Service\KingdomResourcesService;
 use App\Game\Kingdoms\Service\KIngdomsAttackService;
 use App\Game\Kingdoms\Transformers\SelectedKingdom;
 use App\Game\Kingdoms\Handlers\GiveKingdomsToNpcHandler;
-use App\Flare\Transformers\KingdomTransformer;
-use League\Fractal\Manager;
+use App\Game\Kingdoms\Console\Commands\UpdateKingdoms;
+use App\Game\Kingdoms\Handlers\TooMuchPopulationHandler;
+use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
+use App\Game\Kingdoms\Middleware\DoesKingdomBelongToAuthorizedUser;
+use App\Game\Kingdoms\Service\AbandonKingdomService;
+use App\Game\Kingdoms\Service\KingdomSettleService;
+use App\Game\Kingdoms\Service\KingdomUpdateService;
+use App\Game\Kingdoms\Service\PurchasePeopleService;
+use App\Game\Kingdoms\Service\UseItemsService;
+use App\Game\Kingdoms\Service\UpdateKingdom;
+use App\Game\Maps\Services\LocationService;
 
 class ServiceProvider extends ApplicationServiceProvider
 {
@@ -82,14 +83,6 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(UnitRecallService::class, function($app) {
            return new UnitRecallService();
-        });
-
-        $this->app->bind(KingdomResourcesService::class, function($app) {
-            return new KingdomResourcesService(
-                $app->make(UpdateKingdomHandler::class),
-                $app->make(MovementService::class),
-                $app->make(LocationService::class)
-            );
         });
 
         $this->app->bind(TooMuchPopulationHandler::class, function() {
@@ -190,6 +183,17 @@ class ServiceProvider extends ApplicationServiceProvider
             return new UseItemsService(
                 $app->make(KingdomHandler::class),
                 $app->make(NotifyHandler::class)
+            );
+        });
+
+        $this->app->bind(PurchasePeopleService::class, function($app) {
+           return new PurchasePeopleService($app->make(UpdateKingdom::class));
+        });
+
+        $this->app->bind(AbandonKingdomService::class, function($app) {
+            return new AbandonKingdomService(
+                $app->make(UpdateKingdom::class),
+                $app->make(GiveKingdomsToNpcHandler::class),
             );
         });
 

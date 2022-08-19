@@ -36,7 +36,7 @@ export default class AbandonKingdomModal extends React.Component<AbandonKingdomM
                     if (typeof error.response !== 'undefined') {
                         const response = error.response;
 
-                        if (response.status === 429) {
+                        if (response.status === 422) {
                             this.setState({
                                 error_message: response.data.message,
                             });
@@ -69,16 +69,12 @@ export default class AbandonKingdomModal extends React.Component<AbandonKingdomM
                     <li>You have buildings in queue</li>
                     <li>You have units in movement or are under attack or units are traveling to your kingdom</li>
                     <li>You have gold bars in the kingdom</li>
+                    <li>You have already abandoned a kingdom</li>
                 </ul>
 
                 <p className='my-4'>
                     Abandoning kingdoms turns it into an NPC kingdom (yellow on the map). You cannot settle or purchase another kingdom
                     for 15 minutes AFTER you have abandoned the kingdom.
-                </p>
-
-                <p className='my-4'>
-                    If you abandon multiple kingdoms at once, we stack that 15 minute timeout on top of the time left. Attempting to settle or purchase a kingdom during that
-                    time window will tell you how much time is left. <strong>You will be told when yu can settle again</strong>.
                 </p>
 
                 {

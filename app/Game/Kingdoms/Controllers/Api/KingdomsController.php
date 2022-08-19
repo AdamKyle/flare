@@ -2,22 +2,18 @@
 
 namespace App\Game\Kingdoms\Controllers\Api;
 
-use App\Flare\Models\BuildingInQueue;
-use App\Flare\Models\UnitInQueue;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\UnitMovementQueue;
 use App\Flare\Models\Kingdom;
 use App\Game\Kingdoms\Service\UpdateKingdom;
-use App\Game\Kingdoms\Service\KingdomResourcesService;
-use App\Game\Kingdoms\Service\KingdomSettleService;
 use App\Game\Messages\Events\GlobalMessageEvent;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Kingdoms\Requests\PurchasePeopleRequest;
-use App\Game\Kingdoms\Values\KingdomMaxValue;
-use App\Game\Kingdoms\Values\UnitCosts;
 use App\Game\Kingdoms\Requests\KingdomRenameRequest;
-
+use App\Game\Kingdoms\Service\AbandonKingdomService;
+use App\Game\Kingdoms\Service\PurchasePeopleService;
+use App\Flare\Models\BuildingInQueue;
+use App\Flare\Models\UnitInQueue;
 
 class KingdomsController extends Controller {
 
@@ -27,28 +23,28 @@ class KingdomsController extends Controller {
     private UpdateKingdom $updateKingdom;
 
     /**
-     * @var KingdomSettleService $kingdomSettleService
+     * @var PurchasePeopleService $purchasePeopleService
      */
-    private KingdomSettleService $kingdomSettleService;
+    private PurchasePeopleService $purchasePeopleService;
 
     /**
-     * @var KingdomResourcesService $kingdomResourceServer
+     * @var AbandonKingdomService $abandonKingdomService
      */
-    private KingdomResourcesService $kingdomResourceServer;
+    private AbandonKingdomService $abandonKingdomService;
 
     /**
      * @param UpdateKingdom $updateKingdom
-     * @param KingdomSettleService $kingdomSettleService
-     * @param KingdomResourcesService $kingdomResourceServer
+     * @param PurchasePeopleService $purchasePeopleService
+     * @param AbandonKingdomService $abandonKingdomService
      */
     public function __construct(UpdateKingdom $updateKingdom,
-                                KingdomSettleService $kingdomSettleService,
-                                KingdomResourcesService $kingdomResourceServer)
-    {
+                                PurchasePeopleService $purchasePeopleService,
+                                AbandonKingdomService $abandonKingdomService
+    ){
 
         $this->updateKingdom           = $updateKingdom;
-        $this->kingdomSettleService    = $kingdomSettleService;
-        $this->kingdomResourceServer   = $kingdomResourceServer;
+        $this->purchasePeopleService   = $purchasePeopleService;
+        $this->abandonKingdomService   = $abandonKingdomService;
     }
 
     /**
@@ -84,33 +80,7 @@ class KingdomsController extends Controller {
             ], 422);
         }
 
-        $amountToBuy = $request->amount_to_purchase;
-
-        if ($amountToBuy > KingdomMaxValue::MAX_CURRENT_POPULATION) {
-            $amountToBuy = KingdomMaxValue::MAX_CURRENT_POPULATION;
-        }
-
-        $newAmount = $kingdom->current_population + $amountToBuy;
-
-        if ($newAmount > KingdomMaxValue::MAX_CURRENT_POPULATION) {
-            $newAmount = KingdomMaxValue::MAX_CURRENT_POPULATION;
-        }
-
-        $character = $kingdom->character;
-
-        $character->gold -= (new UnitCosts(UnitCosts::PERSON))->fetchCost() * $amountToBuy;
-
-        $character->save();
-
-        $character = $character->refresh();
-
-        $kingdom->update([
-            'current_population' => $newAmount,
-        ]);
-
-        $this->updateKingdom->updateKingdom($kingdom->refresh());
-
-        event(new UpdateTopBarEvent($character->refresh()));
+        $this->purchasePeopleService->setKingdom($kingdom)->purchasePeople($request->amount_to_purchase);
 
         return response()->json([], 200);
     }
@@ -154,12 +124,20 @@ class KingdomsController extends Controller {
             ], 422);
         }
 
-        $this->kingdomResourceServer->abandonKingdom($kingdom);
+        $timeout = $kingdom->character->can_settle_again_at;
 
-        event(new GlobalMessageEvent('The Creator feels for the people of: ' . $kingdom->name . ' as their leader selfishly leaves them to fend for themselves.'));
+        if (!is_null($timeout)) {
+            return response()->json([
+                'message' => 'You cannot abandon this kingdom yet, you have: ' . now()->diffInMinutes($timeout) . ' minutes left before you can settle/purchase/abandon.',
+            ], 422);
+        }
 
-        return response()->json([
-            'message' => 'Kingdom has been abandoned.'
-        ]);
+        $name = $kingdom->name;
+
+        $this->abandonKingdomService->setKingdom($kingdom)->abandon();
+
+        event(new GlobalMessageEvent('The Creator feels for the people of: ' . $name . ' as their leader selfishly leaves them to fend for themselves.'));
+
+        return response()->json([], 200);
     }
 }

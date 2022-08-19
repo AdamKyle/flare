@@ -5,8 +5,6 @@ namespace App\Game\Kingdoms\Console\Commands;
 use App\Flare\Jobs\UpdateKingdomJob;
 use Illuminate\Console\Command;
 use App\Flare\Models\Kingdom;
-use App\Game\Kingdoms\Service\KingdomResourcesService;
-use Facades\App\Flare\Values\UserOnlineValue;
 
 class UpdateKingdoms extends Command
 {
@@ -39,9 +37,9 @@ class UpdateKingdoms extends Command
      *
      * @return int
      */
-    public function handle(KingdomResourcesService $service)
+    public function handle()
     {
-        Kingdom::chunkById(250, function($kingdoms) use ($service) {
+        Kingdom::chunkById(250, function($kingdoms) {
             foreach ($kingdoms as $kingdom) {
                 UpdateKingdomJob::dispatch($kingdom)->onConnection('kingdom_jobs');
             }

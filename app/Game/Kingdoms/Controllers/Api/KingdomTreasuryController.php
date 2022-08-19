@@ -2,33 +2,19 @@
 
 namespace App\Game\Kingdoms\Controllers\Api;
 
-use App\Flare\Models\UnitMovementQueue;
-use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
-use App\Game\Kingdoms\Service\KingdomResourcesService;
-use App\Game\Kingdoms\Service\KingdomService;
-use App\Game\Kingdoms\Service\KingdomSettleService;
-use App\Game\Messages\Events\GlobalMessageEvent;
 use Illuminate\Http\JsonResponse;
-use League\Fractal\Resource\Item;
 use App\Http\Controllers\Controller;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Kingdoms\Jobs\MassEmbezzle;
 use App\Game\Kingdoms\Requests\KingdomDepositRequest;
-use App\Game\Kingdoms\Requests\PurchaseGoldBarsRequest;
-use App\Game\Kingdoms\Requests\PurchasePeopleRequest;
-use App\Game\Kingdoms\Requests\WithdrawGoldBarsRequest;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
-use App\Game\Kingdoms\Values\UnitCosts;
-use App\Game\Kingdoms\Requests\KingdomRenameRequest;
-use App\Game\Kingdoms\Service\KingdomBuildingService;
-use App\Game\Kingdoms\Events\UpdateKingdom;
 use App\Game\Kingdoms\Requests\KingdomEmbezzleRequest;
-use App\Game\Kingdoms\Events\AddKingdomToMap;
-use App\Game\Kingdoms\Events\UpdateGlobalMap;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
+use App\Game\Kingdoms\Service\KingdomService;
 
 class KingdomTreasuryController extends Controller {
 
