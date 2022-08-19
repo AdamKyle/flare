@@ -14,27 +14,19 @@ hosts:
     deploy_path: '{{release_path}}'
 
 tasks:
-  deploy:
-    - deploy:prepare
-    - deploy:vendors
-    - artisan:storage:link
-    - artisan:view:cache
-    - artisan:config:cache
-    - artisan:migrate
-    - yarn:install
-    - yarn:run:prod
-    - artisan:fetch:tag-data
-    - artisan:move:files
-    - deploy:publish
-  yarn:run:prod:
-    script:
-      - 'cd {{release_path}} && yarn run prod'
-  artisan:fetch:tag-data:
-    script:
-      - 'cd {{release_path}} && php artisan fetch:tag-data'
-  artisan:move:files:
-      script:
-        - 'cd {{release_path}} && php artisan move:files'
+  build:
+    - cd: '{{release_path}}'
+    - run: 'deploy:prepare'
+    - run: 'deploy:vendors'
+    - run: 'php artisan:storage:link'
+    - run: 'php artisan:view:cache'
+    - run: 'php artisan:config:cache'
+    - run: 'php artisan:migrate'
+    - run: 'cd {{release_path}} && php artisan:move:files'
+    - run: 'cd {{release_path}} && yarn install && yarn run prod'
+    - run: 'cd {{release_path}} && yarn run prod'
+    - run: 'cd {{release_path}} && artisan:fetch:tag-data'
+    - run: 'deploy:publish'
 
 after:
   deploy:failed: deploy:unlock
