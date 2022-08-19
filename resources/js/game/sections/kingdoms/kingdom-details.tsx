@@ -10,6 +10,7 @@ import BuildingDetails from "../../lib/game/kingdoms/building-details";
 import {buildBuildingsColumns} from "../../lib/game/kingdoms/build-buildings-columns";
 import GoblinBankModal from "./modals/goblin-bank-modal";
 import AbandonKingdomModal from "./modals/abadnon-kingdom-modal";
+import ManageTreasuryModal from "./modals/manage-treasury-modal";
 
 export default class KingdomDetails extends React.Component<KingdomDetailsProps, any> {
     constructor(props: KingdomDetailsProps) {
@@ -20,6 +21,7 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
             show_buy_pop_modal: false,
             show_goblin_bank: false,
             show_abandon_kingdom: false,
+            show_manage_treasury: false,
         }
     }
 
@@ -52,6 +54,12 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
     showAbandonKingdom() {
         this.setState({
             show_abandon_kingdom: !this.state.show_abandon_kingdom
+        })
+    }
+
+    showManageTreasury() {
+        this.setState({
+            show_manage_treasury: !this.state.show_manage_treasury
         })
     }
 
@@ -146,7 +154,7 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
                             <PrimaryOutlineButton button_label={'Change Name'} on_click={this.showChangeName.bind(this)} />
                             <PrimaryOutlineButton button_label={'Buy Population'} on_click={this.showBuyPop.bind(this)} />
                             <SkyOutlineButton button_label={'Manage Gold Bars'} on_click={this.showGoblinBank.bind(this)}  disabled={this.canManageGoldBars()}/>
-                            <SkyOutlineButton button_label={'Manage Treasury'} on_click={() => {}} />
+                            <SkyOutlineButton button_label={'Manage Treasury'} on_click={this.showManageTreasury.bind(this)} />
                             <DangerOutlineButton button_label={'Abandon Kingdom'} on_click={this.showAbandonKingdom.bind(this)} />
                         </div>
                     </div>
@@ -192,6 +200,20 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
                                              handle_close={this.showAbandonKingdom.bind(this)}
                                              handle_kingdom_close={this.props.close_details}
                                              kingdom_id={this.props.kingdom.id}
+                        />
+                    : null
+                }
+
+                {
+                    this.state.show_manage_treasury ?
+                        <ManageTreasuryModal
+                            is_open={true}
+                            handle_close={this.showManageTreasury.bind(this)}
+                            character_gold={this.props.character_gold}
+                            treasury={this.props.kingdom.treasury}
+                            morale={this.props.kingdom.current_morale}
+                            kingdom_id={this.props.kingdom.id}
+                            character_id={this.props.kingdom.character_id}
                         />
                     : null
                 }

@@ -98,7 +98,7 @@ class MassEmbezzle implements ShouldQueue
             $message = 'Stopping!: ' . $kingdom->name . ' At: (X/Y) ' . $kingdom->x_position . '/' . $kingdom->y_position .
                 ' On the ' . $kingdom->gameMap->name . ' Plane. Reason: Embezzling would waste gold.';
 
-            event(new ServerMessageEvent($character->user, $message));
+            event(new ServerMessageEvent($this->character->user, $message));
 
             return true;
         }

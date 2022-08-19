@@ -91,7 +91,11 @@ class KingdomTreasuryController extends Controller {
 
         $this->kingdomService->embezzleFromKingdom($kingdom, $amountToEmbezzle);
 
-        return response()->json([], 200);
+        $kingdom = $kingdom->refresh();
+
+        return response()->json([
+            'message' => 'Withdrew: ' . number_format($amountToEmbezzle) . ' which in turn increased your morale to: ' . ($kingdom->current_morale * 100) . '%'
+        ], 200);
     }
 
     /**
@@ -110,7 +114,9 @@ class KingdomTreasuryController extends Controller {
 
         event(new ServerMessageEvent($character->user, 'Mass Embezzling underway...'));
 
-        return response()->json([], 200);
+        return response()->json([
+            'message' => 'Mass Embezzling underway fot amount: ' . number_format($request->embezzle_amount) . '. Check server messages section below for more info.',
+        ], 200);
     }
 
     /**
@@ -140,7 +146,7 @@ class KingdomTreasuryController extends Controller {
             ], 422);
         }
 
-        $newMorale = $kingdom->current_morale + 0.15;
+        $newMorale = $kingdom->current_morale + 0.05;
 
         if ($newMorale > 1) {
             $newMorale = 1;
@@ -163,6 +169,8 @@ class KingdomTreasuryController extends Controller {
 
         event(new UpdateTopBarEvent($character));
 
-        return response()->json([], 200);
+        return response()->json([
+            'message' => 'Deposited: ' . number_format($amountToDeposit) . ' which in turn increased your morale to: ' . ($newMorale * 100) . '%'
+        ], 200);
     }
 }
