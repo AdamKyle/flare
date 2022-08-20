@@ -4,6 +4,8 @@ namespace App\Game\Maps\Controllers\Api;
 
 use App\Flare\Models\GameMap;
 use App\Game\Maps\Requests\QuestDataRequest;
+use App\Game\Maps\Services\TeleportService;
+use App\Game\Maps\Services\WalkingService;
 use Cache;
 use App\Flare\Models\Npc;
 use App\Flare\Models\Quest;
@@ -27,22 +29,36 @@ class MapController extends Controller {
     /**
      * @var MapTileValue $mapTile
      */
-    private $mapTile;
+    private MapTileValue $mapTile;
 
     /**
      * @var MovementService $movementService
      */
-    private $movementService;
+    private MovementService $movementService;
+
+    /**
+     * @var TeleportService $teleportService
+     */
+    private TeleportService $teleportService;
+
+    /**
+     * @var WalkingService $walkingService
+     */
+    private WalkingService $walkingService;
 
     /**
      * Constructor
      *
      * @param MapTileValue $mapTile
      * @param MovementService $movementService
+     * @param TeleportService $teleportService
+     * @param WalkingService $walkingService
      */
-    public function __construct(MapTileValue $mapTile, MovementService $movementService) {
+    public function __construct(MapTileValue $mapTile, MovementService $movementService, TeleportService $teleportService, WalkingService $walkingService) {
         $this->mapTile         = $mapTile;
         $this->movementService = $movementService;
+        $this->teleportService = $teleportService;
+        $this->walkingService  = $walkingService;
 
         $this->middleware('is.character.dead')->except(['mapInformation', 'fetchQuests']);
     }
@@ -51,32 +67,15 @@ class MapController extends Controller {
         return response()->json($locationService->getLocationData($character), 200);
     }
 
-    public function move(MoveRequest $request, Character $character, MovementService $movementService) {
+    public function move(MoveRequest $request, Character $character) {
         if (!$character->can_move) {
             return response()->json(['invalid input'], 429);
         }
 
-        $xPosition    = $request->character_position_x;
-        $yPosition    = $request->character_position_y;
-
-        $location = Location::where('x', $xPosition)
-                            ->where('y', $yPosition)
-                            ->where('game_map_id', $character->map->game_map_id)
-                            ->first();
-
-        if (!is_null($location)) {
-            if (!is_null($location->enemy_strength_type) && $character->currentAutomations()->where('type', AutomationType::EXPLORING)->get()->isNotEmpty()) {
-                event(new ServerMessageEvent($character->user, 'No. You are currently auto battling and the monsters here are different. Stop auto battling, then enter, then begin again.'));
-                return response()->json(['message' => 'You\'re too busy.'], 422);
-            }
-
-            if (!$location->can_players_enter) {
-                event(new ServerMessageEvent($character->user, 'You cannot enter this location. This is the PVP arena that is only open once per month.'));
-                return response()->json(['message' => 'Not allowed to enter.'], 422);
-            }
-        }
-
-        $response = $movementService->updateCharacterPosition($character, $request->all());
+        $response = $this->walkingService->setCoordinatesToTravelTo(
+            $request->character_position_x,
+            $request->character_position_y
+        )->movePlayerToNewLocation($character);
 
         $status = $response['status'];
 
@@ -86,7 +85,6 @@ class MapController extends Controller {
     }
 
     public function traverseMaps() {
-
         return response()->json($this->movementService->getMapsToTraverse(auth()->user()->character));
     }
 
@@ -104,12 +102,15 @@ class MapController extends Controller {
         return response()->json($response, $status);
     }
 
-    public function teleport(TeleportRequest $request, Character $character, MovementService $movementService) {
+    public function teleport(TeleportRequest $request, Character $character) {
         if (!$character->can_move) {
             return response()->json(['invalid input'], 429);
         }
 
-        $response = $movementService->teleport($character, $request->x, $request->y, $request->cost, $request->timeout);
+        $response = $this->teleportService->setCoordinatesToTravelTo($request->x, $request->y)
+                                          ->setCost($request->cost)
+                                          ->setTimeOutValue($request->timeout)
+                                          ->teleport($character);
 
         $status = $response['status'];
 

@@ -19,6 +19,7 @@ use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\NpcTypes;
 use App\Game\Battle\Services\ConjureService;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
+use App\Game\Core\Traits\CanHaveQuestItem;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Events\UpdateMapBroadcast;
@@ -35,7 +36,7 @@ use League\Fractal\Manager;
 
 class MovementService {
 
-    use ResponseBuilder, LiveCharacterCount, CanPlayerMassEmbezzle;
+    use ResponseBuilder, LiveCharacterCount, CanPlayerMassEmbezzle, CanHaveQuestItem;
 
     /**
      * @var array $portDetails
@@ -132,6 +133,10 @@ class MovementService {
         $this->buildMonsterCacheService   = $buildMonsterCacheService;
         $this->manager                    = $manager;
         $this->locationService            = $locationService;
+    }
+
+    public function accessLocationService(): LocationService {
+        return $this->locationService;
     }
 
     /**
@@ -396,95 +401,6 @@ class MovementService {
     }
 
     /**
-     * Teleport the player to a specified location.
-     *
-     * The array that is returned is for the response of the controller.
-     *
-     * @param Character $character
-     * @param int $x
-     * @param int $y
-     * @param int $cost
-     * @param int $time
-     * @param int $timeout
-     * @return array
-     */
-    public function teleport(Character $character, int $x, int $y, int $cost, int $timeout, bool $pctCommand = false): array {
-        $canTeleportToWater      = $this->mapTile->canWalkOnWater($character, $x, $y);
-        $canTeleportToDeathWater = $this->mapTile->canWalkOnDeathWater($character, $x, $y);
-        $canTeleportToMagma      = $this->mapTile->canWalkOnMagma($character, $x, $y);
-        $location                = Location::where('x', $x)->where('y', $y)->where('game_map_id', $character->map->game_map_id)->first();
-
-        if (!$canTeleportToWater && $this->mapTile->isWaterTile($this->mapTile->getTileColor($character, $x, $y))) {
-            $item = Item::where('effect', ItemEffectsValue::WALK_ON_WATER)->first();
-
-            return $this->errorResult('Cannot teleport to water locations without a ' . $item->name);
-        }
-
-        if (!$canTeleportToDeathWater && $this->mapTile->isDeathWaterTile($this->mapTile->getTileColor($character, $x, $y))) {
-            $item = Item::where('effect', ItemEffectsValue::WALK_ON_DEATH_WATER)->first();
-
-            return $this->errorResult('Cannot teleport to Death Water locations without a ' . $item->name);
-        }
-
-        if (!$canTeleportToMagma && $this->mapTile->isMagma($this->mapTile->getTileColor($character, $x, $y))) {
-            $item = Item::where('effect', ItemEffectsValue::WALK_ON_MAGMA)->first();
-
-            return $this->errorResult('Cannot teleport to magma locations without a ' . $item->name);
-        }
-
-        if ($this->mapTile->isPurgatoryWater($this->mapTile->getTileColor($character, $x, $y))) {
-            return $this->errorResult('You would slip away into the void if you tried to go that way, child!');
-        }
-
-        if (!is_null($location)) {
-
-            if (!$location->can_players_enter) {
-                return $this->errorResult('You cannot enter this location. This is the PVP arena that is only open once per month.');
-            }
-
-            $item = Item::where('id', $location->required_quest_item_id)->first();
-
-            if (!is_null($item)) {
-                $slot = $character->inventory->slots()->where('item_id', $item->id)->first();
-
-                if (is_null($slot)) {
-                    return $this->errorResult('Cannot enter this location without a ' . $item->name);
-                }
-            }
-        }
-
-        if ($character->gold < $cost) {
-            return $this->errorResult('Not enough gold.');
-        }
-
-        $coordinates = $this->coordinatesCache->getFromCache();
-
-        if (!in_array($x, $coordinates['x']) && !in_array($x, $coordinates['y'])) {
-            return $this->errorResult('Invalid coordinates');
-        }
-
-        $this->attemptConjure($character);
-
-        $character->map->update([
-            'character_position_x' => $x,
-            'character_position_y' => $y,
-            'position_x'           => $this->mapPositionValue->fetchXPosition($x, $character->map->position_x),
-            'position_y'           => $this->mapPositionValue->fetchYPosition($y),
-        ]);
-
-        $character = $character->refresh();
-
-        $this->teleportCharacter($character, $timeout, $cost, $pctCommand);
-
-        $this->giveLocationReward($character, [
-            'character_position_x' => $x,
-            'character_position_y' => $y,
-        ]);
-
-        return $this->successResult($this->locationService->getLocationData($character));
-    }
-
-    /**
      * Set sail.
      *
      * Moves the character from one port to another assuming they can.
@@ -631,7 +547,7 @@ class MovementService {
         return $this->successResult($this->locationService->getLocationData($character));
     }
 
-    protected function giveLocationReward(Character $character, array $params) {
+    public function giveLocationReward(Character $character, array $params) {
         $characterLocation = Location::where('x', $params['character_position_x'])
             ->where('y', $params['character_position_y'])
             ->where('game_map_id', $character->map->game_map_id)
@@ -655,33 +571,6 @@ class MovementService {
     }
 
     /**
-     * Teleport the character to a new location.
-     *
-     * @param Character $character
-     * @param int timeout
-     * @param int $cost
-     */
-    protected function teleportCharacter(Character $character, int $timeout, int $cost, bool $pctCommand = false) {
-        $character->update([
-            'can_move'          => $timeout === 0 ? true : false,
-            'gold'              => $character->gold - $cost,
-            'can_move_again_at' => $timeout === 0 ? null : now()->addMinutes($timeout),
-        ]);
-
-
-        $character = $character->refresh();
-
-        if ($timeout !== 0) {
-            event(new MoveTimeOutEvent($character, $timeout, true));
-        }
-        event(new UpdateTopBarEvent($character));
-
-        event(new UpdateCharacterStatus($character));
-
-        event(new UpdateMapBroadcast($character->user));
-    }
-
-    /**
      * Give the quest reward item
      *
      * @param Location $location
@@ -695,6 +584,11 @@ class MovementService {
             })->first();
 
             if (is_null($item)) {
+
+                if (!$this->canHaveItem($character, $item)) {
+                    return;
+                }
+
                 $slot = $character->inventory->slots()->create([
                     'inventory_id' => $character->inventory->id,
                     'item_id'      => $location->questRewardItem->id,
@@ -709,6 +603,8 @@ class MovementService {
                 }
 
                 event(new GameServerMessageEvent($character->user, 'You found: ' . $questItem->affix_name, $slot->id, true));
+
+                event(new UpdateCharacterStatus($character));
             }
         }
     }

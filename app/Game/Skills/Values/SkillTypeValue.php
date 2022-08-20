@@ -200,15 +200,6 @@ class SkillTypeValue {
     }
 
     /**
-     * Does this effect the artifact annulment?
-     *
-     * @return bool
-     */
-    public function isArtifactAnnulment(): bool {
-        return $this->value === self::EFFECTS_ARTIFACT_ANNULMENT;
-    }
-
-    /**
      * Does this effect the kingdom?
      *
      * @return bool

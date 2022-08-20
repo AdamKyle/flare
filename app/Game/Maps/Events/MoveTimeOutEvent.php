@@ -12,22 +12,22 @@ class MoveTimeOutEvent
     /**
      * @var Character $character
      */
-    public $character;
+    public Character $character;
 
     /**
      * @var int $timeout
      */
-    public $timeout;
+    public int $timeout;
 
     /**
      * @var bool $setSail
      */
-    public $setSail;
+    public bool $setSail;
 
     /**
      * @var bool $traverse
      */
-    public $traverse;
+    public bool $traverse;
 
     /**
      * Constructor
@@ -35,9 +35,9 @@ class MoveTimeOutEvent
      * @param Character $character
      * @param int $timeOut | 0
      * @param bool $setSail | false
+     * @param bool $traverse
      */
-    public function __construct(Character $character, int $timeOut = 0, bool $setSail = false, bool $traverse = false)
-    {
+    public function __construct(Character $character, int $timeOut = 0, bool $setSail = false, bool $traverse = false) {
         $this->timeOut     = $timeOut;
         $this->character   = $character;
         $this->setSail     = $setSail;

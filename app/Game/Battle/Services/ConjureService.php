@@ -2,53 +2,43 @@
 
 namespace App\Game\Battle\Services;
 
+use Facades\App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\GameMap;
-use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
-use App\Flare\Transformers\CharacterTopBarTransformer;
 use App\Flare\Values\CelestialType;
 use App\Flare\Values\MapNameValue;
-use App\Game\Battle\Events\UpdateCelestialFight;
-use App\Game\Maps\Events\UpdateMapBroadcast;
-use App\Game\Maps\Events\UpdateMapDetailsBroadcast;
-use App\Game\Maps\Services\LocationService;
-use App\Game\Maps\Services\MovementService;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item;
 use App\Flare\Models\CelestialFight;
 use App\Flare\Models\Character;
-use App\Flare\Models\Kingdom;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Npc;
-use App\Flare\Transformers\KingdomTransformer;
 use App\Flare\Values\NpcTypes;
 use App\Game\Battle\Values\CelestialConjureType;
-use App\Game\Core\Events\UpdateTopBarBroadcastEvent;
-use App\Game\Kingdoms\Events\UpdateKingdom;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
-use Facades\App\Flare\Cache\CoordinatesCache;
-
+use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Maps\Events\UpdateMapBroadcast;
+use App\Game\Maps\Services\LocationService;
 
 class ConjureService {
 
-    const DAMAGE_KD_CHECK = 1000000000;
+    /**
+     * @var NpcServerMessageBuilder $npcServerMessageBuilder
+     */
+    private NpcServerMessageBuilder $npcServerMessageBuilder;
 
-    private $manager;
-
-    private $kingdomTransformer;
-
-    private $characterTransformer;
-
-    private $npcServerMessageBuilder;
-
-    public function __construct(Manager $manager, KingdomTransformer $kingdom, CharacterTopBarTransformer $characterSheetTransformer, NpcServerMessageBuilder $npcServerMessageBuilder) {
-        $this->manager                 = $manager;
-        $this->kingdomTransformer      = $kingdom;
-        $this->characterTransformer    = $characterSheetTransformer;
+    /**
+     * @param NpcServerMessageBuilder $npcServerMessageBuilder
+     */
+    public function __construct(NpcServerMessageBuilder $npcServerMessageBuilder) {
         $this->npcServerMessageBuilder = $npcServerMessageBuilder;
     }
 
+    /**
+     * Conjure on movement.
+     *
+     * @param Character $character
+     * @return void
+     */
     public function movementConjure(Character $character) {
 
         if (CelestialFight::where('type', CelestialConjureType::PUBLIC)->get()->isNotEmpty()) {
@@ -58,15 +48,8 @@ class ConjureService {
         $x = $this->getXPosition();
         $y = $this->getYPosition();
 
-        $kingdom = $this->isAtKingdom($x, $y);
-        $damagedKingdom = false;
-
-        if (!is_null($kingdom)) {
-            $damagedKingdom = $this->canDamageKingdom();
-        }
 
         $invalidMaps = [
-            GameMap::where('name', MapNameValue::HELL)->first()->id,
             GameMap::where('name', MapNameValue::PURGATORY)->first()->id
         ];
 
@@ -85,9 +68,9 @@ class ConjureService {
             'conjured_at'     => now(),
             'x_position'      => $x,
             'y_position'      => $y,
-            'damaged_kingdom' => $damagedKingdom,
-            'stole_treasury'  => $damagedKingdom,
-            'weakened_morale' => $damagedKingdom,
+            'damaged_kingdom' => false,
+            'stole_treasury'  => false,
+            'weakened_morale' => false,
             'current_health'  => $currentMonsterHealth,
             'max_health'      => $currentMonsterHealth,
             'type'            => CelestialConjureType::PUBLIC,
@@ -99,12 +82,17 @@ class ConjureService {
         $randomIndex = rand(0, count($types) - 1);
 
         event(new GlobalMessageEvent($character->name . ' ' . $types[$randomIndex] . ': ' . $monster->name . ' on the ' . $plane . ' plane at (X/Y): ' . $x . '/' . $y));
-
-        if ($damagedKingdom) {
-            $this->damageKingdom($kingdom, $character, $this->getDamageAmount());
-        }
     }
 
+    /**
+     * Paid to conjure the beast.
+     *
+     * @param Monster $monster
+     * @param Character $character
+     * @param string $type
+     * @return void
+     * @throws \Exception
+     */
     public function conjure(Monster $monster, Character $character, string $type) {
         $x = $this->getXPosition();
         $y = $this->getYPosition();
@@ -152,14 +140,16 @@ class ConjureService {
         }
     }
 
-    public function getXPosition(): int {
-        return CoordinatesCache::getFromCache()['x'][rand(CoordinatesCache::getFromCache()['x'][0], (count(CoordinatesCache::getFromCache()['x']) - 1))];
-    }
-
-    public function getYPosition(): int {
-        return CoordinatesCache::getFromCache()['y'][rand(CoordinatesCache::getFromCache()['y'][0], (count(CoordinatesCache::getFromCache()['y']) - 1))];
-    }
-
+    /**
+     * Are we able to conjure?
+     *
+     * - Used when purchasing a conjuration.
+     *
+     * @param Character $character
+     * @param Npc $npc
+     * @param string $type
+     * @return bool
+     */
     public function canConjure(Character $character, Npc $npc, string $type): bool {
 
         if (CelestialFight::where('character_id', $character->id)->get()->isNotEmpty()) {
@@ -177,6 +167,15 @@ class ConjureService {
         return true;
     }
 
+    /**
+     * Can we afford the cost?
+     *
+     * - Only used when purchasing.
+     *
+     * @param Monster $monster
+     * @param Character $character
+     * @return bool
+     */
     public function canAfford(Monster $monster, Character $character) {
         if ($monster->gold_cost > $character->gold || $monster->gold_dust_cost > $character->gold_dust) {
             return false;
@@ -185,86 +184,45 @@ class ConjureService {
         return true;
     }
 
-    public function handleCost(Monster $monster, Character $character) {
+    /**
+     * Pay the cost.
+     *
+     * - Only used when purchasing.
+     *
+     * @param Monster $monster
+     * @param Character $character
+     * @return void
+     */
+    public function handleCost(Monster $monster, Character $character): void {
         $character->update([
             'gold'      => $character->gold - $monster->gold_cost,
             'gold_dust' => $character->gold_dust - $monster->gold_dust_cost,
         ]);
 
-        $user = $character->user;
+        $user           = $character->user;
         $characterMapId = $character->map->game_map_id;
+        $npc            = Npc::where('type', NpcTypes::SUMMONER)->where('game_map_id', $characterMapId)->first();
 
-        $character = new Item($character->refresh(), $this->characterTransformer);
-        $character = $this->manager->createData($character)->toArray();
-        $npc       = Npc::where('type', NpcTypes::SUMMONER)->where('game_map_id', $characterMapId)->first();
+        event(new UpdateTopBarEvent($character));
 
-        event(new UpdateTopBarBroadcastEvent($character, $user));
-
-        return broadcast(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('paid_conjuring', $npc), true));
+        event(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('paid_conjuring', $npc), true));
     }
 
-    public function canDamageKingdom(): bool {
-        return rand(0, self::DAMAGE_KD_CHECK) > (self::DAMAGE_KD_CHECK - 1);
+    /**
+     * Get random X position for the beast.
+     *
+     * @return int
+     */
+    protected function getXPosition(): int {
+        return CoordinatesCache::getFromCache()['x'][rand(CoordinatesCache::getFromCache()['x'][0], (count(CoordinatesCache::getFromCache()['x']) - 1))];
     }
 
-    protected function isAtKingdom(int $x, int $y) {
-        return Kingdom::where('x_position', $x)
-                      ->where('y_position', $y)
-                      ->first();
-    }
-
-    protected function getDamageAmount(): float {
-        return rand(1, 45) / 100;
-    }
-
-    protected function damageKingdom(Kingdom $kingdom, Character $character, float $damage) {
-        $kingdom->buildings->each(function($building) use($damage) {
-            $durability = floor($building->current_durability - ($building->current_durability * $damage));
-
-            $building->update([
-                'current_durability' => $durability
-            ]);
-        });
-
-        $kingdom->units->each(function($unit) use($damage) {
-            $newAmount = floor($unit->amount - ($unit->amount * $damage));
-
-            $unit->update([
-                'amount' => $newAmount
-            ]);
-        });
-
-        $morale   = $kingdom->current_morale - ($kingdom->current_morale * $damage);
-        $treasure = $kingdom->treasure - ($kingdom->treasure * $damage);
-
-        $newMorale = floor($morale * 100);
-
-        if (!($newMorale > 0)) {
-            $morale = 0;
-        }
-
-        $kingdom->update([
-            'current_morale' => $morale,
-            'treasury'       => $treasure,
-        ]);
-
-        $kingdom = $kingdom->refresh();
-
-        $kingdomPlane = $kingdom->gameMap->name;
-
-        if (is_null($kingdom->character_id)) {
-            $kingdomOwner = Npc::where('type', NpcTypes::KINGDOM_HOLDER)->first()->real_name;
-        } else {
-            $kingdomOwner = $kingdom->character->name;
-        }
-
-        $kingdomData = new Item($kingdom, $this->kingdomTransformer);
-        $kingdomData = $this->manager->createData($kingdomData)->toArray();
-
-        if (!is_null($kingdom->character_id)) {
-            event(new UpdateKingdom($character->user, $kingdomData));
-        }
-
-        event(new GlobalMessageEvent($kingdomOwner . '\'s Kingdom on the ' . $kingdomPlane . ' plane was attacked by the Celestial Entity for: ' . ($damage * 100) . '%'));
+    /**
+     * Get random Y  position for the beast.
+     *
+     * @return int
+     */
+    protected function getYPosition(): int {
+        return CoordinatesCache::getFromCache()['y'][rand(CoordinatesCache::getFromCache()['y'][0], (count(CoordinatesCache::getFromCache()['y']) - 1))];
     }
 }

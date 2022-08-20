@@ -40,9 +40,6 @@ class ServiceProvider extends ApplicationServiceProvider
     {
         $this->app->bind(ConjureService::class, function($app) {
             return new ConjureService(
-                $app->make(Manager::class),
-                $app->make(KingdomTransformer::class),
-                $app->make(CharacterTopBarTransformer::class),
                 $app->make(NpcServerMessageBuilder::class),
             );
         });

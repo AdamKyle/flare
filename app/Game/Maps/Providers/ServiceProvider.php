@@ -4,6 +4,8 @@ namespace App\Game\Maps\Providers;
 
 use App\Flare\Builders\Character\CharacterCacheData;
 use App\Game\Maps\Services\PctService;
+use App\Game\Maps\Services\TeleportService;
+use App\Game\Maps\Services\WalkingService;
 use League\Fractal\Manager;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Flare\Cache\CoordinatesCache;
@@ -40,6 +42,26 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(PortService::class, function($app) {
             return new PortService($app->make(DistanceCalculation::class), $app->make(MapPositionValue::class));
+        });
+
+        $this->app->bind(TeleportService::class, function($app) {
+            return new TeleportService(
+                $app->make(MapTileValue::class),
+                $app->make(MapPositionValue::class),
+                $app->make(CoordinatesCache::class),
+                $app->make(ConjureService::class),
+                $app->make(MovementService::class),
+            );
+        });
+
+        $this->app->bind(WalkingService::class, function($app) {
+            return new WalkingService(
+                $app->make(MapTileValue::class),
+                $app->make(MapPositionValue::class),
+                $app->make(CoordinatesCache::class),
+                $app->make(ConjureService::class),
+                $app->make(MovementService::class),
+            );
         });
 
         $this->app->bind(MapTileValue::class, function($app) {

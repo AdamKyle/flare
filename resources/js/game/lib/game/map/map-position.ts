@@ -8,12 +8,11 @@
 import MapSection from "../../../sections/map/map-section";
 
 export const getNewYPosition = (characterY: number, mapPositionY: number, viewPort: number): number => {
-
-    if (characterY < 320) {
+    if (characterY < 288) {
         return 0;
     }
 
-    if (characterY > 320) {
+    if (characterY > 288) {
         return -200;
     }
 

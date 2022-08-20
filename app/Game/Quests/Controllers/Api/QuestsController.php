@@ -4,6 +4,7 @@ namespace App\Game\Quests\Controllers\Api;
 
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Quests\Services\QuestHandlerService;
+use App\Game\Skills\Values\SkillTypeValue;
 use Cache;
 use App\Flare\Models\Character;
 use App\Flare\Models\Quest;
@@ -29,7 +30,17 @@ class QuestsController extends Controller {
     }
 
     public function quest(Quest $quest, Character $character) {
-        return response()->json($quest->loadRelations());
+        $quest = $quest->loadRelations();
+
+        if ($quest->unlocks_skill) {
+            $quest->unlocks_skill_name = (new SkillTypeValue($quest->unlocks_skill_type))->getNamedValue();
+        }
+
+        if (!$quest->unlocks_skill) {
+            $quest->unlocks_skill_name = 'N/A';
+        }
+
+        return response()->json($quest);
     }
 
     public function handInQuest(Quest $quest, Character $character) {

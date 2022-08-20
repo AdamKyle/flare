@@ -7,17 +7,15 @@ use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Events\ShowTimeOutEvent;
 use App\Game\Maps\Jobs\MoveTimeOutJob;
 
-class MoveTimeOutListener
-{
+class MoveTimeOutListener {
 
     /**
      * Handle the event.
      *
-     * @param  \App\Game\Battle\UpdateCharacterEvent  $event
+     * @param MoveTimeOutEvent $event
      * @return void
      */
-    public function handle(MoveTimeOutEvent $event)
-    {
+    public function handle(MoveTimeOutEvent $event): void {
         $character = $event->character;
 
         if ($event->traverse) {
@@ -25,63 +23,73 @@ class MoveTimeOutListener
 
             MoveTimeOutJob::dispatch($character->id)->delay($time);
         } else if ($event->timeOut !== 0) {
-            $time = round($event->timeOut - ($event->timeOut * $this->findMovementMinuteTimeReduction($character)));
-
-            if ($time < 1) {
-                $timeOut    = now()->addMinute();
-                $time = 1 * 60;
-            } else {
-                $timeOut    = now()->addMinutes($time);
-                $time = $time * 60;
-            }
-
-            $character->update([
-                'can_move'          => false,
-                'can_move_again_at' => $timeOut,
-            ]);
-
-            $character = $character->refresh();
-
-            MoveTimeOutJob::dispatch($character->id)->delay($timeOut);
+            $time = $this->disPatchMinuteBasedMovementTimeout($event, $character);
         } else {
-            $time = round(10 - (10 * $this->findMovementTimeReductions($character)));
+            $this->dispatchWalkingTimeOut($event, $character);
 
-            if ($time < 1) {
-                $time = 1;
-            }
-
-            $timeOut = now()->addSeconds($time);
-
-            $character->update([
-                'can_move'          => false,
-                'can_move_again_at' => $timeOut,
-            ]);
-
-            $character = $character->refresh();
-
-            if ($event->traverse) {
-                $timeOut = 10;
-            }
-
-            MoveTimeOutJob::dispatch($character->id)->delay($timeOut);
+            $time = 10;
         }
 
-        broadcast(new ShowTimeOutEvent($event->character->user, true, false, $time, $event->setSail));
+        event(new ShowTimeOutEvent($event->character->user, true, false, $time, $event->setSail));
     }
 
-    protected function findMovementTimeReductions(Character $character) {
-        $skill = $character->skills->filter(function($skill) {
-            return $skill->type()->isMovementTimer();
-        })->first();
+    /**
+     * Dispatches the minute based movement timeout.
+     *
+     * - Applies skill bonus reductions to time.
+     *
+     * @param MoveTimeOutEvent $event
+     * @param Character $character
+     * @return int
+     */
+    protected function disPatchMinuteBasedMovementTimeout(MoveTimeOutEvent $event, Character $character): int {
+        $time = (int) round($event->timeOut - ($event->timeOut * $this->findMovementMinuteTimeReduction($character)));
 
-        if (is_null($skill)) {
-            return 0;
+        if ($time < 1) {
+            $timeOut    = now()->addMinute();
+        } else {
+            $timeOut    = now()->addMinutes($time);
         }
 
-        return $skill->move_time_out_mod;
+        $character->update([
+            'can_move'          => false,
+            'can_move_again_at' => $timeOut,
+        ]);
+
+        $character = $character->refresh();
+
+        MoveTimeOutJob::dispatch($character->id)->delay($timeOut);
+
+        return $time * 60;
     }
 
-    protected function findMovementMinuteTimeReduction(Character $character) {
+    /**
+     * Dispatches the walking movement timer.
+     *
+     * @param MoveTimeOutEvent $event
+     * @param Character $character
+     * @return void
+     */
+    protected function dispatchWalkingTimeOut(MoveTimeOutEvent $event, Character $character): void {
+        $timeOut = now()->addSeconds(10);
+
+        $character->update([
+            'can_move'          => false,
+            'can_move_again_at' => $timeOut,
+        ]);
+
+        $character = $character->refresh();
+
+        MoveTimeOutJob::dispatch($character->id)->delay($timeOut);
+    }
+
+    /**
+     * Finds the characters moment timeout reduction.
+     *
+     * @param Character $character
+     * @return float
+     */
+    protected function findMovementMinuteTimeReduction(Character $character): float {
         $skill = $character->skills->filter(function($skill) {
             return $skill->type()->isMovementTimer();
         })->first();
