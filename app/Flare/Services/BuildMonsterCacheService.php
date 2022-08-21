@@ -2,29 +2,44 @@
 
 namespace App\Flare\Services;
 
-use App\Flare\Models\Location;
-use App\Flare\Values\LocationEffectValue;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Collection as DBCollection;
 use Illuminate\Support\Collection as IlluminateCollection;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
+use App\Flare\Models\Location;
+use App\Flare\Values\LocationEffectValue;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Monster;
 use App\Flare\Transformers\MonsterTransformer;
 
 class BuildMonsterCacheService {
 
-    private $manager;
+    /**
+     * @var Manager $manager
+     */
+    private Manager $manager;
 
-    private $monster;
+    /**
+     * @var MonsterTransformer $monster
+     */
+    private MonsterTransformer $monster;
 
+    /**
+     * @param Manager $manager
+     * @param MonsterTransformer $monster
+     */
     public function __construct(Manager $manager, MonsterTransformer $monster) {
         $this->manager            = $manager;
         $this->monster            = $monster;
     }
 
-    public function buildCache() {
+    /**
+     * Builds monster cache.
+     *
+     * @return void
+     */
+    public function buildCache(): void {
         $monstersCache = [];
 
         Cache::delete('monsters');
@@ -32,8 +47,8 @@ class BuildMonsterCacheService {
         foreach (GameMap::all() as $gameMap) {
             $monsters =  new Collection(
                 Monster::where('is_celestial_entity', false)
-                    ->where('game_map_id', $gameMap->id)
-                    ->get(),
+                       ->where('game_map_id', $gameMap->id)
+                       ->get(),
                 $this->monster
             );
 
@@ -46,7 +61,12 @@ class BuildMonsterCacheService {
         Cache::put('monsters', $monstersCache);
     }
 
-    public function buildCelesetialCache() {
+    /**
+     * Builds celestial cache.
+     *
+     * @return void
+     */
+    public function buildCelesetialCache(): void {
         $monstersCache = [];
 
         Cache::delete('monsters');
@@ -65,7 +85,15 @@ class BuildMonsterCacheService {
         Cache::put('celestials', $monstersCache);
     }
 
-    public function fetchMonsterCache(string $planeName) {
+    /**
+     * Fetch monsters from cache.
+     *
+     * - Will build the cache if none exists.
+     *
+     * @param string $planeName
+     * @return array
+     */
+    public function fetchMonsterCache(string $planeName): array {
         $cache = Cache::get('monsters');
 
         if (is_null($cache)) {
@@ -75,7 +103,16 @@ class BuildMonsterCacheService {
         return Cache::get('monsters')[$planeName];
     }
 
-    public function fetchMonsterFromCache(string $planeName, string $monsterName) {
+    /**
+     * Fetch monster from cache.
+     *
+     * - Will build the cache if none exists.
+     *
+     * @param string $planeName
+     * @param string $monsterName
+     * @return IlluminateCollection
+     */
+    public function fetchMonsterFromCache(string $planeName, string $monsterName): IlluminateCollection {
         $cache = Cache::get('monsters');
 
         if (is_null($cache)) {
@@ -85,7 +122,16 @@ class BuildMonsterCacheService {
         return collect(Cache::get('monsters')[$planeName])->where('name', $monsterName)->first();
     }
 
-    public function fetchCelestialsFromCache(string $planeName, string $monsterName) {
+    /**
+     * Fetch celestial from cache.
+     *
+     * - Will build the cache if none exists.
+     *
+     * @param string $planeName
+     * @param string $monsterName
+     * @return IlluminateCollection
+     */
+    public function fetchCelestialsFromCache(string $planeName, string $monsterName): IlluminateCollection {
         $cache = Cache::get('celestials');
 
         if (is_null($cache)) {
@@ -95,33 +141,27 @@ class BuildMonsterCacheService {
         return collect(Cache::get('celestials')[$planeName])->where('name', $monsterName)->first();
     }
 
+    /**
+     * Get monsters for special locations.
+     *
+     * @param array $monstersCache
+     * @return array
+     */
     protected function manageMonsters(array $monstersCache): array {
         foreach (Location::whereNotNull('enemy_strength_type')->get() as $location) {
             $monsters = Monster::where('is_celestial_entity', false)
                 ->where('game_map_id', $location->game_map_id)
                 ->get();
 
-            switch ($location->enemy_strength_type) {
-                case LocationEffectValue::INCREASE_STATS_BY_HUNDRED_THOUSAND:
-                    $monsters = $this->transformMonsterForLocation($monsters, LocationEffectValue::getIncreaseByAmount($location->enemy_strength_type), LocationEffectValue::fetchPercentageIncrease($location->enemy_strength_type));
-                    break;
-                case LocationEffectValue::INCREASE_STATS_BY_ONE_MILLION:
-                    $monsters = $this->transformMonsterForLocation($monsters, LocationEffectValue::getIncreaseByAmount($location->enemy_strength_type), LocationEffectValue::fetchPercentageIncrease($location->enemy_strength_type));
-                    break;
-                case LocationEffectValue::INCREASE_STATS_BY_TEN_MILLION:
-                    $monsters = $this->transformMonsterForLocation($monsters, LocationEffectValue::getIncreaseByAmount($location->enemy_strength_type), LocationEffectValue::fetchPercentageIncrease($location->enemy_strength_type));
-                    break;
-                case LocationEffectValue::INCREASE_STATS_BY_HUNDRED_MILLION:
-                    $monsters = $this->transformMonsterForLocation($monsters, LocationEffectValue::getIncreaseByAmount($location->enemy_strength_type), LocationEffectValue::fetchPercentageIncrease($location->enemy_strength_type));
-                    break;
-                case LocationEffectValue::INCREASE_STATS_BY_ONE_BILLION:
-                    $monsters = $this->transformMonsterForLocation($monsters, LocationEffectValue::getIncreaseByAmount($location->enemy_strength_type), LocationEffectValue::fetchPercentageIncrease($location->enemy_strength_type));
-                    break;
-                default:
-                    break;
-            }
+            $monsters = $this->transformMonsterForLocation(
+                $monsters,
+                LocationEffectValue::getIncreaseByAmount($location->enemy_strength_type),
+                LocationEffectValue::fetchPercentageIncrease($location->enemy_strength_type)
+            );
 
-            $monsters = new Collection($monsters, $this->monster);
+            $monsterTransformer = $this->monster->setIsMonsterSpecial(true);
+
+            $monsters = new Collection($monsters, $monsterTransformer);
 
             $monstersCache[$location->name] = $this->manager->createData($monsters)->toArray();
         }
@@ -129,6 +169,14 @@ class BuildMonsterCacheService {
         return $monstersCache;
     }
 
+    /**
+     * Transform monsters for special location.
+     *
+     * @param DBCollection $monsters
+     * @param int $increaseStatsBy
+     * @param float $increasePercentageBy
+     * @return IlluminateCollection
+     */
     protected function transformMonsterForLocation(DBCollection $monsters, int $increaseStatsBy, float $increasePercentageBy): IlluminateCollection {
         return $monsters->transform(function($monster) use ($increaseStatsBy, $increasePercentageBy) {
             $monster->str                       += $increaseStatsBy;

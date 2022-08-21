@@ -4,6 +4,7 @@ namespace App\Game\Maps\Services;
 
 use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\Character;
+use App\Flare\Models\Location;
 use App\Game\Battle\Services\ConjureService;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
@@ -72,7 +73,7 @@ class TeleportService extends BaseMovementService {
 
         $character = $this->updateCharacterMapPosition($character);
 
-        $this->teleportCharacter($character);
+        $this->teleportCharacter($character, $location, $usingPCTCommand);
 
         return $this->successResult($this->movementService->accessLocationService()->getLocationData($character));
     }
@@ -87,10 +88,11 @@ class TeleportService extends BaseMovementService {
      *   in minutes.
      *
      * @param Character $character
+     * @param Location|null $location
      * @param bool $pctCommand
      * @return void
      */
-    protected function teleportCharacter(Character $character, bool $pctCommand = false): void {
+    protected function teleportCharacter(Character $character, ?Location $location = null, bool $pctCommand = false): void {
 
         $timeout = $this->timeout;
         $cost    = $this->cost;
@@ -115,9 +117,10 @@ class TeleportService extends BaseMovementService {
 
         event(new UpdateTopBarEvent($character));
 
-        $this->movementService->giveLocationReward($character, [
-            'character_position_x' => $character->map->character_x_position,
-            'character_position_y' => $character->map->character_y_position
-        ]);
+        if (!is_null($location)) {
+            $this->movementService->giveLocationReward($character, $location);
+        }
+
+        $this->updateMonstersList($character, $location);
     }
 }

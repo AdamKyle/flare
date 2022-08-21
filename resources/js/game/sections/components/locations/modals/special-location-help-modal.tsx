@@ -17,8 +17,9 @@ export default class SpecialLocationHelpModal extends React.Component<any, any> 
                     Which you can get from completing various: <a href={"/information/quests"} target='_blank'>Quests <i className="fas fa-external-link-alt"></i></a> with in the game.
                 </p>
                 <p>
-                    These places offer specific quest items that drop at a 1/1,000,000 chance with your looting skill bonus capped at 45%. You can read more about
-                    special locations and see their drops by reading: <a href={"/information/special-locations"} target='_blank'>Special Locations <i className="fas fa-external-link-alt"></i></a>.
+                    These places offer specific quest items that drop. You cannot explore here to have them drop for you. You must manually fight the monsters.
+                    You will want your looting skill raised as high as you can as we only use a max of 45% of the skill, even if the skill bonus is 100%.
+                    You can read more about special locations and see their drops by reading: <a href={"/information/special-locations"} target='_blank'>Special Locations <i className="fas fa-external-link-alt"></i></a>.
                 </p>
             </HelpDialogue>
         );

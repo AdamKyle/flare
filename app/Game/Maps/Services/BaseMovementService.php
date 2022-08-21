@@ -2,7 +2,9 @@
 
 namespace App\Game\Maps\Services;
 
+use App\Flare\Models\GameMap;
 use App\Flare\Values\AutomationType;
+use App\Game\Maps\Events\UpdateMonsterList;
 use Illuminate\Support\Facades\Cache;
 use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\Character;
@@ -251,6 +253,31 @@ class BaseMovementService {
         }
 
         return false;
+    }
+
+    /**
+     * Updates the monster list when a player enters a special location.
+     *
+     * @param Character $character
+     * @param Location|null $location
+     * @return void
+     */
+    protected function updateMonstersList(Character $character, ?Location $location = null): void {
+        $monsters = Cache::get('monsters')[$character->map->gameMap->name];
+
+        if (!is_null($location)) {
+            if (!is_null($location->enemy_strength_type)) {
+                $monsters = Cache::get('monsters')[$location->name];
+
+                event(new ServerMessageEvent($character->user, 'You have entered a special location.
+                Special locations are places where only specific quest items can drop. You can click View Location Details
+                to read more about the location and click the relevant help docs link in the modal to read more about special locations.
+                Exploring here will NOT allow the location specific quest items to drop. Monsters here are stronger then outside the location.'
+                ));
+            }
+        }
+
+        event(new UpdateMonsterList($monsters, $character->user));
     }
 
     /**

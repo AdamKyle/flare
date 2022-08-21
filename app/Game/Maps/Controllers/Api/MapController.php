@@ -2,39 +2,33 @@
 
 namespace App\Game\Maps\Controllers\Api;
 
-use App\Flare\Models\GameMap;
-use App\Game\Maps\Requests\QuestDataRequest;
-use App\Game\Maps\Services\TeleportService;
-use App\Game\Maps\Services\WalkingService;
-use Cache;
-use App\Flare\Models\Npc;
-use App\Flare\Models\Quest;
-use App\Flare\Values\AutomationType;
-use App\Game\Maps\Requests\TraverseRequest;
-use App\Game\Messages\Events\ServerMessageEvent;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
 use App\Http\Controllers\Controller;
-use App\Flare\Models\User;
+use App\Flare\Models\Quest;
 use App\Flare\Models\Character;
-use App\Flare\Models\Location;
+use App\Game\Maps\Requests\TraverseRequest;
 use App\Game\Maps\Services\LocationService;
 use App\Game\Maps\Services\MovementService;
-use App\Game\Maps\Values\MapTileValue;
-use App\Game\Maps\Requests\IsWaterRequest;
 use App\Game\Maps\Requests\MoveRequest;
 use App\Game\Maps\Requests\SetSailValidation;
 use App\Game\Maps\Requests\TeleportRequest;
+use App\Game\Maps\Requests\QuestDataRequest;
+use App\Game\Maps\Services\SetSailService;
+use App\Game\Maps\Services\TeleportService;
+use App\Game\Maps\Services\WalkingService;
 
 class MapController extends Controller {
-
-    /**
-     * @var MapTileValue $mapTile
-     */
-    private MapTileValue $mapTile;
 
     /**
      * @var MovementService $movementService
      */
     private MovementService $movementService;
+
+    /**
+     * @var SetSailService $setSail
+     */
+    private SetSailService $setSail;
 
     /**
      * @var TeleportService $teleportService
@@ -47,27 +41,40 @@ class MapController extends Controller {
     private WalkingService $walkingService;
 
     /**
-     * Constructor
      *
-     * @param MapTileValue $mapTile
      * @param MovementService $movementService
      * @param TeleportService $teleportService
      * @param WalkingService $walkingService
+     * @param SetSailService $setSail
      */
-    public function __construct(MapTileValue $mapTile, MovementService $movementService, TeleportService $teleportService, WalkingService $walkingService) {
-        $this->mapTile         = $mapTile;
+    public function __construct(MovementService $movementService,
+                                TeleportService $teleportService,
+                                WalkingService $walkingService,
+                                SetSailService $setSail)
+    {
         $this->movementService = $movementService;
         $this->teleportService = $teleportService;
         $this->walkingService  = $walkingService;
+        $this->setSail         = $setSail;
 
         $this->middleware('is.character.dead')->except(['mapInformation', 'fetchQuests']);
     }
 
-    public function mapInformation(Character $character, LocationService $locationService) {
-        return response()->json($locationService->getLocationData($character), 200);
+    /**
+     * @param Character $character
+     * @param LocationService $locationService
+     * @return JsonResponse
+     */
+    public function mapInformation(Character $character, LocationService $locationService): JsonResponse {
+        return response()->json($locationService->getLocationData($character));
     }
 
-    public function move(MoveRequest $request, Character $character) {
+    /**
+     * @param MoveRequest $request
+     * @param Character $character
+     * @return JsonResponse
+     */
+    public function move(MoveRequest $request, Character $character): JsonResponse {
         if (!$character->can_move) {
             return response()->json(['invalid input'], 429);
         }
@@ -84,11 +91,20 @@ class MapController extends Controller {
         return response()->json($response, $status);
     }
 
-    public function traverseMaps() {
+    /**
+     * @return JsonResponse
+     */
+    public function traverseMaps(): JsonResponse {
         return response()->json($this->movementService->getMapsToTraverse(auth()->user()->character));
     }
 
-    public function traverse(TraverseRequest $request, Character $character, MovementService $movementService) {
+    /**
+     * @param TraverseRequest $request
+     * @param Character $character
+     * @param MovementService $movementService
+     * @return JsonResponse
+     */
+    public function traverse(TraverseRequest $request, Character $character, MovementService $movementService): JsonResponse {
         if (!$character->can_move) {
             return response()->json(['invalid input'], 429);
         }
@@ -102,7 +118,12 @@ class MapController extends Controller {
         return response()->json($response, $status);
     }
 
-    public function teleport(TeleportRequest $request, Character $character) {
+    /**
+     * @param TeleportRequest $request
+     * @param Character $character
+     * @return JsonResponse
+     */
+    public function teleport(TeleportRequest $request, Character $character): JsonResponse {
         if (!$character->can_move) {
             return response()->json(['invalid input'], 429);
         }
@@ -119,12 +140,20 @@ class MapController extends Controller {
         return response()->json($response, $status);
     }
 
-    public function setSail(SetSailValidation $request, Character $character, MovementService $movementService) {
+    /**
+     * @param SetSailValidation $request
+     * @param Character $character
+     * @return JsonResponse
+     */
+    public function setSail(SetSailValidation $request, Character $character): JsonResponse {
         if (!$character->can_move) {
             return response()->json(['invalid input'], 429);
         }
 
-        $response = $movementService->setSail($character, $request->all());
+        $response = $this->setSail->setCoordinatesToTravelTo($request->x, $request->y)
+                                  ->setCost($request->cost)
+                                  ->setTimeOutValue($request->timeout)
+                                  ->setSail($character);
 
         $status = $response['status'];
 
@@ -133,7 +162,12 @@ class MapController extends Controller {
         return response()->json($response, $status);
     }
 
-    public function fetchQuests(QuestDataRequest $request, Character $character) {
+    /**
+     * @param QuestDataRequest $request
+     * @param Character $character
+     * @return JsonResponse
+     */
+    public function fetchQuests(QuestDataRequest $request, Character $character): JsonResponse {
         if (!Cache::has('all-quests')) {
             Cache::put('all-quests', Quest::where('is_parent', true)->with('childQuests', 'factionMap', 'rewardItem', 'item', 'npc', 'npc.commands', 'npc.gameMap')->get());
         }

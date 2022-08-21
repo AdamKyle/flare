@@ -37,12 +37,15 @@ class Location extends Model
      * @var array
      */
     protected $casts = [
-        'y'                   => 'integer',
-        'x'                   => 'integer',
-        'type'                => 'integer',
-        'enemy_strength_type' => 'string',
-        'is_port'             => 'boolean',
-        'can_players_enter'   => 'boolean',
+        'y'                      => 'integer',
+        'x'                      => 'integer',
+        'type'                   => 'integer',
+        'is_port'                => 'boolean',
+        'can_players_enter'      => 'boolean',
+        'game_map_id'            => 'integer',
+        'quest_reward_item_id'   => 'integer',
+        'required_quest_item_id' => 'integer',
+        'enemy_strength_type'    => 'integer',
     ];
 
     public function questRewardItem() {

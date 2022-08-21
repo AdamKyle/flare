@@ -62,10 +62,11 @@ class WalkingService extends BaseMovementService
 
         $character = $this->updateCharacterMapPosition($character);
 
-        $this->movementService->giveLocationReward($character, [
-            'character_position_x' => $character->map->character_x_position,
-            'character_position_y' => $character->map->character_y_position
-        ]);
+        if (!is_null($location)) {
+            $this->movementService->giveLocationReward($character, $location);
+        }
+
+        $this->updateMonstersList($character, $location);
 
         event(new MoveTimeOutEvent($character));
 

@@ -47,6 +47,10 @@ export default class Monster extends BattleBase {
         const healthRange = this.monster.health_range.split('-');
 
         let health = random(healthRange[0], healthRange[1]);
+        console.log('monster health: ', health, this.monster.dur, (this.monster.dur * 0.25));
+        if (this.monster.is_special && this.monster.dur > 0) {
+            health = health + (this.monster.dur * 0.25);
+        }
 
         if (this.monster.increases_damage_by !== null) {
             health = health + health * this.monster.increases_damage_by;
@@ -176,14 +180,21 @@ export default class Monster extends BattleBase {
         const statReducingAffix = allStatAffixes.all_stat_reduction;
 
         if (this.canMonsterBeStatReduced(statReducingAffix.resistance_reduction, allStatAffixes.cant_be_resisted)) {
+            const strReductionAmount   = monster.str - Math.ceil(monster.str * statReducingAffix.str_reduction);
+            const dexReductionAmount   = monster.dex - Math.ceil(monster.dex * statReducingAffix.dex_reduction);
+            const durReductionAmount   = monster.dur - Math.ceil(monster.dur * statReducingAffix.dur_reduction);
+            const chrReductionAmount   = monster.chr - Math.ceil(monster.chr * statReducingAffix.chr_reduction);
+            const intReductionAmount   = monster.int - Math.ceil(monster.int * statReducingAffix.int_reduction);
+            const agiReductionAmount   = monster.agi - Math.ceil(monster.agi * statReducingAffix.agi_reduction);
+            const focusReductionAmount = monster.focus - Math.ceil(monster.focus * statReducingAffix.focus_reduction);
 
-            monster.str = monster.str - Math.ceil(monster.str * statReducingAffix.str_reduction);
-            monster.dex = monster.dex - Math.ceil(monster.dex * statReducingAffix.dex_reduction);
-            monster.dur = monster.dur - Math.ceil(monster.dur * statReducingAffix.dur_reduction);
-            monster.chr = monster.chr - Math.ceil(monster.chr * statReducingAffix.chr_reduction);
-            monster.int = monster.int - Math.ceil(monster.int * statReducingAffix.int_reduction);
-            monster.agi = monster.agi - Math.ceil(monster.agi * statReducingAffix.agi_reduction);
-            monster.focus = monster.focus - Math.ceil(monster.focus * statReducingAffix.focus_reduction);
+            monster.str   = strReductionAmount > 0 ? strReductionAmount : 1;
+            monster.dex   = dexReductionAmount > 0 ? dexReductionAmount : 1;
+            monster.dur   = durReductionAmount > 0 ? durReductionAmount : 1;
+            monster.chr   = chrReductionAmount > 0 ? chrReductionAmount : 1;
+            monster.int   = intReductionAmount > 0 ? intReductionAmount : 1;
+            monster.agi   = agiReductionAmount > 0 ? agiReductionAmount : 1;
+            monster.focus = focusReductionAmount > 0 ? focusReductionAmount : 1;
 
             return monster;
         }
@@ -206,7 +217,9 @@ export default class Monster extends BattleBase {
             }
 
             if (this.canMonsterBeStatReduced(parseInt(maxReduction.toString()), allStatAffixes.cant_be_resisted)) {
-                monster[stats[i]] = monster[stats[i]] - (monster[stats[i]] * sumOfReductions);
+                const reductionAmount = monster[stats[i]] - (monster[stats[i]] * sumOfReductions);
+
+                monster[stats[i]] = reductionAmount > 0 ? reductionAmount : 1
 
                 applied.push(true);
             } else {

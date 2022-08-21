@@ -11,9 +11,25 @@ class MonsterTransformer extends TransformerAbstract {
     use SkillsTransformerTrait;
 
     /**
+     * @var bool $isSpecial - default false
+     */
+    private bool $isSpecial = false;
+
+    /**
+     * @param bool $isSpecial
+     * @return MonsterTransformer
+     */
+    public function setIsMonsterSpecial(bool $isSpecial): MonsterTransformer {
+        $this->isSpecial = $isSpecial;
+
+        return $this;
+    }
+
+    /**
      * Fetches the monster response data
      *
      * @param Monster $monster
+     * @return array
      */
     public function transform(Monster $monster) {
 
@@ -56,9 +72,17 @@ class MonsterTransformer extends TransformerAbstract {
             'counter_chance'            => $monster->counter_chance,
             'counter_resistance_chance' => $monster->counter_resistance,
             'increases_damage_by'       => $monster->gameMap->enemy_stat_bonus,
+            'is_special'                => $this->isSpecial,
         ];
     }
 
+    /**
+     * Increase stat
+     *
+     * @param int|float|null $statValue
+     * @param float|null $increaseBy
+     * @return int|float
+     */
     public function increaseValue(int|float $statValue = null, float $increaseBy = null): int|float {
         if (is_null($increaseBy)) {
             return $statValue;
@@ -71,6 +95,12 @@ class MonsterTransformer extends TransformerAbstract {
         return $statValue + $statValue * $increaseBy;
     }
 
+    /**
+     * should increase stats?
+     *
+     * @param Monster $monster
+     * @return bool
+     */
     public function shouldIncreaseStats(Monster $monster): bool {
 
         $increase = false;

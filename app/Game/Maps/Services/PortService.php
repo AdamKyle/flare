@@ -58,7 +58,7 @@ class PortService {
      *
      * First we need the other ports that don't match the current one.
      *
-     * next we ned to filter out the ports till we find the one that matches by id, based on
+     * next we need to filter out the ports till we find the one that matches by id, based on
      * where you are going to.
      *
      * Next we return a boolean based on if the timeout and the cost matches

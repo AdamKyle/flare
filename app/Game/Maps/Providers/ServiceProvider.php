@@ -4,6 +4,7 @@ namespace App\Game\Maps\Providers;
 
 use App\Flare\Builders\Character\CharacterCacheData;
 use App\Game\Maps\Services\PctService;
+use App\Game\Maps\Services\SetSailService;
 use App\Game\Maps\Services\TeleportService;
 use App\Game\Maps\Services\WalkingService;
 use League\Fractal\Manager;
@@ -61,6 +62,17 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CoordinatesCache::class),
                 $app->make(ConjureService::class),
                 $app->make(MovementService::class),
+            );
+        });
+
+        $this->app->bind(SetSailService::class, function($app) {
+            return new SetSailService(
+                $app->make(MapTileValue::class),
+                $app->make(MapPositionValue::class),
+                $app->make(CoordinatesCache::class),
+                $app->make(ConjureService::class),
+                $app->make(MovementService::class),
+                $app->make(PortService::class),
             );
         });
 
