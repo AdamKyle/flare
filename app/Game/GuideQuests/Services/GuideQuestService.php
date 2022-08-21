@@ -95,8 +95,6 @@ class GuideQuestService {
             return false;
         }
 
-        $canHandIn = false;
-
         $attributes = [];
 
         if (!is_null($quest->required_level)) {
@@ -225,7 +223,11 @@ class GuideQuestService {
 
     protected function rewardItem(Character $character, int $rewardLevel): Character {
 
-        $level = $rewardLevel;
+        $level = $character->level;
+
+        if ($level > 100) {
+            $level = 100;
+        }
 
         $fetchItem = Item::whereNotIn('type', ['quest', 'alchemy', 'trinket'])
                          ->whereNull('item_prefix_id')
