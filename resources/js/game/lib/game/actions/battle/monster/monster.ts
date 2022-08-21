@@ -47,7 +47,7 @@ export default class Monster extends BattleBase {
         const healthRange = this.monster.health_range.split('-');
 
         let health = random(healthRange[0], healthRange[1]);
-        console.log('monster health: ', health, this.monster.dur, (this.monster.dur * 0.25));
+
         if (this.monster.is_special && this.monster.dur > 0) {
             health = health + (this.monster.dur * 0.25);
         }

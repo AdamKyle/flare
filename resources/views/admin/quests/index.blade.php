@@ -2,7 +2,7 @@
 
 @section('content')
     <x-core.page-title
-        title="Items"
+        title="Quests"
         route="{{route('home')}}"
         color="success" link="Home"
     >

@@ -99,14 +99,14 @@ export default class Crafting extends React.Component<any, any> {
             }).doAjaxCall('post', (result: AxiosResponse) => {
                 const oldCraftableItems = JSON.parse(JSON.stringify(this.state.craftable_items));
 
-               this.setState({
+                this.setState({
                    loading: false,
                    craftable_items: result.data.items
-               }, () => {
+                }, () => {
                    if (!isEqual(oldCraftableItems, result.data.items)) {
                        generateServerMessage('new_items', 'You have new items to craft. Check the list!');
                    }
-               });
+                });
             }, (error: AxiosError) => {
 
             });

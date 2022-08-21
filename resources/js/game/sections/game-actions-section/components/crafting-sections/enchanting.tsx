@@ -7,6 +7,8 @@ import {AxiosError, AxiosResponse} from "axios";
 import LoadingProgressBar from "../../../../components/ui/progress-bars/loading-progress-bar";
 import Select from "react-select";
 import {formatNumber} from "../../../../lib/game/format-number";
+import {isEqual} from "lodash";
+import {generateServerMessage} from "../../../../lib/ajax/generate-server-message";
 
 export default class Enchanting extends React.Component<any, any> {
 
@@ -49,11 +51,17 @@ export default class Enchanting extends React.Component<any, any> {
                 slot_id: this.state.selected_item,
                 affix_ids: [this.state.selected_prefix, this.state.selected_suffix]
             }).doAjaxCall('post', (result: AxiosResponse) => {
+                const oldEnchantments = JSON.parse(JSON.stringify(this.state.enchantments));
+
                 this.setState({
                     loading: false,
                     enchantable_items: result.data.character_inventory,
                     enchantments: result.data.affixes,
                 }, () => {
+                    if (!isEqual(oldEnchantments, result.data.enchantments)) {
+                        generateServerMessage('new_items', 'You have new enchantments. Check the list(s)!');
+                    }
+
                     // Select the next item in the list.
                     const foundIndex = result.data.character_inventory.findIndex((item: any) => {
                         return item.slot_id === this.state.selected_item

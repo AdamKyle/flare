@@ -101,8 +101,6 @@ export default class MovePlayer {
         if (response.status === 401) {
             return location.reload();
         }
-
-        return generateServerMessage('cannot_walk_here', response.data.message);
     }
 }
 

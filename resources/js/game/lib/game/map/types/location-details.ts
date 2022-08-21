@@ -17,7 +17,7 @@ export default interface LocationDetails {
 
     increases_enemy_stats_by: number | null;
 
-    quest_reward_item: number | null;
+    quest_reward_item: any;
 
     quest_reward_item_id: number | null;
 

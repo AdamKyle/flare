@@ -17,7 +17,7 @@
 </h2>
 
 <div class="relative">
-    <div class="float-right">
+    <div class="float-right mt-[-30px]">
         @auth
             @if (auth()->user()->hasRole('Admin'))
                 <x-core.buttons.link-buttons.success-button

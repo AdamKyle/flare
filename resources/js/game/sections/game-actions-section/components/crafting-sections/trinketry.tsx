@@ -7,6 +7,8 @@ import Select from "react-select";
 import LoadingProgressBar from "../../../../components/ui/progress-bars/loading-progress-bar";
 import PrimaryButton from "../../../../components/ui/buttons/primary-button";
 import DangerButton from "../../../../components/ui/buttons/danger-button";
+import {isEqual} from "lodash";
+import {generateServerMessage} from "../../../../lib/ajax/generate-server-message";
 
 export default class Trinketry extends React.Component<any, any> {
 
@@ -76,9 +78,15 @@ export default class Trinketry extends React.Component<any, any> {
             (new Ajax()).setRoute(url).setParameters({
                 item_to_craft: this.state.selected_item.id,
             }).doAjaxCall('post', (result: AxiosResponse) => {
+                const oldItems = JSON.parse(JSON.stringify(this.state.craftable_items));
+
                 this.setState({
                     loading: false,
                     craftable_items: result.data.items
+                }, () => {
+                    if (!isEqual(oldItems, result.data.items)) {
+                        generateServerMessage('new_items', 'You have new Trinkets to craft. Check the list!');
+                    }
                 });
             }, (error: AxiosError) => {
 

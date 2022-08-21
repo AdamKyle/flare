@@ -5,7 +5,7 @@
         <x-core.cards.card-with-title
             title="{{!is_null($quest) ? 'Edit: ' . $quest->name : 'Create Quest'}}"
             buttons="true"
-            backUrl="{{!is_null($quest) ? route('quests.index', ['affix' => $quest->id]) : route('quests.index')}}"
+            backUrl="{{!is_null($quest) ? route('quests.index') : route('quests.index')}}"
         >
             <x-core.form-wizard.container action="{{route('quest.store')}}" modelId="{{!is_null($quest) ? $quest->id : 0}}" lastTab="tab-style-2-5">
                 <x-core.form-wizard.tabs>

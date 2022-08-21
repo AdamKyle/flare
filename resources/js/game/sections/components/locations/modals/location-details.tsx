@@ -52,7 +52,20 @@ export default class LocationDetails extends React.Component<LocationDetailsProp
                                 }%</dd>
                             </dl>
                         </Fragment>
-                    : null
+                    :
+                        this.props.location.quest_reward_item_id !== null ?
+                            <Fragment>
+                                <dl className='mb-4'>
+                                    <dt>Quest Item (Gained on visiting)</dt>
+                                    <dd>
+                                        <a href={"/information/item/" + this.props.location.quest_reward_item.id} target='_blank'>
+                                            {this.props.location.quest_reward_item.affix_name} <i
+                                            className="fas fa-external-link-alt"></i>
+                                        </a>
+                                    </dd>
+                                </dl>
+                            </Fragment>
+                        : null
                 }
 
                 {
