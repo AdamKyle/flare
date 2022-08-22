@@ -55,15 +55,7 @@ class UpdateLocationBasedCraftingOptions implements ShouldBroadcastNow
             return false;
         }
 
-        $characterXPosition = $character->map->character_position_x;
-        $characterYPosition = $character->map->character_position_y;
-
-        $location = Location::where('x', $characterXPosition)
-                            ->where('y', $characterYPosition)
-                            ->where('name', 'Purgatory Smiths House')
-                            ->first();
-
-        return !is_null($location);
+        return true;
     }
 
     /**

@@ -29,10 +29,15 @@ class ShopController extends Controller {
         })->first();
 
         if (is_null($inventorySlot)) {
-            return redirect()->back()->with('error', 'Item not found.');
+            return response()->json(['message' => 'Item not found.']);
         }
 
         $item         = $inventorySlot->item;
+
+        if ($item->type === 'trinket') {
+            return response()->json(['message' => 'The shop keeper will not accept this item (Trinkets cannot be sold to the shop).']);
+        }
+
         $totalSoldFor = SellItemCalculator::fetchSalePriceWithAffixes($item);
 
         $character = $character->refresh();
@@ -41,7 +46,7 @@ class ShopController extends Controller {
 
         $inventory = $this->characterInventoryService->setCharacter($character);
 
-        return response([
+        return response()->json([
             'message' => 'Sold: ' . $item->affix_name . ' for: ' . number_format($totalSoldFor) . ' gold.',
             'inventory' => [
                 'inventory' => $inventory->getInventoryForType('inventory'),
@@ -77,7 +82,7 @@ class ShopController extends Controller {
                 ]
             ], 422);
         }
-        
+
         event(new UpdateTopBarEvent($character));
 
         return response([

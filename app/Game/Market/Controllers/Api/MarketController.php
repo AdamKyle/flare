@@ -68,12 +68,10 @@ class  MarketController extends Controller {
             return response()->json(['message' => 'item is not found.'], 422);
         }
 
-        if ($this->isUnique($slot->item)) {
-            $minCost = SellItemCalculator::fetchMinPrice($slot->item);
+        $minCost = SellItemCalculator::fetchMinPrice($slot->item);
 
-            if ( $minCost > $request->list_for) {
-                return response()->json(['message' => 'No! The minimum selling price is: ' . number_format($minCost) . ' Gold.'], 422);
-            }
+        if ( $minCost !== 0 && $minCost > $request->list_for) {
+            return response()->json(['message' => 'No! The minimum selling price is: ' . number_format($minCost) . ' Gold.'], 422);
         }
 
         MarketBoard::create([

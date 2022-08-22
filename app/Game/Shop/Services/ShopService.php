@@ -27,17 +27,13 @@ class ShopService {
             return 0;
         }
 
-        $trinketCost = 0;
-
-        foreach ($itemsToSell as $slot) {
-            if ($slot->item->type === 'trinket') {
-                $trinketCost += round($slot->item->gold_dust_cost / 100);
-            }
-        }
-
         $cost = 0;
 
         foreach ($itemsToSell as $slot) {
+            if ($slot->item->type === 'trinket') {
+                continue;
+            }
+
             $cost += SellItemCalculator::fetchSalePriceWithAffixes($slot->item);
         }
 
@@ -45,7 +41,7 @@ class ShopService {
 
         $character->inventory->slots()->whereIn('id', $ids)->delete();
 
-        $cost = $cost + $trinketCost;
+        $cost = $cost;
 
         return floor($cost - ($cost * 0.05));
     }

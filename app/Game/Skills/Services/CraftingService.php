@@ -192,7 +192,13 @@ class CraftingService {
                 event(new UpdateSkillEvent($skill));
             }
 
-            $this->updateCharacterGold($character, $item->cost);
+            if ($item->type === 'trinket') {
+                $this->updateTrinketCost($character, $item);
+            }
+
+            if ($item->type !== 'trinket') {
+                $this->updateCharacterGold($character, $item->cost);
+            }
         }
     }
 

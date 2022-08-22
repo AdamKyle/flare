@@ -186,10 +186,15 @@ export default class ComparisonSection extends React.Component<ComparisonSection
                     <PrimaryOutlineButton button_label={'Details'} on_click={() => this.manageViewItemDetails(this.props.comparison_details.itemToEquip)} disabled={this.props.is_action_loading}/>
                     <PrimaryOutlineButton button_label={'Equip'} on_click={this.manageEquipModal.bind(this)} disabled={this.props.is_action_loading || this.props.is_automation_running}/>
                     <PrimaryOutlineButton button_label={'Move'} on_click={this.manageMoveModalModal.bind(this)} disabled={this.props.is_action_loading}/>
-                    <SuccessOutlineButton button_label={'Sell'} on_click={() => this.manageSellModal(this.props.comparison_details.itemToEquip)} disabled={this.props.is_action_loading}/>
 
                     {
-                        this.props.comparison_details.itemToEquip.affix_count > 0 || this.props.comparison_details.itemToEquip.holy_stacks_applied > 0 ?
+                        this.props.comparison_details.itemToEquip.type !== 'trinket' ?
+                            <SuccessOutlineButton button_label={'Sell'} on_click={() => this.manageSellModal(this.props.comparison_details.itemToEquip)} disabled={this.props.is_action_loading}/>
+                        : null
+                    }
+
+                    {
+                        this.props.comparison_details.itemToEquip.affix_count > 0 || this.props.comparison_details.itemToEquip.holy_stacks_applied > 0 || this.props.comparison_details.itemToEquip.type === 'trinket' ?
                             <SuccessOutlineButton button_label={'List'}
                                                   on_click={() => this.manageListItemModal(this.props.comparison_details.itemToEquip)}
                                                   disabled={this.props.is_action_loading || this.props.is_automation_running}/>

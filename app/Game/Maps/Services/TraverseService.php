@@ -49,14 +49,20 @@ class TraverseService {
      */
     private $mapTileValue;
 
-    private $buildCharacterAttackTypes;
+    /**
+     * @var BuildCharacterAttackTypes  $buildCharacterAttackTypes
+     */
+    private BuildCharacterAttackTypes $buildCharacterAttackTypes;
 
     /**
      * TraverseService constructor.
      *
      * @param Manager $manager
+     * @param CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer
+     * @param BuildCharacterAttackTypes $buildCharacterAttackTypes
      * @param MonsterTransformer $monsterTransformer
      * @param LocationService $locationService
+     * @param MapTileValue $mapTileValue
      */
     public function __construct(
         Manager $manager,

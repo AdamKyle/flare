@@ -4,7 +4,7 @@
         <form method='post' action="{{route('game.delist.current-listing', ['marketBoard' => $row->id])}}">
             @csrf
             <x-core.buttons.danger-button type="submit">
-                De List
+               Remove Listing
             </x-core.buttons.danger-button>
         </form>
     </div>

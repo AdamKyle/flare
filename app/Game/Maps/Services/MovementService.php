@@ -157,12 +157,14 @@ class MovementService {
 
         $character = $character->refresh();
 
-        $params = [
-            'character_position_x' => $character->map->character_position_x,
-            'character_position_y' => $character->map->character_position_y,
-        ];
+        $location = Location::where('x', $character->map->character_position_x)
+                            ->where('y', $character->map->character_position_y)
+                            ->whereNotNull('quest_reward_item_id')
+                            ->first();
 
-        $this->giveLocationReward($character, $params);
+        if (!is_null($location)) {
+            $this->giveLocationReward($character, $location);
+        }
 
         return $this->successResult();
     }
