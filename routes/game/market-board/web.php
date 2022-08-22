@@ -8,7 +8,6 @@ Route::group(['middleware' => [
     'is.character.exploring'
 ]], function() {
     Route::get('/market/', ['as' => 'game.market', 'uses' => 'MarketController@index']);
-    Route::get('/market/sell', ['as' => 'game.market.sell', 'uses' => 'MarketController@sell']);
     Route::get('/market/current-listings/{character}', ['as' => 'game.current-listings', 'uses' => 'MarketController@currentListings']);
 
     Route::get('/market/current-listings/edit/{marketBoard}', ['as' => 'game.edit.current-listings', 'uses' => 'MarketController@editCurrentListings']);

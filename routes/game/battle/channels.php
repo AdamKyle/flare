@@ -45,3 +45,8 @@ Broadcast::channel('update-character-status-{userId}', function ($user, $userId)
 Broadcast::channel('celestial-fight-changes', function ($user) {
     return $user;
 });
+
+// When a character revives
+Broadcast::channel('character-revive-{userId}', function($user, $userId) {
+    return $user->id === (int) $userId;
+});

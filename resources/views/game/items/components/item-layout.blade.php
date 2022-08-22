@@ -39,4 +39,8 @@
 
 <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
 
-@include('game.items.components.item-details')
+@if ($item->type === 'alchemy' && !is_null($item->holy_level))
+    @include('game.items.components.item-holy-oil-details')
+@else
+    @include('game.items.components.item-details')
+@endif

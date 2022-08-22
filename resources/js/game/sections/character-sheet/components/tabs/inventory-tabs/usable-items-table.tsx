@@ -97,7 +97,7 @@ export default class UsableItemsTable extends React.Component<UsableItemTable, a
         }
 
         return (
-            <DropDown menu_items={items} button_title={'Use Options'} />
+            <DropDown menu_items={items} button_title={'Actions'} />
         )
     }
 

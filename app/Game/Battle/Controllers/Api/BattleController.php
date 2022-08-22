@@ -5,7 +5,7 @@ namespace App\Game\Battle\Controllers\Api;
 use App\Flare\Models\Location;
 use App\Flare\Services\BuildMonsterCacheService;
 use App\Game\Battle\Jobs\BattleAttackHandler;
-use App\Game\Core\Events\AttackTimeOutEvent;
+use App\Game\Battle\Events\AttackTimeOutEvent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use League\Fractal\Resource\Item;

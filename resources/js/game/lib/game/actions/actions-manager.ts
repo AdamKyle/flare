@@ -25,8 +25,8 @@ export default class ActionsManager {
         (new Ajax()).setRoute('map-actions/' + props.character.id).doAjaxCall('get', (result: AxiosResponse) => {
             this.component.setState({
                 monsters: result.data.monsters,
-                attack_time_out: props.character.can_attack_again_at !== null ? getTimeLeftInSeconds(props.character.can_attack_again_at) : 0,
-                crafting_time_out: props.character.can_craft_again_at !== null ? getTimeLeftInSeconds(props.character.can_craft_again_at) : 0,
+                attack_time_out: props.character.can_attack_again_at !== null ? props.character.can_attack_again_at : 0,
+                crafting_time_out: props.character.can_craft_again_at !== null ? props.character.can_craft_again_at : 0,
                 loading: false,
             })
         }, (error: AxiosError) => {

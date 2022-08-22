@@ -56,6 +56,7 @@ class UsableItemTransformer extends TransformerAbstract {
             'focus_mod'                        => $slot->item->focus_mod,
             'usable'                           => $slot->item->usable,
             'stat_increase'                    => $slot->item->increase_stat_by,
+            'holy_level'                       => $slot->item->holy_level,
         ];
     }
 

@@ -6,6 +6,8 @@ use Cache;
 use App\Flare\Models\Item;
 use App\Flare\Traits\Controllers\ItemsShowInformation;
 use App\Game\Core\Services\ComparisonService;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use League\Fractal\Manager;
 use App\Http\Controllers\Controller;
@@ -19,27 +21,47 @@ class MarketController extends Controller {
 
     use ItemsShowInformation;
 
-    private $manager;
+    /**
+     * @var Manager $manager
+     */
+    private Manager $manager;
 
-    private $transformer;
+    /**
+     * @var MarketItemsTransformer $transformer
+     */
+    private MarketItemsTransformer $transformer;
 
-    private $marketBoardService;
+    /**
+     * @var MarketBoardService $marketBoardService
+     */
+    private MarketBoardService $marketBoardService;
 
+    /**
+     * @param Manager $manager
+     * @param MarketItemsTransformer $transformer
+     * @param MarketBoardService $marketBoardService
+     */
     public function __construct(Manager $manager, MarketItemsTransformer $transformer, MarketBoardService $marketBoardService) {
         $this->manager            = $manager;
         $this->transformer        = $transformer;
         $this->marketBoardService = $marketBoardService;
     }
 
-    public function index() {
+    /**
+     * @return View
+     */
+    public function index(): View {
         return view('game.core.market.market');
     }
 
-    public function sell() {
-        return view('game.core.market.sell');
-    }
-
-    public function marketCompare(Request $request, Character $character, MarketBoard $marketBoard, ComparisonService $comparisonService) {
+    /**
+     * @param Request $request
+     * @param Character $character
+     * @param MarketBoard $marketBoard
+     * @param ComparisonService $comparisonService
+     * @return RedirectResponse
+     */
+    public function marketCompare(Request $request, Character $character, MarketBoard $marketBoard, ComparisonService $comparisonService): RedirectResponse {
 
         if ($marketBoard->character_id === $character->id) {
             return redirect()->back()->with('error', 'You cannot compare your own listing.');
@@ -53,7 +75,12 @@ class MarketController extends Controller {
 
     }
 
-    public function viewItemComparison(Character $character, MarketBoard $marketBoard) {
+    /**
+     * @param Character $character
+     * @param MarketBoard $marketBoard
+     * @return View|RedirectResponse
+     */
+    public function viewItemComparison(Character $character, MarketBoard $marketBoard): View|RedirectResponse {
         $cache = Cache::get('market-board-comparison-character-' . $character->id);
 
         if (is_null($cache)) {
@@ -68,7 +95,12 @@ class MarketController extends Controller {
         ]);
     }
 
-    public function buyAndReplace(Request $request, Character $character) {
+    /**
+     * @param Request $request
+     * @param Character $character
+     * @return RedirectResponse
+     */
+    public function buyAndReplace(Request $request, Character $character): RedirectResponse {
 
         $listing = MarketBoard::find($request->market_board_id);
 
@@ -103,7 +135,12 @@ class MarketController extends Controller {
         return response()->redirectToRoute('game.market')->with('success', 'Item purchased and equipped!');
     }
 
-    public function buy(Request $request, Character $character) {
+    /**
+     * @param Request $request
+     * @param Character $character
+     * @return RedirectResponse
+     */
+    public function buy(Request $request, Character $character): RedirectResponse {
         $listing = MarketBoard::find($request->market_board_id);
 
         if (is_null($listing)) {
@@ -127,7 +164,7 @@ class MarketController extends Controller {
         $totalPrice = ($listing->listed_price * 1.05);
 
         if (!($character->gold >= $totalPrice)) {
-            return response()->json(['message' => 'Not enough gold. We add a 5% tax to the total price.'], 422);
+            return response()->redirectToRoute('game.market')->with('error', 'Not enough gold. We add a 5% tax to the total price.');
         }
 
         $this->marketBoardService->buyItem($character, $listing, $totalPrice);
@@ -135,7 +172,11 @@ class MarketController extends Controller {
         return response()->redirectToRoute('game.market')->with('success', 'Item purchased!');
     }
 
-    public function currentListings(Character $character) {
+    /**
+     * @param Character $character
+     * @return View
+     */
+    public function currentListings(Character $character): View {
         $locked = MarketBoard::where('character_id', $character->id)->where('is_locked', true)->first();
 
         if (!is_null($locked)) {
@@ -150,7 +191,11 @@ class MarketController extends Controller {
         ]);
     }
 
-    public function editCurrentListings(MarketBoard $marketBoard) {
+    /**
+     * @param MarketBoard $marketBoard
+     * @return View|RedirectResponse
+     */
+    public function editCurrentListings(MarketBoard $marketBoard): View|RedirectResponse {
         $character = auth()->user()->character;
 
         if ($character->id !== $marketBoard->character_id) {
@@ -166,7 +211,12 @@ class MarketController extends Controller {
         return view('game.core.market.edit-current-listing', ['marketBoard' => $marketBoard]);
     }
 
-    public function updateCurrentListing(Request $request, MarketBoard $marketBoard) {
+    /**
+     * @param Request $request
+     * @param MarketBoard $marketBoard
+     * @return RedirectResponse
+     */
+    public function updateCurrentListing(Request $request, MarketBoard $marketBoard): RedirectResponse {
         $character = auth()->user()->character;
 
         $request->validate([
@@ -190,7 +240,11 @@ class MarketController extends Controller {
         ]))->with('success', 'Listing for: ' . $marketBoard->item->affix_name . ' updated.');
     }
 
-    public function delist(MarketBoard $marketBoard) {
+    /**
+     * @param MarketBoard $marketBoard
+     * @return RedirectResponse
+     */
+    public function delist(MarketBoard $marketBoard): RedirectResponse {
         $character = auth()->user()->character;
 
         if ($character->id !== $marketBoard->character_id) {

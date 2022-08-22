@@ -31,6 +31,10 @@ export default class MonsterAttack extends BattleBase {
         damage = damage * 2;
       }
 
+      damage -= this.defender.ac;
+
+      this.addMessage('You reduced the incoming (Physical) damage with your armour by: ' + formatNumber(this.defender.ac), 'player-action')
+
       this.currentCharacterHealth = this.currentCharacterHealth - damage;
 
       this.addMessage(monster.name + ' hits for: ' + formatNumber(damage), 'enemy-action');
@@ -58,6 +62,10 @@ export default class MonsterAttack extends BattleBase {
 
           damage = damage * 2;
         }
+
+        damage -= this.defender.ac;
+
+        this.addMessage('You reduced the incoming (Physical) damage with your armour by: ' + formatNumber(this.defender.ac), 'player-action')
 
         this.currentCharacterHealth = this.currentCharacterHealth - damage;
 

@@ -3,8 +3,9 @@
 namespace App\Game\Battle\Handlers;
 
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
+use App\Game\Battle\Events\CharacterRevive;
 use App\Game\Battle\Events\UpdateCharacterStatus;
-use App\Game\Core\Events\AttackTimeOutEvent;
+use App\Game\Battle\Events\AttackTimeOutEvent;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Flare\Models\Character;
@@ -21,25 +22,12 @@ class BattleEventHandler {
      */
     private BattleRewardProcessing $battleRewardProcessing;
 
-    /**
-     * @var Manager $manager
-     */
-    private Manager $manager;
-
-    /**
-     * @var CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer
-     */
-    private CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer;
 
     /**
      * @param BattleRewardProcessing $battleRewardProcessing
-     * @param Manager $manager
-     * @param CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer
      */
-    public function __construct(BattleRewardProcessing $battleRewardProcessing, Manager $manager, CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer) {
-        $this->battleRewardProcessing            = $battleRewardProcessing;
-        $this->manager                           = $manager;
-        $this->characterSheetBaseInfoTransformer = $characterSheetBaseInfoTransformer;
+    public function __construct(BattleRewardProcessing $battleRewardProcessing) {
+        $this->battleRewardProcessing = $battleRewardProcessing;
     }
 
     /**
@@ -93,25 +81,10 @@ class BattleEventHandler {
             ]);
         }
 
-        $character = $character->refresh();
+        event(new CharacterRevive($character->user, $character->getInformation()->buildHealth()));
 
-        $this->updateCharacterStats($character);
+        event(new UpdateCharacterStatus($character));
 
-        broadcast(new UpdateCharacterStatus($character));
-
-        return $character;
-    }
-
-    /**
-     * Update the character stats.
-     *
-     * @param Character $character
-     * @return void
-     */
-    protected function updateCharacterStats(Character $character) {
-        $characterData = new Item($character, $this->characterSheetBaseInfoTransformer);
-        $characterData = $this->manager->createData($characterData)->toArray();
-
-        event(new UpdateBaseCharacterInformation($character->user, $characterData));
+        return $character->refresh();
     }
 }

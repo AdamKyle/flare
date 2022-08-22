@@ -138,7 +138,7 @@ class MovementService {
         $yPosition = $character->map->character_position_y;
         $location  = Location::where('x', $xPosition)->where('y', $yPosition)->first();
 
-        return $this->filterTraversableMaps($character, $location, $gameMaps);
+        return $this->filterTraversableMaps($character, $gameMaps, $location);
     }
 
     /**
@@ -224,11 +224,11 @@ class MovementService {
      *   is physically at the location or on the map.
      *
      * @param Character $character
-     * @param Location $location
+     * @param Location|null $location
      * @param Collection $gameMaps
      * @return array
      */
-    protected function filterTraversableMaps(Character $character, Location $location, Collection $gameMaps): array {
+    protected function filterTraversableMaps(Character $character, Collection $gameMaps, ?Location $location = null): array {
         foreach ($gameMaps as $index => $gameMap) {
             if (!is_null($gameMap->required_location_id) && !$character->map->gameMap->mapType()->isPurgatory()) {
                 if (!is_null($location)) {
@@ -240,6 +240,8 @@ class MovementService {
                 }
             }
         }
+
+        dump($gameMaps->pluck('name')->toArray());
 
         return $gameMaps->toArray();
     }

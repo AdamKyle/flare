@@ -5,8 +5,6 @@ import ComponentLoading from "../../../../components/ui/loading/component-loadin
 import {AxiosError, AxiosResponse} from "axios";
 import Ajax from "../../../../lib/ajax/ajax";
 import LoadingProgressBar from "../../../../components/ui/progress-bars/loading-progress-bar";
-import {viewPortWatcher} from "../../../../lib/view-port-watcher";
-
 
 export default class TraverseModal extends React.Component<any, any> {
 
@@ -18,6 +16,7 @@ export default class TraverseModal extends React.Component<any, any> {
             game_maps: [],
             is_traversing: false,
             error_message: null,
+            traverse_is_same_map: true,
             map: 0,
         }
     }
@@ -27,6 +26,8 @@ export default class TraverseModal extends React.Component<any, any> {
             this.setState({
                 game_maps: result.data,
                 loading: false,
+            }, () => {
+                this.disableTraverseForSameMap();
             })
         }, (error: AxiosError) => {
             if (typeof error.response !== 'undefined') {
@@ -43,6 +44,8 @@ export default class TraverseModal extends React.Component<any, any> {
     setMap(data: any) {
         this.setState({
             map: data.value
+        }, () => {
+            this.disableTraverseForSameMap()
         })
     }
 
@@ -69,6 +72,17 @@ export default class TraverseModal extends React.Component<any, any> {
             label: map.name,
             value: map.id
         }
+    }
+
+    disableTraverseForSameMap() {
+
+        if (this.state.map === 0) {
+            return;
+        }
+
+        this.setState({
+            traverse_is_same_map: this.state.map === this.props.map_id,
+        });
     }
 
     traverse() {
@@ -104,7 +118,7 @@ export default class TraverseModal extends React.Component<any, any> {
                       primary_button_disabled={this.state.is_traversing}
                       secondary_actions={{
                           handle_action: this.traverse.bind(this),
-                          secondary_button_disabled: this.state.is_traversing,
+                          secondary_button_disabled: this.state.is_traversing || this.state.loading || this.state.traverse_is_same_map,
                           secondary_button_label: 'Traverse',
                       }}
             >

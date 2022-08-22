@@ -9,8 +9,6 @@ use App\Game\Core\Events\UpdateCharacterEvent;
 use App\Game\Core\Events\DropsCheckEvent;
 use App\Game\Core\Events\GoldRushCheckEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
-use App\Game\Core\Events\AttackTimeOutEvent;
-use App\Game\Core\Listeners\AttackTimeOutListener;
 use App\Game\Core\Listeners\UpdateTopBarListener;
 use App\Game\Core\Listeners\UpdateCharacterListener;
 use App\Game\Core\Listeners\DropsCheckListener;
@@ -21,11 +19,6 @@ use App\Game\Core\Listeners\CraftedItemTimeOutListener;
 class EventsProvider extends ServiceProvider {
 
     protected $listen = [
-
-        // When the battle is over, set the attack timeout.
-        AttackTimeOutEvent::class => [
-            AttackTimeOutListener::class,
-        ],
 
         // When the character levels up, update the top bar:
         UpdateTopBarEvent::class => [

@@ -33,6 +33,8 @@ export default class Game extends React.Component<GameProps, GameState> {
 
     private characterStatus: any;
 
+    private characterRevive: any;
+
     private characterAttackData: any;
 
     private forceNameChange: any;
@@ -84,6 +86,9 @@ export default class Game extends React.Component<GameProps, GameState> {
 
         // @ts-ignore
         this.characterStatus = Echo.private('update-character-status-' + this.props.userId);
+
+        // @ts-ignore
+        this.characterRevive = Echo.private('character-revive-' + this.props.userId);
 
         // @ts-ignore
         this.characterAttackData = Echo.private('update-character-attack-' + this.props.userId);
@@ -173,6 +178,17 @@ export default class Game extends React.Component<GameProps, GameState> {
                 character: character
             });
         })
+
+        // @ts-ignore
+        this.characterRevive.listen('Game.Battle.Events.CharacterRevive', (event: {health: number}) => {
+            const character = JSON.parse(JSON.stringify(this.state.character));
+
+            character.health = event.health;
+
+            this.setState({
+                character: character
+            });
+        });
 
         // @ts-ignore
         this.kingdomUpdates.listen('Game.Kingdoms.Events.UpdateKingdom', (event: { kingdom: KingdomDetails }) => {

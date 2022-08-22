@@ -6,6 +6,7 @@ import Select from "react-select";
 import LoadingProgressBar from "../../../../components/ui/progress-bars/loading-progress-bar";
 import PrimaryButton from "../../../../components/ui/buttons/primary-button";
 import DangerButton from "../../../../components/ui/buttons/danger-button";
+import {formatNumber} from "../../../../lib/game/format-number";
 
 export default class WorkBench extends React.Component<any, any> {
 
@@ -19,6 +20,7 @@ export default class WorkBench extends React.Component<any, any> {
             selected_item_name: null,
             inventory_items: [],
             alchemy_items: [],
+            cost: 0,
         }
     }
 
@@ -85,8 +87,27 @@ export default class WorkBench extends React.Component<any, any> {
     }
 
     setAlchemyItem(data: any) {
+        const foundAlchemyItem = this.state.alchemy_items.filter((slot: any) => {
+            return slot.item.id === data.value;
+        });
+
+        const foundSelectedItem = this.state.inventory_items.filter((slot: any) => {
+            return slot.item.id === this.state.selected_item;
+        });
+
+        if (foundAlchemyItem.length === 0 && foundSelectedItem.length === 0) {
+            return;
+        }
+
+        const alchemyItem     = foundAlchemyItem[0].item;
+        const selectedItem    = foundSelectedItem[0].item;
+
+        const baseCost        = selectedItem.holy_stacks * 1000;
+        const cost            = baseCost * alchemyItem.holy_level;
+
         this.setState({
-            selected_alchemy_item: parseInt(data.value)
+            selected_alchemy_item: parseInt(data.value),
+            cost: cost,
         });
     }
 
@@ -176,6 +197,12 @@ export default class WorkBench extends React.Component<any, any> {
                             menuPortalTarget={document.body}
                             value={this.selectedAlchemyItem()}
                         />
+                        <div className='my-2'>
+                            <dl>
+                                <dt>Gold Dust Cost:</dt>
+                                <dd>{formatNumber(this.state.cost)}</dd>
+                            </dl>
+                        </div>
                     </div>
                 </div>
 

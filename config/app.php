@@ -205,11 +205,16 @@ return [
         App\Admin\Providers\ServiceProvider::class,
 
         /**
+         * Game Event Providers
+         */
+        App\Game\Core\Providers\EventsProvider::class,
+        App\Game\Battle\Providers\EventsProvider::class,
+
+        /**
         * Game Related
         */
         App\Game\Exploration\Providers\ServiceProvider::class,
         App\Game\Core\Providers\ServiceProvider::class,
-        App\Game\Core\Providers\EventsProvider::class,
         App\Game\Battle\Providers\ServiceProvider::class,
         App\Game\Messages\Providers\EventsProvider::class,
         App\Game\Messages\Providers\ServiceProvider::class,

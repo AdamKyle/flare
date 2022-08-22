@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Core\Jobs;
+namespace App\Game\Battle\Jobs;
 
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use Illuminate\Bus\Queueable;
@@ -11,14 +11,14 @@ use Illuminate\Queue\SerializesModels;
 use App\Flare\Models\Character;
 use App\Game\Core\Events\ShowTimeOutEvent;
 
-class AttackTimeOutJob implements ShouldQueue
-{
+class AttackTimeOutJob implements ShouldQueue {
+
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
      * @var Character $character
      */
-    protected $character;
+    protected Character $character;
 
     /**
      * Create a new job instance.
@@ -26,8 +26,7 @@ class AttackTimeOutJob implements ShouldQueue
      * @param Character $character
      * @return void
      */
-    public function __construct(Character $character)
-    {
+    public function __construct(Character $character) {
         $this->character = $character;
     }
 
@@ -36,8 +35,7 @@ class AttackTimeOutJob implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
-    {
+    public function handle(): void {
 
         $this->character->update([
             'can_attack'          => true,

@@ -65,7 +65,7 @@ class HolyItemService {
     }
 
     protected function getCost(Item $item, Item $alchemyItem): int {
-        $baseCost  = $item->holy_stacks * 10000;
+        $baseCost  = $item->holy_stacks * 1000;
         $totalCost = $baseCost * $alchemyItem->holy_level;
 
         return $totalCost;

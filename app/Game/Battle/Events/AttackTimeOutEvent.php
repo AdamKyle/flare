@@ -1,21 +1,18 @@
 <?php
 
-namespace App\Game\Core\Events;
+namespace App\Game\Battle\Events;
 
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Http\Request;
-use App\Flare\Models\Monster;
-use App\Flare\Models\Character;
-use App\Flare\Models\User;
 
-class AttackTimeOutEvent
-{
+use App\Flare\Models\Character;
+
+class AttackTimeOutEvent {
     use SerializesModels;
 
     /**
      * @var Character $character
      */
-    public $character;
+    public Character $character;
 
     /**
      * Create a new event instance.
@@ -23,8 +20,7 @@ class AttackTimeOutEvent
      * @param  Character $character
      * @return void
      */
-    public function __construct(Character $character)
-    {
+    public function __construct(Character $character) {
         $this->character = $character;
     }
 }

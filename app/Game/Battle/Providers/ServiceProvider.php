@@ -72,8 +72,6 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(BattleEventHandler::class, function($app) {
             return new BattleEventHandler(
                 $app->make(BattleRewardProcessing::class),
-                $app->make(Manager::class),
-                $app->make(CharacterSheetBaseInfoTransformer::class),
             );
         });
 

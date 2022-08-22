@@ -47,12 +47,12 @@ class CharacterInventoryService {
     /**
      * @var InventoryTransformer $inventoryTransformer
      */
-    private $inventoryTransformer;
+    private InventoryTransformer $inventoryTransformer;
 
     /**
      * @var UsableItemTransformer $usableItemTransformer
      */
-    private $usableItemTransformer;
+    private UsableItemTransformer $usableItemTransformer;
 
     /**
      * @var Manager $manager
