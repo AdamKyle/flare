@@ -9,8 +9,9 @@ export const buildKingdomsColumns = (onClick: (kingdom: KingdomDetails) => void)
             name: 'Name',
             selector: (row: KingdomDetails) => row.name,
             cell: (row: any) => <button onClick={() => onClick(row)} className={clsx({
-                'text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-500': row.is_protected === null,
-                'text-white underline': row.is_protected,
+                'text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-500': row.is_protected,
+                'text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-500': row.is_under_attack,
+                'text-white underline': row.is_protected || row.is_under_attack,
             })}>{row.name} {row.is_protected ? ' (Protected) ' : ''}</button>
         },
         {

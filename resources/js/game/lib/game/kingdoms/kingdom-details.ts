@@ -86,4 +86,6 @@ export default interface KingdomDetails extends DataTableBaseData {
     is_protected: boolean;
 
     protected_days_left: number;
+
+    is_under_attack: boolean;
 }

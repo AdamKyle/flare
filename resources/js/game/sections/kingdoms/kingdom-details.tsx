@@ -12,6 +12,7 @@ import GoblinBankModal from "./modals/goblin-bank-modal";
 import AbandonKingdomModal from "./modals/abadnon-kingdom-modal";
 import ManageTreasuryModal from "./modals/manage-treasury-modal";
 import KingdomDetailsState from "../../lib/game/kingdoms/types/kingdom-details-state";
+import SuccessOutlineButton from "../../components/ui/buttons/success-outline-button";
 
 export default class KingdomDetails extends React.Component<KingdomDetailsProps, KingdomDetailsState> {
     constructor(props: KingdomDetailsProps) {
@@ -153,6 +154,7 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
                         <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                         <div className='grid md:grid-cols-1 gap-4'>
                             <PrimaryOutlineButton button_label={'Change Name'} on_click={this.showChangeName.bind(this)} />
+                            <SuccessOutlineButton button_label={'Call for Reinforcements'} on_click={() => {}} />
                             <PrimaryOutlineButton button_label={'Buy Population'} on_click={this.showBuyPop.bind(this)} />
                             <SkyOutlineButton button_label={'Manage Gold Bars'} on_click={this.showGoblinBank.bind(this)}  disabled={this.canManageGoldBars()}/>
                             <SkyOutlineButton button_label={'Manage Treasury'} on_click={this.showManageTreasury.bind(this)} />

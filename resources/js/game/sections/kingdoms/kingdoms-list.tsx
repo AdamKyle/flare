@@ -10,11 +10,29 @@ import BasicCard from "../../components/ui/cards/basic-card";
 import Kingdom from "./kingdom";
 import SmallKingdom from "./small-kingdom";
 import {isEqual} from "lodash";
+import clsx from "clsx";
+import Tabs from "../../components/ui/tabs/tabs";
+import TabPanel from "../../components/ui/tabs/tab-panel";
+import UnitMovement from "./unit-movement";
+import KingdomLogs from "./kingdom-logs";
 
 export default class KingdomsList extends React.Component<KingdomListProps, KingdomListState> {
 
+    private tabs: {name: string, key: string}[];
+
     constructor(props: KingdomListProps) {
         super(props);
+
+        this.tabs = [{
+            name: 'Kingdoms',
+            key: 'kingdoms',
+        },{
+            name: 'Unit Movement',
+            key: 'unit-movement',
+        },{
+            name: 'Logs',
+            key: 'logs',
+        }]
 
         this.state = {
             loading: true,
@@ -106,11 +124,21 @@ export default class KingdomsList extends React.Component<KingdomListProps, King
                                 />
                         :
                             <BasicCard additionalClasses={'overflow-x-scroll'}>
-                                <Table data={this.props.my_kingdoms}
-                                       columns={buildKingdomsColumns(this.viewKingdomDetails.bind(this))}
-                                       dark_table={this.state.dark_tables}
-                                       conditional_row_styles={this.createConditionalRowStyles()}
-                                />
+                                <Tabs tabs={this.tabs}>
+                                    <TabPanel key={'kingdoms'}>
+                                        <Table data={this.props.my_kingdoms}
+                                               columns={buildKingdomsColumns(this.viewKingdomDetails.bind(this))}
+                                               dark_table={this.state.dark_tables}
+                                               conditional_row_styles={this.createConditionalRowStyles()}
+                                        />
+                                    </TabPanel>
+                                    <TabPanel key={'unit-movement'}>
+                                        <UnitMovement />
+                                    </TabPanel>
+                                    <TabPanel key={'logs'}>
+                                        <KingdomLogs />
+                                    </TabPanel>
+                                </Tabs>
                             </BasicCard>
                     }
                 </Fragment>

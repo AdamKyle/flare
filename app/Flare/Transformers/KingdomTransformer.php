@@ -6,6 +6,7 @@ use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameBuildingUnit;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\PassiveSkill;
+use App\Flare\Models\UnitMovementQueue;
 use App\Game\Kingdoms\Values\BuildingActions;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 use App\Game\Kingdoms\Values\UnitCosts;
@@ -69,6 +70,7 @@ class KingdomTransformer extends TransformerAbstract {
             'building_time_reduction'   => $this->fetchTimeReductionBonus($kingdom, 'building_time_reduction'),
             'is_protected'              => !is_null($kingdom->protected_until),
             'protected_days_left'       => !is_null($kingdom->protected_until) ? now()->diffInDays($kingdom->protected_until) : 0,
+            'is_under_attack'           => $this->isKingdomUnderAttack($kingdom),
         ];
     }
 
@@ -129,5 +131,9 @@ class KingdomTransformer extends TransformerAbstract {
         })->first();
 
         return $skill->{$timeReductionAttribute};
+    }
+
+    protected function isKingdomUnderAttack(Kingdom $kingdom): bool {
+        return UnitMovementQueue::where('to_kingdom_id', $kingdom->id)->where('is_attacking', true)->count() > 0;
     }
 }
