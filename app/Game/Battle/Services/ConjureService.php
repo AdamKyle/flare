@@ -97,13 +97,6 @@ class ConjureService {
         $x = $this->getXPosition();
         $y = $this->getYPosition();
 
-        $kingdom = $this->isAtKingdom($x, $y);
-        $damagedKingdom = false;
-
-        if (!is_null($kingdom)) {
-            $damagedKingdom = $this->canDamageKingdom();
-        }
-
         $healthRange          = explode('-', $monster->health_range);
         $currentMonsterHealth = rand($healthRange[0], $healthRange[1]);
 
@@ -113,9 +106,9 @@ class ConjureService {
             'conjured_at'     => now(),
             'x_position'      => $x,
             'y_position'      => $y,
-            'damaged_kingdom' => $damagedKingdom,
-            'stole_treasury'  => $damagedKingdom,
-            'weakened_morale' => $damagedKingdom,
+            'damaged_kingdom' => false,
+            'stole_treasury'  => false,
+            'weakened_morale' => false,
             'current_health'  => $currentMonsterHealth,
             'max_health'      => $currentMonsterHealth,
             'type'            => $type === 'private'? CelestialConjureType::PRIVATE : CelestialConjureType::PUBLIC,
@@ -134,10 +127,6 @@ class ConjureService {
         }
 
         event(new UpdateMapBroadcast($character->user, resolve(LocationService::class)->getLocationData($character->refresh())));
-
-        if ($damagedKingdom) {
-            $this->damageKingdom($kingdom, $character, $this->getDamageAmount());
-        }
     }
 
     /**

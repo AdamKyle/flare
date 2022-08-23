@@ -73,7 +73,7 @@ class BaseCharacterInfo {
         $total = $this->applyCharacterBoons($character, $base, $stat . '_mod');
         $map   = $this->getGameMap($character);
 
-        if ($map->mapType()->isHell() || $map->mapType()->isPurgatory()) {
+        if ($map->mapType()->isShadowPlane() || $map->mapType()->isHell() || $map->mapType()->isPurgatory()) {
             $total -= $total * $map->character_attack_reduction;
         }
 

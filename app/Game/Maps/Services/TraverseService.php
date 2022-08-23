@@ -159,38 +159,31 @@ class TraverseService {
 
         $gameMap = $character->map->gameMap;
 
-        if ($character->map->gameMap->mapType()->isShadowPlane()) {
+        if ($gameMap->mapType()->isShadowPlane()) {
             $message = 'As you enter into the Shadow Plane, all you see for miles around are
             shadowy figures moving across the land. The color of the land is grey and lifeless. But you
             feel the presence of death as it creeps ever closer.
-            (Characters can walk on water here, monster strength is increased by '.($gameMap->enemy_stat_bonus * 100).'% including Devouring Light. You are reduced by '.($gameMap->enemy_stat_bonus * 100).'% (Damage wise) while here.)';
+            (Characters can walk on water here.)';
 
             event(new MessageEvent($character->user,  $message));
 
             event(new GlobalMessageEvent('The gates have opened for: ' . $character->name . '. They have entered the realm of shadows!'));
         }
 
-        if ($character->map->gameMap->mapType()->isHell()) {
-            $message = 'The stench of sulfur fills your nose. The heat of the magma oceans bathes over you. Demonic shadows and figures move about the land. Monsters are increased by: ' .
-                ($gameMap->enemy_stat_bonus * 100) . '% while you are reduced by: '.
-                ($gameMap->character_attack_reduction * 100) . '% in both (modified) stats and damage done. Any quest items that make
-                affixes irresistible will not work down here. Finally, all life stealing affixes be they stackable or not are reduced to half their total output for damage.';
+        if ($gameMap->mapType()->isHell()) {
+            $message = 'The stench of sulfur fills your nose. The heat of the magma oceans bathes over you. Demonic shadows and figures move about the land. Tormented souls cry out in anguish!';
 
             event(new MessageEvent($character->user,  $message));
 
-            event(new GlobalMessageEvent('Hell\'s gates swing wide for: ' . $character->name . '. May the light of Argose the Angelic Saviour, be their guide through such darkness!'));
+            event(new GlobalMessageEvent('Hell\'s gates swing wide for: ' . $character->name . '. May the light of The Poet, be their guide through such darkness!'));
         }
 
-        if ($character->map->gameMap->mapType()->isPurgatory()) {
-            $message = 'The silence of death fills your very being and chills you to bone. Nothing moves amongst the decay and death of this land. Monsters are increased by: ' .
-                ($gameMap->enemy_stat_bonus * 100) . '% while you are reduced by: '.
-                ($gameMap->character_attack_reduction * 100) . '% in both (modified) stats and damage done. Any quest items that make
-                affixes irresistible will not work down here. Finally, all life stealing affixes be they stackable or not are reduced to half their total output for damage and all
-                resurrection chances are capped at 45% (prophets are capped at 65%). Devouring Light and Darkness are reduced by 45% here.';
+        if ($gameMap->mapType()->isPurgatory()) {
+            $message = 'The silence of death fills your very being and chills you to bone. Nothing moves amongst the decay and death of this land.';
 
             event(new MessageEvent($character->user,  $message));
 
-            event(new GlobalMessageEvent('Thunder claps in the sky: ' . $character->name . ' has called forth The Creator\'s gates of despair and unleashed the enemies of Kalitar! The Creator is Furious! "Hear me, child! I shall face you in the depths of my despair and crush the soul from your bones!" the lands fall silent, the children no longer have faith and the fabric of time rips open...'));
+            event(new GlobalMessageEvent('Thunder claps in the sky: ' . $character->name . ' has called forth The Creator\'s gates of despair! The Creator is Furious! "Hear me, child! I shall face you in the depths of my despair and crush the soul from your bones!" the lands fall silent, the children no longer have faith and the fabric of time rips open...'));
         }
     }
 
@@ -319,12 +312,14 @@ class TraverseService {
      * @param Character $character
      * @return void
      */
-    protected function updateActionsForMap(GameMap $gameMap, GameMap $oldGameMap, Character $character) {
-        if ($gameMap->mapType()->isPurgatory() && $oldGameMap->mapType()->isHell()) {
+    protected function updateActionsForMap(GameMap $gameMap, GameMap $oldGameMap, Character $character): void {
+        if ($gameMap->mapType()->isShadowPlane()) {
             $this->updateActionTypeCache($character, $gameMap->enemy_stat_bonus);
-        } else if ($gameMap->mapType()->isHell() && $oldGameMap->mapType()->isPurgatory() || ($gameMap->mapType()->isHell() && !$oldGameMap->mapType()->isPurgatory())) {
+        } else if ($gameMap->mapType()->isHell()) {
             $this->updateActionTypeCache($character, $gameMap->enemy_stat_bonus);
-        } else if (!$gameMap->mapType()->isHell() && !$gameMap->mapType()->isPurgatory() && ($oldGameMap->mapType()->isHell() || $oldGameMap->mapType()->isPurgatory())) {
+        } else if ($gameMap->mapType()->isPurgatory()) {
+            $this->updateActionTypeCache($character, $gameMap->enemy_stat_bonus);
+        } else if ($oldGameMap->mapType()->isPurgatory() || $oldGameMap->mapType()->isHell() || $oldGameMap->mapType()->isShadowPlane()) {
             $this->updateActionTypeCache($character, 0.0);
         }
     }

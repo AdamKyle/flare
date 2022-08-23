@@ -95,6 +95,10 @@ class MonsterAttack extends BattleBase {
             return;
         }
 
+        $attack -= $ac;
+
+        $this->addMessage('You reduced the incoming (Physical) damage with your armour by: ' . number_format($ac), 'player-action');
+
         $this->characterHealth -= $attack;
 
         $this->addMessage($monster->getName() . ' hits for: ' . number_format($attack), 'enemy-action');
