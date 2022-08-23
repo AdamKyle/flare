@@ -21,7 +21,8 @@ class MarketHistory extends Model
      */
     protected $fillable = [
         'item_id',
-        'sold_for'
+        'sold_for',
+        'created_at',
     ];
 
     /**
@@ -40,5 +41,5 @@ class MarketHistory extends Model
     protected static function newFactory() {
         return MarketHistoryFactory::new();
     }
-    
+
 }

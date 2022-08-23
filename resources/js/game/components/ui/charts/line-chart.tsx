@@ -33,7 +33,7 @@ export const MarketBoardLineChart = (props: MarketBoardLineChartProps) => {
     const data = props.data;
 
     return (
-        <ResizableBox height={300} width={720} style={{
+        <ResizableBox height={350} width={720} style={{
             background: props.dark_chart ? "#1e293b" : "#475569",
             padding: ".5rem",
             borderRadius: "5px",
@@ -44,7 +44,8 @@ export const MarketBoardLineChart = (props: MarketBoardLineChartProps) => {
                     primaryAxis,
                     secondaryAxes,
                     dark: true,
-                    getSeriesStyle: getSeriesStyle
+                    getSeriesStyle: getSeriesStyle,
+                    tooltip: false,
                 }}
             />
         </ResizableBox>

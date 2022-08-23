@@ -2,49 +2,57 @@
 
 @section('content')
     <x-core.layout.info-container>
-        <h2 class="mt-2 font-light">
-            <x-item-display-color :item="$marketBoard->item" />
-        </h2>
-
-        <div class="relative">
-            <div class="float-right">
-                <x-core.buttons.link-buttons.success-button
-                    href="{{route('game.current-listings', ['character' => auth()->user()->character->id])}}"
-                    css="tw-ml-2"
-                >
-                    Back
-                </x-core.buttons.link-buttons.success-button>
+        <x-core.cards.card-with-title
+            title="{{$marketBoard->item->affix_name}}"
+            buttons="true"
+            backUrl="{{route('game.current-listings', ['character' => auth()->user()->character->id])}}"
+        >
+            <div style="height: 300px; margin-bottom: 60px;">
+                <canvas id="item-listing-data" width="400" height="400"></canvas>
             </div>
-        </div>
 
-        <div class="mb-4">
-            <div id="market-history" style="height: 300px;"></div>
-        </div>
-
-        <form method="post" action="{{route('game.update.current-listing', ['marketBoard' => $marketBoard])}}">
-            <x-core.forms.input name="listed_price" label="Listed For" :model="$marketBoard" modelKey="listed_price" />
-            <x-core.buttons.primary-button type="submit">
-                Update Listed Price
-            </x-core.buttons.primary-button>
-        </form>
+            <form method="post" action="{{route('game.update.current-listing', ['marketBoard' => $marketBoard])}}" class="mt-4">
+                @csrf()
+                <x-core.forms.input name="listed_price" label="Listed For" :model="$marketBoard" modelKey="listed_price" />
+                <x-core.buttons.primary-button type="submit">
+                    Update Listed Price
+                </x-core.buttons.primary-button>
+            </form>
+        </x-core.cards.card-with-title>
     </x-core.layout.info-container>
 
     @push('scripts')
-        <!-- Charting library -->
-        <script src="https://unpkg.com/echarts/dist/echarts.min.js"></script>
-        <!-- Chartisan -->
-        <script src="https://unpkg.com/@chartisan/echarts/dist/chartisan_echarts.js"></script>
-        <!-- Your application script -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script>
-            const itemId = {{$marketBoard->item_id}};
-            const chart = new Chartisan({
-                el: '#market-history',
-                url: "@chart('market_board_item_history')" + "?item_id=" + itemId,
-                hooks: new ChartisanHooks()
-                    .legend()
-                    .colors()
-                    .tooltip()
-                    .datasets([{ type: 'line', fill: false }]),
+
+            document.addEventListener("DOMContentLoaded", function() {
+                const ctx = document.getElementById('item-listing-data').getContext('2d');
+
+                const saleDataChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: @json($saleData['labels']),
+                        datasets: [{
+                            label: 'Item Listed Data',
+                            data: @json($saleData['data']),
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.2)',
+                            ],
+                            borderColor: [
+                                'rgba(255, 99, 132, 1)',
+                            ],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        },
+                        maintainAspectRatio: false,
+                    }
+                });
             });
         </script>
     @endpush

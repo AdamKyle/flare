@@ -241,8 +241,6 @@ class MovementService {
             }
         }
 
-        dump($gameMaps->pluck('name')->toArray());
-
         return $gameMaps->toArray();
     }
 }

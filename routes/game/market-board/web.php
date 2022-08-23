@@ -9,7 +9,6 @@ Route::group(['middleware' => [
 ]], function() {
     Route::get('/market/', ['as' => 'game.market', 'uses' => 'MarketController@index']);
     Route::get('/market/current-listings/{character}', ['as' => 'game.current-listings', 'uses' => 'MarketController@currentListings']);
-
     Route::get('/market/current-listings/edit/{marketBoard}', ['as' => 'game.edit.current-listings', 'uses' => 'MarketController@editCurrentListings']);
     Route::get('/market/view/comparison/{character}/{marketBoard}', ['as' => 'game.market.view.comparison', 'uses' => 'MarketController@viewItemComparison']);
     Route::post('/market/current-listing/{marketBoard}/update', ['as' => 'game.update.current-listing', 'uses' => 'MarketController@updateCurrentListing']);

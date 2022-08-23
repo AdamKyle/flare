@@ -2,6 +2,7 @@
 
 namespace App\Game\Market\Controllers;
 
+
 use Cache;
 use App\Flare\Models\Item;
 use App\Flare\Traits\Controllers\ItemsShowInformation;
@@ -15,6 +16,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\MarketBoard;
 use App\Flare\Transformers\MarketItemsTransformer;
 use App\Game\Market\Services\MarketBoard as MarketBoardService;
+use App\Game\Market\Services\MarketSaleHistory;
 
 
 class MarketController extends Controller {
@@ -37,21 +39,34 @@ class MarketController extends Controller {
     private MarketBoardService $marketBoardService;
 
     /**
+     * @var MarketSaleHistory $marketHistoryService
+     */
+    private MarketSaleHistory $marketSaleHistory;
+
+    /**
      * @param Manager $manager
      * @param MarketItemsTransformer $transformer
      * @param MarketBoardService $marketBoardService
+     * @param MarketSaleHistory $marketSaleHistory
      */
-    public function __construct(Manager $manager, MarketItemsTransformer $transformer, MarketBoardService $marketBoardService) {
-        $this->manager            = $manager;
-        $this->transformer        = $transformer;
-        $this->marketBoardService = $marketBoardService;
+    public function __construct(Manager $manager,
+                                MarketItemsTransformer $transformer,
+                                MarketBoardService $marketBoardService,
+                                MarketSaleHistory $marketSaleHistory
+    ) {
+        $this->manager              = $manager;
+        $this->transformer          = $transformer;
+        $this->marketBoardService   = $marketBoardService;
+        $this->marketSaleHistory    = $marketSaleHistory;
     }
 
     /**
      * @return View
      */
     public function index(): View {
-        return view('game.core.market.market');
+        return view('game.core.market.market', [
+            'marketChartData' => $this->marketSaleHistory->getHistoricalListingData(),
+        ]);
     }
 
     /**
@@ -208,7 +223,10 @@ class MarketController extends Controller {
             ]);
         }
 
-        return view('game.core.market.edit-current-listing', ['marketBoard' => $marketBoard]);
+        return view('game.core.market.edit-current-listing', [
+            'marketBoard' => $marketBoard,
+            'saleData'    => $this->marketSaleHistory->getSaleInformationForItem($marketBoard->item)
+        ]);
     }
 
     /**
@@ -264,6 +282,6 @@ class MarketController extends Controller {
 
         $marketBoard->delete();
 
-        return redirect()->back()->with('success', 'De listed: ' . $itemName);
+        return redirect()->back()->with('success', 'Delisted: ' . $itemName);
     }
 }
