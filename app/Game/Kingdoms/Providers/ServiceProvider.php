@@ -2,6 +2,10 @@
 
 namespace App\Game\Kingdoms\Providers;
 
+use App\Flare\Transformers\UnitTransformer;
+use App\Game\Kingdoms\Service\UnitMovementService;
+use App\Game\Kingdoms\Validators\MoveUnitsValidator;
+use App\Game\Maps\Calculations\DistanceCalculation;
 use League\Fractal\Manager;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Flare\Transformers\KingdomTransformer;
@@ -69,6 +73,18 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(KingdomBuilder::class),
                 $app->make(UpdateKingdomHandler::class),
             );
+        });
+
+        $this->app->bind(UnitMovementService::class, function($app) {
+            return new UnitMovementService(
+                $app->make(DistanceCalculation::class),
+                $app->make(MoveUnitsValidator::class),
+                $app->make(UpdateKingdom::class)
+            );
+        });
+
+        $this->app->bind(MoveUnitsValidator::class, function() {
+            return new MoveUnitsValidator();
         });
 
         $this->app->bind(UnitService::class, function($app) {

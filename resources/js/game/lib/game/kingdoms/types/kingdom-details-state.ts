@@ -9,4 +9,6 @@ export default interface KingdomDetailsState {
     show_abandon_kingdom: boolean;
 
     show_manage_treasury: boolean;
+
+    show_call_for_reinforcements: boolean;
 }

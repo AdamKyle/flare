@@ -9,8 +9,7 @@ use Bkwld\Cloner\Cloneable;
 use Database\Factories\ItemFactory;
 use App\Flare\Models\Traits\WithSearch;
 
-class Item extends Model
-{
+class Item extends Model {
 
     use Cloneable;
 

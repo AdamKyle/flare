@@ -194,6 +194,8 @@ export default class Game extends React.Component<GameProps, GameState> {
         this.kingdomUpdates.listen('Game.Kingdoms.Events.UpdateKingdom', (event: { kingdom: KingdomDetails }) => {
             const eventKingdom = event.kingdom;
 
+            console.log(eventKingdom);
+
             if (Array.isArray(eventKingdom)) {
                 this.setState({
                     kingdoms: eventKingdom

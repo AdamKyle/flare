@@ -39,18 +39,34 @@ class CleanEnchantedItemsFromDatabase extends Command
     public function handle()
     {
 
-       Item::whereHas('itemPrefix')
-           ->whereDoesntHave('inventorySlots')
-           ->whereDoesntHave('inventorySetSlots')
-           ->whereDoesntHave('marketListings')
-           ->whereDoesntHave('marketHistory')
-           ->delete();
+       $prefixItems = Item::whereHas('itemPrefix')
+                          ->whereDoesntHave('inventorySlots')
+                          ->whereDoesntHave('inventorySetSlots')
+                          ->whereDoesntHave('marketListings')
+                          ->whereDoesntHave('marketHistory')
+                          ->get();
 
-       Item::whereHas('itemSuffix')
-           ->whereDoesntHave('inventorySlots')
-           ->whereDoesntHave('inventorySetSlots')
-           ->whereDoesnthave('marketListings')
-           ->whereDoesntHave('marketHistory')
-           ->delete();
+       foreach ($prefixItems as $item) {
+           if ($item->appliedHolyStacks()->count() > 0) {
+               $item->appliedHolyStacks()->delete();
+           }
+
+           $item->delete();
+       }
+
+       $suffixItems = Item::whereHas('itemSuffix')
+                          ->whereDoesntHave('inventorySlots')
+                          ->whereDoesntHave('inventorySetSlots')
+                          ->whereDoesnthave('marketListings')
+                          ->whereDoesntHave('marketHistory')
+                          ->get();
+
+        foreach ($suffixItems as $item) {
+            if ($item->appliedHolyStacks()->count() > 0) {
+                $item->appliedHolyStacks()->delete();
+            }
+
+            $item->delete();
+        }
     }
 }

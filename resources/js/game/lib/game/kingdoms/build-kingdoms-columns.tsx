@@ -2,17 +2,16 @@ import KingdomDetails from "./kingdom-details";
 import React from "react";
 import {formatNumber} from "../format-number";
 import clsx from "clsx";
+import UnitMovementDetails from "./unit-movement-details";
 
 export const buildKingdomsColumns = (onClick: (kingdom: KingdomDetails) => void) => {
     return [
         {
             name: 'Name',
             selector: (row: KingdomDetails) => row.name,
-            cell: (row: any) => <button onClick={() => onClick(row)} className={clsx({
-                'text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-500': row.is_protected,
-                'text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-500': row.is_under_attack,
-                'text-white underline': row.is_protected || row.is_under_attack,
-            })}>{row.name} {row.is_protected ? ' (Protected) ' : ''}</button>
+            cell: (row: any) => <button onClick={() => onClick(row)}>
+                {iconsToShow(row)} {row.name} {row.is_protected ? ' (Protected) ' : ''}
+            </button>
         },
         {
             name: 'X Position',
@@ -33,4 +32,32 @@ export const buildKingdomsColumns = (onClick: (kingdom: KingdomDetails) => void)
             cell: (row: any) => formatNumber(row.treasury)
         },
     ];
+}
+
+const iconsToShow = (kingdom: KingdomDetails) => {
+    const icons = [];
+
+    if (kingdom.is_protected) {
+        icons.push(
+            <i className='ra ra-heavy-shield text-blue-500 dark:text-blue-400'></i>
+        )
+    }
+
+    if (kingdom.is_under_attack) {
+        icons.push(
+            <i className='ra ra-axe text-red-500 dark:text-red-400'></i>
+        )
+    }
+
+    const anyMoving = kingdom.unitsInMovement.filter((unitMovement: UnitMovementDetails) => {
+        return unitMovement.is_returning || unitMovement.is_moving || unitMovement.is_recalled
+    });
+
+    if (anyMoving.length > 0) {
+        icons.push(
+            <i className='ra ra-trail text-green-500 dark:text-green-400'></i>
+        )
+    }
+
+    return icons;
 }

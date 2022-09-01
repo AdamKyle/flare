@@ -31,6 +31,7 @@ class Skill extends Model
         'xp',
         'xp_max',
         'xp_towards',
+        'skill_type',
     ];
 
     /**
@@ -44,6 +45,7 @@ class Skill extends Model
         'level'                 => 'integer',
         'xp'                    => 'integer',
         'xp_max'                => 'integer',
+        'skill_type'            => 'integer',
         'xp_towards'            => 'float',
     ];
 

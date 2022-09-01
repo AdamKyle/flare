@@ -21,8 +21,8 @@ use App\Flare\Models\Kingdom;
 use App\Flare\Transformers\KingdomTransformer;
 use Facades\App\Flare\Values\UserOnlineValue;
 
-class RebuildBuilding implements ShouldQueue
-{
+class RebuildBuilding implements ShouldQueue {
+
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
@@ -104,7 +104,6 @@ class RebuildBuilding implements ShouldQueue
 
                 event(new ServerMessageEvent($this->user, 'building-repair-finished', $message));
             }
-
         }
     }
 }

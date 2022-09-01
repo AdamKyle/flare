@@ -50,7 +50,7 @@
 
         <dl>
             <dt>Holy Level</dt>
-            <dd>1</dd>
+            <dd>{{$item->holy_level}}</dd>
             <dt>Stat Increase per use</dt>
             <dd>{{$statIncrease}}%</dd>
             <dt>Devouring Increase per use</dt>

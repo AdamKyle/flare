@@ -2,18 +2,12 @@
 
 namespace App\Flare\Transformers;
 
-use App\Flare\Models\GameBuilding;
-use App\Flare\Models\GameBuildingUnit;
+use League\Fractal\TransformerAbstract;
 use App\Flare\Models\GameUnit;
-use App\Flare\Models\PassiveSkill;
 use App\Flare\Models\UnitMovementQueue;
+use App\Flare\Models\Kingdom;
 use App\Game\Kingdoms\Values\BuildingActions;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
-use App\Game\Kingdoms\Values\UnitCosts;
-use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
-use League\Fractal\TransformerAbstract;
-use App\Flare\Models\Kingdom;
-use Illuminate\Support\Collection;
 
 class KingdomTransformer extends TransformerAbstract {
 
@@ -23,6 +17,7 @@ class KingdomTransformer extends TransformerAbstract {
     protected $defaultIncludes = [
         'buildings',
         'units',
+        'unitsInMovement'
     ];
 
     /**
@@ -92,6 +87,14 @@ class KingdomTransformer extends TransformerAbstract {
         $units = GameUnit::all();
 
         return $this->collection($units, new UnitTransformer());
+    }
+
+    /**
+     * @param Kingdom $kingdom
+     * @return \League\Fractal\Resource\Collection
+     */
+    public function includeUnitsInMovement(Kingdom $kingdom) {
+        return $this->collection($kingdom->unitsMovementQueue, new UnitMovementTransformer());
     }
 
     /**

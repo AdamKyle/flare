@@ -25,6 +25,7 @@ class BaseSkillValue {
             'xp'                 => 0,
             'xp_max'             => $skill->can_train ? 100 : rand(100, 350),
             'is_locked'          => $skill->is_locked,
+            'skill_type'         => $skill->type,
         ];
     }
 }

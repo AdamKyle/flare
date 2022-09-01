@@ -39,7 +39,9 @@
 
 <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
 
-@if ($item->type === 'alchemy' && !is_null($item->holy_level))
+@if ($item->type === 'alchemy' && $item->damages_kingdoms)
+    @include('game.items.components.item-kingdom-details')
+@elseif ($item->type === 'alchemy' && !is_null($item->holy_level))
     @include('game.items.components.item-holy-oil-details')
 @else
     @include('game.items.components.item-details')

@@ -13,7 +13,12 @@ import CurrentUnitDetails from "./current-unit-details";
  *
  * @param onClick
  */
-export const BuildUnitsColumns = (onClick: (units: UnitDetails) => void, cancelUnitRecruitment: (queueId: number| null) => void, unitsInQueue: UnitsInQueue[]|[], currentUnits: CurrentUnitDetails[]|[], buildings: BuildingDetails[]|[]) => {
+export const BuildUnitsColumns = (onClick: (units: UnitDetails) => void,
+                                  cancelUnitRecruitment: (queueId: number| null) => void,
+                                  unitsInQueue: UnitsInQueue[]|[],
+                                  currentUnits: CurrentUnitDetails[]|[],
+                                  buildings: BuildingDetails[]|[]) =>
+{
     return [
         {
             name: 'Name',
