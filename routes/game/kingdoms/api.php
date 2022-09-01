@@ -60,3 +60,9 @@ Route::middleware(['auth', 'is.character.dead', 'is.character.exploring', 'is.ch
     Route::get('/kingdoms/units/{character}/{kingdom}/call-reinforcements', ['as' => 'kingdom.call.reinforcements', 'uses' => 'Api\UnitMovementController@fetchAvailableKingdomsAndUnits']);
     Route::post('/kingdom/move-reinforcements/{character}/{kingdom}', ['as' => 'kingdom.call.reinforcements', 'uses' => 'Api\UnitMovementController@moveUnitsBetweenOwnKingdom']);
 });
+
+Route::middleware(['auth', 'is.character.dead', 'is.character.exploring', 'is.character.who.they.say.they.are', 'character.owns.kingdom'])->group(function() {
+    Route::get('/fetch-attacking-data/{kingdom}/{character}', ['as' => 'kingdom.fetch.attacking-data', 'uses' => 'Api\AttackKingdom@fetchAttackingData']);
+});
+
+

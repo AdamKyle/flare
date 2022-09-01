@@ -67,6 +67,7 @@ class BasicKingdomTransformer extends TransformerAbstract {
             'defence_bonus'      => $kingdom->fetchKingdomDefenceBonus(),
             'is_npc_owned'       => $kingdom->npc_owned,
             'is_enemy_kingdom'   => !$kingdom->npc_owned ? $kingdom->character_id !== $this->character->id : false,
+            'is_protected'       => !is_null($kingdom->protected_until),
         ];
     }
 }

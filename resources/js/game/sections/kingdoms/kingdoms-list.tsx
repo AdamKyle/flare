@@ -76,18 +76,6 @@ export default class KingdomsList extends React.Component<KingdomListProps, King
         });
     }
 
-    createConditionalRowStyles() {
-        return [
-            {
-                when: (row: KingdomDetails) => row.is_protected,
-                style: {
-                    backgroundColor: '#49b4fd',
-                    color: 'white',
-                }
-            }
-        ];
-    }
-
     render() {
         if (this.state.loading) {
             return (
@@ -120,7 +108,6 @@ export default class KingdomsList extends React.Component<KingdomListProps, King
                                         <Table data={this.props.my_kingdoms}
                                                columns={buildKingdomsColumns(this.viewKingdomDetails.bind(this))}
                                                dark_table={this.state.dark_tables}
-                                               conditional_row_styles={this.createConditionalRowStyles()}
                                         />
                                     </TabPanel>
                                 </Tabs>
