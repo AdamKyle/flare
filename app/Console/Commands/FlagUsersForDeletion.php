@@ -40,7 +40,7 @@ class FlagUsersForDeletion extends Command
      * @return void
      */
     public function handle(): void {
-        $users = User::whereDate('last_logged_in', '<', now()->subMonths(5))->get();
+        $users = User::whereDate('last_logged_in', '<=', now()->subMonths(5))->get();
 
         $progressBar = new ProgressBar(new ConsoleOutput(), $users->count());
 

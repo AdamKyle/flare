@@ -22,7 +22,7 @@ class FlagUsersForDeletionTest extends TestCase {
         Mail::fake();
 
         $user = $this->createUser([
-            'last_logged_in' => null,
+            'last_logged_in' => now()->subMonths(5),
         ]);
 
         $this->assertEquals(0, $this->artisan('flag:users-for-deletion'));
