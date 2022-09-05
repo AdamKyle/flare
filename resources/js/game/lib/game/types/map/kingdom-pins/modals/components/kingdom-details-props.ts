@@ -12,6 +12,8 @@ export default interface KingdomDetailsProps {
 
     allow_purchase: boolean;
 
+    can_attack_kingdom: boolean;
+
     update_action_in_progress: () => void;
 
     close_modal: () => void;

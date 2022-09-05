@@ -6,4 +6,6 @@ export default interface KingdomDetailsState {
     npc_owned: false,
 
     action_in_progress: boolean;
+
+    can_attack_kingdom: boolean;
 }

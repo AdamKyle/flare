@@ -2,24 +2,17 @@
 
 namespace App\Game\Kingdoms\Jobs;
 
-use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
-use Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item;
-use App\Game\Kingdoms\Events\UpdateKingdom;
-use App\Game\Kingdoms\Mail\RebuiltBuilding;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\User;
 use App\Flare\Models\KingdomBuilding;
-use App\Flare\Models\Kingdom;
-use App\Flare\Transformers\KingdomTransformer;
 use Facades\App\Flare\Values\UserOnlineValue;
+use App\Game\Kingdoms\Service\UpdateKingdom;
 
 class RebuildBuilding implements ShouldQueue {
 
@@ -28,17 +21,17 @@ class RebuildBuilding implements ShouldQueue {
     /**
      * @var User $user
      */
-    protected $user;
+    protected User $user;
 
     /**
      * @var KingdomBuilding $building
      */
-    protected $building;
+    protected KingdomBuilding $building;
 
     /**
      * @var int queueId
      */
-    protected $queueId;
+    protected int $queueId;
 
     /**
      * Create a new job instance.
@@ -59,13 +52,10 @@ class RebuildBuilding implements ShouldQueue {
     /**
      * Execute the job.
      *
-     * @param Manager $manager
-     * @param KingdomTransformer $kingdomTransformer
+     * @param UpdateKingdom $updateKingdom
      * @return void
      */
-    public function handle(UpdateKingdomHandler $updateKingdomHandler)
-    {
-
+    public function handle(UpdateKingdom $updateKingdom): void {
         $queue = BuildingInQueue::find($this->queueId);
 
         if (is_null($queue)) {
@@ -76,34 +66,32 @@ class RebuildBuilding implements ShouldQueue {
             'current_durability' => $this->building->max_durability,
         ]);
 
-        if ($this->building->morale_increase > 0) {
-            $kingdom = $this->building->kingdom;
+        $building = $this->building->refresh();
+        $kingdom  = $building->kingdom;
+
+        if ($building->morale_increase > 0) {
+            $kingdom = $building->kingdom;
 
             $kingdom->update([
                 'current_morale' => $kingdom->current_morale + $this->building->morale_increase,
             ]);
         }
 
-        BuildingInQueue::where('to_level', $this->building->level)
-                       ->where('building_id', $this->building->id)
-                       ->where('kingdom_id', $this->building->kingdom_id)
-                       ->first()
-                       ->delete();
+        $kingdom = $kingdom->refresh();
+
+        $queue->delete();
+
+        $updateKingdom->updateKingdom($kingdom);
 
         if (UserOnlineValue::isOnline($this->user)) {
-            $kingdom = Kingdom::find($this->building->kingdom_id);
             $x       = $kingdom->x_position;
             $y       = $kingdom->y_position;
             $plane   = $kingdom->gameMap->name;
 
-            $updateKingdomHandler->refreshPlayersKingdoms($this->user->character->refresh());
+            $message = $this->building->name . ' finished being rebuilt for kingdom: ' .
+                $this->building->kingdom->name . ' on plane: '.$plane.' At: (X/Y) '.$x.'/'.$y.'.';
 
-            if ($this->user->show_building_rebuilt_messages) {
-                $message = $this->building->name . ' finished being rebuilt for kingdom: ' .
-                    $this->building->kingdom->name . ' on plane: '.$plane.' At: (X/Y) '.$x.'/'.$y.'.';
-
-                event(new ServerMessageEvent($this->user, 'building-repair-finished', $message));
-            }
+            event(new ServerMessageEvent($this->user, 'building-repair-finished', $message));
         }
     }
 }

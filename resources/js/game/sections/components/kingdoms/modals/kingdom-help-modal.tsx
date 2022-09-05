@@ -81,6 +81,40 @@ export default class KingdomHelpModal extends React.Component<any, any> {
         );
     }
 
+    renderTotalDamage() {
+        return (
+            <p className='my-2'>
+                This is the total damage of the the items you have selected.
+            </p>
+        );
+    }
+
+    renderBuildingDamage() {
+        return (
+            <p className='my-2'>
+                Based on the items you have selected, 50% of the damage is used against the buildings of the kingdom.
+            </p>
+        );
+    }
+
+    renderUnitDamage() {
+        return (
+            <p className='my-2'>
+                Based on the items you have selected, 50% of the damage is used against the units of the kingdom.
+            </p>
+        );
+    }
+
+    renderTotalReduction() {
+        return (
+            <p className='my-2'>
+                If the kingdom has over 100% total defence, then we divide the amount over 100% by 5%. giving a maximum of 20%
+                reduction in damage. this means a kingdom with 200% reduces the damage by 20%. However, if the enemy kingdom
+                has 101% total defence, we will reduce the damage by 5%.
+            </p>
+        );
+    }
+
     buildSections() {
         switch (this.props.type) {
             case 'wall_defence':
@@ -95,6 +129,14 @@ export default class KingdomHelpModal extends React.Component<any, any> {
                 return this.renderTotalDefence();
             case 'teleport_details':
                 return this.renderTeleportDetails();
+            case 'total_damage':
+                return this.renderTotalDamage();
+            case 'building_damage':
+                return this.renderBuildingDamage();
+            case 'unit_damage':
+                return this.renderUnitDamage();
+            case 'total_reduction':
+                return this.renderTotalReduction();
             default:
                 return 'Error. Unknown type.'
         }

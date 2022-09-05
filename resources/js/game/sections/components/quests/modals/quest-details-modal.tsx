@@ -309,7 +309,7 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                                                     <div className='border-b-2 block border-b-gray-300 dark:border-b-gray-600 my-3 md:hidden'></div>
                                                     <strong>Npc Access Requirements</strong>
                                                     <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                                                    <dl className={'md:ml-8'}>{npcPLaneAccess}</dl>
+                                                    <dl className={'md:ml-8 max-h-[250px] overflow-y-scroll'}>{npcPLaneAccess}</dl>
                                                 </div>
                                             : null
                                         }

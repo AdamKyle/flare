@@ -2,6 +2,7 @@
 
 namespace App\Flare\Providers;
 
+use App\Flare\Transformers\KingdomAttackLogsTransformer;
 use Illuminate\Support\Facades\Blade;
 use League\Fractal\Manager;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
@@ -249,6 +250,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(InventoryTransformer::class, function() {
             return new InventoryTransformer();
+        });
+
+        $this->app->bind(KingdomAttackLogsTransformer::class, function() {
+            return new KingdomAttackLogsTransformer();
         });
 
         $this->app->bind(BaseSkillValue::class, function($app) {

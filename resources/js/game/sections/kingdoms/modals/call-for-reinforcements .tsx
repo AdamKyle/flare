@@ -8,6 +8,8 @@ import InfoAlert from "../../../components/ui/alerts/simple-alerts/info-alert";
 import CallForReinforcementsState from "../../../lib/game/kingdoms/types/modals/call-for-reinforcements-state";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import MoveUnits from "../../../lib/game/kingdoms/move-units/move-units";
+import UnitMovement from "./partials/unit-movement";
+import SelectedUnitsToCallType from "../../../lib/game/kingdoms/types/selected-units-to-call-type";
 
 
 export default class CallForReinforcements extends React.Component<CallForReinforcementsProps, CallForReinforcementsState> {
@@ -63,23 +65,16 @@ export default class CallForReinforcements extends React.Component<CallForReinfo
 
     }
 
-    setAmountToMove(kingdomId: number, unitId: number, unitAmount: number, e: React.ChangeEvent<HTMLInputElement>) {
-        const unitsToCall = this.moveUnits.setAmountToMove(this.state.selected_units, kingdomId, unitId, unitAmount, e);
-
+    setAmountToMove(selectedUnits: SelectedUnitsToCallType[]|[]) {
         this.setState({
-            selected_units: unitsToCall
+            selected_units: selectedUnits
         });
     }
 
-    setKingdoms(data: any) {
-        const validData = data.filter((data: any) => data.value !== 'Please select one or more kingdoms');
-
-        let selectedKingdoms = JSON.parse(JSON.stringify(this.state.selected_kingdoms));
-
-        selectedKingdoms = validData.map((value: any) => parseInt(value.value, 10) || 0);
+    setKingdoms(kingdomsSelected: number[]|[]) {
 
         this.setState({
-            selected_kingdoms: selectedKingdoms,
+            selected_kingdoms: kingdomsSelected,
         })
     }
 
@@ -104,21 +99,10 @@ export default class CallForReinforcements extends React.Component<CallForReinfo
                 {
                     this.state.kingdoms.length > 0 ?
                         <Fragment>
-                            {this.moveUnits.renderKingdomSelect(this.state.kingdoms, this.state.selected_kingdoms, this.setKingdoms.bind(this))}
-
-                            {
-                                this.state.selected_kingdoms.length > 0 ?
-                                    <div className='my-4 max-h-[350px] overflow-y-scroll'>
-                                        {this.moveUnits.getUnitOptions(
-                                            this.state.kingdoms,
-                                            this.state.selected_units,
-                                            this.state.selected_kingdoms,
-                                            this.setAmountToMove.bind(this)
-                                        )}
-                                    </div>
-
-                                : null
-                            }
+                            <UnitMovement kingdoms={this.state.kingdoms}
+                                          update_units_selected={this.setAmountToMove.bind(this)}
+                                          update_kingdoms_selected={this.setKingdoms.bind(this)}
+                            />
 
                             {
                                 this.state.processing_unit_request ?

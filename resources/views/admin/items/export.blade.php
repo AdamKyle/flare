@@ -42,6 +42,11 @@
                 <input value="trinket" name="type_to_export" type="hidden" />
                 <x-core.buttons.primary-button type="submit">Export Trinkets Only</x-core.buttons.primary-button>
             </form>
+            <form method="POST" action="{{ route('items.export-data') }}" class="mb-4 text-center">
+                @csrf
+                <input value="specialty-shops" name="type_to_export" type="hidden" />
+                <x-core.buttons.primary-button type="submit">Export Specialty Shops Only</x-core.buttons.primary-button>
+            </form>
         </x-core.cards.card-with-title>
     </x-core.layout.info-container>
 @endsection

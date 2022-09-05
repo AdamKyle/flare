@@ -4,10 +4,14 @@ namespace App\Game\Kingdoms\Controllers\Api;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
-use App\Game\Kingdoms\Requests\MoveUnitsRequest;
+use App\Flare\Models\KingdomLog;
+use App\Game\Kingdoms\Requests\DropItemsOnKingdomRequest;
+use App\Game\Kingdoms\Service\AttackWithItemsService;
 use App\Game\Kingdoms\Service\UnitMovementService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Collection;
 
 class AttackKingdom extends Controller {
 
@@ -17,10 +21,19 @@ class AttackKingdom extends Controller {
     private UnitMovementService $unitMovementService;
 
     /**
-     * @param UnitMovementService $unitMovementService
+     * @var AttackWithItemsService $attackWithItemsService
      */
-    public function __construct(UnitMovementService $unitMovementService) {
-        $this->unitMovementService = $unitMovementService;
+    private AttackWithItemsService $attackWithItemsService;
+
+    /**
+     * @param UnitMovementService $unitMovementService
+     * @param AttackWithItemsService $attackWithItemsService
+     */
+    public function __construct(UnitMovementService $unitMovementService,
+                                AttackWithItemsService $attackWithItemsService)
+    {
+        $this->unitMovementService          = $unitMovementService;
+        $this->attackWithItemsService       = $attackWithItemsService;
     }
 
     /**
@@ -41,5 +54,21 @@ class AttackKingdom extends Controller {
             'kingdoms'     => $kingdomsToSelect,
             'items_to_use' => array_values($itemsToUse->toArray()),
         ]);
+    }
+
+    /**
+     * @param DropItemsOnKingdomRequest $request
+     * @param Kingdom $kingdom
+     * @param Character $character
+     * @return JsonResponse
+     */
+    public function dropItems(DropItemsOnKingdomRequest $request, Kingdom $kingdom, Character $character): JsonResponse {
+        $response = $this->attackWithItemsService->useItemsOnKingdom($character, $kingdom, $request->slots);
+
+        $status = $response['status'];
+
+        unset($response['status']);
+
+        return response()->json($response, $status);
     }
 }

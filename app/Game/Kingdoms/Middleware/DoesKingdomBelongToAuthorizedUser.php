@@ -19,6 +19,15 @@ class DoesKingdomBelongToAuthorizedUser
     public function handle($request, Closure $next, $guard = null)
     {
         $kingdom   = $request->has('kingdom') ? $request->kingdom : null;
+
+        if (is_null($kingdom)) {
+            $building = $request->has('building') ? $request->building : null;
+
+            if (!is_null($building)) {
+                $kingdom = $building->kingdom;
+            }
+        }
+
         $character = $request->has('character') ? $request->character : null;
         $message   = null;
 

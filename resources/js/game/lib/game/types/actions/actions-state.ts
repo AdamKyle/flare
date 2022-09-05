@@ -26,4 +26,8 @@ export default interface ActionsState {
     show_duel_fight: boolean;
 
     show_join_pvp: boolean;
+
+    show_hell_forged_section: boolean;
+
+    show_purgatory_chains_section: boolean;
 }

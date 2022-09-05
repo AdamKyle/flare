@@ -25,6 +25,11 @@ Route::middleware(['auth', 'is.character.who.they.say.they.are', 'character.owns
     Route::get('/kingdoms/{character}/{kingdom}', ['as' => 'kingdoms.location', 'uses' => 'Api\KingdomInformationController@getLocationData']);
 });
 
+Route::middleware(['auth', 'is.character.who.they.say.they.are', 'throttle:500,1'])->group(function() {
+    Route::post('/kingdom/opened-log/{character}/{kingdomLog}', ['as' => 'kingdoms.update-log', 'uses' => 'Api\KingdomInformationController@updateLog']);
+    Route::post('/kingdom/delete-log/{character}/{kingdomLog}', ['as' => 'kingdoms.update-log', 'uses' => 'Api\KingdomInformationController@deleteLog']);
+});
+
 Route::middleware(['auth', 'is.character.dead', 'is.character.exploring', 'is.character.who.they.say.they.are'])->group(function() {
     Route::post('/kingdoms/{character}/settle', ['as' => 'kingdoms.settle', 'uses' => 'Api\KingdomSettleController@settle']);
 });
@@ -36,7 +41,6 @@ Route::middleware(['auth', 'is.character.dead', 'is.character.exploring', 'is.ch
 Route::middleware(['auth', 'is.character.dead', 'is.character.exploring', 'is.character.who.they.say.they.are'])->group(function() {
     Route::post('/kingdoms/{character}/upgrade-building/{building}', ['as' => 'kingdoms.building.upgrade', 'uses' => 'Api\KingdomBuildingsController@upgradeKingdomBuilding']);
     Route::post('/kingdoms/building-upgrade/cancel', ['as' => 'kingdoms.building.queue.delete', 'uses' => 'Api\KingdomBuildingsController@removeKingdomBuildingFromQueue']);
-
     Route::post('/kingdoms/{character}/rebuild-building/{building}', ['as' => 'kingdoms.building.rebuild', 'uses' => 'Api\KingdomBuildingsController@rebuildKingdomBuilding']);
 });
 
@@ -63,6 +67,7 @@ Route::middleware(['auth', 'is.character.dead', 'is.character.exploring', 'is.ch
 
 Route::middleware(['auth', 'is.character.dead', 'is.character.exploring', 'is.character.who.they.say.they.are', 'character.owns.kingdom'])->group(function() {
     Route::get('/fetch-attacking-data/{kingdom}/{character}', ['as' => 'kingdom.fetch.attacking-data', 'uses' => 'Api\AttackKingdom@fetchAttackingData']);
+    Route::post('/drop-items-on-kingdom/{kingdom}/{character}', ['as' => 'drop.items.on.kingdoms', 'uses' => 'Api\AttackKingdom@dropItems']);
 });
 
 

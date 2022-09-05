@@ -30,6 +30,10 @@
                                 <x-core.forms.select :model="$item" label="Effects (Quest items only):" modelKey="effect" name="effect" :options="$effects" />
 
                                 <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                                <h3 class="mb-3">Specialty Type</h3>
+                                <x-core.forms.select :model="$item" label="Specialty Type:" modelKey="specialty_type" name="specialty_type" :options="$specialtyTypes" />
+
+                                <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                                 <h3 class="mb-3">Drop Location</h3>
                                 <x-core.forms.collection-select :model="$item" label="Drops From:" modelKey="drop_location_id" name="drop_location_id" value="id" key="name" :options="$locations" />
                             </div>
@@ -38,7 +42,7 @@
                                 <h3 class="mb-3">Item Cost Info</h3>
                                 <x-core.forms.check-box :model="$item" label="Can list on market?" modelKey="market_sellable" name="market_sellable" />
                                 <x-core.forms.input :model="$item" label="Gold Cost:" modelKey="cost" name="cost" />
-                                <x-core.forms.input :model="$item" label="Shards Cost:" modelKey="shard_cost" name="shard_cost" />
+                                <x-core.forms.input :model="$item" label="Shards Cost:" modelKey="shards_cost" name="shards_cost" />
                                 <x-core.forms.input :model="$item" label="Gold Dust Cost:" modelKey="gold_dust_cost" name="gold_dust_cost" />
                                 <x-core.forms.input :model="$item" label="Copper Coin Cost:" modelKey="copper_coin_cost" name="copper_coin_cost" />
                             </div>
@@ -53,7 +57,7 @@
                                 <x-core.forms.input :model="$item" label="Dur Modifier (%):" modelKey="dur_mod" name="dur_mod" />
                                 <x-core.forms.input :model="$item" label="Agi Modifier (%):" modelKey="agi_mod" name="agi_mod" />
                                 <x-core.forms.input :model="$item" label="Int Modifier (%):" modelKey="int_mod" name="int_mod" />
-                                <x-core.forms.input :model="$item" label="Agi Modifier (%):" modelKey="agi_mod" name="agi_mod" />
+                                <x-core.forms.input :model="$item" label="Chr Modifier (%):" modelKey="chr_mod" name="chr_mod" />
                                 <x-core.forms.input :model="$item" label="Focus Modifier (%):" modelKey="focus_mod" name="focus_mod" />
                             </div>
                             <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
@@ -142,5 +146,5 @@
                 </x-core.form-wizard.contents>
             </x-core.form-wizard.container>
         </x-core.cards.card-with-title>
-    </x-core.layout.info-container>>
+    </x-core.layout.info-container>
 @endsection

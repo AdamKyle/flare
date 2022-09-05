@@ -12,10 +12,15 @@ import SmallKingdom from "./small-kingdom";
 import {isEqual} from "lodash";
 import Tabs from "../../components/ui/tabs/tabs";
 import TabPanel from "../../components/ui/tabs/tab-panel";
+import {buildLogsColumns} from "../../lib/game/kingdoms/build-logs-columns";
+import KingdomLogDetailsView from "./kingdom-log-details";
+import KingdomLogDetails from "../../lib/game/kingdoms/kingdom-log-details";
+import Ajax from "../../lib/ajax/ajax";
+import {AxiosError, AxiosResponse} from "axios";
 
 export default class KingdomsList extends React.Component<KingdomListProps, KingdomListState> {
 
-    private tabs: {name: string, key: string}[];
+    private tabs: {name: string, key: string, has_logs?: boolean;}[];
 
     constructor(props: KingdomListProps) {
         super(props);
@@ -23,12 +28,17 @@ export default class KingdomsList extends React.Component<KingdomListProps, King
         this.tabs = [{
             name: 'Kingdoms',
             key: 'kingdoms',
+        }, {
+            name: 'Logs',
+            key: 'kingdom-logs',
+            has_logs: false,
         }]
 
         this.state = {
             loading: true,
             dark_tables: false,
             selected_kingdom: null,
+            selected_log: null,
         }
     }
 
@@ -42,6 +52,8 @@ export default class KingdomsList extends React.Component<KingdomListProps, King
                 loading: false,
             })
         }, 500);
+
+        this.updateIcon();
     }
 
     componentDidUpdate() {
@@ -62,6 +74,22 @@ export default class KingdomsList extends React.Component<KingdomListProps, King
                 })
             }
         }
+
+        this.updateIcon();
+    }
+
+    updateIcon() {
+        if (this.props.logs.length > 0) {
+            const hasUnReadLogs = this.props.logs.filter((log: KingdomLogDetails) => {
+                return !log.opened
+            });
+
+            if (hasUnReadLogs.length > 0) {
+                this.tabs[this.tabs.length - 1].has_logs = true;
+            } else {
+                this.tabs[this.tabs.length - 1].has_logs = false;
+            }
+        }
     }
 
     viewKingdomDetails(kingdom: KingdomDetails) {
@@ -70,9 +98,38 @@ export default class KingdomsList extends React.Component<KingdomListProps, King
         });
     }
 
+    viewLogs(log: KingdomLogDetails) {
+        if (!log.opened) {
+            (new Ajax).setRoute('kingdom/opened-log/'+log.character_id+'/'+log.id).doAjaxCall('post', (result: AxiosResponse) => {
+                this.setState({
+                    selected_log: log,
+                })
+            }, (error: AxiosError) => {
+                console.error(error);
+            });
+        } else {
+            this.setState({
+                selected_log: log,
+            });
+        }
+    }
+
+    deleteLog(log: KingdomLogDetails) {
+        (new Ajax).setRoute('kingdom/delete-log/'+log.character_id+'/'+log.id).doAjaxCall('post', (result: AxiosResponse) => {
+        }, (error: AxiosError) => {
+            console.error(error);
+        });
+    }
+
     closeKingdomDetails() {
         this.setState({
             selected_kingdom: null,
+        });
+    }
+
+    closeLogDetails() {
+        this.setState({
+            selected_log: null,
         });
     }
 
@@ -86,35 +143,45 @@ export default class KingdomsList extends React.Component<KingdomListProps, King
         }
 
         return (
-                <Fragment>
-                    {
-                        this.state.selected_kingdom ?
-                            this.props.view_port < 1600 ?
-                                <SmallKingdom close_details={this.closeKingdomDetails.bind(this)}
-                                              kingdom={this.state.selected_kingdom}
-                                              dark_tables={this.state.dark_tables}
-                                              character_gold={this.props.character_gold}
-                                />
-                            :
-                                <Kingdom close_details={this.closeKingdomDetails.bind(this)}
-                                         kingdom={this.state.selected_kingdom}
-                                         dark_tables={this.state.dark_tables}
-                                         character_gold={this.props.character_gold}
-                                />
+            <Fragment>
+                {
+                    this.state.selected_kingdom !== null ?
+                        this.props.view_port < 1600 ?
+                            <SmallKingdom close_details={this.closeKingdomDetails.bind(this)}
+                                          kingdom={this.state.selected_kingdom}
+                                          dark_tables={this.state.dark_tables}
+                                          character_gold={this.props.character_gold}
+                            />
                         :
-                            <BasicCard additionalClasses={'overflow-x-scroll'}>
-                                <Tabs tabs={this.tabs}>
-                                    <TabPanel key={'kingdoms'}>
-                                        <Table data={this.props.my_kingdoms}
-                                               columns={buildKingdomsColumns(this.viewKingdomDetails.bind(this))}
-                                               dark_table={this.state.dark_tables}
-                                        />
-                                    </TabPanel>
-                                </Tabs>
-                            </BasicCard>
-                    }
-                </Fragment>
-
+                            <Kingdom close_details={this.closeKingdomDetails.bind(this)}
+                                     kingdom={this.state.selected_kingdom}
+                                     dark_tables={this.state.dark_tables}
+                                     character_gold={this.props.character_gold}
+                            />
+                    : this.state.selected_log !== null ?
+                        <KingdomLogDetailsView
+                            close_details={this.closeLogDetails.bind(this)}
+                            log={this.state.selected_log}
+                        />
+                    :
+                        <BasicCard additionalClasses={'overflow-x-scroll'}>
+                            <Tabs tabs={this.tabs} icon_key={'has_logs'}>
+                                <TabPanel key={'kingdoms'}>
+                                    <Table data={this.props.my_kingdoms}
+                                           columns={buildKingdomsColumns(this.viewKingdomDetails.bind(this))}
+                                           dark_table={this.state.dark_tables}
+                                    />
+                                </TabPanel>
+                                <TabPanel key={'kingdom-logs'}>
+                                    <Table data={this.props.logs}
+                                           columns={buildLogsColumns(this.viewLogs.bind(this), this.deleteLog.bind(this))}
+                                           dark_table={this.state.dark_tables}
+                                    />
+                                </TabPanel>
+                            </Tabs>
+                        </BasicCard>
+                }
+            </Fragment>
         )
     }
 

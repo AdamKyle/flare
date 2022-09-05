@@ -14,11 +14,17 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
             loading: true,
             npc_owned: false,
             action_in_progress: false,
+            can_attack_kingdom: false,
         }
     }
 
     updateLoading(kingdomDetails: KingdomDetailsType) {
-        const newState = {loading: false, title: this.buildTitle(kingdomDetails), npc_owned: kingdomDetails.is_npc_owned};
+        const newState = {
+            loading: false,
+            title: this.buildTitle(kingdomDetails),
+            npc_owned: kingdomDetails.is_npc_owned,
+            can_attack_kingdom: kingdomDetails.is_enemy_kingdom || kingdomDetails.is_npc_owned || !kingdomDetails.is_protected
+        };
 
         const state = JSON.parse(JSON.stringify(this.state));
 
@@ -64,6 +70,7 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
                                    allow_purchase={this.state.npc_owned}
                                    update_action_in_progress={this.updateActionInProgress.bind(this)}
                                    close_modal={this.closeModal.bind(this)}
+                                   can_attack_kingdom={this.state.can_attack_kingdom}
                 />
             </Dialogue>
         )

@@ -22,10 +22,9 @@ import Actions from "./sections/game-actions-section/actions";
 import PositionType from "./lib/game/types/map/position-type";
 import {removeCommas} from "./lib/game/format-number";
 import CharacterCurrenciesType from "./lib/game/character/character-currencies-type";
+import KingdomLogDetails from "./lib/game/kingdoms/kingdom-log-details";
 
 export default class Game extends React.Component<GameProps, GameState> {
-
-    private tabs: {name: string, key: string}[];
 
     private characterTopBar: any;
 
@@ -45,22 +44,12 @@ export default class Game extends React.Component<GameProps, GameState> {
 
     private kingdomUpdates: any;
 
+    private kingdomLogsUpdate: any;
+
+    private updateSpecialShopsAccess: any;
+
     constructor(props: GameProps) {
         super(props)
-
-        this.tabs = [{
-            key: 'game',
-            name: 'Game'
-        }, {
-            key: 'character-sheet',
-            name: 'Character Sheet',
-        }, {
-            key: 'quests',
-            name: 'Quests'
-        }, {
-            key: 'kingdoms',
-            name: 'Kingdoms'
-        }]
 
         this.state = {
             view_port: 0,
@@ -73,9 +62,24 @@ export default class Game extends React.Component<GameProps, GameState> {
             celestial_id: 0,
             character: null,
             kingdoms: [],
+            kingdom_logs: [],
             quests: null,
             position: null,
             disable_tabs: false,
+            tabs: [{
+                key: 'game',
+                name: 'Game'
+            }, {
+                key: 'character-sheet',
+                name: 'Character Sheet',
+            }, {
+                key: 'quests',
+                name: 'Quests'
+            }, {
+                key: 'kingdoms',
+                name: 'Kingdoms',
+                has_logs: false,
+            }]
         }
 
         // @ts-ignore
@@ -103,7 +107,14 @@ export default class Game extends React.Component<GameProps, GameState> {
         this.updateCraftingTypes = Echo.private('update-location-base-crafting-options-' + this.props.userId);
 
         // @ts-ignore
+        this.updateSpecialShopsAccess = Echo.private('update-location-base-shops-' + this.props.userId);
+
+        // @ts-ignore
         this.kingdomUpdates = Echo.private('update-kingdom-' + this.props.userId);
+
+        // @ts-ignore
+        this.kingdomLogsUpdate = Echo.private('update-kingdom-logs-' + this.props.userId);
+
     }
 
     componentDidMount() {
@@ -157,6 +168,15 @@ export default class Game extends React.Component<GameProps, GameState> {
         });
 
         // @ts-ignore
+        this.kingdomLogsUpdate.listen('Game.Kingdoms.Events.UpdateKingdomLogs', (event: { logs: KingdomLogDetails[] | []}) => {
+            this.setState({
+                kingdom_logs: event.logs
+            }, () => {
+                this.updateLogIcon();
+            });
+        });
+
+        // @ts-ignore
         this.unlockAlchemySkill.listen('Game.Quests.Events.UnlockSkillEvent', () => {
             const character = JSON.parse(JSON.stringify(this.state.character));
 
@@ -172,7 +192,19 @@ export default class Game extends React.Component<GameProps, GameState> {
             const character = JSON.parse(JSON.stringify(this.state.character));
 
             character.can_use_work_bench = event.canUseWorkBench;
-            character.can_access_queen = event.canUseQueenOfHearts;
+            character.can_access_queen   = event.canUseQueenOfHearts;
+
+            this.setState({
+                character: character
+            });
+        })
+
+        //@ts-ignore
+        this.updateSpecialShopsAccess.listen('Game.Maps.Events.UpdateLocationBasedSpecialShops', (event: any) => {
+            const character = JSON.parse(JSON.stringify(this.state.character));
+
+            character.can_access_hell_forged      = event.canAccessHellForgedShop;
+            character.can_access_purgatory_chains = event.canAccessPurgatoryChainsShop;
 
             this.setState({
                 character: character
@@ -194,8 +226,6 @@ export default class Game extends React.Component<GameProps, GameState> {
         this.kingdomUpdates.listen('Game.Kingdoms.Events.UpdateKingdom', (event: { kingdom: KingdomDetails }) => {
             const eventKingdom = event.kingdom;
 
-            console.log(eventKingdom);
-
             if (Array.isArray(eventKingdom)) {
                 this.setState({
                     kingdoms: eventKingdom
@@ -216,6 +246,24 @@ export default class Game extends React.Component<GameProps, GameState> {
                 kingdoms: currentKingdoms,
             });
         });
+    }
+
+    updateLogIcon() {
+        const tabs    = JSON.parse(JSON.stringify(this.state.tabs));
+
+        if (this.state.kingdom_logs.length > 0) {
+            const hasLogs = this.state.kingdom_logs.filter((log: KingdomLogDetails) => !log.opened);
+
+            if (hasLogs.length > 0) {
+                tabs[tabs.length - 1].has_logs = true;
+            } else {
+                tabs[tabs.length - 1].has_logs = false;
+            }
+        }
+
+        this.setState({
+            tabs: tabs,
+        })
     }
 
     updateDisabledTabs() {
@@ -306,9 +354,9 @@ export default class Game extends React.Component<GameProps, GameState> {
 
                 <ScreenRefresh user_id={this.state.character.user_id} />
 
-                <Tabs tabs={this.tabs} disabled={!this.state.finished_loading || this.state.disable_tabs} additonal_css={clsx({
+                <Tabs tabs={this.state.tabs} disabled={!this.state.finished_loading || this.state.disable_tabs} additonal_css={clsx({
                     'ml-[40px]': this.state.view_port >= 1600
-                })}>
+                })} icon_key={'has_logs'}>
                     <TabPanel key={'game'}>
                         <div className={clsx("grid lg:grid-cols-3 gap-3", {
                             'ml-[40px]': this.state.view_port >= 1600
@@ -381,7 +429,12 @@ export default class Game extends React.Component<GameProps, GameState> {
                         </BasicCard>
                     </TabPanel>
                     <TabPanel key={'kingdoms'}>
-                        <KingdomsList my_kingdoms={this.state.kingdoms} view_port={this.state.view_port} character_gold={removeCommas(this.state.character_currencies.gold)} />
+                        <KingdomsList
+                            my_kingdoms={this.state.kingdoms}
+                            logs={this.state.kingdom_logs}
+                            view_port={this.state.view_port}
+                            character_gold={removeCommas(this.state.character_currencies.gold)}
+                        />
                     </TabPanel>
                 </Tabs>
 

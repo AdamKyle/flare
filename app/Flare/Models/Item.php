@@ -89,6 +89,7 @@ class Item extends Model {
         'counter_chance',
         'counter_resistance',
         'is_mythic',
+        'specialty_type',
     ];
 
     /**

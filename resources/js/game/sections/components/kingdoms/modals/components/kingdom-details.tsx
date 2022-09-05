@@ -7,7 +7,6 @@ import KingdomTopSection from "./kingdom-top-section";
 import KingdomDetailsProps
     from "../../../../../lib/game/types/map/kingdom-pins/modals/components/kingdom-details-props";
 import ComponentLoading from "../../../../../components/ui/loading/component-loading";
-import PrimaryButton from "../../../../../components/ui/buttons/primary-button";
 import PrimaryOutlineButton from "../../../../../components/ui/buttons/primary-outline-button";
 import LoadingProgressBar from "../../../../../components/ui/progress-bars/loading-progress-bar";
 import DangerAlert from "../../../../../components/ui/alerts/simple-alerts/danger-alert";
@@ -194,7 +193,7 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
                             }
 
                             {
-                                !this.state.kingdom_details.is_protected ?
+                                this.props.can_attack_kingdom ?
                                     <div className='mt-4 text-center'>
                                         <DangerOutlineButton button_label={'Attack Kingdom'} on_click={this.manageAttackKingdom.bind(this)} />
                                     </div>
@@ -217,6 +216,7 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
                             handle_close={this.manageAttackKingdom.bind(this)}
                             kingdom_to_attack_id={this.props.kingdom_id}
                             character_id={this.props.character_id}
+                            kingdom_defence={this.state.kingdom_details.defence_bonus}
                         />
                     : null
                 }

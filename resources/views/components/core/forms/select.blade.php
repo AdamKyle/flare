@@ -4,7 +4,7 @@
     <select class="form-control" name="{{$name}}" id="{{$name}}" value="{{!is_null($model) ? $model->{$modelKey} : null}}">
         <option value="">Please select</option>
         @foreach($options as $option)
-            <option value={{$option}} {{!is_null($model) ? $model->{$modelKey} === $option ? 'selected' : '' : ''}}>{{$option}}</option>
+            <option value="{{$option}}" {{!is_null($model) ? $model->{$modelKey} === $option ? 'selected' : '' : ''}}>{{$option}}</option>
         @endforeach
     </select>
 </div>

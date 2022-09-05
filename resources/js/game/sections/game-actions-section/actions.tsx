@@ -14,6 +14,7 @@ import DuelPlayer from "./components/duel-player";
 import SkyOutlineButton from "../../components/ui/buttons/sky-outline-button";
 import JoinPvp from "./components/join-pvp";
 import CelestialFight from "./components/celestial-fight";
+import Shop from "./components/specialty-shops/shop";
 
 export default class Actions extends React.Component<ActionsProps, ActionsState> {
 
@@ -45,6 +46,8 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
             show_celestial_fight: false,
             show_duel_fight: false,
             show_join_pvp: false,
+            show_hell_forged_section: false,
+            show_purgatory_chains_section: false,
         }
 
         this.actionsManager = new ActionsManager(this);
@@ -122,6 +125,18 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
         })
     }
 
+    manageHellForgedShop() {
+        this.setState({
+            show_hell_forged_section: !this.state.show_hell_forged_section
+        })
+    }
+
+    managedPurgatoryChainsShop() {
+        this.setState({
+            show_purgatory_chains_section: !this.state.show_purgatory_chains_section
+        })
+    }
+
     manageDuel() {
         this.setState({
             show_duel_fight: !this.state.show_duel_fight
@@ -190,6 +205,30 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
                                 <div className='mb-4'>
                                     <SuccessOutlineButton button_label={'Exploration'}
                                                           on_click={this.manageExploration.bind(this)}
+                                                          additional_css={'w-1/2'}
+                                                          disabled={this.props.character.is_dead}
+                                    />
+                                </div>
+                            : null
+                        }
+
+                        {
+                            this.props.character.can_access_hell_forged ?
+                                <div className='mb-4'>
+                                    <SuccessOutlineButton button_label={'Hell Forged Gear'}
+                                                          on_click={this.manageHellForgedShop.bind(this)}
+                                                          additional_css={'w-1/2'}
+                                                          disabled={this.props.character.is_dead}
+                                    />
+                                </div>
+                            : null
+                        }
+
+                        {
+                            this.props.character.can_access_purgatory_chains ?
+                                <div className='mb-4'>
+                                    <SuccessOutlineButton button_label={'Purgatory Chains Gear'}
+                                                          on_click={this.managedPurgatoryChainsShop.bind(this)}
                                                           additional_css={'w-1/2'}
                                                           disabled={this.props.character.is_dead}
                                     />
@@ -278,6 +317,14 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
                             this.state.show_join_pvp ?
                                 <JoinPvp manage_section={this.manageJoinPvp.bind(this)} character_id={this.props.character.id}/>
                                 : null
+                        }
+
+                        {
+                            this.state.show_hell_forged_section || this.state.show_purgatory_chains_section ?
+                                <Shop
+                                    type={this.state.show_hell_forged_section ? 'Hell Forged' : 'Purgatory Chains'}
+                                />
+                            : null
                         }
                     </div>
                 </div>

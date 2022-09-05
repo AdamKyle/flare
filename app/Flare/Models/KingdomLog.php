@@ -19,13 +19,18 @@ class KingdomLog extends Model
      */
     protected $fillable = [
         'character_id',
+        'attacking_character_id',
         'from_kingdom_id',
         'to_kingdom_id',
         'status',
         'units_sent',
         'units_survived',
-        'old_defender',
-        'new_defender',
+        'old_buildings',
+        'new_buildings',
+        'old_units',
+        'new_units',
+        'item_damage',
+        'morale_loss',
         'published',
         'opened',
         'created_at',
@@ -39,10 +44,15 @@ class KingdomLog extends Model
     protected $casts = [
         'units_sent'     => 'array',
         'units_survived' => 'array',
-        'old_defender'   => 'array',
-        'new_defender'   => 'array',
+        'old_buildings'  => 'array',
+        'new_buildings'  => 'array',
+        'old_units'      => 'array',
+        'new_units'      => 'array',
         'published'      => 'boolean',
         'opened'         => 'boolean',
+        'item_damage'    => 'float',
+        'morale_loss'    => 'float',
+        'status'         => 'integer',
     ];
 
     protected $appends = [
@@ -70,12 +80,20 @@ class KingdomLog extends Model
         $this->attributes['units_survived'] = json_encode($value);
     }
 
-    public function setOldDefenderAttribute($value) {
-        $this->attributes['old_defender'] = json_encode($value);
+    public function setOldBuildingsAttribute($value) {
+        $this->attributes['old_buildings'] = json_encode($value);
     }
 
-    public function setNewDefenderUnitsAttribute($value) {
-        $this->attributes['new_defender'] = json_encode($value);
+    public function setNewBuildingsUnitsAttribute($value) {
+        $this->attributes['new_buildings'] = json_encode($value);
+    }
+
+    public function setOldUnitsAttribute($value) {
+        $this->attributes['old_units'] = json_encode($value);
+    }
+
+    public function setNewUnitsUnitsAttribute($value) {
+        $this->attributes['new_units'] = json_encode($value);
     }
 
     protected static function newFactory() {

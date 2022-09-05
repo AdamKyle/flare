@@ -11,4 +11,6 @@ export default interface KingdomModalState extends LocationModalState {
     npc_owned: boolean;
 
     action_in_progress: boolean;
+
+    can_attack_kingdom: boolean;
 }

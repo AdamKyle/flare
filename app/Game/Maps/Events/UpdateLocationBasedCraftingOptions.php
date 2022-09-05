@@ -17,19 +17,24 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 Use App\Flare\Models\User;
 use App\Game\Core\Traits\KingdomCache;
 
-class UpdateLocationBasedCraftingOptions implements ShouldBroadcastNow
-{
-    use Dispatchable, InteractsWithSockets, SerializesModels, KingdomCache;
+class UpdateLocationBasedCraftingOptions implements ShouldBroadcastNow {
 
+    use Dispatchable, InteractsWithSockets, SerializesModels, KingdomCache;
 
     /**
      * @var User $user
      */
-    private $user;
+    private User $user;
 
-    public $canUseWorkBench = false;
+    /**
+     * @var bool $canUseWorkBench
+     */
+    public bool $canUseWorkBench = false;
 
-    public $canUseQueenOfHearts = false;
+    /**
+     * @var bool $canUseQueenOfHearts
+     */
+    public bool $canUseQueenOfHearts = false;
 
     /**
      * Create a new event instance.
@@ -37,9 +42,7 @@ class UpdateLocationBasedCraftingOptions implements ShouldBroadcastNow
      * @param User $user
      */
     public function __construct(User $user) {
-        $user = $user->refresh();
-
-        $this->user = $user;
+        $this->user = $user->refresh();
 
         $this->canUseWorkBench     = $this->canUseWorkBench($user->character);
         $this->canUseQueenOfHearts = $this->canUseQueenOfHearts($user->character);
@@ -50,12 +53,7 @@ class UpdateLocationBasedCraftingOptions implements ShouldBroadcastNow
      * @return bool
      */
     protected function canUseWorkBench(Character $character): bool {
-
-        if (!$character->map->gameMap->mapType()->isPurgatory()) {
-            return false;
-        }
-
-        return true;
+        return $character->map->gameMap->mapType()->isPurgatory();
     }
 
     /**
@@ -73,8 +71,7 @@ class UpdateLocationBasedCraftingOptions implements ShouldBroadcastNow
      *
      * @return Channel|array
      */
-    public function broadcastOn()
-    {
+    public function broadcastOn() {
         return new PrivateChannel('update-location-base-crafting-options-' . $this->user->id);
     }
 }

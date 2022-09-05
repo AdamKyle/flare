@@ -3,6 +3,7 @@
 namespace App\Game\Kingdoms\Service;
 
 
+use App\Game\Kingdoms\Traits\CalculateMorale;
 use Illuminate\Support\Facades\Mail;
 use Facades\App\Flare\Values\UserOnlineValue;
 use App\Flare\Mail\GenericMail;
@@ -22,7 +23,7 @@ use App\Game\Skills\Values\SkillTypeValue;
 
 class KingdomUpdateService {
 
-    use DestroyKingdom;
+    use DestroyKingdom, CalculateMorale;
 
     /**
      * @var Kingdom
@@ -274,7 +275,7 @@ class KingdomUpdateService {
             $this->kingdom->gameMap->name . ' plane.'
         ));
 
-        $morale = $this->reduceOrIncreaseMoraleForBuildings($morale);
+        $morale = $this->reduceOrIncreaseMoraleForBuildings();
 
         if ($morale <= 0.0) {
             $this->giveKingdomsToNpcHandler->giveKingdomToNPC($this->kingdom);
@@ -414,34 +415,10 @@ class KingdomUpdateService {
     /**
      * Reduce or increase the morale based on the building durability.
      *
-     * - Skip the building if the building does not decrease and increase the morale.
-     *
-     * @param float $morale
      * @return float
      */
-    private function reduceOrIncreaseMoraleForBuildings(float $morale): float {
-        $buildings = $this->kingdom->buildings;
-
-        foreach ($buildings as $building) {
-
-            if (is_null($building->morale_increase) && is_null($building->morale_decrease)) {
-                continue;
-            }
-
-            $currentDurability = $building->current_durability;
-            $maxDurability     = $building->max_durability;
-
-            if ($currentDurability < $maxDurability) {
-                $morale -= $building->morale_decrease;
-
-            }
-
-            if ($currentDurability === $maxDurability) {
-                $morale += $building->morale_increase;
-            }
-        }
-
-        return $morale;
+    private function reduceOrIncreaseMoraleForBuildings(): float {
+        return $this->calculateNewMorale($this->kingdom, $this->kingdom->current_morale);
     }
 
     /**

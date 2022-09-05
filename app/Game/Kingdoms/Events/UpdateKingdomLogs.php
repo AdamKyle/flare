@@ -27,9 +27,9 @@ class UpdateKingdomLogs implements ShouldBroadcastNow
      *
      * @param Character $character
      */
-    public function __construct(Character $character) {
+    public function __construct(Character $character, array $logs) {
         $this->user = $character->user;
-        $this->logs = $character->kingdomAttackLogs()->where('published', true)->get();
+        $this->logs = $logs;
     }
 
     /**

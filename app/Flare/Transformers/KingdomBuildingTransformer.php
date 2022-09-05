@@ -13,8 +13,9 @@ class KingdomBuildingTransformer extends TransformerAbstract {
     /**
      * Gets the response data for the character sheet
      *
-     * @param Character $character
+     * @param KingdomBuilding $building
      * @return mixed
+     * @throws \Exception
      */
     public function transform(KingdomBuilding $building) {
 

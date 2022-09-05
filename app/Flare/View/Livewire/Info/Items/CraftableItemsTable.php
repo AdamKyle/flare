@@ -17,6 +17,7 @@ class CraftableItemsTable extends DataTableComponent
     public function builder(): Builder {
         return Item::whereNull('item_prefix_id')
             ->whereNull('item_suffix_id')
+            ->where('can_craft', true)
             ->whereNotIn('type', ['quest', 'alchemy', 'trinket']);
     }
 

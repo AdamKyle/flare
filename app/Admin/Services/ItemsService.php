@@ -5,6 +5,7 @@ namespace App\Admin\Services;
 use App\Flare\Models\Location;
 use App\Flare\Models\SetSlot;
 use App\Flare\Values\ItemEffectsValue;
+use App\Flare\Values\ItemSpecialtyType;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Skills\Values\SkillTypeValue;
 use Facades\App\Flare\Calculators\SellItemCalculator;
@@ -20,6 +21,8 @@ class ItemsService {
             'types'            => [
                 'weapon',
                 'bow',
+                'stave',
+                'hammer',
                 'body',
                 'shield',
                 'leggings',
@@ -35,7 +38,6 @@ class ItemsService {
                 'alchemy',
             ],
             'defaultPositions' => [
-                'bow',
                 'body',
                 'leggings',
                 'feet',
@@ -69,6 +71,11 @@ class ItemsService {
                 ItemEffectsValue::PURGATORY,
                 ItemEffectsValue::FACTION_POINTS,
                 ItemEffectsValue::GET_COPPER_COINS,
+                ItemEffectsValue::ENTER_PURGATORY_HOUSE,
+            ],
+            'specialtyTypes' => [
+                ItemSpecialtyType::HELL_FORGED,
+                ItemSpecialtyType::PURGATORY_CHAINS,
             ],
             'locations' => Location::select('name', 'id')->get(),
         ];
@@ -91,8 +98,6 @@ class ItemsService {
             $params['damages_kingdoms']   = false;
             $params['stat_increase']      = null;
             $params['affects_skill_type'] = null;
-            $params['gold_dust_cost']     = 0;
-            $params['shards_cost']        = 0;
         }
 
         if (!filter_var($params['damages_kingdoms'], FILTER_VALIDATE_BOOLEAN)) {

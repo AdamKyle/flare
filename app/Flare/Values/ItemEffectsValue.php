@@ -25,6 +25,7 @@ class ItemEffectsValue {
     const QUEEN_OF_HEARTS       = 'speak-to-queen-of-hearts';
     const FACTION_POINTS        = 'effects-faction-points';
     const GET_COPPER_COINS      = 'get-copper-coins';
+    const ENTER_PURGATORY_HOUSE = 'enter-purgatory-house';
 
     /**
      * @var string[] $values
@@ -46,6 +47,7 @@ class ItemEffectsValue {
         self::PURGATORY             => 'purgatory',
         self::FACTION_POINTS        => 'effects-faction-points',
         self::GET_COPPER_COINS      => 'get-copper-coins',
+        self::ENTER_PURGATORY_HOUSE => 'enter-purgatory-house',
     ];
 
     /**
@@ -199,5 +201,14 @@ class ItemEffectsValue {
      */
     public function getCopperCoins(): bool {
         return $this->value === self::GET_COPPER_COINS;
+    }
+
+    /**
+     * Does this let the player enter into the purgatory smith house?
+     *
+     * @return bool
+     */
+    public function canEnterPurgatorySmithHouse(): bool {
+        return $this->value === self::ENTER_PURGATORY_HOUSE;
     }
 }

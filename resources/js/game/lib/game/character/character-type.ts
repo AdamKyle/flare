@@ -193,4 +193,7 @@ export interface CharacterType {
 
     base_position: PositionType;
 
+    can_access_hell_forged: boolean;
+
+    can_access_purgatory_chains: boolean;
 }

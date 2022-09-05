@@ -7,7 +7,6 @@ import SkyOutlineButton from "../../components/ui/buttons/sky-outline-button";
 import ChangeNameModal from "./modals/change-name-modal";
 import BuyPopulationModal from "./modals/buy-population-modal";
 import BuildingDetails from "../../lib/game/kingdoms/building-details";
-import {buildBuildingsColumns} from "../../lib/game/kingdoms/build-buildings-columns";
 import GoblinBankModal from "./modals/goblin-bank-modal";
 import AbandonKingdomModal from "./modals/abadnon-kingdom-modal";
 import ManageTreasuryModal from "./modals/manage-treasury-modal";
@@ -103,7 +102,7 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
                             <dd>{this.props.kingdom.name}</dd>
                             <dt>Morale</dt>
                             <dd>{
-                                (this.props.kingdom.current_morale * 100).toFixed(2) + '/100 %'
+                                (this.props.kingdom.current_morale * 100).toFixed(2) + '/100%'
                             }</dd>
                             <dt>Treasury</dt>
                             <dd>{

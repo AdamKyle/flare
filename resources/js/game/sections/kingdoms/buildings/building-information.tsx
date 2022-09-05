@@ -2,13 +2,18 @@ import React, {Fragment} from "react";
 import BasicCard from "../../../components/ui/cards/basic-card";
 import BuildingInformationProps from "../../../lib/game/kingdoms/types/building-information-props";
 import {formatNumber} from "../../../lib/game/format-number";
-import InfoAlert from "../../../components/ui/alerts/simple-alerts/info-alert";
 import Select from "react-select";
 import TimeHelpModal from "../modals/time-help-modal";
 import UpgradeWithGold from "./upgrade-with-gold";
 import UpgradeWithResources from "./upgrade-with-resources";
 import BuildingTimeCalculation from "../../../lib/game/kingdoms/calculations/building-time-calculation";
 import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
+import PrimaryButton from "../../../components/ui/buttons/primary-button";
+import DangerButton from "../../../components/ui/buttons/danger-button";
+import Ajax from "../../../lib/ajax/ajax";
+import {AxiosError, AxiosResponse} from "axios";
+import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
+import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
 
 export default class BuildingInformation extends React.Component<BuildingInformationProps, any> {
 
@@ -18,10 +23,29 @@ export default class BuildingInformation extends React.Component<BuildingInforma
         super(props);
 
         this.state = {
-            upgrade_section: null
+            upgrade_section: null,
+            success_message: '',
+            error_message: '',
+            loading: false,
         }
 
         this.buildingTimeCalculation = new BuildingTimeCalculation();
+    }
+
+    componentDidMount() {
+        if (this.props.building.current_durability < this.props.building.max_durability) {
+            this.setState({
+                upgrade_section: 'repair-building'
+            });
+        }
+    }
+
+    componentDidUpdate() {
+        if (this.props.building.current_durability < this.props.building.max_durability && this.state.upgrade_section !== 'repair-building') {
+            this.setState({
+                upgrade_section: 'repair-building'
+            });
+        }
     }
 
     showSelectedForm(data: any) {
@@ -41,6 +65,35 @@ export default class BuildingInformation extends React.Component<BuildingInforma
         this.setState({
             upgrade_section: null,
         })
+    }
+
+    repairBuilding() {
+        this.setState({
+            loading: true,
+            success_message: '',
+            error_message: '',
+        }, () => {
+            (new Ajax).setRoute('kingdoms/'+this.props.character_id+'/rebuild-building/' + this.props.building.id)
+                .doAjaxCall('post', (result: AxiosResponse) => {
+                    this.setState({
+                        success_message: result.data.message,
+                        loading: false,
+                    });
+                }, (error: AxiosError) => {
+                    this.setState({loading: false});
+
+                    if (typeof error.response !== 'undefined') {
+                        const response = error.response;
+
+                        this.setState({
+                            error_message: response.data.message
+                        });
+                    }
+
+                    console.error(error);
+                });
+        });
+
     }
 
     calculateResourceCostWithReductions(cost: number, is_population: boolean, is_iron: boolean): string {
@@ -85,9 +138,70 @@ export default class BuildingInformation extends React.Component<BuildingInforma
                     remove_section={this.removeSelection.bind(this)}
                     is_in_queue={this.props.is_in_queue}
                 />
+            case 'repair-building':
+                return <Fragment>
+                    {
+                        this.props.building.current_durability < this.props.building.max_durability ?
+                            <Fragment>
+                                <PrimaryButton button_label={'Repair'} on_click={this.repairBuilding.bind(this)} additional_css={'mr-2'} />
+                                <DangerButton button_label={'Close section'} on_click={this.removeSelection.bind(this)} />
+
+                                {
+                                    this.state.loading ?
+                                        <LoadingProgressBar />
+                                    : null
+                                }
+                            </Fragment>
+                        :
+                            <Fragment>
+                                <p className='my-2'>Building does not need tro be Repaired</p>
+                                <DangerButton button_label={'Close section'} on_click={this.removeSelection.bind(this)} />
+                            </Fragment>
+                    }
+
+                </Fragment>
+                return 'repair settings';
             default:
                 return null;
         }
+    }
+
+    renderCosts() {
+        if (this.state.upgrade_section !== 'repair-building') {
+            return (
+                <dl className='mb-5'>
+                    <dt>Stone Cost:</dt>
+                    <dd>{this.calculateResourceCostWithReductions(this.props.building.stone_cost, false, false)}</dd>
+                    <dt>Clay Cost:</dt>
+                    <dd>{this.calculateResourceCostWithReductions(this.props.building.clay_cost, false, false)}</dd>
+                    <dt>Wood Cost:</dt>
+                    <dd>{this.calculateResourceCostWithReductions(this.props.building.wood_cost, false, false)}</dd>
+                    <dt>Iron Cost:</dt>
+                    <dd>{this.calculateResourceCostWithReductions(this.props.building.iron_cost, false, true)}</dd>
+                    <dt>Population Cost:</dt>
+                    <dd>{this.calculateResourceCostWithReductions(this.props.building.population_required, true, false)}</dd>
+                    <dt>Time till next level:</dt>
+                    <dd>{formatNumber(this.buildingTimeCalculation.calculateViewTime(this.props.building, this.state.to_level, this.props.kingdom_building_time_reduction).toFixed(2))} Minutes</dd>
+                </dl>
+            )
+        }
+
+        return (
+            <dl className='mb-5'>
+                <dt>Stone Cost:</dt>
+                <dd>{this.calculateResourceCostWithReductions(this.props.building.base_stone_cost, false, false)}</dd>
+                <dt>Clay Cost:</dt>
+                <dd>{this.calculateResourceCostWithReductions(this.props.building.base_clay_cost, false, false)}</dd>
+                <dt>Wood Cost:</dt>
+                <dd>{this.calculateResourceCostWithReductions(this.props.building.base_wood_cost, false, false)}</dd>
+                <dt>Iron Cost:</dt>
+                <dd>{this.calculateResourceCostWithReductions(this.props.building.base_iron_cost, false, true)}</dd>
+                <dt>Population Cost:</dt>
+                <dd>{this.calculateResourceCostWithReductions(this.props.building.base_population, true, false)}</dd>
+                <dt>Time to Repair</dt>
+                <dd>{formatNumber(this.props.building.rebuild_time)} Minutes</dd>
+            </dl>
+        );
     }
 
     render() {
@@ -102,6 +216,20 @@ export default class BuildingInformation extends React.Component<BuildingInforma
                             <DangerAlert>
                                 You must train the appropriate Kingdom Passive skill to unlock this building.
                                 The skill name is the same as this building name.
+                            </DangerAlert>
+                        : null
+                    }
+                    {
+                        this.state.success_message !== '' ?
+                            <SuccessAlert>
+                                {this.state.success_message}
+                            </SuccessAlert>
+                        : null
+                    }
+                    {
+                        this.state.error_message !== '' ?
+                            <DangerAlert>
+                                {this.state.error_message}
                             </DangerAlert>
                         : null
                     }
@@ -124,7 +252,14 @@ export default class BuildingInformation extends React.Component<BuildingInforma
                         </div>
                         <div className='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                         <div>
-                            <h3>Upgrade Costs (For 1 Level)</h3>
+                            <h3>
+                                {
+                                    this.state.upgrade_section === 'repair-building' ?
+                                        'Repair Costs'
+                                    :
+                                        'Upgrade Costs (For 1 Level)'
+                                }
+                            </h3>
                             <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                             {
                                 this.props.building.is_maxed ?
@@ -134,20 +269,7 @@ export default class BuildingInformation extends React.Component<BuildingInforma
                                         <p>Building is currently in queue</p>
                                     :
                                         <Fragment>
-                                            <dl className='mb-5'>
-                                                <dt>Stone Cost:</dt>
-                                                <dd>{this.calculateResourceCostWithReductions(this.props.building.stone_cost, false, false)}</dd>
-                                                <dt>Clay Cost:</dt>
-                                                <dd>{this.calculateResourceCostWithReductions(this.props.building.clay_cost, false, false)}</dd>
-                                                <dt>Wood Cost:</dt>
-                                                <dd>{this.calculateResourceCostWithReductions(this.props.building.wood_cost, false, false)}</dd>
-                                                <dt>Iron Cost:</dt>
-                                                <dd>{this.calculateResourceCostWithReductions(this.props.building.iron_cost, false, true)}</dd>
-                                                <dt>Population Cost:</dt>
-                                                <dd>{this.calculateResourceCostWithReductions(this.props.building.population_required, true, false)}</dd>
-                                                <dt>Time till next level:</dt>
-                                                <dd>{formatNumber(this.buildingTimeCalculation.calculateViewTime(this.props.building, this.state.to_level, this.props.kingdom_building_time_reduction).toFixed(2))} Minutes</dd>
-                                            </dl>
+                                            { this.renderCosts() }
 
                                             {
                                                 this.state.upgrade_section !== null ?
@@ -164,6 +286,10 @@ export default class BuildingInformation extends React.Component<BuildingInforma
                                                                 {
                                                                     label: 'Upgrade with resources',
                                                                     value: 'resources',
+                                                                },
+                                                                {
+                                                                    label: 'Repair Building',
+                                                                    value: 'repair-building',
                                                                 }
                                                             ]}
                                                             menuPosition={'absolute'}

@@ -7,6 +7,7 @@ use App\Admin\Import\Items\ItemsImport;
 use App\Admin\Requests\ItemsManagementRequest;
 use App\Admin\Services\ItemsService;
 use App\Flare\Values\ItemEffectsValue;
+use App\Flare\Values\ItemSpecialtyType;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -104,6 +105,10 @@ class ItemsController extends Controller {
             ],
             'trinket' => [
                 'trinket'
+            ],
+            'specialty-shops' => [
+                ItemSpecialtyType::HELL_FORGED,
+                ItemSpecialtyType::PURGATORY_CHAINS,
             ]
         ];
 

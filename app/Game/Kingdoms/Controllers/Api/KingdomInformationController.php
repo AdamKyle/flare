@@ -2,6 +2,9 @@
 
 namespace App\Game\Kingdoms\Controllers\Api;
 
+use App\Flare\Models\KingdomLog;
+use App\Flare\Transformers\KingdomAttackLogsTransformer;
+use App\Game\Kingdoms\Service\UpdateKingdom;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
@@ -36,20 +39,36 @@ class KingdomInformationController extends Controller{
     private OtherKingdomTransformer $otherKingdomTransformer;
 
     /**
+     * @var KingdomAttackLogsTransformer
+     */
+    private KingdomAttackLogsTransformer $kingdomAttackLogsTransformer;
+
+    /**
+     * @var UpdateKingdom $updateKingdom
+     */
+    private UpdateKingdom $updateKingdom;
+
+    /**
      * @param Manager $manager
      * @param KingdomTransformer $kingdomTransformer
+     * @param KingdomAttackLogsTransformer $kingdomAttackLogsTransformer
      * @param BasicKingdomTransformer $basicKingdomTransformer
      * @param OtherKingdomTransformer $otherKingdomTransformer
+     * @param UpdateKingdom $updateKingdom
      */
-    public function __construct(Manager                 $manager,
-                                KingdomTransformer      $kingdomTransformer,
+    public function __construct(Manager $manager,
+                                KingdomTransformer $kingdomTransformer,
+                                KingdomAttackLogsTransformer $kingdomAttackLogsTransformer,
                                 BasicKingdomTransformer $basicKingdomTransformer,
-                                OtherKingdomTransformer $otherKingdomTransformer)
+                                OtherKingdomTransformer $otherKingdomTransformer,
+                                UpdateKingdom $updateKingdom)
     {
-        $this->manager                 = $manager;
-        $this->kingdomTransformer      = $kingdomTransformer;
-        $this->basicKingdomTransformer = $basicKingdomTransformer;
-        $this->otherKingdomTransformer = $otherKingdomTransformer;
+        $this->manager                      = $manager;
+        $this->kingdomTransformer           = $kingdomTransformer;
+        $this->kingdomAttackLogsTransformer = $kingdomAttackLogsTransformer;
+        $this->basicKingdomTransformer      = $basicKingdomTransformer;
+        $this->otherKingdomTransformer      = $otherKingdomTransformer;
+        $this->updateKingdom                = $updateKingdom;
     }
 
     /**
@@ -77,11 +96,14 @@ class KingdomInformationController extends Controller{
      * @return JsonResponse
      */
     public function getKingdomsList(Character $character): JsonResponse {
-        return response()->json(
-            $this->manager->createData(
+        return response()->json([
+            'kingdoms' => $this->manager->createData(
                 new Collection($character->kingdoms, $this->kingdomTransformer)
-            )->toArray()
-        );
+            )->toArray(),
+            'logs'    => $this->manager->createData(
+                new Collection(KingdomLog::where('character_id', $character->id)->get(), $this->kingdomAttackLogsTransformer)
+            )->toArray(),
+        ]);
     }
 
     /**
@@ -95,5 +117,41 @@ class KingdomInformationController extends Controller{
                 new Item($kingdom, $this->kingdomTransformer)
             )->toArray(),
         );
+    }
+
+    /**
+     * @param Character $character
+     * @param KingdomLog $kingdomLog
+     * @return JsonResponse
+     */
+    public function updateLog(Character $character, KingdomLog $kingdomLog): JsonResponse {
+        if ($kingdomLog->character_id !== $character->id) {
+            return response()->json(['message' => 'Not allowed'], 422);
+        }
+
+        $kingdomLog->update([
+            'opened' => true,
+        ]);
+
+        $this->updateKingdom->updateKingdomLogs($character->refresh());
+
+        return response()->json();
+    }
+
+    /**
+     * @param Character $character
+     * @param KingdomLog $kingdomLog
+     * @return JsonResponse
+     */
+    public function deleteLog(Character $character, KingdomLog $kingdomLog): JsonResponse {
+        if ($kingdomLog->character_id !== $character->id) {
+            return response()->json(['message' => 'Not allowed'], 422);
+        }
+
+        $kingdomLog->delete();
+
+        $this->updateKingdom->updateKingdomLogs($character->refresh());
+
+        return response()->json();
     }
 }

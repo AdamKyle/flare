@@ -9,7 +9,7 @@ export const buildKingdomsColumns = (onClick: (kingdom: KingdomDetails) => void)
         {
             name: 'Name',
             selector: (row: KingdomDetails) => row.name,
-            cell: (row: any) => <button onClick={() => onClick(row)}>
+            cell: (row: any) => <button className='text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-500' onClick={() => onClick(row)}>
                 {iconsToShow(row)} {row.name} {row.is_protected ? ' (Protected) ' : ''}
             </button>
         },

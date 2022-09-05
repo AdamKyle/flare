@@ -2,7 +2,7 @@
 
 namespace App\Game\Kingdoms\Providers;
 
-use App\Flare\Transformers\UnitTransformer;
+use App\Flare\Transformers\KingdomAttackLogsTransformer;
 use App\Game\Kingdoms\Service\UnitMovementService;
 use App\Game\Kingdoms\Validators\MoveUnitsValidator;
 use App\Game\Maps\Calculations\DistanceCalculation;
@@ -25,7 +25,7 @@ use App\Game\Kingdoms\Handlers\SiegeHandler;
 use App\Game\Maps\Services\MovementService;
 use App\Game\Kingdoms\Service\UnitReturnService;
 use App\Game\Kingdoms\Service\KingdomLogService;
-use App\Game\Kingdoms\Service\AttackService;
+use App\Game\Kingdoms\Service\AttackWithItemsService;
 use App\Game\Kingdoms\Service\KingdomBuildingService;
 use App\Game\Kingdoms\Service\KingdomService;
 use App\Game\Kingdoms\Service\UnitService;
@@ -169,13 +169,9 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
-        $this->app->bind(AttackService::class, function($app) {
-            return new AttackService(
-                $app->make(SiegeHandler::class),
-                $app->make(UnitHandler::class),
-                $app->make(KingdomHandler::class),
-                $app->make(NotifyHandler::class),
-                $app->make(AttackBuilder::class)
+        $this->app->bind(AttackWithItemsService::class, function($app) {
+            return new AttackWithItemsService(
+                $app->make(UpdateKingdom::class),
             );
         });
 
@@ -216,6 +212,7 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(UpdateKingdom::class, function($app) {
             return new UpdateKingdom(
                 $app->make(KingdomTransformer::class),
+                $app->make(KingdomAttackLogsTransformer::class),
                 $app->make(Manager::class)
             );
         });

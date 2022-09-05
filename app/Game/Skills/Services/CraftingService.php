@@ -158,7 +158,6 @@ class CraftingService {
         $craftingTypes    = ['armour', 'ring', 'spell', 'artifact'];
 
         $items = Item::where('can_craft', true)
-
                     ->where('skill_level_required', '<=', $skill->level)
                     ->whereNull('item_prefix_id')
                     ->whereNull('item_suffix_id')

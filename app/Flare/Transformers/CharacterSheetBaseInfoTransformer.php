@@ -125,6 +125,8 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
             'is_alchemy_locked'           => $this->isAlchemyLocked($character),
             'can_use_work_bench'          => false,
             'can_access_queen'            => false,
+            'can_access_hell_forged'      => false,
+            'can_access_purgatory_chains' => false,
             'ambush_resistance'           => $characterTrinketsInformation->getAmbushResistanceChance($character),
             'counter_resistance'          => $characterTrinketsInformation->getCounterResistanceChance($character),
             'spell_evasion'               => $characterInformation->getTotalDeduction('spell_evasion'),

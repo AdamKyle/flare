@@ -1,4 +1,5 @@
 import KingdomDetails from "../kingdom-details";
+import KingdomLogDetails from "../kingdom-log-details";
 
 export default interface KingdomListState {
 
@@ -7,4 +8,6 @@ export default interface KingdomListState {
     dark_tables: boolean;
 
     selected_kingdom: KingdomDetails | null;
+
+    selected_log: KingdomLogDetails | null;
 }

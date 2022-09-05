@@ -4,6 +4,9 @@ namespace App\Game\Kingdoms\Service;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
+use App\Flare\Models\KingdomLog;
+use App\Flare\Transformers\KingdomAttackLogsTransformer;
+use App\Game\Kingdoms\Events\UpdateKingdomLogs;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
@@ -18,17 +21,27 @@ class UpdateKingdom {
     private KingdomTransformer $kingdomTransformer;
 
     /**
+     * @var KingdomAttackLogsTransformer
+     */
+    private KingdomAttackLogsTransformer $kingdomAttackLogsTransformer;
+
+    /**
      * @var Manager $manager
      */
     private Manager $manager;
 
     /**
      * @param KingdomTransformer $kingdomTransformer
+     * @param KingdomAttackLogsTransformer $kingdomAttackLogsTransformer
      * @param Manager $manager
      */
-    public function __construct(KingdomTransformer $kingdomTransformer, Manager $manager) {
-        $this->kingdomTransformer = $kingdomTransformer;
-        $this->manager            = $manager;
+    public function __construct(KingdomTransformer $kingdomTransformer,
+                                KingdomAttackLogsTransformer $kingdomAttackLogsTransformer,
+                                Manager $manager
+    ) {
+        $this->kingdomTransformer           = $kingdomTransformer;
+        $this->kingdomAttackLogsTransformer = $kingdomAttackLogsTransformer;
+        $this->manager                      = $manager;
     }
 
     /**
@@ -57,5 +70,21 @@ class UpdateKingdom {
         $kingdomData = $this->manager->createData($kingdomData)->toArray();
 
         event(new UpdateKingdomDetails($character->user, $kingdomData));
+    }
+
+    /**
+     * Updates kingdom attack logs for a character.
+     *
+     * @param Character $character
+     * @return void
+     */
+    public function updateKingdomLogs(Character $character): void {
+        $logs = KingdomLog::where('character_id', $character->id)->get();
+
+        $logData = new Collection($logs, $this->kingdomAttackLogsTransformer);
+
+        $logData = $this->manager->createData($logData)->toArray();
+
+        event(new UpdateKingdomLogs($character, $logData));
     }
 }

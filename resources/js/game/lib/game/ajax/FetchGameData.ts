@@ -77,8 +77,10 @@ export default class FetchGameData {
     }
 
     setKingdomsData(result: AxiosResponse)  {
+
         this.component.setState({
-            kingdoms: result.data,
+            kingdoms: result.data.kingdoms,
+            kingdom_logs: result.data.logs,
             loading: false,
         });
     }

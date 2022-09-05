@@ -52,4 +52,6 @@ export default interface KingdomDetails {
     is_npc_owned: boolean;
 
     is_enemy_kingdom: boolean;
+
+    is_protected: boolean;
 }

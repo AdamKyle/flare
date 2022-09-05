@@ -97,6 +97,10 @@ trait ItemsShowInformation {
             if ($effect->getCopperCoins()) {
                 $effects = 'Enemies in Purgatory will now start dropping copper coins in relation to their gold amounts. These amounts are random between 5-20 per battle.';
             }
+
+            if ($effect->canEnterPurgatorySmithHouse()) {
+                $effects = 'You can enter the Purgatory Smith house in Purgatory to investigate the Green Growing Light in the basement.';
+            }
         }
 
         if ($item->usable && !is_null($item->affects_skill_type)) {

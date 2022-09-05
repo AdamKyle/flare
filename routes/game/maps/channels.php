@@ -49,3 +49,8 @@ broadCast::channel('enemy-kingdom-morale-update', function($user) {
 broadCast::channel('update-location-base-crafting-options-{userId}', function($user, $userId) {
     return $user->id === (int) $userId;
 });
+
+// When we need to update special locations
+broadCast::channel('update-location-base-shops-{userId}', function($user, $userId) {
+    return $user->id === (int) $userId;
+});

@@ -79,7 +79,7 @@ class KingdomBuildingService {
      * @param Character $character
      */
     public function rebuildKingdomBuilding(KingdomBuilding $building, Character $character) {
-        $timeToComplete = now()->addMinutes($this->calculateBuildingTimeReduction($building));
+        $timeToComplete = now()->addMinutes($building->rebuild_time);
 
         $queue = BuildingInQueue::create([
             'character_id' => $character->id,

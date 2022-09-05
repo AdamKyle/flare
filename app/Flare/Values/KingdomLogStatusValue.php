@@ -2,6 +2,8 @@
 
 namespace App\Flare\Values;
 
+use Exception;
+
 class KingdomLogStatusValue {
 
     /**
@@ -9,25 +11,25 @@ class KingdomLogStatusValue {
      */
     private $value;
 
-    const ATTACKED         = 'attacked kingdom';
-    const LOST             = 'lost attack';
-    const TAKEN            = 'taken kingdom';
-    const LOST_KINGDOM     = 'lost kingdom';
-    const KINGDOM_ATTACKED = 'kingdom attacked';
-    const UNITS_RETURNING  = 'units returning';
-    const BOMBS_DROPPED    = 'bombs dropped';
+    const ATTACKED         = 0;
+    const LOST             = 1;
+    const TAKEN            = 2;
+    const LOST_KINGDOM     = 3;
+    const KINGDOM_ATTACKED = 4;
+    const UNITS_RETURNING  = 5;
+    const BOMBS_DROPPED    = 6;
 
     /**
      * @var string[] $values
      */
     protected static $values = [
-        self::ATTACKED         => 'attacked kingdom',
-        self::LOST             => 'lost attack',
-        self::TAKEN            => 'taken kingdom',
-        self::LOST_KINGDOM     => 'lost kingdom',
-        self::KINGDOM_ATTACKED => 'kingdom attacked',
-        self::UNITS_RETURNING  => 'units returning',
-        self::BOMBS_DROPPED    => 'bombs dropped'
+        self::ATTACKED         => 0,
+        self::LOST             => 1,
+        self::TAKEN            => 2,
+        self::LOST_KINGDOM     => 3,
+        self::KINGDOM_ATTACKED => 4,
+        self::UNITS_RETURNING  => 5,
+        self::BOMBS_DROPPED    => 6
     ];
 
     /**
@@ -35,12 +37,12 @@ class KingdomLogStatusValue {
      *
      * Throws if the value does not exist in the array of const values.
      *
-     * @param string $value
-     * @throws \Exception
+     * @param int $value
+     * @throws Exception
      */
-    public function __construct(string $value) {
+    public function __construct(int $value) {
         if (!in_array($value, self::$values)) {
-            throw new \Exception($value . ' does not exist.');
+            throw new Exception($value . ' does not exist.');
         }
 
         $this->value = $value;
