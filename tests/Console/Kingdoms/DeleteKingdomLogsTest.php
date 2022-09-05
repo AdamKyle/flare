@@ -14,7 +14,7 @@ class DeleteKingdomLogsTest extends TestCase
 
     use RefreshDatabase, CreateKingdom;
 
-    public function testDeleteAllAdventureLogs() {
+    public function testDeleteKingdomLogs() {
 
         $character = (new CharacterFactory())->createBaseCharacter()
                                              ->givePlayerLocation()
@@ -24,15 +24,20 @@ class DeleteKingdomLogsTest extends TestCase
                                              ->assignUnits();
 
         $this->createKingdomLog([
-            'character_id'    => $character->getCharacter(false)->id,
-            'from_kingdom_id' => $character->getKingdom()->id,
-            'to_kingdom_id'   => $character->getKingdom()->id,
-            'status'          => KingdomLogStatusValue::UNITS_RETURNING,
-            'units_sent'      => [],
-            'units_survived'  => [],
-            'old_defender'    => $character->getKingdom()->load('buildings', 'units')->toArray(),
-            'new_defender'    => $character->getKingdom()->load('buildings', 'units')->toArray(),
-            'published'       => true,
+            'character_id'           => $character->getCharacter()->id,
+            'attacking_character_id' => $character->getCharacter()->id,
+            'from_kingdom_id'        => $character->getKingdom()->id,
+            'to_kingdom_id'          => $character->getKingdom()->id,
+            'status'                 => KingdomLogStatusValue::UNITS_RETURNING,
+            'units_sent'             => [],
+            'units_survived'         => [],
+            'old_buildings'          => $character->getKingdom()->load('buildings')->toArray(),
+            'new_buildings'          => $character->getKingdom()->load('buildings')->toArray(),
+            'old_units'              => $character->getKingdom()->load('buildings')->toArray(),
+            'new_units'              => $character->getKingdom()->load('buildings')->toArray(),
+            'morale_loss'            => 1.0,
+            'opened'                 => false,
+            'published'              => true,
         ]);
 
         KingdomLog::first()->update(['created_at' => now()->subDays(550)]);
