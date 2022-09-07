@@ -22,6 +22,24 @@ export default class LocationDetails extends React.Component<LocationDetailsProp
         return this.props.location.increase_enemy_percentage_by !== null;
     }
 
+    renderSpecialType() {
+        if (this.props.location.type_name === 'Gold Mines') {
+            return (
+                <Fragment>
+                    <div className='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 hidden sm:block'></div>
+                    <h5 className='text-orange-500 dark:text-orange-400'>Gold Mines!</h5>
+                    <p className='my-4'>
+                        You are in the Gold Mines! This place will drops between 1-5 Shards per kill. You <strong>can explore here</strong>.
+                        This is the only place known to drop <a href='/information/currencies' target="_blank">Crystal Shards <i className="fas fa-external-link-alt"></i></a>,
+                        aside from Celestials who drop the most.
+                    </p>
+                </Fragment>
+            )
+        }
+
+        return null;
+    }
+
     render() {
         return (
             <Fragment>
@@ -51,6 +69,12 @@ export default class LocationDetails extends React.Component<LocationDetailsProp
                                     : 0
                                 }%</dd>
                             </dl>
+
+                            {
+                                this.props.location.type_name !== null ?
+                                    this.renderSpecialType()
+                                : null
+                            }
                         </Fragment>
                     :
                         this.props.location.quest_reward_item_id !== null ?

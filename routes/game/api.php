@@ -2,7 +2,7 @@
 
 Route::post('/character-timeout', ['uses' => 'Api\CharacterSheetController@globalTimeout']);
 
-Route::group(['middleware' => []], function() {
+Route::group(['middleware' => ['is.character.who.they.say.they.are']], function() {
     Route::get('/character-sheet/{character}', ['uses' => 'Api\CharacterSheetController@sheet']);
     Route::get('/character-sheet/{character}/active-boons', ['uses' => 'Api\CharacterSheetController@activeBoons']);
     Route::get('/character-sheet/{character}/factions', ['uses' => 'Api\CharacterSheetController@factions']);
@@ -17,14 +17,12 @@ Route::group(['middleware' => []], function() {
         Route::post('/character-sheet/{character}/remove-boon/{boon}', ['uses' => 'Api\CharacterSheetController@cancelBoon']);
     });
 
-    Route::get('/notifications', ['uses' => 'Api\NotificationsController@index']);
-    Route::post('/notifications/clear', ['uses' => 'Api\NotificationsController@clear']);
-    Route::post('/notifications/{notification}/clear', ['uses' => 'Api\NotificationsController@clearNotification']);
     Route::get('/maps/{character}', ['uses' => 'Api\MapsController@index']);
 
     Route::get('/character/{character}/inventory', ['uses' => 'Api\CharacterInventoryController@inventory']);
     Route::get('/character/{character}/inventory/comparison', ['uses' => 'Api\ItemComparisonController@compareItem']);
     Route::get('/character/{character}/inventory/comparison-from-chat', ['uses' => 'Api\ItemComparisonController@compareItemFromChat']);
+
 
     Route::group(['middleware' => ['is.character.dead']], function() {
         Route::get('/character/{character}/inventory/item/{item}', ['uses' => 'Api\CharacterInventoryController@itemDetails']);

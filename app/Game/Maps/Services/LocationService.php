@@ -5,6 +5,7 @@ namespace App\Game\Maps\Services;
 use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Models\Map;
 use App\Flare\Values\LocationEffectValue;
+use App\Flare\Values\LocationType;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Maps\Events\UpdateDuelAtPosition;
 use App\Game\Maps\Events\UpdateLocationBasedCraftingOptions;
@@ -110,7 +111,20 @@ class LocationService {
             if (!is_null($location->enemy_strength_type)) {
                 $location->increases_enemy_stats_by     = LocationEffectValue::getIncreaseByAmount($location->enemy_strength_type);
                 $location->increase_enemy_percentage_by = LocationEffectValue::fetchPercentageIncrease($location->enemy_strength_type);
+
+                if (!is_null($location->type)) {
+                    $locationType = new LocationType($location->type);
+
+                    if ($locationType->isPurgatorySmithHouse()) {
+                        $location->type_name = 'Purgatory Smiths House';
+                    }
+
+                    if ($locationType->isGoldMines()) {
+                        $location->type_name = 'Gold Mines';
+                    }
+                }
             }
+
 
             return $location;
         });

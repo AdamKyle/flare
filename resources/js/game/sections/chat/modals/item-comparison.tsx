@@ -14,6 +14,8 @@ import {
 } from "../../../lib/game/dark-mode-watcher";
 import UsableItemSection from "../../character-sheet/components/modals/components/usable-item-section";
 import InventoryQuestItemDetails from "../../character-sheet/components/modals/components/inventory-quest-item-details";
+import InventoryUseDetails from "../../character-sheet/components/modals/inventory-use-details";
+import AlchemyItemHoly from "../../character-sheet/components/modals/components/alchemy-item-holy";
 
 export default class ItemComparison extends React.Component<any, any> {
 
@@ -72,7 +74,7 @@ export default class ItemComparison extends React.Component<any, any> {
         }
 
         return (
-            <Fragment>
+            <div className='grid grid-cols-2 gap-2'>
                 <ItemNameColorationText item={{
                     name: this.state.comparison_details.itemToEquip.affix_name,
                     type: this.state.comparison_details.itemToEquip.type,
@@ -80,8 +82,11 @@ export default class ItemComparison extends React.Component<any, any> {
                     is_unique: this.state.comparison_details.itemToEquip.is_unique,
                     is_mythic: this.state.comparison_details.itemToEquip.is_mythic,
                     holy_stacks_applied: this.state.comparison_details.itemToEquip.holy_stacks_applied,
-                }} /> <span className='pl-3'>(Type: {capitalize(this.state.comparison_details.itemToEquip.type)})</span>
-            </Fragment>
+                }} />
+                <div className='absolute right-0'>
+                    <span className='pl-3 text-right mr-[70px]'>(Type: {capitalize(this.state.comparison_details.itemToEquip.type)})</span>
+                </div>
+            </div>
         )
     }
 
@@ -145,7 +150,10 @@ export default class ItemComparison extends React.Component<any, any> {
                                 :
 
                                     this.state.comparison_details.itemToEquip.type === 'alchemy' ?
-                                        <UsableItemSection item={this.state.comparison_details.itemToEquip} />
+                                        this.state.comparison_details.itemToEquip.holy_level > 0 ?
+                                            <AlchemyItemHoly item={this.state.comparison_details.itemToEquip} />
+                                        :
+                                            <UsableItemSection item={this.state.comparison_details.itemToEquip} />
                                    :
                                         this.state.comparison_details.itemToEquip.type === 'quest' ?
                                             <InventoryQuestItemDetails item={this.state.comparison_details.itemToEquip} />

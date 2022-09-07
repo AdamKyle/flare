@@ -11,6 +11,7 @@ class RandomItemDropBuilder {
     /**
      * Generates the random item for a player.
      *
+     * @param int $forLevel
      * @return Item|null
      */
     public function generateItem(int $forLevel): ?Item {
@@ -42,6 +43,7 @@ class RandomItemDropBuilder {
         $query =  Item::inRandomOrder()->doesntHave('itemSuffix')
                                        ->doesntHave('itemPrefix')
                                        ->whereNotIn('type', ['artifact', 'quest', 'alchemy', 'trinket'])
+                                       ->whereNull('specialty_type')
                                        ->where('skill_level_required', '<=', rand(1, $level));
 
 
@@ -52,6 +54,7 @@ class RandomItemDropBuilder {
     /**
      * Fetches one or two Affixes.
      *
+     * @param int $level
      * @return array
      */
     protected function getAffixes(int $level): array {

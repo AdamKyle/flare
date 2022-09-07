@@ -24,4 +24,6 @@ export default interface LocationDetails {
     required_quest_item_id: number | null;
 
     type: string | null;
+
+    type_name: string | null;
 }

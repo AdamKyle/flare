@@ -30,6 +30,7 @@ class UsableItemTransformer extends TransformerAbstract {
             'id'                               => $slot->item->id,
             'slot_id'                          => $slot->id,
             'item_name'                        => $slot->item->affix_name,
+            'affix_name'                       => $slot->item->affix_name,
             'type'                             => $slot->item->type,
             'description'                      => $slot->item->description,
             'damages_kingdoms'                 => $slot->item->damages_kingdoms,
@@ -65,6 +66,7 @@ class UsableItemTransformer extends TransformerAbstract {
         return [
             'id'                               => $item->id,
             'item_name'                        => $item->affix_name,
+            'affix_name'                       => $item->affix_name,
             'type'                             => $item->type,
             'description'                      => $item->description,
             'damages_kingdoms'                 => $item->damages_kingdoms,
@@ -91,6 +93,7 @@ class UsableItemTransformer extends TransformerAbstract {
             'focus_mod'                        => $item->focus_mod,
             'usable'                           => $item->usable,
             'stat_increase'                    => $item->increase_stat_by,
+            'holy_level'                       => $item->holy_level,
         ];
     }
 }

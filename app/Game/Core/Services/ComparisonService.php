@@ -171,6 +171,7 @@ class ComparisonService {
     }
 
     protected function buildUsableItemDetails(InventorySlot $slot): array {
+
         $item = new FractalItem($slot->item, new UsableItemTransformer);
 
         $item = (new Manager())->createData($item)->toArray()['data'];

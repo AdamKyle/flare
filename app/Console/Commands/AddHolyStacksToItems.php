@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Flare\Models\Item;
+use App\Flare\Values\ItemSpecialtyType;
 use Illuminate\Console\Command;
 
 class AddHolyStacksToItems extends Command
@@ -38,15 +39,30 @@ class AddHolyStacksToItems extends Command
      */
     public function handle()
     {
-        Item::whereNotIn('type', ['quest', 'alchemy'])
+        Item::whereNotIn('type', ['quest', 'alchemy', 'trinket'])
             ->chunkById(250, function($items) {
                 foreach ($items as $item) {
-                    $maxLevel = $item->skill_level_trivial;
 
-                    $maxStacks = ($maxLevel / 10) / 2;
+                    $maxStacks = 0;
 
-                    if ($maxStacks < 1) {
-                        $maxStacks = 1;
+                    if (!is_null($item->specialty_type)) {
+                        $type = new ItemSpecialtyType($item->specialty_type);
+
+                        if ($type->isHellForged() || $type->isPurgatoryChains()) {
+                            $maxStacks = 20;
+                        }
+                    } else {
+                        $maxLevel = $item->skill_level_trivial;
+
+                        $maxStacks = ($maxLevel / 10) / 2;
+
+                        if ($maxStacks < 1) {
+                            $maxStacks = 1;
+                        }
+
+                        if ($maxStacks > 20) {
+                            $maxStacks = 20;
+                        }
                     }
 
                     $item->update([

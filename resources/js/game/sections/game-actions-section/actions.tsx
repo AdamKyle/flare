@@ -116,7 +116,12 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
     }
 
     openCrafting(type: CraftingOptions) {
-        this.actionsManager.setCraftingType(type);
+        this.setState({
+            show_purgatory_chains_section: false,
+            show_hell_forged_section: false,
+        }, () => {
+            this.actionsManager.setCraftingType(type);
+        })
     }
 
     manageExploration() {
@@ -127,12 +132,14 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
 
     manageHellForgedShop() {
         this.setState({
+            crafting_type: null,
             show_hell_forged_section: !this.state.show_hell_forged_section
         })
     }
 
     managedPurgatoryChainsShop() {
         this.setState({
+            crafting_type: null,
             show_purgatory_chains_section: !this.state.show_purgatory_chains_section
         })
     }
@@ -323,6 +330,9 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
                             this.state.show_hell_forged_section || this.state.show_purgatory_chains_section ?
                                 <Shop
                                     type={this.state.show_hell_forged_section ? 'Hell Forged' : 'Purgatory Chains'}
+                                    character_id={this.props.character.id}
+                                    close_hell_forged={this.manageHellForgedShop.bind(this)}
+                                    close_purgatory_chains={this.managedPurgatoryChainsShop.bind(this)}
                                 />
                             : null
                         }

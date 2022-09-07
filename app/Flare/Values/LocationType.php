@@ -10,9 +10,11 @@ class LocationType {
     private $value;
 
     const PURGATORY_SMITH_HOUSE = 0;
+    const GOLD_MINES            = 1;
 
     protected static $values = [
         0 => self::PURGATORY_SMITH_HOUSE,
+        1 => self::GOLD_MINES,
     ];
 
     /**
@@ -20,6 +22,7 @@ class LocationType {
      */
     protected static $namedValues = [
         self::PURGATORY_SMITH_HOUSE => 'Purgatory Smiths House',
+        self::GOLD_MINES            => 'Gold Mines',
     ];
 
     /**
@@ -42,5 +45,23 @@ class LocationType {
 
     public static function getNamedValues(): array {
         return self::$namedValues;
+    }
+
+    /**
+     * Is purgatory smith house?
+     *
+     * @return bool
+     */
+    public function isPurgatorySmithHouse(): bool {
+        return $this->value === self::PURGATORY_SMITH_HOUSE;
+    }
+
+    /**
+     * Is gold mines?
+     *
+     * @return bool
+     */
+    public function isGoldMines(): bool {
+        return $this->value === self::GOLD_MINES;
     }
 }

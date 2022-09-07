@@ -56,7 +56,7 @@ export default class Dialogue extends React.Component<DialogueTypes, any> {
                                         className="flex items-center text-lg font-medium leading-6 text-gray-700 dark:text-gray-500 relative mb-5 text-[16px] lg:text-xl"
                                     >
                                         {this.props.title}
-                                        <button className='flex items-center absolute right-[20px] cursor-pointer hover:text-gray-800 dark:hover:text-gray-600' onClick={this.closeModal.bind(this)} disabled={this.props.primary_button_disabled}><i className="fas fa-times "></i></button>
+                                        <button className='flex items-center absolute right-[20px] cursor-pointer hover:text-gray-800 dark:hover:text-gray-600 top-[5px]' onClick={this.closeModal.bind(this)} disabled={this.props.primary_button_disabled}><i className="fas fa-times "></i></button>
                                     </Dialog.Title>
                                     <div className="mt-2">
                                         <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>

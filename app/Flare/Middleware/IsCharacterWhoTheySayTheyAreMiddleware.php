@@ -42,6 +42,7 @@ class IsCharacterWhoTheySayTheyAreMiddleware {
 //        REMINDER: Chances are the method (on the controller) does not exist if you need to uncomment this.
 //        if (is_string($character)) {
 //            $character = Character::find($character);
+//            dump($character);
 //        }
 
         if (!is_null($character)) {

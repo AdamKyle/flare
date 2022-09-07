@@ -38,4 +38,23 @@ class ItemSpecialtyType {
 
         $this->value = $value;
     }
+
+
+    /**
+     * Are we hell forged?
+     *
+     * @return bool
+     */
+    public function isHellForged(): bool {
+        return $this->value === self::HELL_FORGED;
+    }
+
+    /**
+     * Are we purgatory chains?
+     *
+     * @return bool
+     */
+    public function isPurgatoryChains(): bool {
+        return $this->value === self::PURGATORY_CHAINS;
+    }
 }

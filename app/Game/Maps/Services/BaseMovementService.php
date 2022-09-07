@@ -4,6 +4,7 @@ namespace App\Game\Maps\Services;
 
 use App\Flare\Models\GameMap;
 use App\Flare\Values\AutomationType;
+use App\Flare\Values\LocationType;
 use App\Game\Maps\Events\UpdateMonsterList;
 use Illuminate\Support\Facades\Cache;
 use App\Flare\Cache\CoordinatesCache;
@@ -192,6 +193,7 @@ class BaseMovementService {
      * @param Character $character
      * @param Location $location
      * @return bool
+     * @throws \Exception
      */
     protected function canPlayerEnterLocation(Character $character, Location $location): bool {
         if (!$location->can_players_enter) {
@@ -201,6 +203,15 @@ class BaseMovementService {
         }
 
         if (!is_null($location->enemy_strength_type) && $character->currentAutomations()->where('type', AutomationType::EXPLORING)->get()->isNotEmpty()) {
+
+            if (!is_null($location->type)) {
+                $locationType = new LocationType($location->type);
+
+                if ($locationType->isGoldMines()) {
+                    return true;
+                }
+            }
+
             event(new ServerMessageEvent($character->user, 'No. You are currently auto battling and the monsters here are different. Stop auto battling, then enter, then begin again.'));
 
             return false;
@@ -252,7 +263,7 @@ class BaseMovementService {
             return $this->mapTileValue->canWalkOnPurgatoryWater($character, $this->x, $this->y);
         }
 
-        return false;
+        return true;
     }
 
     /**
