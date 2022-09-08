@@ -24,16 +24,16 @@ class AttackRequest extends FormRequest
     public function rules()
     {
         return [
-            'defender_id'         => 'required|integer',
-            'units_to_send'       => 'required|array',
+            'units_to_move' => 'required|array',
         ];
     }
 
     public function messages() {
         return [
-            'defender_id.required' => 'Defender id is required',
-            'defender_id.integer'  => 'Defender id must be an integer.',
-            'units_to_send'        => 'Units to send must be an array.' 
+            'units_to_move.required'     => 'Units to move are required',
+            'units_to_move.*.unit_id'    => 'At least one unit must be selected',
+            'units_to_move.*.kingdom_id' => 'Missing kingdom this unit is from',
+            'units_to_move.*.amount'     => 'Missing amount of units to move',
         ];
     }
 }

@@ -150,7 +150,7 @@ class UnitMovementService {
      * @param array $unitData
      * @return void
      */
-    protected function removeUnitsFromKingdom(array $unitData): void {
+    public function removeUnitsFromKingdom(array $unitData): void {
         foreach ($unitData as $unitData) {
             $kingdom = Kingdom::find($unitData['kingdom_id']);
 
@@ -169,7 +169,7 @@ class UnitMovementService {
      * @param array $unitData
      * @return array
      */
-    protected function buildUnitsToMoveBasedOnKingdom(Kingdom $kingdom, array $unitData): array {
+    public function buildUnitsToMoveBasedOnKingdom(Kingdom $kingdom, array $unitData): array {
         $kingdomUnitsToMove = [];
 
         foreach ($unitData as $unitData) {
@@ -243,7 +243,7 @@ class UnitMovementService {
      * @param int $fromKingdomId
      * @return int
      */
-    protected function determineTimeRequired(Character $character, Kingdom $kingdom, int $fromKingdomId): int {
+    public function determineTimeRequired(Character $character, Kingdom $kingdom, int $fromKingdomId): int {
         $fromKingdom = $character->kingdoms()->find($fromKingdomId);
 
         $pixelDistance = $this->distanceCalculation->calculatePixel(

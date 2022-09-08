@@ -9,16 +9,16 @@ use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
 use App\Game\Kingdoms\Requests\AttackRequest;
 use App\Game\Kingdoms\Requests\SelectedKingdomsRequest;
-use App\Game\Kingdoms\Service\KingdomsAttackService;
+use App\Game\Kingdoms\Service\KingdomAttackService;
 
 class KingdomAttackController extends Controller {
 
     /**
-     * @var KingdomsAttackService $kingdomAttackService
+     * @var KingdomAttackService $kingdomAttackService
      */
     private $kingdomAttackService;
 
-    public function __construct(KingdomsAttackService $kingdomAttackService) {
+    public function __construct(KingdomAttackService $kingdomAttackService) {
         $this->middleware('is.character.dead');
 
         $this->kingdomAttackService = $kingdomAttackService;

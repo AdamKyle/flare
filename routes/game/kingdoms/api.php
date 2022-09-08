@@ -11,11 +11,6 @@ Route::middleware(['auth'])->group(function() {
         Route::post('/kingdoms/abandon/{kingdom}', ['as' => 'abandon.kingdom', 'uses' => 'Api\KingdomsController@abandon']);
 
         Route::post('/kingdoms/purchase-people/{kingdom}', ['as' => 'kingdom.deposit', 'uses' => 'Api\KingdomsController@purchasePeople']);
-
-        Route::post('/kingdoms/{character}/attack/selection', ['as' => 'kingdom.attack.selection', 'uses' => 'Api\KingdomAttackController@selectKingdoms']);
-        Route::post('/kingdoms/{character}/attack', ['as' => 'kingdom.attack', 'uses' => 'Api\KingdomAttackController@attack']);
-        Route::post('/use-items-on-kingdom/{character}', ['as' => 'kingdom.attack-with-items', 'uses' => 'Api\KingdomAttackController@useItems']);
-        Route::post('/recall-units/{unitMovementQueue}/{character}', ['as' => 'recall.units', 'uses' => 'Api\KingdomUnitMovementController@recallUnits']);
     });
 });
 
@@ -65,9 +60,13 @@ Route::middleware(['auth', 'is.character.dead', 'is.character.exploring', 'is.ch
     Route::post('/kingdom/move-reinforcements/{character}/{kingdom}', ['as' => 'kingdom.call.reinforcements', 'uses' => 'Api\UnitMovementController@moveUnitsBetweenOwnKingdom']);
 });
 
-Route::middleware(['auth', 'is.character.dead', 'is.character.exploring', 'is.character.who.they.say.they.are', 'character.owns.kingdom'])->group(function() {
-    Route::get('/fetch-attacking-data/{kingdom}/{character}', ['as' => 'kingdom.fetch.attacking-data', 'uses' => 'Api\AttackKingdom@fetchAttackingData']);
+Route::middleware(['auth', 'is.character.dead', 'is.character.exploring', 'is.character.who.they.say.they.are'])->group(function() {
+    Route::middleware(['character.owns.kingdom'])->group(function() {
+        Route::get('/fetch-attacking-data/{kingdom}/{character}', ['as' => 'kingdom.fetch.attacking-data', 'uses' => 'Api\AttackKingdom@fetchAttackingData']);
+    });
+
     Route::post('/drop-items-on-kingdom/{kingdom}/{character}', ['as' => 'drop.items.on.kingdoms', 'uses' => 'Api\AttackKingdom@dropItems']);
+    Route::post('/attack-kingdom-with-units/{kingdom}/{character}', ['as' => 'attack-kingdom', 'uses' => 'Api\AttackKingdom@attackWithUnits']);
 });
 
 

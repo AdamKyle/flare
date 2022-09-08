@@ -5,6 +5,7 @@ namespace App\Game\Kingdoms\Jobs;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomUnit;
 use App\Game\Kingdoms\Events\UpdateUnitMovementLogs;
+use App\Game\Kingdoms\Handlers\AttackKingdomWithUnitsHandler;
 use App\Game\Kingdoms\Service\UpdateKingdom;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -34,9 +35,13 @@ class MoveUnits implements ShouldQueue {
     }
 
     /**
+     * @param AttackKingdomWithUnitsHandler $attackKingdomWithUnitsHandler
+     * @param UpdateKingdom $updateKingdom
      * @return void
      */
-    public function handle(UpdateKingdom $updateKingdom): void {
+    public function handle(AttackKingdomWithUnitsHandler $attackKingdomWithUnitsHandler,
+                           UpdateKingdom $updateKingdom
+    ): void {
         $unitMovement = UnitMovementQueue::find($this->movementId);
 
         if (is_null($unitMovement)) {
@@ -61,6 +66,19 @@ class MoveUnits implements ShouldQueue {
             // @codeCoverageIgnoreEnd
         }
 
+        if ($unitMovement->is_moving) {
+            $this->moveUnitsFromOneKingdomToTheNext($unitMovement, $updateKingdom);
+
+            return;
+        }
+
+        if ($unitMovement->is_attacking) {
+            $attackKingdomWithUnitsHandler->attackKingdomWithUnits($unitMovement->units_moving);
+        }
+
+    }
+
+    protected function moveUnitsFromOneKingdomToTheNext(UnitMovementQueue $unitMovement, UpdateKingdom $updateKingdom) {
         $unitsMoving = $unitMovement->units_moving;
         $toKingdom   = Kingdom::find($unitMovement->to_kingdom_id);
         $fromKingdom = Kingdom::find($unitMovement->from_kingdom_id);
