@@ -30,6 +30,8 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
 
     private duelOptions: any;
 
+    private traverseUpdate: any;
+
     constructor(props: ActionsProps) {
         super(props);
 
@@ -63,6 +65,9 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
 
         // @ts-ignore
         this.pvpUpdate = Echo.private('update-pvp-attack-' + this.props.character.user_id);
+
+        // @ts-ignore
+        this.traverseUpdate = Echo.private('update-map-plane-' + this.props.user_id);
 
         // @ts-ignore
         this.duelOptions = Echo.join('update-duel');
@@ -105,6 +110,22 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
             this.setState({
                 show_duel_fight: true,
                 duel_fight_info: event.data,
+            });
+        });
+
+        // @ts-ignore
+        this.traverseUpdate.listen('Game.Maps.Events.UpdateMapBroadcast', (event: any) => {
+            console.log(event);
+            let craftingType = this.state.crafting_type;
+
+            if (craftingType === 'workbench' || craftingType === 'queen') {
+                craftingType = null;
+            }
+
+            this.setState({
+                crafting_type: craftingType,
+                show_hell_forged_section: false,
+                show_purgatory_chains_section: false,
             });
         });
     }
