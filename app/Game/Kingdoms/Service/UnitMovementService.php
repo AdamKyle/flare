@@ -235,6 +235,14 @@ class UnitMovementService {
         MoveUnits::dispatch($unitMovementQueue->id)->delay($minutes);
     }
 
+    /**
+     * Determine time required to move units.
+     *
+     * @param Character $character
+     * @param Kingdom $kingdom
+     * @param int $fromKingdomId
+     * @return int
+     */
     protected function determineTimeRequired(Character $character, Kingdom $kingdom, int $fromKingdomId): int {
         $fromKingdom = $character->kingdoms()->find($fromKingdomId);
 

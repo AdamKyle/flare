@@ -77,7 +77,6 @@ class BattleDrop {
      */
     public function handleDrop(Character $character, bool $canGetDrop, bool $returnItem = false): ?Item {
         if ($canGetDrop) {
-
             $drop = $this->getDropFromCache($character, $this->monster->gameMap->name, $this->locationWithEffect);
 
             if (!is_null($drop)) {
@@ -172,15 +171,7 @@ class BattleDrop {
      * @return Item|null
      */
     protected function getDropFromCache(Character $character, string $gameMapName, Location $locationWithEffect = null): ?Item {
-
-        $drop = $this->getCacheDrop($character, $gameMapName, $locationWithEffect);
-
-        if (is_null($drop)) {
-            return $this->randomItemDropBuilder
-                        ->generateItem($this->getMaxLevelBasedOnPlane($character));
-        }
-
-        return $drop;
+        return $this->randomItemDropBuilder->generateItem($this->getMaxLevelBasedOnPlane($character));
     }
 
     /**
@@ -206,7 +197,7 @@ class BattleDrop {
             return $characterLevel;
         }
 
-        if ($character->map->gameMap->mapType()->isDungeon()) {
+        if ($character->map->gameMap->mapType()->isDungeons()) {
             if ($characterLevel >= 240) {
                 return 240;
             }

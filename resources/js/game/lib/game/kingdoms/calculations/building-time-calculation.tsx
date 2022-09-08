@@ -3,6 +3,24 @@ import BuildingDetails from "../building-details";
 export default class BuildingTimeCalculation {
 
     /**
+     * Convert hours to minutes.
+     *
+     * @param time
+     */
+    convertToHours(time: number): number {
+        return time / 60;
+    }
+
+    /**
+     * Is time in hours?
+     *
+     * @param time
+     */
+    isHours(time: number): boolean {
+        return (time / 60) > 1;
+    }
+
+    /**
      * Calculates the time for one level.
      *
      * @param building

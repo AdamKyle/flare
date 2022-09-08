@@ -47,7 +47,7 @@ export default class KingdomLogDetails extends React.Component<any, any> {
         const changes: any = [];
 
         this.props.log.old_units.forEach((oldUnit: { name: string; amount: number; }) => {
-            let foundNewUnit = this.props.log.old_units.filter((newUnit: { name: string; amount: number; }) => newUnit.name === oldUnit.name);
+            let foundNewUnit = this.props.log.new_units.filter((newUnit: { name: string; amount: number; }) => newUnit.name === oldUnit.name);
 
             if (foundNewUnit.length > 0) {
                 foundNewUnit = foundNewUnit[0];

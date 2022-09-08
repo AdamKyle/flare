@@ -27,7 +27,7 @@ class DropCheckCalculator {
 
         $bonus = $lootingChance + $gameMapBonus;
 
-        if ($bonus >= 1.0) {
+        if ($bonus >= 1) {
             return true;
         }
 

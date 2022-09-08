@@ -86,11 +86,11 @@ class ResourceValidation {
      */
     protected function getBuildingCost(Kingdom $kingdom, int $cost, bool $isPopulation = false, bool $isIron = false): int {
         if ($isIron) {
-            $cost = $cost - $cost * $kingdom->fetchIronCostReduction();
+            return $cost - $cost * $kingdom->fetchIronCostReduction();
         }
 
         if ($isPopulation) {
-            $cost = $cost - $cost * $kingdom->fetchPopulationCostReduction();
+            return $cost - $cost * $kingdom->fetchPopulationCostReduction();
         }
 
         return $cost - $cost * $kingdom->fetchBuildingCostReduction();

@@ -141,18 +141,38 @@ class KingdomBuilding extends Model
     }
 
     public function getWoodCostAttribute() {
+
+        if ($this->is_max_level)  {
+            return $this->level * $this->gameBuilding->wood_cost;
+        }
+
         return ($this->level + 1) * $this->gameBuilding->wood_cost;
     }
 
     public function getClayCostAttribute() {
+
+        if ($this->is_max_level)  {
+            return $this->level * $this->gameBuilding->clay_cost;
+        }
+
         return ($this->level + 1) * $this->gameBuilding->clay_cost;
     }
 
     public function getStoneCostAttribute() {
+
+        if ($this->is_max_level)  {
+            return $this->level * $this->gameBuilding->stone_cost;
+        }
+
         return ($this->level + 1) * $this->gameBuilding->stone_cost;
     }
 
     public function getIronCostAttribute() {
+
+        if ($this->is_max_level)  {
+            return $this->level * $this->gameBuilding->iron_cost;
+        }
+
         return ($this->level + 1) * $this->gameBuilding->iron_cost;
     }
 

@@ -67,6 +67,10 @@ export default class BuildingInformation extends React.Component<BuildingInforma
         })
     }
 
+    buildingNeedsToBeRepaired() {
+        return this.props.building.current_durability < this.props.building.max_durability;
+    }
+
     repairBuilding() {
         this.setState({
             loading: true,
@@ -105,11 +109,11 @@ export default class BuildingInformation extends React.Component<BuildingInforma
         }
 
         if (is_iron) {
-            cost = cost - cost * this.props.kingdom_iron_cost_reduction;
+            return formatNumber((cost - cost * this.props.kingdom_iron_cost_reduction).toFixed(0));
         }
 
         if (is_population) {
-            cost = cost - cost * this.props.kingdom_population_cost_reduction;
+            return formatNumber((cost - cost * this.props.kingdom_population_cost_reduction).toFixed(0));
         }
 
         return formatNumber((cost - cost * this.props.kingdom_building_cost_reduction).toFixed(0))
@@ -141,10 +145,10 @@ export default class BuildingInformation extends React.Component<BuildingInforma
             case 'repair-building':
                 return <Fragment>
                     {
-                        this.props.building.current_durability < this.props.building.max_durability ?
+                        this.buildingNeedsToBeRepaired() ?
                             <Fragment>
                                 <PrimaryButton button_label={'Repair'} on_click={this.repairBuilding.bind(this)} additional_css={'mr-2'} />
-                                <DangerButton button_label={'Close section'} on_click={this.removeSelection.bind(this)} />
+                                <DangerButton button_label={'Close section'} disabled={this.buildingNeedsToBeRepaired()} on_click={this.removeSelection.bind(this)} />
 
                                 {
                                     this.state.loading ?
@@ -167,39 +171,31 @@ export default class BuildingInformation extends React.Component<BuildingInforma
     }
 
     renderCosts() {
-        if (this.state.upgrade_section !== 'repair-building') {
-            return (
-                <dl className='mb-5'>
-                    <dt>Stone Cost:</dt>
-                    <dd>{this.calculateResourceCostWithReductions(this.props.building.stone_cost, false, false)}</dd>
-                    <dt>Clay Cost:</dt>
-                    <dd>{this.calculateResourceCostWithReductions(this.props.building.clay_cost, false, false)}</dd>
-                    <dt>Wood Cost:</dt>
-                    <dd>{this.calculateResourceCostWithReductions(this.props.building.wood_cost, false, false)}</dd>
-                    <dt>Iron Cost:</dt>
-                    <dd>{this.calculateResourceCostWithReductions(this.props.building.iron_cost, false, true)}</dd>
-                    <dt>Population Cost:</dt>
-                    <dd>{this.calculateResourceCostWithReductions(this.props.building.population_required, true, false)}</dd>
-                    <dt>Time till next level:</dt>
-                    <dd>{formatNumber(this.buildingTimeCalculation.calculateViewTime(this.props.building, this.state.to_level, this.props.kingdom_building_time_reduction).toFixed(2))} Minutes</dd>
-                </dl>
-            )
-        }
 
         return (
             <dl className='mb-5'>
                 <dt>Stone Cost:</dt>
-                <dd>{this.calculateResourceCostWithReductions(this.props.building.base_stone_cost, false, false)}</dd>
+                <dd>{this.calculateResourceCostWithReductions(this.props.building.stone_cost, false, false)}</dd>
                 <dt>Clay Cost:</dt>
-                <dd>{this.calculateResourceCostWithReductions(this.props.building.base_clay_cost, false, false)}</dd>
+                <dd>{this.calculateResourceCostWithReductions(this.props.building.clay_cost, false, false)}</dd>
                 <dt>Wood Cost:</dt>
-                <dd>{this.calculateResourceCostWithReductions(this.props.building.base_wood_cost, false, false)}</dd>
+                <dd>{this.calculateResourceCostWithReductions(this.props.building.wood_cost, false, false)}</dd>
                 <dt>Iron Cost:</dt>
-                <dd>{this.calculateResourceCostWithReductions(this.props.building.base_iron_cost, false, true)}</dd>
+                <dd>{this.calculateResourceCostWithReductions(this.props.building.iron_cost, false, true)}</dd>
                 <dt>Population Cost:</dt>
-                <dd>{this.calculateResourceCostWithReductions(this.props.building.base_population, true, false)}</dd>
-                <dt>Time to Repair</dt>
-                <dd>{formatNumber(this.props.building.rebuild_time)} Minutes</dd>
+                <dd>{this.calculateResourceCostWithReductions(this.props.building.population_required, true, false)}</dd>
+                <dt>Time till next level:</dt>
+                <dd>
+                    {
+                        this.state.upgrade_section !== 'repair-building' ?
+                            formatNumber(this.buildingTimeCalculation.calculateViewTime(this.props.building, this.state.to_level, this.props.kingdom_building_time_reduction).toFixed(2))
+                        :
+                            this.buildingTimeCalculation.isHours(this.props.building.rebuild_time) ?
+                                formatNumber(this.buildingTimeCalculation.convertToHours(this.props.building.rebuild_time))
+                            :
+                                formatNumber(this.props.building.rebuild_time)
+                    } { this.buildingTimeCalculation.isHours(this.props.building.rebuild_time) ? 'Hours' : 'Minutes' }
+                </dd>
             </dl>
         );
     }
@@ -262,7 +258,7 @@ export default class BuildingInformation extends React.Component<BuildingInforma
                             </h3>
                             <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                             {
-                                this.props.building.is_maxed ?
+                                this.props.building.is_maxed && !this.buildingNeedsToBeRepaired() ?
                                     <p>Building is already max level.</p>
                                 :
                                     this.props.is_in_queue ?

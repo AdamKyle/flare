@@ -120,7 +120,6 @@ class MoveUnits implements ShouldQueue {
      * @return KingdomUnit|null
      */
     protected function findUnitToUpdate(Kingdom $toKingdom, Kingdom $fromKingdom, array $unitMoving): ?KingdomUnit {
-        dump($unitMoving);
         return $toKingdom->units->filter(function($unit) use($unitMoving, $fromKingdom) {
             $fromKingdomUnit = $fromKingdom->units()->find($unitMoving['unit_id']);
 
