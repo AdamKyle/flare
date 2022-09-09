@@ -37,7 +37,7 @@ export default class MoveUnits {
 
         if (index === -1) {
             if (amount === 0) {
-                return;
+                return null;
             }
 
             unitsToCall.push({

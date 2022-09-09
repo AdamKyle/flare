@@ -130,7 +130,7 @@ class KingdomAttackService {
 
             event(new ServerMessageEvent($defender->user,$defender->name . ' Your kingdom is under attack! Kingdom: ' .
                 $kingdom->name . ' on the plane: ' . $mapName . ' At (X/Y): ' . $kingdom->x_position . '/' . $kingdom->y_position . 'from: ' .
-                $fromMapName->name . ' At (X/Y): ' . $fromKingdom->x_position . '/' . $fromKingdom->y_position
+                $fromKingdom->name . ' At (X/Y): ' . $fromKingdom->x_position . '/' . $fromKingdom->y_position
             ));
         }
     }

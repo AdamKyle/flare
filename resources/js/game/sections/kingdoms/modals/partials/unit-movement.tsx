@@ -21,7 +21,12 @@ export default class UnitMovement extends React.Component<UnitMovementProps, Uni
     }
 
     setAmountToMove(kingdomId: number, unitId: number, unitAmount: number, e: React.ChangeEvent<HTMLInputElement>) {
+
         const unitsToCall = this.moveUnits.setAmountToMove(this.state.selected_units, kingdomId, unitId, unitAmount, e);
+
+        if (unitsToCall === null) {
+            return;
+        }
 
         this.setState({
             selected_units: unitsToCall
@@ -45,6 +50,7 @@ export default class UnitMovement extends React.Component<UnitMovementProps, Uni
     }
 
     render() {
+
         return (
             <Fragment>
                 {

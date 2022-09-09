@@ -73,7 +73,9 @@ class MoveUnits implements ShouldQueue {
         }
 
         if ($unitMovement->is_attacking) {
-            $attackKingdomWithUnitsHandler->attackKingdomWithUnits($unitMovement->units_moving);
+            $kingdom = Kingdom::find($unitMovement->to_kingdom_id);
+
+            $attackKingdomWithUnitsHandler->attackKingdomWithUnits($kingdom, $unitMovement->units_moving);
         }
 
     }

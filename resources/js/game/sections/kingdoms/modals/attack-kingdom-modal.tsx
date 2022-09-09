@@ -75,7 +75,35 @@ export default class AttackKingdomModal extends React.Component<any, AttackKingd
     }
 
     attackKingdom() {
-        console.log(this.state.selected_units);
+        this.setState({
+            loading: true,
+            success_message: '',
+            error_message: '',
+        }, () => {
+            (new Ajax).setRoute('attack-kingdom-with-units/' + this.props.kingdom_to_attack_id + '/' + this.props.character_id)
+                .setParameters({
+                    units_to_move: this.state.selected_units
+                }).doAjaxCall('post', (result: AxiosResponse) => {
+
+                this.setState({
+                    loading: false,
+                    success_message: result.data.message,
+                });
+
+            }, (error: AxiosError) => {
+                this.setState({loading: false});
+
+                if (typeof error.response !== 'undefined') {
+                    const response = error.response;
+
+                    this.setState({
+                        success_message: response.data.message,
+                    });
+                }
+
+                console.error(error);
+            });
+        });
     }
 
     manageShowHelpDialogue(type: string) {
