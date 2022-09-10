@@ -13,6 +13,8 @@ export default class ItemNameColorationText extends React.Component<ItemNameColo
             <span className={clsx({
                 'text-pink-500 dark:text-pink-300': this.props.item.type === 'alchemy'
             },{
+                'text-orange-400 dark:text-orange-300': this.props.item.type === 'quest'
+            },{
                 'text-red-700 dark:text-red-400': this.props.item.type === 'trinket' && !this.props.item.is_mythic
             },{
                 'text-green-700 dark:text-green-600': this.props.item.is_unique && this.props.item.type !== 'trinket' && !this.props.item.is_mythic

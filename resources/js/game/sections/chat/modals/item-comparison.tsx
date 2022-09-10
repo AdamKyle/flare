@@ -83,6 +83,7 @@ export default class ItemComparison extends React.Component<any, any> {
                     is_mythic: this.state.comparison_details.itemToEquip.is_mythic,
                     holy_stacks_applied: this.state.comparison_details.itemToEquip.holy_stacks_applied,
                 }} />
+
                 <div className='absolute right-0'>
                     <span className='pl-3 text-right mr-[70px]'>(Type: {capitalize(this.state.comparison_details.itemToEquip.type)})</span>
                 </div>

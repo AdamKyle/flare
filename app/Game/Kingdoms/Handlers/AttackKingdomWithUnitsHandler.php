@@ -156,7 +156,9 @@ class AttackKingdomWithUnitsHandler {
 
             $this->setNewKingdomBuildingsAndSiegeWeapons($attackingKingdom, $kingdom, $unitsAttacking, $siegeAttack, $defence);
         } else {
-            $this->newDefenderBuildings = $this->oldDefenderUnits;
+            $this->newDefenderBuildings = $this->oldDefenderBuildings;
+            $this->newDefenderUnits     = $this->oldDefenderUnits;
+            $this->newAttackingUnits    = $this->oldAttackingUnits;
         }
     }
 
@@ -169,7 +171,7 @@ class AttackKingdomWithUnitsHandler {
     protected function setOldKingdomBuildings(Kingdom $kingdom) {
         foreach ($kingdom->buildings as $building) {
             $this->oldDefenderBuildings[] = [
-                'id'         => $building->id,
+                'unit_id'    => $building->id,
                 'name'       => $building->name,
                 'durability' => $building->current_durability,
             ];
@@ -203,7 +205,7 @@ class AttackKingdomWithUnitsHandler {
             $building = $building->refresh();
 
             $this->newDefenderBuildings[] = [
-                'id'         => $building->id,
+                'unit_id'    => $building->id,
                 'name'       => $building->name,
                 'durability' => $building->current_durability,
             ];
@@ -254,8 +256,9 @@ class AttackKingdomWithUnitsHandler {
                 $newAmount = $unit->amount - ($unit->amount * $damageToSiegeWeapons);
 
                 $this->newAttackingUnits[] = [
-                    'name'   => $unit->gameUnit->name,
-                    'amount' => $newAmount,
+                    'unit_id' => $unit->id,
+                    'name'    => $unit->gameUnit->name,
+                    'amount'  => $newAmount,
                 ];
             }
         }
@@ -449,8 +452,7 @@ class AttackKingdomWithUnitsHandler {
 
         $logDetails['character_id']           = $defenderKingdom->character_id;
         $logDetails['attacking_character_id'] = $attackingKingdom->character_id;
-        dump('attacker logs attributes');
-        dump($logDetails);
+
         KingdomLog::create($logDetails);
 
         event(new ServerMessageEvent($attackingKingdom->character->user, 'Your attack has landed on kingdom: ' .
@@ -511,6 +513,8 @@ class AttackKingdomWithUnitsHandler {
         $time          = $this->unitMovementService->getDistanceTime($character, $attackingKingdom, $defendingKingdom);
 
         $minutes       = now()->addMinutes($time);
+
+        dump($this->newAttackingUnits);
 
         $unitMovementQueue = UnitMovementQueue::create([
             'character_id'      => $character->id,

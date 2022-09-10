@@ -58,7 +58,8 @@ export default class Enchanting extends React.Component<any, any> {
                     enchantable_items: result.data.character_inventory,
                     enchantments: result.data.affixes,
                 }, () => {
-                    if (!isEqual(oldEnchantments, result.data.enchantments)) {
+                    console.log(oldEnchantments, result.data.affixes);
+                    if (!isEqual(oldEnchantments, result.data.affixes)) {
                         generateServerMessage('new_items', 'You have new enchantments. Check the list(s)!');
                     }
 

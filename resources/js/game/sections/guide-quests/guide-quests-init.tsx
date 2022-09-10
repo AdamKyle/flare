@@ -1,4 +1,4 @@
-import ReactDOM from "react-dom";
+import { createRoot } from 'react-dom/client';
 import React from "react";
 import GuideButton from "./guide-button";
 
@@ -26,8 +26,6 @@ if (guideButton !== null) {
         }
     }
 
-    ReactDOM.render(
-        <GuideButton user_id={props.userId} force_open_modal={forceOpenModal} />,
-        guideButton
-    );
+    const root = createRoot(guideButton);
+    root.render(<GuideButton user_id={props.userId} force_open_modal={forceOpenModal} />,);
 }
