@@ -5,12 +5,26 @@ namespace App\Game\Kingdoms\Handlers;
 
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
+use App\Flare\Models\KingdomLog;
 use App\Flare\Models\KingdomUnit;
+use App\Flare\Models\UnitMovementQueue;
+use App\Flare\Values\KingdomLogStatusValue;
+use App\Game\Kingdoms\Jobs\MoveUnits;
+use App\Game\Kingdoms\Service\UnitMovementService;
+use App\Game\Kingdoms\Service\UpdateKingdom;
 use App\Game\Kingdoms\Traits\CalculateMorale;
+use App\Game\Maps\Calculations\DistanceCalculation;
+use App\Game\Messages\Events\ServerMessageEvent;
 
 class AttackKingdomWithUnitsHandler {
 
     use CalculateMorale;
+
+    private DistanceCalculation $distanceCalculation;
+
+    private UnitMovementService $unitMovementService;
+
+    private UpdateKingdom $updateKingdom;
 
     private array $oldAttackingUnits    = [];
 
@@ -26,6 +40,12 @@ class AttackKingdomWithUnitsHandler {
 
     private float $currentMorale;
 
+    public function __construct(DistanceCalculation $distanceCalculation, UnitMovementService $unitMovementService, UpdateKingdom $updateKingdom) {
+        $this->distanceCalculation = $distanceCalculation;
+        $this->unitMovementService = $unitMovementService;
+        $this->updateKingdom       = $updateKingdom;
+    }
+
     public function attackKingdomWithUnits(Kingdom $kingdom, Kingdom $attackingKingdom, array $unitsAttacking): void {
 
         $this->setOldKingdomBuildings($kingdom);
@@ -35,7 +55,10 @@ class AttackKingdomWithUnitsHandler {
         $this->siegeAttack($attackingKingdom, $kingdom, $unitsAttacking);
         $this->unitsAttack($attackingKingdom, $kingdom, $unitsAttacking);
 
-        $kingdom = $kingdom->refresh();
+        $this->createLogForAttacker($attackingKingdom, $kingdom);
+        $this->createLogForDefender($attackingKingdom, $kingdom);
+
+        $this->returnSurvivingUnits($attackingKingdom, $kingdom);
     }
 
     protected function unitsAttack(Kingdom $attackingKingdom, Kingdom $kingdom, array $unitsAttacking): void {
@@ -44,10 +67,10 @@ class AttackKingdomWithUnitsHandler {
         $unitAttack      = 0;
 
         foreach ($unitsAttacking as $unitData) {
-            $unit = KingdomUnit::where('kingdom_id', $attackingKingdom->id)->where('unit_id', $unitData['unit_id'])->first();
+            $unit = KingdomUnit::where('kingdom_id', $attackingKingdom->id)->where('id', $unitData['unit_id'])->first();
 
             if (!$unit->siege_weapon && !$unit->is_settler) {
-                $unitAttack += $unit->amount * $unit->game_unit->attack;
+                $unitAttack += $unit->amount * $unit->gameUnit->attack;
             }
         }
 
@@ -60,15 +83,16 @@ class AttackKingdomWithUnitsHandler {
         }
 
         foreach ($unitsAttacking as $unitData) {
-            $unit = KingdomUnit::where('kingdom_id', $attackingKingdom->id)->where('unit_id', $unitData['unit_id'])->first();
+            $unit = KingdomUnit::where('kingdom_id', $attackingKingdom->id)->where('id', $unitData['unit_id'])->first();
 
             if (!$unit->gameUnit->siege_weapon && !$unit->gameUnit->is_settler) {
 
                 $newAmount = ceil($unitData['amount'] - ($unitData['amount'] * $damageToAttacker));
 
                 $this->newAttackingUnits[] = [
-                    'name'   => $unit->gameUnit->name,
-                    'amount' => $newAmount
+                    'unit_id' => $unit->id,
+                    'name'    => $unit->gameUnit->name,
+                    'amount'  => $newAmount
                 ];
             }
         }
@@ -83,21 +107,24 @@ class AttackKingdomWithUnitsHandler {
 
         $damageToDefenderUnit = $unitAttack / $defence;
 
-        if ($damageToAttacker > 1) {
-            $damageToDefenderUnit = 1;
+        if ($damageToDefenderUnit > 1.0) {
+            $damageToDefenderUnit = 1.0;
         }
 
         foreach ($kingdom->units as $unit) {
             if (!$unit->gameUnit->siege_weapon) {
-                $newAmount = ceil($unit->amount - ($unit->amount * $damageToDefenderUnit));
+                $newAmount = $unit->amount - ($unit->amount * $damageToDefenderUnit);
 
                 $unit->update([
                     'amount' => $newAmount
                 ]);
 
+                $unit = $unit->refresh();
+
                 $this->newDefenderUnits[] = [
-                    'name'   => $unit->gameUnit->name,
-                    'amount' => $newAmount
+                    'unit_id' => $unit->id,
+                    'name'    => $unit->gameUnit->name,
+                    'amount'  => $newAmount
                 ];
             }
         }
@@ -128,6 +155,8 @@ class AttackKingdomWithUnitsHandler {
             $siegeAttack = $siegeAttack - ($siegeAttack * $damageReduction);
 
             $this->setNewKingdomBuildingsAndSiegeWeapons($attackingKingdom, $kingdom, $unitsAttacking, $siegeAttack, $defence);
+        } else {
+            $this->newDefenderBuildings = $this->oldDefenderUnits;
         }
     }
 
@@ -140,6 +169,7 @@ class AttackKingdomWithUnitsHandler {
     protected function setOldKingdomBuildings(Kingdom $kingdom) {
         foreach ($kingdom->buildings as $building) {
             $this->oldDefenderBuildings[] = [
+                'id'         => $building->id,
                 'name'       => $building->name,
                 'durability' => $building->current_durability,
             ];
@@ -170,9 +200,10 @@ class AttackKingdomWithUnitsHandler {
                 'current_durability' => $currentDurability < 0 ? 0 : floor($currentDurability),
             ]);
 
-            $building->refresh();
+            $building = $building->refresh();
 
             $this->newDefenderBuildings[] = [
+                'id'         => $building->id,
                 'name'       => $building->name,
                 'durability' => $building->current_durability,
             ];
@@ -192,9 +223,12 @@ class AttackKingdomWithUnitsHandler {
                     'amount' => $newAmount
                 ]);
 
+                $unit = $unit->refresh();
+
                 $this->newDefenderUnits[] = [
-                    'name'   => $unit->gameUnit->name,
-                    'amount' => $newAmount,
+                    'unit_id' => $unit->id,
+                    'name'    => $unit->gameUnit->name,
+                    'amount'  => $newAmount,
                 ];
             }
         }
@@ -214,7 +248,7 @@ class AttackKingdomWithUnitsHandler {
         }
 
         foreach ($attackingUnits as $unitData) {
-            $unit = KingdomUnit::where('kingdom_id', $attackingKingdom->id)->where('unit_id', $unitData['unit_id'])->first();
+            $unit = KingdomUnit::where('kingdom_id', $attackingKingdom->id)->where('id', $unitData['unit_id'])->first();
 
             if ($unit->gameUnit->siege_weapon) {
                 $newAmount = $unit->amount - ($unit->amount * $damageToSiegeWeapons);
@@ -236,8 +270,9 @@ class AttackKingdomWithUnitsHandler {
     protected function setOldKingdomUnits(Kingdom $kingdom): void {
         foreach ($kingdom->units as $unit) {
             $this->oldDefenderUnits[] = [
-                'name'   => $unit->gameUnit->name,
-                'amount' => $unit->amount,
+                'unit_id' => $unit->id,
+                'name'    => $unit->gameUnit->name,
+                'amount'  => $unit->amount,
             ];
         }
     }
@@ -251,11 +286,12 @@ class AttackKingdomWithUnitsHandler {
      */
     protected function setOldAttackingUnits(Kingdom $attackingKingdom, array $units): void {
         foreach ($units as $unitData) {
-            $unit = KingdomUnit::where('kingdom_id', $attackingKingdom->id)->where('unit_id', $unitData['unit_id'])->first();
+            $unit = KingdomUnit::where('kingdom_id', $attackingKingdom->id)->where('id', $unitData['unit_id'])->first();
 
             $this->oldAttackingUnits[] = [
-                'name'   => $unit->gameUnit->name,
-                'amount' => $unitData['amount']
+                'unit_id' => $unit->id,
+                'name'    => $unit->gameUnit->name,
+                'amount'  => $unitData['amount']
             ];
         }
     }
@@ -271,12 +307,15 @@ class AttackKingdomWithUnitsHandler {
 
         $totalDefence = $kingdom->fetchKingdomDefenceBonus();
 
+        $newDamageReduction = 0.0;
+
+
         if ($totalDefence < 1) {
             return 0.0;
         }
 
         if ($totalDefence > 1) {
-            $newDamageReduction = ($totalDefence - 1) / 0.05;
+            $newDamageReduction = ($totalDefence - 1) / 5;
         }
 
         if ($newDamageReduction < 0.05) {
@@ -345,10 +384,10 @@ class AttackKingdomWithUnitsHandler {
         $totalAttack = 0;
 
         foreach ($units as $unitData) {
-            $unit = KingdomUnit::where('kingdom_id', $attackingKingdom->id)->where('unit_id', $unitData['unit_id'])->first();
+            $unit = KingdomUnit::where('kingdom_id', $attackingKingdom->id)->where('id', $unitData['unit_id'])->first();
 
             if ($unit->gameUnit->siege_weapon) {
-                $totalAttack += $unit->gameUnit->attack * $unitData['attack'];
+                $totalAttack += $unit->gameUnit->attack * $unitData['amount'];
             }
         }
 
@@ -403,5 +442,105 @@ class AttackKingdomWithUnitsHandler {
         }
 
         return $amount;
+    }
+
+    protected function createLogForAttacker(Kingdom $attackingKingdom, Kingdom $defenderKingdom): void {
+        $logDetails = $this->createBaseAttributes($attackingKingdom, $defenderKingdom);
+
+        $logDetails['character_id']           = $defenderKingdom->character_id;
+        $logDetails['attacking_character_id'] = $attackingKingdom->character_id;
+        dump('attacker logs attributes');
+        dump($logDetails);
+        KingdomLog::create($logDetails);
+
+        event(new ServerMessageEvent($attackingKingdom->character->user, 'Your attack has landed on kingdom: ' .
+            $defenderKingdom->name . ' on the plane: ' . $defenderKingdom->gameMap->name . ' At (X/Y): ' . $defenderKingdom->x_position . '/' . $defenderKingdom->y_position .
+            ' you have a new attack log.'));
+
+        $character = $attackingKingdom->character->refresh();
+
+        $this->updateKingdom->updateKingdomAllKingdoms($character);
+        $this->updateKingdom->updateKingdomLogs($character, true);
+
+    }
+
+    protected function createLogForDefender(Kingdom $attackingKingdom, Kingdom $defenderKingdom): void {
+        if ($defenderKingdom->npc_owned) {
+            return;
+        }
+
+        $logDetails = $this->createBaseAttributes($attackingKingdom, $defenderKingdom);
+
+        $logDetails['character_id']           = $defenderKingdom->character_id;
+        $logDetails['attacking_character_id'] = $attackingKingdom->character_id;
+
+        KingdomLog::create($logDetails);
+
+        event(new ServerMessageEvent($defenderKingdom->character->user, $attackingKingdom->character->name . ' has attacked your kingdom: ' .
+            $defenderKingdom->name . ' on the plane: ' . $defenderKingdom->gameMap->name . ' At (X/Y): ' . $defenderKingdom->x_position . '/' . $defenderKingdom->y_position .
+            ' you have a new attack log.'));
+
+        $character = $defenderKingdom->character->refresh();
+
+        $this->updateKingdom->updateKingdomAllKingdoms($character);
+        $this->updateKingdom->updateKingdomLogs($character, true);
+    }
+
+    protected function createBaseAttributes(Kingdom $attackingKingdom, Kingdom $defenderKingdom): array {
+        return [
+            'to_kingdom_id'   => $defenderKingdom->id,
+            'from_kingdom_id' => $attackingKingdom->id,
+            'status'          => KingdomLogStatusValue::ATTACKED,
+            'old_buildings'   => $this->oldDefenderBuildings,
+            'new_buildings'   => $this->newDefenderBuildings,
+            'old_units'       => $this->oldDefenderUnits,
+            'new_units'       => $this->newDefenderUnits,
+            'morale_loss'     => $this->currentMorale - $defenderKingdom->current_morale,
+            'published'       => true,
+        ];
+    }
+
+    protected function returnSurvivingUnits(Kingdom $attackingKingdom, Kingdom $defendingKingdom): void {
+
+        if (!$this->isThereAnySurvivingUnits()) {
+            return;
+        }
+
+        $character     = $attackingKingdom->character;
+
+        $time          = $this->unitMovementService->getDistanceTime($character, $attackingKingdom, $defendingKingdom);
+
+        $minutes       = now()->addMinutes($time);
+
+        $unitMovementQueue = UnitMovementQueue::create([
+            'character_id'      => $character->id,
+            'from_kingdom_id'   => $defendingKingdom->id,
+            'to_kingdom_id'     => $attackingKingdom->id,
+            'units_moving'      => $this->newAttackingUnits,
+            'completed_at'      => $minutes,
+            'started_at'        => now(),
+            'moving_to_x'       => $attackingKingdom->x_position,
+            'moving_to_y'       => $attackingKingdom->y_position,
+            'from_x'            => $defendingKingdom->x_position,
+            'from_y'            => $defendingKingdom->y_position,
+            'is_attacking'      => false,
+            'is_recalled'       => false,
+            'is_returning'      => true,
+            'is_moving'         => false,
+        ]);
+
+        MoveUnits::dispatch($unitMovementQueue->id)->delay($minutes);
+    }
+
+    protected function isThereAnySurvivingUnits(): bool {
+        $attackingUnitAmount = 0;
+
+        foreach ($this->newAttackingUnits as $attackingUnit) {
+            if ($attackingUnit['amount'] > 0) {
+                $attackingUnitAmount = $attackingUnit['amount'];
+            }
+        }
+
+        return $attackingUnitAmount > 0;
     }
 }

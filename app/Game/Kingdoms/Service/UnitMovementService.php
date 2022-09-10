@@ -246,6 +246,18 @@ class UnitMovementService {
     public function determineTimeRequired(Character $character, Kingdom $kingdom, int $fromKingdomId): int {
         $fromKingdom = $character->kingdoms()->find($fromKingdomId);
 
+        return $this->getDistanceTime($character, $kingdom, $fromKingdom);
+    }
+
+    /**
+     * Get the distance time when the fromKingdom is known.
+     *
+     * @param Character $character
+     * @param Kingdom $kingdom
+     * @param Kingdom $fromKingdom
+     * @return int
+     */
+    public function getDistanceTime(Character $character, Kingdom $kingdom, Kingdom $fromKingdom): int {
         $pixelDistance = $this->distanceCalculation->calculatePixel(
             $fromKingdom->x_position,
             $fromKingdom->y_position,

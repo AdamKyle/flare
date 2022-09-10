@@ -12,6 +12,23 @@ use League\Fractal\TransformerAbstract;
 class KingdomAttackLogsTransformer extends TransformerAbstract {
 
     /**
+     * @var int|null $characterId
+     */
+    private ?int $characterId = null;
+
+    /**
+     * Set the characterId.
+     *
+     * @param int $characterId
+     * @return KingdomAttackLogsTransformer
+     */
+    public function setCharacterId(int $characterId): KingdomAttackLogsTransformer {
+        $this->characterId = $characterId;
+
+        return $this;
+    }
+
+    /**
      * @param KingdomLog $log
      * @return array
      * @throws Exception
@@ -75,8 +92,17 @@ class KingdomAttackLogsTransformer extends TransformerAbstract {
      * @return bool
      */
     protected function isMyLog(KingdomLog $log): bool {
-        $character       = auth()->user()->character;
+
+        $user = auth()->user();
+
+        if (is_null($user)) {
+            $character = Character::find($this->characterId);
+        } else {
+            $character = $user->character;
+        }
+
         $attackedKingdom = Kingdom::find($log->to_kingdom_id);
+
 
         return $attackedKingdom->character_id === $character->id;
     }

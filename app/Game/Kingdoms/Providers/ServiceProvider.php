@@ -159,8 +159,12 @@ class ServiceProvider extends ApplicationServiceProvider {
            );
         });
 
-        $this->app->bind(AttackKingdomWithUnitsHandler::class, function() {
-            return new AttackKingdomWithUnitsHandler();
+        $this->app->bind(AttackKingdomWithUnitsHandler::class, function($app) {
+            return new AttackKingdomWithUnitsHandler(
+                $app->make(DistanceCalculation::class),
+                $app->make(UnitMovementService::class),
+                $app->make(UpdateKingdom::class),
+            );
         });
 
         $this->commands([

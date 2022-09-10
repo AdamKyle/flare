@@ -78,10 +78,16 @@ class UpdateKingdom {
      * @param Character $character
      * @return void
      */
-    public function updateKingdomLogs(Character $character): void {
+    public function updateKingdomLogs(Character $character, bool $setCharacterId = false): void {
         $logs = KingdomLog::where('character_id', $character->id)->get();
 
-        $logData = new Collection($logs, $this->kingdomAttackLogsTransformer);
+        $transformer = $this->kingdomAttackLogsTransformer;
+
+        if ($setCharacterId) {
+            $transformer = $transformer->setCharacterId($character->id);
+        }
+
+        $logData = new Collection($logs, $transformer);
 
         $logData = $this->manager->createData($logData)->toArray();
 

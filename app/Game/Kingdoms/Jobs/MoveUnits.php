@@ -66,16 +66,17 @@ class MoveUnits implements ShouldQueue {
             // @codeCoverageIgnoreEnd
         }
 
-        if ($unitMovement->is_moving) {
+        if ($unitMovement->is_moving || $unitMovement->is_returning) {
             $this->moveUnitsFromOneKingdomToTheNext($unitMovement, $updateKingdom);
 
             return;
         }
 
         if ($unitMovement->is_attacking) {
-            $kingdom = Kingdom::find($unitMovement->to_kingdom_id);
+            $kingdom          = Kingdom::find($unitMovement->to_kingdom_id);
+            $attackingKingdom = Kingdom::find($unitMovement->from_kingdom_id);
 
-            $attackKingdomWithUnitsHandler->attackKingdomWithUnits($kingdom, $unitMovement->units_moving);
+            $attackKingdomWithUnitsHandler->attackKingdomWithUnits($kingdom, $attackingKingdom, $unitMovement->units_moving);
         }
 
     }
@@ -141,6 +142,7 @@ class MoveUnits implements ShouldQueue {
      */
     protected function findUnitToUpdate(Kingdom $toKingdom, Kingdom $fromKingdom, array $unitMoving): ?KingdomUnit {
         return $toKingdom->units->filter(function($unit) use($unitMoving, $fromKingdom) {
+
             $fromKingdomUnit = $fromKingdom->units()->find($unitMoving['unit_id']);
 
             if ($unit->gameUnit->name === $fromKingdomUnit->gameUnit->name) {
@@ -164,9 +166,10 @@ class MoveUnits implements ShouldQueue {
      * @return bool
      */
     protected function shouldBail(UnitMovementQueue $unitMovement, Kingdom $toKingdom, Kingdom $fromKingdom): bool {
-        if ($toKingdom->character_id !== $unitMovement->character_id) {
+        $user = Character::find($unitMovement->character_id)->user();
+
+        if ($toKingdom->character_id !== $unitMovement->character_id && !$unitMovement->is_returning) {
             $attributes =  $unitMovement->getAttributes();
-            $user       = Character::find($unitMovement->character_id)->user();
 
             if (is_null($fromKingdom->character_id)) {
                 event(new ServerMessageEvent($user, 'Your units were lost in movement as the kingdom they would return to does not belong to you.'));
@@ -195,6 +198,10 @@ class MoveUnits implements ShouldQueue {
             $unitMovement->delete();
 
             return true;
+        }
+
+        if ($toKingdom->character_id !== $unitMovement->character_id && $unitMovement->is_returning) {
+            event(new ServerMessageEvent($user, 'Your units were lost in movement as the kingdom they would return to does not belong to you.'));
         }
 
         return false;
