@@ -30,6 +30,7 @@ class UnitMovementTransformer extends TransformerAbstract {
             'is_recalled'       => $unitMovementQueue->is_recalled,
             'is_returning'      => $unitMovementQueue->is_returning,
             'is_moving'         => $unitMovementQueue->is_moving,
+            'is_attacking'      => $unitMovementQueue->is_attacking,
         ];
     }
 

@@ -40,13 +40,18 @@ class AttackKingdomWithUnitsHandler {
 
     private float $currentMorale;
 
-    public function __construct(DistanceCalculation $distanceCalculation, UnitMovementService $unitMovementService, UpdateKingdom $updateKingdom) {
+    public function __construct(DistanceCalculation $distanceCalculation,
+                                UnitMovementService $unitMovementService,
+                                UpdateKingdom $updateKingdom
+    ) {
         $this->distanceCalculation = $distanceCalculation;
         $this->unitMovementService = $unitMovementService;
         $this->updateKingdom       = $updateKingdom;
     }
 
     public function attackKingdomWithUnits(Kingdom $kingdom, Kingdom $attackingKingdom, array $unitsAttacking): void {
+
+        $this->currentMorale = $kingdom->current_morale;
 
         $this->setOldKingdomBuildings($kingdom);
         $this->setOldKingdomUnits($kingdom);
@@ -55,10 +60,10 @@ class AttackKingdomWithUnitsHandler {
         $this->siegeAttack($attackingKingdom, $kingdom, $unitsAttacking);
         $this->unitsAttack($attackingKingdom, $kingdom, $unitsAttacking);
 
+        $this->returnSurvivingUnits($attackingKingdom, $kingdom);
+
         $this->createLogForAttacker($attackingKingdom, $kingdom);
         $this->createLogForDefender($attackingKingdom, $kingdom);
-
-        $this->returnSurvivingUnits($attackingKingdom, $kingdom);
     }
 
     protected function unitsAttack(Kingdom $attackingKingdom, Kingdom $kingdom, array $unitsAttacking): void {
@@ -87,19 +92,24 @@ class AttackKingdomWithUnitsHandler {
 
             if (!$unit->gameUnit->siege_weapon && !$unit->gameUnit->is_settler) {
 
-                $newAmount = ceil($unitData['amount'] - ($unitData['amount'] * $damageToAttacker));
+                $newAmount = $unitData['amount'] - ($unitData['amount'] * $damageToAttacker);
 
-                $this->newAttackingUnits[] = [
-                    'unit_id' => $unit->id,
-                    'name'    => $unit->gameUnit->name,
-                    'amount'  => $newAmount
-                ];
+                if (!$this->updateAttackingUnit($unit->id, floor($newAmount))) {
+                    $this->newAttackingUnits[] = [
+                        'unit_id' => $unit->id,
+                        'name'    => $unit->gameUnit->name,
+                        'amount'  => $newAmount
+                    ];
+                }
             }
         }
 
         $healingAmount = $this->getHealingAmount($this->newAttackingUnits);
 
+        dump('Healing Amount: ' . $healingAmount);
+
         if ($healingAmount > 0.0) {
+            dump('here? - ready to heal');
             $newUnits = $this->healUnits($this->newAttackingUnits, $this->oldAttackingUnits, $healingAmount);
 
             $this->newAttackingUnits = $newUnits;
@@ -121,11 +131,13 @@ class AttackKingdomWithUnitsHandler {
 
                 $unit = $unit->refresh();
 
-                $this->newDefenderUnits[] = [
-                    'unit_id' => $unit->id,
-                    'name'    => $unit->gameUnit->name,
-                    'amount'  => $newAmount
-                ];
+                if (!$this->updateDefendingUnitsUnit($unit->id, floor($newAmount))) {
+                    $this->newDefenderUnits[] = [
+                        'unit_id' => $unit->id,
+                        'name'    => $unit->gameUnit->name,
+                        'amount'  => $newAmount
+                    ];
+                }
             }
         }
 
@@ -136,6 +148,48 @@ class AttackKingdomWithUnitsHandler {
 
             $this->newDefenderUnits = $newUnits;
         }
+    }
+
+    /**
+     * Update Attacking Unit Info.
+     *
+     * Can return false if the unit does not exist.
+     *
+     * @param int $unitId
+     * @param int $amount
+     * @return bool
+     */
+    protected function updateAttackingUnit(int $unitId, int $amount): bool {
+        foreach ($this->newAttackingUnits as $index => $unitInfo) {
+            if ($unitInfo['unit_id'] === $unitId) {
+                $this->newAttackingUnits[$index]['amount'] = $amount;
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Update Defending Unit Info.
+     *
+     * Can return false if the unit does not exist.
+     *
+     * @param int $unitId
+     * @param int $amount
+     * @return bool
+     */
+    protected function updateDefendingUnitsUnit(int $unitId, int $amount): bool {
+        foreach ($this->newDefenderUnits as $index => $unitInfo) {
+            if ($unitInfo['unit_id'] === $unitId) {
+                $this->newDefenderUnits[$index]['amount'] = $amount;
+
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -253,7 +307,7 @@ class AttackKingdomWithUnitsHandler {
             $unit = KingdomUnit::where('kingdom_id', $attackingKingdom->id)->where('id', $unitData['unit_id'])->first();
 
             if ($unit->gameUnit->siege_weapon) {
-                $newAmount = $unit->amount - ($unit->amount * $damageToSiegeWeapons);
+                $newAmount = $unitData['amount'] - ($unitData['amount'] * $damageToSiegeWeapons);
 
                 $this->newAttackingUnits[] = [
                     'unit_id' => $unit->id,
@@ -340,7 +394,11 @@ class AttackKingdomWithUnitsHandler {
         foreach ($kingdom->buildings as $building) {
             $percentageOfDefence = 0.0;
 
-            if ($building->current_durability < $building->max_durability) {
+            if ($building->current_durability <= 0) {
+                continue;
+            }
+
+            if ($building->current_durability < $building->max_durability)  {
                 $percentageOfDefence = $building->max_durability / $building->current_durability;
             }
 
@@ -415,14 +473,15 @@ class AttackKingdomWithUnitsHandler {
         foreach ($newUnits as $index => $unitData) {
             $unit = GameUnit::where('name', $unitData['name'])->first();
 
-            if ($unit['amount'] > 0 && !$unit->siege_weapon && $unit->is_settler) {
+            if ($unitData['amount'] > 0 && !$unit->siege_weapon && !$unit->is_settler) {
                 $originalAmount = $this->getOriginalAmount($unitData['name'], $oldUnits);
 
                 if ($originalAmount === 0) {
                     continue;
                 }
 
-                $newAmount = $unit['amount'] + $unit['amount'] * $healAmount;
+                $newAmount = $unitData['amount'] + $unitData['amount'] * $healAmount;
+
 
                 if ($newAmount > $originalAmount) {
                     $newAmount = $originalAmount;
@@ -450,7 +509,7 @@ class AttackKingdomWithUnitsHandler {
     protected function createLogForAttacker(Kingdom $attackingKingdom, Kingdom $defenderKingdom): void {
         $logDetails = $this->createBaseAttributes($attackingKingdom, $defenderKingdom);
 
-        $logDetails['character_id']           = $defenderKingdom->character_id;
+        $logDetails['character_id']           = $attackingKingdom->character_id;
         $logDetails['attacking_character_id'] = $attackingKingdom->character_id;
 
         KingdomLog::create($logDetails);
@@ -489,6 +548,9 @@ class AttackKingdomWithUnitsHandler {
     }
 
     protected function createBaseAttributes(Kingdom $attackingKingdom, Kingdom $defenderKingdom): array {
+
+        $newMorale = $this->currentMorale - $defenderKingdom->current_morale;
+
         return [
             'to_kingdom_id'   => $defenderKingdom->id,
             'from_kingdom_id' => $attackingKingdom->id,
@@ -497,7 +559,9 @@ class AttackKingdomWithUnitsHandler {
             'new_buildings'   => $this->newDefenderBuildings,
             'old_units'       => $this->oldDefenderUnits,
             'new_units'       => $this->newDefenderUnits,
-            'morale_loss'     => $this->currentMorale - $defenderKingdom->current_morale,
+            'units_sent'      => $this->oldAttackingUnits,
+            'units_survived'  => $this->newAttackingUnits,
+            'morale_loss'     => max($newMorale, 0),
             'published'       => true,
         ];
     }
@@ -513,8 +577,6 @@ class AttackKingdomWithUnitsHandler {
         $time          = $this->unitMovementService->getDistanceTime($character, $attackingKingdom, $defendingKingdom);
 
         $minutes       = now()->addMinutes($time);
-
-        dump($this->newAttackingUnits);
 
         $unitMovementQueue = UnitMovementQueue::create([
             'character_id'      => $character->id,

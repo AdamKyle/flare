@@ -76,6 +76,7 @@ class UpdateKingdom {
      * Updates kingdom attack logs for a character.
      *
      * @param Character $character
+     * @param bool $setCharacterId
      * @return void
      */
     public function updateKingdomLogs(Character $character, bool $setCharacterId = false): void {

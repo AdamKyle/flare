@@ -76,12 +76,27 @@ class MoveUnits implements ShouldQueue {
             $kingdom          = Kingdom::find($unitMovement->to_kingdom_id);
             $attackingKingdom = Kingdom::find($unitMovement->from_kingdom_id);
 
-            $attackKingdomWithUnitsHandler->attackKingdomWithUnits($kingdom, $attackingKingdom, $unitMovement->units_moving);
-        }
+            $unitMovement->delete();
 
+            if (!is_null($kingdom->character_id)) {
+                $updateKingdom->updateKingdomAllKingdoms($kingdom->character);
+            }
+
+            $updateKingdom->updateKingdomAllKingdoms($attackingKingdom->character);
+
+            $attackKingdomWithUnitsHandler->attackKingdomWithUnits($kingdom, $attackingKingdom, $unitMovement->units_moving);
+
+        }
     }
 
-    protected function moveUnitsFromOneKingdomToTheNext(UnitMovementQueue $unitMovement, UpdateKingdom $updateKingdom) {
+    /**
+     * Move units from one kingdom to the next.
+     *
+     * @param UnitMovementQueue $unitMovement
+     * @param UpdateKingdom $updateKingdom
+     * @return void
+     */
+    protected function moveUnitsFromOneKingdomToTheNext(UnitMovementQueue $unitMovement, UpdateKingdom $updateKingdom): void {
         $unitsMoving = $unitMovement->units_moving;
         $toKingdom   = Kingdom::find($unitMovement->to_kingdom_id);
         $fromKingdom = Kingdom::find($unitMovement->from_kingdom_id);
@@ -91,9 +106,14 @@ class MoveUnits implements ShouldQueue {
         }
 
         foreach ($unitsMoving as $unitMoving) {
-            $foundUnit = $this->findUnitToUpdate($toKingdom, $fromKingdom, $unitMoving);
 
-            $this->updateOrCrateUnitsForToKingdom($toKingdom, $fromKingdom, $unitMoving, $foundUnit);
+            if ($unitMovement->is_returning) {
+                $this->returnUnitToKingdom($toKingdom, $unitMoving);
+            } else {
+                $foundUnit = $this->findUnitToUpdate($toKingdom, $fromKingdom, $unitMoving);
+
+                $this->updateOrCrateUnitsForToKingdom($toKingdom, $fromKingdom, $unitMoving, $foundUnit);
+            }
         }
 
         $unitMovement->delete();
@@ -101,6 +121,7 @@ class MoveUnits implements ShouldQueue {
         $character = Character::find($unitMovement->character_id);
 
         $updateKingdom->updateKingdomAllKingdoms($character->first());
+
     }
 
     /**
@@ -149,6 +170,33 @@ class MoveUnits implements ShouldQueue {
                 return $unit;
             }
         })->first();
+    }
+
+    /**
+     * Add returning units to the returning to kingdom.
+     *
+     * - If the unit cannot be found just bail.
+     * - If the amount of the unit moving is 0, just bail.
+     * - If the amount + the current amount  > max amount, just use max amount.
+     *
+     * @param Kingdom $toKingdom
+     * @param array $unitMoving
+     * @return void
+     */
+    protected function returnUnitToKingdom(Kingdom $toKingdom, array $unitMoving): void {
+        $unit = $toKingdom->units()->find($unitMoving['unit_id']);
+
+        if (is_null($unit) || $unitMoving['amount'] === 0) {
+            return;
+        }
+
+        $newAmount = $unit->amount + $unitMoving['amount'];
+
+        if ($newAmount > KingdomMaxValue::MAX_UNIT) {
+            $newAmount = KingdomMaxValue::MAX_UNIT;
+        }
+
+        $unit->update(['amount' => $newAmount]);
     }
 
     /**

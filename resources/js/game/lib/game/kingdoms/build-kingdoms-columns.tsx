@@ -50,13 +50,19 @@ const iconsToShow = (kingdom: KingdomDetails) => {
     }
 
     const anyMoving = kingdom.unitsInMovement.filter((unitMovement: UnitMovementDetails) => {
-        return unitMovement.is_returning || unitMovement.is_moving || unitMovement.is_recalled
+        return unitMovement.is_returning || unitMovement.is_moving || unitMovement.is_recalled || unitMovement.is_attacking
     });
 
     if (anyMoving.length > 0) {
+        if (anyMoving[0].is_attacking) {
+            icons.push(
+                <i className='ra ra-axe text-red-500 dark:text-red-400'></i>
+            );
+        }
+
         icons.push(
             <i className='ra ra-trail text-green-500 dark:text-green-400'></i>
-        )
+        );
     }
 
     return icons;

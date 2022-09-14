@@ -5,7 +5,6 @@ import UnitsTable from "../units/units-table";
 import BasicCard from "../../../components/ui/cards/basic-card";
 import React from "react";
 import UnitMovement from "../unit-movement";
-import KingdomLogs from "../kingdom-logs";
 
 export default class KingdomTabs extends React.Component<any, any> {
 

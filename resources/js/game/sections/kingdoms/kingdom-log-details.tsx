@@ -25,12 +25,21 @@ export default class KingdomLogDetails extends React.Component<any, any> {
                            <dd>0% Lost{this.props.log.is_mine ? ', New Durability: ' + formatNumber(foundNewBuilding.durability) : null}</dd>
                        </Fragment>
                    );
+               } else if (foundNewBuilding.durability === 0) {
+                   changes.push(
+                       <Fragment>
+                           <dt>{oldBuilding.name}</dt>
+                           <dd className='text-red-600 dark:text-red-400'>
+                               100% Lost{this.props.log.is_mine ? ', New Durability: ' + formatNumber(foundNewBuilding.durability) : null}
+                           </dd>
+                      </Fragment>
+                   );
                } else {
                    changes.push(
                        <Fragment>
                            <dt>{oldBuilding.name}</dt>
                            <dd className='text-red-600 dark:text-red-400'>
-                               {((foundNewBuilding.durability/oldBuilding.durability) * 100).toFixed(0)}% Lost{
+                               {(((oldBuilding.durability - foundNewBuilding.durability) / 100) * 100).toFixed(0)}% Lost{
                                this.props.log.is_mine ? ', New Durability: ' + formatNumber(foundNewBuilding.durability) : null
                            }
                            </dd>
@@ -56,7 +65,17 @@ export default class KingdomLogDetails extends React.Component<any, any> {
                     changes.push(
                         <Fragment>
                             <dt>{oldUnit.name}</dt>
-                            <dd>0% Lost{this.props.log.is_mine ? ', Amount Left: ' +  formatNumber(foundNewUnit.amount) : null}</dd>
+                            <dd>0%
+                                Lost{this.props.log.is_mine ? ', Amount Left: ' + formatNumber(foundNewUnit.amount) : null}</dd>
+                        </Fragment>
+                    );
+                } else if (foundNewUnit.amount === 0) {
+                    changes.push(
+                        <Fragment>
+                            <dt>{oldUnit.name}</dt>
+                            <dd className='text-red-600 dark:text-red-400'>
+                                100% Lost{this.props.log.is_mine ? ', Amount Left: ' + formatNumber(foundNewUnit.amount) : null}
+                            </dd>
                         </Fragment>
                     );
                 } else {
@@ -64,7 +83,7 @@ export default class KingdomLogDetails extends React.Component<any, any> {
                         <Fragment>
                             <dt>{oldUnit.name}</dt>
                             <dd className='text-red-600 dark:text-red-400'>
-                                {((foundNewUnit.amount/oldUnit.amount) * 100).toFixed(0)}% Lost{this.props.log.is_mine ? ', Amount Left: ' + formatNumber(foundNewUnit.amount) : null}
+                                {(((oldUnit.amount - foundNewUnit.amount) / 100) * 100).toFixed(0)}% Lost{this.props.log.is_mine ? ', Amount Left: ' + formatNumber(foundNewUnit.amount) : null}
                             </dd>
                         </Fragment>
                     );
@@ -73,6 +92,52 @@ export default class KingdomLogDetails extends React.Component<any, any> {
         });
 
         return changes;
+    }
+
+    renderUnitsSentChange() {
+        const changes: any = [];
+
+        this.props.log.units_sent.forEach((sentUnit: { name: string; amount: number; }) => {
+            let foundNewUnit = this.props.log.units_survived.filter((newUnit: { name: string; amount: number; }) => newUnit.name === sentUnit.name);
+
+            if (foundNewUnit.length > 0) {
+                foundNewUnit = foundNewUnit[0];
+
+                if (foundNewUnit.amount === sentUnit.amount) {
+                    changes.push(
+                        <Fragment>
+                            <dt>{sentUnit.name}</dt>
+                            <dd>0%
+                                Lost{this.props.log.is_mine ? ', Amount Left: ' + formatNumber(foundNewUnit.amount) : null}</dd>
+                        </Fragment>
+                    );
+                } else if (foundNewUnit.amount === 0) {
+                    changes.push(
+                        <Fragment>
+                            <dt>{sentUnit.name}</dt>
+                            <dd className='text-red-600 dark:text-red-400'>
+                                100% Lost{this.props.log.is_mine ? ', Amount Left: ' + formatNumber(foundNewUnit.amount) : null}
+                            </dd>
+                        </Fragment>
+                    );
+                } else {
+                    changes.push(
+                        <Fragment>
+                            <dt>{sentUnit.name}</dt>
+                            <dd className='text-red-600 dark:text-red-400'>
+                                {(((sentUnit.amount - foundNewUnit.amount) / 100) * 100).toFixed(0)}% Lost{this.props.log.is_mine ? ', Amount Left: ' + formatNumber(foundNewUnit.amount) : null}
+                            </dd>
+                        </Fragment>
+                    );
+                }
+            }
+        });
+
+        return changes;
+    }
+
+    shouldShowUnitSentChanges(): boolean {
+        return this.props.log.units_sent.length > 0 && this.props.log.units_survived.length > 0;
     }
 
     render() {
@@ -109,7 +174,7 @@ export default class KingdomLogDetails extends React.Component<any, any> {
                 </div>
                 <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                 <div>
-                    <div className='grid md:grid-cols-2 gap-2'>
+                    <div className={'grid md:grid-cols-'+ (this.shouldShowUnitSentChanges() ? '3' : '2') +' gap-2'}>
                         <div>
                             <h3 className='mb-4'>
                                 Building Changes
@@ -135,6 +200,19 @@ export default class KingdomLogDetails extends React.Component<any, any> {
                                         {this.renderUnitChanges()}
                                     </dl>
                                 </div>
+                        }
+
+                        {
+                            this.shouldShowUnitSentChanges() ?
+                                <div>
+                                    <h3 className='mb-4'>
+                                        Attacking Unit Changes
+                                    </h3>
+                                    <dl>
+                                        {this.renderUnitsSentChange()}
+                                    </dl>
+                                </div>
+                            : null
                         }
                     </div>
                 </div>

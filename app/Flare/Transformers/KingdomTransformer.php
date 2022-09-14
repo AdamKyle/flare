@@ -2,6 +2,7 @@
 
 namespace App\Flare\Transformers;
 
+use League\Fractal\Resource\Collection;
 use League\Fractal\TransformerAbstract;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\UnitMovementQueue;
@@ -71,9 +72,9 @@ class KingdomTransformer extends TransformerAbstract {
 
     /**
      * @param Kingdom $kingdom
-     * @return \League\Fractal\Resource\Collection
+     * @return Collection
      */
-    public function includeBuildings(Kingdom $kingdom) {
+    public function includeBuildings(Kingdom $kingdom): Collection {
         $buildings = $kingdom->buildings;
 
         return $this->collection($buildings, new KingdomBuildingTransformer());
@@ -81,9 +82,9 @@ class KingdomTransformer extends TransformerAbstract {
 
     /**
      * @param Kingdom $kingdom
-     * @return \League\Fractal\Resource\Collection
+     * @return Collection
      */
-    public function includeUnits(Kingdom $kingdom) {
+    public function includeUnits(Kingdom $kingdom): Collection {
         $units = GameUnit::all();
 
         return $this->collection($units, new UnitTransformer());
@@ -91,10 +92,14 @@ class KingdomTransformer extends TransformerAbstract {
 
     /**
      * @param Kingdom $kingdom
-     * @return \League\Fractal\Resource\Collection
+     * @return Collection
      */
-    public function includeUnitsInMovement(Kingdom $kingdom) {
-        return $this->collection($kingdom->unitsMovementQueue, new UnitMovementTransformer());
+    public function includeUnitsInMovement(Kingdom $kingdom): Collection {
+
+        $unitMovementQueues = UnitMovementQueue::where('character_id', $kingdom->character_id)
+                                               ->get();
+
+        return $this->collection($unitMovementQueues, new UnitMovementTransformer());
     }
 
     /**
@@ -136,6 +141,12 @@ class KingdomTransformer extends TransformerAbstract {
         return $skill->{$timeReductionAttribute};
     }
 
+    /**
+     * Is the kingdom under attack?
+     *
+     * @param Kingdom $kingdom
+     * @return bool
+     */
     protected function isKingdomUnderAttack(Kingdom $kingdom): bool {
         return UnitMovementQueue::where('to_kingdom_id', $kingdom->id)->where('is_attacking', true)->count() > 0;
     }

@@ -32,14 +32,12 @@ export default class KingdomModal extends React.Component<KingdomModalProps, Kin
     updateLoading(kingdomDetails: KingdomDetailsType) {
         const costState = fetchCost(kingdomDetails.x_position, kingdomDetails.y_position, this.props.character_position, this.props.currencies);
 
-
-
         const newState = {...costState, ...{
             loading: false,
             x: kingdomDetails.x_position,
             y: kingdomDetails.y_position,
             title: this.buildTitle(kingdomDetails),
-            can_attack_kingdom: kingdomDetails.is_npc_owned || kingdomDetails.is_enemy_kingdom || !kingdomDetails.is_protected,
+            can_attack_kingdom: kingdomDetails.is_npc_owned || (kingdomDetails.is_enemy_kingdom && !kingdomDetails.is_protected),
             npc_owned: kingdomDetails.is_npc_owned,
         }};
 

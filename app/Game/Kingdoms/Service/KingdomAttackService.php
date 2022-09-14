@@ -65,6 +65,12 @@ class KingdomAttackService {
 
         $this->updateKingdom->updateKingdomAllKingdoms($character->refresh());
 
+        if (!is_null($kingdom->character_id)) {
+            $defender = $kingdom->character;
+
+            $this->updateKingdom->updateKingdomAllKingdoms($defender->refresh());
+        }
+
         $mapName = $kingdom->gameMap->name;
 
         event(new GlobalMessageEvent($character->name . ' Has launched an attack against: ' .
@@ -125,11 +131,10 @@ class KingdomAttackService {
         if (!is_null($kingdom->character_id)) {
             $defender = $kingdom->character;
 
-            $mapName     = $kingdom->gameMap->name;
             $fromMapName = $fromKingdom->gameMap->name;
 
             event(new ServerMessageEvent($defender->user,$defender->name . ' Your kingdom is under attack! Kingdom: ' .
-                $kingdom->name . ' on the plane: ' . $mapName . ' At (X/Y): ' . $kingdom->x_position . '/' . $kingdom->y_position . 'from: ' .
+                $kingdom->name . ' on the plane: ' . $fromMapName . ' At (X/Y): ' . $kingdom->x_position . '/' . $kingdom->y_position . 'from: ' .
                 $fromKingdom->name . ' At (X/Y): ' . $fromKingdom->x_position . '/' . $fromKingdom->y_position
             ));
         }

@@ -96,7 +96,7 @@ export default class MoveUnits {
                                        onChange={(e: any) => setAmountToMove(kingdom.kingdom_id, unit.id, unit.amount, e)}
                                        className='form-control'
                                 />
-                                <span className='text-gray-500 dark:text-white text-xs'>Max amount to recruit: {formatNumber(unit.amount)}</span>
+                                <span className='text-gray-700 dark:text-white text-xs'>Max amount to recruit: {formatNumber(unit.amount)}</span>
                             </div>
                         </div>
                         {

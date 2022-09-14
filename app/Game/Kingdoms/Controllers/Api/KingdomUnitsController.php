@@ -42,8 +42,7 @@ class KingdomUnitsController extends Controller {
      * @return JsonResponse
      * @throws \Exception
      */
-    public function recruitUnits(KingdomUnitRecruitmentRequest $request, Kingdom $kingdom, GameUnit $gameUnit): JsonResponse
-    {
+    public function recruitUnits(KingdomUnitRecruitmentRequest $request, Kingdom $kingdom, GameUnit $gameUnit): JsonResponse {
         if ($request->amount > KingdomMaxValue::MAX_UNIT) {
             return response()->json([
                 'message' => 'Too many units'

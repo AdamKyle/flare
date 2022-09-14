@@ -3,6 +3,7 @@
 namespace App\Game\Kingdoms\Events;
 
 use App\Flare\Models\Kingdom;
+use App\Flare\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Queue\SerializesModels;
@@ -17,10 +18,15 @@ class UpdateKingdomLogs implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels, KingdomCache;
 
-    public $user;
+    /**
+     * @var User $user
+     */
+    private User $user;
 
-
-    public $logs;
+    /**
+     * @var array $logs
+     */
+    public array $logs;
 
     /**
      * Create a new event instance.
