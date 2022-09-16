@@ -20,33 +20,84 @@ class AttackKingdomWithUnitsHandler {
 
     use CalculateMorale;
 
+    /**
+     * @var DistanceCalculation $distanceCalculation
+     */
     private DistanceCalculation $distanceCalculation;
 
+    /**
+     * @var UnitMovementService $unitMovementService
+     */
     private UnitMovementService $unitMovementService;
 
+    /**
+     * @var UpdateKingdom $updateKingdom
+     */
     private UpdateKingdom $updateKingdom;
 
+    /**
+     * @var KingdomSiegeHandler $kingdomSiegeHandler
+     */
+    private KingdomSiegeHandler $kingdomSiegeHandler;
+
+    /**
+     * @var KingdomUnitHandler $kingdomUnitHandler
+     */
+    private KingdomUnitHandler $kingdomUnitHandler;
+
+    /**
+     * @var array $oldAttackingUnits
+     */
     private array $oldAttackingUnits    = [];
 
+    /**
+     * @var array $newAttackingUnits
+     */
     private array $newAttackingUnits    = [];
 
+    /**
+     * @var array $oldDefenderUnits
+     */
     private array $oldDefenderUnits     = [];
 
+    /**
+     * @var array $newDefenderUnits
+     */
     private array $newDefenderUnits     = [];
 
+    /**
+     * @var array $oldDefenderBuildings
+     */
     private array $oldDefenderBuildings = [];
 
+    /**
+     * @var array $newDefenderBuildings
+     */
     private array $newDefenderBuildings = [];
 
+    /**
+     * @var float $currentMorale
+     */
     private float $currentMorale;
 
+    /**
+     * @param DistanceCalculation $distanceCalculation
+     * @param UnitMovementService $unitMovementService
+     * @param UpdateKingdom $updateKingdom
+     * @param KingdomSiegeHandler $kingdomSiegeHandler
+     * @param KingdomUnitHandler $kingdomUnitHandler
+     */
     public function __construct(DistanceCalculation $distanceCalculation,
                                 UnitMovementService $unitMovementService,
-                                UpdateKingdom $updateKingdom
+                                UpdateKingdom $updateKingdom,
+                                KingdomSiegeHandler $kingdomSiegeHandler,
+                                KingdomUnitHandler $kingdomUnitHandler,
     ) {
         $this->distanceCalculation = $distanceCalculation;
         $this->unitMovementService = $unitMovementService;
         $this->updateKingdom       = $updateKingdom;
+        $this->kingdomSiegeHandler = $kingdomSiegeHandler;
+        $this->kingdomUnitHandler  = $kingdomUnitHandler;
     }
 
     public function attackKingdomWithUnits(Kingdom $kingdom, Kingdom $attackingKingdom, array $unitsAttacking): void {
@@ -57,8 +108,8 @@ class AttackKingdomWithUnitsHandler {
         $this->setOldKingdomUnits($kingdom);
         $this->setOldAttackingUnits($attackingKingdom, $unitsAttacking);
 
-        $this->siegeAttack($attackingKingdom, $kingdom, $unitsAttacking);
-        $this->unitsAttack($attackingKingdom, $kingdom, $unitsAttacking);
+        $this->siegeAttack($attackingKingdom, $kingdom);
+        $this->unitsAttack($attackingKingdom, $kingdom);
 
         $this->returnSurvivingUnits($attackingKingdom, $kingdom);
 
@@ -66,153 +117,64 @@ class AttackKingdomWithUnitsHandler {
         $this->createLogForDefender($attackingKingdom, $kingdom);
     }
 
-    protected function unitsAttack(Kingdom $attackingKingdom, Kingdom $kingdom, array $unitsAttacking): void {
-        $damageReduction = $this->getTotalDamageReduction($kingdom);
-        $defence         = $this->getDefendingKingdomUnitDefence($kingdom);
-        $unitAttack      = 0;
+    protected function unitsAttack(Kingdom $attackingKingdom, Kingdom $kingdom): void {
+        $kingdomUnitHandler = $this->kingdomUnitHandler->setAttackingUnits($this->newAttackingUnits);
 
-        foreach ($unitsAttacking as $unitData) {
-            $unit = KingdomUnit::where('kingdom_id', $attackingKingdom->id)->where('id', $unitData['unit_id'])->first();
+        $kingdomUnitHandler->attackUnits($kingdom, $attackingKingdom->id);
 
-            if (!$unit->siege_weapon && !$unit->is_settler) {
-                $unitAttack += $unit->amount * $unit->gameUnit->attack;
-            }
-        }
+        $this->newAttackingUnits    = [...$this->newAttackingUnits, ...$kingdomUnitHandler->getAttackingUnits()];
+        $this->newDefenderUnits     = [...$this->newDefenderUnits, ...$kingdomUnitHandler->getDefenderUnits()];
 
-        $unitAttack = ceil($unitAttack - ($unitAttack * $damageReduction));
+        $healingAmount = $this->getHealingAmount($this->newDefenderUnits);
 
-        $damageToAttacker = $defence / $unitAttack;
-
-        if ($damageToAttacker > 1) {
-            $damageToAttacker = 1;
-        }
-
-        foreach ($unitsAttacking as $unitData) {
-            $unit = KingdomUnit::where('kingdom_id', $attackingKingdom->id)->where('id', $unitData['unit_id'])->first();
-
-            if (!$unit->gameUnit->siege_weapon && !$unit->gameUnit->is_settler) {
-
-                $newAmount = $unitData['amount'] - ($unitData['amount'] * $damageToAttacker);
-
-                if (!$this->updateAttackingUnit($unit->id, floor($newAmount))) {
-                    $this->newAttackingUnits[] = [
-                        'unit_id' => $unit->id,
-                        'name'    => $unit->gameUnit->name,
-                        'amount'  => $newAmount
-                    ];
-                }
-            }
+        if ($healingAmount <= 0) {
+            $this->healUnits($this->newDefenderUnits, $this->oldDefenderUnits, $healingAmount);
         }
 
         $healingAmount = $this->getHealingAmount($this->newAttackingUnits);
 
-        dump('Healing Amount: ' . $healingAmount);
-
-        if ($healingAmount > 0.0) {
-            dump('here? - ready to heal');
-            $newUnits = $this->healUnits($this->newAttackingUnits, $this->oldAttackingUnits, $healingAmount);
-
-            $this->newAttackingUnits = $newUnits;
+        if ($healingAmount <= 0) {
+            $this->healUnits($this->newAttackingUnits, $this->oldAttackingUnits, $healingAmount);
         }
-
-        $damageToDefenderUnit = $unitAttack / $defence;
-
-        if ($damageToDefenderUnit > 1.0) {
-            $damageToDefenderUnit = 1.0;
-        }
-
-        foreach ($kingdom->units as $unit) {
-            if (!$unit->gameUnit->siege_weapon) {
-                $newAmount = $unit->amount - ($unit->amount * $damageToDefenderUnit);
-
-                $unit->update([
-                    'amount' => $newAmount
-                ]);
-
-                $unit = $unit->refresh();
-
-                if (!$this->updateDefendingUnitsUnit($unit->id, floor($newAmount))) {
-                    $this->newDefenderUnits[] = [
-                        'unit_id' => $unit->id,
-                        'name'    => $unit->gameUnit->name,
-                        'amount'  => $newAmount
-                    ];
-                }
-            }
-        }
-
-        $healingAmount = $this->getHealingAmount($this->newDefenderUnits);
-
-        if ($healingAmount > 0.0) {
-            $newUnits = $this->healUnits($this->newDefenderUnits, $this->oldDefenderUnits, $healingAmount);
-
-            $this->newDefenderUnits = $newUnits;
-        }
-    }
-
-    /**
-     * Update Attacking Unit Info.
-     *
-     * Can return false if the unit does not exist.
-     *
-     * @param int $unitId
-     * @param int $amount
-     * @return bool
-     */
-    protected function updateAttackingUnit(int $unitId, int $amount): bool {
-        foreach ($this->newAttackingUnits as $index => $unitInfo) {
-            if ($unitInfo['unit_id'] === $unitId) {
-                $this->newAttackingUnits[$index]['amount'] = $amount;
-
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Update Defending Unit Info.
-     *
-     * Can return false if the unit does not exist.
-     *
-     * @param int $unitId
-     * @param int $amount
-     * @return bool
-     */
-    protected function updateDefendingUnitsUnit(int $unitId, int $amount): bool {
-        foreach ($this->newDefenderUnits as $index => $unitInfo) {
-            if ($unitInfo['unit_id'] === $unitId) {
-                $this->newDefenderUnits[$index]['amount'] = $amount;
-
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**
      * Siege Attack.
      *
+     * - Rams attack walls and farms
+     * - Trebuchets attack all buildings and units.
+     * - Cannons attack all buildings and units.
+     * - Calculate the new kingdom morale
+     * - Heal remaining units if possible.
+     *
      * @param Kingdom $attackingKingdom
      * @param Kingdom $kingdom
-     * @param array $unitsAttacking
      * @return void
      */
-    protected function siegeAttack(Kingdom $attackingKingdom, Kingdom $kingdom, array $unitsAttacking): void {
+    protected function siegeAttack(Kingdom $attackingKingdom, Kingdom $kingdom): void {
+        $this->currentMorale = $kingdom->current_morale;
+
+        $kingdomSiegeHandler = $this->kingdomSiegeHandler->setAttackingUnits($this->oldAttackingUnits);
+
         $damageReduction = $this->getTotalDamageReduction($kingdom);
-        $defence         = $this->getBuildingsDefence($kingdom);
-        $siegeAttack     = $this->getSiegeUnitAttack($attackingKingdom, $unitsAttacking);
+        $kingdom         = $kingdomSiegeHandler->handleRams($attackingKingdom, $kingdom, $damageReduction);
+        $kingdom         = $kingdomSiegeHandler->handleTrebuchets($attackingKingdom, $kingdom, $damageReduction);
+        $kingdom         = $kingdomSiegeHandler->handleCannons($attackingKingdom, $kingdom, $damageReduction);
 
-        if ($siegeAttack > 0) {
-            $siegeAttack = $siegeAttack - ($siegeAttack * $damageReduction);
+        $newMorale = $this->calculateNewMorale($kingdom, $kingdom->current_morale);
 
-            $this->setNewKingdomBuildingsAndSiegeWeapons($attackingKingdom, $kingdom, $unitsAttacking, $siegeAttack, $defence);
-        } else {
-            $this->newDefenderBuildings = $this->oldDefenderBuildings;
-            $this->newDefenderUnits     = $this->oldDefenderUnits;
-            $this->newAttackingUnits    = $this->oldAttackingUnits;
+        $kingdom->update([
+            'current_morale' => $newMorale
+        ]);
+
+        $this->newDefenderBuildings = [...$this->newDefenderBuildings, ...$kingdomSiegeHandler->getNewBuildings()];
+        $this->newAttackingUnits    = [...$this->newAttackingUnits, ...$kingdomSiegeHandler->getNewAttackingUnits()];
+        $this->newDefenderUnits     = [...$this->newDefenderUnits, ...$kingdomSiegeHandler->getNewUnits()];
+
+        $healingAmount = $this->getHealingAmount($this->newDefenderUnits);
+
+        if ($healingAmount <= 0) {
+            $this->healUnits($this->newDefenderUnits, $this->oldDefenderUnits, $healingAmount);
         }
     }
 
@@ -229,92 +191,6 @@ class AttackKingdomWithUnitsHandler {
                 'name'       => $building->name,
                 'durability' => $building->current_durability,
             ];
-        }
-    }
-
-    /**
-     * Attack the buildings with siege weapons.
-     *
-     * @param Kingdom $attackingKingdom
-     * @param Kingdom $kingdom
-     * @param array $attackingUnits
-     * @param float $damage
-     * @param float $defence
-     * @return void
-     */
-    protected function setNewKingdomBuildingsAndSiegeWeapons(Kingdom $attackingKingdom, Kingdom $kingdom, array $attackingUnits, float $damage, float $defence) {
-        foreach ($kingdom->buildings as $building) {
-            $damage = $damage / $defence;
-
-            if ($damage > 1) {
-                $damage = 1;
-            }
-
-            $currentDurability = $building->current_durability - ($building->current_durability * $damage);
-
-            $building->update([
-                'current_durability' => $currentDurability < 0 ? 0 : floor($currentDurability),
-            ]);
-
-            $building = $building->refresh();
-
-            $this->newDefenderBuildings[] = [
-                'unit_id'    => $building->id,
-                'name'       => $building->name,
-                'durability' => $building->current_durability,
-            ];
-        }
-
-        foreach ($kingdom->units as $unit) {
-            if ($unit->gameUnit->siege_weapon) {
-                $damage = $damage / $defence;
-
-                if ($damage > 1) {
-                    $damage = 1;
-                }
-
-                $newAmount = $unit->amount - ($unit->amount * $damage);
-
-                $unit->update([
-                    'amount' => $newAmount
-                ]);
-
-                $unit = $unit->refresh();
-
-                $this->newDefenderUnits[] = [
-                    'unit_id' => $unit->id,
-                    'name'    => $unit->gameUnit->name,
-                    'amount'  => $newAmount,
-                ];
-            }
-        }
-
-        $this->currentMorale = $kingdom->current_morale;
-
-        $newMorale = $this->calculateNewMorale($kingdom, $kingdom->current_morale);
-
-        $kingdom->update([
-            'current_morale' => $newMorale
-        ]);
-
-        $damageToSiegeWeapons = $damage / $defence;
-
-        if ($damageToSiegeWeapons > 1) {
-            $damageToSiegeWeapons = 1;
-        }
-
-        foreach ($attackingUnits as $unitData) {
-            $unit = KingdomUnit::where('kingdom_id', $attackingKingdom->id)->where('id', $unitData['unit_id'])->first();
-
-            if ($unit->gameUnit->siege_weapon) {
-                $newAmount = $unitData['amount'] - ($unitData['amount'] * $damageToSiegeWeapons);
-
-                $this->newAttackingUnits[] = [
-                    'unit_id' => $unit->id,
-                    'name'    => $unit->gameUnit->name,
-                    'amount'  => $newAmount,
-                ];
-            }
         }
     }
 
@@ -360,12 +236,9 @@ class AttackKingdomWithUnitsHandler {
      * @return float
      */
     protected function getTotalDamageReduction(Kingdom $kingdom): float {
-        $damageReduction = 0.05;
-
-        $totalDefence = $kingdom->fetchKingdomDefenceBonus();
-
+        $damageReduction    = 0.05;
+        $totalDefence       = $kingdom->fetchKingdomDefenceBonus();
         $newDamageReduction = 0.0;
-
 
         if ($totalDefence < 1) {
             return 0.0;
@@ -380,79 +253,6 @@ class AttackKingdomWithUnitsHandler {
         }
 
         return $newDamageReduction;
-    }
-
-    /**
-     * Get the buildings and siege weapons total defence.
-     *
-     * @param Kingdom $kingdom
-     * @return int
-     */
-    protected function getBuildingsDefence(Kingdom $kingdom): int {
-        $defence = 0;
-
-        foreach ($kingdom->buildings as $building) {
-            $percentageOfDefence = 0.0;
-
-            if ($building->current_durability <= 0) {
-                continue;
-            }
-
-            if ($building->current_durability < $building->max_durability)  {
-                $percentageOfDefence = $building->max_durability / $building->current_durability;
-            }
-
-            $defence += ceil($building->current_defence - ($building->current_defence * $percentageOfDefence));
-        }
-
-        foreach ($kingdom->units as $unit) {
-            if ($unit->gameUnit->siege_weapon) {
-                $defence += $unit->gameUnit->defence;
-            }
-        }
-
-        return $defence;
-    }
-
-    /**
-     * Get defending kingdom units defence.
-     *
-     * - Non siege weapons.
-     *
-     * @param Kingdom $kingdom
-     * @return int
-     */
-    protected function getDefendingKingdomUnitDefence(Kingdom $kingdom): int {
-        $defence = 0;
-
-        foreach ($kingdom->units as $unit) {
-            if (!$unit->gameUnit->siege_weapon) {
-                $defence += $unit->gameUnit->defence;
-            }
-        }
-
-        return $defence;
-    }
-
-    /**
-     * Get Siege Unit Attack.
-     *
-     * @param Kingdom $attackingKingdom
-     * @param array $units
-     * @return int
-     */
-    protected function getSiegeUnitAttack(Kingdom $attackingKingdom, array $units): int {
-        $totalAttack = 0;
-
-        foreach ($units as $unitData) {
-            $unit = KingdomUnit::where('kingdom_id', $attackingKingdom->id)->where('id', $unitData['unit_id'])->first();
-
-            if ($unit->gameUnit->siege_weapon) {
-                $totalAttack += $unit->gameUnit->attack * $unitData['amount'];
-            }
-        }
-
-        return $totalAttack;
     }
 
     protected function getHealingAmount(array $units): float {

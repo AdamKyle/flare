@@ -72,8 +72,14 @@ class RebuildBuilding implements ShouldQueue {
         if ($building->morale_increase > 0) {
             $kingdom = $building->kingdom;
 
+            $newMorale = $kingdom->current_morale + $this->building->morale_increase;
+
+            if ($newMorale > 1) {
+                $newMorale = 1;
+            }
+
             $kingdom->update([
-                'current_morale' => $kingdom->current_morale + $this->building->morale_increase,
+                'current_morale' => $newMorale,
             ]);
         }
 

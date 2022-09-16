@@ -81,6 +81,10 @@
                     <a href="/releases" target="_blank">Version: {{GameVersion::version()}}</a>
                 </div>
 
+                <div class="mx-4">
+                    <a href="/information/where-to-start" target="_blank">Help, I'm Stuck!</a>
+                </div>
+
                 <div>
                     <label class="switch switch_outlined" data-toggle="tooltip" data-tippy-content="Toggle Dark Mode">
                         <input id="darkModeToggler" type="checkbox">

@@ -12,6 +12,7 @@ trait CalculateMorale {
      * - Skip buildings who do not increase or decrease morale.
      *
      * @param Kingdom $kingdom
+     * @param float $morale
      * @return float
      */
     public function calculateNewMorale(Kingdom $kingdom, float $morale): float {
@@ -39,6 +40,10 @@ trait CalculateMorale {
 
         if ($morale < 0) {
             return 0.0;
+        }
+
+        if ($morale > 1) {
+            return 1.0;
         }
 
         return $morale;
