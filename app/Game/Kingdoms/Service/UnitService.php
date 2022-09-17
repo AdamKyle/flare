@@ -2,6 +2,7 @@
 
 namespace App\Game\Kingdoms\Service;
 
+use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\Skill;
@@ -13,6 +14,7 @@ use App\Flare\Models\UnitInQueue;
 use App\Flare\Transformers\KingdomTransformer;
 use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
 use App\Game\Kingdoms\Jobs\RecruitUnits;
+use App\Game\Kingdoms\Values\KingdomMaxValue;
 use App\Game\Kingdoms\Values\UnitCosts;
 use App\Game\Skills\Values\SkillTypeValue;
 use Carbon\Carbon;
@@ -36,6 +38,11 @@ class UnitService {
     private $totalResources;
 
     /**
+     * @var bool $paidGold
+     */
+    private bool $paidGold = false;
+
+    /**
      * @var UpdateKingdomHandler $updateKingdomHandler
      */
     private UpdateKingdomHandler $updateKingdomHandler;
@@ -45,6 +52,15 @@ class UnitService {
      */
     public function __construct(UpdateKingdomHandler $updateKingdomHandler) {
         $this->updateKingdomHandler = $updateKingdomHandler;
+    }
+
+    /**
+     * Get whether we paid gold or not.
+     *
+     * @return bool
+     */
+    public function getPaidGold(): bool {
+        return $this->paidGold;
     }
 
     /**
@@ -141,7 +157,6 @@ class UnitService {
     public function updateKingdomResources(Kingdom $kingdom, GameUnit $gameUnit, int $amount): Kingdom {
         $kingdomUnitCostReduction = $kingdom->fetchUnitCostReduction();
         $ironCostReduction        = $kingdom->fetchIronCostReduction();
-        $populationCostReduction  = $kingdom->fetchPopulationCostReduction();
 
         $woodRequired = ($gameUnit->wood_cost * $amount);
         $woodRequired -= $woodRequired * $kingdomUnitCostReduction;
@@ -156,7 +171,7 @@ class UnitService {
         $ironRequired -= $ironRequired * ($kingdomUnitCostReduction + $ironCostReduction);
 
         $populationRequired = ($gameUnit->required_population * $amount);
-        $populationRequired -= $populationRequired * ($kingdomUnitCostReduction + $populationCostReduction);
+        $populationRequired -= $populationRequired * $kingdomUnitCostReduction;
 
         $newWood  = $kingdom->current_wood - $woodRequired;
         $newClay  = $kingdom->current_clay - $clayRequired;
@@ -221,15 +236,34 @@ class UnitService {
 
             $character = $queue->character;
 
-            $character->gold += $queue->gold_paid * 0.75;
+            $currentPopulation    = $kingdom->current_population;
+            $currentCharacterGold = $character->gold;
 
-            $character->save();
+            $populationToGiveBack = $queue->amount * 0.25;
+            $goldToGiveBack       = $queue->gold_paid * 0.25;
 
-            $kingdom->update([
-                'current_population' => $kingdom->current_population + ($queue->amount * 0.25)
+            $newPopulation = ($currentPopulation + $populationToGiveBack);
+            $newGold       = ($currentCharacterGold + $goldToGiveBack);
+
+            if ($newGold > MaxCurrenciesValue::MAX_GOLD) {
+                $newGold = MaxCurrenciesValue::MAX_GOLD;
+            }
+
+            if ($newPopulation > KingdomMaxValue::MAX_CURRENT_POPULATION) {
+                $newPopulation = KingdomMaxValue::MAX_CURRENT_POPULATION;
+            }
+
+            $character->update([
+                'gold' => $newGold
             ]);
 
-            event(new UpdateTopBarEvent($character->refresh()));
+            $kingdom->update([
+                'current_population' => $newPopulation
+            ]);
+
+            $character = $character->refresh();
+
+            event(new updateTopBarEvent($character));
         } else {
             $this->resourceCalculation($queue);
 
@@ -243,9 +277,7 @@ class UnitService {
 
         $queue->delete();
 
-        $this->updateKingdomHandler->refreshPlayersKingdoms($kingdom->character->refresh());
-
-        return $kingdom;
+        return $kingdom->refresh();
     }
 
     /**

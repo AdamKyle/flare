@@ -134,7 +134,7 @@ class KingdomUnitHandler extends BaseDefenderHandler {
         $attack = 0;
 
         foreach ($this->attackingUnits as $unitData) {
-            $unit = KingdomUnit::where('game_unit_id', $unitData['unit_id'])
+            $unit = KingdomUnit::where('id', $unitData['unit_id'])
                                ->where('kingdom_id', $attackingKingdomId)
                                ->first();
 

@@ -27,8 +27,7 @@ export default class UnitInformation extends React.Component<UnitInformationProp
          }
      }
 
-     calculateCostsForUnit(baseCost: number, amount: number, is_iron: boolean, is_population: boolean) {
-
+     calculateCostsForUnit(baseCost: number, amount: number, is_iron: boolean) {
          if (typeof this.props.unit_cost_reduction === 'undefined') {
              console.error('unit_cost_reduction is undefined (prop)');
 
@@ -37,15 +36,11 @@ export default class UnitInformation extends React.Component<UnitInformationProp
 
          let cost = baseCost * amount;
 
-         if (is_iron) {
-             cost = cost - cost - this.props.kingdom_iron_cost_reduction;
+         if (is_iron && cost > 1) {
+             return cost - cost * this.props.kingdom_iron_cost_reduction;
          }
 
-         if (is_population) {
-             cost = (cost - cost * this.props.kingdom_population_cost_reduction);
-         }
-
-         return (cost - cost * this.props.unit_cost_reduction).toFixed(0);
+         return cost;
      }
 
     setResourceAmount(amount: number, timeNeeded: number) {
@@ -172,15 +167,15 @@ export default class UnitInformation extends React.Component<UnitInformationProp
                          <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                          <dl className='mb-5'>
                              <dt>Stone Cost:</dt>
-                             <dd>{formatNumber(this.calculateCostsForUnit(this.props.unit.stone_cost, this.getAmount(), false, false))}</dd>
+                             <dd>{formatNumber(this.calculateCostsForUnit(this.props.unit.stone_cost, this.getAmount(), false))}</dd>
                              <dt>Clay Cost:</dt>
-                             <dd>{formatNumber(this.calculateCostsForUnit(this.props.unit.clay_cost, this.getAmount(), false, false))}</dd>
+                             <dd>{formatNumber(this.calculateCostsForUnit(this.props.unit.clay_cost, this.getAmount(), false))}</dd>
                              <dt>Wood Cost:</dt>
-                             <dd>{formatNumber(this.calculateCostsForUnit(this.props.unit.wood_cost, this.getAmount(), false, false))}</dd>
+                             <dd>{formatNumber(this.calculateCostsForUnit(this.props.unit.wood_cost, this.getAmount(), false))}</dd>
                              <dt>Iron Cost:</dt>
-                             <dd>{formatNumber(this.calculateCostsForUnit(this.props.unit.iron_cost, this.getAmount(), true, false))}</dd>
+                             <dd>{formatNumber(this.calculateCostsForUnit(this.props.unit.iron_cost, this.getAmount(), true))}</dd>
                              <dt>Population Cost:</dt>
-                             <dd>{formatNumber(this.calculateCostsForUnit(this.props.unit.required_population, this.getAmount(), false, true))}</dd>
+                             <dd>{formatNumber(this.calculateCostsForUnit(this.props.unit.required_population, this.getAmount(), false))}</dd>
                              <dt>Time Required (Seconds):</dt>
                              {
                                  this.state.upgrade_section === 'resources' ?

@@ -199,16 +199,7 @@ export default class UpgradeWithGold extends React.Component<any, any> {
                         'text-red-500 dark:text-red-400': this.state.additional_population_cost > 0
                     })}>{formatNumber(this.state.additional_population_needed)}</dd>
                     <dt>Time Needed (Minutes)</dt>
-                    <dd className='flex items-center'>
-                        <span>{formatNumber(this.state.time_needed)}</span>
-                        <div>
-                            <div className='ml-2'>
-                                <button type={"button"} onClick={() => this.props.show_help_dialogue} className='text-blue-500 dark:text-blue-300'>
-                                    <i className={'fas fa-info-circle'}></i> Help
-                                </button>
-                            </div>
-                        </div>
-                    </dd>
+                    <dd>{formatNumber(this.state.time_needed)}</dd>
                 </dl>
                 {
                     this.state.loading ?

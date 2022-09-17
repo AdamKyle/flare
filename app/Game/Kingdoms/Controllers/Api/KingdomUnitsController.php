@@ -55,9 +55,9 @@ class KingdomUnitsController extends Controller {
             ], 422);
         }
 
-        $paidGold = false;
+        $amount = $request->amount < 1 ? 1 : $request->amount;
 
-        $response = $this->unitService->handlePayment($gameUnit, $kingdom, $request->recruitment_type, $request->amount);
+        $response = $this->unitService->handlePayment($gameUnit, $kingdom, $request->recruitment_type, $amount);
 
         if (!empty($response)) {
             return response()->json([
@@ -65,7 +65,7 @@ class KingdomUnitsController extends Controller {
             ], 422);
         }
 
-        $this->unitService->recruitUnits($kingdom, $gameUnit, $request->amount, $paidGold);
+        $this->unitService->recruitUnits($kingdom, $gameUnit, $amount, $this->unitService->getPaidGold());
 
         $this->updateKingdom->updateKingdom($kingdom->refresh());
 
@@ -100,7 +100,7 @@ class KingdomUnitsController extends Controller {
             ], 422);
         }
 
-        $this->updateKingdom->updateKingdom($kingdom->refresh());
+        $this->updateKingdom->updateKingdom($kingdom);
 
         return response()->json([
             'message' => 'Your units have been disbanded. You got a % of some of the cost back in either resources or gold.'

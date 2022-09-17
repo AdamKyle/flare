@@ -24,7 +24,7 @@ class KingdomUnitRecruitmentRequest extends FormRequest
     public function rules()
     {
         return [
-            'amount'           => 'required|integer',
+            'amount'           => 'required|numeric',
             'recruitment_type' => 'required|in:gold,resources',
         ];
     }

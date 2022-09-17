@@ -169,7 +169,7 @@ export default class Game extends React.Component<GameProps, GameState> {
 
         // @ts-ignore
         this.kingdomLogsUpdate.listen('Game.Kingdoms.Events.UpdateKingdomLogs', (event: { logs: KingdomLogDetails[] | []}) => {
-            console.log('Update kingdom logs ...', event);
+
             this.setState({
                 kingdom_logs: event.logs
             }, () => {
@@ -225,7 +225,7 @@ export default class Game extends React.Component<GameProps, GameState> {
 
         // @ts-ignore
         this.kingdomUpdates.listen('Game.Kingdoms.Events.UpdateKingdom', (event: { kingdom: KingdomDetails }) => {
-            console.log('Updating Kingdom ...', this.props.userId, event.kingdom);
+
             const eventKingdom = event.kingdom;
 
             if (Array.isArray(eventKingdom)) {
@@ -289,7 +289,7 @@ export default class Game extends React.Component<GameProps, GameState> {
     }
 
     updateCharacterQuests(quests: QuestType) {
-        console.log('updating character quests: ', quests);
+
         this.setState({
             quests: quests
         });

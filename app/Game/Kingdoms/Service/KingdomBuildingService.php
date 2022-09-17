@@ -108,10 +108,10 @@ class KingdomBuildingService {
         $woodCost       = $building->wood_cost - $building->wood_cost * $buildingCostReduction;
         $clayCost       = $building->clay_cost - $building->clay_cost * $buildingCostReduction;
         $stoneCost      = $building->stone_cost - $building->stone_cost * $buildingCostReduction;
-        $ironCost       = $building->iron_cost - $building->iron_cost * ($buildingCostReduction + $ironCostReduction);
+        $ironCost       = round($building->iron_cost - $building->iron_cost * ($buildingCostReduction + $ironCostReduction));
 
         if (!$ignorePop) {
-            $populationCost = $building->required_population - $building->required_population * ($buildingCostReduction + $populationCostReduction);
+            $populationCost = $building->required_population - $building->required_population * ($populationCostReduction);
 
             $newPop = $building->kingdom->current_population - $populationCost;
 

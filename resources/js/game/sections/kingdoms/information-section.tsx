@@ -30,7 +30,7 @@ export default class InformationSection extends React.Component<InformationSecti
                                     kingdom_building_time_reduction={this.props.cost_reduction.kingdom_building_time_reduction}
                                     kingdom_building_cost_reduction={this.props.cost_reduction.kingdom_building_cost_reduction}
                                     kingdom_iron_cost_reduction={this.props.cost_reduction.kingdom_iron_cost_reduction}
-                                    kingdom_population_cost_reduction={this.props.cost_reduction.kingdom_population_cost_reduction}
+                                    kingdom_population_cost_reduction={this.props.cost_reduction.kingdom_unit_cost_reduction}
                                     kingdom_current_population={this.props.cost_reduction.kingdom_current_population}
                                     unit_cost_reduction={this.props.cost_reduction.kingdom_unit_cost_reduction}
                                     character_id={this.props.character_id}

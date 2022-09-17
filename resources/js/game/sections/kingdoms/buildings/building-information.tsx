@@ -109,7 +109,7 @@ export default class BuildingInformation extends React.Component<BuildingInforma
         }
 
         if (is_iron) {
-            return formatNumber((cost - cost * this.props.kingdom_iron_cost_reduction).toFixed(0));
+            return formatNumber((cost - cost * (this.props.kingdom_building_cost_reduction + this.props.kingdom_iron_cost_reduction)).toFixed(0));
         }
 
         if (is_population) {

@@ -71,24 +71,36 @@ export default class RecruitWithGold extends React.Component<any, any> {
 
         if (value === 0) {
             return this.setState({
-                amount_to_recruit: ''
+                amount_to_recruit: '',
+                time_needed: 0,
+                paying_with_gold: 0,
+                cost_in_gold: 0,
             });
         }
 
-        const amount = this.getAmountToRecruit(value);
+        let amount = this.getAmountToRecruit(value);
 
         if (amount === 0) {
-            return;
+            return this.setState({
+                amount_to_recruit: '',
+                time_needed: 0,
+                paying_with_gold: 0,
+                cost_in_gold: 0,
+            });
         }
 
-        const goldCost = this.props.unit.cost_per_unit * amount;
         const timeNeeded = this.props.unit.time_to_recruit * amount;
 
         this.setState({
-            amount_to_recruit: amount,
-            cost_in_gold: (goldCost - goldCost * this.props.unit_cost_reduction),
+            amount_to_recruit: amount - amount * this.props.unit_cost_reduction,
             time_needed: (timeNeeded - timeNeeded * this.props.kingdom_building_time_reduction),
             paying_with_gold: true,
+        }, () => {
+            amount = amount - amount * this.props.unit_cost_reduction;
+
+            this.setState({
+                cost_in_gold: this.props.unit.cost_per_unit * amount,
+            });
         })
     }
 
@@ -108,8 +120,14 @@ export default class RecruitWithGold extends React.Component<any, any> {
         return numberToRecruit;
     }
 
-    getAmount() {
-        return parseInt(this.state.amount_to_recruit) || 1;
+    getPopulationCost() {
+        const amount = parseInt(this.state.amount_to_recruit, 10) || 0;
+
+        if (this.state.amount_to_recruit > 0 && amount === 0) {
+            return 1;
+        }
+
+        return amount;
     }
 
     render() {
@@ -132,7 +150,7 @@ export default class RecruitWithGold extends React.Component<any, any> {
                 <div className='flex items-center mb-5'>
                     <label className='w-[50px] mr-4'>Amount</label>
                     <div className='w-2/3'>
-                        <input type='text' value={this.state.amount_to_recruit} onChange={this.setGoldAmount.bind(this)} className='form-control' disabled={this.state.loading} />
+                        <input type='text' onChange={this.setGoldAmount.bind(this)} className='form-control' disabled={this.state.loading} />
                     </div>
                 </div>
                 <dl className='mt-4 mb-4'>
@@ -140,6 +158,8 @@ export default class RecruitWithGold extends React.Component<any, any> {
                     <dd>{formatNumber(this.props.character_gold)}</dd>
                     <dt>Gold Cost</dt>
                     <dd>{formatNumber(this.state.cost_in_gold)}</dd>
+                    <dt>Population Cost</dt>
+                    <dd>{formatNumber(this.getPopulationCost())}</dd>
                     <dt>
                         Time Needed (Seconds)
                     </dt>

@@ -415,7 +415,7 @@ export default class QueenOfHearts extends React.Component<any, any> {
     }
 
     reRoll() {
-        console.log(this.state.reroll_options);
+
         this.setState({
             preforming_action: true,
         }, () => {
