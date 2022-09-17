@@ -105,11 +105,13 @@ export default class RecruitWithGold extends React.Component<any, any> {
     }
 
     getAmountToRecruit(numberToRecruit: number) {
+
         if (numberToRecruit === 0) {
             return 0;
         }
 
         numberToRecruit = Math.abs(numberToRecruit);
+        numberToRecruit = numberToRecruit * this.props.unit.required_population;
 
         const currentMax = this.props.unit.max_amount;
 

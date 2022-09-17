@@ -14,6 +14,7 @@ import Ajax from "../../../lib/ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
+import {parseInt} from "lodash";
 
 export default class BuildingInformation extends React.Component<BuildingInformationProps, any> {
 
@@ -170,6 +171,21 @@ export default class BuildingInformation extends React.Component<BuildingInforma
         }
     }
 
+    getRebuildTime() {
+        let rebuildTime = this.buildingTimeCalculation.calculateRebuildTime(
+            this.props.building,
+            this.props.kingdom_building_time_reduction
+        )
+
+        if (rebuildTime > 60) {
+            rebuildTime = rebuildTime / 60;
+
+            return rebuildTime.toFixed(0) + ' Hours';
+        }
+
+        return rebuildTime.toFixed(0) + ' Minutes';
+    }
+
     renderCosts() {
 
         return (
@@ -190,11 +206,8 @@ export default class BuildingInformation extends React.Component<BuildingInforma
                         this.state.upgrade_section !== 'repair-building' ?
                             formatNumber(this.buildingTimeCalculation.calculateViewTime(this.props.building, this.state.to_level, this.props.kingdom_building_time_reduction).toFixed(2))
                         :
-                            this.buildingTimeCalculation.isHours(this.props.building.rebuild_time) ?
-                                formatNumber(this.buildingTimeCalculation.convertToHours(this.props.building.rebuild_time))
-                            :
-                                formatNumber(this.props.building.rebuild_time)
-                    } { this.buildingTimeCalculation.isHours(this.props.building.rebuild_time) ? 'Hours' : 'Minutes' }
+                            this.getRebuildTime()
+                    }
                 </dd>
             </dl>
         );

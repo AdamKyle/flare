@@ -32,6 +32,16 @@ export default class BuildingTimeCalculation {
     }
 
     /**
+     * Calculate the rebuild time needed.
+     *
+     * @param building
+     * @param timeReduction
+     */
+    calculateRebuildTime(building: BuildingDetails, timeReduction: number) {
+        return (building.rebuild_time - building.rebuild_time * timeReduction);
+    }
+
+    /**
      * Calculates the time needed for multiple levels.
      *
      * @param building

@@ -79,7 +79,15 @@ class KingdomBuildingService {
      * @param Character $character
      */
     public function rebuildKingdomBuilding(KingdomBuilding $building, Character $character) {
-        $timeToComplete = now()->addMinutes($building->rebuild_time);
+
+        $timeReduction    = $building->kingdom->fetchKingBasedSkillValue('building_time_reduction');
+        $minutesToRebuild = $building->rebuild_time;
+
+        $minutesToRebuild = $minutesToRebuild - ($minutesToRebuild * $timeReduction);
+
+        dump($minutesToRebuild);
+
+        $timeToComplete = now()->addMinutes($minutesToRebuild);
 
         $queue = BuildingInQueue::create([
             'character_id' => $character->id,
@@ -364,12 +372,18 @@ class KingdomBuildingService {
      */
     protected function updateKingdomAfterCancellation(Kingdom $kingdom, KingdomBuilding $building): Kingdom {
 
+        $newWood  = $kingdom->current_wood + ($building->wood_cost * $this->totalResources);
+        $newClay  = $kingdom->current_clay + ($building->clay_cost * $this->totalResources);
+        $newStone = $kingdom->current_stone + ($building->stone_cost * $this->totalResources);
+        $newIron  = $kingdom->current_iron + ($building->iron_cost * $this->totalResources);
+        $newPop   = $kingdom->current_population + ($building->required_population * $this->totalResources);
+
         $kingdom->update([
-            'current_wood'       => $kingdom->current_wood + ($building->wood_cost * $this->totalResources),
-            'current_clay'       => $kingdom->current_clay + ($building->clay_cost * $this->totalResources),
-            'current_stone'      => $kingdom->current_stone + ($building->stone_cost * $this->totalResources),
-            'current_iron'       => $kingdom->current_iron + ($building->iron_cost * $this->totalResources),
-            'current_population' => $kingdom->current_population + ($building->required_population * $this->totalResources)
+            'current_wood'       => $newWood > $kingdom->max_wood ? $kingdom->max_wood : $newWood,
+            'current_clay'       => $newClay > $kingdom->max_clay ? $kingdom->max_clay : $newClay,
+            'current_stone'      => $newStone > $kingdom->max_stone ? $kingdom->max_stone : $newStone,
+            'current_iron'       => $newIron > $kingdom->max_iron ? $kingdom->max_iron : $newIron,
+            'current_population' => $newPop > $kingdom->max_population ? $kingdom->max_population : $newPop
         ]);
 
         return $kingdom->refresh();

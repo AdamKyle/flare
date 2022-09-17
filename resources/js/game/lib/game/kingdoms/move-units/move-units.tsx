@@ -48,6 +48,8 @@ export default class MoveUnits {
         } else {
             if (amount === 0) {
                 unitsToCall.splice(index, 1);
+
+                return unitsToCall;
             }
 
             unitsToCall[index].amount = amount > unitAmount ? unitAmount : amount;

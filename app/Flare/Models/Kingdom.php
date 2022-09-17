@@ -4,6 +4,7 @@ namespace App\Flare\Models;
 
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
+use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Flare\Models\Traits\WithSearch;
@@ -111,6 +112,12 @@ class Kingdom extends Model implements Auditable
 
     public function fetchPopulationCostReduction(): float {
         return $this->getPercentageForPassive(PassiveSkillTypeValue::POPULATION_COST_REDUCTION);
+    }
+
+    public function fetchKingBasedSkillValue(string $attribute): float {
+        return $this->character->skills->filter(function($skill) {
+           return $skill->skill_type === SkillTypeValue::EFFECTS_KINGDOM;
+        })->first()->{$attribute};
     }
 
     public function fetchKingdomDefenceBonus(): float {
