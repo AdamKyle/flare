@@ -28,14 +28,6 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
         }
     }
 
-    calculateTotalDefence(): number {
-        const kingdom = this.props.kingdom;
-
-        return kingdom.walls_defence + kingdom.treasury_defence +
-               kingdom.gold_bars_defence + kingdom.passive_defence +
-               kingdom.defence_bonus;
-    }
-
     showChangeName() {
         this.setState({
             show_change_name_modal: !this.state.show_change_name_modal
@@ -149,10 +141,8 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
                             <dd>{(this.props.kingdom.gold_bars_defence * 100).toFixed(2)}%</dd>
                             <dt>Passive Defence</dt>
                             <dd>{(this.props.kingdom.passive_defence * 100).toFixed(2)}%</dd>
-                            <dt>Defence Bonus</dt>
+                            <dt>Total Defence Bonus</dt>
                             <dd>{(this.props.kingdom.defence_bonus * 100).toFixed(2)}%</dd>
-                            <dt>Total Defence</dt>
-                            <dd>{(this.calculateTotalDefence() * 100).toFixed(2)}%</dd>
                         </dl>
                     </div>
                     <div className='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>

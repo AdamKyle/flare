@@ -77,11 +77,23 @@ class KingdomUnitHandler extends BaseDefenderHandler {
             return;
         }
 
-        $defenderDamage = $attack / $defence;
+        if ($attack > $defence) {
+            $defenderDamage = $defence / $attack;
+        } else {
+            $defenderDamage = $attack / $defence;
+        }
+
+        if ($defenderDamage > 1) {
+            $defenderDamage = 1;
+        }
 
         $this->updateDefenderUnits($kingdom, $defenderDamage);
 
         $attackerDamage = $defence / $attack;
+
+        if ($attackerDamage > 1) {
+            $attackerDamage = 1;
+        }
 
         $this->updateAttackingUnits($attackerDamage, true);
     }

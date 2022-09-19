@@ -83,7 +83,7 @@ export default class KingdomLogDetails extends React.Component<any, any> {
                         <Fragment>
                             <dt>{oldUnit.name}</dt>
                             <dd className='text-red-600 dark:text-red-400'>
-                                {(((oldUnit.amount - foundNewUnit.amount) / oldUnit.amount) * 100).toFixed(0)}% Lost{this.props.log.is_mine ? ', Amount Left: ' + formatNumber(foundNewUnit.amount) : null}
+                                {(((oldUnit.amount - foundNewUnit.amount) / oldUnit.amount) * 100).toFixed(2)}% Lost{this.props.log.is_mine ? ', Amount Left: ' + formatNumber(foundNewUnit.amount) : null}
                             </dd>
                         </Fragment>
                     );
@@ -108,7 +108,7 @@ export default class KingdomLogDetails extends React.Component<any, any> {
                         <Fragment>
                             <dt>{sentUnit.name}</dt>
                             <dd>0%
-                                Lost{this.props.log.is_mine ? ', Amount Left: ' + formatNumber(foundNewUnit.amount) : null}</dd>
+                                Lost{!this.props.log.is_mine ? ', Amount Left: ' + formatNumber(foundNewUnit.amount) : null}</dd>
                         </Fragment>
                     );
                 } else if (foundNewUnit.amount === 0) {
@@ -116,7 +116,7 @@ export default class KingdomLogDetails extends React.Component<any, any> {
                         <Fragment>
                             <dt>{sentUnit.name}</dt>
                             <dd className='text-red-600 dark:text-red-400'>
-                                100% Lost{this.props.log.is_mine ? ', Amount Left: ' + formatNumber(foundNewUnit.amount) : null}
+                                100% Lost{!this.props.log.is_mine ? ', Amount Left: ' + formatNumber(foundNewUnit.amount) : null}
                             </dd>
                         </Fragment>
                     );

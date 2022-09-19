@@ -82,12 +82,7 @@ class UnitService {
             $amount              = $gameUnit->required_population * $amount;
             $populationReduction = $kingdom->fetchPopulationCostReduction();
 
-            dump('original amount: ' . $amount);
-            dump('populationReduction: ' . $populationReduction);
-
             $amount = ceil($amount - $amount * $populationReduction);
-
-            dump('New Amount Needed: ' . $amount);
 
             if ($amount > $kingdom->current_population) {
                 return $this->errorResult("You don't have enough population to purchase with gold alone.");

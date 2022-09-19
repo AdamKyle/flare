@@ -85,8 +85,6 @@ class KingdomBuildingService {
 
         $minutesToRebuild = $minutesToRebuild - ($minutesToRebuild * $timeReduction);
 
-        dump($minutesToRebuild);
-
         $timeToComplete = now()->addMinutes($minutesToRebuild);
 
         $queue = BuildingInQueue::create([

@@ -209,8 +209,14 @@ class KingdomSiegeHandler {
      * @return void
      */
     protected function damageBuildings(KingdomBuilding $building, array $siegeWeapons, int $damage) {
-        $damagePercentToBuilding = $damage / $building->current_defence;
-        $newDurability           = $building->current_durability;
+
+        if ($damage > $building->current_defence) {
+            $damagePercentToBuilding = $building->current_defence / $damage;
+        } else {
+            $damagePercentToBuilding = $damage / $building->current_defence;;
+        }
+
+        $newDurability = $building->current_durability;
 
         if ($damagePercentToBuilding > 1) {
             $damagePercentToBuilding = 1;
@@ -273,6 +279,10 @@ class KingdomSiegeHandler {
             }
 
             $damagePercentToUnit = $damage / $unitDefence;
+
+            if ($damagePercentToUnit > 1) {
+                $damagePercentToUnit = 1;
+            }
 
             $newAmount = $unit->amount - ($unit->amount * $damagePercentToUnit);
 
@@ -352,7 +362,7 @@ class KingdomSiegeHandler {
      */
     protected function updateSiegeWeapons(array $siegeWeapon, int $damage, int $buildingDefence) {
 
-        $damageToUnits = $buildingDefence / $damage;
+        $damageToUnits = $buildingDefence / $damage;;
 
         if ($damageToUnits > 1) {
             $damageToUnits = 1;

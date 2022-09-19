@@ -174,20 +174,14 @@ class UnitMovementService {
 
         foreach ($unitData as $unitData) {
             if (!isset($kingdomUnitsToMove[$unitData['kingdom_id']])) {
-
-                $amount = $this->fetchAmountToMove($kingdom, $unitData['kingdom_id'], $unitData['unit_id'], $unitData['amount']);
-
                 $kingdomUnitsToMove[$unitData['kingdom_id']][] = [
                     'unit_id' => $unitData['unit_id'],
-                    'amount'  => $amount
+                    'amount'  => $unitData['amount']
                 ];
             } else {
-
-                $amount = $this->fetchAmountToMove($kingdom, $unitData['kingdom_id'], $unitData['unit_id'], $unitData['amount']);
-
                 $kingdomUnitsToMove[$unitData['kingdom_id']][] = [
                     'unit_id' => $unitData['unit_id'],
-                    'amount'  => $amount
+                    'amount'  => $unitData['amount']
                 ];
             }
         }

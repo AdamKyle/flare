@@ -101,14 +101,18 @@ class AttackKingdomWithUnitsHandler {
     }
 
     public function attackKingdomWithUnits(Kingdom $kingdom, Kingdom $attackingKingdom, array $unitsAttacking): void {
-
         $this->currentMorale = $kingdom->current_morale;
 
         $this->setOldKingdomBuildings($kingdom);
         $this->setOldKingdomUnits($kingdom);
         $this->setOldAttackingUnits($attackingKingdom, $unitsAttacking);
 
+        $this->newAttackingUnits    = $this->oldAttackingUnits;
+        $this->newDefenderBuildings = $this->oldDefenderBuildings;
+        $this->newDefenderUnits     = $this->oldDefenderUnits;
+
         $this->siegeAttack($attackingKingdom, $kingdom);
+
         $this->unitsAttack($attackingKingdom, $kingdom);
 
         $this->returnSurvivingUnits($attackingKingdom, $kingdom);
@@ -122,19 +126,56 @@ class AttackKingdomWithUnitsHandler {
 
         $kingdomUnitHandler->attackUnits($kingdom, $attackingKingdom->id);
 
-        $this->newAttackingUnits    = [...$this->newAttackingUnits, ...$kingdomUnitHandler->getAttackingUnits()];
-        $this->newDefenderUnits     = [...$this->newDefenderUnits, ...$kingdomUnitHandler->getDefenderUnits()];
+        $this->mergeAttackerUnits($kingdomUnitHandler->getAttackingUnits());
+
+        $this->mergeDefenderUnits($kingdomUnitHandler->getDefenderUnits());
 
         $healingAmount = $this->getHealingAmount($this->newDefenderUnits);
 
         if ($healingAmount <= 0) {
-            $this->healUnits($this->newDefenderUnits, $this->oldDefenderUnits, $healingAmount);
+            $this->newDefenderUnits = $this->healUnits($this->newDefenderUnits, $this->oldDefenderUnits, $healingAmount);
         }
 
         $healingAmount = $this->getHealingAmount($this->newAttackingUnits);
 
         if ($healingAmount <= 0) {
-            $this->healUnits($this->newAttackingUnits, $this->oldAttackingUnits, $healingAmount);
+            $this->newAttackingUnits = $this->healUnits($this->newAttackingUnits, $this->oldAttackingUnits, $healingAmount);
+        }
+    }
+
+    protected function mergeAttackerUnits($newAttackingUnits): void {
+        foreach ($newAttackingUnits as $attackingUnit) {
+            $index = array_search($attackingUnit['unit_id'], array_column($this->newAttackingUnits, 'unit_id'));
+
+            if ($index !== false) {
+                $this->newAttackingUnits[$index] = $attackingUnit;
+            } else {
+                $this->newAttackingUnits[] = $attackingUnit;
+            }
+        }
+    }
+
+    protected function mergeDefenderUnits($defenderUnits): void {
+        foreach ($defenderUnits as $defenderUnit) {
+            $index = array_search($defenderUnit['unit_id'], array_column($this->newDefenderUnits, 'unit_id'));
+
+            if ($index !== false) {
+                $this->newDefenderUnits[$index] = $defenderUnit;
+            } else {
+                $this->newDefenderUnits[] = $defenderUnit;
+            }
+        }
+    }
+
+    protected function mergeDefenderBuildings($newBuildings): void {
+        foreach ($newBuildings as $building) {
+            $index = array_search($building['name'], array_column($this->newDefenderBuildings, 'name'));
+
+            if ($index !== false) {
+                $this->newDefenderBuildings[$index] = $building;
+            } else {
+                $this->newDefenderBuildings[] = $building;
+            }
         }
     }
 
@@ -157,6 +198,7 @@ class AttackKingdomWithUnitsHandler {
         $kingdomSiegeHandler = $this->kingdomSiegeHandler->setAttackingUnits($this->oldAttackingUnits);
 
         $damageReduction = $this->getTotalDamageReduction($kingdom);
+
         $kingdom         = $kingdomSiegeHandler->handleRams($attackingKingdom, $kingdom, $damageReduction);
         $kingdom         = $kingdomSiegeHandler->handleTrebuchets($attackingKingdom, $kingdom, $damageReduction);
         $kingdom         = $kingdomSiegeHandler->handleCannons($attackingKingdom, $kingdom, $damageReduction);
@@ -167,14 +209,14 @@ class AttackKingdomWithUnitsHandler {
             'current_morale' => $newMorale
         ]);
 
-        $this->newDefenderBuildings = [...$this->newDefenderBuildings, ...$kingdomSiegeHandler->getNewBuildings()];
-        $this->newAttackingUnits    = [...$this->newAttackingUnits, ...$kingdomSiegeHandler->getNewAttackingUnits()];
-        $this->newDefenderUnits     = [...$this->newDefenderUnits, ...$kingdomSiegeHandler->getNewUnits()];
+        $this->mergeAttackerUnits($kingdomSiegeHandler->getNewAttackingUnits());
+        $this->mergeDefenderBuildings($kingdomSiegeHandler->getNewBuildings());
+        $this->mergeDefenderUnits($kingdomSiegeHandler->getNewUnits());
 
         $healingAmount = $this->getHealingAmount($this->newDefenderUnits);
 
         if ($healingAmount <= 0) {
-            $this->healUnits($this->newDefenderUnits, $this->oldDefenderUnits, $healingAmount);
+            $this->newDefenderUnits = $this->healUnits($this->newDefenderUnits, $this->oldDefenderUnits, $healingAmount);
         }
     }
 

@@ -44,6 +44,7 @@ class BaseDefenderHandler {
      * @return void
      */
     protected function updateAttackingUnits(float $attack, bool $ignoreSiegeWeapons = false): void {
+
         foreach ($this->attackingUnits as $index => $unitData) {
 
             if ($ignoreSiegeWeapons) {
