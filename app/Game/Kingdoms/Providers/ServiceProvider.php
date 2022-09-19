@@ -3,10 +3,12 @@
 namespace App\Game\Kingdoms\Providers;
 
 
+use App\Game\Kingdoms\Handlers\AttackLogHandler;
 use App\Game\Kingdoms\Handlers\DefenderArcherHandler;
 use App\Game\Kingdoms\Handlers\DefenderSiegeHandler;
 use App\Game\Kingdoms\Handlers\KingdomSiegeHandler;
 use App\Game\Kingdoms\Handlers\KingdomUnitHandler;
+use App\Game\Kingdoms\Handlers\ReturnSurvivingUnitHandler;
 use League\Fractal\Manager;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
@@ -182,13 +184,22 @@ class ServiceProvider extends ApplicationServiceProvider {
             );
         });
 
+        $this->app->bind(AttackLogHandler::class, function($app) {
+            return new AttackLogHandler(
+                $app->make(UpdateKingdom::class)
+            );
+        });
+
+        $this->app->bind(ReturnSurvivingUnitHandler::class, function($app) {
+            return new ReturnSurvivingUnitHandler($app->make(UnitMovementService::class));
+        });
+
         $this->app->bind(AttackKingdomWithUnitsHandler::class, function($app) {
             return new AttackKingdomWithUnitsHandler(
-                $app->make(DistanceCalculation::class),
-                $app->make(UnitMovementService::class),
-                $app->make(UpdateKingdom::class),
                 $app->make(KingdomSiegeHandler::class),
                 $app->make(KingdomUnitHandler::class),
+                $app->make(AttackLogHandler::class),
+                $app->make(ReturnSurvivingUnitHandler::class),
             );
         });
 
