@@ -175,7 +175,7 @@ export default class ComparisonSection extends React.Component<ComparisonSection
                 <ItemComparisonSection comparison_details={this.props.comparison_details} />
                 <div className='border-b-2 mt-6 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                 <div className={clsx(
-                    'mt-6 grid grid-cols-1 w-full gap-2 md:m-auto max-h-[150px] overflow-x-scroll',
+                    'mt-6 grid grid-cols-1 w-full gap-2 md:m-auto max-h-[150px] overflow-x-auto',
                     {
                         'md:w-3/4': this.props.is_large_modal,
                         'md:grid-cols-7': this.props.is_grid_size(7, this.props.comparison_details.itemToEquip),

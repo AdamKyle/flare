@@ -5,7 +5,7 @@
     <div class="{{
         $itemAffix->damage !== 0 || $itemAffix->reduces_enemy_stats ||
         !is_null($itemAffix->steal_life_amount) || $itemAffix->entranced_chance > 0 ||
-        $itemAffix->devouring_light > 0 || $itemAffix->resistance_reduction > 0 ? 'grid md:grid-cols-2 gap-2 max-h-[350px] overflow-y-scroll' : ' max-h-[350px] overflow-y-scroll'
+        $itemAffix->devouring_light > 0 || $itemAffix->resistance_reduction > 0 ? 'grid md:grid-cols-2 gap-2 max-h-[350px] overflow-y-auto' : ' max-h-[350px] overflow-y-auto'
     }}">
         <div>
             <div class='grid md:grid-cols-2 gap-2'>

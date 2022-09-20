@@ -309,13 +309,13 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                                                     <div className='border-b-2 block border-b-gray-300 dark:border-b-gray-600 my-3 md:hidden'></div>
                                                     <strong>Npc Access Requirements</strong>
                                                     <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                                                    <dl className={'md:ml-8 max-h-[250px] overflow-y-scroll'}>{npcPLaneAccess}</dl>
+                                                    <dl className={'md:ml-8 max-h-[250px] overflow-y-auto'}>{npcPLaneAccess}</dl>
                                                 </div>
                                             : null
                                         }
 
                                     </div>
-                                    <div className='my-4 max-h-[160px] overflow-x-scroll border border-slate-200 dark:border-slate-700 rounded-md bg-slate-200 dark:bg-slate-700 p-4'>
+                                    <div className='my-4 max-h-[160px] overflow-x-auto border border-slate-200 dark:border-slate-700 rounded-md bg-slate-200 dark:bg-slate-700 p-4'>
                                         {
                                             this.props.is_quest_complete ?
                                                 <div dangerouslySetInnerHTML={{__html: this.getText(this.state.quest_details.after_completion_description)}}></div>

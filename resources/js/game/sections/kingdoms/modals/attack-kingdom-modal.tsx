@@ -184,13 +184,13 @@ export default class AttackKingdomModal extends React.Component<any, AttackKingd
         if (this.props.kingdom_defence > 1) {
             const defence = this.props.kingdom_defence - 1;
 
-            reduction = defence / 0.05;
+            reduction = defence / 5;
 
             if (reduction < 0.05) {
                 reduction = 0.05;
             }
 
-            damage -= damage * 0.05;
+            damage -= reduction;
         }
 
         this.setState({
@@ -318,7 +318,7 @@ export default class AttackKingdomModal extends React.Component<any, AttackKingd
                                                         </div>
                                                     </div>
                                                 </dd>
-                                                <dt>Total Reduction</dt>
+                                                <dt className='text-red-600 dark:text-red-400'>Defending Kingdom Reduction</dt>
                                                 <dd>
                                                     <div className='flex items-center mb-4'>
                                                         {(this.state.total_reduction * 100).toFixed(2)} %

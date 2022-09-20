@@ -85,14 +85,14 @@
                 </div>
                 <div class='block md:hidden border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                 <div>
-                    <div class="border-1 rounded-sm p-2 bg-slate-300 dark:bg-slate-700 max-h-[250px] overflow-x-scroll mb-4">
+                    <div class="border-1 rounded-sm p-2 bg-slate-300 dark:bg-slate-700 max-h-[250px] overflow-x-auto mb-4">
                         <h3 class="mb-4">Intro Text</h3>
                         <div>
                             {!! nl2br($guideQuest->intro_text) !!}
                         </div>
                     </div>
 
-                    <div class="border-1 rounded-sm p-2 bg-slate-300 dark:bg-slate-700 max-h-[250px] overflow-x-scroll">
+                    <div class="border-1 rounded-sm p-2 bg-slate-300 dark:bg-slate-700 max-h-[250px] overflow-x-auto">
                         <h3 class="mb-4">Instructions</h3>
                         <div class="guide-quest-instructions">
                             {!! $guideQuest->instructions !!}

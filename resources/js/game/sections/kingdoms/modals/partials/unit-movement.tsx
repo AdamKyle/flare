@@ -60,7 +60,7 @@ export default class UnitMovement extends React.Component<UnitMovementProps, Uni
 
                             {
                                 this.state.selected_kingdoms.length > 0 ?
-                                    <div className='my-4 max-h-[350px] overflow-y-scroll'>
+                                    <div className='my-4 max-h-[350px] overflow-y-auto'>
                                         {this.moveUnits.getUnitOptions(
                                             this.props.kingdoms,
                                             this.state.selected_units,

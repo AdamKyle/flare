@@ -40,7 +40,7 @@ export default class AdditionalInfoModal extends React.Component<AdditionalInfoM
             >
                 <Tabs tabs={this.tabs} full_width={true}>
                     <TabPanel key={'stats'}>
-                        <div className='grid lg:grid-cols-2 gap-2 overflow-x-scroll h-[150px] lg:h-[175px]'>
+                        <div className='grid lg:grid-cols-2 gap-2 overflow-x-auto h-[150px] lg:h-[175px]'>
                             <div>
                                 <dl>
                                     <dt>Raw Str</dt>

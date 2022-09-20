@@ -164,7 +164,7 @@ export default class KingdomsList extends React.Component<KingdomListProps, King
                             log={this.state.selected_log}
                         />
                     :
-                        <BasicCard additionalClasses={'overflow-x-scroll'}>
+                        <BasicCard additionalClasses={'overflow-x-auto'}>
                             <Tabs tabs={this.tabs} icon_key={'has_logs'}>
                                 <TabPanel key={'kingdoms'}>
                                     <Table data={this.props.my_kingdoms}

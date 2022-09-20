@@ -37,7 +37,7 @@ export default class ItemHolyDetails extends React.Component<any, any> {
                       handle_close={this.props.manage_modal}
                       title='Holy Break Down'
             >
-                <div className='max-h-[350px] overflow-y-scroll'>
+                <div className='max-h-[350px] overflow-y-auto'>
                     {this.renderStacks()}
                 </div>
             </Dialogue>

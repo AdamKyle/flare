@@ -19,7 +19,7 @@ export default class HelpDialogue extends React.Component<any, any> {
                       handle_close={this.props.manage_modal}
                       title={this.props.title}
             >
-                <div className={clsx({'max-h-[425px] overflow-x-scroll' : typeof this.props.no_scrolling === 'undefined'})}>
+                <div className={clsx({'max-h-[425px] overflow-x-auto' : typeof this.props.no_scrolling === 'undefined'})}>
                     {this.props.children}
                 </div>
             </Dialogue>

@@ -135,12 +135,12 @@ export default class GuideQuest extends React.Component<any, any> {
 
                             <Tabs tabs={this.tabs}>
                                 <TabPanel key={'story'}>
-                                    <div className={'border-1 rounded-sm p-3 bg-slate-300 dark:bg-slate-700 max-h-[250px] overflow-x-scroll mb-4'}>
+                                    <div className={'border-1 rounded-sm p-3 bg-slate-300 dark:bg-slate-700 max-h-[250px] overflow-x-auto mb-4'}>
                                         <div dangerouslySetInnerHTML={{__html: this.state.quest_data.intro_text }} />
                                     </div>
                                 </TabPanel>
                                 <TabPanel key={'instructions'}>
-                                    <div className={'border-1 rounded-sm p-3 bg-slate-300 dark:bg-slate-700 max-h-[250px] overflow-x-scroll mb-4 guide-quest-instructions'}>
+                                    <div className={'border-1 rounded-sm p-3 bg-slate-300 dark:bg-slate-700 max-h-[250px] overflow-x-auto mb-4 guide-quest-instructions'}>
                                         <div dangerouslySetInnerHTML={{__html: this.state.quest_data.instructions }} />
                                     </div>
                                 </TabPanel>

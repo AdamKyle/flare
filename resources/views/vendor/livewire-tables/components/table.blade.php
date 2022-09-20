@@ -14,7 +14,7 @@
 @if ($theme === 'tailwind')
     <div {{
         $attributes->merge($customAttributes['wrapper'])
-            ->class(['shadow overflow-y-scroll border-b border-gray-200 dark:border-gray-700 sm:rounded-lg' => $customAttributes['wrapper']['default'] ?? true])
+            ->class(['shadow overflow-y-auto border-b border-gray-200 dark:border-gray-700 sm:rounded-lg' => $customAttributes['wrapper']['default'] ?? true])
             ->except('default')
     }}>
         <table {{
@@ -53,7 +53,7 @@
         </table>
     </div>
 @elseif ($theme === 'bootstrap-4' || $theme === 'bootstrap-5')
-    <div {{ 
+    <div {{
         $attributes->merge($customAttributes['wrapper'])
             ->class(['table-responsive' => $customAttributes['wrapper']['default'] ?? true])
             ->except('default')
