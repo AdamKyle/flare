@@ -677,7 +677,7 @@ Menu Bar
   Menu Detail
   */
   .menu-detail {
-    @apply absolute z-10 top-0 bottom-0 p-10 bg-white overflow-y-scroll;
+    @apply absolute z-10 top-0 bottom-0 p-10 bg-white overflow-y-auto;
     left: -220px;
     width: 220px;
     @apply transition-all duration-200 ease-linear;
@@ -791,7 +791,7 @@ Menu Bar
         @apply static pt-0 pr-7 pb-0 pl-16 w-full;
 
         .menu-detail-wrapper {
-          @apply pt-3 pb-0 overflow-y-scroll;
+          @apply pt-3 pb-0 overflow-y-auto;
         }
 
         &.open {
@@ -905,7 +905,7 @@ Menu Bar
   }
 }
 
-/* 
+/*
 Workspace
 */
 .workspace {
@@ -921,7 +921,7 @@ Workspace
   }
 }
 
-/* 
+/*
  Footer
 */
 .dark .footer {
@@ -2183,7 +2183,7 @@ Modal
         }
 
         .modal-body {
-          @apply overflow-y-scroll;
+          @apply overflow-y-auto;
         }
 
         .modal-footer {
