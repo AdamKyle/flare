@@ -32,7 +32,7 @@ class KingdomBuilder {
             'current_population'      => 100,
             'max_population'          => 100,
             'current_morale'          => .50,
-            'max_morale'              => .50,
+            'max_morale'              => 1.0,
             'treasury'                => 0,
             'x_position'              => $character->map->character_position_x,
             'y_position'              => $character->map->character_position_y,

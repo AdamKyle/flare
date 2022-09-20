@@ -148,8 +148,8 @@ class AttackLogHandler {
      * @param Kingdom $defenderKingdom
      * @return void
      */
-    public function createLogForAttacker(Kingdom $attackingKingdom, Kingdom $defenderKingdom): void {
-        $logDetails = $this->createBaseAttributes($attackingKingdom, $defenderKingdom);
+    public function createLogForAttacker(Kingdom $attackingKingdom, Kingdom $defenderKingdom, bool $tookKingdom = false): void {
+        $logDetails = $this->createBaseAttributes($attackingKingdom, $defenderKingdom, $tookKingdom);
 
         $logDetails['character_id']           = $attackingKingdom->character_id;
         $logDetails['attacking_character_id'] = $attackingKingdom->character_id;
@@ -203,14 +203,14 @@ class AttackLogHandler {
      * @param Kingdom $defenderKingdom
      * @return array
      */
-    protected function createBaseAttributes(Kingdom $attackingKingdom, Kingdom $defenderKingdom): array {
+    protected function createBaseAttributes(Kingdom $attackingKingdom, Kingdom $defenderKingdom, bool $tookKingdom = false): array {
 
         $newMorale = $this->currentMorale - $defenderKingdom->current_morale;
 
         return [
             'to_kingdom_id'   => $defenderKingdom->id,
             'from_kingdom_id' => $attackingKingdom->id,
-            'status'          => KingdomLogStatusValue::ATTACKED,
+            'status'          => $tookKingdom ? KingdomLogStatusValue::TAKEN : KingdomLogStatusValue::ATTACKED,
             'old_buildings'   => $this->oldDefenderBuildings,
             'new_buildings'   => $this->newDefenderBuildings,
             'old_units'       => $this->oldDefenderUnits,

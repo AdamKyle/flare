@@ -6,7 +6,11 @@ namespace App\Game\Kingdoms\Handlers;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomUnit;
+use App\Flare\Values\UserOnlineValue;
 use App\Game\Kingdoms\Traits\CalculateMorale;
+use App\Game\Messages\Events\GlobalMessageEvent;
+use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Messages\Services\ServerMessage;
 
 class AttackKingdomWithUnitsHandler {
 
@@ -21,6 +25,11 @@ class AttackKingdomWithUnitsHandler {
      * @var KingdomUnitHandler $kingdomUnitHandler
      */
     private KingdomUnitHandler $kingdomUnitHandler;
+
+    /**
+     * @var SettlerHandler $settlerHandler
+     */
+    private SettlerHandler $settlerHandler;
 
     /**
      * @var AttackLogHandler $attackLogHandler
@@ -70,14 +79,19 @@ class AttackKingdomWithUnitsHandler {
     /**
      * @param KingdomSiegeHandler $kingdomSiegeHandler
      * @param KingdomUnitHandler $kingdomUnitHandler
+     * @param SettlerHandler $settlerHandler
+     * @param AttackLogHandler $attackLogHandler
+     * @param ReturnSurvivingUnitHandler $returnSurvivingUnitHandler
      */
     public function __construct(KingdomSiegeHandler $kingdomSiegeHandler,
                                 KingdomUnitHandler $kingdomUnitHandler,
+                                SettlerHandler $settlerHandler,
                                 AttackLogHandler $attackLogHandler,
                                 ReturnSurvivingUnitHandler $returnSurvivingUnitHandler,
     ) {
         $this->kingdomSiegeHandler        = $kingdomSiegeHandler;
         $this->kingdomUnitHandler         = $kingdomUnitHandler;
+        $this->settlerHandler             = $settlerHandler;
         $this->attackLogHandler           = $attackLogHandler;
         $this->returnSurvivingUnitHandler = $returnSurvivingUnitHandler;
     }
@@ -104,8 +118,11 @@ class AttackKingdomWithUnitsHandler {
         $this->siegeAttack($attackingKingdom, $kingdom);
         $this->unitsAttack($attackingKingdom, $kingdom);
 
-        $this->returnSurvivingUnitHandler->setNewAttackingUnits($this->newAttackingUnits)
-                                         ->returnSurvivingUnits($attackingKingdom, $kingdom);
+        $originalOwner = $kingdom->character;
+
+        $tookKingdom = $this->takeKingdom($attackingKingdom, $kingdom);
+
+        $kingdom = $kingdom->refresh();
 
         $attackLogHandler = $this->attackLogHandler->setCurrentMorale($this->currentMorale)
                                                    ->setOldAttackingUnits($this->oldAttackingUnits)
@@ -115,37 +132,34 @@ class AttackKingdomWithUnitsHandler {
                                                    ->setOldDefenderBuildings($this->oldDefenderBuildings)
                                                    ->setNewDefenderBuildings($this->newDefenderBuildings);
 
+        if ($tookKingdom) {
+            $attackLogHandler->createLogForAttacker($attackingKingdom, $kingdom);
+
+            $kingdomName   = $kingdom->name;
+            $mapName       = $kingdom->gameMap->name;
+            $x             = $kingdom->x_position;
+            $y             = $kingdom->y_position;
+            $characterName = $attackingKingdom->name;
+
+            event(new GlobalMessageEvent($characterName . ' has taken the kingdom: ' . $kingdomName .
+            ' on the plane: ' . $mapName . ' at (X/Y): ' . $x . '/' . $y . ' and is now the rightful ruler!'));
+
+            if (UserOnlineValue::isOnline($originalOwner->user)) {
+                event(new ServerMessageEvent($originalOwner->user, 'You lost your kingdom: ' . $kingdomName .
+                    ' on plane: ' . $mapName . ' at (X/Y): ' . $x . '/' . $y . ' to: ' . $characterName . ' who now the rightful owner'));
+            }
+
+            return;
+        }
+
+
+        $this->returnSurvivingUnitHandler->setNewAttackingUnits($this->newAttackingUnits)
+                                         ->returnSurvivingUnits($attackingKingdom, $kingdom);
+
+
+
         $attackLogHandler->createLogForAttacker($attackingKingdom, $kingdom);
         $attackLogHandler->createLogForDefender($attackingKingdom, $kingdom);
-    }
-
-    /**
-     * Attack the kingdom with units.
-     *
-     * @param Kingdom $attackingKingdom
-     * @param Kingdom $kingdom
-     * @return void
-     */
-    protected function unitsAttack(Kingdom $attackingKingdom, Kingdom $kingdom): void {
-        $kingdomUnitHandler = $this->kingdomUnitHandler->setAttackingUnits($this->newAttackingUnits);
-
-        $kingdomUnitHandler->attackUnits($kingdom, $attackingKingdom->id);
-
-        $this->mergeAttackerUnits($kingdomUnitHandler->getAttackingUnits());
-
-        $this->mergeDefenderUnits($kingdomUnitHandler->getDefenderUnits());
-
-        $healingAmount = $this->getHealingAmount($this->newDefenderUnits);
-
-        if ($healingAmount <= 0) {
-            $this->newDefenderUnits = $this->healUnits($this->newDefenderUnits, $this->oldDefenderUnits, $healingAmount);
-        }
-
-        $healingAmount = $this->getHealingAmount($this->newAttackingUnits);
-
-        if ($healingAmount <= 0) {
-            $this->newAttackingUnits = $this->healUnits($this->newAttackingUnits, $this->oldAttackingUnits, $healingAmount);
-        }
     }
 
     /**
@@ -187,6 +201,61 @@ class AttackKingdomWithUnitsHandler {
         if ($healingAmount <= 0) {
             $this->newDefenderUnits = $this->healUnits($this->newDefenderUnits, $this->oldDefenderUnits, $healingAmount);
         }
+    }
+
+    /**
+     * Attack the kingdom with units.
+     *
+     * @param Kingdom $attackingKingdom
+     * @param Kingdom $kingdom
+     * @return void
+     */
+    protected function unitsAttack(Kingdom $attackingKingdom, Kingdom $kingdom): void {
+        $kingdomUnitHandler = $this->kingdomUnitHandler->setAttackingUnits($this->newAttackingUnits);
+
+        $kingdomUnitHandler->attackUnits($kingdom, $attackingKingdom->id);
+
+        $this->mergeAttackerUnits($kingdomUnitHandler->getAttackingUnits());
+
+        $this->mergeDefenderUnits($kingdomUnitHandler->getDefenderUnits());
+
+        $healingAmount = $this->getHealingAmount($this->newDefenderUnits);
+
+        if ($healingAmount <= 0) {
+            $this->newDefenderUnits = $this->healUnits($this->newDefenderUnits, $this->oldDefenderUnits, $healingAmount);
+        }
+
+        $healingAmount = $this->getHealingAmount($this->newAttackingUnits);
+
+        if ($healingAmount <= 0) {
+            $this->newAttackingUnits = $this->healUnits($this->newAttackingUnits, $this->oldAttackingUnits, $healingAmount);
+        }
+    }
+
+    /**
+     * Attempt to take the kingdom.
+     *
+     * Returns a boolean based on if we took the kingdom or not.
+     * Existing units are automatically transitioned to said kingdom.
+     *
+     * @param Kingdom $attackingKingdom
+     * @param Kingdom $defendingKingdom
+     * @return bool
+     */
+    protected function takeKingdom(Kingdom $attackingKingdom, Kingdom $defendingKingdom) {
+        $defendingKingdom = $this->settlerHandler->attemptToSettleKingdom($attackingKingdom, $defendingKingdom, $this->newAttackingUnits);
+
+        if ($defendingKingdom->character_id === $attackingKingdom->character_id) {
+            return true;
+        }
+
+        $newUnits = $this->settlerHandler->getNewAttackingUnits();
+
+        if (!empty($newUnits)) {
+            $this->mergeAttackerUnits($this->settlerHandler->getNewAttackingUnits());
+        }
+
+        return false;
     }
 
     /**

@@ -9,6 +9,7 @@ use App\Game\Kingdoms\Handlers\DefenderSiegeHandler;
 use App\Game\Kingdoms\Handlers\KingdomSiegeHandler;
 use App\Game\Kingdoms\Handlers\KingdomUnitHandler;
 use App\Game\Kingdoms\Handlers\ReturnSurvivingUnitHandler;
+use App\Game\Kingdoms\Handlers\SettlerHandler;
 use League\Fractal\Manager;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
@@ -194,10 +195,15 @@ class ServiceProvider extends ApplicationServiceProvider {
             return new ReturnSurvivingUnitHandler($app->make(UnitMovementService::class));
         });
 
+        $this->app->bind(SettlerHandler::class, function() {
+            return new SettlerHandler();
+        });
+
         $this->app->bind(AttackKingdomWithUnitsHandler::class, function($app) {
             return new AttackKingdomWithUnitsHandler(
                 $app->make(KingdomSiegeHandler::class),
                 $app->make(KingdomUnitHandler::class),
+                $app->make(SettlerHandler::class),
                 $app->make(AttackLogHandler::class),
                 $app->make(ReturnSurvivingUnitHandler::class),
             );

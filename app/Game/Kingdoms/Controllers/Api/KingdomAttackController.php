@@ -4,6 +4,7 @@ namespace App\Game\Kingdoms\Controllers\Api;
 
 use App\Flare\Models\Kingdom;
 use App\Game\Kingdoms\Requests\UseItemsRequest;
+use App\Game\Kingdoms\Service\AttackWithItemsService;
 use App\Game\Kingdoms\Service\UseItemsService;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
@@ -16,12 +17,23 @@ class KingdomAttackController extends Controller {
     /**
      * @var KingdomAttackService $kingdomAttackService
      */
-    private $kingdomAttackService;
+    private KingdomAttackService $kingdomAttackService;
 
-    public function __construct(KingdomAttackService $kingdomAttackService) {
+    /**
+     * @var AttackWithItemsService $attackWithItemsService
+     */
+    private AttackWithItemsService $attackWithItemsService;
+
+    /**
+     * @param KingdomAttackService $kingdomAttackService
+     * @param AttackWithItemsService $attackWithItemsService
+     */
+    public function __construct(KingdomAttackService $kingdomAttackService, AttackWithItemsService $attackWithItemsService) {
         $this->middleware('is.character.dead');
 
-        $this->kingdomAttackService = $kingdomAttackService;
+        $this->kingdomAttackService   = $kingdomAttackService;
+        $this->attackWithItemsService = $attackWithItemsService;
+
     }
 
     public function fetchKingdomsWithUnits(Character $character) {
@@ -69,9 +81,9 @@ class KingdomAttackController extends Controller {
         return response()->json($response, $status);
     }
 
-    public function useItems(UseItemsRequest $request, Character $character, UseItemsService $useItemsService) {
+    public function useItems(UseItemsRequest $request, Character $character) {
 
-        $useItemsService->useItems($character, Kingdom::find($request->defender_id), $request->slots_selected);
+        $this->attackWithItemsService->useItemsOnKingdom($character, Kingdom::find($request->defender_id), $request->slots_selected);
 
         return response()->json([
             'items' => array_values($character->inventory->slots->filter(function($slot) {

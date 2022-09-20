@@ -80,7 +80,7 @@ class UnitService {
             $this->updateKingdomResources($kingdom, $gameUnit, $amount);
         } else {
             $amount              = $gameUnit->required_population * $amount;
-            $populationReduction = $kingdom->fetchPopulationCostReduction();
+            $populationReduction = $kingdom->fetchUnitCostReduction();
 
             $amount = ceil($amount - $amount * $populationReduction);
 
@@ -117,7 +117,6 @@ class UnitService {
         $character        = $kingdom->character;
         $totalTime        = $gameUnit->time_to_recruit * $amount;
         $totalTime        = $totalTime - $totalTime * $this->fetchTimeReduction($character)->unit_time_reduction;
-
         $timeTillFinished = now()->addSeconds($totalTime);
 
         $goldPaid = null;

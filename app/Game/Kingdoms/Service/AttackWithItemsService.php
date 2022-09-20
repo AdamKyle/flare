@@ -66,7 +66,7 @@ class AttackWithItemsService {
        $this->setOldUnits($kingdom);
 
        $damage    = $this->gatherDamage($character->inventory, $slots);
-       $reduction = $this->getReductionToDamage($kingdom);
+       $reduction = $this->getReductionToDamage($kingdom) / 100;
 
        $damage -= ($damage * $reduction);
 
@@ -74,7 +74,6 @@ class AttackWithItemsService {
 
        $kingdom = $this->damageBuildings($kingdom, ($damage / 2));
        $kingdom = $this->damageUnits($kingdom, ($damage / 2));
-
 
        $newMorale  = $this->calculateNewMorale($kingdom->refresh(), $currentMorale);
 
@@ -137,7 +136,10 @@ class AttackWithItemsService {
                 $kingdom->name . ' on the plane: ' . $kingdom->gameMap->name . ' At (X/Y): ' . $kingdom->x_position . '/' . $kingdom->y_position .
                 ' doing a total of: ' . number_format($damageDone * 100) . '% damage.'));
 
-            $this->updateKingdom->updateKingdomLogs($kingdom->refresh()->character);
+            $kingdom = $kingdom->refresh();
+
+            $this->updateKingdom->updateKingdomLogs($kingdom->character);
+            $this->updateKingdom->updateKingdom($kingdom);
         }
 
         $attributes['character_id'] = $character->id;
@@ -177,7 +179,7 @@ class AttackWithItemsService {
      * @param float $damage
      * @return Kingdom
      */
-    protected function damageBuildings(Kingdom $kingdom, float $damage): Kingdom {
+    protected function  damageBuildings(Kingdom $kingdom, float $damage): Kingdom {
         foreach ($kingdom->buildings as $building) {
             $newDurability = $building->current_durability - ($building->current_durability * $damage);
 

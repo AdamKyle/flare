@@ -82,7 +82,7 @@ export default class RecruitWithResources extends React.Component<any, any> {
         }
 
         let timeNeeded = this.props.unit.time_to_recruit * amount;
-        timeNeeded     = (timeNeeded - timeNeeded * this.props.kingdom_building_time_reduction);
+        timeNeeded     = (timeNeeded - timeNeeded * this.props.kingdom_unit_time_reduction);
 
         this.props.set_resource_amount(amount, timeNeeded);
 

@@ -50,7 +50,10 @@ const iconsToShow = (kingdom: KingdomDetails) => {
     }
 
     const anyMoving = kingdom.unitsInMovement.filter((unitMovement: UnitMovementDetails) => {
-        return unitMovement.is_returning || unitMovement.is_moving || unitMovement.is_recalled || unitMovement.is_attacking
+        const anyMoving = unitMovement.is_returning || unitMovement.is_moving || unitMovement.is_recalled || unitMovement.is_attacking;
+        const fromThisKingdom = kingdom.name === unitMovement.from_kingdom_name;
+
+        return anyMoving && fromThisKingdom;
     });
 
     if (anyMoving.length > 0) {

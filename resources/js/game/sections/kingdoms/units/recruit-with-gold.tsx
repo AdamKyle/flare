@@ -78,9 +78,7 @@ export default class RecruitWithGold extends React.Component<any, any> {
             });
         }
 
-        let amount = this.getAmountToRecruit(value);
-
-        if (amount === 0) {
+        if (value === 0) {
             return this.setState({
                 amount_to_recruit: '',
                 time_needed: 0,
@@ -89,22 +87,21 @@ export default class RecruitWithGold extends React.Component<any, any> {
             });
         }
 
-        const timeNeeded = this.props.unit.time_to_recruit * amount;
+        const timeNeeded = this.props.unit.time_to_recruit * value;
 
         this.setState({
-            amount_to_recruit: amount - amount * this.props.unit_cost_reduction,
-            time_needed: (timeNeeded - timeNeeded * this.props.kingdom_building_time_reduction),
+            amount_to_recruit: value,
+            time_needed: (timeNeeded - timeNeeded * this.props.kingdom_unit_time_reduction),
             paying_with_gold: true,
         }, () => {
-            amount = amount - amount * this.props.unit_cost_reduction;
 
             this.setState({
-                cost_in_gold: this.props.unit.cost_per_unit * amount,
+                cost_in_gold: this.props.unit.cost_per_unit * value,
             });
         })
     }
 
-    getAmountToRecruit(numberToRecruit: number) {
+    getPopulationNeeded(numberToRecruit: number) {
 
         if (numberToRecruit === 0) {
             return 0;
@@ -123,13 +120,13 @@ export default class RecruitWithGold extends React.Component<any, any> {
     }
 
     getPopulationCost() {
-        const amount = parseInt(this.state.amount_to_recruit, 10) || 0;
+        const amount = this.getPopulationNeeded(parseInt(this.state.amount_to_recruit, 10) || 0);
 
         if (this.state.amount_to_recruit > 0 && amount === 0) {
             return 1;
         }
 
-        return amount;
+        return amount - (amount * this.props.unit_cost_reduction);
     }
 
     render() {

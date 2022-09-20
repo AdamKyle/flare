@@ -104,7 +104,8 @@ export default class Kingdom extends React.Component<KingdomProps, any> {
                                         kingdom_iron_cost_reduction: this.props.kingdom.iron_cost_reduction,
                                         kingdom_population_cost_reduction: this.props.kingdom.population_cost_reduction,
                                         kingdom_current_population: this.props.kingdom.current_population,
-                                        kingdom_unit_cost_reduction: this.props.kingdom.unit_cost_reduction
+                                        kingdom_unit_cost_reduction: this.props.kingdom.unit_cost_reduction,
+                                        kingdom_unit_time_reduction: this.props.kingdom.unit_time_reduction,
                                     }}
                                     buildings={this.props.kingdom.buildings}
                                     queue={{

@@ -27,7 +27,7 @@ export default class InformationSection extends React.Component<InformationSecti
         if (this.props.sections.unit_to_view !== null) {
             return <UnitInformation unit={this.props.sections.unit_to_view}
                                     close={this.props.close}
-                                    kingdom_building_time_reduction={this.props.cost_reduction.kingdom_building_time_reduction}
+                                    kingdom_unit_time_reduction={this.props.cost_reduction.kingdom_unit_time_reduction}
                                     kingdom_building_cost_reduction={this.props.cost_reduction.kingdom_building_cost_reduction}
                                     kingdom_iron_cost_reduction={this.props.cost_reduction.kingdom_iron_cost_reduction}
                                     kingdom_population_cost_reduction={this.props.cost_reduction.kingdom_unit_cost_reduction}

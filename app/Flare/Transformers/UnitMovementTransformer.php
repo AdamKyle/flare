@@ -17,7 +17,6 @@ class UnitMovementTransformer extends TransformerAbstract {
 
         return [
             'id'                => $unitMovementQueue->id,
-            'kingdom_id'        => $unitMovementQueue->kingdom_id,
             'character_id'      => $unitMovementQueue->character_id,
             'from_kingdom_name' => $this->getKingdomName($unitMovementQueue->from_kingdom_id),
             'to_kingdom_name'   => $this->getKingdomName($unitMovementQueue->to_kingdom_id),

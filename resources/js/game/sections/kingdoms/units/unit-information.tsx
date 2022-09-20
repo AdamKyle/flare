@@ -101,7 +101,7 @@ export default class UnitInformation extends React.Component<UnitInformationProp
                     character_id={this.props.character_id}
                     unit={this.props.unit}
                     unit_cost_reduction={this.props.unit_cost_reduction}
-                    kingdom_building_time_reduction={this.props.kingdom_building_time_reduction}
+                    kingdom_unit_time_reduction={this.props.kingdom_unit_time_reduction}
                     manage_help_dialogue={this.manageHelpDialogue.bind(this)}
                     remove_selection={this.removeSelection.bind(this)}
                     character_gold={this.props.character_gold}
@@ -112,7 +112,7 @@ export default class UnitInformation extends React.Component<UnitInformationProp
                     character_id={this.props.character_id}
                     unit={this.props.unit}
                     unit_cost_reduction={this.props.unit_cost_reduction}
-                    kingdom_building_time_reduction={this.props.kingdom_building_time_reduction}
+                    kingdom_unit_time_reduction={this.props.kingdom_unit_time_reduction}
                     manage_help_dialogue={this.manageHelpDialogue.bind(this)}
                     remove_selection={this.removeSelection.bind(this)}
                     set_resource_amount={this.setResourceAmount.bind(this)}
@@ -176,21 +176,25 @@ export default class UnitInformation extends React.Component<UnitInformationProp
                              <dd>{formatNumber(this.calculateCostsForUnit(this.props.unit.iron_cost, this.getAmount(), true))}</dd>
                              <dt>Population Cost:</dt>
                              <dd>{formatNumber(this.calculateCostsForUnit(this.props.unit.required_population, this.getAmount(), false))}</dd>
-                             <dt>Time Required (Seconds):</dt>
+                             <dt>Base Time For One (Seconds):</dt>
+                             <dd>{formatNumber(this.props.unit.time_to_recruit)}</dd>
                              {
                                  this.state.upgrade_section === 'resources' ?
-                                     <dd className='flex items-center'>
-                                         <span>{formatNumber(this.state.time_needed)}</span>
-                                         <div>
-                                             <div className='ml-2'>
-                                                 <button type={"button"} onClick={() => this.manageHelpDialogue()} className='text-blue-500 dark:text-blue-300'>
-                                                     <i className={'fas fa-info-circle'}></i> Help
-                                                 </button>
+                                     <Fragment>
+                                         <dt>Time Required (Seconds):</dt>
+                                         <dd className='flex items-center'>
+                                             <span>{formatNumber(this.state.time_needed)}</span>
+                                             <div>
+                                                 <div className='ml-2'>
+                                                     <button type={"button"} onClick={() => this.manageHelpDialogue()} className='text-blue-500 dark:text-blue-300'>
+                                                         <i className={'fas fa-info-circle'}></i> Help
+                                                     </button>
+                                                 </div>
                                              </div>
-                                         </div>
-                                     </dd>
+                                         </dd>
+                                     </Fragment>
                                  :
-                                     <dl>{formatNumber(this.state.time_needed)}</dl>
+                                     null
                              }
                          </dl>
                          {

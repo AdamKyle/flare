@@ -16,6 +16,7 @@ export default interface InformationSectionProps {
         kingdom_population_cost_reduction: number,
         kingdom_current_population: number,
         kingdom_unit_cost_reduction: number,
+        kingdom_unit_time_reduction: number,
     };
 
     queue: {

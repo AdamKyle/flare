@@ -260,48 +260,24 @@ class KingdomUpdateService {
      */
     protected function updateKingdomMorale(): void {
         $lastWalked = $this->getLastTimeWalked();
-        $morale     = $this->kingdom->current_morale;
         $character  = $this->kingdom->character;
-
-        if ($lastWalked >= 30) {
-            $morale -= 0.10;
-        }
-
-        event(new ServerMessageEvent(
-            $character->user,
-            $this->kingdom->name .
-            ' is losing morale, due to not being walked for more than 30 days, at Location (x/y): ' .
-            $this->kingdom->x_position . '/' . $this->kingdom->y_position . ' on the: ' .
-            $this->kingdom->gameMap->name . ' plane.'
-        ));
 
         $morale = $this->reduceOrIncreaseMoraleForBuildings();
 
-        if ($morale <= 0.0) {
-            $this->giveKingdomsToNpcHandler->giveKingdomToNPC($this->kingdom);
+        if ($lastWalked >= 30) {
+            $morale -= 0.10;
 
             event(new ServerMessageEvent(
                 $character->user,
                 $this->kingdom->name .
-                ' Lost too much morale and has been given to the NPC at: ' .
+                ' is losing morale, due to not being walked for more than 30 days, at Location (x/y): ' .
                 $this->kingdom->x_position . '/' . $this->kingdom->y_position . ' on the: ' .
                 $this->kingdom->gameMap->name . ' plane.'
             ));
-
-            event(new GlobalMessageEvent(
-                $this->kingdom->name .
-                ' Has crumbled into ruins. It is now up for grabs at: ' .
-                $this->kingdom->x_position . '/' . $this->kingdom->y_position . ' on the: ' .
-                $this->kingdom->gameMap->name . ' plane.'
-            ));
-
-            $this->kingdom = null;
-
-            return;
         }
 
         $this->kingdom->update([
-            'current_morale' => $morale > $this->kingdom->max_morale ? $this->kingdom->max_morale : ($morale < 0.0 ? 0 : $morale),
+            'current_morale' => $morale > $this->kingdom->max_morale ? $this->kingdom->max_morale : ($morale < 0 ? 0 : $morale),
         ]);
 
         $this->kingdom->refresh();
