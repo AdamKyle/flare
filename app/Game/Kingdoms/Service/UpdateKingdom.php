@@ -80,7 +80,7 @@ class UpdateKingdom {
      * @return void
      */
     public function updateKingdomLogs(Character $character, bool $setCharacterId = false): void {
-        $logs = KingdomLog::where('character_id', $character->id)->get();
+        $logs = KingdomLog::where('character_id', $character->id)->orderBy('id', 'desc')->get();
 
         $transformer = $this->kingdomAttackLogsTransformer;
 

@@ -101,7 +101,7 @@ class KingdomInformationController extends Controller{
                 new Collection($character->kingdoms, $this->kingdomTransformer)
             )->toArray(),
             'logs'    => $this->manager->createData(
-                new Collection(KingdomLog::where('character_id', $character->id)->get(), $this->kingdomAttackLogsTransformer)
+                new Collection(KingdomLog::where('character_id', $character->id)->orderBy('id', 'desc')->get(), $this->kingdomAttackLogsTransformer)
             )->toArray(),
         ]);
     }

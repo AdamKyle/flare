@@ -134,7 +134,7 @@ class Kingdom extends Model implements Auditable
     }
 
     public function fetchGoldBarsDefenceBonus(): float {
-        return $this->gold_bars / 1000;
+        return $this->gold_bars / KingdomMaxValue::MAX_GOLD_BARS;
     }
 
     public function getWallsDefence(): float {
@@ -150,7 +150,13 @@ class Kingdom extends Model implements Auditable
             return 0.0;
         }
 
-        return $walls->level / 30;
+        if ($walls->current_durability < $walls->max_durability) {
+            $wallDefenceReduction = 1.0 - ($walls->current_durability / $walls->max_durability);
+
+            return ($walls->level / $walls->gameBuilding->max_level) - $wallDefenceReduction;
+        }
+
+        return $walls->level / $walls->gameBuilding->max_level;
     }
 
     public function gameMap() {

@@ -14,8 +14,8 @@ export const buildLogsColumns = (onClick: (log: KingdomLogDetails) => void, dele
         {
             name: 'Read',
             cell: (row: KingdomLogDetails) => <span>
-                {row.opened ? <Fragment><i className="far fa-envelope mr-2"></i> Read</Fragment> : <Fragment><i
-                    className="far fa-envelope-open mr-2"></i> Not Read</Fragment>}
+                {row.opened ? <Fragment><i className="far fa-envelope-open mr-2"></i> Read</Fragment> : <Fragment><i
+                    className="far fa-envelope mr-2"></i> Not Read</Fragment>}
             </span>
         },
         {
