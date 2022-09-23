@@ -13,7 +13,8 @@
                     <x-core.form-wizard.tab target="tab-style-2-1" primaryTitle="Basic Info" secondaryTitle="Basic monster info." isActive="true"/>
                     <x-core.form-wizard.tab target="tab-style-2-2" primaryTitle="Resistances" secondaryTitle="Resistances against player actions."/>
                     <x-core.form-wizard.tab target="tab-style-2-3" primaryTitle="Modifiers" secondaryTitle="Misc modifiers."/>
-                    <x-core.form-wizard.tab target="tab-style-2-4" primaryTitle="Quest Item" secondaryTitle="Monsters quest item."/>
+                    <x-core.form-wizard.tab target="tab-style-2-4" primaryTitle="Ambush & Counter" secondaryTitle="Ambush and Counter"/>
+                    <x-core.form-wizard.tab target="tab-style-2-5" primaryTitle="Quest Item" secondaryTitle="Monsters quest item."/>
                 </x-core.form-wizard.tabs>
 
                 <x-core.form-wizard.contents>
@@ -88,6 +89,13 @@
 
                     </x-core.form-wizard.content>
                     <x-core.form-wizard.content target="tab-style-2-4">
+                        <h3 class="mb-3">Ambush and Counter</h3>
+                        <x-core.forms.input :model="$monster" label="Ambush Chance (%):" modelKey="ambush_chance" name="ambush_chance"/>
+                        <x-core.forms.input :model="$monster" label="Ambush Resistance (%):" modelKey="ambush_resistance" name="ambush_resistance"/>
+                        <x-core.forms.input :model="$monster" label="Counter Chance (%):" modelKey="counter_chance" name="counter_chance"/>
+                        <x-core.forms.input :model="$monster" label="Counter Resistance (%):" modelKey="counter_resistance" name="counter_resistance"/>
+                    </x-core.form-wizard.content>
+                    <x-core.form-wizard.content target="tab-style-2-5">
                         <x-core.forms.collection-select :model="$monster" label="Quest Item to Drop:" modelKey="quest_item_id" name="quest_item_id" value="id" key="affix_name" :options="$questItems" />
                         <x-core.forms.input :model="$monster" label="Quest item Drop Chance:" modelKey="quest_item_drop_chance" name="quest_item_drop_chance"/>
                     </x-core.form-wizard.content>

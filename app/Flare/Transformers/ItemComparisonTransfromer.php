@@ -70,6 +70,7 @@ class ItemComparisonTransfromer extends TransformerAbstract {
             'agi_reduction'                    => $item->getAffixAttribute('agi_reduction'),
             'focus_reduction'                  => $item->getAffixAttribute('focus_reduction'),
             'reduces_enemy_stats'              => $item->getAffixAttribute('reduces_enemy_stats'),
+            'resistance_reduction'             => $item->getAffixAttribute('resistance_reduction'),
             'steal_life_amount'                => $item->getAffixAttribute('steal_life_amount'),
             'entranced_chance'                 => $item->getAffixAttribute('entranced_chance'),
             'damage'                           => $item->getAffixAttribute('damage'),

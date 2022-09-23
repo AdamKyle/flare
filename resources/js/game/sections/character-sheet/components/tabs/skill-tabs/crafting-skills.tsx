@@ -30,7 +30,7 @@ export default class CraftingSkills extends React.Component<CraftingSkillsProps,
                 selector: (row: { name: string; }) => row.name,
                 sortable: true,
                 cell: (row: SkillType) => <span key={row.id + '-' + (Math.random() + 1).toString(36).substring(7)}>
-                    <button onClick={() => this.manageSkillDetails(row)}>{row.name}</button>
+                    <button onClick={() => this.manageSkillDetails(row)} className='underline'>{row.name}</button>
                 </span>
             },
             {

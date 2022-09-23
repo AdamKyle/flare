@@ -115,7 +115,7 @@ export default class TimerProgressBar extends React.Component<TimerProgressBarPr
 
         return (
             <Fragment>
-                <div className="flex justify-between mb-1">
+                <div className={"flex justify-between mb-1 " + this.props.additional_css}>
                     <span className="text-base font-medium text-gray-800 dark:text-white">
                         {this.props.time_out_label}
                     </span>

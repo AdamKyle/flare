@@ -55,6 +55,8 @@ export default class CallForReinforcements extends React.Component<CallForReinfo
                 .doAjaxCall('post', (result: AxiosResponse) => {
                     this.setState({
                         processing_unit_request: false,
+                    }, () => {
+                        this.props.handle_close();
                     })
                 }, (error: AxiosError) => {
                     this.setState({processing_unit_request: false});

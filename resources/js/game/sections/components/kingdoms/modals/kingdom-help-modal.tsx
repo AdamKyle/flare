@@ -7,7 +7,6 @@ export default class KingdomHelpModal extends React.Component<any, any> {
     }
 
     buildTitle() {
-        console.log(this.props.type);
         switch (this.props.type) {
             case 'wall_defence':
                 return 'Wall Defence'

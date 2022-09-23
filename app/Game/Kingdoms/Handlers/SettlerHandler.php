@@ -71,7 +71,7 @@ class SettlerHandler {
             $defendingKingdom = $defendingKingdom->refresh();
 
             $this->removeKingdomFromCache($originalOwner, $defendingKingdom);
-            $this->addKingdomToCache($defendingKingdom->character, $defendingKingdom);
+            $this->addKingdomToCache($attackingKingdom->character, $defendingKingdom);
 
             event(new UpdateGlobalMap($attackingKingdom->character));
 
@@ -98,8 +98,8 @@ class SettlerHandler {
     protected function getReducesMoraleBy(Kingdom $attackingKingdom, int $unitId): float {
         return $attackingKingdom->units()
                                 ->where('id', $unitId)
-                                ->where('is_settler', true)
                                 ->first()
+                                ->gameUnit
                                 ->reduces_morale_by;
     }
 

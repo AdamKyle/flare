@@ -173,12 +173,19 @@ export default class KingdomLogDetails extends React.Component<any, any> {
                                     'N/A'
                             }
                         </dd>
-                        <dt>Kingdom Attacked Morale Loss</dt>
-                        <dd className='text-red-600 dark:text-red-400'>{(this.props.log.morale_loss * 100).toFixed(2)} %</dd>
+                        <dt className={this.props.log.took_kingdom ? 'hidden' : ''}>Kingdom Attacked Morale Loss</dt>
+                        <dd className={'text-red-600 dark:text-red-400 ' + this.props.log.took_kingdom ? 'hidden' : ''}>{(this.props.log.morale_loss * 100).toFixed(2)} %</dd>
                     </dl>
+
+                    <div className={'border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3 ' + (!this.props.log.took_kingdom ? 'hidden' : '')}></div>
+
+                    <p className={!this.props.log.took_kingdom ? 'hidden' : ''}>
+                        You now own this kingdom. You took it from the defender. Check your kingdoms list.
+                        Any surviving units are now held up here.
+                    </p>
                 </div>
-                <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                <div>
+                <div className={'border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3 ' + this.props.log.took_kingdom ? 'hidden' : ''}></div>
+                <div className={this.props.log.took_kingdom ? 'hidden' : ''}>
                     <div className={'grid md:grid-cols-'+ (this.shouldShowUnitSentChanges() ? '3' : '2') +' gap-2'}>
                         <div>
                             <h3 className='mb-4'>

@@ -109,7 +109,7 @@ export default class CharacterInventoryTabs extends React.Component<CharacterInv
 
     render() {
         if (this.state.loading || this.state.inventory === null) {
-            return <ComponentLoading />
+            return <div className='my-4'><ComponentLoading /></div>
         }
 
         return (

@@ -46,7 +46,7 @@ export default class KingdomTabs extends React.Component<any, any> {
                         />
                     </TabPanel>
                     <TabPanel key={'unit-movement'}>
-                        <UnitMovement units_in_movement={this.props.kingdom.unitsInMovement} dark_tables={this.props.dark_tables} />
+                        <UnitMovement units_in_movement={this.props.kingdom.unitsInMovement} dark_tables={this.props.dark_tables} character_id={this.props.kingdom.character_id} />
                     </TabPanel>
                 </Tabs>
             </BasicCard>

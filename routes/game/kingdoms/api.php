@@ -66,7 +66,8 @@ Route::middleware(['auth', 'is.character.dead', 'is.character.exploring', 'is.ch
     });
 
     Route::post('/drop-items-on-kingdom/{kingdom}/{character}', ['as' => 'drop.items.on.kingdoms', 'uses' => 'Api\AttackKingdom@dropItems']);
-    Route::post('/attack-kingdom-with-units/{kingdom}/{character}', ['as' => 'attack-kingdom', 'uses' => 'Api\AttackKingdom@attackWithUnits']);
+    Route::post('/attack-kingdom-with-units/{kingdom}/{character}', ['as' => 'attack.kingdom', 'uses' => 'Api\AttackKingdom@attackWithUnits']);
+    Route::post('/recall-units/{unitMovementQueue}/{character}', ['as' => 'recall.units', 'uses' => 'Api\UnitMovementController@recallUnits']);
 });
 
 

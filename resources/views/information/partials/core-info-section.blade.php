@@ -48,7 +48,9 @@
                 @livewire($section['live_wire_component'])
             @endif
 
-            <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+            @if (end($sections) !== $section)
+                <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+            @endif
         @endforeach
     </div>
 </x-core.layout.info-container>

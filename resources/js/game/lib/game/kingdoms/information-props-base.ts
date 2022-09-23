@@ -1,6 +1,4 @@
 export default interface InformationPropsBase {
-    kingdom_building_time_reduction?: number;
-
     kingdom_unit_time_reduction?: number;
 
     kingdom_building_cost_reduction?: number;

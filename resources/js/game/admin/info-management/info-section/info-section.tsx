@@ -118,6 +118,9 @@ export default class InfoSection extends React.Component<any, any> {
             label: 'Skills',
             value: 'admin.skills.skills-table',
         },{
+            label: 'Class Skills',
+            value: 'info.skills.class-skills',
+        },{
             label: 'Maps',
             value: 'admin.maps.maps-table',
         }];

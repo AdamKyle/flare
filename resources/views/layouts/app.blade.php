@@ -51,7 +51,7 @@
         @endauth
 
         <!-- Brand -->
-        <span class="brand"><a href="/">Planes of Tlessa</a></span>
+        <span class="brand hidden sm:block"><a href="/">Planes of Tlessa</a></span>
 
 
         <!-- Right -->
@@ -77,11 +77,11 @@
                     @endif
                 </div>
 
-                <div class="mx-4">
+                <div class="mx-4 hidden sm:block">
                     <a href="/releases" target="_blank">Version: {{GameVersion::version()}}</a>
                 </div>
 
-                <div class="mx-4">
+                <div class="mx-4 hidden sm:block">
                     <a href="/information/where-to-start" target="_blank">Help, I'm Stuck!</a>
                 </div>
 
@@ -110,7 +110,7 @@
     <!-- Workspace -->
     @auth
         @if (auth()->user()->hasRole('Admin'))
-            <main class="workspace scrolling-section mb-10 dark:bg-gray-900">
+            <main class="workspace mb-10 dark:bg-gray-900">
         @else
             <main class="workspace dark:bg-gray-900">
         @endif

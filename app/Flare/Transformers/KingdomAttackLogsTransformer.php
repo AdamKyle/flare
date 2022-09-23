@@ -56,6 +56,7 @@ class KingdomAttackLogsTransformer extends TransformerAbstract {
             'morale_loss'              => $log->morale_loss,
             'opened'                   => $log->opened,
             'created_at'               => $log->created_at->setTimezone(env('TIME_ZONE'))->format('Y-m-d H:m:s'),
+            'took_kingdom'             => (new KingdomLogStatusValue($log->status))->tookKingdom(),
         ];
     }
 

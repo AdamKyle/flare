@@ -63,9 +63,16 @@ const iconsToShow = (kingdom: KingdomDetails) => {
             );
         }
 
-        icons.push(
-            <i className='ra ra-trail text-green-500 dark:text-green-400'></i>
-        );
+        if (anyMoving[0].is_returning || anyMoving[0].is_recalled) {
+            icons.push(
+                <i className="fas fa-exchange-alt text-orange-500 dark:text-orange-300"></i>
+            );
+        } else {
+            icons.push(
+                <i className='ra ra-trail text-green-500 dark:text-green-400'></i>
+            );
+        }
+
     }
 
     return icons;

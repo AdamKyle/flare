@@ -8,7 +8,9 @@ use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Kingdoms\Jobs\MoveUnits;
 use App\Game\Kingdoms\Validators\MoveUnitsValidator;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
+use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Values\SkillTypeValue;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
@@ -127,7 +129,55 @@ class UnitMovementService {
 
         $this->updateKingdom->updateKingdomAllKingdoms($character->refresh());
 
+        event(new ServerMessageEvent($character->user, 'You have requested units to be sent to: ' . $kingdom->name . ' they are aon their way!'));
+
         return $this->successResult(['message' => 'Units are on their way!']);
+    }
+
+    /**
+     * Recall the units back.
+     *
+     * @param UnitMovementQueue $unitMovementQueue
+     * @param Character $character
+     * @return array
+     */
+    public function recallUnits(UnitMovementQueue $unitMovementQueue, Character $character): array {
+        $timeLeft    = $this->getTimeLeft($unitMovementQueue);
+        $elapsedTime = $unitMovementQueue->completed_at->diffInSeconds(now()) * $timeLeft;
+
+        $toKingdom   = $unitMovementQueue->from_kingdom_id;
+        $fromKingdom = $unitMovementQueue->to_kingdom_id;
+
+        $timeLeft    = now()->addSeconds($elapsedTime);
+
+        $queue = UnitMovementQueue::create([
+            'character_id'     => $character->id,
+            'from_kingdom_id'  => $fromKingdom,
+            'to_kingdom_id'    => $toKingdom,
+            'units_moving'     => $unitMovementQueue->units_moving,
+            'completed_at'     => $timeLeft,
+            'started_at'       => now(),
+            'moving_to_x'      => $unitMovementQueue->from_x,
+            'moving_to_y'      => $unitMovementQueue->from_y,
+            'from_x'           => $unitMovementQueue->moving_to_x,
+            'from_y'           => $unitMovementQueue->moving_to_y,
+            'is_attacking'     => false,
+            'is_recalled'      => true,
+            'is_returning'     => false,
+            'is_moving'        => false,
+        ]);
+
+        MoveUnits::dispatch($queue->id)->delay($timeLeft);
+
+        $unitMovementQueue->delete();
+
+        $kingdom = Kingdom::find($toKingdom);
+
+        event(new ServerMessageEvent($character->user, 'You have recalled your units to: ' . $kingdom->name));
+
+        $this->updateKingdom->updateKingdomAllKingdoms($character->refresh());
+
+        return $this->successResult();
     }
 
     /**
@@ -319,6 +369,20 @@ class UnitMovementService {
         }
 
         return $amount;
+    }
+
+    /**
+     * Get the time left in the movement.
+     *
+     * @param UnitMovementQueue $queue
+     * @return float
+     */
+    protected function getTimeLeft(UnitMovementQueue $queue): float {
+        $start   = Carbon::parse($queue->started_at)->timestamp;
+        $end     = Carbon::parse($queue->completed_at)->timestamp;
+        $current = Carbon::parse(now())->timestamp;
+
+        return (($current - $start) / ($end - $start));
     }
 
     /**

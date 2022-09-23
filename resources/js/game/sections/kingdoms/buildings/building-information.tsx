@@ -172,6 +172,7 @@ export default class BuildingInformation extends React.Component<BuildingInforma
     }
 
     getRebuildTime() {
+
         let rebuildTime = this.buildingTimeCalculation.calculateRebuildTime(
             this.props.building,
             this.props.kingdom_building_time_reduction

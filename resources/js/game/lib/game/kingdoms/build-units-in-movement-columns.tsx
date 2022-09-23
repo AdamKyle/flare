@@ -23,9 +23,11 @@ export const BuildUnitsInMovementColumns = (cancelUnitMovement: (queueId: number
             name: 'Time till arrival',
             cell: (row: UnitMovementDetails) => <Fragment>
                 <div className='w-full mt-4'>
-                    <TimerProgressBar time_remaining={row.time_left} time_out_label={''} />
+                    <TimerProgressBar time_remaining={row.time_left} time_out_label={''} additional_css={
+                        row.is_recalled || row.is_returning ? 'mt-[-35px]' : ''
+                    }/>
                     {
-                        row.time_left > 0 ?
+                        row.time_left > 0 && !row.is_returning && !row.is_recalled ?
                             <div className='mt-2 mb-4'>
                                 <button className={
                                     'hover:text-red-500 text-red-700 dark:text-red-500 dark:hover:text-red-400 ' +

@@ -87,7 +87,8 @@ export default class AttackKingdomModal extends React.Component<any, AttackKingd
 
                 this.setState({
                     loading: false,
-                    success_message: result.data.message,
+                }, () => {
+                    this.props.handle_close();
                 });
 
             }, (error: AxiosError) => {

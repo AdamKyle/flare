@@ -10,10 +10,10 @@ export default class InventoryQuestItemDetails extends React.Component<any, any>
     render() {
         return (
             <div className='max-h-[400px] overflow-y-auto'>
-                <div className='mb-4 mt-4 text-sky-700 dark:text-sky-500' dangerouslySetInnerHTML={{__html: this.props.item.description}} />
+                <div className='mb-4 mt-4 text-sky-700 dark:text-sky-300' dangerouslySetInnerHTML={{__html: this.props.item.description}} />
                 <div className='grid md:grid-cols-3 gap-3 mb-4'>
                     <div>
-                        <h4 className='text-sky-600 dark:text-sky-500'>Skill Modifiers</h4>
+                        <h4 className='text-sky-600 dark:text-sky-300'>Skill Modifiers</h4>
                         <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                         <dl>
                             <dt>Effects Skill</dt>
@@ -26,7 +26,7 @@ export default class InventoryQuestItemDetails extends React.Component<any, any>
                     </div>
                     <div className='block md:hidden border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                     <div>
-                        <h4 className='text-sky-600 dark:text-sky-500'>Devouring Chance</h4>
+                        <h4 className='text-sky-600 dark:text-sky-300'>Devouring Chance</h4>
                         <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                         <dl>
                             <dt>Devouring Light</dt>

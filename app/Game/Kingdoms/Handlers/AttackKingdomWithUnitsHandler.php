@@ -6,11 +6,10 @@ namespace App\Game\Kingdoms\Handlers;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomUnit;
-use App\Flare\Values\UserOnlineValue;
+use Facades\App\Flare\Values\UserOnlineValue;
 use App\Game\Kingdoms\Traits\CalculateMorale;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
-use App\Game\Messages\Services\ServerMessage;
 
 class AttackKingdomWithUnitsHandler {
 
@@ -133,13 +132,13 @@ class AttackKingdomWithUnitsHandler {
                                                    ->setNewDefenderBuildings($this->newDefenderBuildings);
 
         if ($tookKingdom) {
-            $attackLogHandler->createLogForAttacker($attackingKingdom, $kingdom);
+            $attackLogHandler->createLogForAttacker($attackingKingdom, $kingdom, true);
 
             $kingdomName   = $kingdom->name;
             $mapName       = $kingdom->gameMap->name;
             $x             = $kingdom->x_position;
             $y             = $kingdom->y_position;
-            $characterName = $attackingKingdom->name;
+            $characterName = $attackingKingdom->character->name;
 
             event(new GlobalMessageEvent($characterName . ' has taken the kingdom: ' . $kingdomName .
             ' on the plane: ' . $mapName . ' at (X/Y): ' . $x . '/' . $y . ' and is now the rightful ruler!'));

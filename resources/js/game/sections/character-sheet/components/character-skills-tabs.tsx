@@ -69,7 +69,7 @@ export default class CharacterSkillsTabs extends React.Component<CharacterSkillT
     render() {
 
         if (this.state.loading || this.state.skills === null) {
-            return <ComponentLoading />
+            return <div className='my-4'><ComponentLoading /></div>
         }
 
         return (

@@ -7,4 +7,6 @@ export default interface BuildingInformationProps extends InformationPropsBase {
     close: (building?: BuildingDetails) => void;
 
     character_gold: number;
+
+    kingdom_building_time_reduction: number;
 }

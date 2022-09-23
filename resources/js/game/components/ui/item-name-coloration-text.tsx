@@ -8,27 +8,49 @@ export default class ItemNameColorationText extends React.Component<ItemNameColo
         super(props);
     }
 
+    getColorClass() {
+      switch(this.props.item.type) {
+          case 'alchemy':
+              return 'text-pink-500 dark:text-pink-300';
+          case 'quest':
+              return 'text-orange-400 dark:text-orange-300';
+          case 'trinket':
+              return 'text-red-700 dark:text-red-400';
+          default:
+              return this.getColorClassFromType();
+
+      }
+    }
+
+    getColorClassFromType() {
+        const item = this.props.item;
+
+        if (item.is_unique) {
+            return 'text-green-700 dark:text-green-600';
+        }
+
+        if (item.is_mythic) {
+            return 'text-amber-600 dark:text-amber-500\''
+        }
+
+        if (item.holy_stacks_applied > 0) {
+            return 'text-sky-700 dark:text-sky-300';
+        }
+
+        if (item.affix_count === 1) {
+            return 'text-blue-500';
+        }
+
+        if (item.affix_count == 2) {
+            return 'text-fuchsia-800 dark:text-fuchsia-300';
+        }
+
+        return 'text-gray-600 dark:text-white';
+    }
+
     render() {
         return (
-            <span className={clsx({
-                'text-pink-500 dark:text-pink-300': this.props.item.type === 'alchemy'
-            },{
-                'text-orange-400 dark:text-orange-300': this.props.item.type === 'quest'
-            },{
-                'text-red-700 dark:text-red-400': this.props.item.type === 'trinket' && !this.props.item.is_mythic
-            },{
-                'text-green-700 dark:text-green-600': this.props.item.is_unique && this.props.item.type !== 'trinket' && !this.props.item.is_mythic
-            },{
-                'text-sky-700 dark:text-sky-300': this.props.item.holy_stacks_applied > 0 && !this.props.item.is_unique && this.props.item.type !== 'trinket' && !this.props.item.is_mythic
-            },{
-                'text-gray-600 dark:text-white': this.props.item.affix_count === 0 && !this.props.item.is_unique && this.props.item.holy_stacks_applied === 0 && this.props.item.type !== 'trinket' && !this.props.item.is_mythic
-            },{
-                'text-blue-500': this.props.item.affix_count === 1 && !this.props.item.is_unique && this.props.item.holy_stacks_applied === 0 && this.props.item.type !== 'trinket' && !this.props.item.is_mythic
-            },{
-                'text-fuchsia-800 dark:text-fuchsia-300': this.props.item.affix_count === 2 && !this.props.item.is_unique && this.props.item.holy_stacks_applied === 0 && this.props.item.type !== 'trinket' && !this.props.item.is_mythic
-            }, {
-                'text-amber-600 dark:text-amber-500': this.props.item.is_mythic
-            })}>{this.props.item.name}</span>
+            <span className={this.getColorClass()}>{this.props.item.name}</span>
         )
     }
 }

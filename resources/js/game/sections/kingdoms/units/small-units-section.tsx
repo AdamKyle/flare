@@ -56,7 +56,6 @@ export default class SmallUnitsSection extends React.Component<SmallUnitSectionP
                     this.state.unit_to_view !== null ?
                         <UnitInformation unit={this.state.unit_to_view}
                                          close={this.closeSection.bind(this)}
-                                         kingdom_building_time_reduction={this.props.kingdom.building_time_reduction}
                                          kingdom_building_cost_reduction={this.props.kingdom.building_cost_reduction}
                                          kingdom_iron_cost_reduction={this.props.kingdom.iron_cost_reduction}
                                          kingdom_population_cost_reduction={this.props.kingdom.population_cost_reduction}

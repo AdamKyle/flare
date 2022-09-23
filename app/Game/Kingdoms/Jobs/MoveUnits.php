@@ -66,7 +66,7 @@ class MoveUnits implements ShouldQueue {
             // @codeCoverageIgnoreEnd
         }
 
-        if ($unitMovement->is_moving || $unitMovement->is_returning) {
+        if ($unitMovement->is_moving || $unitMovement->is_returning || $unitMovement->is_recalled) {
             $this->moveUnitsFromOneKingdomToTheNext($unitMovement, $updateKingdom);
 
             return;
@@ -107,7 +107,7 @@ class MoveUnits implements ShouldQueue {
 
         foreach ($unitsMoving as $unitMoving) {
 
-            if ($unitMovement->is_returning) {
+            if ($unitMovement->is_returning || $unitMovement->is_recalled) {
                 $this->returnUnitToKingdom($toKingdom, $unitMoving);
             } else {
                 $foundUnit = $this->findUnitToUpdate($toKingdom, $fromKingdom, $unitMoving);
@@ -120,8 +120,7 @@ class MoveUnits implements ShouldQueue {
 
         $character = Character::find($unitMovement->character_id);
 
-        $updateKingdom->updateKingdomAllKingdoms($character->first());
-
+        $updateKingdom->updateKingdomAllKingdoms($character);
     }
 
     /**

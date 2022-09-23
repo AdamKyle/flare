@@ -64,6 +64,16 @@ export default class ItemComparison extends React.Component<any, any> {
         })
     }
 
+    getTheName() {
+        const item = this.state.comparison_details.itemToEquip;
+
+        if (typeof item.affix_name === 'undefined') {
+            return item.name;
+        }
+
+        return item.affix_name;
+    }
+
     buildTitle() {
         if (this.state.error_message !== null) {
             return 'Um ... ERROR!'
@@ -76,7 +86,7 @@ export default class ItemComparison extends React.Component<any, any> {
         return (
             <div className='grid grid-cols-2 gap-2'>
                 <ItemNameColorationText item={{
-                    name: this.state.comparison_details.itemToEquip.affix_name,
+                    name: this.getTheName(),
                     type: this.state.comparison_details.itemToEquip.type,
                     affix_count: this.state.comparison_details.itemToEquip.affix_count,
                     is_unique: this.state.comparison_details.itemToEquip.is_unique,
