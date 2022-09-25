@@ -26,8 +26,16 @@
                         <dd>{{$guideQuest->reward_level}}</dd>
                     </dl>
                     <p class="mb-5">
-                        Refers to the level of item between 1 and X that will be generted with random affixes.
+                        Refers to the level of item between 1 and X that will be generated with random affixes.
                     </p>
+                    @if (!is_null($guideQuest->faction_points_per_kill))
+                        <h3 class="text-sky-600 dark:text-sky-500">Extra Bonuses</h3>
+                        <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                        <dl class='mb-5'>
+                            <dt>Faction Points per Kill</dt>
+                            <dd>{{$guideQuest->faction_points_per_kill}}</dd>
+                        </dl>
+                    @endif
                     <h3 class="text-sky-600 dark:text-sky-500">Requirements</h3>
                     <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                     <dl class='mb-5'>

@@ -46,6 +46,10 @@
                                 <x-core.forms.input :model="$guideQuest" label="Required Kingdom Units:" modelKey="required_kingdom_units" name="required_kingdom_units" />
                                 <x-core.forms.key-value-select :model="$guideQuest" label="Required Passive:" modelKey="required_passive_skill" name="required_passive_skill" :options="$passives"/>
                                 <x-core.forms.input :model="$guideQuest" label="Required Passive Level:" modelKey="required_passive_level" name="required_passive_level" />
+
+                                <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                                <h3 class="mb-3">Extra Faction Points Per Kill</h3>
+                                <x-core.forms.input :model="$guideQuest" label="Extra Faction Points Per Kill #:" modelKey="faction_points_per_kill" name="faction_points_per_kill" />
                             </div>
                         </div>
 

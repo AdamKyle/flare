@@ -2,6 +2,7 @@
 
 namespace App\Game\Battle\Providers;
 
+use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Flare\Builders\BuildMythicItem;
 use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Builders\RandomAffixGenerator;
@@ -9,8 +10,6 @@ use App\Flare\Builders\RandomItemDropBuilder;
 use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Flare\ServerFight\Pvp\PvpAttack;
 use App\Flare\Services\CharacterRewardService;
-use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
-use App\Flare\Transformers\CharacterTopBarTransformer;
 use App\Game\Battle\Console\Commands\ClearCelestials;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Handlers\FactionHandler;
@@ -23,11 +22,9 @@ use App\Game\Battle\Services\PvpService;
 use App\Game\Core\Services\GoldRush;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Skills\Services\DisenchantService;
-use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
-use League\Fractal\Manager;
-use App\Flare\Transformers\KingdomTransformer;
 use App\Game\Battle\Services\ConjureService;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
+use App\Game\GuideQuests\Services\GuideQuestService;
 
 class ServiceProvider extends ApplicationServiceProvider
 {
@@ -46,7 +43,8 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(FactionHandler::class, function($app) {
             return new FactionHandler(
-                $app->make(RandomAffixGenerator::class)
+                $app->make(RandomAffixGenerator::class),
+                $app->make(GuideQuestService::class),
             );
         });
 

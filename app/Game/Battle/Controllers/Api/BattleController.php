@@ -6,6 +6,7 @@ use App\Flare\Models\Location;
 use App\Flare\Services\BuildMonsterCacheService;
 use App\Game\Battle\Jobs\BattleAttackHandler;
 use App\Game\Battle\Events\AttackTimeOutEvent;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use League\Fractal\Resource\Item;
@@ -40,9 +41,9 @@ class BattleController extends Controller {
 
     /**
      * @param Character $character
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function index(Character $character) {
+    public function index(Character $character): JsonResponse {
         $characterMap       = $character->map;
 
         $locationWithEffect = Location::whereNotNull('enemy_strength_type')
@@ -69,9 +70,9 @@ class BattleController extends Controller {
     /**
      * @param Request $request
      * @param Character $character
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function battleResults(Request $request, Character $character) {
+    public function battleResults(Request $request, Character $character): JsonResponse {
         if (!$character->can_attack) {
             return response()->json(['message' => 'invalid input.'], 429);
         }
@@ -97,9 +98,9 @@ class BattleController extends Controller {
 
     /**
      * @param Character $character
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function revive(Character $character) {
+    public function revive(Character $character): JsonResponse {
         $this->battleEventHandler->processRevive($character);
 
         return response()->json([]);

@@ -226,7 +226,7 @@ export default class ItemComparisonSection extends React.Component<any, any> {
         if (this.props.comparison_details === null) {
             return null;
         }
-        console.log('Single Item: ', this.props.comparison_details.itemToEquip);
+
         return (
             <div className='max-h-[350px] overflow-y-auto'>
                 <dl>

@@ -18,22 +18,52 @@ use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\RandomAffixDetails;
 use App\Game\Core\Values\FactionLevel;
 use App\Game\Core\Values\FactionType;
+use App\Game\GuideQuests\Services\GuideQuestService;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
+use Exception;
 
 class FactionHandler {
 
-    private $randomAffixGenerator;
+    /**
+     * @var RandomAffixGenerator $randomAffixGenerator
+     */
+    private RandomAffixGenerator $randomAffixGenerator;
 
-    public function __construct(RandomAffixGenerator $randomAffixGenerator){
+    /**
+     * @var GuideQuestService $guideQuestService
+     */
+    private GuideQuestService $guideQuestService;
+
+    /**
+     * @param RandomAffixGenerator $randomAffixGenerator
+     * @param GuideQuestService $guideQuestService
+     */
+    public function __construct(RandomAffixGenerator $randomAffixGenerator, GuideQuestService $guideQuestService){
         $this->randomAffixGenerator = $randomAffixGenerator;
+        $this->guideQuestService    = $guideQuestService;
     }
 
-    public function handleFaction(Character $character, Monster $monster) {
-        $this->handleFactionPoints($character, $monster);
+    /**
+     * Handle faction points.
+     *
+     * @param Character $character
+     * @param Monster $monster
+     * @return void
+     */
+    public function handleFaction(Character $character, Monster $monster): void {
+        $this->handleFactionPoints($character, $monster, $this->guideQuestService);
     }
 
-    protected function handleFactionPoints(Character $character, Monster $monster): void {
+    /**
+     * Handle faction points for the character.
+     *
+     * @param Character $character
+     * @param Monster $monster
+     * @param GuideQuestService $guideQuestService
+     * @return void
+     */
+    protected function handleFactionPoints(Character $character, Monster $monster, GuideQuestService $guideQuestService): void {
         $map     = GameMap::find($monster->game_map_id);
         $faction = Faction::where('character_id', $character->id)->where('game_map_id', $map->id)->first();
 
@@ -62,9 +92,31 @@ class FactionHandler {
             return;
         }
 
+        if ($character->user->guide_enabled) {
+            $guideQuest = $guideQuestService->fetchQuestForCharacter($character);
+
+            if (!is_null($guideQuest)) {
+
+                if (!is_null($guideQuest->faction_points_per_kill) && !is_null($guideQuest->required_faction_level)) {
+                    if ($faction->game_map_id === $guideQuest->required_faction_id && $guideQuest->required_faction_level !== $faction->current_level) {
+                        $faction->current_points += $guideQuest->faction_points_per_kill;
+
+                        event(new ServerMessageEvent($character->user, 'You gained additional ' . $guideQuest->faction_points_per_kill . ' faction points for the current guide quest. This will end once you reach the faction level requirements.'));
+                    }
+                }
+            }
+        }
+
         $faction->save();
     }
 
+    /**
+     * Handle giving custom faction points.
+     *
+     * @param Character $character
+     * @param int $amount
+     * @return void
+     */
     public function handleCustomFactionAmount(Character $character, int $amount): void {
         $map     = Map::where('character_id', $character->id)->first();
         $gameMap = GameMap::find($map->game_map_id);
@@ -99,6 +151,14 @@ class FactionHandler {
 
     }
 
+    /**
+     * Handle faction level up.
+     *
+     * @param Character $character
+     * @param Faction $faction
+     * @param string $mapName
+     * @return void
+     */
     protected function handleFactionLevelUp(Character $character, Faction $faction, string $mapName): void {
         event(new ServerMessageEvent($character->user, $mapName . ' faction has gained a new level!'));
 
@@ -112,6 +172,14 @@ class FactionHandler {
         }
     }
 
+    /**
+     * Handle when the faction maxes out.
+     *
+     * @param Character $character
+     * @param Faction $faction
+     * @param string $mapName
+     * @return void
+     */
     protected function handleFactionMaxedOut(Character $character, Faction $faction, string $mapName): void {
         event(new ServerMessageEvent($character->user, $mapName . ' faction has become maxed out!'));
         event(new GlobalMessageEvent($character->name . ' Has maxed out the faction for: ' . $mapName . ' They are considered legendary among the people of this land.'));
@@ -123,6 +191,12 @@ class FactionHandler {
         ]);
     }
 
+    /**
+     * Update the faction.
+     *
+     * @param Faction $faction
+     * @return Faction
+     */
     protected function updateFaction(Faction $faction): Faction {
 
         $newLevel = $faction->current_level + 1;
@@ -139,6 +213,17 @@ class FactionHandler {
         return $faction->refresh();
     }
 
+    /**
+     * Give the player a new random unique.
+     *
+     * - Only gives 10 Billion Valuation items.
+     *
+     * @param Character $character
+     * @param Faction $faction
+     * @param string $mapName
+     * @param string|null $title
+     * @return void
+     */
     protected function rewardPlayer(Character $character, Faction $faction, string $mapName, ?string $title = null): void {
         $character = $this->giveCharacterGold($character, $faction->current_level);
         $item      = $this->giveCharacterRandomItem($character);
@@ -159,6 +244,14 @@ class FactionHandler {
         }
     }
 
+    /**
+     * Give the character gold.
+     *
+     * @param Character $character
+     * @param int $factionLevel
+     * @return Character
+     * @throws Exception
+     */
     protected function giveCharacterGold(Character $character, int $factionLevel): Character {
         $gold = FactionLevel::getGoldReward($factionLevel);
 
@@ -186,6 +279,13 @@ class FactionHandler {
         return $character->refresh();
     }
 
+    /**
+     * Find a random item to attach the uniques to.
+     *
+     * @param Character $character
+     * @return ItemModel
+     * @throws Exception
+     */
     protected function giveCharacterRandomItem(Character $character): Item {
         $item = ItemModel::where('cost', '<=', RandomAffixDetails::BASIC)
             ->whereNull('item_prefix_id')
@@ -215,6 +315,12 @@ class FactionHandler {
         return $duplicateItem;
     }
 
+    /**
+     * See if the player has a quest item for additional points.
+     *
+     * @param Character $character
+     * @return bool
+     */
     public function playerHasQuestItem(Character $character): bool {
         $inventory = Inventory::where('character_id', $character->id)->first();
         $item      = Item::where('effect', ItemEffectsValue::FACTION_POINTS)->first();

@@ -4,6 +4,7 @@ namespace App\Game\Exploration\Jobs;
 
 use App\Flare\Models\Faction;
 use App\Flare\Models\GameMap;
+use App\Flare\Models\GuideQuest;
 use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Battle\Events\UpdateCharacterStatus;
@@ -15,6 +16,7 @@ use App\Game\Exploration\Events\ExplorationTimeOut;
 use App\Game\Exploration\Events\ExplorationLogUpdate;
 use App\Game\Exploration\Handlers\RewardHandler;
 use App\Game\Exploration\Services\EncounterService;
+use App\Game\GuideQuests\Services\GuideQuestService;
 use App\Game\Maps\Events\UpdateDuelAtPosition;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -28,20 +30,41 @@ class Exploration implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    /**
+     * @var Character $character
+     */
     public Character $character;
 
+    /**
+     * @var int $automationId
+     */
     private int $automationId;
 
+    /**
+     * @var string $attackType
+     */
     private string $attackType;
 
 
+    /**
+     * @param Character $character
+     * @param int $automationId
+     * @param string $attackType
+     */
     public function __construct(Character $character, int $automationId, string $attackType) {
         $this->character    = $character;
         $this->automationId = $automationId;
         $this->attackType   = $attackType;
     }
 
-    public function handle(MonsterPlayerFight $monsterPlayerFight, BattleEventHandler $battleEventHandler, FactionHandler $factionHandler) {
+    /**
+     * @param MonsterPlayerFight $monsterPlayerFight
+     * @param BattleEventHandler $battleEventHandler
+     * @param FactionHandler $factionHandler
+     * @param GuideQuestService $guideQuestService
+     * @return void
+     */
+    public function handle(MonsterPlayerFight $monsterPlayerFight, BattleEventHandler $battleEventHandler, FactionHandler $factionHandler, GuideQuestService $guideQuestService): void {
 
         $automation = CharacterAutomation::where('character_id', $this->character->id)->where('id', $this->automationId)->first();
 
@@ -66,7 +89,7 @@ class Exploration implements ShouldQueue
 
             if ($this->encounter($response, $automation, $battleEventHandler, $params)) {
 
-                $this->rewardAdditionalFactionPoints($factionHandler);
+                $this->rewardAdditionalFactionPoints($factionHandler, $guideQuestService);
 
                 $time = now()->diffInMinutes($automation->completed_at);
 
@@ -87,7 +110,16 @@ class Exploration implements ShouldQueue
         event(new ExplorationTimeOut($this->character->user, 0));
     }
 
-    protected function encounter(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, array $params) {
+    /**
+     * Handle the encounter.
+     *
+     * @param MonsterPlayerFight $response
+     * @param CharacterAutomation $automation
+     * @param BattleEventHandler $battleEventHandler
+     * @param array $params
+     * @return bool
+     */
+    protected function encounter(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, array $params): bool {
         $user = $this->character->user;
 
         event(new ExplorationLogUpdate($user, 'While on your exploration of the area, you encounter a: ' . $response->getEnemyName()));
@@ -116,7 +148,16 @@ class Exploration implements ShouldQueue
         return false;
     }
 
-    protected function fightAutomationMonster(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, array $params) {
+    /**
+     * Fight the monster in automation.
+     *
+     * @param MonsterPlayerFight $response
+     * @param CharacterAutomation $automation
+     * @param BattleEventHandler $battleEventHandler
+     * @param array $params
+     * @return bool
+     */
+    protected function fightAutomationMonster(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, array $params): bool {
         $fightResponse = $response->fightMonster();
 
         if (!$fightResponse) {
@@ -140,6 +181,12 @@ class Exploration implements ShouldQueue
         return true;
     }
 
+    /**
+     * Should we bail on the automation?
+     *
+     * @param CharacterAutomation|null $automation
+     * @return bool
+     */
     protected function shouldBail(CharacterAutomation $automation = null): bool {
 
         if (is_null($automation)) {
@@ -153,6 +200,12 @@ class Exploration implements ShouldQueue
         return false;
     }
 
+    /**
+     * Update the automation.
+     *
+     * @param CharacterAutomation $automation
+     * @return CharacterAutomation
+     */
     protected function updateAutomation(CharacterAutomation $automation): CharacterAutomation {
         if (!is_null($automation->move_down_monster_list_every)) {
             $characterLevel = $this->character->refresh()->level;
@@ -181,7 +234,14 @@ class Exploration implements ShouldQueue
         return $automation->refresh();
     }
 
-    protected function rewardAdditionalFactionPoints(FactionHandler $factionHandler) {
+    /**
+     * Reward the faction points.
+     *
+     * @param FactionHandler $factionHandler
+     * @param GuideQuestService $guideQuestService
+     * @return void
+     */
+    protected function rewardAdditionalFactionPoints(FactionHandler $factionHandler, GuideQuestService $guideQuestService): void {
         $map     = GameMap::find($this->character->map->game_map_id);
         $faction = Faction::where('character_id', $this->character->id)->where('game_map_id', $map->id)->first();
 
@@ -190,8 +250,6 @@ class Exploration implements ShouldQueue
         }
 
         $hasQuestItem = $factionHandler->playerHasQuestItem($this->character);
-
-        $amount = 25;
 
         if ($faction->current_level == 0) {
             $amount = 50;
@@ -206,7 +264,13 @@ class Exploration implements ShouldQueue
         $factionHandler->handleCustomFactionAmount($this->character, $amount);
     }
 
-    protected function endAutomation(?CharacterAutomation $automation) {
+    /**
+     * End the automation.
+     *
+     * @param CharacterAutomation|null $automation
+     * @return void
+     */
+    protected function endAutomation(?CharacterAutomation $automation): void {
         if (!is_null($automation)) {
             $automation->delete();
 
@@ -228,7 +292,13 @@ class Exploration implements ShouldQueue
         }
     }
 
-    protected function rewardPlayer(Character $character) {
+    /**
+     * Reward the player.
+     *
+     * @param Character $character
+     * @return void
+     */
+    protected function rewardPlayer(Character $character): void {
 
         $gold = $character->gold + 10000;
 

@@ -19,11 +19,11 @@ use Exception;
 
 class BattleRewardProcessing {
 
-    private $factionHandler;
+    private FactionHandler $factionHandler;
 
-    private $characterRewardService;
+    private CharacterRewardService $characterRewardService;
 
-    private $goldRushService;
+    private GoldRush $goldRushService;
 
     public function __construct(FactionHandler $factionHandler, CharacterRewardService $characterRewardService, GoldRush $goldRush) {
         $this->factionHandler         = $factionHandler;

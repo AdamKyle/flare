@@ -195,6 +195,7 @@ class EquipItemService {
      *
      * @param Item $toCompare
      * @param Collection $inventorySlots
+     * @param Character $character
      * @return array
      */
     public function getItemStats(Item $toCompare, Collection $inventorySlots, Character $character): array {
@@ -206,6 +207,7 @@ class EquipItemService {
      *
      * @param Item $itemToEquip
      * @param Collection $inventorySlots
+     * @param string $type
      * @return bool
      */
     public function isTwoHandedItemEquipped(Item $itemToEquip, Collection $inventorySlots, string $type): bool {
