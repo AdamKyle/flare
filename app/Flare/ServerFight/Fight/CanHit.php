@@ -26,7 +26,7 @@ class CanHit {
         }
 
         if ($characterAccuracy >= 1) {
-            return false;
+            return true;
         }
 
         $playerToHit = $statValue * 0.20;

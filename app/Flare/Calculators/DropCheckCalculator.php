@@ -16,6 +16,7 @@ class DropCheckCalculator {
      * If true, the check passed and the character should be rewarded.
      *
      * @param Monster $monster
+     * @param int $characterLevel
      * @param float $lootingChance | 0.0
      * @param float $gameMapBonus
      * @return bool
@@ -69,11 +70,11 @@ class DropCheckCalculator {
     public function fetchQuestItemDropCheck(Monster $monster, float $lootingChance = 0.0, float $gameMapBonus = 0.0): bool {
         $totalBonus     = $lootingChance + $gameMapBonus;
 
-        if ($monster->quest_item_drop_chance <= 0.0) {
+        if ($monster->quest_item_drop_chance <= 0) {
             return false;
         }
 
-        if ($monster->quest_item_drop_chance >= 1.0 || $monster->quest_item_drop_chance >= 1.0) {
+        if ($monster->quest_item_drop_chance >= 1.0) {
             return true;
         }
 
@@ -84,6 +85,8 @@ class DropCheckCalculator {
         $roll = RandomNumberGenerator::generateRandomNumber(1, 50, 1, 100);;
         $roll = round($roll + $roll * $totalBonus);
         $dc   = round((100 - (100 * $monster->drop_check)));
+
+        dump('Roll: ' . $roll . ' DC: ' . $dc);
 
         return $roll > $dc;
     }

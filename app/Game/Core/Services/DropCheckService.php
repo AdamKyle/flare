@@ -19,36 +19,37 @@ class DropCheckService {
     /**
      * @var BattleDrop $battleDrop
      */
-    private $battleDrop;
+    private BattleDrop $battleDrop;
 
     /**
      * @var Monster $monster
      */
-    private $monster;
+    private Monster $monster;
 
     /**
-     * @var Location $locationWithEffect
+     * @var Location|null $locationWithEffect
      */
-    private $locationWithEffect;
+    private ?Location $locationWithEffect;
 
     /**
      * @var BuildMythicItem $buildMythicItem
      */
-    private $buildMythicItem;
+    private BuildMythicItem $buildMythicItem;
 
     /**
      * @var float $lootingChance
      */
-    private $lootingChance = 0.0;
+    private float $lootingChance = 0.0;
 
     /**
      * @var float $gameMapBonus
      */
-    private $gameMapBonus = 0.0;
+    private float $gameMapBonus = 0.0;
 
 
     /**
      * @param BattleDrop $battleDrop
+     * @param BuildMythicItem $buildMythicItem
      */
     public function __construct(BattleDrop $battleDrop, BuildMythicItem $buildMythicItem) {
         $this->battleDrop      = $battleDrop;
@@ -63,7 +64,7 @@ class DropCheckService {
      * @return void
      * @throws Exception
      */
-    public function process(Character $character, Monster $monster) {
+    public function process(Character $character, Monster $monster): void {
         $this->lootingChance  = $character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
         $this->monster        = $monster;
 
@@ -93,6 +94,7 @@ class DropCheckService {
      *
      * @param Character $character
      * @return void
+     * @throws Exception
      */
     public function handleMythicDrop(Character $character) {
         $canGetDrop = $this->canHaveMythic();
@@ -129,7 +131,7 @@ class DropCheckService {
      * @param Map $map
      * @return void
      */
-    public function findLocationWithEffect(Map $map) {
+    public function findLocationWithEffect(Map $map): void {
         $this->locationWithEffect = Location::whereNotNull('enemy_strength_type')
                                             ->where('x', $map->character_position_x)
                                             ->where('y', $map->character_position_y)

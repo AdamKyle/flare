@@ -9,23 +9,41 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use App\Game\Battle\Handlers\BattleEventHandler;
 
-class  BattleAttackHandler implements ShouldQueue
-{
+class  BattleAttackHandler implements ShouldQueue {
+
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private $characterId;
+    /**
+     * @var int $characterId
+     */
+    private int $characterId;
 
-    private $monsterId;
+    /**
+     * @var int $monsterId
+     */
+    private int $monsterId;
 
-    private $isAutomation;
+    /**
+     * @var bool $isAutomation
+     */
+    private bool $isAutomation;
 
+    /**
+     * @param int $characterId
+     * @param int $monsterId
+     * @param bool $isAutomation
+     */
     public function __construct(int $characterId, int $monsterId, bool $isAutomation = false) {
         $this->characterId  = $characterId;
         $this->monsterId    = $monsterId;
         $this->isAutomation = $isAutomation;
     }
 
-    public function handle(BattleEventHandler $battleEventHandler) {
+    /**
+     * @param BattleEventHandler $battleEventHandler
+     * @return void
+     */
+    public function handle(BattleEventHandler $battleEventHandler): void {
         $battleEventHandler->processMonsterDeath($this->characterId, $this->monsterId, $this->isAutomation);
     }
 }

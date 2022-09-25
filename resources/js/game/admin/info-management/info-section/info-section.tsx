@@ -109,6 +109,9 @@ export default class InfoSection extends React.Component<any, any> {
             label: 'Craftable Items',
             value: 'info.items.craftable-items-table',
         },{
+            label: 'Craftable Trinkets',
+            value: 'info.items.craftable-trinkets',
+        },{
             label: 'Enchantments',
             value: 'admin.affixes.affixes-table'
         },{

@@ -18,10 +18,11 @@ class ShopService {
      * @return int
      */
     public function sellAllItemsInInventory(Character $character): int {
-        $itemsToSell = $character->inventory->slots()->with('item')->get()->filter(function($slot) {
-            return !$slot->equipped && $slot->item->type !== 'quest' && $slot->item->type !== 'alchemy';
-        });
+        $invalidTypes = ['alchemy', 'quest', 'trinket'];
 
+        $itemsToSell = $character->inventory->slots()->with('item')->get()->filter(function($slot) use($invalidTypes) {
+            return !$slot->equipped && !in_array($slot->item->type, $invalidTypes);
+        });
 
         if ($itemsToSell->isEmpty()) {
             return 0;

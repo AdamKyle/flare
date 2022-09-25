@@ -80,7 +80,7 @@ class ShopController extends Controller {
                 'inventory' => [
                     'inventory' => $inventory->getInventoryForType('inventory'),
                 ]
-            ], 422);
+            ], 200);
         }
 
         event(new UpdateTopBarEvent($character));

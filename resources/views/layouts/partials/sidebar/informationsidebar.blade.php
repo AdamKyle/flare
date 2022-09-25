@@ -50,6 +50,18 @@
                 Chat Commands
             </a>
         </div>
+
+        <div class="menu-detail-wrapper">
+            <h6 class="uppercase">Shops</h6>
+            <a href="{{route('info.page', ['pageName' => 'shop'])}}">
+                <span class="text-sm icon ra ra-anvil""></span>
+                Shop
+            </a>
+            <a href="{{route('info.page', ['pageName' => 'market-board'])}}">
+                <span class="ra ra-wooden-sign"></span>
+                Market Board
+            </a>
+        </div>
     </div>
 
     <!-- Character -->
@@ -220,10 +232,6 @@
                     Guide Quests
                 </a>
             </div>
-            <a href="{{route('info.page', ['pageName' => 'market-board'])}}">
-                <span class="ra ra-wooden-sign"></span>
-                Market Board
-            </a>
             <a href="#no-link" class="active" data-toggle="collapse" data-target="#menuecrafting">
                 <span class="collapse-indicator la la-arrow-circle-down"></span>
                 Crafting/Enchanting

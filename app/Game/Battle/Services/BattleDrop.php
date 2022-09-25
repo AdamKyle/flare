@@ -108,11 +108,12 @@ class BattleDrop {
      * Can return the item.
      *
      * @param Character $character
-     * @return void
+     * @param bool $returnItem
+     * @return Item|null
      */
     public function handleMonsterQuestDrop(Character $character, bool $returnItem = false): ?Item {
         if (!is_null($this->monster->quest_item_id)) {
-            $canGetQuestItem = DropCheckCalculator::fetchQuestItemDropCheck($this->monster, $character->level, $this->lootingChance, $this->gameMapBonus);
+            $canGetQuestItem = DropCheckCalculator::fetchQuestItemDropCheck($this->monster, $this->lootingChance, $this->gameMapBonus);
 
             if ($canGetQuestItem && !$returnItem) {
                 $this->attemptToPickUpItem($character, $this->monster->questItem);

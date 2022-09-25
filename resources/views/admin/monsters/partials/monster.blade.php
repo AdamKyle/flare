@@ -40,11 +40,15 @@
             <h3 class="mb-4">Quest Item Details</h3>
             <p class="mb-4">
                 <strong>Drop Chance: </strong>
-                {{$monster->quest_item_drop_chance * 100}}%, used in:
-                <a href="{{route('info.page.quest', ['quest' =>$quest->id])}}">
-                    {{$quest->name}}
-                </a>
+                {{$monster->quest_item_drop_chance * 100}}%
             </p>
+            @if (!is_null($quest))
+                <p class="mb-4">
+                    Used in: <a href="{{route('info.page.quest', ['quest' =>$quest->id])}}">
+                        {{$quest->name}}
+                    </a>
+                </p>
+            @endif
             @include('game.items.components.item-details', $questItem)
         </div>
     @endif
