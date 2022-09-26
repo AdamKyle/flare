@@ -128,6 +128,7 @@ export default class GuideQuest extends React.Component<any, any> {
                                     { this.state.quest_data.required_kingdom_level !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Required Buildings Level (Combined): {this.state.quest_data.required_kingdom_level}</li> : null }
                                     { this.state.quest_data.required_kingdom_units !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Required Units Amount (Combined): {this.state.quest_data.required_kingdom_units}</li> : null }
                                     { this.state.quest_data.passive_name !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Get Passive Skill: {this.state.quest_data.passive_name} to level: {this.state.quest_data.required_passive_skill}</li> : null }
+                                    { this.state.quest_data.required_shards !== null ? <li className={'text-orange-600 dark:text-orange-400'}>Obtain Shards Amount: {this.state.quest_data.required_shards}</li> : null }
                                 </ul>
                             </div>
 

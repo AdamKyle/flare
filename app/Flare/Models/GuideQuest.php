@@ -30,6 +30,7 @@ class GuideQuest extends Model
         'required_kingdom_units',
         'required_passive_skill',
         'required_passive_level',
+        'required_shards',
         'faction_points_per_kill',
         'reward_level',
         'gold_dust_reward',

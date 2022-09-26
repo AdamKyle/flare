@@ -193,6 +193,11 @@ class CharacterInventoryService {
         DisenchantItem::withChain($jobs)->onConnection('disenchanting')->dispatch($character, $slots->first()->id);
     }
 
+    /**
+     * Get character inventory sets.
+     *
+     * @return array
+     */
     public function getCharacterInventorySets(): array {
         $sets = [];
 
@@ -220,6 +225,15 @@ class CharacterInventoryService {
         return $sets;
     }
 
+    /**
+     * Get equipped inventory set name.
+     *
+     * - Either null if none.
+     * - Equipped set name.
+     * - Equipped set string id + 1
+     *
+     * @return string|null
+     */
     public function getEquippedInventorySetName(): string|null {
         $equippedSet = $this->character->inventorySets()->where('is_equipped', true)->first();
 
@@ -233,7 +247,7 @@ class CharacterInventoryService {
 
         return 'Set ' . $this->character->inventorySets->search(function ($set) use ($equippedSet) {
             return $set->id === $equippedSet->id;
-        });
+        }) + 1;
     }
 
     /**

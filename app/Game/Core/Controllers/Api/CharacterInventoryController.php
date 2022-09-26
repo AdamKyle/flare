@@ -5,6 +5,7 @@ namespace App\Game\Core\Controllers\Api;
 use App\Flare\Handlers\UpdateCharacterAttackTypes;
 use App\Flare\Models\SetSlot;
 use Exception;
+use Illuminate\Http\JsonResponse;
 use League\Fractal\Resource\Item as FractalItem;
 use App\Flare\Events\UpdateCharacterAttackEvent;
 use App\Flare\Jobs\CharacterAttackTypesCacheBuilder;
@@ -36,16 +37,38 @@ use App\Game\Core\Services\InventorySetService;
 
 class  CharacterInventoryController extends Controller {
 
-    private $characterInventoryService;
+    /**
+     * @var CharacterInventoryService $characterInventoryService
+     */
+    private CharacterInventoryService $characterInventoryService;
 
-    private $characterTransformer;
+    /**
+     * @var CharacterSheetBaseInfoTransformer $characterTransformer
+     */
+    private CharacterSheetBaseInfoTransformer $characterTransformer;
 
-    private $updateCharacterAttackTypes;
+    /**
+     * @var UpdateCharacterAttackTypes $updateCharacterAttackTypes
+     */
+    private UpdateCharacterAttackTypes $updateCharacterAttackTypes;
 
-    private $enchantingService;
+    /**
+     * @var EnchantingService $enchantingService
+     */
+    private EnchantingService $enchantingService;
 
-    private $manager;
+    /**
+     * @var Manager $manager
+     */
+    private Manager $manager;
 
+    /**
+     * @param CharacterInventoryService $characterInventoryService
+     * @param CharacterSheetBaseInfoTransformer $characterTransformer
+     * @param UpdateCharacterAttackTypes $updateCharacterAttackTypes
+     * @param EnchantingService $enchantingService
+     * @param Manager $manager
+     */
     public function __construct(CharacterInventoryService $characterInventoryService,
                                 CharacterSheetBaseInfoTransformer $characterTransformer,
                                 UpdateCharacterAttackTypes $updateCharacterAttackTypes,
@@ -59,13 +82,24 @@ class  CharacterInventoryController extends Controller {
         $this->manager                    = $manager;
     }
 
-    public function inventory(Character $character) {
+    /**
+     * @param Character $character
+     * @return JsonResponse
+     */
+    public function inventory(Character $character): JsonResponse {
         $inventory = $this->characterInventoryService->setCharacter($character);
 
         return response()->json($inventory->getInventoryForApi(), 200);
     }
 
-    public function itemDetails(Character $character, Item $item, Manager $manager, ItemTransformer $itemTransformer) {
+    /**
+     * @param Character $character
+     * @param Item $item
+     * @param Manager $manager
+     * @param ItemTransformer $itemTransformer
+     * @return JsonResponse
+     */
+    public function itemDetails(Character $character, Item $item, Manager $manager, ItemTransformer $itemTransformer): JsonResponse {
 
         $slot = $this->characterInventoryService->getSlotForItemDetails($character, $item);
 
@@ -81,8 +115,12 @@ class  CharacterInventoryController extends Controller {
         return response()->json($item);
     }
 
-
-    public function destroy(Request $request, Character $character) {
+    /**
+     * @param Request $request
+     * @param Character $character
+     * @return JsonResponse
+     */
+    public function destroy(Request $request, Character $character): JsonResponse {
 
         $slot = $character->inventory->slots->filter(function($slot) use ($request) {
             return $slot->id === (int) $request->slot_id;
@@ -110,7 +148,11 @@ class  CharacterInventoryController extends Controller {
         ]);
     }
 
-    public function destroyAll(Character $character) {
+    /**
+     * @param Character $character
+     * @return JsonResponse
+     */
+    public function destroyAll(Character $character): JsonResponse {
         $inventory = $this->characterInventoryService->setCharacter($character);
 
         $slotIds   = $inventory->findCharacterInventorySlotIds();
@@ -125,7 +167,11 @@ class  CharacterInventoryController extends Controller {
         ], 200);
     }
 
-    public function disenchantAll(Character $character) {
+    /**
+     * @param Character $character
+     * @return JsonResponse
+     */
+    public function disenchantAll(Character $character): JsonResponse {
         $inventory = $this->characterInventoryService->setCharacter($character);
 
         $slots   = $inventory->getInventoryCollection()->filter(function($slot) {
@@ -145,7 +191,13 @@ class  CharacterInventoryController extends Controller {
         return response()->json(['message' => 'You have nothing to disenchant.']);
     }
 
-    public function moveToSet(MoveItemRequest $request, Character $character, InventorySetService $inventorySetService) {
+    /**
+     * @param MoveItemRequest $request
+     * @param Character $character
+     * @param InventorySetService $inventorySetService
+     * @return JsonResponse
+     */
+    public function moveToSet(MoveItemRequest $request, Character $character, InventorySetService $inventorySetService): JsonResponse {
         $slot         = $character->inventory->slots()->find($request->slot_id);
         $inventorySet = $character->inventorySets()->find($request->move_to_set);
 
@@ -188,7 +240,12 @@ class  CharacterInventoryController extends Controller {
         ]);
     }
 
-    public function renameSet(RenameSetRequest $request, Character $character) {
+    /**
+     * @param RenameSetRequest $request
+     * @param Character $character
+     * @return JsonResponse
+     */
+    public function renameSet(RenameSetRequest $request, Character $character): JsonResponse {
         $inventorySet = $character->inventorySets()->find($request->set_id);
 
         if (is_null($inventorySet)) {
@@ -213,7 +270,13 @@ class  CharacterInventoryController extends Controller {
         ]);
     }
 
-    public function saveEquippedAsSet(SaveEquipmentAsSet $request, Character $character, InventorySetService $inventorySetService) {
+    /**
+     * @param SaveEquipmentAsSet $request
+     * @param Character $character
+     * @param InventorySetService $inventorySetService
+     * @return JsonResponse
+     */
+    public function saveEquippedAsSet(SaveEquipmentAsSet $request, Character $character, InventorySetService $inventorySetService): JsonResponse {
         $currentlyEquipped = $character->inventory->slots->filter(function($slot) {
             return $slot->equipped;
         });
@@ -257,7 +320,13 @@ class  CharacterInventoryController extends Controller {
         ]);
     }
 
-    public function removeFromSet(RemoveItemRequest $request, Character $character, InventorySetService $inventorySetService) {
+    /**
+     * @param RemoveItemRequest $request
+     * @param Character $character
+     * @param InventorySetService $inventorySetService
+     * @return JsonResponse
+     */
+    public function removeFromSet(RemoveItemRequest $request, Character $character, InventorySetService $inventorySetService): JsonResponse {
         $slot = $character->inventorySets()->find($request->inventory_set_id)->slots()->find($request->slot_id);
 
         if (is_null($slot)) {
@@ -306,7 +375,13 @@ class  CharacterInventoryController extends Controller {
         ]);
     }
 
-    public function emptySet(Character $character, InventorySet $inventorySet, InventorySetService $inventorySetService) {
+    /**
+     * @param Character $character
+     * @param InventorySet $inventorySet
+     * @param InventorySetService $inventorySetService
+     * @return JsonResponse
+     */
+    public function emptySet(Character $character, InventorySet $inventorySet, InventorySetService $inventorySetService): JsonResponse {
         $currentInventoryAmount    = $character->inventory_max - $inventorySet->slots->count();
         $originalInventorySetCount = $inventorySet->slots->count();
         $itemsRemoved              = 0;
@@ -353,7 +428,14 @@ class  CharacterInventoryController extends Controller {
         ]);
     }
 
-    public function equipItem(EquipItemValidation $request, Character $character, EquipItemService $equipItemService) {
+    /**
+     * @param EquipItemValidation $request
+     * @param Character $character
+     * @param EquipItemService $equipItemService
+     * @return JsonResponse
+     * @throws Exception
+     */
+    public function equipItem(EquipItemValidation $request, Character $character, EquipItemService $equipItemService): JsonResponse {
         try {
 
             $equipItemService->setRequest($request)
@@ -380,7 +462,14 @@ class  CharacterInventoryController extends Controller {
         }
     }
 
-    public function unequipItem(Request $request, Character $character, InventorySetService $inventorySetService) {
+    /**
+     * @param Request $request
+     * @param Character $character
+     * @param InventorySetService $inventorySetService
+     * @return JsonResponse
+     * @throws Exception
+     */
+    public function unequipItem(Request $request, Character $character, InventorySetService $inventorySetService): JsonResponse {
         if ($request->inventory_set_equipped) {
             $inventorySet = $character->inventorySets()->where('is_equipped', true)->first();
             $inventoryIndex = $character->inventorySets->search(function($set) { return $set->is_equipped; });
@@ -437,7 +526,14 @@ class  CharacterInventoryController extends Controller {
         ]);
     }
 
-    public function unequipAll(Request $request, Character $character, InventorySetService $inventorySetService) {
+    /**
+     * @param Request $request
+     * @param Character $character
+     * @param InventorySetService $inventorySetService
+     * @return JsonResponse
+     * @throws Exception
+     */
+    public function unequipAll(Request $request, Character $character, InventorySetService $inventorySetService): JsonResponse {
 
         if ($request->is_set_equipped) {
             $inventorySet = $character->inventorySets()->where('is_equipped', true)->first();
@@ -465,11 +561,19 @@ class  CharacterInventoryController extends Controller {
                 'equipped'          => $characterInventoryService->getInventoryForType('equipped'),
                 'set_is_equipped'   => false,
                 'set_name_equipped' => $characterInventoryService->getEquippedInventorySetName(),
+                'sets'              => $characterInventoryService->getInventoryForType('sets')['sets']
             ]
         ], 200);
     }
 
-    public function equipItemSet(Character $character, InventorySet $inventorySet, InventorySetService $inventorySetService) {
+    /**
+     * @param Character $character
+     * @param InventorySet $inventorySet
+     * @param InventorySetService $inventorySetService
+     * @return JsonResponse
+     * @throws Exception
+     */
+    public function equipItemSet(Character $character, InventorySet $inventorySet, InventorySetService $inventorySetService): JsonResponse {
         if (!$inventorySet->can_be_equipped) {
             return response()->json(['message' => 'Set cannot be equipped.'], 422);
         }
@@ -499,13 +603,21 @@ class  CharacterInventoryController extends Controller {
             'message' => $inventoryName .  ' is now equipped',
             'inventory' => [
                 'equipped'          => $characterInventoryService->getInventoryForType('equipped'),
+                'sets'              => $characterInventoryService->getInventoryForType('sets')['sets'],
                 'set_is_equipped'   => true,
                 'set_name_equipped' => $characterInventoryService->getEquippedInventorySetName(),
             ]
         ]);
     }
 
-    public function useItem(Character $character, Item $item, UseItemService $useItemService) {
+    /**
+     * @param Character $character
+     * @param Item $item
+     * @param UseItemService $useItemService
+     * @return JsonResponse
+     * @throws Exception
+     */
+    public function useItem(Character $character, Item $item, UseItemService $useItemService): JsonResponse {
         if ($character->boons->count() === 10) {
             return response()->json(['message' => 'You can only have a max of ten boons applied.
             Check active boons to see which ones you have. You can always cancel one by clicking on the row.'], 422);
@@ -537,7 +649,12 @@ class  CharacterInventoryController extends Controller {
         ], 200);
     }
 
-    public function destroyAlchemyItem(Request $request, Character $character) {
+    /**
+     * @param Request $request
+     * @param Character $character
+     * @return JsonResponse
+     */
+    public function destroyAlchemyItem(Request $request, Character $character): JsonResponse {
         $slot = $character->inventory->slots->filter(function($slot) use($request) {
             return $slot->id === $request->slot_id;
         })->first();
@@ -566,7 +683,11 @@ class  CharacterInventoryController extends Controller {
         ]);
     }
 
-    public function destroyAllAlchemyItems(Character $character) {
+    /**
+     * @param Character $character
+     * @return JsonResponse
+     */
+    public function destroyAllAlchemyItems(Character $character): JsonResponse {
         $slots = $character->inventory->slots->filter(function($slot) {
             return $slot->item->type === 'alchemy';
         });

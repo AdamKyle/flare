@@ -183,6 +183,12 @@ class GuideQuestService {
             }
         }
 
+        if (!is_null($quest->required_shards)) {
+            if ($character->shards >= $quest->required_shards) {
+                $attributes[] = 'required_shards';
+            }
+        }
+
         if (!empty($attributes)) {
             $requiredAttributes = $this->requiredAttributeNames($quest);
 

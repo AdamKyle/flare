@@ -3,7 +3,7 @@ import SetDetails from "../inventory/set-details";
 import InventoryDetails from "../inventory/inventory-details";
 
 export default interface SetsInventoryTabProps extends CoreInventoryTabProps {
-    sets: {[key: string]: { equippable: boolean; items: InventoryDetails[] | [], equipped: boolean }};
+    sets: {[key: string]: { equippable: boolean; items: InventoryDetails[] | [], equipped: boolean, set_id: number; }};
 
     savable_sets: SetDetails[] | [];
 

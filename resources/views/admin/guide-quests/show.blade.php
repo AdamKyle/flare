@@ -81,6 +81,10 @@
                             <dt>Required Passive Level</dt>
                             <dd>{{$guideQuest->required_passive_level}}</dd>
                         @endif
+                        @if (!is_null($guideQuest->required_shards))
+                            <dt>Required Shards</dt>
+                            <dd>{{number_format($guideQuest->required_shards)}}</dd>
+                        @endif
                     </dl>
                     <h3 class="text-sky-600 dark:text-sky-500">Currency Rewards</h3>
                     <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>

@@ -141,31 +141,27 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
     }
 
     removeFromSet(id: number) {
-        let setId: any = this.props.savable_sets.filter((set) => {
-            return set.name === this.state.selected_set;
-        });
+        if (this.state.selected_set !== null) {
+            const setId = this.props.sets[this.state.selected_set].set_id;
 
-        if (setId.length > 0) {
-            setId = setId[0].id;
+            this.setState({
+                loading: true
+            }, () => {
+                (new Ajax()).setRoute('character/'+this.props.character_id+'/inventory-set/remove').setParameters({
+                    inventory_set_id: setId,
+                    slot_id: id
+                }).doAjaxCall('post', (result: AxiosResponse) => {
+                    this.setState({
+                        loading: false,
+                        success_message: result.data.message,
+                    }, () => {
+                        this.props.update_inventory(result.data.inventory);
+                    });
+                }, (error: AxiosError) => {
+
+                })
+            });
         }
-
-        this.setState({
-            loading: true
-        }, () => {
-            (new Ajax()).setRoute('character/'+this.props.character_id+'/inventory-set/remove').setParameters({
-                inventory_set_id: setId,
-                slot_id: id
-            }).doAjaxCall('post', (result: AxiosResponse) => {
-                this.setState({
-                    loading: false,
-                    success_message: result.data.message,
-                }, () => {
-                    this.props.update_inventory(result.data.inventory);
-                });
-            }, (error: AxiosError) => {
-
-            })
-        })
     }
 
     renameSet(name: string) {
@@ -283,7 +279,12 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
     }
 
     buttonsDisabled() {
-        return this.state.selected_set === this.props.set_name_equipped || this.props.is_dead || this.props.is_automation_running || this.state.loading
+
+        if (this.state.selected_set !== null) {
+            return this.props.sets[this.state.selected_set].equipped || this.props.is_dead || this.props.is_automation_running || this.state.loading
+        }
+
+        return true;
     }
 
     cannotEquipSet(setName?: string) {
