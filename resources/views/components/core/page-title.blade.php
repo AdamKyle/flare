@@ -11,7 +11,7 @@
     </x-slot>
     <x-slot name="columnTwo">
         <div class="relative">
-            <div class="float-right">
+            <div class="float-right mt-[14px]">
                 @switch($color)
                     @case('success')
                         <x-core.buttons.link-buttons.success-button href="{{$route}}">

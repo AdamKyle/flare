@@ -95,7 +95,9 @@ export default class EquippedTable extends React.Component<EquippedInventoryTabP
     }
 
     buildMenuItems() {
-        const dropDownLabels = Object.keys(this.props.sets);
+        let dropDownLabels = Object.keys(this.props.sets);
+
+        dropDownLabels = dropDownLabels.filter((key) => this.props.sets[key].items.length === 0);
 
         return dropDownLabels.map((label: string) => {
             return {
