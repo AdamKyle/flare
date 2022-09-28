@@ -14,6 +14,7 @@ export default class TimerProgressBar extends React.Component<TimerProgressBarPr
             percentage_left: 0,
             label: 'seconds',
             time_left_label: 0,
+            initial_time: 0,
         }
 
         this.interval = null;
@@ -45,6 +46,7 @@ export default class TimerProgressBar extends React.Component<TimerProgressBarPr
             percentage_left: this.props.time_remaining > 0 ? 1.0 : 0.0,
             label: this.getLabel(),
             time_left_label: this.getTimeLabel(this.props.time_remaining),
+            initial_time: this.props.time_remaining,
         }, () => {
             if (this.props.time_remaining > 0 && this.state.time_left > 0) {
                 this.interval = setInterval(() => {

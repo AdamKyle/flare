@@ -32,6 +32,7 @@ export default class MoveItemModal extends React.Component<MoveModalProps, any> 
     }
 
     buildDropDown() {
+        console.log(this.props.usable_sets);
         return this.props.usable_sets.map((set) => {
             return {
                 name: set.name,
@@ -59,11 +60,11 @@ export default class MoveItemModal extends React.Component<MoveModalProps, any> 
                         <ul className='mb-3 list-disc ml-4'>
                             <li><strong>Hands</strong>: 1 or 2 weapons for hands, or 1 or 2 shields or 1 duel wielded weapon (bow, hammer or stave)</li>
                             <li><strong>Armour</strong>: 1 of each type, body, head, leggings ...</li>
-                            <li><strong>Artifacts</strong>: Max of 2</li>
                             <li><strong>Spells</strong>: Max of 2 regardless of type.</li>
                             <li><strong>Rings</strong>: Max of 2</li>
                             <li><strong>Trinkets</strong>: Max of 2</li>
                             <li><strong>Uniques (green items)</strong>: 1 unique, regardless of type.</li>
+                            <li><strong>Mythics (orange items)</strong>: 1 Mythic, if there is no Unique, regardless of type.</li>
                         </ul>
                         <p className='mb-3'>The above rules only apply to characters who want to equip the set, You may also use a set as a stash tab with unlimited items.</p>
                     </div>

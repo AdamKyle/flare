@@ -34,7 +34,7 @@ class UpdateCharacterStatus implements ShouldBroadcastNow {
         $character = $character->refresh();
         $this->characterStatuses = [
             'can_attack'              => $character->can_attack,
-            'can_attack_again_at'     => $character->can_attack_again_at,
+            'can_attack_again_at'     => now()->diffInSeconds($character->can_attack_again_at),
             'can_craft'               => $character->can_craft,
             'can_craft_again_at'      => $character->can_craft_again_at,
             'is_dead'                 => $character->is_dead,

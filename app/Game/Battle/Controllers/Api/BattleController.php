@@ -4,6 +4,7 @@ namespace App\Game\Battle\Controllers\Api;
 
 use App\Flare\Models\Location;
 use App\Flare\Services\BuildMonsterCacheService;
+use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Jobs\BattleAttackHandler;
 use App\Game\Battle\Events\AttackTimeOutEvent;
 use Illuminate\Http\JsonResponse;
@@ -61,6 +62,8 @@ class BattleController extends Controller {
         } else {
             $monsters = Cache::get('monsters')[$character->map->gameMap->name];
         }
+
+        event(new UpdateCharacterStatus($character));
 
         return response()->json([
             'monsters'  => $monsters,

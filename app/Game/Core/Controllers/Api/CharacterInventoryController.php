@@ -491,9 +491,12 @@ class  CharacterInventoryController extends Controller {
             return response()->json([
                 'message' => 'Unequipped ' . $inventoryName . '.',
                 'inventory' => [
-                    'set_is_equipped' => false,
-                    'equipped'        => $inventory->getInventoryForType('equipped'),
-                    'sets'            => $inventory->getInventoryForType('sets')['sets'],
+                    'inventory'         => $inventory->getInventoryForType('inventory'),
+                    'equipped'          => $inventory->getInventoryForType('equipped'),
+                    'sets'              => $inventory->getInventoryForType('sets')['sets'],
+                    'set_is_equipped'   => false,
+                    'set_name_equipped' => $inventory->getEquippedInventorySetName(),
+                    'usable_sets'       => $inventory->getUsableSets()
                 ]
             ]);
         }
@@ -520,8 +523,12 @@ class  CharacterInventoryController extends Controller {
         return response()->json([
             'message' => 'Unequipped item: ' . $foundItem->item->name,
             'inventory' => [
-                'inventory' => $inventory->getInventoryForType('inventory'),
-                'equipped'  => $inventory->getInventoryForType('equipped'),
+                'inventory'         => $inventory->getInventoryForType('inventory'),
+                'equipped'          => $inventory->getInventoryForType('equipped'),
+                'sets'              => $inventory->getInventoryForType('sets')['sets'],
+                'set_is_equipped'   => false,
+                'set_name_equipped' => $inventory->getEquippedInventorySetName(),
+                'usable_sets'       => $inventory->getUsableSets()
             ]
         ]);
     }
@@ -561,7 +568,8 @@ class  CharacterInventoryController extends Controller {
                 'equipped'          => $characterInventoryService->getInventoryForType('equipped'),
                 'set_is_equipped'   => false,
                 'set_name_equipped' => $characterInventoryService->getEquippedInventorySetName(),
-                'sets'              => $characterInventoryService->getInventoryForType('sets')['sets']
+                'sets'              => $characterInventoryService->getInventoryForType('sets')['sets'],
+                'usable_sets'       => $characterInventoryService->getUsableSets()
             ]
         ], 200);
     }

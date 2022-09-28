@@ -354,14 +354,6 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
                     <div className='ml-2'>
                         <DropDown menu_items={this.buildActionsDropDown()} button_title={'Actions'} disabled={this.props.is_dead || this.state.loading}  />
                     </div>
-                    <div className='ml-2'>
-                        {
-                            this.state.selected_set === this.props.set_name_equipped ?
-                                <span className={'text-green-600 dark:text-green-700'}>set is Equipped!</span>
-                            :
-                                null
-                        }
-                    </div>
                     <div className='ml-4 md:ml-0 my-4 md:my-0 md:absolute md:right-[10px]'>
                         <input type='text' name='search' className='form-control' onChange={this.search.bind(this)} placeholder={'Search'}/>
                     </div>

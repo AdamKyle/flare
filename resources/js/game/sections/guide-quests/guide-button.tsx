@@ -3,16 +3,24 @@ import SuccessOutlineButton from "../../components/ui/buttons/success-outline-bu
 import GuideQuest from "./modals/guide-quest";
 
 export default class GuideButton extends React.Component<any, any> {
+
+    private guideQuestButton: any;
+
     constructor(props: any) {
         super(props);
 
         this.state = {
             is_modal_open: false,
+            show_button: true,
         }
+
+        // @ts-ignore
+        this.guideQuestButton = Echo.private('guide-quest-button-' + this.props.user_id);
     }
 
     componentDidMount() {
         const self = this;
+
         setTimeout(function(){
             if (self.props.force_open_modal) {
                 self.setState({
@@ -20,6 +28,13 @@ export default class GuideButton extends React.Component<any, any> {
                 });
             }
         },5000);
+
+        // @ts-ignore
+        this.guideQuestButton.listen('Game.GuideQuests.Events.RemoveGuideQuestButton', (event: any) => {
+            this.setState({
+                show_button: false,
+            });
+        });
 
     }
 
@@ -30,6 +45,11 @@ export default class GuideButton extends React.Component<any, any> {
     }
 
     render() {
+
+        if (!this.state.show_button) {
+            return null;
+        }
+
         return (
             <Fragment>
                 <SuccessOutlineButton button_label={'Guide Quests'} on_click={this.manageGuideQuestModal.bind(this)} additional_css={'mr-4'}/>

@@ -7,22 +7,39 @@ use App\Flare\Models\Character;
 use App\Flare\Models\GuideQuest;
 use App\Flare\Models\QuestsCompleted;
 use App\Flare\Models\User;
+use App\Game\GuideQuests\Events\RemoveGuideQuestButton;
 use App\Game\GuideQuests\Services\GuideQuestService;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 
 class GuideQuestsController extends Controller {
 
+    /**
+     * @var GuideQuestService $guideQuestService
+     */
     private GuideQuestService $guideQuestService;
 
+    /**
+     * @param GuideQuestService $guideQuestService
+     */
     public function __construct(GuideQuestService $guideQuestService) {
         $this->guideQuestService = $guideQuestService;
     }
 
-    public function getCurrentQuest(User $user) {
+    /**
+     * @param User $user
+     * @return JsonResponse
+     */
+    public function getCurrentQuest(User $user): JsonResponse {
         return $this->getNextQuest($user->character);
     }
 
-    public function handInQuest(User $user, GuideQuest $guideQuest) {
+    /**
+     * @param User $user
+     * @param GuideQuest $guideQuest
+     * @return JsonResponse
+     */
+    public function handInQuest(User $user, GuideQuest $guideQuest): JsonResponse {
         $character = $user->character;
         $response  = $this->guideQuestService->handInQuest($character, $guideQuest);
 
@@ -37,8 +54,14 @@ class GuideQuestsController extends Controller {
         ]);
     }
 
-
-    protected function getNextQuest(Character $character, string $message = '') {
+    /**
+     * Get the next guide quest.
+     *
+     * @param Character $character
+     * @param string $message
+     * @return JsonResponse
+     */
+    protected function getNextQuest(Character $character, string $message = ''): JsonResponse {
         $quest = $this->guideQuestService->fetchQuestForCharacter($character);
 
         if (!is_null($quest)) {
@@ -58,8 +81,14 @@ class GuideQuestsController extends Controller {
             return response()->json($response);
         }
 
-        return response()->json([
-            'error' => 'Could not find next quest.'
-        ], 422);
+        if ($character->user->guide_enabled) {
+            $character->user->update([
+                'guide_enabled' => false
+            ]);
+        }
+
+        event(new RemoveGuideQuestButton($character->user));
+
+        return response()->json();
     }
 }
