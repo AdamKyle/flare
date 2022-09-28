@@ -2376,16 +2376,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v9.31.0",
+            "version": "v9.32.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "75013d4fffe3b24748d313fbbea53206351214f7"
+                "reference": "aae3b59f82434176546c9dd10804adda16da5278"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/75013d4fffe3b24748d313fbbea53206351214f7",
-                "reference": "75013d4fffe3b24748d313fbbea53206351214f7",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/aae3b59f82434176546c9dd10804adda16da5278",
+                "reference": "aae3b59f82434176546c9dd10804adda16da5278",
                 "shasum": ""
             },
             "require": {
@@ -2558,7 +2558,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2022-09-20T13:32:50+00:00"
+            "time": "2022-09-27T13:32:56+00:00"
         },
         {
             "name": "laravel/helpers",
@@ -2618,16 +2618,16 @@
         },
         {
             "name": "laravel/horizon",
-            "version": "v5.10.1",
+            "version": "v5.10.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/horizon.git",
-                "reference": "1570c8a4612484a37392eca986f06d01b771cb96"
+                "reference": "de84bf86ffee940fa92e29c54d41618048ec9b6f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/horizon/zipball/1570c8a4612484a37392eca986f06d01b771cb96",
-                "reference": "1570c8a4612484a37392eca986f06d01b771cb96",
+                "url": "https://api.github.com/repos/laravel/horizon/zipball/de84bf86ffee940fa92e29c54d41618048ec9b6f",
+                "reference": "de84bf86ffee940fa92e29c54d41618048ec9b6f",
                 "shasum": ""
             },
             "require": {
@@ -2689,9 +2689,9 @@
             ],
             "support": {
                 "issues": "https://github.com/laravel/horizon/issues",
-                "source": "https://github.com/laravel/horizon/tree/v5.10.1"
+                "source": "https://github.com/laravel/horizon/tree/v5.10.2"
             },
-            "time": "2022-09-05T16:33:43+00:00"
+            "time": "2022-09-26T13:45:51+00:00"
         },
         {
             "name": "laravel/serializable-closure",
