@@ -32,7 +32,6 @@ export default class MoveItemModal extends React.Component<MoveModalProps, any> 
     }
 
     buildDropDown() {
-        console.log(this.props.usable_sets);
         return this.props.usable_sets.map((set) => {
             return {
                 name: set.name,

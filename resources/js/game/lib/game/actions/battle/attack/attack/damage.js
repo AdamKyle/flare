@@ -154,7 +154,7 @@ export default class Damage extends BattleBase {
       dc = 99;
     }
 
-    dc             -= Math.ceil(dc * skillBonus);
+    dc  -= Math.ceil(dc * skillBonus);
 
     if (roll < dc) {
       this.addMessage('The enemy evades your magic!', 'enemy-action');
@@ -172,13 +172,21 @@ export default class Damage extends BattleBase {
   }
 
   calculateHealingTotal(attacker, attackData, extraHealing) {
-    const skillBonus = attacker.skills.filter(s => s.name === 'Criticality')[0].skill_bonus;
+    let skillBonus = 0;
+
+    if (Array.isArray(attacker.skills)) {
+      skillBonus = attacker.skills.filter(s => s.name === 'Criticality')[0].skill_bonus;
+    } else {
+      // Could be an object of name: float
+      skillBonus = attacker.skills.criticality;
+    }
 
     let healFor = attackData.heal_for;
 
-    const dc = 100 - 100 * skillBonus;
+    const dc   = 100 - 100 * skillBonus;
+    const roll = random(1, 100)
 
-    if (random(1, 100) > dc) {
+    if (roll > dc) {
       this.addMessage('The heavens open and your wounds start to heal over (Critical heal!)', 'regular')
 
       healFor *= 2;
@@ -188,9 +196,9 @@ export default class Damage extends BattleBase {
       healFor += healFor * 0.15
     }
 
-    this.characterCurrentHealth += healFor
+    this.addMessage('Your healing spell(s) heals for an additional: ' + formatNumber(parseInt(healFor.toFixed(0))), 'player-action');
 
-    this.addMessage('Your healing spell(s) heals for an additional: ' + formatNumber(parseInt(healFor.toFixed(0))), 'player-action')
+    return healFor;
   }
 
   hammerSmash(attacker, monsterCurrentHealth, attackData) {
@@ -398,7 +406,9 @@ export default class Damage extends BattleBase {
 
         this.addMessage('Your prayers were heard by The Creator and he grants you extra life!', 'regular');
 
-        characterCurrentHealth = this.calculateHealingTotal(attacker, attackData, extraHealing);
+        console.log('Double healing: ', this.calculateHealingTotal(attacker, attackData, extraHealing));
+
+        characterCurrentHealth += this.calculateHealingTotal(attacker, attackData, extraHealing);
       }
     }
 
@@ -442,6 +452,7 @@ export default class Damage extends BattleBase {
   }
 
   canUse(extraActionChance) {
+
     if (extraActionChance >= 1.0) {
       return true;
     }

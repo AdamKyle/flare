@@ -160,10 +160,23 @@ export default class FightSection extends React.Component<FightSectionProps, Fig
 
         const attackState = attack.getState();
 
+        let characterHealth = attackState.characterCurrentHealth;
+        let monsterHealth   = attackState.monsterCurrentHealth;
+
+        if (typeof this.state.character_max_health !== 'undefined') {
+            if (characterHealth > this.state.character_max_health) {
+                characterHealth = this.state.character_max_health;
+            }
+        }
+
+        if (monsterHealth > this.state.monster_max_health) {
+            monsterHealth = this.state.monster_max_health;
+        }
+
         this.setState({
             battle_messages: [...this.battle_messages, ...attackState.battle_messages],
-            monster_current_health: attackState.monsterCurrentHealth,
-            character_current_health: attackState.characterCurrentHealth,
+            monster_current_health: monsterHealth,
+            character_current_health: characterHealth,
         });
 
         this.battle_messages = [];

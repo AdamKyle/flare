@@ -31,13 +31,18 @@ export default class MonsterAttack extends BattleBase {
         damage = damage * 2;
       }
 
-      damage -= this.defender.ac;
+      if (this.defender.ac >= damage) {
+        this.addMessage('You blocked the enemies attack with your armour!', 'player-action');
+      } else {
+        damage -= this.defender.ac;
 
-      this.addMessage('You reduced the incoming (Physical) damage with your armour by: ' + formatNumber(this.defender.ac), 'player-action')
 
-      this.currentCharacterHealth = this.currentCharacterHealth - damage;
+        this.addMessage('You reduced the incoming (Physical) damage with your armour by: ' + formatNumber(this.defender.ac), 'player-action')
 
-      this.addMessage(monster.name + ' hits for: ' + formatNumber(damage), 'enemy-action');
+        this.currentCharacterHealth = this.currentCharacterHealth - damage;
+
+        this.addMessage(monster.name + ' hits for: ' + formatNumber(damage), 'enemy-action');
+      }
 
       this.useItems(monster, isCharacterVoided, isMonsterVoided);
 
@@ -63,13 +68,18 @@ export default class MonsterAttack extends BattleBase {
           damage = damage * 2;
         }
 
-        damage -= this.defender.ac;
+        if (this.defender.ac >= damage) {
+          this.addMessage('You blocked the enemies attack!', 'player-action');
+        } else {
+          damage -= this.defender.ac;
 
-        this.addMessage('You reduced the incoming (Physical) damage with your armour by: ' + formatNumber(this.defender.ac), 'player-action')
 
-        this.currentCharacterHealth = this.currentCharacterHealth - damage;
+          this.addMessage('You reduced the incoming (Physical) damage with your armour by: ' + formatNumber(this.defender.ac), 'player-action')
 
-        this.addMessage(monster.name + ' hits for: ' + formatNumber(damage), 'enemy-action');
+          this.currentCharacterHealth = this.currentCharacterHealth - damage;
+
+          this.addMessage(monster.name + ' hits for: ' + formatNumber(damage), 'enemy-action');
+        }
 
         this.useItems(monster, isCharacterVoided, isMonsterVoided, previousAttackType);
 
@@ -131,7 +141,7 @@ export default class MonsterAttack extends BattleBase {
       const defenderAC = defender.attack_types[attackType].defence;
 
 
-      if (damage < defenderAC) {
+      if (damage <= defenderAC) {
         return true
       }
 
@@ -143,10 +153,12 @@ export default class MonsterAttack extends BattleBase {
     }
 
     if (isCharacterVoided) {
-      return damage < defender.voided_ac;
+      return damage <= defender.voided_ac;
     }
 
-    return damage < defender.ac;
+    console.log(defender.ac, damage);
+
+    return damage <= defender.ac;
   }
 
   useItems(attacker, isCharacterVoided, isMonsterVoided, previousAttackType) {

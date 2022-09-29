@@ -201,6 +201,8 @@ export default class CastAttack extends BattleBase {
         healFor *= 2;
       }
 
+      console.log('Regular healing Amount', healFor);
+
       this.characterCurrentHealth += healFor
 
       this.addMessage('Your healing spell(s) heals you for: ' + formatNumber(healFor.toFixed(0)), 'player-action');

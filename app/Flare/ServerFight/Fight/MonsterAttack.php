@@ -89,8 +89,8 @@ class MonsterAttack extends BattleBase {
             $ac = $playerCachedDefence;
         }
 
-        if ($ac > $attack) {
-            $this->addMessage('You blocked the enemies attack!', 'enemy-action');
+        if ($ac >= $attack) {
+            $this->addMessage('You blocked the enemies attack with your armour!', 'enemy-action');
 
             return;
         }
