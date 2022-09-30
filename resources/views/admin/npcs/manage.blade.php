@@ -1,29 +1,27 @@
 @extends('layouts.app')
 
 @section('content')
+    <x-core.layout.info-container>
+        <x-core.cards.card-with-title
+            title="{{is_null($npc) ? 'Create NPC' : 'Edit '.$npc->name}}"
+            buttons="true"
+            backUrl="{{route('npcs.index')}}"
+        >
+            <form class="mt-4" action="{{route('npc.store')}}" method="POST">
+                @csrf
 
-    <div class="container-fluid">
-        <div class="row page-titles">
-            <div class="col-md-6 align-self-right">
-                <h4 class="mt-2">{{is_null($npc) ? 'Create NPC' : 'Edit NPC: ' . $npc->name}}</h4>
-            </div>
-            <div class="col-md-6 align-self-right">
-                <a href="{{url()->previous()}}" class="btn btn-primary float-right ml-2">Back</a>
-            </div>
-        </div>
-        @livewire('core.form-wizard', [
-            'views' => [
-                'admin.npcs.partials.details',
-                'admin.npcs.partials.commands',
-            ],
-            'model'     => $npc,
-            'modelName' => 'npc',
-            'steps' => [
-                'NPC Details',
-                'NPC Commands',
-            ],
-            'finishRoute' => 'npcs.index',
-            'editing'     => $editing,
-        ])
-    </div>
+                <input type="hidden" value="{{is_null($npc) ?  '' : $npc->id}}" name="npc_id" />
+
+                <x-core.forms.input :model="$npc" label="Name:" modelKey="real_name" name="real_name" />
+                <x-core.forms.key-value-select :model="$npc" label="Lives on map:" modelKey="game_map_id" name="game_map_id" :options="$gameMaps" />
+                <x-core.forms.key-value-select :model="$npc" label="NPC Type:" modelKey="type" name="type" :options="$types" />
+                <x-core.forms.input :model="$npc" label="X Position:" modelKey="x_position" name="x_position" />
+                <x-core.forms.input :model="$npc" label="Y Position:" modelKey="y_position" name="y_position" />
+
+                <x-core.buttons.primary-button type="submit">
+                    Submit
+                </x-core.buttons.primary-button>
+            </form>
+        </x-core.cards.card-with-title>
+    </x-core.layout.info-container>
 @endsection

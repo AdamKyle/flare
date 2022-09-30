@@ -2,6 +2,8 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Requests\StoreNpcRequest;
+use App\Flare\Models\GameMap;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Admin\Requests\NpcsImportRequest;
 use App\Http\Controllers\Controller;
@@ -28,15 +30,17 @@ class NpcsController extends Controller {
 
     public function create() {
         return view('admin.npcs.manage', [
-            'npc'     => null,
-            'editing' => false,
+            'npc'      => null,
+            'gameMaps' => GameMap::pluck('name', 'id')->toArray(),
+            'types'    => NpcTypes::getNamedValues(),
         ]);
     }
 
     public function edit(Npc $npc) {
         return view('admin.npcs.manage', [
-            'npc'     => $npc,
-            'editing' => true,
+            'npc'      => $npc,
+            'gameMaps' => GameMap::pluck('name', 'id')->toArray(),
+            'types'    => NpcTypes::getNamedValues(),
         ]);
     }
 
@@ -46,6 +50,13 @@ class NpcsController extends Controller {
 
     public function importNpcs() {
         return view('admin.npcs.import');
+    }
+
+    public function store(StoreNpcRequest $request) {
+        $params = [...$request->all(), ...['name' => str_replace(' ', '', $request->real_name)]];
+        $npc    = Npc::updateOrCreate(['id' => $request->npc_id], $params);
+
+        return response()->redirectToRoute('npcs.show', ['npc' => $npc->id])->with('success', 'Saved: ' . $npc->real_name);
     }
 
     /**

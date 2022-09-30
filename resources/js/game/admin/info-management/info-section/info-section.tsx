@@ -126,6 +126,9 @@ export default class InfoSection extends React.Component<any, any> {
         },{
             label: 'Maps',
             value: 'admin.maps.maps-table',
+        },{
+            label: 'NPCs',
+            value: 'admin.npcs.npc-table',
         }];
     }
 

@@ -1,20 +1,29 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container-fluid">
-        <div class="row page-titles">
-            <div class="col-md-6 align-self-left">
-                <h4 class="mt-3">NPCs</h4>
-            </div>
-            <div class="col-md-6 align-self-right">
-                <a href="{{route('home')}}" class="btn btn-success float-right ml-2">Home</a>
-                <a href="{{route('npcs.create')}}" class="btn btn-primary float-right ml-2">Create</a>
-                <a href="{{route('npcs.import')}}" class="btn btn-primary float-right ml-2">Import</a>
-                <a href="{{route('npcs.export')}}" class="btn btn-primary float-right ml-2">Export</a>
-            </div>
-        </div>
-        <hr />
-        @livewire('admin.npcs.data-table')
-
-    </div>
+    <x-core.page-title
+        title="Items"
+        route="{{route('home')}}"
+        color="success" link="Home"
+    >
+        <x-core.buttons.link-buttons.primary-button
+            href="{{route('npcs.create')}}"
+            css="tw-ml-2"
+        >
+            Create NPC
+        </x-core.buttons.link-buttons.primary-button>
+        <x-core.buttons.link-buttons.primary-button
+            href="{{route('npcs.export')}}"
+            css="tw-ml-2"
+        >
+            <i class="fas fa-file-export"></i> Export
+        </x-core.buttons.link-buttons.primary-button>
+        <x-core.buttons.link-buttons.primary-button
+            href="{{route('npcs.import')}}"
+            css="tw-ml-2"
+        >
+            <i class="fas fa-file-upload"></i> Import
+        </x-core.buttons.link-buttons.primary-button>
+    </x-core.page-title>
+    @livewire('admin.npcs.npc-table')
 @endsection
