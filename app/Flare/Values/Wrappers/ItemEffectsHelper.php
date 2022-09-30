@@ -7,7 +7,7 @@ use App\Flare\Values\ItemEffectsValue;
 class ItemEffectsHelper {
 
     /**
-     * Wrapper around the the KingdomLogStatusValue
+     * Wrapper around the KingdomLogStatusValue
      *
      * @param string $effect
      * @return ItemEffectsValue

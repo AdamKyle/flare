@@ -9,6 +9,8 @@ use App\Flare\Models\QuestsCompleted;
 use App\Flare\Models\User;
 use App\Game\GuideQuests\Events\RemoveGuideQuestButton;
 use App\Game\GuideQuests\Services\GuideQuestService;
+use App\Game\Messages\Events\GlobalMessageEvent;
+use App\Game\Messages\Events\ServerMessageEvent;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 
@@ -85,6 +87,12 @@ class GuideQuestsController extends Controller {
             $character->user->update([
                 'guide_enabled' => false
             ]);
+
+            event(new GlobalMessageEvent($character->name . ' Has completed all the Guide Quests! They are now ready to take on anything!'));
+
+            event(new ServerMessageEvent($character->user, 'Congratulations and welcome to Planes of Tlessa! By completing these guide quests you now have a firm grasp on the
+            the basics and the world around you! There are many more quests for you to do in the Quests tab, that unlock all kinds of goodies and features as well as tell an
+            over arching story! Where do you go from here? What do you do now? Check out the quests section! I wish you the best!'));
         }
 
         event(new RemoveGuideQuestButton($character->user));

@@ -67,7 +67,7 @@
                 <span class="fas fa-feather"></span>
                 Completed Quests
             </a>
-            @if (auth()->user()->guide_enabled)
+            @if (GuideQuests::canSeeGuideQuestsLog())
                 <a href="{{route('completed.guide-quests', ['user' => auth()->user()])}}">
                     <span class="fas fa-feather"></span>
                     Completed Guide Quests
