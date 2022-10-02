@@ -1388,9 +1388,9 @@
   integrity sha512-47Aa+JmYjY4xTFpTtYCwrqirmI1arnp1UZETwtWpbTPisXUAuxrdJxKJLH8KHFWMsSrLi9+AcfyfzDIuO75rEA==
 
 "@headlessui/react@^1.5.0":
-  version "1.7.2"
-  resolved "https://registry.yarnpkg.com/@headlessui/react/-/react-1.7.2.tgz#e6a6a8d38342064a53182f1eb2bf6d9c1e53ba6a"
-  integrity sha512-snLv2lxwsf2HNTOBNgHYdvoYZ3ChJE8QszPi1d/hl9js8KrFrUulTaQBfSyPbJP5BybVreWh9DxCgz9S0Z6hKQ==
+  version "1.7.3"
+  resolved "https://registry.yarnpkg.com/@headlessui/react/-/react-1.7.3.tgz#853c598ff47b37cdd192c5cbee890d9b610c3ec0"
+  integrity sha512-LGp06SrGv7BMaIQlTs8s2G06moqkI0cb0b8stgq7KZ3xcHdH3qMP+cRyV7qe5x4XEW/IGY48BW4fLesD6NQLng==
 
 "@isaacs/string-locale-compare@*", "@isaacs/string-locale-compare@^1.1.0":
   version "1.1.0"
@@ -3188,6 +3188,15 @@ cliui@^7.0.2:
     strip-ansi "^6.0.0"
     wrap-ansi "^7.0.0"
 
+cliui@^8.0.1:
+  version "8.0.1"
+  resolved "https://registry.yarnpkg.com/cliui/-/cliui-8.0.1.tgz#0c04b075db02cbfe60dc8e6cf2f5486b1a3608aa"
+  integrity sha512-BSeNnyus75C4//NQ9gQt1/csTXyo/8Sb+afLAkzAptFuMsod9HFokGNudZpi/oQV73hnVK+sR+5PVRMd+Dr7YQ==
+  dependencies:
+    string-width "^4.2.0"
+    strip-ansi "^6.0.1"
+    wrap-ansi "^7.0.0"
+
 clone-deep@^4.0.1:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/clone-deep/-/clone-deep-4.0.1.tgz#c19fd9bdbbf85942b4fd979c84dcf7d5f07c2387"
@@ -4098,9 +4107,9 @@ ee-first@1.1.1:
   integrity sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==
 
 electron-to-chromium@^1.4.251:
-  version "1.4.268"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.268.tgz#5a902075f0209a628837e508a66d40ace04d54ab"
-  integrity sha512-PO90Bv++vEzdln+eA9qLg1IRnh0rKETus6QkTzcFm5P3Wg3EQBZud5dcnzkpYXuIKWBjKe5CO8zjz02cicvn1g==
+  version "1.4.270"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.270.tgz#2c6ea409b45cdb5c3e0cb2c08cf6c0ba7e0f2c26"
+  integrity sha512-KNhIzgLiJmDDC444dj9vEOpZEgsV96ult9Iff98Vanumn+ShJHd5se8aX6KeVxdc0YQeqdrezBZv89rleDbvSg==
 
 elliptic@^6.5.3:
   version "6.5.4"
@@ -7253,9 +7262,9 @@ postcss@^7.0.11, postcss@^7.0.18, postcss@^7.0.32, postcss@^7.0.5:
     source-map "^0.6.1"
 
 postcss@^8.2.15, postcss@^8.4.14:
-  version "8.4.16"
-  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.4.16.tgz#33a1d675fac39941f5f445db0de4db2b6e01d43c"
-  integrity sha512-ipHE1XBvKzm5xI7hiHCZJCSugxvsdq2mPnsq5+UF+VHCjiBvtDrlxJfMBToWaP9D5XlgNmcFGqoHmUn0EYEaRQ==
+  version "8.4.17"
+  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.4.17.tgz#f87863ec7cd353f81f7ab2dec5d67d861bbb1be5"
+  integrity sha512-UNxNOLQydcOFi41yHNMcKRZ39NeXlr8AxGuZJsdub8vIb12fHzcq37DTU/QtbI6WLxNg2gF9Z+8qtRwTj1UI1Q==
   dependencies:
     nanoid "^3.3.4"
     picocolors "^1.0.0"
@@ -8234,9 +8243,9 @@ socks-proxy-agent@^7.0.0:
     socks "^2.6.2"
 
 socks@^2.6.2:
-  version "2.7.0"
-  resolved "https://registry.yarnpkg.com/socks/-/socks-2.7.0.tgz#f9225acdb841e874dca25f870e9130990f3913d0"
-  integrity sha512-scnOe9y4VuiNUULJN72GrM26BNOjVsfPXI+j+98PkyEfsIXroa5ofyjT+FzGvn/xHs73U2JtoBYAVx9Hl4quSA==
+  version "2.7.1"
+  resolved "https://registry.yarnpkg.com/socks/-/socks-2.7.1.tgz#d8e651247178fde79c0663043e07240196857d55"
+  integrity sha512-7maUZy1N7uo6+WVEX6psASxtNlKaNVMlGQKkG/63nEDdLOWNbiUMoLK7X4uYoLhQstau72mLgfEWcXcwsaHbYQ==
   dependencies:
     ip "^2.0.0"
     smart-buffer "^4.2.0"
@@ -9242,11 +9251,11 @@ yargs@17.1.1:
     yargs-parser "^20.2.2"
 
 yargs@^17.2.1, yargs@^17.3.1:
-  version "17.5.1"
-  resolved "https://registry.yarnpkg.com/yargs/-/yargs-17.5.1.tgz#e109900cab6fcb7fd44b1d8249166feb0b36e58e"
-  integrity sha512-t6YAJcxDkNX7NFYiVtKvWUz8l+PaKTLiL63mJYWR2GnHq2gjEWISzsLp9wg3aY36dY1j+gfIEL3pIF+XlJJfbA==
+  version "17.6.0"
+  resolved "https://registry.yarnpkg.com/yargs/-/yargs-17.6.0.tgz#e134900fc1f218bc230192bdec06a0a5f973e46c"
+  integrity sha512-8H/wTDqlSwoSnScvV2N/JHfLWOKuh5MVla9hqLjK3nsfyy6Y4kDSYSvkU5YCUEPOSnRXfIyx3Sq+B/IWudTo4g==
   dependencies:
-    cliui "^7.0.2"
+    cliui "^8.0.1"
     escalade "^3.1.1"
     get-caller-file "^2.0.5"
     require-directory "^2.1.1"
