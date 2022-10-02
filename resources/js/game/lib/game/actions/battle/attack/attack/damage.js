@@ -89,7 +89,7 @@ export default class Damage extends BattleBase {
         if (dc <= 0 || random(1, 100) > dc) {
           this.addMessage('Your damaging enchantments (resistible) have been resisted.', 'enemy-action');
         } else {
-          totalDamage = attacker.non_stacking_damage - attacker.non_stacking_damage * damageDeduction;
+          totalDamage += attacker.non_stacking_damage - attacker.non_stacking_damage * damageDeduction;
         }
       }
     }
@@ -405,8 +405,6 @@ export default class Damage extends BattleBase {
       if (extraActionChance.type === ExtraActionType.PROPHET_HEALING && extraActionChance.has_item) {
 
         this.addMessage('Your prayers were heard by The Creator and he grants you extra life!', 'regular');
-
-        console.log('Double healing: ', this.calculateHealingTotal(attacker, attackData, extraHealing));
 
         characterCurrentHealth += this.calculateHealingTotal(attacker, attackData, extraHealing);
       }

@@ -82,14 +82,14 @@ class ReRollEnchantmentService {
     }
 
     protected function getShardsCost(Character $character, string $type, string $selectedAffix): int {
-        $shardCost = 10000;
+        $shardCost = 100;
 
         if ($selectedAffix === 'all-enchantments') {
             $shardCost *= 2;
         }
 
         if ($type === 'everything') {
-            $shardCost += 500;
+            $shardCost += 250;
         } else {
             $shardCost += 100;
         }

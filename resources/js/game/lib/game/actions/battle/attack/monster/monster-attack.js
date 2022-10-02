@@ -156,8 +156,6 @@ export default class MonsterAttack extends BattleBase {
       return damage <= defender.voided_ac;
     }
 
-    console.log(defender.ac, damage);
-
     return damage <= defender.ac;
   }
 

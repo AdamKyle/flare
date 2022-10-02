@@ -41,7 +41,7 @@ export default class Quests extends React.Component<QuestsProps, QuestState> {
     }
 
     render() {
-
+        console.log('render quests: ', this.state.quests, this.props.quest_details);
         if (this.state.quests.length === 0) {
             return <ComponentLoading />
         }

@@ -37,7 +37,6 @@ export default class BattleSetUp {
         const voidance       = new Voidance(this.character, monster);
 
         switch(monster.plane()) {
-            case 'Hell':
             case 'Purgatory':
                 this.voidanceResult = voidance.monsterVoidsCharacter();
                 break;

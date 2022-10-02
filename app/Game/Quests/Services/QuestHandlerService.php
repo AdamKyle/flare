@@ -166,9 +166,12 @@ class QuestHandlerService {
 
         $character = $character->refresh();
 
+        $quests = Quest::where('is_parent', true)->with('childQuests')->get();
+
         return $this->successResult([
             'completed_quests' => $character->questsCompleted()->pluck('quest_id'),
             'player_plane'     => $character->map->gameMap->name,
+            'quests'           => $quests->toArray(),
         ]);
     }
 

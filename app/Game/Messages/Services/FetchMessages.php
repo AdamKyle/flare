@@ -36,7 +36,10 @@ class FetchMessages {
 
             $message->x     = $message->x_position;
             $message->y     = $message->y_position;
-            $message->map   = $this->getMapNameFromColor($message->color);
+
+            if (!is_null($message->color)) {
+                $message->map = $this->getMapNameFromColor($message->color);
+            }
 
             return $this->setMessageName($message);
         });
@@ -52,8 +55,8 @@ class FetchMessages {
 
         $user = $message->user;
 
-        if ($user->hasRole('admin')) {
-            $message->name = 'Admin';
+        if ($user->hasRole('Admin')) {
+            $message->name = 'The Creator';
 
             return $message;
         }

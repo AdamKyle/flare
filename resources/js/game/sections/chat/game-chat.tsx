@@ -75,7 +75,7 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
 
         (new Ajax()).setRoute('last-chats').doAjaxCall('get', (result: AxiosResponse) => {
             const chats = result.data.map((chat: any) => {
-                if (chat.name === 'Admin') {
+                if (chat.name === 'The Creator') {
                     return {
                         message: chat.message,
                         character_name: 'The Creator',
@@ -170,7 +170,7 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
                chat.length = 500;
            }
 
-           if (event.name === 'Admin') {
+           if (event.name === 'The Creator') {
                chat.unshift({
                    message: event.message.message,
                    character_name: 'The Creator',

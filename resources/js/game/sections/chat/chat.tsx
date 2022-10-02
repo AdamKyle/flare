@@ -153,6 +153,12 @@ export default class Chat extends React.Component<ChatComponentProps, ChatCompon
         return this.props.chat.map(function(message: any) {
             switch (message.type) {
                 case 'chat':
+                    if (message.character_name === 'The Creator') {
+                        return <li className='mb-2 break-all md:break-normal text-yellow-300 text-xl bold'>
+                            The Creator: {message.message}
+                        </li>
+                    }
+
                     return <li style={{color: message.color}} className='mb-2 break-all md:break-normal'>
                         {self.renderLocation(message)} <button type='button' className='underline' onClick={() => self.privateMessage(message.character_name)}>{message.character_name}</button>: {message.message}
                     </li>

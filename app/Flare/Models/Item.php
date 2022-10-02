@@ -454,6 +454,7 @@ class Item extends Model {
     /**
      * Gets the total percentage increase for a stat.
      *
+     * @param string $stat
      * @return float
      */
     public function getTotalPercentageForStat(string $stat): float {
@@ -479,7 +480,7 @@ class Item extends Model {
     /**
      * Gets the total skill training bonus (XP bonus)
      *
-     * @param string $skillName
+     * @param GameSkill $gameSkill
      * @return float
      */
     public function getSkillTrainingBonus(GameSkill $gameSkill): float {
@@ -523,7 +524,7 @@ class Item extends Model {
     /**
      * Gets the total skill training bonus (Bonus when using)
      *
-     * @param string $skillName
+     * @param GameSkill $gameSkill
      * @return float
      */
     public function getSkillBonus(GameSkill $gameSkill): float {

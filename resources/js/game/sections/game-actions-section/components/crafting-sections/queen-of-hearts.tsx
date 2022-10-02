@@ -354,7 +354,7 @@ export default class QueenOfHearts extends React.Component<any, any> {
     }
 
     calculateCost() {
-        let goldDustCost = 1000;
+        let goldDustCost = 10000;
         let shards       = 100;
 
         if (this.state.reroll_options.reroll_option === 'all-enchantments') {
@@ -364,7 +364,10 @@ export default class QueenOfHearts extends React.Component<any, any> {
 
         if (this.state.reroll_options.attribute === 'everything') {
             goldDustCost += 500;
-            shards       += 500;
+            shards       += 250;
+        } else {
+            goldDustCost += 100;
+            shards       += 100;
         }
 
         this.setState({

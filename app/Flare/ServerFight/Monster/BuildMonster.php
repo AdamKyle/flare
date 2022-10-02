@@ -2,6 +2,7 @@
 
 namespace App\Flare\ServerFight\Monster;
 
+use App\Flare\Models\CelestialFight;
 use App\Flare\ServerFight\BattleMessages;
 
 class BuildMonster extends BattleMessages {
@@ -46,17 +47,23 @@ class BuildMonster extends BattleMessages {
     }
 
     protected function buildHealth($monster): int {
-        $healthArray = explode('-', $monster['health_range']);
+        $celestial = CelestialFight::where('monster_id', $monster['id'])->first();
 
-        $health = rand($healthArray[0], $healthArray[1]);
+        if (is_null($celestial)) {
+            $healthArray = explode('-', $monster['health_range']);
 
-        $increasesHealthBy = $monster['increases_damage_by'];
+            $health = rand($healthArray[0], $healthArray[1]);
 
-        if (!is_null($increasesHealthBy)) {
-            $health = $health + $health * $increasesHealthBy;
+            $increasesHealthBy = $monster['increases_damage_by'];
+
+            if (!is_null($increasesHealthBy)) {
+                $health = $health + $health * $increasesHealthBy;
+            }
+
+            return $health;
         }
 
-        return $health;
+        return $celestial->max_health;
     }
 
     protected function reduceEnemyStats(array $monster, array $characterStatReductionAffixes): array {

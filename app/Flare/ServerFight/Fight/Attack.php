@@ -132,6 +132,7 @@ class Attack {
         }
 
         if ($whoAttacks === 'monster') {
+
             $this->monsterAttack->setIsCharacterVoided($this->isCharacterVoided);
             $this->monsterAttack->setCharacterHealth($this->characterHealth);
             $this->monsterAttack->setMonsterHealth($this->monsterHealth);

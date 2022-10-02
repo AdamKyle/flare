@@ -155,7 +155,7 @@ class CraftingService {
      */
     protected function getItems($craftingType, Skill $skill): Collection {
         $twoHandedWeapons = ['bow', 'hammer', 'stave'];
-        $craftingTypes    = ['armour', 'ring', 'spell', 'artifact'];
+        $craftingTypes    = ['armour', 'ring', 'spell'];
 
         $items = Item::where('can_craft', true)
                     ->where('skill_level_required', '<=', $skill->level)
@@ -171,6 +171,8 @@ class CraftingService {
         }else {
             $items->where('type', strtolower($craftingType));
         }
+        $itemNames = $items->pluck('name')->toArray();
+        dump(array_search("Challenger's Cloth Gloves", $itemNames), $craftingType, $skill->level);
 
         return $items->select('name', 'cost', 'type', 'id')->get();
     }

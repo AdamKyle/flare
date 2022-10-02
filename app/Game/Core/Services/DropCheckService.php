@@ -168,7 +168,13 @@ class DropCheckService {
         if (!is_null($this->locationWithEffect)) {
             $dropRate   = new LocationEffectValue($this->locationWithEffect->enemy_strength_type);
 
-            return DropCheckCalculator::fetchLocationDropChance($dropRate->fetchDropRate());
+            $lootingBonus = $this->lootingChance;
+
+            if ($lootingBonus > 0.45) {
+                $lootingBonus = 0.45;
+            }
+
+            return DropCheckCalculator::fetchLocationDropChance($dropRate->fetchDropRate(), $lootingBonus);
         }
 
         return DropCheckCalculator::fetchDropCheckChance($this->monster, $character->level, $this->lootingChance, $this->gameMapBonus);

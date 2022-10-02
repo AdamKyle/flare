@@ -92,16 +92,13 @@ class CelestialFightService {
 
         $this->moveCelestial($character, $celestialFight);
 
-        $celestialFight            = $celestialFight->refresh();
-        $logs                      = $this->monsterPlayerFight->getBattleMessages();
-
-        event(new UpdateCelestialFight($logs, $character->name, $celestialFight));
+        event(new UpdateCelestialFight($character->name, $this->monsterPlayerFight));
 
         return $this->successResult([
             'logs'      => $this->monsterPlayerFight->getBattleMessages(),
             'health' => [
                 'character_health' => $characterHealth,
-                'monster_health'   => $celestialFight->current_health,
+                'monster_health'   => $this->monsterPlayerFight->getMonsterHealth(),
             ]
         ]);
     }

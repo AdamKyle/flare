@@ -290,19 +290,19 @@ class CharacterAffixInformation {
      * @return int
      */
     protected function calculateStackingAffixDamage(Collection $slots): int {
-        $totalResistibleDamage = 0;
+        $totalDamage = 0;
 
         foreach ($slots as $slot) {
             if (!is_null($slot->item->itemPrefix)) {
-                $totalResistibleDamage += $slot->item->itemPrefix->damage;
+                $totalDamage += $slot->item->itemPrefix->damage;
             }
 
             if (!is_null($slot->item->itemSuffix)) {
-                $totalResistibleDamage += $slot->item->itemSuffix->damage;
+                $totalDamage += $slot->item->itemSuffix->damage;
             }
         }
 
-        return $totalResistibleDamage;
+        return $totalDamage;
     }
 
     /**

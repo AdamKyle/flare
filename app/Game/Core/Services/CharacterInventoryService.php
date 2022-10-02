@@ -207,14 +207,14 @@ class CharacterInventoryService {
 
             if (is_null($inventorySet->name)) {
                 $sets['Set ' . $index + 1] = [
-                    'items'      => $this->manager->createData($slots)->toArray(),
+                    'items'      => array_reverse($this->manager->createData($slots)->toArray()),
                     'equippable' => $inventorySet->can_be_equipped,
                     'set_id'     => $inventorySet->id,
                     'equipped'   => $inventorySet->is_equipped,
                 ];
             } else {
                 $sets[$inventorySet->name] = [
-                    'items'      => $this->manager->createData($slots)->toArray(),
+                    'items'      => array_reverse($this->manager->createData($slots)->toArray()),
                     'equippable' => $inventorySet->can_be_equipped,
                     'set_id'     => $inventorySet->id,
                     'equipped'   => $inventorySet->is_equipped,
@@ -340,7 +340,7 @@ class CharacterInventoryService {
 
         $slots = new LeagueCollection($slots, $this->inventoryTransformer);
 
-        return $this->manager->createData($slots)->toArray();
+        return array_reverse($this->manager->createData($slots)->toArray());
     }
 
     public function findCharacterInventorySlotIds(): array {
@@ -349,7 +349,7 @@ class CharacterInventoryService {
         return InventorySlot::where('inventory_slots.inventory_id', $inventory->id)->join('items', function($join) {
             $join->on('inventory_slots.item_id', '=', 'items.id')
                 ->whereNotIn('items.type', ['quest', 'alchemy']);
-        })->where('inventory_slots.equipped', false)->select('inventory_slots.*')->pluck('inventory_slots.id')->toArray();
+        })->where('inventory_slots.equipped', false)->select('inventory_slots.*')->orderBy('inventory_slots.id', 'asc')->pluck('inventory_slots.id')->toArray();
     }
 
     /**

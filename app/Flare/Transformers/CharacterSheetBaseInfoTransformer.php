@@ -75,7 +75,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
             'agi_modded'                  => round($characterInformation->statMod('agi')),
             'focus_modded'                => round($characterInformation->statMod('focus')),
             'weapon_attack'               => round($characterInformation->getTotalWeaponDamage()),
-            'voided_weapon_attack'        => round($characterInformation->getTotalWeaponDamage(false)),
+            'voided_weapon_attack'        => round($characterInformation->getTotalWeaponDamage(true)),
             'ring_damage'                 => round($characterInformation->getTotalRingDamage()),
             'voided_ring_damage'          => round($characterInformation->getTotalRingDamage(true)),
             'spell_damage'                => round($characterInformation->getTotalSpellDamage()),

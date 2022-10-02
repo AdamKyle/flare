@@ -315,7 +315,7 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                                         }
 
                                     </div>
-                                    <div className='my-4 max-h-[160px] overflow-x-auto border border-slate-200 dark:border-slate-700 rounded-md bg-slate-200 dark:bg-slate-700 p-4'>
+                                    <div className={'my-4 max-h-[160px] overflow-x-auto border border-slate-200 dark:border-slate-700 rounded-md bg-slate-200 dark:bg-slate-700 p-4 ' + (!this.props.is_parent_complete ? ' blur-sm' : '')}>
                                         {
                                             this.props.is_quest_complete ?
                                                 <div dangerouslySetInnerHTML={{__html: this.getText(this.state.quest_details.after_completion_description)}}></div>

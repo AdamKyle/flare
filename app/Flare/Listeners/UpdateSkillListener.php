@@ -80,6 +80,12 @@ class UpdateSkillListener
         if ($skill->xp >= $skill->xp_max) {
             $level = $skill->level + 1;
 
+            $bonus = $skill->skill_bonus + $skill->baseSkill->skill_bonus_per_level;
+
+            if ($skill->baseSkill->max_level === $level) {
+                $bonus = 1.0;
+            }
+
             $skill->update([
                 'level'              => $level,
                 'xp_max'             => $skill->can_train ? $level * 10 : rand(100, 350),
@@ -88,7 +94,7 @@ class UpdateSkillListener
                 'base_ac_mod'        => $skill->base_ac_mod + $skill->baseSkill->base_ac_mod_bonus_per_level,
                 'fight_time_out_mod' => $skill->fight_time_out_mod + $skill->baseSkill->fight_time_out_mod_bonus_per_level,
                 'move_time_out_mod'  => $skill->mov_time_out_mod + $skill->baseSkill->mov_time_out_mod_bonus_per_level,
-                'skill_bonus'        => $skill->skill_bonus + $skill->baseSkill->skill_bonus_per_level,
+                'skill_bonus'        => $bonus,
                 'xp'                 => 0,
             ]);
 

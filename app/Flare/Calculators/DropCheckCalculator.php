@@ -38,8 +38,8 @@ class DropCheckCalculator {
             $roll = RandomNumberGenerator::generateRandomNumber(1, 50, 1, 100);
         }
 
-        $roll += round($roll * $bonus);
-        $dc   = round((100 - (100 * $monster->drop_check)));
+        $dc   = round((100 - (100 * ($monster->drop_check + $bonus))));
+
 
         return $roll > $dc;
     }
@@ -48,11 +48,12 @@ class DropCheckCalculator {
      * Can we get a location drop?
      *
      * @param float $locationChance
+     * @param float $lootingChance
      * @return bool
      */
-    public function fetchLocationDropChance(float $locationChance): bool {
+    public function fetchLocationDropChance(float $locationChance, float $lootingChance): bool {
         $roll = RandomNumberGenerator::generateRandomNumber(1, 50 , 1, 100);
-        $dc   = round((100 - (100 * $locationChance)));
+        $dc   = round((100 - (100 * ($locationChance + $lootingChance))));
 
         return $roll > $dc;
     }
@@ -85,8 +86,6 @@ class DropCheckCalculator {
         $roll = RandomNumberGenerator::generateRandomNumber(1, 50, 1, 100);;
         $roll = round($roll + $roll * $totalBonus);
         $dc   = round((100 - (100 * $monster->drop_check)));
-
-        dump('Roll: ' . $roll . ' DC: ' . $dc);
 
         return $roll > $dc;
     }

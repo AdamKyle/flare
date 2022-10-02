@@ -147,9 +147,8 @@ class BattleDrop {
 
             foreach ($items as $item) {
                 if ($this->canHaveItem($character, $item)) {
-                    $chance = 95;
-                    $roll = RandomNumberGenerator::generateRandomNumber(1, 50, 1, 100);;
-                    $roll = $roll + $roll * $lootingChance;
+                    $chance = 95 - (95 * $lootingChance);
+                    $roll = RandomNumberGenerator::generateRandomNumber(1, 70, 1, 100);
 
                     if ($roll > $chance) {
                         $this->attemptToPickUpItem($character, $item);

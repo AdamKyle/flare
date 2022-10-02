@@ -98,7 +98,7 @@ class RandomAffixDetails {
             'Spiritbound Rage',
             'Exile\'s Enchantment',
             'Demonic Infinity',
-            'Guardian\s Fear',
+            'Guardian\'s Fear',
             'Esoteric Flash',
             'Tranquility Gift',
             'Putrefaction of Mortality',

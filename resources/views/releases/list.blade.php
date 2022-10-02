@@ -2,12 +2,6 @@
 
 @section('content')
     <x-core.layout.smaller-container>
-        <x-core.page-title
-            title=""
-            route="{{route('home')}}"
-            color="success" link="Home"
-        >
-        </x-core.page-title>
 
         @forelse($releases as $release)
             <x-core.cards.card-with-title css="mb-5" title="Version: {{$release->version}}, {{$release->name}}, Published on: {{$release->created_at->format('M d Y')}}">

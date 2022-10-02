@@ -15,7 +15,7 @@ class Affixes extends BattleBase {
 
     public function getCharacterAffixDamage(Character $character, float $monsterResistance = 0.0, array $attackData, bool $isPvp): int {
         $totalDamage       = $attackData['affixes']['stacking_damage'] - $attackData['affixes']['stacking_damage'] * $attackData['damage_deduction'];
-        $nonStackingDamage = $attackData['affixes']['non_stacking_damage'] - $attackData['affixes']['stacking_damage'] * $attackData['damage_deduction'];
+        $nonStackingDamage = ($attackData['affixes']['non_stacking_damage'] - $attackData['affixes']['stacking_damage'] * $attackData['damage_deduction']) + $totalDamage;
         $cantBeResisted    = $attackData['affixes']['cant_be_resisted'];
 
         if ($totalDamage > 0 || $nonStackingDamage > 0) {

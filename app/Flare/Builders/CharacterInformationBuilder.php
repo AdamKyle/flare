@@ -220,10 +220,6 @@ class CharacterInformationBuilder {
      * @return bool
      */
     public function canAffixesBeResisted(): bool {
-        if ($this->character->map->gameMap->mapType()->isHell() || $this->character->map->gameMap->mapType()->isPurgatory()) {
-            return false;
-        }
-
         return $this->character->inventory->slots->filter(function($slot) {
             return ($slot->item->type === 'quest') && ($slot->item->effect === ItemEffectsValue::AFFIXES_IRRESISTIBLE);
         })->isNotEmpty();

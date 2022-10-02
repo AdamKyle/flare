@@ -59,6 +59,9 @@
                         Hell is very similar to Shadow Planes, except now we reduce your stats and increase the enemies by a bit more!
                     </p>
                     <p class="my-2">
+                        With out a <a href="/information/quest-items">Dead Kings Crown</a> your enchantments down here that do damage, will be reduced to those that only do non stacking damage.
+                    </p>
+                    <p class="my-2">
                         You will want to make sure you have Stat Reducing Affixes and Entrancing <a href="/information/enchanting">affixes</a> down here.
                     </p>
                 @endif
@@ -75,6 +78,9 @@
                         stats and their damage dealt are reduced by 20%. When characters enter they will see their modified stats adjust to reflect this.
                     </p>
                     <p class="my-2">
+                        With out a <a href="/information/quest-items">Dead Kings Crown</a> your enchantments down here that do damage, will be reduced to those that only do non stacking damage.
+                    </p>
+                    <p class="my-2">
                         Players will also notice a new mechanic down here <a href="/information/combat">Ambush and Counter</a>. Monsters can ambush you and counter your attacks.
                         Players are suggested to start slowly, gaining <a href="/information/currencies">Copper Coins</a> which they can use along side <a href="/information/currencies">Gold Dust</a>
                         to train a new crafting skill: <a href="/information/trinketry">Trinketry</a>. These new items have Ambush and Counter Chance/Resistance which is
@@ -83,6 +89,10 @@
                     <p class="my-2">
                         Further complicating things, vampires damage is capped at 50% of their total life stealing %. Casters without high resistance reduction and skill reduction gear
                         will find their spells are being evaded. Quest items which make your affixes irresistible no longer work down here.
+                    </p>
+                    <p class="my-2">
+                        The other complication is that enemies down here <a href="/information/voidance">void and devoid</a> first. This is where you will want to craft <a href="/information/holy-items">Holy Items</a> to give your
+                        self Voidance and Devoidance Resistance.
                     </p>
                     <p class="my-2">
                         Finally, Enemies down here have Higher stats, even the beginning enemies. Players will want to invest in <a href="/information/holy-items">Holy Items</a> to further boost their damage

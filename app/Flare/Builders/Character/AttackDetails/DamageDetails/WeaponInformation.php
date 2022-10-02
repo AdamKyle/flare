@@ -4,6 +4,7 @@ namespace App\Flare\Builders\Character\AttackDetails\DamageDetails;
 
 use App\Flare\Builders\Character\ClassDetails\ClassBonuses;
 use App\Flare\Builders\Character\ClassDetails\HolyStacks;
+use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use App\Flare\Builders\Character\BaseCharacterInfo;
 use App\Flare\Builders\Character\Traits\FetchEquipped;
@@ -42,7 +43,7 @@ class WeaponInformation {
      * @param Character $character
      * @param bool $voided
      * @return int
-     * @throws \Exception
+     * @throws Exception
      */
     public function getWeaponDamage(Character $character, bool $voided = false): int {
         $slots = $this->fetchEquipped($character);
@@ -55,6 +56,8 @@ class WeaponInformation {
 
         $damage = $this->damageModifiers($character, $totalWeaponDamage, $voided);
 
+        $damage = $this->processOtherAffixesForDamage($slots, $damage, $voided);
+
 
         return $this->calculateWeaponDamage($character, $damage, $voided);
     }
@@ -66,7 +69,7 @@ class WeaponInformation {
      * @param int $damage
      * @param bool $voided
      * @return int
-     * @throws \Exception
+     * @throws Exception
      */
     public function damageModifiers(Character $character, int $damage, bool $voided): int {
         $class = GameClass::find($character->game_class_id);
@@ -167,6 +170,31 @@ class WeaponInformation {
                $this->baseCharacterInfo->getClassBonuses()->getRangersDamageBonus($character) +
                $this->baseCharacterInfo->getClassBonuses()->getThievesDamageBonus($character) +
                $this->baseCharacterInfo->getClassBonuses()->getVampiresDamageBonus($character);
+    }
+
+    /**
+     * Add other affixes base damage mod to the damage.
+     *
+     * @param Collection $slots
+     * @param int $damage
+     * @param bool $isVoided
+     * @return int
+     */
+    protected function processOtherAffixesForDamage(Collection $slots, int $damage, bool $isVoided = false): int {
+        $invalidWeapons = ['weapon', 'stave', 'bow', 'hammer'];
+        $totalPercent   = 0.0;
+
+        if ($isVoided) {
+            return $damage;
+        }
+
+        foreach ($slots as $slot) {
+            if (!in_array($slot->item->type, $invalidWeapons)) {
+                $totalPercent += $slot->item->getAffixAttribute('base_damage_mod');
+            }
+        }
+
+        return (int) ($damage + ($damage * $totalPercent));
     }
 
     /**

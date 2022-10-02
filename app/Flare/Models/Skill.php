@@ -219,6 +219,11 @@ class Skill extends Model
         }
 
         $bonus = ($this->baseSkill->skill_bonus_per_level * ($this->level - 1));
+
+        if ($this->level === $this->baseSkill->max_level) {
+            $bonus = 1.0;
+        }
+
         $bonus += $this->getItemBonuses($this->baseSkill);
 
         $bonus += $this->getCharacterBoonsBonus('skill_bonus');

@@ -56,7 +56,7 @@ export default class ItemAffixDetails extends React.Component<any, any> {
                             <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                             <dl>
                                 <dt>Base Attack Modifier</dt>
-                                <dd>{this.props.affix.base_damage_mod !== null ? this.props.affix.skill_name : 'N/A'}</dd>
+                                <dd>{(this.props.affix.base_damage_mod * 100).toFixed(2)}%</dd>
                                 <dt>Base AC Modifier</dt>
                                 <dd>{(this.props.affix.base_ac_mod * 100).toFixed(2)}%</dd>
                                 <dt>Base Healing Modifier</dt>
