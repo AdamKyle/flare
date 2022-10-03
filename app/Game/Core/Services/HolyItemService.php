@@ -5,6 +5,7 @@ namespace App\Game\Core\Services;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
+use Deployer\Executor\Server;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Collection as DBCollection;
 use App\Game\Core\Events\UpdateTopBarEvent;
@@ -25,7 +26,7 @@ class HolyItemService {
         $slots = $this->getSlots($character);
 
         return $this->successResult([
-            'items'         => $this->fetchValidItems($slots)->values(),
+            'items'         => $this->fetchValidItems($slots)->reverse()->values(),
             'alchemy_items' => $this->fetchAlchemyItems($slots)->values(),
         ]);
     }
@@ -60,6 +61,10 @@ class HolyItemService {
         event(new ServerMessageEvent($character->user, 'Applied Holy Oil to: ' . $slot->item->affix_name, $slot->id));
 
         event(new UpdateTopBarEvent($character));
+
+        if (($slot->item->holy_stacks - $slot->item->holy_stacks_applied) === 0) {
+            event(new ServerMessageEvent($character->user, 'You have applied the max stacks allowed. Item has been removed from list of items you can use at thw work bench.'));
+        }
 
         return $this->fetchSmithingItems($character);
     }

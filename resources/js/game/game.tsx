@@ -23,6 +23,7 @@ import PositionType from "./lib/game/types/map/position-type";
 import {removeCommas} from "./lib/game/format-number";
 import CharacterCurrenciesType from "./lib/game/character/character-currencies-type";
 import KingdomLogDetails from "./lib/game/kingdoms/kingdom-log-details";
+import GlobalTimeoutModal from "./sections/game-modals/global-timeout-modal";
 
 export default class Game extends React.Component<GameProps, GameState> {
 
@@ -48,6 +49,8 @@ export default class Game extends React.Component<GameProps, GameState> {
 
     private updateSpecialShopsAccess: any;
 
+    private globalTimeOut: any;
+
     constructor(props: GameProps) {
         super(props)
 
@@ -66,6 +69,7 @@ export default class Game extends React.Component<GameProps, GameState> {
             quests: null,
             position: null,
             disable_tabs: false,
+            show_global_timeout: false,
             tabs: [{
                 key: 'game',
                 name: 'Game'
@@ -114,6 +118,9 @@ export default class Game extends React.Component<GameProps, GameState> {
 
         // @ts-ignore
         this.kingdomLogsUpdate = Echo.private('update-kingdom-logs-' + this.props.userId);
+
+        // @ts-ignore
+        this.globalTimeOut = Echo.private('global-timeout-' + this.props.userId);
 
     }
 
@@ -248,6 +255,13 @@ export default class Game extends React.Component<GameProps, GameState> {
                 kingdoms: currentKingdoms,
             });
         });
+
+        // @ts-ignore
+        this.globalTimeOut.listen('Game.Core.Events.GlobalTimeOut', (event: {showTimeOut: boolean}) => {
+           this.setState({
+               show_global_timeout: event.showTimeOut,
+           });
+        });
     }
 
     updateLogIcon() {
@@ -283,8 +297,14 @@ export default class Game extends React.Component<GameProps, GameState> {
     }
 
     setCharacterPosition(position: PositionType) {
+
+        const character = JSON.parse(JSON.stringify(this.state.character));
+
+        character.base_position = position;
+
         this.setState({
             position: position,
+            character: character,
         })
     }
 
@@ -453,6 +473,12 @@ export default class Game extends React.Component<GameProps, GameState> {
                 {
                     this.state.character.force_name_change ?
                         <ForceNameChange character_id={this.state.character.id} />
+                    : null
+                }
+
+                {
+                    this.state.show_global_timeout ?
+                        <GlobalTimeoutModal />
                     : null
                 }
             </Fragment>

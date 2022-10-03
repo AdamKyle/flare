@@ -20,6 +20,10 @@ export default class Ajax implements AjaxInterface {
                     if (response.status === 401) {
                         window.location.reload();
                     }
+
+                    if (response.status === 429) {
+                        this.initiateGlobalTimeOut();
+                    }
                 }
 
                 return errorCallBack(error);
@@ -35,6 +39,10 @@ export default class Ajax implements AjaxInterface {
 
                     if (response.status === 401) {
                         window.location.reload();
+                    }
+
+                    if (response.status === 429) {
+                        this.initiateGlobalTimeOut();
                     }
                 }
 
@@ -61,6 +69,12 @@ export default class Ajax implements AjaxInterface {
 
     postRequest(url: string, params?: any): Promise<AxiosResponse<any>> {
         return axios.post('/api/' + url, params);
+    }
+
+    initiateGlobalTimeOut() {
+        this.setRoute('character-timeout').doAjaxCall('post',  (result: AxiosResponse) => {}, (error: AxiosError) => {
+            console.error(error);
+        })
     }
 
 }

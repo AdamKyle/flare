@@ -17,7 +17,7 @@ export default class ItemHolyDetails extends React.Component<any, any> {
                         <dl>
                             <dt>All Stat Boost %</dt>
                             <dd>{(stack.stat_increase_bonus * 100).toFixed(2)}%</dd>
-                            <dt>Devouring Darkness Bonus %</dt>
+                            <dt>Voidance (Devouring Dark/Light) Resistance Bonus %</dt>
                             <dd>{(stack.devouring_darkness_bonus * 100).toFixed(2)}%</dd>
                         </dl>
                     </div>

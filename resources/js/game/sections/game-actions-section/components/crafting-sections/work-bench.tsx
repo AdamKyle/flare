@@ -20,6 +20,8 @@ export default class WorkBench extends React.Component<any, any> {
             selected_item_name: null,
             inventory_items: [],
             alchemy_items: [],
+            max_holy_stacks: 0,
+            applied_holy_stacks: 0,
             cost: 0,
         }
     }
@@ -55,12 +57,14 @@ export default class WorkBench extends React.Component<any, any> {
                     alchemy_items: result.data.alchemy_items,
                 }, () => {
                     const foundItem = this.state.inventory_items.filter((slot: any) => {
-                        return slot.item.name === this.state.selected_item_name;
+                        return slot.item.affix_name === this.state.selected_item_name;
                     });
 
                     if (foundItem.length > 0) {
                         this.setState({
                             selected_item: foundItem[0].item.id,
+                            max_holy_stacks: foundItem[0].item.holy_stacks,
+                            applied_holy_stacks: foundItem[0].item.holy_stacks_applied,
                         })
                     }
                 });
@@ -80,7 +84,9 @@ export default class WorkBench extends React.Component<any, any> {
 
             if (foundItem.length > 0) {
                 this.setState({
-                    selected_item_name: foundItem[0].item.affix_name
+                    selected_item_name: foundItem[0].item.affix_name,
+                    max_holy_stacks: foundItem[0].item.holy_stacks,
+                    applied_holy_stacks: foundItem[0].item.holy_stacks_applied,
                 });
             }
         });
@@ -197,12 +203,20 @@ export default class WorkBench extends React.Component<any, any> {
                             menuPortalTarget={document.body}
                             value={this.selectedAlchemyItem()}
                         />
-                        <div className='my-2'>
-                            <dl>
-                                <dt>Gold Dust Cost:</dt>
-                                <dd>{formatNumber(this.state.cost)}</dd>
-                            </dl>
-                        </div>
+                        {
+                            this.state.selected_item !== null ?
+                                <div className='my-2'>
+                                    <dl>
+                                        <dt>Gold Dust Cost:</dt>
+                                        <dd>{formatNumber(this.state.cost)}</dd>
+                                        <dt>Applied Holy Stacks</dt>
+                                        <dd>{this.state.applied_holy_stacks}</dd>
+                                        <dt>Max Holy Stacks</dt>
+                                        <dd>{this.state.max_holy_stacks}</dd>
+                                    </dl>
+                                </div>
+                            : null
+                        }
                     </div>
                 </div>
 

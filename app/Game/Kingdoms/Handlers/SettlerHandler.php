@@ -5,6 +5,7 @@ namespace App\Game\Kingdoms\Handlers;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
 use App\Game\Core\Traits\KingdomCache;
+use App\Game\Kingdoms\Events\AddKingdomToMap;
 use App\Game\Kingdoms\Events\UpdateGlobalMap;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 
@@ -70,10 +71,17 @@ class SettlerHandler {
 
             $defendingKingdom = $defendingKingdom->refresh();
 
-            $this->removeKingdomFromCache($originalOwner, $defendingKingdom);
-            $this->addKingdomToCache($attackingKingdom->character, $defendingKingdom);
+            if (!is_null($originalOwner)) {
+                $this->removeKingdomFromCache($originalOwner, $defendingKingdom);
+            }
 
-            event(new UpdateGlobalMap($attackingKingdom->character));
+            $character = $attackingKingdom->character->refresh();
+
+            $this->addKingdomToCache($character, $defendingKingdom);
+
+            event(new AddKingdomToMap($character));
+
+            event(new UpdateGlobalMap($character));
 
             return $this->updateNewKingdom($defendingKingdom, $attackingUnits);
         } else {

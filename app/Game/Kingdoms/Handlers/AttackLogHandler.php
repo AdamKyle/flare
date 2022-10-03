@@ -146,6 +146,7 @@ class AttackLogHandler {
      *
      * @param Kingdom $attackingKingdom
      * @param Kingdom $defenderKingdom
+     * @param bool $tookKingdom
      * @return void
      */
     public function createLogForAttacker(Kingdom $attackingKingdom, Kingdom $defenderKingdom, bool $tookKingdom = false): void {
@@ -201,6 +202,7 @@ class AttackLogHandler {
      *
      * @param Kingdom $attackingKingdom
      * @param Kingdom $defenderKingdom
+     * @param bool $tookKingdom
      * @return array
      */
     protected function createBaseAttributes(Kingdom $attackingKingdom, Kingdom $defenderKingdom, bool $tookKingdom = false): array {

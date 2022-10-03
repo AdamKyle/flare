@@ -3,6 +3,7 @@
 namespace App\Game\Kingdoms\Events;
 
 use App\Flare\Models\Kingdom;
+use App\Flare\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -12,32 +13,27 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use App\Flare\Models\Character;
 use App\Game\Core\Traits\KingdomCache;
 
-class AddKingdomToMap implements ShouldBroadcastNow
-{
+class AddKingdomToMap implements ShouldBroadcastNow {
+
     use Dispatchable, InteractsWithSockets, SerializesModels, KingdomCache;
 
     /**
      * @var User $users
      */
-    private $user;
+    private User $user;
 
     /**
      * @var array $myKingdoms
      */
-    public $myKingdoms;
+    public array $myKingdoms;
 
-    /**
-     * @var array $npcKingdoms
-     */
-    public $npcKingdoms;
 
     /**
      * Create a new event instance.
      *
      * @param Character $character
      */
-    public function __construct(Character $character)
-    {
+    public function __construct(Character $character) {
         $this->user        = $character->user;
         $this->myKingdoms  = $this->getKingdoms($character);
     }
@@ -47,8 +43,7 @@ class AddKingdomToMap implements ShouldBroadcastNow
      *
      * @return Channel|array
      */
-    public function broadcastOn()
-    {
+    public function broadcastOn(): Channel|array {
         return new PrivateChannel('add-kingdom-to-map-' . $this->user->id);
     }
 }

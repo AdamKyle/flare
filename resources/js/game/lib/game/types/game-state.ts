@@ -36,5 +36,7 @@ export default interface GameState {
 
     disable_tabs: boolean;
 
+    show_global_timeout: boolean;
+
     tabs: {name: string, key: string, has_logs?: boolean}[]|[]
 }

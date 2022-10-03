@@ -43,9 +43,6 @@ export  default class QuestTree extends React.Component<QuestTreeProps, any> {
     }
 
     fetchParentQuestChain(): QuestDetails | null {
-
-        console.log(this.props.quests);
-
         const plane = this.fetchPlane();
 
         const questChain = this.props.quests.filter((quest) => quest.child_quests.length > 0 && quest.belongs_to_map_name === plane);

@@ -139,6 +139,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
                 'all_stat_reduction' => $characterInformation->findPrefixStatReductionAffix(),
                 'stat_reduction'     => $characterInformation->findSuffixStatReductionAffixes(),
             ],
+            'is_in_timeout'          => !is_null($character->user->timeout_until),
             'base_position' => [
               'x' => $character->map->character_position_x,
               'y' => $character->map->character_position_y,

@@ -60,8 +60,6 @@ class AbandonKingdomService {
     /**
      * Abandon the kingdom.
      *
-     * - Reduce buildings
-     * - Reduce units
      * - Reduce attributes
      * - Time the player out from settling again.
      * - Give the kingdom to the NPC.
@@ -72,14 +70,14 @@ class AbandonKingdomService {
      * @return void
      */
     public function abandon(): void {
-        $this->updateKingdomBuildings();
-        $this->updateKingdomUnits();
+        $character = $this->kingdom->character;
+
         $this->reduceAttributes();
         $this->setTimeOut();
 
-        $this->giveKingdomsToNpcHandler->giveKingdomToNPC($this->kingdom);
-
         $kingdom = $this->kingdom;
+
+        $this->giveKingdomsToNpcHandler->giveKingdomToNPC($kingdom);
 
         event(new GlobalMessageEvent('A kingdom has fallen into the rubble at (X/Y): ' .
             $kingdom->x_position . '/' . $kingdom->y_position . ' on the: ' .
@@ -91,39 +89,9 @@ class AbandonKingdomService {
             . $kingdom->x_position . '/' . $kingdom->y_position . ' on the: ' . $kingdom->gameMap->name . ' plane.'
         ));
 
-        $this->updateKingdom->updateKingdom($this->kingdom);
+        $this->updateKingdom->updateKingdomAllKingdoms($character);
 
-        broadcast(new UpdateNPCKingdoms($this->kingdom->gameMap));
-    }
-
-    /**
-     * Reduce kingdom buildings.
-     *
-     * @return void
-     */
-    protected function updateKingdomBuildings(): void {
-        foreach ($this->kingdom->buildings as $building) {
-            $building->update([
-                'current_durability' => 1,
-            ]);
-        }
-
-        $this->kingdom = $this->kingdom->refresh();
-    }
-
-    /**
-     * Reduce kingdom units.
-     *
-     * @return void
-     */
-    protected function updateKingdomUnits(): void {
-        foreach ($this->kingdom->units as $unit) {
-            $unit->update([
-                'current_amount' => 1,
-            ]);
-        }
-
-        $this->kingdom = $this->kingdom->refresh();
+        event(new UpdateNPCKingdoms($this->kingdom->gameMap));
     }
 
     /**
@@ -140,13 +108,14 @@ class AbandonKingdomService {
      */
     protected function reduceAttributes(): void {
         $this->kingdom->update([
-            'current_morale'     => 0.01,
+            'current_morale'     => 0.10,
             'current_population' => 0,
             'current_stone'      => 0,
             'current_wood'       => 0,
             'current_clay'       => 0,
             'current_iron'       => 0,
             'treasury'           => 0,
+            'protected_until'    => null,
         ]);
 
         $this->kingdom = $this->kingdom->refresh();

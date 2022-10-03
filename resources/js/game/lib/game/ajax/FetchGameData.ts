@@ -43,6 +43,7 @@ export default class FetchGameData {
     }
 
     setCharacterSheet(result: AxiosResponse)  {
+
         this.component.setState({
             character: result.data.sheet,
             percentage_loaded: .33,
@@ -64,7 +65,11 @@ export default class FetchGameData {
                 killed_in_pvp: result.data.sheet.kill_in_pvp,
             },
         }, () => {
-            this.component.setCharacterPosition(result.data.sheet.base_position)
+            this.component.setCharacterPosition(result.data.sheet.base_position);
+
+            if (result.data.sheet.is_in_timeout) {
+                (new Ajax()).initiateGlobalTimeOut();
+            }
         });
     }
 

@@ -26,15 +26,15 @@ export default class AlchemyItemHoly extends React.Component<any, any> {
     getDevouringIncrease() {
         switch(this.props.item.holy_level) {
             case 1:
-                return '0.001-0.003'
+                return '1-3'
             case 2:
-                return '0.001-0.005'
+                return '1-5'
             case 3:
-                return '0.001-0.008'
+                return '1-8'
             case 4:
-                return '0.001-0.01'
+                return '1-10'
             case 5:
-                return '0.001-0.015'
+                return '1-15'
             default:
                 return 'ERROR'
         }
@@ -52,7 +52,7 @@ export default class AlchemyItemHoly extends React.Component<any, any> {
                     <dt>{this.props.item.holy_level}</dt>
                     <dt>Stat Increase Per Item used</dt>
                     <dd>{this.getStatIncrease()}%</dd>
-                    <dt>Devouring Light Increase Per Item used</dt>
+                    <dt>Devouring Resistance Increase Per Item used</dt>
                     <dd>{this.getDevouringIncrease()}%</dd>
                 </dl>
                 <p className='my-4'>

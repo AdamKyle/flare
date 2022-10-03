@@ -9,6 +9,7 @@ use App\Flare\Transformers\CharacterTopBarTransformer;
 use App\Flare\Transformers\ItemTransformer;
 use App\Flare\Transformers\SkillsTransformer;
 use App\Flare\Transformers\UsableItemTransformer;
+use App\Game\Core\Events\GlobalTimeOut;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Services\CharacterPassiveSkills;
 use Illuminate\Http\Request;
@@ -81,16 +82,17 @@ class CharacterSheetController extends Controller {
 
     public function globalTimeOut() {
         $timeout = now()->addMinutes(2);
+        $user    = auth()->user();
 
-        auth()->user()->update([
+        $user->update([
             'timeout_until' => $timeout,
         ]);
 
-        EndGlobalTimeOut::dispatch(auth()->user())->delay($timeout);
+        EndGlobalTimeOut::dispatch($user)->delay($timeout);
 
-        return response()->json([
-            'timeout_until' => $timeout,
-        ]);
+        event(new GlobalTimeOut($user, true));
+
+        return response()->json();
     }
 
     public function activeBoons(Character $character, UsableItemTransformer $usableItemTransformer,  Manager $manager) {

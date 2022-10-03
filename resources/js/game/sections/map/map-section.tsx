@@ -113,6 +113,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
         });
 
         this.globalMapUpdate.listen('Game.Kingdoms.Events.UpdateGlobalMap', (event: any) => {
+
             const playerKingdomsFilter = this.state.player_kingdoms.filter((playerKingdom: PlayerKingdomsDetails) => {
                 if (!event.npcKingdoms.some((kingdom: NpcKingdomsDetails) => kingdom.id === playerKingdom.id)) {
                     return playerKingdom;

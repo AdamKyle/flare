@@ -36,7 +36,7 @@ class UpdateNPCKingdoms implements ShouldBroadcastNow
      */
     public function __construct(GameMap $map) {
         $this->mapName       = $map->name;
-        $this->npcKingdoms   = Kingdom::select('x_position', 'y_position', 'npc_owned')
+        $this->npcKingdoms   = Kingdom::select('id', 'x_position', 'y_position', 'npc_owned', 'name')
                                        ->where('character_id', null)
                                        ->where('npc_owned', true)
                                        ->where('game_map_id', $map->id)->get();

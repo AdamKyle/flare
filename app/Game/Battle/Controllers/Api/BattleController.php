@@ -96,7 +96,7 @@ class BattleController extends Controller {
             BattleAttackHandler::dispatch($character->id, $request->monster_id)->onQueue('default_long');
         }
 
-        return response()->json([]);
+        return response()->json();
     }
 
     /**

@@ -4,7 +4,7 @@ export default interface DialogueTypes {
 
     is_open: boolean;
 
-    handle_close: () => void;
+    handle_close?: () => void;
 
     primary_button_disabled?: boolean;
 

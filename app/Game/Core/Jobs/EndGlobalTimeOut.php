@@ -17,7 +17,7 @@ class EndGlobalTimeOut implements ShouldQueue
     /**
      * @var User $user
      */
-    private $user;
+    private User $user;
 
     /**
      * EndGlobalTimeOut constructor.
@@ -33,13 +33,12 @@ class EndGlobalTimeOut implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
-    {
+    public function handle(): void {
 
         $this->user->update([
             'timeout_until' => null,
         ]);
 
-        broadcast(new GlobalTimeOut($this->user->refresh()));
+        event(new GlobalTimeOut($this->user, false));
     }
 }

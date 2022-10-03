@@ -143,9 +143,11 @@ class AttackKingdomWithUnitsHandler {
             event(new GlobalMessageEvent($characterName . ' has taken the kingdom: ' . $kingdomName .
             ' on the plane: ' . $mapName . ' at (X/Y): ' . $x . '/' . $y . ' and is now the rightful ruler!'));
 
-            if (UserOnlineValue::isOnline($originalOwner->user)) {
-                event(new ServerMessageEvent($originalOwner->user, 'You lost your kingdom: ' . $kingdomName .
-                    ' on plane: ' . $mapName . ' at (X/Y): ' . $x . '/' . $y . ' to: ' . $characterName . ' who now the rightful owner'));
+            if (!is_null($originalOwner)) {
+                if (UserOnlineValue::isOnline($originalOwner->user)) {
+                    event(new ServerMessageEvent($originalOwner->user, 'You lost your kingdom: ' . $kingdomName .
+                        ' on plane: ' . $mapName . ' at (X/Y): ' . $x . '/' . $y . ' to: ' . $characterName . ' who now the rightful owner'));
+                }
             }
 
             return;
