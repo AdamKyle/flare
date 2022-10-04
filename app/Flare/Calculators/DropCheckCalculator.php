@@ -33,15 +33,14 @@ class DropCheckCalculator {
         }
 
         if ($characterLevel < 10 && $lootingChance < .10) {
-            $roll = RandomNumberGenerator::generateRandomNumber(50, 50, 1, 500);
+            $roll = RandomNumberGenerator::generateRandomNumber(100, 50, 1, 500);
         } else {
             $roll = RandomNumberGenerator::generateRandomNumber(1, 50, 1, 100);
         }
 
         $dc   = round((100 - (100 * ($monster->drop_check + $bonus))));
 
-
-        return $roll > $dc;
+        return $roll >= $dc;
     }
 
     /**

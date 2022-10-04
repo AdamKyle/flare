@@ -161,7 +161,6 @@ class Exploration implements ShouldQueue
         $fightResponse = $response->fightMonster();
 
         if (!$fightResponse) {
-            dump($response->getBattleMessages());
             $automation->delete();
 
             $battleEventHandler->processDeadCharacter($this->character);
