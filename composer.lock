@@ -3360,16 +3360,16 @@
         },
         {
             "name": "maatwebsite/excel",
-            "version": "3.1.42",
+            "version": "3.1.43",
             "source": {
                 "type": "git",
                 "url": "https://github.com/SpartnerNL/Laravel-Excel.git",
-                "reference": "b3938c9a4cf70d01173612fe35e64f31ca830132"
+                "reference": "3c5b95478fb6f76b9a6ab527d54afbb3afbda611"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/SpartnerNL/Laravel-Excel/zipball/b3938c9a4cf70d01173612fe35e64f31ca830132",
-                "reference": "b3938c9a4cf70d01173612fe35e64f31ca830132",
+                "url": "https://api.github.com/repos/SpartnerNL/Laravel-Excel/zipball/3c5b95478fb6f76b9a6ab527d54afbb3afbda611",
+                "reference": "3c5b95478fb6f76b9a6ab527d54afbb3afbda611",
                 "shasum": ""
             },
             "require": {
@@ -3423,7 +3423,7 @@
             ],
             "support": {
                 "issues": "https://github.com/SpartnerNL/Laravel-Excel/issues",
-                "source": "https://github.com/SpartnerNL/Laravel-Excel/tree/3.1.42"
+                "source": "https://github.com/SpartnerNL/Laravel-Excel/tree/3.1.43"
             },
             "funding": [
                 {
@@ -3435,7 +3435,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-09-28T11:25:11+00:00"
+            "time": "2022-10-03T11:50:29+00:00"
         },
         {
             "name": "maennchen/zipstream-php",
@@ -5574,16 +5574,16 @@
         },
         {
             "name": "pusher/pusher-php-server",
-            "version": "7.0.2",
+            "version": "7.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pusher/pusher-http-php.git",
-                "reference": "af3eeaefc0c7959f5b3852f0a4dd5547245d33df"
+                "reference": "7ed4a62956c7426814c7dc67b2bb764cd0e1a603"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pusher/pusher-http-php/zipball/af3eeaefc0c7959f5b3852f0a4dd5547245d33df",
-                "reference": "af3eeaefc0c7959f5b3852f0a4dd5547245d33df",
+                "url": "https://api.github.com/repos/pusher/pusher-http-php/zipball/7ed4a62956c7426814c7dc67b2bb764cd0e1a603",
+                "reference": "7ed4a62956c7426814c7dc67b2bb764cd0e1a603",
                 "shasum": ""
             },
             "require": {
@@ -5629,9 +5629,9 @@
             ],
             "support": {
                 "issues": "https://github.com/pusher/pusher-http-php/issues",
-                "source": "https://github.com/pusher/pusher-http-php/tree/7.0.2"
+                "source": "https://github.com/pusher/pusher-http-php/tree/7.2.0"
             },
-            "time": "2021-12-07T13:09:00+00:00"
+            "time": "2022-10-03T14:28:42+00:00"
         },
         {
             "name": "ralouphie/getallheaders",
@@ -6834,16 +6834,16 @@
         },
         {
             "name": "spatie/laravel-collection-macros",
-            "version": "7.12.0",
+            "version": "7.12.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-collection-macros.git",
-                "reference": "fa4ddfb0458d4f1d4b6e365d3c9f11a834fcf436"
+                "reference": "4458d8399626c679f711311187d9fa7952da4556"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-collection-macros/zipball/fa4ddfb0458d4f1d4b6e365d3c9f11a834fcf436",
-                "reference": "fa4ddfb0458d4f1d4b6e365d3c9f11a834fcf436",
+                "url": "https://api.github.com/repos/spatie/laravel-collection-macros/zipball/4458d8399626c679f711311187d9fa7952da4556",
+                "reference": "4458d8399626c679f711311187d9fa7952da4556",
                 "shasum": ""
             },
             "require": {
@@ -6901,7 +6901,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/laravel-collection-macros/issues",
-                "source": "https://github.com/spatie/laravel-collection-macros/tree/7.12.0"
+                "source": "https://github.com/spatie/laravel-collection-macros/tree/7.12.1"
             },
             "funding": [
                 {
@@ -6909,7 +6909,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-08-05T21:39:44+00:00"
+            "time": "2022-10-03T14:08:14+00:00"
         },
         {
             "name": "spatie/laravel-package-tools",
