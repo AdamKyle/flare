@@ -585,6 +585,7 @@ class CharacterFactory {
         $dodge           = $this->createGameSkill(['name' => 'Dodge']);
         $looting         = $this->createGameSkill(['name' => 'Looting']);
         $kingmanship     = $this->createGameSkill(['name' => 'Kingmanship', 'type' => SkillTypeValue::EFFECTS_KINGDOM]);
+        $alchemy         = $this->createGameSkill(['name' => 'Alchemy', 'type' => SkillTypeValue::ALCHEMY]);
 
         $this->createSkill([
             'character_id'  => $this->character->id,
@@ -619,6 +620,11 @@ class CharacterFactory {
         $this->createSkill([
             'character_id'  => $this->character->id,
             'game_skill_id' => $kingmanship->id,
+        ]);
+
+        $this->createSkill([
+            'character_id'  => $this->character->id,
+            'game_skill_id' => $alchemy->id,
         ]);
     }
 
