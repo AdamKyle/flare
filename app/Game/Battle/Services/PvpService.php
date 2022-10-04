@@ -83,6 +83,8 @@ class PvpService {
                 'attacker_max_health' => $this->pvpAttack->cache()->getCachedCharacterData($attacker, 'health'),
                 'defender_health'     => $cache['defender_health'],
                 'defender_max_health' => $this->pvpAttack->cache()->getCachedCharacterData($defender, 'health'),
+                'defender_id'         => $defender->id,
+                'attacker_id'         => $attacker->id,
             ];
         }
 
@@ -91,6 +93,8 @@ class PvpService {
             'attacker_max_health' => $this->pvpAttack->cache()->getCachedCharacterData($attacker, 'health'),
             'defender_health'     => $this->pvpAttack->cache()->getCachedCharacterData($defender, 'health'),
             'defender_max_health' => $this->pvpAttack->cache()->getCachedCharacterData($defender, 'health'),
+            'defender_id'         => $defender->id,
+            'attacker_id'         => $attacker->id,
         ];
     }
 
@@ -179,24 +183,26 @@ class PvpService {
             'health_object' => [
                 'attacker_max_health' => $healthObject['attacker_health'],
                 'attacker_health'     => $this->pvpAttack->getAttackerHealth(),
-                'defender_health'     => $healthObject['defender_health'],
-                'defender_max_health' => $remainingDefenderHealth,
+                'defender_health'     => $remainingDefenderHealth,
+                'defender_max_health' => $healthObject['defender_health'],
             ],
             'messages'    => $this->pvpAttack->getMessages()['attacker'],
-            'attacker_id' => $defenderId,
+            'attacker_id' => $attacker->id,
+            'defender_id' => $defenderId,
         ]));
     }
 
     protected function updateDefenderPvpInfo(Character $defender, array $healthObject, int $attackerId, int $remainingDefenderHealth = 0) {
         event(new UpdateCharacterPvpAttack($defender->user, [
             'health_object' => [
-                'attacker_max_health' => $healthObject['attacker_health'],
-                'attacker_health'     => $this->pvpAttack->getAttackerHealth(),
-                'defender_health'     => $remainingDefenderHealth,
-                'defender_max_health' => $healthObject['defender_health'],
+                'attacker_max_health' => $healthObject['defender_health'],
+                'attacker_health'     => $remainingDefenderHealth,
+                'defender_health'     => $this->pvpAttack->getAttackerHealth(),
+                'defender_max_health' => $healthObject['attacker_health'],
             ],
             'messages'    => $this->pvpAttack->getMessages()['defender'],
-            'attacker_id' => $attackerId,
+            'attacker_id' => $defender->id,
+            'defender_id' => $attackerId,
         ]));
     }
 

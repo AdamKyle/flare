@@ -58,7 +58,7 @@ class MonthlyPvpService {
 
         event(new GlobalMessageEvent('ATTN! Participants for monthly pvp have been moved. Battle is about to begin in 2 minutes. Please stand by!'));
 
-        MonthlyPvpFight::dispatch($usersInFight->get())->delay(now()->addMinutes(2));
+        MonthlyPvpFight::dispatch($usersInFight->get())->delay(now()->addMinutes(2))->onQueue('default_long');
     }
 
     /**

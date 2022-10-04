@@ -18,6 +18,7 @@ export default class DuelPlayer extends React.Component<any, any> {
 
         this.state = {
             character_id: 0,
+            defender_id: 0,
             show_attack_section: false,
             preforming_action: false,
             attacker_max_health: 0,
@@ -37,6 +38,7 @@ export default class DuelPlayer extends React.Component<any, any> {
                 attacker_health: this.props.duel_data.health_object.attacker_health,
                 defender_max_health: this.props.duel_data.health_object.defender_max_health,
                 defender_health: this.props.duel_data.health_object.defender_health,
+                defender_id: this.props.duel_data.defender_id,
                 battle_messages: this.props.duel_data.messages,
             }, () => {
                 this.props.reset_duel_data();
@@ -52,6 +54,7 @@ export default class DuelPlayer extends React.Component<any, any> {
                 attacker_health: this.props.duel_data.health_object.attacker_health,
                 defender_max_health: this.props.duel_data.health_object.defender_max_health,
                 defender_health: this.props.duel_data.health_object.defender_health,
+                defender_id: this.props.duel_data.defender_id,
                 battle_messages: this.props.duel_data.messages,
             }, () => {
                 this.props.reset_duel_data();
@@ -96,7 +99,7 @@ export default class DuelPlayer extends React.Component<any, any> {
 
     defenderName() {
         const foundCharacter = this.props.characters.filter((character: {id: number; name: string}) => {
-            return character.id === this.state.character_id;
+            return character.id === this.state.defender_id;
         });
 
         if (foundCharacter.length === 0) {
@@ -119,6 +122,8 @@ export default class DuelPlayer extends React.Component<any, any> {
                     attacker_health: result.data.attacker_health,
                     defender_max_health: result.data.defender_max_health,
                     defender_health: result.data.defender_health,
+                    character_id: result.data.attacker_id,
+                    defender_id: result.data.defender_id,
                     preforming_action: false,
                 });
             })
@@ -135,7 +140,7 @@ export default class DuelPlayer extends React.Component<any, any> {
             error_message: null,
         }, () => {
             (new Ajax()).setRoute('attack-player/' + this.props.character.id).setParameters({
-                defender_id: this.state.character_id,
+                defender_id: this.state.defender_id,
                 attack_type: type,
             }).doAjaxCall('post', (result: AxiosResponse) => {
                 this.setState({

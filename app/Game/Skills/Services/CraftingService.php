@@ -171,8 +171,6 @@ class CraftingService {
         }else {
             $items->where('type', strtolower($craftingType));
         }
-        $itemNames = $items->pluck('name')->toArray();
-        dump(array_search("Challenger's Cloth Gloves", $itemNames), $craftingType, $skill->level);
 
         return $items->select('name', 'cost', 'type', 'id')->get();
     }

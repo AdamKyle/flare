@@ -107,6 +107,7 @@ class MonthlyPvpFightService {
      *
      * @param Character $character
      * @return void
+     * @throws Exception
      */
     protected function conjureTheKings(Character $character): void {
         event(new GlobalMessageEvent('The kings awaken. The ground rumbles!'));
@@ -130,10 +131,12 @@ class MonthlyPvpFightService {
 
         $item = $this->buildMythicItem->fetchMythicItem($character);
 
-        $slot = $character->inventory->slots()->create([
+        $character->inventory->slots()->create([
             'inventory_id' => $character->inventory->id,
             'item_id'      => $item->id,
         ]);
+
+        event(new ServerMessageEvent($character->user,'You are rewarded with a Mythic Unique: ' . $item->affix_name . ' This item has been given to you regardless of how full your inventory is.', $item->id));
 
         $gold = $character->gold + 50000000000;
 
@@ -147,6 +150,8 @@ class MonthlyPvpFightService {
             'can_attack' => true,
         ]);
 
+        event(new ServerMessageEvent($character->user,'Rewarded with : 50,000,000,000 Gold!'));
+
         CharacterAutomation::where('character_id', $character->id)->delete();
 
         $character = $character->refresh();
@@ -156,10 +161,6 @@ class MonthlyPvpFightService {
         event(new UpdateTopBarEvent($character));
 
         event(new UpdateMapBroadcast($character->user));
-
-        event(new ServerMessageEvent($character->user,'You are rewarded with a Mythic Unique: ' . $item->affix_name . ' This item has been given to you regardless of how full your inventory is.', $slot->id));
-
-        event(new ServerMessageEvent($character->user,'Rewarded with : 50,000,000 Gold!'));
 
         event(new ServerMessageEvent($character->user,'You can move from the location now. The arena is closed. Come again next month!'));
     }

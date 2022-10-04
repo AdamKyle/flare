@@ -48,7 +48,8 @@ class Counter extends BattleBase {
             $this->addDefenderMessage('You were countered in your attack for: '. number_format($weaponDamage), 'enemy-action');
 
         } else {
-            $this->addDefenderMessage('Your counter as blocked!', 'enemy-action');
+            $this->addDefenderMessage('Your counter as blocked!', 'player-action');
+            $this->addAttackerMessage('You Blocked the enemies counter!', 'player-action');
         }
     }
 

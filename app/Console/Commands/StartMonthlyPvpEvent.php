@@ -2,8 +2,10 @@
 
 namespace App\Console\Commands;
 
+use App\Flare\Models\Character;
 use App\Flare\Models\Event;
 use App\Flare\Values\EventType;
+use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Jobs\MonthlyPvpAutomation;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use Illuminate\Console\Command;
@@ -35,8 +37,14 @@ class StartMonthlyPvpEvent extends Command
         event(new GlobalMessageEvent('Those participating in Monthly PVP will be moved to the Arena (on Surface) in 15 minutes.
         All current explorations for these players will stop. You will be considered in "automation" for the time you are in the
         Arena. Finally after being moved and before the fight, your screen will refresh
-        automatically to close any open dialogues and so on. You have 15 minutes to prepare for PVP. All PVP attacks have been locked!'));
+        automatically to close any open dialogues and so on. You have 15 minutes to prepare for PVP (before the move and refresh). All PVP attacks have been locked!'));
 
         MonthlyPvpAutomation::dispatch()->delay(now()->addMinutes(1));
+
+        Character::chunkById(100, function($character) {
+            foreach ($character as $character) {
+                event(new UpdateCharacterStatus($character));
+            }
+        });
     }
 }

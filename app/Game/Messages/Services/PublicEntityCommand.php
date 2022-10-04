@@ -83,7 +83,7 @@ class PublicEntityCommand {
 
         try {
             if (!$this->hasQuestItemForPCT()) {
-                broadcast(new ServerMessageEvent($this->character->user, 'You are missing a quest item to do that.'));
+                broadcast(new ServerMessageEvent($this->character->user, 'You are missing a quest item to use /PCT. You need to complete the Quest: Hunting Expedition on Surface.'));
 
                 return;
             }

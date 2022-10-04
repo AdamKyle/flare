@@ -18,8 +18,6 @@ export default class DirectionalMovement extends React.Component<DirectionalMove
 
 
     move(direction: string) {
-        this.props.update_can_move(false);
-
         this.handleMovePlayer(direction);
     }
 
