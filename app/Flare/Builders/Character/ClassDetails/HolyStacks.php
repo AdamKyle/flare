@@ -43,10 +43,10 @@ class HolyStacks {
 
     public function fetchTotalStacksForCharacter(Character $character): int {
         if ($character->classType()->isRanger() || $character->classType()->isBlacksmith() || $character->classType()->isArcaneAlchemist()) {
-            return 260;
+            return 220;
         }
 
-        return 280;
+        return 240;
     }
 
     public function fetchTotalHolyStacks(Character $character): int {

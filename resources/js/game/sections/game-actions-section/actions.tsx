@@ -306,6 +306,17 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
                                             />
                                         : null
                                     }
+
+                                    {
+                                        this.state.show_hell_forged_section || this.state.show_purgatory_chains_section ?
+                                            <Shop
+                                                type={this.state.show_hell_forged_section ? 'Hell Forged' : 'Purgatory Chains'}
+                                                character_id={this.props.character.id}
+                                                close_hell_forged={this.manageHellForgedShop.bind(this)}
+                                                close_purgatory_chains={this.managedPurgatoryChainsShop.bind(this)}
+                                            />
+                                            : null
+                                    }
                                 </MonsterActions>
                             : null
                         }
@@ -344,17 +355,6 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
                             this.state.show_join_pvp ?
                                 <JoinPvp manage_section={this.manageJoinPvp.bind(this)} character_id={this.props.character.id}/>
                                 : null
-                        }
-
-                        {
-                            this.state.show_hell_forged_section || this.state.show_purgatory_chains_section ?
-                                <Shop
-                                    type={this.state.show_hell_forged_section ? 'Hell Forged' : 'Purgatory Chains'}
-                                    character_id={this.props.character.id}
-                                    close_hell_forged={this.manageHellForgedShop.bind(this)}
-                                    close_purgatory_chains={this.managedPurgatoryChainsShop.bind(this)}
-                                />
-                            : null
                         }
                     </div>
                 </div>

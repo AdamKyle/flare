@@ -152,7 +152,7 @@ class DeleteDuplicateItems extends Command
     protected function replaceItem(InventorySlot | SetSlot $slot, Item $duplicateItem, bool $hasHolyStacks = false) {
         $item    = $slot->item;
 
-        $name    = trim(str_replace('DUPLICATE', '', $item->name));
+        $name    = trim(str_replace('[DUPLICATE]', '', $item->name));
 
         $newItem = Item::where('name', $name)->first();
 
@@ -180,7 +180,7 @@ class DeleteDuplicateItems extends Command
                     'item_id' =>$newItemWithAffixes->id,
                 ]);
             }
-        } else {
+        } else if (!is_null($newItem)) {
             $slot->update([
                 'item_id' => $newItem->id,
             ]);

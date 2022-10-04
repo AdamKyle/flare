@@ -78,7 +78,7 @@ export default class InfoTab extends React.Component<InfoTabProps, InfoTabState>
                         <span className="text-xs font-medium text-orange-700 dark:text-white">{this.props.character.xp}/{this.props.character.xp_next}</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-1.5 dark:bg-gray-700">
-                        <div className="bg-orange-600 h-1.5 rounded-full" style={{width: ((this.props.character.xp / 100) * 100) + '%'}}></div>
+                        <div className="bg-orange-600 h-1.5 rounded-full" style={{width: ((this.props.character.xp / this.props.character.xp_next) * 100) + '%'}}></div>
                     </div>
                 </div>
 

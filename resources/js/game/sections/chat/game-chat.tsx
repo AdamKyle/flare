@@ -129,7 +129,6 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
 
         // @ts-ignore
         this.serverMessages.listen('Game.Messages.Events.ServerMessageEvent', (event: any) => {
-            console.log(event);
             let messages = JSON.parse(JSON.stringify(this.state.server_messages));
 
             if (messages.length > 1000) {
@@ -165,6 +164,7 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
         });
 
         this.chat.listen('Game.Messages.Events.MessageSentEvent', (event: any) => {
+            console.log(event);
            const chat = JSON.parse(JSON.stringify(this.state.chat))
 
            if (chat.length > 1000) {

@@ -34,7 +34,7 @@ class AccountDeletionController extends Controller {
          ];
 
          if ($request->has('class')) {
-             $data['class_id'] = !is_null($request->class) ? $request->class : $character->race->id;
+             $data['class_id'] = !is_null($request->class) ? $request->class : $character->class->id;
          }
 
         if ($request->has('race')) {

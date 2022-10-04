@@ -81,6 +81,10 @@ export default class Monster extends BattleBase {
     canMonsterDevoidPlayer(devouringDarkResistance: number): boolean {
         let chance = this.monster.devouring_darkness_chance
 
+        if (devouringDarkResistance >= 1) {
+            return false;
+        }
+
         if (devouringDarkResistance > chance) {
             return false;
         }
@@ -98,6 +102,10 @@ export default class Monster extends BattleBase {
 
     canMonsterVoidPlayer(devouringLightResistance: number): boolean {
         let chance = this.monster.devouring_light_chance
+
+        if (devouringLightResistance >= 1) {
+            return false;
+        }
 
         if (devouringLightResistance > chance) {
             return false;

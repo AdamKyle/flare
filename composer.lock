@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "803bb208a55c95172a62ca4937e06756",
+    "content-hash": "0a70e46dc37a48ac73ac580fb20c2512",
     "packages": [
         {
             "name": "asahasrabuddhe/laravel-mjml",
@@ -5574,16 +5574,16 @@
         },
         {
             "name": "pusher/pusher-php-server",
-            "version": "7.2.0",
+            "version": "7.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pusher/pusher-http-php.git",
-                "reference": "7ed4a62956c7426814c7dc67b2bb764cd0e1a603"
+                "reference": "af3eeaefc0c7959f5b3852f0a4dd5547245d33df"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pusher/pusher-http-php/zipball/7ed4a62956c7426814c7dc67b2bb764cd0e1a603",
-                "reference": "7ed4a62956c7426814c7dc67b2bb764cd0e1a603",
+                "url": "https://api.github.com/repos/pusher/pusher-http-php/zipball/af3eeaefc0c7959f5b3852f0a4dd5547245d33df",
+                "reference": "af3eeaefc0c7959f5b3852f0a4dd5547245d33df",
                 "shasum": ""
             },
             "require": {
@@ -5629,9 +5629,9 @@
             ],
             "support": {
                 "issues": "https://github.com/pusher/pusher-http-php/issues",
-                "source": "https://github.com/pusher/pusher-http-php/tree/7.2.0"
+                "source": "https://github.com/pusher/pusher-http-php/tree/7.0.2"
             },
-            "time": "2022-10-03T14:28:42+00:00"
+            "time": "2021-12-07T13:09:00+00:00"
         },
         {
             "name": "ralouphie/getallheaders",

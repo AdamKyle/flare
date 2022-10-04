@@ -3,6 +3,7 @@
 namespace App\Game\Quests\Handlers;
 
 use App\Flare\Jobs\CharacterAttackTypesCacheBuilder;
+use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
@@ -10,6 +11,7 @@ use App\Flare\Models\Npc;
 use App\Flare\Models\Quest;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Core\Traits\HandleCharacterLevelUp;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -17,13 +19,15 @@ use App\Game\Quests\Events\UnlockSkillEvent;
 
 class NpcQuestRewardHandler {
 
-    private $npcServerMessageBuilder;
+    use HandleCharacterLevelUp;
 
-    public function __construct(NpcServerMessageBuilder    $npcServerMessageBuilder) {
-        $this->npcServerMessageBuilder    = $npcServerMessageBuilder;
+    private NpcServerMessageBuilder $npcServerMessageBuilder;
+
+    public function __construct(NpcServerMessageBuilder $npcServerMessageBuilder) {
+        $this->npcServerMessageBuilder = $npcServerMessageBuilder;
     }
 
-    public function processReward(Quest $quest, Npc $npc, Character $character) {
+    public function processReward(Quest $quest, Npc $npc, Character $character): void {
 
         if ($this->questHasRewardItem($quest)) {
             $this->giveItem($character, $quest, $npc);
@@ -43,6 +47,10 @@ class NpcQuestRewardHandler {
 
         if ($this->questRewardsShards($quest)) {
             $this->giveShards($character, $quest, $npc);
+        }
+
+        if ($this->questRewardsXP($quest)) {
+            $this->giveXP($character, $quest);
         }
 
         $this->createQuestLog($character, $quest);
@@ -72,7 +80,17 @@ class NpcQuestRewardHandler {
         return !is_null($quest->reward_xp);
     }
 
-    public function giveItem(Character $character, Quest $quest, Npc $npc) {
+    public function giveXP(Character $character, Quest $quest): void {
+        $character->update([
+            'xp' => $quest->reward_xp
+        ]);
+
+        $character = $character->refresh();
+
+        $this->handlePossibleLevelUp($character);
+    }
+
+    public function giveItem(Character $character, Quest $quest, Npc $npc): void {
 
         if (!is_null($quest->rewardItem->effect)) {
             $effectType = new ItemEffectsValue($quest->rewardItem->effect);
@@ -98,7 +116,7 @@ class NpcQuestRewardHandler {
         broadcast(new ServerMessageEvent($character->user, 'Received: ' . $quest->rewardItem->name, $slot->id));
     }
 
-    public function unlockSkill(Quest $quest, Character $character, Npc $npc) {
+    public function unlockSkill(Quest $quest, Character $character, Npc $npc): void {
         $gameSkill = GameSkill::where('type', $quest->unlocks_skill_type)->first();
 
         $characterSkill = $character->skills()->where('game_skill_id', $gameSkill->id)->where('is_locked', true)->first();
@@ -107,16 +125,20 @@ class NpcQuestRewardHandler {
             'is_locked' => false
         ]);
 
-        $this->updateCharacterAttackDataCache($character->refresh());
+        $character = $character->refresh();
+
+        $this->updateCharacterAttackDataCache($character);
 
         $this->npcServerMessage($npc, $character, 'skill_unlocked');
 
         event(new ServerMessageEvent($character->user, 'Unlocked: ' . $gameSkill->name . ' This skill can now be leveled!'));
 
         event(new UnlockSkillEvent($character->user));
+
+        event(new UpdateCharacterStatus($character));
     }
 
-    public function giveGold(Character $character, Quest $quest, Npc $npc) {
+    public function giveGold(Character $character, Quest $quest, Npc $npc): void {
 
         $newValue = $character->gold + $quest->reward_gold;
 
@@ -133,7 +155,7 @@ class NpcQuestRewardHandler {
         broadcast(new ServerMessageEvent($character->user, 'Received: ' . number_format($quest->reward_gold) . ' gold from: ' . $npc->real_name));
     }
 
-    public function giveGoldDust(Character $character, Quest $quest, Npc $npc) {
+    public function giveGoldDust(Character $character, Quest $quest, Npc $npc): void {
 
         $newValue = $character->gold_dust + $quest->reward_gold_dust;
 
@@ -150,7 +172,7 @@ class NpcQuestRewardHandler {
         broadcast(new ServerMessageEvent($character->user, 'Received: ' . number_format($quest->reward_gold_dust) . ' gold dust from: ' . $npc->real_name));
     }
 
-    public function giveShards(Character $character, Quest $quest, Npc $npc) {
+    public function giveShards(Character $character, Quest $quest, Npc $npc): void {
 
         $newValue = $character->shards + $quest->reward_shards;
 
@@ -171,11 +193,11 @@ class NpcQuestRewardHandler {
         broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build($type, $npc)));
     }
 
-    public function updateCharacterAttackDataCache(Character $character) {
+    public function updateCharacterAttackDataCache(Character $character): void {
         CharacterAttackTypesCacheBuilder::dispatch($character);
     }
 
-    public function createQuestLog(Character $character, Quest $quest) {
+    public function createQuestLog(Character $character, Quest $quest): void {
         $character->questsCompleted()->create([
             'character_id' => $character->id,
             'quest_id'     => $quest->id,

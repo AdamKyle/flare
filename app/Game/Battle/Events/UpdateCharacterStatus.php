@@ -5,9 +5,12 @@ namespace App\Game\Battle\Events;
 use App\Flare\Models\CelestialFight;
 use App\Flare\Models\Character;
 use App\Flare\Models\Event;
+use App\Flare\Models\GameSkill;
 use App\Flare\Models\MonthlyPvpParticipant;
+use App\Flare\Models\Skill;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\EventType;
+use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Queue\SerializesModels;
@@ -44,6 +47,7 @@ class UpdateCharacterStatus implements ShouldBroadcastNow {
             'can_move'                => $character->can_move,
             'can_register_for_pvp'    => !is_null(Event::where('type', EventType::MONTHLY_PVP)->first()) && $character->level >= 301,
             'killed_in_pvp'           => $character->killed_in_pvp,
+            'is_alchemy_locked'       => $this->isAlchemyLocked($character),
         ];
 
         $this->user = $character->user;
@@ -57,6 +61,10 @@ class UpdateCharacterStatus implements ShouldBroadcastNow {
         }
 
         return 0;
+    }
+
+    protected function isAlchemyLocked(Character $character): bool {
+        return Skill::where('character_id', $character->id)->where('game_skill_id', GameSkill::where('type', SkillTypeValue::ALCHEMY)->first()->id)->first()->is_locked;
     }
 
     /**
