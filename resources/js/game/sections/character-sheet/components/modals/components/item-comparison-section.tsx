@@ -44,6 +44,10 @@ export default class ItemComparisonSection extends React.Component<any, any> {
             return 'Holy Devouring Light/Dark Resistance'
         }
 
+        if (key.includes('_reduction')) {
+            return 'Enemy ' + key.split('_').join(' ');
+        }
+
         return capitalize(key.split('_').join(' '));
     }
 

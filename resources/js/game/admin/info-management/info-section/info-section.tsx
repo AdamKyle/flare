@@ -118,6 +118,12 @@ export default class InfoSection extends React.Component<any, any> {
             label: 'Alchemy Items',
             value: 'info.alchemy-items.alchemy-items-table',
         },{
+            label: 'Alchemy Holy Items',
+            value: 'info.alchemy-items.alchemy-holy-items-table',
+        },{
+            label: 'Alchemy Kingdom Damaging Items',
+            value: 'info.alchemy-items.alchemy-kingdom-items-table',
+        },{
             label: 'Skills',
             value: 'admin.skills.skills-table',
         },{

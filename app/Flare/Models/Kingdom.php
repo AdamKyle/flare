@@ -152,8 +152,15 @@ class Kingdom extends Model implements Auditable
 
         if ($walls->current_durability < $walls->max_durability) {
             $wallDefenceReduction = 1.0 - ($walls->current_durability / $walls->max_durability);
+            $baseDefence          = ($walls->level / $walls->gameBuilding->max_level) ;
 
-            return ($walls->level / $walls->gameBuilding->max_level) - $wallDefenceReduction;
+            $totalDefence         = $baseDefence - $wallDefenceReduction;
+
+            if ($totalDefence < 0) {
+                return 0;
+            }
+
+            return $totalDefence;
         }
 
         return $walls->level / $walls->gameBuilding->max_level;
