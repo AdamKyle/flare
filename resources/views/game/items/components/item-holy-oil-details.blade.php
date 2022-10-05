@@ -22,19 +22,19 @@
 
         switch($item->holy_level) {
             case 1:
-                $devouringIncrease = '0.001-0.003';
+                $devouringIncrease = '1-3';
                 break;
             case 2:
-                $devouringIncrease = '0.001-0.005';
+                $devouringIncrease = '1-5';
                 break;
             case 3:
-                $devouringIncrease = '0.001-0.008';
+                $devouringIncrease = '1-8';
                 break;
             case 4:
-                $devouringIncrease = '0.001-0.01';
+                $devouringIncrease = '1-10';
                 break;
             case 5:
-                $devouringIncrease = '0.001-0.015';
+                $devouringIncrease = '1-15';
                 break;
             default:
                 $devouringIncrease = 'ERROR';
@@ -53,7 +53,7 @@
             <dd>{{$item->holy_level}}</dd>
             <dt>Stat Increase per use</dt>
             <dd>{{$statIncrease}}%</dd>
-            <dt>Devouring Increase per use</dt>
+            <dt>Devouring Light/Dark Resistance per use</dt>
             <dd>{{$devouringIncrease}}%</dd>
         </dl>
 

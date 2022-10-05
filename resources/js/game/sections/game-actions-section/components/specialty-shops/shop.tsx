@@ -227,7 +227,7 @@ export default class Shop extends React.Component<any, any> {
                                                       on_click={this.closeSection.bind(this)}
                                                       additional_css={'ml-2'}
                                                       disabled={this.state.loading || this.props.cannot_craft} />
-                                        <a href={'/information/'+snakeCase(this.props.type)+'-gear'} target='_blank' className='ml-2'>Help <i
+                                        <a href='/information/gear-progression' target='_blank' className='ml-2'>Help <i
                                             className="fas fa-external-link-alt"></i></a>
                                     </div>
                                 </div>

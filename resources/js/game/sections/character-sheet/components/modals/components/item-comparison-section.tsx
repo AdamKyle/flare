@@ -35,6 +35,18 @@ export default class ItemComparisonSection extends React.Component<any, any> {
         return this.renderPercent(details[key]);
     }
 
+    renderName(key: string): string {
+        if (key === 'damage') {
+            return 'Affix Damage';
+        }
+
+        if (key === 'holy_stack_devouring_darkness') {
+            return 'Holy Devouring Light/Dark Resistance'
+        }
+
+        return capitalize(key.split('_').join(' '));
+    }
+
     renderChange(details: InventoryComparisonAdjustment, itemToEquip?: InventoryComparisonAdjustment) {
         const invalidFields     = ['id', 'min_cost', 'skill_level_req', 'skill_level_trivial', 'holy_level', 'holy_stacks', 'holy_stacks_applied', 'reduces_enemy_stats', 'cost', 'shop_cost', 'slot_id', 'affix_count', 'is_unique'];
 
@@ -43,12 +55,7 @@ export default class ItemComparisonSection extends React.Component<any, any> {
                 if (typeof details[key] === 'number' && details[key] !== 0) {
                     return (
                         <Fragment>
-                            <dt>{
-                                key === 'damage' ?
-                                    'Affix Damage'
-                                :
-                                    capitalize(key.split('_').join(' '))
-                            }</dt>
+                            <dt>{this.renderName(key)}</dt>
                             <dd className={clsx(
                                 {
                                     'text-green-600 dark:text-green-500': details[key] > 0
@@ -127,12 +134,7 @@ export default class ItemComparisonSection extends React.Component<any, any> {
                 if (itemToEquip[key] > 0) {
                     return (
                         <Fragment>
-                            <dt>{
-                                key === 'damage' ?
-                                    'Affix Damage'
-                                    :
-                                    capitalize(key.split('_').join(' '))
-                            }</dt>
+                            <dt>{this.renderName(key)}</dt>
                             <dd className={clsx(
                                 {
                                     'text-green-600 dark:text-green-500': itemToEquip[key] > 0

@@ -20,8 +20,12 @@ class PassiveSkillTable extends DataTableComponent {
             Column::make('Name')->format(function ($value, $row) {
                 $passiveSkillId = PassiveSkill::where('name', $value)->first()->id;
 
-                if (auth()->user()->hasRole('Admin')) {
-                    return '<a href="/admin/passive-skill/'. $passiveSkillId.'">'.$row->name . '</a>';
+                if (auth()->user()) {
+                    if (auth()->user()->hasRole('Admin')) {
+                        return '<a href="/admin/passive-skill/' . $passiveSkillId . '">' . $row->name . '</a>';
+                    }
+
+                    return '<a href="/information/passive-skill/'. $passiveSkillId.'" >'.$row->name . '</a>';
                 }
 
                 return '<a href="/information/passive-skill/'. $passiveSkillId.'" >'.$row->name . '</a>';
@@ -33,8 +37,12 @@ class PassiveSkillTable extends DataTableComponent {
                     return 'Is Parent';
                 }
 
-                if (auth()->user()->hasRole('Admin')) {
-                    return '<a href="/admin/passive-skill/'. $row->parent_skill_id.'">'.$row->parent->name . '</a>';
+                if (auth()->user()) {
+                    if (auth()->user()->hasRole('Admin')) {
+                        return '<a href="/admin/passive-skill/' . $row->parent_skill_id . '">' . $row->parent->name . '</a>';
+                    }
+
+                    return '<a href="/information/passive-skill/'. $row->parent_skill_id.'" >'.$row->parent->name . '</a>';
                 }
 
                 return '<a href="/information/passive-skill/'. $row->parent_skill_id.'" >'.$row->parent->name . '</a>';
@@ -56,16 +64,24 @@ class PassiveSkillTable extends DataTableComponent {
                     $currentIndex++;
 
                     if ($currentIndex !== $length) {
-                        if (auth()->user()->hasRole('Admin')) {
-                            $links .= '<a href="/admin/passive-skill/'. $id.'">'.$name . '</a>, ';
+                        if (auth()->user()) {
+                            if (auth()->user()->hasRole('Admin')) {
+                                $links .= '<a href="/admin/passive-skill/'. $id.'">'.$name . '</a>, ';
+                            } else {
+                                $links .= '<a href="/information/passive-skill/'. $id.'" >'.$name . '</a>, ';
+                            }
                         } else {
                             $links .= '<a href="/information/passive-skill/'. $id.'" >'.$name . '</a>, ';
                         }
                     } else {
-                        if (auth()->user()->hasRole('Admin')) {
-                            $links .= '<a href="/admin/passive-skill/'. $id.'">'.$name . '</a>';
+                        if (auth()->user()) {
+                            if (auth()->user()->hasRole('Admin')) {
+                                $links .= '<a href="/admin/passive-skill/'. $id.'">'.$name . '</a>, ';
+                            } else {
+                                $links .= '<a href="/information/passive-skill/'. $id.'" >'.$name . '</a>, ';
+                            }
                         } else {
-                            $links .= '<a href="/information/passive-skill/'. $id.'" >'.$name . '</a>';
+                            $links .= '<a href="/information/passive-skill/'. $id.'" >'.$name . '</a>, ';
                         }
                     }
                 };

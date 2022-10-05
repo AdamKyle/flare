@@ -116,28 +116,10 @@ class TrainPassiveSkill implements ShouldQueue
                 event(new UpdateKingdom($user, $kingdom));
             }
         }
-
-        $this->createNotifactionEvent($newPassive);
-
         $character = $this->character->Refresh();
 
+        event(new ServerMessageEvent($character->user, $newPassive->passiveSkill->name . ' skill has gained a new level! Check your character sheet!'));
+
         event(new UpdatePassiveTree($character->user, $character->passiveSkills));
-    }
-
-    protected function createNotifactionEvent(CharacterPassiveSkill $characterPassiveSkill) {
-        Notification::create([
-            'character_id' => $this->character->id,
-            'title'        => $characterPassiveSkill->passiveSkill->name,
-            'message'      => $characterPassiveSkill->passiveSkill->name . ' skill has gained a new level! Check your character sheet!',
-            'status'       => 'success',
-            'type'         => 'passive-skill',
-            'url'          => route('game.character.sheet'),
-        ]);
-
-        $character = $this->character->refresh();
-
-        event(new UpdateNotificationsBroadcastEvent($character->notifications()->where('read', false)->get(), $character->user));
-
-        event(new ServerMessageEvent($character->user, $characterPassiveSkill->passiveSkill->name . ' skill has gained a new level! Check your character sheet!'));
     }
 }

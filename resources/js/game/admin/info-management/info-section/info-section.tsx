@@ -129,6 +129,9 @@ export default class InfoSection extends React.Component<any, any> {
         },{
             label: 'NPCs',
             value: 'admin.npcs.npc-table',
+        },{
+            label: 'Kingdom Passive Skills',
+            value: 'admin.passive-skills.passive-skill-table',
         }];
     }
 
