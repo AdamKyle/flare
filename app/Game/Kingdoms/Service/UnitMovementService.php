@@ -69,6 +69,7 @@ class UnitMovementService {
         $playerKingdoms = Kingdom::where('game_map_id', $gameMapId)
                                  ->where('character_id', $character->id)
                                  ->where('id', '!=', $kingdom->id)
+                                 ->whereNull('protected_until')
                                  ->get();
 
         if ($playerKingdoms->isEmpty()) {
