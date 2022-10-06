@@ -1524,9 +1524,9 @@
   integrity sha512-8yQtQ9ArHh/TzdUDKQwEvwCgpDuhSWTDAbiKMl3854PcT+Dk4UmWaiawuFTLy9n5twzXOBXVflWe+90/ffXQrA==
 
 "@npmcli/config@*":
-  version "4.2.2"
-  resolved "https://registry.yarnpkg.com/@npmcli/config/-/config-4.2.2.tgz#2e3334dda84f48d059309c53d152e66b05ca24b7"
-  integrity sha512-5GNcLd+0c4bYBnFop53+26CO5GQP0R9YcxlernohpHDWdIgzUg9I0+GEMk3sNHnLntATVU39d283A4OO+W402w==
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/@npmcli/config/-/config-5.0.0.tgz#c15214cbc225bd3cb0a93ea396d84c11fa0d07be"
+  integrity sha512-TfJ3IRw5eKtzvzCxWbmy74KfO1ikKoWr2oPzpugo3RqSneAF/PNFZuSAuubvyv5qKjAj0hU4BC7VI2o3eOAT2A==
   dependencies:
     "@npmcli/map-workspaces" "^2.0.2"
     ini "^3.0.0"
@@ -1941,9 +1941,9 @@
   integrity sha512-K0VQKziLUWkVKiRVrx4a40iPaxTUefQmjtkQofBkYRcoaaL/8rhwDWww9qWbrgicNOgnpIsMxyNIUM4+n6dUIA==
 
 "@types/node@*", "@types/node@>=10.0.0":
-  version "18.8.2"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.8.2.tgz#17d42c6322d917764dd3d2d3a10d7884925de067"
-  integrity sha512-cRMwIgdDN43GO4xMWAfJAecYn8wV4JbsOGHNfNUIDiuYkUYAR5ec4Rj7IO2SAhFPEfpPtLtUTbbny/TCT7aDwA==
+  version "18.8.3"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.8.3.tgz#ce750ab4017effa51aed6a7230651778d54e327c"
+  integrity sha512-0os9vz6BpGwxGe9LOhgP/ncvYN5Tx1fNcd2TM3rD/aCGBkysb+ZWpXEocG24h6ZzOi13+VB8HndAQFezsSOw1w==
 
 "@types/node@^17.0.21":
   version "17.0.45"
@@ -4112,9 +4112,9 @@ ee-first@1.1.1:
   integrity sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==
 
 electron-to-chromium@^1.4.251:
-  version "1.4.274"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.274.tgz#74369ac6f020c3cea7c77ec040ddf159fe226233"
-  integrity sha512-Fgn7JZQzq85I81FpKUNxVLAzoghy8JZJ4NIue+YfUYBbu1AkpgzFvNwzF/ZNZH9ElkmJD0TSWu1F2gTpw/zZlg==
+  version "1.4.275"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.275.tgz#db25c8e39c9cc910a996d1ec9b73eee834cb0ac1"
+  integrity sha512-aJeQQ+Hl9Jyyzv4chBqYJwmVRY46N5i2BEX5Cuyk/5gFCUZ5F3i7Hnba6snZftWla7Gglwc5pIgcd+E7cW+rPg==
 
 elliptic@^6.5.3:
   version "6.5.4"
