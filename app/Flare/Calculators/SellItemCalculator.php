@@ -69,6 +69,10 @@ class SellItemCalculator {
             }
         }
 
+        if ($cost > 2000000000) {
+            $cost = 2000000000;
+        }
+
         return floor($cost - ($cost * 0.05));
     }
 

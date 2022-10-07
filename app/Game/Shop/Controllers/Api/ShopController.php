@@ -6,6 +6,7 @@ use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Shop\Services\ShopService;
 use App\Http\Controllers\Controller;
 use Facades\App\Flare\Calculators\SellItemCalculator;

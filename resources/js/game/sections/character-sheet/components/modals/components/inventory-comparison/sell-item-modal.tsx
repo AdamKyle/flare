@@ -49,8 +49,9 @@ export default class SellItemModal extends React.Component<SellModalProps, any> 
                     These items are best sold on the market to make your gold invested and time invested worth it.
                 </p>
                 <p className='mb-4'>
-                    Finally, if the either affix cost attached the item is greater then 2 Billion gold, you will only get 2 billion gold for that affix.
-                    For example, on a 10 gold item that has two 12 billion enchants on it, you would only make 4,000,000,010 gold before taxes.
+                    Finally, no item will sell for more then 2 billion gold before the 5% tax. For example selling a max level
+                    crafted item with two max level enchants will only be sold for 2 billion gold before the 5% tax even if the item would sell for
+                    36+ billion gold. Again the market is where these items are best sold to make your money back.
                 </p>
             </Dialogue>
         );
