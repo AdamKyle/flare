@@ -19,7 +19,7 @@ Route::middleware(['auth', 'is.character.who.they.say.they.are', 'character.owns
 
 Route::middleware(['auth', 'is.character.who.they.say.they.are', 'throttle:500,1'])->group(function() {
     Route::post('/kingdom/opened-log/{character}/{kingdomLog}', ['as' => 'kingdoms.update-log', 'uses' => 'Api\KingdomInformationController@updateLog']);
-    Route::post('/kingdom/delete-log/{character}/{kingdomLog}', ['as' => 'kingdoms.update-log', 'uses' => 'Api\KingdomInformationController@deleteLog']);
+    Route::post('/kingdom/delete-log/{character}/{kingdomLog}', ['as' => 'kingdoms.delete-log', 'uses' => 'Api\KingdomInformationController@deleteLog']);
 });
 
 Route::middleware(['auth', 'is.character.dead', 'is.character.exploring', 'is.character.who.they.say.they.are'])->group(function() {
