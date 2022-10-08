@@ -7,7 +7,7 @@ Route::middleware(['auth'])->group(function() {
 
         Route::post('/kingdoms/abandon/{kingdom}', ['as' => 'abandon.kingdom', 'uses' => 'Api\KingdomsController@abandon']);
 
-        Route::post('/kingdoms/purchase-people/{kingdom}', ['as' => 'kingdom.deposit', 'uses' => 'Api\KingdomsController@purchasePeople']);
+        Route::post('/kingdoms/purchase-people/{kingdom}', ['as' => 'kingdom.purchase.people', 'uses' => 'Api\KingdomsController@purchasePeople']);
     });
 });
 
