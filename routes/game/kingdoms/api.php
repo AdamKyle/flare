@@ -53,7 +53,7 @@ Route::middleware(['auth', 'is.character.dead', 'is.character.exploring', 'is.ch
 });
 
 Route::middleware(['auth', 'is.character.dead', 'is.character.exploring', 'is.character.who.they.say.they.are', 'character.owns.kingdom'])->group(function() {
-    Route::get('/kingdoms/units/{character}/{kingdom}/call-reinforcements', ['as' => 'kingdom.call.reinforcements', 'uses' => 'Api\UnitMovementController@fetchAvailableKingdomsAndUnits']);
+    Route::get('/kingdoms/units/{character}/{kingdom}/call-reinforcements', ['as' => 'kingdom.fetch.units', 'uses' => 'Api\UnitMovementController@fetchAvailableKingdomsAndUnits']);
     Route::post('/kingdom/move-reinforcements/{character}/{kingdom}', ['as' => 'kingdom.call.reinforcements', 'uses' => 'Api\UnitMovementController@moveUnitsBetweenOwnKingdom']);
 });
 
