@@ -207,7 +207,7 @@ class EnchantingService {
                         ->where('int_required', '<=', $currentInt)
                         ->where('skill_level_required', '<=', $enchantingSkill->level)
                         ->where('randomly_generated', false)
-                        ->orderBy('cost', 'asc')
+                        ->orderBy('skill_level_required', 'asc')
                         ->get();
     }
 
