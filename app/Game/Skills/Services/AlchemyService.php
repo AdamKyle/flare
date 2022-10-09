@@ -30,7 +30,7 @@ class AlchemyService {
             ->where('skill_level_required', '<=', $skill->level)
             ->where('item_prefix_id', null)
             ->where('item_suffix_id', null)
-            ->orderBy('gold_dust_cost', 'asc')
+            ->orderBy('skill_level_required', 'asc')
             ->select('id', 'name', 'gold_dust_cost', 'shards_cost')
             ->get();
     }
