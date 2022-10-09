@@ -41,7 +41,7 @@ class MessageSentEvent implements ShouldBroadcastNow {
         }
 
         $this->message = $message;
-        $this->name    = auth()->user()->hasRole('Admin') ? 'Admin' : $user->character->name;
+        $this->name    = auth()->user()->hasRole('Admin') ? 'The Creator' : $user->character->name;
     }
 
     /**
