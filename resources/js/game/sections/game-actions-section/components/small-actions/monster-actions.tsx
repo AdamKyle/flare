@@ -55,11 +55,11 @@ export default class MonsterActions extends React.Component<MonsterActionsProps,
 
     render() {
         return (
-            <Fragment>
+            <div className='relative'>
                 {
                     typeof this.props.close_monster_section !== 'undefined' ?
                         <button type='button' onClick={this.props.close_monster_section}
-                                className='text-red-600 dark:text-red-500 absolute right-[5px] top-[5px]'
+                                className='text-red-600 dark:text-red-500 absolute right-[-20px] top-[-25px]'
                         >
                             <i className="fas fa-times-circle"></i>
                         </button>
@@ -102,7 +102,7 @@ export default class MonsterActions extends React.Component<MonsterActionsProps,
                         />
                     : null
                 }
-            </Fragment>
+            </div>
         );
     }
 }

@@ -139,9 +139,9 @@ export default class CelestialFight extends React.Component<any, any> {
     render() {
         return (
             this.state.loading ?
-                    <ComponentLoading />
+                <ComponentLoading />
             :
-                <Fragment>
+                <div className='relative'>
                     <div className={clsx('mt-4 mb-4 text-xs text-center', {
                         'hidden': this.attackButtonDisabled()
                     })}>
@@ -181,7 +181,7 @@ export default class CelestialFight extends React.Component<any, any> {
                             : null
                         }
                     </div>
-                </Fragment>
+                </div>
         )
     }
 }

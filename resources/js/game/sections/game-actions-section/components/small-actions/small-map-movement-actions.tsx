@@ -13,9 +13,9 @@ export default class SmallMapMovementActions extends React.Component<SmallMapSec
 
     render() {
         return (
-            <Fragment>
+            <div className='relative'>
                 <button type='button' onClick={this.props.close_map_section}
-                        className='text-red-600 dark:text-red-500 absolute right-[5px] top-[5px]'
+                        className='text-red-600 dark:text-red-500 absolute right-[-20px] top-[-25px]'
                 >
                     <i className="fas fa-times-circle"></i>
                 </button>
@@ -32,7 +32,7 @@ export default class SmallMapMovementActions extends React.Component<SmallMapSec
                     update_character_quests_plane={this.props.update_plane_quests}
                     disable_bottom_timer={true}
                 />
-            </Fragment>
+            </div>
         )
     }
 }

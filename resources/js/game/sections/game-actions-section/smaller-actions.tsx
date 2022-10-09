@@ -11,7 +11,6 @@ import MapTimer from "../map/map-timer";
 import DuelPlayer from "./components/duel-player";
 import SmallMapMovementActions from "./components/small-actions/small-map-movement-actions";
 import SmallActionsProps from "../../lib/game/types/actions/small-actions-props";
-import {isEqual} from "lodash";
 import CelestialFight from "./components/celestial-fight";
 
 export default class SmallerActions extends React.Component<SmallActionsProps, SmallActionsState> {

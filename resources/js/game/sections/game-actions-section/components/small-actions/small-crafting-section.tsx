@@ -34,9 +34,9 @@ export default class SmallCraftingSection extends React.Component<SmallCraftingS
 
     render() {
         return (
-            <div>
+            <div className='relative'>
                 <button type='button' onClick={this.props.close_crafting_section}
-                        className='text-red-600 dark:text-red-500 absolute right-[5px] top-[5px]'
+                        className='text-red-600 dark:text-red-500 absolute right-[-20px] top-[-25px]'
                 >
                     <i className="fas fa-times-circle"></i>
                 </button>
