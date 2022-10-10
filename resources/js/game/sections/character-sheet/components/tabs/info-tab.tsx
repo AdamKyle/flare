@@ -75,7 +75,7 @@ export default class InfoTab extends React.Component<InfoTabProps, InfoTabState>
                 <div className='relative top-[24px]'>
                     <div className="flex justify-between mb-1">
                         <span className="font-medium text-orange-700 dark:text-white text-xs">XP</span>
-                        <span className="text-xs font-medium text-orange-700 dark:text-white">{this.props.character.xp}/{this.props.character.xp_next}</span>
+                        <span className="text-xs font-medium text-orange-700 dark:text-white">{formatNumber(this.props.character.xp)}/{formatNumber(this.props.character.xp_next)}</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-1.5 dark:bg-gray-700">
                         <div className="bg-orange-600 h-1.5 rounded-full" style={{width: ((this.props.character.xp / this.props.character.xp_next) * 100) + '%'}}></div>
