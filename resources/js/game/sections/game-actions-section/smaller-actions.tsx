@@ -319,11 +319,13 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
                         />
                 }
 
-                <ActionsTimers attack_time_out={this.state.attack_time_out}
-                               crafting_time_out={this.state.crafting_time_out}
-                               update_attack_timer={this.updateAttackTimer.bind(this)}
-                               update_crafting_timer={this.updateCraftingTimer.bind(this)}
-                />
+                <div className='pb-5'>
+                    <ActionsTimers attack_time_out={this.state.attack_time_out}
+                                   crafting_time_out={this.state.crafting_time_out}
+                                   update_attack_timer={this.updateAttackTimer.bind(this)}
+                                   update_crafting_timer={this.updateCraftingTimer.bind(this)}
+                    />
+                </div>
                 <div className='mt-4'>
                     <MapTimer time_left={this.state.movement_time_left} automation_time_out={this.state.automation_time_out} />
                 </div>
