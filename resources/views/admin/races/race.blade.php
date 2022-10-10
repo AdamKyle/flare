@@ -5,7 +5,9 @@
         @php
             $backUrl = route('races.list');
 
-            if (!auth()->user()->hasRole('Admin')) {
+            if (is_null(auth()->user())) {
+                $backUrl = '/information/races-and-classes';
+            } else if (!auth()->user()->hasRole('Admin')) {
                 $backUrl = '/information/races-and-classes';
             }
         @endphp
