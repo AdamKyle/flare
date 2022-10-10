@@ -81,7 +81,7 @@ export default class CharacterTopSection extends React.Component<CharacterTopSec
                     <div className='relative top-[24px]'>
                         <div className="flex justify-between mb-1">
                             <span className="font-medium text-orange-700 dark:text-white text-xs">XP (Current Level: {this.props.character.level}/{this.props.character.max_level})</span>
-                            <span className="text-xs font-medium text-orange-700 dark:text-white">{this.props.character.xp}/100</span>
+                            <span className="text-xs font-medium text-orange-700 dark:text-white">{this.props.character.xp}/{this.props.character.max_level}</span>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-1.5 dark:bg-gray-700">
                             <div className="bg-orange-600 h-1.5 rounded-full" style={{width: this.getXpPercentage() + '%'}}></div>
