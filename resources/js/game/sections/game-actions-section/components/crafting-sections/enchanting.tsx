@@ -9,6 +9,7 @@ import Select from "react-select";
 import {formatNumber} from "../../../../lib/game/format-number";
 import {isEqual} from "lodash";
 import {generateServerMessage} from "../../../../lib/ajax/generate-server-message";
+import DangerLinkButton from "../../../../components/ui/buttons/danger-link-button";
 
 export default class Enchanting extends React.Component<any, any> {
 
@@ -125,6 +126,18 @@ export default class Enchanting extends React.Component<any, any> {
         });
     }
 
+    resetPrefixes() {
+        this.setState({
+            selected_prefix: null,
+        })
+    }
+
+    resetSuffixes() {
+        this.setState({
+            selected_suffix: null,
+        })
+    }
+
     renderTypeOfEnchant(type: 'prefix' | 'suffix') {
         return this.state.enchantments.map((enchantment: any) => {
             if (enchantment.type === type) {
@@ -206,6 +219,10 @@ export default class Enchanting extends React.Component<any, any> {
                             menuPortalTarget={document.body}
                             value={this.selectedEnchantment('prefix')}
                         />
+
+                    </div>
+                    <div className='cols-start-3 cols-end-3 mt-2'>
+                        <DangerLinkButton button_label={'Clear'} on_click={this.resetPrefixes.bind(this)} />
                     </div>
                     <div className='col-start-1 col-span-2'>
                         <Select
@@ -217,6 +234,9 @@ export default class Enchanting extends React.Component<any, any> {
                             menuPortalTarget={document.body}
                             value={this.selectedEnchantment('suffix')}
                         />
+                    </div>
+                    <div className='cols-start-3 cols-end-3 mt-2'>
+                        <DangerLinkButton button_label={'Clear'} on_click={this.resetSuffixes.bind(this)} />
                     </div>
                 </div>
                 <div className='m-auto w-1/2 md:relative left-[-20px]'>
