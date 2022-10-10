@@ -55,6 +55,6 @@ class  EnchantingController extends Controller {
 
         $this->enchantingService->enchant($character, $request->all(), $slot, $cost);
 
-        return response()->json($this->enchantingService->fetchAffixes($character->refresh()));
+        return response()->json($this->enchantingService->fetchAffixes($character->refresh(), true));
     }
 }
