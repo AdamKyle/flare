@@ -10,7 +10,7 @@ export const removeCommas = (number: string): number => {
 }
 
 /**
- * Turns a number into a comma serpeated string.
+ * Turns a number into a comma serpented string.
  *
  * @param number
  * @return string

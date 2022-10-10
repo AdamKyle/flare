@@ -208,7 +208,9 @@ class CharacterRewardService {
             event(new GameServerMessageEvent($this->character->user, 'Rewarded an extra 10XP while doing the first guide quest. This bonus will end after you reach level 2.'));
         }
 
-        $xp = $this->character->xp + $xp;
+        $characterXp = (int) $this->character->xp;
+
+        $xp = $characterXp + $xp;
 
         $this->character->update([
             'xp' => $xp
