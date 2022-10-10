@@ -1,10 +1,8 @@
 import React, {Fragment} from "react";
 import Messages from "./components/messages";
-import {cloneDeep} from "lodash";
 import ItemComparison from "./modals/item-comparison";
 import ServerMessagesComponentProps from "../../lib/game/chat/components/server-messages-component-props";
 import ServerMessagesComponentState from "../../lib/game/chat/components/server-messages-component-state";
-import InventoryUseDetails from "../character-sheet/components/modals/inventory-item-details";
 
 export default class ServerMessages extends React.Component<ServerMessagesComponentProps, ServerMessagesComponentState> {
 

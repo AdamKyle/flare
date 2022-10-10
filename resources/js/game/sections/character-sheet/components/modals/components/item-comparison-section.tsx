@@ -79,7 +79,11 @@ export default class ItemComparisonSection extends React.Component<any, any> {
         if (elements.length === 0 && typeof itemToEquip !== 'undefined') {
             return (
                 <Fragment>
-                    <p>This item is identical to the one you have equipped.</p>
+                    <p className='mb-4'>This item is identical to the one you have equipped.</p>
+                    <dl>
+                        <dt>Position: </dt>
+                        <dd className={'text-blue-600 dark:text-blue-500'}>{this.formatPosition(details['position'])}</dd>
+                    </dl>
                 </Fragment>
             );
         }

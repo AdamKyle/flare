@@ -9,10 +9,17 @@ import Select from "react-select";
 import {formatNumber} from "../../../../lib/game/format-number";
 import {isEqual} from "lodash";
 import {generateServerMessage} from "../../../../lib/ajax/generate-server-message";
+import DangerLinkButton from "../../../../components/ui/buttons/danger-link-button";
+import {
+    EnchantingState,
+    Enchantment,
+    ItemToEnchant
+} from "../../../../lib/game/actions/crafting-sections/enchanting-state";
+import EnchantingProps from "../../../../lib/game/actions/crafting-sections/enchanting-props";
 
-export default class Enchanting extends React.Component<any, any> {
+export default class Enchanting extends React.Component<EnchantingProps, EnchantingState> {
 
-    constructor(props: any) {
+    constructor(props: EnchantingProps) {
         super(props);
 
         this.state = {
@@ -29,6 +36,7 @@ export default class Enchanting extends React.Component<any, any> {
         const url = craftingGetEndPoints('enchant', this.props.character_id);
 
         (new Ajax()).setRoute(url).doAjaxCall('get', (result: AxiosResponse) => {
+            console.log(result.data);
             this.setState({
                 loading: false,
                 enchantable_items: result.data.character_inventory,
@@ -125,20 +133,36 @@ export default class Enchanting extends React.Component<any, any> {
         });
     }
 
-    renderTypeOfEnchant(type: 'prefix' | 'suffix') {
-        return this.state.enchantments.map((enchantment: any) => {
-            if (enchantment.type === type) {
-                return {
-                    label: enchantment.name + ' Cost: ' + formatNumber(enchantment.cost),
-                    value: enchantment.id,
-                }
+    resetPrefixes() {
+        this.setState({
+            selected_prefix: null,
+        })
+    }
+
+    resetSuffixes() {
+        this.setState({
+            selected_suffix: null,
+        })
+    }
+
+    renderEnchantmentOptions(type: 'prefix' | 'suffix') {
+        const enchantments = this.state.enchantments.filter((enchantment: any) => {
+            return enchantment.type === type;
+        });
+
+        return enchantments.map((enchantment: any) => {
+            return {
+                label: enchantment.name + ' Cost: ' + formatNumber(enchantment.cost),
+                value: enchantment.id,
             }
-        }).filter((element: any) => typeof element !== 'undefined');
+        });
     }
 
     selectedItemToEnchant() {
         if (this.state.selected_item !== null) {
-            const foundItem = this.state.enchantable_items.filter((item: any) => {
+
+            // @ts-ignore
+            const foundItem: ItemToEnchant[] = this.state.enchantable_items.filter((item: any) => {
                 return item.slot_id === this.state.selected_item;
             });
 
@@ -157,16 +181,20 @@ export default class Enchanting extends React.Component<any, any> {
     }
 
     selectedEnchantment(type: 'prefix' | 'suffix') {
-        if (this.state['selected_' + type] !== null) {
+        // @ts-ignore
+        const selectedType: number | null = this.state['selected_' + type];
 
-            const foundEnchantment = this.state.enchantments.filter((item: any) => {
-                return item.id === this.state['selected_' + type];
+        if (selectedType !== null) {
+
+            // @ts-ignore
+            const foundEnchantment: Enchantment[] = this.state.enchantments.filter((item: any) => {
+                return item.id === selectedType;
             });
 
             if (foundEnchantment.length > 0) {
                 return {
                     label: foundEnchantment[0].name + ' Cost: ' + formatNumber(foundEnchantment[0].cost),
-                    value: this.state['selected_' + type]
+                    value: selectedType
                 }
             }
         }
@@ -199,24 +227,31 @@ export default class Enchanting extends React.Component<any, any> {
                     <div className='col-start-1 col-span-2'>
                         <Select
                             onChange={this.setPrefix.bind(this)}
-                            options={this.renderTypeOfEnchant('prefix')}
+                            options={this.renderEnchantmentOptions('prefix')}
                             menuPosition={'absolute'}
                             menuPlacement={'bottom'}
                             styles={{menuPortal: (base: any) => ({...base, zIndex: 9999, color: '#000000'})}}
                             menuPortalTarget={document.body}
                             value={this.selectedEnchantment('prefix')}
                         />
+
+                    </div>
+                    <div className='cols-start-3 cols-end-3 mt-2'>
+                        <DangerLinkButton button_label={'Clear'} on_click={this.resetPrefixes.bind(this)} />
                     </div>
                     <div className='col-start-1 col-span-2'>
                         <Select
                             onChange={this.setSuffix.bind(this)}
-                            options={this.renderTypeOfEnchant('suffix')}
+                            options={this.renderEnchantmentOptions('suffix')}
                             menuPosition={'absolute'}
                             menuPlacement={'bottom'}
                             styles={{menuPortal: (base: any) => ({...base, zIndex: 9999, color: '#000000'})}}
                             menuPortalTarget={document.body}
                             value={this.selectedEnchantment('suffix')}
                         />
+                    </div>
+                    <div className='cols-start-3 cols-end-3 mt-2'>
+                        <DangerLinkButton button_label={'Clear'} on_click={this.resetSuffixes.bind(this)} />
                     </div>
                 </div>
                 <div className='m-auto w-1/2 md:relative left-[-20px]'>

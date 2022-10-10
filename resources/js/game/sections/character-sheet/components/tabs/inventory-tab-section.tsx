@@ -276,15 +276,14 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
                         >
                             <p>
                                 Are you sure? You are about to sell all items in your inventory (this does not effect Alchemy, Quest items, Sets or Equipped items). This action cannot be undone.
+                                Also, trinkets cannot be sold to the shop. They can be listed to the market or destroyed.
                             </p>
                             <p className='mt-2'>
-                                <strong>Note</strong>: This will not take into account prices for Holy Items and Uniques.
-                                In those cases you only get the base item cost, even in the case of holy items, if there are affixes attached.
-                                These items are best sold on the market to make your gold invested and time invested worth it.
+                                <strong>Note</strong>: The amount of gold you will get back for items that are enchanted or crafted over the price of two billion gold
+                                will never be sold for <strong>more than</strong> two billion gold. Ie, a 36 billion gold item will only sell for two billion gold before taxes.
                             </p>
                             <p className='mt-2'>
-                                Finally, if the either affix cost attached the item is greater then 2 Billion gold, you will only get 2 billion gold for that affix.
-                                For example, on a 10 gold item that has two 12 billion enchants on it, you would only make 4,000,000,010 gold before taxes.
+                               It is highly recommended you use the market place to sell anything beyond shop gear to make your money back.
                             </p>
                         </InventoryActionConfirmationModal>
                         : null

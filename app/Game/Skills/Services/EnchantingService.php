@@ -104,9 +104,19 @@ class EnchantingService {
             }));
         }
 
+        $newInventory = [];
+
+        foreach ($inventory as $item) {
+            if ($item['attached_affixes_count'] === 0) {
+                array_unshift($newInventory, $item);
+            } else {
+                $newInventory[] = $item;
+            }
+        }
+
         return [
             'affixes'             => $this->getAvailableAffixes($characterInfo, $enchantingSkill),
-            'character_inventory' => $inventory,
+            'character_inventory' => $newInventory,
         ];
     }
 
@@ -207,7 +217,7 @@ class EnchantingService {
                         ->where('int_required', '<=', $currentInt)
                         ->where('skill_level_required', '<=', $enchantingSkill->level)
                         ->where('randomly_generated', false)
-                        ->orderBy('cost', 'asc')
+                        ->orderBy('skill_level_required', 'asc')
                         ->get();
     }
 
