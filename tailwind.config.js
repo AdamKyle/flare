@@ -168,7 +168,7 @@ module.exports = {
               color: theme('colors.gray.300'),
             },
             h3: {
-              color: theme('colors.blue.900'),
+              color: theme('colors.blue.300'),
             },
             h4: {
               color: theme('colors.gray.300'),
