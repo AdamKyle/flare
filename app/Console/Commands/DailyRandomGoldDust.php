@@ -7,6 +7,9 @@ use App\Flare\Models\Character;
 use App\Flare\Services\DailyGoldDustService;
 use Illuminate\Console\Command;
 use Facades\App\Flare\Values\UserOnlineValue;
+use Illuminate\Support\Facades\Cache;
+use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Output\ConsoleOutput;
 
 class DailyRandomGoldDust extends Command
 {
@@ -50,12 +53,20 @@ class DailyRandomGoldDust extends Command
 
         $dailyGoldDustService->handleWonDailyLottery($character);
 
-        Character::chunkById(100, function($characters) use ($characterWhoWon, $dailyGoldDustService) {
+        Cache::delete('daily-gold-dust-lottery-won');
+
+        $progressBar = new ProgressBar(new ConsoleOutput(), Character::count());
+
+        Character::chunkById(100, function($characters) use ($characterWhoWon, $dailyGoldDustService, $progressBar) {
             foreach ($characters as $character) {
                 if ($character->id !== $characterWhoWon) {
                     $dailyGoldDustService->handleRegularDailyGoldDust($character);
+
+                    $progressBar->advance();
                 }
             }
         });
+
+        $progressBar->finish();
     }
 }

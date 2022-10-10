@@ -3,7 +3,6 @@
 namespace App\Flare\Services;
 
 use Cache;
-use Facades\App\Flare\RandomNumber\RandomNumberGenerator;
 use App\Flare\Events\ServerMessageEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
@@ -47,21 +46,26 @@ class DailyGoldDustService {
      * @return void
      */
     public function handleWonDailyLottery(Character $character) {
-        event(new GlobalMessageEvent($character->name . 'has won the daily Gold Dust Lottery!
-        (Gold Dust is used in Alchemy and Quests - See Help section -> (hover over person icon inn help section) Currencies, for more info)'
-        ));
 
-        $newAmount = $character->gold_dust + self::LOTTO_MAX;
+        if (!Cache::has('daily-gold-dust-lottery-won')) {
+            event(new GlobalMessageEvent($character->name . ' has won the daily Gold Dust Lottery!
+            (Gold Dust is used in Alchemy and Quests - See Help section -> Click Help I\'m stuck, and see currencies under: Character Information -> Currencies)'
+            ));
 
-        if ($newAmount >= MaxCurrenciesValue::MAX_GOLD_DUST) {
-            $newAmount = MaxCurrenciesValue::MAX_GOLD_DUST;
+            $newAmount = $character->gold_dust + self::LOTTO_MAX;
+
+            if ($newAmount >= MaxCurrenciesValue::MAX_GOLD_DUST) {
+                $newAmount = MaxCurrenciesValue::MAX_GOLD_DUST;
+            }
+
+            $character->update([
+                'gold_dust' => $newAmount,
+            ]);
+
+            $character = $character->refresh();
+
+            Cache::put('daily-gold-dust-lottery-won', $character->id);
         }
-
-        $character->update([
-            'gold_dust' => $newAmount,
-        ]);
-
-        $character = $character->refresh();
 
         event(new ServerMessageEvent($character->user, 'lotto_max', self::LOTTO_MAX));
 

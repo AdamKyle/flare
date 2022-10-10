@@ -22,7 +22,7 @@
             $item = \App\Flare\Models\Item::find($itemToEquip['id']);
         @endphp
 
-        <x-core.cards.card-with-title title="Comparison Data">
+        <x-core.cards.card-with-title title="Comparison Data" backUrl="{{url()->previous()}}" buttons="true">
             @include('game.core.comparison.components.comparison-details', ['details' => $details])
         </x-core.cards.card-with-title>
 

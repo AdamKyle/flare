@@ -18,7 +18,7 @@ export const BuildInventoryTableColumns = (component?: ActionsInterface, clickAc
         {
             name: 'Name',
             selector: (row: { item_name: string; }) => row.item_name,
-            cell: (row: any) => <ItemNameColorationButton item={row} on_click={clickAction} />
+            cell: (row: any) => <span className='m-auto'><ItemNameColorationButton item={row} on_click={clickAction} /></span>
         },
         {
             name: 'Type',
