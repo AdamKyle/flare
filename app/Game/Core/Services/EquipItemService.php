@@ -297,15 +297,6 @@ class EquipItemService {
         foreach ($slots as $slot) {
             if ($slot->position === 'right-hand' || $slot->position === 'left-hand') {
                 $slot->update(['equipped' => false]);
-
-                if ($removedFromSet) {
-                    $this->character->inventory->slots()->create([
-                        'inventory_id' => $this->character->inventory->id,
-                        'item_id'      => $slot->item->id,
-                    ]);
-
-                    $slot->delete();
-                }
             }
         }
 
