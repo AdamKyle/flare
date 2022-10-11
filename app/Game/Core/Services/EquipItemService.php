@@ -108,7 +108,6 @@ class EquipItemService {
                 throw new EquipItemException('Cannot equip another unique.');
             }
 
-
             $this->unequipSlot($characterSlot, $equippedSet);
 
             $equippedSet->slots()->create([
@@ -120,7 +119,6 @@ class EquipItemService {
 
             $characterSlot->delete();
         } else {
-
             $uniqueSlot          = $this->getUniqueFromSet($this->character->inventory);
             $isItemToEquipUnique = $this->isItemToEquipUnique($characterSlot->item);
             $isItemToReplaceUnique = $this->isItemToBeReplacedUnique($this->character->inventory);
@@ -231,34 +229,51 @@ class EquipItemService {
             $this->unequipBothHands();
         } else {
 
-            $itemForPosition = $inventory->slots->filter(function($slot) {
-                return $slot->position === $this->request->position && $slot->equipped;
-            })->first();
+            if (!$this->removeTwoHandedWeapon($inventory)) {
+                $itemForPosition = $inventory->slots->filter(function ($slot) {
+                    return $slot->position === $this->request->position && $slot->equipped;
+                })->first();
 
-            if (!is_null($itemForPosition)) {
-                $itemForPosition->update(['equipped' => false]);
+                if (!is_null($itemForPosition)) {
+                    $itemForPosition->update(['equipped' => false]);
 
-                $this->character->inventory->slots()->create([
-                    'inventory_id' => $this->character->inventory->id,
-                    'item_id'      => $itemForPosition->item->id,
-                ]);
+                    $this->character->inventory->slots()->create([
+                        'inventory_id' => $this->character->inventory->id,
+                        'item_id' => $itemForPosition->item->id,
+                    ]);
 
-                $itemForPosition->delete();
+                    $itemForPosition->delete();
+                }
             }
         }
     }
 
-    public function hasTwoHandedItemEquipped(Inventory|InventorySet $inventory, string $type): bool {
-        $position        = $this->request->position;
-        $twoHandedInHand = null;
+    protected function removeTwoHandedWeapon(Inventory|InventorySet $inventory): bool {
+        if ($this->request->position === 'right-hand' || $this->request->position === 'left-hand') {
 
-        if ($position === 'left-hand' || $position === 'right-hand') {
-            $twoHandedInHand = $inventory->slots->filter(function($slot) use($type) {
-                return $slot->equipped && $slot->item->type === $type;
-            })->first();
+            $itemsForPosition = $inventory->slots->filter(function($slot) {
+                return ($slot->position === 'right-hand' || $slot->position === 'left-hand') && $slot->equipped;
+            });
+
+            $unequipTypes = ['bow', 'hammer', 'stave'];
+
+            foreach ($itemsForPosition as $itemForPosition) {
+                if (in_array($itemForPosition->item->type, $unequipTypes)) {
+                    $itemForPosition->update(['equipped' => false]);
+
+                    $this->character->inventory->slots()->create([
+                        'inventory_id' => $this->character->inventory->id,
+                        'item_id'      => $itemForPosition->item->id,
+                    ]);
+
+                    $itemForPosition->delete();
+
+                    return true;
+                }
+            }
         }
 
-        return !is_null($twoHandedInHand);
+        return false;
     }
 
     /**
@@ -284,7 +299,6 @@ class EquipItemService {
         }
 
         foreach ($slots as $slot) {
-            dump($slot->position);
             if ($slot->position === 'right-hand' || $slot->position === 'left-hand') {
                 $slot->update(['equipped' => false]);
 
@@ -301,4 +315,5 @@ class EquipItemService {
 
         $this->character = $this->character->refresh();
     }
+
 }
