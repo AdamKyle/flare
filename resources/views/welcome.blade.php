@@ -240,15 +240,14 @@
                 </dd>
                 <dt>Is it persistent?</dt>
                 <dd>
-                    Yes. You can log out if you are in the middle of an adventure or are launching an attack
-                    on another kingdom. Assuming you have the right settings enabled, you will be
-                    emailed when the action is finished.
+                    Yes. You can start an exploration, move your units from one kingdom to the next or attack another kingdom. log out and come back later and it all
+                    ran for you behind the scenes. <strong>Kingdoms will never reset.</strong>
                 </dd>
                 <dt>Is it idle?</dt>
                 <dd>
-                    There are two idle aspects: <a href="/information/exploration" class="dark:text-primary-300 dark:hover:text-primary-600">Exploration</a> and <a href="/information/adventure" class="dark:text-primary-300 dark:hover:text-primary-600">Adventures</a>.
-                    These will both gain you XP, Faction points, skill xp, items and gold. There is another aspect called <a href="information/kingdoms" class="dark:text-primary-300 dark:hover:text-primary-600">Kingdoms</a> which
-                    will let you manage your own kingdoms as well as a special skill tree for kingdom.
+                   <a href="/information/exploration" class="dark:text-primary-300 dark:hover:text-primary-600">Exploration</a> is your best bet for automation.
+                    It automates the whole fighting process so you can focus on other things like <a href="/information/crafting" class="dark:text-primary-300 dark:hover:text-primary-600">Crafting</a>
+                    and <a href="/information/enchanting" class="dark:text-primary-300 dark:hover:text-primary-600">Enchanting</a> - one of the most vital aspects of Tlessa!
                 </dd>
                 <dt>Does it use energy systems?</dt>
                 <dd>
