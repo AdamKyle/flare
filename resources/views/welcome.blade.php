@@ -110,7 +110,7 @@
                     <p class="mb-10 dark:text-gray-300 text-gray-800">Adventure on a map by clicking the action buttons. Set sail from one port to the other, traverse t other planes of existence!</p>
 
                     <x-core.buttons.link-buttons.primary-button href="{{route('info.page', [
-                            'pageName' => 'map',
+                            'pageName' => 'movement',
                     ])}}">
                         Learn more
                     </x-core.buttons.link-buttons.primary-button>
