@@ -230,17 +230,6 @@ class EquipItemService {
         } else if ($characterSlot->item->type === 'stave') {
             $this->unequipBothHands();
         } else {
-            if ($this->hasTwoHandedItemEquipped($inventory, 'bow')) {
-                $this->unequipBothHands();
-            }
-
-            if ($this->hasTwoHandedItemEquipped($inventory, 'hammer')) {
-                $this->unequipBothHands();
-            }
-
-            if ($this->hasTwoHandedItemEquipped($inventory, 'stave')) {
-                $this->unequipBothHands();
-            }
 
             $itemForPosition = $inventory->slots->filter(function($slot) {
                 return $slot->position === $this->request->position && $slot->equipped;
@@ -295,8 +284,18 @@ class EquipItemService {
         }
 
         foreach ($slots as $slot) {
+            dump($slot->position);
             if ($slot->position === 'right-hand' || $slot->position === 'left-hand') {
                 $slot->update(['equipped' => false]);
+
+                if ($removedFromSet) {
+                    $this->character->inventory->slots()->create([
+                        'inventory_id' => $this->character->inventory->id,
+                        'item_id'      => $slot->item->id,
+                    ]);
+
+                    $slot->delete();
+                }
             }
         }
 
