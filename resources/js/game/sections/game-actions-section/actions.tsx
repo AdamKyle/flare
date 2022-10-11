@@ -153,6 +153,10 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
     manageHellForgedShop() {
         this.setState({
             crafting_type: null,
+            show_exploration: false,
+            show_join_pvp: false,
+            show_duel_fight: false,
+            show_celestial_fight: false,
             show_hell_forged_section: !this.state.show_hell_forged_section
         })
     }
@@ -160,6 +164,10 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
     managedPurgatoryChainsShop() {
         this.setState({
             crafting_type: null,
+            show_exploration: false,
+            show_join_pvp: false,
+            show_duel_fight: false,
+            show_celestial_fight: false,
             show_purgatory_chains_section: !this.state.show_purgatory_chains_section
         })
     }
