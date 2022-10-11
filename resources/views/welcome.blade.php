@@ -91,11 +91,12 @@
                     <div class="w-4/5">
                         <h5>
                             <a href="{{route('info.page', [
-                                'pageName' => 'adventure',
-                            ])}}">Go on adventures!</a>
+                                'pageName' => 'exploration',
+                            ])}}">Automated exploration</a>
                         </h5>
                         <p>
-                            Travel to new locations and find out their mysteries by partaking in location based adventures!
+                            Set up automation and let the game do all the fighting for you! Come back later or do other actions and
+                            get rewards over time!
                         </p>
                     </div>
                 </div>
