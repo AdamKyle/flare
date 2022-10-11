@@ -184,21 +184,6 @@
             <x-core.cards.card-with-hover>
                 <div class="flex justify-center items-center">
                     <div class="w-1/5 text-7xl">
-                        <i class="fas fa-calendar-alt text-primary-600 relative top-[10px] right-[10px]"></i>
-                    </div>
-                    <div class="w-4/5">
-                        <h5>
-                            <a href="{{route('info.page', [
-                                'pageName' => 'events',
-                            ])}}">Participate in events!</a>
-                        </h5>
-                        <p>Tlessa always has an event running. Find out about events today!</p>
-                    </div>
-                </div>
-            </x-core.cards.card-with-hover>
-            <x-core.cards.card-with-hover>
-                <div class="flex justify-center items-center">
-                    <div class="w-1/5 text-7xl">
                         <i class="ra ra-bone-bite text-primary-600 relative top-[10px] right-[10px]"></i>
                     </div>
                     <div class="w-4/5">
