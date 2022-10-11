@@ -59,7 +59,7 @@
 
 
     <!-- Right -->
-    <div class="flex items-center absolute right-0 mr-2">
+    <div class="flex items-center absolute right-0 mr-2 pb-5">
 
         <!-- Dark Mode -->
         @guest
