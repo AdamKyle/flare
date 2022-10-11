@@ -221,7 +221,7 @@ export default class Shop extends React.Component<any, any> {
                                         : null
                                     }
 
-                                    <div className={'hidden lg:block lg:text-center md:ml-[-100px] my-3'}>
+                                    <div className={'text-center md:ml-[-100px] my-3'}>
                                         <PrimaryButton button_label={'Purchase Item'} on_click={this.purchase.bind(this)} disabled={this.state.loading || this.state.item_selected === null || this.props.is_dead} />
                                         <DangerButton button_label={'Close'}
                                                       on_click={this.closeSection.bind(this)}

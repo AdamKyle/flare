@@ -123,16 +123,16 @@ export default class SmallActionsManager {
         }];
 
         if (!props.character.is_automation_running) {
-            options.push({
-                label: 'Map Movement',
-                value: 'map-movement'
-            });
-
             options.unshift({
                 label: 'Fight',
                 value: 'fight'
             });
         }
+
+        options.push({
+            label: 'Map Movement',
+            value: 'map-movement'
+        });
 
         if (state.characters_for_dueling.length > 0 && !props.character.killed_in_pvp) {
             options.push({
@@ -152,6 +152,20 @@ export default class SmallActionsManager {
             options.push({
                 label: 'Join Monthly PVP',
                 value: 'join-monthly-pvp'
+            });
+        }
+
+        if (props.character.can_access_hell_forged) {
+            options.push({
+                label: 'Hell Forged Gear',
+                value: 'hell-forged-gear'
+            });
+        }
+
+        if (props.character.can_access_purgatory_chains) {
+            options.push({
+                label: 'Purgatory Chains Gear',
+                value: 'purgatory-chains-gear'
             });
         }
 

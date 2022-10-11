@@ -12,6 +12,7 @@ import DuelPlayer from "./components/duel-player";
 import SmallMapMovementActions from "./components/small-actions/small-map-movement-actions";
 import SmallActionsProps from "../../lib/game/types/actions/small-actions-props";
 import CelestialFight from "./components/celestial-fight";
+import SmallerSpecialtyShop from "./components/small-actions/smaller-specialty-shop";
 
 export default class SmallerActions extends React.Component<SmallActionsProps, SmallActionsState> {
 
@@ -201,6 +202,18 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
         });
     }
 
+    manageHellForgedShop() {
+        this.setState({
+            selected_action: null,
+        });
+    }
+
+    managePurgatoryChainShop() {
+        this.setState({
+            selected_action: null,
+        });
+    }
+
     resetDuelData() {
         this.setState({
             duel_fight_info: null,
@@ -280,6 +293,17 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
         )
     }
 
+    showSpecialtyShop(type: string) {
+        return (
+            <SmallerSpecialtyShop
+                show_hell_forged_section={type === 'hell-forged-gear'}
+                character={this.props.character}
+                manage_hell_forged_shop={this.manageHellForgedShop.bind(this)}
+                manage_purgatory_chain_shop={this.managePurgatoryChainShop.bind(this)}
+            />
+        )
+    }
+
     buildSection() {
         switch(this.state.selected_action) {
             case 'fight':
@@ -296,6 +320,10 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
                 return this.showDuelFight();
             case 'join-monthly-pvp':
                 return this.showJoinPVP();
+            case 'hell-forged-gear':
+                return this.showSpecialtyShop('hell-forged-gear')
+            case 'purgatory-chains-gear':
+                return this.showSpecialtyShop('purgatory-chains-gear')
             default:
                 return null;
         }
