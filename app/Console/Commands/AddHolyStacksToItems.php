@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Flare\Models\Item;
 use App\Flare\Values\ItemSpecialtyType;
+use Exception;
 use Illuminate\Console\Command;
 
 class AddHolyStacksToItems extends Command
@@ -27,18 +28,17 @@ class AddHolyStacksToItems extends Command
      *
      * @return void
      */
-    public function __construct()
-    {
+    public function __construct() {
         parent::__construct();
     }
 
     /**
      * Execute the console command.
      *
-     * @return int
+     * @return void
+     * @throws Exception
      */
-    public function handle()
-    {
+    public function handle(): void {
         Item::whereNotIn('type', ['quest', 'alchemy', 'trinket'])
             ->chunkById(250, function($items) {
                 foreach ($items as $item) {
