@@ -265,11 +265,11 @@ export default class Enchanting extends React.Component<EnchantingProps, Enchant
                         <DangerLinkButton button_label={'Clear'} on_click={this.resetSuffixes.bind(this)} />
                     </div>
                 </div>
-                <div className='m-auto w-1/2 md:relative left-[-20px]'>
+                <div className='m-auto w-1/2 relative left-[-30px] lg:left-[-60px]'>
                     {
                         this.state.loading ?
                             <LoadingProgressBar />
-                            : null
+                        : null
                     }
                 </div>
                 <div className={'text-center md:ml-[-100px] mt-3 mb-3'}>
