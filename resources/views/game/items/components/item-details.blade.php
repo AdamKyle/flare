@@ -177,23 +177,23 @@
                         <strong>Crafting Cost</strong>
                         <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                         <dl>
-                            @if (!is_null($item->gold_cost) || $item->gold_cost > 0)
+                            @if ($item->cost > 0)
                                 <dt>Gold Cost</dt>
-                                <dd>{{number_format($item->gold_cost)}}</dd>
+                                <dd>{{number_format($item->cost)}}</dd>
                             @endif
 
-                            @if (!is_null($item->gold_dust_cost) || $item->gold_dust_cost > 0)
+                            @if ($item->gold_dust_cost > 0)
                                 <dt>Gold Dust Cost</dt>
                                 <dd>{{number_format($item->gold_dust_cost)}}</dd>
                             @endif
 
-                            @if (!is_null($item->shards_cost) || $item->shards_cost > 0)
-                                <dt>Gold Cost</dt>
+                            @if ($item->shards_cost > 0)
+                                <dt>Shards Cost</dt>
                                 <dd>{{number_format($item->shards_cost)}}</dd>
                             @endif
 
-                            @if (!is_null($item->copper_coin_cost) || $item->copper_coin_cost > 0)
-                                <dt>Gold Cost</dt>
+                            @if ($item->copper_coin_cost > 0)
+                                <dt>Copper Coin Cost</dt>
                                 <dd>{{number_format($item->copper_coin_cost)}}</dd>
                             @endif
                         </dl>

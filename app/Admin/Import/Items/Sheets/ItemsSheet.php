@@ -24,8 +24,8 @@ class ItemsSheet implements ToCollection {
 
                 $itemData = $this->returnCleanItem($item);
 
-                // $item = Item::where('name', $itemData['name'])->first();
-                $item = Item::find($itemData['id']);
+                $item = Item::where('name', $itemData['name'])->first();
+                // $item = Item::find($itemData['id']);
 
                 if (!is_null($item)) {
                     $item->update($itemData);
