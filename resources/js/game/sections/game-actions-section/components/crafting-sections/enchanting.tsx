@@ -71,33 +71,10 @@ export default class Enchanting extends React.Component<EnchantingProps, Enchant
                         generateServerMessage('new_items', 'You have new enchantments. Check the list(s)!');
                     }
 
-                    // Select the next item in the list.
-                    const foundIndex = result.data.character_inventory.findIndex((item: any) => {
-                        return item.slot_id === this.state.selected_item
-                    });
-
-                    if (foundIndex !== -1) {
-                        const newIndex = foundIndex + 1;
-
-                        if (typeof result.data.character_inventory[newIndex] != 'undefined') {
-                            this.setState({
-                                selected_item: result.data.character_inventory[newIndex].slot_id
-                            });
-                        }
-                    } else {
-                        let indexOfNonEnchantedItem = result.data.character_inventory.findIndex((inventory: any) => {
-                            return inventory.attached_affixes_count === 0
+                    if (result.data.character_inventory.length > 0) {
+                        this.setState({
+                            selected_item: result.data.character_inventory[0].slot_id
                         });
-
-                        if (indexOfNonEnchantedItem === -1) {
-                            indexOfNonEnchantedItem = 0;
-                        }
-
-                        if (result.data.character_inventory.length > 0) {
-                            this.setState({
-                                selected_item: result.data.character_inventory[indexOfNonEnchantedItem].slot_id
-                            });
-                        }
                     }
                 });
             }, (error: AxiosError) => {
@@ -212,7 +189,7 @@ export default class Enchanting extends React.Component<EnchantingProps, Enchant
     render() {
         return (
             <Fragment>
-                <div className='mt-2 grid md:grid-cols-3 gap-2 md:ml-[120px]'>
+                <div className='mt-2 grid lg:grid-cols-3 gap-2 lg:ml-[120px]'>
                     <div className='col-start-1 col-span-2'>
                         <Select
                             onChange={this.setSelectedItem.bind(this)}
@@ -225,32 +202,67 @@ export default class Enchanting extends React.Component<EnchantingProps, Enchant
                         />
                     </div>
                     <div className='col-start-1 col-span-2'>
-                        <Select
-                            onChange={this.setPrefix.bind(this)}
-                            options={this.renderEnchantmentOptions('prefix')}
-                            menuPosition={'absolute'}
-                            menuPlacement={'bottom'}
-                            styles={{menuPortal: (base: any) => ({...base, zIndex: 9999, color: '#000000'})}}
-                            menuPortalTarget={document.body}
-                            value={this.selectedEnchantment('prefix')}
-                        />
-
+                        <div className='lg:hidden grid grid-cols-3'>
+                            <div className='col-start-1 col-span-2'>
+                                <Select
+                                    onChange={this.setPrefix.bind(this)}
+                                    options={this.renderEnchantmentOptions('prefix')}
+                                    menuPosition={'absolute'}
+                                    menuPlacement={'bottom'}
+                                    styles={{menuPortal: (base: any) => ({...base, zIndex: 9999, color: '#000000'})}}
+                                    menuPortalTarget={document.body}
+                                    value={this.selectedEnchantment('prefix')}
+                                />
+                            </div>
+                            <div className='cols-start-3 cols-end-3 mt-2 ml-4'>
+                                <DangerLinkButton button_label={'Clear'} on_click={this.resetPrefixes.bind(this)} />
+                            </div>
+                        </div>
+                        <div className='hidden lg:block'>
+                            <Select
+                                onChange={this.setPrefix.bind(this)}
+                                options={this.renderEnchantmentOptions('prefix')}
+                                menuPosition={'absolute'}
+                                menuPlacement={'bottom'}
+                                styles={{menuPortal: (base: any) => ({...base, zIndex: 9999, color: '#000000'})}}
+                                menuPortalTarget={document.body}
+                                value={this.selectedEnchantment('prefix')}
+                            />
+                        </div>
                     </div>
-                    <div className='cols-start-3 cols-end-3 mt-2'>
+                    <div className='hidden lg:block cols-start-3 cols-end-3 mt-2'>
                         <DangerLinkButton button_label={'Clear'} on_click={this.resetPrefixes.bind(this)} />
                     </div>
                     <div className='col-start-1 col-span-2'>
-                        <Select
-                            onChange={this.setSuffix.bind(this)}
-                            options={this.renderEnchantmentOptions('suffix')}
-                            menuPosition={'absolute'}
-                            menuPlacement={'bottom'}
-                            styles={{menuPortal: (base: any) => ({...base, zIndex: 9999, color: '#000000'})}}
-                            menuPortalTarget={document.body}
-                            value={this.selectedEnchantment('suffix')}
-                        />
+                        <div className='lg:hidden grid grid-cols-3'>
+                            <div className='col-start-1 col-span-2'>
+                                <Select
+                                    onChange={this.setSuffix.bind(this)}
+                                    options={this.renderEnchantmentOptions('suffix')}
+                                    menuPosition={'absolute'}
+                                    menuPlacement={'bottom'}
+                                    styles={{menuPortal: (base: any) => ({...base, zIndex: 9999, color: '#000000'})}}
+                                    menuPortalTarget={document.body}
+                                    value={this.selectedEnchantment('suffix')}
+                                />
+                            </div>
+                            <div className='cols-start-3 cols-end-3 mt-2 ml-4'>
+                                <DangerLinkButton button_label={'Clear'} on_click={this.resetSuffixes.bind(this)} />
+                            </div>
+                        </div>
+                        <div className='hidden lg:block'>
+                            <Select
+                                onChange={this.setSuffix.bind(this)}
+                                options={this.renderEnchantmentOptions('suffix')}
+                                menuPosition={'absolute'}
+                                menuPlacement={'bottom'}
+                                styles={{menuPortal: (base: any) => ({...base, zIndex: 9999, color: '#000000'})}}
+                                menuPortalTarget={document.body}
+                                value={this.selectedEnchantment('suffix')}
+                            />
+                        </div>
                     </div>
-                    <div className='cols-start-3 cols-end-3 mt-2'>
+                    <div className='hidden lg:block cols-start-3 cols-end-3 mt-2'>
                         <DangerLinkButton button_label={'Clear'} on_click={this.resetSuffixes.bind(this)} />
                     </div>
                 </div>
