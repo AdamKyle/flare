@@ -2,6 +2,7 @@
 
 namespace App\Game\Battle\Services;
 
+use App\Game\Maps\Events\UpdateMap;
 use Facades\App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\GameMap;
 use App\Flare\Values\CelestialType;
@@ -16,7 +17,6 @@ use App\Game\Messages\Builders\NpcServerMessageBuilder;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
-use App\Game\Maps\Events\UpdateMapBroadcast;
 use App\Game\Maps\Services\LocationService;
 
 class ConjureService {
@@ -126,7 +126,7 @@ class ConjureService {
             event(new GlobalMessageEvent( $monster->name . ' has been conjured to the ' . $plane . ' plane at (x/y): ' . $x . '/' . $y));
         }
 
-        event(new UpdateMapBroadcast($character->user, resolve(LocationService::class)->getLocationData($character->refresh())));
+        event(new UpdateMap($character->user, resolve(LocationService::class)->getLocationData($character->refresh())));
     }
 
     /**

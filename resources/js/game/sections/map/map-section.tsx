@@ -79,7 +79,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
         this.explorationTimeOut = Echo.private('exploration-timeout-' + this.props.user_id);
 
         // @ts-ignore
-        this.traverseUpdate     = Echo.private('update-map-plane-' + this.props.user_id);
+        this.traverseUpdate     = Echo.private('update-plane-' + this.props.user_id);
 
         // @ts-ignore
         this.npcKingdomsUpdate  = Echo.join('npc-kingdoms-update');
@@ -106,7 +106,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
             });
         });
 
-        this.traverseUpdate.listen('Game.Maps.Events.UpdateMapBroadcast', (event: any) => {
+        this.traverseUpdate.listen('Game.Maps.Events.UpdateMap', (event: any) => {
             this.setStateFromData(event.mapDetails);
 
             this.props.update_character_quests_plane(event.mapDetails.character_map.game_map.name)

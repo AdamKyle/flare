@@ -7,7 +7,7 @@ use App\Flare\Models\CelestialFight;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
 use App\Game\Battle\Values\CelestialConjureType;
-use App\Game\Maps\Events\UpdateMapBroadcast;
+use App\Game\Maps\Events\UpdateMap;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Foundation\Bus\PendingDispatch;
@@ -105,7 +105,7 @@ class PctService {
 
         $this->traverseService->updateActions($character->map->game_map_id, $character, GameMap::find($oldMapId));
 
-        event(new UpdateMapBroadcast($character->user));
+        event(new UpdateMap($character->user));
 
         event(new ServerMessageEvent($character->user, 'Child! I have done it. I have used the magics to move you to: (X/Y) ' . $celestialFight->x_position . '/' . $celestialFight->y_position . ' on the plane: ' . $celestialFight->monster->gameMap->name));
     }
@@ -151,7 +151,7 @@ class PctService {
             'character_position_y' => $celestialFight->y_position,
         ]);
 
-        event(new UpdateMapBroadcast($character->refresh()->user));
+        event(new UpdateMap($character->refresh()->user));
 
         event(new ServerMessageEvent($character->user, 'Child! I have done it. I have used the magics to move you to: (X/Y) ' . $celestialFight->x_position . '/' . $celestialFight->y_position));
     }

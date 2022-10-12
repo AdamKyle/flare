@@ -67,7 +67,7 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
         this.pvpUpdate = Echo.private('update-pvp-attack-' + this.props.character.user_id);
 
         // @ts-ignore
-        this.traverseUpdate = Echo.private('update-map-plane-' + this.props.character.user_id);
+        this.traverseUpdate = Echo.private('update-plane-' + this.props.character.user_id);
 
         // @ts-ignore
         this.duelOptions = Echo.join('update-duel');
@@ -114,7 +114,7 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
         });
 
         // @ts-ignore
-        this.traverseUpdate.listen('Game.Maps.Events.UpdateMapBroadcast', (event: any) => {
+        this.traverseUpdate.listen('Game.Maps.Events.UpdateMap', (event: any) => {
             let craftingType = this.state.crafting_type;
 
             if (craftingType === 'workbench' || craftingType === 'queen') {

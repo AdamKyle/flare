@@ -36,7 +36,6 @@ export default class Enchanting extends React.Component<EnchantingProps, Enchant
         const url = craftingGetEndPoints('enchant', this.props.character_id);
 
         (new Ajax()).setRoute(url).doAjaxCall('get', (result: AxiosResponse) => {
-            console.log(result.data);
             this.setState({
                 loading: false,
                 enchantable_items: result.data.character_inventory,

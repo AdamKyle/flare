@@ -16,8 +16,8 @@ Broadcast::channel('update-monsters-list-{userId}', function($user, $userId) {
 });
 
 // When a user is traveling to another plane.
-Broadcast::channel('update-map-plane-{userId}', function($user, $userId) {
-   return $user->id === (int) $userId;
+Broadcast::channel('update-plane-{userId}', function($user, $userId) {
+    return $user->id === (int) $userId;
 });
 
 // When player moves and the duel button should update.

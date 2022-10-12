@@ -5,6 +5,7 @@ namespace App\Game\Maps\Services;
 use App\Flare\Jobs\CharacterAttackTypesCacheBuilderWithDeductions;
 use App\Flare\Models\Map;
 use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Game\Maps\Events\UpdateMap;
 use Illuminate\Support\Facades\Cache;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
@@ -19,7 +20,6 @@ use App\Game\Maps\Events\UpdateGlobalCharacterCountBroadcast;
 use App\Game\Maps\Events\UpdateMonsterList;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Messages\Events\GlobalMessageEvent;
-use App\Game\Maps\Events\UpdateMapBroadcast;
 use App\Flare\Events\ServerMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent as MessageEvent;
 use App\Flare\Models\GameMap;
@@ -355,7 +355,7 @@ class TraverseService {
      * @param Character $character
      */
     protected function updateMap(Character $character) {
-        event(new UpdateMapBroadcast($character->user));
+        event(new UpdateMap($character->user));
     }
 
     /**

@@ -117,7 +117,7 @@ export default class Game extends React.Component<GameProps, GameState> {
         this.kingdomUpdates = Echo.private('update-kingdom-' + this.props.userId);
 
         // @ts-ignore
-        this.kingdomLogsUpdate = Echo.private('update-kingdom-logs-' + this.props.userId);
+        this.kingdomLogsUpdate = Echo.private('update-new-kingdom-logs-' + this.props.userId);
 
         // @ts-ignore
         this.globalTimeOut = Echo.private('global-timeout-' + this.props.userId);

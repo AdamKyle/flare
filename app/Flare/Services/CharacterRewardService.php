@@ -259,7 +259,6 @@ class CharacterRewardService {
      */
     protected function distributeGold(Monster $monster) {
         $newGold       = $this->character->gold + $monster->gold;
-        $maxCurrencies = new MaxCurrenciesValue($newGold, MaxCurrenciesValue::GOLD);
 
         if ($newGold >= MaxCurrenciesValue::MAX_GOLD) {
             $newGold = MaxCurrenciesValue::MAX_GOLD;

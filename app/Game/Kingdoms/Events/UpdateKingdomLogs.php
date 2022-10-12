@@ -32,6 +32,7 @@ class UpdateKingdomLogs implements ShouldBroadcastNow
      * Create a new event instance.
      *
      * @param Character $character
+     * @param array $logs
      */
     public function __construct(Character $character, array $logs) {
         $this->user = $character->user;
@@ -43,8 +44,7 @@ class UpdateKingdomLogs implements ShouldBroadcastNow
      *
      * @return Channel|array
      */
-    public function broadcastOn()
-    {
-        return new PrivateChannel('update-kingdom-logs-' . $this->user->id);
+    public function broadcastOn(): Channel|array {
+        return new PrivateChannel('update-new-kingdom-logs-' . $this->user->id);
     }
 }

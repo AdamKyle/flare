@@ -4,7 +4,6 @@ namespace App\Game\Battle\Services;
 
 use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\ServerFight\MonsterPlayerFight;
-use App\Game\Maps\Events\UpdateMapBroadcast;
 use Facades\App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\CelestialFight;
 use App\Flare\Models\Character;

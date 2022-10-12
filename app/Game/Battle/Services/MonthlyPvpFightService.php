@@ -3,6 +3,7 @@
 namespace App\Game\Battle\Services;
 
 
+use App\Game\Maps\Events\UpdateMap;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use App\Flare\Models\Monster;
@@ -14,7 +15,6 @@ use App\Flare\Models\MonthlyPvpParticipant;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Core\Events\UpdateTopBarEvent;
-use App\Game\Maps\Events\UpdateMapBroadcast;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 
@@ -160,7 +160,7 @@ class MonthlyPvpFightService {
 
         event(new UpdateTopBarEvent($character));
 
-        event(new UpdateMapBroadcast($character->user));
+        event(new UpdateMap($character->user));
 
         event(new ServerMessageEvent($character->user,'You can move from the location now. The arena is closed. Come again next month!'));
     }
@@ -237,7 +237,7 @@ class MonthlyPvpFightService {
 
         event(new UpdateCharacterStatus($character));
 
-        event(new UpdateMapBroadcast($character->user));
+        event(new UpdateMap($character->user));
     }
 
     /**
@@ -278,7 +278,7 @@ class MonthlyPvpFightService {
 
         event(new UpdateCharacterStatus($character));
 
-        event(new UpdateMapBroadcast($character->user));
+        event(new UpdateMap($character->user));
     }
 
     /**
