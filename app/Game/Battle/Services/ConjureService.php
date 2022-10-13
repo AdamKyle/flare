@@ -65,6 +65,10 @@ class ConjureService {
                           ->inRandomOrder()
                           ->first();
 
+        if (is_null($monster)) {
+            return;
+        }
+
         $healthRange          = explode('-', $monster->health_range);
         $currentMonsterHealth = rand($healthRange[0], $healthRange[1]) + 10;
 
