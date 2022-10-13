@@ -79,7 +79,7 @@ export default class Skills extends React.Component<SkillsProps, any> {
                 name: 'Name',
                 selector: (row: { name: string; }) => row.name,
                 sortable: true,
-                cell: (row: SkillType) => <span key={row.id + '-' + (Math.random() + 1).toString(36).substring(7)}>
+                cell: (row: SkillType) => <span key={row.id + '-' + (Math.random() + 1).toString(36).substring(7)} className='m-auto'>
                     <button onClick={() => this.manageSkillDetails(row)} className='underline'>{row.name}</button>
                 </span>
             },

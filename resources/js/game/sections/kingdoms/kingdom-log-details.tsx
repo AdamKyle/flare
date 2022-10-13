@@ -156,8 +156,8 @@ export default class KingdomLogDetails extends React.Component<KingdomLogProps, 
                         <dt>Kingdom Attacked (X/Y)</dt>
                         <dd className={
                             clsx({
-                                'text-green-600 dark:text-green-400': !this.props.is_mine,
-                                'text-red-600 dark:text-red-400': this.props.is_mine
+                                'text-green-600 dark:text-green-400': !this.props.log.is_mine,
+                                'text-red-600 dark:text-red-400': this.props.log.is_mine
                             })
                         }>
                             {this.props.log.to_kingdom_name} {this.props.log.to_x} / {this.props.log.to_y}
@@ -165,8 +165,8 @@ export default class KingdomLogDetails extends React.Component<KingdomLogProps, 
                         <dt>Attacked From (X/Y)</dt>
                         <dd className={
                              clsx({
-                                 'text-green-600 dark:text-green-400': this.props.is_mine,
-                                 'text-red-600 dark:text-red-400': !this.props.is_mine
+                                 'text-green-600 dark:text-green-400': this.props.log.is_mine,
+                                 'text-red-600 dark:text-red-400': !this.props.log.is_mine
                              })
                          }>
                             {

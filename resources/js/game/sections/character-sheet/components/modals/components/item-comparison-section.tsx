@@ -195,7 +195,7 @@ export default class ItemComparisonSection extends React.Component<any, any> {
     renderTwoComparisons() {
         if (this.props.comparison_details !== null) {
             return (
-                <div className='grid w-full lg:grid-cols-2 md:m-auto max-h-[400px] overflow-y-auto'>
+                <div className='grid w-full lg:grid-cols-2 md:m-auto max-h-[400px] lg:max-h-[500px] overflow-y-auto'>
                     <div>
                         <div className={'font-light pb-3'}>
                             <ItemNameColorationText item={this.props.comparison_details.details[0]} />
@@ -220,7 +220,7 @@ export default class ItemComparisonSection extends React.Component<any, any> {
     renderSingleComparison() {
         if (this.props.comparison_details !== null) {
             return (
-                <div className='max-h-[400px] overflow-y-auto'>
+                <div className='max-h-[400px] lg:max-h-[500px] overflow-y-auto'>
                     <div className={'font-light pb-3'}>
                         <ItemNameColorationText item={this.props.comparison_details.details[0]} />
                     </div>
@@ -238,7 +238,7 @@ export default class ItemComparisonSection extends React.Component<any, any> {
         }
 
         return (
-            <div className='max-h-[400px] overflow-y-auto'>
+            <div className='max-h-[400px] lg:max-h-[500px] overflow-y-auto'>
                 <dl>
                     {this.renderItemToEquip(this.props.comparison_details.itemToEquip)}
                 </dl>

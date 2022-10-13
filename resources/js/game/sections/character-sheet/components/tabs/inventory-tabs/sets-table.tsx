@@ -243,7 +243,7 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
             on_click: () => this.manageRenameSet()
         })
 
-        if (this.state.selected_set !== null && !this.props.is_automation_running) {
+        if (this.state.selected_set !== null) {
             if (this.state.selected_set !== this.props.set_name_equipped && this.props.sets[this.state.selected_set].items.length > 0) {
                 actions.push({
                     name: 'Empty set',
@@ -251,7 +251,7 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
                     on_click: () => this.emptySet()
                 });
 
-                if (!this.cannotEquipSet()) {
+                if (!this.cannotEquipSet() && !this.props.is_automation_running) {
                     actions.push({
                         name: 'Equip set',
                         icon_class: 'ra ra-muscle-fat',
