@@ -75,7 +75,7 @@ export interface CharacterType {
 
     to_hit_stat: string;
 
-    can_attack_again_at: number|null;
+    can_attack_again_at: string|null;
 
     is_automation_running: boolean;
 
@@ -153,7 +153,7 @@ export interface CharacterType {
 
     can_craft: boolean;
 
-    can_craft_again_at: number|null;
+    can_craft_again_at: string|null;
 
     can_use_work_bench: boolean;
 

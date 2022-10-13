@@ -2,9 +2,10 @@ import Ajax from "../../ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
 import {capitalize} from "lodash";
 import {CraftingOptions} from "../types/actions/crafting-type-options";
-import {getTimeLeftInSeconds} from "./convert-time";
 import Actions from "../../../sections/game-actions-section/actions";
 import PvpCharactersType from "../types/pvp-characters-type";
+import {CharacterType} from "../character/character-type";
+import {DateTime} from "luxon";
 
 export default class ActionsManager {
 
@@ -25,13 +26,28 @@ export default class ActionsManager {
         (new Ajax()).setRoute('map-actions/' + props.character.id).doAjaxCall('get', (result: AxiosResponse) => {
             this.component.setState({
                 monsters: result.data.monsters,
-                attack_time_out: props.character.can_attack_again_at !== null ? props.character.can_attack_again_at : 0,
-                crafting_time_out: props.character.can_craft_again_at !== null ? props.character.can_craft_again_at : 0,
+                attack_time_out: props.character.can_attack_again_at !== null ? this.calculateTimeLeft(props.character.can_attack_again_at) : 0,
+                crafting_time_out: props.character.can_craft_again_at !== null ? this.calculateTimeLeft(props.character.can_craft_again_at) : 0,
                 loading: false,
             })
         }, (error: AxiosError) => {
             console.error(error);
         });
+    }
+
+    protected calculateTimeLeft(timeLeft: string): number {
+
+        const future = DateTime.fromISO(timeLeft);
+        const now    = DateTime.now();
+
+        const diff       = future.diff(now, ['seconds']);
+        const objectDiff = diff.toObject();
+
+        if (typeof objectDiff.seconds === 'undefined') {
+             return 0;
+        }
+
+        return parseInt(objectDiff.seconds.toFixed(0));
     }
 
     /**
