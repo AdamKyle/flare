@@ -4,6 +4,7 @@ import Ajax from "../../ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
 import {getTimeLeftInSeconds} from "./convert-time";
 import PvpCharactersType from "../types/pvp-characters-type";
+import {DateTime} from "luxon";
 
 type SelectedData = {
     label: string;
@@ -27,8 +28,8 @@ export default class SmallActionsManager {
         (new Ajax()).setRoute('map-actions/' + props.character.id).doAjaxCall('get', (result: AxiosResponse) => {
             this.component.setState({
                 monsters: result.data.monsters,
-                attack_time_out: props.character.can_attack_again_at !== null ? getTimeLeftInSeconds(props.character.can_attack_again_at) : 0,
-                crafting_time_out: props.character.can_craft_again_at !== null ? getTimeLeftInSeconds(props.character.can_craft_again_at) : 0,
+                attack_time_out: props.character.can_attack_again_at !== null ? this.calculateTimeLeft(props.character.can_attack_again_at) : 0,
+                crafting_time_out: props.character.can_craft_again_at !== null ? this.calculateTimeLeft(props.character.can_craft_again_at) : 0,
                 automation_time_out: props.character.automation_completed_at !== null ? props.character.automation_completed_at : 0,
                 loading: false,
             })
@@ -67,6 +68,27 @@ export default class SmallActionsManager {
                 characters_for_dueling: charactersForDueling,
             });
         }
+    }
+
+    /**
+     * Calculate the time left based on the can_x_again_at
+     *
+     * @param timeLeft
+     * @protected
+     */
+    protected calculateTimeLeft(timeLeft: string): number {
+
+        const future = DateTime.fromISO(timeLeft);
+        const now    = DateTime.now();
+
+        const diff       = future.diff(now, ['seconds']);
+        const objectDiff = diff.toObject();
+
+        if (typeof objectDiff.seconds === 'undefined') {
+            return 0;
+        }
+
+        return parseInt(objectDiff.seconds.toFixed(0));
     }
 
     /**

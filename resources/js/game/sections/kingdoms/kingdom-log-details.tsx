@@ -2,35 +2,37 @@ import React, {Fragment} from "react";
 import BasicCard from "../../components/ui/cards/basic-card";
 import clsx from "clsx";
 import { formatNumber } from "../../lib/game/format-number";
+import KingdomLogProps from "../../lib/game/kingdoms/types/kingdom-log-props";
+import {BuildingLogDetails, UnitLogDetails} from "../../lib/game/kingdoms/kingdom-log-details";
 
-export default class KingdomLogDetails extends React.Component<any, any> {
+export default class KingdomLogDetails extends React.Component<KingdomLogProps, {  }> {
 
-    constructor(props: any) {
+    constructor(props: KingdomLogProps) {
         super(props);
     }
 
     renderBuildingChanges() {
         const changes: any = [];
 
-        this.props.log.old_buildings.forEach((oldBuilding: { name: string; durability: number; }) => {
-           let foundNewBuilding = this.props.log.new_buildings.filter((newBuilding: { name: string; durability: number; }) => newBuilding.name === oldBuilding.name);
+        this.props.log.old_buildings.forEach((oldBuilding: BuildingLogDetails) => {
+           let foundNewBuilding: BuildingLogDetails[]|[] = this.props.log.new_buildings.filter((newBuilding: { name: string; durability: number; }) => newBuilding.name === oldBuilding.name);
 
            if (foundNewBuilding.length > 0) {
-               foundNewBuilding = foundNewBuilding[0];
+               const newBuilding: BuildingLogDetails = foundNewBuilding[0];
 
-               if (foundNewBuilding.durability === oldBuilding.durability) {
+               if (newBuilding.durability === oldBuilding.durability) {
                    changes.push(
                        <Fragment>
                            <dt>{oldBuilding.name}</dt>
-                           <dd>0% Lost{this.props.log.is_mine ? ', New Durability: ' + formatNumber(foundNewBuilding.durability) : null}</dd>
+                           <dd>0% Lost{this.props.log.is_mine ? ', New Durability: ' + formatNumber(newBuilding.durability) : null}</dd>
                        </Fragment>
                    );
-               } else if (foundNewBuilding.durability === 0) {
+               } else if (newBuilding.durability === 0) {
                    changes.push(
                        <Fragment>
                            <dt>{oldBuilding.name}</dt>
                            <dd className='text-red-600 dark:text-red-400'>
-                               100% Lost{this.props.log.is_mine ? ', New Durability: ' + formatNumber(foundNewBuilding.durability) : null}
+                               100% Lost{this.props.log.is_mine ? ', New Durability: ' + formatNumber(newBuilding.durability) : null}
                            </dd>
                       </Fragment>
                    );
@@ -39,8 +41,8 @@ export default class KingdomLogDetails extends React.Component<any, any> {
                        <Fragment>
                            <dt>{oldBuilding.name}</dt>
                            <dd className='text-red-600 dark:text-red-400'>
-                               {(((oldBuilding.durability - foundNewBuilding.durability) / oldBuilding.durability) * 100).toFixed(0)}% Lost{
-                               this.props.log.is_mine ? ', New Durability: ' + formatNumber(foundNewBuilding.durability) : null
+                               {(((oldBuilding.durability - newBuilding.durability) / oldBuilding.durability) * 100).toFixed(0)}% Lost{
+                               this.props.log.is_mine ? ', New Durability: ' + formatNumber(newBuilding.durability) : null
                            }
                            </dd>
                        </Fragment>
@@ -55,26 +57,26 @@ export default class KingdomLogDetails extends React.Component<any, any> {
     renderUnitChanges() {
         const changes: any = [];
 
-        this.props.log.old_units.forEach((oldUnit: { name: string; amount: number; }) => {
-            let foundNewUnit = this.props.log.new_units.filter((newUnit: { name: string; amount: number; }) => newUnit.name === oldUnit.name);
+        this.props.log.old_units.forEach((oldUnit: UnitLogDetails) => {
+            let foundNewUnit: UnitLogDetails[]|[] = this.props.log.new_units.filter((newUnit: { name: string; amount: number; }) => newUnit.name === oldUnit.name);
 
             if (foundNewUnit.length > 0) {
-                foundNewUnit = foundNewUnit[0];
+                const newUnit: UnitLogDetails = foundNewUnit[0];
 
-                if (foundNewUnit.amount === oldUnit.amount) {
+                if (newUnit.amount === oldUnit.amount) {
                     changes.push(
                         <Fragment>
                             <dt>{oldUnit.name}</dt>
                             <dd>0%
-                                Lost{this.props.log.is_mine ? ', Amount Left: ' + formatNumber(foundNewUnit.amount) : null}</dd>
+                                Lost{this.props.log.is_mine ? ', Amount Left: ' + formatNumber(newUnit.amount) : null}</dd>
                         </Fragment>
                     );
-                } else if (foundNewUnit.amount === 0) {
+                } else if (newUnit.amount === 0) {
                     changes.push(
                         <Fragment>
                             <dt>{oldUnit.name}</dt>
                             <dd className='text-red-600 dark:text-red-400'>
-                                100% Lost{this.props.log.is_mine ? ', Amount Left: ' + formatNumber(foundNewUnit.amount) : null}
+                                100% Lost{this.props.log.is_mine ? ', Amount Left: ' + formatNumber(newUnit.amount) : null}
                             </dd>
                         </Fragment>
                     );
@@ -83,7 +85,7 @@ export default class KingdomLogDetails extends React.Component<any, any> {
                         <Fragment>
                             <dt>{oldUnit.name}</dt>
                             <dd className='text-red-600 dark:text-red-400'>
-                                {(((oldUnit.amount - foundNewUnit.amount) / oldUnit.amount) * 100).toFixed(2)}% Lost{this.props.log.is_mine ? ', Amount Left: ' + formatNumber(foundNewUnit.amount) : null}
+                                {(((oldUnit.amount - newUnit.amount) / oldUnit.amount) * 100).toFixed(2)}% Lost{this.props.log.is_mine ? ', Amount Left: ' + formatNumber(newUnit.amount) : null}
                             </dd>
                         </Fragment>
                     );
@@ -97,26 +99,26 @@ export default class KingdomLogDetails extends React.Component<any, any> {
     renderUnitsSentChange() {
         const changes: any = [];
 
-        this.props.log.units_sent.forEach((sentUnit: { name: string; amount: number; }) => {
-            let foundNewUnit = this.props.log.units_survived.filter((newUnit: { name: string; amount: number; }) => newUnit.name === sentUnit.name);
+        this.props.log.units_sent.forEach((sentUnit: UnitLogDetails) => {
+            let foundNewUnit: UnitLogDetails[]|[] = this.props.log.units_survived.filter((newUnit: { name: string; amount: number; }) => newUnit.name === sentUnit.name);
 
             if (foundNewUnit.length > 0) {
-                foundNewUnit = foundNewUnit[0];
+                const newUnit: UnitLogDetails = foundNewUnit[0];
 
-                if (foundNewUnit.amount === sentUnit.amount) {
+                if (newUnit.amount === sentUnit.amount) {
                     changes.push(
                         <Fragment>
                             <dt>{sentUnit.name}</dt>
                             <dd>0%
-                                Lost{!this.props.log.is_mine ? ', Amount Left: ' + formatNumber(foundNewUnit.amount) : null}</dd>
+                                Lost{!this.props.log.is_mine ? ', Amount Left: ' + formatNumber(newUnit.amount) : null}</dd>
                         </Fragment>
                     );
-                } else if (foundNewUnit.amount === 0) {
+                } else if (newUnit.amount === 0) {
                     changes.push(
                         <Fragment>
                             <dt>{sentUnit.name}</dt>
                             <dd className='text-red-600 dark:text-red-400'>
-                                100% Lost{!this.props.log.is_mine ? ', Amount Left: ' + formatNumber(foundNewUnit.amount) : null}
+                                100% Lost{!this.props.log.is_mine ? ', Amount Left: ' + formatNumber(newUnit.amount) : null}
                             </dd>
                         </Fragment>
                     );
@@ -125,7 +127,7 @@ export default class KingdomLogDetails extends React.Component<any, any> {
                         <Fragment>
                             <dt>{sentUnit.name}</dt>
                             <dd className='text-red-600 dark:text-red-400'>
-                                {(((sentUnit.amount - foundNewUnit.amount) / sentUnit.amount) * 100).toFixed(0)}% Lost{!this.props.log.is_mine ? ', Amount Left: ' + formatNumber(foundNewUnit.amount) : null}
+                                {(((sentUnit.amount - newUnit.amount) / sentUnit.amount) * 100).toFixed(0)}% Lost{!this.props.log.is_mine ? ', Amount Left: ' + formatNumber(newUnit.amount) : null}
                             </dd>
                         </Fragment>
                     );
@@ -141,6 +143,7 @@ export default class KingdomLogDetails extends React.Component<any, any> {
     }
 
     render() {
+        console.log(this.props);
         return (
             <BasicCard>
                 <div className='text-right cursor-pointer text-red-500'>

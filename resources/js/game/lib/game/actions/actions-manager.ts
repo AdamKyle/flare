@@ -4,13 +4,21 @@ import {capitalize} from "lodash";
 import {CraftingOptions} from "../types/actions/crafting-type-options";
 import Actions from "../../../sections/game-actions-section/actions";
 import PvpCharactersType from "../types/pvp-characters-type";
-import {CharacterType} from "../character/character-type";
 import {DateTime} from "luxon";
 
 export default class ActionsManager {
 
+    /**
+     * Actions Conmponent.
+     *
+     * @private
+     */
     private component: Actions;
 
+    /**
+     *
+     * @param component
+     */
     constructor(component: Actions) {
         this.component = component;
     }
@@ -35,21 +43,6 @@ export default class ActionsManager {
         });
     }
 
-    protected calculateTimeLeft(timeLeft: string): number {
-
-        const future = DateTime.fromISO(timeLeft);
-        const now    = DateTime.now();
-
-        const diff       = future.diff(now, ['seconds']);
-        const objectDiff = diff.toObject();
-
-        if (typeof objectDiff.seconds === 'undefined') {
-             return 0;
-        }
-
-        return parseInt(objectDiff.seconds.toFixed(0));
-    }
-
     /**
      * When the component updates let's update the state.
      */
@@ -58,6 +51,11 @@ export default class ActionsManager {
         this.setDuelingStateOnUpdate();
     }
 
+    /**
+     * Set the characters for dueling based on the characters position.
+     *
+     * @param eventCharactersForDueling
+     */
     public setCharactersForDueling(eventCharactersForDueling: PvpCharactersType[]) {
         let charactersForDueling: PvpCharactersType[]|[] = [];
         const props = this.component.props;
@@ -80,6 +78,27 @@ export default class ActionsManager {
                 characters_for_dueling: charactersForDueling,
             })
         }
+    }
+
+    /**
+     * Calculate the time left based on the can_x_again_at
+     *
+     * @param timeLeft
+     * @protected
+     */
+    protected calculateTimeLeft(timeLeft: string): number {
+
+        const future = DateTime.fromISO(timeLeft);
+        const now    = DateTime.now();
+
+        const diff       = future.diff(now, ['seconds']);
+        const objectDiff = diff.toObject();
+
+        if (typeof objectDiff.seconds === 'undefined') {
+            return 0;
+        }
+
+        return parseInt(objectDiff.seconds.toFixed(0));
     }
 
     /**

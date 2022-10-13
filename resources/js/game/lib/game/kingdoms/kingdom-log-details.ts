@@ -1,3 +1,7 @@
+export type UnitLogDetails = { name: string; amount: number };
+
+export type BuildingLogDetails = { name: string; durability: number; }
+
 export default interface KingdomLogDetails {
 
     id: number;
@@ -22,17 +26,17 @@ export default interface KingdomLogDetails {
 
     status: string;
 
-    units_sent: { name: string; amount: number }[]|[];
+    units_sent: UnitLogDetails[]|[];
 
-    units_survived: { name: string; amount: number; }[]|[];
+    units_survived: UnitLogDetails[]|[];
 
-    old_buildings: { name: string; durability: number; }[]|[];
+    old_buildings: BuildingLogDetails[]|[];
 
-    new_buildings: { name: string; durability: number; }[]|[];
+    new_buildings: BuildingLogDetails[]|[];
 
-    old_units: { name: string; amount: number; }[]|[];
+    old_units: UnitLogDetails[]|[];
 
-    new_units: { name: string; amount: number; }[]|[];
+    new_units: UnitLogDetails[]|[];
 
     item_damage: number;
 
@@ -41,5 +45,7 @@ export default interface KingdomLogDetails {
     opened: boolean;
 
     created_at: string;
+
+    took_kingdom: boolean;
 
 }

@@ -7,8 +7,9 @@ import BuildingInQueueDetails from "../../lib/game/kingdoms/building-in-queue-de
 import SmallBuildingsSection from "./buildings/small-buildings-section";
 import SmallUnitsSection from "./units/small-units-section";
 import DangerButton from "../../components/ui/buttons/danger-button";
+import SmallKingdomState from "../../lib/game/kingdoms/types/small-kingdom-state";
 
-export default class SmallKingdom extends React.Component<KingdomProps, any> {
+export default class SmallKingdom extends React.Component<KingdomProps, SmallKingdomState> {
 
     constructor(props: KingdomProps) {
         super(props);
@@ -16,22 +17,7 @@ export default class SmallKingdom extends React.Component<KingdomProps, any> {
         this.state = {
             show_kingdom_details: false,
             which_selected: null,
-            view_building: null,
         }
-    }
-
-    isInQueue() {
-        if (this.state.view_building === null) {
-            return false;
-        }
-
-        if (this.props.kingdom.building_queue.length > 0) {
-            return false;
-        }
-
-        return this.props.kingdom.building_queue.filter((queue: BuildingInQueueDetails) => {
-            return queue.building_id === this.state.view_building.id
-        }).length > 0;
     }
 
     manageKingdomDetails() {

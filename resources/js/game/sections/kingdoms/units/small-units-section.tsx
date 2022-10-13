@@ -5,9 +5,9 @@ import BasicCard from "../../../components/ui/cards/basic-card";
 import UnitsTable from "./units-table";
 import UnitDetails from "../../../lib/game/kingdoms/unit-details";
 import SmallUnitSectionProps from "../../../lib/game/kingdoms/types/small-unit-section-props";
-import SmallBuildingsSectionsState from "../../../lib/game/kingdoms/types/small-units-sections-state";
+import SmallUnitsSectionsState from "../../../lib/game/kingdoms/types/small-units-sections-state";
 
-export default class SmallUnitsSection extends React.Component<SmallUnitSectionProps, SmallBuildingsSectionsState> {
+export default class SmallUnitsSection extends React.Component<SmallUnitSectionProps, SmallUnitsSectionsState> {
 
     constructor(props: SmallUnitSectionProps) {
         super(props);

@@ -41,6 +41,12 @@ class ConjureService {
      */
     public function movementConjure(Character $character) {
 
+        $gameMap = $character->map->gameMap;
+
+        if ($gameMap->mapType()->isHell() || $gameMap->mapType()->isPurgatory()) {
+            return;
+        }
+
         if (CelestialFight::where('type', CelestialConjureType::PUBLIC)->get()->isNotEmpty()) {
             return;
         }

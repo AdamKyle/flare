@@ -1,10 +1,12 @@
 import React from 'react';
 
-export default class RefreshComponent extends React.Component<any, any> {
+type UserId = {user_id: number};
+
+export default class RefreshComponent extends React.Component<UserId, {}> {
 
     private refreshListener: any;
 
-    constructor(props: any) {
+    constructor(props: UserId) {
         super(props);
 
         // @ts-ignore

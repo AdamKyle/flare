@@ -11,7 +11,6 @@ import LocationDetails from "../../../lib/game/map/types/location-details";
 import Conjuration from "../../components/map-actions/modals/conjuration";
 import SettleKingdomModal from "../../components/map-actions/modals/settle-kingdom-modal";
 import ViewLocationModal from "../../components/map-actions/modals/view-location-modal";
-import clsx from "clsx";
 
 export default class MapActions extends React.Component<MapActionsProps, MapActionsState> {
     constructor(props: MapActionsProps) {

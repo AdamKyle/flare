@@ -26,12 +26,6 @@ class Kernel extends ConsoleKernel {
         // Delete the flagged users once a month.
         $schedule->command('delete:flagged-users')->monthly()->timezone(config('app.timezone'));
 
-        // Refresh the droppable items.
-        $schedule->command('cache:droppable-items')->everyThreeHours()->timezone(config('app.timezone'));
-
-        // Refresh the high-end droppable items.
-        $schedule->command('cache:high-end-items')->everyThreeHours()->timezone(config('app.timezone'));
-
         // Clear the celestials every hour.
         $schedule->command('clear:celestials')->hourly()->timezone(config('app.timezone'));
 
