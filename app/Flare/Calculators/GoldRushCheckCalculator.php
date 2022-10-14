@@ -21,7 +21,7 @@ class GoldRushCheckCalculator {
     public function fetchGoldRushChance(Monster $monster, float $gameMapBonus = 0.0) {
         $bonus = $gameMapBonus;
 
-        $roll = RandomNumberGenerator::generateRandomNumber(100, 50 ,1 ,100);
+        $roll = RandomNumberGenerator::generateRandomNumber(75, 50 ,1 ,100);
         $roll += ceil($roll * $bonus);
 
         return $roll > 95;

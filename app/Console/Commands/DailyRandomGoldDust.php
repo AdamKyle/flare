@@ -43,6 +43,8 @@ class DailyRandomGoldDust extends Command
     public function handle(DailyGoldDustService $dailyGoldDustService) {
         $characterIds = Character::pluck('id')->toArray();
 
+        Cache::delete('daily-gold-dust-lottery-won');
+
         $maxCharacters = count($characterIds) - 1;
 
         $randomIndex = rand(0, $maxCharacters);
@@ -52,8 +54,6 @@ class DailyRandomGoldDust extends Command
         $character = Character::find($characterWhoWon);
 
         $dailyGoldDustService->handleWonDailyLottery($character);
-
-        Cache::delete('daily-gold-dust-lottery-won');
 
         $progressBar = new ProgressBar(new ConsoleOutput(), Character::count());
 
