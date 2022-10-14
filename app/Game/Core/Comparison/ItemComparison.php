@@ -218,6 +218,10 @@ class ItemComparison {
         $comparison = [];
 
         foreach ($toCompareSkills as $index => $skillDetails) {
+            if (!isset($equippedItemSkills[$index])) {
+                continue;
+            }
+
             if ($skillDetails['skill_name'] === $equippedItemSkills[$index]['skill_name']) {
                 $comparison[] = [
                     'skill_name'           => $skillDetails['skill_name'],

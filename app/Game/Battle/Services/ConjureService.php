@@ -41,12 +41,6 @@ class ConjureService {
      */
     public function movementConjure(Character $character) {
 
-        $gameMap = $character->map->gameMap;
-
-        if ($gameMap->mapType()->isHell() || $gameMap->mapType()->isPurgatory()) {
-            return;
-        }
-
         if (CelestialFight::where('type', CelestialConjureType::PUBLIC)->get()->isNotEmpty()) {
             return;
         }
@@ -55,19 +49,13 @@ class ConjureService {
         $y = $this->getYPosition();
 
 
-        $invalidMaps = [
-            GameMap::where('name', MapNameValue::PURGATORY)->first()->id
-        ];
+        $invalidMaps = GameMap::whereIn('name', [MapNameValue::PURGATORY, MapNameValue::HELL])->pluck('id')->toArray();
 
         $monster = Monster::where('is_celestial_entity', true)
                           ->whereNotIn('game_map_id', $invalidMaps)
-                          ->where('celestial_type', '!=', CelestialType::KING_CELESTIAL)
+                          ->whereNull('celestial_type')
                           ->inRandomOrder()
                           ->first();
-
-        if (is_null($monster)) {
-            return;
-        }
 
         $healthRange          = explode('-', $monster->health_range);
         $currentMonsterHealth = rand($healthRange[0], $healthRange[1]) + 10;
