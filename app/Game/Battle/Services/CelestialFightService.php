@@ -4,6 +4,7 @@ namespace App\Game\Battle\Services;
 
 use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\ServerFight\MonsterPlayerFight;
+use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use Facades\App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\CelestialFight;
@@ -130,15 +131,7 @@ class CelestialFightService {
     protected function handleMonsterDeath(Character $character, CelestialFight $celestialFight) {
         event(new UpdateCelestialFight($character->name, $this->monsterPlayerFight));
 
-        $character->update([
-            'shards' => $celestialFight->monster->shards,
-        ]);
-
-        $character = $character->refresh();
-
-        event(new UpdateTopBarEvent($character));
-
-        event(new ServerMessageEvent($character->user, 'You received: ' . $celestialFight->monster->shards . ' shards! Shards can only be used in Alchemy.'));
+        $this->giveShards($character, $celestialFight);
 
         BattleAttackHandler::dispatch($character->id, $celestialFight->monster_id)->onQueue('default_long')->delay(now()->addSeconds(2));
 
@@ -149,6 +142,24 @@ class CelestialFightService {
         CharacterInCelestialFight::where('celestial_fight_id', $celestialFight->id)->delete();
 
         $celestialFight->delete();
+    }
+
+    protected function giveShards(Character $character, CelestialFight $celestialFight) {
+        $shards = $character->shards + $celestialFight->monster->shards;
+
+        if ($shards >= MaxCurrenciesValue::MAX_SHARDS) {
+            $shards = MaxCurrenciesValue::MAX_SHARDS;
+        }
+
+        $character->update([
+            'shards' => $shards,
+        ]);
+
+        $character = $character->refresh();
+
+        event(new UpdateTopBarEvent($character));
+
+        event(new ServerMessageEvent($character->user, 'You received: ' . $celestialFight->monster->shards . ' shards! Shards can only be used in Alchemy.'));
     }
 
     protected function updateCharacterInFight(Character $character, CharacterInCelestialFight $characterInCelestialFight) {
