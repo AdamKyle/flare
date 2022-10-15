@@ -176,7 +176,7 @@ class NpcQuestRewardHandler {
 
         $newValue = $character->shards + $quest->reward_shards;
 
-        if ((new MaxCurrenciesValue($newValue, MaxCurrenciesValue::MAX_SHARDS))->canNotGiveCurrency()) {
+        if ((new MaxCurrenciesValue($newValue, MaxCurrenciesValue::SHARDS))->canNotGiveCurrency()) {
             $newValue = MaxCurrenciesValue::MAX_SHARDS;
         }
 
