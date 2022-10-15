@@ -143,7 +143,7 @@ class NpcQuestRewardHandler {
         $newValue = $character->gold + $quest->reward_gold;
 
         if ((new MaxCurrenciesValue($newValue, MaxCurrenciesValue::GOLD))->canNotGiveCurrency()) {
-            $newValue = MaxCurrenciesValue::GOLD;
+            $newValue = MaxCurrenciesValue::MAX_GOLD;
         }
 
         $character->update([
@@ -160,7 +160,7 @@ class NpcQuestRewardHandler {
         $newValue = $character->gold_dust + $quest->reward_gold_dust;
 
         if ((new MaxCurrenciesValue($newValue, MaxCurrenciesValue::GOLD_DUST))->canNotGiveCurrency()) {
-            $newValue = MaxCurrenciesValue::GOLD_DUST;
+            $newValue = MaxCurrenciesValue::MAX_GOLD_DUST;
         }
 
         $character->update([
@@ -176,8 +176,8 @@ class NpcQuestRewardHandler {
 
         $newValue = $character->shards + $quest->reward_shards;
 
-        if ((new MaxCurrenciesValue($newValue, MaxCurrenciesValue::SHARDS))->canNotGiveCurrency()) {
-            $newValue = MaxCurrenciesValue::SHARDS;
+        if ((new MaxCurrenciesValue($newValue, MaxCurrenciesValue::MAX_SHARDS))->canNotGiveCurrency()) {
+            $newValue = MaxCurrenciesValue::MAX_SHARDS;
         }
 
         $character->update([

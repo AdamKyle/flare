@@ -4,6 +4,7 @@ namespace App\Game\Battle\Services;
 
 use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\ServerFight\MonsterPlayerFight;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use Facades\App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\CelestialFight;
 use App\Flare\Models\Character;
@@ -79,6 +80,7 @@ class CelestialFightService {
         }
 
         $characterHealth = $this->monsterPlayerFight->getCharacterHealth();
+        $monsterHealth   = $this->monsterPlayerFight->getMonsterHealth();
         $characterHealth = $characterHealth <= 0 ? 0 : $characterHealth;
 
         if ($characterHealth <= 0) {
@@ -89,9 +91,12 @@ class CelestialFightService {
             'character_current_health' => $this->monsterPlayerFight->getCharacterHealth(),
         ]);
 
-        $this->moveCelestial($character, $celestialFight);
 
-        event(new UpdateCelestialFight($character->name, $this->monsterPlayerFight));
+        if ($characterHealth > 0 && $monsterHealth > 0) {
+            $this->moveCelestial($character, $celestialFight);
+
+            event(new UpdateCelestialFight($character->name, $this->monsterPlayerFight));
+        }
 
         return $this->successResult([
             'logs'      => $this->monsterPlayerFight->getBattleMessages(),
@@ -124,6 +129,14 @@ class CelestialFightService {
 
     protected function handleMonsterDeath(Character $character, CelestialFight $celestialFight) {
         event(new UpdateCelestialFight($character->name, $this->monsterPlayerFight));
+
+        $character->update([
+            'shards' => $celestialFight->monster->shards,
+        ]);
+
+        $character = $character->refresh();
+
+        event(new UpdateTopBarEvent($character));
 
         event(new ServerMessageEvent($character->user, 'You received: ' . $celestialFight->monster->shards . ' shards! Shards can only be used in Alchemy.'));
 

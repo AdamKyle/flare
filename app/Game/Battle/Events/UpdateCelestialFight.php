@@ -29,21 +29,11 @@ class UpdateCelestialFight implements ShouldBroadcastNow {
         $this->data = [
             'monster_current_health' => is_null($celestialFight) ? 0 : $celestialFight->getMonsterHealth(),
             'celestial_fight_over'   => is_null($celestialFight),
+            'who_killed'             => [
+                'message' => 'Processing Fight',
+                'type'    => 'player-actions',
+            ]
         ];
-
-        if (is_null($celestialFight)) {
-            $this->data['who_killed'] = [
-                'message' => is_null($celestialFight) ? $characterName . ' has slaughtered the feral beast!' : '',
-                'type'    => 'enemy-action',
-            ];
-        }
-
-        if (!is_null($celestialFight)) {
-            $this->data['who_killed'] = [
-                'message' => 'Slippery bastard got away! ' . $characterName . ' was unable to kill the creature. Quick after it!',
-                'type'    => 'enemy-action',
-            ];
-        }
     }
 
     /**
@@ -51,7 +41,7 @@ class UpdateCelestialFight implements ShouldBroadcastNow {
      *
      * @return Channel|array
      */
-    public function broadcastOn() {
+    public function broadcastOn(): Channel|array {
         return new PresenceChannel('celestial-fight-changes');
     }
 }

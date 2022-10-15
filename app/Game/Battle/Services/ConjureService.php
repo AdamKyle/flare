@@ -192,7 +192,7 @@ class ConjureService {
 
         event(new UpdateTopBarEvent($character));
 
-        event(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('paid_conjuring', $npc), true));
+        event(new ServerMessageEvent($user, $this->npcServerMessageBuilder->build('paid_conjuring', $npc)));
     }
 
     /**

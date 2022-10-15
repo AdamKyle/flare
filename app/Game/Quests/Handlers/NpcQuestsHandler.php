@@ -49,7 +49,7 @@ class NpcQuestsHandler {
 
         if ($this->questHasCurrenciesRequirement($quest)) {
             if ($this->canPay($character, $quest)) {
-                $this->payCurrencies($character, $npc, $quest);
+                $this->payCurrencies($character, $quest);
 
                 $giveRewards = true;
             }
@@ -70,12 +70,11 @@ class NpcQuestsHandler {
         }
 
         if ($giveRewards) {
-
             $this->npcQuestRewardHandler->processReward($quest, $npc, $character);
         }
     }
 
-    public function payCurrencies(Character $character, Npc $npc, Quest $quest) {
+    public function payCurrencies(Character $character, Quest $quest) {
         $newGold        = $character->gold - $quest->gold_cost;
         $newGoldDust    = $character->gold_dust - $quest->gold_dust_cost;
         $newShards      = $character->shards - $quest->shard_cost;

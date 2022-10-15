@@ -77,7 +77,7 @@ trait QuestDetails {
         $faction = $character->factions->where('game_map_id', $quest->faction_game_map_id)->first();
 
         if ($quest->required_faction_level > 4) {
-            if (!FactionLevel::isMaxLevel($faction->current_level, $faction->current_points)) {
+            if (!FactionLevel::isMaxLevel($faction->current_level)) {
                 return false;
             }
         } else {
@@ -90,24 +90,12 @@ trait QuestDetails {
     }
 
     protected function canPay(Character $character, Quest $quest) : bool {
-        $canPay = true;
+        $hasGold     = $character->gold >= $quest->gold_cost;
+        $hasGoldDust = $character->gold_dust >= $quest->gold_dust_cost;
+        $hasShards   = $character->shards >= $quest->shard_cost;
+        $copperCoins = $character->copper_coins >= $quest->copper_coin_cost;
 
-        if ($quest->gold_cost > 0) {
-            $canPay = $character->gold >= $quest->gold_cost;
-        }
 
-        if ($quest->gold_dust_cost > 0) {
-            $canPay = $character->gold_dust >= $quest->gold_dust_cost;
-        }
-
-        if ($quest->shard_cost > 0) {
-            $canPay = $character->shards >= $quest->shard_cost;
-        }
-
-        if ($quest->copper_coin_cost > 0) {
-            $canPay = $character->copper_coins >= $quest->copper_coin_cost;
-        }
-
-        return $canPay;
+        return $hasGold && $hasGoldDust && $hasShards && $copperCoins;
     }
 }
