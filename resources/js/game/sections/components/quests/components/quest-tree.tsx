@@ -24,7 +24,7 @@ export  default class QuestTree extends React.Component<QuestTreeProps, any> {
             name: 'One Off Quests',
         }];
 
-        this.invalid_planes = ['Dungeon', 'Shadow Plane', 'Purgatory']
+        this.invalid_planes = ['Purgatory']
     }
 
     renderQuestTree(parentQuest: QuestDetails | ChildQuestDetails | null) {
@@ -46,7 +46,7 @@ export  default class QuestTree extends React.Component<QuestTreeProps, any> {
         const plane = this.fetchPlane();
 
         const questChain = this.props.quests.filter((quest) => quest.child_quests.length > 0 && quest.belongs_to_map_name === plane);
-
+        console.log(plane, questChain);
         if (questChain.length > 0) {
             return questChain[0];
         }

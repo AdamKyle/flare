@@ -455,7 +455,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                             my_kingdoms={this.state.kingdoms}
                             logs={this.state.kingdom_logs}
                             view_port={this.state.view_port}
-                            character_gold={removeCommas(this.state.character_currencies.gold)}
+                            character_gold={removeCommas(this.state.character.gold)}
                         />
                     </TabPanel>
                 </Tabs>

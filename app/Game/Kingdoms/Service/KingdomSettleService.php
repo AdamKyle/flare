@@ -198,7 +198,9 @@ class KingdomSettleService {
 
         $kingdom->update($params);
 
-        $this->addKingdomToCache($character, $kingdom->refresh());
+        $kingdom = $this->updateBuildings($kingdom->refresh());
+
+        $this->addKingdomToCache($character, $kingdom);
 
         if ($underProtection) {
             event(new ServerMessageEvent($character->user, 'Your kingdom is under protection for 7 days.'));
@@ -209,6 +211,39 @@ class KingdomSettleService {
         event(new ServerMessageEvent($character->user, 'The Old Man smiles at you. "Thank you child! This kingdom is all yours now."'));
 
         event(new UpdateGlobalMap($character));
+
+        return $kingdom->refresh();
+    }
+
+    /**
+     * Update weather the buildings are locked or not.
+     *
+     * - Used for purchasing a kingdom.
+     *
+     * @param Kingdom $kingdom
+     * @return Kingdom
+     */
+    protected function updateBuildings(Kingdom $kingdom): Kingdom {
+        $character = $kingdom->character;
+
+        foreach(GameBuilding::all() as $building) {
+
+            $isLocked = $building->is_locked;
+
+            if ($isLocked) {
+                $passive = $character->passiveSkills()->where('passive_skill_id', $building->passive_skill_id)->first();
+
+                if (!is_null($passive)) {
+                    if ($passive->current_level === $building->level_required) {
+                        $building = $kingdom->buildings->where('game_building_id', $building->id)->first();
+
+                        $building->update([
+                            'is_locked' => false,
+                        ]);
+                    }
+                }
+            }
+        }
 
         return $kingdom->refresh();
     }

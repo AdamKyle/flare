@@ -41,6 +41,7 @@ export default class Quests extends React.Component<QuestsProps, QuestState> {
     }
 
     render() {
+
         if (this.state.quests.length === 0) {
             return <ComponentLoading />
         }
@@ -69,6 +70,11 @@ export default class Quests extends React.Component<QuestsProps, QuestState> {
                                         },
                                         {
                                             name: 'Dungeons',
+                                            on_click: this.setPlaneForQuests.bind(this),
+                                            icon_class: 'ra ra-footprint'
+                                        },
+                                        {
+                                            name: 'Shadow Plane',
                                             on_click: this.setPlaneForQuests.bind(this),
                                             icon_class: 'ra ra-footprint'
                                         },

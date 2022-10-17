@@ -55,6 +55,10 @@
                         <x-core.forms.input :model="$quest" label="Copper Coins Reward:" modelKey="copper_coin_reward" name="copper_coin_reward" />
 
                         <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                        <h3 class="mb-3">XP Reward</h3>
+                        <x-core.forms.input :model="$quest" label="XP Reward:" modelKey="reward_xp" name="reward_xp" />
+
+                        <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                         <h3 class='mb-3'>Unlocks Skill</h3>
                         <x-core.forms.check-box :model="$quest" label="Unlocks skill?" modelKey="unlocks_skill" name="unlocks_skill" />
                         <x-core.forms.key-value-select :model="$quest" label="Unlocks Skyll Type: " modelKey="unlocks_skill_type" name="unlocks_skill_type" :options="$skillTypes" />

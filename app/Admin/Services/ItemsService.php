@@ -2,6 +2,7 @@
 
 namespace App\Admin\Services;
 
+use App\Flare\Models\GameSkill;
 use App\Flare\Models\Location;
 use App\Flare\Models\SetSlot;
 use App\Flare\Values\ItemEffectsValue;
@@ -77,7 +78,8 @@ class ItemsService {
                 ItemSpecialtyType::HELL_FORGED,
                 ItemSpecialtyType::PURGATORY_CHAINS,
             ],
-            'locations' => Location::select('name', 'id')->get(),
+            'locations'  => Location::select('name', 'id')->get(),
+            'skills'     => GameSkill::pluck('name')->toArray(),
         ];
     }
 
