@@ -1585,6 +1585,21 @@
     semver "^7.3.5"
     which "^2.0.2"
 
+"@npmcli/git@^4.0.0":
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/@npmcli/git/-/git-4.0.0.tgz#3b4c5562dc61c2e1d5f8caa81e62fed066793d59"
+  integrity sha512-X/rAZ6486YpMQsIii6eYW9agUwxxXqJGQTONSUp10Td/d3A2CdPTR4otaGGuEsevb/zuYW0TS4AeomCf3uaXdw==
+  dependencies:
+    "@npmcli/promise-spawn" "^3.0.0"
+    lru-cache "^7.4.4"
+    mkdirp "^1.0.4"
+    npm-pick-manifest "^7.0.0"
+    proc-log "^3.0.0"
+    promise-inflight "^1.0.1"
+    promise-retry "^2.0.1"
+    semver "^7.3.5"
+    which "^2.0.2"
+
 "@npmcli/installed-package-contents@^1.0.7":
   version "1.0.7"
   resolved "https://registry.yarnpkg.com/@npmcli/installed-package-contents/-/installed-package-contents-1.0.7.tgz#ab7408c6147911b970a8abe261ce512232a3f4fa"
@@ -1592,6 +1607,14 @@
   dependencies:
     npm-bundled "^1.1.1"
     npm-normalize-package-bin "^1.0.1"
+
+"@npmcli/installed-package-contents@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@npmcli/installed-package-contents/-/installed-package-contents-2.0.0.tgz#769daa3c11f30875d7f0fe78016978d3af862626"
+  integrity sha512-vpPDeSnqHAXaPK1l6lcIcpgK/aIe63AbNR5vbzOhO6I2rkaFZmviQZ5nAlSpt+vwKrOH1CnplOdoE5/x8FWtNA==
+  dependencies:
+    npm-bundled "^3.0.0"
+    npm-normalize-package-bin "^3.0.0"
 
 "@npmcli/map-workspaces@*":
   version "3.0.0"
@@ -1683,7 +1706,7 @@
     postcss-selector-parser "^6.0.10"
     semver "^7.3.7"
 
-"@npmcli/run-script@*":
+"@npmcli/run-script@*", "@npmcli/run-script@^5.0.0":
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/@npmcli/run-script/-/run-script-5.0.0.tgz#39d10916b1f4a1e3ebc871e805bc5cdf05639aa4"
   integrity sha512-AuqcoTOt7v4D2JqC7mCa+eUQHb64vWbwyu9o1hoJiq2kfZNwCB71f0s7tvUw+v+1B5XMdqcr98aGzjKIg7s6Vw==
@@ -3122,9 +3145,9 @@ caniuse-api@^3.0.0:
     lodash.uniq "^4.5.0"
 
 caniuse-lite@^1.0.0, caniuse-lite@^1.0.30001109, caniuse-lite@^1.0.30001400, caniuse-lite@^1.0.30001407:
-  version "1.0.30001419"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001419.tgz#3542722d57d567c8210d5e4d0f9f17336b776457"
-  integrity sha512-aFO1r+g6R7TW+PNQxKzjITwLOyDhVRLjW0LcwS/HCZGUUKTGNp9+IwLC4xyDSZBygVL/mxaFR3HIV6wEKQuSzw==
+  version "1.0.30001420"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001420.tgz#f62f35f051e0b6d25532cf376776d41e45b47ef6"
+  integrity sha512-OnyeJ9ascFA9roEj72ok2Ikp7PHJTKubtEJIQ/VK3fdsS50q4KWy+Z5X0A1/GswEItKX0ctAp8n4SYDE7wTu6A==
 
 chalk@*:
   version "5.1.2"
@@ -6482,6 +6505,13 @@ npm-bundled@^2.0.0:
   dependencies:
     npm-normalize-package-bin "^2.0.0"
 
+npm-bundled@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/npm-bundled/-/npm-bundled-3.0.0.tgz#7e8e2f8bb26b794265028491be60321a25a39db7"
+  integrity sha512-Vq0eyEQy+elFpzsKjMss9kxqb9tG3YHg4dsyWuUENuzvSUWe1TCnW/vV9FkhvBk/brEDoDiVd+M1Btosa6ImdQ==
+  dependencies:
+    npm-normalize-package-bin "^3.0.0"
+
 npm-install-checks@*, npm-install-checks@^6.0.0:
   version "6.0.0"
   resolved "https://registry.yarnpkg.com/npm-install-checks/-/npm-install-checks-6.0.0.tgz#9a021d8e8b3956d61fd265c2eda4735bcd3d9b83"
@@ -6538,7 +6568,7 @@ npm-packlist@^7.0.0:
   dependencies:
     ignore-walk "^5.0.1"
 
-npm-pick-manifest@*:
+npm-pick-manifest@*, npm-pick-manifest@^8.0.0:
   version "8.0.0"
   resolved "https://registry.yarnpkg.com/npm-pick-manifest/-/npm-pick-manifest-8.0.0.tgz#cf7743b00ae777215fa0c4233a346b5df8bc2af0"
   integrity sha512-Tcy/Mdf9L5f09vaBZo/z9+eb+ZTDeXWZFuPD5PZ6grobO9E3tjaPH+jQOFXZNn3EcqaiRcROzKU1UU7mLTtC2w==
@@ -6566,7 +6596,7 @@ npm-profile@*:
     npm-registry-fetch "^13.0.1"
     proc-log "^2.0.0"
 
-npm-registry-fetch@*:
+npm-registry-fetch@*, npm-registry-fetch@^14.0.0:
   version "14.0.0"
   resolved "https://registry.yarnpkg.com/npm-registry-fetch/-/npm-registry-fetch-14.0.0.tgz#de48285befd4da0cb87514e7e83cb770d8f10ca8"
   integrity sha512-suDRgyZKQcy3z10gEhPETQPmz0rJCUQQHQVsdJo1HlU9Y4dAt8WundNTNlHBONfyQUAkhFbdGUysoKHx0+6z+A==
@@ -6898,26 +6928,26 @@ p-try@^2.0.0:
   integrity sha512-R4nPAVTAU0B9D35/Gk3uJf/7XYbQcyohSKdvAxIRSNghFl4e71hVoGnBNQz9cWaXxO2I10KTC+3jMdvvoKw6dQ==
 
 pacote@*:
-  version "15.0.0"
-  resolved "https://registry.yarnpkg.com/pacote/-/pacote-15.0.0.tgz#32f6f7e9b59f4dd17e48c5f957c0d777f2d59021"
-  integrity sha512-YsMK5om14r2rf4Ukum5R43zKFoJe0swrsZRbG4fUfTJUxHpdMrie6+Js/jaNtn7Bq0YRL9SnAajPqz6n4wgi6g==
+  version "15.0.1"
+  resolved "https://registry.yarnpkg.com/pacote/-/pacote-15.0.1.tgz#408d9a4816acfb6a3c2204a7adecfb4963d61cdc"
+  integrity sha512-91Po/ZZE5fIEkbesHwsZPNae7SczIN8pSD2od96NMCfA2gGzdeEVY4CAFfXZKi+lfSEOlFIsKadRrYPj7nR/PA==
   dependencies:
-    "@npmcli/git" "^3.0.0"
-    "@npmcli/installed-package-contents" "^1.0.7"
-    "@npmcli/promise-spawn" "^3.0.0"
-    "@npmcli/run-script" "^4.1.0"
+    "@npmcli/git" "^4.0.0"
+    "@npmcli/installed-package-contents" "^2.0.0"
+    "@npmcli/promise-spawn" "^4.0.0"
+    "@npmcli/run-script" "^5.0.0"
     cacache "^17.0.0"
     fs-minipass "^2.1.0"
     minipass "^3.1.6"
     npm-package-arg "^9.0.0"
     npm-packlist "^7.0.0"
-    npm-pick-manifest "^7.0.0"
-    npm-registry-fetch "^13.0.1"
-    proc-log "^2.0.0"
+    npm-pick-manifest "^8.0.0"
+    npm-registry-fetch "^14.0.0"
+    proc-log "^3.0.0"
     promise-retry "^2.0.1"
-    read-package-json "^5.0.0"
+    read-package-json "^6.0.0"
     read-package-json-fast "^3.0.0"
-    ssri "^9.0.0"
+    ssri "^10.0.0"
     tar "^6.1.11"
 
 pacote@^13.0.3, pacote@^13.6.1:
@@ -7529,6 +7559,11 @@ proc-log@^2.0.0, proc-log@^2.0.1:
   resolved "https://registry.yarnpkg.com/proc-log/-/proc-log-2.0.1.tgz#8f3f69a1f608de27878f91f5c688b225391cb685"
   integrity sha512-Kcmo2FhfDTXdcbfDH76N7uBYHINxc/8GW7UAVuVP9I+Va3uHSerrnKV6dLooga/gh7GlgzuCCr/eoldnL1muGw==
 
+proc-log@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/proc-log/-/proc-log-3.0.0.tgz#fb05ef83ccd64fd7b20bbe9c8c1070fc08338dd8"
+  integrity sha512-++Vn7NS4Xf9NacaU9Xq3URUuqZETPsf8L4j5/ckhaRYsfPeRyzGw+iDjFhV/Jr3uNmTvvddEJFWh5R1gRgUH8A==
+
 process-nextick-args@~2.0.0:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/process-nextick-args/-/process-nextick-args-2.0.1.tgz#7820d9b16120cc55ca9ae7792680ae7dba6d7fe2"
@@ -7802,9 +7837,9 @@ react-resizable@^3.0.4:
     react-draggable "^4.0.3"
 
 react-select@^5.2.1:
-  version "5.5.0"
-  resolved "https://registry.yarnpkg.com/react-select/-/react-select-5.5.0.tgz#c82286e20b26194738186ada54cc8a0c677dfc6e"
-  integrity sha512-yzA+eavdxpF5Onf0u9KZ84qxr8r/CwPPn777bRkslbDtEUYx2+m13OrhP3WVa30+aWYxwkO/pkLcZ7q7r/6OhQ==
+  version "5.5.1"
+  resolved "https://registry.yarnpkg.com/react-select/-/react-select-5.5.1.tgz#60cc6767e77396cdf1d6f49a10555b80d27e749a"
+  integrity sha512-zOXIKvNqrnBn030Goi7pRHfLJHnvjPweA4uDyj9me8YPqgkaJp+vX3eNGHOzTlI442rbfPUMGrEZQnymJn/XUg==
   dependencies:
     "@babel/runtime" "^7.12.0"
     "@emotion/cache" "^11.4.0"
@@ -8627,7 +8662,7 @@ spdy@^4.0.2:
     select-hose "^2.0.0"
     spdy-transport "^3.0.0"
 
-ssri@*:
+ssri@*, ssri@^10.0.0:
   version "10.0.0"
   resolved "https://registry.yarnpkg.com/ssri/-/ssri-10.0.0.tgz#1e34554cbbc4728f5290674264e21b64aaf27ca7"
   integrity sha512-64ghGOpqW0k+jh7m5jndBGdVEoPikWwGQmBNN5ks6jyUSMymzHDTlnNHOvzp+6MmHOljr2MokUzvRksnTwG0Iw==
@@ -8667,9 +8702,9 @@ statuses@~1.4.0:
   integrity sha512-zhSCtt8v2NDrRlPQpCNtw/heZLtfUDqxBM1udqikb/Hbk52LK4nQSwr10u77iopCW5LsyHpuXS0GnEc48mLeew==
 
 std-env@^3.0.1:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/std-env/-/std-env-3.2.1.tgz#00e260ec3901333537125f81282b9296b00d7304"
-  integrity sha512-D/uYFWkI/31OrnKmXZqGAGK5GbQRPp/BWA1nuITcc6ICblhhuQUPHS5E2GSCVS7Hwhf4ciq8qsATwBUxv+lI6w==
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/std-env/-/std-env-3.3.0.tgz#86b5b5d416c5744b3fdeac6893c2b98196fc1a55"
+  integrity sha512-cNNS+VYsXIs5gI6gJipO4qZ8YYT274JHvNnQ1/R/x8Q8mdP0qj0zoMchRXmBNPqp/0eOEhX+3g7g6Fgb7meLIQ==
 
 stream-browserify@^2.0.1:
   version "2.0.2"
