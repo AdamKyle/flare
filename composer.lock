@@ -2377,16 +2377,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v9.35.1",
+            "version": "v9.36.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "79aed20f54b6ab75f926bf7d0dd7a5043ceb774a"
+                "reference": "0bcd350eec1974c9f912f129368587ef7e43722b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/79aed20f54b6ab75f926bf7d0dd7a5043ceb774a",
-                "reference": "79aed20f54b6ab75f926bf7d0dd7a5043ceb774a",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/0bcd350eec1974c9f912f129368587ef7e43722b",
+                "reference": "0bcd350eec1974c9f912f129368587ef7e43722b",
                 "shasum": ""
             },
             "require": {
@@ -2559,7 +2559,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2022-10-11T17:30:47+00:00"
+            "time": "2022-10-18T18:46:20+00:00"
         },
         {
             "name": "laravel/helpers",
@@ -3073,16 +3073,16 @@
         },
         {
             "name": "league/flysystem",
-            "version": "3.7.0",
+            "version": "3.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/flysystem.git",
-                "reference": "0deb0ff21094cbd37b13cbda085c076312708e6c"
+                "reference": "60f3760352fe08e918bc3b1acae4e91af092ebe1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/0deb0ff21094cbd37b13cbda085c076312708e6c",
-                "reference": "0deb0ff21094cbd37b13cbda085c076312708e6c",
+                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/60f3760352fe08e918bc3b1acae4e91af092ebe1",
+                "reference": "60f3760352fe08e918bc3b1acae4e91af092ebe1",
                 "shasum": ""
             },
             "require": {
@@ -3144,7 +3144,7 @@
             ],
             "support": {
                 "issues": "https://github.com/thephpleague/flysystem/issues",
-                "source": "https://github.com/thephpleague/flysystem/tree/3.7.0"
+                "source": "https://github.com/thephpleague/flysystem/tree/3.9.0"
             },
             "funding": [
                 {
@@ -3160,7 +3160,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-10-17T07:23:36+00:00"
+            "time": "2022-10-18T21:02:43+00:00"
         },
         {
             "name": "league/fractal",
