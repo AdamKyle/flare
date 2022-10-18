@@ -9,7 +9,6 @@ use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\ItemSpecialtyType;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Skills\Values\SkillTypeValue;
-use Facades\App\Flare\Calculators\SellItemCalculator;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 
@@ -73,6 +72,7 @@ class ItemsService {
                 ItemEffectsValue::FACTION_POINTS,
                 ItemEffectsValue::GET_COPPER_COINS,
                 ItemEffectsValue::ENTER_PURGATORY_HOUSE,
+                ItemEffectsValue::HIDE_CHAT_LOCATION,
             ],
             'specialtyTypes' => [
                 ItemSpecialtyType::HELL_FORGED,

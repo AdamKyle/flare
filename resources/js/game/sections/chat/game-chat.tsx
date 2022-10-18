@@ -90,6 +90,7 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
                         x: chat.x_position,
                         y: chat.y_position,
                         type: 'chat',
+                        hide_location: chat.hide_location,
                     }
                 }
             }).filter((chat: any) => typeof chat !== 'undefined');
@@ -184,6 +185,7 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
                    message: event.message.message,
                    x: event.message.x_position,
                    y: event.message.y_position,
+                   hide_location: event.message.hide_location,
                    type: 'chat',
                });
            }

@@ -101,6 +101,10 @@ trait ItemsShowInformation {
             if ($effect->canEnterPurgatorySmithHouse()) {
                 $effects = 'You can enter the Purgatory Smith house in Purgatory to investigate the Green Growing Light in the basement.';
             }
+
+            if ($effect->hideChatLocation()) {
+                $effects = 'Hides your location from chat so others cannot find you to duel you!';
+            }
         }
 
         if ($item->usable && !is_null($item->affects_skill_type)) {

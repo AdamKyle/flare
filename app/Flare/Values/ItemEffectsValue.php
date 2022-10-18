@@ -26,6 +26,7 @@ class ItemEffectsValue {
     const FACTION_POINTS        = 'effects-faction-points';
     const GET_COPPER_COINS      = 'get-copper-coins';
     const ENTER_PURGATORY_HOUSE = 'enter-purgatory-house';
+    const HIDE_CHAT_LOCATION    = 'hide-chat-location';
 
     /**
      * @var string[] $values
@@ -48,6 +49,7 @@ class ItemEffectsValue {
         self::FACTION_POINTS        => 'effects-faction-points',
         self::GET_COPPER_COINS      => 'get-copper-coins',
         self::ENTER_PURGATORY_HOUSE => 'enter-purgatory-house',
+        self::HIDE_CHAT_LOCATION    => 'hide-chat-location',
     ];
 
     /**
@@ -210,5 +212,14 @@ class ItemEffectsValue {
      */
     public function canEnterPurgatorySmithHouse(): bool {
         return $this->value === self::ENTER_PURGATORY_HOUSE;
+    }
+
+    /**
+     * Does this item hide chat location?
+     *
+     * @return bool
+     */
+    public function hideChatLocation(): bool {
+        return $this->value === self::HIDE_CHAT_LOCATION;
     }
 }
