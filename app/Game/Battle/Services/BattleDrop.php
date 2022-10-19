@@ -23,41 +23,87 @@ class BattleDrop {
 
     use CanHaveQuestItem;
 
-    private $randomItemDropBuilder;
+    /**
+     * @var RandomItemDropBuilder $randomItemDropBuilder
+     */
+    private RandomItemDropBuilder $randomItemDropBuilder;
 
-    private $disenchantService;
+    /**
+     * @var DisenchantService $disenchantService
+     */
+    private DisenchantService $disenchantService;
 
-    private $monster;
+    /**
+     * @var Monster $monster
+     */
+    private Monster $monster;
 
-    private $locationWithEffect;
+    /**
+     * @var Location|null $locationWithEffect
+     */
+    private ?Location $locationWithEffect;
 
-    private $gameMapBonus;
+    /**
+     * @var float $gameMapBonus
+     */
+    private float $gameMapBonus;
 
-    private $lootingChance;
+    /**
+     * @var float $lootingChance
+     */
+    private float $lootingChance;
 
+    /**
+     * @param RandomItemDropBuilder $randomItemDropBuilder
+     * @param DisenchantService $disenchantService
+     */
     public function __construct(RandomItemDropBuilder $randomItemDropBuilder, DisenchantService $disenchantService) {
         $this->randomItemDropBuilder = $randomItemDropBuilder;
         $this->disenchantService     = $disenchantService;
     }
 
+    /**
+     * Set Monster.
+     *
+     * @param Monster $monster
+     * @return BattleDrop
+     */
     public function setMonster(Monster $monster): BattleDrop {
         $this->monster = $monster;
 
         return $this;
     }
 
+    /**
+     * Set Special Location.
+     *
+     * @param Location|null $location
+     * @return BattleDrop
+     */
     public function setSpecialLocation(Location $location = null): BattleDrop {
         $this->locationWithEffect = $location;
 
         return $this;
     }
 
+    /**
+     * Set Game Map Bonus.
+     *
+     * @param float $gameMapBonus
+     * @return BattleDrop
+     */
     public function setGameMapBonus(float $gameMapBonus = 0.0): BattleDrop {
         $this->gameMapBonus = $gameMapBonus;
 
         return $this;
     }
 
+    /**
+     * Set Location Chance.
+     *
+     * @param float $lootingChance
+     * @return BattleDrop
+     */
     public function setLootingChance(float $lootingChance = 0.0): BattleDrop {
         $this->lootingChance = $lootingChance;
 
@@ -216,24 +262,6 @@ class BattleDrop {
         return 300;
     }
 
-    protected function getCacheDrop(Character $character, string $gameMapName, Location $locationWithEffect = null): ?Item {
-        $levelDifference = $character->level - $this->monster->max_level;
-
-        if ($gameMapName === MapNameValue::SHADOW_PLANE) {
-            if ($levelDifference >= 10) {
-                return $this->getDrop('highend-droppable-items');
-            }
-        }
-
-        if (!is_null($locationWithEffect)) {
-            if ($levelDifference >= 10) {
-                return $this->getDrop('highend-droppable-items');
-            }
-        }
-
-        return null;
-    }
-
     /**
      * Gets drop from the cache. Can return null.
      *
@@ -283,11 +311,13 @@ class BattleDrop {
      * @param $item
      * @return void
      */
-    private function autoDisenchantItem(Character $character, $item) {
+    private function autoDisenchantItem(Character $character, $item): void {
         $user = $character->user;
 
         if ($user->auto_disenchant_amount === 'all') {
             $this->disenchantService->disenchantItemWithSkill($character->refresh(), false);
+
+            return;
         }
 
         if ($user->auto_disenchant_amount === '1-billion') {
@@ -308,6 +338,7 @@ class BattleDrop {
      *
      * @param Character $character
      * @param Item $item
+     * @param bool $isMythic
      * @return void
      */
     private function giveItemToPlayer(Character $character, Item $item, bool $isMythic = false) {

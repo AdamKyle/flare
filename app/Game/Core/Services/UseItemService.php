@@ -75,7 +75,13 @@ class UseItemService {
         $boons = $character->boons->toArray();
 
         foreach ($boons as $key => $boon) {
-            $skills = GameSkill::where('type', $boon['affect_skill_type'])->pluck('name')->toArray();
+            $item   = Item::find($boon['item_id']);
+
+            if (is_null($item->affect_skill_type)) {
+                continue;
+            }
+
+            $skills = GameSkill::where('type', $item->affect_skill_type)->pluck('name')->toArray();
 
             $boon['type'] = (new ItemUsabilityType($boon['type']))->getNamedValue();
             $boon['affected_skills'] = implode(', ', $skills);

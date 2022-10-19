@@ -54,6 +54,6 @@ class ExplorationAutomationService {
     }
 
     protected function startAutomation(Character $character, int $automationId, string $attackType) {
-        Exploration::dispatch($character, $automationId, $attackType)->delay(now()->addMinutes(5));
+        Exploration::dispatch($character, $automationId, $attackType)->delay(now()->addMinutes(5))->onQueue('default_long');
     }
 }
