@@ -2,7 +2,7 @@ import React from "react";
 
 export default interface ResizableBoxProps {
 
-    width: number;
+    width?: number;
 
     height: number;
 

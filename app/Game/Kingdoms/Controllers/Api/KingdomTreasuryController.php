@@ -101,7 +101,7 @@ class KingdomTreasuryController extends Controller {
         event(new ServerMessageEvent($character->user, 'Mass Embezzling underway...'));
 
         return response()->json([
-            'message' => 'Mass Embezzling underway fot amount: ' . number_format($request->embezzle_amount) . '. Check server messages section below for more info.',
+            'message' => 'Mass Embezzling underway for amount: ' . number_format($request->embezzle_amount) . '. Check server messages section below for more info.',
         ], 200);
     }
 
