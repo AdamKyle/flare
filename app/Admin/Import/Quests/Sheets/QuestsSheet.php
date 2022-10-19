@@ -66,9 +66,9 @@ class QuestsSheet implements ToCollection {
 
             if (is_null($item)) {
                 $quest['reward_item'] = null;
+            } else {
+                $quest['reward_item'] = $item->id;
             }
-
-            $quest['reward_item'] = $item->id;
         } else {
             $quest['reward_item'] = null;
         }
