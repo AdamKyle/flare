@@ -50,13 +50,13 @@
                 <span class="collapse-indicator la la-arrow-circle-down"></span>
                 Game Systems
             </a>
-            <div id="game-option" class="collapse">
+            <div id="game-option" class="collapse open">
                 <a href="#no-link" class="active" data-toggle="collapse" data-target="#manage-races">
                     <span class="collapse-indicator la la-arrow-circle-down"></span>
                     Manage Races
                 </a>
 
-                <div id="manage-races" class="collapse">
+                <div id="manage-races" class="collapse open">
                     <a href="{{route('races.list')}}">
                         <span class="fas fa-list"></span>
                         Races
@@ -72,7 +72,7 @@
                     Manage Classes
                 </a>
 
-                <div id="manage-classes" class="collapse">
+                <div id="manage-classes" class="collapse open">
                     <a href="{{route('classes.list')}}">
                         <span class="fas fa-list"></span>
                         Classes
@@ -88,7 +88,7 @@
                     Manage Maps
                 </a>
 
-                <div id="manage-maps" class="collapse">
+                <div id="manage-maps" class="collapse open">
                     <a href="{{route('maps')}}">
                         <span class="ra ra-scroll-unfurled"></span>
                         Maps
@@ -103,7 +103,7 @@
                         Manage Locations
                     </a>
 
-                    <div id="manage-locations" class="collapse">
+                    <div id="manage-locations" class="collapse open">
                         <a href="{{route('locations.list')}}">
                             <span class="ra ra-compass"></span>
                             Locations
@@ -119,7 +119,7 @@
                         Manage Quests
                     </a>
 
-                    <div id="manage-quests" class="collapse">
+                    <div id="manage-quests" class="collapse open">
                         <a href="{{route('quests.index')}}">
                             <span class="ra ra-book"></span>
                             Quests
@@ -135,7 +135,7 @@
                         Manage NPCs
                     </a>
 
-                    <div id="manage-npcs" class="collapse">
+                    <div id="manage-npcs" class="collapse open">
                         <a href="{{route('npcs.index')}}">
                             <span class="ra ra-pawn"></span>
                             Npcs
@@ -151,7 +151,7 @@
                     Manage Kingdoms
                 </a>
 
-                <div id="manage-kingdoms" class="collapse">
+                <div id="manage-kingdoms" class="collapse open">
                     <a href="{{route('buildings.list')}}">
                         <span class="ra ra-guarded-tower"></span>
                         Buildings
@@ -175,7 +175,7 @@
                     Manage Monsters
                 </a>
 
-                <div id="manage-monsters" class="collapse">
+                <div id="manage-monsters" class="collapse open">
                     <a href="{{route('monsters.list')}}">
                         <span class="ra ra-eye-monster"></span>
                         Monsters
@@ -199,7 +199,7 @@
                     Manage Items
                 </a>
 
-                <div id="manage-items" class="collapse">
+                <div id="manage-items" class="collapse open">
                     <a href="{{route('items.list')}}">
                         <span class="ra ra-sword"></span>
                         Items
@@ -222,7 +222,7 @@
                         Manage Affixes
                     </a>
 
-                    <div id="manage-affixes" class="collapse">
+                    <div id="manage-affixes" class="collapse open">
                         <a href="{{route('affixes.list')}}">
                             <span class="ra ra-burning-embers"></span>
                             Affixes
@@ -246,7 +246,7 @@
                     Manage Skills
                 </a>
 
-                <div id="manage-skills" class="collapse">
+                <div id="manage-skills" class="collapse open">
                     <a href="{{route('skills.list')}}">
                         <span class="ra ra-muscle-up"></span>
                         Skills
@@ -270,7 +270,7 @@
                     Manage Passive Skills
                 </a>
 
-                <div id="manage-passive-skills" class="collapse">
+                <div id="manage-passive-skills" class="collapse open">
                     <a href="{{route('passive.skills.list')}}">
                         <span class="ra ra-muscle-up"></span>
                         Passives
