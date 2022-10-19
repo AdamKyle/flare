@@ -8,11 +8,12 @@ use App\Flare\Models\Kingdom;
 use App\Game\Core\Traits\KingdomCache;
 use App\Game\Kingdoms\Events\AddKingdomToMap;
 use App\Game\Kingdoms\Events\UpdateGlobalMap;
+use App\Game\Kingdoms\Traits\UpdateKingdomBuildingsBasedOnPassives;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 
 class SettlerHandler {
 
-    use KingdomCache;
+    use KingdomCache, UpdateKingdomBuildingsBasedOnPassives;
 
     /**
      * @var array $newAttackingUnits
@@ -172,38 +173,5 @@ class SettlerHandler {
         $kingdom = $defendingKingdom->refresh();
 
         return $this->updateBuildings($kingdom);
-    }
-
-    /**
-     * Update weather the buildings are locked or not.
-     *
-     * - Used for purchasing a kingdom.
-     *
-     * @param Kingdom $kingdom
-     * @return Kingdom
-     */
-    protected function updateBuildings(Kingdom $kingdom): Kingdom {
-        $character = $kingdom->character;
-
-        foreach(GameBuilding::all() as $building) {
-
-            $isLocked = $building->is_locked;
-
-            if ($isLocked) {
-                $passive = $character->passiveSkills()->where('passive_skill_id', $building->passive_skill_id)->first();
-
-                if (!is_null($passive)) {
-                    if ($passive->current_level === $building->level_required) {
-                        $building = $kingdom->buildings->where('game_building_id', $building->id)->first();
-
-                        $building->update([
-                            'is_locked' => false,
-                        ]);
-                    }
-                }
-            }
-        }
-
-        return $kingdom->refresh();
     }
 }
