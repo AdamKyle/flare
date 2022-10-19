@@ -14,7 +14,6 @@ import Ajax from "../../../lib/ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
-import {parseInt} from "lodash";
 
 export default class BuildingInformation extends React.Component<BuildingInformationProps, any> {
 

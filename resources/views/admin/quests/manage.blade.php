@@ -49,10 +49,13 @@
 
                     <x-core.form-wizard.content target="tab-style-2-3">
                         <h3 class="mb-3">Currencies Reward</h3>
-                        <x-core.forms.input :model="$quest" label="Gold Reward:" modelKey="gold_reward" name="gold_reward" />
-                        <x-core.forms.input :model="$quest" label="Gold Dust Reward:" modelKey="gold_dust_reward" name="gold_dust_reward" />
-                        <x-core.forms.input :model="$quest" label="Shards Reward:" modelKey="shard_reward" name="shard_reward" />
-                        <x-core.forms.input :model="$quest" label="Copper Coins Reward:" modelKey="copper_coin_reward" name="copper_coin_reward" />
+                        <x-core.forms.input :model="$quest" label="Gold Reward:" modelKey="reward_gold" name="reward_gold" />
+                        <x-core.forms.input :model="$quest" label="Gold Dust Reward:" modelKey="reward_gold_dust" name="reward_gold_dust" />
+                        <x-core.forms.input :model="$quest" label="Shards Reward:" modelKey="reward_shards" name="reward_shards" />
+
+                        <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                        <h3 class="mb-3">XP Reward</h3>
+                        <x-core.forms.input :model="$quest" label="XP Reward:" modelKey="reward_xp" name="reward_xp" />
 
                         <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                         <h3 class='mb-3'>Unlocks Skill</h3>

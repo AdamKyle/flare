@@ -3,7 +3,9 @@
 namespace App\Game\Messages\Services;
 
 use App\Admin\Events\UpdateAdminChatEvent;
+use App\Flare\Models\Character;
 use App\Flare\Models\User;
+use App\Flare\Values\ItemEffectsValue;
 use App\Game\Messages\Events\MessageSentEvent;
 use App\Game\Messages\Values\MapChatColor;
 
@@ -21,10 +23,11 @@ class PublicMessage {
         $killedInPVP = $this->wasKilledInPVP($user);
 
         $newMessage = $user->messages()->create([
-            'message'    => $message,
-            'x_position' => $killedInPVP ? 0 : $this->getXPosition($user),
-            'y_position' => $killedInPVP ? 0 : $this->getYPosition($user),
-            'color'      => $this->getColor($user),
+            'message'       => $message,
+            'x_position'    => $killedInPVP ? 0 : $this->getXPosition($user),
+            'y_position'    => $killedInPVP ? 0 : $this->getYPosition($user),
+            'color'         => $this->getColor($user),
+            'hide_location' => $this->hideLocation($user),
         ]);
 
         $newMessage->map_name = $this->shortenedMapName($user);
@@ -125,5 +128,15 @@ class PublicMessage {
         }
 
         return (new MapChatColor($user->character->map->gameMap->name))->getColor();
+    }
+
+    protected function hideLocation(User $user): bool {
+        if ($user->hasRole('Admin')) {
+            return false;
+        }
+
+        return $user->character->inventory->slots->filter(function($slot) {
+            return $slot->item->effect === ItemEffectsValue::HIDE_CHAT_LOCATION;
+        })->isNotEmpty();
     }
 }

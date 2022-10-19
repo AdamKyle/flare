@@ -3,6 +3,7 @@
 namespace App\Game\Kingdoms\Service;
 
 use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
+use App\Game\Kingdoms\Traits\UpdateKingdomBuildingsBasedOnPassives;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Cache;
 use App\Flare\Models\Character;
@@ -18,7 +19,7 @@ use App\Game\Kingdoms\Builders\KingdomBuilder;
 
 class KingdomSettleService {
 
-    use ResponseBuilder, KingdomCache;
+    use ResponseBuilder, KingdomCache, UpdateKingdomBuildingsBasedOnPassives;
 
     /**
      * @var KingdomBuilder $kingdomBuilder
@@ -198,7 +199,9 @@ class KingdomSettleService {
 
         $kingdom->update($params);
 
-        $this->addKingdomToCache($character, $kingdom->refresh());
+        $kingdom = $this->updateBuildings($kingdom->refresh());
+
+        $this->addKingdomToCache($character, $kingdom);
 
         if ($underProtection) {
             event(new ServerMessageEvent($character->user, 'Your kingdom is under protection for 7 days.'));

@@ -19,6 +19,11 @@ class Message extends Model {
         'x_position',
         'y_position',
         'color',
+        'hide_location',
+    ];
+
+    protected $casts = [
+        'hide_location' => 'boolean',
     ];
 
     public function user() {

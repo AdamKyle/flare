@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    Data here
+    <x-core.layout.info-container>
+        <div id="administrator-statistics"></div>
+    </x-core.layout.info-container>
 @endsection

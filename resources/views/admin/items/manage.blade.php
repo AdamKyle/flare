@@ -13,7 +13,8 @@
                     <x-core.form-wizard.tab target="tab-style-2-2" primaryTitle="Stats" secondaryTitle="Set up the stat data for the item." />
                     <x-core.form-wizard.tab target="tab-style-2-3" primaryTitle="Modifiers" secondaryTitle="Modifiers that effect the character." />
                     <x-core.form-wizard.tab target="tab-style-2-4" primaryTitle="Crafting" secondaryTitle="Crafting Details." />
-                    <x-core.form-wizard.tab target="tab-style-2-5" primaryTitle="Usability" secondaryTitle="Usable Details." />
+                    <x-core.form-wizard.tab target="tab-style-2-5" primaryTitle="Quest" secondaryTitle="Quest Details" />
+                    <x-core.form-wizard.tab target="tab-style-2-6" primaryTitle="Usability" secondaryTitle="Usable Details." />
                 </x-core.form-wizard.tabs>
                 <x-core.form-wizard.contents>
                     <x-core.form-wizard.content target="tab-style-2-1" isOpen="true">
@@ -24,18 +25,6 @@
                                 <x-core.forms.select :model="$item" label="Type:" modelKey="type" name="type" :options="$types" />
                                 <x-core.forms.text-area :model="$item" label="Description:" modelKey="description" name="description" />
                                 <x-core.forms.select :model="$item" label="Default Position (Armour only):" modelKey="default_position" name="default_position" :options="$defaultPositions" />
-
-                                <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
-                                <h3 class="mb-3">Quest</h3>
-                                <x-core.forms.select :model="$item" label="Effects (Quest items only):" modelKey="effect" name="effect" :options="$effects" />
-
-                                <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
-                                <h3 class="mb-3">Specialty Type</h3>
-                                <x-core.forms.select :model="$item" label="Specialty Type:" modelKey="specialty_type" name="specialty_type" :options="$specialtyTypes" />
-
-                                <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
-                                <h3 class="mb-3">Drop Location</h3>
-                                <x-core.forms.collection-select :model="$item" label="Drops From:" modelKey="drop_location_id" name="drop_location_id" value="id" key="name" :options="$locations" />
                             </div>
                             <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                             <div>
@@ -87,7 +76,6 @@
                                 <x-core.forms.input :model="$item" label="XP Bonus (%):" modelKey="xp_bonus" name="xp_bonus" />
                                 <x-core.forms.check-box :model="$item" label="Can Ignore Caps?" modelKey="ignores_caps" name="ignores_caps" />
 
-
                             </div>
                             <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                             <div>
@@ -118,6 +106,23 @@
 
                     </x-core.form-wizard.content>
                     <x-core.form-wizard.content target="tab-style-2-5">
+                        <x-core.forms.select :model="$item" label="Effects (Quest items only):" modelKey="effect" name="effect" :options="$effects" />
+
+                        <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                        <h3 class="mb-3">Specialty Type</h3>
+                        <x-core.forms.select :model="$item" label="Specialty Type:" modelKey="specialty_type" name="specialty_type" :options="$specialtyTypes" />
+
+                        <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                        <h3 class="mb-3">Drop Location</h3>
+                        <x-core.forms.collection-select :model="$item" label="Drops From:" modelKey="drop_location_id" name="drop_location_id" value="id" key="name" :options="$locations" />
+
+                        <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                        <h3 class="mb-3">Effects Skill</h3>
+                        <x-core.forms.select :model="$item" label="Skill:" modelKey="skill_name" name="skill_name" :options="$skills" />
+                        <x-core.forms.input :model="$item" label="Skill Bonus:" modelKey="skill_bonus" name="skill_bonus" />
+                        <x-core.forms.input :model="$item" label="Skill Training Bonus:" modelKey="skill_training_bonus" name="skill_training_bonus" />
+                    </x-core.form-wizard.content>
+                    <x-core.form-wizard.content target="tab-style-2-6">
                         <div class="grid md:grid-cols-2 gap-2">
                             <div>
                                 <h3 class="mb-3">Basic Usable Info</h3>

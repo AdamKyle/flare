@@ -37,13 +37,13 @@ class ClassesTable extends DataTableComponent
             })->html(),
             Column::make('To Hit', 'to_hit_stat')->sortable(),
             Column::make('Damage Stat', 'damage_stat')->sortable(),
-            Column::make('Str Mod', 'str_mod')->sortable(),
-            Column::make('Dex Mod', 'dex_mod')->sortable(),
-            Column::make('Int Mod', 'int_mod')->sortable(),
-            Column::make('Agi Mod', 'agi_mod')->sortable(),
-            Column::make('Chr Mod', 'chr_mod')->sortable(),
-            Column::make('Dur Mod', 'dur_mod')->sortable(),
-            Column::make('Focus Mod', 'focus_mod')->sortable(),
+            Column::make('Str Mod', 'str_mod')->format(function ($value) { return is_null($value) ? 0 : $value; })->sortable(),
+            Column::make('Dex Mod', 'dex_mod')->format(function ($value) { return is_null($value) ? 0 : $value; })->sortable(),
+            Column::make('Int Mod', 'int_mod')->format(function ($value) { return is_null($value) ? 0 : $value; })->sortable(),
+            Column::make('Agi Mod', 'agi_mod')->format(function ($value) { return is_null($value) ? 0 : $value; })->sortable(),
+            Column::make('Chr Mod', 'chr_mod')->format(function ($value) { return is_null($value) ? 0 : $value; })->sortable(),
+            Column::make('Dur Mod', 'dur_mod')->format(function ($value) { return is_null($value) ? 0 : $value; })->sortable(),
+            Column::make('Focus Mod', 'focus_mod')->format(function ($value) { return is_null($value) ? 0 : $value; })->sortable(),
         ];
     }
 }

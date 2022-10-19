@@ -2,16 +2,18 @@
 
 namespace App\Game\Kingdoms\Handlers;
 
+use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
 use App\Game\Core\Traits\KingdomCache;
 use App\Game\Kingdoms\Events\AddKingdomToMap;
 use App\Game\Kingdoms\Events\UpdateGlobalMap;
+use App\Game\Kingdoms\Traits\UpdateKingdomBuildingsBasedOnPassives;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 
 class SettlerHandler {
 
-    use KingdomCache;
+    use KingdomCache, UpdateKingdomBuildingsBasedOnPassives;
 
     /**
      * @var array $newAttackingUnits
@@ -168,6 +170,8 @@ class SettlerHandler {
             }
         }
 
-        return $defendingKingdom->refresh();
+        $kingdom = $defendingKingdom->refresh();
+
+        return $this->updateBuildings($kingdom);
     }
 }

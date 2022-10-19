@@ -3,24 +3,20 @@
 namespace App\Admin\Controllers\Api;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\Kingdom;
+use App\Flare\Models\User;
 use App\Flare\Values\SiteAccessStatisticValue;
 use App\Http\Controllers\Controller;
 
 class SiteAccessStatisticsController extends Controller {
 
-    public function index() {
-        return response()->json([
-            'registered' => SiteAccessStatisticValue::getRegistered(),
-            'signed_in'  => SiteAccessStatisticValue::getSignedIn(),
-        ], 200);
-    }
 
     public function fetchLoggedInAllTime() {
-        return response()->json(['stats' => SiteAccessStatisticValue::getAllTimeSignedIn()], 200);
+        return response()->json(['stats' => SiteAccessStatisticValue::getSignedIn(),], 200);
     }
 
     public function fetchRegisteredAllTime() {
-        return response()->json(['stats' => SiteAccessStatisticValue::getAllTimeRegistered()], 200);
+        return response()->json(['stats' => SiteAccessStatisticValue::getRegistered()], 200);
     }
 
     public function fetchCharactersGold() {
@@ -32,5 +28,36 @@ class SiteAccessStatisticsController extends Controller {
                 'data'   => $charactersWithHighGold->pluck('gold')->toArray(),
             ]
         ]);
+    }
+
+    public function otherDetails() {
+        return response()->json([
+            'averageCharacterLevel'       => number_format(Character::avg('level'), 2),
+            'averageCharacterGold'        => number_format(Character::avg('gold')),
+            'characterKingdomCount'       => number_format(Kingdom::whereNotNull('character_id')->count()),
+            'npcKingdomCount'             => number_format(Kingdom::whereNull('character_id')->count()),
+            'richestCharacter'            => Character::orderBy('gold', 'desc')->select('name', 'gold')->first(),
+            'highestLevelCharacter'       => Character::orderBy('gold', 'desc')->select('name', 'level')->first(),
+            'kingdomHolders'              => $this->fetchKingdomHolders(),
+            'lastLoggedInCount'           => User::whereDate('last_logged_in', now())->count(),
+            'lastFiveMonthsLoggedInCount' => User::whereBetween('last_logged_in', [now()->subMonths(5), now()])->count(),
+            'neverLoggedInCount'          => User::whereNull('last_logged_in')->count(),
+            'totalCharactersRegistered'   => User::count(),
+            'willBeDeletedCount'          => User::where('will_be_deleted', true)->count(),
+        ]);
+    }
+
+    protected function fetchKingdomHolders(): array {
+        $onlyCharactersWithKingdoms = Character::whereHas('kingdoms')->get();
+
+        $array = [];
+
+        foreach ($onlyCharactersWithKingdoms as $characterWithKingdom) {
+            $array[$characterWithKingdom->name] = $characterWithKingdom->kingdoms_count;
+        }
+
+        arsort($array);
+
+        return $array;
     }
 }

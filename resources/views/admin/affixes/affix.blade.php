@@ -5,7 +5,9 @@
         @php
             $backUrl = route('affixes.list');
 
-            if (!auth()->user()->hasRole('Admin')) {
+            if (is_null(auth()->user())) {
+                $backUrl = '/information/enchanting';
+            } else if (!auth()->user()->hasRole('Admin')) {
                 $backUrl = '/information/enchanting';
             }
         @endphp
