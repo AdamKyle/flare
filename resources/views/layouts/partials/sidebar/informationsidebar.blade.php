@@ -50,7 +50,7 @@
                 Chat Commands
             </a>
         </div>
-
+        <hr />
         <div class="menu-detail-wrapper">
             <h6 class="uppercase">Shops</h6>
             <a href="{{route('info.page', ['pageName' => 'shop'])}}">
@@ -79,40 +79,32 @@
                 <i class="fas fa-chart-line"></i>
                 Character XP
             </a>
-            <a href="#no-link" class="active" data-toggle="collapse" data-target="#menueSkills">
-                <span class="collapse-indicator la la-arrow-circle-down"></span>
-                Skill Info
+            <hr />
+            <h6 class="uppercase">Skills</h6>
+            <a href="{{route('info.page', ['pageName' => 'skill-information'])}}">
+                <span class="ra ra-aura"></span>
+                Skills
             </a>
-            <div id="menueSkills" class="collapse open">
-                <a href="{{route('info.page', ['pageName' => 'skill-information'])}}">
-                    <span class="ra ra-aura"></span>
-                    Skills
-                </a>
-
-                <a href="{{route('info.page', ['pageName' => 'class-skills'])}}">
-                    <span class="ra ra-player-pyromaniac"></span>
-                    Class Skills
-                </a>
-            </div>
-
-            <a href="#no-link" class="active" data-toggle="collapse" data-target="#menueEquipment">
-                <span class="collapse-indicator la la-arrow-circle-down"></span>
-                Equipment Info
+            <a href="{{route('info.page', ['pageName' => 'class-skills'])}}">
+                <span class="ra ra-player-pyromaniac"></span>
+                Class Skills
             </a>
-            <div id="menueEquipment" class="collapse open">
-                <a href="{{route('info.page', ['pageName' => 'equipment'])}}">
-                    <span class="ra ra-axe"></span>
-                    Equipment
-                </a>
-                <a href="{{route('info.page', ['pageName' => 'gear-progression'])}}">
-                    <span class="fas fa-level-up-alt"></span>
-                    Gear Progression
-                </a>
-                <a href="{{route('info.page', ['pageName' => 'equipment-sets'])}}">
-                    <span class="ra ra-battered-axe"></span>
-                    Equipment Sets
-                </a>
-            </div>
+            <hr>
+            <h6 class="uppercase">Equipment</h6>
+            <a href="{{route('info.page', ['pageName' => 'equipment'])}}">
+                <span class="ra ra-axe"></span>
+                Equipment
+            </a>
+            <a href="{{route('info.page', ['pageName' => 'gear-progression'])}}">
+                <span class="fas fa-level-up-alt"></span>
+                Gear Progression
+            </a>
+            <a href="{{route('info.page', ['pageName' => 'equipment-sets'])}}">
+                <span class="ra ra-battered-axe"></span>
+                Equipment Sets
+            </a>
+            <hr />
+            <h6 class="uppercase">Misc.</h6>
             <a href="{{route('info.page', ['pageName' => 'currencies'])}}">
                 <span class="fas fa-coins"></span>
                 Currencies
@@ -155,32 +147,28 @@
                 <span class="fas fa-map-signs"></span>
                 Exploration
             </a>
-            <a href="#no-link" class="active" data-toggle="collapse" data-target="#menuMapActions">
-                <span class="collapse-indicator la la-arrow-circle-down"></span>
-                The Map
+            <hr />
+            <h6 class="uppercase">Map Movement</h6>
+            <a href="{{route('info.page', ['pageName' => 'movement'])}}">
+                <span class="far fa-compass"></span>
+                Movement Actions
             </a>
-            <div id="menuMapActions" class="collapse open">
-                <a href="{{route('info.page', ['pageName' => 'movement'])}}">
-                    <span class="far fa-compass"></span>
-                    Movement Actions
-                </a>
-                <a href="{{route('info.page', ['pageName' => 'traverse'])}}">
-                    <span class="ra ra-player-pyromaniac"></span>
-                    Traverse Action
-                </a>
-                <a href="{{route('info.page', ['pageName' => 'set-sail'])}}">
-                    <span class="fas fa-ship"></span>
-                    Set Sail Action
-                </a>
-                <a href="{{route('info.page', ['pageName' => 'locations'])}}">
-                    <span class="fas fa-search-location"></span>
-                    Map Locations
-                </a>
-                <a href="{{route('info.page', ['pageName' => 'special-locations'])}}">
-                    <span class="fas fa-dungeon"></span>
-                    Special Locations
-                </a>
-            </div>
+            <a href="{{route('info.page', ['pageName' => 'traverse'])}}">
+                <span class="ra ra-player-pyromaniac"></span>
+                Traverse Action
+            </a>
+            <a href="{{route('info.page', ['pageName' => 'set-sail'])}}">
+                <span class="fas fa-ship"></span>
+                Set Sail Action
+            </a>
+            <a href="{{route('info.page', ['pageName' => 'locations'])}}">
+                <span class="fas fa-search-location"></span>
+                Map Locations
+            </a>
+            <a href="{{route('info.page', ['pageName' => 'special-locations'])}}">
+                <span class="fas fa-dungeon"></span>
+                Special Locations
+            </a>
         </div>
     </div>
 
@@ -214,77 +202,64 @@
     <!-- Game Systems -->
     <div class="menu-detail" data-menu="game-systems">
         <div class="menu-detail-wrapper">
-            <a href="#no-link" class="active" data-toggle="collapse" data-target="#menunpcs">
-                <span class="collapse-indicator la la-arrow-circle-down"></span>
-                NPC's and Quests
+            <h6 class="uppercase">NPC's and Quests</h6>
+            <a href="{{route('info.page', ['pageName' => 'npcs'])}}">
+                <span class="ra ra-player"></span>
+                NPC's
             </a>
-            <div id="menunpcs" class="collapse open">
-                <a href="{{route('info.page', ['pageName' => 'npcs'])}}">
-                    <span class="ra ra-player"></span>
-                    NPC's
-                </a>
-                <a href="{{route('info.page', ['pageName' => 'quests'])}}">
-                    <span class="ra ra-trophy"></span>
-                    Quests
-                </a>
-                <a href="{{route('info.page', ['pageName' => 'guide-quests'])}}">
-                    <span class="ra ra-book"></span>
-                    Guide Quests
-                </a>
-            </div>
-            <a href="#no-link" class="active" data-toggle="collapse" data-target="#menuecrafting">
-                <span class="collapse-indicator la la-arrow-circle-down"></span>
-                Crafting/Enchanting
+            <a href="{{route('info.page', ['pageName' => 'quests'])}}">
+                <span class="ra ra-trophy"></span>
+                Quests
             </a>
-            <div id="menuecrafting" class="collapse open">
-                <a href="{{route('info.page', ['pageName' => 'crafting'])}}">
-                    <span class="ra ra-hammer"></span>
-                    Crafting
-                </a>
-                <a href="{{route('info.page', ['pageName' => 'enchanting'])}}">
-                    <span class="ra ra-burning-book"></span>
-                    Enchanting
-                </a>
-                <a href="{{route('info.page', ['pageName' => 'disenchanting'])}}">
-                    <span class="ra ra-explosion"></span>
-                    Disenchanting
-                </a>
-                <a href="{{route('info.page', ['pageName' => 'alchemy'])}}">
-                    <span class="ra ra-round-bottom-flask"></span>
-                    Alchemy (Usable items)
-                </a>
-                <a href="{{route('info.page', ['pageName' => 'random-enchants'])}}">
-                    <span class="ra ra-fairy-wand"></span>
-                    Random Enchantments (Uniques)
-                </a>
-                <a href="{{route('info.page', ['pageName' => 'holy-items'])}}">
-                    <span class="fas fa-cross"></span>
-                    Holy Items
-                </a>
-                <a href="{{route('info.page', ['pageName' => 'trinketry'])}}">
-                    <span class="ra ra-fire-shield"></span>
-                    Trinkets
-                </a>
-            </div>
-            <a href="#no-link" class="active" data-toggle="collapse" data-target="#menueLists">
-                <span class="collapse-indicator la la-arrow-circle-down"></span>
-                Lists
+            <a href="{{route('info.page', ['pageName' => 'guide-quests'])}}">
+                <span class="ra ra-book"></span>
+                Guide Quests
             </a>
-            <div id="menueLists" class="collapse open">
-                <a href="{{route('info.page', ['pageName' => 'monsters'])}}">
-                    <span class="ra ra-broken-skull"></span>
-                    Monsters
-                </a>
-                <a href="{{route('info.page', ['pageName' => 'celestials'])}}">
-                    <span class="ra ra-batwings"></span>
-                    Celestials
-                </a>
+            <hr />
+            <h6 class="uppercase">Crafting and Enchanting</h6>
+            <a href="{{route('info.page', ['pageName' => 'crafting'])}}">
+                <span class="ra ra-hammer"></span>
+                Crafting
+            </a>
+            <a href="{{route('info.page', ['pageName' => 'enchanting'])}}">
+                <span class="ra ra-burning-book"></span>
+                Enchanting
+            </a>
+            <a href="{{route('info.page', ['pageName' => 'disenchanting'])}}">
+                <span class="ra ra-explosion"></span>
+                Disenchanting
+            </a>
+            <a href="{{route('info.page', ['pageName' => 'alchemy'])}}">
+                <span class="ra ra-round-bottom-flask"></span>
+                Alchemy (Usable items)
+            </a>
+            <a href="{{route('info.page', ['pageName' => 'random-enchants'])}}">
+                <span class="ra ra-fairy-wand"></span>
+                Random Enchantments (Uniques)
+            </a>
+            <a href="{{route('info.page', ['pageName' => 'holy-items'])}}">
+                <span class="fas fa-cross"></span>
+                Holy Items
+            </a>
+            <a href="{{route('info.page', ['pageName' => 'trinketry'])}}">
+                <span class="ra ra-fire-shield"></span>
+                Trinkets
+            </a>
+            <hr />
+            <h6>Misc. Lists</h6>
+            <a href="{{route('info.page', ['pageName' => 'monsters'])}}">
+                <span class="ra ra-broken-skull"></span>
+                Monsters
+            </a>
+            <a href="{{route('info.page', ['pageName' => 'celestials'])}}">
+                <span class="ra ra-batwings"></span>
+                Celestials
+            </a>
 
-                <a href="{{route('info.page', ['pageName' => 'quest-items'])}}">
-                    <span class="ra ra-bat-sword"></span>
-                    Quest Items
-                </a>
-            </div>
+            <a href="{{route('info.page', ['pageName' => 'quest-items'])}}">
+                <span class="ra ra-bat-sword"></span>
+                Quest Items
+            </a>
         </div>
     </div>
 </aside>
