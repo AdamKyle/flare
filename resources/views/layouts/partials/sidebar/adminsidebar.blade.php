@@ -43,253 +43,173 @@
         </div>
     </div>
 
-    <!-- Manage Game -->
     <div class="menu-detail" data-menu="manage-game">
-        <div class="menu-detail-wrapper">
-            <a href="#no-link" class="active" data-toggle="collapse" data-target="#game-option">
-                <span class="collapse-indicator la la-arrow-circle-down"></span>
-                Game Systems
-            </a>
-            <div id="game-option" class="collapse open">
-                <a href="#no-link" class="active" data-toggle="collapse" data-target="#manage-races">
-                    <span class="collapse-indicator la la-arrow-circle-down"></span>
-                    Manage Races
-                </a>
+        <h6 class="uppercase">Races and Classes</h6>
+        <a href="{{route('races.list')}}">
+            <span class="fas fa-list"></span>
+            Races
+        </a>
+        <a href="{{route('races.create')}}">
+            <span class="fas fa-plus"></span>
+            Create New Race
+        </a>
 
-                <div id="manage-races" class="collapse open">
-                    <a href="{{route('races.list')}}">
-                        <span class="fas fa-list"></span>
-                        Races
-                    </a>
-                    <a href="{{route('races.create')}}">
-                        <span class="fas fa-plus"></span>
-                        Create New Race
-                    </a>
-                </div>
-
-                <a href="#no-link" class="active" data-toggle="collapse" data-target="#manage-classes">
-                    <span class="collapse-indicator la la-arrow-circle-down"></span>
-                    Manage Classes
-                </a>
-
-                <div id="manage-classes" class="collapse open">
-                    <a href="{{route('classes.list')}}">
-                        <span class="fas fa-list"></span>
-                        Classes
-                    </a>
-                    <a href="{{route('classes.create')}}">
-                        <span class="fas fa-plus"></span>
-                        Create New Class
-                    </a>
-                </div>
-
-                <a href="#no-link" class="active" data-toggle="collapse" data-target="#manage-maps">
-                    <span class="collapse-indicator la la-arrow-circle-down"></span>
-                    Manage Maps
-                </a>
-
-                <div id="manage-maps" class="collapse open">
-                    <a href="{{route('maps')}}">
-                        <span class="ra ra-scroll-unfurled"></span>
-                        Maps
-                    </a>
-                    <a href="{{route('maps.upload')}}">
-                        <span class="fas fa-plus"></span>
-                        Upload New Map
-                    </a>
-
-                    <a href="#no-link" class="active" data-toggle="collapse" data-target="#manage-locations">
-                        <span class="collapse-indicator la la-arrow-circle-down"></span>
-                        Manage Locations
-                    </a>
-
-                    <div id="manage-locations" class="collapse open">
-                        <a href="{{route('locations.list')}}">
-                            <span class="ra ra-compass"></span>
-                            Locations
-                        </a>
-                        <a href="{{route('locations.create')}}">
-                            <span class="fas fa-plus"></span>
-                            Create New Location
-                        </a>
-                    </div>
-
-                    <a href="#no-link" class="active" data-toggle="collapse" data-target="#manage-quests">
-                        <span class="collapse-indicator la la-arrow-circle-down"></span>
-                        Manage Quests
-                    </a>
-
-                    <div id="manage-quests" class="collapse open">
-                        <a href="{{route('quests.index')}}">
-                            <span class="ra ra-book"></span>
-                            Quests
-                        </a>
-                        <a href="{{route('quests.create')}}">
-                            <span class="fas fa-plus"></span>
-                            Create New Quest
-                        </a>
-                    </div>
-
-                    <a href="#no-link" class="active" data-toggle="collapse" data-target="#manage-npcs">
-                        <span class="collapse-indicator la la-arrow-circle-down"></span>
-                        Manage NPCs
-                    </a>
-
-                    <div id="manage-npcs" class="collapse open">
-                        <a href="{{route('npcs.index')}}">
-                            <span class="ra ra-pawn"></span>
-                            Npcs
-                        </a>
-                        <a href="{{route('npcs.create')}}">
-                            <span class="fas fa-plus"></span>
-                            Create New NPC
-                        </a>
-                    </div>
-                </div>
-                <a href="#no-link" class="active" data-toggle="collapse" data-target="#manage-kingdoms">
-                    <span class="collapse-indicator la la-arrow-circle-down"></span>
-                    Manage Kingdoms
-                </a>
-
-                <div id="manage-kingdoms" class="collapse open">
-                    <a href="{{route('buildings.list')}}">
-                        <span class="ra ra-guarded-tower"></span>
-                        Buildings
-                    </a>
-                    <a href="{{route('units.list')}}">
-                        <span class="ra ra-guarded-tower"></span>
-                        Units
-                    </a>
-                    <a href="{{route('kingdoms.export')}}">
-                        <span class="fas fa-file-export"></span>
-                        Export Data
-                    </a>
-                    <a href="{{route('kingdoms.import')}}">
-                        <span class="fas fa-file-import"></span>
-                        Import Data
-                    </a>
-                </div>
-
-                <a href="#no-link" class="active" data-toggle="collapse" data-target="#manage-monsters">
-                    <span class="collapse-indicator la la-arrow-circle-down"></span>
-                    Manage Monsters
-                </a>
-
-                <div id="manage-monsters" class="collapse open">
-                    <a href="{{route('monsters.list')}}">
-                        <span class="ra ra-eye-monster"></span>
-                        Monsters
-                    </a>
-                    <a href="{{route('monsters.create')}}">
-                        <span class="fas fa-plus"></span>
-                        Create New Monster
-                    </a>
-                    <a href="{{route('monsters.export')}}">
-                        <span class="fas fa-file-export"></span>
-                        Export Data
-                    </a>
-                    <a href="{{route('monsters.import')}}">
-                        <span class="fas fa-file-import"></span>
-                        Import Data
-                    </a>
-                </div>
-
-                <a href="#no-link" class="active" data-toggle="collapse" data-target="#manage-items">
-                    <span class="collapse-indicator la la-arrow-circle-down"></span>
-                    Manage Items
-                </a>
-
-                <div id="manage-items" class="collapse open">
-                    <a href="{{route('items.list')}}">
-                        <span class="ra ra-sword"></span>
-                        Items
-                    </a>
-                    <a href="{{route('items.create')}}">
-                        <span class="fas fa-plus"></span>
-                        Create New Item
-                    </a>
-                    <a href="{{route('items.export')}}">
-                        <span class="fas fa-file-export"></span>
-                        Export Data
-                    </a>
-                    <a href="{{route('items.import')}}">
-                        <span class="fas fa-file-import"></span>
-                        Import Data
-                    </a>
-
-                    <a href="#no-link" class="active" data-toggle="collapse" data-target="#manage-affixes">
-                        <span class="collapse-indicator la la-arrow-circle-down"></span>
-                        Manage Affixes
-                    </a>
-
-                    <div id="manage-affixes" class="collapse open">
-                        <a href="{{route('affixes.list')}}">
-                            <span class="ra ra-burning-embers"></span>
-                            Affixes
-                        </a>
-                        <a href="{{route('affixes.create')}}">
-                            <span class="fas fa-plus"></span>
-                            Create New Affix
-                        </a>
-                        <a href="{{route('affixes.export')}}">
-                            <span class="fas fa-file-export"></span>
-                            Export Data
-                        </a>
-                        <a href="{{route('affixes.import')}}">
-                            <span class="fas fa-file-import"></span>
-                            Import Data
-                        </a>
-                    </div>
-                </div>
-                <a href="#no-link" class="active" data-toggle="collapse" data-target="#manage-skills">
-                    <span class="collapse-indicator la la-arrow-circle-down"></span>
-                    Manage Skills
-                </a>
-
-                <div id="manage-skills" class="collapse open">
-                    <a href="{{route('skills.list')}}">
-                        <span class="ra ra-muscle-up"></span>
-                        Skills
-                    </a>
-                    <a href="{{route('skills.create')}}">
-                        <span class="fas fa-plus"></span>
-                        Create New Skill
-                    </a>
-                    <a href="{{route('skills.export')}}">
-                        <span class="fas fa-file-export"></span>
-                        Export Data
-                    </a>
-                    <a href="{{route('skills.import')}}">
-                        <span class="fas fa-file-import"></span>
-                        Import Data
-                    </a>
-                </div>
-
-                <a href="#no-link" class="active" data-toggle="collapse" data-target="#manage-passive-skills">
-                    <span class="collapse-indicator la la-arrow-circle-down"></span>
-                    Manage Passive Skills
-                </a>
-
-                <div id="manage-passive-skills" class="collapse open">
-                    <a href="{{route('passive.skills.list')}}">
-                        <span class="ra ra-muscle-up"></span>
-                        Passives
-                    </a>
-                    <a href="{{route('passive.skills.create')}}">
-                        <span class="fas fa-plus"></span>
-                        Create New Passive
-                    </a>
-                    <a href="{{route('passive.skills.export')}}">
-                        <span class="fas fa-file-export"></span>
-                        Export Data
-                    </a>
-                    <a href="{{route('passive.skills.import')}}">
-                        <span class="fas fa-file-import"></span>
-                        Import Data
-                    </a>
-                </div>
-            </div>
-        </div>
+        <a href="{{route('classes.list')}}">
+            <span class="fas fa-list"></span>
+            Classes
+        </a>
+        <a href="{{route('classes.create')}}">
+            <span class="fas fa-plus"></span>
+            Create New Class
+        </a>
+        <hr />
+        <h6 class="uppercase">Maps</h6>
+        <a href="{{route('maps')}}">
+            <span class="ra ra-scroll-unfurled"></span>
+            Maps
+        </a>
+        <a href="{{route('maps.upload')}}">
+            <span class="fas fa-plus"></span>
+            Upload New Map
+        </a>
+        <hr />
+        <h6 class="uppercase">Locations</h6>
+        <a href="{{route('locations.list')}}">
+            <span class="ra ra-compass"></span>
+            Locations
+        </a>
+        <a href="{{route('locations.create')}}">
+            <span class="fas fa-plus"></span>
+            Create New Location
+        </a>
+        <hr />
+        <h6 class="uppercase">Quests</h6>
+        <a href="{{route('quests.index')}}">
+            <span class="ra ra-book"></span>
+            Quests
+        </a>
+        <a href="{{route('quests.create')}}">
+            <span class="fas fa-plus"></span>
+            Create New Quest
+        </a>
+        <hr />
+        <h6 class="uppercase">NPC's</h6>
+        <a href="{{route('npcs.index')}}">
+            <span class="ra ra-pawn"></span>
+            Npcs
+        </a>
+        <a href="{{route('npcs.create')}}">
+            <span class="fas fa-plus"></span>
+            Create New NPC
+        </a>
+        <hr />
+        <h6 class="uppercase">Kingdoms</h6>
+        <a href="{{route('buildings.list')}}">
+            <span class="ra ra-guarded-tower"></span>
+            Buildings
+        </a>
+        <a href="{{route('units.list')}}">
+            <span class="ra ra-guarded-tower"></span>
+            Units
+        </a>
+        <a href="{{route('kingdoms.export')}}">
+            <span class="fas fa-file-export"></span>
+            Export Data
+        </a>
+        <a href="{{route('kingdoms.import')}}">
+            <span class="fas fa-file-import"></span>
+            Import Data
+        </a>
+        <hr />
+        <h6 class="uppercase">Monsters</h6>
+        <a href="{{route('monsters.list')}}">
+            <span class="ra ra-eye-monster"></span>
+            Monsters
+        </a>
+        <a href="{{route('monsters.create')}}">
+            <span class="fas fa-plus"></span>
+            Create New Monster
+        </a>
+        <a href="{{route('monsters.export')}}">
+            <span class="fas fa-file-export"></span>
+            Export Data
+        </a>
+        <a href="{{route('monsters.import')}}">
+            <span class="fas fa-file-import"></span>
+            Import Data
+        </a>
+        <hr />
+        <h6 class="uppercase">Items</h6>
+        <a href="{{route('items.list')}}">
+            <span class="ra ra-sword"></span>
+            Items
+        </a>
+        <a href="{{route('items.create')}}">
+            <span class="fas fa-plus"></span>
+            Create New Item
+        </a>
+        <a href="{{route('items.export')}}">
+            <span class="fas fa-file-export"></span>
+            Export Data
+        </a>
+        <a href="{{route('items.import')}}">
+            <span class="fas fa-file-import"></span>
+            Import Data
+        </a>
+        <hr />
+        <h6 class="uppercase">Affixes</h6>
+        <a href="{{route('affixes.list')}}">
+            <span class="ra ra-burning-embers"></span>
+            Affixes
+        </a>
+        <a href="{{route('affixes.create')}}">
+            <span class="fas fa-plus"></span>
+            Create New Affix
+        </a>
+        <a href="{{route('affixes.export')}}">
+            <span class="fas fa-file-export"></span>
+            Export Data
+        </a>
+        <a href="{{route('affixes.import')}}">
+            <span class="fas fa-file-import"></span>
+            Import Data
+        </a>
+        <hr />
+        <h6 class="uppercase">Skills</h6>
+        <a href="{{route('skills.list')}}">
+            <span class="ra ra-muscle-up"></span>
+            Skills
+        </a>
+        <a href="{{route('skills.create')}}">
+            <span class="fas fa-plus"></span>
+            Create New Skill
+        </a>
+        <a href="{{route('skills.export')}}">
+            <span class="fas fa-file-export"></span>
+            Export Data
+        </a>
+        <a href="{{route('skills.import')}}">
+            <span class="fas fa-file-import"></span>
+            Import Data
+        </a>
+        <hr />
+        <h6 class="uppercase">Passives</h6>
+        <a href="{{route('passive.skills.list')}}">
+            <span class="ra ra-muscle-up"></span>
+            Passives
+        </a>
+        <a href="{{route('passive.skills.create')}}">
+            <span class="fas fa-plus"></span>
+            Create New Passive
+        </a>
+        <a href="{{route('passive.skills.export')}}">
+            <span class="fas fa-file-export"></span>
+            Export Data
+        </a>
+        <a href="{{route('passive.skills.import')}}">
+            <span class="fas fa-file-import"></span>
+            Import Data
+        </a>
     </div>
 
 </aside>
