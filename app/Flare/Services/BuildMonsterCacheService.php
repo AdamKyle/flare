@@ -186,6 +186,8 @@ class BuildMonsterCacheService {
             $monster->chr                       += $increaseStatsBy;
             $monster->int                       += $increaseStatsBy;
             $monster->ac                        += $increaseStatsBy;
+            $monster->health_range              = $this->createNewHealthRange($monster, $increaseStatsBy);
+            $monster->attack_range              = $this->createNewAttackRange($monster, $increaseStatsBy);
             $monster->spell_evasion             += $increasePercentageBy;
             $monster->artifact_annulment        += $increasePercentageBy;
             $monster->affix_resistance          += $increasePercentageBy;
@@ -200,5 +202,23 @@ class BuildMonsterCacheService {
 
             return $monster;
         });
+    }
+
+    protected function createNewHealthRange(Monster $monster, int $increaseStatsBy): string {
+        $monsterHealthRangeParts = explode('-', $monster->health_range);
+
+        $minHealth = intval($monsterHealthRangeParts[0]) + $increaseStatsBy;
+        $maxHealth = intval($monsterHealthRangeParts[1]) + $increaseStatsBy;
+
+        return $minHealth . '-' . $maxHealth;
+    }
+
+    protected function createNewAttackRange(Monster $monster, int $increaseStatsBy): string {
+        $monsterAttackParts = explode('-', $monster->attack_range);
+
+        $minAttack = intval($monsterAttackParts[0]) + $increaseStatsBy;
+        $maxAttack = intval($monsterAttackParts[1]) + $increaseStatsBy;
+
+        return $minAttack . '-' . $maxAttack;
     }
 }

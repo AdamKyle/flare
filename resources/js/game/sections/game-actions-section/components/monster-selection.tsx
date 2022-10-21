@@ -14,6 +14,22 @@ export default class MonsterSelection extends React.Component<MonsterSelectionPr
 
         this.state = {
             monster_to_fight: null,
+            monsters: [],
+        }
+    }
+
+    componentDidMount() {
+        this.setState({
+            monsters: this.props.monsters
+        });
+    }
+
+    componentDidUpdate(prevProps: Readonly<MonsterSelectionProps>, prevState: Readonly<MonsterSelectionState>, snapshot?: any) {
+        if (!isEqual(this.state.monsters, this.props.monsters)) {
+            this.setState({
+                monster_to_fight: null,
+                monsters: this.props.monsters,
+            });
         }
     }
 

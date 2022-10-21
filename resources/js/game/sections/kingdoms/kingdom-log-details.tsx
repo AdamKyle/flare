@@ -143,7 +143,6 @@ export default class KingdomLogDetails extends React.Component<KingdomLogProps, 
     }
 
     render() {
-        console.log(this.props);
         return (
             <BasicCard>
                 <div className='text-right cursor-pointer text-red-500'>

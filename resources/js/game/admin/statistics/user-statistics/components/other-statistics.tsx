@@ -51,8 +51,6 @@ export default class OtherStatistics extends React.Component<any, any> {
             return <ComponentLoading />
         }
 
-        console.log(this.state.data);
-
         return (
             <Fragment>
                 <BasicCard additionalClasses={'mb-5'}>
