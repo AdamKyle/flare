@@ -2,6 +2,9 @@
 
 namespace App\Flare\Providers;
 
+use App\Flare\Builders\CharacterInformation\AttributeBuilders\DamageBuilder;
+use App\Flare\Builders\CharacterInformation\AttributeBuilders\DefenceBuilder;
+use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
 use App\Flare\Transformers\KingdomAttackLogsTransformer;
 use Illuminate\Support\Facades\Blade;
 use League\Fractal\Manager;
@@ -506,6 +509,21 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(UpdateCharacterAttackTypes::class, function($app) {
             return new UpdateCharacterAttackTypes($app->make(BuildCharacterAttackTypes::class));
+        });
+
+        $this->app->bind(DefenceBuilder::class, function() {
+            return new DefenceBuilder();
+        });
+
+        $this->app->bind(DamageBuilder::class, function() {
+            return new DamageBuilder();
+        });
+
+        $this->app->bind(CharacterStatBuilder::class, function($app) {
+            return new CharacterStatBuilder(
+                $app->make(DefenceBuilder::class),
+                $app->make(DamageBuilder::class)
+            );
         });
     }
 

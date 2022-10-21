@@ -32,6 +32,20 @@ class CharacterClassValue {
         self::ARCANE_ALCHEMIST => 'Arcane Alchemist',
     ];
 
+    protected $nonCaster = [
+        self::FIGHTER,
+        self::BLACKSMITH,
+        self::RANGER,
+        self::THIEF,
+        self::VAMPIRE,
+    ];
+
+    protected $caster = [
+        self::PROPHET,
+        self::HERETIC,
+        self::ARCANE_ALCHEMIST,
+    ];
+
     /**
      * CharacterClassValue constructor.
      *
@@ -116,5 +130,23 @@ class CharacterClassValue {
      */
     public function isArcaneAlchemist(): bool {
         return $this->value === self::ARCANE_ALCHEMIST;
+    }
+
+    /**
+     * Are we a caster class?
+     *
+     * @return bool
+     */
+    public function isCaster(): bool {
+        return in_array($this->value, $this->caster);
+    }
+
+    /**
+     * Are we a non caster class?
+     *
+     * @return bool
+     */
+    public function isNonCaster(): bool {
+        return in_array($this->value, $this->nonCaster);
     }
 }
