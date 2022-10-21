@@ -3,6 +3,6 @@
     'isOpen' => 'false',
 ])
 
-<div id="{{$target}}" class="{{($isOpen === 'true' ? 'open' : '')}}">
+<div id="{{$target}}" class="{{'collapse ' . ($isOpen === 'true' ? 'open' : '')}}">
     {{$slot}}
 </div>
