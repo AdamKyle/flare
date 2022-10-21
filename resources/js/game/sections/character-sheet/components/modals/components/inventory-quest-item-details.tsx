@@ -8,7 +8,6 @@ export default class InventoryQuestItemDetails extends React.Component<any, any>
 
 
     render() {
-        console.log(this.props.item);
         return (
             <div className='max-h-[400px] overflow-y-auto'>
                 <div className='mb-4 mt-4 text-sky-700 dark:text-sky-300' dangerouslySetInnerHTML={{__html: this.props.item.description}} />

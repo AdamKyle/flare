@@ -50,8 +50,8 @@ class MonsterTransformer extends TransformerAbstract {
             'focus'                     => $shouldIncrease ? $this->increaseValue($monster->focus, $increaseAmount) : $monster->focus,
             'to_hit_base'               => $shouldIncrease ? $this->increaseValue($monster->dex, $increaseAmount) : $monster->dex,
             'ac'                        => $shouldIncrease ? $this->increaseValue($monster->ac, $increaseAmount) : $monster->ac,
-            'health_range'              => $monster->health_range,
-            'attack_range'              => $monster->attack_range,
+            'health_range'              => $shouldIncrease ? $this->createNewHealthRange($monster, $increaseAmount): $monster->health_range,
+            'attack_range'              => $shouldIncrease ? $this->createNewAttackRange($monster, $increaseAmount) : $monster->attack_range,
             'accuracy'                  => $shouldIncrease ? $this->increaseValue($monster->accuracy, $increaseAmount) : $monster->accuracy,
             'dodge'                     => $shouldIncrease ? $this->increaseValue($monster->dodge, $increaseAmount) : $monster->dodge,
             'casting_accuracy'          => $shouldIncrease ? $this->increaseValue($monster->casting_accuracy, $increaseAmount) : $monster->casting_accuracy,
@@ -74,6 +74,30 @@ class MonsterTransformer extends TransformerAbstract {
             'increases_damage_by'       => $monster->gameMap->enemy_stat_bonus,
             'is_special'                => $this->isSpecial,
         ];
+    }
+
+    protected function createNewHealthRange(Monster $monster, float $increaseAmount): string {
+        $monsterHealthRangeParts = explode('-', $monster->health_range);
+
+        $minHealth = intval($monsterHealthRangeParts[0]);
+        $maxHealth = intval($monsterHealthRangeParts[1]);
+
+        $minHealth = $minHealth + $minHealth * $increaseAmount;
+        $maxHealth = $maxHealth + $maxHealth * $increaseAmount;
+
+        return $minHealth . '-' . $maxHealth;
+    }
+
+    protected function createNewAttackRange(Monster $monster, float $increaseAmount): string {
+        $monsterAttackParts = explode('-', $monster->attack_range);
+
+        $minAttack = intval($monsterAttackParts[0]);
+        $maxAttack = intval($monsterAttackParts[1]);
+
+        $minAttack = $minAttack + $minAttack * $increaseAmount;
+        $maxAttack = $maxAttack + $maxAttack * $increaseAmount;
+
+        return $minAttack . '-' . $maxAttack;
     }
 
     /**
