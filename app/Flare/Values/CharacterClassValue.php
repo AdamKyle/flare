@@ -46,6 +46,11 @@ class CharacterClassValue {
         self::ARCANE_ALCHEMIST,
     ];
 
+    protected $healers = [
+        self::PROPHET,
+        self::RANGER,
+    ];
+
     /**
      * CharacterClassValue constructor.
      *
@@ -148,5 +153,14 @@ class CharacterClassValue {
      */
     public function isNonCaster(): bool {
         return in_array($this->value, $this->nonCaster);
+    }
+
+    /**
+     * Are a healer?
+     *
+     * @return bool
+     */
+    public function isHealer(): bool {
+        return in_array($this->value, $this->healers);
     }
 }

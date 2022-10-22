@@ -4,6 +4,7 @@ namespace App\Flare\Providers;
 
 use App\Flare\Builders\CharacterInformation\AttributeBuilders\DamageBuilder;
 use App\Flare\Builders\CharacterInformation\AttributeBuilders\DefenceBuilder;
+use App\Flare\Builders\CharacterInformation\AttributeBuilders\HealingBuilder;
 use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
 use App\Flare\Transformers\KingdomAttackLogsTransformer;
 use Illuminate\Support\Facades\Blade;
@@ -198,7 +199,8 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CharacterHealthInformation::class),
                 $app->make(CharacterAffixInformation::class),
                 $app->make(HolyStacks::class),
-                $app->make(CharacterTrinketsInformation::class)
+                $app->make(CharacterTrinketsInformation::class),
+                $app->make(CharacterStatBuilder::class)
             );
         });
 
@@ -519,10 +521,15 @@ class ServiceProvider extends ApplicationServiceProvider
             return new DamageBuilder();
         });
 
+        $this->app->bind(HealingBuilder::class, function() {
+            return new HealingBuilder();
+        });
+
         $this->app->bind(CharacterStatBuilder::class, function($app) {
             return new CharacterStatBuilder(
                 $app->make(DefenceBuilder::class),
-                $app->make(DamageBuilder::class)
+                $app->make(DamageBuilder::class),
+                $app->make(HealingBuilder::class)
             );
         });
     }

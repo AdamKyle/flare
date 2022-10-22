@@ -6,6 +6,7 @@ use App\Flare\Builders\Character\Traits\Boons;
 use App\Flare\Builders\Character\Traits\FetchEquipped;
 use App\Flare\Builders\CharacterInformation\AttributeBuilders\DamageBuilder;
 use App\Flare\Builders\CharacterInformation\AttributeBuilders\DefenceBuilder;
+use App\Flare\Builders\CharacterInformation\AttributeBuilders\HealingBuilder;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
@@ -29,12 +30,15 @@ class CharacterStatBuilder {
 
     private DamageBuilder $damageBuilder;
 
+    private HealingBuilder $healingBuilder;
+
     // Debugging:
     private float $startTime = 0;
 
-    public function __construct(DefenceBuilder $defenceBuilder, DamageBuilder $damageBuilder) {
+    public function __construct(DefenceBuilder $defenceBuilder, DamageBuilder $damageBuilder, HealingBuilder $healingBuilder) {
         $this->defenceBuilder = $defenceBuilder;
         $this->damageBuilder  = $damageBuilder;
+        $this->healingBuilder = $healingBuilder;
     }
 
     /**
@@ -55,6 +59,18 @@ class CharacterStatBuilder {
         $this->map            = $this->character->map->gameMap;
 
         $this->skills         = $this->character->skills;
+
+        $this->damageBuilder->initialize(
+            $this->character,
+            $this->skills,
+            $this->equippedItems,
+        );
+
+        $this->healingBuilder->initialize(
+            $this->character,
+            $this->skills,
+            $this->equippedItems,
+        );
 
         return $this;
     }
@@ -93,20 +109,78 @@ class CharacterStatBuilder {
     }
 
     public function buildDamage(string $type, bool $voided = false): int {
-        $this->damageBuilder->initialize(
-            $this->character,
-            $this->skills,
-            $this->equippedItems,
-        );
+
+        $stat = $this->statMod($this->character->damage_stat, $voided);
 
         switch($type) {
             case 'weapon':
-                $stat = $this->statMod($this->character->damage_stat, $voided);
-
                 return ceil($this->damageBuilder->buildWeaponDamage($stat, $voided));
+            case 'ring':
+                return $this->damageBuilder->buildRingDamage();
+            case 'spell-damage':
+                return ceil($this->damageBuilder->buildSpellDamage($stat, $voided));
             default:
                 return 0;
         }
+    }
+
+    public function positionalWeaponDamage(string $weaponPosition, bool $voided = false): int {
+        $stat = $this->statMod($this->character->damage_stat, $voided);
+
+        return ceil($this->damageBuilder->buildWeaponDamage($stat, $voided, $weaponPosition));
+    }
+
+    public function positionalSpellDamage(string $spellPosition, bool $voided = false): int {
+        $stat = $this->statMod($this->character->damage_stat, $voided);
+
+        return ceil($this->damageBuilder->buildSpellDamage($stat, $voided, $spellPosition));
+    }
+
+    public function positionalHealing(string $spellPosition, bool $voided = false): int {
+        $stat = $this->statMod($this->character->damage_stat, $voided);
+
+        return ceil($this->healingBuilder->buildHealing($stat, $voided, $spellPosition));
+    }
+
+    public function buildHealing(bool $voided = false): int {
+        $stat = $this->statMod($this->character->damage_stat, $voided);
+
+        return ceil($this->healingBuilder->buildHealing($stat, $voided));
+    }
+
+    public function buildAffixDamage(string $type, bool $voided = false): float|int{
+        switch($type) {
+            case 'affix-stacking-damage':
+                return $this->damageBuilder->buildAffixStackingDamage($voided);
+            case 'affix-non-stacking':
+                return $this->damageBuilder->buildAffixNonStackingDamage($voided);
+            case 'affix-irresistible-damage-stacking':
+                return $this->damageBuilder->buildIrresistibleStackingAffixDamage($voided);
+            case 'affix-irresistible-damage-non-stacking':
+                return $this->damageBuilder->buildIrresistibleNonStackingAffixDamage($voided);
+            case 'life-stealing':
+                return $this->damageBuilder->buildLifeStealingDamage($voided);
+            default:
+                return 0;
+        }
+    }
+
+    public function buildEntrancingChance($voided): float {
+
+        if ($voided) {
+            return 0;
+        }
+
+        $entrancingAmountSuffix = $this->equippedItems->sum('item.itemSuffix.entranced_chance');
+        $entrancingAmountPrefix = $this->equippedItems->sum('item.itemPrefix.entranced_chance');
+
+        $entranceAmount = $entrancingAmountPrefix + $entrancingAmountSuffix;
+
+        if ($entranceAmount > 1) {
+            $entranceAmount = 1.0;
+        }
+
+        return $entranceAmount;
     }
 
     protected function applyBoons(float $base, ?string $statAttribute = null): float {

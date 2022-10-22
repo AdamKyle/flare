@@ -57,14 +57,14 @@ class RandomAffixDetails {
     public function getDamageRange(): array {
         switch($this->value) {
             case self::MEDIUM:
-                return [500, 750];
+                return [5000, 7500];
             case self::LEGENDARY:
-                return [1000, 5000];
+                return [10000, 50000];
             case self::MYTHIC:
-                return [6000, 10000];
+                return [60000, 100000];
             case self::BASIC:
             default:
-                return [100, 300];
+                return [1000, 3000];
         }
     }
 
