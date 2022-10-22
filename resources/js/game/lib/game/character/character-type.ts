@@ -145,11 +145,11 @@ export interface CharacterType {
 
     ambush_chance: number;
 
-    ambush_resistance: number;
+    ambush_resistance_chance: number;
 
     counter_chance: number;
 
-    counter_resistance: number;
+    counter_resistance_chance: number;
 
     can_craft: boolean;
 

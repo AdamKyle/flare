@@ -151,11 +151,11 @@ export default class AdditionalInfoModal extends React.Component<AdditionalInfoM
                             <dt>Ambush Chance</dt>
                             <dd>{(this.props.character.ambush_chance * 100).toFixed(2)}%</dd>
                             <dt>Ambush Resistance</dt>
-                            <dd>{(this.props.character.ambush_resistance * 100).toFixed(2)}%</dd>
+                            <dd>{(this.props.character.ambush_resistance_chance * 100).toFixed(2)}%</dd>
                             <dt>Counter Chance</dt>
                             <dd>{(this.props.character.counter_chance * 100).toFixed(2)}%</dd>
                             <dt>Counter Resistance</dt>
-                            <dd>{(this.props.character.counter_resistance * 100).toFixed(2)}%</dd>
+                            <dd>{(this.props.character.counter_resistance_chance * 100).toFixed(2)}%</dd>
                         </dl>
                         <p className='mt-4'>
                             For more information please see <a href='/information/combat' target='_blank'>Combat Help <i

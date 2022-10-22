@@ -2,16 +2,11 @@
 
 namespace App\Flare\Builders\Character\AttackDetails;
 
-use App\Flare\Builders\Character\ClassDetails\HolyStacks;
 use App\Flare\Builders\Character\Traits\FetchEquipped;
 use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
-use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Models\Character;
-use App\Flare\Models\GameClass;
 use App\Flare\Models\GameMap;
-use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Map;
-use App\Flare\Models\SetSlot;
 use Exception;
 
 class CharacterAttackBuilder {
@@ -21,32 +16,7 @@ class CharacterAttackBuilder {
     /**
      * @var Character $character
      */
-    private $character;
-
-    /**
-     * @var CharacterInformationBuilder $characterInformationBuilder
-     */
-    private $characterInformationBuilder;
-
-    /**
-     * @var CharacterHealthInformation $characterHealthInformation
-     */
-    private $characterHealthInformation;
-
-    /**
-     * @var CharacterAffixInformation $characterAffixReduction
-     */
-    private $characterAffixReduction;
-
-    /**
-     * @var HolyStacks $holyStacks
-     */
-    private $holyStacks;
-
-    /**
-     * @var CharacterTrinketsInformation $characterTrinketsInformation
-     */
-    private $characterTrinketsInformation;
+    private Character $character;
 
     /**
      * @var CharacterStatBuilder $characterStatBuilder
@@ -54,26 +24,10 @@ class CharacterAttackBuilder {
     private CharacterStatBuilder $characterStatBuilder;
 
     /**
-     * @param CharacterInformationBuilder $characterInformationBuilder
-     * @param CharacterHealthInformation $characterHealthInformation
-     * @param CharacterAffixInformation $characterAffixInformation
-     * @param HolyStacks $holyStacks
-     * @param CharacterTrinketsInformation $characterTrinketsInformation
      * @param CharacterStatBuilder $characterStatBuilder
      */
-    public function __construct(CharacterInformationBuilder $characterInformationBuilder,
-                                CharacterHealthInformation $characterHealthInformation,
-                                CharacterAffixInformation $characterAffixInformation,
-                                HolyStacks $holyStacks,
-                                CharacterTrinketsInformation $characterTrinketsInformation,
-                                CharacterStatBuilder $characterStatBuilder) {
-
-        $this->characterInformationBuilder  = $characterInformationBuilder;
-        $this->characterHealthInformation   = $characterHealthInformation;
-        $this->characterAffixReduction      = $characterAffixInformation;
-        $this->holyStacks                   = $holyStacks;
-        $this->characterTrinketsInformation = $characterTrinketsInformation;
-        $this->characterStatBuilder         = $characterStatBuilder;
+    public function __construct(CharacterStatBuilder $characterStatBuilder) {
+        $this->characterStatBuilder = $characterStatBuilder;
     }
 
     /**
@@ -86,10 +40,6 @@ class CharacterAttackBuilder {
         $this->character = $character;
 
         $this->characterStatBuilder = $this->characterStatBuilder->setCharacter($character);
-
-        $this->characterInformationBuilder = $this->characterInformationBuilder->setCharacter($character);
-        $this->characterAffixReduction     = $this->characterAffixReduction->setCharacter($character);
-        $this->characterHealthInformation  = $this->characterHealthInformation->setCharacter($character);
 
         return $this;
     }
@@ -178,14 +128,14 @@ class CharacterAttackBuilder {
             'name'                      => $this->character->name,
             'ring_damage'               => $this->characterStatBuilder->buildDamage('ring', $voided),
             'heal_for'                  => $this->characterStatBuilder->buildHealing($voided),
-            'res_chance'                => $this->characterHealthInformation->fetchResurrectionChance(),
+            'res_chance'                => $this->characterStatBuilder->buildResurrectionChance(),
             'damage_deduction'          => $characterReduction,
             'ambush_chance'             => $this->characterStatBuilder->buildAmbush('chance'),
             'ambush_resistance_chance'  => $this->characterStatBuilder->buildAmbush('resistance'),
             'counter_chance'            => $this->characterStatBuilder->buildCounter('chance'),
             'counter_resistance_chance' => $this->characterStatBuilder->buildCounter('resistance'),
             'affixes'                   => [
-                'cant_be_resisted'       => $this->characterInformationBuilder->canAffixesBeResisted(),
+                'cant_be_resisted'       => $this->characterStatBuilder->canAffixesBeResisted(),
                 'stacking_damage'        => $this->characterStatBuilder->buildAffixDamage('affix-stacking-damage', $voided) +
                                             $this->characterStatBuilder->buildAffixDamage('affix-irresistible-damage-stacking', $voided),
                 'non_stacking_damage'    => $this->characterStatBuilder->buildAffixDamage('affix-non-stacking', $voided) +

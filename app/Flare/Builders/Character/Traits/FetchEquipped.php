@@ -22,7 +22,7 @@ trait FetchEquipped {
     public function fetchEquipped(Character $character): Collection|null
     {
         $inventory = InventoryModel::where('character_id', $character->id)->first();
-        $slots     = InventorySlot::where('inventory_id', $inventory->id)->where('equipped', true)->with('item', 'item.itemSuffix', 'item.itemPrefix')->get();
+        $slots     = InventorySlot::where('inventory_id', $inventory->id)->where('equipped', true)->with('item', 'item.itemSuffix', 'item.itemPrefix', 'item.appliedHolyStacks')->get();
 
         if ($slots->isNotEmpty()) {
             return $slots;
@@ -31,7 +31,7 @@ trait FetchEquipped {
         $inventorySet = InventorySet::where('character_id', $character->id)->where('is_equipped', true)->first();
 
         if (!is_null($inventorySet)) {
-            return SetSlot::where('inventory_set_id', $inventorySet->id)->with('item', 'item.itemSuffix', 'item.itemPrefix')->get();
+            return SetSlot::where('inventory_set_id', $inventorySet->id)->with('item', 'item.itemSuffix', 'item.itemPrefix', 'item.appliedHolyStacks')->get();
         }
 
         return null;

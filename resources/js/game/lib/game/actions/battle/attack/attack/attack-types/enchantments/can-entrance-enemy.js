@@ -13,7 +13,11 @@ export default class CanEntranceEnemy extends BattleBase {
     let canEntrance   = false;
     const chance      = attackType.affixes.entrancing_chance;
 
-    if (attackType.affixes.entrancing_chance > 0.0) {
+    if (chance >= 1) {
+      this.addMessage('The enemy is dazed by your enchantments!', 'player-action');
+
+      canEntrance = true;
+    } else if (chance> 0.0) {
       const cantResist     = attackType.affixes.cant_be_resisted;
       const canBeEntranced = random(1, 100) > (100 - (100 * chance));
 

@@ -3,9 +3,7 @@
 namespace App\Flare\Transformers\DataSets;
 
 use Illuminate\Support\Facades\Cache;
-use App\Flare\Builders\Character\ClassDetails\HolyStacks;
 use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
-use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Skill;
@@ -13,7 +11,7 @@ use App\Flare\Values\ClassAttackValue;
 
 class CharacterAttackData {
 
-    public function attackData(Character $character, CharacterStatBuilder $characterStatBuilder, CharacterInformationBuilder $characterInformation, HolyStacks $holyStacks): array {
+    public function attackData(Character $character, CharacterStatBuilder $characterStatBuilder): array {
         $accuracySkill                = Skill::where('game_skill_id', GameSkill::where('name', 'Accuracy')->first()->id)->where('character_id', $character->id)->first();
         $castingAccuracySkill         = Skill::where('game_skill_id', GameSkill::where('name', 'Casting Accuracy')->first()->id)->where('character_id', $character->id)->first();
         $dodgeSkill                   = Skill::where('game_skill_id', GameSkill::where('name', 'Dodge')->first()->id)->where('character_id', $character->id)->first();
@@ -45,16 +43,17 @@ class CharacterAttackData {
             'voided_spell_damage'         => $characterStatBuilder->buildDamage('spell-damage', true),
             'healing_amount'              => $characterStatBuilder->buildHealing(),
             'voided_healing_amount'       => $characterStatBuilder->buildHealing(true),
-            'devouring_light'             => $characterInformation->getDevouringLight(),
-            'devouring_darkness'          => $characterInformation->getDevouringDarkness(),
+            'devouring_light'             => $characterStatBuilder->buildDevouring('devouring_light'),
+            'devouring_darkness'          => $characterStatBuilder->buildDevouring('devouring_darkness'),
             'extra_action_chance'         => (new ClassAttackValue($character))->buildAttackData(),
-            'holy_bonus'                  => $holyStacks->fetchHolyBonus($character),
-            'devouring_resistance'        => $holyStacks->fetchDevouringResistanceBonus($character),
-            'max_holy_stacks'             => $holyStacks->fetchTotalStacksForCharacter($character),
-            'current_stacks'              => $holyStacks->fetchTotalHolyStacks($character),
-            'holy_attack_bonus'           => $holyStacks->fetchAttackBonus($character),
-            'holy_ac_bonus'               => $holyStacks->fetchDefenceBonus($character),
-            'holy_healing_bonus'          => $holyStacks->fetchHealingBonus($character),
+            'holy_bonus'                  => $characterStatBuilder->holyInfo()->fetchHolyBonus(),
+            'devouring_resistance'        => $characterStatBuilder->holyInfo()->fetchDevouringResistanceBonus(),
+            'max_holy_stacks'             => $characterStatBuilder->holyInfo()->fetchTotalStacksForCharacter(),
+            'current_stacks'              => $characterStatBuilder->holyInfo()->getTotalAppliedStacks(),
+            'stat_increase_bonus'         => $characterStatBuilder->holyInfo()->fetchStatIncrease(),
+            'holy_attack_bonus'           => $characterStatBuilder->holyInfo()->fetchAttackBonus(),
+            'holy_ac_bonus'               => $characterStatBuilder->holyInfo()->fetchDefenceBonus(),
+            'holy_healing_bonus'          => $characterStatBuilder->holyInfo()->fetchHealingBonus(),
             'ambush_chance'               => $characterStatBuilder->buildAmbush(),
             'ambush_resistance_chance'    => $characterStatBuilder->buildAmbush('resistance'),
             'counter_chance'              => $characterStatBuilder->buildCounter(),
@@ -65,17 +64,17 @@ class CharacterAttackData {
                 'dodge'            => $dodgeSkill->skill_bonus,
                 'criticality'      => $criticalitySkill->skill_bonus,
             ],
-            'devouring_light_res'         => $holyStacks->fetchDevouringResistanceBonus($character),
-            'devouring_darkness_res'      => $holyStacks->fetchDevouringResistanceBonus($character),
-            'spell_evasion'               => $characterInformation->getTotalDeduction('spell_evasion'),
-            'affix_damage_reduction'      => $characterInformation->getTotalDeduction('affix_damage_reduction'),
-            'healing_reduction'           => $characterInformation->getTotalDeduction('healing_reduction'),
-            'skill_reduction'             => $characterInformation->getBestSkillReduction(),
-            'resistance_reduction'        => $characterInformation->getBestResistanceReduction(),
+            'devouring_light_res'         => $characterStatBuilder->holyInfo()->fetchDevouringResistanceBonus(),
+            'devouring_darkness_res'      => $characterStatBuilder->holyInfo()->fetchDevouringResistanceBonus(),
+            'spell_evasion'               => $characterStatBuilder->reductionInfo()->getRingReduction('spell_evasion'),
+            'affix_damage_reduction'      => $characterStatBuilder->reductionInfo()->getRingReduction('affix_damage_reduction'),
+            'healing_reduction'           => $characterStatBuilder->reductionInfo()->getRingReduction('healing_reduction'),
+            'skill_reduction'             => $characterStatBuilder->reductionInfo()->getAffixReduction('skill_reduction'),
+            'resistance_reduction'        => $characterStatBuilder->reductionInfo()->getAffixReduction('resistance_reduction'),
             'stat_affixes'                => [
-                'cant_be_resisted'   => $characterInformation->canAffixesBeResisted(),
-                'all_stat_reduction' => $characterInformation->findPrefixStatReductionAffix(),
-                'stat_reduction'     => $characterInformation->findSuffixStatReductionAffixes(),
+                'cant_be_resisted'   => $characterStatBuilder->canAffixesBeResisted(),
+                'all_stat_reduction' => $characterStatBuilder->getStatReducingPrefix(),
+                'stat_reduction'     => $characterStatBuilder->getStatReducingSuffixes(),
             ],
             'attack_types'           => $this->fetchAttackTypes($character),
         ];

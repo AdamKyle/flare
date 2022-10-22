@@ -2,14 +2,19 @@
 
 namespace App\Flare\Builders\CharacterInformation;
 
+use App\Flare\Builders\Character\ClassDetails\HolyStacks;
 use App\Flare\Builders\Character\Traits\Boons;
 use App\Flare\Builders\Character\Traits\FetchEquipped;
 use App\Flare\Builders\CharacterInformation\AttributeBuilders\DamageBuilder;
 use App\Flare\Builders\CharacterInformation\AttributeBuilders\DefenceBuilder;
 use App\Flare\Builders\CharacterInformation\AttributeBuilders\HealingBuilder;
+use App\Flare\Builders\CharacterInformation\AttributeBuilders\HolyBuilder;
+use App\Flare\Builders\CharacterInformation\AttributeBuilders\ReductionsBuilder;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
+use App\Flare\Models\ItemAffix;
+use App\Flare\Values\ItemEffectsValue;
 use Illuminate\Support\Collection;
 
 class CharacterStatBuilder {
@@ -19,6 +24,8 @@ class CharacterStatBuilder {
     private Character $character;
 
     private ?Collection $equippedItems;
+
+    private Collection $questItems;
 
     private Collection $characterBoons;
 
@@ -32,13 +39,24 @@ class CharacterStatBuilder {
 
     private HealingBuilder $healingBuilder;
 
+    private HolyBuilder $holyBuilder;
+
+    private ReductionsBuilder $reductionsBuilder;
+
     // Debugging:
     private float $startTime = 0;
 
-    public function __construct(DefenceBuilder $defenceBuilder, DamageBuilder $damageBuilder, HealingBuilder $healingBuilder) {
-        $this->defenceBuilder = $defenceBuilder;
-        $this->damageBuilder  = $damageBuilder;
-        $this->healingBuilder = $healingBuilder;
+    public function __construct(DefenceBuilder $defenceBuilder,
+                                DamageBuilder $damageBuilder,
+                                HealingBuilder $healingBuilder,
+                                HolyBuilder $holyBuilder,
+                                ReductionsBuilder $reductionsBuilder
+    ) {
+        $this->defenceBuilder    = $defenceBuilder;
+        $this->damageBuilder     = $damageBuilder;
+        $this->healingBuilder    = $healingBuilder;
+        $this->holyBuilder       = $holyBuilder;
+        $this->reductionsBuilder = $reductionsBuilder;
     }
 
     /**
@@ -53,6 +71,10 @@ class CharacterStatBuilder {
         $this->character      = $character;
 
         $this->equippedItems  = $this->fetchEquipped($character);
+
+        $this->questItems     = $character->inventory->slots->filter(function($slot) {
+            return $slot->item->type === 'quest';
+        });
 
         $this->characterBoons = $this->fetchCharacterBoons($character);
 
@@ -72,7 +94,33 @@ class CharacterStatBuilder {
             $this->equippedItems,
         );
 
+        $this->holyBuilder->initialize($this->character, $this->skills, $this->equippedItems);
+
+        $this->reductionsBuilder->initialize($this->character, $this->skills, $this->equippedItems);
+
         return $this;
+    }
+
+    /**
+     * @return HolyBuilder
+     */
+    public function holyInfo(): HolyBuilder {
+        return $this->holyBuilder;
+    }
+
+    /**
+     * @return ReductionsBuilder
+     */
+    public function reductionInfo(): ReductionsBuilder {
+        return $this->reductionsBuilder;
+    }
+
+    public function canAffixesBeResisted(): bool {
+        if (empty($this->equippedItems)) {
+            return false;
+        }
+
+        return !is_null($this->equippedItems->where('item.effect', ItemEffectsValue::AFFIXES_IRRESISTIBLE)->first());
     }
 
     public function statMod(string $stat, bool $voided = false): float {
@@ -176,6 +224,59 @@ class CharacterStatBuilder {
         return ceil($this->healingBuilder->buildHealing($stat, $voided));
     }
 
+    public function  buildDevouring(string $type): float {
+
+        $itemDevouring = 0;
+
+        if ($this->questItems->isNotEmpty()) {
+            $itemDevouring = $this->questItems->sum('item.' . $type);
+        }
+
+        if (empty($this->equippedItems)) {
+            return $itemDevouring;
+        }
+
+        $prefixDevouring  = $this->equippedItems->pluck('item.itemPrefix.' . $type)->toArray();
+        $suffixDevouring  = $this->equippedItems->pluck('item.itemSuffix.' . $type)->toArray();
+
+        $bestAffixDevouring = max(array_merge($prefixDevouring, $suffixDevouring));
+        $amount             = $itemDevouring + $bestAffixDevouring;
+
+        if ($this->character->map->gameMap->mapType()->isPurgatory()) {
+            $amount -= 0.45;
+        }
+
+        if ($amount > 1) {
+            $amount = 1;
+        }
+
+        return $amount;
+    }
+
+    public function buildResurrectionChance(): float {
+        if (empty($this->equippedItems)) {
+            return  0;
+        }
+
+        $chance = $this->equippedItems->where('item.type', '=', 'spell-healing')->sum('item.resurrection_chance');
+
+        if ($this->character->classType()->isProphet()) {
+            $chance += 0.05;
+        }
+
+        if ($chance > 0) {
+            if ($this->character->map->gameMap->mapType()->isPurgatory() && $chance > 0.45) {
+                if ($this->character->classType()->isProphet()) {
+                    $chance = 0.65;
+                } else {
+                    $chance = 0.45;
+                }
+            }
+        }
+
+        return $chance;
+    }
+
     public function buildAffixDamage(string $type, bool $voided = false): float|int {
         switch($type) {
             case 'affix-stacking-damage':
@@ -211,6 +312,21 @@ class CharacterStatBuilder {
         return $entranceAmount;
     }
 
+    public function getStatReducingPrefix(): ?ItemAffix {
+        $slot = $this->equippedItems->where('item.itemPrefix.reduces_enemy_stats', '>', 0)->first();
+
+        if (!is_null($slot)) {
+            return $slot->item->itemPrefix;
+        }
+
+        return null;
+    }
+
+    public function getStatReducingSuffixes(): Collection {
+        return $this->equippedItems->where('item.itemSuffix.reduces_enemy_stats', '>', 0)->values();
+    }
+
+
     public function buildAmbush(string $type = 'chance'): float {
 
         if (is_null($this->equippedItems)) {
@@ -218,10 +334,10 @@ class CharacterStatBuilder {
         }
 
         if ($type === 'chance') {
-            return $this->equippedItems->where('item.type', 'trinket')->sum('ambush_chance');
+            return $this->equippedItems->where('item.type', 'trinket')->sum('item.ambush_chance');
         }
 
-        return $this->equippedItems->where('item.type', 'trinket')->sum('ambush_resistance');
+        return $this->equippedItems->where('item.type', 'trinket')->sum('item.ambush_resistance');
     }
 
     public function buildCounter(string $type = 'chance'): float {
@@ -231,10 +347,10 @@ class CharacterStatBuilder {
         }
 
         if ($type === 'chance') {
-            return $this->equippedItems->where('item.type', 'trinket')->sum('counter_chance');
+            return $this->equippedItems->where('item.type', 'trinket')->sum('item.counter_chance');
         }
 
-        return $this->equippedItems->where('item.type', 'trinket')->sum('counter_resistance');
+        return $this->equippedItems->where('item.type', 'trinket')->sum('item.counter_resistance');
     }
 
     protected function applyBoons(float $base, ?string $statAttribute = null): float {

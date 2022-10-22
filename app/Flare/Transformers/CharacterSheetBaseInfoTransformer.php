@@ -9,10 +9,7 @@ use App\Flare\Models\GameSkill;
 use App\Flare\Models\Skill;
 use App\Flare\Values\AutomationType;
 use App\Game\Skills\Values\SkillTypeValue;
-use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Models\Character;
-use App\Flare\Builders\Character\ClassDetails\HolyStacks;
-use App\Flare\Builders\Character\AttackDetails\CharacterTrinketsInformation;
 use Facades\App\Flare\Transformers\DataSets\CharacterAttackData;
 
 class CharacterSheetBaseInfoTransformer extends BaseTransformer {
@@ -24,10 +21,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
      * @return mixed
      */
     public function transform(Character $character) {
-        $characterInformation         = resolve(CharacterInformationBuilder::class)->setCharacter($character);
         $characterStatBuilder         = resolve(CharacterStatBuilder::class)->setCharacter($character);
-        $holyStacks                   = resolve(HolyStacks::class);
-        $characterTrinketsInformation = resolve(CharacterTrinketsInformation::class);
         $gameClass                    = GameClass::find($character->game_class_id);
 
         $baseStat = [
@@ -81,7 +75,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
             ],
         ];
 
-        $attackData = CharacterAttackData::attackData($character, $characterStatBuilder, $characterInformation, $holyStacks);
+        $attackData = CharacterAttackData::attackData($character, $characterStatBuilder);
 
         return array_merge($baseStat, $attackData);
     }

@@ -2,7 +2,6 @@
 
 namespace App\Flare\Transformers;
 
-use App\Flare\Builders\Character\ClassDetails\HolyStacks;
 use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
 use App\Flare\Builders\CharacterInformationBuilder;
 use Facades\App\Flare\Transformers\DataSets\CharacterAttackData;
@@ -20,8 +19,7 @@ class CharacterAttackTransformer extends BaseTransformer {
 
         $characterInformation         = resolve(CharacterInformationBuilder::class)->setCharacter($character);
         $characterStatBuilder         = resolve(CharacterStatBuilder::class)->setCharacter($character);
-        $holyStacks                   = resolve(HolyStacks::class);
 
-        return CharacterAttackData::attackData($character, $characterStatBuilder, $characterInformation, $holyStacks);
+        return CharacterAttackData::attackData($character, $characterStatBuilder, $characterInformation);
     }
 }

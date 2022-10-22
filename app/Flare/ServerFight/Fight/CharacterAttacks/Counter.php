@@ -22,7 +22,7 @@ class Counter extends BattleBase {
         $weaponDamage       = $defenderAttackData['weapon_damage'];
         $attackerAc         = $this->characterCacheData->getCachedCharacterData($attacker, 'ac');
 
-        $attackerCounterResistance = $this->characterCacheData->getCachedCharacterData($attacker, 'counter_resistance');
+        $attackerCounterResistance = $this->characterCacheData->getCachedCharacterData($attacker, 'counter_resistance_chance');
         $defenderCounterChance     = $this->characterCacheData->getCachedCharacterData($defender, 'counter_chance');
 
         if ($defenderCounterChance <= 0.0) {
@@ -56,7 +56,7 @@ class Counter extends BattleBase {
     public function monsterCounter(Character $character, ServerMonster $monster) {
         $characterAc = $this->characterCacheData->getCachedCharacterData($character, 'ac');
 
-        $characterCounterResistance = $this->characterCacheData->getCachedCharacterData($character, 'counter_resistance');
+        $characterCounterResistance = $this->characterCacheData->getCachedCharacterData($character, 'counter_resistance_chance');
         $monsterCounterChance       = $monster->getMonsterStat('counter_chance');
 
         $monsterCounterChance -= $characterCounterResistance;
@@ -81,7 +81,7 @@ class Counter extends BattleBase {
 
     public function playerCounter(Character $character, ServerMonster $monster) {
         $monsterAc                = $monster->getMonsterStat('ac');
-        $monsterCounterResistance = $monster->getMonsterStat('counter_resistance_chance');
+        $monsterCounterResistance = $monster->getMonsterStat('counter_resistance_chance_chance');
         $characterCounterChance   = $this->characterCacheData->getCachedCharacterData($character, 'counter_chance');
 
         $characterCounterChance -= $monsterCounterResistance;
