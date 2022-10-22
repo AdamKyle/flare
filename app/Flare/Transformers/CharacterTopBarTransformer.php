@@ -2,6 +2,7 @@
 
 namespace App\Flare\Transformers;
 
+use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
 use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
@@ -23,23 +24,23 @@ class CharacterTopBarTransformer extends BaseTransformer {
      */
     public function transform(Character $character) {
 
-        $characterInformation = resolve(CharacterInformationBuilder::class)->setCharacter($character);
+        $characterStatBuilder = resolve(CharacterStatBuilder::class)->setCharacter($character);
 
         return [
-            'attack'            => $characterInformation->buildTotalAttack(),
-            'health'            => $characterInformation->buildHealth(),
-            'ac'                => $characterInformation->buildDefence(),
+            'attack'            => $characterStatBuilder->buildTotalAttack(),
+            'health'            => $characterStatBuilder->buildHealth(),
+            'ac'                => $characterStatBuilder->buildDefence(),
             'level'             => number_format($character->level),
             'max_level'         => number_format($this->getMaxLevel($character)),
             'xp'                => (int) $character->xp,
             'xp_next'           => (int) $character->xp_next,
-            'str_modded'        => round($characterInformation->statMod('str')),
-            'dur_modded'        => round($characterInformation->statMod('dur')),
-            'dex_modded'        => round($characterInformation->statMod('dex')),
-            'chr_modded'        => round($characterInformation->statMod('chr')),
-            'int_modded'        => round($characterInformation->statMod('int')),
-            'agi_modded'        => round($characterInformation->statMod('agi')),
-            'focus_modded'      => round($characterInformation->statMod('focus')),
+            'str_modded'        => $characterStatBuilder->statMod('str'),
+            'dur_modded'        => $characterStatBuilder->statMod('dur'),
+            'dex_modded'        => $characterStatBuilder->statMod('dex'),
+            'chr_modded'        => $characterStatBuilder->statMod('chr'),
+            'int_modded'        => $characterStatBuilder->statMod('int'),
+            'agi_modded'        => $characterStatBuilder->statMod('agi'),
+            'focus_modded'      => $characterStatBuilder->statMod('focus'),
             'inventory_max'     => $character->inventory_max,
             'inventory_count'   => $character->getInventoryCount(),
             'gold'              => number_format($character->gold),

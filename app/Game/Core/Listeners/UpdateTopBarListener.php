@@ -15,18 +15,22 @@ class UpdateTopBarListener
     /**
      * @var Manager $manager
      */
-    private $manager;
+    private Manager $manager;
 
     /**
      * @var CharacterTopBarTransformer $characterTopBarTransformer
      */
-    private $characterTopBarTransformer;
+    private CharacterTopBarTransformer $characterTopBarTransformer;
 
-    private $characterSheetBaseInfoTransformer;
+    /**
+     * @var CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer
+     */
+    private CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer;
 
     /**
      * @param Manager $manager
      * @param CharacterTopBarTransformer $characterTopBarTransformer
+     * @param CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer
      */
     public function __construct(Manager $manager, CharacterTopBarTransformer $characterTopBarTransformer, CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer) {
         $this->manager                           = $manager;
@@ -37,11 +41,10 @@ class UpdateTopBarListener
     /**
      * Handle the event.
      *
-     * @param  \App\Game\Battle\UpdateCharacterEvent  $event
+     * @param UpdateTopBarEvent $event
      * @return void
      */
-    public function handle(UpdateTopBarEvent $event)
-    {
+    public function handle(UpdateTopBarEvent $event): void {
         $character = new Item($event->character, $this->characterTopBarTransformer);
         $character = $this->manager->createData($character)->toArray();
 

@@ -108,7 +108,7 @@ export default class CounterHandler {
     }
 
     canPlayerCounter(character: any, monster: any) {
-        const chance = character.counter_chance - monster.counter_resistance;
+        const chance = character.counter_chance - monster.counter_resistance_chance;
 
         if (chance <= 0) {
           return false;
@@ -118,7 +118,7 @@ export default class CounterHandler {
     }
 
     canEnemyCounter(character: any, monster: any) {
-        const chance = monster.counter_chance - character.counter_resistance;
+        const chance = monster.counter_chance - character.counter_resistance_chance;
 
         if (chance <= 0) {
           return false;

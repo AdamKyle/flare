@@ -109,14 +109,14 @@ export default class MagicAndWeaponAttackBase extends BattleBase {
   doWeaponCastAttack(attackData, canEntrance) {
     const weaponAttack     = new WeaponAttack(this.attacker, this.defender, this.characterCurrentHealth, this.monsterHealth, this.voided);
 
-    weaponAttack.attackWithWeapon(attackData, false, false);
+    weaponAttack.attackWithWeapon(attackData, canEntrance, false);
 
     this.setStateInfo(weaponAttack);
 
     const castAttack       = new CastAttack(this.attacker, this.defender, this.characterCurrentHealth, this.monsterHealth, this.voided);
 
     if (attackData.spell_damage > 0) {
-      castAttack.attackWithSpells(attackData, false, false);
+      castAttack.attackWithSpells(attackData, canEntrance, false);
     }
 
     if (attackData.heal_for > 0) {

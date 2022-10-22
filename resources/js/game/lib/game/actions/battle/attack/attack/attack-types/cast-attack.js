@@ -36,10 +36,8 @@ export default class CastAttack extends BattleBase {
 
     const canHit           = canHitCheck.canCast(this.attacker, this.defender, this.battleMessages);
 
-    console.log('cast attack');
-
     if (canHitCheck.getCanAutoHit()) {
-      console.log('cast attack - auto hit');
+
       this.mergeMessages(canHitCheck.getBattleMessages());
 
       const status = this.attackWithSpells(attackData, false, true);
@@ -111,7 +109,6 @@ export default class CastAttack extends BattleBase {
         this.useItems(attackData, this.attacker.class);
       }
     } else {
-      console.log('cast attack - no damage?');
       this.healWithSpells(attackData);
 
       this.useItems(attackData, this.attacker.class)

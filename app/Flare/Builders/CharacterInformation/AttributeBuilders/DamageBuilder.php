@@ -62,7 +62,7 @@ class DamageBuilder extends BaseAttribute {
 
     public function buildAffixStackingDamage(bool $voided = false): int {
 
-        if ($voided) {
+        if ($voided || is_null($this->inventory)) {
             return 0;
         }
 
@@ -74,7 +74,7 @@ class DamageBuilder extends BaseAttribute {
 
     public function buildAffixNonStackingDamage(bool $voided = false): int {
 
-        if ($voided) {
+        if ($voided || is_null($this->inventory)) {
             return 0;
         }
 
@@ -92,7 +92,7 @@ class DamageBuilder extends BaseAttribute {
 
     public function buildIrresistibleNonStackingAffixDamage(bool $voided = false): int {
 
-        if ($voided) {
+        if ($voided || is_null($this->inventory)) {
             return 0;
         }
 
@@ -114,7 +114,7 @@ class DamageBuilder extends BaseAttribute {
 
     public function buildIrresistibleStackingAffixDamage(bool $voided = false): int {
 
-        if ($voided) {
+        if ($voided || is_null($this->inventory)) {
             return 0;
         }
 
@@ -130,7 +130,7 @@ class DamageBuilder extends BaseAttribute {
 
     public function buildLifeStealingDamage(bool $voided = false): float {
 
-        if ($voided) {
+        if ($voided || is_null($this->inventory)) {
             return 0;
         }
 

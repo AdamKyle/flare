@@ -10,7 +10,6 @@ export default class CanEntranceEnemy extends BattleBase {
   }
 
   canEntranceEnemy(attackType, defender) {
-
     let canEntrance   = false;
     const chance      = attackType.affixes.entrancing_chance;
 

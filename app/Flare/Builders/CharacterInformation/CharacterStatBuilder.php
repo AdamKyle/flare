@@ -112,6 +112,10 @@ class CharacterStatBuilder {
 
         $stat = $this->statMod($this->character->damage_stat, $voided);
 
+        if (is_null($this->equippedItems)) {
+            return $stat;
+        }
+
         switch($type) {
             case 'weapon':
                 return ceil($this->damageBuilder->buildWeaponDamage($stat, $voided));
@@ -124,8 +128,20 @@ class CharacterStatBuilder {
         }
     }
 
+    public function buildTotalAttack(): int {
+        $weaponDamage = $this->buildDamage('weapon');
+        $ringDamage   = $this->buildDamage('ring');
+        $spellDamage  = $this->buildDamage('spell-damage');
+
+        return $weaponDamage + $ringDamage + $spellDamage;
+    }
+
     public function positionalWeaponDamage(string $weaponPosition, bool $voided = false): int {
         $stat = $this->statMod($this->character->damage_stat, $voided);
+
+        if (is_null($this->equippedItems)) {
+            return $stat;
+        }
 
         return ceil($this->damageBuilder->buildWeaponDamage($stat, $voided, $weaponPosition));
     }
@@ -133,11 +149,19 @@ class CharacterStatBuilder {
     public function positionalSpellDamage(string $spellPosition, bool $voided = false): int {
         $stat = $this->statMod($this->character->damage_stat, $voided);
 
+        if (is_null($this->equippedItems)) {
+            return $stat;
+        }
+
         return ceil($this->damageBuilder->buildSpellDamage($stat, $voided, $spellPosition));
     }
 
     public function positionalHealing(string $spellPosition, bool $voided = false): int {
         $stat = $this->statMod($this->character->damage_stat, $voided);
+
+        if (is_null($this->equippedItems)) {
+            return $stat;
+        }
 
         return ceil($this->healingBuilder->buildHealing($stat, $voided, $spellPosition));
     }
@@ -145,10 +169,14 @@ class CharacterStatBuilder {
     public function buildHealing(bool $voided = false): int {
         $stat = $this->statMod($this->character->damage_stat, $voided);
 
+        if (is_null($this->equippedItems)) {
+            return $stat;
+        }
+
         return ceil($this->healingBuilder->buildHealing($stat, $voided));
     }
 
-    public function buildAffixDamage(string $type, bool $voided = false): float|int{
+    public function buildAffixDamage(string $type, bool $voided = false): float|int {
         switch($type) {
             case 'affix-stacking-damage':
                 return $this->damageBuilder->buildAffixStackingDamage($voided);
@@ -167,7 +195,7 @@ class CharacterStatBuilder {
 
     public function buildEntrancingChance($voided): float {
 
-        if ($voided) {
+        if ($voided || is_null($this->equippedItems)) {
             return 0;
         }
 
@@ -181,6 +209,32 @@ class CharacterStatBuilder {
         }
 
         return $entranceAmount;
+    }
+
+    public function buildAmbush(string $type = 'chance'): float {
+
+        if (is_null($this->equippedItems)) {
+            return 0;
+        }
+
+        if ($type === 'chance') {
+            return $this->equippedItems->where('item.type', 'trinket')->sum('ambush_chance');
+        }
+
+        return $this->equippedItems->where('item.type', 'trinket')->sum('ambush_resistance');
+    }
+
+    public function buildCounter(string $type = 'chance'): float {
+
+        if (is_null($this->equippedItems)) {
+            return 0;
+        }
+
+        if ($type === 'chance') {
+            return $this->equippedItems->where('item.type', 'trinket')->sum('counter_chance');
+        }
+
+        return $this->equippedItems->where('item.type', 'trinket')->sum('counter_resistance');
     }
 
     protected function applyBoons(float $base, ?string $statAttribute = null): float {

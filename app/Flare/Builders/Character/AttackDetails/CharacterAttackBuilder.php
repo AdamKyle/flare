@@ -180,10 +180,10 @@ class CharacterAttackBuilder {
             'heal_for'                  => $this->characterStatBuilder->buildHealing($voided),
             'res_chance'                => $this->characterHealthInformation->fetchResurrectionChance(),
             'damage_deduction'          => $characterReduction,
-            'ambush_chance'             => $this->characterTrinketsInformation->getAmbushChance($this->character),
-            'ambush_resistance_chance'  => $this->characterTrinketsInformation->getAmbushResistanceChance($this->character),
-            'counter_chance'            => $this->characterTrinketsInformation->getCounterChance($this->character),
-            'counter_resistance_chance' => $this->characterTrinketsInformation->getCounterResistanceChance($this->character),
+            'ambush_chance'             => $this->characterStatBuilder->buildAmbush('chance'),
+            'ambush_resistance_chance'  => $this->characterStatBuilder->buildAmbush('resistance'),
+            'counter_chance'            => $this->characterStatBuilder->buildCounter('chance'),
+            'counter_resistance_chance' => $this->characterStatBuilder->buildCounter('resistance'),
             'affixes'                   => [
                 'cant_be_resisted'       => $this->characterInformationBuilder->canAffixesBeResisted(),
                 'stacking_damage'        => $this->characterStatBuilder->buildAffixDamage('affix-stacking-damage', $voided) +
