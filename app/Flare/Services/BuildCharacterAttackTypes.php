@@ -3,12 +3,8 @@
 namespace App\Flare\Services;
 
 use Cache;
-use App\Flare\Builders\CharacterInformationBuilder;
-use App\Flare\Models\GameClass;
-use App\Flare\Models\Skill;
 use App\Flare\Transformers\Traits\SkillsTransformerTrait;
 use App\Flare\Builders\Character\AttackDetails\CharacterAttackBuilder;
-use App\Flare\Builders\Character\AttackDetails\CharacterLifeStealing;
 use App\Flare\Models\Character;
 
 class BuildCharacterAttackTypes {

@@ -2,17 +2,11 @@
 
 namespace App\Game\Skills\Services;
 
+use Illuminate\Database\Eloquent\Collection;
 use App\Flare\Models\Inventory;
-use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
-use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
-use App\Game\Core\Events\UpdateQueenOfHeartsPanel;
 use App\Game\Core\Services\CharacterInventoryService;
 use App\Game\Core\Services\RandomEnchantmentService;
-use App\Game\Skills\Events\UpdateCharacterEnchantingList;
 use App\Game\Skills\Values\SkillTypeValue;
-use Exception;
-use Illuminate\Database\Eloquent\Collection;
-use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateSkillEvent;
 use App\Flare\Models\Character;
@@ -21,20 +15,18 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
 use App\Flare\Models\Skill;
-use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Skills\Services\Traits\UpdateCharacterGold;
-use App\Game\Messages\Events\ServerMessageEvent as GameServerMessageEvent;
-use Illuminate\Support\Facades\Log;
+use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
 
 class EnchantingService {
 
     use ResponseBuilder, UpdateCharacterGold;
 
     /**
-     * @var CharacterInformationBuilder $characterInformationBuilder;
+     * @var CharacterStatBuilder $characterStatBuilder;
      */
-    private $characterInformationBuilder;
+    private CharacterStatBuilder $characterStatBuilder;
 
     /**
      * @var CharacterInventoryService $characterInventoryService
@@ -66,17 +58,18 @@ class EnchantingService {
     /**
      * Constructor
      *
-     * @param CharacterInformationBuilder $characterInformationBuilder
+     * @param CharacterStatBuilder $characterStatBuilder
+     * @param CharacterInventoryService $characterInventoryService
      * @param EnchantItemService $enchantItemService
-     * @return void
+     * @param RandomEnchantmentService $randomEnchantmentService
      */
-    public function __construct(CharacterInformationBuilder $characterInformationBuilder,
+    public function __construct(CharacterStatBuilder $characterStatBuilder,
                                 CharacterInventoryService $characterInventoryService,
                                 EnchantItemService $enchantItemService,
                                 RandomEnchantmentService $randomEnchantmentService)
     {
 
-        $this->characterInformationBuilder = $characterInformationBuilder;
+        $this->characterStatBuilder        = $characterStatBuilder;
         $this->characterInventoryService   = $characterInventoryService;
         $this->enchantItemService          = $enchantItemService;
         $this->randomEnchantmentService    = $randomEnchantmentService;
@@ -88,15 +81,15 @@ class EnchantingService {
      * Only returns that which the player has the skill level and intelligence for.
      *
      * @param Character $character
+     * @param bool $ignoreTrinkets
      * @return array
      */
     public function fetchAffixes(Character $character, bool $ignoreTrinkets = false): array {
-        $characterInfo   = $this->characterInformationBuilder->setCharacter($character);;
+        $characterInfo   = $this->characterStatBuilder->setCharacter($character);
         $enchantingSkill = $this->getEnchantingSkill($character);
 
         $characterInventoryService = $this->characterInventoryService->setCharacter($character);
-
-        $inventory = $characterInventoryService->getInventoryForType('inventory');
+        $inventory                 = $characterInventoryService->getInventoryForType('inventory');
 
         if ($ignoreTrinkets) {
             $inventory = array_values(array_filter($inventory, function($item) {
@@ -125,7 +118,7 @@ class EnchantingService {
      *
      * @param array $enchantmentIds
      * @param int $itemId
-     * @return bool
+     * @return int
      */
     public function getCostOfEnchantment(array $enchantmentIds, int $itemId): int {
         $itemAffixes   = ItemAffix::findMany($enchantmentIds);
@@ -166,7 +159,8 @@ class EnchantingService {
      * @param Character $character
      * @param array $params
      * @param InventorySlot $slot
-     * @return array
+     * @param int $cost
+     * @return void
      */
     public function enchant(Character $character, array $params, InventorySlot $slot, int $cost): void {
         $enchantingSkill = $this->getEnchantingSkill($character);
@@ -203,7 +197,7 @@ class EnchantingService {
         return Skill::where('character_id', $character->id)->where('game_skill_id', $gameSkill->id)->first();
     }
 
-    protected function getAvailableAffixes(CharacterInformationBuilder $builder, Skill $enchantingSkill): Collection {
+    protected function getAvailableAffixes(CharacterStatBuilder $builder, Skill $enchantingSkill): Collection {
 
         $currentInt = $builder->statMod('int');
 

@@ -2,7 +2,7 @@
 
 namespace App\Game\Core\Values\View;
 
-use App\Flare\Builders\CharacterInformationBuilder;
+use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
 use App\Flare\Models\Character;
 use App\Flare\Values\CharacterClassValue;
 use App\Flare\Values\ClassAttackValue;
@@ -25,7 +25,7 @@ class ClassBonusInformation {
     public function buildClassBonusDetails(Character $character): array {
         $classAttackValue = new CharacterClassValue($character->class->name);
 
-        $information = resolve(CharacterInformationBuilder::class)->setCharacter($character);
+        $information = resolve(CharacterStatBuilder::class)->setCharacter($character);
 
         $details = [
             'base_chance' => 0.05,

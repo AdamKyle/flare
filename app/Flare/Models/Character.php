@@ -2,13 +2,13 @@
 
 namespace App\Flare\Models;
 
-use App\Flare\Builders\Character\AttackDetails\CharacterHealthInformation;
-use App\Flare\Builders\CharacterInformationBuilder;
-use App\Flare\Values\CharacterClassValue;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Flare\Models\Traits\WithSearch;
 use Database\Factories\CharacterFactory;
+use App\Flare\Models\Traits\WithSearch;
+use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
+use App\Flare\Values\CharacterClassValue;
 
 class Character extends Model
 {
@@ -172,33 +172,22 @@ class Character extends Model
     /**
      * Allows one to get specific information from a character.
      *
-     * By returning the CharacterInformationBuilder class, we can allow you to get
+     * By returning the CharacterStatBuilder class, we can allow you to get
      * multiple calculated sets of data.
      *
-     * @return CharacterInformationBuilder
+     * @return CharacterStatBuilder
      */
-    public function getInformation(): CharacterInformationBuilder {
-        $info = resolve(CharacterInformationBuilder::class);
+    public function getInformation(): CharacterStatBuilder {
+        $info = resolve(CharacterStatBuilder::class);
 
         return $info->setCharacter($this);
-    }
-
-    /**
-     * Allows one to get health information about the character.
-     *
-     * @return CharacterHealthInformation
-     */
-    public function getHeathInformation(): CharacterHealthInformation {
-        $healthInfo = resolve(CharacterHealthInformation::class);
-
-        return $healthInfo->setCharacter($this);
     }
 
     /**
      * Returns the character class value.
      *
      * @return CharacterClassValue
-     * @throws \Exception
+     * @throws Exception
      */
     public function classType(): CharacterClassValue {
         return new CharacterClassValue($this->class->name);

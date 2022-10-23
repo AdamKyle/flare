@@ -2,6 +2,9 @@
 
 namespace App\Flare\Providers;
 
+use Illuminate\Support\Facades\Blade;
+use League\Fractal\Manager;
+use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Flare\Builders\CharacterInformation\AttributeBuilders\DamageBuilder;
 use App\Flare\Builders\CharacterInformation\AttributeBuilders\DefenceBuilder;
 use App\Flare\Builders\CharacterInformation\AttributeBuilders\HealingBuilder;
@@ -9,22 +12,10 @@ use App\Flare\Builders\CharacterInformation\AttributeBuilders\HolyBuilder;
 use App\Flare\Builders\CharacterInformation\AttributeBuilders\ReductionsBuilder;
 use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
 use App\Flare\Transformers\KingdomAttackLogsTransformer;
-use Illuminate\Support\Facades\Blade;
-use League\Fractal\Manager;
-use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Flare\Builders\AffixAttributeBuilder;
 use App\Flare\Builders\BuildMythicItem;
-use App\Flare\Builders\Character\AttackDetails\CharacterAffixInformation;
-use App\Flare\Builders\Character\AttackDetails\CharacterHealthInformation;
-use App\Flare\Builders\Character\AttackDetails\CharacterLifeStealing;
-use App\Flare\Builders\Character\AttackDetails\CharacterTrinketsInformation;
-use App\Flare\Builders\Character\AttackDetails\DamageDetails\DamageSpellInformation;
-use App\Flare\Builders\Character\AttackDetails\DamageDetails\WeaponInformation;
-use App\Flare\Builders\Character\BaseCharacterInfo;
 use App\Flare\Builders\Character\AttackDetails\CharacterAttackBuilder;
-use App\Flare\Builders\Character\AttackDetails\CharacterAttackInformation;
 use App\Flare\Builders\Character\CharacterCacheData;
-use App\Flare\Builders\Character\ClassDetails\ClassBonuses;
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Handlers\UpdateCharacterAttackTypes;
 use App\Flare\Middleware\IsCharacterLoggedInMiddleware;
@@ -73,9 +64,7 @@ use App\Flare\Transformers\OtherKingdomTransformer;
 use App\Flare\Transformers\UsableItemTransformer;
 use App\Flare\Values\BaseStatValue;
 use App\Flare\Builders\CharacterBuilder;
-use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Builders\RandomItemDropBuilder;
-use App\Flare\Builders\Character\AttackDetails\CharacterDamageInformation;
 use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Handlers\MessageThrottledHandler;
 use App\Flare\Middleware\IsCharacterDeadMiddleware;
@@ -90,7 +79,6 @@ use App\Flare\Transformers\MonsterTransformer;
 use App\Flare\Transformers\UnitTransformer;
 use App\Flare\Values\BaseSkillValue;
 use App\Flare\View\Components\ItemDisplayColor;
-use App\Flare\Builders\Character\ClassDetails\HolyStacks;
 use App\Game\Core\Services\CharacterService;
 use App\Game\Kingdoms\Handlers\GiveKingdomsToNpcHandler;
 
@@ -113,48 +101,6 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
-        $this->app->bind(HolyStacks::class, function() {
-            return new HolyStacks();
-        });
-
-        $this->app->bind(WeaponInformation::class, function($app) {
-            return new WeaponInformation($app->make(HolyStacks::class));
-        });
-
-        $this->app->bind(DamageSpellInformation::class, function($app) {
-            return new DamageSpellInformation(
-                $app->make(ClassBonuses::class)
-            );
-        });
-
-        $this->app->bind(CharacterDamageInformation::class, function($app) {
-            return new CharacterDamageInformation(
-                $app->make(WeaponInformation::class),
-                $app->make(DamageSpellInformation::class)
-            );
-        });
-
-        $this->app->bind(CharacterLifeStealing::class, function() {
-            return new CharacterLifeStealing();
-        });
-
-        $this->app->bind(CharacterAffixInformation::class, function($app) {
-            return new CharacterAffixInformation(
-                $app->make(CharacterLifeStealing::class)
-            );
-        });
-
-        $this->app->bind(CharacterAttackInformation::class, function($app) {
-            return new CharacterAttackInformation(
-                $app->make(CharacterDamageInformation::class),
-                $app->make(CharacterAffixInformation::class)
-            );
-        });
-
-        $this->app->bind(CharacterTrinketsInformation::class, function() {
-            return new CharacterTrinketsInformation();
-        });
-
         $this->app->bind(AffixAttributeBuilder::class, function() {
             return new AffixAttributeBuilder();
         });
@@ -170,37 +116,11 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
-        $this->app->bind(ClassBonuses::class, function($app) {
-            return new ClassBonuses();
-        });
-
-        $this->app->bind(BaseCharacterInfo::class, function($app) {
-            return new BaseCharacterInfo(
-                $app->make(ClassBonuses::class)
-            );
-        });
-
-        $this->app->bind(CharacterInformationBuilder::class, function($app) {
-            return new CharacterInformationBuilder(
-                $app->make(BaseCharacterInfo::class),
-                $app->make(CharacterAttackInformation::class),
-            );
-        });
-
-        $this->app->bind(CharacterHealthInformation::class, function($app) {
-            return new CharacterHealthInformation(
-                $app->make(CharacterInformationBuilder::class),
-                $app->make(ClassBonuses::class),
-                $app->make(HolyStacks::class)
-            );
-        });
-
         $this->app->bind(CharacterAttackBuilder::class, function($app) {
             return new CharacterAttackBuilder(
                 $app->make(CharacterStatBuilder::class)
             );
         });
-
 
         $this->app->bind(RandomItemDropBuilder::class, function($app) {
             return new RandomItemDropBuilder();

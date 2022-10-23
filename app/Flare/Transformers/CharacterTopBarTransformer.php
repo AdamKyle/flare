@@ -3,16 +3,7 @@
 namespace App\Flare\Transformers;
 
 use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
-use App\Flare\Builders\CharacterInformationBuilder;
-use App\Flare\Models\Inventory;
-use App\Flare\Models\InventorySlot;
-use App\Flare\Models\Item;
-use Illuminate\Support\Facades\Cache;
-use League\Fractal\TransformerAbstract;
 use App\Flare\Models\Character;
-use App\Flare\Models\MaxLevelConfiguration;
-use App\Flare\Values\ItemEffectsValue;
-use App\Game\Battle\Values\MaxLevel;
 
 class CharacterTopBarTransformer extends BaseTransformer {
 

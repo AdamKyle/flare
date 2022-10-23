@@ -2,13 +2,11 @@
 
 namespace App\Flare\Builders\Character;
 
-use App\Flare\Builders\CharacterInformationBuilder;
+use Illuminate\Support\Facades\Cache;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
-use Cache;
 use App\Flare\Models\Character;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
-use PHPUnit\Runner\Exception;
 
 class CharacterCacheData extends CharacterPvpCacheData {
 

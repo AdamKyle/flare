@@ -19,7 +19,6 @@ trait Boons {
         return CharacterBoon::where('character_id', $character->id)->with('item')->get();
     }
 
-
     public function fetchStatIncrease(Character $character, string $statAttribute): float {
         return CharacterBoon::where('character_id', $character->id)->join('items', function($join) use ($statAttribute) {
             $join->on('items.id', '=', 'character_boons.item_id')

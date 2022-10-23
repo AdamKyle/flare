@@ -2,7 +2,6 @@
 
 namespace App\Flare\Transformers;
 
-use App\Flare\Builders\CharacterInformationBuilder;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Inventory;
@@ -76,15 +75,6 @@ class BaseTransformer extends TransformerAbstract {
         }
 
         return true;
-    }
-
-    public function getToHitBase(Character $character, CharacterInformationBuilder $characterInformation, bool $voided = false): int {
-
-        if (!$voided) {
-            return $characterInformation->statMod($character->class->to_hit_stat);
-        }
-
-        return $character->{$character->class->to_hit_stat};
     }
 
     public function getMaxLevel(Character $character) {

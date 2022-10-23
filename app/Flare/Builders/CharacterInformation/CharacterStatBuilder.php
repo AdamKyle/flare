@@ -101,6 +101,31 @@ class CharacterStatBuilder {
         return $this;
     }
 
+    public function fetchInventory(): Collection {
+        if (empty($this->equippedItems)) {
+            return collect();
+        }
+
+        return $this->equippedItems;
+    }
+
+    public function classBonus(): float {
+        if (empty($this->equippedItems)) {
+            return 0.0;
+        }
+
+        $suffixClassBonus = $this->equippedItems->sum('item.itemSuffix.class_bonus');
+        $prefixClassBonus = $this->equippedItems->sum('item.itemPrefix.class_bonus');
+
+        $total = $suffixClassBonus + $prefixClassBonus;
+
+        if ($total > 1) {
+            return 1.0;
+        }
+
+        return $total;
+    }
+
     /**
      * @return HolyBuilder
      */

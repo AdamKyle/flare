@@ -2,9 +2,8 @@
 
 namespace App\Flare\Values;
 
-use App\Flare\Builders\CharacterInformationBuilder;
+use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
 use App\Flare\Models\Inventory;
-use App\Flare\Models\InventorySet;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\SetSlot;
 use Illuminate\Database\Eloquent\Collection;
@@ -34,7 +33,7 @@ class ClassAttackValue {
 
     public function __construct(Character $character) {
         $this->classType     = new CharacterClassValue($character->class->name);
-        $this->characterInfo = resolve(CharacterInformationBuilder::class)->setCharacter($character);
+        $this->characterInfo = resolve(CharacterStatBuilder::class)->setCharacter($character);
         $this->character     = $character;
     }
 
