@@ -8,6 +8,7 @@ import Chat from "./chat";
 import GameChatProps from "../../lib/game/chat/game-chat-props";
 import GameChatState from "../../lib/game/chat/game-chat-state";
 import ExplorationMessages from "./exploration-messages";
+import {DateTime} from "luxon";
 
 export default class GameChat extends React.Component<GameChatProps, GameChatState> {
     private chat: any;
@@ -91,6 +92,7 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
                         y: chat.y_position,
                         type: 'chat',
                         hide_location: chat.hide_location,
+                        time_stamp: (DateTime.fromISO(chat.created_at)).toLocaleString(DateTime.DATETIME_MED),
                     }
                 }
             }).filter((chat: any) => typeof chat !== 'undefined');
@@ -186,6 +188,7 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
                    x: event.message.x_position,
                    y: event.message.y_position,
                    hide_location: event.message.hide_location,
+                   time_stamp: (DateTime.fromISO(event.message.created_at)).toLocaleString(DateTime.DATETIME_MED),
                    type: 'chat',
                });
            }

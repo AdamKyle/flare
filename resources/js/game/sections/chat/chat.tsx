@@ -146,7 +146,7 @@ export default class Chat extends React.Component<ChatComponentProps, ChatCompon
             return '['+message.map_name + ' ' + '***/***]';
         }
 
-        return '[' + message.map_name + ' ' + message.x + '/' + message.y + ']'
+        return message.time_stamp + ' [' + message.map_name + ' ' + message.x + '/' + message.y + ']'
     }
 
     renderChatMessages() {

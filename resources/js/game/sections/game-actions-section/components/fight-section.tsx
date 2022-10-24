@@ -99,6 +99,8 @@ export default class FightSection extends React.Component<FightSectionProps, Fig
                 monster_to_fight_id: this.props.monster_to_fight.id,
                 battle_messages: this.battle_messages,
                 monster_to_fight: battleSetUp.getMonster(),
+            }, () => {
+                this.postBattleResults(healthObject.monster_health, healthObject.character_health);
             });
         } else {
             this.setState({
@@ -172,15 +174,19 @@ export default class FightSection extends React.Component<FightSectionProps, Fig
         this.battle_messages = [];
 
         if (attackState.characterCurrentHealth <= 0 || attackState.monsterCurrentHealth <= 0) {
-            (new Ajax()).setRoute('battle-results/' + this.props.character?.id).setParameters({
-                is_character_dead: attackState.characterCurrentHealth <= 0,
-                is_defender_dead: attackState.monsterCurrentHealth <= 0,
-                monster_id: this.state.monster_to_fight_id,
-            }).doAjaxCall('post', (result: AxiosResponse) => {},
-                (error: AxiosError) => {
-                    console.error(error);
-                });
+            this.postBattleResults(attackState.monsterCurrentHealth, attackState.characterCurrentHealth);
         }
+    }
+
+    postBattleResults(monsterHealth: number, characterHealth: number) {
+        (new Ajax()).setRoute('battle-results/' + this.props.character?.id).setParameters({
+            is_character_dead: characterHealth <= 0,
+            is_defender_dead: monsterHealth <= 0,
+            monster_id: this.state.monster_to_fight_id,
+        }).doAjaxCall('post', (result: AxiosResponse) => {},
+            (error: AxiosError) => {
+                console.error(error);
+            });
     }
 
     attackButtonDisabled() {

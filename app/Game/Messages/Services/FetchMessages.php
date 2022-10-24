@@ -63,7 +63,6 @@ class FetchMessages {
 
         $message->name = $message->user->character->name;
 
-
         return $message;
     }
 

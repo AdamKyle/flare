@@ -26,6 +26,10 @@ class Message extends Model {
         'hide_location' => 'boolean',
     ];
 
+    protected $hidden = [
+        'user'
+    ];
+
     public function user() {
         return $this->belongsTo(User::class);
     }

@@ -110,9 +110,14 @@ class KingdomTreasuryController extends Controller {
      * @param Kingdom $kingdom
      * @return JsonResponse
      */
-    public function deposit(KingdomDepositRequest $request, Kingdom $kingdom): JsonResponse
-    {
+    public function deposit(KingdomDepositRequest $request, Kingdom $kingdom): JsonResponse {
         $amountToDeposit = $request->deposit_amount;
+
+        if ($amountToDeposit <= 0) {
+            return response()->json([
+                'message' => 'Invalid Amount.'
+            ], 422);
+        }
 
         if ($kingdom->character->id !== auth()->user()->character->id) {
             return response()->json([
