@@ -45,8 +45,8 @@ class MonstersSheet implements ToCollection {
         foreach ($monster as $key => $value) {
             if (!is_null($value)) {
 
-                if ($key === 'quest_item_id') {
-                    $questItem = Item::find($value);
+                if ($key === 'quest_item_name') {
+                    $questItem = Item::where('name', $value)->first();
 
                     if (is_null($questItem)) {
                         return null;
@@ -80,7 +80,11 @@ class MonstersSheet implements ToCollection {
                 }
 
                 if ($key !== 'health_range_min' && $key !== 'attack_range_min') {
-                    $cleanData[$key] = $value;
+                    if ($key === 'quest_item_name') {
+                        $cleanData['quest_item_id'] = $value;
+                    } else {
+                        $cleanData[$key] = $value;
+                    }
                 }
             }
         }

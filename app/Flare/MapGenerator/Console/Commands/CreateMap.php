@@ -57,7 +57,10 @@ class CreateMap extends Command
         // $land = new Color(59, 46, 23);
 
         // Purgatory:
-        $land = new Color(0,0,0);
+        // $land = new Color(0,0,0);
+
+        // Emerald Curse
+        $land = new Color(13, 133, 46);
 
         // Surface & Labyrinth:
         // $water = new Color(66, 129, 178);
@@ -72,7 +75,10 @@ class CreateMap extends Command
         //$water = new Color(97, 0, 16);
 
         // Purgatory Water:
-        $water = new Color(255, 255, 255);
+        // $water = new Color(255, 255, 255);
+
+        // Emerald Curse Water:
+        $water = new Color(113, 227, 144);
 
         // Regular Water Level
         // $waterLevel = 30;
@@ -81,7 +87,10 @@ class CreateMap extends Command
         // $waterLevel = 55;
 
         //  Purgatory Water Level
-        $waterLevel = 85;
+        // $waterLevel = 85;
+
+        // Emerald Curse Water Level:
+        $waterLevel = 25;
 
         ini_set('memory_limit','3G');
 

@@ -36,8 +36,8 @@ class QuestsSheet implements ToCollection {
 
         $quest['npc_id'] = $npc->id;
 
-        if (isset($quest['item_id'])) {
-            $requiredItem = Item::find($quest['item_id']);
+        if (isset($quest['item_name'])) {
+            $requiredItem = Item::where('name', $quest['item_name'])->first();
 
             if (is_null($requiredItem)) {
                 $quest['item_id'] = null;
@@ -48,8 +48,8 @@ class QuestsSheet implements ToCollection {
             $quest['item_id'] = null;
         }
 
-        if (isset($quest['secondary_required_item'])) {
-            $requiredItem = Item::find($quest['secondary_required_item']);
+        if (isset($quest['secondary_required_item_name'])) {
+            $requiredItem = Item::where('name', $quest['secondary_required_item_name'])->first();
 
             if (is_null($requiredItem)) {
                 $quest['secondary_required_item'] = null;
@@ -60,9 +60,8 @@ class QuestsSheet implements ToCollection {
             $quest['secondary_required_item'] = null;
         }
 
-
-        if (isset($quest['reward_item'])) {
-            $item = Item::find($quest['reward_item']);
+        if (isset($quest['reward_item_name'])) {
+            $item = Item::where('name', $quest['reward_item_name'])->first();
 
             if (is_null($item)) {
                 $quest['reward_item'] = null;
@@ -124,6 +123,10 @@ class QuestsSheet implements ToCollection {
                 $quest['required_passive_level'] = null;
             }
         }
+
+        unset($quest['item_name']);
+        unset($quest['secondary_required_item_name']);
+        unset($quest['reward_item_name']);
 
         return $quest;
     }

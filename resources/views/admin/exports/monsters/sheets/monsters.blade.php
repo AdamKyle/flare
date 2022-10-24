@@ -39,7 +39,7 @@
         <th>ambush_resistance</th>
         <th>counter_chance</th>
         <th>counter_resistance</th>
-        <th>quest_item_id</th>
+        <th>quest_item_name</th>
         <th>quest_item_drop_chance</th>
         <th>game_map_id</th>
         <th>celestial_type</th>
@@ -86,7 +86,7 @@
             <td>{{$monster->ambush_resistance}}</td>
             <td>{{$monster->counter_chance}}</td>
             <td>{{$monster->counter_resistance}}</td>
-            <td>{{(!is_null($monster->questItem)) ? $monster->questItem->id : null}}</td>
+            <td>{{(!is_null($monster->questItem)) ? $monster->questItem->name : null}}</td>
             <td>{{$monster->quest_item_drop_chance}}</td>
             <td>{{$monster->game_map_id}}</td>
             <td>{{$monster->celestial_type}}</td>
