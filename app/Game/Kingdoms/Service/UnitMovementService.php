@@ -119,7 +119,15 @@ class UnitMovementService {
     public function moveUnitsToKingdom(Character $character, Kingdom $kingdom, array $params): array {
 
         if (!$this->moveUnitsValidator->setUnitsToMove($params['units_to_move'])->isValid($character)) {
-            return $this->errorResult(['Invalid input.']);
+            return $this->errorResult('Invalid input.');
+        }
+
+        if ($character->map->game_map_id !== $kingdom->game_map_id) {
+            return $this->errorResult('cannot move across plabe.');
+        }
+
+        if ($kingdom->character_id !== $character->id) {
+            return $this->errorResult('Not allowed to do that');
         }
 
         $unitsToMove = $this->buildUnitsToMoveBasedOnKingdom($kingdom, $params['units_to_move']);

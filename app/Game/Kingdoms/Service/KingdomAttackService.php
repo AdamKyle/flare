@@ -54,7 +54,15 @@ class KingdomAttackService {
      */
     public function attackKingdom(Character $character, Kingdom $kingdom, array $params): array {
         if (!$this->moveUnitsValidator->setUnitsToMove($params['units_to_move'])->isValid($character)) {
-            return $this->errorResult(['Invalid input.']);
+            return $this->errorResult('Invalid input.');
+        }
+
+        if ($kingdom->character_id === $character->id) {
+            return $this->errorResult('Cannot do that');
+        }
+
+        if ($kingdom->game_map_id !== $character->map->game_map_id) {
+            return $this->errorResult('Cannot attack across plane.');
         }
 
         $unitsToMove = $this->unitMovementService->buildUnitsToMoveBasedOnKingdom($kingdom, $params['units_to_move']);
