@@ -155,8 +155,6 @@ class PvpService {
     }
 
     protected function processBattleWin(Character $attacker, Character $defender, array $healthObject) {
-        $this->handleReward($attacker);
-
         event(new ServerMessageEvent($attacker->user, 'You have killed: ' . $defender->name));
         event(new ServerMessageEvent($defender->user, 'You have been killed by: ' . $attacker->name));
 
@@ -216,25 +214,6 @@ class PvpService {
         event(new ServerMessageEvent($defender->user, 'You were safely moved away from your current location. You cannot be targeted by pvp for 2 minutes and, during that time, your location will be masked in chat.'));
 
         RemoveKilledInPvpFromUser::dispatch($defender)->delay(now()->addMinutes(2));
-    }
-
-    protected function handleReward(Character $attacker) {
-        $rand = rand(1, 1000000);
-
-        if ($rand > 999995) {
-            $item = $this->buildMythicItem->fetchMythicItem($attacker);
-
-            if (!$attacker->isInventoryFull()) {
-                $slot = $attacker->inventory->slots()->create([
-                    'inventory_id' => $attacker->inventory->id,
-                    'item_id'      => $item->id,
-                ]);
-
-                event(new GlobalMessageEvent($attacker->name . ' has found a Mythic unique!'));
-
-                event(new ServerMessageEvent($attacker->user, 'You found: ' . $item->affix_name . ' on the enemies corpse!', $slot->id));
-            }
-        }
     }
 
     private function movePlayerToNewLocation(Character $character): Character {

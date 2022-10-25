@@ -122,6 +122,10 @@ class LocationService {
                     if ($locationType->isGoldMines()) {
                         $location->type_name = 'Gold Mines';
                     }
+
+                    if ($locationType->isPurgatoryDungeons()) {
+                        $location->type_name = 'Purgatory Dungeons';
+                    }
                 }
             }
 

@@ -207,7 +207,7 @@ class BaseMovementService {
             if (!is_null($location->type)) {
                 $locationType = new LocationType($location->type);
 
-                if ($locationType->isGoldMines()) {
+                if ($locationType->isGoldMines() || $locationType->isPurgatoryDungeons()) {
                     return true;
                 }
             }

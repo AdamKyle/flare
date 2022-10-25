@@ -4,6 +4,7 @@ namespace App\Game\Core\Services;
 
 use App\Flare\Builders\BuildMythicItem;
 use App\Flare\Values\CelestialType;
+use App\Flare\Values\LocationType;
 use App\Game\Battle\Services\BattleDrop;
 use Exception;
 use Facades\App\Flare\Calculators\DropCheckCalculator;
@@ -85,7 +86,17 @@ class DropCheckService {
         $this->handleDropChance($character);
 
         if ($monster->celestial_type === CelestialType::KING_CELESTIAL) {
-            $this->handleMythicDrop($character);
+            $this->handleMythicDrop($character, true);
+        }
+
+        if (!is_null($this->locationWithEffect)) {
+            if (!is_null($this->locationWithEffect->type)) {
+                $locationType = new LocationType($this->locationWithEffect->type);
+
+                if ($locationType->isPurgatoryDungeons()) {
+                    $this->handleMythicDrop($character);
+                }
+            }
         }
     }
 
@@ -93,11 +104,12 @@ class DropCheckService {
      * See if the player can have a mythic drop.
      *
      * @param Character $character
+     * @param bool $useLootingChance
      * @return void
      * @throws Exception
      */
-    public function handleMythicDrop(Character $character) {
-        $canGetDrop = $this->canHaveMythic();
+    public function handleMythicDrop(Character $character, bool $useLootingChance = false) {
+        $canGetDrop = $this->canHaveMythic($useLootingChance);
 
         if ($canGetDrop) {
             $mythic = $this->buildMythicItem->fetchMythicItem($character);
@@ -142,19 +154,28 @@ class DropCheckService {
     /**
      * Can we get the mythic item?
      *
+     * @param bool $useLooting
      * @return bool
      */
-    protected function canHaveMythic(): bool {
+    protected function canHaveMythic(bool $useLooting = false): bool {
         $chance = $this->lootingChance;
 
-        if ($chance > 0.15) {
-            $chance = 0.15;
+        $roll = RandomNumberGenerator::generateRandomNumber(1, 50 , 1, 1000);
+
+        if ($useLooting) {
+
+            if ($chance > 0.15) {
+                $chance = 0.15;
+            }
+
+            $roll = RandomNumberGenerator::generateRandomNumber(1, 50 , 1, 100);
+
+            $roll = $roll + $roll * $chance;
+
+            return $roll > 99;
         }
 
-        $roll = RandomNumberGenerator::generateRandomNumber(1, 50 , 1, 100);
-        $roll = $roll + $roll * $chance;
-
-        return $roll > 99;
+        return $roll > 999;
     }
 
     /**
