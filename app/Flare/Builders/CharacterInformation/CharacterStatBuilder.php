@@ -338,6 +338,11 @@ class CharacterStatBuilder {
     }
 
     public function getStatReducingPrefix(): ?ItemAffix {
+
+        if (is_null($this->equippedItems)) {
+            return null;
+        }
+
         $slot = $this->equippedItems->where('item.itemPrefix.reduces_enemy_stats', '>', 0)->first();
 
         if (!is_null($slot)) {
@@ -348,6 +353,11 @@ class CharacterStatBuilder {
     }
 
     public function getStatReducingSuffixes(): Collection {
+
+        if (is_null($this->equippedItems)) {
+            return collect();
+        }
+
         return $this->equippedItems->where('item.itemSuffix.reduces_enemy_stats', '>', 0)->values();
     }
 

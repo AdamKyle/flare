@@ -13,6 +13,7 @@ import SmallMapMovementActions from "./components/small-actions/small-map-moveme
 import SmallActionsProps from "../../lib/game/types/actions/small-actions-props";
 import CelestialFight from "./components/celestial-fight";
 import SmallerSpecialtyShop from "./components/small-actions/smaller-specialty-shop";
+import {removeCommas} from "../../lib/game/format-number";
 
 export default class SmallerActions extends React.Component<SmallActionsProps, SmallActionsState> {
 
@@ -116,6 +117,12 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
             this.setState({
                 pvp_characters_on_map: event.characters,
                 characters_for_dueling: [],
+            }, () => {
+                const characterLevel = removeCommas(this.props.character.level);
+
+                if (characterLevel >= 301) {
+                    this.smallActionsManager.setCharactersForDueling(event.characters);
+                }
             })
         });
 
@@ -133,12 +140,6 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
                 automation_time_out: event.forLength,
             });
         });
-    }
-
-    componentDidUpdate(prevProps: Readonly<SmallActionsProps>, prevState: Readonly<SmallActionsState>, snapshot?: any) {
-        if (this.state.pvp_characters_on_map.length > 0 && this.state.characters_for_dueling.length === 0) {
-            this.smallActionsManager.setCharactersForDueling(this.state.pvp_characters_on_map);
-        }
     }
 
     showAction(data: any) {

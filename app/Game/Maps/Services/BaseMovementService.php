@@ -5,6 +5,7 @@ namespace App\Game\Maps\Services;
 use App\Flare\Models\GameMap;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\LocationType;
+use App\Game\Maps\Events\UpdateCharacterBasePosition;
 use App\Game\Maps\Events\UpdateMonsterList;
 use Illuminate\Support\Facades\Cache;
 use App\Flare\Cache\CoordinatesCache;
@@ -139,6 +140,8 @@ class BaseMovementService {
             'position_x'           => $this->mapPositionValue->fetchXPosition($this->x, $map->position_x),
             'position_y'           => $this->mapPositionValue->fetchYPosition($this->y),
         ]);
+
+        event(new UpdateCharacterBasePosition($character->user->id, $this->x, $this->y, $character->map->game_map_id));
 
         return $character->refresh();
     }

@@ -54,3 +54,8 @@ broadCast::channel('update-location-base-crafting-options-{userId}', function($u
 broadCast::channel('update-location-base-shops-{userId}', function($user, $userId) {
     return $user->id === (int) $userId;
 });
+
+// Update the character base position
+broadCast::channel('update-character-position-{userId}', function($user, $userId) {
+    return $user->id === (int) $userId;
+});

@@ -140,7 +140,7 @@ class ReRollEnchantmentService {
     public function canAffordMovementCost(Character $character, int $selectedItemToMoveId, string $selectedAffix) {
         $costs = $this->getMovementCosts($selectedItemToMoveId, $selectedAffix);
 
-        return $character->gold >= $costs['gold_cost'] && $character->shards >= $costs['shards_cost'];
+        return $character->gold_dust >= $costs['gold_dust_cost'] && $character->shards >= $costs['shards_cost'];
     }
 
     public function getMovementCosts(int $selectedItemToMoveId, string $selectedAffix): array {
@@ -164,13 +164,14 @@ class ReRollEnchantmentService {
             $cost += ItemAffix::find($item->{'item_' . $selectedAffix . '_id'})->cost;
         }
 
-        $shardCost = $cost * .00000002;
+        $cost      = $cost / 1000000;
+        $shardCost = $cost * .005;
 
         $shardCost = (int) round($shardCost);
 
         return [
-            'gold_cost'   => $cost,
-            'shards_cost' => $shardCost,
+            'gold_dust_cost' => $cost,
+            'shards_cost'    => $shardCost,
         ];
     }
 
@@ -178,8 +179,8 @@ class ReRollEnchantmentService {
         $costs = $this->getMovementCosts($slot->item_id, $affixType);
 
         $character->update([
-            'gold'    => $character->gold - $costs['gold_cost'],
-            'shards'  => $character->shards - $costs['shards_cost'],
+            'gold_dust' => $character->gold_dust - $costs['gold_dust_cost'],
+            'shards'    => $character->shards - $costs['shards_cost'],
         ]);
 
         $duplicateSecondaryItem = $secondarySlot->item->duplicate();

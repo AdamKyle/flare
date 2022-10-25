@@ -35,6 +35,7 @@ class UpdateCharacterStatus implements ShouldBroadcastNow {
      */
     public function __construct(Character $character) {
         $character = $character->refresh();
+
         $this->characterStatuses = [
             'can_attack'              => $character->can_attack,
             'can_attack_again_at'     => now()->diffInSeconds($character->can_attack_again_at),

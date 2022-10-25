@@ -139,7 +139,7 @@ export interface CharacterType {
 
     xp_next: number,
 
-    level: number;
+    level: string;
 
     max_level: number;
 

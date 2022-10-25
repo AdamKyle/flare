@@ -60,6 +60,8 @@ export default class ActionsManager {
         let charactersForDueling: PvpCharactersType[]|[] = [];
         const props = this.component.props;
 
+        console.log(props.character.base_position);
+
         if (props.character_position !== null) {
             charactersForDueling = eventCharactersForDueling.filter((character: PvpCharactersType) => {
                 if (character.id !== props.character.id &&

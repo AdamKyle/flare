@@ -15,6 +15,7 @@ import SkyOutlineButton from "../../components/ui/buttons/sky-outline-button";
 import JoinPvp from "./components/join-pvp";
 import CelestialFight from "./components/celestial-fight";
 import Shop from "./components/specialty-shops/shop";
+import {removeCommas} from "../../lib/game/format-number";
 
 export default class Actions extends React.Component<ActionsProps, ActionsState> {
 
@@ -102,6 +103,12 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
             this.setState({
                 pvp_characters_on_map: event.characters,
                 characters_for_dueling: [],
+            }, () => {
+                const characterLevel = removeCommas(this.props.character.level);
+
+                if (characterLevel >= 301) {
+                    this.actionsManager.setCharactersForDueling(event.characters);
+                }
             });
         });
 
@@ -127,12 +134,6 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
                 show_purgatory_chains_section: false,
             });
         });
-    }
-
-    componentDidUpdate(prevProps: Readonly<ActionsProps>, prevState: Readonly<ActionsState>, snapshot?: any) {
-        if (this.state.pvp_characters_on_map.length > 0 && this.state.characters_for_dueling.length === 0) {
-            this.actionsManager.setCharactersForDueling(this.state.pvp_characters_on_map);
-        }
     }
 
     openCrafting(type: CraftingOptions) {

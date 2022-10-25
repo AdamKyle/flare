@@ -129,10 +129,10 @@ class RandomEnchantController extends Controller {
         }
 
         if (!$this->reRollEnchantmentService->canAffordMovementCost($character, $slot->item->id, $request->selected_affix)) {
-            return response()->json(['message' => 'Child, you are so poor ...'], 422);
+            return response()->json(['message' => 'Child, you are so poor (Not enough currency) ...'], 422);
         }
 
-        if ($character->gold < $request->gold_cost || $character->shards < $request->shard_cost) {
+        if ($character->gold_dust < $request->gold_cost || $character->shards < $request->shard_cost) {
             return response()->json(['message' => 'What! No! Child! I don\'t like poor people. I don\'t even date poor men! Oh this is so saddening, child! (You don\'t have enough currency, you made the Queen sad.)'], 422);
         }
 

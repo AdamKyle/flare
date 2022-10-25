@@ -164,6 +164,31 @@ class KingdomUpdateService {
         $this->updateKingdomPopulation();
 
         $this->alertUsersOfKingdomRemoval();
+
+        $this->updateKingdomProtectedUntil();
+    }
+
+    /**
+     * Update the protection status.
+     *
+     * @return void
+     */
+    protected function updateKingdomProtectedUntil() {
+        if (is_null($this->kingdom->protected_until)) {
+            return;
+        }
+
+        $difference = now()->diffInDays($this->kingdom->protected_until);
+
+        if ($difference <= 0) {
+            $this->kingdom->update([
+                'protected_until' => null,
+            ]);
+
+            $this->alertUserToLossOfProtection();
+        }
+
+        $this->kingdom = $this->kingdom->refresh();
     }
 
     protected function destroyNPCKingdom(): void {
@@ -474,6 +499,24 @@ class KingdomUpdateService {
             event(new ServerMessageEvent(
                 $user,
                 $this->kingdom->name . ' Was updated per the hourly update at (X/Y): ' . $x . '/' . $y .
+                ' On plane: ' . $gameMap->name
+            ));
+        }
+
+        $this->updateKingdom->updateKingdom($this->kingdom);
+    }
+
+    protected function alertUserToLossOfProtection(): void {
+        $user = $this->kingdom->character->user;
+
+        if (UserOnlineValue::isOnline($user) && $user->show_kingdom_update_messages) {
+            $x       = $this->kingdom->x_position;
+            $y       = $this->kingdom->y_position;
+            $gameMap = $this->kingdom->gameMap;
+
+            event(new ServerMessageEvent(
+                $user,
+                $this->kingdom->name . ' lost its protection and is open to everyone now at (X/Y): ' . $x . '/' . $y .
                 ' On plane: ' . $gameMap->name
             ));
         }

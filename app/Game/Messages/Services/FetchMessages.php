@@ -78,6 +78,8 @@ class FetchMessages {
                 return 'LABY';
             case '#ccb9a5':
                 return 'DUN';
+            case '#ff7d8e':
+                return 'HELL';
             case '#ababab':
                 return 'SHP';
             case '#639cff':

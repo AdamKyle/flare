@@ -71,6 +71,11 @@ class HolyBuilder extends BaseAttribute {
     }
 
     public function getTotalAppliedStacks(): int {
+
+        if (is_null($this->inventory)) {
+            return 0;
+        }
+
         return $this->inventory->sum('item.holy_stacks_applied');
     }
 

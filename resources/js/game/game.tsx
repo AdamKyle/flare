@@ -51,6 +51,8 @@ export default class Game extends React.Component<GameProps, GameState> {
 
     private globalTimeOut: any;
 
+    private updateCharacterBasePosition: any;
+
     constructor(props: GameProps) {
         super(props)
 
@@ -121,6 +123,9 @@ export default class Game extends React.Component<GameProps, GameState> {
 
         // @ts-ignore
         this.globalTimeOut = Echo.private('global-timeout-' + this.props.userId);
+
+        // @ts-ignore
+        this.updateCharacterBasePosition = Echo.private('update-character-position-' + this.props.userId);
 
     }
 
@@ -261,6 +266,16 @@ export default class Game extends React.Component<GameProps, GameState> {
            this.setState({
                show_global_timeout: event.showTimeOut,
            });
+        });
+
+        this.updateCharacterBasePosition.listen('Game.Maps.Events.UpdateCharacterBasePosition', (event: any) => {
+            const character = JSON.parse(JSON.stringify(this.state.character));
+
+            character.base_position = event.basePosition;
+
+            this.setState({
+                character: character
+            });
         });
     }
 

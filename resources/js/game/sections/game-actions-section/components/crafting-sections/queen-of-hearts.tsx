@@ -319,7 +319,7 @@ export default class QueenOfHearts extends React.Component<any, any> {
             return {label: foundSelected[0].item.affix_name, value: foundSelected[0].id};
         }
 
-        return {label: 'Please select unique', value: ''}
+        return {label: 'Please select item', value: ''}
     }
 
     uniquesToMove() {
@@ -406,7 +406,8 @@ export default class QueenOfHearts extends React.Component<any, any> {
         }
 
         if (goldDust > 0) {
-            shards = parseInt(ceil(goldDust * .00000002).toFixed(0));
+            goldDust = goldDust / 1000000
+            shards   = parseInt(ceil(goldDust * .005).toFixed(0));
         }
 
         this.setState({
@@ -457,7 +458,12 @@ export default class QueenOfHearts extends React.Component<any, any> {
                 this.setState({
                     preforming_action: false,
                     character_uniques: result.data.unique_slots,
-                    character_non_uniques: result.data.non_unique_slots
+                    character_non_uniques: result.data.non_unique_slots,
+                    move_options: {
+                        unique_id: null,
+                        item_to_move_to_id: null,
+                        affix_to_move: null
+                    }
                 });
             }, (error: AxiosError) => {
                 if (typeof error.response !== 'undefined') {
