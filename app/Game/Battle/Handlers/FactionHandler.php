@@ -142,10 +142,6 @@ class FactionHandler {
         if ($faction->current_points >= $faction->points_needed && !FactionLevel::isMaxLevel($faction->current_level)) {
 
             $this->handleFactionLevelUp($character, $faction, $gameMap->name);
-
-        } else if (FactionLevel::isMaxLevel($faction->current_level) && !$faction->maxed) {
-
-            $this->handleFactionMaxedOut($character, $faction, $gameMap->name);
         }
 
     }
@@ -182,8 +178,6 @@ class FactionHandler {
     protected function handleFactionMaxedOut(Character $character, Faction $faction, string $mapName): void {
         event(new ServerMessageEvent($character->user, $mapName . ' faction has become maxed out!'));
         event(new GlobalMessageEvent($character->name . ' Has maxed out the faction for: ' . $mapName . ' They are considered legendary among the people of this land.'));
-
-        $this->rewardPlayer($character, $faction, $mapName, FactionType::getTitle($faction->current_level));
 
         $faction->update([
             'maxed' => true,

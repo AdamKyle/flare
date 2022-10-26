@@ -15,37 +15,75 @@ use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
 use App\Flare\Values\ItemEffectsValue;
+use Exception;
 use Illuminate\Support\Collection;
 
 class CharacterStatBuilder {
 
     use FetchEquipped, Boons;
 
+    /**
+     * @var Character $character
+     */
     private Character $character;
 
+    /**
+     * @var Collection|null $equippedItems
+     */
     private ?Collection $equippedItems;
 
+    /**
+     * @var Collection $questItems
+     */
     private Collection $questItems;
 
+    /**
+     * @var Collection $characterBoons
+     */
     private Collection $characterBoons;
 
+    /**
+     * @var Collection $skills
+     */
     private Collection $skills;
 
+    /**
+     * @var GameMap $map
+     */
     private GameMap $map;
 
+    /**
+     * @var DefenceBuilder $defenceBuilder
+     */
     private DefenceBuilder $defenceBuilder;
 
+    /**
+     * @var DamageBuilder $damageBuilder
+     */
     private DamageBuilder $damageBuilder;
 
+    /**
+     * @var HealingBuilder $healingBuilder
+     */
     private HealingBuilder $healingBuilder;
 
+    /**
+     * @var HolyBuilder $holyBuilder
+     */
     private HolyBuilder $holyBuilder;
 
+    /**
+     * @var ReductionsBuilder $reductionsBuilder
+     */
     private ReductionsBuilder $reductionsBuilder;
 
-    // Debugging:
-    private float $startTime = 0;
-
+    /**
+     * @param DefenceBuilder $defenceBuilder
+     * @param DamageBuilder $damageBuilder
+     * @param HealingBuilder $healingBuilder
+     * @param HolyBuilder $holyBuilder
+     * @param ReductionsBuilder $reductionsBuilder
+     */
     public function __construct(DefenceBuilder $defenceBuilder,
                                 DamageBuilder $damageBuilder,
                                 HealingBuilder $healingBuilder,
@@ -101,6 +139,11 @@ class CharacterStatBuilder {
         return $this;
     }
 
+    /**
+     * Fetch inventory.
+     *
+     * @return Collection
+     */
     public function fetchInventory(): Collection {
         if (empty($this->equippedItems)) {
             return collect();
@@ -109,6 +152,11 @@ class CharacterStatBuilder {
         return $this->equippedItems;
     }
 
+    /**
+     * Get class bonus.
+     *
+     * @return float
+     */
     public function classBonus(): float {
         if (empty($this->equippedItems)) {
             return 0.0;
@@ -127,6 +175,8 @@ class CharacterStatBuilder {
     }
 
     /**
+     * Get instance of Holy Builder.
+     *
      * @return HolyBuilder
      */
     public function holyInfo(): HolyBuilder {
@@ -134,25 +184,40 @@ class CharacterStatBuilder {
     }
 
     /**
+     * Get instance of reduction builder.
+     *
      * @return ReductionsBuilder
      */
     public function reductionInfo(): ReductionsBuilder {
         return $this->reductionsBuilder;
     }
 
+    /**
+     * Can the characters affixes be resisted?
+     *
+     * @return bool
+     */
     public function canAffixesBeResisted(): bool {
-        if (empty($this->equippedItems)) {
+        if ($this->questItems->isEmpty()) {
             return false;
         }
 
-        return !is_null($this->equippedItems->where('item.effect', ItemEffectsValue::AFFIXES_IRRESISTIBLE)->first());
+        return !is_null($this->questItems->where('item.effect', ItemEffectsValue::AFFIXES_IRRESISTIBLE)->first());
     }
 
+    /**
+     * Get modded stat.
+     *
+     * @param string $stat
+     * @param bool $voided
+     * @return float
+     */
     public function statMod(string $stat, bool $voided = false): float {
         $baseStat = $this->character->{$stat};
 
         if (is_null($this->equippedItems)) {
-            return $this->applyBoons($baseStat);
+            $baseStat = $this->applyBoons($baseStat);
+            return $this->applyBoons($baseStat, $stat . '_mod');
         }
 
         $baseStat = $baseStat + $baseStat * $this->fetchStatFromEquipment($stat, $voided);
@@ -167,10 +232,22 @@ class CharacterStatBuilder {
         return $baseStat;
     }
 
+    /**
+     * Build health based off durability stat.
+     *
+     * @param bool $voided
+     * @return float
+     */
     public function buildHealth(bool $voided = false): float {
         return $this->statMod('dur', $voided);
     }
 
+    /**
+     * Build Defence.
+     *
+     * @param bool $voided
+     * @return float
+     */
     public function buildDefence(bool $voided = false): float {
         $this->defenceBuilder->initialize(
             $this->character,
@@ -181,6 +258,13 @@ class CharacterStatBuilder {
         return $this->defenceBuilder->buildDefence($voided);
     }
 
+    /**
+     * Build damage.
+     *
+     * @param string $type
+     * @param bool $voided
+     * @return int
+     */
     public function buildDamage(string $type, bool $voided = false): int {
 
         $stat = $this->statMod($this->character->damage_stat, $voided);
@@ -201,6 +285,13 @@ class CharacterStatBuilder {
         }
     }
 
+    /**
+     * Build total attacks
+     *
+     * Includes: Weapons, Rings and Spell Damage.
+     *
+     * @return int
+     */
     public function buildTotalAttack(): int {
         $weaponDamage = $this->buildDamage('weapon');
         $ringDamage   = $this->buildDamage('ring');
@@ -209,6 +300,13 @@ class CharacterStatBuilder {
         return $weaponDamage + $ringDamage + $spellDamage;
     }
 
+    /**
+     * Build Positional Weapon Damage.
+     *
+     * @param string $weaponPosition
+     * @param bool $voided
+     * @return int
+     */
     public function positionalWeaponDamage(string $weaponPosition, bool $voided = false): int {
         $stat = $this->statMod($this->character->damage_stat, $voided);
 
@@ -219,6 +317,13 @@ class CharacterStatBuilder {
         return ceil($this->damageBuilder->buildWeaponDamage($stat, $voided, $weaponPosition));
     }
 
+    /**
+     * Build Positional Spell Damage.
+     *
+     * @param string $spellPosition
+     * @param bool $voided
+     * @return int
+     */
     public function positionalSpellDamage(string $spellPosition, bool $voided = false): int {
         $stat = $this->statMod($this->character->damage_stat, $voided);
 
@@ -229,6 +334,13 @@ class CharacterStatBuilder {
         return ceil($this->damageBuilder->buildSpellDamage($stat, $voided, $spellPosition));
     }
 
+    /**
+     * Build positional healing.
+     *
+     * @param string $spellPosition
+     * @param bool $voided
+     * @return int
+     */
     public function positionalHealing(string $spellPosition, bool $voided = false): int {
         $stat = $this->statMod($this->character->damage_stat, $voided);
 
@@ -239,6 +351,12 @@ class CharacterStatBuilder {
         return ceil($this->healingBuilder->buildHealing($stat, $voided, $spellPosition));
     }
 
+    /**
+     * Build total healing.
+     *
+     * @param bool $voided
+     * @return int
+     */
     public function buildHealing(bool $voided = false): int {
         $stat = $this->statMod($this->character->damage_stat, $voided);
 
@@ -249,6 +367,14 @@ class CharacterStatBuilder {
         return ceil($this->healingBuilder->buildHealing($stat, $voided));
     }
 
+    /**
+     * Build Devouring info for type.
+     *
+     * type can be Devouring Darkness or Devouring Light
+     *
+     * @param string $type
+     * @return float
+     */
     public function  buildDevouring(string $type): float {
 
         $itemDevouring = 0;
@@ -278,6 +404,12 @@ class CharacterStatBuilder {
         return $amount;
     }
 
+    /**
+     * Build resurrection chance.
+     *
+     * @return float
+     * @throws Exception
+     */
     public function buildResurrectionChance(): float {
         if (empty($this->equippedItems)) {
             return  0;
@@ -302,6 +434,13 @@ class CharacterStatBuilder {
         return $chance;
     }
 
+    /**
+     * Build affix damage based on type.
+     *
+     * @param string $type
+     * @param bool $voided
+     * @return float|int
+     */
     public function buildAffixDamage(string $type, bool $voided = false): float|int {
         switch($type) {
             case 'affix-stacking-damage':
@@ -319,6 +458,12 @@ class CharacterStatBuilder {
         }
     }
 
+    /**
+     * Build entrancing chance.
+     *
+     * @param $voided
+     * @return float
+     */
     public function buildEntrancingChance($voided): float {
 
         if ($voided || is_null($this->equippedItems)) {
@@ -337,13 +482,23 @@ class CharacterStatBuilder {
         return $entranceAmount;
     }
 
+    /**
+     * Get stat reducing prefix.
+     *
+     * Takes the Highest one.
+     *
+     * @return ItemAffix|null
+     */
     public function getStatReducingPrefix(): ?ItemAffix {
 
         if (is_null($this->equippedItems)) {
             return null;
         }
 
-        $slot = $this->equippedItems->where('item.itemPrefix.reduces_enemy_stats', '>', 0)->first();
+        $slot = $this->equippedItems->firstWhere(
+            'item.itemPrefix.reduces_enemy_stats',
+            $this->equippedItems->max('item.itemPrefix.reduces_enemy_stats')
+        );
 
         if (!is_null($slot)) {
             return $slot->item->itemPrefix;
@@ -352,6 +507,11 @@ class CharacterStatBuilder {
         return null;
     }
 
+    /**
+     * Get all stat reducing suffixes
+     *
+     * @return Collection
+     */
     public function getStatReducingSuffixes(): Collection {
 
         if (is_null($this->equippedItems)) {
@@ -361,7 +521,14 @@ class CharacterStatBuilder {
         return $this->equippedItems->where('item.itemSuffix.reduces_enemy_stats', '>', 0)->values();
     }
 
-
+    /**
+     * Build ambush based off trinkets.
+     *
+     * - Builds chance or resistance
+     *
+     * @param string $type
+     * @return float
+     */
     public function buildAmbush(string $type = 'chance'): float {
 
         if (is_null($this->equippedItems)) {
@@ -375,6 +542,14 @@ class CharacterStatBuilder {
         return $this->equippedItems->where('item.type', 'trinket')->sum('item.ambush_resistance');
     }
 
+    /**
+     * Build counter based off trinkets.
+     *
+     * - Builds chance or resistance
+     *
+     * @param string $type
+     * @return float
+     */
     public function buildCounter(string $type = 'chance'): float {
 
         if (is_null($this->equippedItems)) {
@@ -388,20 +563,34 @@ class CharacterStatBuilder {
         return $this->equippedItems->where('item.type', 'trinket')->sum('item.counter_resistance');
     }
 
+    /**
+     * Apply boons.
+     *
+     * @param float $base
+     * @param string|null $statAttribute
+     * @return float
+     */
     protected function applyBoons(float $base, ?string $statAttribute = null): float {
         $totalPercent = 0;
 
         if ($this->characterBoons->isNotEmpty()) {
             if (is_null($statAttribute)) {
-                $totalPercent = $this->characterBoons->sum('item.stat_increase');
+                $totalPercent = $this->characterBoons->sum('itemUsed.stat_increase');
             } else {
-                $totalPercent = $this->characterBoons->sum('item.' . $statAttribute);
+                $totalPercent = $this->characterBoons->sum('itemUsed.' . $statAttribute);
             }
         }
 
         return $base + $base * $totalPercent;
     }
 
+    /**
+     * Fetch stat from equipment.
+     *
+     * @param string $stat
+     * @param bool $voided
+     * @return float
+     */
     protected function fetchStatFromEquipment(string $stat, bool $voided = false): float {
         $totalPercentFromEquipped = 0;
 
@@ -412,6 +601,14 @@ class CharacterStatBuilder {
         return $totalPercentFromEquipped;
     }
 
+    /**
+     * Fetch modded stat
+     *
+     * @param Item $item
+     * @param string $stat
+     * @param bool $voided
+     * @return float
+     */
     private function fetchModdedStat(Item $item, string $stat, bool $voided = false): float {
         $staMod          = $item->{$stat . '_mod'};
         $totalPercentage = !is_null($staMod) ? $staMod : 0.0;

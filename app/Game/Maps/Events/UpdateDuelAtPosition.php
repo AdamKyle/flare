@@ -43,6 +43,9 @@ class UpdateDuelAtPosition implements ShouldBroadcastNow
                              ->join('maps', function($join) use($character) {
                                  $join->on('maps.character_id', '=', 'characters.id')
                                       ->where('maps.game_map_id', '=', $character->map->game_map_id);
+                            })->whereNotIn('characters.id', function($query) {
+                                $query->select('character_id')
+                                      ->from('character_automations');
                             })->select('characters.id as id',
                                        'characters.name as name',
                                        'maps.character_position_x',

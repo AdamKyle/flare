@@ -16,7 +16,7 @@ trait Boons {
      * @return Collection
      */
     public function fetchCharacterBoons(Character $character): Collection{
-        return CharacterBoon::where('character_id', $character->id)->with('item')->get();
+        return CharacterBoon::where('character_id', $character->id)->with('itemUsed')->get();
     }
 
     public function fetchStatIncrease(Character $character, string $statAttribute): float {
