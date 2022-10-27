@@ -94,8 +94,8 @@ export default class FightSection extends React.Component<FightSectionProps, Fig
             this.setState({
                 monster_current_health: healthObject.monster_health <= 0 ? 0 : healthObject.monster_health,
                 monster_max_health: monsterHealth,
-                character_current_health: healthObject.character_health <= 0 ? 0 : healthObject.character_health,
-                character_max_health: this.props.character.health,
+                character_current_health: healthObject.character_health <= 0 ? 0 : parseInt(healthObject.character_health.toFixed(0)),
+                character_max_health: parseInt(this.props.character.health.toFixed(0)),
                 monster_to_fight_id: this.props.monster_to_fight.id,
                 battle_messages: this.battle_messages,
                 monster_to_fight: battleSetUp.getMonster(),
@@ -106,8 +106,8 @@ export default class FightSection extends React.Component<FightSectionProps, Fig
             this.setState({
                 monster_current_health: healthObject.monster_health,
                 monster_max_health: monsterHealth,
-                character_current_health: healthObject.character_health,
-                character_max_health: this.props.character.health,
+                character_current_health: parseInt(healthObject.character_health.toFixed(0)),
+                character_max_health: parseInt(this.props.character.health.toFixed(0)),
                 monster_to_fight_id: this.props.monster_to_fight.id,
                 is_character_voided: battleSetUp.getVoidanceResult().is_character_voided,
                 is_monster_voided: battleSetUp.getVoidanceResult().is_monster_voided,

@@ -20,11 +20,7 @@ class HolyBuilder extends BaseAttribute {
 
         $total = $this->getTotalAmount('devouring_darkness_bonus');
 
-        if ($total > 1) {
-            return 1;
-        }
-
-        return $total;
+        return min($total, 1);
     }
 
     public function fetchStatIncrease(): float {
@@ -38,25 +34,19 @@ class HolyBuilder extends BaseAttribute {
     public function fetchAttackBonus(): float {
         $holyBonus = $this->fetchHolyBonus();
 
-        if ($holyBonus > 0.90) {
-            return 0.90;
-        }
-
-        return $holyBonus;
+        return min($holyBonus, .90);
     }
 
     public function fetchDefenceBonus(): float {
         $holyBonus = $this->fetchHolyBonus();
 
-        if ($holyBonus > 0.75) {
-            return 0.75;
-        }
-
-        return $holyBonus;
+        return min($holyBonus, .75);
     }
 
-    public function fetchHealingBonus() {
-        return $this->getTotalAppliedStacks() / 100;
+    public function fetchHealingBonus(): float {
+        $value = $this->getTotalAppliedStacks() / 100;
+
+        return min($value, 1.0);
     }
 
     public function fetchTotalStacksForCharacter(): int {

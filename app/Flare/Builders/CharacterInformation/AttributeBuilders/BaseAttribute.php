@@ -8,12 +8,27 @@ use Illuminate\Support\Collection;
 
 class BaseAttribute {
 
+    /**
+     * @var Character $character
+     */
     protected  Character $character;
 
+    /**
+     * @var Collection|null $inventory
+     */
     protected ?Collection $inventory;
 
+    /**
+     * @var Collection $skills
+     */
     protected  Collection $skills;
 
+    /**
+     * @param Character $character
+     * @param Collection $skills
+     * @param Collection|null $inventory
+     * @return void
+     */
     public function initialize(Character $character, Collection $skills, ?Collection $inventory): void {
 
         $this->character = $character;
@@ -21,12 +36,23 @@ class BaseAttribute {
         $this->skills    = $skills;
     }
 
+    /**
+     * Get attribute bonus from all item affixes.
+     *
+     * @param string $attribute
+     * @return float
+     */
     protected function getAttributeBonusFromAllItemAffixes(string $attribute): float {
         return $this->inventory->sum('item.itemPrefix.'.$attribute.'_mod') +
             $this->inventory->sum('item.itemSuffix.'.$attribute.'_mod');
     }
 
-
+    /**
+     * Fetch attribute bonus from skills.
+     *
+     * @param string $baseAttribute
+     * @return float
+     */
     protected function fetchBaseAttributeFromSkills(string $baseAttribute): float {
         $totalPercent = 0;
 
@@ -37,6 +63,13 @@ class BaseAttribute {
         return $totalPercent;
     }
 
+    /**
+     * Should we include skill damage?
+     *
+     * @param GameClass $class
+     * @param string $type
+     * @return bool
+     */
     protected function shouldIncludeSkillDamage(GameClass $class, string $type): bool {
         switch($type) {
             case 'weapon':
@@ -50,6 +83,13 @@ class BaseAttribute {
         }
     }
 
+    /**
+     * Get damage from items.
+     *
+     * @param string $type
+     * @param string $position
+     * @return int
+     */
     protected function getDamageFromItems(string $type, string $position): int {
 
         if ($position === 'both') {
@@ -59,6 +99,13 @@ class BaseAttribute {
         return $this->inventory->where('item.type', $type)->where('position', $position)->sum('item.base_damage');
     }
 
+    /**
+     * Get healing from items.
+     *
+     * @param string $type
+     * @param string $position
+     * @return int
+     */
     protected function getHealingFromItems(string $type, string $position): int {
 
         if ($position === 'both') {

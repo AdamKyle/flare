@@ -62,6 +62,18 @@ class AttackWithItemsService {
            return $this->errorResult('You are not allowed to do that.');
        }
 
+       if ($character->id === $kingdom->character_id) {
+           return $this->errorResult('You are not allowed to do that.');
+       }
+
+       if (!is_null($kingdom->protected_until)) {
+           return $this->errorResult('You are not allowed to do that.');
+       }
+
+       if ($character->map->game_map_id !== $kingdom->game_map_id) {
+           return $this->errorResult('You are not allowed to do that.');
+       }
+
        $this->setOldBuildings($kingdom);
        $this->setOldUnits($kingdom);
 

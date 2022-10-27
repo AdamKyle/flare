@@ -5,6 +5,14 @@ namespace App\Flare\Builders\CharacterInformation\AttributeBuilders;
 
 class DamageBuilder extends BaseAttribute {
 
+    /**
+     * Build weapon damage.
+     *
+     * @param float $damageStat
+     * @param bool $voided
+     * @param string $position
+     * @return float
+     */
     public function buildWeaponDamage(float $damageStat, bool $voided = false, string $position = 'both'): float {
         $class      = $this->character->class;
         $baseDamage = $damageStat * .05;
@@ -28,15 +36,29 @@ class DamageBuilder extends BaseAttribute {
         return $totalDamage + $totalDamage * ($skillPercentage + $affixPercentage);
     }
 
+    /**
+     * Build ring damage.
+     *
+     * @return int
+     */
     public function buildRingDamage(): int {
         return $this->getDamageFromItems('ring', 'both');
     }
 
+    /**
+     * Build spell damage.
+     *
+     * @param float $damageStat
+     * @param bool $voided
+     * @param $position
+     * @return float
+     */
     public function buildSpellDamage(float $damageStat, bool $voided = false, $position = 'both'): float {
         $class = $this->character->class;
 
         if ($class->type()->isCaster()) {
             $baseDamage = $damageStat * 0.05;
+            $baseDamage = max($baseDamage, 5);
         } else {
             $baseDamage = 0;
         }
@@ -60,6 +82,12 @@ class DamageBuilder extends BaseAttribute {
         return $totalDamage + $totalDamage * ($skillPercentage + $affixPercentage);
     }
 
+    /**
+     * Build stacking affix damage.
+     *
+     * @param bool $voided
+     * @return int
+     */
     public function buildAffixStackingDamage(bool $voided = false): int {
 
         if ($voided || is_null($this->inventory)) {
@@ -72,6 +100,12 @@ class DamageBuilder extends BaseAttribute {
         return $itemSuffix + $itemPrefix;
     }
 
+    /**
+     * Build affix non stacking damage.
+     *
+     * @param bool $voided
+     * @return int
+     */
     public function buildAffixNonStackingDamage(bool $voided = false): int {
 
         if ($voided || is_null($this->inventory)) {
@@ -90,6 +124,12 @@ class DamageBuilder extends BaseAttribute {
         return max($amounts);
     }
 
+    /**
+     * Build irresistible stacking damage.
+     *
+     * @param bool $voided
+     * @return int
+     */
     public function buildIrresistibleNonStackingAffixDamage(bool $voided = false): int {
 
         if ($voided || is_null($this->inventory)) {
@@ -112,6 +152,12 @@ class DamageBuilder extends BaseAttribute {
         return max($amounts);
     }
 
+    /**
+     * Build non stacking irresistible damage.
+     *
+     * @param bool $voided
+     * @return int
+     */
     public function buildIrresistibleStackingAffixDamage(bool $voided = false): int {
 
         if ($voided || is_null($this->inventory)) {
@@ -128,6 +174,12 @@ class DamageBuilder extends BaseAttribute {
         return $itemPrefix + $itemSuffix;
     }
 
+    /**
+     * Build life stealing.
+     *
+     * @param bool $voided
+     * @return float
+     */
     public function buildLifeStealingDamage(bool $voided = false): float {
 
         if ($voided || is_null($this->inventory)) {

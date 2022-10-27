@@ -65,6 +65,10 @@ class KingdomAttackService {
             return $this->errorResult('Cannot attack across plane.');
         }
 
+        if (!is_null($kingdom->protected_until)) {
+            return $this->errorResult('Cannot do that');
+        }
+
         $unitsToMove = $this->unitMovementService->buildUnitsToMoveBasedOnKingdom($kingdom, $params['units_to_move']);
 
         $this->unitMovementService->removeUnitsFromKingdom($params['units_to_move']);

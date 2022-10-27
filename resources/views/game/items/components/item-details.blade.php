@@ -49,14 +49,25 @@
                     <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                     <strong>Skill Modifiers</strong>
                     <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                    <dl>
-                        <dt>Effects Skill</dt>
-                        <dd>{{!is_null($item->skill_name) ? $item->skill_name : 'N/A'}}</dd>
-                        <dt>Skill Bonus</dt>
-                        <dd>{{$item->skill_bonus * 100}}%</dd>
-                        <dt>Skill XP Bonus</dt>
-                        <dd>{{$item->skill_training_bonus * 100}}%</dd>
-                    </dl>
+                    @if ($item->type === 'alchemy')
+                        <dl>
+                            <dt>Effects Skill(s)</dt>
+                            <dd>{{!is_null($item->affects_skill_type) ? implode(',', $skills) : 'N/A'}}</dd>
+                            <dt>Skill Bonus</dt>
+                            <dd>{{$item->increase_skill_bonus_by * 100}}%</dd>
+                            <dt>Skill XP Bonus</dt>
+                            <dd>{{$item->increase_skill_training_bonus_by * 100}}%</dd>
+                        </dl>
+                    @else
+                        <dl>
+                            <dt>Effects Skill</dt>
+                            <dd>{{!is_null($item->skill_name) ? $item->skill_name : 'N/A'}}</dd>
+                            <dt>Skill Bonus</dt>
+                            <dd>{{$item->skill_bonus * 100}}%</dd>
+                            <dt>Skill XP Bonus</dt>
+                            <dd>{{$item->skill_training_bonus * 100}}%</dd>
+                        </dl>
+                    @endif
                 </div>
                 <div class='block md:hidden border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                 <div>
@@ -69,6 +80,15 @@
                         <dd>{{$item->healing_reduction * 100}} %</dd>
                         <dt>Affix Dmg. Reduction</dt>
                         <dd>{{$item->affix_damage_reduction * 100}} %</dd>
+                    </dl>
+                    <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                    <strong>Timeout reductions</strong>
+                    <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                    <dl>
+                        <dt>Fight Timeout Reduction</dt>
+                        <dd>{{$item->fight_time_out_mod_bonus * 100}} %</dd>
+                        <dt>Move Timeout Reduction</dt>
+                        <dd>{{$item->move_time_out_mod_bonus * 100}} %</dd>
                     </dl>
                     <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                     <div class="mt-4">
@@ -93,7 +113,7 @@
 
         <x-core.cards.card css="mt-4 mb-4">
             <div class="grid md:grid-cols-3 gap-3">
-                <div>
+                <div>$skills
                     <strong>Devouring Chance</strong>
                     <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                     <dl>

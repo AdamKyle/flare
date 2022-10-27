@@ -14,7 +14,6 @@ use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
-use Tests\Traits\CreateSkill;
 
 class CharacterStatBuilderTest extends TestCase {
 
@@ -1139,6 +1138,19 @@ class CharacterStatBuilderTest extends TestCase {
         $this->assertEquals(150, $damage);
     }
 
+    public function testBuildAffixNonStackingDamageNoEnchantments() {
+        $item = $this->createItem([
+            'name'           => 'weapon',
+            'type'           => 'spell-healing',
+            'base_healing'   => 100
+        ]);
+
+        $character = $this->character->inventoryManagement()->giveItem($item)->equipItem('spell-one', 'weapon')->getCharacter();
+        $damage   = $this->characterStatBuilder->setCharacter($character)->buildAffixDamage('affix-non-stacking');
+
+        $this->assertEquals(0, $damage);
+    }
+
     public function testBuildAffixNonStackingDamageVoided() {
         $itemPrefixAffix = $this->createItemAffix([
             'name'             => 'Sample',
@@ -1261,6 +1273,20 @@ class CharacterStatBuilderTest extends TestCase {
         $this->assertEquals(150, $damage);
     }
 
+    public function testBuildAffixIrresistibleNonStackingDamageWithNoEnchantments() {
+
+        $item = $this->createItem([
+            'name'           => 'weapon',
+            'type'           => 'spell-healing',
+            'base_healing'   => 100
+        ]);
+
+        $character = $this->character->inventoryManagement()->giveItem($item)->equipItem('spell-one', 'weapon')->getCharacter();
+        $damage   = $this->characterStatBuilder->setCharacter($character)->buildAffixDamage('affix-irresistible-damage-non-stacking');
+
+        $this->assertEquals(0, $damage);
+    }
+
     public function testBuildAffixIrresistibleNonStackingDamageVoided() {
         $itemPrefixAffix = $this->createItemAffix([
             'name'                => 'Sample',
@@ -1319,6 +1345,19 @@ class CharacterStatBuilderTest extends TestCase {
         $amount    = $this->characterStatBuilder->setCharacter($character)->buildAffixDamage('life-stealing');
 
         $this->assertEquals(.99, $amount);
+    }
+
+    public function testBuildAffixLifeStealingNonStackingWithNoEnchantments() {
+        $item = $this->createItem([
+            'name'           => 'weapon',
+            'type'           => 'spell-healing',
+            'base_healing'   => 100
+        ]);
+
+        $character = $this->character->inventoryManagement()->giveItem($item)->equipItem('spell-one', 'weapon')->getCharacter();
+        $amount    = $this->characterStatBuilder->setCharacter($character)->buildAffixDamage('life-stealing');
+
+        $this->assertEquals(0, $amount);
     }
 
     public function testBuildAffixLifeStealingVoided() {

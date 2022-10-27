@@ -36,6 +36,8 @@ class WeeklyCelestialSpawnEvent implements ShouldQueue
             The Creator has managed to get the celestial gates under control!
             The Celestials have been locked away again! Come back next Wednesday!
             '));
+
+            $event->delete();
         } else {
             WeeklyCelestialSpawnEvent::dispatch()->delay(now()->addMinutes(15))->onConnection('weekly_spawn');
         }

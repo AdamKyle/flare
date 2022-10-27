@@ -10,6 +10,7 @@ class HealingBuilder extends BaseAttribute {
 
         if ($class->type()->isHealer()) {
             $baseDamage = $damageStat * 0.05;
+            $baseDamage = max($baseDamage, 5);
         } else {
             $baseDamage = 0;
         }

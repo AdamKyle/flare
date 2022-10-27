@@ -6,6 +6,12 @@ use Illuminate\Support\Collection;
 
 class DefenceBuilder extends BaseAttribute {
 
+    /**
+     * Build defence.
+     *
+     * @param bool $voided
+     * @return int
+     */
     public function buildDefence(bool $voided = false): int {
         $baseAc      = $this->character->ac;
         $skillBonus  = $this->fetchBaseAttributeFromSkills('base_ac');
@@ -28,6 +34,12 @@ class DefenceBuilder extends BaseAttribute {
         return intval($baseAc + $itemAC);
     }
 
+    /**
+     * Get base ac from items and divide by amount of armour equipped.
+     *
+     * @param Collection $slots
+     * @return int
+     */
     protected function getACFromItems(Collection $slots): int {
         $ac = 0;
 
@@ -40,6 +52,11 @@ class DefenceBuilder extends BaseAttribute {
         return intval($ac / $slots->count());
     }
 
+    /**
+     * Get all items with a base AC.
+     *
+     * @return Collection
+     */
     protected function getItemsWithBaseAC(): Collection {
         return $this->inventory->filter(function ($slot) {
             return $slot->item->base_ac > 0;

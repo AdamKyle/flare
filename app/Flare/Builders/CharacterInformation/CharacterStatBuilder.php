@@ -255,7 +255,10 @@ class CharacterStatBuilder {
             $this->equippedItems,
         );
 
-        return $this->defenceBuilder->buildDefence($voided);
+        $defence   = $this->defenceBuilder->buildDefence($voided);
+        $holyBonus = $this->holyInfo()->fetchDefenceBonus();
+
+        return $defence + $defence * $holyBonus;
     }
 
     /**
@@ -289,14 +292,18 @@ class CharacterStatBuilder {
 
         switch($type) {
             case 'weapon':
-                return ceil($this->damageBuilder->buildWeaponDamage($stat, $voided));
+                $damage = $this->damageBuilder->buildWeaponDamage($stat, $voided);
+                break;
             case 'ring':
                 return $this->damageBuilder->buildRingDamage();
             case 'spell-damage':
-                return ceil($this->damageBuilder->buildSpellDamage($stat, $voided));
+                $damage = $this->damageBuilder->buildSpellDamage($stat, $voided);
+                break;
             default:
-                return 0;
+                $damage = 0;
         }
+
+        return ceil($damage + $damage * $this->holyInfo()->fetchAttackBonus());
     }
 
     /**
@@ -331,7 +338,9 @@ class CharacterStatBuilder {
             return $value < 5 ? 5 : $value;
         }
 
-        return ceil($this->damageBuilder->buildWeaponDamage($stat, $voided, $weaponPosition));
+        $damage = $this->damageBuilder->buildWeaponDamage($stat, $voided, $weaponPosition);
+
+        return ceil($damage + $damage * $this->holyInfo()->fetchAttackBonus());
     }
 
     /**
@@ -355,7 +364,9 @@ class CharacterStatBuilder {
             return 0;
         }
 
-        return ceil($this->damageBuilder->buildSpellDamage($stat, $voided, $spellPosition));
+        $damage = $this->damageBuilder->buildSpellDamage($stat, $voided, $spellPosition);
+
+        return ceil($damage + $damage * $this->holyInfo()->fetchAttackBonus());
     }
 
     /**
@@ -381,7 +392,9 @@ class CharacterStatBuilder {
             return 0;
         }
 
-        return ceil($this->healingBuilder->buildHealing($stat, $voided, $spellPosition));
+        $healing = $this->healingBuilder->buildHealing($stat, $voided, $spellPosition);
+
+        return ceil($healing + $healing * $this->holyInfo()->fetchHealingBonus());
     }
 
     /**
@@ -405,7 +418,9 @@ class CharacterStatBuilder {
             return 0;
         }
 
-        return ceil($this->healingBuilder->buildHealing($stat, $voided));
+        $healing = $this->healingBuilder->buildHealing($stat, $voided);
+
+        return ceil($healing + $healing * $this->holyInfo()->fetchHealingBonus());
     }
 
     /**

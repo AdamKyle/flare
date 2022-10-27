@@ -42,7 +42,7 @@ export default class CharacterTopSection extends React.Component<CharacterTopSec
             return 0;
         }
 
-        let statNumber = stat;
+        let statNumber = parseInt(stat.toFixed(0));
 
         const symbol = ["", "k", "M", "B", "T", "Quad.", "Qunit."];
 

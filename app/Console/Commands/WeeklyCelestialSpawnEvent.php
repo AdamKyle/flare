@@ -7,7 +7,6 @@ use App\Flare\Values\EventType;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use Cache;
 use Illuminate\Console\Command;
-use Facades\App\Flare\Values\UserOnlineValue;
 use App\Flare\Jobs\WeeklyCelestialSpawnEvent as SpawnCancelingJob;
 
 class WeeklyCelestialSpawnEvent extends Command
