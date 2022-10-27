@@ -591,6 +591,23 @@ class CharacterStatBuilderTest extends TestCase {
         $this->assertGreaterThan(100, $damage);
     }
 
+    public function testSpellDamageForCasterWithNoInventory() {
+
+        $character = $this->character->getCharacter();
+
+        $class = $this->createClass([
+            'name' => 'Heretic',
+        ]);
+
+        $character->update(['game_class_id' => $class->id]);
+
+        $character = $character->refresh();
+
+        $damage = $this->characterStatBuilder->setCharacter($character)->buildDamage('spell-damage');
+
+        $this->assertGreaterThan(0, $damage);
+    }
+
     public function testGetNoDamageForInvalidType() {
 
         $character = $this->character->equipStartingEquipment()->getCharacter();
@@ -638,6 +655,25 @@ class CharacterStatBuilderTest extends TestCase {
         $this->assertEquals(0, $damage);
     }
 
+    public function testPositionalSpellDamageWithEmptyInventoryAsCaster() {
+
+        $character = $this->character->getCharacter();
+
+        $class = $this->createClass([
+            'name' => 'Heretic'
+        ]);
+
+        $character->update([
+            'game_class_id' => $class->id
+        ]);
+
+        $character = $character->refresh();
+
+        $damage = $this->characterStatBuilder->setCharacter($character)->positionalSpellDamage('spell-one');
+
+        $this->assertGreaterThan(0, $damage);
+    }
+
     public function testGetPositionalHealing() {
         $item = $this->createItem(['name' => 'sample', 'type' => 'spell-healing', 'base_healing' => 100]);
 
@@ -655,6 +691,25 @@ class CharacterStatBuilderTest extends TestCase {
         $damage = $this->characterStatBuilder->setCharacter($character)->positionalHealing('spell-two');
 
         $this->assertEquals(0, $damage);
+    }
+
+    public function testGetPositionalHealingWithEmptyInventoryAsProphet() {
+
+        $character = $this->character->getCharacter();
+
+        $class = $this->createClass([
+            'name' => 'Prophet'
+        ]);
+
+        $character->update([
+            'game_class_id' => $class->id
+        ]);
+
+        $character = $character->refresh();
+
+        $damage = $this->characterStatBuilder->setCharacter($character)->positionalHealing('spell-two');
+
+        $this->assertGreaterThan(0, $damage);
     }
 
     public function testHealingWithOutSkill() {
@@ -774,6 +829,23 @@ class CharacterStatBuilderTest extends TestCase {
         $damage = $this->characterStatBuilder->setCharacter($character)->buildHealing();
 
         $this->assertEquals(0, $damage);
+    }
+
+    public function testHealingWithNoEquipmentAsAProphet() {
+
+        $character = $this->character->getCharacter();
+
+        $class = $this->createClass(['name' => 'Prophet']);
+
+        $character->update([
+            'game_class_id' => $class->id,
+        ]);
+
+        $character = $character->refresh();
+
+        $damage = $this->characterStatBuilder->setCharacter($character)->buildHealing();
+
+        $this->assertGreaterThan(0, $damage);
     }
 
     public function testDevouringWithOnlyQuestItem() {
