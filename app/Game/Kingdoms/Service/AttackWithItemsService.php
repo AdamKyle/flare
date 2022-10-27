@@ -132,7 +132,7 @@ class AttackWithItemsService {
 
             KingdomLog::create($attributes);
 
-            event(new ServerMessageEvent($character->user, $character->name . ' has dropped bombs on your kingdom: ' .
+            event(new ServerMessageEvent($kingdom->character->user, $character->name . ' has dropped bombs on your kingdom: ' .
                 $kingdom->name . ' on the plane: ' . $kingdom->gameMap->name . ' At (X/Y): ' . $kingdom->x_position . '/' . $kingdom->y_position .
                 ' doing a total of: ' . number_format($damageDone * 100) . '% damage.'));
 
