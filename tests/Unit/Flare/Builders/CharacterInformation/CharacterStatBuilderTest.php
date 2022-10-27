@@ -616,7 +616,7 @@ class CharacterStatBuilderTest extends TestCase {
 
         $damage = $this->characterStatBuilder->setCharacter($character)->positionalWeaponDamage('left-hand');
 
-        $this->assertEquals(0, $damage);
+        $this->assertGreaterThan(0, $damage);
     }
 
     public function testPositionalSpellDamage() {

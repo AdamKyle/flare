@@ -264,13 +264,27 @@ class CharacterStatBuilder {
      * @param string $type
      * @param bool $voided
      * @return int
+     * @throws Exception
      */
     public function buildDamage(string $type, bool $voided = false): int {
 
         $stat = $this->statMod($this->character->damage_stat, $voided);
 
         if (is_null($this->equippedItems)) {
-            return $stat;
+
+            if ($type === 'weapon') {
+                $value = $stat / 2;
+
+                return $value < 5 ? 5 : $value;
+            }
+
+            if ($type === 'spell-damage' && $this->character->classType()->isCaster()) {
+                $value = $stat / 2;
+
+                return $value < 5 ? 5 : $value;
+            }
+
+            return 0;
         }
 
         switch($type) {
@@ -291,6 +305,7 @@ class CharacterStatBuilder {
      * Includes: Weapons, Rings and Spell Damage.
      *
      * @return int
+     * @throws Exception
      */
     public function buildTotalAttack(): int {
         $weaponDamage = $this->buildDamage('weapon');
@@ -308,11 +323,13 @@ class CharacterStatBuilder {
      * @return int
      */
     public function positionalWeaponDamage(string $weaponPosition, bool $voided = false): int {
-        if (is_null($this->equippedItems)) {
-            return 0;
-        }
-
         $stat = $this->statMod($this->character->damage_stat, $voided);
+
+        if (is_null($this->equippedItems)) {
+            $value = $stat / 2;
+
+            return $value < 5 ? 5 : $value;
+        }
 
         return ceil($this->damageBuilder->buildWeaponDamage($stat, $voided, $weaponPosition));
     }
@@ -323,13 +340,20 @@ class CharacterStatBuilder {
      * @param string $spellPosition
      * @param bool $voided
      * @return int
+     * @throws Exception
      */
     public function positionalSpellDamage(string $spellPosition, bool $voided = false): int {
+        $stat = $this->statMod($this->character->damage_stat, $voided);
+
         if (is_null($this->equippedItems)) {
+            if ($this->character->classType()->isCaster()) {
+                $value = $stat / 2;
+
+                return $value < 5 ? 5 : $value;
+            }
+
             return 0;
         }
-
-        $stat = $this->statMod($this->character->damage_stat, $voided);
 
         return ceil($this->damageBuilder->buildSpellDamage($stat, $voided, $spellPosition));
     }
@@ -340,14 +364,22 @@ class CharacterStatBuilder {
      * @param string $spellPosition
      * @param bool $voided
      * @return int
+     * @throws Exception
      */
     public function positionalHealing(string $spellPosition, bool $voided = false): int {
 
+        $stat = $this->statMod($this->character->damage_stat, $voided);
+
         if (is_null($this->equippedItems)) {
+
+            if ($this->character->classType()->isProphet()) {
+                $value = $stat / 2;
+
+                return $value < 5 ? 5 : $value;
+            }
+
             return 0;
         }
-
-        $stat = $this->statMod($this->character->damage_stat, $voided);
 
         return ceil($this->healingBuilder->buildHealing($stat, $voided, $spellPosition));
     }
@@ -357,14 +389,21 @@ class CharacterStatBuilder {
      *
      * @param bool $voided
      * @return int
+     * @throws Exception
      */
     public function buildHealing(bool $voided = false): int {
 
+        $stat = $this->statMod($this->character->damage_stat, $voided);
+
         if (is_null($this->equippedItems)) {
+            if ($this->character->classType()->isProphet()) {
+                $value = $stat / 2;
+
+                return $value < 5 ? 5 : $value;
+            }
+
             return 0;
         }
-
-        $stat = $this->statMod($this->character->damage_stat, $voided);
 
         return ceil($this->healingBuilder->buildHealing($stat, $voided));
     }
@@ -506,8 +545,10 @@ class CharacterStatBuilder {
         }
 
         foreach ($this->equippedItems as $slot) {
-            if ($slot->item->itemPrefix->reduces_enemy_stats) {
-                return $slot->item->itemPrefix;
+            if (!is_null($slot->item->itemPrefix)) {
+                if ($slot->item->itemPrefix->reduces_enemy_stats) {
+                    return $slot->item->itemPrefix;
+                }
             }
         }
 
@@ -528,8 +569,10 @@ class CharacterStatBuilder {
         $suffixes = [];
 
         foreach ($this->equippedItems as $slot) {
-            if ($slot->item->itemSuffix->reduces_enemy_stats) {
-                $suffixes[] = $slot->item->itemSuffix;
+            if (!is_null($slot->item->itemSuffix)) {
+                if ($slot->item->itemSuffix->reduces_enemy_stats) {
+                    $suffixes[] = $slot->item->itemSuffix;
+                }
             }
         }
 
