@@ -97,10 +97,10 @@ class DamageBuilder extends BaseAttribute {
         }
 
         $itemSuffix = $this->inventory->where('item.itemSuffix.damage_can_stack', false)
-                                      ->where('item.itemSuffix.irresistible_damage', false)
+                                      ->where('item.itemSuffix.irresistible_damage', true)
                                       ->sum('item.itemSuffix.damage');
         $itemPrefix = $this->inventory->where('item.itemPrefix.damage_can_stack', false)
-                                      ->where('item.itemPrefix.irresistible_damage', false)
+                                      ->where('item.itemPrefix.irresistible_damage', true)
                                       ->sum('item.itemPrefix.damage');
 
         $amounts = array_filter([$itemPrefix, $itemSuffix]);
@@ -143,12 +143,12 @@ class DamageBuilder extends BaseAttribute {
             $lifeStealAmount  = $itemSuffix + $itemPrefix;
             $gameMap          = $this->character->map->gameMap;
 
-            if ($gameMap->mapType()->isHell() || $gameMap->mapType()->isPurgatory()) {
-                $lifeStealAmount = $lifeStealAmount / 2;
-            }
-
             if ($lifeStealAmount >= 1) {
                 $lifeStealAmount =  0.99;
+            }
+
+            if (($gameMap->mapType()->isHell() || $gameMap->mapType()->isPurgatory())) {
+                $lifeStealAmount = $lifeStealAmount / 2;
             }
 
             return $lifeStealAmount;
@@ -165,6 +165,8 @@ class DamageBuilder extends BaseAttribute {
             return 0;
         }
 
-        return max($lifeStealAmounts);
+        $value = max($lifeStealAmounts);
+
+        return $value >= 1 ? .99 : $value;
     }
 }

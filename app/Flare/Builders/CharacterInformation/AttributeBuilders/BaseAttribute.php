@@ -58,4 +58,13 @@ class BaseAttribute {
 
         return $this->inventory->where('item.type', $type)->where('position', $position)->sum('item.base_damage');
     }
+
+    protected function getHealingFromItems(string $type, string $position): int {
+
+        if ($position === 'both') {
+            return $this->inventory->where('item.type', $type)->sum('item.base_healing');
+        }
+
+        return $this->inventory->where('item.type', $type)->where('position', $position)->sum('item.base_healing');
+    }
 }

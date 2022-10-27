@@ -308,11 +308,11 @@ class CharacterStatBuilder {
      * @return int
      */
     public function positionalWeaponDamage(string $weaponPosition, bool $voided = false): int {
-        $stat = $this->statMod($this->character->damage_stat, $voided);
-
         if (is_null($this->equippedItems)) {
-            return $stat;
+            return 0;
         }
+
+        $stat = $this->statMod($this->character->damage_stat, $voided);
 
         return ceil($this->damageBuilder->buildWeaponDamage($stat, $voided, $weaponPosition));
     }
@@ -325,11 +325,11 @@ class CharacterStatBuilder {
      * @return int
      */
     public function positionalSpellDamage(string $spellPosition, bool $voided = false): int {
-        $stat = $this->statMod($this->character->damage_stat, $voided);
-
         if (is_null($this->equippedItems)) {
-            return $stat;
+            return 0;
         }
+
+        $stat = $this->statMod($this->character->damage_stat, $voided);
 
         return ceil($this->damageBuilder->buildSpellDamage($stat, $voided, $spellPosition));
     }
@@ -342,11 +342,12 @@ class CharacterStatBuilder {
      * @return int
      */
     public function positionalHealing(string $spellPosition, bool $voided = false): int {
-        $stat = $this->statMod($this->character->damage_stat, $voided);
 
         if (is_null($this->equippedItems)) {
-            return $stat;
+            return 0;
         }
+
+        $stat = $this->statMod($this->character->damage_stat, $voided);
 
         return ceil($this->healingBuilder->buildHealing($stat, $voided, $spellPosition));
     }
@@ -358,11 +359,12 @@ class CharacterStatBuilder {
      * @return int
      */
     public function buildHealing(bool $voided = false): int {
-        $stat = $this->statMod($this->character->damage_stat, $voided);
 
         if (is_null($this->equippedItems)) {
-            return $stat;
+            return 0;
         }
+
+        $stat = $this->statMod($this->character->damage_stat, $voided);
 
         return ceil($this->healingBuilder->buildHealing($stat, $voided));
     }
@@ -384,6 +386,12 @@ class CharacterStatBuilder {
         }
 
         if (empty($this->equippedItems)) {
+            if ($this->character->map->gameMap->mapType()->isPurgatory()) {
+                if ($itemDevouring >= 0.45) {
+                    $itemDevouring -= 0.45;
+                }
+            }
+
             return $itemDevouring;
         }
 
@@ -394,14 +402,16 @@ class CharacterStatBuilder {
         $amount             = $itemDevouring + $bestAffixDevouring;
 
         if ($this->character->map->gameMap->mapType()->isPurgatory()) {
-            $amount -= 0.45;
+            if ($amount >= 0.45) {
+                $amount -= 0.45;
+            }
         }
 
         if ($amount > 1) {
             $amount = 1;
         }
 
-        return $amount;
+        return floatval(number_format($amount, 2, '.', ''));
     }
 
     /**
@@ -424,9 +434,9 @@ class CharacterStatBuilder {
         if ($chance > 0) {
             if ($this->character->map->gameMap->mapType()->isPurgatory() && $chance > 0.45) {
                 if ($this->character->classType()->isProphet()) {
-                    $chance = 0.65;
+                    $chance = min($chance, 0.65);
                 } else {
-                    $chance = 0.45;
+                    $chance = min($chance, 0.45);
                 }
             }
         }
@@ -461,10 +471,10 @@ class CharacterStatBuilder {
     /**
      * Build entrancing chance.
      *
-     * @param $voided
+     * @param bool $voided
      * @return float
      */
-    public function buildEntrancingChance($voided): float {
+    public function buildEntrancingChance(bool $voided = false): float {
 
         if ($voided || is_null($this->equippedItems)) {
             return 0;
@@ -495,13 +505,10 @@ class CharacterStatBuilder {
             return null;
         }
 
-        $slot = $this->equippedItems->firstWhere(
-            'item.itemPrefix.reduces_enemy_stats',
-            $this->equippedItems->max('item.itemPrefix.reduces_enemy_stats')
-        );
-
-        if (!is_null($slot)) {
-            return $slot->item->itemPrefix;
+        foreach ($this->equippedItems as $slot) {
+            if ($slot->item->itemPrefix->reduces_enemy_stats) {
+                return $slot->item->itemPrefix;
+            }
         }
 
         return null;
@@ -510,15 +517,23 @@ class CharacterStatBuilder {
     /**
      * Get all stat reducing suffixes
      *
-     * @return Collection
+     * @return array
      */
-    public function getStatReducingSuffixes(): Collection {
+    public function getStatReducingSuffixes(): array {
 
         if (is_null($this->equippedItems)) {
-            return collect();
+            return [];
         }
 
-        return $this->equippedItems->where('item.itemSuffix.reduces_enemy_stats', '>', 0)->values();
+        $suffixes = [];
+
+        foreach ($this->equippedItems as $slot) {
+            if ($slot->item->itemSuffix->reduces_enemy_stats) {
+                $suffixes[] = $slot->item->itemSuffix;
+            }
+        }
+
+        return $suffixes;
     }
 
     /**

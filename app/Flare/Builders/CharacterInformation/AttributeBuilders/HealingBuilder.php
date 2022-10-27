@@ -14,7 +14,7 @@ class HealingBuilder extends BaseAttribute {
             $baseDamage = 0;
         }
 
-        $itemDamage      = $this->getDamageFromItems('spell-healing', $position);
+        $itemDamage      = $this->getHealingFromItems('spell-healing', $position);
 
         $skillPercentage = 0;
 
