@@ -3,6 +3,8 @@
 namespace App\Game\Shop\Controllers;
 
 use App\Flare\Jobs\CharacterAttackTypesCacheBuilder;
+use App\Game\Shop\Requests\ShopBuyMultipleValidation;
+use App\Game\Shop\Requests\ShopPurchaseMultipleValidation;
 use Cache;
 use Illuminate\Http\Request;
 use League\Fractal\Manager;
@@ -204,5 +206,56 @@ class ShopController extends Controller {
         CharacterAttackTypesCacheBuilder::dispatch($character);
 
         return redirect()->to(route('game.shop.buy', ['character' => $character]))->with('success', 'Purchased and equipped: ' . $item->affix_name . '.');
+    }
+
+    public function puracheMultiple(ShopBuyMultipleValidation $request, Character $character) {
+        $item = Item::where('name', $request->item_name)
+                    ->whereNotIn('type', ['alchemy', 'trinket'])
+                    ->whereNull('item_suffix_id')
+                    ->whereNull('item_prefix_id')
+                    ->whereDoesntHave('appliedHolyStacks')
+                    ->first();
+
+        if (is_null($item)) {
+            return redirect()->back()->with('error', 'No matching item found ...');
+        }
+
+        return view('game.shop.multiple', [
+            'gold'        => $character->gold,
+            'cost'        => $item->cost,
+            'itemId'      => $item->id,
+            'itemName'    => $item->name,
+            'characterId' => $character->id
+        ]);
+    }
+
+    public function buyMultiple(ShopPurchaseMultipleValidation $request, Character $character) {
+        $item   = Item::find($request->item_id);
+        $amount = $request->amount;
+
+        if ($amount > $character->inventory_max || $character->isInventoryFull()) {
+            return redirect()->back()->with('error', 'You cannot purchase more then you have inventory space.');
+        }
+
+        $cost = $amount * $item->cost;
+
+        if ($cost > $character->gold) {
+            return redirect()->back()->with('error', 'You do not have enough gold.');
+        }
+
+        $character->update([
+            'gold' => $character->gold - $cost,
+        ]);
+
+        $character = $character->refresh();
+
+        for ($i = 1; $i <= $amount; $i++) {
+            $character->inventory->slots()->create([
+                'inventory_id' => $character->inventory->id,
+                'item_id'      => $item->id,
+            ]);
+        }
+
+        return redirect()->to(route('game.shop.buy', ['character' => $character->id]))->with('success', 'You purchased: ' . $amount . ' of ' . $item->name);
     }
 }

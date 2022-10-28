@@ -93,6 +93,7 @@ class RemoveDuplicateAlchemyItems extends Command {
         }
 
         $this->newLine();
+
         $this->line('All done.');
     }
 }

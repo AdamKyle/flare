@@ -5,6 +5,7 @@ namespace App\Game\Battle\Services;
 use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Battle\Values\CelestialConjureType;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use Facades\App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\CelestialFight;
@@ -135,7 +136,13 @@ class CelestialFightService {
 
         BattleAttackHandler::dispatch($character->id, $celestialFight->monster_id)->onQueue('default_long')->delay(now()->addSeconds(2));
 
-        event(new GlobalMessageEvent($character->name . ' has slain the '.$celestialFight->monster->name.'! They have been rewarded with a godly gift!'));
+        $celestialFightType = new CelestialConjureType($celestialFight->type);
+
+        if ($celestialFightType->isPublic()) {
+            event(new GlobalMessageEvent($character->name . ' has slain the ' . $celestialFight->monster->name . '! They have been rewarded with a godly gift!'));
+        } else {
+            event(new ServerMessageEvent($character->user,'You have slain the ' . $celestialFight->monster->name . '! They have been rewarded with a godly gift!'));
+        }
 
         $this->characterCacheData->deleteCharacterSheet($character);
 
@@ -182,6 +189,12 @@ class CelestialFightService {
             'current_health'  => $celestialFight->current_health,
         ]);
 
-        event(new GlobalMessageEvent($character->name . ' Has caused: ' . $monster->name . ' to flee to the far ends of Tlessa (use /pct or /pc to find the new coordinates).'));
+        $celestialFightType = new CelestialConjureType($celestialFight->type);
+
+        if ($celestialFightType->isPublic()) {
+            event(new GlobalMessageEvent($character->name . ' Has caused: ' . $monster->name . ' to flee to the far ends of Tlessa (use /pct or /pc to find the new coordinates).'));
+        } else {
+            event(new ServerMessageEvent($character->user, 'You Have caused: ' . $monster->name . ' to flee to the far ends of Tlessa (use /pct or /pc to find the new coordinates).'));
+        }
     }
 }

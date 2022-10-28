@@ -112,19 +112,17 @@ class ConjureService {
             'type'            => $type === 'private'? CelestialConjureType::PRIVATE : CelestialConjureType::PUBLIC,
         ]);
 
-        $plane = $character->map->gameMap->name;
         $type  = new CelestialConjureType($type === 'private'? CelestialConjureType::PRIVATE : CelestialConjureType::PUBLIC);
         $npc   = Npc::where('type', NpcTypes::SUMMONER)->first();
+        $plane = $character->map->gameMap->name;
 
-        if ($type->isPrivate()) {
+        broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('location_of_conjure', $npc, $celestialFight)));
+
+        if ($type->isPublic()) {
             event(new GlobalMessageEvent($monster->name . ' has been conjured to the ' . $plane . ' plane.'));
-
-            broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('location_of_conjure', $npc, $celestialFight)));
-        } else if ($type->isPublic()) {
-            event(new GlobalMessageEvent( $monster->name . ' has been conjured to the ' . $plane . ' plane at (x/y): ' . $x . '/' . $y));
         }
 
-        event(new UpdateMap($character->user, resolve(LocationService::class)->getLocationData($character->refresh())));
+        event(new UpdateMap($character->user));
     }
 
     /**
