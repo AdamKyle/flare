@@ -13,7 +13,7 @@ class SetQuestToComplete extends Command
      *
      * @var string
      */
-    protected $signature = 'update-quest:complete {characterName} {questName}';
+    protected $signature = 'update-quest:complete {characterName} {questName=all}';
 
     /**
      * The console command description.
@@ -36,14 +36,27 @@ class SetQuestToComplete extends Command
             return;
         }
 
-        $quest = Quest::where('name', $this->argument('questName'))->first();
+        if ($this->argument('questName') === 'all') {
+            $quests = Quest::all();
 
-        if (is_null($quest)) {
-            $this->error('Quest not found');
+            foreach ($quests as $quest) {
+                $this->completeQuest($character, $quest);
+            }
+        } else {
+            $quest = Quest::where('name', $this->argument('questName'))->first();
 
-            return;
+            if (is_null($quest)) {
+                $this->error('Quest not found');
+
+                return;
+            }
+
+            $this->completeQuest($character, $quest);
         }
 
+    }
+
+    protected function completeQuest(Character $character, Quest $quest) {
         $hasItem = $character->inventory->slots->filter(function($slot) use($quest) {
             return $slot->item_id === $quest->reward_item;
         })->isNotEmpty();
