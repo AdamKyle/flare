@@ -12,7 +12,7 @@ export default class SkillHelpModal extends React.Component<any, any> {
                           manage_modal={this.props.manage_modal}
                           title='Sacrifice XP'>
                 <p className='my-2 text-gray-700 dark:text-gray-200'>
-                    By setting this to a percentage, any XP gained from monsters, Adventures or Exploration
+                    By setting this to a percentage, any XP gained from monsters or Exploration
                     will be reduced <strong>BEFORE</strong> additional modifiers and quest items are applied. This amount will then be
                     applied to the skill XP.
                 </p>

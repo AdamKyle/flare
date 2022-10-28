@@ -9,11 +9,14 @@ use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
+use App\Flare\Models\Location;
+use App\Flare\Models\Map;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Skill;
 use App\Flare\Events\UpdateSkillEvent;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Values\ItemEffectsValue;
+use App\Flare\Values\LocationType;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Services\CharacterService;
@@ -290,13 +293,37 @@ class CharacterRewardService {
             $slot      = InventorySlot::where('inventory_id', $inventory->id)->where('item_id', $item->id)->first();
 
             if (!is_null($slot)) {
-                $newCoins      = $this->character->copper_coins + rand(5, 20);
-                $maxCurrencies = new MaxCurrenciesValue($newCoins, MaxCurrenciesValue::COPPER);
+                $coins             = rand(5, 20);
+                $purgatoryDungeons = $this->purgatoryDungeons($this->character->map);
+
+                if (!is_null($purgatoryDungeons)) {
+                    $coins *= 3;
+                }
+
+                $newCoins          = $this->character->copper_coins + $coins;
+                $maxCurrencies     = new MaxCurrenciesValue($newCoins, MaxCurrenciesValue::COPPER);
 
                 if (!$maxCurrencies->canNotGiveCurrency()) {
                     $this->character->update(['copper_coins' => $newCoins]);
+                } else {
+                    $this->character->update(['copper_coins' => MaxCurrenciesValue::MAX_COPPER]);
                 }
             }
         }
+    }
+
+    /**
+     * Are we at a location with an effect (special location)?
+     *
+     * @param Map $map
+     * @return Location|null
+     */
+    protected function purgatoryDungeons(Map $map): ?Location {
+       return Location::whereNotNull('enemy_strength_type')
+                       ->where('x', $map->character_position_x)
+                       ->where('y', $map->character_position_y)
+                       ->where('game_map_id', $map->game_map_id)
+                       ->where('type', LocationType::PURGATORY_DUNGEONS)
+                       ->first();
     }
 }
