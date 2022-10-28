@@ -10,8 +10,6 @@ const ratingStars = () => {
     stars.forEach((star) => star.classList.remove("active"));
 
     event.target.classList.add("active");
-
-    console.log("You have rated " + count + " stars.");
   };
 
   on("body", "click", ".rating-stars", (event) => {
