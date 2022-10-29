@@ -143,7 +143,7 @@ export default class Chat extends React.Component<ChatComponentProps, ChatCompon
         if (message.x === 0 && message.y === 0) {
             return <Fragment>{message.time_stamp} <i className="fas fa-skull"></i></Fragment>
         } else if (message.hide_location) {
-            return '['+message.map_name + ' ' + '***/***]';
+            return message.time_stamp + ' ['+message.map_name + ' ' + '***/***]';
         }
 
         return message.time_stamp + ' [' + message.map_name + ' ' + message.x + '/' + message.y + ']'
