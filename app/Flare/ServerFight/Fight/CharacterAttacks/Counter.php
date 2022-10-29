@@ -81,7 +81,7 @@ class Counter extends BattleBase {
 
     public function playerCounter(Character $character, ServerMonster $monster) {
         $monsterAc                = $monster->getMonsterStat('ac');
-        $monsterCounterResistance = $monster->getMonsterStat('counter_resistance_chance_chance');
+        $monsterCounterResistance = $monster->getMonsterStat('counter_resistance_chance');
         $characterCounterChance   = $this->characterCacheData->getCachedCharacterData($character, 'counter_chance');
 
         $characterCounterChance -= $monsterCounterResistance;
