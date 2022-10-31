@@ -55,6 +55,7 @@ export default class LocationDetails extends React.Component<LocationDetailsProp
     }
 
     render() {
+        console.log(this.props.location);
         return (
             <Fragment>
                 <p className='my-3'>{this.props.location.description}</p>
@@ -96,7 +97,7 @@ export default class LocationDetails extends React.Component<LocationDetailsProp
                                 <dl className='mb-4'>
                                     <dt>Quest Item (Gained on visiting)</dt>
                                     <dd>
-                                        <a href={"/information/item/" + this.props.location.quest_reward_item.id} target='_blank'>
+                                        <a href={"/information/item/" + this.props.location.quest_reward_item_id} target='_blank'>
                                             {this.props.location.quest_reward_item.affix_name} <i
                                             className="fas fa-external-link-alt"></i>
                                         </a>

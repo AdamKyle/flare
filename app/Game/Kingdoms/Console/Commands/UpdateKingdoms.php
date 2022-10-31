@@ -41,7 +41,7 @@ class UpdateKingdoms extends Command
     {
         Kingdom::chunkById(250, function($kingdoms) {
             foreach ($kingdoms as $kingdom) {
-                UpdateKingdomJob::dispatch($kingdom)->onConnection('kingdom_jobs');
+                UpdateKingdomJob::dispatch($kingdom)->onConnection('long_running');
             }
         });
     }

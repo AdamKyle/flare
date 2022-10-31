@@ -5,6 +5,13 @@ Route::get('/monsters/{monster}', ['as' => 'game.monsters.monster', 'uses' => 'M
 Route::get('/locations/{location}', ['as' => 'game.locations.location', 'uses' => 'LocationsController@show']);
 
 Route::middleware([
+    'auth',
+])->group(function() {
+    Route::get('/game/tops', ['as' => 'game.tops', 'uses' => 'GameTopsController@tops']);
+    Route::get('/game/tops/{character}', ['as' => 'game.tops.character.stats', 'uses' => 'GameTopsController@characterStats']);
+});
+
+Route::middleware([
     'is.player.banned',
     'is.character.who.they.say.they.are',
     'is.globally.timed.out',

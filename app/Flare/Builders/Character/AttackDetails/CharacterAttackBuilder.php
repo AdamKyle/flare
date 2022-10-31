@@ -130,15 +130,15 @@ class CharacterAttackBuilder {
             'heal_for'                  => $this->characterStatBuilder->buildHealing($voided),
             'res_chance'                => $this->characterStatBuilder->buildResurrectionChance(),
             'damage_deduction'          => $characterReduction,
-            'ambush_chance'             => $this->characterStatBuilder->buildAmbush('chance'),
+            'ambush_chance'             => $this->characterStatBuilder->buildAmbush(),
             'ambush_resistance_chance'  => $this->characterStatBuilder->buildAmbush('resistance'),
-            'counter_chance'            => $this->characterStatBuilder->buildCounter('chance'),
+            'counter_chance'            => $this->characterStatBuilder->buildCounter(),
             'counter_resistance_chance' => $this->characterStatBuilder->buildCounter('resistance'),
             'affixes'                   => [
                 'cant_be_resisted'       => $this->characterStatBuilder->canAffixesBeResisted(),
-                'stacking_damage'        => $this->characterStatBuilder->buildAffixDamage('affix-stacking-damage', $voided) +
+                'stacking_damage'        => $this->characterStatBuilder->buildAffixDamage('affix-stacking-damage', $voided),
                                             $this->characterStatBuilder->buildAffixDamage('affix-irresistible-damage-stacking', $voided),
-                'non_stacking_damage'    => $this->characterStatBuilder->buildAffixDamage('affix-non-stacking', $voided) +
+                'non_stacking_damage'    => $this->characterStatBuilder->buildAffixDamage('affix-non-stacking', $voided),
                                             $this->characterStatBuilder->buildAffixDamage('affix-irresistible-damage-non-stacking', $voided),
                 'stacking_life_stealing' => $this->characterStatBuilder->buildAffixDamage('life-stealing', $voided),
                 'life_stealing'          => $this->characterStatBuilder->buildAffixDamage('life-stealing', $voided),

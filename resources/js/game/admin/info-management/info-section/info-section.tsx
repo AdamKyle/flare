@@ -144,6 +144,12 @@ export default class InfoSection extends React.Component<any, any> {
         },{
             label: 'Kingdom Units',
             value: 'admin.kingdoms.units.units-table',
+        },{
+            label: 'Regular Locations',
+            value: 'info.locations.regular-locations',
+        },{
+            label: 'Special Locations',
+            value: 'info.locations.special-locations',
         }];
     }
 

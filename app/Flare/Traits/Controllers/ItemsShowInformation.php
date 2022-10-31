@@ -133,8 +133,6 @@ trait ItemsShowInformation {
             }
         }
 
-        dump(Monster::where('quest_item_id', $item->id)->first());
-
         return [
             'item'      => $item,
             'monster'   => Monster::where('quest_item_id', $item->id)->first(),

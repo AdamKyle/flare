@@ -18,6 +18,10 @@
             <span class="icon fas fa-feather"></span>
             <span class="title">Quest Log</span>
         </a>
+        <a href="#no-link" class="link" data-target="[data-menu=tops]" data-toggle="tooltip-menu" data-tippy-content="Tops">
+            <span class="icon fas fa-chart-area"></span>
+            <span class="title">Tops</span>
+        </a>
     </div>
 
     <!-- Character -->
@@ -73,6 +77,15 @@
                     Completed Guide Quests
                 </a>
             @endif
+        </div>
+    </div>
+
+    <div class="menu-detail" data-menu="tops">
+        <div class="menu-detail-wrapper">
+            <a href="{{route('game.tops')}}">
+                <span class="fas fa-list"></span>
+                Characters
+            </a>
         </div>
     </div>
 </aside>

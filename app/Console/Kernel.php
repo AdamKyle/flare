@@ -41,6 +41,9 @@ class Kernel extends ConsoleKernel {
         // clean the kingdom logs every week on monday at 2 am.
         $schedule->command('clean:kingdomLogs')->weeklyOn(1, '2:00')->timezone(config('app.timezone'));
 
+        // Unlock market listings that have been locked for a day.
+        $schedule->command('unlock:market-listings')->dailyAt('02:00')->timezone(config('app.timezone'));
+
         /**
          * Game Events:
          */
