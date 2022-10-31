@@ -246,11 +246,18 @@ class  CharacterInventoryController extends Controller {
      * @return JsonResponse
      */
     public function renameSet(RenameSetRequest $request, Character $character): JsonResponse {
-        $inventorySet = $character->inventorySets()->find($request->set_id);
+        $inventorySets = $character->inventorySets;
+        $inventorySet  = $inventorySets->firstWhere('id', $request->set_id);
 
         if (is_null($inventorySet)) {
             return response()->json([
                 'message' => 'Set does not exist.'
+            ], 422);
+        }
+
+        if ($inventorySets->where('name', $inventorySet->name)->isNotEmpty()) {
+            return response()->json([
+                'message' => 'You already have a set with this name. Pick something else.'
             ], 422);
         }
 
