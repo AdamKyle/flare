@@ -57,6 +57,9 @@ class Kernel extends ConsoleKernel {
         // Monthly PVP Alert at 8 am - Lets players sign up for pvp.
         $schedule->command('monthly:pvp')->lastDayOfMonth('08:00')->timezone(config('app.timezone'));
 
+        // Start the monthly pvp event.
+        $schedule->command('start:pvp-monthly-event')->lastDayOfMonth('18:30')->timezone(config('app.timezone'));
+
         // Give people a chance to win daily lottery for gold dust
         $schedule->command('daily:gold-dust')->dailyAt('12:00')->timezone(config('app.timezone'));
     }

@@ -198,8 +198,11 @@ class TraverseService {
     protected function updateKingdomOwnedKingdom(Character $character): void {
         $mapId = $character->map->game_map_id;
 
-        Kingdom::where('x_position', $this->x)
-               ->where('y_position', $this->y)
+        $x = $character->map->character_position_x;
+        $y = $character->map->character_position_y;
+
+        Kingdom::where('x_position',$x)
+               ->where('y_position', $y)
                ->where('character_id', $character->id)
                ->where('game_map_id', $mapId)
                ->update([
