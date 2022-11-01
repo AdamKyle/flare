@@ -14,7 +14,6 @@ import {
 } from "../../../lib/game/dark-mode-watcher";
 import UsableItemSection from "../../character-sheet/components/modals/components/usable-item-section";
 import InventoryQuestItemDetails from "../../character-sheet/components/modals/components/inventory-quest-item-details";
-import InventoryUseDetails from "../../character-sheet/components/modals/inventory-use-details";
 import AlchemyItemHoly from "../../character-sheet/components/modals/components/alchemy-item-holy";
 
 export default class ItemComparison extends React.Component<any, any> {

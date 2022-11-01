@@ -2,7 +2,10 @@
 
 namespace App\Game\Battle\Services;
 
+use App\Flare\Models\Event;
 use App\Flare\Models\Location;
+use App\Flare\Values\EventType;
+use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\LocationType;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\UpdateTopBarEvent;
@@ -49,7 +52,49 @@ class BattleRewardProcessing {
 
         $character = $this->giveShards($character);
 
+        $character = $this->currencyEventReward($character, $monster);
+
         event(new UpdateTopBarEvent($character));
+    }
+
+    protected function currencyEventReward(Character $character, Monster $monster): Character {
+        $event = Event::where('type', EventType::WEEKLY_CURRENCY_DROPS)->first();
+
+        if (!is_null($event) && !$monster->is_celestial_entity) {
+
+            $canHaveCopperCoins = $character->inventory->slots->filter(function($slot) {
+                return $slot->item->effect === ItemEffectsValue::GET_COPPER_COINS;
+            })->isNotEmpty();
+
+            $characterShards      = $character->shards + rand(1,25);
+            $characterGoldDust    = $character->gold_dust + rand(1,25);
+
+            if ($canHaveCopperCoins) {
+                $characterCopperCoins = $character->copper_coins + rand(1, 25);
+            } else {
+                $characterCopperCoins = $character->copper_coins;
+            }
+
+            if ($characterShards > MaxCurrenciesValue::MAX_SHARDS) {
+                $characterShards = MaxCurrenciesValue::MAX_SHARDS;
+            }
+
+            if ($characterCopperCoins > MaxCurrenciesValue::MAX_COPPER) {
+                $characterCopperCoins = MaxCurrenciesValue::MAX_COPPER;
+            }
+
+            if ($characterGoldDust > MaxCurrenciesValue::MAX_GOLD_DUST) {
+                $characterGoldDust = MaxCurrenciesValue::MAX_GOLD_DUST;
+            }
+
+            $character->update([
+                'shards'       => $characterShards,
+                'copper_coins' => $characterCopperCoins,
+                'gold_dust'    => $characterGoldDust
+            ]);
+        }
+
+        return $character->refresh();
     }
 
     /**

@@ -212,6 +212,21 @@
                     </div>
                 </div>
             </x-core.cards.card-with-hover>
+            <x-core.cards.card-with-hover>
+                <div class="flex justify-center items-center">
+                    <div class="w-1/5 text-7xl">
+                        <i class="fas fa-calendar text-primary-600 relative top-[10px] right-[10px]"></i>
+                    </div>
+                    <div class="w-4/5">
+                        <h5>
+                            <a href="{{route('info.page', [
+                                        'pageName' => 'events',
+                                    ])}}">Events</a>
+                        </h5>
+                        <p>Tlessa offers events that reward players for participating!</p>
+                    </div>
+                </div>
+            </x-core.cards.card-with-hover>
         </div>
 
         <div class="w-full lg:w-2/4 mx-auto mt-10 lg:mt-20 mb-10">
