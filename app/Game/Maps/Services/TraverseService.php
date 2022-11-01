@@ -3,6 +3,7 @@
 namespace App\Game\Maps\Services;
 
 use App\Flare\Jobs\CharacterAttackTypesCacheBuilderWithDeductions;
+use App\Flare\Models\Kingdom;
 use App\Flare\Models\Map;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Maps\Events\UpdateMap;
@@ -152,6 +153,7 @@ class TraverseService {
 
         $this->updateMap($character);
         $this->updateActions($mapId, $character, $oldMap);
+        $this->updateKingdomOwnedKingdom($character);
 
         $message = 'You have traveled to: ' . $character->map->gameMap->name;
 
@@ -185,6 +187,27 @@ class TraverseService {
 
             event(new GlobalMessageEvent('Thunder claps in the sky: ' . $character->name . ' has called forth The Creator\'s gates of despair! The Creator is Furious! "Hear me, child! I shall face you in the depths of my despair and crush the soul from your bones!" the lands fall silent, the children no longer have faith and the fabric of time rips open...'));
         }
+    }
+
+    /**
+     * Update the players kingdom at specified location.
+     *
+     * @param Character $character
+     * @return void
+     */
+    protected function updateKingdomOwnedKingdom(Character $character): void {
+        $mapId = $character->map->game_map_id;
+
+        $x = $character->map->character_position_x;
+        $y = $character->map->character_position_y;
+
+        Kingdom::where('x_position',$x)
+               ->where('y_position', $y)
+               ->where('character_id', $character->id)
+               ->where('game_map_id', $mapId)
+               ->update([
+                   'last_walked' => now(),
+               ]);
     }
 
     /**

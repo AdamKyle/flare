@@ -76,6 +76,8 @@ class SetSailService extends BaseMovementService {
 
         $this->updateMonstersList($character, $toPort);
 
+        $this->updateKingdomOwnedKingdom($character);
+
         return $this->successResult($this->movementService->accessLocationService()->getLocationData($character));
     }
 

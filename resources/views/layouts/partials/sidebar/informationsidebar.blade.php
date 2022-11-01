@@ -49,6 +49,10 @@
                 <span class="text-sm far fa-comment-dots"></span>
                 Chat Commands
             </a>
+            <a href="{{route('info.page', ['pageName' => 'events'])}}">
+                <span class="text-sm fas fa-calendar"></span>
+                Events
+            </a>
         </div>
         <hr />
         <div class="menu-detail-wrapper">

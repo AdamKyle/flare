@@ -4,6 +4,7 @@ namespace App\Admin\Controllers;
 
 use App\Admin\Services\LocationService;
 use App\Flare\Values\LocationEffectValue;
+use App\Flare\Values\LocationType;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Location;
 use Illuminate\Http\Request;
@@ -39,6 +40,7 @@ class LocationsController extends Controller {
     public function show(Location $location) {
 
         $increasesEnemyStrengthBy = null;
+        $locationType             = null;
         $increasesDropChanceBy    = 0.0;
 
         if (!is_null($location->enemy_strength_type)) {
@@ -46,10 +48,15 @@ class LocationsController extends Controller {
             $increasesDropChanceBy    = (new LocationEffectValue($location->enemy_strength_type))->fetchDropRate();
         }
 
+        if (!is_null($location->type)) {
+            $locationType = (new LocationType($location->type));
+        }
+
         return view('admin.locations.location', [
             'location'                 => $location,
             'increasesEnemyStrengthBy' => $increasesEnemyStrengthBy,
             'increasesDropChanceBy'    => $increasesDropChanceBy,
+            'locationType'             => $locationType,
         ]);
     }
 }

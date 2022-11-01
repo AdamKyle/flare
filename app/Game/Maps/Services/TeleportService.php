@@ -122,5 +122,7 @@ class TeleportService extends BaseMovementService {
         }
 
         $this->updateMonstersList($character, $location);
+
+        $this->updateKingdomOwnedKingdom($character);
     }
 }

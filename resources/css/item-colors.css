@@ -18,6 +18,10 @@
   @apply text-green-700 dark:text-green-600;
 }
 
+.mythic {
+  @apply text-amber-600 dark:text-amber-500;
+}
+
 .holy-item {
   @apply text-sky-700 dark:text-sky-300
 }

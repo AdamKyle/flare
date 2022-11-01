@@ -41,6 +41,7 @@ class WalkingService extends BaseMovementService
      *
      * @param Character $character
      * @return array
+     * @throws \Exception
      */
     public function movePlayerToNewLocation(Character $character): array {
 
@@ -67,6 +68,8 @@ class WalkingService extends BaseMovementService
         }
 
         $this->updateMonstersList($character, $location);
+
+        $this->updateKingdomOwnedKingdom($character);
 
         event(new MoveTimeOutEvent($character));
 

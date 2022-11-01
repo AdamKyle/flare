@@ -54,6 +54,10 @@ trait ItemsShowInformation {
                 $effects = 'Use Traverse (beside movement map-actions) to traverse to Dungeons plane';
             }
 
+            if ($effect->shadowPlane()) {
+                $effects = 'Use Traverse (beside movement map-actions) to traverse to Shadow Plane';
+            }
+
             if ($effect->hell()) {
                 $effects = 'Use Traverse (beside movement map-actions) to traverse to Hell plane';
             }

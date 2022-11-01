@@ -17,7 +17,7 @@
             editUrl="{{route('location.edit', ['location' => $location->id])}}"
         >
             @include('admin.locations.partials.location', [
-                'location' => $location
+                'location' => $location,
             ])
         </x-core.cards.card-with-title>
     </x-core.layout.info-container>

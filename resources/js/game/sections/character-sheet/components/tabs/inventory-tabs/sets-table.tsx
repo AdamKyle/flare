@@ -19,6 +19,7 @@ import RenameSetModal from "../../modals/rename-set-modal";
 import clsx from "clsx";
 import UsableItemsDetails from "../../../../../lib/game/character-sheet/types/inventory/usable-items-details";
 import InventoryUseDetails from "../../modals/inventory-item-details";
+import DangerAlert from "../../../../../components/ui/alerts/simple-alerts/danger-alert";
 
 export default class SetsTable extends React.Component<SetsInventoryTabProps, SetsTableState> implements ActionsInterface {
     constructor(props: SetsInventoryTabProps) {
@@ -37,6 +38,7 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
             view_item: false,
             loading_label: null,
             show_loading_label: false,
+            error_message: null,
         }
     }
 
@@ -197,7 +199,14 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
                     this.props.update_inventory(result.data.inventory);
                 });
             }, (error: AxiosError) => {
+                if (typeof error.response !== 'undefined') {
+                    const response = error.response;
 
+                    this.setState({
+                        loading: false,
+                        error_message: response.data.message,
+                    });
+                }
             })
         })
     }
@@ -307,6 +316,12 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
         });
     }
 
+    clearErrorMessage() {
+        this.setState({
+            error_message: null,
+        });
+    }
+
     buildSetTitle() {
         if (this.state.selected_set !== null) {
             return 'Viewing: '+this.state.selected_set + '.';
@@ -331,6 +346,13 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
                             {this.state.success_message}
                         </SuccessAlert>
                     : null
+                }
+                {
+                    this.state.error_message !== null ?
+                        <DangerAlert close_alert={this.clearErrorMessage.bind(this)} additional_css={'mt-4 mb-4'}>
+                            {this.state.error_message}
+                        </DangerAlert>
+                        : null
                 }
                 {
                     this.cannotEquipSet() ?

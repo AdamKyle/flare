@@ -3,6 +3,7 @@
 namespace App\Game\Maps\Services;
 
 use App\Flare\Models\GameMap;
+use App\Flare\Models\Kingdom;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\LocationType;
 use App\Game\Maps\Events\UpdateCharacterBasePosition;
@@ -144,6 +145,24 @@ class BaseMovementService {
         event(new UpdateCharacterBasePosition($character->user->id, $this->x, $this->y, $character->map->game_map_id));
 
         return $character->refresh();
+    }
+
+    /**
+     * Update the players kingdom at specified location.
+     * 
+     * @param Character $character
+     * @return void
+     */
+    protected function updateKingdomOwnedKingdom(Character $character): void {
+        $mapId = $character->map->game_map_id;
+
+        Kingdom::where('x_position', $this->x)
+               ->where('y_position', $this->y)
+               ->where('character_id', $character->id)
+               ->where('game_map_id', $mapId)
+               ->update([
+                    'last_walked' => now(),
+               ]);
     }
 
     /**

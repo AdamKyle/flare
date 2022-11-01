@@ -77,7 +77,7 @@ class MarketBoard {
             'gold' => $newGold,
         ]);
 
-        $message = 'Sold market listing: ' . $listing->item->affix_name . ' for: ' . $gold . ' After fees (5% tax).';
+        $message = 'Sold market listing: ' . $listing->item->affix_name . ' for: ' . number_format($gold) . ' After fees (5% tax).';
 
         event(new ServerMessageEvent($listingCharacter->user, 'sold_item', $message));
 

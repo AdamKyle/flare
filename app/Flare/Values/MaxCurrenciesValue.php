@@ -2,6 +2,8 @@
 
 namespace App\Flare\Values;
 
+use Exception;
+
 class MaxCurrenciesValue {
 
     const MAX_GOLD      = 2000000000000;
@@ -31,12 +33,13 @@ class MaxCurrenciesValue {
     /**
      * MaxLevel constructor.
      *
-     * @param int $currentLevel
-     * @param int $xp
+     * @param int $amount
+     * @param int $value
+     * @throws Exception
      */
     public function __construct(int $amount, int $value) {
         if (!in_array($value, self::$values)) {
-            throw new \Exception($value . ' does not exist.');
+            throw new Exception($value . ' does not exist.');
         }
 
         $this->value  = $value;

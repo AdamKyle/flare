@@ -24,4 +24,6 @@ export default interface SetsTableState {
     loading_label: string | null;
 
     show_loading_label: boolean;
+
+    error_message: string | null;
 }

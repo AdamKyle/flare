@@ -2,6 +2,7 @@
 
 namespace App\Game\Maps\Controllers\Api;
 
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use App\Http\Controllers\Controller;
@@ -73,6 +74,7 @@ class MapController extends Controller {
      * @param MoveRequest $request
      * @param Character $character
      * @return JsonResponse
+     * @throws Exception
      */
     public function move(MoveRequest $request, Character $character): JsonResponse {
         if (!$character->can_move) {

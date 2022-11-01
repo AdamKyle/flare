@@ -38,7 +38,11 @@ class ItemDisplayColor extends Component
         $isEitherRandomlyGenerated = $this->isEitherEnchantRandomlyGenerated();
 
         if ($isEitherRandomlyGenerated) {
-            $this->color = 'unique-item';
+            if ($this->item->is_mythic) {
+                $this->color = 'mythic';
+            } else {
+                $this->color = 'unique-item';
+            }
         } else {
             if ($this->item->type === 'trinket') {
                 $this->color = 'trinket';
@@ -52,9 +56,7 @@ class ItemDisplayColor extends Component
                 $this->color = 'quest-item';
             } elseif ($this->item->usable || $this->item->can_use_on_other_items) {
                 $this->color = 'usable-item';
-            } elseif($this->item->is_mythic) {
-                $this->color = 'mythic-unique';
-            } else {
+            }  else {
                 $this->color = 'normal-item';
             }
         }
