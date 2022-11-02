@@ -26,7 +26,7 @@ class KingdomUpdateService {
     use DestroyKingdom, CalculateMorale;
 
     /**
-     * @var Kingdom
+     * @var Kingdom|null $kingdom
      */
     private ?Kingdom $kingdom;
 

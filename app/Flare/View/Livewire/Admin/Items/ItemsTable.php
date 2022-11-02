@@ -69,9 +69,11 @@ class ItemsTable extends DataTableComponent {
             'spell-damage'  => 'Damage Spells',
         ];
 
-        if (auth()->user()->hasRole('Admin')) {
-            $options['trinket'] = 'Trinkets';
-            $options['quest']   = 'Quest items';
+        if (!is_null(auth()->user())) {
+            if (auth()->user()->hasRole('Admin')) {
+                $options['trinket'] = 'Trinkets';
+                $options['quest'] = 'Quest items';
+            }
         }
 
         return $options;
