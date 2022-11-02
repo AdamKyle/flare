@@ -96,7 +96,9 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
         const setId = this.props.sets[this.state.selected_set].set_id
 
         this.setState({
-            loading: true
+            loading: true,
+            error_message: null,
+            success_message: null,
         }, () => {
             (new Ajax()).setRoute('character/'+this.props.character_id+'/inventory-set/' + setId + '/remove-all').doAjaxCall('post', (result: AxiosResponse) => {
                 this.setState({
@@ -123,7 +125,9 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
         this.setState({
             loading: true,
             show_loading_label: true,
-            loading_label: 'Equipping set and recalculating your stats (this can take a few seconds) ...'
+            loading_label: 'Equipping set and recalculating your stats (this can take a few seconds) ...',
+            error_message: null,
+            success_message: null,
         }, () => {
             this.props.disable_tabs();
 
@@ -184,7 +188,9 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
         }
 
         this.setState({
-            loading: true
+            loading: true,
+            error_message: null,
+            success_message: null,
         }, () => {
             (new Ajax()).setRoute('character/'+this.props.character_id+'/inventory-set/rename-set').setParameters({
                 set_id: setId,

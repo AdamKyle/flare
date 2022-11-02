@@ -255,7 +255,7 @@ class  CharacterInventoryController extends Controller {
             ], 422);
         }
 
-        if ($inventorySets->where('name', $inventorySet->name)->isNotEmpty()) {
+        if ($inventorySets->where('name', $request->set_name)->isNotEmpty()) {
             return response()->json([
                 'message' => 'You already have a set with this name. Pick something else.'
             ], 422);
