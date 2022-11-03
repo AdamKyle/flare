@@ -53,7 +53,7 @@ class BaseAttribute {
      * @param string $baseAttribute
      * @return float
      */
-    protected function fetchBaseAttributeFromSkills(string $baseAttribute): float {
+    public function fetchBaseAttributeFromSkills(string $baseAttribute): float {
         $totalPercent = 0;
 
         foreach ($this->skills as $skill) {

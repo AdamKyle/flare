@@ -2,12 +2,19 @@
 
 namespace App\Game\Maps\Listeners;
 
+use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
 use App\Flare\Models\Character;
 use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Events\ShowTimeOutEvent;
 use App\Game\Maps\Jobs\MoveTimeOutJob;
 
 class MoveTimeOutListener {
+
+    private CharacterStatBuilder $characterStatBuilder;
+
+    public function __construct(CharacterStatBuilder $characterStatBuilder) {
+        $this->characterStatBuilder = $characterStatBuilder;
+    }
 
     /**
      * Handle the event.
@@ -17,6 +24,8 @@ class MoveTimeOutListener {
      */
     public function handle(MoveTimeOutEvent $event): void {
         $character = $event->character;
+
+        $this->characterStatBuilder = $this->characterStatBuilder->setCharacter($character);
 
         if ($event->traverse) {
             $time = $event->timeOut;
@@ -43,7 +52,7 @@ class MoveTimeOutListener {
      * @return int
      */
     protected function disPatchMinuteBasedMovementTimeout(MoveTimeOutEvent $event, Character $character): int {
-        $time = (int) round($event->timeOut - ($event->timeOut * $this->findMovementMinuteTimeReduction($character)));
+        $time = (int) round($event->timeOut - ($event->timeOut * $this->characterStatBuilder->buildTimeOutModifier('move_time_out')));
 
         if ($time < 1) {
             $timeOut    = now()->addMinute();
@@ -81,23 +90,5 @@ class MoveTimeOutListener {
         $character = $character->refresh();
 
         MoveTimeOutJob::dispatch($character->id)->delay($timeOut);
-    }
-
-    /**
-     * Finds the characters moment timeout reduction.
-     *
-     * @param Character $character
-     * @return float
-     */
-    protected function findMovementMinuteTimeReduction(Character $character): float {
-        $skill = $character->skills->filter(function($skill) {
-            return $skill->type()->isMovementTimer();
-        })->first();
-
-        if (is_null($skill)) {
-            return 0;
-        }
-
-        return $skill->move_time_out_mod;
     }
 }

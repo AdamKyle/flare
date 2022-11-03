@@ -262,6 +262,27 @@ class CharacterStatBuilder {
     }
 
     /**
+     * Build time out modifier bonus for type.
+     *
+     * @param string $type
+     * @return float
+     */
+    public function buildTimeOutModifier(string $type): float {
+        $bonus     = 0;
+
+        if (!is_null($this->equippedItems)) {
+            $prefixes = $this->equippedItems->pluck('item.itemPrefix.' . $type)->toArray();
+            $suffixes = $this->equippedItems->pluck('item.itemSuffix.' . $type)->toArray();
+
+            $bonus = max(array_merge($prefixes, $suffixes));
+        }
+
+        $bonus += $this->damageBuilder->fetchBaseAttributeFromSkills($type);
+
+        return $bonus;
+    }
+
+    /**
      * Build damage.
      *
      * @param string $type

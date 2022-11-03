@@ -426,6 +426,7 @@ class ClassBonuses {
      * @param Character $character
      * @param GameClass $class
      * @param string $type
+     * @param bool $multipleByLevel
      * @return float
      */
     private function getClassBonus(Character $character, GameClass $class, string $type, bool $multipleByLevel = false): float {

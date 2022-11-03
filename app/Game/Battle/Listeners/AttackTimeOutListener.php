@@ -3,6 +3,7 @@
 namespace App\Game\Battle\Listeners;
 
 use App\Flare\Builders\Character\ClassDetails\ClassBonuses;
+use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Skill;
@@ -16,15 +17,15 @@ use Exception;
 class AttackTimeOutListener {
 
     /**
-     * @var ClassBonuses $classBonuses
+     * @var CharacterStatBuilder $classBonuses
      */
-    private ClassBonuses $classBonuses;
+    private CharacterStatBuilder $characterStatBuilder;
 
     /**
-     * @param ClassBonuses $classBonuses
+     * @param CharacterStatBuilder $characterStatBuilder
      */
-    public function __construct(ClassBonuses $classBonuses) {
-        $this->classBonuses = $classBonuses;
+    public function __construct(CharacterStatBuilder $characterStatBuilder) {
+        $this->characterStatBuilder = $characterStatBuilder;
     }
 
     /**
@@ -38,7 +39,7 @@ class AttackTimeOutListener {
         $time = $event->character->is_dead ? 20 : 10;
 
         if ($time === 10) {
-            $time = $time - ($time * $this->findTimeReductions($event->character));
+            $time = $time - ($time * $this->characterStatBuilder->setCharacter($event->character)->buildTimeOutModifier('fight_time_out'));
         }
 
         if ($time < 5) {
@@ -55,26 +56,5 @@ class AttackTimeOutListener {
         event(new ShowTimeOutEvent($event->character->user, $time));
 
         AttackTimeOutJob::dispatch($event->character)->delay(now()->addSeconds($time));
-    }
-
-    /**
-     * Fetch Timer reductions.
-     *
-     * @param Character $character
-     * @return float|int
-     * @throws Exception
-     */
-    protected function findTimeReductions(Character $character): float|int {
-
-        $gameSkill = GameSkill::where('type', '=', SkillTypeValue::EFFECTS_BATTLE_TIMER)->first();
-        $skill     = Skill::where('character_id', $character->id)->where('game_skill_id', $gameSkill->id)->first();
-
-        if (is_null($skill)) {
-            return 0;
-        }
-
-        $classBonus = $this->classBonuses->getThievesFightTimeout($character) + $this->classBonuses->getRangersFightTimeout($character);
-
-        return $skill->fight_time_out_mod + $classBonus;
     }
 }
