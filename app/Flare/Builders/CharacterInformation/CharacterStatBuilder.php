@@ -630,10 +630,14 @@ class CharacterStatBuilder {
         }
 
         if ($type === 'chance') {
-            return $this->equippedItems->where('item.type', 'trinket')->sum('item.ambush_chance');
+            $chance = $this->equippedItems->where('item.type', 'trinket')->sum('item.ambush_chance');
+
+            return min($chance, 0.95);
         }
 
-        return $this->equippedItems->where('item.type', 'trinket')->sum('item.ambush_resistance');
+        $chance = $this->equippedItems->where('item.type', 'trinket')->sum('item.ambush_resistance');
+
+        return min($chance, 0.95);
     }
 
     /**
@@ -651,10 +655,14 @@ class CharacterStatBuilder {
         }
 
         if ($type === 'chance') {
-            return $this->equippedItems->where('item.type', 'trinket')->sum('item.counter_chance');
+            $chance = $this->equippedItems->where('item.type', 'trinket')->sum('item.counter_chance');
+
+            return min($chance, 0.95);
         }
 
-        return $this->equippedItems->where('item.type', 'trinket')->sum('item.counter_resistance');
+        $chance = $this->equippedItems->where('item.type', 'trinket')->sum('item.counter_resistance');
+
+        return min($chance, 0.95);
     }
 
     /**
