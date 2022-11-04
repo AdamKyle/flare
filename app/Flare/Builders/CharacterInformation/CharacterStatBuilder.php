@@ -271,8 +271,8 @@ class CharacterStatBuilder {
         $bonus     = 0;
 
         if (!is_null($this->equippedItems)) {
-            $prefixes = $this->equippedItems->pluck('item.itemPrefix.' . $type)->toArray();
-            $suffixes = $this->equippedItems->pluck('item.itemSuffix.' . $type)->toArray();
+            $prefixes = $this->equippedItems->pluck('item.itemPrefix.' . $type . '_mod_bonus')->toArray();
+            $suffixes = $this->equippedItems->pluck('item.itemSuffix.' . $type . '_mod_bonus')->toArray();
 
             $bonus = max(array_merge($prefixes, $suffixes));
         }
