@@ -54,6 +54,7 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
             show_join_pvp: false,
             show_hell_forged_section: false,
             show_purgatory_chains_section: false,
+            show_gambling_section: false,
         }
 
         // @ts-ignore

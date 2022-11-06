@@ -95,6 +95,7 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapShopApiRoutes();
         $this->mapGameGuideQuestsApiRoutes();
         $this->mapSpecialtyShopApiRoutes();
+        $this->mapGamblingRoutes();
     }
 
     /**
@@ -267,5 +268,12 @@ class RouteServiceProvider extends ServiceProvider
             ->middleware('web')
             ->namespace('App\Game\SpecialtyShops\Controllers')
             ->group(base_path('routes/game/specialty-shops/api.php'));
+    }
+
+    protected function mapGamblingRoutes() {
+        Route::prefix('api')
+            ->middleware('web')
+            ->namespace('App\Game\Gambler\Controllers')
+            ->group(base_path('routes/game/gambler/api.php'));
     }
 }

@@ -30,4 +30,6 @@ export default interface ActionsState {
     show_hell_forged_section: boolean;
 
     show_purgatory_chains_section: boolean;
+
+    show_gambling_section: boolean;
 }

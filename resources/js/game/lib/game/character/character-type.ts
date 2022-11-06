@@ -196,4 +196,8 @@ export interface CharacterType {
     can_access_hell_forged: boolean;
 
     can_access_purgatory_chains: boolean;
+
+    can_spin: boolean;
+
+    can_spin_again_at: number;
 }

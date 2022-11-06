@@ -29,5 +29,6 @@ class BroadcastServiceProvider extends ServiceProvider
         require base_path('routes/game/quests/channels.php');
         require base_path('routes/game/guide-quests/channels.php');
         require base_path('routes/flare/channels.php');
+        require base_path('routes/game/gambler/channels.php');
     }
 }

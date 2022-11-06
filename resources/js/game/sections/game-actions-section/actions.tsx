@@ -16,6 +16,7 @@ import JoinPvp from "./components/join-pvp";
 import CelestialFight from "./components/celestial-fight";
 import Shop from "./components/specialty-shops/shop";
 import {removeCommas} from "../../lib/game/format-number";
+import GamblingSection from "./components/gambling-section";
 
 export default class Actions extends React.Component<ActionsProps, ActionsState> {
 
@@ -51,6 +52,7 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
             show_join_pvp: false,
             show_hell_forged_section: false,
             show_purgatory_chains_section: false,
+            show_gambling_section: false,
         }
 
         this.actionsManager = new ActionsManager(this);
@@ -191,6 +193,12 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
         })
     }
 
+    manageGamblingSection() {
+        this.setState({
+            show_gambling_section: !this.state.show_gambling_section,
+        })
+    }
+
     isLoading(): boolean {
         return this.state.loading || this.state.monsters.length === 0;
     }
@@ -271,6 +279,10 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
                                 </div>
                             : null
                         }
+
+                        <div className='mb-4'>
+                            <SuccessOutlineButton button_label={'Slots'} on_click={this.manageGamblingSection.bind(this)} additional_css={'w-1/2'} disabled={this.props.character.is_dead} />
+                        </div>
 
                         {
                             this.props.celestial_id !== 0 && !this.state.show_exploration && !this.state.show_duel_fight && !this.state.show_join_pvp ?
@@ -363,6 +375,12 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
                         {
                             this.state.show_join_pvp ?
                                 <JoinPvp manage_section={this.manageJoinPvp.bind(this)} character_id={this.props.character.id}/>
+                                : null
+                        }
+
+                        {
+                            this.state.show_gambling_section ?
+                                <GamblingSection character={this.props.character} />
                                 : null
                         }
                     </div>

@@ -228,6 +228,7 @@ return [
         App\Game\Quests\Providers\ServiceProvider::class,
         App\Game\GuideQuests\Providers\ServiceProvider::class,
         App\Game\SpecialtyShops\Providers\ServiceProvider::class,
+        App\Game\Gambler\Providers\ServiceProvider::class,
     ],
 
     /*

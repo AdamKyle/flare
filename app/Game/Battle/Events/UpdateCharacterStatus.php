@@ -41,6 +41,8 @@ class UpdateCharacterStatus implements ShouldBroadcastNow {
             'can_attack_again_at'     => now()->diffInSeconds($character->can_attack_again_at),
             'can_craft'               => $character->can_craft,
             'can_craft_again_at'      => $character->can_craft_again_at,
+            'can_spin'                => $character->can_spin,
+            'can_spin_again_at'       => now()->diffInSeconds($character->can_spin_again_at),
             'is_dead'                 => $character->is_dead,
             'is_automation_running'   => $character->currentAutomations()->where('character_id', $character->id)->get()->isNotEmpty(),
             'automation_completed_at' => $this->getTimeLeftOnAutomation($character),
