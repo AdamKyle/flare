@@ -74,7 +74,7 @@ class CurrencyValue {
     }
 
     public function getAttribute(): string {
-        return self::getAttribute()[$this->value];
+        return self::$attributes[$this->value];
     }
 
     public static function getIcons(): array {
@@ -82,6 +82,7 @@ class CurrencyValue {
     }
 
     public static function roll(): array {
+
         $rollOne   = rand(0, count(self::$rollIcons) - 1);
         $rollTwo   = rand(0, count(self::$rollIcons) - 1);
         $rollThree = rand(0, count(self::$rollIcons) - 1);

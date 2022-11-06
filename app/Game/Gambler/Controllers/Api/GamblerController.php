@@ -39,8 +39,6 @@ class GamblerController extends Controller {
     public function rollSlots(Character $character): JsonResponse {
         $response = $this->gamblerService->roll($character);
 
-        dump($response);
-
         return response()->json($response);
     }
 }

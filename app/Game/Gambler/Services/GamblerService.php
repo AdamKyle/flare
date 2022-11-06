@@ -16,7 +16,6 @@ class GamblerService {
     use ResponseBuilder;
 
     public function roll(Character $character): array {
-
         $this->spinTimeout($character);
 
         $rollInfo = CurrencyValue::roll();
@@ -89,6 +88,6 @@ class GamblerService {
             }
         }
 
-        return 0;
+        return $amount;
     }
 }

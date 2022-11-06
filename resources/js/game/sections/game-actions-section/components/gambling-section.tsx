@@ -107,7 +107,7 @@ export default class GamblingSection extends React.Component<any, any> {
 
         if (this.state.spinning && this.state.spinningIndexes.length > 0) {
             return (
-                <div>
+                <div className='ml-[-50px]'>
                     <div className='max-h-[150px] overflow-hidden mt-4'>
                         <div className='grid grid-cols-3'>
                             <div>{this.renderIcons(this.state.spinningIndexes[0])}</div>
@@ -123,7 +123,7 @@ export default class GamblingSection extends React.Component<any, any> {
         }
 
         return(
-            <div>
+            <div className='ml-[-50px]'>
                 <div className='max-h-[150px] overflow-hidden mt-4'>
                     <div className='grid grid-cols-3'>
                         <div>{this.renderIcons(this.state.roll.length > 0 ? this.state.roll[0] : 0)}</div>
@@ -145,9 +145,11 @@ export default class GamblingSection extends React.Component<any, any> {
 
                     {
                         this.state.timeoutFor !== 0 ?
-                            <TimerProgressBar time_remaining={this.state.timeoutFor}
-                                              time_out_label={'Spin TimeOut'}
-                            />
+                            <div className='w-1/2 ml-auto mr-auto'>
+                                <TimerProgressBar time_remaining={this.state.timeoutFor}
+                                                  time_out_label={'Spin TimeOut'}
+                                />
+                            </div>
                         : null
                     }
                 </div>
