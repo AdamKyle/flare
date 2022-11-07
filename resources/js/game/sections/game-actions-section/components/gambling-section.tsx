@@ -1,7 +1,6 @@
 import React from "react";
 import Ajax from "../../../lib/ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
-import ComponentLoading from "../../../components/ui/loading/component-loading";
 import SuccessButton from "../../../components/ui/buttons/success-button";
 import {random} from "lodash";
 import TimerProgressBar from "../../../components/ui/progress-bars/timer-progress-bar";
@@ -21,6 +20,7 @@ export default class GamblingSection extends React.Component<any, any> {
             spinningIndexes: [],
             roll: [],
             roll_message: '',
+            error_message: '',
             timeoutFor: 0,
         };
 
@@ -85,8 +85,16 @@ export default class GamblingSection extends React.Component<any, any> {
                 spinning: false,
             });
         }, (error: AxiosError) => {
-            console.error(error);
-        })
+            this.setState({spinning: false});
+
+            if (typeof error.response !== 'undefined') {
+                const response = error.response;
+
+                this.setState({
+                    error_message: response.data.message,
+                });
+            }
+        });
     }
 
     renderIcons(index: number) {
@@ -107,7 +115,7 @@ export default class GamblingSection extends React.Component<any, any> {
 
         if (this.state.spinning && this.state.spinningIndexes.length > 0) {
             return (
-                <div className='ml-[-50px]'>
+                <div className='max-w-[450px] mr-auto ml-[150px]'>
                     <div className='max-h-[150px] overflow-hidden mt-4'>
                         <div className='grid grid-cols-3'>
                             <div>{this.renderIcons(this.state.spinningIndexes[0])}</div>
@@ -123,7 +131,7 @@ export default class GamblingSection extends React.Component<any, any> {
         }
 
         return(
-            <div className='ml-[-50px]'>
+            <div className='max-w-[450px] ml-[150px] mr-auto'>
                 <div className='max-h-[150px] overflow-hidden mt-4'>
                     <div className='grid grid-cols-3'>
                         <div>{this.renderIcons(this.state.roll.length > 0 ? this.state.roll[0] : 0)}</div>
@@ -133,19 +141,32 @@ export default class GamblingSection extends React.Component<any, any> {
                 </div>
                 {
                     this.state.roll_message !== '' ?
-                        <div className='text-center text-green-500 dark:text-green-400 font-bold my-4'>
+                        <div className='text-center text-green-500 dark:text-green-400 font-bold my-2'>
                             <p>
                                 {this.state.roll_message}
                             </p>
                         </div>
                     : null
                 }
+
+                {
+                    this.state.error_message !== '' ?
+                        <div className='text-center text-red-500 dark:text-red-400 font-bold my-2'>
+                            <p>
+                                {this.state.roll_message}
+                            </p>
+                        </div>
+                        : null
+                }
                 <div className='text-center'>
                     <SuccessButton button_label={'Spin'} on_click={this.spin.bind(this)} additional_css={'mb-5'} disabled={!this.props.character.can_spin}/>
+                    <p className='text-sm mb-4'>Cost Per Spin: 1,000,000 Gold</p>
+                    <p> <a href='/information/slots' target='_blank' className='ml-2'>Help <i
+                        className="fas fa-external-link-alt"></i></a></p>
 
                     {
                         this.state.timeoutFor !== 0 ?
-                            <div className='w-1/2 ml-auto mr-auto'>
+                            <div className='ml-auto mr-auto'>
                                 <TimerProgressBar time_remaining={this.state.timeoutFor}
                                                   time_out_label={'Spin TimeOut'}
                                 />

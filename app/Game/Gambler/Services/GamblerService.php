@@ -16,12 +16,25 @@ class GamblerService {
     use ResponseBuilder;
 
     public function roll(Character $character): array {
+
+        if ($character->gold < 1000000) {
+            return $this->errorResult('Not enough gold');
+        }
+
+        $character->update([
+            'gold' => $character->gold - 1000000
+        ]);
+
+        $character = $character->refresh();
+
+        event(new UpdateTopBarEvent($character));
+
         $this->spinTimeout($character);
 
         $rollInfo = CurrencyValue::roll();
 
         if ($rollInfo['matchingAmount'] === 2) {
-            return $this->giveReward($character, $rollInfo, 100);
+            return $this->giveReward($character, $rollInfo, 250);
         }
 
         if ($rollInfo['matchingAmount'] === 3) {
@@ -35,6 +48,7 @@ class GamblerService {
     }
 
     protected function spinTimeout(Character $character): void {
+
         $time = now()->addSeconds(10);
 
         $character->update([

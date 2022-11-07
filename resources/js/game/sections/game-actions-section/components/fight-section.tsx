@@ -197,6 +197,13 @@ export default class FightSection extends React.Component<FightSectionProps, Fig
         return this.state.monster_current_health <= 0 || this.state.character_current_health <= 0 || this.props.character?.is_dead || !this.props.character?.can_attack
     }
 
+    clearBattleMessages() {
+        this.setState({
+            battle_messages: [],
+            monster_max_health: 0,
+        })
+    }
+
     render() {
         return (
             <div className={clsx({'ml-[-125px]': !this.props.is_small})}>
@@ -211,6 +218,16 @@ export default class FightSection extends React.Component<FightSectionProps, Fig
                     <a href='/information/combat' target='_blank' className='ml-2'>Help <i
                         className="fas fa-external-link-alt"></i></a>
                 </div>
+                {
+                    this.attackButtonDisabled() ?
+                        <div className='text-center mt-4'>
+                            <button onClick={this.clearBattleMessages.bind(this)}
+                                    className='text-red-500 dark:text-red-400 underline hover:text-red-600 dark:hover:text-red-500'>
+                                Clear
+                            </button>
+                        </div>
+                    : null
+                }
                 {
                     this.state.monster_max_health > 0 && this.props.character !== null ?
                         <div className={clsx('mb-4 max-w-md m-auto', {
