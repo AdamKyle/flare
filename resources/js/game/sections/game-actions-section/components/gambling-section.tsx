@@ -5,6 +5,7 @@ import SuccessButton from "../../../components/ui/buttons/success-button";
 import {random} from "lodash";
 import TimerProgressBar from "../../../components/ui/progress-bars/timer-progress-bar";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
+import DangerButton from "../../../components/ui/buttons/danger-button";
 
 export default class GamblingSection extends React.Component<any, any> {
 
@@ -159,7 +160,10 @@ export default class GamblingSection extends React.Component<any, any> {
                         : null
                 }
                 <div className='text-center'>
-                    <SuccessButton button_label={'Spin'} on_click={this.spin.bind(this)} additional_css={'mb-5'} disabled={!this.props.character.can_spin}/>
+                    <div className='flex justify-center mb-2'>
+                        <SuccessButton button_label={'Spin'} on_click={this.spin.bind(this)} disabled={!this.props.character.can_spin}/>
+                        <DangerButton button_label={'close'} on_click={this.props.close_gambling_section} additional_css={'ml-2'} />
+                    </div>
                     <p className='text-sm mb-4'>Cost Per Spin: 1,000,000 Gold</p>
                     <p> <a href='/information/slots' target='_blank' className='ml-2'>Help <i
                         className="fas fa-external-link-alt"></i></a></p>

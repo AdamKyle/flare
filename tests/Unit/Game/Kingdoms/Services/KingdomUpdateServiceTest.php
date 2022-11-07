@@ -1,8 +1,7 @@
 <?php
 
-namespace Tests\Unit\Kingdoms\Services;
+namespace Tests\Unit\Game\Kingdoms\Services;
 
-use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Kingdom;
 use App\Flare\Values\NpcTypes;
@@ -10,7 +9,6 @@ use App\Game\Kingdoms\Service\KingdomUpdateService;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Event;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGameBuilding;

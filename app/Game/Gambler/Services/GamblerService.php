@@ -3,18 +3,34 @@
 namespace App\Game\Gambler\Services;
 
 use App\Flare\Models\Character;
+use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Gambler\Events\GamblerSlotTimeOut;
+use App\Game\Gambler\Handlers\SpinHandler;
 use App\Game\Gambler\Jobs\SlotTimeOut;
 use App\Game\Gambler\Values\CurrencyValue;
+use Exception;
 
 class GamblerService {
 
     use ResponseBuilder;
 
+    private SpinHandler $spinHandler;
+
+    public function __construct(SpinHandler $spinHandler) {
+        $this->spinHandler = $spinHandler;
+    }
+
+    /**
+     * Spin the wheel.
+     *
+     * @param Character $character
+     * @return array
+     * @throws Exception
+     */
     public function roll(Character $character): array {
 
         if ($character->gold < 1000000) {
@@ -31,7 +47,9 @@ class GamblerService {
 
         $this->spinTimeout($character);
 
-        $rollInfo = CurrencyValue::roll();
+        $rollInfo = $this->spinHandler->roll();
+
+        $rollInfo = $this->spinHandler->processRoll($rollInfo);
 
         if ($rollInfo['matchingAmount'] === 2) {
             return $this->giveReward($character, $rollInfo, 250);
@@ -47,6 +65,12 @@ class GamblerService {
         ]);
     }
 
+    /**
+     * handle the spin timeout.
+     *
+     * @param Character $character
+     * @return void
+     */
     protected function spinTimeout(Character $character): void {
 
         $time = now()->addSeconds(10);
@@ -65,8 +89,29 @@ class GamblerService {
         SlotTimeOut::dispatch($character)->delay($time);
     }
 
+    /**
+     * Give reward for matching.
+     *
+     * @param Character $character
+     * @param array $rollInfo
+     * @param int $amountToWin
+     * @return array
+     * @throws Exception
+     */
     protected function giveReward(Character $character, array $rollInfo, int $amountToWin): array {
         $attribute = (new CurrencyValue($rollInfo['matching']))->getAttribute();
+
+
+        if ($attribute === 'copper_coins') {
+            $hasItem = $character->inventory->slots->where('item.effect', ItemEffectsValue::GET_COPPER_COINS)->isNotEmpty();
+
+            if (!$hasItem) {
+                return $this->successResult([
+                    'message' => 'Your do not have the quest item to get copper coins. Complete the quest: The Magic of Purgatory in Hell.',
+                    'rolls'   => $rollInfo['roll'],
+                ]);
+            }
+        }
 
         $newAmount = $character->{$attribute} + $amountToWin;
         $newAmount = $this->getAmount($attribute, $newAmount);
@@ -82,6 +127,13 @@ class GamblerService {
         ]);
     }
 
+    /**
+     * Get new amount of currency for player.
+     *
+     * @param string $attribute
+     * @param int $amount
+     * @return int
+     */
     protected function getAmount(string $attribute, int $amount): int {
 
         if ($attribute === 'gold_dust') {

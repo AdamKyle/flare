@@ -380,7 +380,7 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
 
                         {
                             this.state.show_gambling_section ?
-                                <GamblingSection character={this.props.character} />
+                                <GamblingSection character={this.props.character} close_gambling_section={this.manageGamblingSection.bind(this)}/>
                                 : null
                         }
                     </div>

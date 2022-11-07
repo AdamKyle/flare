@@ -2,6 +2,8 @@
 
 namespace App\Game\Gambler\Values;
 
+use Exception;
+
 class CurrencyValue {
 
     const GOLD_DUST    = 1;
@@ -63,11 +65,11 @@ class CurrencyValue {
 
     /**
      * @param int $value
-     * @throws \Exception
+     * @throws Exception
      */
     public function __construct(int $value) {
         if (!in_array($value, self::$values)) {
-            throw new \Exception($value . ' does not exist.');
+            throw new Exception($value . ' does not exist.');
         }
 
         $this->value = $value;
@@ -77,53 +79,11 @@ class CurrencyValue {
         return self::$attributes[$this->value];
     }
 
+    public static function getValues(): array {
+        return self::$values;
+    }
+
     public static function getIcons(): array {
         return self::$rollIcons;
-    }
-
-    public static function roll(): array {
-
-        $rollOne   = rand(0, count(self::$rollIcons) - 1);
-        $rollTwo   = rand(0, count(self::$rollIcons) - 1);
-        $rollThree = rand(0, count(self::$rollIcons) - 1);
-
-        $rolls      = [$rollOne, $rollTwo, $rollThree];
-
-        $difference = array_diff_assoc($rolls, array_unique($rolls));
-        $difference = array_values($difference);
-
-        return self::processRoll($difference, $rolls);
-    }
-
-    protected static function processRoll(array $difference, array $rolls): array {
-        $matching       = null;
-        $matchingAmount = 0;
-
-
-        if (count($difference) === 1) {
-            $index      = $difference[0];
-            $itemRolled = self::$rollIcons[$index]['type'];
-
-            if (in_array($itemRolled, self::$values)) {
-                $matchingAmount = 2;
-                $matching       = $itemRolled;
-            }
-        }
-
-        if (count($difference) === 2) {
-            $index      = $difference[0];
-            $itemRolled = self::$rollIcons[$index]['type'];
-
-            if (in_array($itemRolled, self::$values)) {
-                $matchingAmount = 3;
-                $matching       = $itemRolled;
-            }
-        }
-
-        return [
-            'roll'           => $rolls,
-            'matching'       => $matching,
-            'matchingAmount' => $matchingAmount
-        ];
     }
 }

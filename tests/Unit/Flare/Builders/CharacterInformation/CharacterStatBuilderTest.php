@@ -97,6 +97,28 @@ class CharacterStatBuilderTest extends TestCase {
         $this->assertEquals(1.0, $value);
     }
 
+    public function testTimeOutModifier() {
+        $itemAffix = $this->createItemAffix([
+            'name'                     => 'Sample',
+            'fight_time_out_mod_bonus' => 2.0
+        ]);
+
+        $item = $this->createItem([
+            'name'           => 'Powerful item',
+            'item_suffix_id' => $itemAffix->id,
+            'type'           => 'weapon',
+        ]);
+
+        $character = $this->character->inventoryManagement()
+            ->giveItem($item)
+            ->equipItem('left_hand', 'Powerful item')
+            ->getCharacter();
+
+        $value = $this->characterStatBuilder->setCharacter($character)->buildTimeOutModifier('fight_time_out');
+
+        $this->assertEquals(2.0, $value);
+    }
+
     public function testClassBonusWithNoItemsEquipped() {
         $character = $this->character->getCharacter();
 
