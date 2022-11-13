@@ -137,10 +137,16 @@ class KingdomTreasuryController extends Controller {
             ], 422);
         }
 
-        $newMorale = $kingdom->current_morale + 0.05;
+        $newMorale = $kingdom->morale;
 
-        if ($newMorale > 1) {
-            $newMorale = 1;
+        // Is >= 10 million gold.
+        if ($amountToDeposit >= 10000000) {
+
+            $newMorale = $kingdom->current_morale + 0.05;
+
+            if ($newMorale > 1) {
+                $newMorale = 1;
+            }
         }
 
         $kingdom->update([

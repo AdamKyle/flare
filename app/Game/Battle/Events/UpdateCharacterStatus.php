@@ -37,20 +37,23 @@ class UpdateCharacterStatus implements ShouldBroadcastNow {
         $character = $character->refresh();
 
         $this->characterStatuses = [
-            'can_attack'              => $character->can_attack,
-            'can_attack_again_at'     => now()->diffInSeconds($character->can_attack_again_at),
-            'can_craft'               => $character->can_craft,
-            'can_craft_again_at'      => $character->can_craft_again_at,
-            'can_spin'                => $character->can_spin,
-            'can_spin_again_at'       => now()->diffInSeconds($character->can_spin_again_at),
-            'is_dead'                 => $character->is_dead,
-            'is_automation_running'   => $character->currentAutomations()->where('character_id', $character->id)->get()->isNotEmpty(),
-            'automation_completed_at' => $this->getTimeLeftOnAutomation($character),
-            'is_silenced'             => $character->is_silenced,
-            'can_move'                => $character->can_move,
-            'can_register_for_pvp'    => !is_null(Event::where('type', EventType::MONTHLY_PVP)->first()) && $character->level >= 301,
-            'killed_in_pvp'           => $character->killed_in_pvp,
-            'is_alchemy_locked'       => $this->isAlchemyLocked($character),
+            'can_attack'                     => $character->can_attack,
+            'can_attack_again_at'            => now()->diffInSeconds($character->can_attack_again_at),
+            'can_craft'                      => $character->can_craft,
+            'can_craft_again_at'             => $character->can_craft_again_at,
+            'can_spin'                       => $character->can_spin,
+            'can_spin_again_at'              => now()->diffInSeconds($character->can_spin_again_at),
+            'can_engage_celestials'          => $character->can_engage_celestials,
+            'can_engage_celestials_again_at' => now()->diffInSeconds($character->can_engage_celestials_again_at),
+            'is_dead'                        => $character->is_dead,
+            'is_automation_running'          => $character->currentAutomations()->where('character_id', $character->id)->get()->isNotEmpty(),
+            'automation_completed_at'        => $this->getTimeLeftOnAutomation($character),
+            'is_silenced'                    => $character->is_silenced,
+            'can_move'                       => $character->can_move,
+            'can_register_for_pvp'           => !is_null(Event::where('type', EventType::MONTHLY_PVP)->first()) && $character->level >= 301,
+            'killed_in_pvp'                  => $character->killed_in_pvp,
+            'is_alchemy_locked'              => $this->isAlchemyLocked($character),
+            'is_mercenary_unlocked'          => $character->is_mercenary_unlocked,
         ];
 
         $this->user = $character->user;

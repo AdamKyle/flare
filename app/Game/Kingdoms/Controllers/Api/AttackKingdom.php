@@ -5,7 +5,7 @@ namespace App\Game\Kingdoms\Controllers\Api;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomLog;
-use App\Game\Kingdoms\Requests\AttackRequest;
+use App\Game\Kingdoms\Requests\PurchaseMercenaryRequest;
 use App\Game\Kingdoms\Requests\DropItemsOnKingdomRequest;
 use App\Game\Kingdoms\Service\AttackWithItemsService;
 use App\Game\Kingdoms\Service\KingdomAttackService;
@@ -83,12 +83,12 @@ class AttackKingdom extends Controller {
     }
 
     /**
-     * @param AttackRequest $request
+     * @param PurchaseMercenaryRequest $request
      * @param Kingdom $kingdom
      * @param Character $character
      * @return JsonResponse
      */
-    public function attackWithUnits(AttackRequest $request, Kingdom $kingdom, Character $character): JsonResponse {
+    public function attackWithUnits(PurchaseMercenaryRequest $request, Kingdom $kingdom, Character $character): JsonResponse {
         $response = $this->kingdomAttackService->attackKingdom($character, $kingdom, $request->all());
 
         $status = $response['status'];

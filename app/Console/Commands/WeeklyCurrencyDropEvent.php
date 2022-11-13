@@ -39,6 +39,6 @@ class WeeklyCurrencyDropEvent extends Command {
         WeeklyCurrencyEventJob::dispatch()->delay(now()->addMinutes(15))->onConnection('weekly_spawn');
 
         event(new GlobalMessageEvent('Currencies are dropping like crazy! Shards, Copper Coins and
-        Gold Dust are falling off the enemies for one day only! At a rate of 1-25 per currency type.'));
+        Gold Dust are falling off the enemies for one day only! At a rate of 1-50 per currency type.'));
     }
 }

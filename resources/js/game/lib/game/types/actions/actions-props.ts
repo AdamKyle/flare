@@ -12,4 +12,6 @@ export default interface ActionsProps {
     celestial_id: number;
 
     update_celestial: (celestialId: number | null) => void;
+
+    can_engage_celestial: boolean;
 }

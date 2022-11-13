@@ -20,6 +20,7 @@ use App\Flare\Values\LocationType;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Services\CharacterService;
+use App\Game\Core\Traits\MercenaryBonus;
 use App\Game\Messages\Events\ServerMessageEvent as GameServerMessageEvent;
 use Exception;
 use Facades\App\Flare\Calculators\XPCalculator;
@@ -28,6 +29,8 @@ use League\Fractal\Resource\Item;
 use App\Flare\Models\Item as ItemModel;
 
 class CharacterRewardService {
+
+    use MercenaryBonus;
 
     /**
      * @var Character $character
@@ -299,6 +302,8 @@ class CharacterRewardService {
                 if (!is_null($purgatoryDungeons)) {
                     $coins *= 3;
                 }
+
+                $coins = $coins + $coins * $this->getCopperCoinBonus($this->character);
 
                 $newCoins          = $this->character->copper_coins + $coins;
                 $maxCurrencies     = new MaxCurrenciesValue($newCoins, MaxCurrenciesValue::COPPER);

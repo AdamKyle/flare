@@ -40,6 +40,12 @@ class QuestsController extends Controller {
             $quest->unlocks_skill_name = 'N/A';
         }
 
+        if (!is_null($quest->unlocks_feature)) {
+            $quest->feature_to_unlock_name = $quest->unlocksFeature()->getNameOfFeature();
+        } else {
+            $quest->feature_to_unlock_name = null;
+        }
+
         return response()->json($quest);
     }
 

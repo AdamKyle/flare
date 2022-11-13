@@ -6,12 +6,14 @@ import {random} from "lodash";
 import TimerProgressBar from "../../../components/ui/progress-bars/timer-progress-bar";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import DangerButton from "../../../components/ui/buttons/danger-button";
+import GamblingSectionState from "../../../lib/game/types/actions/gambling/slots/types/gambling-section-state";
+import GamblingSectionProps from "../../../lib/game/types/actions/gambling/slots/types/gambling-section-props";
 
-export default class GamblingSection extends React.Component<any, any> {
+export default class GamblingSection extends React.Component<GamblingSectionProps, GamblingSectionState> {
 
     private gamblingTimeOut: any;
 
-    constructor(props: any) {
+    constructor(props: GamblingSectionProps) {
         super(props);
 
         this.state = {

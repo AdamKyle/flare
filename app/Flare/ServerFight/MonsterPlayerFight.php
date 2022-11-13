@@ -204,6 +204,7 @@ class MonsterPlayerFight {
 
         $health = $ambush->getHealthObject();
 
+
         if ($health['character_health'] <= 0) {
             $this->battleMessages[] = [
                 'message' => 'The enemies ambush has slaughtered you!',

@@ -5,8 +5,13 @@ namespace App\Game\Battle\Services;
 use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Game\Battle\Jobs\CelestialTimeOut;
 use App\Game\Battle\Values\CelestialConjureType;
+use App\Game\Core\Events\UpdateCharacterCelestialTimeOut;
 use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Core\Traits\MercenaryBonus;
+use App\Game\Mercenaries\Values\MercenaryValue;
 use Facades\App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\CelestialFight;
 use App\Flare\Models\Character;
@@ -20,13 +25,13 @@ use App\Game\Messages\Events\ServerMessageEvent;
 
 class CelestialFightService {
 
-    use ResponseBuilder;
+    use ResponseBuilder, MercenaryBonus;
 
     private BattleEventHandler $battleEventHandler;
 
     private CharacterCacheData $characterCacheData;
 
-    private MonsterPlayerFight $monsterPlayerFight;
+    private ?MonsterPlayerFight $monsterPlayerFight;
 
     public function __construct(BattleEventHandler $battleEventHandler, CharacterCacheData $characterCacheData, MonsterPlayerFight $monsterPlayerFight) {
         $this->battleEventHandler = $battleEventHandler;
@@ -68,12 +73,16 @@ class CelestialFightService {
 
         if ($result) {
 
+            $messages = $this->monsterPlayerFight->getBattleMessages();
+
+            $this->monsterPlayerFight = null;
+
             $characterHealth = $characterInCelestialFight->character_max_health;
 
             $this->handleMonsterDeath($character, $celestialFight);
 
             return $this->successResult([
-                'logs' => $this->monsterPlayerFight->getBattleMessages(),
+                'logs' => $messages,
                 'health' => [
                     'character_health' => $characterHealth,
                     'monster_health'   => 0,
@@ -86,6 +95,8 @@ class CelestialFightService {
         $characterHealth = $characterHealth <= 0 ? 0 : $characterHealth;
 
         if ($characterHealth <= 0) {
+            $this->moveCelestial($character, $celestialFight);
+
             $this->battleEventHandler->processDeadCharacter($character);
         }
 
@@ -132,6 +143,8 @@ class CelestialFightService {
     protected function handleMonsterDeath(Character $character, CelestialFight $celestialFight) {
         event(new UpdateCelestialFight($character->name, $this->monsterPlayerFight));
 
+        $character = $this->timeOutCelestialEvent($character);
+
         $this->giveShards($character, $celestialFight);
 
         BattleAttackHandler::dispatch($character->id, $celestialFight->monster_id)->onQueue('default_long')->delay(now()->addSeconds(2));
@@ -151,8 +164,31 @@ class CelestialFightService {
         $celestialFight->delete();
     }
 
+    protected function timeOutCelestialEvent(Character $character): Character {
+        $timeLeft = now()->addMinute();
+
+        $character->update([
+            'can_engage_celestials'          => false,
+            'can_engage_celestials_again_at' => $timeLeft,
+        ]);
+
+        $character = $character->refresh();
+
+        event(new UpdateCharacterStatus($character));
+
+        broadcast(new UpdateCharacterCelestialTimeOut($character->user, 60));
+
+        CelestialTimeOut::dispatch($character)->delay(60);
+
+        return $character->refresh();
+    }
+
     protected function giveShards(Character $character, CelestialFight $celestialFight) {
-        $shards = $character->shards + $celestialFight->monster->shards;
+
+        $monsterShards = $celestialFight->monster->shards;
+        $monsterShards = $monsterShards + $monsterShards * $this->getShardBonus($character);
+
+        $shards = $character->shards + $monsterShards;
 
         if ($shards >= MaxCurrenciesValue::MAX_SHARDS) {
             $shards = MaxCurrenciesValue::MAX_SHARDS;
@@ -166,7 +202,7 @@ class CelestialFightService {
 
         event(new UpdateTopBarEvent($character));
 
-        event(new ServerMessageEvent($character->user, 'You received: ' . $celestialFight->monster->shards . ' shards! Shards can only be used in Alchemy.'));
+        event(new ServerMessageEvent($character->user, 'You received: ' . number_format($monsterShards) . ' shards! Shards can only be used in Alchemy.'));
     }
 
     protected function updateCharacterInFight(Character $character, CharacterInCelestialFight $characterInCelestialFight) {

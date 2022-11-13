@@ -60,7 +60,11 @@
                         <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                         <h3 class='mb-3'>Unlocks Skill</h3>
                         <x-core.forms.check-box :model="$quest" label="Unlocks skill?" modelKey="unlocks_skill" name="unlocks_skill" />
-                        <x-core.forms.key-value-select :model="$quest" label="Unlocks Skyll Type: " modelKey="unlocks_skill_type" name="unlocks_skill_type" :options="$skillTypes" />
+                        <x-core.forms.key-value-select :model="$quest" label="Unlocks Skill Type: " modelKey="unlocks_skill_type" name="unlocks_skill_type" :options="$skillTypes" />
+
+                        <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                        <h3 class='mb-3'>Unlocks Feature</h3>
+                        <x-core.forms.key-value-select :model="$quest" label="Unlocks Feature Type: " modelKey="unlocks_feature" name="unlocks_feature" :options="$unlocksFeatures" />
 
                         <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                         <h3 class='mb-3'>Quest Item Reward</h3>

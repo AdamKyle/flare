@@ -7,6 +7,7 @@ use App\Game\Battle\Events\CharacterRevive;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Events\AttackTimeOutEvent;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
+use App\Game\Mercenaries\Services\MercenaryService;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterInCelestialFight;
@@ -22,12 +23,19 @@ class BattleEventHandler {
      */
     private BattleRewardProcessing $battleRewardProcessing;
 
+    /**
+     * @var MercenaryService $mercenaryService
+     */
+    private MercenaryService $mercenaryService;
+
 
     /**
      * @param BattleRewardProcessing $battleRewardProcessing
+     * @param MercenaryService $mercenaryService
      */
-    public function __construct(BattleRewardProcessing $battleRewardProcessing) {
+    public function __construct(BattleRewardProcessing $battleRewardProcessing, MercenaryService $mercenaryService) {
         $this->battleRewardProcessing = $battleRewardProcessing;
+        $this->mercenaryService       = $mercenaryService;
     }
 
     /**
@@ -60,6 +68,8 @@ class BattleEventHandler {
         $character = Character::find($characterId);
 
         $this->battleRewardProcessing->handleMonster($character, $monster, $isAutomation);
+
+        $this->mercenaryService->giveXpToMercenaries($character);
     }
 
     /**

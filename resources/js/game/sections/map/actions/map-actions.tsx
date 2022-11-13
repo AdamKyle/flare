@@ -114,11 +114,11 @@ export default class MapActions extends React.Component<MapActionsProps, MapActi
                                           disabled={this.canDoAction()}/>
                     <PrimaryOutlineButton button_label={'Conjure'}
                                           on_click={this.manageConjureModal.bind(this)}
-                                          disabled={this.canDoAction()}/>
+                                          disabled={this.canDoAction() || !this.props.can_engage_celestial}/>
                 </div>
 
                 {
-                    this.state.open_conjure ?
+                    this.state.open_conjure && this.props.can_engage_celestial ?
                         <Conjuration is_open={this.state.open_conjure}
                                      handle_close={this.manageConjureModal.bind(this)}
                                      title={'Conjuration'}

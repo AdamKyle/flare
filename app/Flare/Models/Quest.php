@@ -2,6 +2,7 @@
 
 namespace App\Flare\Models;
 
+use App\Flare\Values\FeatureTypes;
 use Database\Factories\QuestFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -39,27 +40,29 @@ class Quest extends Model {
         'required_faction_level',
         'before_completion_description',
         'after_completion_description',
+        'unlocks_feature',
     ];
 
     protected $casts = [
-        'name'               => 'string',
-        'item_id'            => 'integer',
-        'gold_dust_cost'     => 'integer',
-        'shard_cost'         => 'integer',
-        'gold_cost'          => 'integer',
-        'copper_coin_cost'   => 'integer',
-        'reward_item'        => 'integer',
-        'reward_gold_dust'   => 'integer',
-        'reward_shards'      => 'integer',
-        'reward_gold'        => 'integer',
-        'reward_xp'          => 'integer',
-        'unlocks_skill'      => 'boolean',
-        'is_parent'          => 'boolean',
-        'unlocks_skill_type' => 'integer',
-        'parent_quest_id'    => 'integer',
+        'name'                    => 'string',
+        'item_id'                 => 'integer',
+        'gold_dust_cost'          => 'integer',
+        'shard_cost'              => 'integer',
+        'gold_cost'               => 'integer',
+        'copper_coin_cost'        => 'integer',
+        'reward_item'             => 'integer',
+        'reward_gold_dust'        => 'integer',
+        'reward_shards'           => 'integer',
+        'reward_gold'             => 'integer',
+        'reward_xp'               => 'integer',
+        'unlocks_skill'           => 'boolean',
+        'is_parent'               => 'boolean',
+        'unlocks_skill_type'      => 'integer',
+        'parent_quest_id'         => 'integer',
         'faction_game_map_id'     => 'integer',
         'secondary_required_item' => 'integer',
         'required_faction_level'  => 'integer',
+        'unlocks_feature'         => 'integer',
     ];
 
     protected $appends = [
@@ -113,6 +116,14 @@ class Quest extends Model {
 
     public function factionMap() {
         return $this->hasOne(GameMap::class, 'id', 'faction_game_map_id');
+    }
+
+    public function unlocksFeature(): ?FeatureTypes {
+        if (!is_null($this->unlocks_feature)) {
+            return new FeatureTypes($this->unlocks_feature);
+        }
+
+        return null;
     }
 
     public function getBelongsToMapNameAttribute() {

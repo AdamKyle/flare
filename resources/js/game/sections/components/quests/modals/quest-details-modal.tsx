@@ -76,9 +76,11 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                 if (typeof error.response !== 'undefined') {
                     const response = error.response;
 
+                    const message = response.data.hasOwnProperty('message') ? response.data.message : response.data.error;
+
                     this.setState({
                         handing_in: false,
-                        error_message: response.data.message
+                        error_message: message
                     });
                 }
             })

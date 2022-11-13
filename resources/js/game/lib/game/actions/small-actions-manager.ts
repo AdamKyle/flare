@@ -31,6 +31,7 @@ export default class SmallActionsManager {
                 attack_time_out: props.character.can_attack_again_at !== null ? this.calculateTimeLeft(props.character.can_attack_again_at) : 0,
                 crafting_time_out: props.character.can_craft_again_at !== null ? this.calculateTimeLeft(props.character.can_craft_again_at) : 0,
                 automation_time_out: props.character.automation_completed_at !== null ? props.character.automation_completed_at : 0,
+                celestial_time_out: props.character.can_engage_celestials_again_at !== null ? props.character.can_engage_celestials_again_at : 0,
                 loading: false,
             })
         }, (error: AxiosError) => {
@@ -163,7 +164,7 @@ export default class SmallActionsManager {
             });
         }
 
-        if (props.celestial_id !== 0 && props.celestial_id !== null) {
+        if (props.celestial_id !== 0 && props.celestial_id !== null && props.character.can_engage_celestials) {
             options.push({
                 label: 'Celestial Fight',
                 value: 'celestial-fight'

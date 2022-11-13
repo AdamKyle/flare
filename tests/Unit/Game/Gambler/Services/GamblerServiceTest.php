@@ -64,6 +64,30 @@ class GamblerServiceTest extends TestCase {
         $this->assertEquals(422, $response['status']);
     }
 
+    public function testFailedToMatchAny() {
+        $mock = Mockery::mock(SpinHandler::class)->makePartial();
+
+        $mock->shouldReceive('roll')->andReturn([
+            'rolls'      => [1, 2, 3],
+            'difference' => [],
+        ]);
+
+        $this->app->instance(SpinHandler::class, $mock);
+        $gamblerService = $this->app->make(GamblerService::class);
+
+        $character = $this->character->getCharacter();
+
+        $character->update(['gold' => 1000000]);
+
+        $character = $character->refresh();
+
+        $response = $gamblerService->roll($character->refresh());
+
+        $this->assertEquals(0, $character->gold);
+        $this->assertEquals(200, $response['status']);
+        $this->assertEquals('Darn! Better luck next time child! Spin again!', $response['message']);
+    }
+
     public function testRolledAllThreeOfGoldDust() {
         $mock = Mockery::mock(SpinHandler::class)->makePartial();
 

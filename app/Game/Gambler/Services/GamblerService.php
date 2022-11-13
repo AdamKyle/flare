@@ -7,16 +7,18 @@ use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Core\Traits\MercenaryBonus;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Gambler\Events\GamblerSlotTimeOut;
 use App\Game\Gambler\Handlers\SpinHandler;
 use App\Game\Gambler\Jobs\SlotTimeOut;
 use App\Game\Gambler\Values\CurrencyValue;
+use App\Game\Mercenaries\Values\MercenaryValue;
 use Exception;
 
 class GamblerService {
 
-    use ResponseBuilder;
+    use ResponseBuilder, MercenaryBonus;
 
     private SpinHandler $spinHandler;
 
@@ -101,7 +103,6 @@ class GamblerService {
     protected function giveReward(Character $character, array $rollInfo, int $amountToWin): array {
         $attribute = (new CurrencyValue($rollInfo['matching']))->getAttribute();
 
-
         if ($attribute === 'copper_coins') {
             $hasItem = $character->inventory->slots->where('item.effect', ItemEffectsValue::GET_COPPER_COINS)->isNotEmpty();
 
@@ -114,6 +115,37 @@ class GamblerService {
         }
 
         $newAmount = $character->{$attribute} + $amountToWin;
+
+        if ($attribute === 'shards') {
+
+            $amountToWin = $amountToWin + $amountToWin * $this->getShardBonus($character);
+            $amountToWin = $amountToWin + $amountToWin * $this->getGamblerBonus($character);
+
+            $newAmount   = $character->{$attribute} + $amountToWin;
+
+            $newAmount = $newAmount;
+        }
+
+        if ($attribute === 'gold_dust') {
+
+            $amountToWin = $amountToWin + $amountToWin * $this->getGoldDustBonus($character);
+            $amountToWin = $amountToWin + $amountToWin * $this->getGamblerBonus($character);
+
+            $newAmount   = $character->{$attribute} + $amountToWin;
+
+            $newAmount = $newAmount;
+        }
+
+        if ($attribute === 'copper_coins') {
+
+            $amountToWin = $amountToWin + $amountToWin * $this->getCopperCoinBonus($character);
+            $amountToWin = $amountToWin + $amountToWin * $this->getGamblerBonus($character);
+
+            $newAmount   = $character->{$attribute} + $amountToWin;
+
+            $newAmount = $newAmount;
+        }
+
         $newAmount = $this->getAmount($attribute, $newAmount);
 
         $character->{$attribute} = $newAmount;
@@ -122,7 +154,7 @@ class GamblerService {
         event(new UpdateTopBarEvent($character->refresh()));
 
         return $this->successResult([
-            'message' => 'You got a ' . $amountToWin . ' ' . ucfirst(str_replace('_', ' ', $attribute)) . '!',
+            'message' => 'You got a ' . number_format($amountToWin) . ' ' . ucfirst(str_replace('_', ' ', $attribute)) . '!',
             'rolls'   => $rollInfo['roll'],
         ]);
     }

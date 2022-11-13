@@ -2,7 +2,6 @@ import React, {Fragment} from "react";
 import SmallMapSectionProps
     from "../../../../lib/game/types/actions/components/smaller-actions/small-map-section-props";
 import MapSection from "../../../map/map-section";
-import PositionType from "../../../../lib/game/types/map/position-type";
 
 
 export default class SmallMapMovementActions extends React.Component<SmallMapSectionProps, any> {
@@ -31,6 +30,8 @@ export default class SmallMapMovementActions extends React.Component<SmallMapSec
                     set_character_position={this.props.update_character_position}
                     update_character_quests_plane={this.props.update_plane_quests}
                     disable_bottom_timer={true}
+                    can_engage_celestial={this.props.character.can_engage_celestials}
+                    can_engage_celestials_again_at={this.props.character.can_engage_celestials_again_at}
                 />
             </div>
         )

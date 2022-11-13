@@ -32,11 +32,13 @@ class Character extends Model
         'can_craft',
         'can_spin',
         'is_dead',
+        'can_engage_celestials',
         'can_move_again_at',
         'can_attack_again_at',
         'can_craft_again_at',
         'can_settle_again_at',
         'can_spin_again_at',
+        'can_engage_celestials_again_at',
         'force_name_change',
         'spell_evasion',
         'artifact_annulment',
@@ -58,6 +60,7 @@ class Character extends Model
         'shards',
         'copper_coins',
         'killed_in_pvp',
+        'is_mercenary_unlocked',
     ];
 
     /**
@@ -75,11 +78,14 @@ class Character extends Model
         'force_name_change'           => 'boolean',
         'is_attack_automation_locked' => 'boolean',
         'killed_in_pvp'               => 'boolean',
+        'is_mercenary_unlocked'       => 'boolean',
+        'can_engage_celestials'       => 'boolean',
         'can_move_again_at'           => 'datetime',
         'can_attack_again_at'         => 'datetime',
         'can_craft_again_at'          => 'datetime',
         'can_settle_again_at'         => 'datetime',
         'can_spin_again_at'           => 'datetime',
+        'can_engage_celestials_again_at' => 'datetime',
         'level'                       => 'integer',
         'xp'                          => 'integer',
         'xp_next'                     => 'integer',
@@ -171,6 +177,10 @@ class Character extends Model
 
     public function passiveSkills() {
         return $this->hasMany(CharacterPassiveSkill::class);
+    }
+
+    public function mercenaries() {
+        return $this->hasMany(CharacterMercenary::class);
     }
 
     /**

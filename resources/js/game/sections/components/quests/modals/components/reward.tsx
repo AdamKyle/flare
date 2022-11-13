@@ -7,6 +7,15 @@ export default class Reward extends React.Component<any, any> {
         super(props);
     }
 
+    getFeatureLink() {
+        return (
+            <a href={"/information/" + this.props.quest.feature_to_unlock_name.toLowerCase()} target="_blank">
+                {this.props.quest.feature_to_unlock_name} <i
+                className="fas fa-external-link-alt"></i>
+            </a>
+        );
+    }
+
     render() {
         return (
             <dl>
@@ -47,6 +56,14 @@ export default class Reward extends React.Component<any, any> {
                         <Fragment>
                             <dt>Unlocks New Skill</dt>
                             <dd>{this.props.quest.unlocks_skill_name}</dd>
+                        </Fragment>
+                        : null
+                }
+                {
+                    this.props.quest.feature_to_unlock_name !== null ?
+                        <Fragment>
+                            <dt>Unlocks Game Feature</dt>
+                            <dd>{this.getFeatureLink()}</dd>
                         </Fragment>
                         : null
                 }

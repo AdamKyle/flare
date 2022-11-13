@@ -40,6 +40,10 @@ class CharacterDeletion {
             $this->emptyCharacterInventorySets($character->inventorySets);
         }
 
+        if (!$character->mercenaries->isEmpty()) {
+            $this->removeMercenaries($character->mercenaries);
+        }
+
         $this->deleteCharacterMarketListings($character);
 
         $this->deleteCharacter($character);
@@ -65,6 +69,12 @@ class CharacterDeletion {
         $user->refresh()->update([
             'guide_enabled' => $params['guide']
         ]);
+    }
+
+    protected function removeMercenaries(Collection $mercenaries): void {
+        foreach ($mercenaries as $merc) {
+            $merc->delete();
+        }
     }
 
     protected function deleteCharacterMarketListings(Character $character): void {

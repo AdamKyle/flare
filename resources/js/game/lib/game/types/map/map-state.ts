@@ -40,4 +40,6 @@ export default interface MapState {
     can_player_move: boolean,
 
     characters_on_map: number,
+
+    celestial_time_out: number,
 }

@@ -37,6 +37,8 @@ export default class MapSection extends React.Component<MapProps, MapState> {
 
     private npcKingdomsUpdate: any;
 
+    private celestialTimeout: any;
+
     constructor(props: MapProps) {
         super(props);
 
@@ -64,6 +66,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
             characters_on_map: 0,
             time_left: 0,
             automation_time_out: 0,
+            celestial_time_out: 0,
         }
 
         // @ts-ignore
@@ -83,15 +86,22 @@ export default class MapSection extends React.Component<MapProps, MapState> {
 
         // @ts-ignore
         this.npcKingdomsUpdate  = Echo.join('npc-kingdoms-update');
+
+        // @ts-ignore
+        this.celestialTimeout   = Echo.private('update-character-celestial-timeout-' + this.props.user_id);
     }
 
     componentDidMount() {
         (new Ajax()).setRoute('map/' + this.props.character_id)
                     .doAjaxCall('get', (result: AxiosResponse) => {
             this.setStateFromData(result.data, () => {
+                this.setState({
+                    celestial_time_out: this.props.can_engage_celestials_again_at
+                });
+
                 if (this.props.automation_completed_at !== 0) {
                     this.setState({
-                        automation_time_out: this.props.automation_completed_at
+                        automation_time_out: this.props.automation_completed_at,
                     })
                 }
             });
@@ -145,17 +155,17 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                     npc_kingdoms: event.npcKingdoms
                 });
             }
-        })
+        });
+
+        this.celestialTimeout.listen('Game.Core.Events.UpdateCharacterCelestialTimeOut', (event: any) => {
+            this.setState({
+                celestial_time_out: event.timeLeft,
+            });
+        });
     }
 
     setStateFromData(data: MapData, callback?: () => void) {
         MapStateManager.manageState(data, this, callback);
-    }
-
-    updateCanMove(canMove: boolean) {
-        // this.setState({
-        //     can_player_move: canMove,
-        // })
     }
 
     handleDrag(e: MouseEvent, position: {x: number, y: number}) {
@@ -175,7 +185,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
 
         return(
             <Fragment>
-                <div className='overflow-hidden max-h-[300px]'>
+                <div className='overflow-hidden max-h-[315px]'>
                     <Draggable
                         position={this.state.map_position}
                         bounds={{top: -200, left: fetchLeftBounds(this), right: this.state.right_bounds, bottom: this.state.bottom_bounds}}
@@ -252,6 +262,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                         can_move={this.state.can_player_move}
                         is_dead={this.props.is_dead}
                         is_automation_running={this.props.is_automaton_running}
+                        can_engage_celestial={this.props.can_engage_celestial}
                         port_location={this.state.port_location}
                         locations={this.state.locations}
                         player_kingdoms={this.state.player_kingdoms}
@@ -282,7 +293,10 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                 <div className={clsx('mt-4', {
                     'hidden': this.props.disable_bottom_timer,
                 })}>
-                    <MapTimer time_left={this.state.time_left} automation_time_out={this.state.automation_time_out} />
+                    <MapTimer time_left={this.state.time_left}
+                              automation_time_out={this.state.automation_time_out}
+                              celestial_time_out={this.state.celestial_time_out}
+                    />
                 </div>
             </Fragment>
         )

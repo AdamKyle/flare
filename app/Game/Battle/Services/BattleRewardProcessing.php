@@ -18,9 +18,13 @@ use App\Game\Battle\Handlers\FactionHandler;
 use App\Game\Battle\Jobs\BattleItemHandler;
 use App\Game\Core\Services\DropCheckService;
 use App\Game\Core\Services\GoldRush;
+use App\Game\Core\Traits\MercenaryBonus;
+use App\Game\Mercenaries\Values\MercenaryValue;
 use Exception;
 
 class BattleRewardProcessing {
+
+    use MercenaryBonus;
 
     private FactionHandler $factionHandler;
 
@@ -66,11 +70,20 @@ class BattleRewardProcessing {
                 return $slot->item->effect === ItemEffectsValue::GET_COPPER_COINS;
             })->isNotEmpty();
 
-            $characterShards      = $character->shards + rand(1,25);
-            $characterGoldDust    = $character->gold_dust + rand(1,25);
+            $shards = rand(1,50);
+            $shards = $shards + $shards * $this->getShardBonus($character);
+
+            $goldDust = rand(1,50);
+            $goldDust = $goldDust + $goldDust * $this->getGoldDustBonus($character);
+
+            $characterShards      = $character->shards + $shards;
+            $characterGoldDust    = $character->gold_dust + $goldDust;
 
             if ($canHaveCopperCoins) {
-                $characterCopperCoins = $character->copper_coins + rand(1, 25);
+                $copperCoins = rand(1,50);
+                $copperCoins = $copperCoins + $copperCoins * $this->getCopperCoinBonus($character);
+
+                $characterCopperCoins = $character->copper_coins + $copperCoins;
             } else {
                 $characterCopperCoins = $character->copper_coins;
             }
@@ -114,7 +127,9 @@ class BattleRewardProcessing {
                 $locationType = new LocationType($specialLocation->type);
 
                 if ($locationType->isGoldMines()) {
-                    $shards = rand(1,5);
+                    $shards = rand(1,25);
+
+                    $shards = $shards + $shards * $this->getShardBonus($character);
 
                     $newShards = $character->shards + $shards;
 

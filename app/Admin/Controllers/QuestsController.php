@@ -7,6 +7,7 @@ use App\Admin\Services\QuestService;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
 use App\Flare\Models\Npc;
+use App\Flare\Values\FeatureTypes;
 use App\Game\Skills\Values\SkillTypeValue;
 use Cache;
 use App\Flare\Models\Character;
@@ -46,25 +47,27 @@ class QuestsController extends Controller {
 
     public function create() {
         return view('admin.quests.manage', [
-            'quest'          => null,
-            'editing'        => false,
-            'npcs'           => Npc::pluck('real_name', 'id')->toArray(),
-            'questItems'     => Item::where('type', 'quest')->pluck('name', 'id')->toArray(),
-            'quests'         => Quest::pluck('name', 'id')->toArray(),
-            'gameMaps'       => GameMap::pluck('name', 'id')->toArray(),
-            'skillTypes'     => SkillTypeValue::getValues(),
+            'quest'           => null,
+            'editing'         => false,
+            'npcs'            => Npc::pluck('real_name', 'id')->toArray(),
+            'questItems'      => Item::where('type', 'quest')->pluck('name', 'id')->toArray(),
+            'quests'          => Quest::pluck('name', 'id')->toArray(),
+            'gameMaps'        => GameMap::pluck('name', 'id')->toArray(),
+            'skillTypes'      => SkillTypeValue::getValues(),
+            'unlocksFeatures' => FeatureTypes::getSelectable(),
         ]);
     }
 
     public function edit(Quest $quest) {
         return view('admin.quests.manage', [
-            'quest'          => $quest,
-            'editing'        => true,
-            'npcs'           => Npc::pluck('real_name', 'id')->toArray(),
-            'questItems'     => Item::where('type', 'quest')->pluck('name', 'id')->toArray(),
-            'quests'         => Quest::pluck('name', 'id')->toArray(),
-            'gameMaps'       => GameMap::pluck('name', 'id')->toArray(),
-            'skillTypes'     => SkillTypeValue::getValues(),
+            'quest'           => $quest,
+            'editing'         => true,
+            'npcs'            => Npc::pluck('real_name', 'id')->toArray(),
+            'questItems'      => Item::where('type', 'quest')->pluck('name', 'id')->toArray(),
+            'quests'          => Quest::pluck('name', 'id')->toArray(),
+            'gameMaps'        => GameMap::pluck('name', 'id')->toArray(),
+            'skillTypes'      => SkillTypeValue::getValues(),
+            'unlocksFeatures' => FeatureTypes::getSelectable(),
         ]);
     }
 

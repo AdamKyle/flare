@@ -200,4 +200,10 @@ export interface CharacterType {
     can_spin: boolean;
 
     can_spin_again_at: number;
+
+    is_mercenary_unlocked: boolean;
+
+    can_engage_celestials: boolean;
+
+    can_engage_celestials_again_at: number;
 }

@@ -3,7 +3,6 @@ import Select from "react-select";
 import PrimaryButton from "../../../components/ui/buttons/primary-button";
 import {isEqual} from "lodash";
 import MonsterType from "../../../lib/game/types/actions/monster/monster-type";
-import ComponentLoading from "../../../components/ui/loading/component-loading";
 import MonsterSelectionProps from "../../../lib/game/types/actions/components/monster-selection-props";
 import MonsterSelectionState from "../../../lib/game/types/actions/components/monster-selection-state";
 

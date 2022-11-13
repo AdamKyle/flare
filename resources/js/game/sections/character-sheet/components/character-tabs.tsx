@@ -5,6 +5,7 @@ import InfoTab from "./tabs/info-tab";
 import CharacterTabsProps from "../../../lib/game/character-sheet/types/character-tabs-props";
 import CharacterActiveBoons from "./character-active-boons";
 import CharacterFactions from "./character-factions";
+import CharacterMercenaries from "./character-mercenaries";
 
 export default class CharacterTabs extends React.Component<CharacterTabsProps, any> {
 
@@ -22,6 +23,9 @@ export default class CharacterTabs extends React.Component<CharacterTabsProps, a
         }, {
             key: 'factions',
             name: 'Factions'
+        }, {
+            key: 'mercenaries',
+            name: 'Mercenaries'
         }];
     }
 
@@ -37,6 +41,9 @@ export default class CharacterTabs extends React.Component<CharacterTabsProps, a
                     </TabPanel>
                     <TabPanel key={'factions'}>
                         <CharacterFactions character_id={this.props.character?.id} finished_loading={this.props.finished_loading}/>
+                    </TabPanel>
+                    <TabPanel key={'mercenaries'}>
+                        <CharacterMercenaries character={this.props.character} />
                     </TabPanel>
                 </Tabs>
             </Fragment>

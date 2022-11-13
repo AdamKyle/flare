@@ -287,7 +287,7 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
                         {
                             this.props.celestial_id !== 0 && !this.state.show_exploration && !this.state.show_duel_fight && !this.state.show_join_pvp ?
                                 <div className='mb-4'>
-                                    <SuccessOutlineButton button_label={'Fight Celestial!'} on_click={this.manageFightCelestial.bind(this)} additional_css={'w-1/2'} disabled={this.props.character.is_dead || this.props.character.is_automation_running} />
+                                    <SuccessOutlineButton button_label={'Fight Celestial!'} on_click={this.manageFightCelestial.bind(this)} additional_css={'w-1/2'} disabled={this.props.character.is_dead || this.props.character.is_automation_running || !this.props.can_engage_celestial} />
                                 </div>
                             : null
                         }

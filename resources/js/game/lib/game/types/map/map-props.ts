@@ -17,6 +17,8 @@ export default interface MapProps {
 
     automation_completed_at: number;
 
+    can_engage_celestials_again_at: number;
+
     show_celestial_fight_button: (id: number | null) => void;
 
     set_character_position: (position: PositionType) => void;
@@ -24,4 +26,6 @@ export default interface MapProps {
     update_character_quests_plane: (plane: string) => void;
 
     disable_bottom_timer: boolean;
+
+    can_engage_celestial: boolean;
 }

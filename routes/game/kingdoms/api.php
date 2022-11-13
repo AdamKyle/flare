@@ -41,13 +41,13 @@ Route::middleware(['auth', 'is.character.dead', 'is.character.exploring', 'is.ch
     Route::post('/kingdoms/recruit-units/cancel', ['as' => 'kingdoms.recruit.units.cancel', 'uses' => 'Api\KingdomUnitsController@cancelRecruit']);
 });
 
-Route::middleware(['auth', 'is.character.dead', 'is.character.exploring', 'is.character.who.they.say.they.are', 'character.owns.kingdom'])->group(function() {
+Route::middleware(['auth', 'is.character.dead', 'is.character.exploring', 'is.character.who.they.say.they.are', 'character.owns.kingdom', 'throttle:25,1'])->group(function() {
     Route::post('/kingdoms/embezzle/{kingdom}', ['as' => 'kingdom.embezzle', 'uses' => 'Api\KingdomTreasuryController@embezzle']);
     Route::post('/kingdoms/mass-embezzle/{character}', ['as' => 'kingdom.mass.embezzle', 'uses' => 'Api\KingdomTreasuryController@massEmbezzle']);
     Route::post('/kingdoms/deposit/{kingdom}', ['as' => 'kingdom.deposit', 'uses' => 'Api\KingdomTreasuryController@deposit']);
 });
 
-Route::middleware(['auth', 'is.character.dead', 'is.character.exploring', 'is.character.who.they.say.they.are', 'character.owns.kingdom'])->group(function() {
+Route::middleware(['auth', 'is.character.dead', 'is.character.exploring', 'is.character.who.they.say.they.are', 'character.owns.kingdom', 'throttle:25,1'])->group(function() {
     Route::post('/kingdoms/purchase-gold-bars/{kingdom}', ['as' => 'kingdom.purchase.bars', 'uses' => 'Api\KingdomGoldBarsController@purchaseGoldBars']);
     Route::post('/kingdoms/withdraw-bars-as-gold/{kingdom}', ['as' => 'kingdom.withdraw.bars', 'uses' => 'Api\KingdomGoldBarsController@withdrawGoldBars']);
 });

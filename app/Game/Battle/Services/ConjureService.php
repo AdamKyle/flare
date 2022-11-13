@@ -137,6 +137,10 @@ class ConjureService {
      */
     public function canConjure(Character $character, Npc $npc, string $type): bool {
 
+        if (!$character->can_engage_celestials) {
+            return false;
+        }
+
         if (CelestialFight::where('character_id', $character->id)->get()->isNotEmpty()) {
             event(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build('already_conjured', $npc)));
 

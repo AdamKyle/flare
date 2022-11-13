@@ -49,7 +49,9 @@ class CelestialBattleController extends Controller {
         $npc = Npc::where('type', NpcTypes::SUMMONER)->first();
 
         if (!$this->conjureService->canConjure($character, $npc, $request->type)) {
-            return response()->json([], 200);
+            return response()->json([
+                'message' => 'You cannot conjure right now.'
+            ], 422);
         }
 
         $monster = Monster::find($request->monster_id);

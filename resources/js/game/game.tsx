@@ -421,6 +421,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                                                 update_plane_quests={this.updateQuestPlane.bind(this)}
                                                 update_character_position={this.setCharacterPosition.bind(this)}
                                                 view_port={this.state.view_port}
+                                                can_engage_celestial={this.state.character.can_engage_celestials}
                                             />
                                         :
                                             <Actions
@@ -429,6 +430,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                                                 character_position={this.state.position}
                                                 celestial_id={this.state.celestial_id}
                                                 update_celestial={this.updateCelestial.bind(this)}
+                                                can_engage_celestial={this.state.character.can_engage_celestials}
                                             />
                                     }
                                 </BasicCard>
@@ -443,7 +445,9 @@ export default class Game extends React.Component<GameProps, GameState> {
                                     currencies={this.state.character_currencies}
                                     is_dead={this.state.character.is_dead}
                                     is_automaton_running={this.state.character.is_automation_running}
+                                    can_engage_celestial={this.state.character.can_engage_celestials}
                                     automation_completed_at={this.state.character.automation_completed_at}
+                                    can_engage_celestials_again_at={this.state.character.can_engage_celestials_again_at}
                                     show_celestial_fight_button={this.updateCelestial.bind(this)}
                                     set_character_position={this.setCharacterPosition.bind(this)}
                                     update_character_quests_plane={this.updateQuestPlane.bind(this)}

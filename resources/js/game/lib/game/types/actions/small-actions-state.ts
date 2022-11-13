@@ -6,4 +6,6 @@ export default interface SmallActionsState extends ActionsState {
     automation_time_out: number;
 
     movement_time_left: number;
+
+    celestial_time_out: number;
 }

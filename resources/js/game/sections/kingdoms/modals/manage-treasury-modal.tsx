@@ -65,6 +65,16 @@ export default class ManageTreasuryModal extends React.Component<ManageTreasuryM
             value = this.props.character_gold;
         }
 
+        if (value === 0) {
+            this.setState({
+                success_message: '',
+                error_message: '',
+                amount_to_deposit: '',
+            });
+
+            return;
+        }
+
         this.setState({
             success_message: '',
             error_message: '',
@@ -209,8 +219,8 @@ export default class ManageTreasuryModal extends React.Component<ManageTreasuryM
                 <Tabs tabs={this.tabs} disabled={this.state.loading}>
                     <TabPanel key={'deposit'}>
                         <InfoAlert>
-                            Depositing Gold can increase the Morale by 5% per deposit, regardless of amount.
-                            Kingdoms can hold a maximum of 2 billion gold.
+                            Depositing Gold can increase the Morale by 5% per deposit. The minimum amount to gain 5%
+                            increase in morale is 10,000,000 Gold. Kingdoms can hold a maximum of 2 billion gold.
                             Depositing gold also increases your treasury defence which increases your
                             over all kingdom defence.
                         </InfoAlert>
@@ -218,7 +228,6 @@ export default class ManageTreasuryModal extends React.Component<ManageTreasuryM
                             <label className='w-1/2'>Amount to deposit</label>
                             <div className='w-1/2'>
                                 <input type='number'
-                                       value={this.state.amount_to_deposit}
                                        onChange={this.setAmountToDeposit.bind(this)}
                                        className='form-control'
                                        disabled={this.props.character_gold === 0}
@@ -251,7 +260,6 @@ export default class ManageTreasuryModal extends React.Component<ManageTreasuryM
                             <label className='w-1/2'>Amount to withdraw</label>
                             <div className='w-1/2'>
                                 <input type='number'
-                                       value={this.state.amount_to_withdraw}
                                        onChange={this.setAmountToWithdraw.bind(this)}
                                        className='form-control'
                                        disabled={this.props.treasury === 0 || this.props.morale <= 0.15}
@@ -289,7 +297,6 @@ export default class ManageTreasuryModal extends React.Component<ManageTreasuryM
                             <label className='w-1/2'>Amount to withdraw</label>
                             <div className='w-1/2'>
                                 <input type='number'
-                                       value={this.state.amount_to_withdraw}
                                        onChange={this.setAmountToWithdraw.bind(this)}
                                        className='form-control'
                                        disabled={this.props.treasury === 0}

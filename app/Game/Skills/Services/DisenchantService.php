@@ -5,6 +5,7 @@ namespace App\Game\Skills\Services;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Models\Item;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Core\Traits\MercenaryBonus;
 use App\Game\Messages\Events\ServerMessageEvent as MessageEvent;
 use App\Flare\Events\UpdateSkillEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
@@ -19,7 +20,7 @@ use Illuminate\Support\Str;
 
 class DisenchantService {
 
-    use SkillCheck;
+    use SkillCheck, MercenaryBonus;
 
     /**
      * @var int $goldDust
@@ -119,6 +120,8 @@ class DisenchantService {
         if (!$failedCheck && !is_null($skill)) {
             $goldDust = $goldDust + $goldDust * $skill->bonus;
         }
+
+        $goldDust = $goldDust + $goldDust * $this->getGoldDustBonus($character);
 
         $questSlot = $character->inventory->slots->filter(function($slot) {
             return $slot->item->type === 'quest' && $slot->item->effect === ItemEffectsValue::GOLD_DUST_RUSH;

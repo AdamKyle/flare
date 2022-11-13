@@ -33,6 +33,8 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
 
     private smallActionsManager: SmallActionsManager;
 
+    private celestialTimeout: any;
+
     constructor(props: SmallActionsProps) {
         super(props);
 
@@ -44,6 +46,7 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
             attack_time_out: 0,
             crafting_time_out: 0,
             automation_time_out: 0,
+            celestial_time_out: 0,
             movement_time_left: 0,
             crafting_type: null,
             duel_fight_info: null,
@@ -74,6 +77,9 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
 
         // @ts-ignore
         this.pvpUpdate = Echo.private('update-pvp-attack-' + this.props.character.user_id);
+
+        // @ts-ignore
+        this.celestialTimeout   = Echo.private('update-character-celestial-timeout-' + this.props.user_id);
 
         // @ts-ignore
         this.duelOptions = Echo.join('update-duel');
@@ -111,6 +117,13 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
             this.setState({
                 monsters: event.monster,
             })
+        });
+
+        // @ts-ignore
+        this.celestialTimeout.listen('Game.Core.Events.UpdateCharacterCelestialTimeOut', (event: any) => {
+            this.setState({
+                celestial_time_out: event.timeOut,
+            });
         });
 
         // // @ts-ignore
@@ -357,7 +370,11 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
                     />
                 </div>
                 <div className='mt-4'>
-                    <MapTimer time_left={this.state.movement_time_left} automation_time_out={this.state.automation_time_out} />
+                    <MapTimer
+                        time_left={this.state.movement_time_left}
+                        automation_time_out={this.state.automation_time_out}
+                        celestial_time_out={this.state.celestial_time_out}
+                    />
                 </div>
             </Fragment>
         );
