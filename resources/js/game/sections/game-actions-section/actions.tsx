@@ -375,13 +375,13 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
                         {
                             this.state.show_join_pvp ?
                                 <JoinPvp manage_section={this.manageJoinPvp.bind(this)} character_id={this.props.character.id}/>
-                                : null
+                            : null
                         }
 
                         {
                             this.state.show_gambling_section ?
-                                <GamblingSection character={this.props.character} close_gambling_section={this.manageGamblingSection.bind(this)}/>
-                                : null
+                                <GamblingSection character={this.props.character} close_gambling_section={this.manageGamblingSection.bind(this)} is_small={false}/>
+                            : null
                         }
                     </div>
                 </div>

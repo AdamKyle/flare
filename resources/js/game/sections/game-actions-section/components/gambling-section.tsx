@@ -8,6 +8,7 @@ import LoadingProgressBar from "../../../components/ui/progress-bars/loading-pro
 import DangerButton from "../../../components/ui/buttons/danger-button";
 import GamblingSectionState from "../../../lib/game/types/actions/gambling/slots/types/gambling-section-state";
 import GamblingSectionProps from "../../../lib/game/types/actions/gambling/slots/types/gambling-section-props";
+import clsx from "clsx";
 
 export default class GamblingSection extends React.Component<GamblingSectionProps, GamblingSectionState> {
 
@@ -118,7 +119,9 @@ export default class GamblingSection extends React.Component<GamblingSectionProp
 
         if (this.state.spinning && this.state.spinningIndexes.length > 0) {
             return (
-                <div className='max-w-[450px] mr-auto ml-[150px]'>
+                <div className={clsx('max-w-[450px] mr-auto', {
+                    'ml-[150px]': !this.props.is_small
+                })}>
                     <div className='max-h-[150px] overflow-hidden mt-4'>
                         <div className='grid grid-cols-3'>
                             <div>{this.renderIcons(this.state.spinningIndexes[0])}</div>
@@ -134,7 +137,9 @@ export default class GamblingSection extends React.Component<GamblingSectionProp
         }
 
         return(
-            <div className='max-w-[450px] ml-[150px] mr-auto'>
+            <div className={clsx('max-w-[450px] mr-auto', {
+                'ml-[150px]': !this.props.is_small
+            })}>
                 <div className='max-h-[150px] overflow-hidden mt-4'>
                     <div className='grid grid-cols-3'>
                         <div>{this.renderIcons(this.state.roll.length > 0 ? this.state.roll[0] : 0)}</div>

@@ -39,7 +39,7 @@ class MercenaryController extends Controller {
     }
 
     public function buy(PurchaseMercenaryRequest $request, Character $character) {
-        $response = $this->mercenaryService->purchaseMercenary($request, $character);
+        $response = $this->mercenaryService->purchaseMercenary($request->all(), $character);
         $status   = $response['status'];
 
         unset($response['status']);

@@ -14,6 +14,7 @@ import SmallActionsProps from "../../lib/game/types/actions/small-actions-props"
 import CelestialFight from "./components/celestial-fight";
 import SmallerSpecialtyShop from "./components/small-actions/smaller-specialty-shop";
 import {removeCommas} from "../../lib/game/format-number";
+import GamblingSection from "./components/gambling-section";
 
 export default class SmallerActions extends React.Component<SmallActionsProps, SmallActionsState> {
 
@@ -229,6 +230,12 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
         });
     }
 
+    removeSlots() {
+        this.setState({
+            selected_action: null,
+        })
+    }
+
     resetDuelData() {
         this.setState({
             duel_fight_info: null,
@@ -302,6 +309,12 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
         )
     }
 
+    showSlots() {
+        return (
+            <GamblingSection character={this.props.character} close_gambling_section={this.removeSlots.bind(this)} is_small={true}/>
+        )
+    }
+
     showJoinPVP() {
         return (
             <JoinPvp manage_section={this.manageJoinPvp.bind(this)} character_id={this.props.character.id}/>
@@ -339,6 +352,8 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
                 return this.showSpecialtyShop('hell-forged-gear')
             case 'purgatory-chains-gear':
                 return this.showSpecialtyShop('purgatory-chains-gear')
+            case 'slots':
+                return this.showSlots();
             default:
                 return null;
         }

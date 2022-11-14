@@ -220,6 +220,16 @@
                 Guide Quests
             </a>
             <hr />
+            <h6 class="uppercase">Gambling and Mercenaries</h6>
+            <a href="{{route('info.page', ['pageName' => 'mercenary'])}}">
+                <span class="ra ra-double-team"></span>
+                Mercenaries
+            </a>
+            <a href="{{route('info.page', ['pageName' => 'slots'])}}">
+                <span class="ra ra-dice-two"></span>
+                Slots
+            </a>
+            <hr />
             <h6 class="uppercase">Crafting and Enchanting</h6>
             <a href="{{route('info.page', ['pageName' => 'crafting'])}}">
                 <span class="ra ra-hammer"></span>

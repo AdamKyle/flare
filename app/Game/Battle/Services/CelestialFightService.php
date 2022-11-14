@@ -165,7 +165,7 @@ class CelestialFightService {
     }
 
     protected function timeOutCelestialEvent(Character $character): Character {
-        $timeLeft = now()->addMinute();
+        $timeLeft = now()->addSeconds(10);
 
         $character->update([
             'can_engage_celestials'          => false,
@@ -176,9 +176,9 @@ class CelestialFightService {
 
         event(new UpdateCharacterStatus($character));
 
-        broadcast(new UpdateCharacterCelestialTimeOut($character->user, 60));
+        broadcast(new UpdateCharacterCelestialTimeOut($character->user, 10));
 
-        CelestialTimeOut::dispatch($character)->delay(60);
+        CelestialTimeOut::dispatch($character)->delay(10);
 
         return $character->refresh();
     }

@@ -48,13 +48,12 @@ class MercenaryService {
     /**
      * Buy a mercenary.
      *
-     * @param PurchaseMercenaryRequest $request
+     * @param array $params
      * @param Character $character
      * @return array
-     * @throws Exception
      */
-    public function purchaseMercenary(PurchaseMercenaryRequest $request, Character $character): array {
-        if (!is_null($character->mercenaries->where('mercenary_type', $request->type)->first())) {
+    public function purchaseMercenary(array $params, Character $character): array {
+        if (!is_null($character->mercenaries->where('mercenary_type', $params['type'])->first())) {
             return $this->errorResult('No. You already have this Mercenary.');
         }
 
@@ -63,12 +62,12 @@ class MercenaryService {
         }
 
         try {
-            $mercType = new MercenaryValue($request->type);
+            $mercType = new MercenaryValue($params['type']);
         } catch (Exception $e) {
             return $this->errorResult('Invalid type.');
         }
 
-        if ($request->type === MercenaryValue::CHILD_OF_COPPER_COINS) {
+        if ($params['type'] === MercenaryValue::CHILD_OF_COPPER_COINS) {
             $hasQuestItem = $character->inventory->slots->where('item.effect', ItemEffectsValue::GET_COPPER_COINS)->isNotEmpty();
 
             if (!$hasQuestItem) {
@@ -77,7 +76,7 @@ class MercenaryService {
         }
 
         $character->update([
-            'gold' => $character->gold - MercenaryValue::MERCENARY_COST
+            'gold' => $character->gold - $mercType->getCost()
         ]);
 
         $character = $character->refresh();
@@ -86,7 +85,7 @@ class MercenaryService {
 
         CharacterMercenary::create([
             'character_id'         => $character->id,
-            'mercenary_type'       => $request->type,
+            'mercenary_type'       => $params['type'],
             'current_level'        => 1,
             'current_xp'           => 0,
             'xp_required'          => $mercType->getNextLevelXP(),

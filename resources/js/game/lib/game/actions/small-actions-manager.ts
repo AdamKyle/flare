@@ -153,6 +153,11 @@ export default class SmallActionsManager {
         }
 
         options.push({
+            label: 'Slots',
+            value: 'slots'
+        });
+
+        options.push({
             label: 'Map Movement',
             value: 'map-movement'
         });
