@@ -258,7 +258,9 @@ export default class CharacterMercenaries extends React.Component<CharacterMerce
         if (!this.props.character.is_mercenary_unlocked) {
             return (
                 <div className='text-center text-red-500 dark:text-red-400'>
-                    <p>You must complete a quest to unlock this feature.</p>
+                    <p>You must complete a quest to unlock this feature. Head down to <a href='/information/planes' target='_blank' className='ml-2 relative top-[5px]'>Labyrinth <i
+                        className="fas fa-external-link-alt"></i></a></p> and complete the <a href='/information/quests' target='_blank' className='ml-2 relative top-[5px]'>Quest: <i
+                    className="fas fa-external-link-alt"></i></a> "The story of the children".
                 </div>
             );
         }
