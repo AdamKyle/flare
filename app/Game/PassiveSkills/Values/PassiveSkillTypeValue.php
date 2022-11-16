@@ -2,6 +2,8 @@
 
 namespace App\Game\PassiveSkills\Values;
 
+use Exception;
+
 class PassiveSkillTypeValue {
 
     /**
@@ -49,38 +51,67 @@ class PassiveSkillTypeValue {
      *
      * Throws if the value does not exist in the array of const values.
      *
-     * @param string $value
-     * @throws \Exception
+     * @param int $value
+     * @throws Exception
      */
-    public function __construct(int $value)
-    {
+    public function __construct(int $value) {
         if (!in_array($value, self::$values)) {
-            throw new \Exception($value . ' does not exist.');
+            throw new Exception($value . ' does not exist.');
         }
 
         $this->value = $value;
     }
 
+    /**
+     * Effects kingdom defence.
+     *
+     * @return bool
+     */
     public function isDefence(): bool {
         return $this->value === self::KINGDOM_DEFENCE;
     }
 
+    /**
+     * Effects resource gain?
+     *
+     * @return bool
+     */
     public function isResourceGain(): bool {
         return $this->value === self::KINGDOM_RESOURCE_GAIN;
     }
 
+    /**
+     * Effects unit cost reduction
+     *
+     * @return bool
+     */
     public function isUnitCostReduction(): bool {
         return $this->value === self::KINGDOM_UNIT_COST_REDUCTION;
     }
 
+    /**
+     * Unlocks a specific building
+     *
+     * @return bool
+     */
     public function unlocksBuilding(): bool {
         return $this->value === self::UNLOCKS_BUILDING;
     }
 
+    /**
+     * Is iron cost reduction.
+     *
+     * @return bool
+     */
     public function isIronCostReduction(): bool {
         return $this->value === self::IRON_COST_REDUCTION;
     }
 
+    /**
+     * Is population cost reduction.
+     *
+     * @return bool
+     */
     public function isPopulationCostReduction(): bool {
         return $this->value === self::POPULATION_COST_REDUCTION;
     }

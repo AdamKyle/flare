@@ -116,6 +116,7 @@ class TrainPassiveSkill implements ShouldQueue
                 event(new UpdateKingdom($user, $kingdom));
             }
         }
+
         $character = $this->character->Refresh();
 
         event(new ServerMessageEvent($character->user, $newPassive->passiveSkill->name . ' skill has gained a new level! Check your character sheet!'));
