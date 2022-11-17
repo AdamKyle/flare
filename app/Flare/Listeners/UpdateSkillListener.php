@@ -2,16 +2,12 @@
 
 namespace App\Flare\Listeners;
 
-use App\Flare\Events\UpdateCharacterAttackEvent;
-use App\Flare\Models\Adventure;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Skill;
 use App\Flare\Services\BuildCharacterAttackTypes;
-use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
-use App\Game\Core\Events\UpdateAttackStats;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Skills\Services\SkillService;
 use App\Game\Skills\Values\SkillTypeValue;
@@ -21,11 +17,16 @@ use App\Flare\Events\SkillLeveledUpServerMessageEvent;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item as ResourceItem;
 
-class UpdateSkillListener
-{
+class UpdateSkillListener {
 
-    private $skillService;
+    /**
+     * @var SkillService $skillService
+     */
+    private SkillService $skillService;
 
+    /**
+     * @param SkillService $skillService
+     */
     public function __construct(SkillService $skillService) {
         $this->skillService = $skillService;
     }

@@ -2,10 +2,8 @@
 
 namespace App\Game\Quests\Controllers;
 
-use App\Flare\Models\Adventure;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
-use App\Flare\Models\Quest;
 use App\Flare\Models\QuestsCompleted;
 use App\Flare\Models\User;
 use App\Http\Controllers\Controller;

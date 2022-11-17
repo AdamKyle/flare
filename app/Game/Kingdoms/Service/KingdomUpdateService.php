@@ -178,9 +178,9 @@ class KingdomUpdateService {
             return;
         }
 
-        $difference = now()->diffInDays($this->kingdom->protected_until);
+        $protectionIsOver = now()->gte($this->kingdom->protected_until);
 
-        if ($difference <= 0) {
+        if ($protectionIsOver) {
             $this->kingdom->update([
                 'protected_until' => null,
             ]);

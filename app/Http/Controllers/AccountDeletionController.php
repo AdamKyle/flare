@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Flare\Jobs\AccountDeletionJob;
-use App\Flare\Models\Adventure;
 use App\Flare\Models\User;
 use App\Flare\Services\CharacterDeletion;
 

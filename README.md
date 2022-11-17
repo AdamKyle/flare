@@ -43,7 +43,7 @@ No. It's every person for themselves. There are also no resets.
 - Are there energy systems or ways to slow the player down?
 
 No and yes. There are no energy systems, that is there is no feature in-game to prevent you from being as active as you want to be. 
-However, we do make use of timers, these can range from 10 seconds for successfully killing a monster to a few minutes for an adventure to (at most) a couple of hours for upgrading buildings (at higher levels) for your kingdom.
+However, we do make use of timers, these can range from 10 seconds for successfully killing a monster to a few hours for an exploration to (at most) a couple of hours for upgrading buildings (at higher levels) for your kingdom.
 
 The idea is to keep you engaged and playing.
 

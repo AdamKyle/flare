@@ -218,7 +218,7 @@ class NpcQuestRewardHandler {
 
         $character = $character->refresh();
 
-        broadcast(new ServerMessageEvent($character->user, 'Quest: ' . $quest->name . ' completed. Check quest logs under adventure logs section.'));
+        broadcast(new ServerMessageEvent($character->user, 'Quest: ' . $quest->name . ' completed. Check quest logs under quest logs section.'));
 
         event(new UpdateTopBarEvent($character));
     }

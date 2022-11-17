@@ -4,7 +4,6 @@ namespace App\Flare\Services;
 
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Jobs\CharacterAttackTypesCacheBuilder;
-use App\Flare\Models\Adventure;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Inventory;
@@ -88,12 +87,11 @@ class CharacterRewardService {
      * Distribute the gold and xp to the character.
      *
      * @param Monster $monster
-     * @param Adventure|null $adventure | null
      * @return void
      * @throws Exception
      */
-    public function distributeGoldAndXp(Monster $monster, Adventure $adventure = null): void {
-        $this->distributeXP($monster, $adventure);
+    public function distributeGoldAndXp(Monster $monster): void {
+        $this->distributeXP($monster);
 
         if ($this->character->xp >= $this->character->xp_next) {
             $leftOverXP = $this->character->xp - $this->character->xp_next;
@@ -165,22 +163,20 @@ class CharacterRewardService {
      * Fire the update skill event.
      *
      * @param Skill $skill
-     * @param Adventure|null $adventure | nul
      * @param Monster|null $monster
      * @return void
      */
-    public function trainSkill(Skill $skill, Adventure $adventure = null, Monster $monster = null) {
-        event(new UpdateSkillEvent($skill, $adventure, $monster));
+    public function trainSkill(Skill $skill, Monster $monster = null) {
+        event(new UpdateSkillEvent($skill, $monster));
     }
 
     /**
      * Assigns XP to the character.
      *
      * @param Monster $monster
-     * @param Adventure|null $adventure
      * @return void
      */
-    protected function distributeXP(Monster $monster, Adventure $adventure = null) {
+    protected function distributeXP(Monster $monster) {
         $currentSkill = $this->fetchCurrentSkillInTraining();
         $xpReduction  = 0.0;
         $gameMap      = $this->character->map->gameMap;
@@ -188,7 +184,7 @@ class CharacterRewardService {
         if (!is_null($currentSkill)) {
             $xpReduction = $currentSkill->xp_towards;
 
-            $this->trainSkill($currentSkill, $adventure, $monster);
+            $this->trainSkill($currentSkill, $monster);
         }
 
         if (!$this->characterXpService->canCharacterGainXP($this->character)) {

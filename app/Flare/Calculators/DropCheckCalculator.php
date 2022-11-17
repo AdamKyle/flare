@@ -2,7 +2,6 @@
 
 namespace App\Flare\Calculators;
 
-use App\Flare\Models\Adventure;
 use App\Flare\Models\Monster;
 use Facades\App\Flare\RandomNumber\RandomNumberGenerator;
 

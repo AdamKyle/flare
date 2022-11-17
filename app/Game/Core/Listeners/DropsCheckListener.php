@@ -7,15 +7,18 @@ use App\Game\Core\Traits\CanHaveQuestItem;
 use App\Game\Core\Events\DropsCheckEvent;
 
 
-class DropsCheckListener
-{
+class DropsCheckListener {
 
     use CanHaveQuestItem;
 
-    private $randomItemDropBuilder;
+    /**
+     * @var DropCheckService
+     */
+    private DropCheckService $dropCheckService;
 
-    private $disenchantService;
-
+    /**
+     * @param DropCheckService $dropCheckService
+     */
     public function __construct(DropCheckService $dropCheckService) {
         $this->dropCheckService = $dropCheckService;
     }
@@ -25,10 +28,10 @@ class DropsCheckListener
      *
      * @param DropsCheckEvent $event
      * @return void
+     * @throws \Exception
      */
-    public function handle(DropsCheckEvent $event)
-    {
-        $this->dropCheckService->process($event->character, $event->monster, $event->adventure);
+    public function handle(DropsCheckEvent $event) {
+        $this->dropCheckService->process($event->character, $event->monster);
     }
 
 }

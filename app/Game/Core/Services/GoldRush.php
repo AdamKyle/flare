@@ -5,13 +5,12 @@ namespace App\Game\Core\Services;
 use Facades\App\Flare\Calculators\GoldRushCheckCalculator;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Values\MaxCurrenciesValue;
-use App\Flare\Models\Adventure;
 use App\Flare\Models\Character;
 use App\Flare\Models\Monster;
 
 class GoldRush {
 
-    public function processPotentialGoldRush(Character $character, Monster $monster, Adventure $adventure = null) {
+    public function processPotentialGoldRush(Character $character, Monster $monster) {
         if ($character->gold === MaxCurrenciesValue::MAX_GOLD) {
             return;
         }

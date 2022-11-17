@@ -4,7 +4,6 @@ namespace App\Flare\Traits\Controllers;
 
 use Auth;
 use Illuminate\Contracts\View\View;
-use App\Flare\Models\Adventure;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
 use App\Flare\Models\Location;

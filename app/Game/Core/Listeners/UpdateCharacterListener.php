@@ -10,13 +10,12 @@ use App\Game\Core\Events\CharacterLevelUpEvent;
 use App\Game\Core\Events\UpdateCharacterEvent;
 use App\Game\Core\Services\CharacterService;
 
-class UpdateCharacterListener
-{
+class UpdateCharacterListener {
 
     /**
      * @var CharacterService $characterService
      */
-    private $characterService;
+    private CharacterService $characterService;
 
     /**
      * Constructor
@@ -34,13 +33,12 @@ class UpdateCharacterListener
      * @param UpdateCharacterEvent $event
      * @return void
      */
-    public function handle(UpdateCharacterEvent $event)
-    {
+    public function handle(UpdateCharacterEvent $event) {
         $characterRewardService = resolve(CharacterRewardService::class, [
             'character' => $event->character,
         ]);
 
-        $characterRewardService->distributeGoldAndXp($event->monster, $event->adventure);
+        $characterRewardService->distributeGoldAndXp($event->monster);
 
         $character = $characterRewardService->getCharacter();
 

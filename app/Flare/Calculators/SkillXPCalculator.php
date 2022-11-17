@@ -2,7 +2,6 @@
 
 namespace App\Flare\Calculators;
 
-use App\Flare\Models\Adventure;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Skill;
 
@@ -15,7 +14,6 @@ class SkillXPCalculator {
      * a base of 5.
      *
      * @param Skill $skill
-     * @param Adventure|null $adventure | null
      * @param Monster|null $monster
      * @return float|int
      */
@@ -50,19 +48,5 @@ class SkillXPCalculator {
         }
 
         return $totalTowards;
-    }
-
-    /**
-     * Returns the adventure skill training bonus.
-     *
-     * @param Adventure|null $adventure
-     * @return float
-     */
-    protected function fetchAdventureBonus(Adventure $adventure = null): float {
-        if (!is_null($adventure)) {
-            return $adventure->skill_exp_bonus;
-        }
-
-        return 0.0;
     }
 }

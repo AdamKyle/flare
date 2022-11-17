@@ -315,7 +315,7 @@ class BattleDrop {
         $user = $character->user;
 
         if ($user->auto_disenchant_amount === 'all') {
-            $this->disenchantService->disenchantItemWithSkill($character->refresh(), false);
+            $this->disenchantService->disenchantItemWithSkill($character->refresh());
 
             return;
         }
@@ -328,7 +328,7 @@ class BattleDrop {
 
                 event(new ServerMessageEvent($character->user, 'You found: ' . $item->affix_name . ' on the enemies corpse.', $slot->id));
             } else {
-                $this->disenchantService->disenchantItemWithSkill($character->refresh(), false);
+                $this->disenchantService->disenchantItemWithSkill($character->refresh());
             }
         }
     }

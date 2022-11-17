@@ -2,42 +2,33 @@
 
 namespace App\Game\Core\Events;
 
-use App\Flare\Models\Adventure;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Http\Request;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Character;
-use App\Flare\Models\User;
 
-class GoldRushCheckEvent
-{
+class GoldRushCheckEvent {
+
     use SerializesModels;
 
     /**
      * @var Character $character
      */
-    public $character;
+    public Character $character;
 
     /**
      * @var Monster $monster
      */
-    public $monster;
+    public Monster $monster;
 
-    /**
-     * @var Adventure $adventure
-     */
-    public $adventure;
 
     /**
      * Create a new event instance.
      *
      * @param Character $character
      * @param Monster $monster
-     * @param Adventure $adventure | null
      * @return void
      */
-    public function __construct(Character $character, Monster $monster)
-    {
+    public function __construct(Character $character, Monster $monster) {
         $this->character = $character;
         $this->monster   = $monster;
     }

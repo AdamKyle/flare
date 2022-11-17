@@ -64,7 +64,6 @@ class ServerMessageListener
             case 'deleted_item':
             case 'building-repair-finished':
             case 'building-upgrade-finished':
-            case 'adventure':
             case 'sold_item':
             case 'new-building':
             case 'kingdom-resources-update':

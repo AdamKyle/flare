@@ -67,6 +67,12 @@ class BattleEventHandler {
         $monster   = Monster::find($monsterId);
         $character = Character::find($characterId);
 
+        if (is_null($monster)) {
+            \Log::error('Missing Monster for id: ' . $monsterId);
+
+            return;
+        }
+
         $this->battleRewardProcessing->handleMonster($character, $monster, $isAutomation);
 
         $this->mercenaryService->giveXpToMercenaries($character);

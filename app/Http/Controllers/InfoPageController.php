@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Storage;
+use Illuminate\Http\Request;
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\InfoPage;
@@ -12,10 +14,6 @@ use App\Flare\Traits\Controllers\MonstersShowInformation;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\LocationEffectValue;
 use App\Flare\Values\LocationType;
-use App\Game\Core\Values\View\ClassBonusInformation;
-use Storage;
-use Illuminate\Http\Request;
-use App\Flare\Models\Adventure;
 use App\Flare\Models\GameBuildingUnit;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameRace;
@@ -26,6 +24,7 @@ use App\Flare\Models\ItemAffix;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use App\Flare\Traits\Controllers\ItemsShowInformation;
+use App\Game\Core\Values\View\ClassBonusInformation;
 
 class InfoPageController extends Controller
 {
@@ -89,13 +88,6 @@ class InfoPageController extends Controller
     public function viewSkill(Request $request, GameSkill $skill) {
         return view('information.skills.skill', [
             'skill' => $skill,
-        ]);
-    }
-
-    public function viewAdventure(Request $request, Adventure $adventure) {
-
-        return view('information.adventures.adventure', [
-            'adventure' => $adventure,
         ]);
     }
 
