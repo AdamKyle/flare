@@ -39,27 +39,29 @@ class CleanEnchantedItemsFromDatabase extends Command
     public function handle()
     {
 
-       $prefixItems = Item::whereHas('itemPrefix')
-                          ->whereDoesntHave('inventorySlots')
-                          ->whereDoesntHave('inventorySetSlots')
-                          ->whereDoesntHave('marketListings')
-                          ->whereDoesntHave('marketHistory')
-                          ->get();
+        ini_set('memory_limit', '3G');
 
-       foreach ($prefixItems as $item) {
-           if ($item->appliedHolyStacks()->count() > 0) {
-               $item->appliedHolyStacks()->delete();
-           }
+        $prefixItems = Item::whereHas('itemPrefix')
+            ->whereDoesntHave('inventorySlots')
+            ->whereDoesntHave('inventorySetSlots')
+            ->whereDoesntHave('marketListings')
+            ->whereDoesntHave('marketHistory')
+            ->get();
 
-           $item->delete();
-       }
+        foreach ($prefixItems as $item) {
+            if ($item->appliedHolyStacks()->count() > 0) {
+                $item->appliedHolyStacks()->delete();
+            }
 
-       $suffixItems = Item::whereHas('itemSuffix')
-                          ->whereDoesntHave('inventorySlots')
-                          ->whereDoesntHave('inventorySetSlots')
-                          ->whereDoesnthave('marketListings')
-                          ->whereDoesntHave('marketHistory')
-                          ->get();
+            $item->delete();
+        }
+
+        $suffixItems = Item::whereHas('itemSuffix')
+            ->whereDoesntHave('inventorySlots')
+            ->whereDoesntHave('inventorySetSlots')
+            ->whereDoesnthave('marketListings')
+            ->whereDoesntHave('marketHistory')
+            ->get();
 
         foreach ($suffixItems as $item) {
             if ($item->appliedHolyStacks()->count() > 0) {
