@@ -19,6 +19,7 @@
         <th>clay_cost</th>
         <th>stone_cost</th>
         <th>iron_cost</th>
+        <th>steel_cost</th>
         <th>time_to_build</th>
         <th>time_increase_amount</th>
         <th>decrease_morale_amount</th>
@@ -56,6 +57,7 @@
             <td>{{$building->clay_cost}}</td>
             <td>{{$building->stone_cost}}</td>
             <td>{{$building->iron_cost}}</td>
+            <td>{{$building->steel_cost}}</td>
             <td>{{$building->time_to_build}}</td>
             <td>{{$building->time_increase_amount}}</td>
             <td>{{$building->decrease_morale_amount}}</td>

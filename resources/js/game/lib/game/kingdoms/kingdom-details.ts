@@ -20,6 +20,8 @@ export default interface KingdomDetails extends DataTableBaseData {
 
     can_access_bank: boolean;
 
+    can_access_smelter: boolean;
+
     character_id: number;
 
     color: string;
@@ -34,9 +36,15 @@ export default interface KingdomDetails extends DataTableBaseData {
 
     current_stone: number;
 
+    current_steel: number;
+
     current_units: CurrentUnitDetails[] | [];
 
     current_wood: number;
+
+    smelting_time_left: number;
+
+    smelting_amount: number;
 
     defence_bonus: number;
 
@@ -62,6 +70,8 @@ export default interface KingdomDetails extends DataTableBaseData {
 
     max_wood: number;
 
+    max_steel: number;
+
     name: string;
 
     passive_defence: number;
@@ -73,6 +83,8 @@ export default interface KingdomDetails extends DataTableBaseData {
     treasury_defence: number;
 
     unit_cost_reduction: number;
+
+    smelting_time_reduction: number;
 
     unit_movement: [];
 
@@ -91,4 +103,6 @@ export default interface KingdomDetails extends DataTableBaseData {
     protected_days_left: number;
 
     is_under_attack: boolean;
+
+    smelting_completed_at: string;
 }

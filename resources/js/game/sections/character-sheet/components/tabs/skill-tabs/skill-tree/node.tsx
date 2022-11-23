@@ -13,6 +13,11 @@ export default class Node extends React.Component<any, any> {
     }
 
     render() {
+
+        if (this.props.passive.name === 'Blacksmiths Furnace') {
+            console.log(this.props.passive);
+        }
+
         return (
             <div>
                 <button onClick={() => this.props.show_passive_modal(this.props.passive)} disabled={this.props.is_automation_running}>
@@ -20,7 +25,11 @@ export default class Node extends React.Component<any, any> {
                         'text-red-500 dark:text-red-400' : this.props.passive.parent_skill_id !== null && this.props.passive.is_locked,
                         'text-blue-500 dark:text-blue-400' : this.props.passive.parent_skill_id === null,
                         'text-green-700 dark:text-green-600': this.props.passive.current_level === this.props.passive.max_level,
-                    })}>{this.props.passive.name}
+                    })}>
+                        <i className={clsx('ra ra-wooden-sign', {
+                            'hidden': this.props.passive.quest_name === null || this.props.passive.is_quest_complete,
+                            'text-yellow-500 dark:text-yellow-400': this.props.passive.quest_name !== null && !this.props.passive.is_quest_complete
+                        })} /> {this.props.passive.name}
                     </h4>
                 </button>
                 <p className='mt-3'>Level: {this.props.passive.current_level}/{this.props.passive.max_level}</p>

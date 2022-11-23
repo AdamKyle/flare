@@ -29,6 +29,7 @@ class MonstersTable extends DataTableComponent {
                     'Labyrinth'               => 'Labyrinth',
                     'Dungeons'                => 'Dungeons',
                     'Shadow Plane'            => 'Shadow Plane',
+                    'Hell'                    => 'Hell',
                     'Purgatory'               => 'Purgatory',
                     'Surface Celestials'      => 'Surface Celestials',
                     'Labyrinth Celestials'    => 'Labyrinth Celestials',

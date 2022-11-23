@@ -11,4 +11,8 @@ export default interface KingdomDetailsState {
     show_manage_treasury: boolean;
 
     show_call_for_reinforcements: boolean;
+
+    show_smelter: boolean;
+
+    show_specialty_help: boolean;
 }

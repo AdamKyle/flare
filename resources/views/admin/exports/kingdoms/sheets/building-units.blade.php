@@ -2,8 +2,8 @@
     <thead>
     <tr>
         <th>id</th>
-        <th>Building Name</th>
-        <th>Unit Name</th>
+        <th>Building ID</th>
+        <th>Unit ID</th>
         <th>Required Level</th>
     </tr>
     </thead>

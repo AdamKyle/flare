@@ -6,7 +6,7 @@
         <x-core.cards.card-with-title
             title="{{!is_null($building) ? 'Edit: ' . nl2br($building->name) : 'Create New Building'}}"
             buttons="true"
-            backUrl="{{!is_null($building) ? route('buildings.building', ['building' => $building->id]) : route('building.list')}}"
+            backUrl="{{!is_null($building) ? route('buildings.building', ['building' => $building->id]) : route('buildings.list')}}"
         >
             <x-core.form-wizard.container action="{{route('buildings.store')}}" modelId="{{!is_null($building) ? $building->id : 0}}" lastTab="tab-style-2-5">
                 <x-core.form-wizard.tabs>
@@ -20,7 +20,7 @@
                     <x-core.form-wizard.content target="tab-style-2-1" isOpen="true">
                         <div class="grid md:grid-cols-2 gap-2">
                             <div>
-                                <h3 class="mb-3">Basic Item Info</h3>
+                                <h3 class="mb-3">Basic Building Info</h3>
                                 <x-core.forms.input :model="$building" label="Name:" modelKey="name" name="name" type="text"/>
                                 <x-core.forms.text-area :model="$building" label="Description:" modelKey="description" name="description" />
                                 <x-core.forms.input :model="$building" label="Max Level:" modelKey="max_level" name="max_level" type="text"/>
@@ -50,7 +50,7 @@
                                                                 value="id"
                                                                 :options="$passiveSkills"
                                 />
-                                <x-core.forms.input :model="$building" label="Passive Level Required?:" modelKey="is_locked" name="is_locked" type="text"/>
+                                <x-core.forms.input :model="$building" label="Passive Level Required?:" modelKey="level_required" name="level_required" type="text"/>
                                 <x-core.forms.check-box :model="$building" label="is Building Locked?" modelKey="is_locked" name="is_locked" />
                             </div>
                         </div>
@@ -63,6 +63,7 @@
                                 <x-core.forms.input :model="$building" label="Clay Cost:" modelKey="clay_cost" name="clay_cost" type="text"/>
                                 <x-core.forms.input :model="$building" label="Stone Cost:" modelKey="stone_cost" name="stone_cost" type="text"/>
                                 <x-core.forms.input :model="$building" label="Iron Cost:" modelKey="iron_cost" name="iron_cost" type="text"/>
+                                <x-core.forms.input :model="$building" label="Steel Cost:" modelKey="steel_cost" name="steel_cost" type="text"/>
                             </div>
                             <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                             <div>

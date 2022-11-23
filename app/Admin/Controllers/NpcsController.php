@@ -21,7 +21,7 @@ class NpcsController extends Controller {
     public function show(Npc $npc) {
 
         $npc->game_map_name = $npc->gameMap->name;
-        $npc->type          = (new NpcTypes($npc->type))->getNamedValue();
+        $npc->type_name     = (new NpcTypes($npc->type))->getNamedValue();
 
         return view('admin.npcs.show', [
             'npc' => $npc,

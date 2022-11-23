@@ -13,6 +13,8 @@ import ManageTreasuryModal from "./modals/manage-treasury-modal";
 import KingdomDetailsState from "../../lib/game/kingdoms/types/kingdom-details-state";
 import SuccessOutlineButton from "../../components/ui/buttons/success-outline-button";
 import CallForReinforcements from "./modals/call-for-reinforcements ";
+import SmelterModal from "./modals/smelter-modal";
+import SpecialtyActionsHelpModal from "./modals/specialty-actions-help-modal";
 
 export default class KingdomDetails extends React.Component<KingdomDetailsProps, KingdomDetailsState> {
     constructor(props: KingdomDetailsProps) {
@@ -25,6 +27,8 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
             show_abandon_kingdom: false,
             show_manage_treasury: false,
             show_call_for_reinforcements: false,
+            show_smelter: false,
+            show_specialty_help: false,
         }
     }
 
@@ -64,6 +68,12 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
         })
     }
 
+    showSmelter() {
+        this.setState({
+            show_smelter: !this.state.show_smelter
+        });
+    }
+
     abandonedKingdom() {
         this.props.close_details();
     }
@@ -80,6 +90,12 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
         bankBuilding = bankBuilding[0];
 
         return bankBuilding.is_locked;
+    }
+
+    showSpecialtyHelpModal() {
+        this.setState({
+            show_specialty_help: !this.state.show_specialty_help,
+        });
     }
 
     render() {
@@ -119,6 +135,8 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
                             <dd>{formatNumber(this.props.kingdom.current_wood) + '/' + formatNumber(this.props.kingdom.max_wood)}</dd>
                             <dt>Iron</dt>
                             <dd>{formatNumber(this.props.kingdom.current_iron) + '/' + formatNumber(this.props.kingdom.max_iron)}</dd>
+                            <dt>Steel</dt>
+                            <dd>{formatNumber(this.props.kingdom.current_steel) + '/' + formatNumber(this.props.kingdom.max_steel)}</dd>
                             <dt>Population</dt>
                             <dd>{
                                 formatNumber(this.props.kingdom.current_population ) + '/' +
@@ -128,7 +146,7 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
                     </div>
                 </div>
                 <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
-                <div className='grid md:grid-cols-2 gap-4'>
+                <div className='grid md:grid-cols-3 gap-2'>
                     <div>
                         <h3>Defence Break Down</h3>
                         <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
@@ -153,9 +171,26 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
                             <PrimaryOutlineButton button_label={'Change Name'} on_click={this.showChangeName.bind(this)} />
                             <SuccessOutlineButton button_label={'Call for Reinforcements'} on_click={this.showCallForReinforcements.bind(this)} />
                             <PrimaryOutlineButton button_label={'Buy Population'} on_click={this.showBuyPop.bind(this)} />
-                            <SkyOutlineButton button_label={'Manage Gold Bars'} on_click={this.showGoblinBank.bind(this)}  disabled={this.canManageGoldBars()}/>
                             <SkyOutlineButton button_label={'Manage Treasury'} on_click={this.showManageTreasury.bind(this)} />
                             <DangerOutlineButton button_label={'Abandon Kingdom'} on_click={this.showAbandonKingdom.bind(this)} />
+                        </div>
+                    </div>
+                    <div className='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                    <div>
+                        <h3>
+                            Specialty Actions <button onClick={this.showSpecialtyHelpModal.bind(this)}><i className="fas fa-info-circle text-blue-500 dark:text-blue-400"></i></button>
+                        </h3>
+                        <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                        <div className='grid md:grid-cols-1 gap-4'>
+                            <PrimaryOutlineButton button_label={
+                                this.props.kingdom.smelting_time_left > 0 ?
+                                    <Fragment>
+                                        <i className='far fa-clock text-yellow-700 dark:text-yellow-500 mr-2' /> Smelter
+                                    </Fragment>
+                                :
+                                    'Smelter'
+                            } on_click={this.showSmelter.bind(this)} disabled={!this.props.kingdom.can_access_smelter}/>
+                            <SkyOutlineButton button_label={'Manage Gold Bars'} on_click={this.showGoblinBank.bind(this)}  disabled={this.canManageGoldBars()}/>
                         </div>
                     </div>
                 </div>
@@ -225,6 +260,32 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
                             kingdom_id={this.props.kingdom.id}
                             handle_close={this.showCallForReinforcements.bind(this)}
                             character_id={this.props.kingdom.character_id}
+                        />
+                    : null
+                }
+
+                {
+                    this.state.show_smelter ?
+                        <SmelterModal
+                            is_open={true}
+                            kingdom_id={this.props.kingdom.id}
+                            max_steel={this.props.kingdom.max_steel}
+                            iron={this.props.kingdom.current_iron}
+                            handle_close={this.showSmelter.bind(this)}
+                            character_id={this.props.kingdom.character_id}
+                            smelting_time_reduction={this.props.kingdom.smelting_time_reduction}
+                            smelting_time_left={this.props.kingdom.smelting_time_left}
+                            smelting_completed_at={this.props.kingdom.smelting_completed_at}
+                            smelting_amount={this.props.kingdom.smelting_amount}
+                        />
+                        : null
+                }
+
+                {
+                    this.state.show_specialty_help ?
+                        <SpecialtyActionsHelpModal
+                            is_open={true}
+                            handle_close={this.showSpecialtyHelpModal.bind(this)}
                         />
                     : null
                 }

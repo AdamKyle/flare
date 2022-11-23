@@ -33,6 +33,7 @@ class Kingdom extends Model implements Auditable
         'max_wood',
         'max_clay',
         'max_iron',
+        'max_steel',
         'current_stone',
         'current_wood',
         'current_clay',
@@ -63,6 +64,8 @@ class Kingdom extends Model implements Auditable
         'max_wood'           => 'integer',
         'max_clay'           => 'integer',
         'max_iron'           => 'integer',
+        'max_steel'          => 'integer',
+        'current_steel'      => 'integer',
         'current_stone'      => 'integer',
         'current_wood'       => 'integer',
         'current_clay'       => 'integer',
@@ -110,8 +113,20 @@ class Kingdom extends Model implements Auditable
         return $this->getPercentageForPassive(PassiveSkillTypeValue::IRON_COST_REDUCTION);
     }
 
+    public function fetchSmeltingTimeReduction(): float {
+        return $this->getPercentageForPassive(PassiveSkillTypeValue::STEEL_SMELTING_TIME_REDUCTION);
+    }
+
     public function fetchPopulationCostReduction(): float {
         return $this->getPercentageForPassive(PassiveSkillTypeValue::POPULATION_COST_REDUCTION);
+    }
+
+    public function fetchAirShipAttackIncrease(): float {
+        return $this->getPercentageForPassive(PassiveSkillTypeValue::AIRSHIP_ATTACK_INCREASE);
+    }
+
+    public function fetchAirShipDefenceIncrease(): float {
+        return $this->getPercentageForPassive(PassiveSkillTypeValue::AIRSHIP_UNIT_DEFENCE);
     }
 
     public function fetchKingBasedSkillValue(string $attribute): float {

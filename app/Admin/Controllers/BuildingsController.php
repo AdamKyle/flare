@@ -32,8 +32,11 @@ class BuildingsController extends Controller {
 
     public function create() {
         return view ('admin.kingdoms.buildings.manage', [
-            'building' => null,
-            'editing'  => false,
+            'building'         => null,
+            'editing'          => false,
+            'passiveSkills'    => PassiveSkill::all(),
+            'recruitableUnits' => GameUnit::all(),
+            'unitsForBuilding' => [],
         ]);
     }
 

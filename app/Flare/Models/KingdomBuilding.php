@@ -59,10 +59,12 @@ class KingdomBuilding extends Model
         'clay_cost',
         'stone_cost',
         'iron_cost',
+        'steel_cost',
         'base_wood_cost',
         'base_clay_cost',
         'base_stone_cost',
         'base_iron_cost',
+        'base_steel_cost',
         'population_increase',
         'future_population_increase',
         'time_increase',
@@ -176,6 +178,15 @@ class KingdomBuilding extends Model
         return ($this->level + 1) * $this->gameBuilding->iron_cost;
     }
 
+    public function getSteelCostAttribute() {
+
+        if ($this->is_max_level)  {
+            return $this->level * $this->gameBuilding->steel_cost;
+        }
+
+        return ($this->level + 1) * $this->gameBuilding->steel_cost;
+    }
+
     public function getBaseWoodCostAttribute() {
         return $this->gameBuilding->wood_cost;
     }
@@ -190,6 +201,10 @@ class KingdomBuilding extends Model
 
     public function getBaseIronCostAttribute() {
         return $this->gameBuilding->iron_cost;
+    }
+
+    public function getBaseSteelCostAttribute() {
+        return $this->gameBuilding->steel_cost;
     }
 
     public function getPopulationIncreaseAttribute() {

@@ -53,6 +53,19 @@ class NpcQuestRewardHandler {
             $this->giveXP($character, $quest);
         }
 
+        if ($this->questRewardsPassive($quest)) {
+            $passive = $character->passiveSkills()->where('passive_skill_id', $quest->unlocks_passive_id)->first();
+
+            $passive->update([
+                'is_locked' => false,
+            ]);
+
+            $passive = $passive->refresh();
+
+            event(new ServerMessageEvent($character->user, 'You unlocked a new Kingdom passive! head to your skills section
+            to learn more. You have unlocked: ' . $passive->name));
+        }
+
         if (!is_null($quest->unlocks_feature)) {
             if ($quest->unlocksFeature()->isMercenary()) {
                 $character->update(['is_mercenary_unlocked' => true]);
@@ -91,6 +104,10 @@ class NpcQuestRewardHandler {
 
     public function questRewardsXP(Quest $quest): bool {
         return !is_null($quest->reward_xp);
+    }
+
+    public function questRewardsPassive(Quest $quest): bool {
+        return !is_null($quest->unlocks_passive_id);
     }
 
     public function giveXP(Character $character, Quest $quest): void {

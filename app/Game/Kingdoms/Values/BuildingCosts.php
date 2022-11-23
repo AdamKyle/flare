@@ -7,34 +7,38 @@ namespace App\Game\Kingdoms\Values;
 class BuildingCosts
 {
 
-    const KEEP             = 'Keep';
-    const FARM             = 'Farm';
-    const LUMBER_MILL      = 'Lumber Mill';
-    const STONE_QUARRY     = 'Stone Quarry';
-    const CLAY_PIT         = 'Clay Pit';
-    const IRON_MINE        = 'Iron Mine';
-    const WALLS            = 'Walls';
-    const BARRACKS         = 'Barracks';
-    const CHURCH           = 'Church';
-    const SETTLERS_HALL    = 'Settler\'s Hall';
-    const GOBLIN_COIN_BANK = 'Goblin Coin Bank';
-    const CANNONEER_SHOP   = 'Cannoneer Shop';
-    const CALVARY          = 'Calvary Training Grounds';
+    const KEEP                 = 'Keep';
+    const FARM                 = 'Farm';
+    const LUMBER_MILL          = 'Lumber Mill';
+    const STONE_QUARRY         = 'Stone Quarry';
+    const CLAY_PIT             = 'Clay Pit';
+    const IRON_MINE            = 'Iron Mine';
+    const WALLS                = 'Walls';
+    const BARRACKS             = 'Barracks';
+    const CHURCH               = 'Church';
+    const SETTLERS_HALL        = 'Settler\'s Hall';
+    const GOBLIN_COIN_BANK     = 'Goblin Coin Bank';
+    const CANNONEER_SHOP       = 'Cannoneer Shop';
+    const CALVARY              = 'Calvary Training Grounds';
+    const BLACKSMITHS_FURNACE  = 'Blacksmith\'s Furnace';
+    const AIRSHIP_FIELDS       = 'Airship Fields';
 
     protected static $values = [
-        self::KEEP             => self::KEEP,
-        self::FARM             => self::FARM,
-        self::LUMBER_MILL      => self::LUMBER_MILL,
-        self::STONE_QUARRY     => self::STONE_QUARRY,
-        self::CLAY_PIT         => self::CLAY_PIT,
-        self::IRON_MINE        => self::IRON_MINE,
-        self::WALLS            => self::WALLS,
-        self::BARRACKS         => self::BARRACKS,
-        self::CHURCH           => self::CHURCH,
-        self::SETTLERS_HALL    => self::SETTLERS_HALL,
-        self::GOBLIN_COIN_BANK => self::GOBLIN_COIN_BANK,
-        self::CANNONEER_SHOP   => self::CANNONEER_SHOP,
-        self::CALVARY          => self::CALVARY,
+        self::KEEP                => self::KEEP,
+        self::FARM                => self::FARM,
+        self::LUMBER_MILL         => self::LUMBER_MILL,
+        self::STONE_QUARRY        => self::STONE_QUARRY,
+        self::CLAY_PIT            => self::CLAY_PIT,
+        self::IRON_MINE           => self::IRON_MINE,
+        self::WALLS               => self::WALLS,
+        self::BARRACKS            => self::BARRACKS,
+        self::CHURCH              => self::CHURCH,
+        self::SETTLERS_HALL       => self::SETTLERS_HALL,
+        self::GOBLIN_COIN_BANK    => self::GOBLIN_COIN_BANK,
+        self::CANNONEER_SHOP      => self::CANNONEER_SHOP,
+        self::CALVARY             => self::CALVARY,
+        self::BLACKSMITHS_FURNACE => self::BLACKSMITHS_FURNACE,
+        self::AIRSHIP_FIELDS      => self::AIRSHIP_FIELDS,
     ];
 
     private $name;
@@ -76,6 +80,10 @@ class BuildingCosts
                 return 150000;
             case self::CALVARY:
                 return 15000;
+            case self::BLACKSMITHS_FURNACE:
+                return 500000;
+            case self::AIRSHIP_FIELDS:
+                return 75000;
             default:
                 return 0;
         }
@@ -129,7 +137,7 @@ class BuildingCosts
         return $this->value === self::CALVARY;
     }
 
-    public function isPerson(): bool {
-        return $this->name === self::PERSON;
+    public function isBlackSmithsFurnace(): bool {
+        return $this->value === self::BLACKSMITHS_FURNACE;
     }
 }

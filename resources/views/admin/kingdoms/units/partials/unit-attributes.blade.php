@@ -32,6 +32,8 @@
             <dd>{{$unit->defence}}</dd>
             <dd><strong>Is Siege Weapon?</strong>:</dd>
             <dd>{{$unit->siege_weapon ? 'Yes' : 'No'}}</dd>
+            <dd><strong>Is Airship?</strong>:</dd>
+            <dd>{{$unit->is_airship ? 'Yes' : 'No'}}</dd>
             <dd><strong>Can Heal?</strong>:</dd>
             <dd>{{$unit->can_heal ? 'Yes' : 'No'}}</dd>
         </dl>
@@ -39,8 +41,6 @@
         <h3>Time Details</h3>
         <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
         <dl>
-            <dd><strong>Travel Time (per 16pxs)</strong>:</dd>
-            <dd>{{$unit->travel_time}} Minutes</dd>
             <dd><strong>Time To Recruit</strong>:</dd>
             <dd>{{$unit->time_to_recruit}} Seconds</dd>
         </dl>
@@ -58,6 +58,8 @@
             <dd>{{$unit->stone_cost}}</dd>
             <dd><strong>Cost in iron</strong>:</dd>
             <dd>{{$unit->iron_cost}}</dd>
+            <dd><strong>Cost in steel</strong>:</dd>
+            <dd>{{$unit->steel_cost}}</dd>
             <dd><strong>Required population</strong>:</dd>
             <dd>{{$unit->required_population}}</dd>
         </dl>

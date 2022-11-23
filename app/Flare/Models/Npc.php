@@ -24,9 +24,6 @@ class Npc extends Model {
         'real_name',
         'type',
         'game_map_id',
-        'moves_around_map',
-        'must_be_at_same_location',
-        'text_command_to_message',
         'x_position',
         'y_position',
     ];

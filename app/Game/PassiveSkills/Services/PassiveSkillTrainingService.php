@@ -35,7 +35,7 @@ class PassiveSkillTrainingService {
 
         $skill->update([
             'started_at'   => now(),
-            'completed_at' => $time
+            'completed_at' => $time,
         ]);
 
         $skill = $skill->refresh();

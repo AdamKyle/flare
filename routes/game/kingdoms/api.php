@@ -17,7 +17,7 @@ Route::middleware(['auth', 'is.character.who.they.say.they.are', 'character.owns
     Route::get('/kingdoms/{character}/{kingdom}', ['as' => 'kingdoms.location', 'uses' => 'Api\KingdomInformationController@getLocationData']);
 });
 
-Route::middleware(['auth', 'is.character.who.they.say.they.are', 'throttle:500,1'])->group(function() {
+Route::middleware(['auth', 'is.character.who.they.say.they.are', 'throttle:25,1'])->group(function() {
     Route::post('/kingdom/opened-log/{character}/{kingdomLog}', ['as' => 'kingdoms.update-log', 'uses' => 'Api\KingdomInformationController@updateLog']);
     Route::post('/kingdom/delete-log/{character}/{kingdomLog}', ['as' => 'kingdoms.delete-log', 'uses' => 'Api\KingdomInformationController@deleteLog']);
 });
@@ -50,6 +50,11 @@ Route::middleware(['auth', 'is.character.dead', 'is.character.exploring', 'is.ch
 Route::middleware(['auth', 'is.character.dead', 'is.character.exploring', 'is.character.who.they.say.they.are', 'character.owns.kingdom', 'throttle:25,1'])->group(function() {
     Route::post('/kingdoms/purchase-gold-bars/{kingdom}', ['as' => 'kingdom.purchase.bars', 'uses' => 'Api\KingdomGoldBarsController@purchaseGoldBars']);
     Route::post('/kingdoms/withdraw-bars-as-gold/{kingdom}', ['as' => 'kingdom.withdraw.bars', 'uses' => 'Api\KingdomGoldBarsController@withdrawGoldBars']);
+});
+
+Route::middleware(['auth', 'is.character.dead', 'is.character.exploring', 'is.character.who.they.say.they.are', 'character.owns.kingdom', 'throttle:25,1'])->group(function() {
+    Route::post('/kingdoms/smelt-iron/{kingdom}', ['as' => 'kingdom.smelt.iron', 'uses' => 'Api\KingdomSteelController@smeltSteel']);
+    Route::post('/kingdoms/cancel-smelting/{kingdom}', ['as' => 'kingdom.cancel.smelting', 'uses' => 'Api\KingdomSteelController@cancelSmelting']);
 });
 
 Route::middleware(['auth', 'is.character.dead', 'is.character.exploring', 'is.character.who.they.say.they.are', 'character.owns.kingdom'])->group(function() {

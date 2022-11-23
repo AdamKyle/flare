@@ -156,10 +156,7 @@ export default class UnitInformation extends React.Component<UnitInformationProp
                              <dd>{this.props.unit.attacker ? 'Yes' : 'No'}</dd>
                              <dt>Good for defending?</dt>
                              <dd>{this.props.unit.defender ? 'Yes' : 'No'}</dd>
-                             <dt>Travel Time</dt>
-                             <dd>{this.props.unit.travel_time} Minutes per 1 square<sup>*</sup></dd>
                          </dl>
-                         <p className='text-sm mt-5'><sup>*</sup> 1 Square = 16 Miles = 1 Player Directional Movement Action.</p>
                      </div>
                      <div className='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                      <div>
@@ -174,6 +171,8 @@ export default class UnitInformation extends React.Component<UnitInformationProp
                              <dd>{formatNumber(this.calculateCostsForUnit(this.props.unit.wood_cost, this.getAmount(), false))}</dd>
                              <dt>Iron Cost:</dt>
                              <dd>{formatNumber(this.calculateCostsForUnit(this.props.unit.iron_cost, this.getAmount(), true))}</dd>
+                             <dt>Steel Cost:</dt>
+                             <dd>{formatNumber(this.calculateCostsForUnit(this.props.unit.steel_cost, this.getAmount(), true))}</dd>
                              <dt>Population Cost:</dt>
                              <dd>{formatNumber(this.calculateCostsForUnit(this.props.unit.required_population, this.getAmount(), false))}</dd>
                              <dt>Base Time For One (Seconds):</dt>

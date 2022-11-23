@@ -17,6 +17,7 @@ export default class Reward extends React.Component<any, any> {
     }
 
     render() {
+        console.log(this.props.quest);
         return (
             <dl>
                 {
@@ -64,6 +65,14 @@ export default class Reward extends React.Component<any, any> {
                         <Fragment>
                             <dt>Unlocks Game Feature</dt>
                             <dd>{this.getFeatureLink()}</dd>
+                        </Fragment>
+                        : null
+                }
+                {
+                    this.props.quest.unlocks_passive_name !== null ?
+                        <Fragment>
+                            <dt>Unlocks Kingdom Passive</dt>
+                            <dd>{this.props.quest.unlocks_passive_name}</dd>
                         </Fragment>
                         : null
                 }
