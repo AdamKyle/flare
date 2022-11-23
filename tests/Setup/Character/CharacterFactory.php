@@ -107,6 +107,7 @@ class CharacterFactory {
         $this->createPassiveForCharacter(PassiveSkillTypeValue::KINGDOM_BUILDING_COST_REDUCTION);
         $this->createPassiveForCharacter(PassiveSkillTypeValue::IRON_COST_REDUCTION);
         $this->createPassiveForCharacter(PassiveSkillTypeValue::POPULATION_COST_REDUCTION);
+        $this->createPassiveForCharacter(PassiveSkillTypeValue::STEEL_SMELTING_TIME_REDUCTION);
 
         $this->character = $this->character->refresh();
 

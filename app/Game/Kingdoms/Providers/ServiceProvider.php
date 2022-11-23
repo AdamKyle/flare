@@ -6,6 +6,7 @@ namespace App\Game\Kingdoms\Providers;
 use App\Game\Kingdoms\Handlers\AttackLogHandler;
 use App\Game\Kingdoms\Handlers\DefenderArcherHandler;
 use App\Game\Kingdoms\Handlers\DefenderSiegeHandler;
+use App\Game\Kingdoms\Handlers\KingdomAirshipHandler;
 use App\Game\Kingdoms\Handlers\KingdomSiegeHandler;
 use App\Game\Kingdoms\Handlers\KingdomUnitHandler;
 use App\Game\Kingdoms\Handlers\ReturnSurvivingUnitHandler;
@@ -210,6 +211,7 @@ class ServiceProvider extends ApplicationServiceProvider {
             return new AttackKingdomWithUnitsHandler(
                 $app->make(KingdomSiegeHandler::class),
                 $app->make(KingdomUnitHandler::class),
+                $app->make(KingdomAirshipHandler::class),
                 $app->make(SettlerHandler::class),
                 $app->make(AttackLogHandler::class),
                 $app->make(ReturnSurvivingUnitHandler::class),
