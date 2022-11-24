@@ -122,6 +122,22 @@ export default class UnitInformation extends React.Component<UnitInformationProp
         }
     }
 
+    buildRecruitmentOptions() {
+         const options = [{
+                 label: 'Recruit with resources',
+                 value: 'resources',
+         }];
+
+         if (!this.props.unit.is_special) {
+             options.push({
+                 label: 'Recruit with gold',
+                 value: 'gold',
+             })
+         }
+
+         return options;
+    }
+
      render() {
          return (
              <Fragment>
@@ -208,26 +224,22 @@ export default class UnitInformation extends React.Component<UnitInformationProp
                                          this.state.upgrade_section !== null ?
                                              this.renderSelectedSection()
                                          :
-                                             <Select
-                                                 onChange={this.showSelectedForm.bind(this)}
-                                                 options={[
-                                                     {
-                                                         label: 'Recruit with gold',
-                                                         value: 'gold',
-                                                     },
-                                                     {
-                                                         label: 'Recruit with resources',
-                                                         value: 'resources',
-                                                     }
-                                                 ]}
-                                                 menuPosition={'absolute'}
-                                                 menuPlacement={'bottom'}
-                                                 styles={{menuPortal: (base: any) => ({...base, zIndex: 9999, color: '#000000'})}}
-                                                 menuPortalTarget={document.body}
-                                                 value={[
-                                                     {label: 'Please Select Recruit Path', value: ''}
-                                                 ]}
-                                             />
+                                             <Fragment>
+                                                 <Select
+                                                     onChange={this.showSelectedForm.bind(this)}
+                                                     options={this.buildRecruitmentOptions()}
+                                                     menuPosition={'absolute'}
+                                                     menuPlacement={'bottom'}
+                                                     styles={{menuPortal: (base: any) => ({...base, zIndex: 9999, color: '#000000'})}}
+                                                     menuPortalTarget={document.body}
+                                                     value={[
+                                                         {label: 'Please Select Recruit Path', value: ''}
+                                                     ]}
+                                                 />
+                                                 <p className='my-4 text-sm'>
+                                                     This unit cannot be recruited with gold.
+                                                 </p>
+                                             </Fragment>
                          }
                      </div>
                  </div>

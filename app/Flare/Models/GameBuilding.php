@@ -50,6 +50,7 @@ class GameBuilding extends Model
         'is_locked',
         'passive_skill_id',
         'level_required',
+        'is_special',
     ];
 
     /**
@@ -69,6 +70,7 @@ class GameBuilding extends Model
         'is_resource_building'        => 'boolean',
         'trains_units'                => 'boolean',
         'is_locked'                   => 'boolean',
+        'is_special'                  => 'boolean',
         'wood_cost'                   => 'integer',
         'clay_cost'                   => 'integer',
         'stone_cost'                  => 'integer',

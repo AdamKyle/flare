@@ -50,4 +50,6 @@ export default interface UnitDetails extends DataTableBaseData {
     additional_pop_cost: number;
 
     steel_cost: number;
+
+    is_special: boolean;
 }

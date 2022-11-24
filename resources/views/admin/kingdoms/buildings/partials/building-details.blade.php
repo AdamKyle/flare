@@ -52,6 +52,16 @@
                     <dd>{{$building->time_increase_amount * 100}}%</dd>
                 </dl>
                 <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                <h3>Is Special Unit?</h3>
+                <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                <p class="my-2">
+                    Special units cannot be purchased with gold and thus require you to use the kingdoms resources.
+                </p>
+                <dl>
+                    <dd><strong>Is Special</strong>:</dd>
+                    <dd>{{$building->is_special ? 'Yes' : 'No'}}</dd>
+                </dl>
+                <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                 <x-core.alerts.info-alert title="Cost Calculation">
                     <p>
                         Below is the cost for one level, that is from level 1 to level 2. For every level past that, its the
@@ -67,6 +77,8 @@
                     <dd>{{$building->stone_cost}}</dd>
                     <dd><strong>Cost in iron</strong>:</dd>
                     <dd>{{$building->iron_cost}}</dd>
+                    <dd><strong>Cost in steel</strong>:</dd>
+                    <dd>{{$building->steel_cost}}</dd>
                 </dl>
             </div>
         </div>

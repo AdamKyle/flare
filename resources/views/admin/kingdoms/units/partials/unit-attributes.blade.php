@@ -44,6 +44,16 @@
             <dd><strong>Time To Recruit</strong>:</dd>
             <dd>{{$unit->time_to_recruit}} Seconds</dd>
         </dl>
+        <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+        <h3>Is Special Unit?</h3>
+        <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+        <p class="my-2">
+            Special units cannot be purchased with gold and thus require you to use the kingdoms resources.
+        </p>
+        <dl>
+            <dd><strong>Is Special</strong>:</dd>
+            <dd>{{$unit->is_special ? 'Yes' : 'No'}}</dd>
+        </dl>
     </div>
     <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
     <div>

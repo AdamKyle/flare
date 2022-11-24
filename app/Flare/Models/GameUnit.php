@@ -38,6 +38,7 @@ class GameUnit extends Model
         'can_not_be_healed',
         'is_settler',
         'reduces_morale_by',
+        'is_special',
     ];
 
     /**
@@ -57,6 +58,7 @@ class GameUnit extends Model
         'defender'             => 'boolean',
         'can_not_be_healed'    => 'boolean',
         'is_settler'           => 'boolean',
+        'is_special'           => 'boolean',
         'reduces_morale_by'    => 'float',
         'wood_cost'            => 'integer',
         'clay_cost'            => 'integer',

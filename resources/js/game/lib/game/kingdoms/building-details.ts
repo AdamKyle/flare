@@ -110,4 +110,6 @@ export default interface BuildingDetails extends DataTableBaseData {
     building_name: string;
 
     steel_cost: number;
+
+    is_special: boolean;
 }

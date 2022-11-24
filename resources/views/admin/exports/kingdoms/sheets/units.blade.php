@@ -13,6 +13,7 @@
         <th>heal_percentage</th>
         <th>siege_weapon</th>
         <th>is_airship</th>
+        <th>is_special</th>
         <th>defender</th>
         <th>attacker</th>
         <th>wood_cost</th>
@@ -39,6 +40,7 @@
             <td>{{$unit->heal_percentage}}</td>
             <td>{{$unit->siege_weapon}}</td>
             <td>{{$unit->is_airship}}</td>
+            <td>{{$unit->is_special}}</td>
             <td>{{$unit->defender}}</td>
             <td>{{$unit->attacker}}</td>
             <td>{{$unit->wood_cost}}</td>

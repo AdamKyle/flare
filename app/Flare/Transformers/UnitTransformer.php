@@ -43,6 +43,7 @@ class UnitTransformer extends TransformerAbstract {
             'pop_cost_gold'           => (new UnitCosts(UnitCosts::PERSON))->fetchCost(),
             'recruited_from'          => GameBuildingUnit::where('game_unit_id', $unit->id)->first(),
             'required_building_level' => $this->getRequiredBuildingLevel($unit),
+            'is_special'              => $unit->is_special,
         ];
     }
 

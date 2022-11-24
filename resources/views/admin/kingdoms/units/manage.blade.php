@@ -45,6 +45,11 @@
                                 <x-core.forms.check-box :model="$unit" label="Is Airship?" modelKey="is_airship" name="is_airship" />
 
                                 <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                                <h3 class="mb-3">Is Special?</h3>
+                                <p class="mb-3 text-sm">Special units cannot be purchased with gold.</p>
+                                <x-core.forms.check-box :model="$unit" label="Special?" modelKey="is_special" name="is_special" />
+
+                                <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                                 <h3 class="mb-3">Misc. (Optional)</h3>
                                 <x-core.forms.check-box :model="$unit" label="Cannot be healed?" modelKey="can_not_be_healed" name="can_not_be_healed" />
 

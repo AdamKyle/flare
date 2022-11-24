@@ -79,6 +79,7 @@ class KingdomBuildingTransformer extends TransformerAbstract {
             'max_level'                   => $building->gameBuilding->max_level,
             'upgrade_cost'                => (new BuildingCosts($building->gameBuilding->name))->fetchCost(),
             'additional_pop_cost'         => (new UnitCosts(UnitCosts::PERSON))->fetchCost(),
+            'is_special'                  => $building->gameBuilding->is_special,
         ];
     }
 }

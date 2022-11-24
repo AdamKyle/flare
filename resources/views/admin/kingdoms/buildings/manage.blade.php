@@ -33,6 +33,11 @@
                                 <x-core.forms.check-box :model="$building" label="Are we a Resource Building?" modelKey="is_resource_building" name="is_resource_building" />
 
                                 <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                                <h3 class="mb-3">Is Special?</h3>
+                                <p class="mb-3 text-sm">Special buildings cannot be leveled with gold.</p>
+                                <x-core.forms.check-box :model="$building" label="Special?" modelKey="is_special" name="is_special" />
+
+                                <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                                 <h3 class="mb-3">Morale Increment/Decrement per Hour</h3>
                                 <x-core.forms.input :model="$building" label="Increasesd Morale By (%):" modelKey="increase_morale_amount" name="increase_morale_amount" type="text"/>
                                 <x-core.forms.input :model="$building" label="Decreases Morale By (%):" modelKey="decrease_morale_amount" name="decrease_morale_amount" type="text"/>
