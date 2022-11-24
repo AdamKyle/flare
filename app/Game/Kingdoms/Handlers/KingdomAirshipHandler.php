@@ -35,7 +35,7 @@ class KingdomAirshipHandler {
      * @param array $attackingUnits
      * @return $this
      */
-    public function setAttackingUnits(array $attackingUnits): KingdomSiegeHandler {
+    public function setAttackingUnits(array $attackingUnits): KingdomAirshipHandler {
         $this->attackingUnits = $attackingUnits;
 
         return $this;
@@ -79,12 +79,13 @@ class KingdomAirshipHandler {
      * @return Kingdom
      */
     public function handleAirships(Kingdom $attackingKingdom, Kingdom $kingdom, float $damageReduction): Kingdom {
+
         $kingdom = $this->handleUnits($attackingKingdom, $kingdom, UnitNames::AIRSHIP, $damageReduction);
 
         foreach ($kingdom->buildings as $building) {
             $airships = $this->getAirships(UnitNames::AIRSHIP);
 
-            if (empty($trebuchets)) {
+            if (empty($airships)) {
                 return $kingdom;
             }
 
@@ -97,18 +98,18 @@ class KingdomAirshipHandler {
             }
 
             if ($building->current_durability <= 0 ) {
-                $this->setNewAirshipUnits($trebuchets);
+                $this->setNewAirshipUnits($airships);
 
                 continue;
             }
 
             if ($building->is_locked) {
-                $this->setNewAirshipUnits($trebuchets);
+                $this->setNewAirshipUnits($airships);
 
                 continue;
             }
 
-            $this->damageBuildings($building, $trebuchets, $damage);
+            $this->damageBuildings($building, $damage);
         }
 
         return $kingdom->refresh();
@@ -118,11 +119,10 @@ class KingdomAirshipHandler {
      * Damage defender buildings.
      *
      * @param KingdomBuilding $building
-     * @param array $siegeWeapons
      * @param int $damage
      * @return void
      */
-    protected function damageBuildings(KingdomBuilding $building, array $siegeWeapons, int $damage) {
+    protected function damageBuildings(KingdomBuilding $building, int $damage): void {
 
         if ($damage > $building->current_defence) {
             $damagePercentToBuilding = $building->current_defence / $damage;
@@ -182,7 +182,7 @@ class KingdomAirshipHandler {
                 continue;
             }
 
-            $unitDefence = $unit->amount * $unit->defence;
+            $unitDefence = $unit->amount * $unit->gameUnit->defence;
             $unitDefence = $unitDefence + ($unitDefence * $kingdom->fetchAirShipDefenceIncrease());
 
             if ($unitDefence <= 0) {

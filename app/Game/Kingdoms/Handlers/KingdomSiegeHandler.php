@@ -270,7 +270,7 @@ class KingdomSiegeHandler {
                 continue;
             }
 
-            $unitDefence = $unit->amount * $unit->defence;
+            $unitDefence = $unit->amount * $unit->gameUnit->defence;
 
             if ($unitDefence <= 0) {
                 $this->setNewSiegeUnits($siegeWeapons);
