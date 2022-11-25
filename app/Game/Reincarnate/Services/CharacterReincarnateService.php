@@ -21,16 +21,16 @@ class CharacterReincarnateService {
 
     public function reincarnate(Character $character): array {
 
-        if ($character->copper_coins < 50000) {
-            return $this->errorResult('Reincarnation costs 50,000 Copper Coins');
-        }
-
         $completedQuest = $character->questsCompleted->filter(function ($completedQuest) {
             return $completedQuest->quest->unlocks_feature === FeatureTypes::REINCARNATION;
         })->first();
 
         if (is_null($completedQuest)) {
             return $this->errorResult('You must complete: "The story of rebirth" quest line in Hell first.');
+        }
+
+        if ($character->copper_coins < 50000) {
+            return $this->errorResult('Reincarnation costs 50,000 Copper Coins');
         }
 
         $baseStats    = ['str', 'dur', 'dex', 'chr', 'int', 'agi', 'focus'];
