@@ -20,5 +20,7 @@ export default interface MercenaryType {
 
     xp_increase: number;
 
+    xp_buff: number | null;
+
     xp_required: number;
 }

@@ -8,6 +8,7 @@ use App\Flare\Values\ItemEffectsValue;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Mercenaries\Requests\PurchaseMercenaryRequest;
+use App\Game\Mercenaries\Values\ExperienceBuffValue;
 use App\Game\Mercenaries\Values\MercenaryValue;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Exception;
@@ -37,6 +38,7 @@ class MercenaryService {
                 'xp_required'        => $mercenary->xp_required,
                 'bonus'              => $mercenary->type()->getBonus($mercenary->current_level, $mercenary->reincarnated_bonus),
                 'xp_increase'        => $mercenary->xp_increase,
+                'xp_buff'            => $mercenary->xp_buff,
                 'times_reincarnated' => $mercenary->times_reincarnated,
                 'can_reincarnate'    => $mercenary->current_level === MercenaryValue::MAX_LEVEL && $mercenary->times_reincarnated !== MercenaryValue::MAX_REINCARNATION
             ];
@@ -101,6 +103,13 @@ class MercenaryService {
         ]);
     }
 
+    /**
+     * Reincarnate the mercenary.
+     *
+     * @param Character $character
+     * @param CharacterMercenary $characterMercenary
+     * @return array
+     */
     public function reIncarnateMercenary(Character $character, CharacterMercenary $characterMercenary): array {
         if ($character->id !== $characterMercenary->character_id) {
             return $this->errorResult('Not allowed to do that.');
@@ -145,6 +154,49 @@ class MercenaryService {
     }
 
     /**
+     * Purchase an XP buff for the mercenary.
+     *
+     * @param Character $character
+     * @param CharacterMercenary $characterMercenary
+     * @param string $type
+     * @return array
+     * @throws Exception
+     */
+    public function purchaseXpBuffForMercenary(Character $character, CharacterMercenary $characterMercenary, string $type): array {
+        if ($character->id !== $characterMercenary->character_id) {
+            return $this->errorResult('Not allowed to do that.');
+        }
+
+        $buffType = new ExperienceBuffValue($type);
+
+        $cost = $buffType->getCost();
+
+        if ($character->gold < $cost) {
+            return $this->errorResult('You do not have the gold to do that.');
+        }
+
+        $character->update([
+            'gold' => $character->gold - $cost
+        ]);
+
+        $characterMercenary->update([
+            'xp_buff' => $buffType->getXPBuff()
+        ]);
+
+        $character = $character->refresh();
+
+        event(new UpdateTopBarEvent($character));
+
+        event(new ServerMessageEvent($character->user, 'Reincarnated ' . $characterMercenary->type()->getName() . ' back to level 1! Leveling back to level 100 will stack the bonuses! Get even more currencies!'));
+
+        return $this->successResult([
+            'merc_data'    => $this->formatCharacterMercenaries($character->mercenaries),
+            'mercs_to_buy' => MercenaryValue::mercenaries($character->mercenaries),
+            'message'      => 'Applied the buff to the Mercenary'
+        ]);
+    }
+
+    /**
      * Give xp to all mercenaries.
      *
      * @param Character $character
@@ -158,6 +210,7 @@ class MercenaryService {
             }
 
             $newXp = $mercenary->current_xp + MercenaryValue::XP_PER_KILL;
+            $newXp = $newXp + $newXp * $mercenary->xp_buff;
 
             if ($newXp >= $mercenary->type()->getNextLevelXP($mercenary->xp_increase)) {
                 $mercenary->update([

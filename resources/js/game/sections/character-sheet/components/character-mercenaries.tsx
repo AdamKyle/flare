@@ -23,6 +23,7 @@ export default class CharacterMercenaries extends React.Component<CharacterMerce
             loading: false,
             mercs: [],
             mercs_to_buy: [],
+            merc_xp_buffs: [],
             merc_selected: null,
             buying_merc: false,
             error_message: null,
@@ -30,6 +31,7 @@ export default class CharacterMercenaries extends React.Component<CharacterMerce
             reincarnate_error_message: null,
             reincarnate_success_message: null,
             reincarnating: false,
+            buying_buff: false,
             dark_tables: false,
             show_merc_details: false,
             merc_for_show: null,
@@ -56,6 +58,7 @@ export default class CharacterMercenaries extends React.Component<CharacterMerce
                     this.setState({
                         mercs: response.data.merc_data,
                         mercs_to_buy: response.data.mercs_to_buy,
+                        merc_xp_buffs: response.data.merc_xp_buffs,
                         loading: false,
                     })
                 }, (error: AxiosError) => {
@@ -173,6 +176,41 @@ export default class CharacterMercenaries extends React.Component<CharacterMerce
         })
     }
 
+    purchaseBuff(mercId: number, buffType: string) {
+        let characterId: number|null = null;
+
+        if (this.props.character === null) {
+            return;
+        }
+
+        characterId = this.props.character.id;
+
+        this.setState({
+            success_message: null,
+            error_message: null,
+            buying_buff: true,
+        }, () => {
+            (new Ajax()).setRoute('mercenaries/purcahse-buff/'+characterId+'/' + mercId).setParameters({
+                type: buffType
+            }).doAjaxCall('post', (response: AxiosResponse) => {
+                this.setState({
+                    mercs: response.data.merc_data,
+                    mercs_to_buy: response.data.mercs_to_buy,
+                    buying_buff: false,
+                    success_message: response.data.message,
+                }, () => {
+                    this.closeDetailsModal()
+                });
+            }, (error: AxiosError) => {
+                if (typeof error.response !== 'undefined') {
+                    const response = error.response;
+
+                    this.setState({buying_buff: false, error_message: response.data.message});
+                }
+            });
+        })
+    }
+
     buyMerc() {
         let characterId: number|null = null;
 
@@ -244,6 +282,15 @@ export default class CharacterMercenaries extends React.Component<CharacterMerce
                 cell: (row: any) => <span
                     key={row.id + '-' + (Math.random() + 1).toString(36).substring(7)}>
                     {(row.bonus * 100).toFixed(0)}%
+                </span>
+            },
+            {
+                name: 'XP Buff',
+                selector: (row: any) => row.xp_buff,
+                sortable: true,
+                cell: (row: any) => <span
+                    key={row.id + '-' + (Math.random() + 1).toString(36).substring(7)}>
+                    {(row.xp_buff * 100).toFixed(0)}%
                 </span>
             },
         ];
@@ -335,8 +382,11 @@ export default class CharacterMercenaries extends React.Component<CharacterMerce
                                             handle_close={this.closeDetailsModal.bind(this)}
                                             character={this.props.character}
                                             reincarnating={this.state.reincarnating}
+                                            buying_buff={this.state.buying_buff}
                                             error_message={this.state.reincarnate_error_message}
                                             reincarnate={this.reincarnateMerc.bind(this)}
+                                            xp_buffs={this.state.merc_xp_buffs}
+                                            purchase_buff={this.purchaseBuff.bind(this)}
                         />
                     : null
                 }

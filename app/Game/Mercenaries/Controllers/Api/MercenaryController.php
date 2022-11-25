@@ -11,8 +11,10 @@ use App\Flare\Models\User;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\GuideQuests\Events\RemoveGuideQuestButton;
 use App\Game\GuideQuests\Services\GuideQuestService;
+use App\Game\Mercenaries\Requests\PurchaseMercenaryBuffRequest;
 use App\Game\Mercenaries\Requests\PurchaseMercenaryRequest;
 use App\Game\Mercenaries\Services\MercenaryService;
+use App\Game\Mercenaries\Values\ExperienceBuffValue;
 use App\Game\Mercenaries\Values\MercenaryValue;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -33,13 +35,23 @@ class MercenaryController extends Controller {
         $charactersMercenary = $character->mercenaries;
 
         return response()->json([
-            'merc_data'    => $this->mercenaryService->formatCharacterMercenaries($charactersMercenary),
-            'mercs_to_buy' => MercenaryValue::mercenaries($charactersMercenary)
+            'merc_data'     => $this->mercenaryService->formatCharacterMercenaries($charactersMercenary),
+            'merc_xp_buffs' => ExperienceBuffValue::buffSelection(),
+            'mercs_to_buy'  => MercenaryValue::mercenaries($charactersMercenary)
         ]);
     }
 
     public function buy(PurchaseMercenaryRequest $request, Character $character) {
         $response = $this->mercenaryService->purchaseMercenary($request->all(), $character);
+        $status   = $response['status'];
+
+        unset($response['status']);
+
+        return response()->json($response, $status);
+    }
+
+    public function purchaseBuff(PurchaseMercenaryBuffRequest $request, Character $character, CharacterMercenary $characterMercenary) {
+        $response = $this->mercenaryService->purchaseXpBuffForMercenary($character, $characterMercenary, $request->type);
         $status   = $response['status'];
 
         unset($response['status']);
