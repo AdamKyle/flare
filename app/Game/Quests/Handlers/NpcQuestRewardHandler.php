@@ -77,6 +77,13 @@ class NpcQuestRewardHandler {
                 You can ream more about them by clicking on Help I\'m Stuck! and selecting Mercenary under Game Systems.
                 There is also a help link on the tab. mercenaries add new boons to those who farm currencies!'));
             }
+
+            if ($quest->unlocksFeature()->isReincarnation()) {
+
+                event(new ServerMessageEvent($character->user, 'You can now reincarnate your character for a cost of 50,000 Copper Coins per Reincarnation. This allows
+                you to set your character level back to level 1 and keep 20% of your base stats, but you are penalized by having 5% (that stacks per reincarnation)
+                added to your XP. You can now use this feature on your Character Sheet!'));
+            }
         }
 
         $this->createQuestLog($character, $quest);

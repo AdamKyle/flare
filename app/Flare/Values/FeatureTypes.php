@@ -8,6 +8,8 @@ class FeatureTypes {
 
     const MERCENARY = 0;
 
+    const REINCARNATION = 1;
+
     /**
      * @var int $value
      */
@@ -18,10 +20,12 @@ class FeatureTypes {
      */
     protected static array $values = [
         0 => self::MERCENARY,
+        1 => self::REINCARNATION,
     ];
 
     protected static array $valueNames = [
-        self::MERCENARY => 'Mercenary',
+        self::MERCENARY     => 'Mercenary',
+        self::REINCARNATION => 'Reincarnation',
     ];
 
     /**
@@ -48,5 +52,9 @@ class FeatureTypes {
 
     public function isMercenary(): bool {
         return $this->value === self::MERCENARY;
+    }
+
+    public function isReincarnation(): bool {
+        return $this->value === self::REINCARNATION;
     }
 }

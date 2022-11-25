@@ -47,6 +47,7 @@ class Character extends Model
         'level',
         'xp',
         'xp_next',
+        'xp_penalty',
         'str',
         'dur',
         'dex',
@@ -61,6 +62,8 @@ class Character extends Model
         'copper_coins',
         'killed_in_pvp',
         'is_mercenary_unlocked',
+        'reincarnated_stat_increase',
+        'times_reincarnated',
     ];
 
     /**
@@ -89,6 +92,7 @@ class Character extends Model
         'level'                       => 'integer',
         'xp'                          => 'integer',
         'xp_next'                     => 'integer',
+        'xp_penalty'                  => 'float',
         'str'                         => 'integer',
         'dur'                         => 'integer',
         'dex'                         => 'integer',
@@ -101,6 +105,8 @@ class Character extends Model
         'gold_dust'                   => 'integer',
         'shards'                      => 'integer',
         'copper_coins'                => 'integer',
+        'reincarnated_stat_increase'  => 'integer',
+        'times_reincarnated'          => 'integer',
     ];
 
     public function race() {

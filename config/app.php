@@ -230,6 +230,7 @@ return [
         App\Game\SpecialtyShops\Providers\ServiceProvider::class,
         App\Game\Gambler\Providers\ServiceProvider::class,
         App\Game\Mercenaries\Providers\ServiceProvider::class,
+        App\Game\Reincarnate\Providers\ServiceProvider::class,
     ],
 
     /*
