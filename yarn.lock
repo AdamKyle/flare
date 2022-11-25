@@ -1372,9 +1372,9 @@
   integrity sha512-Skfy0YS3NJ5nV9us0uuPN0HDk1Q4edljaOhRBJGDWs9EBa7ZVMYBHRFlhLvvmwEoaIM9BlH6QJFn9/uZg0bACg==
 
 "@floating-ui/dom@^1.0.1":
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/@floating-ui/dom/-/dom-1.0.6.tgz#e42393ec381a4fe96673fbcee137a95e86c93ebc"
-  integrity sha512-kt/tg1oip9OAH1xjCTcx1OpcUpu9rjDw3GKJ/rEhUqhO7QyJWfrHU0DpLTNsH67+JyFL5Kv9X1utsXwKFVtyEQ==
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/@floating-ui/dom/-/dom-1.0.7.tgz#9e8e6615ce03e5ebc6a4ae879640a199a366f86d"
+  integrity sha512-6RsqvCYe0AYWtsGvuWqCm7mZytnXAZCjWtsWu1Kg8dI3INvj/DbKlDsZO+mKSaQdPT12uxIW9W2dAWJkPx4Y5g==
   dependencies:
     "@floating-ui/core" "^1.0.2"
 
@@ -1928,9 +1928,9 @@
   integrity sha512-wOuvG1SN4Us4rez+tylwwwCV1psiNVOkJeM3AUWUNWg/jDQY2+HE/444y5gc+jBmRqASOm2Oeh5c1axHobwRKQ==
 
 "@types/lodash@^4.14.180":
-  version "4.14.189"
-  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.189.tgz#975ff8c38da5ae58b751127b19ad5e44b5b7f6d2"
-  integrity sha512-kb9/98N6X8gyME9Cf7YaqIMvYGnBSWqEci6tiettE6iJWH1XdJz/PO8LB0GtLCG7x8dU3KWhZT+lA1a35127tA==
+  version "4.14.190"
+  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.190.tgz#d8e99647af141c63902d0ca53cf2b34d2df33545"
+  integrity sha512-5iJ3FBJBvQHQ8sFhEhJfjUP+G+LalhavTkYyrAYqz5MEJG+erSv0k9KJLb6q7++17Lafk1scaTIFXcMJlwK8Mw==
 
 "@types/luxon@^2.3.0":
   version "2.4.0"
@@ -3144,9 +3144,9 @@ chrome-trace-event@^1.0.2:
   integrity sha512-p3KULyQg4S7NIHixdwbGX+nFHkoBiA4YQmyWtjb8XngSKV124nJmRysgAeujbUVb15vh+RvFUfCPqU7rXk+hZg==
 
 ci-info@^3.6.1:
-  version "3.6.2"
-  resolved "https://registry.yarnpkg.com/ci-info/-/ci-info-3.6.2.tgz#362ea15378f1c39378ba786affbc1c9ef015ecfd"
-  integrity sha512-lVZdhvbEudris15CLytp2u6Y0p5EKfztae9Fqa189MfNmln9F33XuH69v5fvNfiRN5/0eAUz2yJL3mo+nhaRKg==
+  version "3.7.0"
+  resolved "https://registry.yarnpkg.com/ci-info/-/ci-info-3.7.0.tgz#6d01b3696c59915b6ce057e4aa4adfc2fa25f5ef"
+  integrity sha512-2CpRNYmImPx+RXKLq6jko/L07phmS9I02TyqkcNU20GCF/GgaWvc58hPtjxDX8lPpkdwc9sNh72V9k00S7ezog==
 
 cidr-regex@4.0.2:
   version "4.0.2"
@@ -4240,11 +4240,11 @@ engine.io@~6.2.1:
     ws "~8.2.3"
 
 enhanced-resolve@^5.0.0, enhanced-resolve@^5.10.0:
-  version "5.11.0"
-  resolved "https://registry.yarnpkg.com/enhanced-resolve/-/enhanced-resolve-5.11.0.tgz#543cf6c847a85adba0c4a5e2170bded4d493919a"
-  integrity sha512-0Gcraf7gAJSQoPg+bTSXNhuzAYtXqLc4C011vb8S3B8XUSEkGYNBk20c68X9291VF4vvsCD8SPkr6Mza+DwU+g==
+  version "5.12.0"
+  resolved "https://registry.yarnpkg.com/enhanced-resolve/-/enhanced-resolve-5.12.0.tgz#300e1c90228f5b570c4d35babf263f6da7155634"
+  integrity sha512-QHTXI/sZQmko1cbDoNAa3mJ5qhWUUNAq3vR0/YiD379fWQrcfuoX1+HW2S0MTt7XmoPLapdaDKUtelUSPic7hQ==
   dependencies:
-    graceful-fs "^4.2.9"
+    graceful-fs "^4.2.4"
     tapable "^2.2.0"
 
 entities@^2.0.0:
@@ -4830,7 +4830,7 @@ globby@^11.0.3:
     merge2 "^1.4.1"
     slash "^3.0.0"
 
-graceful-fs@*, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.2.0, graceful-fs@^4.2.2, graceful-fs@^4.2.6, graceful-fs@^4.2.9:
+graceful-fs@*, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.2.0, graceful-fs@^4.2.2, graceful-fs@^4.2.4, graceful-fs@^4.2.6, graceful-fs@^4.2.9:
   version "4.2.10"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.10.tgz#147d3a006da4ca3ce14728c7aefc287c367d7a6c"
   integrity sha512-9ByhssR2fPVsNZj478qUUbKfmL0+t5BDVyjShtyZZLiK7ZDAArFFfopyOTj0M05wE2tJPisA4iTnnXl2YoPvOA==
@@ -8807,9 +8807,9 @@ terser@^4.6.3:
     source-map-support "~0.5.12"
 
 terser@^5.14.1, terser@^5.9.0:
-  version "5.15.1"
-  resolved "https://registry.yarnpkg.com/terser/-/terser-5.15.1.tgz#8561af6e0fd6d839669c73b92bdd5777d870ed6c"
-  integrity sha512-K1faMUvpm/FBxjBXud0LWVAGxmvoPbZbfTCYbSgaaYQaIXI3/TdI7a7ZGA73Zrou6Q8Zmz3oeUTsp/dj+ag2Xw==
+  version "5.16.0"
+  resolved "https://registry.yarnpkg.com/terser/-/terser-5.16.0.tgz#29362c6f5506e71545c73b069ccd199bb28f7f54"
+  integrity sha512-KjTV81QKStSfwbNiwlBXfcgMcOloyuRdb62/iLFPGBcVNF4EXjhdYBhYHmbJpiBrVxZhDvltE11j+LBQUxEEJg==
   dependencies:
     "@jridgewell/source-map" "^0.3.2"
     acorn "^8.5.0"
