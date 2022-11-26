@@ -20,6 +20,7 @@ class UnitNames
     const PALADIN         = 'Paladin';
     const SETTLER         = 'Settler';
     const PERSON          = 'Person';
+    const AIRSHIP         = 'Airship';
 
     protected static $values = [
         self::SPEARMEN        => self::SPEARMEN,
@@ -35,6 +36,7 @@ class UnitNames
         self::PALADIN         => self::PALADIN,
         self::SETTLER         => self::SETTLER,
         self::PERSON          => self::PERSON,
+        self::AIRSHIP         => self::AIRSHIP
     ];
 
     private $name;
@@ -85,5 +87,9 @@ class UnitNames
 
     public function isPerson(): bool {
         return $this->name === self::PERSON;
+    }
+
+    public function isAirship(): bool {
+        return $this->name === self::AIRSHIP;
     }
 }

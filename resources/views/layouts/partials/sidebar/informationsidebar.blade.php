@@ -79,6 +79,10 @@
                 <span class="far fa-chart-bar"></span>
                 Character Stats
             </a>
+            <a href="{{route('info.page', ['pageName' => 'reincarnation'])}}">
+                <span class="ra ra-player-pyromaniac"></span>
+                Reincarnation
+            </a>
             <a href="{{route('info.page', ['pageName' => 'character-xp'])}}">
                 <i class="fas fa-chart-line"></i>
                 Character XP

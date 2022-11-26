@@ -374,6 +374,7 @@ class KingdomBuildingService {
         $newClay  = $kingdom->current_clay + ($building->clay_cost * $this->totalResources);
         $newStone = $kingdom->current_stone + ($building->stone_cost * $this->totalResources);
         $newIron  = $kingdom->current_iron + ($building->iron_cost * $this->totalResources);
+        $newSteel = $kingdom->current_steel + ($building->steel_cost * $this->totalResources);
         $newPop   = $kingdom->current_population + ($building->required_population * $this->totalResources);
 
         $kingdom->update([
@@ -381,6 +382,7 @@ class KingdomBuildingService {
             'current_clay'       => $newClay > $kingdom->max_clay ? $kingdom->max_clay : $newClay,
             'current_stone'      => $newStone > $kingdom->max_stone ? $kingdom->max_stone : $newStone,
             'current_iron'       => $newIron > $kingdom->max_iron ? $kingdom->max_iron : $newIron,
+            'current_steel'      => $newSteel > $kingdom->max_steel ? $kingdom->max_steel : $newSteel,
             'current_population' => $newPop > $kingdom->max_population ? $kingdom->max_population : $newPop
         ]);
 

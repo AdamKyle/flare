@@ -37,8 +37,7 @@ class AssignNewSkillsToPlayers extends Command
      *
      * @return int
      */
-    public function handle()
-    {
+    public function handle() {
         Character::chunkById(100, function($characters) {
             foreach ($characters as $character) {
                 $this->assignNewSkills($character);
@@ -47,6 +46,10 @@ class AssignNewSkillsToPlayers extends Command
     }
 
     public function assignNewSkills(Character $character) {
-        resolve(CharacterBuilder::class)->setCharacter($character)->assignSkills();
+
+        $characterBuilder = resolve(CharacterBuilder::class);
+
+        $characterBuilder->setCharacter($character)->assignSkills();
+        $characterBuilder->setCharacter($character)->assignPassiveSkills();
     }
 }

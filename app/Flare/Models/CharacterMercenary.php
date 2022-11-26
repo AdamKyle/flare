@@ -23,6 +23,7 @@ class CharacterMercenary extends Model {
         'xp_required',
         'reincarnated_bonus',
         'xp_increase',
+        'xp_buff',
         'times_reincarnated',
     ];
 
@@ -38,6 +39,7 @@ class CharacterMercenary extends Model {
         'times_reincarnated' => 'integer',
         'reincarnated_bonus' => 'float',
         'xp_increase'        => 'float',
+        'xp_buff'            => 'float',
     ];
 
     public function type(): MercenaryValue {

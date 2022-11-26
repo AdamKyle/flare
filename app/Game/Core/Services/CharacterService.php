@@ -21,8 +21,10 @@ class CharacterService
 
         $character = $character->refresh();
 
+        $characterXp = $this->getXPForNextLevel($character->level + 1);
+
         $character->update([
-            'xp_next' => $this->getXPForNextLevel($character->level + 1),
+            'xp_next' => $characterXp + $characterXp * $character->xp_penalty,
         ]);
     }
 

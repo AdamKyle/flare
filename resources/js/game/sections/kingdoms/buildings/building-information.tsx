@@ -198,6 +198,8 @@ export default class BuildingInformation extends React.Component<BuildingInforma
                 <dd>{this.calculateResourceCostWithReductions(this.props.building.wood_cost, false, false)}</dd>
                 <dt>Iron Cost:</dt>
                 <dd>{this.calculateResourceCostWithReductions(this.props.building.iron_cost, false, true)}</dd>
+                <dt>Steel Cost:</dt>
+                <dd>{this.calculateResourceCostWithReductions(this.props.building.steel_cost, false, true)}</dd>
                 <dt>Population Cost:</dt>
                 <dd>{this.calculateResourceCostWithReductions(this.props.building.population_required, true, false)}</dd>
                 <dt>Time till next level:</dt>
@@ -211,6 +213,28 @@ export default class BuildingInformation extends React.Component<BuildingInforma
                 </dd>
             </dl>
         );
+    }
+
+    buildOptions() {
+        const options = [
+            {
+                label: 'Upgrade with resources',
+                value: 'resources',
+            },
+            {
+                label: 'Repair Building',
+                value: 'repair-building',
+            }
+        ];
+
+        if (!this.props.building.is_special) {
+            options.push({
+                label: 'Upgrade with gold',
+                value: 'gold',
+            })
+        }
+
+        return options;
     }
 
     render() {
@@ -285,30 +309,22 @@ export default class BuildingInformation extends React.Component<BuildingInforma
                                                     this.renderSelectedSection()
                                                 :
                                                     !this.props.is_in_queue && !this.props.building.is_locked ?
-                                                        <Select
-                                                            onChange={this.showSelectedForm.bind(this)}
-                                                            options={[
-                                                                {
-                                                                    label: 'Upgrade with gold',
-                                                                    value: 'gold',
-                                                                },
-                                                                {
-                                                                    label: 'Upgrade with resources',
-                                                                    value: 'resources',
-                                                                },
-                                                                {
-                                                                    label: 'Repair Building',
-                                                                    value: 'repair-building',
-                                                                }
-                                                            ]}
-                                                            menuPosition={'absolute'}
-                                                            menuPlacement={'bottom'}
-                                                            styles={{menuPortal: (base: any) => ({...base, zIndex: 9999, color: '#000000'})}}
-                                                            menuPortalTarget={document.body}
-                                                            value={[
-                                                                {label: 'Please Select Upgrade Path', value: ''}
-                                                            ]}
-                                                        />
+                                                        <Fragment>
+                                                            <Select
+                                                                onChange={this.showSelectedForm.bind(this)}
+                                                                options={this.buildOptions()}
+                                                                menuPosition={'absolute'}
+                                                                menuPlacement={'bottom'}
+                                                                styles={{menuPortal: (base: any) => ({...base, zIndex: 9999, color: '#000000'})}}
+                                                                menuPortalTarget={document.body}
+                                                                value={[
+                                                                    {label: 'Please Select Upgrade Path', value: ''}
+                                                                ]}
+                                                            />
+                                                            <p className='my-4 text-sm'>
+                                                                This building cannot be upgraded with gold.
+                                                            </p>
+                                                        </Fragment>
                                                     : null
                                             }
                                         </Fragment>

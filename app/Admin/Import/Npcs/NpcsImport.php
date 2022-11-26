@@ -12,8 +12,7 @@ class NpcsImport implements WithMultipleSheets
     public function sheets(): array
     {
         return [
-            0 => new NpcsSheet,
-            1 => new NpcCommandsSheet,
+            0 => new NpcsSheet
         ];
     }
 }

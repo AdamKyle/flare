@@ -2,6 +2,7 @@
 
 namespace App\Game\Quests\Controllers\Api;
 
+use App\Flare\Models\PassiveSkill;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Quests\Services\QuestHandlerService;
 use App\Game\Skills\Values\SkillTypeValue;
@@ -44,6 +45,12 @@ class QuestsController extends Controller {
             $quest->feature_to_unlock_name = $quest->unlocksFeature()->getNameOfFeature();
         } else {
             $quest->feature_to_unlock_name = null;
+        }
+
+        if (!is_null($quest->unlocks_passive_id)) {
+            $quest->unlocks_passive_name = PassiveSkill::find($quest->unlocks_passive_id)->name;
+        } else {
+            $quest->unlocks_passive_name = null;
         }
 
         return response()->json($quest);

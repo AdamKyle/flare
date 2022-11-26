@@ -28,9 +28,6 @@ class NpcFactory extends Factory
             'real_name'                   => 'Sample NPC',
             'type'                        => NpcTypes::KINGDOM_HOLDER,
             'game_map_id'                 => null,
-            'moves_around_map'            => false,
-            'must_be_at_same_location'    => false,
-            'text_command_to_message'     => 'Take Kingdom',
             'x_position'                  => 32,
             'y_position'                  => 144,
         ];

@@ -29,19 +29,16 @@ class GameUnitFactory extends Factory
             'can_heal'               => false,
             'heal_percentage'        => null,
             'siege_weapon'           => false,
+            'is_airship'             => false,
             'attacker'               => true,
             'defender'               => false,
-            'primary_target'         => null,
-            'fall_back'              => null,
-            'travel_time'            => 1,
             'wood_cost'              => 10,
             'clay_cost'              => 10,
             'stone_cost'             => 10,
             'iron_cost'              => 10,
+            'steel_cost'             => 0,
             'required_population'    => 1,
             'time_to_recruit'        => 1,
-            'primary_target'         => null,
-            'fall_back'              => null,
         ];
     }
 }

@@ -2,6 +2,9 @@
 
 namespace App\Flare\Transformers;
 
+use App\Flare\Models\PassiveSkill;
+use App\Flare\Models\SmeltingProgress;
+use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use League\Fractal\Resource\Collection;
 use League\Fractal\TransformerAbstract;
 use App\Flare\Models\GameUnit;
@@ -36,6 +39,8 @@ class KingdomTransformer extends TransformerAbstract {
             'max_wood'                  => $kingdom->max_wood,
             'max_clay'                  => $kingdom->max_clay,
             'max_iron'                  => $kingdom->max_iron,
+            'max_steel'                 => $kingdom->max_steel,
+            'current_steel'             => $kingdom->current_steel,
             'current_stone'             => $kingdom->current_stone,
             'current_wood'              => $kingdom->current_wood,
             'current_clay'              => $kingdom->current_clay,
@@ -53,12 +58,17 @@ class KingdomTransformer extends TransformerAbstract {
             'unit_movement'             => $kingdom->unitsMovementQueue,
             'treasury_defence'          => $kingdom->treasury / KingdomMaxValue::MAX_TREASURY,
             'current_units'             => $kingdom->units,
+            'smelting_time_left'        => $this->getTimeLeftOnSmelting($kingdom),
+            'smelting_completed_at'     => $this->smeltingCompletedAt($kingdom),
+            'smelting_amount'           => $this->getAmountSmelting($kingdom),
             'passive_defence'           => $kingdom->fetchDefenceBonusFromPassive(),
             'unit_cost_reduction'       => $kingdom->fetchUnitCostReduction(),
             'building_cost_reduction'   => $kingdom->fetchBuildingCostReduction(),
             'iron_cost_reduction'       => $kingdom->fetchIronCostReduction(),
             'population_cost_reduction' => $kingdom->fetchPopulationCostReduction(),
+            'smelting_time_reduction'   => $kingdom->fetchSmeltingTimeReduction(),
             'can_access_bank'           => $this->canAccessGoblinCoinBank($kingdom),
+            'can_access_smelter'        => $this->canAccessSmelter($kingdom),
             'walls_defence'             => $kingdom->getWallsDefence(),
             'gold_bars_defence'         => $kingdom->fetchGoldBarsDefenceBonus(),
             'defence_bonus'             => $kingdom->fetchKingdomDefenceBonus(),
@@ -103,6 +113,54 @@ class KingdomTransformer extends TransformerAbstract {
     }
 
     /**
+     * get smelting time left.
+     *
+     * @param Kingdom $kingdom
+     * @return int
+     */
+    protected function getTimeLeftOnSmelting(Kingdom $kingdom): int {
+        $smeltingQueue = SmeltingProgress::where('kingdom_id', $kingdom->id)->first();
+
+        if (is_null($smeltingQueue)) {
+            return 0;
+        }
+
+        return $smeltingQueue->completed_at->diffInseconds(now());
+    }
+
+    /**
+     * get smelting time left.
+     *
+     * @param Kingdom $kingdom
+     * @return int
+     */
+    protected function smeltingCompletedAt(Kingdom $kingdom): ?string {
+        $smeltingQueue = SmeltingProgress::where('kingdom_id', $kingdom->id)->first();
+
+        if (is_null($smeltingQueue)) {
+            return null;
+        }
+
+        return $smeltingQueue->completed_at->toIso8601String();
+    }
+
+    /**
+     * Get amount currently smelting.
+     *
+     * @param Kingdom $kingdom
+     * @return int
+     */
+    protected function getAmountSmelting(Kingdom $kingdom): int {
+        $smeltingQueue = SmeltingProgress::where('kingdom_id', $kingdom->id)->first();
+
+        if (is_null($smeltingQueue)) {
+            return 0;
+        }
+
+        return $smeltingQueue->amount_to_smelt;
+    }
+
+    /**
      * Can we access the goblin bank?
      *
      * @param Kingdom $kingdom
@@ -118,6 +176,24 @@ class KingdomTransformer extends TransformerAbstract {
         }
 
         return !$building->is_locked && BuildingActions::canAccessGoblinBank($building);
+    }
+
+    /**
+     * Can we access the smelter?
+     *
+     * @param Kingdom $kingdom
+     * @return bool
+     */
+    protected function canAccessSmelter(Kingdom $kingdom): bool {
+        $building = $kingdom->buildings->filter(function($building) {
+            return $building->name === BuildingActions::BLACKSMITHS_FURNACE;
+        })->first();
+
+        if (is_null($building)) {
+            return false;
+        }
+
+        return !$building->is_locked && BuildingActions::canAccessSmelter($building);
     }
 
     /**

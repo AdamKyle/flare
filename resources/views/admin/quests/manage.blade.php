@@ -67,6 +67,10 @@
                         <x-core.forms.key-value-select :model="$quest" label="Unlocks Feature Type: " modelKey="unlocks_feature" name="unlocks_feature" :options="$unlocksFeatures" />
 
                         <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                        <h3 class='mb-3'>Unlocks Kingdom Passive</h3>
+                        <x-core.forms.key-value-select :model="$quest" label="Unlocks Kingdom Passive: " modelKey="unlocks_passive_id" name="unlocks_passive_id" :options="$passiveSkills" />
+
+                        <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                         <h3 class='mb-3'>Quest Item Reward</h3>
                         <x-core.forms.key-value-select :model="$quest" label="Quest item Reward:" modelKey="reward_item" name="reward_item" :options="$questItems" />
                     </x-core.form-wizard.content>

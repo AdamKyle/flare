@@ -83,17 +83,15 @@ class ShopController extends Controller {
 
         $totalSoldFor = $service->sellAllItemsInInventory($character);
 
-        $maxCurrencies = new MaxCurrenciesValue($character->gold + $totalSoldFor, MaxCurrenciesValue::GOLD);
+        $newGold = $character->gold + $totalSoldFor;
 
-        if ($maxCurrencies->canNotGiveCurrency()) {
-            $character->update([
-                'gold' => MaxCurrenciesValue::MAX_GOLD,
-            ]);
-        } else {
-            $character->update([
-                'gold' => $character->gold + $totalSoldFor,
-            ]);
+        if ($newGold > MaxCurrenciesValue::MAX_GOLD) {
+            $newGold = MaxCurrenciesValue::MAX_GOLD;
         }
+
+        $character->update([
+            'gold' => $newGold,
+        ]);
 
         if ($totalSoldFor === 0) {
             return redirect()->back()->with('error', 'You have nothing that you can sell.');

@@ -12,17 +12,15 @@
         <th>can_heal</th>
         <th>heal_percentage</th>
         <th>siege_weapon</th>
-        <th>attacks_walls</th>
-        <th>attacks_buildings</th>
+        <th>is_airship</th>
+        <th>is_special</th>
         <th>defender</th>
         <th>attacker</th>
-        <th>primary_target</th>
-        <th>fall_back</th>
-        <th>travel_time</th>
         <th>wood_cost</th>
         <th>clay_cost</th>
         <th>stone_cost</th>
         <th>iron_cost</th>
+        <th>steel_cost</th>
         <th>required_population</th>
         <th>time_to_recruit</th>
     </tr>
@@ -41,17 +39,15 @@
             <td>{{$unit->can_heal}}</td>
             <td>{{$unit->heal_percentage}}</td>
             <td>{{$unit->siege_weapon}}</td>
-            <td>{{$unit->attacks_walls}}</td>
-            <td>{{$unit->attacks_buildings}}</td>
+            <td>{{$unit->is_airship}}</td>
+            <td>{{$unit->is_special}}</td>
             <td>{{$unit->defender}}</td>
             <td>{{$unit->attacker}}</td>
-            <td>{{$unit->primary_target}}</td>
-            <td>{{$unit->fall_back}}</td>
-            <td>{{$unit->travel_time}}</td>
             <td>{{$unit->wood_cost}}</td>
             <td>{{$unit->clay_cost}}</td>
             <td>{{$unit->stone_cost}}</td>
             <td>{{$unit->iron_cost}}</td>
+            <td>{{$unit->steel_cost}}</td>
             <td>{{$unit->required_population}}</td>
             <td>{{$unit->time_to_recruit}}</td>
         </tr>

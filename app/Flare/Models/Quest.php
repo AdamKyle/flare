@@ -41,6 +41,7 @@ class Quest extends Model {
         'before_completion_description',
         'after_completion_description',
         'unlocks_feature',
+        'unlocks_passive_id',
     ];
 
     protected $casts = [
@@ -63,6 +64,7 @@ class Quest extends Model {
         'secondary_required_item' => 'integer',
         'required_faction_level'  => 'integer',
         'unlocks_feature'         => 'integer',
+        'unlocks_passive_id'      => 'integer'
     ];
 
     protected $appends = [

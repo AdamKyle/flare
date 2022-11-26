@@ -19,6 +19,7 @@ class UnitCosts
     const CLERIC          = 'Cleric';
     const PALADIN         = 'Paladin';
     const SETTLER         = 'Settler';
+    const AIRSHIP         = 'Airship';
     const PERSON          = 'Person';
 
     protected static $values = [
@@ -35,6 +36,7 @@ class UnitCosts
         self::PALADIN         => self::PALADIN,
         self::SETTLER         => self::SETTLER,
         self::PERSON          => self::PERSON,
+        self::AIRSHIP         => self::AIRSHIP,
     ];
 
     private $name;
@@ -76,6 +78,8 @@ class UnitCosts
                 return 2500;
             case self::PERSON:
                 return 5;
+            case self::AIRSHIP:
+                return 10000;
             default:
                 return 0;
         }
@@ -119,5 +123,9 @@ class UnitCosts
 
     public function isPerson(): bool {
         return $this->name === self::PERSON;
+    }
+
+    public function isAirShip(): bool {
+        return $this->name === self::AIRSHIP;
     }
 }

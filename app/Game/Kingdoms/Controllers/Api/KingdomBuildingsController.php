@@ -42,6 +42,13 @@ class KingdomBuildingsController extends Controller {
      */
     public function upgradeKingdomBuilding(KingdomUpgradeBuildingRequest $request, Character $character, KingdomBuilding $building): JsonResponse {
         if ($request->paying_with_gold) {
+
+            if ($building->gameBuilding->is_special) {
+                return response()->json([
+                    'message' => 'Cannot upgrade this building with gold.'
+                ], 422);
+            }
+
             $paid = $this->kingdomBuildingService->upgradeBuildingWithGold($building, $request->all());
 
             if (!$paid) {

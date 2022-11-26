@@ -47,6 +47,7 @@ class KingdomUnitHandler extends BaseDefenderHandler {
      * - Attackers attack next.
      *
      * @param Kingdom $kingdom
+     * @param int $attackingKingdomId
      * @return array
      */
     public function attackUnits(Kingdom $kingdom, int $attackingKingdomId): array {

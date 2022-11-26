@@ -19,6 +19,7 @@
         <th>clay_cost</th>
         <th>stone_cost</th>
         <th>iron_cost</th>
+        <th>steel_cost</th>
         <th>time_to_build</th>
         <th>time_increase_amount</th>
         <th>decrease_morale_amount</th>
@@ -31,6 +32,7 @@
         <th>increase_durability_amount</th>
         <th>increase_defence_amount</th>
         <th>is_locked</th>
+        <th>is_special</th>
         <th>passive_skill_id</th>
         <th>level_required</th>
     </tr>
@@ -56,6 +58,7 @@
             <td>{{$building->clay_cost}}</td>
             <td>{{$building->stone_cost}}</td>
             <td>{{$building->iron_cost}}</td>
+            <td>{{$building->steel_cost}}</td>
             <td>{{$building->time_to_build}}</td>
             <td>{{$building->time_increase_amount}}</td>
             <td>{{$building->decrease_morale_amount}}</td>
@@ -68,6 +71,7 @@
             <td>{{$building->increase_durability_amount}}</td>
             <td>{{$building->increase_defence_amount}}</td>
             <td>{{$building->is_locked}}</td>
+            <td>{{$building->is_special}}</td>
             <td>
                 @if (!is_null($building->passive_skill_id))
                     {{$building->passive_skill_id}}

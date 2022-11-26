@@ -23,17 +23,13 @@ class SellItemListener
 
         $totalNewGold = $event->character->gold + SellItemCalculator::fetchSalePriceWithAffixes($item);
 
-        $maxCurrencies = new MaxCurrenciesValue($totalNewGold, MaxCurrenciesValue::GOLD);
-
-        if ($maxCurrencies->canNotGiveCurrency()) {
-            $event->character->update([
-                'gold' => MaxCurrenciesValue::MAX_GOLD,
-            ]);
-        } else {
-            $event->character->update([
-                'gold' => $totalNewGold,
-            ]);
+        if ($totalNewGold > MaxCurrenciesValue::MAX_GOLD) {
+            $totalNewGold = MaxCurrenciesValue::MAX_GOLD;
         }
+
+        $event->character->update([
+            'gold' => $totalNewGold,
+        ]);
 
         $event->inventorySlot->delete();
 

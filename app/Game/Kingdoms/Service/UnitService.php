@@ -79,6 +79,11 @@ class UnitService {
 
             $this->updateKingdomResources($kingdom, $gameUnit, $amount);
         } else {
+
+            if ($gameUnit->is_special) {
+                return $this->errorResult('No, this unit cannot be bought with gold.');
+            }
+
             $amount              = $gameUnit->required_population * $amount;
             $populationReduction = $kingdom->fetchUnitCostReduction();
 

@@ -6,10 +6,12 @@ namespace App\Game\Kingdoms\Providers;
 use App\Game\Kingdoms\Handlers\AttackLogHandler;
 use App\Game\Kingdoms\Handlers\DefenderArcherHandler;
 use App\Game\Kingdoms\Handlers\DefenderSiegeHandler;
+use App\Game\Kingdoms\Handlers\KingdomAirshipHandler;
 use App\Game\Kingdoms\Handlers\KingdomSiegeHandler;
 use App\Game\Kingdoms\Handlers\KingdomUnitHandler;
 use App\Game\Kingdoms\Handlers\ReturnSurvivingUnitHandler;
 use App\Game\Kingdoms\Handlers\SettlerHandler;
+use App\Game\Kingdoms\Service\SteelSmeltingService;
 use League\Fractal\Manager;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
@@ -51,6 +53,12 @@ class ServiceProvider extends ApplicationServiceProvider {
     public function register(): void {
         $this->app->bind(KingdomBuilder::class, function($app) {
             return new KingdomBuilder();
+        });
+
+        $this->app->bind(SteelSmeltingService::class, function($app) {
+            return new SteelSmeltingService(
+                $app->make(UpdateKingdom::class)
+            );
         });
 
         $this->app->bind(UpdateKingdomHandler::class, function($app) {
@@ -203,6 +211,7 @@ class ServiceProvider extends ApplicationServiceProvider {
             return new AttackKingdomWithUnitsHandler(
                 $app->make(KingdomSiegeHandler::class),
                 $app->make(KingdomUnitHandler::class),
+                $app->make(KingdomAirshipHandler::class),
                 $app->make(SettlerHandler::class),
                 $app->make(AttackLogHandler::class),
                 $app->make(ReturnSurvivingUnitHandler::class),

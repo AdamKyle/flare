@@ -91,6 +91,15 @@ export default class TrainPassive extends React.Component<any, any> {
                 }
 
                 {
+                    this.props.skill.quest_name !== null && !this.props.skill.is_quest_complete ?
+                        <p className='mb-4 text-orange-700 dark:text-orange-400'>
+                            You must complete the quest: "{this.props.skill.quest_name}" before you can unlock this
+                            passive.
+                        </p>
+                        : null
+                }
+
+                {
                     this.isMaxed() ?
                         <p className='mb-4 text-green-600 dark:text-green-500'>
                             This skill has been maxed out and cannot be trained any higher.

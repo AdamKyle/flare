@@ -7,6 +7,12 @@ import CharacterSheetProps from "../../lib/game/character-sheet/types/character-
 import DangerAlert from "../../components/ui/alerts/simple-alerts/danger-alert";
 import WarningAlert from "../../components/ui/alerts/simple-alerts/warning-alert";
 import Select from "react-select";
+import PrimaryButton from "../../components/ui/buttons/primary-button";
+import LoadingProgressBar from "../../components/ui/progress-bars/loading-progress-bar";
+import SuccessAlert from "../../components/ui/alerts/simple-alerts/success-alert";
+import {AxiosError, AxiosResponse} from "axios";
+import Ajax from "../../lib/ajax/ajax";
+import ReincarnationCheckModal from "./components/modals/reincarnation-check-modal";
 
 export default class CharacterSheet extends React.Component<CharacterSheetProps, any> {
 
@@ -17,7 +23,17 @@ export default class CharacterSheet extends React.Component<CharacterSheetProps,
             show_inventory_section: false,
             show_skills_section: false,
             show_top_section: false,
+            reincarnating: false,
+            success_message: null,
+            error_message: null,
+            reincarnation_check: false,
         }
+    }
+
+    manageReincarnationCheck() {
+        this.setState({
+            reincarnation_check: !this.state.reincarnation_check,
+        })
     }
 
     showSection() {
@@ -63,6 +79,32 @@ export default class CharacterSheet extends React.Component<CharacterSheetProps,
     manageSkillsManagement() {
         this.setState({
             show_skills_section: !this.state.show_skills_section
+        });
+    }
+
+    reincarnateCharacter() {
+        this.setState({
+            reincarnating: true,
+            reincarnation_check: false,
+        }, () => {
+            (new Ajax()).setRoute('character/reincarnate/' + this.props.character?.id).doAjaxCall('post', (response: AxiosResponse) => {
+                this.setState({
+                    reincarnating: false,
+                    success_message: response.data.message,
+                })
+            }, (error: AxiosError) => {
+                this.setState({
+                    reincarnating: false,
+                }, () => {
+                    if (typeof error.response !== 'undefined') {
+                        const response = error.response;
+
+                        this.setState({
+                            error_message: response.data.message,
+                        });
+                    }
+                });
+            });
         });
     }
 
@@ -112,7 +154,7 @@ export default class CharacterSheet extends React.Component<CharacterSheetProps,
                                         view_port={this.props.view_port}
                                     />
                                 </BasicCard>
-                                <BasicCard additionalClasses={'overflow-y-auto lg:w-1/2 md:max-h-[225px]'}>
+                                <BasicCard additionalClasses={'overflow-y-auto lg:w-1/2 md:max-h-[325px]'}>
                                     <div className='grid lg:grid-cols-2 gap-2'>
                                         <div>
                                             <dl>
@@ -125,6 +167,37 @@ export default class CharacterSheet extends React.Component<CharacterSheetProps,
                                                 <dt>Copper Coins:</dt>
                                                 <dd>{this.props.character.copper_coins}</dd>
                                             </dl>
+                                            <div className='mt-6 text-center'>
+                                                <PrimaryButton button_label={'Reincarnate Character'} on_click={this.manageReincarnationCheck.bind(this)} />
+                                                <p className='text-sm my-2'>
+                                                    <a href="/information/reincarnation" target="_blank">
+                                                        What is Reincarnation? <i
+                                                        className="fas fa-external-link-alt"></i>
+                                                    </a>
+                                                </p>
+                                                {
+                                                    this.state.reincarnating ?
+                                                        <LoadingProgressBar />
+                                                    : null
+                                                }
+
+                                                {
+                                                    this.state.error_message !== null ?
+                                                        <p className='text-red-500 dark:text-red-400 my-3'>
+                                                            {this.state.error_message}
+                                                        </p>
+                                                    : null
+                                                }
+
+                                                {
+                                                    this.state.success_message !== null ?
+                                                        <p className='text-green-500 dark:text-green-400 my-3'>
+                                                                {this.state.success_message}
+                                                        </p>
+                                                    : null
+                                                }
+
+                                            </div>
                                         </div>
                                         <div className='border-b-2 block lg:hidden border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                                         <div>
@@ -230,6 +303,15 @@ export default class CharacterSheet extends React.Component<CharacterSheetProps,
                         : null
                     }
                 </div>
+
+                {
+                    this.state.reincarnation_check ?
+                        <ReincarnationCheckModal
+                            manage_modal={this.manageReincarnationCheck.bind(this)}
+                            handle_reincarnate={this.reincarnateCharacter.bind(this)}
+                        />
+                        : null
+                }
             </div>
         );
     }

@@ -26,6 +26,11 @@ class AttackKingdomWithUnitsHandler {
     private KingdomUnitHandler $kingdomUnitHandler;
 
     /**
+     * @var KingdomAirshipHandler $kingdomAirshipHandler
+     */
+    private KingdomAirshipHandler $kingdomAirshipHandler;
+
+    /**
      * @var SettlerHandler $settlerHandler
      */
     private SettlerHandler $settlerHandler;
@@ -78,18 +83,21 @@ class AttackKingdomWithUnitsHandler {
     /**
      * @param KingdomSiegeHandler $kingdomSiegeHandler
      * @param KingdomUnitHandler $kingdomUnitHandler
+     * @param KingdomAirshipHandler $kingdomAirshipHandler
      * @param SettlerHandler $settlerHandler
      * @param AttackLogHandler $attackLogHandler
      * @param ReturnSurvivingUnitHandler $returnSurvivingUnitHandler
      */
     public function __construct(KingdomSiegeHandler $kingdomSiegeHandler,
                                 KingdomUnitHandler $kingdomUnitHandler,
+                                KingdomAirshipHandler $kingdomAirshipHandler,
                                 SettlerHandler $settlerHandler,
                                 AttackLogHandler $attackLogHandler,
                                 ReturnSurvivingUnitHandler $returnSurvivingUnitHandler,
     ) {
         $this->kingdomSiegeHandler        = $kingdomSiegeHandler;
         $this->kingdomUnitHandler         = $kingdomUnitHandler;
+        $this->kingdomAirshipHandler      = $kingdomAirshipHandler;
         $this->settlerHandler             = $settlerHandler;
         $this->attackLogHandler           = $attackLogHandler;
         $this->returnSurvivingUnitHandler = $returnSurvivingUnitHandler;
@@ -114,6 +122,7 @@ class AttackKingdomWithUnitsHandler {
         $this->newDefenderBuildings = $this->oldDefenderBuildings;
         $this->newDefenderUnits     = $this->oldDefenderUnits;
 
+        $this->airshipAttack($attackingKingdom, $kingdom);
         $this->siegeAttack($attackingKingdom, $kingdom);
         $this->unitsAttack($attackingKingdom, $kingdom);
 
@@ -196,6 +205,44 @@ class AttackKingdomWithUnitsHandler {
         $this->mergeAttackerUnits($kingdomSiegeHandler->getNewAttackingUnits());
         $this->mergeDefenderBuildings($kingdomSiegeHandler->getNewBuildings());
         $this->mergeDefenderUnits($kingdomSiegeHandler->getNewUnits());
+
+        $healingAmount = $this->getHealingAmount($this->newDefenderUnits);
+
+        if ($healingAmount <= 0) {
+            $this->newDefenderUnits = $this->healUnits($this->newDefenderUnits, $this->oldDefenderUnits, $healingAmount);
+        }
+    }
+
+    /**
+     * Airship Attack.
+     *
+     * - Attack enemy airships first - this is where you can take damage.
+     * - Attack buildings - you take no damage
+     *   - Both Attack Bonuses and Buffs are included here.
+     * - Calculate the new kingdom morale
+     * - Heal remaining units if possible.
+     *
+     * @param Kingdom $attackingKingdom
+     * @param Kingdom $kingdom
+     * @return void
+     */
+    protected function airshipAttack(Kingdom $attackingKingdom, Kingdom $kingdom): void {
+        $this->currentMorale = $kingdom->current_morale;
+
+        $kingdomAirshipHandler = $this->kingdomAirshipHandler->setAttackingUnits($this->oldAttackingUnits);
+
+        $damageReduction = $this->getTotalDamageReduction($kingdom);
+        $kingdom         = $kingdomAirshipHandler->handleAirships($attackingKingdom, $kingdom, $damageReduction);
+
+        $newMorale = $this->calculateNewMorale($kingdom, $kingdom->current_morale);
+
+        $kingdom->update([
+            'current_morale' => $newMorale
+        ]);
+
+        $this->mergeAttackerUnits($kingdomAirshipHandler->getNewAttackingUnits());
+        $this->mergeDefenderBuildings($kingdomAirshipHandler->getNewBuildings());
+        $this->mergeDefenderUnits($kingdomAirshipHandler->getNewUnits());
 
         $healingAmount = $this->getHealingAmount($this->newDefenderUnits);
 

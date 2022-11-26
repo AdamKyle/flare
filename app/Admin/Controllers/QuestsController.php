@@ -7,6 +7,7 @@ use App\Admin\Services\QuestService;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
 use App\Flare\Models\Npc;
+use App\Flare\Models\PassiveSkill;
 use App\Flare\Values\FeatureTypes;
 use App\Game\Skills\Values\SkillTypeValue;
 use Cache;
@@ -55,6 +56,7 @@ class QuestsController extends Controller {
             'gameMaps'        => GameMap::pluck('name', 'id')->toArray(),
             'skillTypes'      => SkillTypeValue::getValues(),
             'unlocksFeatures' => FeatureTypes::getSelectable(),
+            'passiveSkills'   => PassiveSkill::pluck('name', 'id')->toArray(),
         ]);
     }
 
@@ -68,6 +70,7 @@ class QuestsController extends Controller {
             'gameMaps'        => GameMap::pluck('name', 'id')->toArray(),
             'skillTypes'      => SkillTypeValue::getValues(),
             'unlocksFeatures' => FeatureTypes::getSelectable(),
+            'passiveSkills'   => PassiveSkill::pluck('name', 'id')->toArray(),
         ]);
     }
 

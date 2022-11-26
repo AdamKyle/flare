@@ -19,8 +19,9 @@ class ResourceValidation {
         return ($kingdom->current_wood < $this->getBuildingCost($kingdom, ($building->level * $building->wood_cost))) ||
                ($kingdom->current_clay < $this->getBuildingCost($kingdom, ($building->level * $building->clay_cost))) ||
                ($kingdom->current_stone < $this->getBuildingCost($kingdom, ($building->level * $building->stone_cost))) ||
+               ($kingdom->current_steel < $this->getBuildingCost($kingdom, ($building->level * $building->steel_cost))) ||
                (($kingdom->current_iron < $this->getBuildingCost($kingdom, ($building->level * $building->iron_cost), false, true))) ||
-               ($kingdom->current_population < $this->getBuildingCost($kingdom, ($building->level *$building->required_population), true));
+               ($kingdom->current_population < $this->getBuildingCost($kingdom, ($building->level * $building->required_population), true));
     }
 
     /**
@@ -34,6 +35,7 @@ class ResourceValidation {
         return ($kingdom->current_wood < $this->getBuildingCost($kingdom, ($building->level * $building->base_wood_cost))) ||
                ($kingdom->current_clay < $this->getBuildingCost($kingdom, ($building->level * $building->base_clay_cost))) ||
                ($kingdom->current_stone < $this->getBuildingCost($kingdom, ($building->level * $building->base_stone_cost))) ||
+               ($kingdom->current_steel < $this->getBuildingCost($kingdom, ($building->level * $building->steel_cost))) ||
                ($kingdom->current_iron < $this->getBuildingCost($kingdom, ($building->level * $building->base_iron_cost), false, true)) ||
                ($kingdom->current_population < $this->getBuildingCost($kingdom, ($building->level * $building->base_population), true));
     }
@@ -50,6 +52,7 @@ class ResourceValidation {
         return ($kingdom->current_wood < $this->getUnitCost($kingdom, ($unit->wood_cost * $amount))) ||
                ($kingdom->current_clay < $this->getUnitCost($kingdom, ($unit->clay_cost * $amount))) ||
                ($kingdom->current_stone < $this->getUnitCost($kingdom, ($unit->stone_cost * $amount))) ||
+               ($kingdom->current_steel < $this->getBuildingCost($kingdom, ($unit->steel_cost * $amount))) ||
                ($kingdom->current_iron < $this->getUnitCost($kingdom, ($unit->iron_cost * $amount), false, true)) ||
                ($kingdom->current_population < $this->getUnitCost($kingdom, ($unit->required_population * $amount), true));
     }

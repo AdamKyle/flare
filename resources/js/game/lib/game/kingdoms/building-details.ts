@@ -108,4 +108,8 @@ export default interface BuildingDetails extends DataTableBaseData {
     additional_pop_cost: number;
 
     building_name: string;
+
+    steel_cost: number;
+
+    is_special: boolean;
 }

@@ -33,6 +33,7 @@ class GameBuilding extends Model
         'clay_cost',
         'stone_cost',
         'iron_cost',
+        'steel_cost',
         'increase_population_amount',
         'increase_morale_amount',
         'decrease_morale_amount',
@@ -49,6 +50,7 @@ class GameBuilding extends Model
         'is_locked',
         'passive_skill_id',
         'level_required',
+        'is_special',
     ];
 
     /**
@@ -68,10 +70,12 @@ class GameBuilding extends Model
         'is_resource_building'        => 'boolean',
         'trains_units'                => 'boolean',
         'is_locked'                   => 'boolean',
+        'is_special'                  => 'boolean',
         'wood_cost'                   => 'integer',
         'clay_cost'                   => 'integer',
         'stone_cost'                  => 'integer',
         'iron_cost'                   => 'integer',
+        'steel_cost'                  => 'integer',
         'increase_population_amount'  => 'integer',
         'decrease_morale_amount'      => 'float',
         'increase_morale_amount'      => 'float',
@@ -81,11 +85,10 @@ class GameBuilding extends Model
         'increase_iron_amount'        => 'float',
         'increase_durability_amount'  => 'float',
         'increase_defence_amount'     => 'float',
-        'time_to_build'               => 'float',     
+        'time_to_build'               => 'float',
         'time_increase_amount'        => 'float',
         'units_per_level'             => 'integer',
         'only_at_level'               => 'integer',
-        'is_locked'                   => 'boolean',
     ];
 
     public function units() {

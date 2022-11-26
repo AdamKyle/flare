@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Requests\KingdomUnitManagementRequest;
 use App\Flare\Models\GameBuildingUnit;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\GameUnit;
@@ -15,7 +16,6 @@ class UnitsController extends Controller {
     public function create() {
         return view ('admin.kingdoms.units.manage', [
             'unit'    => null,
-            'editing' => false,
         ]);
     }
 
@@ -38,8 +38,15 @@ class UnitsController extends Controller {
     public function edit(GameUnit $gameUnit) {
         return view ('admin.kingdoms.units.manage', [
             'unit'    => $gameUnit,
-            'editing' => true,
         ]);
+    }
+
+    public function store(KingdomUnitManagementRequest $request) {
+        GameUnit::updateOrCreate([
+            'id' => $request->id,
+        ], $request->all());
+
+        return redirect()->route('units.list')->with('success', 'Unit: ' . $request->name . ' saved.');
     }
 
 }

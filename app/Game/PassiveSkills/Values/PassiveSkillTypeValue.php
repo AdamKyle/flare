@@ -18,6 +18,9 @@ class PassiveSkillTypeValue {
     const UNLOCKS_BUILDING                = 4;
     const IRON_COST_REDUCTION             = 5;
     const POPULATION_COST_REDUCTION       = 6;
+    const STEEL_SMELTING_TIME_REDUCTION   = 7;
+    const AIRSHIP_ATTACK_INCREASE         = 8;
+    const AIRSHIP_UNIT_DEFENCE            = 9;
 
 
     /**
@@ -31,6 +34,9 @@ class PassiveSkillTypeValue {
         self::UNLOCKS_BUILDING                => 4,
         self::IRON_COST_REDUCTION             => 5,
         self::POPULATION_COST_REDUCTION       => 6,
+        self::STEEL_SMELTING_TIME_REDUCTION   => 7,
+        self::AIRSHIP_ATTACK_INCREASE         => 8,
+        self::AIRSHIP_UNIT_DEFENCE            => 9,
     ];
 
     /**
@@ -44,6 +50,9 @@ class PassiveSkillTypeValue {
         4  => 'Unlocks New Building',
         5  => 'Iron Cost Reduction',
         6  => 'Population Cost Reduction',
+        7  => 'Steel Smelting Time Reduction',
+        8  => 'Airship Attack Increase',
+        9  => 'Airship Unit Defence',
     ];
 
     /**
@@ -123,6 +132,15 @@ class PassiveSkillTypeValue {
      */
     public function isBuildingCostReduction(): bool {
         return $this->value === self::KINGDOM_BUILDING_COST_REDUCTION;
+    }
+
+    /**
+     * Is steel smelting time reduction?
+     *
+     * @return bool
+     */
+    public function isSteelSmeltingTimeReduction(): bool {
+        return $this->value === self::STEEL_SMELTING_TIME_REDUCTION;
     }
 
     /**

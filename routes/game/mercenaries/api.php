@@ -11,5 +11,6 @@ Route::group(['middleware' => [
     Route::middleware(['is.character.exploring', 'is.character.dead'])->group(function() {
         Route::post('/mercenaries/buy/{character}', ['uses' => 'Api\MercenaryController@buy']);
         Route::post('/mercenaries/re-incarnate/{character}/{characterMercenary}', ['uses' => 'Api\MercenaryController@reincarnate']);
+        Route::post('/mercenaries/purcahse-buff/{character}/{characterMercenary}', ['uses' => 'Api\MercenaryController@purchaseBuff']);
     });
 });
