@@ -22,7 +22,6 @@ class CharacterPassiveSkillController extends Controller {
     }
 
     public function getKingdomPassives(Character $character) {
-        dump($this->characterPassiveSkills->getPassiveSkills($character));
         return response()->json([
             'kingdom_passives' => $this->characterPassiveSkills->getPassiveSkills($character),
         ]);
