@@ -236,9 +236,13 @@ export default class UnitInformation extends React.Component<UnitInformationProp
                                                          {label: 'Please Select Recruit Path', value: ''}
                                                      ]}
                                                  />
-                                                 <p className='my-4 text-sm'>
-                                                     This unit cannot be recruited with gold.
-                                                 </p>
+                                                 {
+                                                     this.props.unit.is_special ?
+                                                         <p className='my-4 text-sm'>
+                                                             This unit cannot be recruited with gold.
+                                                         </p>
+                                                     : null
+                                                 }
                                              </Fragment>
                          }
                      </div>

@@ -321,9 +321,13 @@ export default class BuildingInformation extends React.Component<BuildingInforma
                                                                     {label: 'Please Select Upgrade Path', value: ''}
                                                                 ]}
                                                             />
-                                                            <p className='my-4 text-sm'>
-                                                                This building cannot be upgraded with gold.
-                                                            </p>
+                                                            {
+                                                                this.props.building.is_special ?
+                                                                    <p className='my-4 text-sm'>
+                                                                        This building cannot be upgraded with gold.
+                                                                    </p>
+                                                                : null
+                                                            }
                                                         </Fragment>
                                                     : null
                                             }
