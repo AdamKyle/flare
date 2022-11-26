@@ -63,7 +63,7 @@ class NpcQuestRewardHandler {
             $passive = $passive->refresh();
 
             event(new ServerMessageEvent($character->user, 'You unlocked a new Kingdom passive! head to your skills section
-            to learn more. You have unlocked: ' . $passive->name));
+            to learn more. You have unlocked: ' . $passive->passiveSkill->name));
         }
 
         if (!is_null($quest->unlocks_feature)) {
