@@ -74,7 +74,6 @@ class NpcTypes
      * @return string
      */
     public function getNamedValue(): string {
-        dump($this->value, self::$namedValues, self::$namedValues[$this->value]);
         return self::$namedValues[$this->value];
     }
 
