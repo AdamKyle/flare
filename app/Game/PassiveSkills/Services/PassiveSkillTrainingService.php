@@ -30,7 +30,6 @@ class PassiveSkillTrainingService {
      * @return void
      */
     public function trainSkill(CharacterPassiveSkill $skill, Character $character): void {
-
         $time = now()->addHours($skill->hours_to_next);
 
         $skill->update([

@@ -54,7 +54,6 @@ export default class CharacterMercenaries extends React.Component<CharacterMerce
                 loading: true,
             }, () => {
                 (new Ajax()).setRoute('mercenaries/list/' + characterId).doAjaxCall('get', (response: AxiosResponse) => {
-                    console.log(response.data);
                     this.setState({
                         mercs: response.data.merc_data,
                         mercs_to_buy: response.data.mercs_to_buy,

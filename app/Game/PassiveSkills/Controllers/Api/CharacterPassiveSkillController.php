@@ -32,7 +32,7 @@ class CharacterPassiveSkillController extends Controller {
 
         return response()->json([
             'message'          => 'Started training ' . $characterPassiveSkill->passiveSkill->name,
-            'kingdom_passives' => $this->characterPassiveSkills->getPassiveSkills($character),
+            'kingdom_passives' => $this->characterPassiveSkills->getPassiveSkills($character->refresh()),
         ]);
     }
 
