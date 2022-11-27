@@ -179,8 +179,8 @@ class NpcQuestRewardHandler {
 
         $newValue = $character->gold + $quest->reward_gold;
 
-        if ((new MaxCurrenciesValue($newValue, MaxCurrenciesValue::GOLD))->canNotGiveCurrency()) {
-            $newValue = MaxCurrenciesValue::MAX_GOLD;
+        if ($newValue > MaxCurrenciesValue::MAX_GOLD) {
+            $newValue = MaxCurrenciesValue::MAX_GOLD
         }
 
         $character->update([
