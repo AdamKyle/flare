@@ -4,11 +4,12 @@ import {AdditionalInfoModalProps} from "../../../../lib/game/character-sheet/typ
 import Tabs from "../../../../components/ui/tabs/tabs";
 import TabPanel from "../../../../components/ui/tabs/tab-panel";
 import {formatNumber} from "../../../../lib/game/format-number";
+import ReincarnateCheckModelProps from "../../../../lib/game/character-sheet/types/modal/reincarnate-check-model-props";
 
-export default class ReincarnationCheckModal extends React.Component<any, any> {
+export default class ReincarnationCheckModal extends React.Component<ReincarnateCheckModelProps, any> {
 
 
-    constructor(props: any) {
+    constructor(props: ReincarnateCheckModelProps) {
         super(props);
     }
 
