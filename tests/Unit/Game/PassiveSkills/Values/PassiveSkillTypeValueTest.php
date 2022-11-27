@@ -53,6 +53,10 @@ class PassiveSkillTypeValueTest extends TestCase {
         $this->assertTrue((new PassiveSkillTypeValue(6))->isPopulationCostReduction());
     }
 
+    public function testSteelSmeltingTimeReduction() {
+        $this->assertTrue((new PassiveSkillTypeValue(7))->isSteelSmeltingTimeReduction());
+    }
+
     public function testIsIronCostReductionPassiveTypeName() {
         $this->assertEquals('Iron Cost Reduction', (new PassiveSkillTypeValue(5))->getNamedValue());
     }

@@ -89,7 +89,10 @@ class ExperienceBuffValue {
                     $cost     = self::RANK_SEVEN_COST;
                     break;
                 default:
+                    // @codeCoverageIgnoreStart
                     $xpAmount = 0.0;
+                    $cost     = 0.0;
+                    // @codeCoverageIgnoreEnd
             }
 
             $selection[] = [
@@ -134,7 +137,9 @@ class ExperienceBuffValue {
             case self::RANK_SEVEN:
                 return self::RANK_SEVEN_COST;
             default:
+                // @codeCoverageIgnoreStart
                 throw new Exception('Invalid Rank: ' . $name . ' for Cost.');
+                // @codeCoverageIgnoreEnd
         }
     }
 
@@ -157,7 +162,9 @@ class ExperienceBuffValue {
             case self::RANK_SEVEN:
                 return self::RANK_SEVEN_AMOUNT;
             default:
+                // @codeCoverageIgnoreStart
                 throw new Exception('Invalid Rank: ' . $name . ' for XP.');
+                // @codeCoverageIgnoreEnd
         }
     }
 

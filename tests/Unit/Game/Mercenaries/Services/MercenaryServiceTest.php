@@ -3,7 +3,9 @@
 namespace Tests\Unit\Game\Kingdoms\Services;
 
 use App\Flare\Models\CharacterMercenary;
+use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Mercenaries\Services\MercenaryService;
+use App\Game\Mercenaries\Values\ExperienceBuffValue;
 use App\Game\Mercenaries\Values\MercenaryValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
@@ -337,5 +339,76 @@ class MercenaryServiceTest extends TestCase {
         $this->assertEquals(25, $merc->current_xp);
 
         $this->assertEquals(1, $merc->current_level);
+    }
+
+    public function testCannotPurchaseMercenaryBuffForMercenaryYouDoNotOwn() {
+        $character = $this->character->getCharacter();
+
+        $mercType = new MercenaryValue(MercenaryValue::CHILD_OF_GOLD_DUST);
+
+        $merc = CharacterMercenary::create([
+            'character_id'         => (new CharacterFactory())->createBaseCharacter()->getCharacter()->id,
+            'mercenary_type'       => MercenaryValue::CHILD_OF_GOLD_DUST,
+            'current_level'        => 1,
+            'current_xp'           => 0,
+            'xp_required'          => $mercType->getNextLevelXP(),
+            'reincarnated_bonus'   => 0,
+            'times_reincarnated'   => 0
+        ]);
+
+
+        $result = $this->mercenaryService->purchaseXpBuffForMercenary($character, $merc, ExperienceBuffValue::RANK_ONE);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('Not allowed to do that.', $result['message']);
+    }
+
+    public function testYouDoNotHaveTheGoldForThisBuff() {
+        $character = $this->character->getCharacter();
+
+        $mercType = new MercenaryValue(MercenaryValue::CHILD_OF_GOLD_DUST);
+
+        $merc = CharacterMercenary::create([
+            'character_id'         => $character->id,
+            'mercenary_type'       => MercenaryValue::CHILD_OF_GOLD_DUST,
+            'current_level'        => 1,
+            'current_xp'           => 0,
+            'xp_required'          => $mercType->getNextLevelXP(),
+            'reincarnated_bonus'   => 0,
+            'times_reincarnated'   => 0
+        ]);
+
+
+        $result = $this->mercenaryService->purchaseXpBuffForMercenary($character, $merc, ExperienceBuffValue::RANK_ONE);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('You do not have the gold to do that.', $result['message']);
+    }
+
+    public function testPurchasedBuffForMercenary() {
+        $character = $this->character->getCharacter();
+
+        $mercType = new MercenaryValue(MercenaryValue::CHILD_OF_GOLD_DUST);
+
+        $merc = CharacterMercenary::create([
+            'character_id'         => $character->id,
+            'mercenary_type'       => MercenaryValue::CHILD_OF_GOLD_DUST,
+            'current_level'        => 1,
+            'current_xp'           => 0,
+            'xp_required'          => $mercType->getNextLevelXP(),
+            'reincarnated_bonus'   => 0,
+            'times_reincarnated'   => 0
+        ]);
+
+        $character->update(['gold' => MaxCurrenciesValue::MAX_GOLD]);
+
+        $result = $this->mercenaryService->purchaseXpBuffForMercenary($character, $merc, ExperienceBuffValue::RANK_SEVEN);
+
+        $merc = $merc->refresh();
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals('Applied the buff to the Mercenary', $result['message']);
+        $this->assertEquals(ExperienceBuffValue::RANK_SEVEN_AMOUNT, $merc->xp_buff);
+        $this->assertEquals(1000000000000, $character->refresh()->gold);
     }
 }

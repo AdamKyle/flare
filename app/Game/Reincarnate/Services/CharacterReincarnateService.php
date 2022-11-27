@@ -49,6 +49,10 @@ class CharacterReincarnateService {
             $characterBonus  = $characterStat * 0.20;
             $base            = $base + $characterBonus;
 
+            if ($base >= 999999) {
+                $base = 999999;
+            }
+
             $updatedStats[$stat] = $base;
         }
 
@@ -58,13 +62,19 @@ class CharacterReincarnateService {
 
         $xpPenalty = $character->xp_penalty + 0.05;
 
+        $newReincarnatedStatBonus = $character->reincarnated_stat_increase + $characterBonus;
+
+        if ($newReincarnatedStatBonus > 999999) {
+            $newReincarnatedStatBonus = 999999;
+        }
+
         $additionalUpdates = [
             'xp_penalty'                 => $xpPenalty,
             'level'                      => 1,
             'xp'                         => 0,
             'xp_next'                    => 100 + 100 * $xpPenalty,
             'copper_coins'               => $character->copper_coins - 50000,
-            'reincarnated_stat_increase' => $character->reincarnated_stat_increase + $characterBonus,
+            'reincarnated_stat_increase' => $newReincarnatedStatBonus,
             'times_reincarnated'         => $character->times_reincarnated + 1,
         ];
 
