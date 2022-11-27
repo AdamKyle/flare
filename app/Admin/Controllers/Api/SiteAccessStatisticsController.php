@@ -30,6 +30,17 @@ class SiteAccessStatisticsController extends Controller {
         ]);
     }
 
+    public function fetchReincarnationChart() {
+        $charactersWithHighGold = Character::where('times_reincarnated', '>=', 1)->get();
+
+        return response()->json([
+            'stats' => [
+                'labels' => $charactersWithHighGold->pluck('name')->toArray(),
+                'data'   => $charactersWithHighGold->pluck('times_reincarnated')->toArray(),
+            ]
+        ]);
+    }
+
     public function otherDetails() {
         return response()->json([
             'averageCharacterLevel'       => number_format(Character::avg('level'), 2),

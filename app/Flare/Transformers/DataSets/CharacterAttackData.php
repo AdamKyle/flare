@@ -83,7 +83,10 @@ class CharacterAttackData {
                 'all_stat_reduction' => $characterStatBuilder->getStatReducingPrefix(),
                 'stat_reduction'     => $characterStatBuilder->getStatReducingSuffixes(),
             ],
-            'attack_types'           => $this->fetchAttackTypes($character),
+            'reincarnated_times'          => $character->times_reincarnated,
+            'reincarnated_stat_increase'  => $character->reincarnated_stat_increase,
+            'xp_penalty'                  => $character->xp_penalty,
+            'attack_types'                => $this->fetchAttackTypes($character),
         ];
     }
 

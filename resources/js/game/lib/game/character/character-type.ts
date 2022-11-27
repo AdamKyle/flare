@@ -206,4 +206,10 @@ export interface CharacterType {
     can_engage_celestials: boolean;
 
     can_engage_celestials_again_at: number;
+
+    reincarnated_times: number | null;
+
+    reincarnated_stat_increase: number | null;
+
+    xp_penalty: number | null;
 }

@@ -4,6 +4,7 @@ import BasicCard from "../../../components/ui/cards/basic-card";
 import RegistrationStatistics from "./components/registration-statistics";
 import CharacterGoldStatistics from "./components/character-gold-statistics";
 import OtherStatistics from "./components/other-statistics";
+import CharacterReincarnationStatistics from "./components/character-reincarnation-statistics";
 
 export default class UserStatistics extends React.Component<any, any> {
 
@@ -24,10 +25,16 @@ export default class UserStatistics extends React.Component<any, any> {
                         <RegistrationStatistics />
                     </BasicCard>
                 </div>
-                <BasicCard additionalClasses={'mb-5'}>
-                    <h3 className='mb-4'>Character Gold (Over 1 Billion)</h3>
-                    <CharacterGoldStatistics />
-                </BasicCard>
+                <div className='grid lg:grid-cols-2 gap-3 mb-5'>
+                    <BasicCard additionalClasses={'mb-5'}>
+                        <h3 className='mb-4'>Characters Who Reincarnated Once (or more)</h3>
+                        <CharacterReincarnationStatistics />
+                    </BasicCard>
+                    <BasicCard additionalClasses={'mb-5'}>
+                        <h3 className='mb-4'>Character Gold (Over 1 Billion)</h3>
+                        <CharacterGoldStatistics />
+                    </BasicCard>
+                </div>
                 <OtherStatistics />
             </div>
         );

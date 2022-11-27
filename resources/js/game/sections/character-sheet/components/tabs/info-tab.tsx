@@ -6,6 +6,7 @@ import {formatNumber} from "../../../../lib/game/format-number";
 import OrangeButton from "../../../../components/ui/buttons/orange-button";
 import InfoTabState from "../../../../lib/game/character-sheet/types/tabs/info-tab-state";
 import CharacterResistances from "../modals/character-resistances";
+import CharacterReincarnationModal from "../modals/character-reincarnation-modal";
 
 export default class InfoTab extends React.Component<InfoTabProps, InfoTabState> {
 
@@ -15,6 +16,7 @@ export default class InfoTab extends React.Component<InfoTabProps, InfoTabState>
         this.state = {
             open_info: false,
             open_resistances: false,
+            open_reincarnation: false,
         }
     }
 
@@ -27,6 +29,12 @@ export default class InfoTab extends React.Component<InfoTabProps, InfoTabState>
     manageResistancesDialogue() {
         this.setState({
             open_resistances: !this.state.open_resistances
+        })
+    }
+
+    manageReincarnation() {
+        this.setState({
+            open_reincarnation: !this.state.open_reincarnation
         })
     }
 
@@ -64,12 +72,16 @@ export default class InfoTab extends React.Component<InfoTabProps, InfoTabState>
                         </dl>
                     </div>
                 </div>
-                <div className='grid md:grid-cols-1 w-full md:w-[35%]'>
+                <div className='border-b-2 block border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                <div className='flex flex-wrap justify-center gap-2'>
                     <div className='mt-4'>
-                        <OrangeButton button_label={'Additional Information'} on_click={this.manageInfoDialogue.bind(this)} additional_css='w-1/2' />
+                        <OrangeButton button_label={'Additional Information'} on_click={this.manageInfoDialogue.bind(this)} />
                     </div>
                     <div className='mt-4'>
-                        <OrangeButton button_label={'Resistances'} on_click={this.manageResistancesDialogue.bind(this)} additional_css={'w-1/2'}/>
+                        <OrangeButton button_label={'Resistances'} on_click={this.manageResistancesDialogue.bind(this)}/>
+                    </div>
+                    <div className='mt-4'>
+                        <OrangeButton button_label={'Reincarnation'} on_click={this.manageReincarnation.bind(this)}/>
                     </div>
                 </div>
                 <div className='relative top-[24px]'>
@@ -100,6 +112,18 @@ export default class InfoTab extends React.Component<InfoTabProps, InfoTabState>
                             is_open={this.state.open_resistances}
                             manage_modal={this.manageResistancesDialogue.bind(this)}
                             title={'Resistance Info'}
+                            character={this.props.character}
+                            finished_loading={true}
+                        />
+                    : null
+                }
+
+                {
+                    this.state.open_reincarnation ?
+                        <CharacterReincarnationModal
+                            is_open={this.state.open_reincarnation}
+                            manage_modal={this.manageReincarnation.bind(this)}
+                            title={'Character Reincarnation Info'}
                             character={this.props.character}
                             finished_loading={true}
                         />

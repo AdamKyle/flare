@@ -73,6 +73,9 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
             'can_access_hell_forged'      => false,
             'can_access_purgatory_chains' => false,
             'is_in_timeout'               => !is_null($character->user->timeout_until),
+            'reincarnated_times'          => $character->times_reincarnated,
+            'reincarnated_stat_increase'  => $character->reincarnated_stat_increase,
+            'xp_penalty'                  => $character->xp_penalty,
             'base_position' => [
               'x' => $character->map->character_position_x,
               'y' => $character->map->character_position_y,
