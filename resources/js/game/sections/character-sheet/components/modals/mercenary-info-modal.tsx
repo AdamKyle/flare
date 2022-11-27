@@ -8,8 +8,10 @@ import Select from "react-select";
 import PrimaryButton from "../../../../components/ui/buttons/primary-button";
 import MercenaryXpBuffs from "../../../../lib/game/character-sheet/types/mercenaries/types/mercenary-xp-buffs";
 import {formatNumber} from "../../../../lib/game/format-number";
+import MercenaryInfoModalState
+    from "../../../../lib/game/character-sheet/types/mercenaries/modal/mercenary-info-modal-state";
 
-export default class MercenaryInfoModal extends React.Component<MercenaryInfoModalProps, any> {
+export default class MercenaryInfoModal extends React.Component<MercenaryInfoModalProps, MercenaryInfoModalState> {
 
     constructor(props: MercenaryInfoModalProps) {
         super(props);
@@ -78,6 +80,10 @@ export default class MercenaryInfoModal extends React.Component<MercenaryInfoMod
 
     purchaseBuff() {
         if (this.props.mercenary === null) {
+            return;
+        }
+
+        if (this.state.selected_buff == null) {
             return;
         }
 
