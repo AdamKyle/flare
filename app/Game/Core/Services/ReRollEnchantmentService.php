@@ -28,11 +28,7 @@ class ReRollEnchantmentService {
     private $functionMap = [
         'base'       => [
             'setCoreModifiers',
-            'setDamageDetails',
             'setClassBonus',
-            'setSkillBonuses',
-            'setLifeStealingAmount',
-            'setEntrancingAmount',
         ],
         'stats'      => [
             'increaseStats',

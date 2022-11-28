@@ -16,12 +16,12 @@ class ResourceValidation {
      * @return bool
      */
     public function shouldRedirectKingdomBuilding(KingdomBuilding $building, Kingdom $kingdom): bool {
-        return ($kingdom->current_wood < $this->getBuildingCost($kingdom, ($building->level * $building->wood_cost))) ||
-               ($kingdom->current_clay < $this->getBuildingCost($kingdom, ($building->level * $building->clay_cost))) ||
-               ($kingdom->current_stone < $this->getBuildingCost($kingdom, ($building->level * $building->stone_cost))) ||
-               ($kingdom->current_steel < $this->getBuildingCost($kingdom, ($building->level * $building->steel_cost))) ||
-               (($kingdom->current_iron < $this->getBuildingCost($kingdom, ($building->level * $building->iron_cost), false, true))) ||
-               ($kingdom->current_population < $this->getBuildingCost($kingdom, ($building->level * $building->required_population), true));
+        return ($kingdom->current_wood < $this->getBuildingCost($kingdom, $building->wood_cost)) ||
+               ($kingdom->current_clay < $this->getBuildingCost($kingdom, $building->clay_cost)) ||
+               ($kingdom->current_stone < $this->getBuildingCost($kingdom, $building->stone_cost)) ||
+               ($kingdom->current_steel < $this->getBuildingCost($kingdom, $building->steel_cost)) ||
+               (($kingdom->current_iron < $this->getBuildingCost($kingdom, $building->iron_cost, false, true))) ||
+               ($kingdom->current_population < $this->getBuildingCost($kingdom, $building->required_population, true));
     }
 
     /**
@@ -32,12 +32,12 @@ class ResourceValidation {
      * @return bool
      */
     public function shouldRedirectRebuildKingdomBuilding(KingdomBuilding $building, Kingdom $kingdom): bool {
-        return ($kingdom->current_wood < $this->getBuildingCost($kingdom, ($building->level * $building->base_wood_cost))) ||
-               ($kingdom->current_clay < $this->getBuildingCost($kingdom, ($building->level * $building->base_clay_cost))) ||
-               ($kingdom->current_stone < $this->getBuildingCost($kingdom, ($building->level * $building->base_stone_cost))) ||
-               ($kingdom->current_steel < $this->getBuildingCost($kingdom, ($building->level * $building->steel_cost))) ||
-               ($kingdom->current_iron < $this->getBuildingCost($kingdom, ($building->level * $building->base_iron_cost), false, true)) ||
-               ($kingdom->current_population < $this->getBuildingCost($kingdom, ($building->level * $building->base_population), true));
+        return ($kingdom->current_wood < $this->getBuildingCost($kingdom, $building->base_wood_cost)) ||
+               ($kingdom->current_clay < $this->getBuildingCost($kingdom, $building->base_clay_cost)) ||
+               ($kingdom->current_stone < $this->getBuildingCost($kingdom, $building->base_stone_cost)) ||
+               ($kingdom->current_steel < $this->getBuildingCost($kingdom, $building->steel_cost)) ||
+               ($kingdom->current_iron < $this->getBuildingCost($kingdom, $building->base_iron_cost, false, true)) ||
+               ($kingdom->current_population < $this->getBuildingCost($kingdom, $building->base_population, true));
     }
 
     /**
