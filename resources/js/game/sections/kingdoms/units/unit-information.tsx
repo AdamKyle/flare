@@ -188,7 +188,7 @@ export default class UnitInformation extends React.Component<UnitInformationProp
                              <dt>Iron Cost:</dt>
                              <dd>{formatNumber(this.calculateCostsForUnit(this.props.unit.iron_cost, this.getAmount(), true))}</dd>
                              <dt>Steel Cost:</dt>
-                             <dd>{formatNumber(this.calculateCostsForUnit(this.props.unit.steel_cost, this.getAmount(), true))}</dd>
+                             <dd>{formatNumber(this.calculateCostsForUnit(this.props.unit.steel_cost, this.getAmount(), false))}</dd>
                              <dt>Population Cost:</dt>
                              <dd>{formatNumber(this.calculateCostsForUnit(this.props.unit.required_population, this.getAmount(), false))}</dd>
                              <dt>Base Time For One (Seconds):</dt>

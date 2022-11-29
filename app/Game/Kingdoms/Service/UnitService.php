@@ -174,6 +174,9 @@ class UnitService {
         $ironRequired = ($gameUnit->iron_cost * $amount);
         $ironRequired -= $ironRequired * ($kingdomUnitCostReduction + $ironCostReduction);
 
+        $steelCost = ($gameUnit->steel_cost * $amount);
+        $steelCost -= $steelCost * $kingdomUnitCostReduction;
+
         $populationRequired = ($gameUnit->required_population * $amount);
         $populationRequired -= $populationRequired * $kingdomUnitCostReduction;
 
@@ -182,12 +185,14 @@ class UnitService {
         $newStone = $kingdom->current_stone - $stoneRequired;
         $newIron  = $kingdom->current_iron - $ironRequired;
         $newPop   = $kingdom->current_population - $populationRequired;
+        $newSteel = $kingdom->current_steel - $steelCost;
 
         $kingdom->update([
             'current_wood'       => $newWood > 0 ? $newWood : 0,
             'current_clay'       => $newClay > 0 ? $newClay : 0,
             'current_stone'      => $newStone > 0 ? $newStone : 0,
             'current_iron'       => $newIron > 0 ? $newIron : 0,
+            'current_steel'      => $newSteel > 0 ? $newSteel : 0,
             'current_population' => $newPop > 0 ? $newPop : 0,
         ]);
 
@@ -346,6 +351,7 @@ class UnitService {
             'current_clay'       => $kingdom->current_clay + (($unit->clay_cost * $queue->amount) * $this->totalResources),
             'current_stone'      => $kingdom->current_stone + (($unit->stone_cost * $queue->amount) * $this->totalResources),
             'current_iron'       => $kingdom->current_iron + (($unit->iron_cost * $queue->amount) * $this->totalResources),
+            'current_steel'      => $kingdom->current_steel + (($unit->steel_cost * $queue->amount) * $this->totalResources),
             'current_population' => $kingdom->current_population + (($unit->required_population * $queue->amount) * $this->totalResources)
         ]);
 
