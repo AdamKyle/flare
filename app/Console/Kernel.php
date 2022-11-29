@@ -44,8 +44,11 @@ class Kernel extends ConsoleKernel {
         // Unlock market listings that have been locked for a day.
         $schedule->command('unlock:market-listings')->dailyAt('02:20')->timezone(config('app.timezone'));
 
-        // Clean up the items every week.
+        // Clean up the items every day.
         $schedule->command('cleanup:unused-items')->dailyAt('03:00')->timezone(config('app.timezeon'));
+
+        // Fix Character Gold every 5 minutes.
+        $schedule->command('fix:character-gold')->everyFiveMinutes();
 
         /**
          * Game Events:

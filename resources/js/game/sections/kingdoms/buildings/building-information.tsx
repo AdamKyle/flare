@@ -199,7 +199,7 @@ export default class BuildingInformation extends React.Component<BuildingInforma
                 <dt>Iron Cost:</dt>
                 <dd>{this.calculateResourceCostWithReductions(this.props.building.iron_cost, false, true)}</dd>
                 <dt>Steel Cost:</dt>
-                <dd>{this.calculateResourceCostWithReductions(this.props.building.steel_cost, false, true)}</dd>
+                <dd>{this.calculateResourceCostWithReductions(this.props.building.steel_cost, false, false)}</dd>
                 <dt>Population Cost:</dt>
                 <dd>{this.calculateResourceCostWithReductions(this.props.building.population_required, true, false)}</dd>
                 <dt>Time till next level:</dt>

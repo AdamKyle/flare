@@ -38,6 +38,7 @@ class Kingdom extends Model implements Auditable
         'current_wood',
         'current_clay',
         'current_iron',
+        'current_steel',
         'current_population',
         'max_population',
         'x_position',

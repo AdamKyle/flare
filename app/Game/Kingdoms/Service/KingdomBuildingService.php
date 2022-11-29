@@ -115,6 +115,7 @@ class KingdomBuildingService {
         $clayCost       = $building->clay_cost - $building->clay_cost * $buildingCostReduction;
         $stoneCost      = $building->stone_cost - $building->stone_cost * $buildingCostReduction;
         $ironCost       = round($building->iron_cost - $building->iron_cost * ($buildingCostReduction + $ironCostReduction));
+        $steelCost      = $building->steel_cost - $building->steel_cost * $buildingCostReduction;
 
         if (!$ignorePop) {
             $populationCost = $building->required_population - $building->required_population * ($populationCostReduction);
@@ -132,12 +133,14 @@ class KingdomBuildingService {
         $newClay  = $building->kingdom->current_clay - $clayCost;
         $newStone = $building->kingdom->current_stone - $stoneCost;
         $newIron  = $building->kingdom->current_iron - $ironCost;
+        $newSteel = $building->kingdom->current_steel - $steelCost;
 
         $building->kingdom->update([
             'current_wood'       => $newWood > 0 ? $newWood : 0,
             'current_clay'       => $newClay > 0 ? $newClay : 0,
             'current_stone'      => $newStone > 0 ? $newStone : 0,
             'current_iron'       => $newIron > 0 ? $newIron : 0,
+            'current_steel'      => $newSteel > 0 ? $newSteel : 0,
             'current_population' => $newPop > 0 ? $newPop : 0,
         ]);
 
@@ -154,12 +157,15 @@ class KingdomBuildingService {
         $stoneCost      = $building->level * $building->base_stone_cost;
         $ironCost       = $building->level * $building->base_iron_cost;
         $populationCost = $building->level * $building->base_population;
+        $steelCost      = $building->level - $building->base_steel_cost;
 
         $woodCost       -= $woodCost * $buildingCostReduction;
         $clayCost       -= $clayCost * $buildingCostReduction;
         $stoneCost      -= $stoneCost * $buildingCostReduction;
         $ironCost       -= $ironCost * ($buildingCostReduction + $ironCostReduction);
         $populationCost -= $populationCost * ($buildingCostReduction + $populationCostReduction);
+        $steelCost      -= $steelCost * $buildingCostReduction;
+
 
         $building->kingdom->update([
             'current_wood'       => $building->kingdom->current_wood - $woodCost,
@@ -167,6 +173,7 @@ class KingdomBuildingService {
             'current_stone'      => $building->kingdom->current_stone - $stoneCost,
             'current_iron'       => $building->kingdom->current_iron - $ironCost,
             'current_population' => $building->kingdom->current_population - $populationCost,
+            'current_steel'      => $building->kingdom->current_steel - $steelCost,
         ]);
 
         return $building->kingdom->refresh();
