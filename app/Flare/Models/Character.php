@@ -189,6 +189,10 @@ class Character extends Model
         return $this->hasMany(CharacterMercenary::class);
     }
 
+    public function classRanks() {
+        return $this->hasMany(CharacterClassRank::class);
+    }
+
     /**
      * Allows one to get specific information from a character.
      *

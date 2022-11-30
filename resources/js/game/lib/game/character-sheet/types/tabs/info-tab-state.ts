@@ -4,4 +4,6 @@ export default interface InfoTabState {
     open_resistances: boolean;
 
     open_reincarnation: boolean;
+
+    open_class_ranks: boolean;
 }

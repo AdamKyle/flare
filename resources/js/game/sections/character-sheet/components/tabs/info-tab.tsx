@@ -7,6 +7,8 @@ import OrangeButton from "../../../../components/ui/buttons/orange-button";
 import InfoTabState from "../../../../lib/game/character-sheet/types/tabs/info-tab-state";
 import CharacterResistances from "../modals/character-resistances";
 import CharacterReincarnationModal from "../modals/character-reincarnation-modal";
+import CharacterTabs from "../character-tabs";
+import CharacterClassRanksModal from "../modals/character-class-ranks-modal";
 
 export default class InfoTab extends React.Component<InfoTabProps, InfoTabState> {
 
@@ -17,6 +19,7 @@ export default class InfoTab extends React.Component<InfoTabProps, InfoTabState>
             open_info: false,
             open_resistances: false,
             open_reincarnation: false,
+            open_class_ranks: false,
         }
     }
 
@@ -36,6 +39,12 @@ export default class InfoTab extends React.Component<InfoTabProps, InfoTabState>
         this.setState({
             open_reincarnation: !this.state.open_reincarnation
         })
+    }
+
+    manageClassRanks() {
+        this.setState({
+            open_class_ranks: !this.state.open_class_ranks,
+        });
     }
 
     render() {
@@ -83,6 +92,9 @@ export default class InfoTab extends React.Component<InfoTabProps, InfoTabState>
                     <div className='mt-4'>
                         <OrangeButton button_label={'Reincarnation'} on_click={this.manageReincarnation.bind(this)}/>
                     </div>
+                    <div className='mt-4'>
+                        <OrangeButton button_label={'Class Ranks'} on_click={this.manageClassRanks.bind(this)}/>
+                    </div>
                 </div>
                 <div className='relative top-[24px]'>
                     <div className="flex justify-between mb-1">
@@ -119,11 +131,11 @@ export default class InfoTab extends React.Component<InfoTabProps, InfoTabState>
                 }
 
                 {
-                    this.state.open_reincarnation ?
-                        <CharacterReincarnationModal
-                            is_open={this.state.open_reincarnation}
-                            manage_modal={this.manageReincarnation.bind(this)}
-                            title={'Character Reincarnation Info'}
+                    this.state.open_class_ranks ?
+                        <CharacterClassRanksModal
+                            is_open={this.state.open_class_ranks}
+                            manage_modal={this.manageClassRanks.bind(this)}
+                            title={'Character Class Ranks'}
                             character={this.props.character}
                             finished_loading={true}
                         />

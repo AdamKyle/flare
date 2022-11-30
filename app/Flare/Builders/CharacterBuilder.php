@@ -13,6 +13,7 @@ use App\Flare\Models\Item;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Values\BaseStatValue;
 use App\Flare\Values\BaseSkillValue;
+use App\Game\ClassRanks\Values\ClassRankValue;
 use App\Game\Core\Values\FactionLevel;
 use Exception;
 
@@ -141,6 +142,8 @@ class CharacterBuilder {
 
         $this->assignFactions();
 
+        $this->assignClassRanks();
+
         $this->character = $this->character->refresh();
 
         return $this;
@@ -233,6 +236,29 @@ class CharacterBuilder {
                     'points_needed' => FactionLevel::getPointsNeeded(0),
                 ]);
             }
+        }
+
+        $this->character = $this->character->refresh();
+
+        return $this;
+    }
+
+    /**
+     * Assign Class Ranks to a character.
+     *
+     * @return CharacterBuilder
+     */
+    public function assignClassRanks(): CharacterBuilder {
+        $gameClasses = GameClass::all();
+
+        foreach ($gameClasses as $gameClass) {
+            $this->character->classRanks()->create([
+                'character_id'   => $this->character->id,
+                'game_class_id'  => $gameClass->id,
+                'current_xp'     => 0,
+                'required_xp'    => ClassRankValue::XP_PER_LEVEL,
+                'level'          => 0,
+            ]);
         }
 
         $this->character = $this->character->refresh();

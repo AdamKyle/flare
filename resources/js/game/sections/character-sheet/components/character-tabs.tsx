@@ -6,6 +6,7 @@ import CharacterTabsProps from "../../../lib/game/character-sheet/types/characte
 import CharacterActiveBoons from "./character-active-boons";
 import CharacterFactions from "./character-factions";
 import CharacterMercenaries from "./character-mercenaries";
+import CharacterClassRanks from "./character-class-ranks";
 
 export default class CharacterTabs extends React.Component<CharacterTabsProps, any> {
 
@@ -17,7 +18,7 @@ export default class CharacterTabs extends React.Component<CharacterTabsProps, a
         this.tabs = [{
             key: 'info',
             name: 'Info'
-        }, {
+        },{
             key: 'active-boons',
             name: 'Active Boons',
         }, {

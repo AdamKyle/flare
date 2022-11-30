@@ -110,6 +110,12 @@ export default class CharacterActiveBoons extends React.Component<any, any> {
                             </InfoAlert>
                         : null
                     }
+                    <p className='my-4 text-center'>
+                        <a href="/information/alchemy" target="_blank">
+                            What are boons and how do I get them? <i
+                            className="fas fa-external-link-alt"></i>
+                        </a>
+                    </p>
                     <Table columns={this.buildColumns()} data={this.state.boons} dark_table={this.state.dark_tables} />
                 </div>
 

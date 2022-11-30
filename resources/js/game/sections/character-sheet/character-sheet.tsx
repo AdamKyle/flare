@@ -9,7 +9,6 @@ import WarningAlert from "../../components/ui/alerts/simple-alerts/warning-alert
 import Select from "react-select";
 import PrimaryButton from "../../components/ui/buttons/primary-button";
 import LoadingProgressBar from "../../components/ui/progress-bars/loading-progress-bar";
-import SuccessAlert from "../../components/ui/alerts/simple-alerts/success-alert";
 import {AxiosError, AxiosResponse} from "axios";
 import Ajax from "../../lib/ajax/ajax";
 import ReincarnationCheckModal from "./components/modals/reincarnation-check-modal";

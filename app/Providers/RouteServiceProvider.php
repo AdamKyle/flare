@@ -98,6 +98,7 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapSpecialtyShopApiRoutes();
         $this->mapMercenariesApiRoutes();
         $this->mapReincarnateApiRoutes();
+        $this->mapClassRanksApiRoutes();
     }
 
     /**
@@ -291,5 +292,12 @@ class RouteServiceProvider extends ServiceProvider
             ->middleware('web')
             ->namespace('App\Game\Reincarnate\Controllers')
             ->group(base_path('routes/game/reincarnate/api.php'));
+    }
+
+    protected function mapClassRanksApiRoutes() {
+        Route::prefix('api')
+            ->middleware('web')
+            ->namespace('App\Game\ClassRanks\Controllers')
+            ->group(base_path('routes/game/class-ranks/api.php'));
     }
 }
