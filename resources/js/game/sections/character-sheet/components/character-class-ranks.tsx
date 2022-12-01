@@ -5,8 +5,13 @@ import {watchForDarkModeClassRankChange} from "../../../lib/game/dark-mode-watch
 import Ajax from "../../../lib/ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
 import ComponentLoading from "../../../components/ui/loading/component-loading";
+import CharacterClassRanksState
+    from "../../../lib/game/character-sheet/types/class-ranks/types/character-class-ranks-state";
+import GameClassType from "../../../lib/game/character-sheet/types/class-ranks/game-class-type";
+import ClassRankType from "../../../lib/game/character-sheet/types/class-ranks/class-rank-type";
+import BuildingDetails from "../../../lib/game/kingdoms/building-details";
 
-export default class CharacterClassRanks extends React.Component<any, any> {
+export default class CharacterClassRanks extends React.Component<any, CharacterClassRanksState> {
 
     constructor(props: any) {
         super(props);
@@ -16,7 +21,7 @@ export default class CharacterClassRanks extends React.Component<any, any> {
             dark_tables: false,
             loading: true,
             open_class_details: false,
-            class_name_selected: '',
+            class_name_selected: null,
         }
     }
 
@@ -33,10 +38,11 @@ export default class CharacterClassRanks extends React.Component<any, any> {
         });
     }
 
-    manageViewClass(className: string) {
+    manageViewClass(className: string|null) {
+        const classNameSelected: ClassRankType = this.state.class_ranks.filter((rank) => rank.class_name === className)[0];
         this.setState({
             open_class_details: !this.state.open_class_details,
-            class_name_selected: className
+            class_name_selected: classNameSelected,
         })
     }
 
@@ -82,21 +88,75 @@ export default class CharacterClassRanks extends React.Component<any, any> {
 
     render() {
         if (this.state.loading) {
-            return <ComponentLoading />
+            return (
+                <div className='relative my-6 p-[20px]'>
+                    <ComponentLoading />
+                </div>
+            )
         }
 
         return (
             <div className='max-h-[375px] overflow-y-auto lg:overflow-y-hidden lg:max-h-full'>
 
-
                 {
-                    this.state.open_class_details ?
+                    this.state.open_class_details && this.state.class_name_selected !== null ?
                         <Fragment>
                             <div className='text-right cursor-pointer text-red-500 position top-[-10px]'>
-                                <button onClick={() => this.manageViewClass('')}><i className="fas fa-minus-circle"></i></button>
+                                <button onClick={() => this.manageViewClass(null)}><i className="fas fa-minus-circle"></i></button>
                             </div>
 
-                            Hello World {this.state.class_name_selected}
+                            <h2 className='text-sky-700 dark:text-sky-500 font-bold my-4'>
+                                {this.state.class_name_selected.class_name}
+                            </h2>
+
+                            <p className='mb-4'>
+                                To learn more about this class, checkout <a href="/information/reincarnation" target="_blank">the class documentation <i className="fas fa-external-link-alt"></i></a> to
+                                learn more about this class including tips and tricks to maximize damage output and unlock the special attack.
+                            </p>
+
+                            <p className='mb-4'>
+                                Your stats will not change when you switch to this class. This is just a general break down of the class. Special clases are different,
+                                these will give you % boosts to your stats as a modifier while you have this class enabled.
+                            </p>
+
+                            <p className='mb-4'>
+                                When you switch to this class, your current class skill be hidden and you will now have an opportunity to level this classes skill
+                                in the skill section for trainable skills. Click the above link to learn more about the class.
+                            </p>
+
+                            <div className='grid lg:grid-cols-2 gap-2 mb-4'>
+                                <div>
+                                    <h3 className='my-3'>Base Information</h3>
+                                    <dl>
+                                        <dt>Base Damage Stat</dt>
+                                        <dd>{this.state.class_name_selected.game_class.to_hit_stat}</dd>
+                                        <dt>Str Mod (pts.)</dt>
+                                        <dd>+{this.state.class_name_selected.game_class.str_mod}</dd>
+                                        <dt>Dex Mod (pts.)</dt>
+                                        <dd>+{this.state.class_name_selected.game_class.dex_mod}</dd>
+                                        <dt>Dur Mod (pts.)</dt>
+                                        <dd>+{this.state.class_name_selected.game_class.dur_mod}</dd>
+                                        <dt>Int Mod (pts.)</dt>
+                                        <dd>+{this.state.class_name_selected.game_class.int_mod}</dd>
+                                        <dt>Agi Mod (pts.)</dt>
+                                        <dd>+{this.state.class_name_selected.game_class.agi_mod}</dd>
+                                        <dt>Chr Mod (pts.)</dt>
+                                        <dd>+{this.state.class_name_selected.game_class.chr_mod}</dd>
+                                        <dt>Focus Mod (pts.)</dt>
+                                        <dd>+{this.state.class_name_selected.game_class.focus_mod}</dd>
+                                    </dl>
+                                </div>
+                                <div className='border-b-2 block lg:hidden border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                                <div>
+                                    <h3 className='my-3'>Skill Modifiers</h3>
+                                    <dl>
+                                        <dt>Accuracy Mod</dt>
+                                        <dd>+{(this.state.class_name_selected.game_class.accuracy_mod * 100).toFixed(2)}%</dd>
+                                        <dt>Looting Mod</dt>
+                                        <dd>+{(this.state.class_name_selected.game_class.accuracy_mod * 100).toFixed(2)}%</dd>
+                                    </dl>
+                                </div>
+                            </div>
                         </Fragment>
                     :
                         <Table

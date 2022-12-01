@@ -2,6 +2,7 @@
 
 namespace App\Game\Battle\Providers;
 
+use App\Game\ClassRanks\Services\ClassRankService;
 use App\Game\Mercenaries\Services\MercenaryService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Flare\Builders\BuildMythicItem;
@@ -71,7 +72,8 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(BattleEventHandler::class, function($app) {
             return new BattleEventHandler(
                 $app->make(BattleRewardProcessing::class),
-                $app->make(MercenaryService::class)
+                $app->make(MercenaryService::class),
+                $app->make(ClassRankService::class)
             );
         });
 

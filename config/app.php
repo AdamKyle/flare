@@ -231,6 +231,7 @@ return [
         App\Game\Gambler\Providers\ServiceProvider::class,
         App\Game\Mercenaries\Providers\ServiceProvider::class,
         App\Game\Reincarnate\Providers\ServiceProvider::class,
+        App\Game\ClassRanks\Providers\ServiceProvider::class,
     ],
 
     /*

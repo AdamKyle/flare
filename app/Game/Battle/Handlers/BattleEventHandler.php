@@ -6,6 +6,7 @@ use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Battle\Events\CharacterRevive;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Events\AttackTimeOutEvent;
+use App\Game\ClassRanks\Services\ClassRankService;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Mercenaries\Services\MercenaryService;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -28,14 +29,24 @@ class BattleEventHandler {
      */
     private MercenaryService $mercenaryService;
 
+    /**
+     * @var ClassRankService $classRankService
+     */
+    private ClassRankService $classRankService;
+
 
     /**
      * @param BattleRewardProcessing $battleRewardProcessing
      * @param MercenaryService $mercenaryService
+     * @param ClassRankService $classRankService
      */
-    public function __construct(BattleRewardProcessing $battleRewardProcessing, MercenaryService $mercenaryService) {
+    public function __construct(BattleRewardProcessing $battleRewardProcessing,
+                                MercenaryService $mercenaryService,
+                                ClassRankService $classRankService,
+    ) {
         $this->battleRewardProcessing = $battleRewardProcessing;
         $this->mercenaryService       = $mercenaryService;
+        $this->classRankService       = $classRankService;
     }
 
     /**
@@ -62,6 +73,7 @@ class BattleEventHandler {
      * @param int $monsterId
      * @param bool $isAutomation
      * @return void
+     * @throws \Exception
      */
     public function processMonsterDeath(int $characterId, int $monsterId, bool $isAutomation = false): void {
         $monster   = Monster::find($monsterId);
@@ -76,6 +88,8 @@ class BattleEventHandler {
         $this->battleRewardProcessing->handleMonster($character, $monster, $isAutomation);
 
         $this->mercenaryService->giveXpToMercenaries($character);
+
+        $this->classRankService->giveXpToClassRank($character);
     }
 
     /**

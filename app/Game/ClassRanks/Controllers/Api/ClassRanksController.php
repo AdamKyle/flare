@@ -9,7 +9,7 @@ class ClassRanksController extends Controller {
 
     public function getCharacterClassRanks(Character $character) {
 
-        $classRanks = $character->classRanks;
+        $classRanks = $character->classRanks()->with('gameClass')->get();
 
         $classRanks  = $classRanks->transform(function($classRank) use($character) {
 
@@ -20,9 +20,11 @@ class ClassRanksController extends Controller {
             $classRank->is_locked  = false;
 
             return $classRank;
-        });
+        })->sortByDesc(function($item) {
+            return $item->is_active;
+        })->all();
 
-        return response()->json(['class_ranks' => $classRanks->toArray()]);
+        return response()->json(['class_ranks' => array_values($classRanks)]);
     }
 
 }
