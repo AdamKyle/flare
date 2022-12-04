@@ -24,7 +24,6 @@ import {removeCommas} from "./lib/game/format-number";
 import CharacterCurrenciesType from "./lib/game/character/character-currencies-type";
 import KingdomLogDetails from "./lib/game/kingdoms/kingdom-log-details";
 import GlobalTimeoutModal from "./sections/game-modals/global-timeout-modal";
-import CharacterClassRanks from "./sections/character-sheet/components/character-class-ranks";
 
 export default class Game extends React.Component<GameProps, GameState> {
 

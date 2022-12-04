@@ -13,15 +13,16 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('character_class_ranks', function (Blueprint $table) {
+        Schema::create('character_class_specialties_equipped', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('character_id');
-            $table->foreign('character_id')->references('id')->on('characters');
-            $table->unsignedBigInteger('game_class_id');
-            $table->foreign('game_class_id')->references('id')->on('game_classes');
+            $table->unsignedBigInteger('game_class_special_id');
+            $table->foreign('character_id', 'cc_se_c_id')->references('id')->on('characters');
+            $table->foreign('game_class_special_id', 'cc_se_gcs_id')->references('id')->on('game_class_specials');
+            $table->integer('level');
             $table->integer('current_xp');
             $table->integer('required_xp');
-            $table->integer('level');
+            $table->boolean('equipped');
             $table->timestamps();
         });
     }
@@ -33,6 +34,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('class_ranks');
+        Schema::dropIfExists('character_class_specialties_equipped');
     }
 };

@@ -62,6 +62,15 @@
             <span class="fas fa-plus"></span>
             Create New Class
         </a>
+
+        <a href="{{route('class-specials.list')}}">
+            <span class="fas fa-list"></span>
+            Class Specials
+        </a>
+        <a href="{{route('class-specials.create')}}">
+            <span class="fas fa-plus"></span>
+            Create New Class Special
+        </a>
         <hr />
         <h6 class="uppercase">Maps</h6>
         <a href="{{route('maps')}}">

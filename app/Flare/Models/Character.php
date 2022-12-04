@@ -193,6 +193,10 @@ class Character extends Model
         return $this->hasMany(CharacterClassRank::class);
     }
 
+    public function classSpecialsEquipped() {
+        return $this->hasMany(CharacterClassSpecialtiesEquipped::class);
+    }
+
     /**
      * Allows one to get specific information from a character.
      *

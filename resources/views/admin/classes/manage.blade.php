@@ -10,7 +10,7 @@
             <x-core.form-wizard.container action="{{route('classes.store')}}" modelId="{{!is_null($class) ? $class->id : 0}}" lastTab="tab-style-2-5">
                 <x-core.form-wizard.tabs>
                     <x-core.form-wizard.tab target="tab-style-2-1" primaryTitle="Basic Info" secondaryTitle="Basic information about the class." isActive="true"/>
-                    <x-core.form-wizard.tab target="tab-style-2-2" primaryTitle="Skill Info" secondaryTitle="Basic information about the c;ass effects on skills."/>
+                    <x-core.form-wizard.tab target="tab-style-2-2" primaryTitle="Skill Info" secondaryTitle="Basic information about the class effects on skills."/>
                 </x-core.form-wizard.tabs>
                 <x-core.form-wizard.contents>
                     <x-core.form-wizard.content target="tab-style-2-1" isOpen="true">

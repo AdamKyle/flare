@@ -11,14 +11,12 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
-    {
-        Schema::create('character_class_ranks', function (Blueprint $table) {
+    public function up() {
+        Schema::create('character_class_ranks_weapon_masteries', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('character_id');
-            $table->foreign('character_id')->references('id')->on('characters');
-            $table->unsignedBigInteger('game_class_id');
-            $table->foreign('game_class_id')->references('id')->on('game_classes');
+            $table->unsignedBigInteger('character_class_rank_id');
+            $table->foreign('character_class_rank_id', 'ccrank_id')->references('id')->on('character_class_ranks');
+            $table->integer('weapon_type');
             $table->integer('current_xp');
             $table->integer('required_xp');
             $table->integer('level');
@@ -31,8 +29,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
-    {
-        Schema::dropIfExists('class_ranks');
+    public function down() {
+        Schema::dropIfExists('class_ranks_weapon_masteries');
     }
 };

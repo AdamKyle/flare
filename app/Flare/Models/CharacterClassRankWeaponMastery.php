@@ -7,7 +7,9 @@ use Database\Factories\CharacterBoonFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class CharacterClassRank extends Model {
+class CharacterClassRankWeaponMastery extends Model {
+
+    protected $table = 'character_class_ranks_weapon_masteries';
 
     /**
      * The attributes that are mass assignable.
@@ -15,8 +17,8 @@ class CharacterClassRank extends Model {
      * @var array
      */
     protected $fillable = [
-        'character_id',
-        'game_class_id',
+        'class_rank_id',
+        'weapon_type',
         'current_xp',
         'required_xp',
         'level',
@@ -28,20 +30,14 @@ class CharacterClassRank extends Model {
      * @var array
      */
     protected $casts = [
-        'current_xp'   => 'integer',
-        'required_xp'  => 'integer',
-        'level'        => 'integer',
+        'class_rank_id' => 'integer',
+        'weapon_type'   => 'integer',
+        'current_xp'    => 'integer',
+        'required_xp'   => 'integer',
+        'level'         => 'integer',
     ];
 
-    public function character() {
-        return $this->belongsTo(Character::class, 'character_id', 'id');
-    }
-
-    public function gameClass() {
-        return $this->belongsTo(GameClass::class, 'game_class_id', 'id');
-    }
-
-    public function weaponMasteries() {
-        return $this->hasMany(CharacterClassRankWeaponMastery::class);
+    public function classRank() {
+        return $this->belongsTo(CharacterClassRank::class, 'class_rank_id', 'id');
     }
 }

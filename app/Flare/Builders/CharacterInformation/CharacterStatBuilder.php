@@ -217,6 +217,7 @@ class CharacterStatBuilder {
 
         if (is_null($this->equippedItems)) {
             $baseStat = $this->applyBoons($baseStat);
+
             return $this->applyBoons($baseStat, $stat . '_mod');
         }
 

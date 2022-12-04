@@ -91,6 +91,17 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::post('/admin/passive-skills/store', ['as' => 'passive.skill.store', 'uses' => 'PassiveSkillsController@store']);
     Route::post('/admin/passive-skills/{passiveSkill}/update', ['as' => 'passive.skill.update', 'uses' => 'PassiveSkillsController@update']);
 
+    Route::get('/admin/class-specials', ['as' => 'class-specials.list', 'uses' => 'ClassSpecialsController@index']);
+    Route::get('/admin/class-special/{gameClassSpecial}', ['as' => 'class-specials.show', 'uses' => 'ClassSpecialsController@show']);
+    Route::get('/admin/class-specials/create', ['as' => 'class-specials.create', 'uses' => 'ClassSpecialsController@create']);
+    Route::get('/admin/class-specials/{gameClassSpecial}/edit', ['as' => 'class-specials.edit', 'uses' => 'ClassSpecialsController@edit']);
+    Route::get('/admin/class-specials/export-class-specials', ['as' => 'class-specials.show-export', 'uses' => 'ClassSpecialsController@showExport']);
+    Route::get('/admin/class-specials/import-class-specials', ['as' => 'class-specials.show-import', 'uses' => 'ClassSpecialsController@showImport']);
+    Route::post('/admin/class-specials/export', ['as' => 'class-specials.export', 'uses' => 'ClassSpecialsController@export']);
+    Route::post('/admin/class-specials/import', ['as' => 'class-specials.import', 'uses' => 'ClassSpecialsController@import']);
+    Route::post('/admin/class-specials/store', ['as' => 'class-specials.store', 'uses' => 'ClassSpecialsController@store']);
+    Route::post('/admin/class-specials/store', ['as' => 'class-specials.store', 'uses' => 'ClassSpecialsController@store']);
+
     Route::post('/admin/race/store', ['as' => 'races.store', 'uses' => 'RacesController@store']);
 
     Route::get('/admin/races', ['as' => 'races.list', 'uses' => 'RacesController@index']);

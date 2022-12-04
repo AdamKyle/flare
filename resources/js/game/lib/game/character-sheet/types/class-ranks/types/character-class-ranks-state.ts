@@ -12,4 +12,6 @@ export default interface CharacterClassRanksState {
     open_class_details: boolean;
 
     class_name_selected: ClassRankType|null;
+
+    show_class_specialties: boolean;
 }

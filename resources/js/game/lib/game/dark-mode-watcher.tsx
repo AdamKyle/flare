@@ -4,6 +4,8 @@ import CharacterActiveBoons from "../../sections/character-sheet/components/char
 import {Component, ReactComponentElement} from "react";
 import ItemComparison from "../../sections/chat/modals/item-comparison";
 import CharacterClassRanks from "../../sections/character-sheet/components/character-class-ranks";
+import CharacterClassSpecialtiesModal
+    from "../../sections/character-sheet/components/modals/character-class-specialties-modal";
 
 /**
  * When dark mode is enabled set the dark_table to true on the table.
@@ -26,6 +28,20 @@ export const watchForDarkModeInventoryChange = (component: CharacterInventoryTab
 }
 
 export const watchForDarkModeClassRankChange = (component: CharacterClassRanks) => {
+    window.setInterval(() => {
+        if (window.localStorage.hasOwnProperty('scheme') && component.state.dark_tables !== true) {
+            component.setState({
+                dark_tables: window.localStorage.scheme === 'dark'
+            })
+        } else if (!window.localStorage.hasOwnProperty('scheme') && component.state.dark_tables) {
+            component.setState({
+                dark_tables: false
+            });
+        }
+    }, 10);
+}
+
+export const watchForDarkModeClassSpecialtyChange = (component: CharacterClassSpecialtiesModal) => {
     window.setInterval(() => {
         if (window.localStorage.hasOwnProperty('scheme') && component.state.dark_tables !== true) {
             component.setState({

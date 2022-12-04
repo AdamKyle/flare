@@ -10,6 +10,9 @@ import CharacterClassRanksState
 import GameClassType from "../../../lib/game/character-sheet/types/class-ranks/game-class-type";
 import ClassRankType from "../../../lib/game/character-sheet/types/class-ranks/class-rank-type";
 import BuildingDetails from "../../../lib/game/kingdoms/building-details";
+import WeaponMastery from "../../../lib/game/character-sheet/types/class-ranks/weapon-mastery";
+import PrimaryButton from "../../../components/ui/buttons/primary-button";
+import CharacterClassSpecialtiesModal from "./modals/character-class-specialties-modal";
 
 export default class CharacterClassRanks extends React.Component<any, CharacterClassRanksState> {
 
@@ -21,6 +24,7 @@ export default class CharacterClassRanks extends React.Component<any, CharacterC
             dark_tables: false,
             loading: true,
             open_class_details: false,
+            show_class_specialties: false,
             class_name_selected: null,
         }
     }
@@ -40,6 +44,7 @@ export default class CharacterClassRanks extends React.Component<any, CharacterC
 
     manageViewClass(className: string|null) {
         const classNameSelected: ClassRankType = this.state.class_ranks.filter((rank) => rank.class_name === className)[0];
+
         this.setState({
             open_class_details: !this.state.open_class_details,
             class_name_selected: classNameSelected,
@@ -86,6 +91,36 @@ export default class CharacterClassRanks extends React.Component<any, CharacterC
         ];
     }
 
+    masteryTableColumns() {
+        return [
+            {
+                name: 'Mastery Name',
+                selector: (row: WeaponMastery) => row.mastery_name
+            },
+            {
+                name: 'Level',
+                selector: (row: WeaponMastery) => row.level,
+                sortable: true,
+                cell: (row: any) => <span>
+                    { formatNumber(row.level) + '/' + 100 }
+                </span>
+            },
+            {
+                name: 'XP',
+                selector: (row: WeaponMastery) => row.current_xp,
+                cell: (row: any) => <span>
+                    { formatNumber(row.current_xp) + '/' + formatNumber(row.required_xp) }
+                </span>
+            },
+        ];
+    }
+
+    manageClassSpecialties() {
+        this.setState({
+            show_class_specialties: !this.state.show_class_specialties
+        });
+    }
+
     render() {
         if (this.state.loading) {
             return (
@@ -96,11 +131,11 @@ export default class CharacterClassRanks extends React.Component<any, CharacterC
         }
 
         return (
-            <div className='max-h-[375px] overflow-y-auto lg:overflow-y-hidden lg:max-h-full'>
+            <div className='max-h-[375px] overflow-y-auto lg:max-h-[500px] lg:max-h-full'>
 
                 {
                     this.state.open_class_details && this.state.class_name_selected !== null ?
-                        <Fragment>
+                        <div>
                             <div className='text-right cursor-pointer text-red-500 position top-[-10px]'>
                                 <button onClick={() => this.manageViewClass(null)}><i className="fas fa-minus-circle"></i></button>
                             </div>
@@ -110,13 +145,8 @@ export default class CharacterClassRanks extends React.Component<any, CharacterC
                             </h2>
 
                             <p className='mb-4'>
-                                To learn more about this class, checkout <a href="/information/reincarnation" target="_blank">the class documentation <i className="fas fa-external-link-alt"></i></a> to
-                                learn more about this class including tips and tricks to maximize damage output and unlock the special attack.
-                            </p>
-
-                            <p className='mb-4'>
-                                Your stats will not change when you switch to this class. This is just a general break down of the class. Special clases are different,
-                                these will give you % boosts to your stats as a modifier while you have this class enabled.
+                                To learn more about this class, checkout <a href="/information/reincarnation" target="_blank">the class documentation <i className="fas fa-external-link-alt"></i></a> to learn
+                                more about special attacks and tips and tricks to play the class to the fullest advantage.
                             </p>
 
                             <p className='mb-4'>
@@ -127,43 +157,62 @@ export default class CharacterClassRanks extends React.Component<any, CharacterC
                             <div className='grid lg:grid-cols-2 gap-2 mb-4'>
                                 <div>
                                     <h3 className='my-3'>Base Information</h3>
+                                    <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                                     <dl>
                                         <dt>Base Damage Stat</dt>
                                         <dd>{this.state.class_name_selected.game_class.to_hit_stat}</dd>
-                                        <dt>Str Mod (pts.)</dt>
-                                        <dd>+{this.state.class_name_selected.game_class.str_mod}</dd>
-                                        <dt>Dex Mod (pts.)</dt>
-                                        <dd>+{this.state.class_name_selected.game_class.dex_mod}</dd>
-                                        <dt>Dur Mod (pts.)</dt>
-                                        <dd>+{this.state.class_name_selected.game_class.dur_mod}</dd>
-                                        <dt>Int Mod (pts.)</dt>
-                                        <dd>+{this.state.class_name_selected.game_class.int_mod}</dd>
-                                        <dt>Agi Mod (pts.)</dt>
-                                        <dd>+{this.state.class_name_selected.game_class.agi_mod}</dd>
-                                        <dt>Chr Mod (pts.)</dt>
-                                        <dd>+{this.state.class_name_selected.game_class.chr_mod}</dd>
-                                        <dt>Focus Mod (pts.)</dt>
-                                        <dd>+{this.state.class_name_selected.game_class.focus_mod}</dd>
-                                    </dl>
-                                </div>
-                                <div className='border-b-2 block lg:hidden border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                                <div>
-                                    <h3 className='my-3'>Skill Modifiers</h3>
-                                    <dl>
                                         <dt>Accuracy Mod</dt>
                                         <dd>+{(this.state.class_name_selected.game_class.accuracy_mod * 100).toFixed(2)}%</dd>
                                         <dt>Looting Mod</dt>
                                         <dd>+{(this.state.class_name_selected.game_class.accuracy_mod * 100).toFixed(2)}%</dd>
                                     </dl>
+                                    <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                                    <h3 className='my-3'>Class Specialties</h3>
+                                    <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                                    <p className='my-4 text-sm'>
+                                        Manage your class specialties below. You may only have three specialties equipped at any one time.
+                                        You can mix and match specialties from other classes. More specialties are unlocked as
+                                        you level the class.
+                                    </p>
+                                    <div className='my-4 text-center'>
+                                        <PrimaryButton button_label={'Manage Specialties'} on_click={this.manageClassSpecialties.bind(this)} />
+                                    </div>
+                                </div>
+                                <div className='border-b-2 block lg:hidden border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                                <div>
+                                    <h3 className='my-3'>Class Masteries</h3>
+                                    <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                                    <p className='my-4'>
+                                        The more levels you put in, by using a specific weapon type,
+                                        the more % bonus towards that weapon types damage.
+                                    </p>
+                                    <Table
+                                        data={this.state.class_name_selected.weapon_masteries}
+                                        columns={this.masteryTableColumns()}
+                                        dark_table={this.props.dark_tables}
+                                    />
                                 </div>
                             </div>
-                        </Fragment>
+                        </div>
                     :
                         <Table
                             data={this.state.class_ranks}
                             columns={this.tableColumns()}
                             dark_table={this.props.dark_tables}
                         />
+                }
+
+                {
+                    this.state.show_class_specialties ?
+                        <CharacterClassSpecialtiesModal
+                            is_open={this.state.show_class_specialties}
+                            manage_modal={this.manageClassSpecialties.bind(this)}
+                            title={'Class Specialties'}
+                            character={this.props.character}
+                            finished_loading={true}
+                            class_rank={this.state.class_name_selected}
+                        />
+                    : null
                 }
             </div>
         );

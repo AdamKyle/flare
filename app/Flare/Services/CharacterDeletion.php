@@ -123,7 +123,11 @@ class CharacterDeletion {
 
         $character->passiveSkills()->delete();
 
+        $character->classRanks->weaponMasteries()->delete();
+
         $character->classRanks()->delete();
+
+        $character->classSpecialsEquipped()->delete();
 
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 

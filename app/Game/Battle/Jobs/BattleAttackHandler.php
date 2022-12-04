@@ -42,6 +42,7 @@ class  BattleAttackHandler implements ShouldQueue {
     /**
      * @param BattleEventHandler $battleEventHandler
      * @return void
+     * @throws \Exception
      */
     public function handle(BattleEventHandler $battleEventHandler): void {
         $battleEventHandler->processMonsterDeath($this->characterId, $this->monsterId, $this->isAutomation);
