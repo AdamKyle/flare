@@ -2,11 +2,14 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Exports\ClassSpecials\ClassSpecialsExport;
+use App\Admin\Exports\Npcs\NpcsExport;
 use App\Admin\Requests\ItemsImport as ItemsImportRequest;
 use App\Flare\Models\GameClassSpecial;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\GameClass;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ClassSpecialsController extends Controller {
 
@@ -51,13 +54,11 @@ class ClassSpecialsController extends Controller {
     /**
      * @codeCoverageIgnore
      */
-    public function export(Request $request) {
+    public function export() {
+        $response = Excel::download(new ClassSpecialsExport(), 'class-specials.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+        ob_end_clean();
 
-
-//        $response = Excel::download(new ItemsExport($types[$request->type_to_export]), 'items.xlsx', \Maatwebsite\Excel\Excel::XLSX);
-//        ob_end_clean();
-//
-//        return $response;
+        return $response;
     }
 
     /**

@@ -56,10 +56,6 @@ class ClassSpecialsTable extends DataTableComponent {
             Column::make('Class Rank Level', 'requires_class_rank_level')->sortable()->format(function ($value) {
                 return number_format($value);
             }),
-
-            Column::make('Description', 'description')->sortable()->format(function ($value) {
-                return $value;
-            }),
         ];
     }
 }
