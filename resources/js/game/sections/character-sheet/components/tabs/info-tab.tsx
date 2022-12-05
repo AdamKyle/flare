@@ -131,6 +131,17 @@ export default class InfoTab extends React.Component<InfoTabProps, InfoTabState>
                 }
 
                 {
+                    this.state.open_reincarnation ?
+                        <CharacterReincarnationModal is_open={this.state.open_reincarnation}
+                                                     manage_modal={this.manageReincarnation.bind(this)}
+                                                     title={'Character Reincarnation Stats'}
+                                                     character={this.props.character}
+                                                     finished_loading={true}
+                        />
+                    : null
+                }
+
+                {
                     this.state.open_class_ranks ?
                         <CharacterClassRanksModal
                             is_open={this.state.open_class_ranks}

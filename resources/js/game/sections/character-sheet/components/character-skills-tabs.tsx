@@ -10,7 +10,6 @@ import ComponentLoading from "../../../components/ui/loading/component-loading";
 import CharacterSkillTabsState from "../../../lib/game/character-sheet/types/skills/character-skill-tabs-state";
 import {watchForDarkModeSkillsChange} from "../../../lib/game/dark-mode-watcher";
 import CharacterSkillTabsProps from "../../../lib/game/character-sheet/types/skills/character-skill-tabs-props";
-import SkillType from "../../../lib/game/character-sheet/types/skills/skill-type";
 
 export default class CharacterSkillsTabs extends React.Component<CharacterSkillTabsProps, CharacterSkillTabsState> {
 

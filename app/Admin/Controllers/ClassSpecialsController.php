@@ -3,8 +3,8 @@
 namespace App\Admin\Controllers;
 
 use App\Admin\Exports\ClassSpecials\ClassSpecialsExport;
-use App\Admin\Exports\Npcs\NpcsExport;
-use App\Admin\Requests\ItemsImport as ItemsImportRequest;
+use App\Admin\Import\ClassSpecials\ClassSpecialsImport;
+use App\Admin\Requests\ClassSpecialsImportRequest;
 use App\Flare\Models\GameClassSpecial;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\GameClass;
@@ -64,9 +64,9 @@ class ClassSpecialsController extends Controller {
     /**
      * @codeCoverageIgnore
      */
-    public function import(ItemsImportRequest $request) {
-//        Excel::import(new ItemsImport, $request->items_import);
-//
-//        return redirect()->back()->with('success', 'imported item data.');
+    public function import(ClassSpecialsImportRequest $request) {
+        Excel::import(new ClassSpecialsImport(), $request->class_specials_import);
+
+        return redirect()->back()->with('success', 'imported class specials.');
     }
 }
