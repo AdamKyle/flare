@@ -2,6 +2,7 @@
 
 namespace App\Game\ClassRanks\Services;
 
+use App\Flare\Builders\Character\Traits\FetchEquipped;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterClassRank;
 use App\Game\ClassRanks\Values\ClassRankValue;
@@ -10,6 +11,8 @@ use App\Game\Messages\Events\ServerMessageEvent;
 use Exception;
 
 class ClassRankService {
+
+    use FetchEquipped;
 
     /**
      * give xp to a class rank for the characters current class.
@@ -59,11 +62,14 @@ class ClassRankService {
             throw new Exception('No Class Rank Found for character: ' . $character->name . ' for id: ' . $character->ghame_class_id);
         }
 
+        $inventory = $this->fetchEquipped($character);
+
         foreach (WeaponMasteryValue::getTypes() as $type) {
-            $inventorySlot = $character->inventory->slots->where('item.type', $type)->first();
+
+            $inventorySlot = $inventory->where('item.type', WeaponMasteryValue::getTypeForNumericalValue($type))->first();
 
             if (!is_null($inventorySlot)) {
-                $weaponMastery = $classRank->weaponMasteries()->where('weapon_type', WeaponMasteryValue::getNumericValueForStringType($type))->first();
+                $weaponMastery = $classRank->weaponMasteries()->where('weapon_type', $type)->first();
 
                 if ($weaponMastery->level >= WeaponMasteryValue::MAX_LEVEL) {
                     continue;
@@ -82,7 +88,7 @@ class ClassRankService {
 
                     $weaponMastery = $weaponMastery->refresh();
 
-                    event(new ServerMessageEvent('Your class: ' .
+                    event(new ServerMessageEvent($character->user,'Your class: ' .
                         $classRank->gameClass->name . ' has gained a new level in: ' .
                         (new WeaponMasteryValue(WeaponMasteryValue::getNumericValueForStringType($type)))->getName() .
                         ' and is now level: ' . $weaponMastery->level

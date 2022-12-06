@@ -14,7 +14,7 @@ class WeaponMasteryValue {
     const HEALING_SPELL = 5;
 
     const XP_PER_LEVEL = 1000000;
-    const XP_PER_KILL  = 1000;
+    const XP_PER_KILL  = 10000;
     const MAX_LEVEL    = 100;
 
     protected static $values = [
@@ -83,6 +83,25 @@ class WeaponMasteryValue {
                 return self::DAMAGE_SPELL;
             case 'spell-healing':
                 return self::HEALING_SPELL;
+            default:
+                throw new Exception('Undefined type for: ' . $type);
+        }
+    }
+
+    public static function getTypeForNumericalValue(int $type): string {
+        switch ($type) {
+            case self::WEAPON:
+                return 'weapon';
+            case self::HAMMER:
+                return 'hammer';
+            case self::STAVE:
+                return 'stave';
+            case self::BOW:
+                return 'bow';
+            case self::DAMAGE_SPELL:
+                return 'spell-damage';
+            case self::HEALING_SPELL:
+                return 'spell-healing';
             default:
                 throw new Exception('Undefined type for: ' . $type);
         }
