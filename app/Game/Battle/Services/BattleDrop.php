@@ -324,13 +324,7 @@ class BattleDrop {
             $cost = SellItemCalculator::fetchSalePriceWithAffixes($item);
 
             if ($cost >= 1000000000) {
-                $slot = $character->refresh()->inventory->slots()->where('item_id', $item->id)->first();
-
-                if (is_null($slot)) {
-                    return;
-                }
-
-                event(new ServerMessageEvent($character->user, 'You found: ' . $item->affix_name . ' on the enemies corpse.', $slot->id));
+                $this->giveItemToPlayer($character, $item);
             } else {
                 $this->disenchantService->disenchantItemWithSkill($character->refresh());
             }
