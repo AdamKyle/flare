@@ -308,10 +308,10 @@ class BattleDrop {
      * Auto disenchants the item using the characters disenchanting skill.
      *
      * @param Character $character
-     * @param $item
+     * @param Item $item
      * @return void
      */
-    private function autoDisenchantItem(Character $character, $item): void {
+    private function autoDisenchantItem(Character $character, Item $item): void {
         $user = $character->user;
 
         if ($user->auto_disenchant_amount === 'all') {
@@ -324,9 +324,7 @@ class BattleDrop {
             $cost = SellItemCalculator::fetchSalePriceWithAffixes($item);
 
             if ($cost >= 1000000000) {
-                $slot = $character->refresh()->inventory->slots()->where('item_id', $item->id)->first();
-
-                event(new ServerMessageEvent($character->user, 'You found: ' . $item->affix_name . ' on the enemies corpse.', $slot->id));
+                $this->giveItemToPlayer($character, $item);
             } else {
                 $this->disenchantService->disenchantItemWithSkill($character->refresh());
             }
