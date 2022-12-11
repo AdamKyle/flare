@@ -46,6 +46,7 @@ class BuildCharacterAttackTypes {
                 'voided_attack_and_cast' => $characterAttack->buildAttackAndCast(true),
                 'defend'                 => $characterAttack->buildDefend(),
                 'voided_defend'          => $characterAttack->buildDefend(true),
+                'damage_stat_amount'     => $character->getInformation()->statMod($character->damage_stat),
             ],
         ]);
 

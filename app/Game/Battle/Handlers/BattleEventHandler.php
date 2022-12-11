@@ -92,6 +92,8 @@ class BattleEventHandler {
         $this->classRankService->giveXpToClassRank($character);
 
         $this->classRankService->giveXpToMasteries($character);
+
+        $this->classRankService->giveXpToEquippedClassSpecialties($character);
     }
 
     /**

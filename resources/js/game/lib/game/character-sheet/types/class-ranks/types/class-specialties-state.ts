@@ -1,4 +1,5 @@
 import ClassSpecialtiesType from "../class-specialties-type";
+import CharacterSpecialsEquippedTyp from "../character-specials-equipped-typ";
 
 export default interface ClassSpecialtiesState {
 
@@ -8,7 +9,15 @@ export default interface ClassSpecialtiesState {
 
     special_selected: ClassSpecialtiesType | null;
 
-    specialties_equipped: any[]|[];
+    equipped_special: CharacterSpecialsEquippedTyp | null;
+
+    specialties_equipped: CharacterSpecialsEquippedTyp[]|[];
 
     dark_tables: boolean;
+
+    equipping: boolean;
+
+    success_message: string | null;
+
+    error_message: string | null;
 }

@@ -226,6 +226,15 @@ class CharacterStatBuilder {
         $baseStat = $this->applyBoons($baseStat);
         $baseStat = $this->applyBoons($baseStat, $stat . '_mod');
 
+        if ($stat === $this->character->damage_stat) {
+            $classSpecialsBonus = $this->character->classSpecialsEquipped
+                                                  ->where('equipped', true)
+                                                  ->where('gameClassSpecial.base_damage_stat_increase', '>', 0)
+                                                  ->sum('gameClassSpecial.base_damage_stat_increase');
+
+            $baseStat = $baseStat + $baseStat * $classSpecialsBonus;
+        }
+
         if ($this->map->mapType()->isHell() || $this->map->mapType()->isPurgatory()) {
             $baseStat = $baseStat - $baseStat * $this->map->character_attack_reduction;
         }

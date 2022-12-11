@@ -3,7 +3,35 @@
 namespace App\Flare\Builders\CharacterInformation\AttributeBuilders;
 
 
+use App\Flare\Models\Character;
+use Illuminate\Support\Collection;
+
 class DamageBuilder extends BaseAttribute {
+
+    /**
+     * @var ClassRanksWeaponMasteriesBuilder $classRanksWeaponMasteriesBuilder
+     */
+    private ClassRanksWeaponMasteriesBuilder $classRanksWeaponMasteriesBuilder;
+
+    /**
+     * @param ClassRanksWeaponMasteriesBuilder $classRanksWeaponMasteriesBuilder
+     */
+    public function __construct(ClassRanksWeaponMasteriesBuilder $classRanksWeaponMasteriesBuilder) {
+        $this->classRanksWeaponMasteriesBuilder = $classRanksWeaponMasteriesBuilder;
+    }
+
+    /**
+     * @inheritDoc
+     * @param Character $character
+     * @param Collection $skills
+     * @param Collection|null $inventory
+     * @return void
+     */
+    public function initialize(Character $character, Collection $skills, ?Collection $inventory): void {
+        parent::initialize($character, $skills, $inventory);
+
+        $this->classRanksWeaponMasteriesBuilder->initialize($this->character, $this->skills, $this->inventory);
+    }
 
     /**
      * Build weapon damage.
@@ -31,9 +59,10 @@ class DamageBuilder extends BaseAttribute {
             return $totalDamage + $totalDamage * $skillPercentage;
         }
 
-        $affixPercentage = $this->getAttributeBonusFromAllItemAffixes('base_damage');
+        $affixPercentage         = $this->getAttributeBonusFromAllItemAffixes('base_damage');
+        $weaponMasteryPercentage = $this->classRanksWeaponMasteriesBuilder->determineBonusForWeapon($position);
 
-        return $totalDamage + $totalDamage * ($skillPercentage + $affixPercentage);
+        return $totalDamage + $totalDamage * ($skillPercentage + $affixPercentage + $weaponMasteryPercentage);
     }
 
     /**
@@ -79,7 +108,9 @@ class DamageBuilder extends BaseAttribute {
 
         $affixPercentage = $this->getAttributeBonusFromAllItemAffixes('base_damage');
 
-        return $totalDamage + $totalDamage * ($skillPercentage + $affixPercentage);
+        $spellMasteryPercentage = $this->classRanksWeaponMasteriesBuilder->determineBonusForSpellDamage($position);
+
+        return $totalDamage + $totalDamage * ($skillPercentage + $affixPercentage + $spellMasteryPercentage);
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace App\Flare\Providers;
 
+use App\Flare\Builders\CharacterInformation\AttributeBuilders\ClassRanksWeaponMasteriesBuilder;
 use Illuminate\Support\Facades\Blade;
 use League\Fractal\Manager;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
@@ -434,12 +435,16 @@ class ServiceProvider extends ApplicationServiceProvider
             return new DefenceBuilder();
         });
 
-        $this->app->bind(DamageBuilder::class, function() {
-            return new DamageBuilder();
+        $this->app->bind(ClassRanksWeaponMasteriesBuilder::class, function() {
+            return new ClassRanksWeaponMasteriesBuilder();
         });
 
-        $this->app->bind(HealingBuilder::class, function() {
-            return new HealingBuilder();
+        $this->app->bind(DamageBuilder::class, function($app) {
+            return new DamageBuilder($app->make(ClassRanksWeaponMasteriesBuilder::class));
+        });
+
+        $this->app->bind(HealingBuilder::class, function($app) {
+            return new HealingBuilder($app->make(ClassRanksWeaponMasteriesBuilder::class));
         });
 
         $this->app->bind(HolyBuilder::class, function() {

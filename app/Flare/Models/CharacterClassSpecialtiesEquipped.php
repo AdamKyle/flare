@@ -3,9 +3,7 @@
 namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Flare\Models\Traits\WithSearch;
-use Database\Factories\GameBuildingFactory;
+use Illuminate\Support\Facades\Cache;
 
 class CharacterClassSpecialtiesEquipped extends Model
 {
@@ -45,9 +43,19 @@ class CharacterClassSpecialtiesEquipped extends Model
     ];
 
     public function getSpecialtyDamageAttribute() {
+       $cache = Cache::get('character-attack-data-' . $this->character->id);
+
+       if (is_null($cache)) {
+           return 0;
+       }
+
+       if (!isset($cache['damage_stat_amount'])) {
+           return 0;
+       }
+
         $baseDamage          = $this->gameClassSpecial->specialty_damage;
         $addedDamage         = $this->gameClassSpecial->increase_specialty_damage_per_level * $this->level;
-        $characterDamageStat =  $this->character->getInformation()->statMod($this->character->damage_stat) * $this->gameClassSpecial->specialty_damage_uses_damage_stat_amount;
+        $characterDamageStat = $cache['damage_stat_amount'] * $this->gameClassSpecial->specialty_damage_uses_damage_stat_amount;
 
         return $baseDamage + $addedDamage + $characterDamageStat;
     }
@@ -64,7 +72,7 @@ class CharacterClassSpecialtiesEquipped extends Model
         return $this->gameClassSpecial->base_healing_mod * $this->level;
     }
 
-    public function getBaseSpellDamageMod() {
+    public function getBaseSpellDamageModAttribute() {
         return $this->gameClassSpecial->base_spell_damage_mod * $this->level;
     }
 
@@ -76,15 +84,15 @@ class CharacterClassSpecialtiesEquipped extends Model
         return $this->gameClassSpecial->base_damage_stat_increase * $this->level;
     }
 
-    public function getIncreasesSpecialtyDamagePerLevelAttribute() {
+    public function getIncreaseSpecialtyDamagePerLevelAttribute() {
         return $this->gameClassSpecial->increase_specialty_damage_per_level * $this->level;
     }
 
     public function gameClassSpecial() {
-        return $this->hasOne(GameClassSpecial::class, 'game_class_special_id', 'id');
+        return $this->belongsTo(GameClassSpecial::class, 'game_class_special_id', 'id');
     }
 
     public function character() {
-        return $this->hasOne(Character::class, 'character_id', 'id');
+        return $this->belongsTo(Character::class);
     }
 }

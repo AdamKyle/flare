@@ -3,9 +3,10 @@
 namespace App\Game\ClassRanks\Services;
 
 use App\Flare\Builders\Character\Traits\FetchEquipped;
+use App\Flare\Handlers\UpdateCharacterAttackTypes;
 use App\Flare\Models\Character;
-use App\Flare\Models\CharacterClassRank;
 use App\Game\ClassRanks\Values\ClassRankValue;
+use App\Game\ClassRanks\Values\ClassSpecialValue;
 use App\Game\ClassRanks\Values\WeaponMasteryValue;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Exception;
@@ -13,6 +14,12 @@ use Exception;
 class ClassRankService {
 
     use FetchEquipped;
+
+    private UpdateCharacterAttackTypes $updateCharacterAttackTypes;
+
+    public function __construct(UpdateCharacterAttackTypes $updateCharacterAttackTypes) {
+        $this->updateCharacterAttackTypes = $updateCharacterAttackTypes;
+    }
 
     /**
      * give xp to a class rank for the characters current class.
@@ -46,6 +53,45 @@ class ClassRankService {
 
              event(new ServerMessageEvent('You gained a new class rank in: ' . $character->class->name));
         }
+    }
+
+    /**
+     * Give XP to equipped specials.
+     *
+     * @param Character $character
+     * @return void
+     * @throws Exception
+     */
+    public function giveXpToEquippedClassSpecialties(Character $character): void {
+        $equippedSpecials = $character->classSpecialsEquipped()->where('equipped', true)->get();
+
+        if ($equippedSpecials->isEmpty()) {
+            return;
+        }
+
+        foreach ($equippedSpecials as $special) {
+            if ($special->level >= ClassSpecialValue::MAX_LEVEL) {
+                return;
+            }
+
+            $special->update([
+                'current_xp' => $special->current_xp + ClassSpecialValue::XP_PER_KILL,
+            ]);
+
+            $special = $special->refresh();
+
+            if ($special->current_xp >= $special->required_xp) {
+                $special->update([
+                    'level'      => $special->level + 1,
+                    'current_xp' => 0,
+                ]);
+
+                event(new ServerMessageEvent('Your class special:  ' . $special->gameClassSpecial->name . ' has gamed a new level is now level: ' . $special->level));
+
+                $this->updateCharacterAttackTypes->updateCache($character->refresh());
+            }
+        }
+
     }
 
     /**
@@ -83,22 +129,19 @@ class ClassRankService {
 
                 if ($weaponMastery->current_xp >= $weaponMastery->required_xp) {
                     $weaponMastery->update([
-                        'level' => $weaponMastery->level + 1
+                        'level'      => $weaponMastery->level + 1,
+                        'current_xp' => 0,
                     ]);
 
                     $weaponMastery = $weaponMastery->refresh();
 
                     event(new ServerMessageEvent($character->user,'Your class: ' .
-                        $classRank->gameClass->name . ' has gained a new level in: ' .
-                        (new WeaponMasteryValue(WeaponMasteryValue::getNumericValueForStringType($type)))->getName() .
+                        $classRank->gameClass->name . ' has gained a new level in (Weapon Masteries): ' .
+                        (new WeaponMasteryValue($type))->getName() .
                         ' and is now level: ' . $weaponMastery->level
                     ));
                 }
             }
         }
-    }
-
-    public function fetchClassSpecialitiesForCharacter(Character $character, CharacterClassRank $characterClassRank) {
-
     }
 }

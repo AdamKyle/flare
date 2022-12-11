@@ -44,9 +44,4 @@ class GameClassSpecial extends Model
         'health_mod'                                => 'float',
         'base_damage_stat_increase'                 => 'float',
     ];
-
-    public function gameClass() {
-        return $this->hasOne(GameClass::class, 'id', 'game_class_id');
-    }
-
 }
