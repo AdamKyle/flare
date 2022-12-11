@@ -31,7 +31,6 @@ class QuestsSheet implements ToCollection {
         $npc = Npc::find($quest['npc_id']);
 
         if (is_null($npc)) {
-            dd($quest);
             return [];
         }
 
