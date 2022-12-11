@@ -14,7 +14,7 @@
 
     <div class="pb-5">
         <x-core.page-title
-            title="{{$monster->name}}"
+            title="{{$monster->name}} in {{$monster->gameMap->name}}"
             route="{{$backUrl}}"
             color="success" link="Back"
         >

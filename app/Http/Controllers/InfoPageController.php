@@ -78,10 +78,18 @@ class InfoPageController extends Controller
             default        => '',
         };
 
+        $walkOnWater = match ($map->name) {
+            'Labyrinth', 'Surface' => ItemEffectsValue::WALK_ON_WATER,
+            'Dungeons'     => ItemEffectsValue::WALK_ON_DEATH_WATER,
+            'Hell'         => ItemEffectsValue::WALK_ON_MAGMA,
+            default        => '',
+        };
+
         return view('information.maps.map', [
-            'map'        => $map,
-            'itemNeeded' => Item::where('effect', $effects)->first(),
-            'mapUrl'     => Storage::disk('maps')->url($map->path),
+            'map'         => $map,
+            'itemNeeded'  => Item::where('effect', $effects)->first(),
+            'walkOnWater' => Item::where('effect', $walkOnWater)->first(),
+            'mapUrl'      => Storage::disk('maps')->url($map->path),
         ]);
     }
 

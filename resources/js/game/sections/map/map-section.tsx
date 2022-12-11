@@ -249,7 +249,10 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                             X/Y: {this.state.character_position.x} / {this.state.character_position.y}
                         </div>
                         <div>
-                            Plane: {this.state.map_name}
+                            Plane: <a href={"/information/map/" + this.state.map_id}
+                                      target="_blank">
+                                        {this.state.map_name} <i className="fas fa-external-link-alt"></i>
+                                    </a>
                         </div>
                     </div>
                     <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
