@@ -142,7 +142,8 @@ class QuestHandlerService {
         if (!$this->mapTileValue->canWalk($character, $npc->x_position, $npc->y_position)) {
             $character->map->update(['game_map_id' => $oldMapDetails->game_map_id]);
 
-            return $this->errorResult('You can traverse to the NPC, but not move to their location as you are missing a required item.');
+            return $this->errorResult("You can traverse to the NPC, but not move to their location as you are
+            missing a required item. Click the map name under the NPC name above, to see what items you need to travel to this NPC.");
         }
 
         $character->map()->update([

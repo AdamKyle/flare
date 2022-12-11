@@ -104,6 +104,22 @@
                         </li>
                     </ul>
                 @endif
+
+                @if (!is_null($walkOnWater))
+                    <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
+                    <h3 class="my-4">Item required to walk on Water/DeathWater/Magma</h3>
+                    <p class="mt-3 mb-2">
+                        Some planes require you to have a special item to walk on that planes water. This is one such plane.
+                        Below you can click the button to learn more about where to get the item you need.
+                    </p>
+                    <ul class="my-4">
+                        <li>
+                            <x-core.buttons.link-buttons.primary-button href="{{route('info.page.item', ['item' => $walkOnWater->id])}}">
+                                {{$walkOnWater->name}}
+                            </x-core.buttons.link-buttons.primary-button>
+                        </li>
+                    </ul>
+                @endif
             </div>
         </div>
     </x-core.cards.card-with-title>

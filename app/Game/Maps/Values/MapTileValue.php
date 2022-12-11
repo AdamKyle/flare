@@ -71,6 +71,7 @@ class MapTileValue {
     }
 
     public function canWalk(Character $character, int $x, int $y) {
+
         if (!$this->canWalkOnWater($character, $x, $y)) {
             return false;
         }

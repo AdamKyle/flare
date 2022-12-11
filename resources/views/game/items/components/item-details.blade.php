@@ -113,7 +113,7 @@
 
         <x-core.cards.card css="mt-4 mb-4">
             <div class="grid md:grid-cols-3 gap-3">
-                <div>$skills
+                <div>
                     <strong>Devouring Chance</strong>
                     <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                     <dl>

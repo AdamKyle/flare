@@ -9,6 +9,7 @@ use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Values\MapPositionValue;
 use App\Game\Maps\Values\MapTileValue;
+use App\Game\Messages\Events\ServerMessageEvent;
 
 class WalkingService extends BaseMovementService
 {
@@ -47,6 +48,13 @@ class WalkingService extends BaseMovementService
 
         if (!$this->validateCoordinates()) {
             return $this->errorResult('Invalid coordinates');
+        }
+
+        if (!$this->mapTileValue->canWalk($character, $this->x, $this->y)) {
+            event(new ServerMessageEvent($character-> user, "You are missing a specific quest item for that.
+            Click the map name under the map to see what item you need."));
+
+            return $this->errorResult("Missing item to do that.");
         }
 
         $location = $this->getLocationForCoordinates($character);

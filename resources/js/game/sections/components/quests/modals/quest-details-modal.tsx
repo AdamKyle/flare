@@ -300,7 +300,11 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                                                 <dt>Coordinates (X/Y)</dt>
                                                 <dd>{this.state.quest_details.npc.x_position} / {this.state.quest_details.npc.y_position}</dd>
                                                 <dt>On Plane</dt>
-                                                <dd>{this.state.quest_details.npc.game_map.name}</dd>
+                                                <dd>
+                                                    <a href={'/information/map/' + this.state.quest_details.npc.game_map.id} target='_blank'>
+                                                        {this.state.quest_details.npc.game_map.name} <i className="fas fa-external-link-alt"></i>
+                                                    </a>
+                                                </dd>
                                                 <dt>Must be at same location?</dt>
                                                 <dd>{this.state.quest_details.npc.must_be_at_same_location ? 'Yes' : 'No'}</dd>
                                             </dl>

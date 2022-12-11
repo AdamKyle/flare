@@ -149,7 +149,7 @@ class BaseMovementService {
 
     /**
      * Update the players kingdom at specified location.
-     * 
+     *
      * @param Character $character
      * @return void
      */
@@ -321,22 +321,21 @@ class BaseMovementService {
      */
     protected function generateCannotWalkServerMessage(Character $character): void {
         $gameMap = $character->map->gameMap;
-        $baseMessage = 'You are missing a required item to do that. Item you are missing is: ';
 
         if ($gameMap->mapType()->isSurface() || $gameMap->mapType()->isLabyrinth()) {
-            $this->createServerMessageForCannotWalk($character->user, ItemEffectsValue::WALK_ON_WATER, $baseMessage);
+            $this->createServerMessageForCannotWalk($character->user);
 
             return;
         }
 
         if ($gameMap->mapType()->isDungeons()) {
-            $this->createServerMessageForCannotWalk($character->user, ItemEffectsValue::WALK_ON_DEATH_WATER, $baseMessage);
+            $this->createServerMessageForCannotWalk($character->user);
 
             return;
         }
 
         if ($gameMap->mapType()->isHell()) {
-            $this->createServerMessageForCannotWalk($character->user, ItemEffectsValue::WALK_ON_MAGMA, $baseMessage);
+            $this->createServerMessageForCannotWalk($character->user);
 
             return;
         }
@@ -350,15 +349,9 @@ class BaseMovementService {
      * Generate a server message when missing the required quest item.
      *
      * @param User $user
-     * @param int $itemType
-     * @param string $baseMessage
      * @return void
      */
-    private function createServerMessageForCannotWalk(User $user, int $itemType, string $baseMessage): void {
-        $itemNeeded = Item::where('effect', $itemType)->first();
-
-        $baseMessage .= $itemNeeded->name;
-
-        event(new ServerMessageEvent($user, $baseMessage, $itemNeeded->id, true));
+    private function createServerMessageForCannotWalk(User $user): void {
+        event(new ServerMessageEvent($user, 'You are missing a specific quest item for that. Click the map name under the map to see what item you need.'));
     }
 }
