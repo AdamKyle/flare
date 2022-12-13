@@ -7,43 +7,31 @@ use App\Flare\Models\Character;
 use App\Flare\Models\CharacterClassRank;
 use App\Flare\Models\CharacterClassSpecialtiesEquipped;
 use App\Flare\Models\GameClassSpecial;
+use App\Game\ClassRanks\Services\ClassRankService;
 use App\Game\ClassRanks\Values\ClassSpecialValue;
 use App\Game\ClassRanks\Values\WeaponMasteryValue;
 use App\Http\Controllers\Controller;
 
 class ClassRanksController extends Controller {
 
+    private ClassRankService $classRankService;
+
     private UpdateCharacterAttackTypes $updateCharacterAttackTypes;
 
-    public function __construct(UpdateCharacterAttackTypes $updateCharacterAttackTypes) {
+
+    public function __construct(ClassRankService $classRankService, UpdateCharacterAttackTypes $updateCharacterAttackTypes) {
+        $this->classRankService           = $classRankService;
         $this->updateCharacterAttackTypes = $updateCharacterAttackTypes;
     }
 
     public function getCharacterClassRanks(Character $character) {
 
-        $classRanks = $character->classRanks()->with(['gameClass', 'weaponMasteries'])->get();
+        $response = $this->classRankService->getClassRanks($character);
+        $status   = $response['status'];
 
-        $classRanks  = $classRanks->transform(function($classRank) use($character) {
+        unset($response['status']);
 
-            $classRank->class_name = $classRank->gameClass->name;
-
-            $classRank->is_active  = $classRank->gameClass->id === $character->game_class_id;
-
-            $classRank->is_locked  = false;
-
-            $classRank->weapon_masteries = $classRank->weaponMasteries->transform(function($weaponMastery) {
-
-                $weaponMastery->mastery_name = (new WeaponMasteryValue($weaponMastery->weapon_type))->getName();
-
-                return $weaponMastery;
-            });
-
-            return $classRank;
-        })->sortByDesc(function($item) {
-            return $item->is_active;
-        })->all();
-
-        return response()->json(['class_ranks' => array_values($classRanks)]);
+        return response()->json($response, $status);
     }
 
     public function getCharacterClassSpecialties(Character $character, CharacterClassRank $characterClassRank) {
@@ -56,67 +44,22 @@ class ClassRanksController extends Controller {
     }
 
     public function equipSpecial(Character $character, GameClassSpecial $gameClassSpecial) {
-        if ($character->classSpecialsEquipped->where('equipped', true)->count() >= 3) {
-            return response()->json([
-                'message' => 'You have the maximum amount of specials (3) equipped. You cannot equip anymore.'
-            ], 422);
-        }
+        $response = $this->classRankService->equipSpecialty($character, $gameClassSpecial);
 
-        if ($gameClassSpecial->specialty_damage > 0) {
-            if ($character->classSpecialsEquipped->where('gameClassSpecial.specialty_damage', '>', 0)->count() > 0) {
-                return response()->json([
-                    'message' => 'You already have a damage specialty equipped and cannot equip another one.'
-                ], 422);
-            }
-        }
+        $status = $response['status'];
 
-        $classSpecial = $character->classSpecialsEquipped->where('game_class_special_id', $gameClassSpecial->id)
-                                                         ->where('character_id', $character->id)
-                                                         ->where('equipped', false)
-                                                         ->first();
+        unset($response['status']);
 
-        if (!is_null($classSpecial)) {
-            $classSpecial->update([
-                'equipped' => true,
-            ]);
-        } else {
-            $character->classSpecialsEquipped()->create([
-                'character_id'           => $character->id,
-                'game_class_special_id'  => $gameClassSpecial->id,
-                'level'                  => 1,
-                'current_xp'             => 0,
-                'required_xp'            => ClassSpecialValue::XP_PER_LEVEL,
-                'equipped'               => true,
-            ]);
-        }
-
-        $character = $character->refresh();
-
-        $this->updateCharacterAttackTypes->updateCache($character);
-
-        return response()->json([
-            'specials_equipped' => $character->classSpecialsEquipped->where('equipped', true)->toArray(),
-            'message'           => 'Equipped class special: ' . $gameClassSpecial->name
-        ]);
+        return response()->json($response, $status);
     }
 
     public function unequipSpecial(Character $character, CharacterClassSpecialtiesEquipped $classSpecialEquipped) {
-        $specialEquipped = $character->classSpecialsEquipped()->where('id', $classSpecialEquipped->id)->first();
+        $response = $this->classRankService->unequipSpecial($character, $classSpecialEquipped);
 
-        if (is_null($specialEquipped)) {
-            return response()->json(['message' => 'You do not own that.'], 422);
-        }
+        $status = $response['status'];
 
-        $specialEquipped->update(['equipped' => false]);
+        unset($response['status']);
 
-        $character = $character->refresh();
-
-        $this->updateCharacterAttackTypes->updateCache($character);
-
-        return response()->json([
-            'specials_equipped' => $character->classSpecialsEquipped->where('equipped', true)->toArray(),
-            'message'           => 'Unequipped class special: ' . $classSpecialEquipped->gameClassSpecial->name
-        ]);
+        return response()->json($response, $status);
     }
-
 }

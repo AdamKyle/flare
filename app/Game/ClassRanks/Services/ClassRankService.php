@@ -5,20 +5,133 @@ namespace App\Game\ClassRanks\Services;
 use App\Flare\Builders\Character\Traits\FetchEquipped;
 use App\Flare\Handlers\UpdateCharacterAttackTypes;
 use App\Flare\Models\Character;
+use App\Flare\Models\CharacterClassSpecialtiesEquipped;
+use App\Flare\Models\GameClassSpecial;
 use App\Game\ClassRanks\Values\ClassRankValue;
 use App\Game\ClassRanks\Values\ClassSpecialValue;
 use App\Game\ClassRanks\Values\WeaponMasteryValue;
+use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Exception;
 
 class ClassRankService {
 
-    use FetchEquipped;
+    use FetchEquipped, ResponseBuilder;
 
     private UpdateCharacterAttackTypes $updateCharacterAttackTypes;
 
     public function __construct(UpdateCharacterAttackTypes $updateCharacterAttackTypes) {
         $this->updateCharacterAttackTypes = $updateCharacterAttackTypes;
+    }
+
+    /**
+     * Get class ranks.
+     *
+     * @param Character $character
+     * @return array
+     */
+    public function getClassRanks(Character $character): array {
+        $classRanks = $character->classRanks()->with(['gameClass', 'weaponMasteries'])->get();
+
+        $classRanks  = $classRanks->transform(function($classRank) use($character) {
+
+            $classRank->class_name = $classRank->gameClass->name;
+
+            $classRank->is_active  = $classRank->gameClass->id === $character->game_class_id;
+
+            $classRank->is_locked  = false;
+
+            $classRank->weapon_masteries = $classRank->weaponMasteries->transform(function($weaponMastery) {
+
+                $weaponMastery->mastery_name = (new WeaponMasteryValue($weaponMastery->weapon_type))->getName();
+
+                return $weaponMastery;
+            });
+
+            return $classRank;
+        })->sortByDesc(function($item) {
+            return $item->is_active;
+        })->all();
+
+        return $this->successResult([
+            'class_ranks' => array_values($classRanks)
+        ]);
+    }
+
+    /**
+     * Equip a class specialty
+     *
+     * @param Character $character
+     * @param GameClassSpecial $gameClassSpecial
+     * @return array
+     * @throws Exception
+     */
+    public function equipSpecialty(Character $character, GameClassSpecial $gameClassSpecial): array {
+        if ($character->classSpecialsEquipped->where('equipped', true)->count() >= 3) {
+            return $this->errorResult('You have the maximum amount of specials (3) equipped. You cannot equip anymore.');
+        }
+
+        if ($gameClassSpecial->specialty_damage > 0) {
+            if ($character->classSpecialsEquipped->where('gameClassSpecial.specialty_damage', '>', 0)->count() > 0) {
+                return $this->errorResult('You already have a damage specialty equipped and cannot equip another one.');
+            }
+        }
+
+        $classSpecial = $character->classSpecialsEquipped->where('game_class_special_id', $gameClassSpecial->id)
+            ->where('character_id', $character->id)
+            ->where('equipped', false)
+            ->first();
+
+        if (!is_null($classSpecial)) {
+            $classSpecial->update([
+                'equipped' => true,
+            ]);
+        } else {
+            $character->classSpecialsEquipped()->create([
+                'character_id'           => $character->id,
+                'game_class_special_id'  => $gameClassSpecial->id,
+                'level'                  => 1,
+                'current_xp'             => 0,
+                'required_xp'            => ClassSpecialValue::XP_PER_LEVEL,
+                'equipped'               => true,
+            ]);
+        }
+
+        $character = $character->refresh();
+
+        $this->updateCharacterAttackTypes->updateCache($character);
+
+        return $this->successResult([
+            'specials_equipped' => $character->classSpecialsEquipped->where('equipped', true)->toArray(),
+            'message'           => 'Equipped class special: ' . $gameClassSpecial->name
+        ]);
+    }
+
+    /**
+     * Unequip the specialty.
+     *
+     * @param Character $character
+     * @param CharacterClassSpecialtiesEquipped $classSpecialEquipped
+     * @return array
+     * @throws Exception
+     */
+    public function unequipSpecial(Character $character, CharacterClassSpecialtiesEquipped $classSpecialEquipped) {
+        $specialEquipped = $character->classSpecialsEquipped()->where('id', $classSpecialEquipped->id)->first();
+
+        if (is_null($specialEquipped)) {
+            return $this->errorResult('You do not own that.');
+        }
+
+        $specialEquipped->update(['equipped' => false]);
+
+        $character = $character->refresh();
+
+        $this->updateCharacterAttackTypes->updateCache($character);
+
+        return $this->successResult([
+            'specials_equipped' => $character->classSpecialsEquipped->where('equipped', true)->toArray(),
+            'message'           => 'Unequipped class special: ' . $classSpecialEquipped->gameClassSpecial->name
+        ]);
     }
 
     /**

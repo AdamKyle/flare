@@ -229,8 +229,8 @@ class CharacterStatBuilder {
         if ($stat === $this->character->damage_stat) {
             $classSpecialsBonus = $this->character->classSpecialsEquipped
                                                   ->where('equipped', true)
-                                                  ->where('gameClassSpecial.base_damage_stat_increase', '>', 0)
-                                                  ->sum('gameClassSpecial.base_damage_stat_increase');
+                                                  ->where('base_damage_stat_increase', '>', 0)
+                                                  ->sum('base_damage_stat_increase');
 
             $baseStat = $baseStat + $baseStat * $classSpecialsBonus;
         }
