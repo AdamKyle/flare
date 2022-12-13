@@ -135,6 +135,8 @@ class ClassRankService {
 
                     $weaponMastery = $weaponMastery->refresh();
 
+                    $this->updateCharacterAttackTypes->updateCache($character->refresh());
+
                     event(new ServerMessageEvent($character->user,'Your class: ' .
                         $classRank->gameClass->name . ' has gained a new level in (Weapon Masteries): ' .
                         (new WeaponMasteryValue($type))->getName() .

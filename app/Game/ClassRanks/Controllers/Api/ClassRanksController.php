@@ -5,6 +5,7 @@ namespace App\Game\ClassRanks\Controllers\Api;
 use App\Flare\Handlers\UpdateCharacterAttackTypes;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterClassRank;
+use App\Flare\Models\CharacterClassSpecialtiesEquipped;
 use App\Flare\Models\GameClassSpecial;
 use App\Game\ClassRanks\Values\ClassSpecialValue;
 use App\Game\ClassRanks\Values\WeaponMasteryValue;
@@ -50,7 +51,7 @@ class ClassRanksController extends Controller {
 
         return response()->json([
             'class_specialties' => GameClassSpecial::where('game_class_id', $characterClassRank->game_class_id)->get(),
-            'specials_equipped' => $classSpecialsEquipped,
+            'specials_equipped' => array_values($classSpecialsEquipped->toArray()),
         ]);
     }
 
@@ -69,7 +70,7 @@ class ClassRanksController extends Controller {
             }
         }
 
-        $classSpecial = $character->classSpecialsEquipped->where('game_class_special_id', $gameClassSpecial)
+        $classSpecial = $character->classSpecialsEquipped->where('game_class_special_id', $gameClassSpecial->id)
                                                          ->where('character_id', $character->id)
                                                          ->where('equipped', false)
                                                          ->first();
@@ -96,6 +97,25 @@ class ClassRanksController extends Controller {
         return response()->json([
             'specials_equipped' => $character->classSpecialsEquipped->where('equipped', true)->toArray(),
             'message'           => 'Equipped class special: ' . $gameClassSpecial->name
+        ]);
+    }
+
+    public function unequipSpecial(Character $character, CharacterClassSpecialtiesEquipped $classSpecialEquipped) {
+        $specialEquipped = $character->classSpecialsEquipped()->where('id', $classSpecialEquipped->id)->first();
+
+        if (is_null($specialEquipped)) {
+            return response()->json(['message' => 'You do not own that.'], 422);
+        }
+
+        $specialEquipped->update(['equipped' => false]);
+
+        $character = $character->refresh();
+
+        $this->updateCharacterAttackTypes->updateCache($character);
+
+        return response()->json([
+            'specials_equipped' => $character->classSpecialsEquipped->where('equipped', true)->toArray(),
+            'message'           => 'Unequipped class special: ' . $classSpecialEquipped->gameClassSpecial->name
         ]);
     }
 

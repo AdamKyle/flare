@@ -19,6 +19,8 @@ import Table from "../../../../components/ui/data-tables/table";
 import LoadingProgressBar from "../../../../components/ui/progress-bars/loading-progress-bar";
 import CharacterSpecialsEquippedTyp
     from "../../../../lib/game/character-sheet/types/class-ranks/character-specials-equipped-typ";
+import SuccessAlert from "../../../../components/ui/alerts/simple-alerts/success-alert";
+import DangerAlert from "../../../../components/ui/alerts/simple-alerts/danger-alert";
 
 export default class CharacterClassSpecialtiesModal extends React.Component<ClassSpecialtiesEquippedProps, ClassSpecialtiesState> {
 
@@ -68,6 +70,35 @@ export default class CharacterClassSpecialtiesModal extends React.Component<Clas
                     })
     }
 
+    unequipSpecial(specialId: number) {
+        this.setState({
+            equipping: true,
+            success_message: null,
+            error_message: null,
+        }, () => {
+            if (this.props.character === null) {
+                return;
+            }
+
+            (new Ajax()).setRoute('unequip-specialty/'+this.props.character.id+'/' + specialId)
+                .doAjaxCall('post', (response: AxiosResponse) => {
+                    this.setState({
+                        equipping: false,
+                        specialties_equipped: response.data.specials_equipped,
+                        success_message: response.data.message
+                    })
+                }, (error: AxiosError) => {
+                    this.setState({equipping: false});
+
+                    if (typeof error.response !== 'undefined') {
+                        this.setState({
+                            error_message: error.response.data.message,
+                        });
+                    }
+                });
+        });
+    }
+
     equipSpecial(specialId: number) {
         this.setState({
             equipping: true,
@@ -83,14 +114,14 @@ export default class CharacterClassSpecialtiesModal extends React.Component<Clas
                     this.setState({
                         equipping: false,
                         specialties_equipped: response.data.specials_equipped,
-                        success_message: response.data.success_message
+                        success_message: response.data.message
                     })
                 }, (error: AxiosError) => {
                     this.setState({equipping: false});
 
                     if (typeof error.response !== 'undefined') {
                         this.setState({
-                            error_message: error.response.data.error_message,
+                            error_message: error.response.data.message,
                         });
                     }
                 });
@@ -154,6 +185,15 @@ export default class CharacterClassSpecialtiesModal extends React.Component<Clas
                 selector: (row: CharacterSpecialsEquippedTyp) => row.id,
                 cell: (row: CharacterSpecialsEquippedTyp) => <Fragment>
                     {formatNumber(row.current_xp)}/{formatNumber(row.required_xp)}
+                </Fragment>
+            },
+            {
+                name: 'Actions',
+                selector: (row: CharacterSpecialsEquippedTyp) => row.id,
+                cell: (row: CharacterSpecialsEquippedTyp) => <Fragment>
+                    <PrimaryButton button_label={'Unequip'}
+                                   on_click={() => this.unequipSpecial(row.id)}
+                    />
                 </Fragment>
             },
         ];
@@ -307,6 +347,21 @@ export default class CharacterClassSpecialtiesModal extends React.Component<Clas
                     this.state.equipping ?
                         <LoadingProgressBar />
                     : null
+                }
+                {
+                    this.state.success_message !== null ?
+                        <SuccessAlert>
+                            {this.state.success_message}
+                        </SuccessAlert>
+                    : null
+                }
+
+                {
+                    this.state.error_message !== null ?
+                        <DangerAlert>
+                            {this.state.error_message}
+                        </DangerAlert>
+                        : null
                 }
                 <Tabs tabs={this.tabs}>
                     <TabPanel key={'class-specialties'}>
