@@ -1,5 +1,6 @@
 import Damage from "../damage";
 import BattleBase from "../../../battle-base";
+import {random} from "lodash";
 
 export default class CanHitCheck extends BattleBase {
 
@@ -96,6 +97,7 @@ export default class CanHitCheck extends BattleBase {
   }
 
   toHitCalculation(toHit, agi, accuracy, dodge) {
+
     if (accuracy >= 1) {
       return true;
     }

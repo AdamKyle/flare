@@ -249,7 +249,14 @@ class CharacterStatBuilder {
      * @return float
      */
     public function buildHealth(bool $voided = false): float {
-        return $this->statMod('dur', $voided);
+        $classSpecialsBonus = $this->character->classSpecialsEquipped
+                                              ->where('equipped', true)
+                                              ->where('health_mod', '>', 0)
+                                              ->sum('health_mod');
+
+        $health = $this->statMod('dur', $voided);
+
+        return ($health + ($health * $classSpecialsBonus));
     }
 
     /**
@@ -268,7 +275,12 @@ class CharacterStatBuilder {
         $defence   = $this->defenceBuilder->buildDefence($voided);
         $holyBonus = $this->holyInfo()->fetchDefenceBonus();
 
-        return $defence + $defence * $holyBonus;
+        $classSpecialsBonus = $this->character->classSpecialsEquipped
+                                              ->where('equipped', true)
+                                              ->where('base_ac_mod', '>', 0)
+                                              ->sum('base_ac_mod');
+
+        return $defence + ($defence * ($holyBonus + $classSpecialsBonus));
     }
 
     /**
@@ -334,7 +346,12 @@ class CharacterStatBuilder {
                 $damage = 0;
         }
 
-        return ceil($damage + $damage * $this->holyInfo()->fetchAttackBonus());
+        $classSpecialsBonus = $this->character->classSpecialsEquipped
+                                              ->where('equipped', true)
+                                              ->where('base_damage_mod', '>', 0)
+                                              ->sum('base_damage_mod');
+
+        return ceil($damage + ($damage * ($this->holyInfo()->fetchAttackBonus() + $classSpecialsBonus)));
     }
 
     /**
@@ -371,7 +388,12 @@ class CharacterStatBuilder {
 
         $damage = $this->damageBuilder->buildWeaponDamage($stat, $voided, $weaponPosition);
 
-        return ceil($damage + $damage * $this->holyInfo()->fetchAttackBonus());
+        $classSpecialsBonus = $this->character->classSpecialsEquipped
+                                              ->where('equipped', true)
+                                              ->where('base_damage_mod', '>', 0)
+                                              ->sum('base_damage_mod');
+
+        return ceil($damage + ($damage * ($this->holyInfo()->fetchAttackBonus() + $classSpecialsBonus)));
     }
 
     /**
@@ -397,7 +419,12 @@ class CharacterStatBuilder {
 
         $damage = $this->damageBuilder->buildSpellDamage($stat, $voided, $spellPosition);
 
-        return ceil($damage + $damage * $this->holyInfo()->fetchAttackBonus());
+        $classSpecialsBonus = $this->character->classSpecialsEquipped
+                                              ->where('equipped', true)
+                                              ->where('base_damage_mod', '>', 0)
+                                              ->sum('base_damage_mod');
+
+        return ceil($damage + ($damage * ($this->holyInfo()->fetchAttackBonus() + $classSpecialsBonus)));
     }
 
     /**
@@ -425,7 +452,12 @@ class CharacterStatBuilder {
 
         $healing = $this->healingBuilder->buildHealing($stat, $voided, $spellPosition);
 
-        return ceil($healing + $healing * $this->holyInfo()->fetchHealingBonus());
+        $classSpecialsBonus = $this->character->classSpecialsEquipped
+                                              ->where('equipped', true)
+                                              ->where('base_healing_mod', '>', 0)
+                                              ->sum('base_healing_mod');
+
+        return ceil($healing + ($healing * ($this->holyInfo()->fetchHealingBonus() + $classSpecialsBonus)));
     }
 
     /**
@@ -451,7 +483,12 @@ class CharacterStatBuilder {
 
         $healing = $this->healingBuilder->buildHealing($stat, $voided);
 
-        return ceil($healing + $healing * $this->holyInfo()->fetchHealingBonus());
+        $classSpecialsBonus = $this->character->classSpecialsEquipped
+                                              ->where('equipped', true)
+                                              ->where('base_healing_mod', '>', 0)
+                                              ->sum('base_healing_mod');
+
+        return ceil($healing + ($healing * ($this->holyInfo()->fetchHealingBonus() + $classSpecialsBonus)));
     }
 
     /**

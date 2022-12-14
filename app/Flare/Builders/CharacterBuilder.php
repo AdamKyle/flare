@@ -2,6 +2,7 @@
 
 namespace App\Flare\Builders;
 
+use App\Flare\Models\CharacterClassRank;
 use App\Flare\Models\PassiveSkill;
 use App\Flare\Models\User;
 use App\Flare\Models\GameMap;
@@ -14,6 +15,7 @@ use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Values\BaseStatValue;
 use App\Flare\Values\BaseSkillValue;
 use App\Game\ClassRanks\Values\ClassRankValue;
+use App\Game\ClassRanks\Values\WeaponMasteryValue;
 use App\Game\Core\Values\FactionLevel;
 use Exception;
 
@@ -252,13 +254,15 @@ class CharacterBuilder {
         $gameClasses = GameClass::all();
 
         foreach ($gameClasses as $gameClass) {
-            $this->character->classRanks()->create([
+            $classRank = $this->character->classRanks()->create([
                 'character_id'   => $this->character->id,
                 'game_class_id'  => $gameClass->id,
                 'current_xp'     => 0,
                 'required_xp'    => ClassRankValue::XP_PER_LEVEL,
                 'level'          => 0,
             ]);
+
+            $this->assignWeaponMasteriesToClassRanks($classRank);
         }
 
         $this->character = $this->character->refresh();
@@ -283,5 +287,68 @@ class CharacterBuilder {
      */
     public function character(): Character {
         return $this->character;
+    }
+
+    /**
+     * Assigns weapon masteries to class ranks.
+     *
+     * @param CharacterClassRank $classRank
+     * @return void
+     * @throws Exception
+     */
+    protected function assignWeaponMasteriesToClassRanks(CharacterClassRank $classRank): void {
+        foreach (WeaponMasteryValue::getTypes() as $type) {
+            $classRank->weaponMasteries()->create([
+                'character_class_rank_id'   => $classRank->id,
+                'weapon_type'               => $type,
+                'current_xp'                => 0,
+                'required_xp'               => WeaponMasteryValue::XP_PER_LEVEL,
+                'level'                     => $this->getDefaultLevel($classRank, $type),
+            ]);
+        }
+    }
+
+    /**
+     * Get default level for weapon mastery.
+     *
+     * @param CharacterClassRank $classRank
+     * @param int $type
+     * @return int
+     * @throws Exception
+     */
+    protected function getDefaultLevel(CharacterClassRank $classRank, int $type) {
+        if (($classRank->gameClass->type()->isFighter() || $classRank->gameClass->type()->isThief() || $classRank->gameClass->type()->isVampire())&& (new WeaponMasteryValue($type))->isWeapon()) {
+            return 5;
+        }
+
+        if (($classRank->gameClass->type()->isHeretic() || $classRank->gameClass->type()->isArcaneAlchemist()) && (new WeaponMasteryValue($type))->isStaff()) {
+            return 5;
+        }
+
+        if (($classRank->gameClass->type()->isHeretic() || $classRank->gameClass->type()->isArcaneAlchemist()) && (new WeaponMasteryValue($type))->isDamageSpell()) {
+            return 5;
+        }
+
+        if (($classRank->gameClass->type()->isProphet()) && (new WeaponMasteryValue($type))->isHealingSpell()) {
+            return 5;
+        }
+
+        if (($classRank->gameClass->type()->isRanger()) && (new WeaponMasteryValue($type))->isHealingSpell()) {
+            return 2;
+        }
+
+        if (($classRank->gameClass->type()->isRanger()) && (new WeaponMasteryValue($type))->isBow()) {
+            return 5;
+        }
+
+        if (($classRank->gameClass->type()->isThief()) && (new WeaponMasteryValue($type))->isBow()) {
+            return 2;
+        }
+
+        if (($classRank->gameClass->type()->isBlackSmith()) && (new WeaponMasteryValue($type))->isHammer()) {
+            return 5;
+        }
+
+        return 0;
     }
 }

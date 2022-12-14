@@ -2,6 +2,7 @@
 
 namespace Tests\Setup\Character;
 
+use App\Game\ClassRanks\Values\WeaponMasteryValue;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cache;
 use App\Flare\Models\GameBuilding;
@@ -92,6 +93,8 @@ class CharacterFactory {
 
         $this->assignPassiveSkills();
 
+        $this->createClassRanks();
+
         $character = $this->character->refresh();
 
         Cache::put('character-attack-data-' . $character->id, (new AttackDataCacheSetUp())->getCacheObject());
@@ -117,6 +120,30 @@ class CharacterFactory {
             'unlocks_at_level'         => 1,
             'parent_skill_id'          => $this->character->passiveSkills()->first()->passiveSkill->id,
         ]);
+
+        return $this;
+    }
+
+    public function createClassRanks(): CharacterFactory {
+        $classRank = $this->character->classRanks()->create([
+            'character_id'  => $this->character->id,
+            'game_class_id' => $this->character->game_class_id,
+            'current_xp'    => 0,
+            'required_xp'   => 100,
+            'level'         => 0,
+        ]);
+
+        foreach (WeaponMasteryValue::getTypes() as $type) {
+            $classRank->weaponMasteries()->create([
+                'character_class_rank_id'   => $classRank->id,
+                'weapon_type'               => $type,
+                'current_xp'                => 0,
+                'required_xp'               => WeaponMasteryValue::XP_PER_LEVEL,
+                'level'                     => 0,
+            ]);
+        }
+
+        $this->character = $this->character->refresh();
 
         return $this;
     }
