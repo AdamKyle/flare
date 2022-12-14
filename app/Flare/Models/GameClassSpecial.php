@@ -2,13 +2,14 @@
 
 namespace App\Flare\Models;
 
+use Database\Factories\GameClassSpecialtiesFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Flare\Models\Traits\WithSearch;
-use Database\Factories\GameBuildingFactory;
 
 class GameClassSpecial extends Model
 {
+
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -44,4 +45,8 @@ class GameClassSpecial extends Model
         'health_mod'                                => 'float',
         'base_damage_stat_increase'                 => 'float',
     ];
+
+    protected static function newFactory() {
+        return GameClassSpecialtiesFactory::new();
+    }
 }

@@ -72,9 +72,15 @@ class ClassRankService {
         }
 
         if ($gameClassSpecial->specialty_damage > 0) {
-            if ($character->classSpecialsEquipped->where('gameClassSpecial.specialty_damage', '>', 0)->count() > 0) {
+            if ($character->classSpecialsEquipped->where('gameClassSpecial.specialty_damage', '>', 0)->where('equipped', true)->count() > 0) {
                 return $this->errorResult('You already have a damage specialty equipped and cannot equip another one.');
             }
+        }
+
+        $classRank = $character->classRanks->where('game_class_id', $character->game_class_id)->first();
+
+        if ($classRank->level < $gameClassSpecial->requires_class_rank_level) {
+            return $this->errorResult('You do not have the required class rank level for this.');
         }
 
         $classSpecial = $character->classSpecialsEquipped->where('game_class_special_id', $gameClassSpecial->id)
@@ -144,10 +150,6 @@ class ClassRankService {
     public function giveXpToClassRank(Character $character): void {
         $classRank = $character->classRanks()->where('game_class_id', $character->game_class_id)->first();
 
-        if (is_null($classRank)) {
-            throw new Exception('No Class Rank Found for character: ' . $character->name . ' for id: ' . $character->ghame_class_id);
-        }
-
         if ($classRank->level >= ClassRankValue::MAX_LEVEL) {
             return;
         }
@@ -216,10 +218,6 @@ class ClassRankService {
      */
     public function giveXpToMasteries(Character $character) {
         $classRank = $character->classRanks()->where('game_class_id', $character->game_class_id)->first();
-
-        if (is_null($classRank)) {
-            throw new Exception('No Class Rank Found for character: ' . $character->name . ' for id: ' . $character->ghame_class_id);
-        }
 
         $inventory = $this->fetchEquipped($character);
 
