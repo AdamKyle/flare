@@ -3,7 +3,7 @@
 @section('content')
     <x-core.layout.info-container>
         <x-core.cards.card-with-title
-            title="{{!is_null($classSpecial) ? 'Edit: ' . nl2br($classSpecial->name) : 'Create New Race'}}"
+            title="{{!is_null($classSpecial) ? 'Edit: ' . nl2br($classSpecial->name) : 'Create New Class Special'}}"
             buttons="true"
             backUrl="{{!is_null($classSpecial) ? route('class-specials.show', ['gameClassSpecial' => $classSpecial->id]) : route('class-specials.list')}}"
         >

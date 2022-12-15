@@ -205,7 +205,7 @@ export default class CharacterClassSpecialtiesModal extends React.Component<Clas
             return true;
         }
 
-        return requiredLevel !== this.props.class_rank.level;
+        return this.props.class_rank.level < requiredLevel;
     }
 
     manageViewSpecialty(specialty: ClassSpecialtiesType | null) {
@@ -335,7 +335,7 @@ export default class CharacterClassSpecialtiesModal extends React.Component<Clas
             return 0;
         }
 
-        return (value * 100).toFixed(0);
+        return (value * 100).toFixed(2);
     }
 
     renderSpecialties() {
