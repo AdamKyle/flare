@@ -206,17 +206,25 @@ export default class FightSection extends React.Component<FightSectionProps, Fig
 
     render() {
         return (
-            <div className={clsx({'ml-[-125px]': !this.props.is_small})}>
+            <div className={clsx({'ml-[-100px]': !this.props.is_small})}>
                 <div className={clsx('mt-4 mb-4 text-xs text-center', {
-                    'hidden': this.attackButtonDisabled()
+                    'hidden': this.attackButtonDisabled(),
+                    'ml-[50px]': !this.props.is_small
                 })}>
-                    <AttackButton additional_css={'btn-attack'} icon_class={'ra ra-sword'} on_click={() => this.attack('attack')} disabled={this.attackButtonDisabled()}/>
-                    <AttackButton additional_css={'btn-cast'} icon_class={'ra ra-burning-book'} on_click={() => this.attack('cast')} disabled={this.attackButtonDisabled()}/>
-                    <AttackButton additional_css={'btn-cast-attack'} icon_class={'ra ra-lightning-sword'} on_click={() => this.attack('cast_and_attack')} disabled={this.attackButtonDisabled()}/>
-                    <AttackButton additional_css={'btn-attack-cast'} icon_class={'ra ra-lightning-sword'} on_click={() => this.attack('attack_and_cast')} disabled={this.attackButtonDisabled()}/>
-                    <AttackButton additional_css={'btn-defend'} icon_class={'ra ra-round-shield'} on_click={() => this.attack('defend')} disabled={this.attackButtonDisabled()}/>
+                    <AttackButton is_small={this.props.is_small} type={'Atk'} additional_css={'btn-attack'} icon_class={'ra ra-sword'} on_click={() => this.attack('attack')} disabled={this.attackButtonDisabled()}/>
+                    <AttackButton is_small={this.props.is_small} type={'Cast'} additional_css={'btn-cast'} icon_class={'ra ra-burning-book'} on_click={() => this.attack('cast')} disabled={this.attackButtonDisabled()}/>
+                    <AttackButton is_small={this.props.is_small} type={'Cast & Atk'} additional_css={'btn-cast-attack'} icon_class={'ra ra-lightning-sword'} on_click={() => this.attack('cast_and_attack')} disabled={this.attackButtonDisabled()}/>
+                    <AttackButton is_small={this.props.is_small} type={'Atk & Cast'} additional_css={'btn-attack-cast'} icon_class={'ra ra-lightning-sword'} on_click={() => this.attack('attack_and_cast')} disabled={this.attackButtonDisabled()}/>
+                    <AttackButton is_small={this.props.is_small} type={'Defend'} additional_css={'btn-defend'} icon_class={'ra ra-round-shield'} on_click={() => this.attack('defend')} disabled={this.attackButtonDisabled()}/>
                     <a href='/information/combat' target='_blank' className='ml-2'>Help <i
                         className="fas fa-external-link-alt"></i></a>
+                </div>
+                <div className={clsx('mt-1 text-xs text-center ml-[-50px] lg:ml-0', { 'hidden': this.attackButtonDisabled() })}>
+                    <span className={'w-10 mr-4 ml-4'}>Atk</span>
+                    <span className={'w-10 ml-6'}>Cast</span>
+                    <span className={'w-10 ml-4'}>Cast & Atk</span>
+                    <span className={'w-10 ml-2'}>Atk & Cast</span>
+                    <span className={'w-10 ml-2'}>Defend</span>
                 </div>
                 {
                     this.attackButtonDisabled() ?

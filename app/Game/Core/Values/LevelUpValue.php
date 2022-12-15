@@ -39,6 +39,11 @@ class LevelUpValue {
      * @return int
      */
     protected function addValue(Character $character, string $currenStat): int {
+
+        if ($character->{$currenStat} >= 999999) {
+            return $character->{$currenStat};
+        }
+
         if ($character->damage_stat === $currenStat) {
             return $character->{$currenStat} += 2;
         }
