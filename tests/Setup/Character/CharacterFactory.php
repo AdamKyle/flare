@@ -138,7 +138,7 @@ class CharacterFactory {
                 'character_class_rank_id'   => $classRank->id,
                 'weapon_type'               => $type,
                 'current_xp'                => 0,
-                'required_xp'               => WeaponMasteryValue::XP_PER_LEVEL,
+                'required_xp'               => 100,
                 'level'                     => 0,
             ]);
         }

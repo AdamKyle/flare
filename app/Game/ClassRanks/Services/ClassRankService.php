@@ -166,7 +166,7 @@ class ClassRankService {
                  'current_xp' => 0,
              ]);
 
-             event(new ServerMessageEvent('You gained a new class rank in: ' . $character->class->name));
+             event(new ServerMessageEvent($character->user,'You gained a new class rank in: ' . $character->class->name));
         }
     }
 
@@ -179,10 +179,6 @@ class ClassRankService {
      */
     public function giveXpToEquippedClassSpecialties(Character $character): void {
         $equippedSpecials = $character->classSpecialsEquipped()->where('equipped', true)->get();
-
-        if ($equippedSpecials->isEmpty()) {
-            return;
-        }
 
         foreach ($equippedSpecials as $special) {
             if ($special->level >= ClassSpecialValue::MAX_LEVEL) {
@@ -201,7 +197,7 @@ class ClassRankService {
                     'current_xp' => 0,
                 ]);
 
-                event(new ServerMessageEvent('Your class special:  ' . $special->gameClassSpecial->name . ' has gamed a new level is now level: ' . $special->level));
+                event(new ServerMessageEvent($character->user,'Your class special:  ' . $special->gameClassSpecial->name . ' has gamed a new level is now level: ' . $special->level));
 
                 $this->updateCharacterAttackTypes->updateCache($character->refresh());
             }

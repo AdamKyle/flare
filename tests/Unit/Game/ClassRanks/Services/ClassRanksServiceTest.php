@@ -1,8 +1,11 @@
 <?php
 
-namespace Tests\Unit\Game\Gambler\Services;
+namespace Tests\Unit\Game\ClassRanks\Services;
 
 use App\Game\ClassRanks\Services\ClassRankService;
+use App\Game\ClassRanks\Values\ClassRankValue;
+use App\Game\ClassRanks\Values\ClassSpecialValue;
+use App\Game\ClassRanks\Values\WeaponMasteryValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -235,7 +238,7 @@ class ClassRanksServiceTest extends TestCase {
             'level'                   => 0,
             'current_xp'              => 0,
             'required_xp'             => 100,
-            'equipped'                => false,
+            'equipped'                => true,
         ]);
 
         $character = $character->refresh();
@@ -245,5 +248,152 @@ class ClassRanksServiceTest extends TestCase {
         $this->assertEquals(200, $response['status']);
         $this->assertEquals('Unequipped class special: ' . $classSpecialEquipped->gameClassSpecial->name, $response['message']);
         $this->assertEmpty($response['specials_equipped']);
+    }
+
+    public function testNoXpForMaxLevel() {
+        $character = $this->character->getCharacter();
+
+        $character->classRanks()->update(['level' => ClassRankValue::MAX_LEVEL]);
+
+        $character = $character->refresh();
+
+        $this->classRankService->giveXpToClassRank($character);
+
+        $character = $character->refresh();
+
+        foreach ($character->classRanks as $rank) {
+            $this->assertEquals(0, $rank->current_xp);
+        }
+    }
+
+    public function testGainLevelInClassRank() {
+        $character = $this->character->getCharacter();
+
+        $currentlevel = $character->classRanks->first()->level;
+
+        $this->classRankService->giveXpToClassRank($character);
+
+        $character = $character->refresh();
+
+        $newLevel = $character->classRanks->first()->level;
+
+        $this->assertNotEquals($currentlevel, $newLevel);
+    }
+
+    public function testDoNotLevelUpSpecialtyWhenAtMax() {
+        $character    = $this->character->getCharacter();
+
+        $classSpecial = $this->createGameClassSpecial([
+            'game_class_id'                            => $character->game_class_id,
+            'specialty_damage'                         => 50000,
+            'increase_specialty_damage_per_level'      => 50,
+            'specialty_damage_uses_damage_stat_amount' => 0.10,
+        ]);
+
+        $classSpecialEquipped = $character->classSpecialsEquipped()->create([
+            'character_id'            => $character->id,
+            'game_class_special_id'   => $classSpecial->id,
+            'level'                   => ClassSpecialValue::MAX_LEVEL,
+            'current_xp'              => 0,
+            'required_xp'             => 100,
+            'equipped'                => true,
+        ]);
+
+        $currentLevel = $classSpecialEquipped->level;
+
+        $character = $character->refresh();
+
+        $this->classRankService->giveXpToEquippedClassSpecialties($character);
+
+        $character = $character->refresh();
+
+        $newlevel = $character->classSpecialsEquipped->first()->level;
+
+        $this->assertEquals($currentLevel, $newlevel);
+    }
+
+    public function testLevelUpSpecialty() {
+        $character    = $this->character->getCharacter();
+
+        $classSpecial = $this->createGameClassSpecial([
+            'game_class_id'                            => $character->game_class_id,
+            'specialty_damage'                         => 50000,
+            'increase_specialty_damage_per_level'      => 50,
+            'specialty_damage_uses_damage_stat_amount' => 0.10,
+        ]);
+
+        $classSpecialEquipped = $character->classSpecialsEquipped()->create([
+            'character_id'            => $character->id,
+            'game_class_special_id'   => $classSpecial->id,
+            'level'                   => 0,
+            'current_xp'              => 0,
+            'required_xp'             => 100,
+            'equipped'                => true,
+        ]);
+
+        $currentLevel = $classSpecialEquipped->level;
+
+        $character = $character->refresh();
+
+        $this->classRankService->giveXpToEquippedClassSpecialties($character);
+
+        $character = $character->refresh();
+
+        $newlevel = $character->classSpecialsEquipped->first()->level;
+
+        $this->assertNotequals($currentLevel, $newlevel);
+    }
+
+    public function testDoNotLevelWeaponSpeacitlyWhenAtMaxLevel() {
+        $character = $this->character->equipStartingEquipment()->getCharacter();
+
+        foreach ($character->classRanks as $rank) {
+            foreach ($rank->weaponMasteries as $mastery) {
+                $mastery->update([
+                    'level' => WeaponMasteryValue::MAX_LEVEL
+                ]);
+            }
+        }
+
+        $character = $character->refresh();
+
+        $this->classRankService->giveXpToMasteries($character);
+
+        $character = $character->refresh();
+
+        foreach ($character->classRanks as $rank) {
+            foreach ($rank->weaponMasteries as $mastery) {
+                $this->assertEquals(WeaponMasteryValue::MAX_LEVEL, $mastery->level);
+            }
+        }
+    }
+
+    public function testLevelWeaponSpeacitly() {
+        $character = $this->character->equipStartingEquipment()->getCharacter();
+
+        foreach ($character->classRanks as $rank) {
+            foreach ($rank->weaponMasteries as $mastery) {
+                $mastery->update([
+                    'level' => 0
+                ]);
+            }
+        }
+
+        $character = $character->refresh();
+
+        $this->classRankService->giveXpToMasteries($character);
+
+        $character = $character->refresh();
+
+        foreach ($character->classRanks as $rank) {
+            foreach ($rank->weaponMasteries as $mastery) {
+
+                if ((new WeaponMasteryValue($mastery->weapon_type))->isWeapon()) {
+                    $this->assertEquals(1, $mastery->level);
+                } else {
+                    $this->assertEquals(0, $mastery->level);
+                }
+            }
+        }
     }
 }
