@@ -6,6 +6,7 @@ use App\Admin\Exports\ClassSpecials\ClassSpecialsExport;
 use App\Admin\Import\ClassSpecials\ClassSpecialsImport;
 use App\Admin\Requests\ClassSpecialsImportRequest;
 use App\Flare\Models\GameClassSpecial;
+use App\Flare\Values\AttackTypeValue;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\GameClass;
 use Illuminate\Http\Request;
@@ -25,8 +26,16 @@ class ClassSpecialsController extends Controller {
 
     public function create() {
         return view('admin.class-specials.manage', [
-            'classSpecial' => null,
-            'gameClasses'  => GameClass::pluck('name', 'id')->toArray(),
+            'classSpecial'  => null,
+            'gameClasses'   => GameClass::pluck('name', 'id')->toArray(),
+            'forAttackType' => [
+                AttackTypeValue::ATTACK          => AttackTypeValue::ATTACK,
+                AttackTypeValue::CAST            => AttackTypeValue::CAST,
+                AttackTypeValue::ATTACK_AND_CAST => AttackTypeValue::ATTACK_AND_CAST,
+                AttackTypeValue::CAST_AND_ATTACK => AttackTypeValue::CAST_AND_ATTACK,
+                AttackTypeValue::DEFEND          => AttackTypeValue::DEFEND,
+                'any'                            => 'any'
+            ]
         ]);
     }
 
@@ -40,6 +49,14 @@ class ClassSpecialsController extends Controller {
         return view('admin.class-specials.manage', [
             'classSpecial' => $gameClassSpecial,
             'gameClasses'  => GameClass::pluck('name', 'id')->toArray(),
+            'forAttackType' => [
+                AttackTypeValue::ATTACK          => AttackTypeValue::ATTACK,
+                AttackTypeValue::CAST            => AttackTypeValue::CAST,
+                AttackTypeValue::ATTACK_AND_CAST => AttackTypeValue::ATTACK_AND_CAST,
+                AttackTypeValue::CAST_AND_ATTACK => AttackTypeValue::CAST_AND_ATTACK,
+                AttackTypeValue::DEFEND          => AttackTypeValue::DEFEND,
+                'any'                            => 'any'
+            ]
         ]);
     }
 

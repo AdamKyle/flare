@@ -27,4 +27,6 @@ export default interface ClassSpecialtiesType {
     specialty_damage: number | null;
 
     specialty_damage_uses_damage_stat_amount: number | null;
+
+    attack_type_required: string;
 }

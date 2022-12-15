@@ -38,6 +38,8 @@
                         </p>
                         <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                         <dl>
+                            <dt>Required Attack Type</dt>
+                            <dd>{{ucwords(str_replace('_', ' ', $classSpecial->attack_type_required))}}</dd>
                             <dt>Damage Amount:</dt>
                             <dd>{{!is_null($classSpecial->specialty_damage) ? $classSpecial->specialty_damage : 0}}</dd>
                             <dt>Damage Increase per Level:</dt>

@@ -26,7 +26,7 @@
                         <x-core.forms.input :model="$classSpecial" label="Damage (optional):" modelKey="specialty_damage" name="specialty_damage" />
                         <x-core.forms.input :model="$classSpecial" label="Damage Increase per Level (optional):" modelKey="increase_specialty_damage_per_level" name="increase_specialty_damage_per_level" />
                         <x-core.forms.input :model="$classSpecial" label="Damage Stat % towards Damage (optional):" modelKey="specialty_damage_uses_damage_stat_amount" name="specialty_damage_uses_damage_stat_amount" />
-
+                        <x-core.forms.key-value-select :model="$classSpecial" label="Attack Type Required:" modelKey="attack_type_required" name="attack_type_required" :options="$forAttackType"/>
                         <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                         <h3 class="mb-3">Modifiers</h3>
                         <x-core.forms.input :model="$classSpecial" label="Base Damage Mod % (optional):" modelKey="base_damage_mod" name="base_damage_mod" />

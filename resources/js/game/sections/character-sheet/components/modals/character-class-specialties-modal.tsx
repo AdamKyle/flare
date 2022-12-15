@@ -21,6 +21,7 @@ import CharacterSpecialsEquippedTyp
     from "../../../../lib/game/character-sheet/types/class-ranks/character-specials-equipped-typ";
 import SuccessAlert from "../../../../components/ui/alerts/simple-alerts/success-alert";
 import DangerAlert from "../../../../components/ui/alerts/simple-alerts/danger-alert";
+import {startCase} from "lodash";
 
 export default class CharacterClassSpecialtiesModal extends React.Component<ClassSpecialtiesEquippedProps, ClassSpecialtiesState> {
 
@@ -239,6 +240,8 @@ export default class CharacterClassSpecialtiesModal extends React.Component<Clas
                             <h3>Damage Information</h3>
                             <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                             <dl>
+                                <dt>Required Attack Type:</dt>
+                                <dd>{startCase(this.state.special_selected.attack_type_required)}</dd>
                                 <dt>Damage Amount:</dt>
                                 <dd>{formatNumber(this.state.special_selected.specialty_damage)}</dd>
                                 <dt>Damage Increase per level:</dt>
@@ -292,6 +295,8 @@ export default class CharacterClassSpecialtiesModal extends React.Component<Clas
                             <h3>Damage Information</h3>
                             <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                             <dl>
+                                <dt>Required Attack Type:</dt>
+                                <dd>{startCase(this.state.equipped_special.game_class_special.attack_type_required)}</dd>
                                 <dt>Damage Amount:</dt>
                                 <dd>{formatNumber(this.state.equipped_special.specialty_damage)}</dd>
                                 <dt>Damage Increase per level:</dt>

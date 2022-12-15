@@ -32,6 +32,7 @@ class Skill extends Model
         'xp_max',
         'xp_towards',
         'skill_type',
+        'is_hidden',
     ];
 
     /**
@@ -47,6 +48,7 @@ class Skill extends Model
         'xp_max'                => 'integer',
         'skill_type'            => 'integer',
         'xp_towards'            => 'float',
+        'is_hidden'             => 'boolean',
     ];
 
     protected $appends = [

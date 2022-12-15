@@ -15,6 +15,7 @@
         <th>base_spell_damage_mod</th>
         <th>health_mod</th>
         <th>base_damage_stat_increase</th>
+        <th>attack_type_required</th>
     </tr>
     </thead>
     <tbody>
@@ -34,6 +35,7 @@
             <td>{{$classSpecial->base_spell_damage_mod}}</td>
             <td>{{$classSpecial->health_mod}}</td>
             <td>{{$classSpecial->base_damage_stat_increase}}</td>
+            <td>{{$classSpecial->attack_type_required}}</td>
         </tr>
     @endforeach
     </tbody>

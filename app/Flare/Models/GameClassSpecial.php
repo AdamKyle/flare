@@ -30,6 +30,7 @@ class GameClassSpecial extends Model
         'base_spell_damage_mod',
         'health_mod',
         'base_damage_stat_increase',
+        'attack_type_required',
     ];
 
     protected $casts = [
@@ -45,6 +46,10 @@ class GameClassSpecial extends Model
         'health_mod'                                => 'float',
         'base_damage_stat_increase'                 => 'float',
     ];
+
+    public function gameClass() {
+        return $this->belongsTo(GameClass::class);
+    }
 
     protected static function newFactory() {
         return GameClassSpecialtiesFactory::new();

@@ -14,4 +14,11 @@ export default interface CharacterClassRanksState {
     class_name_selected: ClassRankType|null;
 
     show_class_specialties: boolean;
+
+    switching_class: boolean;
+
+    success_message: string | null;
+
+    error_message: string | null;
+
 }

@@ -7,12 +7,12 @@ import {AxiosError, AxiosResponse} from "axios";
 import ComponentLoading from "../../../components/ui/loading/component-loading";
 import CharacterClassRanksState
     from "../../../lib/game/character-sheet/types/class-ranks/types/character-class-ranks-state";
-import GameClassType from "../../../lib/game/character-sheet/types/class-ranks/game-class-type";
 import ClassRankType from "../../../lib/game/character-sheet/types/class-ranks/class-rank-type";
-import BuildingDetails from "../../../lib/game/kingdoms/building-details";
 import WeaponMastery from "../../../lib/game/character-sheet/types/class-ranks/weapon-mastery";
 import PrimaryButton from "../../../components/ui/buttons/primary-button";
 import CharacterClassSpecialtiesModal from "./modals/character-class-specialties-modal";
+import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
+import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
 
 export default class CharacterClassRanks extends React.Component<any, CharacterClassRanksState> {
 
@@ -26,6 +26,9 @@ export default class CharacterClassRanks extends React.Component<any, CharacterC
             open_class_details: false,
             show_class_specialties: false,
             class_name_selected: null,
+            switching_class: false,
+            success_message: null,
+            error_message: null,
         }
     }
 
@@ -48,6 +51,33 @@ export default class CharacterClassRanks extends React.Component<any, CharacterC
         this.setState({
             open_class_details: !this.state.open_class_details,
             class_name_selected: classNameSelected,
+        })
+    }
+
+    switchClass(classId: number) {
+        this.setState({
+            switching_class: true,
+            success_message: null,
+            error_message: null
+        }, () => {
+            (new Ajax()).setRoute('switch-classes/'+this.props.character.id+'/' + classId).doAjaxCall('post', (response: AxiosResponse) => {
+                this.setState({
+                    switching_class: false,
+                    success_message: response.data.message
+                })
+            }, (error: AxiosError) => {
+                this.setState({switching_class: false});
+
+                if (typeof error.response !== 'undefined') {
+                    const response = error.response;
+
+                    this.setState({
+                        error_message: 'Something went wrong switching classes.'
+                    });
+                }
+
+                console.error(error);
+            })
         })
     }
 
@@ -86,6 +116,13 @@ export default class CharacterClassRanks extends React.Component<any, CharacterC
                 selector: (row: { is_locked: boolean; }) => row.is_locked,
                 cell: (row: any) => <span>
                     { row.is_locked ? 'Yes' : 'No' }
+                </span>
+            },
+            {
+                name: 'Action',
+                selector: (row: ClassRankType) => row.id,
+                cell: (row: ClassRankType) => <span>
+                    <PrimaryButton button_label={'Switch To'}  on_click={() => this.switchClass(row.game_class_id)} disabled={row.is_active} />
                 </span>
             }
         ];
@@ -195,11 +232,32 @@ export default class CharacterClassRanks extends React.Component<any, CharacterC
                             </div>
                         </div>
                     :
-                        <Table
-                            data={this.state.class_ranks}
-                            columns={this.tableColumns()}
-                            dark_table={this.props.dark_tables}
-                        />
+                        <Fragment>
+                            {
+                                this.state.switching_class ?
+                                    <LoadingProgressBar />
+                                : null
+                            }
+                            {
+                                this.state.error_message ?
+                                    <DangerAlert additional_css={'my-4'}>
+                                        {this.state.error_message}
+                                    </DangerAlert>
+                                : null
+                            }
+                            {
+                                this.state.success_message ?
+                                    <DangerAlert additional_css={'my-4'}>
+                                        {this.state.error_message}
+                                    </DangerAlert>
+                                    : null
+                            }
+                            <Table
+                                data={this.state.class_ranks}
+                                columns={this.tableColumns()}
+                                dark_table={this.props.dark_tables}
+                            />
+                        </Fragment>
                 }
 
                 {

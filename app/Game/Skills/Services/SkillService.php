@@ -32,7 +32,7 @@ class SkillService {
      * @return array
      */
     public function getSkills(Character $character, array $gameSkillIds): array {
-        $skills = $character->skills()->whereIn('game_skill_id', $gameSkillIds)->get();
+        $skills = $character->skills()->whereIn('game_skill_id', $gameSkillIds)->where('is_hidden', false)->get();
 
         $skills = new Collection($skills, $this->skillsTransformer);
 
@@ -52,7 +52,7 @@ class SkillService {
     public function trainSkill(Character $character, int $skillId, float $xpPercentage): array {
         // Find the skill we want to train.
         $skill = $character->skills->filter(function ($skill) use($skillId) {
-            return $skill->id === $skillId;
+            return $skill->id === $skillId && !$skill->is_hidden;
         })->first();
 
         if (is_null($skill)) {

@@ -11,7 +11,7 @@ Route::middleware([
 
 
     Route::middleware(['is.character.dead', 'is.character.exploring'])->group(function() {
-        Route::post('/switch-classes/{character}', ['uses' => 'Api\ManageClassController@switchClass']);
+        Route::post('/switch-classes/{character}/{gameClass}', ['uses' => 'Api\ManageClassController@switchClass']);
 
         Route::post('/equip-specialty/{character}/{gameClassSpecial}', ['uses' => 'Api\ClassRanksController@equipSpecial']);
         Route::post('/unequip-specialty/{character}/{classSpecialEquipped}', ['uses' => 'Api\ClassRanksController@unequipSpecial']);
