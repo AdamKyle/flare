@@ -2376,16 +2376,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v9.43.0",
+            "version": "v9.44.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "011f2e1d49a11c22519a7899b46ddf3bc5b0f40b"
+                "reference": "60808a7d9acd53461fd69634c08fc7e0a99fbf98"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/011f2e1d49a11c22519a7899b46ddf3bc5b0f40b",
-                "reference": "011f2e1d49a11c22519a7899b46ddf3bc5b0f40b",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/60808a7d9acd53461fd69634c08fc7e0a99fbf98",
+                "reference": "60808a7d9acd53461fd69634c08fc7e0a99fbf98",
                 "shasum": ""
             },
             "require": {
@@ -2558,7 +2558,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2022-12-06T14:26:07+00:00"
+            "time": "2022-12-15T14:56:36+00:00"
         },
         {
             "name": "laravel/helpers",
@@ -2618,16 +2618,16 @@
         },
         {
             "name": "laravel/horizon",
-            "version": "v5.10.5",
+            "version": "v5.10.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/horizon.git",
-                "reference": "01b26da26ca8abe3a525a307b1155d52d7293c8d"
+                "reference": "22b6d7c67bb86722cf380dbaed55ff1a3fc84053"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/horizon/zipball/01b26da26ca8abe3a525a307b1155d52d7293c8d",
-                "reference": "01b26da26ca8abe3a525a307b1155d52d7293c8d",
+                "url": "https://api.github.com/repos/laravel/horizon/zipball/22b6d7c67bb86722cf380dbaed55ff1a3fc84053",
+                "reference": "22b6d7c67bb86722cf380dbaed55ff1a3fc84053",
                 "shasum": ""
             },
             "require": {
@@ -2689,9 +2689,9 @@
             ],
             "support": {
                 "issues": "https://github.com/laravel/horizon/issues",
-                "source": "https://github.com/laravel/horizon/tree/v5.10.5"
+                "source": "https://github.com/laravel/horizon/tree/v5.10.6"
             },
-            "time": "2022-11-25T15:57:02+00:00"
+            "time": "2022-12-14T15:24:14+00:00"
         },
         {
             "name": "laravel/serializable-closure",
@@ -11212,35 +11212,36 @@
         },
         {
             "name": "php-vcr/php-vcr",
-            "version": "1.6.0",
+            "version": "1.6.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-vcr/php-vcr.git",
-                "reference": "180d5b6571fcfbf271bc0d5b90ddff409712474f"
+                "reference": "107a20d00711e567b7fc62d66d6728ca6e920549"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-vcr/php-vcr/zipball/180d5b6571fcfbf271bc0d5b90ddff409712474f",
-                "reference": "180d5b6571fcfbf271bc0d5b90ddff409712474f",
+                "url": "https://api.github.com/repos/php-vcr/php-vcr/zipball/107a20d00711e567b7fc62d66d6728ca6e920549",
+                "reference": "107a20d00711e567b7fc62d66d6728ca6e920549",
                 "shasum": ""
             },
             "require": {
                 "beberlei/assert": "^3.2.5",
                 "ext-curl": "*",
-                "php": "^8.0",
-                "symfony/event-dispatcher": "^5.0",
-                "symfony/yaml": "^3.0|^4.0|^5.0"
+                "php": "^8",
+                "symfony/event-dispatcher": "^4|^5",
+                "symfony/event-dispatcher-contracts": "^1|^2|^3",
+                "symfony/yaml": "^3|^4|^5"
             },
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "^3.0",
-                "guzzlehttp/guzzle": "^7.0",
+                "guzzlehttp/guzzle": "^7",
                 "mikey179/vfsstream": "^1.6.10",
                 "phpstan/extension-installer": "^1.1",
-                "phpstan/phpstan": "^0.12.92",
-                "phpstan/phpstan-beberlei-assert": "^0.12.0",
-                "phpstan/phpstan-phpunit": "^0.12.22",
-                "phpunit/phpunit": "^9.5.0",
-                "thecodingmachine/phpstan-strict-rules": "^0.12"
+                "phpstan/phpstan": "^1",
+                "phpstan/phpstan-beberlei-assert": "^1",
+                "phpstan/phpstan-phpunit": "^1",
+                "phpunit/phpunit": "^9.5.10",
+                "thecodingmachine/phpstan-strict-rules": "^1"
             },
             "type": "library",
             "autoload": {
@@ -11261,9 +11262,9 @@
             "description": "Record your test suite's HTTP interactions and replay them during future test runs for fast, deterministic, accurate tests.",
             "support": {
                 "issues": "https://github.com/php-vcr/php-vcr/issues",
-                "source": "https://github.com/php-vcr/php-vcr/tree/1.6.0"
+                "source": "https://github.com/php-vcr/php-vcr/tree/1.6.2"
             },
-            "time": "2021-10-09T15:30:47+00:00"
+            "time": "2022-12-15T15:57:18+00:00"
         },
         {
             "name": "phpdocumentor/reflection-common",

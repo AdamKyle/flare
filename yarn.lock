@@ -1397,9 +1397,9 @@
   integrity sha512-47Aa+JmYjY4xTFpTtYCwrqirmI1arnp1UZETwtWpbTPisXUAuxrdJxKJLH8KHFWMsSrLi9+AcfyfzDIuO75rEA==
 
 "@headlessui/react@^1.5.0":
-  version "1.7.5"
-  resolved "https://registry.yarnpkg.com/@headlessui/react/-/react-1.7.5.tgz#c8864b0731d95dbb34aa6b3a60d0ee9ae6f8a7ca"
-  integrity sha512-UZSxOfA0CYKO7QDT5OGlFvesvlR1SKkawwSjwQJwt7XQItpzRKdE3ZUQxHcg4LEz3C0Wler2s9psdb872ynwrQ==
+  version "1.7.6"
+  resolved "https://registry.yarnpkg.com/@headlessui/react/-/react-1.7.6.tgz#578fcd336955e4afcae8f223b26f8a121941c9ee"
+  integrity sha512-yM/IOGCRaS/DaQRchElrTiH0jOfYWbBX5wkZTAbPDu4OMYdQ1ateM/UgApOcv+7DNpeRaMjUz4bZ4xxNgTGNLA==
   dependencies:
     client-only "^0.0.1"
 
@@ -1585,11 +1585,11 @@
     npm-normalize-package-bin "^3.0.0"
 
 "@npmcli/map-workspaces@*", "@npmcli/map-workspaces@^3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@npmcli/map-workspaces/-/map-workspaces-3.0.0.tgz#7863da57470cdd7fda76d807567d7925a642ddb3"
-  integrity sha512-aaEDwQ+fUH80iNYSDAcKv9lxIFWsgGkLjIPZENyep75hKeAk2CfSbCAZ6IHDDrVlNybvvNmlFjPap6GdTz9cCw==
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/@npmcli/map-workspaces/-/map-workspaces-3.0.1.tgz#558941a715361ef51d6ad990cacb1af8990a7136"
+  integrity sha512-QXwE2p5zRTP6X8Irgf/swYwwdQEalSA1GBm0IGE/86R5EJbUGgKMOP0kOjaJWJxaWPkSqyhM8N50SPxFHTfkNg==
   dependencies:
-    "@npmcli/name-from-folder" "^1.0.1"
+    "@npmcli/name-from-folder" "^2.0.0"
     glob "^8.0.1"
     minimatch "^5.0.1"
     read-package-json-fast "^3.0.0"
@@ -1616,6 +1616,11 @@
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@npmcli/name-from-folder/-/name-from-folder-1.0.1.tgz#77ecd0a4fcb772ba6fe927e2e2e155fbec2e6b1a"
   integrity sha512-qq3oEfcLFwNfEYOQ8HLimRGKlD8WSeGEdtUa7hmzpR8Sa7haL1KVQrvgO6wqMjhWFFVjgtrh1gIxDz+P8sjUaA==
+
+"@npmcli/name-from-folder@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@npmcli/name-from-folder/-/name-from-folder-2.0.0.tgz#c44d3a7c6d5c184bb6036f4d5995eee298945815"
+  integrity sha512-pwK+BfEBZJbKdNYpHHRTNBwBoqrN/iIMO0AiGvYsp3Hoaq0WbgGSWQR6SCldZovoDpY3yje5lkFUe6gsDgJ2vg==
 
 "@npmcli/node-gyp@^3.0.0":
   version "3.0.0"
@@ -2979,12 +2984,12 @@ bytes@3.1.2, bytes@^3.0.0:
   integrity sha512-/Nf7TyzTx6S3yRJObOAV7956r8cr2+Oj8AC5dt8wSP3BQAoeX58NoHyCU8P8zGkNXStjTSi6fzO6F0pBdcYbEg==
 
 cacache@*, cacache@^17.0.0, cacache@^17.0.3:
-  version "17.0.3"
-  resolved "https://registry.yarnpkg.com/cacache/-/cacache-17.0.3.tgz#9ba14e0e50eca763ae7e2ee89036a948a13035ed"
-  integrity sha512-pwsIK/grdM0cHpfVaNFxMdzElBtLJGsVPE+JnxqXP1l40O01Z1mfDE8MbRTuwomGq/UwEtGisOylutOEVJxEqg==
+  version "17.0.4"
+  resolved "https://registry.yarnpkg.com/cacache/-/cacache-17.0.4.tgz#5023ed892ba8843e3b7361c26d0ada37e146290c"
+  integrity sha512-Z/nL3gU+zTUjz5pCA5vVjYM8pmaw2kxM7JEiE0fv3w77Wj+sFbi70CrBruUWH0uNcEdvLDixFpgA2JM4F4DBjA==
   dependencies:
     "@npmcli/fs" "^3.1.0"
-    fs-minipass "^2.1.0"
+    fs-minipass "^3.0.0"
     glob "^8.0.1"
     lru-cache "^7.7.1"
     minipass "^4.0.0"
@@ -4661,6 +4666,13 @@ fs-minipass@^2.0.0, fs-minipass@^2.1.0:
   integrity sha512-V/JgOLFCS+R6Vcq0slCuaeWEdNC3ouDlJMNIsacH2VtALiu9mV4LPrHc5cDl8k5aw6J8jwgWWpiTo5RYhmIzvg==
   dependencies:
     minipass "^3.0.0"
+
+fs-minipass@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/fs-minipass/-/fs-minipass-3.0.0.tgz#8e6ed2b4e1ba44077cae69971393068a1bbeeed6"
+  integrity sha512-EUojgQaSPy6sxcqcZgQv6TVF6jiKvurji3AxhAivs/Ep4O1UpS8TusaxpybfFHZ2skRhLqzk6WR8nqNYIMMDeA==
+  dependencies:
+    minipass "^4.0.0"
 
 fs-monkey@^1.0.3:
   version "1.0.3"
@@ -6782,16 +6794,16 @@ p-try@^2.0.0:
   integrity sha512-R4nPAVTAU0B9D35/Gk3uJf/7XYbQcyohSKdvAxIRSNghFl4e71hVoGnBNQz9cWaXxO2I10KTC+3jMdvvoKw6dQ==
 
 pacote@*, pacote@^15.0.0, pacote@^15.0.7:
-  version "15.0.7"
-  resolved "https://registry.yarnpkg.com/pacote/-/pacote-15.0.7.tgz#8f68210e4c973d01d8f4b524926e47189cebd756"
-  integrity sha512-OFf4dl3SM1PpsZvi1zk4vvMA0EplnyO0Ajbrtoyx6E3dXOWBoPnMapnLgQdInEfqPkNT8mrd2bY6c5t8JZ69sQ==
+  version "15.0.8"
+  resolved "https://registry.yarnpkg.com/pacote/-/pacote-15.0.8.tgz#8a1cb1e0207f9f3c74894feaa716aaa9e35f890e"
+  integrity sha512-UlcumB/XS6xyyIMwg/WwMAyUmga+RivB5KgkRwA1hZNtrx+0Bt41KxHCvg1kr0pZ/ZeD8qjhW4fph6VaYRCbLw==
   dependencies:
     "@npmcli/git" "^4.0.0"
     "@npmcli/installed-package-contents" "^2.0.1"
     "@npmcli/promise-spawn" "^6.0.1"
     "@npmcli/run-script" "^6.0.0"
     cacache "^17.0.0"
-    fs-minipass "^2.1.0"
+    fs-minipass "^3.0.0"
     minipass "^4.0.0"
     npm-package-arg "^10.0.0"
     npm-packlist "^7.0.0"
