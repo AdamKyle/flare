@@ -76,54 +76,54 @@ class ItemComparison {
         return $totalHealForCompare - $totalHealForEquipped;
     }
 
-    public function getStatAdjustment(Item $toCompare, Item $equipped, string $stat): int {
+    public function getStatAdjustment(Item $toCompare, Item $equipped, string $stat): float {
         $totalPercentageForEquipped = $equipped->getTotalPercentageForStat($stat);
         $totalPercentageForCompare  = $toCompare->getTotalPercentageForStat($stat);
 
         return $totalPercentageForCompare - $totalPercentageForEquipped;
     }
 
-    public function getResChanceAdjustment(Item $toCompare, Item $equipped): int {
+    public function getResChanceAdjustment(Item $toCompare, Item $equipped): float {
         return $toCompare->resurrection_chance - $equipped->resurrection_chance;
     }
 
-    public function getBaseDamageAdjustment(Item $toCompare, Item $equipped): int {
+    public function getBaseDamageAdjustment(Item $toCompare, Item $equipped): float {
         return $toCompare->base_damage_mod - $equipped->base_damage_mod;
     }
 
-    public function getBaseHealingAdjustment(Item $toCompare, Item $equipped): int  {
+    public function getBaseHealingAdjustment(Item $toCompare, Item $equipped): float  {
         return $toCompare->base_healing_mod - $equipped->base_healing_mod;
     }
 
-    public function getBaseAcAdjustment(Item $toCompare, Item $equipped): int  {
+    public function getBaseAcAdjustment(Item $toCompare, Item $equipped): float  {
         return $toCompare->base_ac_mod - $equipped->base_ac_mod;
     }
 
-    public function getFightTimeOutModAdjustment(Item $toCompare, Item $equipped): int {
+    public function getFightTimeOutModAdjustment(Item $toCompare, Item $equipped): float {
         return $toCompare->getTotalFightTimeOutMod() - $equipped->getTotalFightTimeOutMod();
     }
 
-    public function getBaseDamageModAdjustment(Item $toCompare, Item $equipped): int {
+    public function getBaseDamageModAdjustment(Item $toCompare, Item $equipped): float {
         return $toCompare->getTotalBaseDamageMod() - $equipped->getTotalBaseDamageMod();
     }
 
-    public function getSpellEvasionAdjustment(Item $toCompare, Item $equipped): int {
+    public function getSpellEvasionAdjustment(Item $toCompare, Item $equipped): float {
         return $toCompare->spell_evasion - $equipped->spell_evasion;
     }
 
-    public function getAmbushChanceAdjustment(Item $toCompare, Item $equipped): int {
+    public function getAmbushChanceAdjustment(Item $toCompare, Item $equipped): float {
         return $toCompare->ambush_chance - $equipped->ambush_chance;
     }
 
-    public function getAmbushResistanceAdjustment(Item $toCompare, Item $equipped): int {
+    public function getAmbushResistanceAdjustment(Item $toCompare, Item $equipped): float {
         return $toCompare->ambush_resistance - $equipped->ambush_resistance;
     }
 
-    public function getCounterChanceAdjustment(Item $toCompare, Item $equipped): int {
+    public function getCounterChanceAdjustment(Item $toCompare, Item $equipped): float {
         return $toCompare->counter_chance - $equipped->counter_chance;
     }
 
-    public function getCounterResistanceAdjustment(Item $toCompare, Item $equipped): int {
+    public function getCounterResistanceAdjustment(Item $toCompare, Item $equipped): float {
         return $toCompare->counter_resistance - $equipped->counter_resistance;
     }
 
