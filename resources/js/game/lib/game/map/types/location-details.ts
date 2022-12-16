@@ -22,6 +22,7 @@ export default interface LocationDetails {
     quest_reward_item_id: number | null;
 
     required_quest_item_id: number | null;
+    required_quest_item_name: string | null;
 
     type: string | null;
 

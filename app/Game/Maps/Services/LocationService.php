@@ -107,6 +107,11 @@ class LocationService {
 
             $location->increases_enemy_stats_by      = null;
             $location->increase_enemy_percentage_by  = null;
+            $location->type_name                     = null;
+
+            if ((new LocationType($location->type))->isPurgatorySmithHouse()) {
+                $location->type_name = 'Purgatory Smiths House';
+            }
 
             if (!is_null($location->enemy_strength_type)) {
                 $location->increases_enemy_stats_by     = LocationEffectValue::getIncreaseByAmount($location->enemy_strength_type);
@@ -114,10 +119,6 @@ class LocationService {
 
                 if (!is_null($location->type)) {
                     $locationType = new LocationType($location->type);
-
-                    if ($locationType->isPurgatorySmithHouse()) {
-                        $location->type_name = 'Purgatory Smiths House';
-                    }
 
                     if ($locationType->isGoldMines()) {
                         $location->type_name = 'Gold Mines';
@@ -129,6 +130,11 @@ class LocationService {
                 }
             }
 
+            $location->required_quest_item_name = null;
+
+            if (!is_null($location->required_quest_item_id)) {
+                $location->required_quest_item_name = $location->requiredQuestItem->name;
+            }
 
             return $location;
         });

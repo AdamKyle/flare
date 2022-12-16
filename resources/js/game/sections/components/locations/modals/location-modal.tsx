@@ -56,6 +56,35 @@ export default class LocationModal extends React.Component<LocationModalPros, Lo
         })
     }
 
+    purgatorySmithsHouse() {
+        if (this.props.location.type_name === "Purgatory Smiths House") {
+            return (
+                <Fragment>
+                    <div className='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 hidden sm:block'></div>
+                    <h5 className='text-orange-500 dark:text-orange-400'>Purgatory Smiths House</h5>
+                    <p className='my-4'>
+                        The basement of this house holds tunnels deep into the earth where the shadows become one with the darkness.
+                        Players in this location cannot explore, instead they will find their attack section has been updated to allow them
+                        to select a <a href='/information/ranked-fights' target="_blank">Rank <i className="fas fa-external-link-alt"></i></a> and
+                        a monster, from here the fights take place on the server - All creatures have stats ranging from 10 million in rank 1
+                        to 1 billion in rank 10.
+                    </p>
+                    <p className='mb-4'>
+                        Ranked fights are tracked and reset every month. Players can see who is at the top of the rank fights
+                        by opening the side menu and selecting Tops. From here you can see who is #1 in each of the ranks. Being #1 means killing the
+                        last creature in the list for that rank.
+                    </p>
+                    <p>
+                        <strong>Players in this location will find their stats are the same as on surface, all reductions are removed.</strong>
+                    </p>
+                    <div className='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 hidden sm:block'></div>
+                </Fragment>
+            )
+        }
+
+        return null;
+    }
+
     render() {
         return (
             <Dialogue is_open={this.props.is_open}
@@ -68,6 +97,8 @@ export default class LocationModal extends React.Component<LocationModalPros, Lo
                       }}
             >
                 <LocationDetails location={this.props.location} />
+
+                {this.purgatorySmithsHouse()}
 
                 {
                     this.state.cost > 0 ?
@@ -84,6 +115,18 @@ export default class LocationModal extends React.Component<LocationModalPros, Lo
                             <dd>{this.state.distance}</dd>
                             <dt>Timeout (minutes):</dt>
                             <dd>{this.state.time_out}</dd>
+                            <dt>Required Item To Enter:</dt>
+                            <dd>
+                                {
+                                    this.props.location.required_quest_item_id !== null ?
+                                        <a href={"/information/item/" + this.props.location.required_quest_item_id} target='_blank'>
+                                            {this.props.location.required_quest_item_name} <i
+                                            className="fas fa-external-link-alt"></i>
+                                        </a>
+                                    :
+                                        'Requires No Item'
+                                }
+                            </dd>
                         </dl>
                     :
                         <WarningAlert>

@@ -83,10 +83,6 @@ export default class Defend {
   }
 
   handleClassSpecialAttackEquipped(character, monsterHealth) {
-    console.log(character);
-    // if (monsterHealth <= 0) {
-    //     return 0;
-    // }
 
     if (character.special_damage.length == 0) {
       return monsterHealth;
