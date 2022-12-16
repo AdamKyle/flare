@@ -75,7 +75,7 @@ export default class AmbushHandler extends BattleBase {
 
             monsterHealth = monsterHealth - damage;
 
-            this.addMessage('You strike the enemy in an ambush doing: ' + formatNumber(damage) + ' damage!', 'enemy-action');
+            this.addMessage('You strike the enemy in an ambush doing: ' + formatNumber(damage) + ' damage!', 'player-action');
         }else if (this.canEnemyAmbush(monster, character)) {
             this.addMessage('The enemies plotting and scheming comes to fruition!', 'enemy-action');
 

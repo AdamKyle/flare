@@ -158,7 +158,7 @@ export default class AdditionalInfoModal extends React.Component<AdditionalInfoM
                             <dd>{(this.props.character.counter_resistance_chance * 100).toFixed(2)}%</dd>
                         </dl>
                         <p className='mt-4'>
-                            For more information please see <a href='/information/combat' target='_blank'>Combat Help <i
+                            For more information please see <a href='/information/ambush-and-counter' target='_blank'>Ambush and Counter Help <i
                             className="fas fa-external-link-alt"></i></a>
                         </p>
                     </TabPanel>

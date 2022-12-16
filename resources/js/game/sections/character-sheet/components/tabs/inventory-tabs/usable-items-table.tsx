@@ -14,7 +14,6 @@ import {AxiosError, AxiosResponse} from "axios";
 import InventoryUseItem from "../../modals/inventory-use-item";
 import UsableItemsDetails from "../../../../../lib/game/character-sheet/types/inventory/usable-items-details";
 import InventoryUseDetails from "../../modals/inventory-use-details";
-import InventoryUseManyItems from "../../modals/inventory-use-many-items";
 
 export default class UsableItemsTable extends React.Component<UsableItemTable, any> implements ActionsInterface {
     constructor(props: UsableItemTable) {
@@ -97,7 +96,7 @@ export default class UsableItemsTable extends React.Component<UsableItemTable, a
         }
 
         return (
-            <DropDown menu_items={items} button_title={'Actions'} />
+            <DropDown menu_items={items} button_title={'Actions'}  use_relative={true}/>
         )
     }
 

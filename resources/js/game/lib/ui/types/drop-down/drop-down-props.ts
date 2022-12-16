@@ -11,4 +11,6 @@ export default interface DropDownProps {
     button_title: string;
 
     disabled?: boolean;
+
+    use_relative?: boolean;
 }
