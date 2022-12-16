@@ -169,8 +169,7 @@ export default class CharacterClassRanks extends React.Component<any, CharacterC
         }
 
         return (
-            <div className='max-h-[375px] overflow-y-auto lg:max-h-[500px] lg:max-h-full'>
-
+            <div className='max-h-[375px] overflow-y-auto'>
                 {
                     this.state.open_class_details && this.state.class_name_selected !== null ?
                         <div>
@@ -183,7 +182,7 @@ export default class CharacterClassRanks extends React.Component<any, CharacterC
                             </h2>
 
                             <p className='mb-4'>
-                                To learn more about this class, checkout <a href="/information/reincarnation" target="_blank">the class documentation <i className="fas fa-external-link-alt"></i></a> to learn
+                                To learn more about this class, checkout <a href={"/information/class/" + this.state.class_name_selected.game_class_id} target="_blank">the class documentation <i className="fas fa-external-link-alt"></i></a> to learn
                                 more about special attacks and tips and tricks to play the class to the fullest advantage.
                             </p>
 
