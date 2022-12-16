@@ -1,9 +1,8 @@
-import CanHitCheck from "./can-hit-check";
 import AttackType from "../attack-type";
 import CanEntranceEnemy from "./enchantments/can-entrance-enemy";
 import UseItems from "./use-items";
 import Damage from "../damage";
-import {random} from "lodash";
+import {formatNumber} from "../../../../../format-number";
 
 export default class Defend {
 
@@ -36,12 +35,16 @@ export default class Defend {
 
       this.fireOffVampThirst(attackData);
 
+      this.monsterHealth = this.handleClassSpecialAttackEquipped(attackData, this.monsterHealth);
+
       return this.setState();
     }
 
     this.useItems(attackData, this.attacker.class)
 
     this.fireOffVampThirst(attackData);
+
+    this.monsterHealth = this.handleClassSpecialAttackEquipped(attackData, this.monsterHealth);
 
     return this.setState();
   }
@@ -79,7 +82,34 @@ export default class Defend {
     this.battleMessages = [...this.battleMessages, ...damage.getMessages()];
   }
 
-  addMessage(message) {
-    this.battleMessages.push({message: message, class: 'info-damage'});
+  handleClassSpecialAttackEquipped(character, monsterHealth) {
+    console.log(character);
+    // if (monsterHealth <= 0) {
+    //     return 0;
+    // }
+
+    if (character.special_damage.length == 0) {
+      return monsterHealth;
+    }
+
+    if (character.special_damage.required_attack_type !== 'any') {
+
+      if (character.special_damage.required_attack_type !== character.attack_type) {
+        return monsterHealth;
+      }
+    }
+
+    monsterHealth = monsterHealth - character.special_damage.damage;
+
+    this.addMessage('Your class special: ' + character.special_damage.name + ' fires off and you do: ' + formatNumber(character.special_damage.damage) + ' damage to the enemy!', "player-action");
+
+    return monsterHealth > 0 ? monsterHealth : 0
+  }
+
+  addMessage(message, type) {
+    this.battleMessages.push({
+      message: message,
+      type: type,
+    });
   }
 }

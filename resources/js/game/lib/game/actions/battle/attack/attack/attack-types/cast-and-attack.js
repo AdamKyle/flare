@@ -38,7 +38,7 @@ export default class CastAndAttack extends MagicAndWeaponAttackBase {
       return this.entrancedCastThenAttack(attackData, castAttack, canEntranceEnemy, canEntrance)
     }
 
-    this.castAttack(attackData, castAttack, canHitCheck, canCast);
+    this.castAttack(attackData, castAttack, canHitCheck, canCast, true);
 
     const castState = this.setStateInfo(castAttack);
 
@@ -48,7 +48,7 @@ export default class CastAndAttack extends MagicAndWeaponAttackBase {
 
     const weaponAttack     = new WeaponAttack(this.attacker, this.defender, this.characterCurrentHealth, this.monsterHealth, this.voided);
 
-    this.weaponAttack(attackData, weaponAttack, canHitCheck, canHit);
+    this.weaponAttack(attackData, weaponAttack, canHitCheck, canHit, false);
 
     const weaponState = this.setStateInfo(weaponAttack);
 

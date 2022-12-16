@@ -7,6 +7,7 @@ use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Map;
+use App\Flare\Values\AttackTypeValue;
 use Exception;
 
 class CharacterAttackBuilder {
@@ -52,7 +53,7 @@ class CharacterAttackBuilder {
      * @throws Exception
      */
     public function buildAttack(bool $voided = false): array {
-        $attack = $this->baseAttack($voided);
+        $attack = $this->baseAttack(AttackTypeValue::ATTACK, $voided);
 
         $attack['weapon_damage'] = $this->characterStatBuilder->buildDamage('weapon', $voided);
 
@@ -67,7 +68,7 @@ class CharacterAttackBuilder {
      * @throws Exception
      */
     public function buildCastAttack(bool $voided = false) {
-        $attack = $this->baseAttack($voided);
+        $attack = $this->baseAttack(AttackTypeValue::CAST, $voided);
 
         $attack['spell_damage'] = $this->characterStatBuilder->buildDamage('spell-damage', $voided);
 
@@ -82,7 +83,7 @@ class CharacterAttackBuilder {
      * @throws Exception
      */
     public function buildCastAndAttack(bool $voided = false): array {
-        return $this->castAndAttackPositionalDamage('spell-one', 'left-hand', $voided);
+        return $this->castAndAttackPositionalDamage(AttackTypeValue::CAST_AND_ATTACK, 'spell-one', 'left-hand', $voided);
     }
 
     /**
@@ -93,7 +94,7 @@ class CharacterAttackBuilder {
      * @throws Exception
      */
     public function buildAttackAndCast(bool $voided = false): array {
-        return $this->castAndAttackPositionalDamage('spell-two', 'right-hand', $voided);
+        return $this->castAndAttackPositionalDamage(AttackTypeValue::ATTACK_AND_CAST, 'spell-two', 'right-hand', $voided);
     }
 
     /**
@@ -104,7 +105,7 @@ class CharacterAttackBuilder {
      * @throws Exception
      */
     public function buildDefend(bool $voided = false): array {
-        $defence = $this->baseAttack($voided);
+        $defence = $this->baseAttack(AttackTypeValue::DEFEND, $voided);
 
         $defence['defence'] = $this->characterStatBuilder->buildDefence($voided);
 
@@ -114,17 +115,19 @@ class CharacterAttackBuilder {
     /**
      * The base attack object when building the different attack types.
      *
+     * @param string $attackType
      * @param bool $voided
      * @return array
      * @throws Exception
      */
-    protected function baseAttack(bool $voided = false): array {
+    protected function baseAttack(string $attackType, bool $voided = false): array {
         $map     = Map::where('character_id', $this->character->id)->first();
         $gameMap = GameMap::find($map->game_map_id);
 
         $characterReduction = $gameMap->character_attack_reduction;
 
         return [
+            'attack_type'               => $attackType,
             'name'                      => $this->character->name,
             'ring_damage'               => $this->characterStatBuilder->buildDamage('ring', $voided),
             'heal_for'                  => $this->characterStatBuilder->buildHealing($voided),
@@ -143,21 +146,44 @@ class CharacterAttackBuilder {
                 'stacking_life_stealing' => $this->characterStatBuilder->buildAffixDamage('life-stealing', $voided),
                 'life_stealing'          => $this->characterStatBuilder->buildAffixDamage('life-stealing', $voided),
                 'entrancing_chance'      => $this->characterStatBuilder->buildEntrancingChance($voided)
-            ]
+            ],
+            'special_damage'            => $this->fetchClassSpecialDamageInfo(),
+        ];
+    }
+
+    /**
+     * Builds the special damage information.
+     *
+     * - Based off the class special equipped which does damage.
+     *
+     * @return array
+     */
+    protected function fetchClassSpecialDamageInfo():array {
+        $classSpecialEquipped = $this->character->classSpecialsEquipped->where('equipped', true)->where('specialty_damage', '>', 0)->first();
+
+        if (is_null($classSpecialEquipped)) {
+            return [];
+        }
+
+        return [
+            'name'                 => $classSpecialEquipped->gameClassSpecial->name,
+            'damage'               => $classSpecialEquipped->specialty_damage,
+            'required_attack_type' => $classSpecialEquipped->gameClassSpecial->attack_type_required,
         ];
     }
 
     /**
      * Deals with the positional aspects of Attack and Cast and Cast and Attack.
      *
+     * @param string $attackType
      * @param string $spellPosition
      * @param string $weaponPosition
      * @param bool $voided
      * @return array
      * @throws Exception
      */
-    protected function castAndAttackPositionalDamage(string $spellPosition, string $weaponPosition, bool $voided = false): array {
-        $attack        = $this->baseAttack($voided);
+    protected function castAndAttackPositionalDamage(string $attackType, string $spellPosition, string $weaponPosition, bool $voided = false): array {
+        $attack        = $this->baseAttack($attackType, $voided);
 
         $weaponDamage = $this->characterStatBuilder->positionalWeaponDamage($weaponPosition, $voided);
         $spellDamage  = $this->characterStatBuilder->positionalSpellDamage($spellPosition, $voided);

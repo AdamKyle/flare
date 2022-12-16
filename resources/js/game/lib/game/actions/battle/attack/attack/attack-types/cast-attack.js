@@ -129,7 +129,7 @@ export default class CastAttack extends BattleBase {
     return state;
   }
 
-  attackWithSpells(attackData, isEntranced, canAutoHit) {
+  attackWithSpells(attackData, isEntranced, canUseClassSpecial) {
     const evasion = this.defender.spell_evasion;
     let dc        = 100 - (100 - 100 * evasion);
     let roll      = random(1, 100);
@@ -181,7 +181,7 @@ export default class CastAttack extends BattleBase {
       }
     }
 
-    this.extraAttacks(attackData);
+    this.extraAttacks(attackData, canUseClassSpecial);
 
     return true;
   }
@@ -222,7 +222,7 @@ export default class CastAttack extends BattleBase {
 
   }
 
-  extraAttacks(attackData) {
+  extraAttacks(attackData, canUseClassSpecial) {
     const damage = new Damage();
 
     this.monsterHealth = damage.doubleCastChance(this.attacker, attackData, this.monsterHealth);
@@ -231,6 +231,10 @@ export default class CastAttack extends BattleBase {
 
     this.monsterHealth          = health.monster_hp;
     this.characterCurrentHealth = health.character_hp;
+
+    if (canUseClassSpecial) {
+      this.monsterHealth = this.handleClassSpecialAttackEquipped(attackData, this.monsterHealth)
+    }
 
     this.mergeMessages(damage.getMessages());
   }

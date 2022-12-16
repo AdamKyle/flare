@@ -41,7 +41,7 @@ export default class WeaponAttack extends BattleBase {
     if (canHitCheck.getCanAutoHit()) {
       this.mergeMessages(canHitCheck.getBattleMessages());
 
-      const status = this.attackWithWeapon(attackData, false, canHitCheck.getCanAutoHit());
+      const status = this.attackWithWeapon(attackData, false, canHitCheck.getCanAutoHit(), true);
 
       if (!status) {
         return this.setState();
@@ -55,7 +55,7 @@ export default class WeaponAttack extends BattleBase {
     if (canEntrance ) {
       this.mergeMessages(canEntranceEnemy.getBattleMessages());
 
-      const status = this.attackWithWeapon(attackData, canEntrance, false);
+      const status = this.attackWithWeapon(attackData, canEntrance, false, true);
 
       if (!status) {
         return this.setState();
@@ -77,7 +77,7 @@ export default class WeaponAttack extends BattleBase {
         return this.setState();
       }
 
-      this.attackWithWeapon(attackData, false, false);
+      this.attackWithWeapon(attackData, false, false, true);
 
       if (this.monster_is_dead || this.character_is_dead) {
         return this.setState();
@@ -105,7 +105,7 @@ export default class WeaponAttack extends BattleBase {
     return state;
   }
 
-  attackWithWeapon(attackData, isEntranced, canAutoHit) {
+  attackWithWeapon(attackData, isEntranced, canAutoHit, useClassSpecial) {
 
     const skillBonus = this.attacker.skills.criticality;
 
@@ -136,7 +136,7 @@ export default class WeaponAttack extends BattleBase {
       }
     }
 
-    this.extraAttacks(attackData);
+    this.extraAttacks(attackData, useClassSpecial);
 
     return true;
   }
@@ -152,7 +152,7 @@ export default class WeaponAttack extends BattleBase {
     this.mergeMessages(useItems.getBattleMessage())
   }
 
-  extraAttacks(attackData) {
+  extraAttacks(attackData, useClassSpecial) {
     const damage = new Damage();
 
     this.monsterHealth = damage.tripleAttackChance(this.attacker, this.monsterHealth, attackData);
@@ -163,6 +163,10 @@ export default class WeaponAttack extends BattleBase {
 
     this.monsterHealth          = healthObject.monster_hp;
     this.characterCurrentHealth = healthObject.character_hp;
+
+    if (useClassSpecial) {
+      this.monsterHealth = this.handleClassSpecialAttackEquipped(attackData, this.monsterHealth)
+    }
 
     this.mergeMessages(damage.getMessages());
   }

@@ -43,15 +43,16 @@ class CharacterClassSpecialtiesEquipped extends Model
     ];
 
     public function getSpecialtyDamageAttribute() {
-       $cache = Cache::get('character-attack-data-' . $this->character->id);
+        $cache = Cache::get('character-attack-data-' . $this->character->id);
 
-       if (is_null($cache)) {
+        if (is_null($cache)) {
            return 0;
-       }
+        }
 
-       if (!isset($cache['damage_stat_amount'])) {
+        if (!isset($cache['damage_stat_amount'])) {
            return 0;
-       }
+        }
+
 
         $baseDamage          = $this->gameClassSpecial->specialty_damage;
         $addedDamage         = $this->gameClassSpecial->increase_specialty_damage_per_level * $this->level;

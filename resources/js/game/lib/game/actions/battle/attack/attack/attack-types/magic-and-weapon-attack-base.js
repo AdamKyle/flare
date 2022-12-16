@@ -59,7 +59,7 @@ export default class MagicAndWeaponAttackBase extends BattleBase {
 
     const weaponAttack     = new WeaponAttack(this.attacker, this.defender, this.characterCurrentHealth, this.monsterHealth, this.voided);
 
-    weaponAttack.attackWithWeapon(attackData, false, true);
+    weaponAttack.attackWithWeapon(attackData, false, true, false);
 
     this.setStateInfo(weaponAttack);
 
@@ -78,7 +78,7 @@ export default class MagicAndWeaponAttackBase extends BattleBase {
     this.battle_messages.push(...canEntranceEnemy.getBattleMessages())
 
     if (attackData.spell_damage > 0) {
-      castAttack.attackWithSpells(attackData, true, false);
+      castAttack.attackWithSpells(attackData, true, true);
     }
 
     if (attackData.heal_for > 0) {
@@ -89,7 +89,7 @@ export default class MagicAndWeaponAttackBase extends BattleBase {
 
     const weaponAttack     = new WeaponAttack(this.attacker, this.defender, this.characterCurrentHealth, this.monsterHealth, this.voided);
 
-    weaponAttack.attackWithWeapon(attackData, true, false);
+    weaponAttack.attackWithWeapon(attackData, true, false, false);
 
     this.setStateInfo(weaponAttack);
 
@@ -109,7 +109,7 @@ export default class MagicAndWeaponAttackBase extends BattleBase {
   doWeaponCastAttack(attackData, canEntrance) {
     const weaponAttack     = new WeaponAttack(this.attacker, this.defender, this.characterCurrentHealth, this.monsterHealth, this.voided);
 
-    weaponAttack.attackWithWeapon(attackData, canEntrance, false);
+    weaponAttack.attackWithWeapon(attackData, canEntrance, false, true);
 
     this.setStateInfo(weaponAttack);
 
@@ -130,7 +130,7 @@ export default class MagicAndWeaponAttackBase extends BattleBase {
     return this.setState();
   }
 
-  castAttack(attackData, castAttack, canHitCheck, canCast) {
+  castAttack(attackData, castAttack, canHitCheck, canCast, canUseSpecial) {
     const spellDamage = attackData.spell_damage;
 
     if (spellDamage > 0) {
@@ -145,7 +145,7 @@ export default class MagicAndWeaponAttackBase extends BattleBase {
           }
         } else {
           if (attackData.spell_damage > 0) {
-            castAttack.attackWithSpells(attackData, false, false);
+            castAttack.attackWithSpells(attackData, false, canUseSpecial);
           } else if (attackData.heal_for > 0) {
             castAttack.healWithSpells(attackData);
           }
@@ -161,12 +161,12 @@ export default class MagicAndWeaponAttackBase extends BattleBase {
     }
   }
 
-  weaponAttack(attackData, weaponAttack, canHitCheck, canHit) {
+  weaponAttack(attackData, weaponAttack, canHitCheck, canHit, canUseSpecial) {
     if (canHit) {
       if (this.canBlock(attackData.weapon_damage)) {
         this.addMessage('Your weapon was blocked!', 'enemy-action')
       } else {
-        weaponAttack.attackWithWeapon(attackData, false, false);
+        weaponAttack.attackWithWeapon(attackData, false, false, canUseSpecial);
 
       }
     } else {

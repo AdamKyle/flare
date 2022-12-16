@@ -1,5 +1,6 @@
 import {BattleMessage} from "./types/battle-message-type";
 import CounterHandler from "./attack/attack/attack-types/ambush-and-counter/CounterHandler";
+import {formatNumber} from "../../format-number";
 
 export default class BattleBase {
 
@@ -34,6 +35,30 @@ export default class BattleBase {
 
     mergeMessages(messagesToMerge: BattleMessage[]) {
         this.battle_messages = [...this.battle_messages, ...messagesToMerge];
+    }
+
+    handleClassSpecialAttackEquipped(character: any, monsterHealth: number) {
+        console.log(character);
+        // if (monsterHealth <= 0) {
+        //     return 0;
+        // }
+
+        if (character.special_damage.length == 0) {
+            return monsterHealth;
+        }
+
+        if (character.special_damage.required_attack_type !== 'any') {
+
+            if (character.special_damage.required_attack_type !== character.attack_type) {
+                return monsterHealth;
+            }
+        }
+
+        monsterHealth = monsterHealth - character.special_damage.damage;
+
+        this.addMessage('Your class special: ' + character.special_damage.name + ' fires off and you do: ' + formatNumber(character.special_damage.damage) + ' damage to the enemy!', "player-action");
+
+        return monsterHealth > 0 ? monsterHealth : 0
     }
 
     handleCounter(character: any, monster: any, characterHealth: number, monsterHealth: number, type: 'enemy' | 'player', isCharacterVoided: boolean) {
