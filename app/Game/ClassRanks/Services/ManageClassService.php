@@ -38,7 +38,9 @@ class ManageClassService {
      */
     public function switchClass(Character $character, GameClass $class): array {
 
-        $skillToHide = $character->skills->where('baseSkill.game_class_id', $character->game_class_id)->first()->id;
+        $gameSkill = GameSkill::where('game_class_id', $character->game_class_id)->first();
+
+        $skillToHide = $character->skills->where('game_skill_id', $gameSkill->id)->first()->id;
 
         $character->skills()->where('id', $skillToHide)->update(['is_hidden' => true]);
 

@@ -21,6 +21,6 @@ class ManageClassController extends Controller {
         $status = $response['status'];
         unset($response['status']);
 
-        return response()->jsoon($response, $status);
+        return response()->json($response, $status);
     }
 }

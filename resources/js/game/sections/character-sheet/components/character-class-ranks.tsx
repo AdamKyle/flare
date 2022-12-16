@@ -13,6 +13,7 @@ import PrimaryButton from "../../../components/ui/buttons/primary-button";
 import CharacterClassSpecialtiesModal from "./modals/character-class-specialties-modal";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
+import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
 
 export default class CharacterClassRanks extends React.Component<any, CharacterClassRanksState> {
 
@@ -239,17 +240,17 @@ export default class CharacterClassRanks extends React.Component<any, CharacterC
                                 : null
                             }
                             {
-                                this.state.error_message ?
+                                this.state.error_message !== null ?
                                     <DangerAlert additional_css={'my-4'}>
                                         {this.state.error_message}
                                     </DangerAlert>
                                 : null
                             }
                             {
-                                this.state.success_message ?
-                                    <DangerAlert additional_css={'my-4'}>
-                                        {this.state.error_message}
-                                    </DangerAlert>
+                                this.state.success_message !== null ?
+                                    <SuccessAlert additional_css={'my-4'}>
+                                        {this.state.success_message}
+                                    </SuccessAlert>
                                     : null
                             }
                             <Table
