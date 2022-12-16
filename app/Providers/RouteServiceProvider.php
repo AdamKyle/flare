@@ -47,12 +47,12 @@ class RouteServiceProvider extends ServiceProvider
 
         // When crafting items
         RateLimiter::for('crafting', function(Request $request) {
-            return Limit::perMinute(25)->by($request->ip());
+            return Limit::perMinute(100)->by($request->ip());
         });
 
         // When enchanting items
         RateLimiter::for('enchanting', function(Request $request) {
-            return Limit::perMinute(25)->by($request->ip());
+            return Limit::perMinute(100)->by($request->ip());
         });
 
         // When moving around the map (including traversing)

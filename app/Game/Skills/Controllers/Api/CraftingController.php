@@ -37,7 +37,7 @@ class CraftingController extends Controller {
 
     public function craft(CraftingValidation $request, Character $character, CraftingService $craftingService) {
         if (!$character->can_craft) {
-            return response()->json(['message' => 'invalid input.'], 429);
+            return response()->json(['message' => 'Cannot craft yet.'], 422);
         }
 
         event(new CraftedItemTimeOutEvent($character));

@@ -24,7 +24,7 @@ class AlchemyController extends Controller {
 
     public function transmute(AlchemyValidation $request, Character $character) {
         if (!$character->can_craft) {
-            return response()->json(['message' => 'invalid input.'], 429);
+            return response()->json(['message' => 'You must wait to craft again.'], 422);
         }
 
         event(new CraftedItemTimeOutEvent($character));
