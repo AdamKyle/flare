@@ -121,6 +121,10 @@
                 <span class="ra ra-archer"></span>
                 Combat
             </a>
+            <a href="{{route('info.page', ['pageName' => 'ambush-and-counter'])}}">
+                <span class="ra ra-muscle-fat"></span>
+                Ambush and Counter
+            </a>
             <a href="{{route('info.page', ['pageName' => 'player-vs-player'])}}">
                 <span class="ra ra-helmet"></span>
                 Player vs Player

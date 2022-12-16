@@ -69,7 +69,12 @@ export default class DropDown extends React.Component<DropDownProps, any> {
                         leaveFrom="transform opacity-100 scale-100"
                         leaveTo="transform opacity-0 scale-95"
                     >
-                        <Menu.Items className="absolute right-0 left-[5px] z-50 w-56 mt-2 origin-top-right dark:bg-gray-700 bg-white divide-y dark:divide-gray-600 divide-gray-300 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                        <Menu.Items className={clsx(
+                            "absolute right-0 left-[5px] z-50 w-56 mt-2 origin-top-right dark:bg-gray-700 " +
+                            "bg-white divide-y dark:divide-gray-600 divide-gray-300 rounded-md shadow-lg ring-1 " +
+                            "ring-black ring-opacity-5 focus:outline-none",
+                            {'absolute': !this.props.use_relative, 'relative': this.props.use_relative}
+                        )}>
                             {this.renderMenuItems()}
                         </Menu.Items>
                     </Transition>

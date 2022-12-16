@@ -66,12 +66,6 @@ class TrinketCraftingService {
             return $this->fetchItemsToCraft($character);
         }
 
-
-        $character->update([
-            'gold_dust' => $character->gold_dust - $item->gold_cost_cost,
-            'copper_coins' => $character->copper_coins - $item->copper_coin_cost,
-        ]);
-
         $character = $character->refresh();
 
         event(new UpdateTopBarEvent($character));

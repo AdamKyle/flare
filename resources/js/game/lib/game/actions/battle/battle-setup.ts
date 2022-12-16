@@ -58,6 +58,8 @@ export default class BattleSetUp {
             monster.reduceSkills(this.character.skill_reduction);
             monster.reduceResistances(this.character.resistance_reduction);
 
+            this.monster = monster.getMonster();
+
             this.battleMessages = [...this.battleMessages, ...monster.getMessages()]
         }
     }

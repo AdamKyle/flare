@@ -257,6 +257,8 @@
                 <ul class="mb-4 list-disc ml-[20px]">
                     <li>Spell Evasion</li>
                     <li>Affix Resistance</li>
+                    <li>Ambush Resistance</li>
+                    <li>Counter Resistance</li>
                 </ul>
                 <p class="mb-4">Should you have many equipped, we will take the best one of them all.</p>
                 <p class="mb-4">Much like skill reduction and stat reduction these are applied only if you are not voided and before the fight begins.</p>

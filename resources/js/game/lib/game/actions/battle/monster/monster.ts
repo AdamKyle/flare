@@ -32,7 +32,7 @@ export default class Monster extends BattleBase {
     }
 
     ambushResistance(): number {
-        return this.monster.ambush_resistance;
+        return this.monster.ambush_resistance_chance;
     }
 
     counterChance(): number {
@@ -283,9 +283,13 @@ export default class Monster extends BattleBase {
 
         let monster = JSON.parse(JSON.stringify(this.monster));
 
-        if (reduction > 0.0) {
-            monster.spell_evasion      = monster.spell_evasion - reduction;
-            monster.affix_resistance   = monster.affix_resistance - reduction;
+        if (reduction > 0) {
+            monster.spell_evasion             = monster.spell_evasion - reduction;
+            monster.affix_resistance          = monster.affix_resistance - reduction;
+
+            monster.counter_resistance_chance = monster.counter_resistance_chance - reduction;
+
+            monster.ambush_resistance_chance  = monster.ambush_resistance_chance - reduction;
 
             if (monster.spell_evasion < 0.0) {
                 monster.spell_evasion = 0.0;
@@ -295,9 +299,17 @@ export default class Monster extends BattleBase {
                 monster.affix_resistance = 0.0;
             }
 
+            if (monster.counter_resistance_chance < 0.0) {
+                monster.counter_resistance_chance = 0.0;
+            }
+
+            if (monster.ambush_resistance_chance < 0.0) {
+                monster.ambush_resistance_chance = 0.0;
+            }
+
             this.monster = monster;
 
-            this.addMessage(this.name() + ' is less resistant to your charms! (spell/affix resistance reduced!)', 'player-action');
+            this.addMessage(this.name() + ' is less resistant to your charms! (spell/affix/ambush/counter resistance\'s reduced!)', 'player-action');
         }
 
         return;
