@@ -116,6 +116,8 @@ class Defend extends BattleBase {
             }
         }
 
+        $this->classSpecialtyDamage($isPvp);
+
         $this->vampireSpecial($character, $this->attackData, $isPvp);
     }
 
@@ -137,6 +139,24 @@ class Defend extends BattleBase {
             }
 
             $this->specialAttacks->clearMessages();
+        }
+    }
+
+    protected function classSpecialtyDamage(bool $isPvp = false) {
+        $special = $this->attackData['special_damage'];
+
+        if (empty($special)) {
+            return;
+        }
+
+        if ($special['required_attack_type'] === $this->attackData['attack_type']) {
+            $this->monsterHealth -= $special['damage'];
+
+            $this->addMessage('Your class special: ' . $special['name'] . ' fires off and you do: ' . number_format($special['damage']) . ' damage to the enemy!', "player-action", $isPvp);
+
+            if ($isPvp) {
+                $this->addDefenderMessage('The enemy lashes out using one of their coveted skills (class special) to do:  ' . $special['damage'] . ' damage.', 'enemy-action');
+            }
         }
     }
 }

@@ -109,8 +109,10 @@ class LocationService {
             $location->increase_enemy_percentage_by  = null;
             $location->type_name                     = null;
 
-            if ((new LocationType($location->type))->isPurgatorySmithHouse()) {
-                $location->type_name = 'Purgatory Smiths House';
+            if (!is_null($location->type)) {
+                if ((new LocationType($location->type))->isPurgatorySmithHouse()) {
+                    $location->type_name = 'Purgatory Smiths House';
+                }
             }
 
             if (!is_null($location->enemy_strength_type)) {

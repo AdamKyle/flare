@@ -87,7 +87,7 @@ class Affixes extends BattleBase {
         } else {
             $this->addMessage('The enemy\'s blood flows through the air and gives you life: ' . number_format($damage), 'player-action', $isPvp);
 
-            if (!$isPvp) {
+            if ($isPvp) {
                 $this->addDefenderMessage('Your blood seeps from the pores in your flesh, you scream in agony taking: ' . number_format($damage) . ' damage.', 'enemy-action');
             }
 
