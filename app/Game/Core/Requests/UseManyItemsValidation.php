@@ -24,13 +24,13 @@ class UseManyItemsValidation extends FormRequest
     public function rules()
     {
         return [
-            'slot_ids' => 'required',
+            'items_to_use' => 'required',
         ];
     }
 
     public function messages() {
         return [
-            'slot_ids.required' => 'You must select some items to use.',
+            'items_to_use.required' => 'You must select some items to use.',
         ];
     }
 }

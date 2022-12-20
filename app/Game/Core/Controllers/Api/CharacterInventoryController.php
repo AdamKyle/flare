@@ -4,6 +4,7 @@ namespace App\Game\Core\Controllers\Api;
 
 use App\Flare\Handlers\UpdateCharacterAttackTypes;
 use App\Flare\Models\SetSlot;
+use App\Game\Core\Requests\UseManyItemsValidation;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use League\Fractal\Resource\Item as FractalItem;
@@ -623,6 +624,44 @@ class  CharacterInventoryController extends Controller {
                 'set_name_equipped' => $characterInventoryService->getEquippedInventorySetName(),
             ]
         ]);
+    }
+
+    /**
+     * @param UseManyItemsValidation $request
+     * @param Character $character
+     * @param UseItemService $useItemService
+     * @return JsonResponse
+     * @throws Exception
+     */
+    public function useManyItems(UseManyItemsValidation $request, Character $character, UseItemService $useItemService): JsonResponse {
+        if ($character->boons->count() === 10) {
+            return response()->json(['message' => 'You can only have a max of ten boons applied.
+            Check active boons to see which ones you have. You can always cancel one by clicking on the row.'], 422);
+        }
+
+        $slots = $character->inventory->slots()->whereIn('id', $request->items_to_use)->get();
+
+        if ($slots->isEmpty()) {
+            return response()->json(['message' => 'You don\'t have these items.'], 422);
+        }
+
+        foreach ($slots as $slot) {
+            $useItemService->useItem($slot, $character, $slot->item);
+        }
+
+        $this->updateCharacterAttackDataCache($character);
+
+        $character = $character->refresh();
+
+        event(new UpdateTopBarEvent($character));
+
+        $inventory = $this->characterInventoryService->setCharacter($character);
+
+        return response()->json([
+            'inventory' => [
+                'usable_items' => $inventory->getInventoryForType('usable_items')
+            ]
+        ], 200);
     }
 
     /**
