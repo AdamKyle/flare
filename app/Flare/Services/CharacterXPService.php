@@ -176,9 +176,9 @@ class CharacterXPService {
      * @param bool $ignoreCaps
      * @param float $xpBonus
      * @param int $xp
-     * @return int|float
+     * @return float
      */
-    protected function getXP(Character $character, bool $ignoreCaps, float $xpBonus, int $xp): int|float {
+    protected function getXP(Character $character, bool $ignoreCaps, float $xpBonus, int $xp): float {
         $config = MaxLevelConfiguration::first();
 
         if (is_null($config)) {
@@ -197,11 +197,7 @@ class CharacterXPService {
             return ceil($xp * MaxLevel::LAST_LEG_PERCENT);
         }
 
-        if ($character->level >= $config->max_level) {
-            return 0;
-        } else {
-            return $xp + $xp * $xpBonus;
-        }
+        return $xp + $xp * $xpBonus;
     }
 
     /**

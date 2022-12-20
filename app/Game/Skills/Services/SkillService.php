@@ -2,26 +2,45 @@
 
 namespace App\Game\Skills\Services;
 
-use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Flare\Events\SkillLeveledUpServerMessageEvent;
+use App\Flare\Handlers\UpdateCharacterAttackTypes;
+use App\Flare\Models\GameMap;
+use App\Flare\Models\Skill;
 use App\Flare\Models\Character;
 use App\Flare\Transformers\SkillsTransformer;
 use App\Game\Core\Traits\ResponseBuilder;
-use App\Game\Skills\Events\UpdateCharacterSkills;
+use Exception;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
-use League\Fractal\Resource\Item;
 
 class SkillService {
 
     use ResponseBuilder;
 
-    private $manager;
+    /**
+     * @var Manager $manager
+     */
+    private Manager $manager;
 
-    private $skillsTransformer;
+    /**
+     * @var SkillsTransformer $skillsTransformer
+     */
+    private SkillsTransformer $skillsTransformer;
 
-    public function __construct(Manager $manager, SkillsTransformer $skillsTransformer) {
-        $this->manager           = $manager;
-        $this->skillsTransformer = $skillsTransformer;
+    /**
+     * @var UpdateCharacterAttackTypes $updateCharacterAttackTypes
+     */
+    private UpdateCharacterAttackTypes $updateCharacterAttackTypes;
+
+    /**
+     * @param Manager $manager
+     * @param SkillsTransformer $skillsTransformer
+     * @param UpdateCharacterAttackTypes $updateCharacterAttackTypes
+     */
+    public function __construct(Manager $manager, SkillsTransformer $skillsTransformer, UpdateCharacterAttackTypes $updateCharacterAttackTypes) {
+        $this->manager                    = $manager;
+        $this->skillsTransformer          = $skillsTransformer;
+        $this->updateCharacterAttackTypes = $updateCharacterAttackTypes;
     }
 
     /**
@@ -80,5 +99,104 @@ class SkillService {
         return $this->successResult([
             'message' => 'You are now training ' . $skill->name
         ]);
+    }
+
+    /**
+     * Assign XP to a training skill.
+     *
+     * @param Character $character
+     * @param int $xp
+     * @return int
+     * @throws Exception
+     */
+    public function assignXPToTrainingSkill(Character $character, int $xp): int {
+        $skillInTraining = $character->skills->where('currently_training', true)->first();
+
+        if (is_null($skillInTraining)) {
+            return $xp;
+        }
+
+        if ($skillInTraining->level === $skillInTraining->baseSkill->max_level) {
+            return $xp;
+        }
+
+        $skillXp     = $xp * $skillInTraining->xp_towards;
+        $remainingXp = ($xp - $skillXp);
+        $skillXp     = $skillXp + $skillXp * ($skillInTraining->skill_training_bonus + $character->map->gameMap->skill_training_bonus);
+        $skillXp     += 5;
+
+        $skillInTraining->update([
+            'xp' => $skillInTraining->xp + $skillXp
+        ]);
+
+        $skillInTraining = $skillInTraining->refresh();
+
+        $this->levelUpSkill($skillInTraining);
+
+        return intval($remainingXp);
+    }
+
+    /**
+     * Assign xp to crafting skills.
+     *
+     * - Uses a base of 25
+     * - Applies skill training bonuses
+     * - Applies Game Map Bonuses
+     *
+     * @param GameMap $gameMap
+     * @param Skill $skill
+     * @return void
+     * @throws Exception
+     */
+    public function assignXpToCraftingSkill(GameMap $gameMap, Skill $skill): void {
+        $xp = 25;
+        $xp = $xp + $xp * ($skill->skill_training_bonus + $gameMap->skill_training_bonus);
+
+        $skill->update([
+            'xp' => $skill->xp + $xp,
+        ]);
+
+        $skill = $skill->refresh();
+
+        $this->levelUpSkill($skill);
+    }
+
+    /**
+     * Level a skill.
+     *
+     * @param Skill $skill
+     * @return void
+     * @throws Exception
+     */
+    protected function levelUpSkill(Skill $skill): void {
+        if ($skill->xp >= $skill->xp_max) {
+            $level = $skill->level + 1;
+
+            $bonus = $skill->skill_bonus + $skill->baseSkill->skill_bonus_per_level;
+
+            if ($skill->baseSkill->max_level === $level) {
+                $bonus = 1.0;
+            }
+
+            $skill->update([
+                'level'              => $level,
+                'xp_max'             => $skill->can_train ? $level * 10 : rand(100, 350),
+                'base_damage_mod'    => $skill->base_damage_mod + $skill->baseSkill->base_damage_mod_bonus_per_level,
+                'base_healing_mod'   => $skill->base_healing_mod + $skill->baseSkill->base_healing_mod_bonus_per_level,
+                'base_ac_mod'        => $skill->base_ac_mod + $skill->baseSkill->base_ac_mod_bonus_per_level,
+                'fight_time_out_mod' => $skill->fight_time_out_mod + $skill->baseSkill->fight_time_out_mod_bonus_per_level,
+                'move_time_out_mod'  => $skill->mov_time_out_mod + $skill->baseSkill->mov_time_out_mod_bonus_per_level,
+                'skill_bonus'        => $bonus,
+                'xp'                 => 0,
+            ]);
+
+            $character = $skill->character->refresh();
+
+            event(new SkillLeveledUpServerMessageEvent($skill->character->user, $skill->refresh()));
+
+            if ($skill->can_train) {
+                $this->updateCharacterAttackTypes->updateCache($character);
+            }
+        }
     }
 }

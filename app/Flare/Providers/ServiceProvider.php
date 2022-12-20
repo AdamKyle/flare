@@ -3,6 +3,7 @@
 namespace App\Flare\Providers;
 
 use App\Flare\Builders\CharacterInformation\AttributeBuilders\ClassRanksWeaponMasteriesBuilder;
+use App\Game\Skills\Services\SkillService;
 use Illuminate\Support\Facades\Blade;
 use League\Fractal\Manager;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
@@ -195,6 +196,7 @@ class ServiceProvider extends ApplicationServiceProvider
             return new CharacterRewardService(
                 $app->make(CharacterXPService::class),
                 $app->make(CharacterService::class),
+                $app->make(SkillService::class),
                 $app->make(Manager::class),
                 $app->make(CharacterSheetBaseInfoTransformer::class)
             );
