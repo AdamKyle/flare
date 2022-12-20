@@ -2,8 +2,8 @@ import React from "react";
 import Dialogue from "../../../../components/ui/dialogue/dialogue";
 import Select from "react-select";
 import UsableItemsDetails from "../../../../lib/game/character-sheet/types/inventory/usable-items-details";
-import ManualProgressBar from "../../../../components/ui/progress-bars/manual-progress-bar";
 import UseManyItems from "../../../../lib/game/character-sheet/ajax/use-many-items";
+import LoadingProgressBar from "../../../../components/ui/progress-bars/loading-progress-bar";
 
 export default class InventoryUseManyItems extends React.Component<any, any> {
     constructor(props: any) {
@@ -19,14 +19,15 @@ export default class InventoryUseManyItems extends React.Component<any, any> {
     }
 
     useManyItems() {
-        const items = this.props.items.filter((item: UsableItemsDetails) => this.state.selected_items.includes(item.slot_id)).map((item: UsableItemsDetails) => {
-           return {
-               item_name: item.item_name,
-               item_id: item.id
-           }
-        });
 
-        (new UseManyItems(items, this)).postEachItem(this.props.character_id);
+        this.setState({
+            loading: true,
+            error_message: null,
+        }, () => {
+            const items = this.props.items.filter((item: UsableItemsDetails) => this.state.selected_items.includes(item.slot_id)).map((item: UsableItemsDetails) => item.slot_id);
+
+            (new UseManyItems(items, this)).useAllItems(this.props.character_id);
+        });
     }
 
     setItemsToUse(data: any) {
@@ -98,11 +99,7 @@ export default class InventoryUseManyItems extends React.Component<any, any> {
                     {
                         this.state.loading ?
                             <div className='mt-4 mb-4'>
-                                <ManualProgressBar label={'Using ' + this.state.using_item}
-                                                   secondary_label={this.state.item_progress + '/' + this.state.selected_items.length + 'items used'}
-                                                   percentage_left={this.state.item_progress / this.state.selected_items.length}
-                                                   show_loading_icon={true}
-                                />
+                                <LoadingProgressBar />
                             </div>
                         : null
                     }
