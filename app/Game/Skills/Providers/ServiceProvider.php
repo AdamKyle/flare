@@ -3,6 +3,7 @@
 namespace App\Game\Skills\Providers;
 
 use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
+use App\Flare\Handlers\UpdateCharacterAttackTypes;
 use App\Flare\Transformers\SkillsTransformer;
 use App\Game\Core\Services\CharacterInventoryService;
 use App\Game\Core\Services\RandomEnchantmentService;
@@ -31,7 +32,8 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(CraftingService::class, function($app) {
             return new CraftingService(
-                $app->make(RandomEnchantmentService::class)
+                $app->make(RandomEnchantmentService::class),
+                $app->make(SkillService::class)
             );
         });
 
@@ -46,7 +48,8 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(SkillService::class, function($app) {
             return new SkillService(
                 $app->make(Manager::class),
-                $app->make(SkillsTransformer::class)
+                $app->make(SkillsTransformer::class),
+                $app->make(UpdateCharacterAttackTypes::class),
             );
         });
 

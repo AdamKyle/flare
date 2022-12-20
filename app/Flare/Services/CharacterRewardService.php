@@ -2,6 +2,10 @@
 
 namespace App\Flare\Services;
 
+use Exception;
+use Facades\App\Flare\Calculators\XPCalculator;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Flare\Models\Character;
@@ -11,8 +15,6 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Location;
 use App\Flare\Models\Map;
 use App\Flare\Models\Monster;
-use App\Flare\Models\Skill;
-use App\Flare\Events\UpdateSkillEvent;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\LocationType;
@@ -21,10 +23,7 @@ use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Services\CharacterService;
 use App\Game\Core\Traits\MercenaryBonus;
 use App\Game\Messages\Events\ServerMessageEvent as GameServerMessageEvent;
-use Exception;
-use Facades\App\Flare\Calculators\XPCalculator;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item;
+use App\Game\Skills\Services\SkillService;
 use App\Flare\Models\Item as ItemModel;
 
 class CharacterRewardService {
@@ -40,6 +39,11 @@ class CharacterRewardService {
      * @var CharacterService $characterService
      */
     private CharacterService $characterService;
+
+    /**
+     * @var SkillService $skillService
+     */
+    private SkillService $skillService;
 
     /**
      * @var CharacterXPService $characterXpService
@@ -61,12 +65,19 @@ class CharacterRewardService {
      *
      * @param CharacterXPService $characterXpService
      * @param CharacterService $characterService
+     * @param SkillService $skillService
      * @param Manager $manager
      * @param CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer
      */
-    public function __construct(CharacterXPService $characterXpService, CharacterService $characterService, Manager $manager, CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer) {
+    public function __construct(CharacterXPService $characterXpService,
+                                CharacterService $characterService,
+                                SkillService $skillService,
+                                Manager $manager,
+                                CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer
+    ) {
         $this->characterXpService                = $characterXpService;
         $this->characterService                  = $characterService;
+        $this->skillService                      = $skillService;
         $this->characterSheetBaseInfoTransformer = $characterSheetBaseInfoTransformer;
         $this->manager                           = $manager;
     }
@@ -151,45 +162,15 @@ class CharacterRewardService {
     }
 
     /**
-     * Get the skill in training or null
-     *
-     * @return mixed
-     */
-    public function fetchCurrentSkillInTraining() {
-        return Skill::where('character_id', $this->character->id)->where('currently_training', true)->first();
-    }
-
-    /**
-     * Fire the update skill event.
-     *
-     * @param Skill $skill
-     * @param Monster|null $monster
-     * @return void
-     */
-    public function trainSkill(Skill $skill, Monster $monster = null) {
-        event(new UpdateSkillEvent($skill, $monster));
-    }
-
-    /**
      * Assigns XP to the character.
      *
      * @param Monster $monster
      * @return void
+     * @throws Exception
      */
     protected function distributeXP(Monster $monster) {
-        $currentSkill = $this->fetchCurrentSkillInTraining();
         $xpReduction  = 0.0;
         $gameMap      = $this->character->map->gameMap;
-
-        if (!is_null($currentSkill)) {
-            $xpReduction = $currentSkill->xp_towards;
-
-            $this->trainSkill($currentSkill, $monster);
-        }
-
-        if (!$this->characterXpService->canCharacterGainXP($this->character)) {
-            return;
-        }
 
         $xp = XPCalculator::fetchXPFromMonster($monster, $this->character->level, $xpReduction);
         $xp = $this->characterXpService->determineXPToAward($this->character, $xp);
@@ -208,6 +189,12 @@ class CharacterRewardService {
             $xp += 10;
 
             event(new GameServerMessageEvent($this->character->user, 'Rewarded an extra 10XP while doing the first guide quest. This bonus will end after you reach level 2.'));
+        }
+
+        $xp = $this->skillService->assignXPToTrainingSkill($this->character, $xp);
+
+        if (!$this->characterXpService->canCharacterGainXP($this->character)) {
+            return;
         }
 
         $characterXp = (int) $this->character->xp;

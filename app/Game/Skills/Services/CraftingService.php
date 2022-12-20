@@ -2,18 +2,14 @@
 
 namespace App\Game\Skills\Services;
 
-use App\Flare\Events\ServerMessageEvent;
-use App\Flare\Events\UpdateSkillEvent;
-use App\Flare\Models\GameSkill;
-use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
-use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
-use App\Game\Core\Events\UpdateQueenOfHeartsPanel;
-use App\Game\Core\Services\RandomEnchantmentService;
-use App\Game\Skills\Events\UpdateCharacterCraftingList;
+use Exception;
 use Illuminate\Database\Eloquent\Collection;
+use App\Flare\Events\ServerMessageEvent;
+use App\Flare\Models\GameSkill;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Models\Skill;
+use App\Game\Core\Services\RandomEnchantmentService;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Skills\Services\Traits\SkillCheck;
 use App\Game\Skills\Services\Traits\UpdateCharacterGold;
@@ -26,13 +22,20 @@ class CraftingService {
     /**
      * @var RandomEnchantmentService $randomEnchantmentService
      */
-    private $randomEnchantmentService;
+    private RandomEnchantmentService $randomEnchantmentService;
+
+    /**
+     * @var SkillService $skillService
+     */
+    private SkillService $skillService;
 
     /**
      * @param RandomEnchantmentService $randomEnchantmentService
+     * @param SkillService $skillService
      */
-    public function __construct(RandomEnchantmentService $randomEnchantmentService) {
+    public function __construct(RandomEnchantmentService $randomEnchantmentService, SkillService $skillService) {
         $this->randomEnchantmentService = $randomEnchantmentService;
+        $this->skillService             = $skillService;
     }
 
     /**
@@ -66,8 +69,9 @@ class CraftingService {
      * if they fail to craft them item.
      *
      * @param Character $character
-     * @param array params
+     * @param array $params params
      * @return bool
+     * @throws Exception
      */
     public function craft(Character $character, array $params): bool {
         $item  = Item::find($params['item_to_craft']);
@@ -96,6 +100,7 @@ class CraftingService {
      * @param Skill $skill
      * @param Item $item
      * @return bool
+     * @throws Exception
      */
     protected function attemptToCraftItem(Character $character, Skill $skill, Item $item): bool {
         if ($skill->level < $item->skill_level_required) {
@@ -183,12 +188,13 @@ class CraftingService {
      * @param Skill $skill
      * @param bool $tooEasy
      * @return void
+     * @throws Exception
      */
     public function pickUpItem(Character $character, Item $item, Skill $skill, bool $tooEasy = false) {
         if ($this->attemptToPickUpItem($character, $item)) {
 
             if (!$tooEasy) {
-                event(new UpdateSkillEvent($skill));
+                $this->skillService->assignXpToCraftingSkill($character->map->gameMap, $skill);
             }
 
             if ($item->type === 'trinket') {
