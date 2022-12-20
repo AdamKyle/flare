@@ -45,7 +45,7 @@ class ItemsTable extends DataTableComponent {
             SelectFilter::make('Types')
                 ->options($this->buildOptions())
                 ->filter(function(Builder $builder, string $value) {
-                    return $builder->where('type', $value);
+                    return $builder->where('type', $value)->orWhere('crafting_type', $value);
                 }),
         ];
     }
@@ -73,6 +73,7 @@ class ItemsTable extends DataTableComponent {
             if (auth()->user()->hasRole('Admin')) {
                 $options['trinket'] = 'Trinkets';
                 $options['quest'] = 'Quest items';
+                $options['alchemy'] = 'Alchemy items';
             }
         }
 
