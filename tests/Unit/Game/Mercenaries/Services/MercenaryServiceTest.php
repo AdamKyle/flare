@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Game\Kingdoms\Services;
+namespace Tests\Unit\Game\Mercenaries\Services;
 
 use App\Flare\Models\CharacterMercenary;
 use App\Flare\Values\MaxCurrenciesValue;

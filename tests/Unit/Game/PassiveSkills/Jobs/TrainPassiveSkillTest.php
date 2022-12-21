@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Game\PassiveSkills\Values;
+namespace Tests\Unit\Game\PassiveSkills\Jobs;
 
 use App\Flare\Models\PassiveSkill;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;

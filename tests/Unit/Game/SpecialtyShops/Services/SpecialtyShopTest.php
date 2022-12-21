@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Game\PassiveSkills\Services;
+namespace Tests\Unit\Game\SpecialtyShops\Services;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Values\ItemSpecialtyType;

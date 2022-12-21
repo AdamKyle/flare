@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Game\Kingdoms\Services;
+namespace Tests\Unit\Game\Mercenaries\Values;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Game\Mercenaries\Values\ExperienceBuffValue;
