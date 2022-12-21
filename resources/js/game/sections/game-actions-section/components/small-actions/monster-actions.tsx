@@ -23,15 +23,7 @@ export default class MonsterActions extends React.Component<MonsterActionsProps,
             is_same_monster: false,
             character_revived: false,
             attack_time_out: 0,
-            rank_selected: 0,
-        }
-    }
-
-    componentDidMount() {
-        if (this.props.is_rank_fights) {
-            this.setState({
-                rank_selected: 1,
-            });
+            rank_selected: 1,
         }
     }
 
@@ -47,7 +39,7 @@ export default class MonsterActions extends React.Component<MonsterActionsProps,
         component.setState({
             processing_rank_battle: true
         }, () => {
-            console.log(attackType);
+            console.log(attackType, this.state.rank_selected, this.state.monster_to_fight?.id);
         })
     }
 
@@ -72,7 +64,9 @@ export default class MonsterActions extends React.Component<MonsterActionsProps,
     }
 
     setRank(data: any) {
-
+        this.setState({
+            rank_selected: data.value,
+        });
     }
 
     optionsForRanks() {

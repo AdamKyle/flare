@@ -31,5 +31,6 @@ class CreateMonsterCache extends Command {
     {
         $buildMonsterCacheService->buildCache();
         $buildMonsterCacheService->buildCelesetialCache();
+        $buildMonsterCacheService->createRankMonsters();
     }
 }

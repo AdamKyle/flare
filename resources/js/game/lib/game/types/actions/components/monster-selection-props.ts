@@ -1,5 +1,6 @@
 import MonsterType from "../monster/monster-type";
 import {CharacterType} from "../../../character/character-type";
+import MonsterSelection from "../../../../../sections/game-actions-section/components/monster-selection";
 
 export default interface MonsterSelectionProps {
     monsters: MonsterType[]|[];

@@ -2,6 +2,8 @@
 
 namespace App\Flare\Services;
 
+use App\Flare\Transformers\RankMonsterTransformer;
+use App\Flare\Values\MapNameValue;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Collection as DBCollection;
 use Illuminate\Support\Collection as IlluminateCollection;
@@ -12,6 +14,7 @@ use App\Flare\Values\LocationEffectValue;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Monster;
 use App\Flare\Transformers\MonsterTransformer;
+use League\Fractal\Resource\Item;
 
 class BuildMonsterCacheService {
 
@@ -26,12 +29,19 @@ class BuildMonsterCacheService {
     private MonsterTransformer $monster;
 
     /**
+     * @var RankMonsterTransformer $rankMonsterTransformer
+     */
+    private RankMonsterTransformer $rankMonsterTransformer;
+
+    /**
      * @param Manager $manager
      * @param MonsterTransformer $monster
+     * @param RankMonsterTransformer $rankMonsterTransformer
      */
-    public function __construct(Manager $manager, MonsterTransformer $monster) {
-        $this->manager            = $manager;
-        $this->monster            = $monster;
+    public function __construct(Manager $manager, MonsterTransformer $monster, RankMonsterTransformer $rankMonsterTransformer) {
+        $this->manager                = $manager;
+        $this->monster                = $monster;
+        $this->rankMonsterTransformer = $rankMonsterTransformer;
     }
 
     /**
@@ -69,7 +79,7 @@ class BuildMonsterCacheService {
     public function buildCelesetialCache(): void {
         $monstersCache = [];
 
-        Cache::delete('monsters');
+        Cache::delete('celestials');
 
         foreach (GameMap::all() as $gameMap) {
             $monsters =  new Collection(
@@ -83,6 +93,43 @@ class BuildMonsterCacheService {
         }
 
         Cache::put('celestials', $monstersCache);
+    }
+
+    /**
+     * @return void
+     */
+    public function createRankMonsters(): void {
+        $rankCache = [];
+
+        Cache::delete('rank-monsters');
+        $purgatoryMonsters = Monster::where('game_map_id', GameMap::where('name', MapNameValue::PURGATORY)->first()->id)->get();
+        $maxAmount         = 5000000000;
+        $monsterAmount     = $purgatoryMonsters->count();
+
+        for ($i = 1; $i <= 10; $i++) {
+
+            $statAmount =  $monsterAmount / $maxAmount;
+            $count      =  1;
+
+            foreach ($purgatoryMonsters as $monster) {
+                $statAmount = ($statAmount * $count);
+
+                if ($statAmount > $maxAmount) {
+                    $statAmount = $maxAmount;
+                }
+
+                $transformer = $this->rankMonsterTransformer->setStat($statAmount);
+
+                $monster = new Item($monster, $transformer);
+                $rankCache[$i][] = $this->manager->createData($monster)->toArray();
+
+                $count++;
+            }
+
+            $maxAmount += $maxAmount;
+        }
+
+        Cache::put('rank-monsters', $rankCache);
     }
 
     /**

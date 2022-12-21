@@ -3,6 +3,7 @@
 namespace App\Flare\Providers;
 
 use App\Flare\Builders\CharacterInformation\AttributeBuilders\ClassRanksWeaponMasteriesBuilder;
+use App\Flare\Transformers\RankMonsterTransformer;
 use App\Game\Skills\Services\SkillService;
 use Illuminate\Support\Facades\Blade;
 use League\Fractal\Manager;
@@ -209,7 +210,8 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(BuildMonsterCacheService::class, function($app) {
             return new BuildMonsterCacheService(
                 $app->make(Manager::class),
-                $app->make(MonsterTransformer::class)
+                $app->make(MonsterTransformer::class),
+                $app->make(RankMonsterTransformer::class),
             );
         });
 
