@@ -212,4 +212,8 @@ export interface CharacterType {
     reincarnated_stat_increase: number | null;
 
     xp_penalty: number | null;
+
+    base_stat_mod: number;
+
+    base_damage_stat_mod: number;
 }

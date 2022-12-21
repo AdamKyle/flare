@@ -64,6 +64,8 @@ class Character extends Model
         'is_mercenary_unlocked',
         'reincarnated_stat_increase',
         'times_reincarnated',
+        'base_stat_mod',
+        'base_damage_stat_mod',
     ];
 
     /**
@@ -107,6 +109,8 @@ class Character extends Model
         'copper_coins'                => 'integer',
         'reincarnated_stat_increase'  => 'integer',
         'times_reincarnated'          => 'integer',
+        'base_stat_mod'               => 'float',
+        'base_damage_stat_mod'        => 'float',
     ];
 
     public function race() {

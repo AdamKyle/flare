@@ -1,5 +1,6 @@
 import MonsterType from "./monster/monster-type";
 import {BattleMessage} from "../../actions/battle/types/battle-message-type";
+import FightSection from "../../../../sections/game-actions-section/components/fight-section";
 
 export default interface FightSectionState {
     battle_messages: BattleMessage[]|[];
@@ -19,4 +20,6 @@ export default interface FightSectionState {
     is_monster_voided: boolean,
 
     monster_to_fight: MonsterType|null,
+
+    processing_rank_battle: boolean;
 }

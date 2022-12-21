@@ -108,7 +108,6 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
 
         // @ts-ignore
         this.manageRankFights.listen('Game.Maps.Events.UpdateRankFights', (event: any) => {
-            console.log(event);
             this.setState({
                 show_rank_fight: event.showRankSelection,
             });

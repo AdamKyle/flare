@@ -11,6 +11,7 @@ import AmbushHandler
 import Ajax from "../../../lib/ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
 import FightSectionState from "../../../lib/game/types/actions/fight-section-state";
+import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 
 export default class FightSection extends React.Component<FightSectionProps, FightSectionState> {
 
@@ -29,16 +30,25 @@ export default class FightSection extends React.Component<FightSectionProps, Fig
             is_character_voided: false,
             is_monster_voided: false,
             monster_to_fight: null,
+            processing_rank_battle: false,
         }
 
         this.battle_messages = [];
     }
 
     componentDidMount() {
+        if (this.props.is_rank_fight) {
+            return;
+        }
+
         this.setUpBattle();
     }
 
     componentDidUpdate() {
+        if (this.props.is_rank_fight) {
+            return;
+        }
+
         if (this.props.monster_to_fight.id !== this.state.monster_to_fight_id) {
             this.setState({
                 battle_messages: [],
@@ -142,6 +152,11 @@ export default class FightSection extends React.Component<FightSectionProps, Fig
     }
 
     attack(attackType: string) {
+
+        if (this.props.is_rank_fight) {
+            return this.props.process_rank_fight(this, attackType);
+        }
+
         const attack = new Attack(this.state.character_current_health, this.state.monster_current_health, this.state.is_character_voided, this.state.is_monster_voided);
 
         if (this.state.is_character_voided) {
@@ -190,6 +205,16 @@ export default class FightSection extends React.Component<FightSectionProps, Fig
     }
 
     attackButtonDisabled() {
+
+        if (this.props.is_rank_fight) {
+
+            if (this.props.character?.is_dead || !this.props.character?.can_attack) {
+                return true;
+            }
+
+            return false;
+        }
+
         if (typeof this.state.character_current_health === 'undefined') {
             return true;
         }
@@ -226,6 +251,13 @@ export default class FightSection extends React.Component<FightSectionProps, Fig
                     <span className={'w-10 ml-2'}>Atk & Cast</span>
                     <span className={'w-10 ml-2'}>Defend</span>
                 </div>
+                {
+                    this.state.processing_rank_battle ?
+                        <div className='w-1/2 mx-auto'>
+                            <LoadingProgressBar />
+                        </div>
+                    : null
+                }
                 {
                     this.attackButtonDisabled() ?
                         <div className='text-center mt-4'>

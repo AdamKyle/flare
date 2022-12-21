@@ -1,5 +1,6 @@
 import {CharacterType} from "../../character/character-type";
 import MonsterType from "./monster/monster-type";
+import FightSection from "../../../../sections/game-actions-section/components/fight-section";
 
 export default interface FightSectionProps {
 
@@ -18,4 +19,8 @@ export default interface FightSectionProps {
     character_revived: boolean;
 
     is_small: boolean;
+
+    is_rank_fight: boolean
+
+    process_rank_fight: (component: FightSection, attackType: string) => void;
 }

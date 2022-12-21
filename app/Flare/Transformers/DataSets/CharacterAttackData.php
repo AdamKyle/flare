@@ -35,6 +35,8 @@ class CharacterAttackData {
             'int_modded'                  => $characterStatBuilder->statMod('int'),
             'agi_modded'                  => $characterStatBuilder->statMod('agi'),
             'focus_modded'                => $characterStatBuilder->statMod('focus'),
+            'base_stat_mod'               => $character->base_stat_mod,
+            'base_damage_stat_mod'        => $character->base_damage_stat_mod,
             'str'                         => $character->str,
             'dur'                         => $character->dur,
             'dex'                         => $character->dex,

@@ -10,6 +10,7 @@ use App\Flare\Services\CharacterRewardService;
 use App\Game\Core\Events\CharacterLevelUpEvent;
 use App\Game\Core\Events\UpdateCharacterEvent;
 use App\Game\Core\Services\CharacterService;
+use Exception;
 
 class CharacterLevelUpListener
 {
@@ -25,7 +26,7 @@ class CharacterLevelUpListener
      * Constructor
      *
      * @param CharacterService $characterService
-     * @return void
+     * @param BuildCharacterAttackTypes $buildCharacterAttackTypes
      */
     public function __construct(CharacterService $characterService, BuildCharacterAttackTypes $buildCharacterAttackTypes) {
         $this->characterService          = $characterService;
@@ -37,6 +38,7 @@ class CharacterLevelUpListener
      *
      * @param CharacterLevelUpEvent $event
      * @return void
+     * @throws Exception
      */
     public function handle(CharacterLevelUpEvent $event)
     {

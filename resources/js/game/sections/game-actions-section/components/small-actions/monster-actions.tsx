@@ -43,6 +43,14 @@ export default class MonsterActions extends React.Component<MonsterActionsProps,
         }
     }
 
+    processRankFight(component: FightSection, attackType: string) {
+        component.setState({
+            processing_rank_battle: true
+        }, () => {
+            console.log(attackType);
+        })
+    }
+
     setSelectedMonster(monster: MonsterType|null) {
         this.monsterActionManager.setSelectedMonster(monster);
     }
@@ -92,6 +100,7 @@ export default class MonsterActions extends React.Component<MonsterActionsProps,
                             menuPlacement={'bottom'}
                             styles={{menuPortal: (base) => ({...base, zIndex: 9999, color: '#000000'})}}
                             menuPortalTarget={document.body}
+                            value={{label: 'Rank 1', value: 1}}
                         />
                     </div>
                     <div className='cols-start-3 cols-end-3'>
@@ -156,6 +165,8 @@ export default class MonsterActions extends React.Component<MonsterActionsProps,
                             character_revived={this.state.character_revived}
                             reset_revived={this.resetRevived.bind(this)}
                             is_small={this.props.is_small}
+                            is_rank_fight={this.props.is_rank_fights}
+                            process_rank_fight={this.processRankFight.bind(this)}
                         />
                     : null
                 }

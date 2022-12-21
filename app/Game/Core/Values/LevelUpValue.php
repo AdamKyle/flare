@@ -16,16 +16,18 @@ class LevelUpValue {
      */
     public function createValueObject(Character $character, int $leftOverXP = 0) {
         return [
-            'level'   => $character->level + 1,
-            'xp'      => $leftOverXP,
-            'xp_next' => 100,
-            'str'     => $this->addValue($character, 'str'),
-            'dur'     => $this->addValue($character, 'dur'),
-            'dex'     => $this->addValue($character, 'dex'),
-            'chr'     => $this->addValue($character, 'chr'),
-            'int'     => $this->addValue($character, 'int'),
-            'agi'     => $this->addValue($character, 'agi'),
-            'focus'   => $this->addValue($character, 'focus'),
+            'level'                => $character->level + 1,
+            'xp'                   => $leftOverXP,
+            'xp_next'              => 100,
+            'str'                  => $this->addValue($character, 'str'),
+            'dur'                  => $this->addValue($character, 'dur'),
+            'dex'                  => $this->addValue($character, 'dex'),
+            'chr'                  => $this->addValue($character, 'chr'),
+            'int'                  => $this->addValue($character, 'int'),
+            'agi'                  => $this->addValue($character, 'agi'),
+            'focus'                => $this->addValue($character, 'focus'),
+            'base_stat_mod'        => $this->addModifier($character, 'base_stat_mod'),
+            'base_damage_stat_mod' => $this->addModifier($character, 'base_damage_stat_mod', true),
         ];
     }
 
@@ -49,5 +51,26 @@ class LevelUpValue {
         }
 
         return $character->{$currenStat} += 1;
+    }
+
+    /**
+     * Add to the stat modifier pool when the stats are maxed out.
+     *
+     * @param Character $character
+     * @param string $stat
+     * @param bool $isDamage
+     * @return float
+     */
+    protected function addModifier(Character $character, string $stat, bool $isDamage = false): float {
+
+        if ($isDamage && $character->{$character->damage_stat} >= 999999) {
+            return $character->{$stat} + 0.002;
+        }
+
+        if ($character->str >= 999999 && !$isDamage) {
+            return $character->{$stat} + 0.0001;
+        }
+
+        return 0.0;
     }
 }

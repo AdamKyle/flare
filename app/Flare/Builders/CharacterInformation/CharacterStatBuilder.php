@@ -238,10 +238,10 @@ class CharacterStatBuilder {
                                                   ->where('base_damage_stat_increase', '>', 0)
                                                   ->sum('base_damage_stat_increase');
 
-            $baseStat = $baseStat + $baseStat * $classSpecialsBonus;
+            $baseStat = $baseStat + $baseStat * ($classSpecialsBonus + $this->character->base_damage_stat_mod);
+        } else {
+            $baseStat = $baseStat + $baseStat * $this->character->base_stat_mod;
         }
-
-        dump('Ignore: ' . ($this->ignoreReductions ? 'Yes' : 'No'));
 
         if (($this->map->mapType()->isHell() || $this->map->mapType()->isPurgatory()) && !$this->ignoreReductions) {
             $baseStat = $baseStat - $baseStat * $this->map->character_attack_reduction;
