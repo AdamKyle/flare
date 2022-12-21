@@ -34,6 +34,8 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
 
     private traverseUpdate: any;
 
+    private manageRankFights: any;
+
     constructor(props: ActionsProps) {
         super(props);
 
@@ -53,6 +55,7 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
             show_hell_forged_section: false,
             show_purgatory_chains_section: false,
             show_gambling_section: false,
+            show_rank_fight: false,
         }
 
         this.actionsManager = new ActionsManager(this);
@@ -71,6 +74,9 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
 
         // @ts-ignore
         this.traverseUpdate = Echo.private('update-plane-' + this.props.character.user_id);
+
+        // @ts-ignore
+        this.manageRankFights = Echo.private('update-rank-fight-' + this.props.character.user_id);
 
         // @ts-ignore
         this.duelOptions = Echo.join('update-duel');
@@ -97,6 +103,14 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
         this.monsterUpdate.listen('Game.Maps.Events.UpdateMonsterList', (event: any) => {
             this.setState({
                 monsters: event.monsters,
+            });
+        });
+
+        // @ts-ignore
+        this.manageRankFights.listen('Game.Maps.Events.UpdateRankFights', (event: any) => {
+            console.log(event);
+            this.setState({
+                show_rank_fight: event.showRankSelection,
             });
         });
 
@@ -236,11 +250,13 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
                     <div className='md:col-start-1 md:col-span-1'>
                         {
                             !this.state.show_exploration && !this.state.show_duel_fight && !this.state.show_join_pvp && !this.state.show_celestial_fight && this.props.character !== null ?
-                                <DropDown menu_items={this.actionsManager.buildCraftingList(this.openCrafting.bind(this))}
-                                          button_title={'Craft/Enchant'}
-                                          disabled={this.actionsManager.cannotCraft()}
-                                          selected_name={this.actionsManager.getSelectedCraftingOption()}
-                                />
+                                <div>
+                                    <DropDown menu_items={this.actionsManager.buildCraftingList(this.openCrafting.bind(this))}
+                                              button_title={'Craft/Enchant'}
+                                              disabled={this.actionsManager.cannotCraft()}
+                                              selected_name={this.actionsManager.getSelectedCraftingOption()}
+                                    />
+                                </div>
                             : null
                         }
 
@@ -314,6 +330,7 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
                                 <MonsterActions monsters={this.state.monsters}
                                                 character={this.props.character}
                                                 character_statuses={this.props.character_status}
+                                                is_rank_fights={this.state.show_rank_fight}
                                                 is_small={false}
                                 >
                                     {

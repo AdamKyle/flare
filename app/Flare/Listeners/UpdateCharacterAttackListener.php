@@ -43,6 +43,8 @@ class UpdateCharacterAttackListener
 
         $event->character->refresh();
 
+        $this->characterAttackTransformer->setIgnoreReductions($event->ignoreReductions);
+
         $attack = new Item($event->character, $this->characterAttackTransformer);
         $attack = $this->manager->createData($attack)->toArray();
 

@@ -59,3 +59,8 @@ broadCast::channel('update-location-base-shops-{userId}', function($user, $userI
 broadCast::channel('update-character-position-{userId}', function($user, $userId) {
     return $user->id === (int) $userId;
 });
+
+// Update the character fight section to show rank selection
+broadCast::channel('update-rank-fight-{userId}', function($user, $userId) {
+    return $user->id === (int) $userId;
+});

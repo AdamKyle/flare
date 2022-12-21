@@ -25,23 +25,25 @@ class UpdateCharacterAttackTypes {
 
     /**
      * @param Character $character
+     * @param bool $ignoreReductions
      * @return void
      * @throws Exception
      */
-    public function updateCache(Character $character): void {
-        $cache = $this->buildCharacterAttackTypes->buildCache($character);
+    public function updateCache(Character $character, bool $ignoreReductions = false): void {
+        $cache = $this->buildCharacterAttackTypes->buildCache($character, $ignoreReductions);
 
-        $this->updateCharacterStats($character, $cache);
+        $this->updateCharacterStats($character, $cache, $ignoreReductions);
     }
 
     /**
      * @param Character $character
      * @param array $attackDataCache
+     * @param bool $ignoreReductions
      * @return void
      */
-    protected function updateCharacterStats(Character $character, array $attackDataCache): void {
+    protected function updateCharacterStats(Character $character, array $attackDataCache, bool $ignoreReductions = false): void {
         event(new UpdateCharacterAttacks($character->user, $attackDataCache));
 
-        event(new UpdateCharacterAttackEvent($character));
+        event(new UpdateCharacterAttackEvent($character, $ignoreReductions));
     }
 }

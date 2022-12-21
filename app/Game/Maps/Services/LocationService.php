@@ -3,6 +3,9 @@
 namespace App\Game\Maps\Services;
 
 use App\Flare\Builders\Character\CharacterCacheData;
+use App\Flare\Events\UpdateCharacterAttackEvent;
+use App\Flare\Handlers\UpdateCharacterAttackTypes;
+use App\Flare\Jobs\CharacterAttackTypesCacheBuilderWithDeductions;
 use App\Flare\Models\Map;
 use App\Flare\Values\LocationEffectValue;
 use App\Flare\Values\LocationType;
@@ -10,6 +13,7 @@ use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Maps\Events\UpdateDuelAtPosition;
 use App\Game\Maps\Events\UpdateLocationBasedCraftingOptions;
 use App\Game\Maps\Events\UpdateLocationBasedSpecialShops;
+use App\Game\Maps\Events\UpdateRankFights;
 use Illuminate\Support\Collection;
 use Storage;
 use League\Fractal\Manager;
@@ -38,6 +42,11 @@ class LocationService {
     private CharacterCacheData $characterCacheData;
 
     /**
+     * @var UpdateCharacterAttackTypes $updateCharacterAttackTypes
+     */
+    private UpdateCharacterAttackTypes $updateCharacterAttackTypes;
+
+    /**
      * @var Location $location | null
      */
     private $location;
@@ -50,10 +59,13 @@ class LocationService {
     /**
      * @param CoordinatesCache $coordinatesCache
      * @param CharacterCacheData $characterCacheData
+     * @param UpdateCharacterAttackTypes $updateCharacterAttackTypes
      */
-    public function __construct(CoordinatesCache $coordinatesCache, CharacterCacheData $characterCacheData) {
-        $this->coordinatesCache   = $coordinatesCache;
-        $this->characterCacheData = $characterCacheData;
+    public function __construct(CoordinatesCache $coordinatesCache, CharacterCacheData $characterCacheData, UpdateCharacterAttackTypes $updateCharacterAttackTypes) {
+        $this->coordinatesCache           = $coordinatesCache;
+        $this->characterCacheData         = $characterCacheData;
+        $this->updateCharacterAttackTypes = $updateCharacterAttackTypes;
+
     }
 
     /**
@@ -83,6 +95,8 @@ class LocationService {
 
         $this->characterCacheData->removeFromPvpCache($character);
 
+        $this->updateForRankFights($character);
+
         return [
             'map_url'                => Storage::disk('maps')->url($character->map_url),
             'character_map'          => $character->map,
@@ -98,6 +112,32 @@ class LocationService {
             'characters_on_map'      => $this->getActiveUsersCountForMap($character),
             'lockedLocationType'     => is_null($lockedLocation) ? null : $lockedLocation->type,
         ];
+    }
+
+    protected function updateForRankFights(Character $character): void {
+        if (is_null($this->location)) {
+            return;
+        }
+
+        if (is_null($this->location->type)) {
+            return;
+        }
+
+        if ((new LocationType($this->location->type))->isPurgatorySmithHouse()) {
+            dump('Rank fights?');
+
+            event(new UpdateRankFights($character->user, true));
+
+            $this->updateCharacterAttackTypes->updateCache($character, true);
+
+            return;
+        }
+
+        dump('No Rank fights?');
+
+        $this->updateCharacterAttackTypes->updateCache($character);
+
+        event(new UpdateRankFights($character->user, false));
     }
 
     protected function fetchLocationData(Character $character): Collection {

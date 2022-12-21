@@ -8,6 +8,12 @@ use App\Flare\Models\Character;
 
 class CharacterAttackTransformer extends BaseTransformer {
 
+    private bool $ignoreReductions = false;
+
+    public function setIgnoreReductions(bool $ignoreReductions = false) {
+        $this->ignoreReductions = $ignoreReductions;
+    }
+
     /**
      * creates response data for character attack data.
      *
@@ -16,7 +22,7 @@ class CharacterAttackTransformer extends BaseTransformer {
      */
     public function transform(Character $character) {
 
-        $characterStatBuilder = resolve(CharacterStatBuilder::class)->setCharacter($character);
+        $characterStatBuilder = resolve(CharacterStatBuilder::class)->setCharacter($character, $this->ignoreReductions);
 
         return CharacterAttackData::attackData($character, $characterStatBuilder);
     }

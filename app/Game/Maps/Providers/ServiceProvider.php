@@ -3,6 +3,7 @@
 namespace App\Game\Maps\Providers;
 
 use App\Flare\Builders\Character\CharacterCacheData;
+use App\Flare\Handlers\UpdateCharacterAttackTypes;
 use App\Game\Maps\Services\PctService;
 use App\Game\Maps\Services\SetSailService;
 use App\Game\Maps\Services\TeleportService;
@@ -102,6 +103,7 @@ class ServiceProvider extends ApplicationServiceProvider
             return new LocationService(
                 $app->make(CoordinatesCache::class),
                 $app->make(CharacterCacheData::class),
+                $app->make(UpdateCharacterAttackTypes::class),
             );
         });
 

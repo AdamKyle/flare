@@ -35,12 +35,13 @@ class CharacterAttackBuilder {
      * Set the character.
      *
      * @param Character $character
+     * @param bool $ignoreReductions
      * @return $this
      */
-    public function setCharacter(Character $character): CharacterAttackBuilder {
+    public function setCharacter(Character $character, bool $ignoreReductions = false): CharacterAttackBuilder {
         $this->character = $character;
 
-        $this->characterStatBuilder = $this->characterStatBuilder->setCharacter($character);
+        $this->characterStatBuilder = $this->characterStatBuilder->setCharacter($character, $ignoreReductions);
 
         return $this;
     }

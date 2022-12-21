@@ -7,6 +7,7 @@ import MonsterType from "../../../../lib/game/types/actions/monster/monster-type
 import MonsterActionsProps from "../../../../lib/game/types/actions/components/monster-actions-props";
 import MonsterActionState from "../../../../lib/game/types/actions/components/monster-action-state";
 import {isEqual} from "lodash";
+import Select from "react-select";
 
 export default class MonsterActions extends React.Component<MonsterActionsProps, MonsterActionState> {
 
@@ -22,6 +23,15 @@ export default class MonsterActions extends React.Component<MonsterActionsProps,
             is_same_monster: false,
             character_revived: false,
             attack_time_out: 0,
+            rank_selected: 0,
+        }
+    }
+
+    componentDidMount() {
+        if (this.props.is_rank_fights) {
+            this.setState({
+                rank_selected: 1,
+            });
         }
     }
 
@@ -53,6 +63,47 @@ export default class MonsterActions extends React.Component<MonsterActionsProps,
         this.monsterActionManager.revive(this.props.character.id);
     }
 
+    setRank(data: any) {
+
+    }
+
+    optionsForRanks() {
+        const options = [];
+
+        for (let i = 1; i <= 10; i++) {
+            options.push({
+                label: 'Rank ' + i,
+                value: i
+            });
+        }
+
+        return options;
+    }
+
+    renderRankSelection() {
+        return (
+            <div className='mt-2 md:ml-[120px]'>
+                <div className='grid grid-cols-3 gap-2'>
+                    <div className='cols-start-1 col-span-2'>
+                        <Select
+                            onChange={this.setRank.bind(this)}
+                            options={this.optionsForRanks()}
+                            menuPosition={'absolute'}
+                            menuPlacement={'bottom'}
+                            styles={{menuPortal: (base) => ({...base, zIndex: 9999, color: '#000000'})}}
+                            menuPortalTarget={document.body}
+                        />
+                    </div>
+                    <div className='cols-start-3 cols-end-3'>
+                        <a href='/information/rank-fights' target='_blank' className='ml-2 relative top-[5px]'>Help <i
+                            className="fas fa-external-link-alt"></i></a>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+
     render() {
         return (
             <div className='relative'>
@@ -63,6 +114,12 @@ export default class MonsterActions extends React.Component<MonsterActionsProps,
                         >
                             <i className="fas fa-times-circle"></i>
                         </button>
+                    : null
+                }
+
+                {
+                    this.props.is_rank_fights ?
+                        this.renderRankSelection()
                     : null
                 }
 

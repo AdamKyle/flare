@@ -8,4 +8,6 @@ export default interface MonsterActionState {
     character_revived: boolean;
 
     attack_time_out: number;
+
+    rank_selected: number;
 }

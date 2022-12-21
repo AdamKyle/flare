@@ -27,12 +27,13 @@ class BuildCharacterAttackTypes {
      * Build character attack data cache
      *
      * @param Character $character
+     * @param bool $ignoreReductions
      * @return array
      * @throws \Exception
      */
-    public function buildCache(Character $character): array {
+    public function buildCache(Character $character, bool $ignoreReductions = false): array {
 
-        $characterAttack = $this->characterAttackBuilder->setCharacter($character->refresh());
+        $characterAttack = $this->characterAttackBuilder->setCharacter($character->refresh(), $ignoreReductions);
 
         Cache::put('character-attack-data-' . $character->id, [
             'attack_types' => [

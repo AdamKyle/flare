@@ -78,6 +78,11 @@ class CharacterStatBuilder {
     private ReductionsBuilder $reductionsBuilder;
 
     /**
+     * @var bool $ignoreReductions
+     */
+    private bool $ignoreReductions = false;
+
+    /**
      * @param DefenceBuilder $defenceBuilder
      * @param DamageBuilder $damageBuilder
      * @param HealingBuilder $healingBuilder
@@ -101,10 +106,11 @@ class CharacterStatBuilder {
      * Set the character and their inventory.
      *
      * @param Character $character
+     * @param bool $ignoreReductions
      * @return CharacterStatBuilder
      */
-    public function setCharacter(Character $character): CharacterStatBuilder {
-        $this->startTime = microtime(true);
+    public function setCharacter(Character $character, bool $ignoreReductions = false): CharacterStatBuilder {
+        $this->ignoreReductions = $ignoreReductions;
 
         $this->character      = $character;
 
@@ -235,7 +241,9 @@ class CharacterStatBuilder {
             $baseStat = $baseStat + $baseStat * $classSpecialsBonus;
         }
 
-        if ($this->map->mapType()->isHell() || $this->map->mapType()->isPurgatory()) {
+        dump('Ignore: ' . ($this->ignoreReductions ? 'Yes' : 'No'));
+
+        if (($this->map->mapType()->isHell() || $this->map->mapType()->isPurgatory()) && !$this->ignoreReductions) {
             $baseStat = $baseStat - $baseStat * $this->map->character_attack_reduction;
         }
 

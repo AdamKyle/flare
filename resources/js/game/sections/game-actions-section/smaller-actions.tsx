@@ -36,6 +36,8 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
 
     private celestialTimeout: any;
 
+    private manageRankFights: any;
+
     constructor(props: SmallActionsProps) {
         super(props);
 
@@ -59,6 +61,7 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
             show_hell_forged_section: false,
             show_purgatory_chains_section: false,
             show_gambling_section: false,
+            show_rank_fight: false,
         }
 
         // @ts-ignore
@@ -83,6 +86,9 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
         this.celestialTimeout   = Echo.private('update-character-celestial-timeout-' + this.props.user_id);
 
         // @ts-ignore
+        this.manageRankFights = Echo.private('update-rank-fight-' + this.props.character.user_id);
+
+        // @ts-ignore
         this.duelOptions = Echo.join('update-duel');
 
         this.smallActionsManager = new SmallActionsManager(this);
@@ -103,6 +109,14 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
         this.craftingTimeOut.listen('Game.Core.Events.ShowCraftingTimeOutEvent', (event: any) => {
             this.setState({
                 crafting_time_out: event.timeout,
+            });
+        });
+
+        // @ts-ignore
+        this.manageRankFights.listen('Game.Maps.Events.UpdateRankFights', (event: any) => {
+            console.log(event);
+            this.setState({
+                show_rank_fight: event.showRankSelection,
             });
         });
 
@@ -246,6 +260,7 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
         return (
             <MonsterActions monsters={this.state.monsters}
                             character={this.props.character}
+                            is_rank_fights={this.state.show_rank_fight}
                             close_monster_section={this.closeMonsterSection.bind(this)}
                             character_statuses={this.props.character_status}
                             is_small={true}
