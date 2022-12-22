@@ -38,7 +38,7 @@ class SecondaryAttacks extends BattleBase {
             if ($this->isEnemyEntranced) {
                 $affixReduction = 0.0;
             }
-
+            dump('Secondary PVP Attack. Is Pvp On: ' . ($isPvp ? 'Yes' : 'No'));
             $this->classSpecialtyDamage($isPvp);
 
             $this->affixLifeStealingDamage($character, $monster, $affixReduction, $isPvp);
@@ -96,11 +96,11 @@ class SecondaryAttacks extends BattleBase {
 
         if ($special['required_attack_type'] === $this->attackData['attack_type']) {
             $this->monsterHealth -= $special['damage'];
-
+            
             $this->addMessage('Your class special: ' . $special['name'] . ' fires off and you do: ' . number_format($special['damage']) . ' damage to the enemy!', "player-action", $isPvp);
 
             if ($isPvp) {
-                $this->addDefenderMessage('The enemy lashes out using one of their coveted skills (class special) to do:  ' . $special['damage'] . ' damage.', 'enemy-action');
+                $this->addDefenderMessage('The enemy lashes out using one of their coveted skills (class special) to do:  ' . number_format($special['damage']) . ' damage.', 'enemy-action');
             }
         }
     }

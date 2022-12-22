@@ -55,7 +55,7 @@ class AttackAndCast extends BattleBase
         $this->handlePvpWeaponAttack($attacker, $defender);
         $this->handlePvpCastAttack($attacker, $defender);
 
-        $this->secondaryAttack($attacker, null, $this->characterCacheData->getCachedCharacterData($attacker, 'affix_damage_reduction'));
+        $this->secondaryAttack($attacker, null, $this->characterCacheData->getCachedCharacterData($attacker, 'affix_damage_reduction'), true);
 
         return $this;
     }

@@ -153,6 +153,13 @@ export default class CelestialFight extends React.Component<any, any> {
                         <a href='/information/combat' target='_blank' className='ml-2'>Help <i
                             className="fas fa-external-link-alt"></i></a>
                     </div>
+                    <div className={clsx('mt-1 text-xs text-center ml-[-50px]', { 'hidden': this.attackButtonDisabled() })}>
+                        <span className={'w-10 mr-4 ml-4'}>Atk</span>
+                        <span className={'w-10 ml-6'}>Cast</span>
+                        <span className={'w-10 ml-4'}>Cast & Atk</span>
+                        <span className={'w-10 ml-2'}>Atk & Cast</span>
+                        <span className={'w-10 ml-2'}>Defend</span>
+                    </div>
                     {
                         this.state.monster_max_health > 0 ?
                             <div className={clsx('mb-4 max-w-md m-auto', {

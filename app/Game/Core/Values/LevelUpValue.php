@@ -12,9 +12,14 @@ class LevelUpValue {
      * Increases core stats.
      *
      * @param Character $character
+     * @param int $leftOverXP
      * @return array
      */
-    public function createValueObject(Character $character, int $leftOverXP = 0) {
+    public function createValueObject(Character $character, int $leftOverXP = 0): array {
+
+        $baseStatMod       = $this->addModifier($character, 'base_stat_mod');
+        $baseDamageStatMod = $this->addModifier($character, 'base_damage_stat_mod', true);
+
         return [
             'level'                => $character->level + 1,
             'xp'                   => $leftOverXP,
@@ -26,8 +31,8 @@ class LevelUpValue {
             'int'                  => $this->addValue($character, 'int'),
             'agi'                  => $this->addValue($character, 'agi'),
             'focus'                => $this->addValue($character, 'focus'),
-            'base_stat_mod'        => $this->addModifier($character, 'base_stat_mod'),
-            'base_damage_stat_mod' => $this->addModifier($character, 'base_damage_stat_mod', true),
+            'base_stat_mod'        => min($baseStatMod, 5.0),
+            'base_damage_stat_mod' => min($baseDamageStatMod, 5.0),
         ];
     }
 

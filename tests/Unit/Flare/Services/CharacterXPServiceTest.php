@@ -358,7 +358,7 @@ class CharacterXPServiceTest extends TestCase {
         $character->update(['level' => 3000]);
 
         $xp = $this->characterXPService->determineXPToAward($character->refresh(), 10);
-        
+
         $this->assertEquals(10, $xp);
     }
 

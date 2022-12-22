@@ -23,7 +23,7 @@ class CastAndAttack extends AttackAndCast {
         $this->handlePvpCastAttack($attacker, $defender);
         $this->handlePvpWeaponAttack($attacker, $defender);
 
-        $this->secondaryAttack($attacker, null, $this->characterCacheData->getCachedCharacterData($attacker, 'affix_damage_reduction'));
+        $this->secondaryAttack($attacker, null, $this->characterCacheData->getCachedCharacterData($attacker, 'affix_damage_reduction'), true);
 
         return $this;
     }
