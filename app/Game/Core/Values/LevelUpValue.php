@@ -32,7 +32,7 @@ class LevelUpValue {
             'agi'                  => $this->addValue($character, 'agi'),
             'focus'                => $this->addValue($character, 'focus'),
             'base_stat_mod'        => min($baseStatMod, 5.0),
-            'base_damage_stat_mod' => min($baseDamageStatMod, 5.0),
+            'base_damage_stat_mod' => min($baseDamageStatMod, 10.0),
         ];
     }
 

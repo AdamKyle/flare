@@ -96,7 +96,7 @@ class SecondaryAttacks extends BattleBase {
 
         if ($special['required_attack_type'] === $this->attackData['attack_type']) {
             $this->monsterHealth -= $special['damage'];
-            
+
             $this->addMessage('Your class special: ' . $special['name'] . ' fires off and you do: ' . number_format($special['damage']) . ' damage to the enemy!', "player-action", $isPvp);
 
             if ($isPvp) {
