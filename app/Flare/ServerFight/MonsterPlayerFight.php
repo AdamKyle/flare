@@ -2,6 +2,7 @@
 
 namespace App\Flare\ServerFight;
 
+use App\Flare\ServerFight\Monster\ServerMonster;
 use Illuminate\Support\Facades\Cache;
 use App\Flare\Models\Character;
 use App\Flare\ServerFight\Fight\Ambush;
@@ -84,6 +85,20 @@ class MonsterPlayerFight {
     }
 
     /**
+     * Set the character.
+     *
+     * - Useful for rank fights where the setup is already done and in the cache.
+     *
+     * @param Character $character
+     * @return MonsterPlayerFight
+     */
+    public function setCharacter(Character $character): MonsterPlayerFight {
+        $this->character = $character;
+
+        return $this;
+    }
+
+    /**
      * Set up the fight.
      *
      * - Can return an error if the monster is not found.
@@ -100,6 +115,28 @@ class MonsterPlayerFight {
         if (empty($this->monster)) {
             return $this->errorResult('No monster was found.');
         }
+
+        return $this;
+    }
+
+    /**
+     * Set up the rank fight.
+     *
+     * @param Character $character
+     * @param int $monsterId
+     * @param int $rank
+     * @return array|$this
+     */
+    public function setUpRankFight(Character $character, int $monsterId, int $rank): MonsterPlayerFight|array {
+
+        $rankMonster = $this->fetchRankMonster($monsterId, $rank);
+
+        if (is_null($rankMonster)) {
+            return $this->errorResult('No monster was found.');
+        }
+
+        $this->character = $character;
+        $this->monster   = $rankMonster;
 
         return $this;
     }
@@ -155,6 +192,15 @@ class MonsterPlayerFight {
     }
 
     /**
+     * get the monster.
+     *
+     * @return array
+     */
+    public function getMonster(): array {
+        return $this->monster;
+    }
+
+    /**
      * Get the character health.
      *
      * @return int
@@ -173,23 +219,19 @@ class MonsterPlayerFight {
     }
 
     /**
-     * Fight the monster.
+     * Base Fight Setup.
      *
-     * - Returns true if the character won.
-     * - Returns false if the character lost or took too long.
-     *
-     * @param bool $onlyOnce
-     * @return bool
+     * @param bool $isRankFight
+     * @return array
      */
-    public function fightMonster(bool $onlyOnce = false): bool {
-
+    public function fightSetUp(bool $isRankFight = false): array {
         $characterStatReductionAffixes = $this->characterCacheData->getCachedCharacterData($this->character, 'stat_affixes');
         $skillReduction                = $this->characterCacheData->getCachedCharacterData($this->character, 'skill_reduction');
         $resistanceReduction           = $this->characterCacheData->getCachedCharacterData($this->character, 'resistance_reduction');
 
-        $monster = $this->buildMonster->buildMonster($this->monster, $characterStatReductionAffixes, $skillReduction, $resistanceReduction);
+        $monster       = $this->buildMonster->buildMonster($this->monster, $characterStatReductionAffixes, $skillReduction, $resistanceReduction);
 
-        $this->voidance->void($this->character, $this->characterCacheData, $monster);
+        $this->voidance->void($this->character, $this->characterCacheData, $monster, $isRankFight);
 
         $this->mergeMessages($this->voidance->getMessages());
 
@@ -198,12 +240,66 @@ class MonsterPlayerFight {
         $isPlayerVoided = $this->voidance->isPlayerVoided();
         $isEnemyVoided  = $this->voidance->isEnemyVoided();
 
-        $ambush = $this->ambush->handleAmbush($this->character, $monster, $isPlayerVoided);
+        $ambush = $this->ambush->handleAmbush($this->character, $monster, $isPlayerVoided, $isRankFight);
 
         $this->mergeMessages($ambush->getMessages());
 
         $health = $ambush->getHealthObject();
 
+        $health['max_character_health'] = $this->characterCacheData->getCachedCharacterData($this->character, 'health');
+        $health['max_monster_health']   = $monster->getHealth();
+
+        $data = [
+            'health'        => $health,
+            'player_voided' => $isPlayerVoided,
+            'enemy_voided'  => $isEnemyVoided,
+            'monster'       => $monster,
+        ];
+
+        if ($isRankFight && ($data['health']['character_health'] > 0 && $data['health']['monster_health'] > 0)) {
+            Cache::put('rank-fight-for-character-' . $this->character->id, $data);
+        }
+
+        return $data;
+    }
+
+    /**
+     * Fight the monster.
+     *
+     * - Returns true if the character won.
+     * - Returns false if the character lost or took too long.
+     *
+     * @param bool $onlyOnce
+     * @param bool $isRankFight
+     * @param string|null $attackType
+     * @return bool
+     */
+    public function fightMonster(bool $onlyOnce = false, bool $isRankFight = false, string $attackType = null): bool {
+
+        if (!is_null($attackType)) {
+            $this->attackType = $attackType;
+        }
+
+        if ($isRankFight) {
+            if (Cache::has('rank-fight-for-character-' . $this->character->id)) {
+                $data = Cache::get('rank-fight-for-character-' . $this->character->id);
+
+                $this->monster = $data['monster']->getMonster();
+            } else {
+                $data = $this->fightSetUp(true);
+
+                $this->monster = $data['monster']->getMonster();
+            }
+        } else {
+            $data = $this->fightSetUp();
+
+            $this->monster = $data['monster']->getMonster();
+        }
+
+        $health         = $data['health'];
+        $monster        = $data['monster'];
+        $isPlayerVoided = $data['player_voided'];
+        $isEnemyVoided  = $data['enemy_voided'];
 
         if ($health['character_health'] <= 0) {
             $this->battleMessages[] = [
@@ -223,11 +319,25 @@ class MonsterPlayerFight {
             return true;
         }
 
-        $this->attack->setHealth($ambush->getHealthObject())
-                     ->setIsCharacterVoided($isPlayerVoided)
-                     ->setIsEnemyVoided($isEnemyVoided)
-                     ->onlyAttackOnce($onlyOnce)
-                     ->attack($this->character, $monster, $this->attackType, 'character');
+        return $this->doAttack($monster, $health, $isPlayerVoided, $isEnemyVoided, $onlyOnce);
+    }
+
+    /**
+     * Do the actual attack
+     *
+     * @param ServerMonster $monster
+     * @param array $health
+     * @param bool $isPlayerVoided
+     * @param bool $isEnemyVoided
+     * @param bool $onlyOnce
+     * @return bool
+     */
+    protected function doAttack(ServerMonster $monster, array $health, bool $isPlayerVoided, bool $isEnemyVoided, bool $onlyOnce): bool {
+        $this->attack->setHealth($health)
+            ->setIsCharacterVoided($isPlayerVoided)
+            ->setIsEnemyVoided($isEnemyVoided)
+            ->onlyAttackOnce($onlyOnce)
+            ->attack($this->character, $monster, $this->attackType, 'character');
 
         $this->mergeMessages($this->attack->getMessages());
 
@@ -306,6 +416,29 @@ class MonsterPlayerFight {
         }
 
         $monsters = Cache::get('celestials')[$mapName];
+
+        foreach ($monsters as $monster) {
+            if ($monster['id'] === $monsterId) {
+                return $monster;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Fetch Rank Monster.
+     *
+     * @param int $monsterId
+     * @param int $rank
+     * @return array|null
+     */
+    protected function fetchRankMonster(int $monsterId, int $rank): array|null {
+        if (!Cache::has('rank-monsters')) {
+            resolve(BuildMonsterCacheService::class)->createRankMonsters();
+        }
+
+        $monsters = Cache::get('rank-monsters')[$rank];
 
         foreach ($monsters as $monster) {
             if ($monster['id'] === $monsterId) {

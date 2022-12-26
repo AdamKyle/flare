@@ -8,6 +8,8 @@ import MonsterActionsProps from "../../../../lib/game/types/actions/components/m
 import MonsterActionState from "../../../../lib/game/types/actions/components/monster-action-state";
 import {isEqual} from "lodash";
 import Select from "react-select";
+import Ajax from "../../../../lib/ajax/ajax";
+import {AxiosError, AxiosResponse} from "axios";
 
 export default class MonsterActions extends React.Component<MonsterActionsProps, MonsterActionState> {
 
@@ -35,11 +37,75 @@ export default class MonsterActions extends React.Component<MonsterActionsProps,
         }
     }
 
+    setupRankFight(component: FightSection) {
+        component.setState({
+            processing_rank_battle: true
+        }, () => {
+
+            if (this.state.monster_to_fight === null) {
+                component.setState({
+                    processing_rank_battle: false,
+                });
+
+                return;
+            }
+
+            (new Ajax()).setRoute('set-up-rank-fight/'+this.props.character.id+'/' + this.state.monster_to_fight.id)
+                .setParameters({rank: this.state.rank_selected})
+                .doAjaxCall('post', (result: AxiosResponse) => {
+                    console.log(result.data);
+
+                    this.setState({
+                        is_same_monster: false,
+                    }, () => {
+                        component.setState({
+                            processing_rank_battle: false,
+                            battle_messages: result.data.messages,
+                            character_current_health: result.data.health.character_health,
+                            character_max_health: result.data.health.max_character_health,
+                            monster_current_health: result.data.health.monster_health,
+                            monster_max_health: result.data.health.max_monster_health,
+                            setting_up_rank_fight: false,
+                        });
+                    })
+
+                }, (error: AxiosError) => {
+                    component.setState({
+                        processing_rank_battle: false,
+                    });
+
+                    console.log(error);
+                });
+        });
+    }
+
     processRankFight(component: FightSection, attackType: string) {
         component.setState({
             processing_rank_battle: true
         }, () => {
-            console.log(attackType, this.state.rank_selected, this.state.monster_to_fight?.id);
+            if (this.state.monster_to_fight === null) {
+                component.setState({
+                    processing_rank_battle: false
+                });
+
+                return;
+            }
+
+            (new Ajax()).setRoute('fight-ranked-monster/' + this.props.character.id)
+                .setParameters({
+                    rank: this.state.rank_selected,
+                    monster_id: this.state.monster_to_fight.id,
+                    attack_type: attackType,
+                }).doAjaxCall('post', (result: AxiosResponse) => {
+                    component.setState({
+                        processing_rank_battle: false,
+                        battle_messages: [...component.state.battle_messages, ...result.data.messages],
+                        character_current_health: result.data.health.character_health,
+                        monster_current_health: result.data.health.monster_health,
+                    });
+                }, (error: AxiosError) => {
+                    console.log(error);
+                });
         })
     }
 
@@ -161,6 +227,7 @@ export default class MonsterActions extends React.Component<MonsterActionsProps,
                             is_small={this.props.is_small}
                             is_rank_fight={this.props.is_rank_fights}
                             process_rank_fight={this.processRankFight.bind(this)}
+                            setup_rank_fight={this.setupRankFight.bind(this)}
                         />
                     : null
                 }

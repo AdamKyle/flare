@@ -31,6 +31,7 @@ export default class FightSection extends React.Component<FightSectionProps, Fig
             is_monster_voided: false,
             monster_to_fight: null,
             processing_rank_battle: false,
+            setting_up_rank_fight: false,
         }
 
         this.battle_messages = [];
@@ -38,6 +39,8 @@ export default class FightSection extends React.Component<FightSectionProps, Fig
 
     componentDidMount() {
         if (this.props.is_rank_fight) {
+            this.props.setup_rank_fight(this);
+
             return;
         }
 
@@ -45,7 +48,22 @@ export default class FightSection extends React.Component<FightSectionProps, Fig
     }
 
     componentDidUpdate() {
+
         if (this.props.is_rank_fight) {
+
+            if (this.state.setting_up_rank_fight) {
+                return;
+            }
+
+            if (this.props.is_same_monster) {
+                this.setState({
+                    battle_messages: [],
+                    setting_up_rank_fight: true,
+                }, () => {
+                    this.props.setup_rank_fight(this);
+                });
+            }
+
             return;
         }
 

@@ -102,31 +102,21 @@ class BuildMonsterCacheService {
         $rankCache = [];
 
         Cache::delete('rank-monsters');
+
         $purgatoryMonsters = Monster::where('game_map_id', GameMap::where('name', MapNameValue::PURGATORY)->first()->id)->get();
-        $maxAmount         = 5000000000;
-        $monsterAmount     = $purgatoryMonsters->count();
+        $statAmount        = 250000000;
 
         for ($i = 1; $i <= 10; $i++) {
 
-            $statAmount =  $monsterAmount / $maxAmount;
-            $count      =  1;
-
             foreach ($purgatoryMonsters as $monster) {
-                $statAmount = ($statAmount * $count);
-
-                if ($statAmount > $maxAmount) {
-                    $statAmount = $maxAmount;
-                }
-
                 $transformer = $this->rankMonsterTransformer->setStat($statAmount);
 
                 $monster = new Item($monster, $transformer);
+
                 $rankCache[$i][] = $this->manager->createData($monster)->toArray();
 
-                $count++;
+                $statAmount = $statAmount + 100000000;
             }
-
-            $maxAmount += $maxAmount;
         }
 
         Cache::put('rank-monsters', $rankCache);

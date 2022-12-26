@@ -15,6 +15,7 @@ class RankMonsterTransformer extends TransformerAbstract {
      */
     private int $statAmount;
 
+
     /**
      * @param int $statAmount
      * @return RankMonsterTransformer

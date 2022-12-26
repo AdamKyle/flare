@@ -14,6 +14,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\CharacterInCelestialFight;
 use App\Flare\Models\Monster;
 use App\Game\Battle\Services\BattleRewardProcessing;
+use Exception;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
 
@@ -71,11 +72,10 @@ class BattleEventHandler {
      *
      * @param int $characterId
      * @param int $monsterId
-     * @param bool $isAutomation
      * @return void
-     * @throws \Exception
+     * @throws Exception
      */
-    public function processMonsterDeath(int $characterId, int $monsterId, bool $isAutomation = false): void {
+    public function processMonsterDeath(int $characterId, int $monsterId): void {
         $monster   = Monster::find($monsterId);
         $character = Character::find($characterId);
 
@@ -85,7 +85,7 @@ class BattleEventHandler {
             return;
         }
 
-        $this->battleRewardProcessing->handleMonster($character, $monster, $isAutomation);
+        $this->battleRewardProcessing->handleMonster($character, $monster);
 
         $this->mercenaryService->giveXpToMercenaries($character);
 

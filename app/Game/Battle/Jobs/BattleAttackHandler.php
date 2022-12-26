@@ -2,6 +2,7 @@
 
 namespace App\Game\Battle\Jobs;
 
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -24,27 +25,25 @@ class  BattleAttackHandler implements ShouldQueue {
     private int $monsterId;
 
     /**
-     * @var bool $isAutomation
+     * @var bool $isRankBattle
      */
-    private bool $isAutomation;
+    private bool $isRankBattle;
 
     /**
      * @param int $characterId
      * @param int $monsterId
-     * @param bool $isAutomation
      */
-    public function __construct(int $characterId, int $monsterId, bool $isAutomation = false) {
+    public function __construct(int $characterId, int $monsterId) {
         $this->characterId  = $characterId;
         $this->monsterId    = $monsterId;
-        $this->isAutomation = $isAutomation;
     }
 
     /**
      * @param BattleEventHandler $battleEventHandler
      * @return void
-     * @throws \Exception
+     * @throws Exception
      */
     public function handle(BattleEventHandler $battleEventHandler): void {
-        $battleEventHandler->processMonsterDeath($this->characterId, $this->monsterId, $this->isAutomation);
+        $battleEventHandler->processMonsterDeath($this->characterId, $this->monsterId);
     }
 }

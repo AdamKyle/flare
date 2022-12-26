@@ -76,10 +76,12 @@ class CharacterCacheData extends CharacterPvpCacheData {
         $this->updateCharacterSheetCache($character, $data);
     }
 
-    public function characterSheetCache(Character $character): array {
+    public function characterSheetCache(Character $character, bool $ignoreReductions = false): array {
         $this->deleteCharacterSheet($character);
 
         $characterId = $character->id;
+
+        $this->characterSheetBaseInfoTransformer->setIgnoreReductions($ignoreReductions);
 
         $character = new Item($character, $this->characterSheetBaseInfoTransformer);
         $character = $this->manager->createData($character)->toArray();

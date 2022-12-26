@@ -38,7 +38,7 @@ class BattleRewardProcessing {
         $this->goldRushService        = $goldRush;
     }
 
-    public function handleMonster(Character $character, Monster $monster, bool $isAutomation = false) {
+    public function handleMonster(Character $character, Monster $monster) {
         $map     = Map::where('character_id', $character->id)->first();
         $gameMap = GameMap::find($map->game_map_id);
 

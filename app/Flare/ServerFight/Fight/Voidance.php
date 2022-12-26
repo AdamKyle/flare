@@ -23,10 +23,10 @@ class Voidance extends BattleMessages {
         $this->enemyIsVoided     = false;
     }
 
-    public function void(Character $character, CharacterCacheData $characterCacheData, ServerMonster $monster) {
+    public function void(Character $character, CharacterCacheData $characterCacheData, ServerMonster $monster, bool $isRankFight = false) {
         $mapNameValue = $character->map->gameMap->mapType();
 
-        if ($mapNameValue->isPurgatory()) {
+        if ($mapNameValue->isPurgatory() && !$isRankFight) {
             $this->monsterVoidsFirst($character, $characterCacheData, $monster);
         } else {
             $this->characterVoidsFirst($character, $characterCacheData, $monster);

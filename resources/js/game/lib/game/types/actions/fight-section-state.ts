@@ -22,4 +22,6 @@ export default interface FightSectionState {
     monster_to_fight: MonsterType|null,
 
     processing_rank_battle: boolean;
+
+    setting_up_rank_fight: boolean;
 }

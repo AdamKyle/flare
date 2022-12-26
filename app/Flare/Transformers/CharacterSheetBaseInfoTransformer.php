@@ -14,6 +14,12 @@ use Facades\App\Flare\Transformers\DataSets\CharacterAttackData;
 
 class CharacterSheetBaseInfoTransformer extends BaseTransformer {
 
+    private bool $ignoreReductions = false;
+
+    public function setIgnoreReductions(bool $ignoreReductions): void {
+        $this->ignoreReductions = $ignoreReductions;
+    }
+
     /**
      * Gets the response data for the character sheet
      *
@@ -21,7 +27,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
      * @return mixed
      */
     public function transform(Character $character) {
-        $characterStatBuilder         = resolve(CharacterStatBuilder::class)->setCharacter($character);
+        $characterStatBuilder         = resolve(CharacterStatBuilder::class)->setCharacter($character, $this->ignoreReductions);
         $gameClass                    = GameClass::find($character->game_class_id);
 
         $baseStat = [

@@ -124,7 +124,6 @@ class LocationService {
         }
 
         if ((new LocationType($this->location->type))->isPurgatorySmithHouse()) {
-            dump('Rank fights?');
 
             event(new UpdateRankFights($character->user, true));
 
@@ -132,8 +131,6 @@ class LocationService {
 
             return;
         }
-
-        dump('No Rank fights?');
 
         $this->updateCharacterAttackTypes->updateCache($character);
 

@@ -38,7 +38,7 @@ class SecondaryAttacks extends BattleBase {
             if ($this->isEnemyEntranced) {
                 $affixReduction = 0.0;
             }
-            dump('Secondary PVP Attack. Is Pvp On: ' . ($isPvp ? 'Yes' : 'No'));
+            
             $this->classSpecialtyDamage($isPvp);
 
             $this->affixLifeStealingDamage($character, $monster, $affixReduction, $isPvp);

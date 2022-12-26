@@ -15,14 +15,14 @@ class Ambush extends BattleBase {
         parent::__construct($characterCacheData);
     }
 
-    public function handleAmbush(Character $character, ServerMonster $monster, bool $isCharacterVoided = false): Ambush {
+    public function handleAmbush(Character $character, ServerMonster $monster, bool $isCharacterVoided = false, bool $isRankFight = false): Ambush {
 
         $this->healthObject = [
             'character_health' => $this->characterCacheData->getCachedCharacterData($character, 'health'),
             'monster_health'   => $monster->getHealth(),
         ];
 
-        if ($character->map->gameMap->mapType()->isPurgatory()) {
+        if ($character->map->gameMap->mapType()->isPurgatory() && !$isRankFight) {
             $this->monsterAmbushesPlayer($character, $monster, $isCharacterVoided);
         } else {
             $this->playerAmbushesMonster($character, $monster, $isCharacterVoided);

@@ -2,6 +2,7 @@
 
 namespace App\Game\Battle\Providers;
 
+use App\Game\Battle\Services\RankFightService;
 use App\Game\ClassRanks\Services\ClassRankService;
 use App\Game\Mercenaries\Services\MercenaryService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
@@ -79,6 +80,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(CelestialFightService::class, function($app) {
             return new CelestialFightService($app->make(BattleEventHandler::class), $app->make(CharacterCacheData::class), $app->make(MonsterPlayerFight::class));
+        });
+
+        $this->app->bind(RankFightService::class, function($app) {
+            return new RankFightService($app->make(BattleEventHandler::class), $app->make(CharacterCacheData::class), $app->make(MonsterPlayerFight::class));
         });
 
         $this->app->bind(PvpService::class, function($app) {
