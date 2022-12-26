@@ -18,7 +18,7 @@ class UpdateSiteStatisticsChart implements ShouldBroadcastNow
     /**
      * @var User $user
      */
-    public User $user;
+    private User $user;
 
     /**
      * @var array $registered
