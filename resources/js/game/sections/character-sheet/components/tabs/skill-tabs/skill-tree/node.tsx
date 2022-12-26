@@ -14,10 +14,6 @@ export default class Node extends React.Component<any, any> {
 
     render() {
 
-        if (this.props.passive.name === 'Blacksmiths Furnace') {
-            console.log(this.props.passive);
-        }
-
         return (
             <div>
                 <button onClick={() => this.props.show_passive_modal(this.props.passive)} disabled={this.props.is_automation_running}>

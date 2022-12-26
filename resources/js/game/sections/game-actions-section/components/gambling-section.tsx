@@ -44,7 +44,6 @@ export default class GamblingSection extends React.Component<GamblingSectionProp
 
         // @ts-ignore
         this.gamblingTimeOut.listen('Game.Gambler.Events.GamblerSlotTimeOut', (event: any) => {
-            console.log(event);
             this.setState({
                 timeoutFor: event.timeoutFor,
             });

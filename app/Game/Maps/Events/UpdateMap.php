@@ -24,7 +24,7 @@ class UpdateMap implements ShouldBroadcastNow
     /**
      * @var User $user
      */
-    public User $user;
+    private User $user;
 
     /**
      * Create a new event instance.

@@ -17,7 +17,6 @@ export default class Reward extends React.Component<any, any> {
     }
 
     render() {
-        console.log(this.props.quest);
         return (
             <dl>
                 {
