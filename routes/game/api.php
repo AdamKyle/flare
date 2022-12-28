@@ -2,6 +2,11 @@
 
 Route::post('/character-timeout', ['uses' => 'Api\CharacterSheetController@globalTimeout']);
 
+Route::group(['middleware' => ['auth']], function() {
+    Route::get('/ranked-fight-tops', ['uses' => 'Api\RankTopsController@loadRankTops']);
+    Route::get('/rank-fight-tops-list', ['uses' => 'Api\RankTopsController@loadSpecificTop']);
+});
+
 Route::group(['middleware' => ['is.character.who.they.say.they.are']], function() {
     Route::get('/character-sheet/{character}', ['uses' => 'Api\CharacterSheetController@sheet']);
     Route::get('/character-sheet/{character}/active-boons', ['uses' => 'Api\CharacterSheetController@activeBoons']);
@@ -59,6 +64,5 @@ Route::group(['middleware' => ['is.character.who.they.say.they.are']], function(
         Route::post('/character/{character}/inventory/disenchant-all', ['uses' => 'Api\CharacterInventoryController@disenchantAll']);
         Route::post('/character/{character}/inventory/move-to-set', ['uses' => 'Api\CharacterInventoryController@moveToSet']);
         Route::post('/character/{character}/inventory-set/rename-set', ['uses' => 'Api\CharacterInventoryController@renameSet']);
-
     });
 });

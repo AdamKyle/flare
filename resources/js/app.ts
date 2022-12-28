@@ -20,6 +20,11 @@ require('./game/sections/guide-quests/guide-quests-init');
 require('./game/game-launcher');
 
 /**
+ * Load the rank fight tops chart and list.
+ */
+require('./game/tops/rank-fight-tops-component');
+
+/**
  * When the administrator is logged in, load their chat.
  */
 require('./game/admin/admin-chat');
