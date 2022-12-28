@@ -46,24 +46,18 @@ class BuildMonster extends BattleMessages {
         return rand(1, 100) > $dc;
     }
 
-    protected function buildHealth($monster): int {
-        $celestial = CelestialFight::where('monster_id', $monster['id'])->first();
+    protected function buildHealth(array $monster): int {
+        $healthArray = explode('-', $monster['health_range']);
 
-        if (is_null($celestial)) {
-            $healthArray = explode('-', $monster['health_range']);
+        $health = rand($healthArray[0], $healthArray[1]);
 
-            $health = rand($healthArray[0], $healthArray[1]);
+        $increasesHealthBy = $monster['increases_damage_by'];
 
-            $increasesHealthBy = $monster['increases_damage_by'];
-
-            if (!is_null($increasesHealthBy)) {
-                $health = $health + $health * $increasesHealthBy;
-            }
-
-            return $health;
+        if (!is_null($increasesHealthBy)) {
+            $health = $health + $health * $increasesHealthBy;
         }
 
-        return $celestial->max_health;
+        return $health;
     }
 
     protected function reduceEnemyStats(array $monster, array $characterStatReductionAffixes): array {
@@ -90,10 +84,6 @@ class BuildMonster extends BattleMessages {
 
     protected function reduceEnemySkills(array $monster, float $skillReduction): array {
         if ($skillReduction > 0.0) {
-            $monster['accuracy']         =- $skillReduction;
-            $monster['casting_accuracy'] =- $skillReduction;
-            $monster['dodge']            =- $skillReduction;
-            $monster['criticality']      =- $skillReduction;
 
             if ($monster['accuracy'] <= 0) {
                 $monster['accuracy'] = 0.0;

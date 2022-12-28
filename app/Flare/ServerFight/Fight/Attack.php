@@ -88,8 +88,7 @@ class Attack {
         return $this->monsterHealth;
     }
 
-    public function attack(Character $character, ServerMonster $serverMonster, string $attackType, string $whoAttacks) {
-
+    public function attack(Character $character, ServerMonster $serverMonster, string $attackType, string $whoAttacks, bool $isRankFight = false) {
         if ($this->characterHealth <= 0) {
             $this->battleMessages[] = ['message' => 'You must resurrect first!', 'type' => 'enemy-action'];
 
@@ -128,16 +127,15 @@ class Attack {
 
             $this->attackCounter++;
 
-            $this->attack($character, $serverMonster, $attackType, 'monster');
+            $this->attack($character, $serverMonster, $attackType, 'monster', $isRankFight);
         }
 
         if ($whoAttacks === 'monster') {
-
             $this->monsterAttack->setIsCharacterVoided($this->isCharacterVoided);
             $this->monsterAttack->setCharacterHealth($this->characterHealth);
             $this->monsterAttack->setMonsterHealth($this->monsterHealth);
             $this->monsterAttack->setIsEnemyVoided($this->isEnemyVoided);
-            $this->monsterAttack->monsterAttack($serverMonster, $character, $attackType);
+            $this->monsterAttack->monsterAttack($serverMonster, $character, $attackType, $isRankFight);
 
             $this->mergeBattleMessages($this->monsterAttack->getMessages());
 

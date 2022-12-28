@@ -31,10 +31,12 @@ class MonsterAttack extends BattleBase {
         return $this;
     }
 
-    public function monsterAttack(ServerMonster $monster, Character $character, string $previousAttackType) {
+    public function monsterAttack(ServerMonster $monster, Character $character, string $previousAttackType, bool $isRankFight) {
 
-        if ($this->canHit->canMonsterHitPlayer($character, $monster, $this->isVoided)) {
+        if ($this->canHit->canMonsterHitPlayer($character, $monster, $this->isVoided, $isRankFight)) {
             $this->attackPlayer($monster, $character);
+        } else {
+            $this->addMessage($monster->getName() . ' misses!', 'enemy-action');
         }
 
         $this->doPlayerCounterMonster($character, $monster);
@@ -48,7 +50,9 @@ class MonsterAttack extends BattleBase {
             $this->castSpells($monster, $character, $previousAttackType);
         }
 
-        $this->playerHealing($monster, $character, $previousAttackType);
+        if ($this->characterHealth > 0) {
+            $this->playerHealing($monster, $character, $previousAttackType);
+        }
     }
 
     protected function playerHealing(ServerMonster $monster, Character $character, string $previousAttackType) {

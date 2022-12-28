@@ -3,6 +3,7 @@
 namespace App\Game\Battle\Controllers\Api;
 
 use App\Flare\Models\Location;
+use App\Flare\Models\RankFight;
 use App\Flare\Services\BuildMonsterCacheService;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Jobs\BattleAttackHandler;
@@ -10,6 +11,7 @@ use App\Game\Battle\Events\AttackTimeOutEvent;
 use App\Game\Battle\Request\RankedFightRequest;
 use App\Game\Battle\Request\RankFightSetUpRequest;
 use App\Game\Battle\Services\RankFightService;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -48,8 +50,26 @@ class RankFightController extends Controller {
      * @param Character $character
      * @param Monster $monster
      * @return JsonResponse
+     * @throws Exception
      */
     public function setUpRankFight(RankFightSetUpRequest $request, Character $character, Monster $monster): JsonResponse {
+        $currentRank = RankFight::first()->current_rank;
+
+        if ($currentRank < $request->rank) {
+            return response([
+                'messages' => [
+                    [
+                        'message' => 'You cannot fight what you cannot see. Rank does not exist.',
+                        'type'    => 'enemy-action',
+                    ]
+                ],
+                'health'   => [
+                    'character_health' => 0,
+                    'monster_health'   => 0,
+                ],
+            ]);
+        }
+
         $result = $this->rankFightService->setupFight($character, $monster, $request->rank);
 
         $status = $result['status'];
@@ -62,8 +82,24 @@ class RankFightController extends Controller {
      * @param RankedFightRequest $request
      * @param Character $character
      * @return JsonResponse
+     * @throws Exception
      */
     public function fightRankedMonster(RankedFightRequest $request, Character $character): JsonResponse {
+
+        if (!Cache::has('rank-fight-for-character-' . $character->id)) {
+            return response()->json([
+                'messages' => [
+                    [
+                        'message' => 'The enemy has fled away. Click attack again or select a different monster!',
+                        'type'    => 'enemy-action',
+                    ]
+                ],
+                'health'   => [
+                    'character_health' => 0,
+                    'monster_health'   => 0,
+                ],
+            ]);
+        }
 
         $result = $this->rankFightService->fight($character, $request->attack_type);
 

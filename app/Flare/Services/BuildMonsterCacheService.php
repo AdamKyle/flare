@@ -2,8 +2,10 @@
 
 namespace App\Flare\Services;
 
+use App\Flare\Models\RankFight;
 use App\Flare\Transformers\RankMonsterTransformer;
 use App\Flare\Values\MapNameValue;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Collection as DBCollection;
 use Illuminate\Support\Collection as IlluminateCollection;
@@ -103,20 +105,37 @@ class BuildMonsterCacheService {
 
         Cache::delete('rank-monsters');
 
-        $purgatoryMonsters = Monster::where('game_map_id', GameMap::where('name', MapNameValue::PURGATORY)->first()->id)->get();
-        $statAmount        = 250000000;
+        $currentRank       = RankFight::first();
 
-        for ($i = 1; $i <= 10; $i++) {
+        if (is_null($currentRank)) {
+            Artisan::call('update:rank-fights');
 
-            foreach ($purgatoryMonsters as $monster) {
-                $transformer = $this->rankMonsterTransformer->setStat($statAmount);
+            return;
+        }
+
+        $monsters          = Monster::where('game_map_id', GameMap::where('name', MapNameValue::SURFACE)->first()->id)
+                                    ->where('is_celestial_entity', false)
+                                    ->get();
+        $iteration         = $monsters->count();
+        $baseAmount        = 100000;
+        $maxAmount         = 1000000;
+
+        for ($i = 1; $i <= $currentRank->current_rank; $i++) {
+
+            $increments = ($maxAmount - $baseAmount) / $iteration;
+
+            foreach ($monsters as $monster) {
+
+                $transformer = $this->rankMonsterTransformer->setStat($baseAmount);
 
                 $monster = new Item($monster, $transformer);
 
                 $rankCache[$i][] = $this->manager->createData($monster)->toArray();
 
-                $statAmount = $statAmount + 100000000;
+                $baseAmount += $increments;
             }
+
+            $maxAmount += $maxAmount;
         }
 
         Cache::put('rank-monsters', $rankCache);

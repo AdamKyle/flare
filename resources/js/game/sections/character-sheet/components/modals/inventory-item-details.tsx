@@ -1,7 +1,7 @@
 import React, {Fragment} from "react";
 import Dialogue from "../../../../components/ui/dialogue/dialogue";
 import ItemNameColorationText from "../../../../components/ui/item-name-coloration-text";
-import {AxiosResponse} from "axios";
+import {AxiosError, AxiosResponse} from "axios";
 import Ajax from "../../../../lib/ajax/ajax";
 import ComponentLoading from "../../../../components/ui/loading/component-loading";
 import ItemDetails from "./components/item-details";
@@ -14,6 +14,7 @@ export default class InventoryUseDetails extends React.Component<any, any> {
         this.state = {
             loading: true,
             item: null,
+            error_message: null,
         }
     }
 
@@ -23,14 +24,25 @@ export default class InventoryUseDetails extends React.Component<any, any> {
                 loading: false,
                 item: result.data,
             });
-        }, (error: AxiosResponse) => {
+        }, (error: AxiosError) => {
+            if (typeof error.response !== 'undefined') {
+                const response = error.response;
 
+                this.setState({
+                    loading: false,
+                    error_message: response.data.message,
+                })
+            }
         })
     }
 
     modalTitle() {
         if (this.state.loading) {
             return 'Fetching item details ...';
+        }
+
+        if (this.state.error_message !== null) {
+            return 'There was an error!';
         }
 
         return <ItemNameColorationText item={this.state.item} />;
@@ -59,14 +71,21 @@ export default class InventoryUseDetails extends React.Component<any, any> {
                                 <ComponentLoading />
                             </div>
                         :
-                            <Fragment>
-                                {
-                                    this.state.item.type === 'quest' ?
-                                        <InventoryQuestItemDetails item={this.state.item} />
-                                    :
-                                        <ItemDetails item={this.state.item} />
-                                }
-                            </Fragment>
+                            this.state.error_message !== null ?
+                                <Fragment>
+                                    <p className='my-4 text-red-500 dark:text-red-400'>{
+                                        this.state.error_message
+                                    }</p>
+                                </Fragment>
+                            :
+                                <Fragment>
+                                    {
+                                        this.state.item.type === 'quest' ?
+                                            <InventoryQuestItemDetails item={this.state.item} />
+                                        :
+                                            <ItemDetails item={this.state.item} />
+                                    }
+                                </Fragment>
                     }
                 </div>
             </Dialogue>

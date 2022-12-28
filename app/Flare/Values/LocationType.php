@@ -12,11 +12,13 @@ class LocationType {
     const PURGATORY_SMITH_HOUSE = 0;
     const GOLD_MINES            = 1;
     const PURGATORY_DUNGEONS    = 2;
+    const UNDERWATER_CAVES      = 3;
 
     protected static $values = [
         0 => self::PURGATORY_SMITH_HOUSE,
         1 => self::GOLD_MINES,
         2 => self::PURGATORY_DUNGEONS,
+        3 => self::UNDERWATER_CAVES,
     ];
 
     /**
@@ -25,7 +27,8 @@ class LocationType {
     protected static $namedValues = [
         self::PURGATORY_SMITH_HOUSE => 'Purgatory Smiths House',
         self::GOLD_MINES            => 'Gold Mines',
-        self::PURGATORY_DUNGEONS    => 'Purgatory Dungeons'
+        self::PURGATORY_DUNGEONS    => 'Purgatory Dungeons',
+        self::UNDERWATER_CAVES      => 'Underwater Caves',
     ];
 
     /**
@@ -75,5 +78,14 @@ class LocationType {
      */
     public function isPurgatoryDungeons(): bool {
         return $this->value === self::PURGATORY_DUNGEONS;
+    }
+
+    /**
+     * Is Purgatory dungeons?
+     *
+     * @return bool
+     */
+    public function isUnderWaterCaves(): bool {
+        return $this->value === self::UNDERWATER_CAVES;
     }
 }

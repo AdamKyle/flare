@@ -34,4 +34,6 @@ export default interface ActionsState {
     show_gambling_section: boolean;
 
     show_rank_fight: boolean;
+
+    total_ranks: number;
 }

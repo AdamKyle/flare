@@ -4,6 +4,7 @@ namespace App\Game\Maps\Events;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Map;
+use App\Flare\Models\RankFight;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -24,6 +25,11 @@ class UpdateRankFights implements ShouldBroadcastNow
     public bool $showRankSelection = false;
 
     /**
+     * @var int $ranks
+     */
+    public int $ranks;
+
+    /**
      * @var User $user
      */
     private User $user;
@@ -36,6 +42,7 @@ class UpdateRankFights implements ShouldBroadcastNow
      */
     public function __construct(User $user, bool $showRankSelection) {
         $this->showRankSelection = $showRankSelection;
+        $this->ranks             = RankFight::first()->current_rank;
         $this->user              = $user;
     }
 
@@ -44,8 +51,7 @@ class UpdateRankFights implements ShouldBroadcastNow
      *
      * @return Channel|array
      */
-    public function broadcastOn()
-    {
+    public function broadcastOn() {
         return new PrivateChannel('update-rank-fight-' . $this->user->id);
     }
 }

@@ -24,7 +24,7 @@ class RankFightSetUpRequest extends FormRequest
     public function rules()
     {
         return [
-            'rank' => 'integer|required|gt:0|lte:10',
+            'rank' => 'integer|required|gt:0',
         ];
     }
 

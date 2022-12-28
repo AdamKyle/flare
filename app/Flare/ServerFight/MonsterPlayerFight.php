@@ -33,6 +33,11 @@ class MonsterPlayerFight {
     private string $attackType;
 
     /**
+     * @var int $rank
+     */
+    private int $rank = 0;
+
+    /**
      * @var bool $tookTooLong
      */
     private bool $tookTooLong;
@@ -219,12 +224,20 @@ class MonsterPlayerFight {
     }
 
     /**
+     * @return int
+     */
+    public function getRank(): int {
+        return $this->rank;
+    }
+
+    /**
      * Base Fight Setup.
      *
+     * @param int $rank
      * @param bool $isRankFight
      * @return array
      */
-    public function fightSetUp(bool $isRankFight = false): array {
+    public function fightSetUp(int $rank = 0, bool $isRankFight = false): array {
         $characterStatReductionAffixes = $this->characterCacheData->getCachedCharacterData($this->character, 'stat_affixes');
         $skillReduction                = $this->characterCacheData->getCachedCharacterData($this->character, 'skill_reduction');
         $resistanceReduction           = $this->characterCacheData->getCachedCharacterData($this->character, 'resistance_reduction');
@@ -250,10 +263,12 @@ class MonsterPlayerFight {
         $health['max_monster_health']   = $monster->getHealth();
 
         $data = [
-            'health'        => $health,
-            'player_voided' => $isPlayerVoided,
-            'enemy_voided'  => $isEnemyVoided,
-            'monster'       => $monster,
+            'health'                => $health,
+            'player_voided'         => $isPlayerVoided,
+            'enemy_voided'          => $isEnemyVoided,
+            'monster'               => $monster,
+            'opening_messages'      => $this->getBattleMessages(),
+            'rank'                  => $rank,
         ];
 
         if ($isRankFight && ($data['health']['character_health'] > 0 && $data['health']['monster_health'] > 0)) {
@@ -284,10 +299,12 @@ class MonsterPlayerFight {
             if (Cache::has('rank-fight-for-character-' . $this->character->id)) {
                 $data = Cache::get('rank-fight-for-character-' . $this->character->id);
 
+                $this->rank    = $data['rank'];
                 $this->monster = $data['monster']->getMonster();
             } else {
                 $data = $this->fightSetUp(true);
 
+                $this->rank    = $data['rank'];
                 $this->monster = $data['monster']->getMonster();
             }
         } else {
@@ -319,7 +336,7 @@ class MonsterPlayerFight {
             return true;
         }
 
-        return $this->doAttack($monster, $health, $isPlayerVoided, $isEnemyVoided, $onlyOnce);
+        return $this->doAttack($monster, $health, $isPlayerVoided, $isEnemyVoided, $onlyOnce, $isRankFight);
     }
 
     /**
@@ -330,14 +347,15 @@ class MonsterPlayerFight {
      * @param bool $isPlayerVoided
      * @param bool $isEnemyVoided
      * @param bool $onlyOnce
+     * @param bool $isRankFight
      * @return bool
      */
-    protected function doAttack(ServerMonster $monster, array $health, bool $isPlayerVoided, bool $isEnemyVoided, bool $onlyOnce): bool {
+    protected function doAttack(ServerMonster $monster, array $health, bool $isPlayerVoided, bool $isEnemyVoided, bool $onlyOnce, bool $isRankFight = false): bool {
         $this->attack->setHealth($health)
             ->setIsCharacterVoided($isPlayerVoided)
             ->setIsEnemyVoided($isEnemyVoided)
             ->onlyAttackOnce($onlyOnce)
-            ->attack($this->character, $monster, $this->attackType, 'character');
+            ->attack($this->character, $monster, $this->attackType, 'character', $isRankFight);
 
         $this->mergeMessages($this->attack->getMessages());
 

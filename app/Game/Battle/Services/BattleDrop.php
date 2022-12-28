@@ -349,7 +349,7 @@ class BattleDrop {
             if ($item->type === 'quest') {
                 $message = $character->name . ' has found: ' . $item->affix_name;
 
-                $slot = $character->refresh()->inventory->slots()->where('item_id', $item->id)->first();
+                $character->refresh()->inventory->slots()->where('item_id', $item->id)->first();
 
                 event(new GameServerMessage($character->user, 'You found: ' . $item->affix_name . ' on the enemies corpse.', $item->id, true));
 

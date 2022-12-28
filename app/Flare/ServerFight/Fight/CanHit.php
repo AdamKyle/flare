@@ -91,11 +91,17 @@ class CanHit {
         return false;
     }
 
-    public function canMonsterHitPlayer(Character $character, ServerMonster $monster, bool $isPlayerVoided) {
+    public function canMonsterHitPlayer(Character $character, ServerMonster $monster, bool $isPlayerVoided, bool $isRankFight) {
         $monsterToHit    = $monster->getMonsterStat('to_hit_base') * 0.20;
         $characterAgi    = $this->characterCacheData->getCachedCharacterData($character, $isPlayerVoided ? 'agi' : 'agi_modded') * 0.20;
         $monsterAccuracy = $monster->getMonsterStat('accuracy');
         $characterDodge  = $this->characterCacheData->getCachedCharacterData($character, 'skills')['dodge'];
+
+        if ($isRankFight) {
+            $characterDodge = 0; //min($characterDodge, 0);
+
+            return true;
+        }
 
         if ($characterDodge >= 1) {
             return false;

@@ -123,16 +123,12 @@ class LocationService {
             return;
         }
 
-        if ((new LocationType($this->location->type))->isPurgatorySmithHouse()) {
+        if ((new LocationType($this->location->type))->isUnderWaterCaves()) {
 
             event(new UpdateRankFights($character->user, true));
 
-            $this->updateCharacterAttackTypes->updateCache($character, true);
-
             return;
         }
-
-        $this->updateCharacterAttackTypes->updateCache($character);
 
         event(new UpdateRankFights($character->user, false));
     }
@@ -149,6 +145,10 @@ class LocationService {
             if (!is_null($location->type)) {
                 if ((new LocationType($location->type))->isPurgatorySmithHouse()) {
                     $location->type_name = 'Purgatory Smiths House';
+                }
+
+                if ((new LocationType($location->type))->isUnderWaterCaves()) {
+                    $location->type_name = 'Underwater Caves';
                 }
             }
 

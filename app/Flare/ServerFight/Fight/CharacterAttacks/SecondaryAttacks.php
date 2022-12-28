@@ -4,9 +4,11 @@ namespace App\Flare\ServerFight\Fight\CharacterAttacks;
 
 use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Models\Character;
+use App\Flare\Models\Location;
 use App\Flare\ServerFight\BattleBase;
 use App\Flare\ServerFight\Fight\Affixes;
 use App\Flare\ServerFight\Monster\ServerMonster;
+use App\Flare\Values\LocationType;
 
 class SecondaryAttacks extends BattleBase {
 
@@ -38,7 +40,7 @@ class SecondaryAttacks extends BattleBase {
             if ($this->isEnemyEntranced) {
                 $affixReduction = 0.0;
             }
-            
+
             $this->classSpecialtyDamage($isPvp);
 
             $this->affixLifeStealingDamage($character, $monster, $affixReduction, $isPvp);
@@ -132,6 +134,10 @@ class SecondaryAttacks extends BattleBase {
 
         $this->affixes->clearMessages();
 
+        if ($lifeStealingDamage > 0.0 && $this->isAtRankedFightLocation($character)) {
+            $lifeStealingDamage = min($lifeStealingDamage, .50);
+        }
+
         if ($isPvp && $affixDamageReduction > 0.0) {
             $lifeStealingDamage = $lifeStealingDamage - $lifeStealingDamage * $affixDamageReduction;
 
@@ -163,6 +169,17 @@ class SecondaryAttacks extends BattleBase {
                 $this->addDefenderMessage('The enemies rings glow and lash out for: ' . number_format($ringDamage), 'enemy-action');
             }
         }
+    }
+
+    protected function isAtRankedFightLocation(Character $character): bool {
+
+        $location = Location::where('x', $character->map->x_position)
+                            ->where('y', $character->map->y_position)
+                            ->where('game_map_id', $character->map->game_map_id)
+                            ->where('type', LocationType::UNDERWATER_CAVES)
+                            ->first();
+
+        return !is_null($location) ** $character->classType()->isVampire();
     }
 
 }

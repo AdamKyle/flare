@@ -56,6 +56,7 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
             show_purgatory_chains_section: false,
             show_gambling_section: false,
             show_rank_fight: false,
+            total_ranks: 0,
         }
 
         this.actionsManager = new ActionsManager(this);
@@ -110,6 +111,7 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
         this.manageRankFights.listen('Game.Maps.Events.UpdateRankFights', (event: any) => {
             this.setState({
                 show_rank_fight: event.showRankSelection,
+                total_ranks: event.ranks,
             });
         });
 
@@ -330,6 +332,7 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
                                                 character={this.props.character}
                                                 character_statuses={this.props.character_status}
                                                 is_rank_fights={this.state.show_rank_fight}
+                                                total_ranks={this.state.total_ranks}
                                                 is_small={false}
                                 >
                                     {

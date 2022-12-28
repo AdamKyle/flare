@@ -53,8 +53,6 @@ export default class MonsterActions extends React.Component<MonsterActionsProps,
             (new Ajax()).setRoute('set-up-rank-fight/'+this.props.character.id+'/' + this.state.monster_to_fight.id)
                 .setParameters({rank: this.state.rank_selected})
                 .doAjaxCall('post', (result: AxiosResponse) => {
-                    console.log(result.data);
-
                     this.setState({
                         is_same_monster: false,
                     }, () => {
@@ -66,6 +64,7 @@ export default class MonsterActions extends React.Component<MonsterActionsProps,
                             monster_current_health: result.data.health.monster_health,
                             monster_max_health: result.data.health.max_monster_health,
                             setting_up_rank_fight: false,
+                            monster_to_fight_id: result.data.monster_id
                         });
                     })
 
@@ -99,7 +98,7 @@ export default class MonsterActions extends React.Component<MonsterActionsProps,
                 }).doAjaxCall('post', (result: AxiosResponse) => {
                     component.setState({
                         processing_rank_battle: false,
-                        battle_messages: [...component.state.battle_messages, ...result.data.messages],
+                        battle_messages: result.data.messages,
                         character_current_health: result.data.health.character_health,
                         monster_current_health: result.data.health.monster_health,
                     });
@@ -138,7 +137,7 @@ export default class MonsterActions extends React.Component<MonsterActionsProps,
     optionsForRanks() {
         const options = [];
 
-        for (let i = 1; i <= 10; i++) {
+        for (let i = 1; i <= this.props.total_ranks; i++) {
             options.push({
                 label: 'Rank ' + i,
                 value: i
@@ -160,7 +159,7 @@ export default class MonsterActions extends React.Component<MonsterActionsProps,
                             menuPlacement={'bottom'}
                             styles={{menuPortal: (base) => ({...base, zIndex: 9999, color: '#000000'})}}
                             menuPortalTarget={document.body}
-                            value={{label: 'Rank 1', value: 1}}
+                            value={[{label: 'Rank ' + this.state.rank_selected, value: this.state.rank_selected}]}
                         />
                     </div>
                     <div className='cols-start-3 cols-end-3'>

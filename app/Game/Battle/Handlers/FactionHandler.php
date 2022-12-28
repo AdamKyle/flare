@@ -283,7 +283,9 @@ class FactionHandler {
         $item = ItemModel::where('cost', '<=', RandomAffixDetails::BASIC)
             ->whereNull('item_prefix_id')
             ->whereNull('item_suffix_id')
+            ->whereNull('specialty_type')
             ->whereNotIn('type', ['alchemy', 'quest', 'trinket'])
+            ->whereDoesntHave('appliedHolyStacks')
             ->where('cost', '<=', 4000000000)
             ->inRandomOrder()
             ->first();

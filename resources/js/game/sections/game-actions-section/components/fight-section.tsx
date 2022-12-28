@@ -64,6 +64,15 @@ export default class FightSection extends React.Component<FightSectionProps, Fig
                 });
             }
 
+            if (this.props.monster_to_fight.id !== this.state.monster_to_fight_id && this.state.monster_to_fight_id !== 0) {
+                this.setState({
+                    battle_messages: [],
+                    setting_up_rank_fight: true,
+                }, () => {
+                    this.props.setup_rank_fight(this);
+                });
+            }
+
             return;
         }
 
@@ -227,6 +236,10 @@ export default class FightSection extends React.Component<FightSectionProps, Fig
         if (this.props.is_rank_fight) {
 
             if (this.props.character?.is_dead || !this.props.character?.can_attack) {
+                return true;
+            }
+
+            if (this.state.monster_current_health <= 0) {
                 return true;
             }
 

@@ -76,7 +76,7 @@ class Ambush extends BattleBase {
 
             $this->healthObject['monster_health'] -= $damage;
 
-            $this->addMessage('You strike the enemy in an ambush doing: ' . number_format($damage) . ' damage!', 'enemy-action');
+            $this->addMessage('You strike the enemy in an ambush doing: ' . number_format($damage) . ' damage!', 'player-action');
         } else if ($this->canMonsterAmbushPlayer($serverMonster->getMonsterStat('ambush_chance'), $characterAmbushResistance)) {
             $this->addMessage('The enemies plotting and scheming comes to fruition!', 'enemy-action');
 
@@ -110,7 +110,7 @@ class Ambush extends BattleBase {
 
             $this->healthObject['monster_health'] -= $damage;
 
-            $this->addMessage('You strike the enemy in an ambush doing: ' . number_format($damage) . ' damage!', 'enemy-action');
+            $this->addMessage('You strike the enemy in an ambush doing: ' . number_format($damage) . ' damage!', 'player-action');
         }
     }
 

@@ -83,7 +83,13 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
         $this->app->bind(RankFightService::class, function($app) {
-            return new RankFightService($app->make(BattleEventHandler::class), $app->make(CharacterCacheData::class), $app->make(MonsterPlayerFight::class));
+            return new RankFightService(
+                $app->make(BattleEventHandler::class),
+                $app->make(CharacterCacheData::class),
+                $app->make(MonsterPlayerFight::class),
+                $app->make(RandomAffixGenerator::class),
+                $app->make(BuildMythicItem::class)
+            );
         });
 
         $this->app->bind(PvpService::class, function($app) {

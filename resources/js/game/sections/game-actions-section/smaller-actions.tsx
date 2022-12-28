@@ -62,6 +62,7 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
             show_purgatory_chains_section: false,
             show_gambling_section: false,
             show_rank_fight: false,
+            total_ranks: 0,
         }
 
         // @ts-ignore
@@ -117,6 +118,7 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
             console.log(event);
             this.setState({
                 show_rank_fight: event.showRankSelection,
+                total_ranks: event.ranks,
             });
         });
 
@@ -261,6 +263,7 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
             <MonsterActions monsters={this.state.monsters}
                             character={this.props.character}
                             is_rank_fights={this.state.show_rank_fight}
+                            total_ranks={this.state.total_ranks}
                             close_monster_section={this.closeMonsterSection.bind(this)}
                             character_statuses={this.props.character_status}
                             is_small={true}
