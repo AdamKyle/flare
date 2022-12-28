@@ -226,7 +226,7 @@ class Skill extends Model
 
         $bonus += $this->getItemBonuses($this->baseSkill);
 
-        $bonus += $this->getCharacterBoonsBonus('skill_bonus');
+        $bonus += $this->getCharacterBoonsBonus('increase_skill_bonus_by');
 
         $accuracy = $this->getCharacterSkillBonus($this->character, 'Accuracy');
         $looting  = $this->getCharacterSkillBonus($this->character, 'Looting');
@@ -259,7 +259,7 @@ class Skill extends Model
         $bonus = 0.0;
 
         $bonus += $this->getItemBonuses($this->baseSkill, 'skill_training_bonus');
-        $bonus += $this->getCharacterBoonsBonus('skill_training_bonus');
+        $bonus += $this->getCharacterBoonsBonus('increase_skill_training_bonus_by');
         $bonus += $this->getClassSpecificTrainingBonus($this->character);
 
         return $bonus;
@@ -317,7 +317,7 @@ class Skill extends Model
         $boons = CharacterBoon::where('character_id', $this->character->id)->get();
 
         if ($boons->isNotEmpty()) {
-            $newBonus += $boons->sum($skillBonusAttribute);
+            $newBonus += $boons->sum('itemUsed.' . $skillBonusAttribute);
         }
 
         return $newBonus;

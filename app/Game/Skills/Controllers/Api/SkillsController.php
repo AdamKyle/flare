@@ -22,6 +22,17 @@ class SkillsController extends Controller {
         ]);
     }
 
+    public function skillInformation(Character $character, Skill $skill, SkillService $skillService) {
+
+        if ($character->id !== $skill->character_id) {
+            return response()->json([
+                'message' => 'No. Not allowed to do that.'
+            ], 422);
+        }
+
+        return response()->json($skillService->getSkill($skill));
+    }
+
     public function train(TrainSkillValidation $request, Character $character, SkillService $skillService) {
         $result = $skillService->trainSkill($character, $request->skill_id, $request->xp_percentage);
 

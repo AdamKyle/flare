@@ -7,11 +7,13 @@ use App\Flare\Handlers\UpdateCharacterAttackTypes;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Skill;
 use App\Flare\Models\Character;
+use App\Flare\Transformers\BasicSkillsTransformer;
 use App\Flare\Transformers\SkillsTransformer;
 use App\Game\Core\Traits\ResponseBuilder;
 use Exception;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
+use League\Fractal\Resource\Item;
 
 class SkillService {
 
@@ -21,6 +23,11 @@ class SkillService {
      * @var Manager $manager
      */
     private Manager $manager;
+
+    /**
+     * @var BasicSkillsTransformer $skillsTransformer
+     */
+    private BasicSkillsTransformer $basicSkillsTransformer;
 
     /**
      * @var SkillsTransformer $skillsTransformer
@@ -34,11 +41,17 @@ class SkillService {
 
     /**
      * @param Manager $manager
+     * @param BasicSkillsTransformer $basicSkillsTransformer
      * @param SkillsTransformer $skillsTransformer
      * @param UpdateCharacterAttackTypes $updateCharacterAttackTypes
      */
-    public function __construct(Manager $manager, SkillsTransformer $skillsTransformer, UpdateCharacterAttackTypes $updateCharacterAttackTypes) {
+    public function __construct(Manager $manager,
+                                BasicSkillsTransformer $basicSkillsTransformer,
+                                SkillsTransformer $skillsTransformer,
+                                UpdateCharacterAttackTypes $updateCharacterAttackTypes
+    ) {
         $this->manager                    = $manager;
+        $this->basicSkillsTransformer     = $basicSkillsTransformer;
         $this->skillsTransformer          = $skillsTransformer;
         $this->updateCharacterAttackTypes = $updateCharacterAttackTypes;
     }
@@ -53,9 +66,21 @@ class SkillService {
     public function getSkills(Character $character, array $gameSkillIds): array {
         $skills = $character->skills()->whereIn('game_skill_id', $gameSkillIds)->get();
 
-        $skills = new Collection($skills, $this->skillsTransformer);
+        $skills = new Collection($skills, $this->basicSkillsTransformer);
 
         return $this->manager->createData($skills)->toArray();
+    }
+
+    /**
+     * Fetch Skill Info.
+     *
+     * @param Skill $skill
+     * @return array
+     */
+    public function getSkill(Skill $skill): array {
+        $skill = new Item($skill, $this->skillsTransformer);
+
+        return $this->manager->createData($skill)->toArray();
     }
 
     /**
