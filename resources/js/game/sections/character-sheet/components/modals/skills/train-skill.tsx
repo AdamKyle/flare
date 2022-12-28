@@ -167,8 +167,6 @@ export default class TrainSkill extends React.Component<any, any> {
                             value={this.defaultItem()}
                         />
                     </dd>
-                    <dt>Skill Bonus</dt>
-                    <dd>{(this.props.skill.skill_bonus * 100).toFixed(2)}%</dd>
                     <dt>XP</dt>
                     <dd>{formatNumber(this.props.skill.xp)} / {formatNumber(this.props.skill.xp_max)}</dd>
                 </dl>

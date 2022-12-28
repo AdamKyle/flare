@@ -116,10 +116,14 @@ class LocationService {
 
     protected function updateForRankFights(Character $character): void {
         if (is_null($this->location)) {
+            event(new UpdateRankFights($character->user, false));
+
             return;
         }
 
         if (is_null($this->location->type)) {
+            event(new UpdateRankFights($character->user, false));
+
             return;
         }
 

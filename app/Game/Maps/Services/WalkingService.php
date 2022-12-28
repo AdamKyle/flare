@@ -4,6 +4,7 @@ namespace App\Game\Maps\Services;
 
 use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\Character;
+use App\Flare\Values\LocationType;
 use App\Game\Battle\Services\ConjureService;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Maps\Events\MoveTimeOutEvent;
@@ -62,6 +63,13 @@ class WalkingService extends BaseMovementService
         if (!is_null($location)) {
             if (!$this->canPlayerEnterLocation($character, $location)) {
                 return $this->successResult();
+            }
+
+            if (!is_null($location->type)) {
+                if ((new LocationType($location->type))->isUnderWaterCaves() && $character->currentAutomations->isNotEmpty()) {
+                    event(new ServerMessageEvent($character->user, 'You cannot enter this place while exploring!'));
+                    return $this->successResult();
+                }
             }
         }
 

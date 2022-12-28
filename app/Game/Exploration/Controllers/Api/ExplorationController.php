@@ -2,6 +2,8 @@
 
 namespace App\Game\Exploration\Controllers\Api;
 
+use App\Flare\Models\Location;
+use App\Flare\Values\LocationType;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\CharacterAutomation;
@@ -49,6 +51,18 @@ class ExplorationController extends Controller {
         if ($character->currentAutomations()->where('type', AutomationType::EXPLORING)->count() > 0) {
             return response()->json([
                 'message' => 'Nope. You already have one in progress.'
+            ], 422);
+        }
+
+        $location = Location::where('x', $character->map->character_position_x)
+                            ->where('y', $character->map->character_position_y)
+                            ->where('game_map_id', $character->map->game_map_id)
+                            ->where('type', LocationType::UNDERWATER_CAVES)
+                            ->first();
+
+        if (!is_null($location)) {
+            return response()->json([
+                'message' => 'Nope. You cannot explore here.'
             ], 422);
         }
 

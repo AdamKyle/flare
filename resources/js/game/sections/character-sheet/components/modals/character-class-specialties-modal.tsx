@@ -341,12 +341,15 @@ export default class CharacterClassSpecialtiesModal extends React.Component<Clas
     renderSpecialties() {
         return (
             <Fragment>
-                <p className='my-4 text-sm'>
-                    Each class has its own specialties that unlock at specific Clas Ranks for a class.
+                <p className='my-4'>
+                    Each class has its own specialties that unlock at specific Class Ranks for a class.
                     As you level the class, through killing monsters, you will slowly unlock the
                     specialities for the selected class. A player may only have three specialities equipped
                     and can only have one damage speciality equipped. You may mix and match across classes
                     to create your own unique build.
+                </p>
+                <p className='my-4'>
+                    <a href={"/information/class-specialties/"} target="_blank">Learn more <i className="fas fa-external-link-alt"></i></a>.
                 </p>
                 {
                     this.state.equipping ?

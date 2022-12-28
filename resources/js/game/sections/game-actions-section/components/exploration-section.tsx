@@ -6,6 +6,7 @@ import {replace, startCase} from "lodash";
 import Ajax from "../../../lib/ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
+import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
 
 export default class ExplorationSection extends React.Component<any, any> {
     constructor(props: any) {
@@ -16,6 +17,7 @@ export default class ExplorationSection extends React.Component<any, any> {
             time_selected: null,
             attack_type: null,
             move_down_monster_list: null,
+            error_message: null,
         }
     }
 
@@ -173,6 +175,7 @@ export default class ExplorationSection extends React.Component<any, any> {
     startExploration() {
         this.setState({
             loading: true,
+            error_message: null,
         }, () => {
             (new Ajax()).setRoute('exploration/'+this.props.character.id+'/start').setParameters({
                 auto_attack_length: this.state.time_selected,
@@ -183,13 +186,24 @@ export default class ExplorationSection extends React.Component<any, any> {
                 this.setState({
                     loading: false,
                 });
-            }, (error: AxiosError) => {});
+            }, (error: AxiosError) => {
+                this.setState({loading: false});
+
+                if (typeof error.response !== 'undefined') {
+                    const response = error.response;
+
+                    this.setState({
+                        error_message: response.data.message,
+                    })
+                }
+            });
         })
     }
 
     stopExploration() {
         this.setState({
             loading: true,
+            error_message: null,
         }, () => {
             (new Ajax()).setRoute('exploration/'+this.props.character.id+'/stop').doAjaxCall('post', (result: AxiosResponse) => {
                 this.setState({
@@ -280,6 +294,16 @@ export default class ExplorationSection extends React.Component<any, any> {
                                     this.state.loading ?
                                         <div className='w-1/2 ml-auto mr-auto'>
                                             <LoadingProgressBar />
+                                        </div>
+                                    : null
+                                }
+
+                                {
+                                    this.state.error_message !== null ?
+                                        <div className='w-1/2 ml-auto mr-auto mt-4'>
+                                            <DangerAlert>
+                                                {this.state.error_message}
+                                            </DangerAlert>
                                         </div>
                                     : null
                                 }
