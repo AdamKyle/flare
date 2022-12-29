@@ -69,7 +69,7 @@ class LevelUpValue {
     protected function addModifier(Character $character, string $stat, bool $isDamage = false): float {
 
         if ($isDamage && $character->{$character->damage_stat} >= 999999) {
-            return $character->{$stat} + 0.002;
+            return $character->{$stat} + 0.0002;
         }
 
         if ($character->str >= 999999 && !$isDamage) {

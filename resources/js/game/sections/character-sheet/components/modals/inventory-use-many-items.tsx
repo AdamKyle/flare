@@ -44,7 +44,7 @@ export default class InventoryUseManyItems extends React.Component<any, any> {
     }
 
     buildItems() {
-        return this.props.items.filter((item: UsableItemsDetails) => !item.damages_kingdoms).map((item: UsableItemsDetails) => {
+        return this.props.items.filter((item: UsableItemsDetails) => !item.damages_kingdoms && item.usable).map((item: UsableItemsDetails) => {
             return {
                 label: item.item_name + ' Lasts for: ' + item.lasts_for + ' minutes',
                 value: item.slot_id,

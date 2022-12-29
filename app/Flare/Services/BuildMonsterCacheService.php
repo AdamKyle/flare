@@ -126,6 +126,10 @@ class BuildMonsterCacheService {
 
             foreach ($monsters as $monster) {
 
+                if ($baseAmount > 500000000000) {
+                    $baseAmount = 500000000000;
+                }
+
                 $transformer = $this->rankMonsterTransformer->setStat($baseAmount);
 
                 $monster = new Item($monster, $transformer);
@@ -133,6 +137,7 @@ class BuildMonsterCacheService {
                 $rankCache[$i][] = $this->manager->createData($monster)->toArray();
 
                 $baseAmount += $increments;
+
             }
 
             $maxAmount += $maxAmount;

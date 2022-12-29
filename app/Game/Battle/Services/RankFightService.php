@@ -2,6 +2,7 @@
 
 namespace App\Game\Battle\Services;
 
+use App\Flare\Services\CharacterXPService;
 use Exception;
 use Illuminate\Support\Facades\Cache;
 use App\Flare\Builders\BuildMythicItem;
@@ -38,6 +39,11 @@ class RankFightService {
     private CharacterCacheData $characterCacheData;
 
     /**
+     * @var CharacterXPService $characterXPService;
+     */
+    private CharacterXPService $characterXPService;
+
+    /**
      * @var MonsterPlayerFight|null $monsterPlayerFight
      */
     private ?MonsterPlayerFight $monsterPlayerFight;
@@ -55,18 +61,21 @@ class RankFightService {
     /**
      * @param BattleEventHandler $battleEventHandler
      * @param CharacterCacheData $characterCacheData
+     * @param CharacterXPService $characterXPService
      * @param MonsterPlayerFight $monsterPlayerFight
      * @param RandomAffixGenerator $randomAffixGenerator
      * @param BuildMythicItem $buildMythicItem
      */
     public function __construct(BattleEventHandler $battleEventHandler,
                                 CharacterCacheData $characterCacheData,
+                                CharacterXPService $characterXPService,
                                 MonsterPlayerFight $monsterPlayerFight,
                                 RandomAffixGenerator $randomAffixGenerator,
                                 BuildMythicItem $buildMythicItem,
     ) {
         $this->battleEventHandler   = $battleEventHandler;
         $this->characterCacheData   = $characterCacheData;
+        $this->characterXPService   = $characterXPService;
         $this->monsterPlayerFight   = $monsterPlayerFight;
         $this->randomAffixGenerator = $randomAffixGenerator;
         $this->buildMythicItem      = $buildMythicItem;
@@ -355,16 +364,19 @@ class RankFightService {
             $gold = MaxCurrenciesValue::MAX_GOLD;
         }
 
-        $character->update([
-            'xp'   => $character->xp + 10000,
-            'gold' => $gold,
-        ]);
+        if ($this->characterXPService->canCharacterGainXP($character)) {
+            $character->update([
+                'xp' => $character->xp + 10000,
+                'gold' => $gold,
+            ]);
 
-        $character = $character->refresh();
+            $character = $character->refresh();
 
-        $this->handlePossibleLevelUp($character);
+            $this->handlePossibleLevelUp($character);
 
-        event(new ServerMessageEvent($character->user, 'Gained: 10,000XP for reaching the end of Rank ' . $rank . ' Critter list'));
+            event(new ServerMessageEvent($character->user, 'Gained: 10,000XP for reaching the end of Rank ' . $rank . ' Critter list'));
+        }
+
         event(new ServerMessageEvent($character->user, 'Gained: 2,000,000,000 Gold for reaching the end of Rank ' . $rank . ' Critter list'));
 
         $item = $this->giveCharacterRandomItem($character);
@@ -398,18 +410,22 @@ class RankFightService {
             $newGold = MaxCurrenciesValue::MAX_GOLD;
         }
 
-        $character->update([
-            'xp'   => $character->xp + 100000,
-            'gold' => $newGold,
-        ]);
+        if ($this->characterXPService->canCharacterGainXP($character)) {
+            $character->update([
+                'xp' => $character->xp + 100000,
+                'gold' => $newGold,
+            ]);
 
-        $character = $character->refresh();
+            $character = $character->refresh();
 
-        $this->handlePossibleLevelUp($character);
+            $this->handlePossibleLevelUp($character);
 
-        $character = $character->refresh();
 
-        event(new ServerMessageEvent($character->user, 'Gained: 100,000XP for reaching the end of Rank ' . $rank . ' Critter list'));
+            $character = $character->refresh();
+
+            event(new ServerMessageEvent($character->user, 'Gained: 100,000XP for reaching the end of Rank ' . $rank . ' Critter list'));
+        }
+
         event(new ServerMessageEvent($character->user, 'Gained: 1,000,000,000,000 Gold for reaching the end of Rank ' . $rank . ' Critter list'));
 
         $mythic = $this->buildMythicItem->fetchMythicItem($character);

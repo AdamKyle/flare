@@ -2,6 +2,7 @@
 
 namespace App\Game\Battle\Providers;
 
+use App\Flare\Services\CharacterXPService;
 use App\Game\Battle\Services\RankFightService;
 use App\Game\ClassRanks\Services\ClassRankService;
 use App\Game\Mercenaries\Services\MercenaryService;
@@ -86,6 +87,7 @@ class ServiceProvider extends ApplicationServiceProvider
             return new RankFightService(
                 $app->make(BattleEventHandler::class),
                 $app->make(CharacterCacheData::class),
+                $app->make(CharacterXPService::class),
                 $app->make(MonsterPlayerFight::class),
                 $app->make(RandomAffixGenerator::class),
                 $app->make(BuildMythicItem::class)

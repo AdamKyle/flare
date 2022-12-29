@@ -46,9 +46,9 @@ export default class CharacterReincarnationModal extends React.Component<Additio
                         <dt>Reincarnation Stat Bonus (pts.)</dt>
                         <dd>{this.props.character.reincarnated_stat_increase !== null ? formatNumber(this.props.character.reincarnated_stat_increase) : 0}</dd>
                         <dt>Base Stat Mod</dt>
-                        <dd>{formatNumber(this.props.character.base_stat_mod)}%</dd>
+                        <dd>{(this.props.character.base_stat_mod * 100).toFixed(2)}%</dd>
                         <dt>Base Damage Stat Mod</dt>
-                        <dd>{formatNumber(this.props.character.base_damage_stat_mod)}%</dd>
+                        <dd>{(this.props.character.base_damage_stat_mod * 100).toFixed(2)}%</dd>
                         <dt>XP Penalty</dt>
                         <dd>{this.props.character.xp_penalty !== null ? (this.props.character.xp_penalty * 100).toFixed(0) : 0}%</dd>
                     </dl>
