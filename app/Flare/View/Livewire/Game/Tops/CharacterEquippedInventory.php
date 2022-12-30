@@ -28,7 +28,7 @@ class CharacterEquippedInventory extends DataTableComponent {
 
         $inventory = Inventory::where('character_id', $this->characterId)->first();
 
-        return InventorySlot::where('equipped')->where('inventory_id', $inventory->id);
+        return InventorySlot::where('equipped', true)->where('inventory_id', $inventory->id);
     }
 
     public function columns(): array {

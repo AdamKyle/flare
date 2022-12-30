@@ -42,7 +42,7 @@ class UpdateRankFights implements ShouldBroadcastNow
      */
     public function __construct(User $user, bool $showRankSelection) {
         $rank                    = RankFight::first();
-        
+
         $this->showRankSelection = $showRankSelection;
         $this->ranks             = is_null($rank) ? 1 : $rank->current_rank;
         $this->user              = $user;
