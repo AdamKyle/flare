@@ -360,7 +360,7 @@ class BattleDrop {
                 event(new GameServerMessage($character->user, 'You found: ' . $item->affix_name . ' on the enemies corpse.', $slot->id));
 
                 if ($isMythic) {
-                    event(new GlobalMessageEvent($character->name . ' Has found a mythical item on the king!'));
+                    event(new GlobalMessageEvent($character->name . ' Has found a mythical item on the enemies corpse! Such a rare drop!'));
                 }
             }
         }
