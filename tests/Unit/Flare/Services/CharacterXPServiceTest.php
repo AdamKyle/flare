@@ -359,7 +359,7 @@ class CharacterXPServiceTest extends TestCase {
 
         $xp = $this->characterXPService->determineXPToAward($character->refresh(), 10);
 
-        $this->assertEquals(10, $xp);
+        $this->assertEquals(0, $xp);
     }
 
     public function testContinueLevelingWithNoConfig() {
