@@ -78,7 +78,7 @@ class MapController extends Controller {
      */
     public function move(MoveRequest $request, Character $character): JsonResponse {
         if (!$character->can_move) {
-            return response()->json(['message' => 'Must wait to be able to move.'], 422);
+            return response()->json(['invalid input'], 429);
         }
 
         $response = $this->walkingService->setCoordinatesToTravelTo(
@@ -108,7 +108,7 @@ class MapController extends Controller {
      */
     public function traverse(TraverseRequest $request, Character $character, MovementService $movementService): JsonResponse {
         if (!$character->can_move) {
-            return response()->json(['message' => 'Must be able to move to traverse.'], 422);
+            return response()->json(['invalid input'], 429);
         }
 
         $response = $movementService->updateCharacterPlane($request->map_id, $character);
@@ -127,7 +127,7 @@ class MapController extends Controller {
      */
     public function teleport(TeleportRequest $request, Character $character): JsonResponse {
         if (!$character->can_move) {
-            return response()->json(['Must be able to move to teleport.'], 422);
+            return response()->json(['invalid input'], 429);
         }
 
         $response = $this->teleportService->setCoordinatesToTravelTo($request->x, $request->y)
@@ -149,7 +149,7 @@ class MapController extends Controller {
      */
     public function setSail(SetSailValidation $request, Character $character): JsonResponse {
         if (!$character->can_move) {
-            return response()->json(['Cannot set sail yet, you must be able to move.'], 422);
+            return response()->json(['invalid input'], 429);
         }
 
         $response = $this->setSail->setCoordinatesToTravelTo($request->x, $request->y)

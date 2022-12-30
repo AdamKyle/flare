@@ -32,7 +32,7 @@ class  EnchantingController extends Controller {
 
     public function enchant(EnchantingValidation $request, Character $character) {
         if (!$character->can_craft) {
-            return response()->json(['message' => 'You cannot enchant yet.'], 422);
+            return response()->json(['message' => 'Cannot Craft.'], 429);
         }
 
         $slot = $this->enchantingService->getSlotFromInventory($character, $request->slot_id);

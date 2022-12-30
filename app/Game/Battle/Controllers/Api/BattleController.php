@@ -77,7 +77,7 @@ class BattleController extends Controller {
      */
     public function battleResults(Request $request, Character $character): JsonResponse {
         if (!$character->can_attack) {
-            return response()->json(['message' => 'Must wait to be able to attack'], 422);
+            return response()->json(['message' => 'invalid input.'], 429);
         }
 
         if ($request->is_character_dead) {
