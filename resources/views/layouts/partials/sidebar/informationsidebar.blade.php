@@ -41,6 +41,10 @@
                 <span class="text-sm fas fa-info-circle"></span>
                 Rules
             </a>
+            <a href="{{route('info.page', ['pageName' => 'some-clicking-required'])}}">
+                <span class="fas fa-mouse-pointer"></span>
+                Some clicking Required
+            </a>
             <a href="{{route('info.page', ['pageName' => 'settings'])}}">
                 <span class="text-sm fas fa-cogs"></span>
                 Player Settings
@@ -74,6 +78,10 @@
             <a href="{{route('info.page', ['pageName' => 'races-and-classes'])}}">
                 <span class="ra ra-player"></span>
                 Races and Classes
+            </a>
+            <a href="{{route('info.page', ['pageName' => 'class-ranks'])}}">
+                <span class="fas fa-users"></span>
+                Class ranks
             </a>
             <a href="{{route('info.page', ['pageName' => 'character-stats'])}}">
                 <span class="far fa-chart-bar"></span>
@@ -124,6 +132,10 @@
             <a href="{{route('info.page', ['pageName' => 'ambush-and-counter'])}}">
                 <span class="ra ra-muscle-fat"></span>
                 Ambush and Counter
+            </a>
+            <a href="{{route('info.page', ['pageName' => 'ranked-fights'])}}">
+                <span class="ra ra-monster-skull"></span>
+                Ranked Fights (End Game)
             </a>
             <a href="{{route('info.page', ['pageName' => 'player-vs-player'])}}">
                 <span class="ra ra-helmet"></span>

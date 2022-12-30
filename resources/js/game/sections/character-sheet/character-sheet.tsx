@@ -247,6 +247,7 @@ export default class CharacterSheet extends React.Component<CharacterSheetProps,
                                     : null
                                 }
                                 <CharacterSkillsTabs character_id={this.props.character.id}
+                                                     user_id={this.props.character.user_id}
                                                      is_dead={this.props.character.is_dead}
                                                      is_automation_running={this.props.character.is_automation_running}
                                                      finished_loading={this.props.finished_loading}

@@ -163,7 +163,7 @@ export default class MonsterActions extends React.Component<MonsterActionsProps,
                         />
                     </div>
                     <div className='cols-start-3 cols-end-3'>
-                        <a href='/information/rank-fights' target='_blank' className='ml-2 relative top-[5px]'>Help <i
+                        <a href='/information/ranked-fights' target='_blank' className='ml-2 relative top-[5px]'>Help <i
                             className="fas fa-external-link-alt"></i></a>
                     </div>
                 </div>

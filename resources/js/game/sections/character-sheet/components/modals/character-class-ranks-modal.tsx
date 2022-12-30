@@ -29,10 +29,6 @@ export default class CharacterClassRanksModal extends React.Component<Additional
                     here. All classes are leveled by you killing monsters, either exploration or manually. <a href="/information/class-ranks" target="_blank">
                     learn more about Class Ranks <i className="fas fa-external-link-alt"></i></a>
                     </p>
-                    <p className='my-2'>
-                        When switching classes, you'll have to refresh the character sheet tab by switching away and back to refresh the skills list to see your new
-                        class skill. Your previous skill is hidden till you switch back.
-                    </p>
                 </InfoAlert>
                 <CharacterClassRanks character={this.props.character} />
             </Dialogue>

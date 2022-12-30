@@ -15,6 +15,8 @@ export default class CharacterSkillsTabs extends React.Component<CharacterSkillT
 
     private tabs: {name: string, key: string}[];
 
+    private updateCharacterSkills: any;
+
     constructor(props: CharacterSkillTabsProps) {
         super(props);
 
@@ -34,6 +36,9 @@ export default class CharacterSkillsTabs extends React.Component<CharacterSkillT
             dark_tables: false,
             skills: null,
         }
+
+        // @ts-ignore
+        this.updateCharacterSkills = Echo.private('update-skill-' + this.props.user_id);
     }
 
     componentDidMount() {
@@ -49,6 +54,17 @@ export default class CharacterSkillsTabs extends React.Component<CharacterSkillT
                 console.error(error);;
             });
         }
+
+        // @ts-ignore
+        this.updateCharacterSkills.listen('Game.Skills.Events.UpdateCharacterSkills', (event: any) => {
+
+            let skills             = JSON.parse(JSON.stringify(this.state.skills));
+            skills.training_skills = event.skills;
+
+            this.setState({
+                skills: skills,
+            });
+        });
     }
 
     updateSkills(skills: any) {

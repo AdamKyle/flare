@@ -143,6 +143,7 @@ export default class RankFightTops extends React.Component<any, any> {
                     this.state.list_data.length > 0 ?
                         <div className='mx-auto w-full md:w-1/2'>
                             <h3 className='my-2'>Rank {this.state.rank_selected}</h3>
+                            <p className='mb-2 text-sm'>Timezone is: GMT-6</p>
                             <Table data={this.state.list_data}
                                    columns={[
                                        {

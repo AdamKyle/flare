@@ -1,5 +1,10 @@
 @extends('layouts.app')
 
+@push('head')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" />
+    <script src="https://cdn.jsdelivr.net/gh/mcstudios/glightbox/dist/js/glightbox.min.js"></script>
+@endpush
+
 @section('content')
     <div class="container mx-auto px-4 mb-5">
         <div class="text-center mb-10 mt-10">
@@ -29,7 +34,12 @@
 
         </div>
 
-        <img src="{{asset('promotion/game.png')}}" class="shadow rounded max-w-full h-auto align-middle border-none img-fluid max-w-[60%] my-4 m-auto"/>
+        <div>
+            <img src="{{asset('promotion/game.png')}}" class="shadow rounded max-w-full h-auto align-middle border-none img-fluid max-w-[60%] my-4 m-auto glightbox cursor-pointer"/>
+            <div class="text-sm text-center">
+                Click to make larger.
+            </div>
+        </div>
 
         <div class="text-center w-full lg:w-2/4 mx-auto mt-20">
             <h2 class="mb-5 font-thin text-5xl dark:text-gray-300 text-gray-800">
@@ -108,7 +118,7 @@
             <div class="md:flex md:items-center text-center md:text-left">
                 <div>
                     <h2 class="mb-5 font-thin md:text-4xl lg:text-5xl dark:text-gray-300 text-gray-800">See where you're going!</h2>
-                    <p class="mb-10 dark:text-gray-300 text-gray-800">Adventure on a map by clicking the action buttons. Set sail from one port to the other, traverse t other planes of existence!</p>
+                    <p class="mb-10 dark:text-gray-300 text-gray-800">Adventure on a map by clicking the action buttons. Set sail from one port to the other, traverse to other planes of existence!</p>
 
                     <x-core.buttons.link-buttons.primary-button href="{{route('info.page', [
                             'pageName' => 'movement',
@@ -130,6 +140,45 @@
             <p class="mb-10 dark:text-gray-300 text-gray-800">
                 This game is free. This game has one philosophy: You want it? Earn it! Every thing from the best gear,
                 to the strongest kingdoms to ability to travel from one plane to the next is all only attainable by playing the game.
+            </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-3 mt-5 w-full mt-10 mx-auto lg:w-2/3 md:mt-20">
+            <div class="md:flex md:items-center text-center md:text-left">
+                <div>
+                    <h2 class="mb-5 font-thin md:text-4xl lg:text-5xl dark:text-gray-300 text-gray-800">Ranked Fights</h2>
+                    <p class="mb-10 dark:text-gray-300 text-gray-800">
+                        Participate in some of the hardest fights in the game! Reach the top of the list for legendary rewards!
+                    </p>
+
+                    <p class="mb-10 dark:text-gray-300 text-gray-800">
+                        Ranked fights reset once per month, ranks will also increase one rank per month making the enemies at the bottom of the rank list
+                        for that month even harder!
+                    </p>
+
+                    <x-core.buttons.link-buttons.primary-button href="{{route('info.page', [
+                            'pageName' => 'rank-fights',
+                    ])}}">
+                        Learn more
+                    </x-core.buttons.link-buttons.primary-button>
+                </div>
+            </div>
+            <div>
+                <img src="{{asset('promotion/rank-fight-chart-data.png')}}" class="shadow rounded max-w-full h-auto align-middle border-none img-fluid glightbox w-100 mb-5 cursor-pointer" />
+                <div class="text-center text-sm">
+                    Click to make larger. Chart does not represent actual in game Rank progression data.
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center w-full lg:w-2/4 mx-auto mt-20">
+            <h2 class="mb-5 font-thin text-5xl dark:text-gray-300 text-gray-800">
+                <i class="fas fa-mouse-pointer mr-2"></i>
+                Some Clicking Required!
+            </h2>
+            <p class="mb-10 dark:text-gray-300 text-gray-800">
+                Tlessa is not an idle game. We do offer <a href="/information/exploration">Exploration</a> to make the progression a bit easier,
+                however, players should be prepared to not put the game on autopilot and walk away. <a href="/information/some-clicking-required">Learn more</a>,
             </p>
         </div>
 
@@ -267,3 +316,9 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        const lightbox = GLightbox();
+    </script>
+@endpush

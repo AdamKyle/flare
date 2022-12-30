@@ -8,6 +8,7 @@ use App\Flare\Models\GameClass;
 use App\Flare\Models\GameSkill;
 use App\Flare\Values\BaseSkillValue;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Skills\Services\UpdateCharacterSkillsService;
 use Exception;
 
 class ManageClassService {
@@ -20,10 +21,27 @@ class ManageClassService {
     private UpdateCharacterAttackTypes $updateCharacterAttackTypes;
 
     /**
-     * @param UpdateCharacterAttackTypes $updateCharacterAttackTypes
+     * @var UpdateCharacterSkillsService $updateCharacterSkillsService
      */
-    public function __construct(UpdateCharacterAttackTypes $updateCharacterAttackTypes) {
-        $this->updateCharacterAttackTypes = $updateCharacterAttackTypes;
+    private UpdateCharacterSkillsService $updateCharacterSkillsService;
+
+    /**
+     * @var ClassRankService $classRankService
+     */
+    private ClassRankService $classRankService;
+
+    /**
+     * @param UpdateCharacterAttackTypes $updateCharacterAttackTypes
+     * @param UpdateCharacterSkillsService $updateCharacterSkillsService
+     * @param ClassRankService $classRankService
+     */
+    public function __construct(UpdateCharacterAttackTypes $updateCharacterAttackTypes,
+                                UpdateCharacterSkillsService $updateCharacterSkillsService,
+                                ClassRankService $classRankService
+    ) {
+        $this->updateCharacterAttackTypes   = $updateCharacterAttackTypes;
+        $this->updateCharacterSkillsService = $updateCharacterSkillsService;
+        $this->classRankService             = $classRankService;
     }
 
     /**
@@ -68,8 +86,11 @@ class ManageClassService {
 
         $this->updateCharacterAttackTypes->updateCache($character);
 
+        $this->updateCharacterSkillsService->updateCharacterSkills($character);
+
         return $this->successResult([
-            'message' => 'You have switched to: ' . $class->name
+            'message'     => 'You have switched to: ' . $class->name,
+            'class_ranks' => $this->classRankService->getClassRanks($character)['class_ranks'],
         ]);
     }
 }

@@ -79,7 +79,11 @@ class UpdateCharactersForClassRanks extends Command
     }
 
     protected function getDefaultLevel(CharacterClassRank $classRank, int $type) {
-        if (($classRank->gameClass->type()->isFighter() || $classRank->gameClass->type()->isThief() || $classRank->gameClass->type()->isVampire())&& (new WeaponMasteryValue($type))->isWeapon()) {
+        if (($classRank->gameClass->type()->isFighter() ||
+             $classRank->gameClass->type()->isThief() ||
+             $classRank->gameClass->type()->isVampire() ||
+             $classRank->gameClass->type()->isBlackSmith()) && (new WeaponMasteryValue($type))->isWeapon())
+        {
             return 5;
         }
 
@@ -95,7 +99,7 @@ class UpdateCharactersForClassRanks extends Command
             return 5;
         }
 
-        if (($classRank->gameClass->type()->isRanger()) && (new WeaponMasteryValue($type))->isHealingSpell()) {
+        if (($classRank->gameClass->type()->isRanger() || $classRank->gameClass->type()->isArcaneAlchemist()) && (new WeaponMasteryValue($type))->isHealingSpell()) {
             return 2;
         }
 
@@ -103,7 +107,7 @@ class UpdateCharactersForClassRanks extends Command
             return 5;
         }
 
-        if (($classRank->gameClass->type()->isThief()) && (new WeaponMasteryValue($type))->isBow()) {
+        if (($classRank->gameClass->type()->isThief() || $classRank->gameClass->type()->isArcaneAlchemist()) && (new WeaponMasteryValue($type))->isBow()) {
             return 2;
         }
 

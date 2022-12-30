@@ -15,6 +15,7 @@ use App\Game\Skills\Services\EnchantingService;
 use App\Game\Skills\Services\EnchantItemService;
 use App\Game\Skills\Services\SkillService;
 use App\Game\Skills\Services\TrinketCraftingService;
+use App\Game\Skills\Services\UpdateCharacterSkillsService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
 
@@ -29,6 +30,10 @@ class ServiceProvider extends ApplicationServiceProvider
     {
         $this->app->bind(EnchantItemService::class, function() {
             return new EnchantItemService;
+        });
+
+        $this->app->bind(UpdateCharacterSkillsService::class, function($app) {
+            return new UpdateCharacterSkillsService($app->make(SkillService::class));
         });
 
         $this->app->bind(CraftingService::class, function($app) {

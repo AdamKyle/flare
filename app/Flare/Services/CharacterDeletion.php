@@ -9,6 +9,7 @@ use App\Flare\Models\GameMap;
 use App\Flare\Models\GameRace;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\MarketBoard;
+use App\Flare\Models\RankFightTop;
 use App\Flare\Models\User;
 use App\Game\Kingdoms\Handlers\GiveKingdomsToNpcHandler;
 use Illuminate\Support\Collection;
@@ -130,6 +131,8 @@ class CharacterDeletion {
         $character->classSpecialsEquipped()->delete();
 
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
+        RankFightTop::where('character_id', $character->id)->delete();
 
         $character->map()->delete();
 

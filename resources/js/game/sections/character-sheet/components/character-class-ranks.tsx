@@ -64,7 +64,8 @@ export default class CharacterClassRanks extends React.Component<any, CharacterC
             (new Ajax()).setRoute('switch-classes/'+this.props.character.id+'/' + classId).doAjaxCall('post', (response: AxiosResponse) => {
                 this.setState({
                     switching_class: false,
-                    success_message: response.data.message
+                    success_message: response.data.message,
+                    class_ranks: response.data.class_ranks,
                 })
             }, (error: AxiosError) => {
                 this.setState({switching_class: false});

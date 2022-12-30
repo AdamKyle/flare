@@ -53,7 +53,9 @@ class IncreaseRankFight extends Command
 
             Artisan::call('generate:monster-cache');
 
-            event(new GlobalMessageEvent('Rank fights have a new rank: Rank ' . $currentRank->current_rank . '. head to Underwater Caves to test your might against these fearsome beasts!'));
+            event(new GlobalMessageEvent('Rank fights have a new rank: Rank ' . $currentRank->current_rank . '. head to Underwater Caves (on Surface) to test your might against these fearsome beasts!'));
+        } else {
+            event(new GlobalMessageEvent('Rank fights are no longer increasing but the tops is still resetting! Quick can you be the first to Rank 50!?! Epic rewards await at the Underwater Caves on Surface!'));
         }
     }
 }

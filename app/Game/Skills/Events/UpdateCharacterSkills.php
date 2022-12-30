@@ -17,16 +17,16 @@ class UpdateCharacterSkills implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $skills;
+    public array $skills;
 
     /**
-     * @var User $users
+     * @var User $user
      */
-    private $user;
+    private User $user;
 
     /**
      * @param User $user
-     * @param array $skill
+     * @param array $skills
      */
     public function __construct(User $user, array $skills) {
         $this->user   = $user;
@@ -38,8 +38,7 @@ class UpdateCharacterSkills implements ShouldBroadcastNow
      *
      * @return Channel|array
      */
-    public function broadcastOn()
-    {
+    public function broadcastOn() {
         return new PrivateChannel('update-skill-' . $this->user->id);
     }
 }

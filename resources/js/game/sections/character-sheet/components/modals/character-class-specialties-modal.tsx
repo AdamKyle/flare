@@ -349,7 +349,7 @@ export default class CharacterClassSpecialtiesModal extends React.Component<Clas
                     to create your own unique build.
                 </p>
                 <p className='my-4'>
-                    <a href={"/information/class-specialties/"} target="_blank">Learn more <i className="fas fa-external-link-alt"></i></a>.
+                    <a href={"/information/class-ranks/"} target="_blank">Learn more <i className="fas fa-external-link-alt"></i></a>.
                 </p>
                 {
                     this.state.equipping ?

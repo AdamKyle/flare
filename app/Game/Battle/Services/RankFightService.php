@@ -309,7 +309,10 @@ class RankFightService {
                 }
 
                 $this->firstOneToMaxRank($character->refresh(), $rank);
+
+                return;
             }
+
         }
 
         if ($isLastMonsterForRank) {
