@@ -700,7 +700,7 @@ export default class QueenOfHearts extends React.Component<any, any> {
 
                     <DangerButton button_label={'Remove Queen'} on_click={this.props.remove_crafting} disabled={this.state.preforming_action} additional_css={'ml-2'}/>
 
-                    <a href='/information/random-enchantments' target='_blank' className='ml-2'>Help <i
+                    <a href='/information/random-enchants' target='_blank' className='ml-2'>Help <i
                         className="fas fa-external-link-alt"></i></a>
                 </div>
             </Fragment>
