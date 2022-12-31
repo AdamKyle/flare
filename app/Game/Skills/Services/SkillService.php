@@ -174,6 +174,11 @@ class SkillService {
      * @throws Exception
      */
     public function assignXpToCraftingSkill(GameMap $gameMap, Skill $skill): void {
+
+        if ($skill->level >= 400) {
+            return;
+        }
+
         $xp = 25;
         $xp = $xp + $xp * ($skill->skill_training_bonus + $gameMap->skill_training_bonus);
 
