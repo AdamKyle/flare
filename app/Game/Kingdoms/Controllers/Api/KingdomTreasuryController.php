@@ -137,7 +137,7 @@ class KingdomTreasuryController extends Controller {
             ], 422);
         }
 
-        $newMorale = $kingdom->morale;
+        $newMorale = $kingdom->current_morale;
 
         // Is >= 10 million gold.
         if ($amountToDeposit >= 10000000) {

@@ -2,6 +2,7 @@
 
 namespace App\Game\Kingdoms\Handlers\Traits;
 
+use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Game\Kingdoms\Events\AddKingdomToMap;
 use App\Game\Kingdoms\Events\UpdateGlobalMap;

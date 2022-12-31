@@ -15,20 +15,27 @@ class UpdateKingdomJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
-     * @var Kingdom $user
+     * @var int $kingdomId
      */
-    public $kingdom;
+    public int $kingdomId;
 
     /**
      * Create a new job instance.
      *
-     * @param Kingdom $kingdom
+     * @param int $kingdomId
      */
-    public function __construct(Kingdom $kingdom) {
-        $this->kingdom = $kingdom;
+    public function __construct(int $kingdomId) {
+        $this->kingdomId = $kingdomId;
     }
 
     public function handle(KingdomUpdateService $kingdomUpdateService) {
-        $kingdomUpdateService->setKingdom($this->kingdom)->updateKingdom();
+
+        $kingdom = Kingdom::find($this->kingdomId);
+
+        if (is_null($kingdom)) {
+            return;
+        }
+
+        $kingdomUpdateService->setKingdom($kingdom)->updateKingdom();
     }
 }

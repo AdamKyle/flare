@@ -2,6 +2,10 @@
     @php
         $backUrl = route('buildings.list');
 
+        if (is_null(auth()->user())) {
+            $backUrl = '/information/kingdom-buildings';
+        }
+
         if (!auth()->user()->hasRole('Admin')) {
             $backUrl = '/information/kingdom-buildings';
         }
