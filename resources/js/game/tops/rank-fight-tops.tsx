@@ -88,6 +88,11 @@ export default class RankFightTops extends React.Component<any, any> {
 
 
     renderRankSelection() {
+
+        if (this.state.chart_data.data.length === 0) {
+            return null;
+        }
+
         return (
             <div className='my-4'>
                 <Select
