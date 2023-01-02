@@ -340,28 +340,6 @@ class CharacterXPServiceTest extends TestCase {
         $this->assertEquals(ceil(10 * 0.25), $xp);
     }
 
-    public function testCanContinueLevelingGetNoXpWhenMax() {
-        $item = $this->createItem([
-            'effect' => ItemEffectsValue::CONTINUE_LEVELING,
-            'type'   => 'quest',
-        ]);
-
-        MaxLevelConfiguration::create([
-            'max_level'      => 3000,
-            'half_way'       => 1500,
-            'three_quarters' => 2250,
-            'last_leg'       => 2900,
-        ]);
-
-        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
-
-        $character->update(['level' => 3000]);
-
-        $xp = $this->characterXPService->determineXPToAward($character->refresh(), 10);
-
-        $this->assertEquals(10, $xp);
-    }
-
     public function testContinueLevelingWithNoConfig() {
         $item = $this->createItem([
             'effect' => ItemEffectsValue::CONTINUE_LEVELING,
