@@ -227,7 +227,7 @@ export default class CharacterClassRanks extends React.Component<any, CharacterC
                                     <Table
                                         data={this.state.class_name_selected.weapon_masteries}
                                         columns={this.masteryTableColumns()}
-                                        dark_table={this.props.dark_tables}
+                                        dark_table={this.state.dark_tables}
                                     />
                                 </div>
                             </div>
