@@ -74,7 +74,7 @@ export default class CharacterRankedFightTopsChart extends React.Component<any, 
                 </p>
                 <p className='mb-4'>
                     Characters will need to make use of {this.buildLink('Reincarnation', 'reincarnation')},
-                    {this.buildLink('Class Ranks and Class Specials', 'class-ranks')}.
+                    {this.buildLink('Class Ranks and Class Specials', 'class-ranks')} to truly make it down the Rank List.
                 </p>
             </Fragment>
         )

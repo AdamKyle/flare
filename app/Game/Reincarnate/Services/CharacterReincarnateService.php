@@ -21,7 +21,7 @@ class CharacterReincarnateService {
 
     public function reincarnate(Character $character): array {
 
-        $completedQuest = $character->questsCompleted->filter(function ($completedQuest) {
+        $completedQuest = $character->questsCompleted()->whereNotNull('quest_id')->get()->filter(function ($completedQuest) {
             return $completedQuest->quest->unlocks_feature === FeatureTypes::REINCARNATION;
         })->first();
 
