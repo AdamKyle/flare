@@ -197,7 +197,7 @@ class ClassRankService {
                     'current_xp' => 0,
                 ]);
 
-                event(new ServerMessageEvent($character->user,'Your class special:  ' . $special->gameClassSpecial->name . ' has gamed a new level is now level: ' . $special->level));
+                event(new ServerMessageEvent($character->user,'Your class special:  ' . $special->gameClassSpecial->name . ' has gained a new level is now level: ' . $special->level));
 
                 $this->updateCharacterAttackTypes->updateCache($character->refresh());
             }
