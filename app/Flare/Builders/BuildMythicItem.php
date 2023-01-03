@@ -37,7 +37,12 @@ class BuildMythicItem {
             ->setPaidAmount(RandomAffixDetails::MYTHIC)
             ->generateAffix('suffix');
 
-        $item = Item::inRandomOrder()->first();
+        $item = Item::inRandomOrder()
+                    ->doesntHave('itemSuffix')
+                    ->doesntHave('itemPrefix')
+                    ->whereNotIn('type', ['quest', 'alchemy', 'trinket'])
+                    ->whereNull('specialty_type')
+                    ->first();
 
         $item = $item->duplicate();
 

@@ -42,7 +42,7 @@ class RandomItemDropBuilder {
     protected function getItem(int $level): Item {
         $query =  Item::inRandomOrder()->doesntHave('itemSuffix')
                                        ->doesntHave('itemPrefix')
-                                       ->whereNotIn('type', ['artifact', 'quest', 'alchemy', 'trinket'])
+                                       ->whereNotIn('type', ['quest', 'alchemy', 'trinket'])
                                        ->whereNull('specialty_type')
                                        ->where('skill_level_required', '<=', rand(1, $level));
 

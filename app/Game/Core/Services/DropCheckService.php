@@ -109,7 +109,7 @@ class DropCheckService {
      * @throws Exception
      */
     public function handleMythicDrop(Character $character, bool $useLootingChance = false) {
-        $canGetDrop = $this->canHaveMythic($useLootingChance);
+        $canGetDrop = true;// $this->canHaveMythic($useLootingChance);
 
         if ($canGetDrop) {
             $mythic = $this->buildMythicItem->fetchMythicItem($character);

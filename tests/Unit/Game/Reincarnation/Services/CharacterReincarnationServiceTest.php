@@ -2,17 +2,20 @@
 
 namespace Tests\Unit\Game\Reincarnation\Services;
 
+use App\Flare\Models\MaxLevelConfiguration;
+use App\Flare\Values\ItemEffectsValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Values\FeatureTypes;
 use App\Game\Reincarnate\Services\CharacterReincarnateService;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateItem;
 use Tests\Traits\CreateNpc;
 use Tests\Traits\CreateQuest;
 
 class CharacterReincarnationServiceTest extends TestCase {
 
-    use RefreshDatabase, CreateQuest, CreateNpc;
+    use RefreshDatabase, CreateQuest, CreateNpc, CreateItem;
 
     private ?CharacterFactory $character;
 
@@ -23,6 +26,13 @@ class CharacterReincarnationServiceTest extends TestCase {
 
         $this->character            = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
         $this->reincarnationService = resolve(CharacterReincarnateService::class);
+
+        MaxLevelConfiguration::create([
+            'max_level'      => 2000,
+            'half_way'       => 1000,
+            'three_quarters' => 1500,
+            'last_leg'       => 1900,
+        ]);
     }
 
     public function tearDown(): void {
@@ -32,8 +42,34 @@ class CharacterReincarnationServiceTest extends TestCase {
         $this->reincarnationService = null;
     }
 
-    public function testCannotReincarnateWhenQuestNotComplete() {
+    public function testCannotReincarnateWhenCannotLevelToMax() {
         $character = $this->character->getCharacter();
+
+        $result    = $this->reincarnationService->reincarnate($character);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('You need to complete the quest: Reach for the stars (Labyrinth, one off quests) to be able to reincarnate', $result['message']);
+    }
+
+    public function testCannotReincarnateWhenCannotLevelToMaxWhenNotMaxLevel() {
+        $item      = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
+
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+
+        $result    = $this->reincarnationService->reincarnate($character);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('You must be at max level to reincarnate.', $result['message']);
+    }
+
+    public function testCannotReincarnateWhenQuestNotComplete() {
+        $item      = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
+
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+
+        $character->update(['level' => 2000]);
+
+        $character->refresh();
 
         $result    = $this->reincarnationService->reincarnate($character);
 
@@ -42,7 +78,11 @@ class CharacterReincarnationServiceTest extends TestCase {
     }
 
     public function testCannotReincarnateWhenCannotAfford() {
-        $character = $this->character->getCharacter();
+        $item      = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
+
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+
+        $character->update(['level' => 2000]);
 
         $quest = $this->createQuest([
             'unlocks_feature' => FeatureTypes::REINCARNATION,
@@ -63,7 +103,11 @@ class CharacterReincarnationServiceTest extends TestCase {
     }
 
     public function testCanReincarnate() {
-        $character = $this->character->getCharacter();
+        $item      = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
+
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+
+        $character->update(['level' => 2000]);
 
         $quest = $this->createQuest([
             'unlocks_feature' => FeatureTypes::REINCARNATION,
@@ -104,7 +148,11 @@ class CharacterReincarnationServiceTest extends TestCase {
     }
 
     public function testReincarnationWillNotGoAboveMaxValue() {
-        $character = $this->character->getCharacter();
+        $item      = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
+
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+
+        $character->update(['level' => 2000]);
 
         $quest = $this->createQuest([
             'unlocks_feature' => FeatureTypes::REINCARNATION,
@@ -147,7 +195,11 @@ class CharacterReincarnationServiceTest extends TestCase {
     }
 
     public function testCannotReincarnateWhenStatsAreMaxed() {
-        $character = $this->character->getCharacter();
+        $item      = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
+
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+
+        $character->update(['level' => 2000]);
 
         $quest = $this->createQuest([
             'unlocks_feature' => FeatureTypes::REINCARNATION,

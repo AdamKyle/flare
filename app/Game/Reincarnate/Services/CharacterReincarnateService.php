@@ -4,14 +4,16 @@ namespace App\Game\Reincarnate\Services;
 
 use App\Flare\Handlers\UpdateCharacterAttackTypes;
 use App\Flare\Models\Character;
+use App\Flare\Models\MaxLevelConfiguration;
 use App\Flare\Values\BaseStatValue;
 use App\Flare\Values\FeatureTypes;
 use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Core\Traits\CharacterMaxLevel;
 use App\Game\Core\Traits\ResponseBuilder;
 
 class CharacterReincarnateService {
 
-    use ResponseBuilder;
+    use ResponseBuilder, CharacterMaxLevel;
 
     private UpdateCharacterAttackTypes $updateCharacterAttackTypes;
 
@@ -20,6 +22,18 @@ class CharacterReincarnateService {
     }
 
     public function reincarnate(Character $character): array {
+
+        $maxLevel = MaxLevelConfiguration::first()->max_level;
+
+
+
+        if ($this->getMaxLevel($character) < $maxLevel) {
+            return $this->errorResult('You need to complete the quest: Reach for the stars (Labyrinth, one off quests) to be able to reincarnate');
+        }
+
+        if ($character->level < $maxLevel) {
+            return $this->errorResult('You must be at max level to reincarnate.');
+        }
 
         $completedQuest = $character->questsCompleted()->whereNotNull('quest_id')->get()->filter(function ($completedQuest) {
             return $completedQuest->quest->unlocks_feature === FeatureTypes::REINCARNATION;
