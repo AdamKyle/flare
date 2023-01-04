@@ -135,7 +135,7 @@ class ClassRankService {
         $this->updateCharacterAttackTypes->updateCache($character);
 
         return $this->successResult([
-            'specials_equipped' => $character->classSpecialsEquipped->where('equipped', true)->toArray(),
+            'specials_equipped' => array_values($character->classSpecialsEquipped->where('equipped', true)->toArray()),
             'message'           => 'Unequipped class special: ' . $classSpecialEquipped->gameClassSpecial->name
         ]);
     }

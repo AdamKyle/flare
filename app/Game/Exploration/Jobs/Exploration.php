@@ -63,6 +63,7 @@ class Exploration implements ShouldQueue
      * @param FactionHandler $factionHandler
      * @param GuideQuestService $guideQuestService
      * @return void
+     * @throws \Exception
      */
     public function handle(MonsterPlayerFight $monsterPlayerFight, BattleEventHandler $battleEventHandler, FactionHandler $factionHandler, GuideQuestService $guideQuestService): void {
 
@@ -118,6 +119,7 @@ class Exploration implements ShouldQueue
      * @param BattleEventHandler $battleEventHandler
      * @param array $params
      * @return bool
+     * @throws \Exception
      */
     protected function encounter(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, array $params): bool {
         $user = $this->character->user;
@@ -156,6 +158,7 @@ class Exploration implements ShouldQueue
      * @param BattleEventHandler $battleEventHandler
      * @param array $params
      * @return bool
+     * @throws \Exception
      */
     protected function fightAutomationMonster(MonsterPlayerFight $response, CharacterAutomation $automation, BattleEventHandler $battleEventHandler, array $params): bool {
         $fightResponse = $response->fightMonster();
