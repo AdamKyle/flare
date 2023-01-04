@@ -53,7 +53,6 @@ class CharacterClassSpecialtiesEquipped extends Model
            return 0;
         }
 
-
         $baseDamage          = $this->gameClassSpecial->specialty_damage;
         $addedDamage         = $this->gameClassSpecial->increase_specialty_damage_per_level * $this->level;
         $characterDamageStat = $cache['damage_stat_amount'] * $this->gameClassSpecial->specialty_damage_uses_damage_stat_amount;

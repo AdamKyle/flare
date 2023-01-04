@@ -116,7 +116,16 @@ class MonsterTransformer extends TransformerAbstract {
             return $increaseBy;
         }
 
-        return $statValue + $statValue * $increaseBy;
+        $increaseBy = $statValue + $statValue * $increaseBy;
+
+
+        if (is_float($statValue)) {
+            if ($increaseBy >= 1) {
+                $increaseBy = 1.0;
+            }
+        }
+
+        return $increaseBy;
     }
 
     /**

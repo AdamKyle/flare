@@ -50,14 +50,6 @@ class CharacterAttackTypesCacheBuilderWithDeductions implements ShouldQueue
 
         $attackData = Cache::get('character-attack-data-' . $this->character->id);
 
-        if ($this->deduction > 0.0) {
-            foreach ($attackData as $key => $array) {
-                $attackData[$key]['damage_deduction'] = $this->deduction;
-            }
-        }
-
-        Cache::put('character-attack-data-' . $this->character->id, $attackData);
-
         $this->updateCharacterStats($this->character, $attackData);
     }
 
