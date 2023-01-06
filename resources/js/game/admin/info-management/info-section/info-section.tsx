@@ -150,6 +150,9 @@ export default class InfoSection extends React.Component<any, any> {
         },{
             label: 'Special Locations',
             value: 'info.locations.special-locations',
+        }, {
+            label: 'Class Specials',
+            value: 'admin.class-specials.class-specials-table',
         }];
     }
 

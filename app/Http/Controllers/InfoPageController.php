@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Flare\Models\GameClassSpecial;
 use Storage;
 use Illuminate\Http\Request;
 use App\Flare\Models\GameBuilding;
@@ -96,6 +97,12 @@ class InfoPageController extends Controller
     public function viewSkill(Request $request, GameSkill $skill) {
         return view('information.skills.skill', [
             'skill' => $skill,
+        ]);
+    }
+
+    public function viewClassSpecialty(Request $request, GameClassSpecial $gameClassSpecial) {
+        return view('information.class-specialties.specialty', [
+            'classSpecial' => $gameClassSpecial,
         ]);
     }
 

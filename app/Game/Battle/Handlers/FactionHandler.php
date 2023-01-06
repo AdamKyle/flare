@@ -67,6 +67,10 @@ class FactionHandler {
         $map     = GameMap::find($monster->game_map_id);
         $faction = Faction::where('character_id', $character->id)->where('game_map_id', $map->id)->first();
 
+        if (is_null($faction)) {
+            return;
+        }
+
         if ($faction->maxed) {
             return;
         }

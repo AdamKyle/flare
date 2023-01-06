@@ -25,6 +25,36 @@ class ClassRankService {
     }
 
     /**
+     * Get the class specials for the character.
+     *
+     * @param Character $character
+     * @return array
+     */
+    public function getSpecials(Character $character): array {
+        $classSpecialsEquipped    = $character->classSpecialsEquipped()->with('gameClassSpecial')->where('equipped', '=', true)->get();
+        $classSpecialsNotEquipped = $character->classSpecialsEquipped()->with('gameClassSpecial')->where('equipped', '=', false)->get();
+
+        return [
+            'class_specialties' => GameClassSpecial::all()->transform(function($special) {
+                $special->class_name = $special->gameClass->name;
+
+                return $special;
+            }),
+            'specials_equipped' => array_values($classSpecialsEquipped->transform(function($specialEquipped) {
+                $specialEquipped->class_name = $specialEquipped->gameClassSpecial->gameClass->name;
+
+                return $specialEquipped;
+            })->toArray()),
+            'class_ranks'          => $character->classRanks->toArray(),
+            'other_class_specials' => array_values($classSpecialsNotEquipped->transform(function($special) {
+                $special->class_name = $special->gameClassSpecial->gameClass->name;
+
+                return $special;
+            })->toArray()),
+        ];
+    }
+
+    /**
      * Get class ranks.
      *
      * @param Character $character
@@ -107,10 +137,9 @@ class ClassRankService {
 
         $this->updateCharacterAttackTypes->updateCache($character);
 
-        return $this->successResult([
-            'specials_equipped' => array_values($character->classSpecialsEquipped->where('equipped', true)->toArray()),
+        return $this->successResult(array_merge([
             'message'           => 'Equipped class special: ' . $gameClassSpecial->name
-        ]);
+        ], $this->getSpecials($character)));
     }
 
     /**
@@ -134,10 +163,9 @@ class ClassRankService {
 
         $this->updateCharacterAttackTypes->updateCache($character);
 
-        return $this->successResult([
-            'specials_equipped' => array_values($character->classSpecialsEquipped->where('equipped', true)->toArray()),
+        return $this->successResult(array_merge([
             'message'           => 'Unequipped class special: ' . $classSpecialEquipped->gameClassSpecial->name
-        ]);
+        ], $this->getSpecials($character)));
     }
 
     /**

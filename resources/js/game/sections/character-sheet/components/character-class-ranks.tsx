@@ -204,17 +204,6 @@ export default class CharacterClassRanks extends React.Component<any, CharacterC
                                         <dt>Looting Mod</dt>
                                         <dd>+{(this.state.class_name_selected.game_class.accuracy_mod * 100).toFixed(2)}%</dd>
                                     </dl>
-                                    <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                                    <h3 className='my-3'>Class Specialties</h3>
-                                    <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                                    <p className='my-4 text-sm'>
-                                        Manage your class specialties below. You may only have three specialties equipped at any one time.
-                                        You can mix and match specialties from other classes. More specialties are unlocked as
-                                        you level the class.
-                                    </p>
-                                    <div className='my-4 text-center'>
-                                        <PrimaryButton button_label={'Manage Specialties'} on_click={this.manageClassSpecialties.bind(this)} />
-                                    </div>
                                 </div>
                                 <div className='border-b-2 block lg:hidden border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                                 <div>
@@ -259,19 +248,6 @@ export default class CharacterClassRanks extends React.Component<any, CharacterC
                                 dark_table={this.state.dark_tables}
                             />
                         </Fragment>
-                }
-
-                {
-                    this.state.show_class_specialties ?
-                        <CharacterClassSpecialtiesModal
-                            is_open={this.state.show_class_specialties}
-                            manage_modal={this.manageClassSpecialties.bind(this)}
-                            title={'Class Specialties'}
-                            character={this.props.character}
-                            finished_loading={true}
-                            class_rank={this.state.class_name_selected}
-                        />
-                    : null
                 }
             </div>
         );

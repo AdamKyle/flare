@@ -3,12 +3,23 @@ import Dialogue from "../../../../components/ui/dialogue/dialogue";
 import {AdditionalInfoModalProps} from "../../../../lib/game/character-sheet/types/modal/additional-info-modal-props";
 import CharacterClassRanks from "../character-class-ranks";
 import InfoAlert from "../../../../components/ui/alerts/simple-alerts/info-alert";
+import CharacterClassSpecialtiesModal from "./character-class-specialties-modal";
 
 export default class CharacterClassRanksModal extends React.Component<AdditionalInfoModalProps, any> {
 
 
     constructor(props: AdditionalInfoModalProps) {
         super(props);
+
+        this.state = {
+            show_class_specialties_model: false,
+        }
+    }
+
+    manageClassSpecialtiesModal() {
+        this.setState({
+            show_class_specialties_model: !this.state.show_class_specialties_model,
+        });
     }
 
     render() {
@@ -22,6 +33,11 @@ export default class CharacterClassRanksModal extends React.Component<Additional
                       handle_close={this.props.manage_modal}
                       title={this.props.title}
                       medium_modal={true}
+                      secondary_actions={{
+                          secondary_button_label: 'Manage Specialties',
+                          secondary_button_disabled: false,
+                          handle_action: this.manageClassSpecialtiesModal.bind(this)
+                      }}
             >
                 <InfoAlert additional_css={'my-4'}>
                     <p>
@@ -31,6 +47,19 @@ export default class CharacterClassRanksModal extends React.Component<Additional
                     </p>
                 </InfoAlert>
                 <CharacterClassRanks character={this.props.character} />
+
+                {
+                    this.state.show_class_specialties_model ?
+                        <CharacterClassSpecialtiesModal
+                            is_open={this.state.show_class_specialties}
+                            manage_modal={this.manageClassSpecialtiesModal.bind(this)}
+                            title={'Class Specialties'}
+                            character={this.props.character}
+                            finished_loading={true}
+                        />
+                    :
+                        null
+                }
             </Dialogue>
         );
     }

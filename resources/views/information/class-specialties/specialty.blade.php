@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.information')
 
 @section('content')
     @include('admin.class-specials.partials.class-special', ['classSpecial' => $classSpecial])

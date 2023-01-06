@@ -3,5 +3,4 @@ import ClassRankType from "../class-ranks/class-rank-type";
 
 export default interface ClassSpecialtiesEquippedProps extends AdditionalInfoModalProps {
 
-    class_rank: ClassRankType | null;
 }

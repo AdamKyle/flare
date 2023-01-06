@@ -8,6 +8,7 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::get('/admin/site-statistics/all-characters-gold', ['uses' => 'Api\SiteAccessStatisticsController@fetchCharactersGold']);
     Route::get('/admin/site-statistics/other-stats', ['uses' => 'Api\SiteAccessStatisticsController@otherDetails']);
     Route::get('/admin/site-statistics/reincarnation', ['uses' => 'Api\SiteAccessStatisticsController@fetchReincarnationChart']);
+    Route::get('/admin/site-statistics/character-total-gold', ['uses' => 'Api\SiteAccessStatisticsController@getTotalGoldIncludingKingdomsForCharacters']);
 
     Route::get('/admin/info-section/page', ['uses' => 'Api\InformationController@getPage']);
     Route::post('/admin/info-section/store-page', ['uses' => 'Api\InformationController@storePage']);

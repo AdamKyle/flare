@@ -1,6 +1,4 @@
-@extends('layouts.information', [
-    'pageTitle' => 'Unit'
-])
+@extends('layouts.information')
 
 @section('content')
   <div class="mt-20 mb-10 w-full lg:w-5/6 m-auto">

@@ -71,4 +71,20 @@ class SiteAccessStatisticsController extends Controller {
 
         return $array;
     }
+
+    public function getTotalGoldIncludingKingdomsForCharacters() {
+        $data = Character::select('characters.name as character_name',
+             \DB::raw('characters.gold + SUM(kingdoms.treasury) + SUM(kingdoms.gold_bars) * 2000000000 as total_gold')
+         )->leftJoin('kingdoms', 'kingdoms.character_id', '=', 'characters.id')
+          ->where('kingdoms.id', '!=', null)
+          ->having('total_gold', '>', 2000000000000)
+          ->orderBy('total_gold', 'asc')
+          ->groupBy('characters.id')
+          ->get();
+
+        return response()->json([
+            'data' => $data->pluck('total_gold')->toArray(),
+            'labels' => $data->pluck('character_name')->toArray()
+        ]);
+    }
 }

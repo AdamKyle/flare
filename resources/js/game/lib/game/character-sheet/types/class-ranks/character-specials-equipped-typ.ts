@@ -33,4 +33,6 @@ export default interface CharacterSpecialsEquippedTyp {
     required_xp: number;
 
     specialty_damage: number;
+
+    class_name: string;
 }

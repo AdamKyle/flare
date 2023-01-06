@@ -5,6 +5,7 @@ import RegistrationStatistics from "./components/registration-statistics";
 import CharacterGoldStatistics from "./components/character-gold-statistics";
 import OtherStatistics from "./components/other-statistics";
 import CharacterReincarnationStatistics from "./components/character-reincarnation-statistics";
+import CharacterTotalGold from "./components/character-total-gold";
 
 export default class UserStatistics extends React.Component<any, any> {
 
@@ -35,6 +36,10 @@ export default class UserStatistics extends React.Component<any, any> {
                         <CharacterGoldStatistics />
                     </BasicCard>
                 </div>
+                <BasicCard additionalClasses={'my-4'}>
+                    <h3 className='mb-4'>Characters Gold</h3>
+                    <CharacterTotalGold />
+                </BasicCard>
                 <OtherStatistics />
             </div>
         );

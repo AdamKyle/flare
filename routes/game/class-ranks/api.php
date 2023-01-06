@@ -7,7 +7,7 @@ Route::middleware([
 ])->group(function() {
 
     Route::get('/class-ranks/{character}', ['uses' => 'Api\ClassRanksController@getCharacterClassRanks']);
-    Route::get('/class-ranks/{character}/specials/{characterClassRank}', ['uses' => 'Api\ClassRanksController@getCharacterClassSpecialties']);
+    Route::get('/class-ranks/{character}/specials', ['uses' => 'Api\ClassRanksController@getCharacterClassSpecialties']);
 
 
     Route::middleware(['is.character.dead', 'is.character.exploring'])->group(function() {

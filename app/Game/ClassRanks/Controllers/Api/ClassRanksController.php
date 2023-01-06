@@ -34,13 +34,9 @@ class ClassRanksController extends Controller {
         return response()->json($response, $status);
     }
 
-    public function getCharacterClassSpecialties(Character $character, CharacterClassRank $characterClassRank) {
-        $classSpecialsEquipped = $character->classSpecialsEquipped()->with('gameClassSpecial')->where('equipped', '=', true)->get();
+    public function getCharacterClassSpecialties(Character $character) {
 
-        return response()->json([
-            'class_specialties' => GameClassSpecial::where('game_class_id', $characterClassRank->game_class_id)->get(),
-            'specials_equipped' => array_values($classSpecialsEquipped->toArray()),
-        ]);
+        return response()->json($this->classRankService->getSpecials($character));
     }
 
     public function equipSpecial(Character $character, GameClassSpecial $gameClassSpecial) {
