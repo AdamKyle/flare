@@ -210,7 +210,7 @@ class ClassRankService {
 
         foreach ($equippedSpecials as $special) {
             if ($special->level >= ClassSpecialValue::MAX_LEVEL) {
-                return;
+                continue;
             }
 
             $special->update([
