@@ -34,6 +34,7 @@
                                 <x-core.forms.input :model="$item" label="Shards Cost:" modelKey="shards_cost" name="shards_cost" />
                                 <x-core.forms.input :model="$item" label="Gold Dust Cost:" modelKey="gold_dust_cost" name="gold_dust_cost" />
                                 <x-core.forms.input :model="$item" label="Copper Coin Cost:" modelKey="copper_coin_cost" name="copper_coin_cost" />
+                                <x-core.forms.input :model="$item" label="Gold Bars Cost:" modelKey="gold_bars_cost" name="gold_bars_cost" />
                             </div>
                         </div>
                     </x-core.form-wizard.content>
@@ -128,6 +129,8 @@
                                 <h3 class="mb-3">Basic Usable Info</h3>
                                 <x-core.forms.check-box :model="$item" label="Usable?" modelKey="usable" name="usable" />
                                 <x-core.forms.check-box :model="$item" label="Can use on items?" modelKey="can_use_on_other_items" name="can_use_on_other_items" />
+                                <x-core.forms.check-box :model="$item" label="Can stack (use on self)?" modelKey="can_stack" name="can_stack" />
+                                <x-core.forms.check-box :model="$item" label="Gains a level when leveling?" modelKey="gains_additional_level" name="gains_additional_level" />
                                 <x-core.forms.input :model="$item" label="Lasts For (Minutes):" modelKey="lasts_for" name="lasts_for" />
                                 <x-core.forms.check-box :model="$item" label="Increases Stats?" modelKey="stat_increase" name="stat_increase" />
                                 <x-core.forms.input :model="$item" label="Increases All Stats By (%):" modelKey="increase_stat_by" name="increase_stat_by" />

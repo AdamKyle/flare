@@ -90,6 +90,9 @@ class Item extends Model {
         'counter_resistance',
         'is_mythic',
         'specialty_type',
+        'gold_bars_cost',
+        'can_stack',
+        'gains_additional_level',
     ];
 
     /**
@@ -108,6 +111,7 @@ class Item extends Model {
         'parent_id'                        => 'integer',
         'holy_level'                       => 'integer',
         'holy_stacks'                      => 'integer',
+        'gold_bars_cost'                   => 'integer',
         'base_damage_mod'                  => 'float',
         'base_healing_mod'                 => 'float',
         'base_ac_mod'                      => 'float',
@@ -139,6 +143,8 @@ class Item extends Model {
         'stat_increase'                    => 'boolean',
         'can_use_on_other_items'           => 'boolean',
         'is_mythic'                        => 'boolean',
+        'can_stack'                        => 'boolean',
+        'gains_additional_level'           => 'boolean',
         'kingdom_damage'                   => 'float',
         'lasts_for'                        => 'integer',
         'increase_stat_by'                 => 'float',

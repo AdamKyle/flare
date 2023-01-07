@@ -4,6 +4,7 @@ import UsableItemSection from "./components/usable-item-section";
 import LoadingProgressBar from "../../../../components/ui/progress-bars/loading-progress-bar";
 import {AxiosError, AxiosResponse} from "axios";
 import Ajax from "../../../../lib/ajax/ajax";
+import DangerAlert from "../../../../components/ui/alerts/simple-alerts/danger-alert";
 
 export default class InventoryUseItem extends React.Component<any, any> {
     constructor(props: any) {
@@ -11,12 +12,14 @@ export default class InventoryUseItem extends React.Component<any, any> {
 
         this.state = {
             loading: false,
+            error_message: null,
         }
     }
 
     useItem() {
         this.setState({
             loading: true,
+            error_message: null,
         });
 
         (new Ajax()).setRoute('character/'+this.props.character_id+'/inventory/use-item/' + this.props.item.id)
@@ -31,8 +34,16 @@ export default class InventoryUseItem extends React.Component<any, any> {
                             this.props.manage_modal();
                         });
                     }, (error: AxiosError) => {
+                        this.setState({loading: false});
 
-                    })
+                        if (typeof error.response !== 'undefined') {
+                            const response = error.response;
+
+                            this.setState({
+                                error_message: response.data.message,
+                            });
+                        }
+                    });
     }
 
     render() {
@@ -48,6 +59,13 @@ export default class InventoryUseItem extends React.Component<any, any> {
             >
                 <div className="mb-5">
                     <UsableItemSection item={this.props.item} />
+                    {
+                        this.state.error_message !== null ?
+                            <DangerAlert additional_css='my-4'>
+                                {this.state.error_message}
+                            </DangerAlert>
+                        : null
+                    }
                     {
                         this.state.loading ?
                             <LoadingProgressBar />

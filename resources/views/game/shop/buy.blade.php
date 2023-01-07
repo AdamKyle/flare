@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="w-full lg:w-3/4 m-auto">
+    <div class="w-full lg:w-3/4 mx-auto pb-10">
 
         <x-core.page-title
             title="Buying"

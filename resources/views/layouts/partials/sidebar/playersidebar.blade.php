@@ -37,6 +37,7 @@
     <!-- Shop -->
     <div class="menu-detail" data-menu="shop">
         <div class="menu-detail-wrapper">
+            <h6 class="uppercase">General Shop (Uses Gold)</h6>
             <a href="{{route('game.shop.buy', ['character' => auth()->user()->character->id])}}">
                 <span class="fas fa-cart-plus"></span>
                 Buy
@@ -46,6 +47,15 @@
                 Sell
             </a>
         </div>
+        <hr />
+        <div class="menu-detail-wrapper">
+            <h6 class="uppercase">Goblin Shop (Uses Gold Bars)</h6>
+            <a href="{{route('game.goblin-shop.shop', ['character' => auth()->user()->character->id])}}">
+                <span class="fas fa-cart-plus"></span>
+                Buy
+            </a>
+        </div>
+        <hr />
     </div>
 
     <!-- Market -->

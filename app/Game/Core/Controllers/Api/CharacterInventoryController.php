@@ -677,6 +677,22 @@ class  CharacterInventoryController extends Controller {
             Check active boons to see which ones you have. You can always cancel one by clicking on the row.'], 422);
         }
 
+        if (!$item->can_stack) {
+            $foundItem = $character->boons()->where('item_id', $item->id)->first();
+
+            if (!is_null($foundItem)) {
+                return response()->json(['message' => 'This item cannot stack. You cannot use more then one at a time.'], 422);
+            }
+
+            if ($item->xp_bonus > 0.0) {
+                $foundItem = $character->boons->where('itemUsed.xp_bonus', '>', 0)->first();
+
+                if (!is_null($foundItem)) {
+                    return response()->json(['message' => 'This item cannot stack. You cannot use more then one at a time.'], 422);
+                }
+            }
+        }
+
         $slot = $character->inventory->slots->filter(function($slot) use($item) {
             return $slot->item_id === $item->id;
         })->first();

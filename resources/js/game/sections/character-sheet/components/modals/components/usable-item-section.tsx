@@ -37,6 +37,16 @@ export default class UsableItemSection extends React.Component<any, any> {
                             <p className='mb-4 text-sky-700 dark:text-sky-500'>
                                 <strong>Lasts For: </strong> {this.props.item.lasts_for} Minutes.
                             </p>
+                            <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                            <dl>
+                                <dt>Can Stack?</dt>
+                                <dd>{this.props.item.can_stack ? 'Yes' : 'No'}</dd>
+                                <dt>Grants additional level upon level up?</dt>
+                                <dd>{this.props.item.gain_additional_level ? 'Yes' : 'No'}</dd>
+                                <dt>XP Bonus per Kill (%)</dt>
+                                <dd>{(this.props.item.xp_bonus * 100).toFixed(2)}%</dd>
+                            </dl>
+                            <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                             <div className='grid grid-cols-2 gap-2'>
                                 <div>
                                     {

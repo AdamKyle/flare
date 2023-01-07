@@ -15,8 +15,12 @@ class ServiceProvider extends ApplicationServiceProvider
     public function register()
     {
 
-        $this->app->bind(ShopService::class, function($app) {
+        $this->app->bind(ShopService::class, function() {
             return new ShopService();
+        });
+
+        $this->app->bind(GoblinShopService::class, function() {
+            return new GoblinShopService();
         });
     }
 }

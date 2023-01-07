@@ -15,6 +15,7 @@
         <th>gold_dust_cost</th>
         <th>shards_cost</th>
         <th>copper_coin_cost</th>
+        <th>gold_bars_cost</th>
         <th>base_damage_mod</th>
         <th>base_healing_mod</th>
         <th>base_ac_mod</th>
@@ -41,6 +42,7 @@
         <th>skill_training_bonus</th>
         <th>craft_only</th>
         <th>usable</th>
+        <th>can_stack</th>
         <th>damages_kingdoms</th>
         <th>kingdom_damage</th>
         <th>lasts_for</th>
@@ -67,6 +69,7 @@
         <td>ambush_resistance</td>
         <td>counter_chance</td>
         <td>counter_resistance</td>
+        <td>gains_additional_level</td>
     </tr>
     </thead>
     <tbody>
@@ -86,6 +89,7 @@
             <td>{{$item->gold_dust_cost}}</td>
             <td>{{$item->shards_cost}}</td>
             <td>{{$item->copper_coin_cost}}</td>
+            <td>{{$item->gold_bars_cost}}</td>
             <td>{{$item->base_damage_mod}}</td>
             <td>{{$item->base_healing_mod}}</td>
             <td>{{$item->base_ac_mod}}</td>
@@ -112,6 +116,7 @@
             <td>{{$item->skill_training_bonus}}</td>
             <td>{{$item->craft_only}}</td>
             <td>{{$item->usable}}</td>
+            <td>{{$item->can_stack}}</td>
             <td>{{$item->damages_kingdoms}}</td>
             <td>{{$item->kingdom_damage}}</td>
             <td>{{$item->lasts_for}}</td>
@@ -138,6 +143,7 @@
             <td>{{$item->ambush_resistance}}</td>
             <td>{{$item->counter_chance}}</td>
             <td>{{$item->counter_resistance}}</td>
+            <td>{{$item->gains_additional_level}}</td>
         </tr>
     @endforeach
     </tbody>

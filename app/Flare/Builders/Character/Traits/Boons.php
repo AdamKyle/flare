@@ -19,25 +19,49 @@ trait Boons {
         return CharacterBoon::where('character_id', $character->id)->with('itemUsed')->get();
     }
 
-    public function fetchStatIncrease(Character $character, string $statAttribute): float {
-        return CharacterBoon::where('character_id', $character->id)->join('items', function($join) use ($statAttribute) {
-            $join->on('items.id', '=', 'character_boons.item_id')
-                 ->whereNotNull('items.' . $statAttribute);
-        })->sum('items.' . $statAttribute);
-    }
 
-    public function fetchStatIncreaseSum(Character $character): float {
+    /**
+     * Do we have at least one item that lets the character gain an additional level on level up?
+     *
+     * @param Character $character
+     * @return bool
+     */
+    public function gainsAdditionalLevelOnLevelUp(Character $character): bool {
         return CharacterBoon::where('character_id', $character->id)->join('items', function($join) {
             $join->on('items.id', '=', 'character_boons.item_id');
-        })->sum('items.stat_increase');
+        })->where('items.gains_additional_level', true)->get()->isNotEmpty();
     }
 
+    /**
+     * Fetch Fight timeout modifier from boons.
+     *
+     * @param Character $character
+     * @return float
+     */
+    public function fetchXpBonus(Character $character): float {
+        return CharacterBoon::where('character_id', $character->id)->join('items', function($join) {
+            $join->on('items.id', '=', 'character_boons.item_id');
+        })->sum('items.xp_bonus');
+    }
+
+    /**
+     * Fetch Fight timeout modifier from boons.
+     *
+     * @param Character $character
+     * @return float
+     */
     public function fetchFightTimeOutModifier(Character $character): float {
         return CharacterBoon::where('character_id', $character->id)->join('items', function($join) {
             $join->on('items.id', '=', 'character_boons.item_id');
         })->sum('items.fight_time_out_mod_bonus');
     }
 
+    /**
+     * Fetch the move time out modifer from boons.
+     *
+     * @param Character $character
+     * @return float
+     */
     public function fetchMoveTimOutModifier(Character $character): float {
         return CharacterBoon::where('character_id', $character->id)->join('items', function($join) {
             $join->on('items.id', '=', 'character_boons.item_id');

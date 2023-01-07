@@ -49,7 +49,7 @@ class CharacterXPService {
      * Can the character gain XP?
      *
      * @param Character $character
-     * @return int
+     * @return bool
      */
     public function canCharacterGainXP(Character $character): bool {
 

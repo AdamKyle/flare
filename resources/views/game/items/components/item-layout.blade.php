@@ -43,6 +43,8 @@
     @include('game.items.components.item-kingdom-details')
 @elseif ($item->type === 'alchemy' && !is_null($item->holy_level))
     @include('game.items.components.item-holy-oil-details')
+@elseif ($item->type === 'alchemy' && $item->usable)
+    @include('game.items.components.item-usable')
 @else
     @include('game.items.components.item-details')
 @endif

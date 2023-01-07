@@ -58,6 +58,9 @@ class UsableItemTransformer extends TransformerAbstract {
             'usable'                           => $slot->item->usable,
             'stat_increase'                    => $slot->item->increase_stat_by,
             'holy_level'                       => $slot->item->holy_level,
+            'can_stack'                        => $slot->item->can_stack,
+            'gain_additional_level'            => $slot->item->gain_additional_level,
+            'xp_bonus'                         => $slot->item->xp_bonus,
         ];
     }
 
@@ -94,6 +97,9 @@ class UsableItemTransformer extends TransformerAbstract {
             'usable'                           => $item->usable,
             'stat_increase'                    => $item->increase_stat_by,
             'holy_level'                       => $item->holy_level,
+            'can_stack'                        => $item->can_stack,
+            'gain_additional_level'            => $item->gain_additional_level,
+            'xp_bonus'                         => $item->xp_bonus,
         ];
     }
 }

@@ -7,6 +7,9 @@ Route::middleware([
 ])->group(function() {
 
     Route::middleware(['is.character.exploring'])->group(function() {
+        Route::get('/goblin-shop/{character}', ['as' => 'game.goblin-shop.shop', 'uses' => 'GoblinShopController@listItems']);
+        Route::post('/goblin-shop/buy/{character}/{item}', ['as' => 'game.goblin-shop.buy', 'uses' => 'GoblinShopController@buyItem']);
+
         Route::get('/shop/buy/{character}', ['as' => 'game.shop.buy', 'uses' => 'ShopController@shopBuy']);
         Route::get('/shop/sell/{character}', ['as' => 'game.shop.sell', 'uses' => 'ShopController@shopSell']);
         Route::get('/shop/view/comparison/{character}', ['as' => 'game.shop.view.comparison', 'uses' => 'ShopController@viewShopCompare']);
