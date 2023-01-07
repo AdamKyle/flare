@@ -1,3 +1,5 @@
+import BuildingDetails from "../building-details";
+
 export default interface KingdomDetailsState {
 
     show_change_name_modal: boolean;
@@ -15,4 +17,6 @@ export default interface KingdomDetailsState {
     show_smelter: boolean;
 
     show_specialty_help: boolean;
+
+    goblin_bank_building: BuildingDetails | null;
 }

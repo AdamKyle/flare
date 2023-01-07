@@ -60,4 +60,10 @@ export default interface UsableItemsDetails extends DataTableBaseData {
     usable: boolean;
 
     stat_increase: number;
+
+    can_stack: boolean;
+
+    gains_additional_level: boolean;
+
+    xp_bonus: number;
 }

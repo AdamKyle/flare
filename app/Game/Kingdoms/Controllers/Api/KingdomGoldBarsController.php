@@ -37,6 +37,12 @@ class KingdomGoldBarsController extends Controller {
             ], 422);
         }
 
+        if ($kingdom->buildings->where('name', 'Goblin Coin Bank')->first()->level < 5) {
+            return response()->json([
+                'message' => 'Goblin Coin Bank must be level 5 or higher to purchase.'
+            ], 422);
+        }
+
         $amountToBuy = $request->amount_to_purchase;
 
         if ($amountToBuy > 1000) {
@@ -85,6 +91,13 @@ class KingdomGoldBarsController extends Controller {
                 'message' => 'Invalid Input. Not allowed to do that.'
             ], 422);
         }
+
+        if ($kingdom->buildings->where('name', 'Goblin Coin Bank')->first()->level < 5) {
+            return response()->json([
+                'message' => 'Goblin Coin Bank must be level 5 or higher to withdraw.'
+            ], 422);
+        }
+
 
         $amount = $request->amount_to_withdraw;
 

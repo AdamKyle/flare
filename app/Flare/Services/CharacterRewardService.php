@@ -170,19 +170,9 @@ class CharacterRewardService {
      */
     protected function distributeXP(Monster $monster) {
         $xpReduction  = 0.0;
-        $gameMap      = $this->character->map->gameMap;
-        $boonBonus    = $this->character->boons->sum('itemUsed.xp_bonus');
 
         $xp = XPCalculator::fetchXPFromMonster($monster, $this->character->level, $xpReduction);
         $xp = $this->characterXpService->determineXPToAward($this->character, $xp);
-
-        $bonus = $boonBonus;
-
-        if (!is_null($gameMap->xp_bonus)) {
-            $bonus = $gameMap->xp_bonus;
-        }
-
-        $xp = $xp + $xp * $bonus;
 
         $guideEnabled              = $this->character->user->guide_enabled;
         $hasNoCompletedGuideQuests = $this->character->questsCompleted()

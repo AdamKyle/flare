@@ -66,13 +66,12 @@ class GoblinShopController extends Controller {
         }
 
         $kingdoms = $character->kingdoms()
-            ->whereRaw('(SELECT SUM(gold_bars) FROM kingdoms) >= ?', [$item->gold_bars_cost])
-            ->havingRaw('SUM(gold_bars) >= ?', [$item->gold_bars_cost])
+            ->whereRaw('(SELECT SUM(gold_bars) FROM kingdoms WHERE gold_bars > 0) >= ?', [$item->gold_bars_cost])
             ->groupBy('kingdoms.id', 'kingdoms.character_id', 'kingdoms.name')
             ->selectRaw('*, SUM(gold_bars) as gold_bars_sum')
             ->get();
 
-        if ($kingdoms->isEmpty()) {
+        if ($kingdoms->sum('gold_bars_sum') < $item->gold_bars_cost) {
             return redirect()->back()->with('error', 'Not enough gold bars. Go slay monsters to stalk your treasury.');
         }
 

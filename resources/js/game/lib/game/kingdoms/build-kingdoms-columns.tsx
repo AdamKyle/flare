@@ -31,6 +31,11 @@ export const buildKingdomsColumns = (onClick: (kingdom: KingdomDetails) => void)
             selector: (row: KingdomDetails) => row.treasury,
             cell: (row: any) => formatNumber(row.treasury)
         },
+        {
+            name: 'Gold Bars',
+            selector: (row: KingdomDetails) => row.gold_bars,
+            cell: (row: any) => formatNumber(row.gold_bars)
+        },
     ];
 }
 

@@ -21,6 +21,7 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
         super(props);
 
         this.state = {
+            goblin_bank_building: null,
             show_change_name_modal: false,
             show_buy_pop_modal: false,
             show_goblin_bank: false,
@@ -45,8 +46,12 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
     }
 
     showGoblinBank() {
+        console.log(this.props.kingdom.buildings);
+        const building = this.props.kingdom.buildings.filter((building: BuildingDetails) => building.name === 'Goblin Coin Bank')[0];
+
         this.setState({
-            show_goblin_bank: !this.state.show_goblin_bank
+            show_goblin_bank: !this.state.show_goblin_bank,
+            goblin_bank_building: building,
         });
     }
 
@@ -218,13 +223,14 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
                 }
 
                 {
-                    this.state.show_goblin_bank ?
+                    this.state.show_goblin_bank && this.state.goblin_bank_building !== null ?
                         <GoblinBankModal
                             is_open={true}
                             handle_close={this.showGoblinBank.bind(this)}
                             character_gold={this.props.character_gold}
                             gold_bars={this.props.kingdom.gold_bars}
                             kingdom_id={this.props.kingdom.id}
+                            goblin_bank={this.state.goblin_bank_building}
                         />
                     : null
                 }

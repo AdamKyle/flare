@@ -12,6 +12,7 @@ import InfoAlert from "../../../components/ui/alerts/simple-alerts/info-alert";
 import Ajax from "../../../lib/ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
 import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
+import WarningAlert from "../../../components/ui/alerts/simple-alerts/warning-alert";
 
 export default class GoblinBankModal extends React.Component<GoblinBankModalProps, GoblinCoinBankModalState> {
 
@@ -71,6 +72,7 @@ export default class GoblinBankModal extends React.Component<GoblinBankModalProp
         let value = parseInt(e.target.value, 10) || 0;
 
         if (value === 0) {
+            console.log('um?');
             return this.setState({
                 success_message: '',
                 error_message: '',
@@ -84,7 +86,7 @@ export default class GoblinBankModal extends React.Component<GoblinBankModalProp
         }
 
         const newTotal = this.props.gold_bars + value;
-
+        console.log('new total: ', newTotal);
         if (newTotal > 1000) {
             value = this.props.gold_bars - this.props.gold_bars
         }
@@ -164,6 +166,14 @@ export default class GoblinBankModal extends React.Component<GoblinBankModalProp
 
     }
 
+    isInputDisabled(amount: number) {
+        if (this.props.goblin_bank.level < 5) {
+            return true;
+        }
+
+        return amount === 0;
+    }
+
     render() {
         return (
             <Dialogue is_open={this.props.is_open}
@@ -171,6 +181,13 @@ export default class GoblinBankModal extends React.Component<GoblinBankModalProp
                       title={'Goblin Bank'}
                       primary_button_disabled={this.state.loading}
             >
+                {
+                    this.props.goblin_bank.level < 5 ?
+                        <WarningAlert additional_css='my-4'>
+                            You need to level the Goblin Bank to level 5 before being able to use the bank.
+                        </WarningAlert>
+                    : null
+                }
                 <Tabs tabs={this.tabs} disabled={this.state.loading}>
                     <TabPanel key={'deposit'}>
                         <InfoAlert>
@@ -183,7 +200,7 @@ export default class GoblinBankModal extends React.Component<GoblinBankModalProp
                                        value={this.state.amount_to_deposit}
                                        onChange={this.setAmountToDeposit.bind(this)}
                                        className='form-control'
-                                       disabled={this.props.character_gold === 0}
+                                       disabled={this.isInputDisabled(this.props.character_gold)}
                                 />
                             </div>
                         </div>
@@ -197,8 +214,10 @@ export default class GoblinBankModal extends React.Component<GoblinBankModalProp
                         </dl>
                         <PrimaryButton button_label={'Deposit Amount'}
                                        on_click={this.deposit.bind(this)}
-                                       disabled={this.state.amount_to_deposit === '' ||
+                                       disabled={
+                                                 this.state.amount_to_deposit === '' ||
                                                  this.props.character_gold === 0 ||
+                                                 this.state.amount_to_deposit <= 0 ||
                                                  this.props.character_gold < this.state.cost_to_deposit
                                       }
                         />
@@ -211,7 +230,7 @@ export default class GoblinBankModal extends React.Component<GoblinBankModalProp
                                        value={this.state.amount_to_withdraw}
                                        onChange={this.setAmountToWithdraw.bind(this)}
                                        className='form-control'
-                                       disabled={this.props.gold_bars === 0}
+                                       disabled={this.isInputDisabled(this.props.gold_bars)}
                                 />
                             </div>
                         </div>
@@ -223,7 +242,7 @@ export default class GoblinBankModal extends React.Component<GoblinBankModalProp
                         </dl>
                         <PrimaryButton button_label={'Withdraw Amount'}
                                        on_click={this.withdraw.bind(this)}
-                                       disabled={this.state.amount_to_withdraw === '' || this.props.gold_bars === 0}
+                                       disabled={this.state.amount_to_withdraw === '' || this.props.gold_bars <= 0}
                         />
                     </TabPanel>
                 </Tabs>

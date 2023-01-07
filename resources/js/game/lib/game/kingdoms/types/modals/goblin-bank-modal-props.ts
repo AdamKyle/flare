@@ -1,3 +1,5 @@
+import BuildingDetails from "../../building-details";
+
 export default interface GoblinBankModalProps {
 
     is_open: boolean;
@@ -9,4 +11,6 @@ export default interface GoblinBankModalProps {
     gold_bars: number;
 
     kingdom_id: number;
+
+    goblin_bank: BuildingDetails;
 }

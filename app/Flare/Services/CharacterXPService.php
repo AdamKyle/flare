@@ -34,8 +34,11 @@ class CharacterXPService {
         $canContinueLeveling = $this->canContinueLeveling($character);
 
         $xpBonusQuestSlots   = $this->findAllItemsThatGiveXpBonus($character);
+        $boonBonus           = $character->boons->sum('itemUsed.xp_bonus');
+        $map                 = $character->map->gameMap;
+        $mapBonus            = !is_null($map->xp_bonus) ? $map->xp_bonus : 0;
 
-        $xpBonusIgnoreCaps   = $this->getTotalXpBonus($xpBonusQuestSlots, true);
+        $xpBonusIgnoreCaps   = $this->getTotalXpBonus($xpBonusQuestSlots, true) + $boonBonus + $mapBonus;
         $xpBonusWithCaps     = $this->getTotalXpBonus($xpBonusQuestSlots, false);
 
         if ($canContinueLeveling) {
