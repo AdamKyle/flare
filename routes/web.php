@@ -27,7 +27,7 @@ Route::get('/information/map/{map}', ['as' => 'info.page.map', 'uses' => 'InfoPa
 Route::get('/information/npcs/{npc}', ['as' => 'info.page.npc', 'uses' => 'InfoPageController@viewNpc']);
 Route::get('/information/quests/{quest}', ['as' => 'info.page.quest', 'uses' => 'InfoPageController@viewQuest']);
 Route::get('/information/passive-skill/{passiveSkill}', ['as' => 'info.page.passive.skill', 'uses' => 'InfoPageController@viewPassiveSkill']);
-Route::get('/information/class-specials/{gameClassSpecial}', ['as' => 'info.page.passive.skill', 'uses' => 'InfoPageController@viewClassSpecialty']);
+Route::get('/information/class-specials/{gameClassSpecial}', ['as' => 'info.page.class-special', 'uses' => 'InfoPageController@viewClassSpecialty']);
 
 Route::get('/releases', ['as' => 'releases.list', 'uses' => 'ReleasesController@index']);
 
