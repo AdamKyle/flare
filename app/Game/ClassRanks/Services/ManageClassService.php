@@ -60,7 +60,11 @@ class ManageClassService {
 
         $skillToHide = $character->skills->where('game_skill_id', $gameSkill->id)->first()->id;
 
-        $character->skills()->where('id', $skillToHide)->update(['is_hidden' => true]);
+        $character->skills()->where('id', $skillToHide)->update([
+            'is_hidden'          => true,
+            'currently_training' => false,
+            'xp_towards'         => 0,
+        ]);
 
         $character = $character->refresh();
 
