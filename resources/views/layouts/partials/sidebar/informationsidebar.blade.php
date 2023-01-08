@@ -62,8 +62,12 @@
         <div class="menu-detail-wrapper">
             <h6 class="uppercase">Shops</h6>
             <a href="{{route('info.page', ['pageName' => 'shop'])}}">
-                <span class="text-sm icon ra ra-anvil""></span>
+                <span class="text-sm icon ra ra-anvil"></span>
                 Shop
+            </a>
+            <a href="{{route('info.page', ['pageName' => 'goblin-shop'])}}">
+                <span class="text-sm icon ra ra-anvil"></span>
+                Goblin Shop
             </a>
             <a href="{{route('info.page', ['pageName' => 'market-board'])}}">
                 <span class="ra ra-wooden-sign"></span>
