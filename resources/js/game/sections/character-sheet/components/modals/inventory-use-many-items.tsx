@@ -86,6 +86,9 @@ export default class InventoryUseManyItems extends React.Component<any, any> {
                         we recalculate your stats based on plane stat reductions based off your surface level stats. The more boons you use,
                         the more stats you have for harder planes of existence.
                     </p>
+                    <p className='mb-4'>
+                        Only items that can stack will be allowed to be selected.
+                    </p>
                     <Select
                         onChange={this.setItemsToUse.bind(this)}
                         options={this.buildItems()}

@@ -112,7 +112,7 @@ export default class UsableItemsTable extends React.Component<UsableItemTable, a
     render() {
         return (
             <Fragment>
-                <Table data={this.props.usable_items} columns={buildLimitedColumns(this, this.manageViewItem.bind(this))} dark_table={this.props.dark_table}/>
+                <Table data={this.props.usable_items} columns={buildLimitedColumns(this, this.manageViewItem.bind(this), true)} dark_table={this.props.dark_table}/>
 
                 {
                     this.state.show_list_modal && this.state.item_to_list !== null ?

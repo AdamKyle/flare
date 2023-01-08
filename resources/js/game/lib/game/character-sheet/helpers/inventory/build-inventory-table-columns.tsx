@@ -72,7 +72,7 @@ export const BuildInventoryTableColumns = (component?: ActionsInterface, clickAc
  * @param component
  * @param onClick
  */
-export const buildLimitedColumns = (component?: ActionsInterface, onClick?: (item?: InventoryDetails | UsableItemsDetails) => any) => {
+export const buildLimitedColumns = (component?: ActionsInterface, onClick?: (item?: InventoryDetails | UsableItemsDetails) => any, usableItem?: boolean) => {
         const columns = [
             {
                 name: 'Name',
@@ -85,6 +85,14 @@ export const buildLimitedColumns = (component?: ActionsInterface, onClick?: (ite
                 cell: (row: any) => row.description
             },
         ];
+
+        if (usableItem) {
+            columns.push({
+                name: 'Can Stack',
+                selector: (row: any) => '',
+                cell: (row: any) => row.can_stack ? 'Yes' : 'No'
+            })
+        }
 
         if (typeof component !== 'undefined') {
             columns.push({
