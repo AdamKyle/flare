@@ -57,7 +57,6 @@ export default class LocationModal extends React.Component<LocationModalPros, Lo
     }
 
     underwaterCavesHouse() {
-        console.log(this.props.location);
         if (this.props.location.type_name === "Underwater Caves") {
             return (
                 <Fragment>

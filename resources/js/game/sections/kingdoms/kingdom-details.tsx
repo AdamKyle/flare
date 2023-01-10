@@ -46,7 +46,6 @@ export default class KingdomDetails extends React.Component<KingdomDetailsProps,
     }
 
     showGoblinBank() {
-        console.log(this.props.kingdom.buildings);
         const building = this.props.kingdom.buildings.filter((building: BuildingDetails) => building.name === 'Goblin Coin Bank')[0];
 
         this.setState({

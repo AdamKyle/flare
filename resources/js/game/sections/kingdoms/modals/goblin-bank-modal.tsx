@@ -13,6 +13,7 @@ import Ajax from "../../../lib/ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
 import SuccessAlert from "../../../components/ui/alerts/simple-alerts/success-alert";
 import WarningAlert from "../../../components/ui/alerts/simple-alerts/warning-alert";
+import {parseInt} from "lodash";
 
 export default class GoblinBankModal extends React.Component<GoblinBankModalProps, GoblinCoinBankModalState> {
 
@@ -71,8 +72,11 @@ export default class GoblinBankModal extends React.Component<GoblinBankModalProp
     setAmountToDeposit(e: React.ChangeEvent<HTMLInputElement>) {
         let value = parseInt(e.target.value, 10) || 0;
 
+        this.setAmount(value);
+    }
+
+    setAmount(value: number) {
         if (value === 0) {
-            console.log('um?');
             return this.setState({
                 success_message: '',
                 error_message: '',
@@ -86,7 +90,7 @@ export default class GoblinBankModal extends React.Component<GoblinBankModalProp
         }
 
         const newTotal = this.props.gold_bars + value;
-        console.log('new total: ', newTotal);
+
         if (newTotal > 1000) {
             value = this.props.gold_bars - this.props.gold_bars
         }
@@ -108,6 +112,8 @@ export default class GoblinBankModal extends React.Component<GoblinBankModalProp
     withdraw() {
         this.setState({
             loading: true,
+            error_message: '',
+            success_message: '',
         }, () => {
             (new Ajax()).setParameters({
                 amount_to_withdraw: this.state.amount_to_withdraw
@@ -115,7 +121,9 @@ export default class GoblinBankModal extends React.Component<GoblinBankModalProp
                 .doAjaxCall('post', (result: AxiosResponse) => {
                     this.setState({
                         loading: false,
-                        success_message: result.data.message
+                        success_message: result.data.message,
+                        amount_to_deposit: '',
+                        amount_to_withdraw: '',
                     })
                 }, (error: AxiosError) => {
                     this.setState({loading: false});
@@ -138,6 +146,8 @@ export default class GoblinBankModal extends React.Component<GoblinBankModalProp
     deposit() {
         this.setState({
             loading: true,
+            error_message: '',
+            success_message: '',
         }, () => {
             (new Ajax()).setParameters({
                 amount_to_purchase: this.state.amount_to_deposit
@@ -145,8 +155,10 @@ export default class GoblinBankModal extends React.Component<GoblinBankModalProp
               .doAjaxCall('post', (result: AxiosResponse) => {
                   this.setState({
                       loading: false,
-                      success_message: result.data.message
-                  })
+                      success_message: result.data.message,
+                      amount_to_deposit: '',
+                      amount_to_withdraw: '',
+                  });
               }, (error: AxiosError) => {
                   this.setState({loading: false});
 

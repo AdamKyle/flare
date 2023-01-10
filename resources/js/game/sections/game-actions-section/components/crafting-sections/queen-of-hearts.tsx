@@ -343,6 +343,10 @@ export default class QueenOfHearts extends React.Component<any, any> {
                 });
             }, (error: AxiosError) => {
                 if (typeof error.response !== 'undefined') {
+                    this.setState({
+                        preforming_action: false,
+                    });
+
                     const response = error.response;
 
                     this.setState({

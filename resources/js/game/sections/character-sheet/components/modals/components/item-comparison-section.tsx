@@ -238,7 +238,7 @@ export default class ItemComparisonSection extends React.Component<any, any> {
         }
 
         return (
-            <div className='max-h-[400px] lg:max-h-[500px] overflow-y-auto'>
+            <div className='max-h-[200px] md:max-h-[400px] lg:max-h-[500px] overflow-y-auto'>
                 <dl>
                     {this.renderItemToEquip(this.props.comparison_details.itemToEquip)}
                 </dl>

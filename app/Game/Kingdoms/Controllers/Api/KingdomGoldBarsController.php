@@ -3,6 +3,7 @@
 namespace App\Game\Kingdoms\Controllers\Api;
 
 use App\Game\Kingdoms\Service\UpdateKingdom;
+use App\Game\Kingdoms\Values\KingdomMaxValue;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Game\Core\Events\UpdateTopBarEvent;
@@ -44,6 +45,14 @@ class KingdomGoldBarsController extends Controller {
         }
 
         $amountToBuy = $request->amount_to_purchase;
+
+        $newAmount   = $amountToBuy + $kingdom->gold_bars;
+
+        if ($newAmount > KingdomMaxValue::MAX_GOLD_BARS) {
+            return response()->json([
+                'message' => 'Cannot go over the max amount of Gold Bars: 1000'
+            ], 422);
+        }
 
         if ($amountToBuy > 1000) {
             $amountToBuy = 1000;

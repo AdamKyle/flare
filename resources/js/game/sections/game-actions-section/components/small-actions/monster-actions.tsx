@@ -73,7 +73,7 @@ export default class MonsterActions extends React.Component<MonsterActionsProps,
                         processing_rank_battle: false,
                     });
 
-                    console.log(error);
+                    console.error(error);
                 });
         });
     }
@@ -103,7 +103,7 @@ export default class MonsterActions extends React.Component<MonsterActionsProps,
                         monster_current_health: result.data.health.monster_health,
                     });
                 }, (error: AxiosError) => {
-                    console.log(error);
+                    console.error(error);
                 });
         })
     }
