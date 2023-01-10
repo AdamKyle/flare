@@ -17,20 +17,27 @@ class UpdateCharacterEnchantingList implements ShouldBroadcastNow
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
 
-    public $availableAffixes;
-
-    public $inventory;
+    /**
+     * @var Collection $availableAffixes
+     */
+    public Collection $availableAffixes;
 
     /**
-     * @var User $users
+     * @var array $inventory
      */
-    public $user;
+    public array $inventory;
+
+    /**
+     * @var User $user
+     */
+    private User $user;
 
     /**
      * Create a new event instance.
      *
      * @param User $user
-     * @param array $items
+     * @param Collection $availableAffixes
+     * @param array $inventory
      */
     public function __construct(User $user, Collection $availableAffixes, array $inventory) {
         $this->user                  = $user;

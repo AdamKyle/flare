@@ -9,17 +9,9 @@ use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Skills\Events\UpdateCharacterEnchantingList;
 use App\Game\Skills\Services\EnchantingService;
 
-class BuyItemListener
-{
+class BuyItemListener {
 
-    private $enchantingService;
-
-    public function __construct(EnchantingService $enchantingService) {
-        $this->enchantingService = $enchantingService;
-    }
-
-    public function handle(BuyItemEvent $event)
-    {
+    public function handle(BuyItemEvent $event) {
         $event->character->gold = $event->character->gold - $event->item->cost;
         $event->character->save();
 
@@ -29,18 +21,6 @@ class BuyItemListener
         ]);
 
         $character = $event->character->refresh();
-
-        $affixData = $this->enchantingService->fetchAffixes($character);
-
-        event(new UpdateCharacterEnchantingList(
-            $character->user,
-            $affixData['affixes'],
-            $affixData['character_inventory'],
-        ));
-
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
-
-        event(new CharacterInventoryDetailsUpdate($character->user));
 
         event(new UpdateTopBarEvent($character));
     }
