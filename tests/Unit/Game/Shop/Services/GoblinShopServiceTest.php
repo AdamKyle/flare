@@ -156,4 +156,59 @@ class GoblinShopServiceTest extends TestCase {
 
         $this->assertEquals(0, $character->kingdoms->sum('gold_bars'));
     }
+
+    public function testPurchaseWhenMultipleKingdomsHaveVariableGoldBars() {
+        $item = $this->createItem(['gold_bars_cost' => 1000]);
+
+        $character   = (new CharacterFactory())->createBaseCharacter()
+                                               ->givePlayerLocation()
+                                               ->kingdomManagement()
+                                               ->assignKingdom(['gold_bars' => 500])
+                                               ->assignKingdom(['gold_bars' => 500])
+                                               ->assignKingdom(['gold_bars' => 400])
+                                               ->getCharacterFactory();
+
+        $character = $character->getCharacter();
+
+        $character = $character->refresh();
+
+        $this->shopService->buyItem($character, $item, $character->kingdoms()->get());
+
+        $character = $character->refresh();
+
+        $hasItem = $character->inventory->slots->filter(function($slot) use ($item) {
+           return $slot->item_id === $item->id;
+        })->first();
+
+        $this->assertNotNull($hasItem);
+        $this->assertEquals(400, $character->kingdoms->sum('gold_bars'));
+    }
+
+    public function testPurchaseWhenMultipleKingdomsHaveVariableGoldBarsAndOneHasNoGoldBars() {
+        $item = $this->createItem(['gold_bars_cost' => 1000]);
+
+        $character   = (new CharacterFactory())->createBaseCharacter()
+            ->givePlayerLocation()
+            ->kingdomManagement()
+            ->assignKingdom(['gold_bars' => 500])
+            ->assignKingdom(['gold_bars' => 500])
+            ->assignKingdom(['gold_bars' => 400])
+            ->assignKingdom(['gold_bars' => 0])
+            ->getCharacterFactory();
+
+        $character = $character->getCharacter();
+
+        $character = $character->refresh();
+
+        $this->shopService->buyItem($character, $item, $character->kingdoms()->get());
+
+        $character = $character->refresh();
+
+        $hasItem = $character->inventory->slots->filter(function($slot) use ($item) {
+            return $slot->item_id === $item->id;
+        })->first();
+
+        $this->assertNotNull($hasItem);
+        $this->assertEquals(400, $character->kingdoms->sum('gold_bars'));
+    }
 }

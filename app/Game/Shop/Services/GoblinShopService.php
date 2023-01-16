@@ -51,6 +51,8 @@ class GoblinShopService {
             return;
         }
 
+        $kingdoms = $kingdoms->filter(function($kingdom) { return $kingdom->gold_bars > 0; });
+
         foreach ($kingdoms as $kingdom) {
 
             $contribution = floor($goldBarCost * $kingdom->gold_bars / $totalGoldBars);

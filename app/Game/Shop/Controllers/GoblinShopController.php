@@ -49,6 +49,8 @@ class GoblinShopController extends Controller {
             return redirect()->back()->with('error', 'Not enough gold bars. Go slay monsters to stalk your treasury.');
         }
 
+
+
         $this->goblinShopService->buyItem($character, $item, $kingdoms);
 
         return redirect()->back()->with('success', 'Purchased: ' . $item->name . '. Cost has been taken from all kingdoms - split evenly - that could afford this item.
