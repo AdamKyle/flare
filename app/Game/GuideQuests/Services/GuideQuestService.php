@@ -23,7 +23,10 @@ class GuideQuestService {
     }
 
     public function fetchQuestForCharacter(Character $character): GuideQuest | null {
-        $lastCompletedGuideQuest = $character->questsCompleted()->orderByDesc('guide_quest_id')->first();
+        $lastCompletedGuideQuest = $character->questsCompleted()
+                                             ->whereNotNull('guide_quest_id')
+                                             ->orderByDesc('guide_quest_id')
+                                             ->first();
 
         if (is_null($lastCompletedGuideQuest)) {
             $quest = GuideQuest::first();

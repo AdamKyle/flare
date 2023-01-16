@@ -38,14 +38,14 @@ class EquipItemService {
     private $inventorySetService;
 
     /**
-     * @var Request $request
-     */
-    private $request;
-
-    /**
      * @var Character $character
      */
-    private $character;
+    private Character $character;
+
+    /**
+     * @var array $request
+     */
+    private array $request;
 
     /**
      * EquipItemService constructor.
@@ -63,10 +63,10 @@ class EquipItemService {
     /**
      * Set the request
      *
-     * @param Request $request
+     * @param array $request
      * @return EquipItemService
      */
-    public function setRequest(Request $request): EquipItemService {
+    public function setRequest(array $request): EquipItemService {
         $this->request = $request;
 
         return $this;
@@ -86,7 +86,7 @@ class EquipItemService {
 
     public function replaceItem(): Item {
         $characterSlot = $this->character->inventory->slots->filter(function($slot) {
-            return $slot->id === (int) $this->request->slot_id && !$slot->equipped;
+            return $slot->id === (int) $this->request['slot_id'] && !$slot->equipped;
         })->first();
 
         if (is_null($characterSlot)) {
@@ -114,7 +114,7 @@ class EquipItemService {
                 'inventory_set_id' => $equippedSet->id,
                 'item_id'  => $characterSlot->item->id,
                 'equipped' => true,
-                'position' => $this->request->position,
+                'position' => $this->request['position'],
             ]);
 
             $characterSlot->delete();
@@ -131,7 +131,7 @@ class EquipItemService {
 
             $characterSlot->update([
                 'equipped' => true,
-                'position' => $this->request->position,
+                'position' => $this->request['position'],
             ]);
         }
 
@@ -168,7 +168,7 @@ class EquipItemService {
 
     public function isItemToBeReplacedUnique(Inventory|InventorySet $inventory): bool {
         $item = $inventory->slots->filter(function($slot) {
-            return $slot->position === $this->request->position && $slot->equipped;
+            return $slot->position === $this->request['position'] && $slot->equipped;
         })->first();
 
         if (is_null($item)) {
@@ -231,7 +231,7 @@ class EquipItemService {
 
             if (!$this->removeTwoHandedWeapon($inventory)) {
                 $itemForPosition = $inventory->slots->filter(function ($slot) {
-                    return $slot->position === $this->request->position && $slot->equipped;
+                    return $slot->position === $this->request['position'] && $slot->equipped;
                 })->first();
 
                 if (!is_null($itemForPosition)) {
@@ -249,7 +249,7 @@ class EquipItemService {
     }
 
     protected function removeTwoHandedWeapon(Inventory|InventorySet $inventory): bool {
-        if ($this->request->position === 'right-hand' || $this->request->position === 'left-hand') {
+        if ($this->request['position'] === 'right-hand' || $this->request['position'] === 'left-hand') {
 
             $itemsForPosition = $inventory->slots->filter(function($slot) {
                 return ($slot->position === 'right-hand' || $slot->position === 'left-hand') && $slot->equipped;

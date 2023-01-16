@@ -7,10 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Flare\Models\GameMap;
 use Database\Factories\MapFactory;
 
-class Event extends Model
-{
-
-    use HasFactory;
+class Event extends Model {
 
     /**
      * The attributes that are mass assignable.
@@ -31,8 +28,4 @@ class Event extends Model
     protected $casts = [
         'type' => 'integer',
     ];
-
-    protected static function newFactory() {
-
-    }
 }

@@ -9,6 +9,14 @@ use Illuminate\Database\Eloquent\Collection;
 
 class GoblinShopService {
 
+    /**
+     * Buy the item.
+     *
+     * @param Character $character
+     * @param Item $item
+     * @param Collection $kingdoms
+     * @return void
+     */
     public function buyItem(Character $character, Item $item, Collection $kingdoms): void {
         $this->subtractCostFromKingdoms($kingdoms, $item->gold_bars_cost);
 
@@ -18,6 +26,13 @@ class GoblinShopService {
         ]);
     }
 
+    /**
+     * Subtract the cost from kingdoms gold bars.
+     *
+     * @param Collection $kingdoms
+     * @param int $goldBarCost
+     * @return void
+     */
     protected function subtractCostFromKingdoms(Collection $kingdoms, int $goldBarCost): void {
 
         $contributions = [];
@@ -36,11 +51,9 @@ class GoblinShopService {
             return;
         }
 
-        foreach ($kingdoms as $kingdom) {
+        $kingdoms = $kingdoms->filter(function($kingdom) { return $kingdom->gold_bars > 0; });
 
-            if ($kingdom->gold_bars <= 0) {
-                continue;
-            }
+        foreach ($kingdoms as $kingdom) {
 
             $contribution = floor($goldBarCost * $kingdom->gold_bars / $totalGoldBars);
 
@@ -50,22 +63,6 @@ class GoblinShopService {
 
             $goldBarCost -= $contribution;
             $totalGoldBars -= $kingdom->gold_bars;
-        }
-
-        $totalContributions = array_sum(array_values($contributions));
-        $costRemaining      = $goldBarCost - $totalContributions;
-
-        while ($costRemaining > 0) {
-            foreach ($contributions as $kingdomId => $contribution) {
-
-                $possibleContributionAddition = $contribution + 1;
-
-                if ($kingdoms->where('id', $kingdomId)->first()->gold_bars >= $possibleContributionAddition) {
-                    $contributions[$kingdomId] = $possibleContributionAddition;
-                }
-            }
-
-            $costRemaining--;
         }
 
         foreach ($kingdoms as $kingdom) {

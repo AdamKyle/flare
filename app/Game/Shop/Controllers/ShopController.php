@@ -2,50 +2,43 @@
 
 namespace App\Game\Shop\Controllers;
 
-use App\Flare\Jobs\CharacterAttackTypesCacheBuilder;
-use App\Game\Shop\Requests\ShopBuyMultipleValidation;
-use App\Game\Shop\Requests\ShopPurchaseMultipleValidation;
 use Cache;
 use Illuminate\Http\Request;
 use League\Fractal\Manager;
-use League\Fractal\Resource\Item as ResourceItem;
 use App\Http\Controllers\Controller;
-use Facades\App\Flare\Calculators\SellItemCalculator;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Models\Location;
-use App\Game\Core\Events\UpdateTopBarEvent;
-use App\Flare\Models\Inventory;
-use App\Flare\Models\InventorySlot;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
-use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
-use App\Game\Core\Events\UpdateBaseCharacterInformation;
+use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Shop\Requests\ShopBuyMultipleValidation;
+use App\Game\Shop\Requests\ShopPurchaseMultipleValidation;
 use App\Game\Core\Services\EquipItemService;
 use App\Game\Core\Services\ComparisonService;
-use App\Game\Shop\Jobs\PurchaseItemsJob;
 use App\Game\Shop\Events\BuyItemEvent;
-use App\Game\Shop\Events\SellItemEvent;
 use App\Game\Shop\Services\ShopService;
 use App\Game\Shop\Requests\ShopReplaceItemValidation;
 
 
 class ShopController extends Controller {
 
-    private $equipItemService;
+    private EquipItemService $equipItemService;
 
-    private $buildCharacterAttackTypes;
+    private BuildCharacterAttackTypes $buildCharacterAttackTypes;
 
-    private $characterSheetBaseInfoTransformer;
+    private CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer;
 
-    private $manager;
+    private ShopService $shopService;
+
+    private Manager $manager;
 
     public function __construct(
         EquipItemService $equipItemService,
         BuildCharacterAttackTypes $buildCharacterAttackTypes,
         CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer,
+        ShopService $shopService,
         Manager $manager
     ) {
         $this->middleware('auth');
@@ -54,6 +47,7 @@ class ShopController extends Controller {
         $this->equipItemService                       = $equipItemService;
         $this->buildCharacterAttackTypes              = $buildCharacterAttackTypes;
         $this->characterSheetBaseInfoTransformer      = $characterSheetBaseInfoTransformer;
+        $this->shopService                            = $shopService;
         $this->manager                                = $manager;
     }
 
@@ -79,9 +73,9 @@ class ShopController extends Controller {
         ]);
     }
 
-    public function shopSellAll(Character $character, ShopService $service) {
+    public function shopSellAll(Character $character) {
 
-        $totalSoldFor = $service->sellAllItemsInInventory($character);
+        $totalSoldFor = $this->shopService->sellAllItemsInInventory($character);
 
         $newGold = $character->gold + $totalSoldFor;
 
@@ -140,9 +134,7 @@ class ShopController extends Controller {
         }
 
         $item         = $inventorySlot->item;
-        $totalSoldFor = SellItemCalculator::fetchSalePriceWithAffixes($item);
-
-        event(new SellItemEvent($inventorySlot, $character));
+        $totalSoldFor = $this->shopService->sellItem($inventorySlot, $character);
 
         return redirect()->back()->with('success', 'Sold: ' . $item->affix_name . ' for: ' . $totalSoldFor . ' gold.');
     }
@@ -185,23 +177,7 @@ class ShopController extends Controller {
             return redirect()->back()->with('error', 'Inventory is full. Please make room.');
         }
 
-        event(new BuyItemEvent($item, $character));
-
-        $character = $character->refresh();
-
-        $inventory = Inventory::where('character_id', $character->id)->first();
-
-        $slot      = InventorySlot::where('equipped', false)->where('item_id', $item->id)->where('inventory_id', $inventory->id)->first();
-
-        $request->merge([
-            'slot_id' => $slot->id,
-        ]);
-
-        $this->equipItemService->setRequest($request)
-            ->setCharacter($character)
-            ->replaceItem();
-
-        CharacterAttackTypesCacheBuilder::dispatch($character);
+        $this->shopService->buyAndReplace($item, $character, $request);
 
         return redirect()->to(route('game.shop.buy', ['character' => $character]))->with('success', 'Purchased and equipped: ' . $item->affix_name . '.');
     }
@@ -241,18 +217,7 @@ class ShopController extends Controller {
             return redirect()->back()->with('error', 'You do not have enough gold.');
         }
 
-        $character->update([
-            'gold' => $character->gold - $cost,
-        ]);
-
-        $character = $character->refresh();
-
-        for ($i = 1; $i <= $amount; $i++) {
-            $character->inventory->slots()->create([
-                'inventory_id' => $character->inventory->id,
-                'item_id'      => $item->id,
-            ]);
-        }
+        $this->shopService->buyMultipleItems($character, $item, $cost, $amount);
 
         return redirect()->to(route('game.shop.buy', ['character' => $character->id]))->with('success', 'You purchased: ' . $amount . ' of ' . $item->name);
     }
