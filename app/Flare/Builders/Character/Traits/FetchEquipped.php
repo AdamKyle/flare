@@ -7,7 +7,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\InventorySet;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\SetSlot;
-use \App\Flare\Models\Inventory as InventoryModel;
+use \App\Flare\Models\Inventory;
 
 trait FetchEquipped {
 
@@ -21,7 +21,7 @@ trait FetchEquipped {
      */
     public function fetchEquipped(Character $character): Collection|null
     {
-        $inventory = InventoryModel::where('character_id', $character->id)->first();
+        $inventory = Inventory::where('character_id', $character->id)->first();
 
         // Somehow the character has no inventory, instead - lets mark them for deletion.
         // These could be characters who deleted their accounts and the deletion failed.

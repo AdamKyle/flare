@@ -317,8 +317,15 @@ class CharacterInventoryService {
         return $indexes;
     }
 
+    /**
+     * @return Collection
+     */
     public function getInventoryCollection(): Collection {
         $inventory = Inventory::where('character_id', $this->character->id)->first();
+
+        if (is_null($inventory)) {
+            return collect();
+        }
 
         return InventorySlot::where('inventory_slots.inventory_id', $inventory->id)->join('items', function($join) {
             $join->on('inventory_slots.item_id', '=', 'items.id')

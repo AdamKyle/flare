@@ -240,10 +240,14 @@ class ClassRankService {
      * @return void
      * @throws Exception
      */
-    public function giveXpToMasteries(Character $character) {
+    public function giveXpToMasteries(Character $character): void {
         $classRank = $character->classRanks()->where('game_class_id', $character->game_class_id)->first();
 
         $inventory = $this->fetchEquipped($character);
+
+        if (is_null($inventory)) {
+            return;
+        }
 
         foreach (WeaponMasteryValue::getTypes() as $type) {
 
