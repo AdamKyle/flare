@@ -266,6 +266,22 @@ class ClassRanksServiceTest extends TestCase {
         }
     }
 
+    public function testNoExpForNoInventory() {
+        $character = $this->character->getCharacter();
+
+        $character->inventory->slots()->update(['equipped' => false]);
+
+        $character = $character->refresh();
+
+        $this->classRankService->giveXpToClassRank($character);
+
+        $character = $character->refresh();
+
+        foreach ($character->classRanks as $rank) {
+            $this->assertEquals(0, $rank->current_xp);
+        }
+    }
+
     public function testGainLevelInClassRank() {
         $character = $this->character->getCharacter();
 
