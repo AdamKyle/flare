@@ -446,7 +446,7 @@ class  CharacterInventoryController extends Controller {
     public function equipItem(EquipItemValidation $request, Character $character, EquipItemService $equipItemService): JsonResponse {
         try {
 
-            $equipItemService->setRequest($request)
+            $equipItemService->setRequest($request->all())
                              ->setCharacter($character)
                              ->replaceItem();
 
