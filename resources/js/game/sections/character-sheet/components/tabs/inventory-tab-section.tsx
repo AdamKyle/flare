@@ -58,20 +58,29 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
     }
 
     search(e: React.ChangeEvent<HTMLInputElement>) {
-        const value = e.target.value;
+        const value: string = e.target.value;
 
         if (this.state.table === 'Inventory') {
             this.setState({
                 data: this.props.inventory.filter((item: InventoryDetails) => {
-                    return item.item_name.includes(value) || item.type.includes(value);
-                }),
+                    const itemName = item.item_name.toLowerCase();
+                    const itemType = item.type.toLowerCase();
+
+                    if (itemName.includes(value.toLowerCase()) || itemType.includes(value.toLowerCase())) {
+                        return item;
+                    }
+                }).filter((item: InventoryDetails) => item),
                 search_string: value,
             });
         } else {
             this.setState({
                 usable_items: this.props.usable_items.filter((item: UsableItemsDetails) => {
-                    return item.item_name.includes(value) || item.description.includes(value);
-                }),
+                    const itemName = item.item_name.toLowerCase();
+
+                    if (itemName.includes(value.toLowerCase())) {
+                        return item;
+                    }
+                }).filter((item: UsableItemsDetails) => item),
                 search_string: value,
             });
         }

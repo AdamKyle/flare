@@ -29,7 +29,7 @@ export default class ListItemModal extends React.Component<any, any> {
         }
 
         (new Ajax()).setRoute('market-board/items').setParameters({
-            item_id: this.props.item.id
+            item_id: this.props.item.item_id
         }).doAjaxCall('get', (result: AxiosResponse) => {
             const data = result.data.items.map((item: { listed_at: string, listed_price: number }) => {
                 return {

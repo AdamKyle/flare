@@ -34,7 +34,10 @@ class ItemsTable extends DataTableComponent {
         }
 
         if ($this->isShop) {
-            $query = $query->where('cost', '<=', 2000000000)->whereNotIn('type', ['quest', 'alchemy', 'trinket']);
+            $query = $query->where('cost', '<=', 2000000000)
+                           ->whereNotIn('type', ['quest', 'alchemy', 'trinket'])
+                           ->whereNull('item_suffix_id')
+                           ->whereNull('item_prefix_id');
         }
 
         return $query;
@@ -45,7 +48,11 @@ class ItemsTable extends DataTableComponent {
             SelectFilter::make('Types')
                 ->options($this->buildOptions())
                 ->filter(function(Builder $builder, string $value) {
-                    return $builder->where('type', $value)->orWhere('crafting_type', $value);
+                    return $builder->where('type', $value)
+                                   ->where('cost', '<=', 2000000000)
+                                   ->whereNull('item_suffix_id')
+                                   ->whereNull('item_prefix_id')
+                                   ->whereNotIn('type', ['quest', 'alchemy', 'trinket']);
                 }),
         ];
     }

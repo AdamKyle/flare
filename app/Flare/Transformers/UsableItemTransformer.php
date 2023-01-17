@@ -27,7 +27,8 @@ class UsableItemTransformer extends TransformerAbstract {
     protected function transformForSlot(InventorySlot|SetSlot $slot): array
     {
         return [
-            'id'                               => $slot->item->id,
+            'id'                               => $slot->id,
+            'item_id'                          => $slot->item_id,
             'slot_id'                          => $slot->id,
             'item_name'                        => $slot->item->affix_name,
             'affix_name'                       => $slot->item->affix_name,

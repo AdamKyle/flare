@@ -22,7 +22,7 @@ export default class InventoryUseItem extends React.Component<any, any> {
             error_message: null,
         });
 
-        (new Ajax()).setRoute('character/'+this.props.character_id+'/inventory/use-item/' + this.props.item.id)
+        (new Ajax()).setRoute('character/'+this.props.character_id+'/inventory/use-item/' + this.props.item.item_id)
                     .doAjaxCall('post', (result: AxiosResponse) => {
                         this.setState({
                             loading: false
