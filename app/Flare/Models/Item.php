@@ -93,6 +93,7 @@ class Item extends Model {
         'gold_bars_cost',
         'can_stack',
         'gains_additional_level',
+        'unlocks_class_id',
     ];
 
     /**
@@ -112,6 +113,7 @@ class Item extends Model {
         'holy_level'                       => 'integer',
         'holy_stacks'                      => 'integer',
         'gold_bars_cost'                   => 'integer',
+        'unlocks_class_id'                 => 'integer',
         'base_damage_mod'                  => 'float',
         'base_healing_mod'                 => 'float',
         'base_ac_mod'                      => 'float',
@@ -207,6 +209,10 @@ class Item extends Model {
 
     public function dropLocation() {
         return $this->hasOne(Location::class, 'id', 'drop_location_id')->with('map');
+    }
+
+    public function unlocksClass() {
+        return $this->hasOne(GameClass::class, 'id', 'unlocks_class_id');
     }
 
     public function children() {

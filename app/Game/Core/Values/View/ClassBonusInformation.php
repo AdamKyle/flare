@@ -87,6 +87,12 @@ class ClassBonusInformation {
             $details['description'] = 'Every time you attack you have chance to, based on class bonus and with a stave equipped, to do Alchemists Ravenous Dream. This can do 10% of your int followed by an additional 3% for each additional attack between 2 and 6 times.';
         }
 
+        if ($classAttackValue->isPrisoner()) {
+            $details['type'] = Str::ucfirst(ClassAttackValue::PRISONER_RAGE);
+            $details['requires'] = 'Weapons';
+            $details['description'] = 'With a weapon (or two) equipped you have a chance to rage out at the enemy for 15% of your strength 1-4 times';
+        }
+
         return $details;
     }
 }

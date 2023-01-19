@@ -31,4 +31,8 @@ export default class ExtraActionType {
   static get ARCANE_ALCHEMISTS_DREAMS() {
     return 'alchemists ravenous dream';
   }
+
+  static get PRISONER_RAGE() {
+    return 'prisoner rage';
+  }
 }

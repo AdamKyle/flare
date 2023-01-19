@@ -13,6 +13,8 @@ class CharacterClassValue {
     const BLACKSMITH       = 'Blacksmith';
     const ARCANE_ALCHEMIST = 'Arcane Alchemist';
 
+    const PRISONER         = 'Prisoner';
+
     /**
      * @var string $value
      */
@@ -30,6 +32,7 @@ class CharacterClassValue {
         self::VAMPIRE          => 'Vampire',
         self::BLACKSMITH       => 'Blacksmith',
         self::ARCANE_ALCHEMIST => 'Arcane Alchemist',
+        self::PRISONER         => 'Prisoner'
     ];
 
     protected $nonCaster = [
@@ -38,6 +41,7 @@ class CharacterClassValue {
         self::RANGER,
         self::THIEF,
         self::VAMPIRE,
+        self::PRISONER,
     ];
 
     protected $caster = [
@@ -135,6 +139,15 @@ class CharacterClassValue {
      */
     public function isArcaneAlchemist(): bool {
         return $this->value === self::ARCANE_ALCHEMIST;
+    }
+
+    /**
+     * Is a prisoner?
+     *
+     * @return bool
+     */
+    public function isPrisoner(): bool {
+        return $this->value === self::PRISONER;
     }
 
     /**

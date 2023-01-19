@@ -33,6 +33,10 @@ class GameClass extends Model
         'dodge_mod',
         'defense_mod',
         'looting_mod',
+        'primary_required_class_id',
+        'secondary_required_class_id',
+        'primary_required_class_level',
+        'secondary_required_class_level',
     ];
 
     /**
@@ -41,21 +45,33 @@ class GameClass extends Model
      * @var array
      */
     protected $casts = [
-        'str_mod'      => 'integer',
-        'dur_mod'      => 'integer',
-        'dex_mod'      => 'integer',
-        'chr_mod'      => 'integer',
-        'int_mod'      => 'integer',
-        'agi_mod'      => 'integer',
-        'focus_mod'    => 'integer',
-        'accuracy_mod' => 'float',
-        'dodge_mod'    => 'float',
-        'defense_mod'  => 'float',
-        'looting_mod'  => 'float',
+        'str_mod'                        => 'integer',
+        'dur_mod'                        => 'integer',
+        'dex_mod'                        => 'integer',
+        'chr_mod'                        => 'integer',
+        'int_mod'                        => 'integer',
+        'agi_mod'                        => 'integer',
+        'focus_mod'                      => 'integer',
+        'primary_required_class_id'      => 'integer',
+        'secondary_required_class_id'    => 'integer',
+        'primary_required_class_level'   => 'integer',
+        'secondary_required_class_level' => 'integer',
+        'accuracy_mod'                   => 'float',
+        'dodge_mod'                      => 'float',
+        'defense_mod'                    => 'float',
+        'looting_mod'                    => 'float',
     ];
 
     public function gameSkills() {
         return $this->hasMany(GameSkill::class, 'game_class_id', 'id');
+    }
+
+    public function primaryClassRequired() {
+        return $this->hasOne(GameClass::class, 'id', 'primary_required_class_id');
+    }
+
+    public function secondaryClassRequired() {
+        return $this->hasOne(GameClass::class, 'id', 'secondary_required_class_id');
     }
 
     public function type() {

@@ -367,6 +367,7 @@ export default class Damage extends BattleBase {
   }
 
   doubleCastChance(attacker, attackData, monsterCurrentHealth) {
+    console.log(attacker);
     if (attacker.extra_action_chance.class_name === attacker.class) {
       const extraActionChance = attacker.extra_action_chance;
 
@@ -447,6 +448,38 @@ export default class Damage extends BattleBase {
       monster_hp: monsterCurrentHealth,
       character_hp: characterCurrentHealth,
     };
+  }
+
+  prisonersRage(attacker, monsterCurrentHealth, attackData, damageDeduction) {
+
+    if (attacker.extra_action_chance.class_name === attacker.class) {
+
+      const extraActionChance = attacker.extra_action_chance;
+
+      if (!this.canUse(extraActionChance)) {
+        return monsterCurrentHealth;
+      }
+
+      this.addMessage('You cannot let them keep you prisoner! Lash out and kill!', 'regular');
+
+      let strAmount  = attacker.str_modded * 0.15;
+      let damageToDo = (attackData.weapon_damage + strAmount);
+
+      if (damageDeduction > 0.0) {
+        this.addMessage('The Plane weakens your ability to do full damage!', 'enemy-action');
+        damageToDo = damageDeduction - (damageToDo * damageDeduction);
+      }
+
+      const times = Math.random(1, 4);
+
+      for (let i = 1; i <= times; i++) {
+          monsterCurrentHealth = monsterCurrentHealth - damageToDo;
+
+        this.addMessage('You slash, you thrash, you bash and you crash your way through! (You dealt: '+formatNumber(damageToDo)+')', 'player-action');
+      }
+    }
+
+    return monsterCurrentHealth
   }
 
   canUse(extraActionChance) {

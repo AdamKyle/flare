@@ -112,9 +112,16 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::post('/admin/classes/store', ['as' => 'classes.store', 'uses' => 'ClassesController@store']);
 
     Route::get('/admin/classes', ['as' => 'classes.list', 'uses' => 'ClassesController@index']);
+    Route::get('/admin/classes/export-classes', ['as' => 'classes.export-excel', 'uses' => 'ClassesController@exportClasses']);
+    Route::get('/admin/classes/import-classes', ['as' => 'classes.import-excel', 'uses' => 'ClassesController@importClasses']);
+
+    Route::post('/admin/classes/export-class-data', ['as' => 'classes.export-data', 'uses' => 'ClassesController@export']);
+    Route::post('/admin/classes/import-class-data', ['as' => 'classes.import-data', 'uses' => 'ClassesController@import']);
+
     Route::get('/admin/classes/create', ['as' => 'classes.create', 'uses' => 'ClassesController@create']);
     Route::get('/admin/classes/{class}', ['as' => 'classes.class', 'uses' => 'ClassesController@show']);
     Route::get('/admin/classes/{class}/edit', ['as' => 'classes.edit', 'uses' => 'ClassesController@edit']);
+
 
     Route::get('/admin/kingdoms/buildings/create', ['as' => 'buildings.create', 'uses' => 'BuildingsController@create']);
     Route::get('/admin/kingdoms/buildings', ['as' => 'buildings.list', 'uses' => 'BuildingsController@index']);

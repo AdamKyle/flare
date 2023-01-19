@@ -74,36 +74,41 @@
 
     <x-core.cards.card-with-title title="Hints">
         <div class="prose dark:prose-invert">
-        @if ($class->type()->isFighter())
-            @include('information.classes.partials.fighter')
-        @endif
+            @if ($class->type()->isFighter())
+                @include('information.classes.partials.fighter')
+            @endif
 
-        @if ($class->type()->isRanger())
-            @include('information.classes.partials.ranger')
-        @endif
+            @if ($class->type()->isRanger())
+                @include('information.classes.partials.ranger')
+            @endif
 
-        @if ($class->type()->isThief())
-            @include('information.classes.partials.thief')
-        @endif
+            @if ($class->type()->isThief())
+                @include('information.classes.partials.thief')
+            @endif
 
-        @if ($class->type()->isProphet())
-            @include('information.classes.partials.prophet')
-        @endif
+            @if ($class->type()->isProphet())
+                @include('information.classes.partials.prophet')
+            @endif
 
-        @if ($class->type()->isHeretic())
-            @include('information.classes.partials.heretic')
-        @endif
+            @if ($class->type()->isHeretic())
+                @include('information.classes.partials.heretic')
+            @endif
 
-        @if ($class->type()->isVampire())
-            @include('information.classes.partials.vampire')
-        @endif
+            @if ($class->type()->isVampire())
+                @include('information.classes.partials.vampire')
+            @endif
 
-        @if ($class->type()->isBlackSmith())
-            @include('information.classes.partials.blacksmith')
-        @endif
+            @if ($class->type()->isBlackSmith())
+                @include('information.classes.partials.blacksmith')
+            @endif
 
-        @if ($class->type()->isArcaneAlchemist())
-            @include('information.classes.partials.arcane-alchemist')
-        @endif
+            @if ($class->type()->isArcaneAlchemist())
+                @include('information.classes.partials.arcane-alchemist')
+            @endif
+
+            @if ($class->type()->isPrisoner())
+                @include('information.classes.partials.prisoner')
+            @endif
+        </div>
     </x-core.cards.card-with-title>
 </div>

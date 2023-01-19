@@ -44,6 +44,16 @@ class ClassesTable extends DataTableComponent
             Column::make('Chr Mod', 'chr_mod')->format(function ($value) { return is_null($value) ? 0 : $value; })->sortable(),
             Column::make('Dur Mod', 'dur_mod')->format(function ($value) { return is_null($value) ? 0 : $value; })->sortable(),
             Column::make('Focus Mod', 'focus_mod')->format(function ($value) { return is_null($value) ? 0 : $value; })->sortable(),
+            Column::make('Is Locked', 'name')->format(function ($value, $row) {
+                $gameClass = GameClass::where('name', $value)->first();
+
+                if (!is_null($gameClass->primary_required_class_id) && !is_null($gameClass->secondary_required_class_id)) {
+                    return 'Yes';
+                }
+
+                return 'No';
+
+            })->html(),
         ];
     }
 }

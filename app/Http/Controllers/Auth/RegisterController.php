@@ -156,9 +156,13 @@ class RegisterController extends Controller {
      * @return View
      */
     public function showRegistrationForm(): View {
+
+
         return view('auth.register', [
             'races'   => GameRace::pluck('name', 'id'),
-            'classes' => GameClass::pluck('name', 'id'),
+            'classes' => GameClass::whereNull('primary_required_class_id')
+                                  ->whereNull('secondary_required_class_id')
+                                  ->pluck('name', 'id'),
         ]);
     }
 }

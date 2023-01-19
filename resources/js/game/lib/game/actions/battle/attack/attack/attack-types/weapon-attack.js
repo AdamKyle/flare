@@ -159,6 +159,7 @@ export default class WeaponAttack extends BattleBase {
     this.monsterHealth = damage.doubleDamage(this.attacker, this.monsterHealth, attackData);
     this.monsterHealth = damage.hammerSmash(this.attacker, this.monsterHealth, attackData);
     this.monsterHealth = damage.alchemistsRavenousDream(this.attacker, this.monsterHealth, attackData)
+    this.monsterHealth = damage.prisonersRage(this.attacker, this.monsterHealth, attackData, attackData.damage_deduction);
     const healthObject = damage.vampireThirstChance(this.attacker, this.monsterHealth, this.characterCurrentHealth, attackData.damage_deduction);
 
     this.monsterHealth          = healthObject.monster_hp;

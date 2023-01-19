@@ -107,7 +107,13 @@
 
                     </x-core.form-wizard.content>
                     <x-core.form-wizard.content target="tab-style-2-5">
+                        <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                        <h3 class="mb-3">Effects</h3>
                         <x-core.forms.select :model="$item" label="Effects (Quest items only):" modelKey="effect" name="effect" :options="$effects" />
+
+                        <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                        <h3 class="mb-3">Class to unlock</h3>
+                        <x-core.forms.key-value-select :model="$item" label="Unlocks Class (Quest items only)" modelKey="unlocks_class_id" name="unlocks_class_id" :options="$classes"/>
 
                         <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                         <h3 class="mb-3">Specialty Type</h3>
