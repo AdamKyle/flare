@@ -127,7 +127,7 @@ export default class CharacterClassSpecialtiesModal extends React.Component<Clas
     }
 
     classOptions() {
-        const classes = ['Please select', 'Equippable', 'Heretic', 'Fighter', 'Vampire', 'Ranger', 'Prophet', 'Thief', 'Blacksmith', 'Arcane Alchemist'];
+        const classes = ['Please select', 'Equippable', 'Heretic', 'Fighter', 'Vampire', 'Ranger', 'Prophet', 'Thief', 'Blacksmith', 'Arcane Alchemist', 'Prisoner'];
 
         return classes.map((className) => {
             return {

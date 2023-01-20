@@ -13,4 +13,8 @@ export default interface ClassRankType {
     is_locked: boolean;
     level: number;
     required_xp: number;
+    primary_class_name: string|null;
+    secondary_class_name: string|null;
+    primary_class_required_level: number|null;
+    secondary_class_required_level: number|null;
 }

@@ -5,6 +5,7 @@ namespace App\Game\ClassRanks\Services;
 use App\Flare\Builders\Character\Traits\FetchEquipped;
 use App\Flare\Handlers\UpdateCharacterAttackTypes;
 use App\Flare\Models\Character;
+use App\Flare\Models\CharacterClassRank;
 use App\Flare\Models\CharacterClassSpecialtiesEquipped;
 use App\Flare\Models\GameClassSpecial;
 use App\Game\ClassRanks\Values\ClassRankValue;
@@ -69,7 +70,7 @@ class ClassRankService {
 
             $classRank->is_active  = $classRank->gameClass->id === $character->game_class_id;
 
-            $classRank->is_locked  = false;
+            $classRank->is_locked  = $this->isClassLocked($character, $classRank);
 
             $classRank->weapon_masteries = $classRank->weaponMasteries->transform(function($weaponMastery) {
 
@@ -77,6 +78,14 @@ class ClassRankService {
 
                 return $weaponMastery;
             });
+
+            $primaryClass   = $classRank->gameClass->primaryClassRequired;
+            $secondaryClass = $classRank->gameClass->secondaryClassRequired;
+
+            $classRank->primary_class_name             = !is_null($primaryClass) ? $primaryClass->name : null;
+            $classRank->secondary_class_name           = !is_null($secondaryClass) ? $secondaryClass->name : null;
+            $classRank->primary_class_required_level   = $classRank->gameClass->primary_required_class_level;
+            $classRank->secondary_class_required_level = $classRank->gameClass->secondary_required_class_level;
 
             return $classRank;
         })->sortByDesc(function($item) {
@@ -284,5 +293,23 @@ class ClassRankService {
                 }
             }
         }
+    }
+
+    protected function isClassLocked(Character $character, CharacterClassRank $classRank): bool {
+        if (!is_null($classRank->gameClass->primary_required_class_id) &&
+            !is_null($classRank->gameClass->secondary_required_class_id)) {
+
+            $primaryRequiredClassId   = $classRank->gameClass->primary_required_class_id;
+            $secondaryRequiredClassId = $classRank->gameClass->secondary_required_class_id;
+
+            $primaryClassRank   = $character->classRanks->where('game_class_id', $primaryRequiredClassId)->first();
+            $secondaryClassRank = $character->classRanks->where('game_class_id', $secondaryRequiredClassId)->first();
+
+
+            return !(($primaryClassRank->level >= $classRank->gameClass->primary_required_class_level) &&
+                   ($secondaryClassRank->level >= $classRank->gameClass->secondary_required_class_level));
+        }
+
+        return false;
     }
 }
