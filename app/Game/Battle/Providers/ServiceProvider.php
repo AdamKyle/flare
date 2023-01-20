@@ -6,6 +6,7 @@ use App\Flare\Services\CharacterXPService;
 use App\Game\Battle\Services\RankFightService;
 use App\Game\ClassRanks\Services\ClassRankService;
 use App\Game\Mercenaries\Services\MercenaryService;
+use App\Game\Skills\Services\DisenchantService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Flare\Builders\BuildMythicItem;
 use App\Flare\Builders\Character\CharacterCacheData;
@@ -59,7 +60,7 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(BattleDrop::class, function($app) {
             return new BattleDrop(
                 $app->make(RandomItemDropBuilder::class),
-                $app->make(MassDisenchantService::class)
+                $app->make(DisenchantService::class)
             );
         });
 

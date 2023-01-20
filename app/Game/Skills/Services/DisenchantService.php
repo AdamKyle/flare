@@ -43,9 +43,9 @@ class DisenchantService {
      * Set up the service.
      *
      * @param Character $character
-     * @return MassDisenchantService
+     * @return DisenchantService
      */
-    public function setUp(Character $character): MassDisenchantService {
+    public function setUp(Character $character): DisenchantService {
         $this->character = $character;
 
         $this->disenchantingSkill = $character->skills->filter(function($skill) {
