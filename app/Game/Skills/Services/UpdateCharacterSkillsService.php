@@ -32,7 +32,7 @@ class UpdateCharacterSkillsService {
     }
 
     /**
-     * Fire off an event to update the character skills.
+     * Fire off an event to update the character training skills.
      *
      * @param Character $character
      * @return void
@@ -43,5 +43,19 @@ class UpdateCharacterSkillsService {
         $trainingSkills = $this->skillService->getSkills($character, $trainableSkillIds);
 
         event(new UpdateCharacterSkills($character->user, $trainingSkills));
+    }
+
+    /**
+     * Fire off an event to update the character crafting skills.
+     *
+     * @param Character $character
+     * @return void
+     */
+    public function updateCharacterCraftingSkills(Character $character): void {
+        $trainableSkillIds = GameSkill::where('can_train', false)->pluck('id')->toArray();
+
+        $craftingSkills = $this->skillService->getSkills($character, $trainableSkillIds);
+
+        event(new UpdateCharacterSkills($character->user, [], $craftingSkills));
     }
 }

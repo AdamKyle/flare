@@ -676,7 +676,7 @@ export default class QueenOfHearts extends React.Component<any, any> {
                     </div>
                 </div>
 
-                <div className={'hidden lg:block lg:text-center md:ml-[-100px] mt-3 mb-3'}>
+                <div className={'text-center lg:ml-[-100px] mt-3 mb-3'}>
 
                     {
                         this.state.initial_action === 'buy-item' ?
@@ -704,7 +704,12 @@ export default class QueenOfHearts extends React.Component<any, any> {
 
                     <DangerButton button_label={'Remove Queen'} on_click={this.props.remove_crafting} disabled={this.state.preforming_action} additional_css={'ml-2'}/>
 
-                    <a href='/information/random-enchants' target='_blank' className='ml-2'>Help <i
+                    <a href='/information/random-enchants' target='_blank' className='hidden lg:block ml-2'>Help <i
+                        className="fas fa-external-link-alt"></i></a>
+                </div>
+
+                <div className='text-center mt-4 block lg:hidden'>
+                    <a href='/information/random-enchants' target='_blank' className='block lg:hidden ml-2'>Help <i
                         className="fas fa-external-link-alt"></i></a>
                 </div>
             </Fragment>

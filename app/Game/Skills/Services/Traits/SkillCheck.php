@@ -14,6 +14,7 @@ trait SkillCheck {
      *
      * @param Skill $skill
      * @param int $dcIncrease | 0
+     * @return int
      */
     public function getDCCheck(Skill $skill, int $dcIncrease = 0): int {
 
@@ -32,9 +33,9 @@ trait SkillCheck {
      * Fetches the characters roll.
      *
      * @param Skill $skill
-     * @return mixed
+     * @return float|int
      */
-    public function characterRoll(Skill $skill) {
+    public function characterRoll(Skill $skill): float|int {
         if ( $skill->skill_bonus >= 1.0) {
             return 401;
         }

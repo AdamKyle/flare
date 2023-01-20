@@ -19,7 +19,8 @@ use App\Game\Core\Services\HolyItemService;
 use App\Game\Core\Services\InventorySetService;
 use App\Game\Core\Services\RandomEnchantmentService;
 use App\Game\Core\Services\UseItemService;
-use App\Game\Skills\Services\DisenchantService;
+use App\Game\Skills\Services\MassDisenchantService;
+use App\Game\Skills\Services\UpdateCharacterSkillsService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
 use App\Game\Core\Comparison\ItemComparison;
@@ -77,6 +78,8 @@ class ServiceProvider extends ApplicationServiceProvider
             return new CharacterInventoryService(
                 $app->make(InventoryTransformer::class),
                 $app->make(UsableItemTransformer::class),
+                $app->make(MassDisenchantService::class),
+                $app->make(UpdateCharacterSkillsService::class),
                 $app->make(Manager::class)
             );
         });

@@ -59,7 +59,14 @@ export default class CharacterSkillsTabs extends React.Component<CharacterSkillT
         this.updateCharacterSkills.listen('Game.Skills.Events.UpdateCharacterSkills', (event: any) => {
 
             let skills             = JSON.parse(JSON.stringify(this.state.skills));
-            skills.training_skills = event.skills;
+
+            if (event.trainingSkills.length > 0) {
+                skills.training_skills = event.trainingSkills;
+            }
+
+            if (event.craftingSkills.length > 0) {
+                skills.crafting_skills = event.craftingSkills;
+            }
 
             this.setState({
                 skills: skills,

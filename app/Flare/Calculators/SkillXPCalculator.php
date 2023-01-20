@@ -10,14 +10,14 @@ class SkillXPCalculator {
     /**
      * Fetches the total skill exp.
      *
-     * Applies equipment, quest item, adventure bonuses and percentage of xp towards, to skill exp which starts at a
-     * a base of 5.
+     * Applies equipment, quest item, adventure bonuses and percentage of xp towards,
+     * to skill exp which starts at a base of 5.
      *
      * @param Skill $skill
      * @param Monster|null $monster
      * @return float|int
      */
-    public function fetchSkillXP(Skill $skill, Monster $monster = null) {
+    public function fetchSkillXP(Skill $skill, Monster $monster = null): float|int {
         $xpTowards      = $this->getXpTowards($skill, $monster);
         $totalBonus     = $skill->skill_training_bonus;
 
@@ -30,7 +30,14 @@ class SkillXPCalculator {
         return $base + $base * $totalBonus;
     }
 
-    protected function getXpTowards(Skill $skill, Monster $monster = null) {
+    /**
+     * Get XP towards.
+     *
+     * @param Skill $skill
+     * @param Monster|null $monster
+     * @return int
+     */
+    protected function getXpTowards(Skill $skill, Monster $monster = null): int {
         if (is_null($monster)) {
              return 0;
         }

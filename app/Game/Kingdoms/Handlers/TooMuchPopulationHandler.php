@@ -65,6 +65,7 @@ class TooMuchPopulationHandler {
         $characterGold   = $this->kingdom->character->gold;
         $goldBars        = $this->kingdom->gold_bars;
 
+
         $cost = $this->takeAmountFromKingdomTreasury($kingdomTreasury, $cost);
 
         if ($cost === 0) {
@@ -96,7 +97,6 @@ class TooMuchPopulationHandler {
     protected function getTheCostOfTooMuchPopulation(): int {
         $currentPop = $this->kingdom->current_population;
         $maxPop     = $this->kingdom->max_population;
-
         $currentPop = $currentPop - $maxPop;
 
         return $currentPop * 10000;
@@ -129,10 +129,14 @@ class TooMuchPopulationHandler {
 
             $this->kingdom = $this->kingdom->refresh();
 
-            return $kingdomTreasury - $cost;
+            if ($kingdomTreasury <= 0) {
+                return $cost;
+            }
+
+            return $cost - $kingdomTreasury;
         }
 
-        $newTreasury = $kingdomTreasury - $cost;
+        $newTreasury = $cost - $kingdomTreasury;
 
         $this->kingdom->update([
             'treasury' => $newTreasury

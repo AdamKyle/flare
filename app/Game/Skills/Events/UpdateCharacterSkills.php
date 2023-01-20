@@ -17,7 +17,9 @@ class UpdateCharacterSkills implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public array $skills;
+    public array $trainingSkills;
+
+    public array $craftingSkills;
 
     /**
      * @var User $user
@@ -26,11 +28,13 @@ class UpdateCharacterSkills implements ShouldBroadcastNow
 
     /**
      * @param User $user
-     * @param array $skills
+     * @param array $trainingSkills
+     * @param array $craftingSkills
      */
-    public function __construct(User $user, array $skills) {
-        $this->user   = $user;
-        $this->skills = $skills;
+    public function __construct(User $user, array $trainingSkills = [], array $craftingSkills = []) {
+        $this->user           = $user;
+        $this->trainingSkills = $trainingSkills;
+        $this->craftingSkills = $craftingSkills;
     }
 
     /**

@@ -3,9 +3,11 @@
 namespace App\Game\Core\Services;
 
 use App\Flare\Transformers\UsableItemTransformer;
-use App\Game\Skills\Jobs\DisenchantItem;
+use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Skills\Services\MassDisenchantService;
+use App\Game\Skills\Services\UpdateCharacterSkillsService;
 use League\Fractal\Resource\Collection as LeagueCollection;
-use League\Fractal\Resource\Item as LeagueItem;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\SetSlot;
 use App\Flare\Transformers\InventoryTransformer;
@@ -18,6 +20,8 @@ use App\Flare\Models\Item;
 use League\Fractal\Manager;
 
 class CharacterInventoryService {
+
+    use ResponseBuilder;
 
     /**
      * @var Character $character
@@ -55,14 +59,39 @@ class CharacterInventoryService {
     private UsableItemTransformer $usableItemTransformer;
 
     /**
+     * @var MassDisenchantService $massDisenchantService
+     */
+    private MassDisenchantService $massDisenchantService;
+
+    /**
+     * @var UpdateCharacterSkillsService $updateCharacterSkillsService
+     */
+    private UpdateCharacterSkillsService $updateCharacterSkillsService;
+
+    /**
      * @var Manager $manager
      */
-    private $manager;
+    private Manager $manager;
 
-    public function __construct(InventoryTransformer $inventoryTransformer, UsableItemTransformer $usableItemTransformer,  Manager $manager) {
-        $this->inventoryTransformer  = $inventoryTransformer;
-        $this->usableItemTransformer = $usableItemTransformer;
-        $this->manager               = $manager;
+    /**
+     * @param InventoryTransformer $inventoryTransformer
+     * @param UsableItemTransformer $usableItemTransformer
+     * @param MassDisenchantService $massDisenchantService
+     * @param UpdateCharacterSkillsService $updateCharacterSkillsService
+     * @param Manager $manager
+     */
+    public function __construct(InventoryTransformer  $inventoryTransformer,
+                                UsableItemTransformer $usableItemTransformer,
+                                MassDisenchantService $massDisenchantService,
+                                UpdateCharacterSkillsService $updateCharacterSkillsService,
+                                Manager               $manager,
+
+    ) {
+        $this->inventoryTransformer         = $inventoryTransformer;
+        $this->usableItemTransformer        = $usableItemTransformer;
+        $this->massDisenchantService        = $massDisenchantService;
+        $this->updateCharacterSkillsService = $updateCharacterSkillsService;
+        $this->manager                      = $manager;
     }
 
     /**
@@ -175,22 +204,33 @@ class CharacterInventoryService {
      *
      * @param Collection $slots
      * @param Character $character
-     * @return void
+     * @return array
      */
-    public function disenchantAllItems(Collection $slots, Character $character) {
-        $jobs = [];
+    public function disenchantAllItems(Collection $slots, Character $character): array {
 
-        foreach ($slots as $index => $slot) {
-            if ($index !== 0) {
-                if ($index === ($slots->count() - 1)) {
-                    $jobs[] = new DisenchantItem($character, $slot->id, true);
-                } else {
-                    $jobs[] = new DisenchantItem($character, $slot->id);
-                }
-            }
+        $maxedOutGoldDust = $character->gold_dust >= MaxCurrenciesValue::MAX_GOLD_DUST;
+
+        $this->massDisenchantService->setUp($character)->disenchantItems($slots);
+
+        $totalDisenchantingLevels = $this->massDisenchantService->getDisenchantingTimesLeveled();
+        $totalEnchantingLevels    = $this->massDisenchantService->getEnchantingTimesLeveled();
+        $totalGoldDust            = $this->massDisenchantService->getTotalGoldDust();
+
+        $this->updateCharacterSkillsService->updateCharacterCraftingSkills($character->refresh());
+
+        $message = 'Disenchanted all items and gained: ' . ($maxedOutGoldDust ? 0 . ' (You are capped ) ' :  number_format($totalGoldDust)) . ' Gold Dust (with gold dust rushes)';
+
+        if ($totalDisenchantingLevels > 0) {
+            $message .= ' You also gained: ' . $totalDisenchantingLevels . ' Skill Levels in Disenchanting.';
         }
 
-        DisenchantItem::withChain($jobs)->onConnection('disenchanting')->dispatch($character, $slots->first()->id);
+        if ($totalEnchantingLevels > 0) {
+            $message .= ' You also gained: ' . $totalEnchantingLevels . ' Skill Levels in Enchanting.';
+        }
+
+        return $this->successResult([
+            'message' => $message
+        ]);
     }
 
     /**

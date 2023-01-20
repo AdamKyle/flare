@@ -2,21 +2,15 @@
 
 namespace App\Game\Messages\Jobs;
 
-use App\Game\Core\Events\UpdateTopBarEvent;
-use App\Flare\Models\Character;
-use App\Flare\Models\InventorySlot;
-use App\Flare\Models\Npc;
-use App\Flare\Models\User;
-use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
-use App\Game\Messages\Events\ServerMessageEvent;
-use App\Game\Messages\Handlers\NpcCommandHandler;
-use App\Game\Skills\Services\DisenchantService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Cache;
+use App\Flare\Models\Character;
+use App\Flare\Models\Npc;
+use App\Flare\Models\User;
+use App\Game\Messages\Handlers\NpcCommandHandler;
 
 class ProcessNPCCommands implements ShouldQueue
 {
