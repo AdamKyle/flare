@@ -32,6 +32,32 @@ class ManageClassServiceTest extends TestCase {
         $this->manageClassService = null;
     }
 
+    public function testCannotSwitchToClassThatIsLocked() {
+        $heretic     = $this->createClass([
+            'name' => 'Heretic',
+        ]);
+
+        $thief       = $this->createClass([
+            'name' => 'Thief',
+        ]);
+
+        $prisonerClass = $this->createClass([
+            'name'                            => 'Prisoner',
+            'primary_required_class_id'       => $heretic->id,
+            'secondary_required_class_id'     => $thief->id,
+            'primary_required_class_level'    => 10,
+            'secondary_required_class_level'  => 20,
+        ]);
+
+        $character = $this->character->addAdditionalClassRanks([$heretic->id, $thief->id, $prisonerClass->id])
+                                     ->getCharacter();
+
+        $response = $this->manageClassService->switchClass($character, $prisonerClass);
+
+        $this->assertEquals(422, $response['status']);
+        $this->assertEquals('This class is locked. You must level this classes required classes to the specified levels.', $response['message']);
+    }
+
     public function testSwitchCharacterClass() {
         $character = $this->character->getCharacter();
         $skill     = $this->createGameSkill(['name' => 'Class Skill', 'game_class_id' => $character->game_class_id]);
