@@ -105,6 +105,13 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::post('/admin/race/store', ['as' => 'races.store', 'uses' => 'RacesController@store']);
 
     Route::get('/admin/races', ['as' => 'races.list', 'uses' => 'RacesController@index']);
+
+    Route::get('/adamin/races/export-races', ['as' => 'races.export-view', 'uses' => 'RacesController@exportRaces']);
+    Route::get('/adamin/races/import-races', ['as' => 'races.import-view', 'uses' => 'RacesController@importRaces']);
+
+    Route::post('/adamin/races/export', ['as' => 'races.export', 'uses' => 'RacesController@export']);
+    Route::post('/adamin/races/import', ['as' => 'races.import', 'uses' => 'RacesController@import']);
+
     Route::get('/admin/races/create', ['as' => 'races.create', 'uses' => 'RacesController@create']);
     Route::get('/admin/races/{race}', ['as' => 'races.race', 'uses' => 'RacesController@show']);
     Route::get('/admin/races/{race}/edit', ['as' => 'races.edit', 'uses' => 'RacesController@edit']);

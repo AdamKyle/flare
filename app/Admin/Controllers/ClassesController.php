@@ -2,10 +2,10 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Exports\Classes\ClassesExport;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Controllers\Controller;
-use App\Admin\Exports\Classes\ClassesExport;
 use App\Admin\Import\Classes\ClassImport;
 use App\Admin\Requests\ClassesImport;
 use App\Game\Core\Values\View\ClassBonusInformation;
