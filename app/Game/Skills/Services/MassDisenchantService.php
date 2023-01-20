@@ -225,8 +225,6 @@ class MassDisenchantService {
             'xp'                 => 0,
         ]);
 
-        event(new SkillLeveledUpServerMessageEvent($this->character->user, $skill->refresh()));
-
         $this->{$leveledType} += 1;
     }
 
