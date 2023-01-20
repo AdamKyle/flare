@@ -416,6 +416,24 @@ class ClassRanksServiceTest extends TestCase {
         }
     }
 
+    public function testDoNotGiveXPToMasteriesWhenNoInventory() {
+        $character = $this->character->equipStartingEquipment()->getCharacter();
+
+        $character->inventory->slots()->update(['equipped' => false]);
+
+        $character = $character->refresh();
+
+        $this->classRankService->giveXpToMasteries($character);
+
+        $character = $character->refresh();
+
+        foreach ($character->classRanks as $rank) {
+            foreach ($rank->weaponMasteries as $mastery) {
+                $this->assertEquals(0, $mastery->current_xp);
+            }
+        }
+    }
+
     public function testLevelWeaponSpeacitly() {
         $character = $this->character->equipStartingEquipment()->getCharacter();
 
