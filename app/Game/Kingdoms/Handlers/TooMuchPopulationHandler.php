@@ -136,7 +136,7 @@ class TooMuchPopulationHandler {
             return $cost - $kingdomTreasury;
         }
 
-        $newTreasury = $cost - $kingdomTreasury;
+        $newTreasury = $kingdomTreasury - $cost;
 
         $this->kingdom->update([
             'treasury' => $newTreasury
