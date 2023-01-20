@@ -10,6 +10,7 @@ use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\DoubleAttack;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\DoubleCast;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\DoubleHeal;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\HammerSmash;
+use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\PrisonerRage;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\ThiefBackStab;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\TripleAttack;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\VampireThirst;
@@ -65,8 +66,12 @@ class SpecialAttacks extends BattleMessages {
             return $this->vampireThirst($character, $attackData, $isPvp);
         }
 
-        if ($isPvp && $character->classType()->isThief()) {
+        if ($character->classType()->isThief()) {
             return $this->thiefBackStab($character, $attackData);
+        }
+
+        if ($character->classType()->isPrisoner()) {
+             return $this->prisonersRage($character, $attackData);
         }
     }
 
@@ -114,6 +119,14 @@ class SpecialAttacks extends BattleMessages {
         $thievesBackStab->clearMessages();
     }
 
+    /**
+     * Do hammer smash attack.
+     *
+     * @param Character $character
+     * @param array $attackData
+     * @param bool $isPvp
+     * @return void
+     */
     public function hammerSmash(Character $character, array $attackData, bool $isPvp = false) {
         $hammerSmash = resolve(HammerSmash::class);
 
@@ -134,6 +147,14 @@ class SpecialAttacks extends BattleMessages {
         $hammerSmash->clearMessages();
     }
 
+    /**
+     * Do alchemists ravenous rage attack.
+     *
+     * @param Character $character
+     * @param array $attackData
+     * @param bool $isPvp
+     * @return void
+     */
     public function alchemistsRavenousRage(Character $character, array $attackData, bool $isPvp = false) {
         $alchemistsRavenousDream = resolve(AlchemistsRavenousDream::class);
 
@@ -154,6 +175,14 @@ class SpecialAttacks extends BattleMessages {
         $alchemistsRavenousDream->clearMessages();
     }
 
+    /**
+     * Do tripple attack.
+     *
+     * @param Character $character
+     * @param array $attackData
+     * @param $isPvp
+     * @return void
+     */
     public function tripleAttack(Character $character, array $attackData, $isPvp = false) {
         $tripleAttack = resolve(TripleAttack::class);
 
@@ -174,6 +203,14 @@ class SpecialAttacks extends BattleMessages {
         $tripleAttack->clearMessages();
     }
 
+    /**
+     * Double damage.
+     *
+     * @param Character $character
+     * @param array $attackData
+     * @param bool $isPvp
+     * @return void
+     */
     public function doubleDamage(Character $character, array $attackData, bool $isPvp = false) {
         $doubleAttack = resolve(DoubleAttack::class);
 
@@ -194,6 +231,14 @@ class SpecialAttacks extends BattleMessages {
         $doubleAttack->clearMessages();
     }
 
+    /**
+     * Double cast.
+     *
+     * @param Character $character
+     * @param array $attackData
+     * @param bool $isPvp
+     * @return void
+     */
     public function doubleCast(Character $character, array $attackData, bool $isPvp = false) {
         $doubleCast = resolve(DoubleCast::class);
 
@@ -214,6 +259,14 @@ class SpecialAttacks extends BattleMessages {
         $doubleCast->clearMessages();
     }
 
+    /**
+     * Double heal.
+     *
+     * @param Character $character
+     * @param array $attackData
+     * @param bool $isPvp
+     * @return void
+     */
     public function doubleHeal(Character $character, array $attackData, bool $isPvp = false) {
         $doubleCast = resolve(DoubleHeal::class);
 
@@ -231,6 +284,14 @@ class SpecialAttacks extends BattleMessages {
         $doubleCast->clearMessages();
     }
 
+    /**
+     * Vampire thirst attack.
+     *
+     * @param Character $character
+     * @param array $attackData
+     * @param bool $isPvp
+     * @return void
+     */
     public function vampireThirst(Character $character, array $attackData, bool $isPvp = false) {
         $thirst = resolve(VampireThirst::class);
 
@@ -244,6 +305,29 @@ class SpecialAttacks extends BattleMessages {
         $this->monsterHealth   = $thirst->getMonsterHealth();
 
         $thirst->clearMessages();
+    }
+
+    /**
+     * Prisoners rage attack.
+     *
+     * @param Character $character
+     * @param array $attackData
+     * @param bool $isPvp
+     * @return void
+     */
+    public function prisonersRage(Character $character, array $attackData, bool $isPvp = false) {
+        $prisonersRage = resolve(PrisonerRage::class);
+
+        $prisonersRage->setCharacterHealth($this->characterHealth);
+        $prisonersRage->setMonsterHealth($this->monsterHealth);
+        $prisonersRage->handleAttack($character, $attackData, $isPvp);
+
+        $this->mergeMessages($prisonersRage->getMessages());
+
+        $this->characterHealth = $prisonersRage->getCharacterHealth();
+        $this->monsterHealth   = $prisonersRage->getMonsterHealth();
+
+        $prisonersRage->clearMessages();
     }
 
 }

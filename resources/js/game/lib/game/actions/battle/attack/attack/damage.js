@@ -467,7 +467,7 @@ export default class Damage extends BattleBase {
 
       if (damageDeduction > 0.0) {
         this.addMessage('The Plane weakens your ability to do full damage!', 'enemy-action');
-        damageToDo = damageDeduction - (damageToDo * damageDeduction);
+        damageToDo = damageToDo - (damageToDo * damageDeduction);
       }
 
       const times = Math.random(1, 4);
