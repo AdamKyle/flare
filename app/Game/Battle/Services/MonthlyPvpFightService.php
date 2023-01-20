@@ -206,10 +206,6 @@ class MonthlyPvpFightService {
      * @return void
      */
     protected function repeatFight(MonthlyPvpParticipant $attacker, MonthlyPvpParticipant $defender) {
-        if ($this->counter >= 10) {
-            // dump('Counter hit: ' . $this->counter);
-        }
-
         $result = $this->pvpService->attack($attacker->character, $defender->character, $attacker->attack_type, true, true);
 
         $this->handleResult($defender, $attacker, $result);
