@@ -31,4 +31,5 @@ export default interface ClassSpecialtiesState {
     selected_filter: string | null;
 
     show_equipped: boolean,
+
 }

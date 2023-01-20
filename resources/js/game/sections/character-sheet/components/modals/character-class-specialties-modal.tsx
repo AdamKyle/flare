@@ -339,12 +339,22 @@ export default class CharacterClassSpecialtiesModal extends React.Component<Clas
                                 <dt>% Of Damage Stat Used:</dt>
                                 <dd>{this.renderPercent(this.state.special_selected.specialty_damage_uses_damage_stat_amount)}%</dd>
                             </dl>
+                            <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                            <h3 className="my-4">Evasion Bonus</h3>
+                            <p>
+                                This will be applied to your spell evasion, which comes primarily from rings.
+                            </p>
+                            <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                            <dl className="mb-4">
+                                <dt>Spell Evasion</dt>
+                                <dd>{this.renderPercent(this.state.special_selected.spell_evasion)}%</dd>
+                            </dl>
                         </div>
                         <div className='lg:hidden block border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                         <div>
                             <h3>Modifier Information</h3>
                             <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
-                            <dl>
+                            <dl className='mb-4'>
                                 <dt>Base Damage Modifier:</dt>
                                 <dd>{this.renderPercent(this.state.special_selected.base_damage_mod)}%</dd>
                                 <dt>Base AC Modifier:</dt>
@@ -357,6 +367,18 @@ export default class CharacterClassSpecialtiesModal extends React.Component<Clas
                                 <dd>{this.renderPercent(this.state.special_selected.health_mod)}%</dd>
                                 <dt>Base Damage Stat Modifier:</dt>
                                 <dd>{this.renderPercent(this.state.special_selected.base_damage_stat_increase)}%</dd>
+                            </dl>
+                            <h3>Reductions</h3>
+                            <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                            <dl>
+                                <dt>Affix Damage Reduction</dt>
+                                <dd>{this.renderPercent(this.state.special_selected.affix_damage_reduction)}%</dd>
+                                <dt>Healing Reduction</dt>
+                                <dd>{this.renderPercent(this.state.special_selected.healing_reduction)}%</dd>
+                                <dt>Skill Reduction</dt>
+                                <dd>{this.renderPercent(this.state.special_selected.skill_reduction)}%</dd>
+                                <dt>Resistance Reduction</dt>
+                                <dd>{this.renderPercent(this.state.special_selected.resistance_reduction)}%</dd>
                             </dl>
                         </div>
                     </div>

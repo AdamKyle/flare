@@ -31,4 +31,14 @@ export default interface ClassSpecialtiesType {
     attack_type_required: string;
 
     class_name: string;
+
+    spell_evasion: number;
+
+    affix_damage_reduction: number;
+
+    healing_reduction: number;
+
+    skill_reduction: number;
+
+    resistance_reduction: number;
 }

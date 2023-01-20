@@ -76,8 +76,6 @@
                     <h3>Reductions</h3>
                     <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                     <dl>
-                        <dt>Spell Evasion</dt>
-                        <dd>{{$classSpecial->spell_evasion * 100}}%</dd>
                         <dt>Affix Damage Reduction</dt>
                         <dd>{{$classSpecial->affix_damage_reduction * 100}}%</dd>
                         <dt>Healing Reduction</dt>
