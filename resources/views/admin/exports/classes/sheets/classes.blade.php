@@ -40,8 +40,8 @@
             <td>{{$gameClass->dodge_mod}}</td>
             <td>{{$gameClass->defense_mod}}</td>
             <td>{{$gameClass->looting_mod}}</td>
-            <td>{{$gameClass->primaryClassRequired->name}}</td>
-            <td>{{$gameClass->secondaryClassRequired->name}}</td>
+            <td>{{!is_null($gameClass->primaryClassRequired) ? $gameClass->primaryClassRequired->name : ''}}</td>
+            <td>{{!is_null($gameClass->secondaryClassRequired) ? $gameClass->secondaryClassRequired->name : ''}}</td>
             <td>{{$gameClass->primary_required_class_level}}</td>
             <td>{{$gameClass->secondary_required_class_level}}</td>
         </tr>
