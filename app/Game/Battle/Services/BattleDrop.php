@@ -2,6 +2,7 @@
 
 namespace App\Game\Battle\Services;
 
+use App\Game\Skills\Services\DisenchantService;
 use Illuminate\Support\Facades\Cache;
 use Facades\App\Flare\RandomNumber\RandomNumberGenerator;
 use App\Flare\Builders\RandomItemDropBuilder;
@@ -10,11 +11,9 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
-use App\Flare\Values\MapNameValue;
 use App\Flare\Values\AutomationType;
 use App\Game\Core\Traits\CanHaveQuestItem;
 use App\Game\Messages\Events\GlobalMessageEvent;
-use App\Game\Skills\Services\DisenchantService;
 use Facades\App\Flare\Calculators\DropCheckCalculator;
 use Facades\App\Flare\Calculators\SellItemCalculator;
 use App\Game\Messages\Events\ServerMessageEvent as GameServerMessage;
@@ -315,7 +314,7 @@ class BattleDrop {
         $user = $character->user;
 
         if ($user->auto_disenchant_amount === 'all') {
-            $this->disenchantService->disenchantItemWithSkill($character->refresh());
+            $this->disenchantService->setUp($character->refresh())->disenchantItemWithSkill();
 
             return;
         }
@@ -326,7 +325,7 @@ class BattleDrop {
             if ($cost >= 1000000000) {
                 $this->giveItemToPlayer($character, $item);
             } else {
-                $this->disenchantService->disenchantItemWithSkill($character->refresh());
+                $this->disenchantService->setUp($character->refresh())->disenchantItemWithSkill();
             }
         }
     }

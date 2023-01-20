@@ -9,24 +9,27 @@ use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Services\CharacterInventoryService;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Skills\Services\DisenchantService;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Item;
-use App\Game\Skills\Services\DisenchantService;
-use Illuminate\Support\Facades\Cache;
 
 class DisenchantingController extends Controller {
 
     /**
      * @var DisenchantService $disenchantingService
      */
-    private $disenchantingService;
+    private DisenchantService $disenchantingService;
 
-    private $characterInventoryService;
+    /**
+     * @var CharacterInventoryService $characterInventoryService
+     */
+    private CharacterInventoryService $characterInventoryService;
 
     /**
      * Constructor
      *
      * @param DisenchantService $disenchantService
+     * @param CharacterInventoryService $characterInventoryService
      */
     public function __construct(DisenchantService $disenchantService, CharacterInventoryService $characterInventoryService) {
         $this->disenchantingService      = $disenchantService;
@@ -56,7 +59,7 @@ class DisenchantingController extends Controller {
                 return response()->json([], 200);
             }
 
-            $this->disenchantingService->disenchantWithSkill($character, $foundItem);
+            $this->disenchantingService->setUp($character)->disenchantWithSkill($foundItem);
 
             event(new UpdateTopBarEvent($character->refresh()));
         }

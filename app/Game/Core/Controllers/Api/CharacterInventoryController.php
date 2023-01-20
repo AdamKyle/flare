@@ -181,12 +181,11 @@ class  CharacterInventoryController extends Controller {
 
         if ($slots->isNotEmpty()) {
 
-            $this->characterInventoryService->disenchantAllItems($slots, $character);
+            $response = $this->characterInventoryService->disenchantAllItems($slots, $character);
 
-            return response()->json(['message' => 'You can freely move about.
-                Your inventory will update as items disenchant. Check chat to see
-                the total gold dust earned.'
-            ]);
+            unset($response['status']);
+
+            return response()->json($response);
         }
 
         return response()->json(['message' => 'You have nothing to disenchant.']);

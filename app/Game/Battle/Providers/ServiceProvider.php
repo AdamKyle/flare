@@ -25,7 +25,7 @@ use App\Game\Battle\Services\MonthlyPvpService;
 use App\Game\Battle\Services\PvpService;
 use App\Game\Core\Services\GoldRush;
 use App\Game\Maps\Values\MapTileValue;
-use App\Game\Skills\Services\DisenchantService;
+use App\Game\Skills\Services\MassDisenchantService;
 use App\Game\Battle\Services\ConjureService;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
 use App\Game\GuideQuests\Services\GuideQuestService;
@@ -59,7 +59,7 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(BattleDrop::class, function($app) {
             return new BattleDrop(
                 $app->make(RandomItemDropBuilder::class),
-                $app->make(DisenchantService::class)
+                $app->make(MassDisenchantService::class)
             );
         });
 

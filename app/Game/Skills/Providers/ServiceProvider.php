@@ -10,7 +10,7 @@ use App\Game\Core\Services\CharacterInventoryService;
 use App\Game\Core\Services\RandomEnchantmentService;
 use App\Game\Skills\Services\AlchemyService;
 use App\Game\Skills\Services\CraftingService;
-use App\Game\Skills\Services\DisenchantService;
+use App\Game\Skills\Services\MassDisenchantService;
 use App\Game\Skills\Services\EnchantingService;
 use App\Game\Skills\Services\EnchantItemService;
 use App\Game\Skills\Services\SkillService;
@@ -47,8 +47,8 @@ class ServiceProvider extends ApplicationServiceProvider
             return new AlchemyService;
         });
 
-        $this->app->bind(DisenchantService::class, function() {
-            return new DisenchantService();
+        $this->app->bind(MassDisenchantService::class, function() {
+            return new MassDisenchantService();
         });
 
         $this->app->bind(SkillService::class, function($app) {
