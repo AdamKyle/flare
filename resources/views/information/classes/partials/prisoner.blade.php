@@ -30,6 +30,6 @@
 </p>
 <p class="mb-4">
     Prisoner's <a href="/information/class-ranks">class specials</a> focus mostly on reducing enemy stats and
-    resistances via what are called diseases and will be applied at the start of the battle.
+    resistances as well as increasing your spell evasion.
 </p>
 
