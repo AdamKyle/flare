@@ -1,4 +1,5 @@
 <p class="mb-3 mt-3">{{$unit->description}}</p>
+
 @if (!is_null($building))
     @guest
         <p class="mt-4 mb-4"><strong>Can be recruited from: <a href="{{route('game.buildings.building', [

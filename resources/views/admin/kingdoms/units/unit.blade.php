@@ -5,9 +5,22 @@
         @php
             $backUrl = route('units.list');
 
-            if (!auth()->user()->hasRole('Admin')) {
-                $backUrl = '/information/kingdom-units';
+            if (is_null(auth()->user())) {
+                $backUrl = '/information/kingdoms';
             }
+
+            if (!is_null(auth()->user())) {
+                if (!auth()->user()->hasRole('Admin')) {
+                    $backUrl = '/information/kingdoms';
+                }
+
+                if (auth()->user()->hasRole('Admin')) {
+                    $backUrl = '/admin/kingdoms/units';
+                }
+            }
+
+
+
         @endphp
         {{-- Spacer div. --}}
         <div class="pb-10"></div>

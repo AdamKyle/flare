@@ -3,11 +3,13 @@
         $backUrl = route('buildings.list');
 
         if (is_null(auth()->user())) {
-            $backUrl = '/information/kingdom-buildings';
+            $backUrl = '/information/kingdoms';
         }
 
-        if (!auth()->user()->hasRole('Admin')) {
-            $backUrl = '/information/kingdom-buildings';
+        if (!is_null(auth()->user())) {
+            if (!auth()->user()->hasRole('Admin')) {
+                $backUrl = '/information/kingdoms';
+            }
         }
     @endphp
 

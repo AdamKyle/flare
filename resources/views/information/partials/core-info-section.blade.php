@@ -2,7 +2,8 @@
     <x-core.page-title
         title="{{$pageTitle}}"
         route="{{url()->previous()}}"
-        color="success" link="Back"
+        color="success"
+        link="Back"
     >
         @auth
             @if (auth()->user()->hasRole('Admin'))
