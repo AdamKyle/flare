@@ -3,6 +3,7 @@ import Dialogue from "../../../../../components/ui/dialogue/dialogue";
 import {AxiosError, AxiosResponse} from "axios";
 import Ajax from "../../../../../lib/ajax/ajax";
 import LoadingProgressBar from "../../../../../components/ui/progress-bars/loading-progress-bar";
+import DangerAlert from "../../../../../components/ui/alerts/simple-alerts/danger-alert";
 
 export default class TrainPassive extends React.Component<any, any> {
 
@@ -11,6 +12,7 @@ export default class TrainPassive extends React.Component<any, any> {
 
         this.state = {
             loading: false,
+            error_message: '',
         }
     }
 
@@ -27,7 +29,15 @@ export default class TrainPassive extends React.Component<any, any> {
                         this.props.manage_modal();
                     })
             }, (error: AxiosError) => {
+                this.setState({loading: false});
 
+                if (typeof error.response !== 'undefined') {
+                    const response = error.response;
+
+                    this.setState({
+                        error_message: response.data.message,
+                    });
+                }
             });
         });
 
@@ -124,6 +134,14 @@ export default class TrainPassive extends React.Component<any, any> {
                 {
                     this.state.loading ?
                         <LoadingProgressBar />
+                    : null
+                }
+
+                {
+                    this.state.error_message !== '' ?
+                        <DangerAlert additional_css={'mt-4'}>
+                            {this.state.error_message}
+                        </DangerAlert>
                     : null
                 }
             </Dialogue>
