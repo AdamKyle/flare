@@ -327,6 +327,11 @@ class CharacterStatBuilder {
         if (is_null($this->equippedItems)) {
 
             if ($type === 'weapon') {
+
+                if ($this->character->classType()->isAlcoholic()) {
+                    return $stat;
+                }
+
                 $value = $stat / 2;
 
                 return $value < 5 ? 5 : $value;

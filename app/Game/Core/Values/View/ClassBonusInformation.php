@@ -93,6 +93,12 @@ class ClassBonusInformation {
             $details['description'] = 'With a weapon (or two) equipped you have a chance to rage out at the enemy for 15% of your strength 1-4 times';
         }
 
+        if ($classAttackValue->isAlcoholic()) {
+            $details['type'] = Str::ucfirst(ClassAttackValue::ALCOHOLIC_PUKE);
+            $details['requires'] = 'No Weapons';
+            $details['description'] = 'with no weapons, you have a chance to do two different attacks, based on your class bonus: Deathly puke, a small chance to kill the enemy instantly (or 15% of your damage stat) OR, Bloody puke: deals damage (30% your health)) to you and them.';
+        }
+
         return $details;
     }
 }

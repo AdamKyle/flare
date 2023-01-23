@@ -21,7 +21,7 @@
     >
         <div class="flex flex-wrap -mx-2 mb-8">
             <div class="w-full md:w-1/2 px-2 mb-4">
-                <dl>
+                <dl class="mb-4">
                     <dt>Strength Mofidfier</dt>
                     <dd>+ {{$class->str_mod > 0 ? $class->str_mod : 0}} pts.</dd>
                     <dt>Durability Modifier</dt>
@@ -44,6 +44,20 @@
                     <dd>+ {{$class->looting_mod * 100}} %</dd>
                     <dt>Defense Modifier</dt>
                     <dd>+ {{$class->defense_mod * 100}} %</dd>
+                </dl>
+                <div class='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3'></div>
+                <p class="my-2">
+                    Damage Stat refers to the primary stat which your damage will come from.
+                </p>
+                <p class="my-2">
+                    To Hit Stat refers to the stat in which is used in conjunction with your
+                    accuracy and casting accuracy to determine if you can hit or if your damage spell hits.
+                </p>
+                <dl class="my-4">
+                    <dt>Damage Stat</dt>
+                    <dd>{{$class->damage_stat}}</dd>
+                    <dt>To Hit Stat</dt>
+                    <dd>{{$class->to_hit_stat}}</dd>
                 </dl>
             </div>
             <div class="w-full md:w-1/2 px-2 mb-4">
@@ -108,6 +122,10 @@
 
             @if ($class->type()->isPrisoner())
                 @include('information.classes.partials.prisoner')
+            @endif
+
+            @if ($class->type()->isAlcoholic())
+                @include('information.classes.partials.alcoholic')
             @endif
         </div>
     </x-core.cards.card-with-title>

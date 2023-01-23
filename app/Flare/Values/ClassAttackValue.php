@@ -21,6 +21,7 @@ class ClassAttackValue {
     const BLACKSMITHS_HAMMER_SMASH = 'hammer smash';
     const ARCANE_ALCHEMISTS_DREAMS = 'alchemists ravenous dream';
     const PRISONER_RAGE            = 'prisoner rage';
+    const ALCOHOLIC_PUKE           = 'alcoholic puke';
 
     private CharacterClassValue $classType;
 
@@ -98,6 +99,12 @@ class ClassAttackValue {
             return $this->chance;
         }
 
+        if ($this->classType->isAlcoholic()) {
+            $this->buildAlcoholicsChance();
+
+            return $this->chance;
+        }
+
         return $this->chance;
     }
 
@@ -170,6 +177,14 @@ class ClassAttackValue {
         $this->chance['only'] = 'weapon';
         $this->chance['class_name'] = 'Prisoner';
         $this->chance['has_item'] = $this->hasItemTypeEquipped('weapon');
+        $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
+    }
+
+    public function buildAlcoholicsChance() {
+        $this->chance['type'] = self::ALCOHOLIC_PUKE;
+        $this->chance['only'] = 'No weapon equipped';
+        $this->chance['class_name'] = 'Alcoholic';
+        $this->chance['has_item'] = !$this->hasItemTypeEquipped('weapon');
         $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
     }
 

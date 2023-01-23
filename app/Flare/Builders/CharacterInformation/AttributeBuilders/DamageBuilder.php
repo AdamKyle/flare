@@ -40,6 +40,7 @@ class DamageBuilder extends BaseAttribute {
      * @param bool $voided
      * @param string $position
      * @return float
+     * @throws \Exception
      */
     public function buildWeaponDamage(float $damageStat, bool $voided = false, string $position = 'both'): float {
         $class      = $this->character->class;
@@ -62,7 +63,13 @@ class DamageBuilder extends BaseAttribute {
         $affixPercentage         = $this->getAttributeBonusFromAllItemAffixes('base_damage');
         $weaponMasteryPercentage = $this->classRanksWeaponMasteriesBuilder->determineBonusForWeapon($position);
 
-        return $totalDamage + $totalDamage * ($skillPercentage + $affixPercentage + $weaponMasteryPercentage);
+        $damage = $totalDamage + $totalDamage * ($skillPercentage + $affixPercentage + $weaponMasteryPercentage);
+
+        if ($this->character->classType()->isAlcoholic()) {
+            return $damage - ($damage * 0.25);
+        }
+
+        return $damage;
     }
 
     /**
@@ -109,6 +116,12 @@ class DamageBuilder extends BaseAttribute {
         $affixPercentage = $this->getAttributeBonusFromAllItemAffixes('base_damage');
 
         $spellMasteryPercentage = $this->classRanksWeaponMasteriesBuilder->determineBonusForSpellDamage($position);
+
+        $damage = $totalDamage + $totalDamage * ($skillPercentage + $affixPercentage + $spellMasteryPercentage);
+
+        if ($this->character->classType()->isAlcoholic()) {
+            return $damage - ($damage * 0.50);
+        }
 
         return $totalDamage + $totalDamage * ($skillPercentage + $affixPercentage + $spellMasteryPercentage);
     }

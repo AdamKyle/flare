@@ -13,7 +13,12 @@ class CharacterClassValue {
     const BLACKSMITH       = 'Blacksmith';
     const ARCANE_ALCHEMIST = 'Arcane Alchemist';
 
+    // These are special classes that require you to unlock them
+    // via the class rank's system:
+
     const PRISONER         = 'Prisoner';
+    const ALCOHOLIC        = 'Alcoholic';
+
 
     /**
      * @var string $value
@@ -32,7 +37,8 @@ class CharacterClassValue {
         self::VAMPIRE          => 'Vampire',
         self::BLACKSMITH       => 'Blacksmith',
         self::ARCANE_ALCHEMIST => 'Arcane Alchemist',
-        self::PRISONER         => 'Prisoner'
+        self::PRISONER         => 'Prisoner',
+        self::ALCOHOLIC        => 'Alcoholic',
     ];
 
     protected $nonCaster = [
@@ -42,6 +48,7 @@ class CharacterClassValue {
         self::THIEF,
         self::VAMPIRE,
         self::PRISONER,
+        self::ALCOHOLIC,
     ];
 
     protected $caster = [
@@ -148,6 +155,15 @@ class CharacterClassValue {
      */
     public function isPrisoner(): bool {
         return $this->value === self::PRISONER;
+    }
+
+    /**
+     * Is a alcoholic?
+     *
+     * @return bool
+     */
+    public function isAlcoholic(): bool {
+        return $this->value === self::ALCOHOLIC;
     }
 
     /**
