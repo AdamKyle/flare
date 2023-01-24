@@ -26,6 +26,7 @@ class SpecialtyShopController extends Controller {
 
     /**
      * @param SpecialtyShopValidation $request
+     * @param Character $character
      * @return JsonResponse
      */
     public function fetchItems(SpecialtyShopValidation $request, Character $character): JsonResponse {
@@ -48,6 +49,7 @@ class SpecialtyShopController extends Controller {
      * @param SpecialtyShopPurchaseValidation $request
      * @param Character $character
      * @return JsonResponse
+     * @throws \Exception
      */
     public function purchaseItem(SpecialtyShopPurchaseValidation $request, Character $character): JsonResponse {
         $result = $this->specialtyShop->purchaseItem($character, $request->item_id, $request->type);

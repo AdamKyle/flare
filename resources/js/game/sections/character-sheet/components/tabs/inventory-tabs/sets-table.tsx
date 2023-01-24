@@ -108,8 +108,16 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
                     this.props.update_inventory(result.data.inventory);
                 });
             }, (error: AxiosError) => {
+                this.setState({loading: false});
 
-            })
+                if (typeof error.response !== 'undefined') {
+                    const response = error.response;
+
+                    this.setState({
+                        error_message: response.data.message,
+                    })
+                }
+            });
         })
     }
 
@@ -141,7 +149,15 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
                     this.props.disable_tabs();
                 });
             }, (error: AxiosError) => {
+                this.setState({loading: false});
 
+                if (typeof error.response !== 'undefined') {
+                    const response = error.response;
+
+                    this.setState({
+                        error_message: response.data.message,
+                    })
+                }
             });
         });
     }
@@ -164,7 +180,15 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
                         this.props.update_inventory(result.data.inventory);
                     });
                 }, (error: AxiosError) => {
+                    this.setState({loading: false});
 
+                    if (typeof error.response !== 'undefined') {
+                        const response = error.response;
+
+                        this.setState({
+                            error_message: response.data.message,
+                        })
+                    }
                 })
             });
         }
@@ -350,7 +374,7 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
                         <DangerAlert close_alert={this.clearErrorMessage.bind(this)} additional_css={'mt-4 mb-4'}>
                             {this.state.error_message}
                         </DangerAlert>
-                        : null
+                    : null
                 }
                 {
                     this.cannotEquipSet() ?

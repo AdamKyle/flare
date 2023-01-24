@@ -206,6 +206,10 @@ export default class CharacterSheet extends React.Component<CharacterSheetProps,
                                                 <dt>Inventory Count:</dt>
                                                 <dd>{this.props.character.inventory_count}</dd>
                                             </dl>
+                                            <p className= 'my-4'>
+                                                Inventory count consists of both Usable Items and Items in your inventory.
+                                                Equipment, Quest items and Sets do not count towards inventory count.
+                                            </p>
                                             <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                                             <dl>
                                                 <dt>Damage Stat:</dt>
