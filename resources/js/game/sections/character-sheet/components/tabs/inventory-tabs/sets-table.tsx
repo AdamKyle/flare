@@ -176,6 +176,7 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
                     this.setState({
                         loading: false,
                         success_message: result.data.message,
+                        search_string: '',
                     }, () => {
                         this.props.update_inventory(result.data.inventory);
                     });
@@ -399,7 +400,7 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
                         <DropDown menu_items={this.buildActionsDropDown()} button_title={'Actions'} disabled={this.props.is_dead || this.state.loading}  />
                     </div>
                     <div className='ml-4 md:ml-0 my-4 md:my-0 md:absolute md:right-[10px]'>
-                        <input type='text' name='search' className='form-control' onChange={this.search.bind(this)} placeholder={'Search'}/>
+                        <input type='text' name='search' className='form-control' onChange={this.search.bind(this)} placeholder={'Search'} value={this.state.search_string} />
                     </div>
                 </div>
 

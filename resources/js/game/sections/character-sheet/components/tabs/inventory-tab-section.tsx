@@ -165,6 +165,14 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
         }
     }
 
+    updateInventory(inventory: {[key: string]: InventoryDetails[]}) {
+        this.setState({
+            search_string: '',
+        }, () => {
+            this.props.update_inventory(inventory)
+        });
+    }
+
     render() {
         return (
             <Fragment>
@@ -195,15 +203,15 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
                         <DropDown menu_items={this.createActionsDropDown()} button_title={'Actions'} selected_name={this.state.table} disabled={this.props.is_dead} />
                     </div>
                     <div className='ml-4 md:ml-0 my-4 md:my-0 md:absolute md:right-[10px]'>
-                        <input type='text' name='search' className='form-control' onChange={this.search.bind(this)} placeholder={'Search'}/>
+                        <input type='text' name='search' className='form-control' onChange={this.search.bind(this)} placeholder={'Search'} value={this.state.search_string} />
                     </div>
                 </div>
 
                 {
                     this.state.table === 'Inventory'  ?
-                        <InventoryTable dark_table={this.props.dark_tables} character_id={this.props.character_id} inventory={this.state.data} is_dead={this.props.is_dead} update_inventory={this.props.update_inventory} usable_sets={this.props.usable_sets} set_success_message={this.setSuccessMessage.bind(this)} is_automation_running={this.props.is_automation_running} />
-                        :
-                        <UsableItemsTable dark_table={this.props.dark_tables} character_id={this.props.character_id} usable_items={this.state.usable_items} is_dead={this.props.is_dead} update_inventory={this.props.update_inventory} set_success_message={this.setSuccessMessage.bind(this)} is_automation_running={this.props.is_automation_running}/>
+                        <InventoryTable dark_table={this.props.dark_tables} character_id={this.props.character_id} inventory={this.state.data} is_dead={this.props.is_dead} update_inventory={this.updateInventory.bind(this)} usable_sets={this.props.usable_sets} set_success_message={this.setSuccessMessage.bind(this)} is_automation_running={this.props.is_automation_running} />
+                    :
+                        <UsableItemsTable dark_table={this.props.dark_tables} character_id={this.props.character_id} usable_items={this.state.usable_items} is_dead={this.props.is_dead} update_inventory={this.updateInventory.bind(this)} set_success_message={this.setSuccessMessage.bind(this)} is_automation_running={this.props.is_automation_running}/>
                 }
 
                 {
