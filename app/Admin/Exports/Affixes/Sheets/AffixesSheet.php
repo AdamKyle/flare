@@ -46,6 +46,10 @@ class AffixesSheet implements FromView, WithTitle, ShouldAutoSize {
         $damageField  = 'damage';
         $booleanFields = ['irresistible_damage', 'damage_can_stack'];
 
+        if ($type === 'suffix' || $type === 'prefix') {
+            return $query->where('type', $type);
+        }
+
         if ($invalidField === $type) {
             return $query;
         }
