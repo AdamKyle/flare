@@ -19,10 +19,6 @@ class Kernel extends ConsoleKernel {
      */
     protected function schedule(Schedule $schedule) {
 
-
-        // Increase the max level every month.
-        $schedule->command('increase:max_level')->monthly()->timezone(config('app.timezone'));
-
         // Delete the flagged users once a month.
         $schedule->command('delete:flagged-users')->monthly()->timezone(config('app.timezone'));
 
