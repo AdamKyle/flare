@@ -181,11 +181,14 @@ class ClassAttackValue {
     }
 
     public function buildAlcoholicsChance() {
-        $this->chance['type'] = self::ALCOHOLIC_PUKE;
-        $this->chance['only'] = 'No weapon equipped';
+        $this->chance['type']       = self::ALCOHOLIC_PUKE;
+        $this->chance['only']       = 'No weapon equipped';
         $this->chance['class_name'] = 'Alcoholic';
-        $this->chance['has_item'] = !$this->hasItemTypeEquipped('weapon');
-        $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
+        $this->chance['has_item']   = !$this->hasItemTypeEquipped('weapon') &&
+                                      !$this->hasItemTypeEquipped('stave') &&
+                                      !$this->hasItemTypeEquipped('bow') &&
+                                      !$this->hasItemTypeEquipped('hammer');
+        $this->chance['chance']     = $this->chance['chance'] + $this->characterInfo->classBonus();
     }
 
     protected function hasItemTypeEquipped(string $type): bool {

@@ -18,7 +18,7 @@ class ClassSheet implements ToCollection {
                 if (is_null($foundClass)) {
 
                     if (!is_null($gameClass['primary_required_class_id'])) {
-                        $primaryClass = GameClass::where('name', $gameClass['name'])->first();
+                        $primaryClass = GameClass::where('name', $gameClass['primary_required_class_id'])->first();
 
                         if (is_null($primaryClass)) {
                             continue;
@@ -28,7 +28,7 @@ class ClassSheet implements ToCollection {
                     }
 
                     if (!is_null($gameClass['secondary_required_class_id'])) {
-                        $secondaryClass = GameClass::where('name', $gameClass['name'])->first();
+                        $secondaryClass = GameClass::where('name', $gameClass['secondary_required_class_id'])->first();
 
                         if (is_null($secondaryClass)) {
                             continue;
