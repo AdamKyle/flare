@@ -334,6 +334,12 @@ class  CharacterInventoryController extends Controller {
      * @return JsonResponse
      */
     public function removeFromSet(RemoveItemRequest $request, Character $character, InventorySetService $inventorySetService): JsonResponse {
+        if ($character->isInventoryFull()) {
+            return response()->json([
+                'message' => 'Your inventory is full. Cannot remove item from set.'
+            ], 422);
+        }
+
         $slot = $character->inventorySets()->find($request->inventory_set_id)->slots()->find($request->slot_id);
 
         if (is_null($slot)) {
@@ -389,6 +395,13 @@ class  CharacterInventoryController extends Controller {
      * @return JsonResponse
      */
     public function emptySet(Character $character, InventorySet $inventorySet, InventorySetService $inventorySetService): JsonResponse {
+
+        if ($character->isInventoryFull()) {
+            return response()->json([
+                'message' => 'Your inventory is full. Cannot remove items from set.'
+            ], 422);
+        }
+
         $currentInventoryAmount    = $character->inventory_max - $inventorySet->slots->count();
         $originalInventorySetCount = $inventorySet->slots->count();
         $itemsRemoved              = 0;
@@ -477,6 +490,7 @@ class  CharacterInventoryController extends Controller {
      * @throws Exception
      */
     public function unequipItem(Request $request, Character $character, InventorySetService $inventorySetService): JsonResponse {
+
         if ($request->inventory_set_equipped) {
             $inventorySet = $character->inventorySets()->where('is_equipped', true)->first();
             $inventoryIndex = $character->inventorySets->search(function($set) { return $set->is_equipped; });
@@ -506,6 +520,12 @@ class  CharacterInventoryController extends Controller {
                     'usable_sets'       => $inventory->getUsableSets()
                 ]
             ]);
+        }
+
+        if ($character->isInventoryFull()) {
+            return response()->json([
+                'message' => 'Your inventory is full. Cannot unequip item. You have no room in your inventory.'
+            ], 422);
         }
 
         $foundItem = $character->inventory->slots->find($request->item_to_remove);
@@ -554,6 +574,13 @@ class  CharacterInventoryController extends Controller {
 
             $inventorySetService->unEquipInventorySet($inventorySet);
         } else {
+
+            if ($character->isInventoryFull()) {
+                return response()->json([
+                    'message' => 'Your inventory is full. Cannot unequip item.s You have no room in your inventory.'
+                ], 422);
+            }
+
             $character->inventory->slots->each(function($slot) {
                 $slot->update([
                     'equipped' => false,

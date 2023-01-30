@@ -25,7 +25,12 @@ class SpecialtyShop {
      * @throws Exception
      */
     public function purchaseItem(Character $character, int $itemId, string $type): array {
-        $item = Item::where('id', $itemId)->where('specialty_type', $type)->first();
+        $item = Item::where('id', $itemId)
+                    ->where('specialty_type', $type)
+                    ->whereNull('item_suffix_id')
+                    ->whereNull('item_prefix_id')
+                    ->doesntHave('appliedHolyStacks')
+                    ->first();
 
         if (is_null($item)) {
             return $this->errorResult('Item is not found.');

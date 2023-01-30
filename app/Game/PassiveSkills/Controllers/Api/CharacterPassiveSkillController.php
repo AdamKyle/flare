@@ -28,6 +28,19 @@ class CharacterPassiveSkillController extends Controller {
     }
 
     public function trainSkill(CharacterPassiveSkill $characterPassiveSkill, Character $character) {
+
+        if ($characterPassiveSkill->character_id !== $character->id) {
+            return response()->json(['message' => 'You do not own that.'], 422);
+        }
+
+        $passivesRunning = CharacterPassiveSkill::where('character_id', $character->id)
+                                                ->whereNotNull('started_at')
+                                                ->count();
+
+        if ($passivesRunning > 0) {
+            return response()->json(['message' => 'Only one passive allowed to train at a time.'], 422);
+        }
+
         $this->passiveSkillTrainingService->trainSkill($characterPassiveSkill, $character);
 
         return response()->json([

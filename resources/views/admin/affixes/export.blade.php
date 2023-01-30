@@ -58,6 +58,8 @@
             'Celestial Prayer'         => 'Celestial Prayer',
             'Astral Magics'            => 'Astral Magics',
             'Fighter\'s Resilience'    => 'Fighter\'s Resilience',
+            'suffix'                   => 'Suffixes Only',
+            'prefix'                   => 'Prefixes Only',
         ];
     @endphp
     <x-core.layout.info-container>

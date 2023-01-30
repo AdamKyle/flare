@@ -2,10 +2,10 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Import\Affixes\AffixesImport;
 use App\Admin\Import\Affixes\ClassSpecialsImport;
 use App\Admin\Import\Affixes\GuideQuests;
 use App\Admin\Requests\AffixManagementRequest;
-use App\Flare\Models\GameSkill;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Maatwebsite\Excel\Facades\Excel;
@@ -23,9 +23,7 @@ class AffixesController extends Controller {
     }
 
     public function index() {
-        return view('admin.affixes.affixes', [
-            'affixes' => ItemAffix::all(),
-        ]);
+        return view('admin.affixes.affixes');
     }
 
     public function create() {
@@ -105,7 +103,7 @@ class AffixesController extends Controller {
      * @codeCoverageIgnore
      */
     public function importData(AffixesImportRequest $request) {
-        Excel::import(new ClassSpecialsImport, $request->affixes_import);
+        Excel::import(new AffixesImport, $request->affixes_import);
 
         return redirect()->back()->with('success', 'imported affix data.');
     }
