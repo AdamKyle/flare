@@ -177,7 +177,7 @@ class ShopController extends Controller {
             return redirect()->back()->with('error', 'Inventory is full. Please make room.');
         }
 
-        $this->shopService->buyAndReplace($item, $character, $request);
+        $this->shopService->buyAndReplace($item, $character, $request->all());
 
         return redirect()->to(route('game.shop.buy', ['character' => $character]))->with('success', 'Purchased and equipped: ' . $item->affix_name . '.');
     }
