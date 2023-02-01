@@ -24,6 +24,7 @@ class CharacterPassiveSkillController extends Controller {
     public function getKingdomPassives(Character $character) {
         return response()->json([
             'kingdom_passives' => $this->characterPassiveSkills->getPassiveSkills($character),
+            'passive_training' => $this->characterPassiveSkills->getPassiveInTraining($character),
         ]);
     }
 
@@ -43,9 +44,12 @@ class CharacterPassiveSkillController extends Controller {
 
         $this->passiveSkillTrainingService->trainSkill($characterPassiveSkill, $character);
 
+        $character = $character->refresh();
+
         return response()->json([
             'message'          => 'Started training ' . $characterPassiveSkill->passiveSkill->name,
-            'kingdom_passives' => $this->characterPassiveSkills->getPassiveSkills($character->refresh()),
+            'kingdom_passives' => $this->characterPassiveSkills->getPassiveSkills($character),
+            'passive_training' => $this->characterPassiveSkills->getPassiveInTraining($character),
         ]);
     }
 
