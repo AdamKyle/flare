@@ -48,6 +48,7 @@ class DamageBuilder extends BaseAttribute {
         $baseDamage = $baseDamage < 1 ? 1 : $baseDamage;
 
         $itemDamage      = $this->getDamageFromItems('weapon', $position);
+
         $skillPercentage = 0;
 
         if ($this->shouldIncludeSkillDamage($class,'weapon')) {

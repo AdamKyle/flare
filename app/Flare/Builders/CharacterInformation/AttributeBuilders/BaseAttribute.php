@@ -93,7 +93,7 @@ class BaseAttribute {
     protected function getDamageFromItems(string $type, string $position): int {
 
         if ($position === 'both') {
-            return $this->inventory->where('item.type', $type)->sum('item.base_damage');
+            return $this->inventory->whereIn('item.type', ['stave', 'bow', 'hammer'])->sum('item.base_damage');
         }
 
         return $this->inventory->where('item.type', $type)->where('position', $position)->sum('item.base_damage');
