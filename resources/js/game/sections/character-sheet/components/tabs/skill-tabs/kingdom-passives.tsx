@@ -27,8 +27,7 @@ export default class KingdomPassives extends React.Component<any, any> {
             this.setState({
                 loading: false,
                 kingdom_passives: result.data.kingdom_passives,
-            }, () => {
-                this.findSkillInTraining(result.data.kingdom_passives[0]);
+                skill_in_training: result.data.passive_training,
             })
         }, (error: AxiosError) => {
 
@@ -47,25 +46,17 @@ export default class KingdomPassives extends React.Component<any, any> {
         })
     }
 
-    updatePassives(passives: any) {
+    updatePassives(passives: any, passiveInTraining: any) {
         this.setState({
-            kingdom_passives: passives
-        }, () => {
-            this.findSkillInTraining(passives[0]);
+            kingdom_passives: passives,
+            skill_in_training: passiveInTraining,
         });
     }
 
     findSkillInTraining(passive: any): void {
-        if (passive.started_at !== null) {
-            this.setState({
-                skill_in_training: passive,
-            });
 
+        if (this.updatePassiveTrainingState(passive)) {
             return;
-        } else {
-            this.setState({
-                skill_in_training: null,
-            })
         }
 
         if (passive.children.length > 0) {
@@ -75,7 +66,28 @@ export default class KingdomPassives extends React.Component<any, any> {
                 if (child.children.length > 0) {
                     this.findSkillInTraining(child);
                 }
+
+                if (this.updatePassiveTrainingState(child)) {
+                    return;
+                }
             }
+        }
+    }
+
+    updatePassiveTrainingState(passive: any): boolean {
+        if (passive.started_at !== null) {
+            console.log(passive.name);
+            this.setState({
+                skill_in_training: passive,
+            });
+
+            return true;
+        } else {
+            this.setState({
+                skill_in_training: null,
+            })
+
+            return false;
         }
     }
 

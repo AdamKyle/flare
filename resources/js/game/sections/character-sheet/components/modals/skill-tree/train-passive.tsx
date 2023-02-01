@@ -25,7 +25,7 @@ export default class TrainPassive extends React.Component<any, any> {
                         loading: false,
                     }, () => {
                         this.props.manage_success_message(result.data.message);
-                        this.props.update_passives(result.data.kingdom_passives);
+                        this.props.update_passives(result.data.kingdom_passives, result.data.passive_training);
                         this.props.manage_modal();
                     })
             }, (error: AxiosError) => {

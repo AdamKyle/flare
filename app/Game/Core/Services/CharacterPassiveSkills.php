@@ -26,6 +26,10 @@ class CharacterPassiveSkills {
         return collect($collections);
     }
 
+    public function getPassiveInTraining(Character $character): ?CharacterPassiveSkill {
+        return $character->passiveSkills()->whereNotNull('started_at')->first();
+    }
+
     protected function transformNestedPassives(Character $character, CharacterPassiveSkill $passiveSkill) {
 
         $passiveSkill = $this->assignQuestInfoToPassive($character, $passiveSkill);
