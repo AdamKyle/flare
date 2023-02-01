@@ -60,32 +60,21 @@ export default class KingdomPassives extends React.Component<any, any> {
             this.setState({
                 skill_in_training: passive,
             });
+
+            return;
         } else {
-            if (passive.children.length > 0) {
+            this.setState({
+                skill_in_training: null,
+            })
+        }
 
-                for (let i = 0; i < passive.children.length; i++) {
-                    const child: any = passive.children[i];
+        if (passive.children.length > 0) {
+            for (let i = 0; i < passive.children.length; i++) {
+                const child = passive.children[i];
 
-                    if (child.started_at !== null) {
-                        return this.setState({
-                            skill_in_training: child,
-                        });
-                    } else {
-                        if (child.children.length === 0) {
-                            this.setState({
-                                skill_in_training: null,
-                            });
-
-                            continue;
-                        }
-
-                        return this.findSkillInTraining(child);
-                    }
+                if (child.children.length > 0) {
+                    this.findSkillInTraining(child);
                 }
-            } else {
-                return this.setState({
-                    skill_in_training: null,
-                });
             }
         }
     }

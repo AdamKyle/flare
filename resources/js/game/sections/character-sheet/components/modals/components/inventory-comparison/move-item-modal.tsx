@@ -47,7 +47,7 @@ export default class MoveItemModal extends React.Component<MoveModalProps, any> 
                       handle_close={this.props.manage_modal}
                       title={'Move to set'}
                       secondary_actions={{
-                          secondary_button_disabled: false,
+                          secondary_button_disabled: this.state.set_id === null,
                           secondary_button_label: 'Move',
                           handle_action: this.move.bind(this)
                       }}

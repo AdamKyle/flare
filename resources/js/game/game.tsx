@@ -24,6 +24,7 @@ import {removeCommas} from "./lib/game/format-number";
 import CharacterCurrenciesType from "./lib/game/character/character-currencies-type";
 import KingdomLogDetails from "./lib/game/kingdoms/kingdom-log-details";
 import GlobalTimeoutModal from "./sections/game-modals/global-timeout-modal";
+import {reduce} from "lodash";
 
 export default class Game extends React.Component<GameProps, GameState> {
 
@@ -391,10 +392,11 @@ export default class Game extends React.Component<GameProps, GameState> {
 
                 <ScreenRefresh user_id={this.state.character.user_id} />
 
-                <Tabs tabs={this.state.tabs} disabled={!this.state.finished_loading || this.state.disable_tabs} additonal_css={clsx({
+                <Tabs tabs={this.state.tabs} disabled={this.state.disable_tabs} additonal_css={clsx({
                     'ml-[40px]': this.state.view_port >= 1600
                 })} icon_key={'has_logs'}>
                     <TabPanel key={'game'}>
+
                         <div className={clsx("grid lg:grid-cols-3 gap-3", {
                             'ml-[40px]': this.state.view_port >= 1600
                         })}>

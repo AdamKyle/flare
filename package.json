@@ -41,7 +41,7 @@
     },
     "dependencies": {
         "@ashvin27/react-datatable": "^1.5.3",
-        "@headlessui/react": "^1.5.0",
+        "@headlessui/react": "1.6.0",
         "@types/lodash": "^4.14.180",
         "@types/node": "^17.0.21",
         "@types/react": "^18.0.*",
