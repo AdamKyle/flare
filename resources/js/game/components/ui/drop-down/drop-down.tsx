@@ -2,6 +2,7 @@ import React, {Fragment} from "react";
 import { Menu, Transition } from '@headlessui/react'
 import DropDownProps from "../../../lib/ui/types/drop-down/drop-down-props";
 import clsx from "clsx";
+import DangerButton from "../buttons/danger-button";
 
 export default class DropDown extends React.Component<DropDownProps, any> {
 
@@ -47,7 +48,7 @@ export default class DropDown extends React.Component<DropDownProps, any> {
 
     render() {
         return (
-            <div className="my-4">
+            <div className="my-4 text-center lg:text-left">
                 <Menu as="div" className="relative inline-block text-left">
                     <div>
                         <Menu.Button className="inline-flex justify-center w-full px-4 py-2 text-sm font-medium rounded-sm
@@ -79,6 +80,11 @@ export default class DropDown extends React.Component<DropDownProps, any> {
                         </Menu.Items>
                     </Transition>
                 </Menu>
+                {
+                    this.props.show_close_button && typeof this.props.close_button_action !== 'undefined' ?
+                        <DangerButton button_label={'Close Crafting'} on_click={this.props.close_button_action} additional_css={'ml-4 pb-[14px] pt-[8px]'} />
+                    : null
+                }
             </div>
         )
     }

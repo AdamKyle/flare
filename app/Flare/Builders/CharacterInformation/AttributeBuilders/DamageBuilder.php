@@ -4,6 +4,7 @@ namespace App\Flare\Builders\CharacterInformation\AttributeBuilders;
 
 
 use App\Flare\Models\Character;
+use Exception;
 use Illuminate\Support\Collection;
 
 class DamageBuilder extends BaseAttribute {
@@ -40,14 +41,14 @@ class DamageBuilder extends BaseAttribute {
      * @param bool $voided
      * @param string $position
      * @return float
-     * @throws \Exception
+     * @throws Exception
      */
     public function buildWeaponDamage(float $damageStat, bool $voided = false, string $position = 'both'): float {
         $class      = $this->character->class;
         $baseDamage = $damageStat * .05;
         $baseDamage = $baseDamage < 1 ? 1 : $baseDamage;
 
-        $itemDamage      = $this->getDamageFromItems('weapon', $position);
+        $itemDamage      = $this->getDamageFromWeapons($position);
 
         $skillPercentage = 0;
 
@@ -66,7 +67,7 @@ class DamageBuilder extends BaseAttribute {
 
         $damage = $totalDamage + $totalDamage * ($skillPercentage + $affixPercentage + $weaponMasteryPercentage);
 
-        if ($this->character->classType()->isAlcoholic()) {
+        if ($this->character->classType()->isAlcoholic() && $itemDamage > 0) {
             return $damage - ($damage * 0.25);
         }
 
@@ -87,10 +88,11 @@ class DamageBuilder extends BaseAttribute {
      *
      * @param float $damageStat
      * @param bool $voided
-     * @param $position
+     * @param string $position
      * @return float
+     * @throws Exception
      */
-    public function buildSpellDamage(float $damageStat, bool $voided = false, $position = 'both'): float {
+    public function buildSpellDamage(float $damageStat, bool $voided = false, string $position = 'both'): float {
         $class = $this->character->class;
 
         if ($class->type()->isCaster()) {

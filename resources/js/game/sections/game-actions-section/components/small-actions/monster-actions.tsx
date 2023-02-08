@@ -175,15 +175,15 @@ export default class MonsterActions extends React.Component<MonsterActionsProps,
     render() {
         return (
             <div className='relative'>
-                {
-                    typeof this.props.close_monster_section !== 'undefined' ?
-                        <button type='button' onClick={this.props.close_monster_section}
-                                className='text-red-600 dark:text-red-500 absolute right-[-20px] top-[-25px]'
-                        >
-                            <i className="fas fa-times-circle"></i>
-                        </button>
-                    : null
-                }
+                {/*{*/}
+                {/*    typeof this.props.close_monster_section !== 'undefined' ?*/}
+                {/*        <button type='button' onClick={this.props.close_monster_section}*/}
+                {/*                className='text-red-600 dark:text-red-500 absolute right-[0px] top-[-12px]'*/}
+                {/*        >*/}
+                {/*            <i className="fas fa-times-circle"></i>*/}
+                {/*        </button>*/}
+                {/*    : null*/}
+                {/*}*/}
 
                 {
                     this.props.is_rank_fights ?
@@ -194,6 +194,7 @@ export default class MonsterActions extends React.Component<MonsterActionsProps,
                 <MonsterSelection monsters={this.props.monsters}
                                   update_monster_to_fight={this.setSelectedMonster.bind(this)}
                                   character={this.props.character}
+                                  close_monster_section={this.props.close_monster_section}
                 />
 
                 {

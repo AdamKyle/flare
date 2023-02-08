@@ -219,7 +219,7 @@ export default class ExplorationSection extends React.Component<any, any> {
                 {
                     this.props.character.is_automation_running ?
                         <Fragment>
-                            <div className='mb-4 md:ml-[120px]'>
+                            <div className='mb-4 lg:ml-[120px] text-center lg:text-left'>
                                 Automation is running. You can cancel it below. <a href='/information/automation' target='_blank'>See Exploration Help <i
                                 className="fas fa-external-link-alt"></i></a> for more details.
                             </div>
@@ -237,7 +237,7 @@ export default class ExplorationSection extends React.Component<any, any> {
                         </Fragment>
                     :
                         <Fragment>
-                            <div className='mt-2 grid md:grid-cols-3 gap-2 md:ml-[120px]'>
+                            <div className='mt-2 grid lg:grid-cols-3 gap-2 lg:ml-[120px]'>
                                 <div className='cols-start-1 col-span-2'>
                                     <div className='mb-3'>
                                         <Select
@@ -286,7 +286,7 @@ export default class ExplorationSection extends React.Component<any, any> {
                                 </div>
                             </div>
 
-                            <div className={'lg:text-center md:ml-[-100px] mt-3 mb-3'}>
+                            <div className={'lg:text-center lg:ml-[-100px] mt-3 mb-3'}>
                                 <PrimaryButton button_label={'Explore'} on_click={this.startExploration.bind(this)} disabled={this.state.monster_selected === null || this.state.time_selected === null || this.state.attack_type === null || this.state.loading || this.props.character.is_dead || !this.props.character.can_attack} additional_css={'mr-2'}/>
                                 <DangerButton button_label={'Close'} on_click={this.props.manage_exploration} disabled={this.state.loading} />
 

@@ -8,4 +8,6 @@ export default interface MonsterSelectionProps {
     character: CharacterType;
 
     update_monster_to_fight: (monster: MonsterType|null) => void;
+
+    close_monster_section?: () => void;
 }

@@ -13,4 +13,8 @@ export default interface DropDownProps {
     disabled?: boolean;
 
     use_relative?: boolean;
+
+    show_close_button?: boolean;
+
+    close_button_action?: () => void;
 }

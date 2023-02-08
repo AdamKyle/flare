@@ -157,8 +157,8 @@ export default class Crafting extends React.Component<any, any> {
     render() {
         return (
             <Fragment>
-                <div className='mt-2 grid md:grid-cols-3 gap-2 md:ml-[120px]'>
-                    <div className='cols-start-1 col-span-2'>
+                <div className='mt-2 lg:grid lg:grid-cols-3 lg:gap-2 lg:ml-[120px]'>
+                    <div className='lg:cols-start-1 lg:col-span-2'>
                         {
                             this.state.selected_type === null ?
                                 <Fragment>
@@ -197,21 +197,12 @@ export default class Crafting extends React.Component<any, any> {
 
                     </div>
                 </div>
-                <div className={'hidden lg:block lg:text-center md:ml-[-100px] mt-3 mb-3'}>
+                <div className={'hidden md:block md:text-center lg:ml-[-100px] mt-3 mb-3'}>
                     <PrimaryButton button_label={'Craft'} on_click={this.craft.bind(this)} disabled={this.state.loading || this.state.selected_item === null || this.props.cannot_craft} />
                     <PrimaryButton button_label={'Change Type'} on_click={this.changeType.bind(this)} disabled={this.state.loading || this.state.selected_type == null || this.props.cannot_craft} additional_css={'ml-2'} />
                     <DangerButton button_label={'Close'}
                                   on_click={this.clearCrafting.bind(this)}
                                   additional_css={'ml-2'}
-                                  disabled={this.state.loading || this.props.cannot_craft} />
-                    <a href='/information/crafting' target='_blank' className='ml-2'>Help <i
-                        className="fas fa-external-link-alt"></i></a>
-                </div>
-                <div className='block lg:hidden grid grid-cols-1 gap-3 mt-3 mb-3'>
-                    <PrimaryButton button_label={'Craft'} on_click={this.craft.bind(this)} disabled={this.state.loading || this.state.selected_item === null || this.props.cannot_craft} />
-                    <PrimaryButton button_label={'Change Type'} on_click={this.changeType.bind(this)} disabled={this.state.loading || this.state.selected_type == null || this.props.cannot_craft} />
-                    <DangerButton button_label={'Close'}
-                                  on_click={this.clearCrafting.bind(this)}
                                   disabled={this.state.loading || this.props.cannot_craft} />
                     <a href='/information/crafting' target='_blank' className='ml-2'>Help <i
                         className="fas fa-external-link-alt"></i></a>

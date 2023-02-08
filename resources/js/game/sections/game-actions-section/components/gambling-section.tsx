@@ -118,7 +118,7 @@ export default class GamblingSection extends React.Component<GamblingSectionProp
 
         if (this.state.spinning && this.state.spinningIndexes.length > 0) {
             return (
-                <div className={clsx('max-w-[450px] mr-auto', {
+                <div className={clsx('max-w-[450px] m-auto lg:mr-auto', {
                     'ml-[150px]': !this.props.is_small
                 })}>
                     <div className='max-h-[150px] overflow-hidden mt-4'>
@@ -136,7 +136,7 @@ export default class GamblingSection extends React.Component<GamblingSectionProp
         }
 
         return(
-            <div className={clsx('max-w-[450px] mr-auto', {
+            <div className={clsx('max-w-[450px] m-auto lg:mr-auto', {
                 'ml-[150px]': !this.props.is_small
             })}>
                 <div className='max-h-[150px] overflow-hidden mt-4'>
