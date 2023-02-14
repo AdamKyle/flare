@@ -128,11 +128,13 @@ export default class UnitsTable extends React.Component<UnitsTableProps, Upgrade
                         </div>
                         : null
                 }
-                <Table data={this.getOrderedUnits(this.props.units)}
-                       conditional_row_styles={this.createConditionalRowStyles()}
-                       columns={BuildUnitsColumns(this.viewUnit.bind(this), this.cancelUnitRecruitment.bind(this), this.props.units_in_queue, this.props.current_units, this.props.buildings)}
-                       dark_table={this.props.dark_tables}
-                />
+                <div className={'max-w-[290px] sm:max-w-[100%] overflow-x-hidden'}>
+                    <Table data={this.getOrderedUnits(this.props.units)}
+                           conditional_row_styles={this.createConditionalRowStyles()}
+                           columns={BuildUnitsColumns(this.viewUnit.bind(this), this.cancelUnitRecruitment.bind(this), this.props.units_in_queue, this.props.current_units, this.props.buildings)}
+                           dark_table={this.props.dark_tables}
+                    />
+                </div>
             </Fragment>
 
         )

@@ -68,7 +68,7 @@ export default class SmallUnitsSection extends React.Component<SmallUnitSectionP
                                          character_gold={this.props.character_gold}
                         />
                         :
-                        <BasicCard additionalClasses={'overflow-x-auto'}>
+                        <BasicCard>
                             <UnitsTable units={this.props.kingdom.units}
                                         buildings={this.props.kingdom.buildings}
                                         dark_tables={this.props.dark_tables}

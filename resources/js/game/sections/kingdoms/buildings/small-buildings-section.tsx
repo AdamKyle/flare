@@ -65,7 +65,7 @@ export default class SmallBuildingsSection extends React.Component<SmallBuilding
                         />
                         :
 
-                        <BasicCard additionalClasses={'overflow-x-auto'}>
+                        <BasicCard>
                             <BuildingsTable buildings={this.props.kingdom.buildings}
                                             dark_tables={this.props.dark_tables}
                                             view_building={this.viewSelectedBuilding.bind(this)}

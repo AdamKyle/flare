@@ -17,6 +17,7 @@ import KingdomLogDetailsView from "./kingdom-log-details";
 import KingdomLogDetails from "../../lib/game/kingdoms/kingdom-log-details";
 import Ajax from "../../lib/ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
+import LoadingProgressBar from "../../components/ui/progress-bars/loading-progress-bar";
 
 export default class KingdomsList extends React.Component<KingdomListProps, KingdomListState> {
 
@@ -136,9 +137,7 @@ export default class KingdomsList extends React.Component<KingdomListProps, King
     render() {
         if (this.state.loading) {
             return (
-                <BasicCard>
-                    <ComponentLoading />
-                </BasicCard>
+                <LoadingProgressBar />
             );
         }
 
@@ -167,16 +166,42 @@ export default class KingdomsList extends React.Component<KingdomListProps, King
                         <BasicCard additionalClasses={'overflow-x-auto'}>
                             <Tabs tabs={this.tabs} icon_key={'has_logs'}>
                                 <TabPanel key={'kingdoms'}>
-                                    <Table data={this.props.my_kingdoms}
-                                           columns={buildKingdomsColumns(this.viewKingdomDetails.bind(this))}
-                                           dark_table={this.state.dark_tables}
-                                    />
+                                    {
+                                        this.props.my_kingdoms.length > 0 ?
+                                            <div className={'max-w-[290px] sm:max-w-[100%] overflow-x-hidden'}>
+                                                <Table data={this.props.my_kingdoms}
+                                                       columns={buildKingdomsColumns(this.viewKingdomDetails.bind(this))}
+                                                       dark_table={this.state.dark_tables}
+                                                />
+                                            </div>
+                                        :
+                                            <Fragment>
+                                                <p className='my-4 text-center'>
+                                                    No Settled Kingdoms.
+                                                </p>
+                                                <p className='text-center'>
+                                                    <a href="/information/kingdoms" target="_blank">
+                                                        What are and how to get kingdoms. <i
+                                                        className="fas fa-external-link-alt"></i>
+                                                    </a>
+                                                </p>
+                                            </Fragment>
+                                    }
                                 </TabPanel>
                                 <TabPanel key={'kingdom-logs'}>
-                                    <Table data={this.props.logs}
-                                           columns={buildLogsColumns(this.viewLogs.bind(this), this.deleteLog.bind(this))}
-                                           dark_table={this.state.dark_tables}
-                                    />
+                                    {
+                                        this.props.logs.length > 0 ?
+                                            <div className={'max-w-[290px] sm:max-w-[100%] overflow-x-hidden'}>
+                                                <Table data={this.props.logs}
+                                                       columns={buildLogsColumns(this.viewLogs.bind(this), this.deleteLog.bind(this))}
+                                                       dark_table={this.state.dark_tables}
+                                                />
+                                            </div>
+                                        :
+                                            <p className='my-4 text-center'>
+                                                No Logs.
+                                            </p>
+                                    }
                                 </TabPanel>
                             </Tabs>
                         </BasicCard>
