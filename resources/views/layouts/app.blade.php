@@ -55,7 +55,11 @@
         @endauth
 
         <!-- Brand -->
-        <span class="brand relative top-[20px] hidden md:block"><a href="/">Planes of Tlessa</a></span>
+        @guest
+            <span class="brand relative top-[20px] hidden md:block"><a href="/">Planes of Tlessa</a></span>
+        @else
+            <span class="brand hidden md:block"><a href="/">Planes of Tlessa</a></span>
+        @endguest
 
 
         <!-- Right -->

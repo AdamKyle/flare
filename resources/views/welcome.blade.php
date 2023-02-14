@@ -10,7 +10,7 @@
         <div class="text-center mb-10 lg:mt-10">
             <h1 class="mb-5 font-thin text-7xl dark:text-gray-300 text-gray-800 text-4xl md:text-9xl">Planes of Tlessa</h1>
             <p class="mb-10 dark:text-gray-300 text-gray-800 italic">A world full of mystery and exploration.</p>
-            <div class="grid md:grid-cols-3 gap-2 w-2/3 mr-auto ml-auto">
+            <div class="grid md:grid-cols-3 gap-2 w-1/3 mr-auto ml-auto">
                 <x-core.buttons.link-buttons.primary-button  css="mr-2" href="{{route('register')}}">
                     Join Today!
                 </x-core.buttons.link-buttons.primary-button>
