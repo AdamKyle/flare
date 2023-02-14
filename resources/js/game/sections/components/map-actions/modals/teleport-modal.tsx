@@ -45,12 +45,6 @@ export default class TeleportModal extends React.Component<TeleportModalProps, T
     }
 
     componentDidUpdate() {
-        if (this.state.view_port !== null) {
-            if (this.state.view_port < 1600) {
-                this.props.handle_close();
-            }
-        }
-
         if (this.props.locations === null) {
             return;
         }

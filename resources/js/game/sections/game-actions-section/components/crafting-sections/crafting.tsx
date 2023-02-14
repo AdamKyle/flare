@@ -197,14 +197,14 @@ export default class Crafting extends React.Component<any, any> {
 
                     </div>
                 </div>
-                <div className={'hidden md:block md:text-center lg:ml-[-100px] mt-3 mb-3'}>
+                <div className={'text-center lg:ml-[-100px] mt-3 mb-3'}>
                     <PrimaryButton button_label={'Craft'} on_click={this.craft.bind(this)} disabled={this.state.loading || this.state.selected_item === null || this.props.cannot_craft} />
                     <PrimaryButton button_label={'Change Type'} on_click={this.changeType.bind(this)} disabled={this.state.loading || this.state.selected_type == null || this.props.cannot_craft} additional_css={'ml-2'} />
                     <DangerButton button_label={'Close'}
                                   on_click={this.clearCrafting.bind(this)}
                                   additional_css={'ml-2'}
                                   disabled={this.state.loading || this.props.cannot_craft} />
-                    <a href='/information/crafting' target='_blank' className='ml-2'>Help <i
+                    <a href='/information/crafting' target='_blank' className='relative top-[20px] md:top-[0px] ml-2'>Help <i
                         className="fas fa-external-link-alt"></i></a>
                 </div>
             </Fragment>
