@@ -1,6 +1,7 @@
  import React, {Fragment} from "react";
 import TimerProgressBarProps from "../../../lib/ui/types/progress-bars/timer-progress-bar-props";
 import TimerProgressBarState from "../../../lib/ui/types/progress-bars/timer-progress-bar-state";
+ import clsx from "clsx";
 
 export default class TimerProgressBar extends React.Component<TimerProgressBarProps, TimerProgressBarState> {
 
@@ -117,13 +118,20 @@ export default class TimerProgressBar extends React.Component<TimerProgressBarPr
 
         return (
             <Fragment>
-                <div className={"flex md:justify-between mb-1 " + this.props.additional_css}>
+                <div className={this.props.additional_css + clsx(
+                    {"flex justify-between mb-1 ": !this.props.useSmallTimer},
+                    {"flex md:justify-between mb-1": this.props.useSmallTimer}
+                )}>
                     <span className="text-base font-medium text-gray-800 dark:text-white mr-4 md:mr-0">
                         {this.props.time_out_label}
                     </span>
                     <span className="text-sm font-medium text-gray-800 dark:text-white mt-[3px]">{this.state.time_left_label} {this.state.label} left</span>
                 </div>
-                <div className="w-1/2 md:w-full bg-gray-200 rounded-full h-1.5 dark:bg-gray-700">
+                <div className={clsx(
+                    "bg-gray-200 rounded-full h-1.5 dark:bg-gray-700",
+                    {'w-full': !this.props.useSmallTimer},
+                    {'w-1/2': this.props.useSmallTimer}
+                )}>
                     <div className={'h-1.5 rounded-full ' + (
                         this.state.percentage_left >= 0.75 ? 'bg-fuchsia-600 dark:bg-fuchsia-700' :
                         this.state.percentage_left < 0.75 && this.state.percentage_left >= 0.50 ? 'bg-fuchsia-500 dark:bg-fuchsia-600' :

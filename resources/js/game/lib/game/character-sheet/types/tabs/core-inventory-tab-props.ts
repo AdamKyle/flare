@@ -8,5 +8,4 @@ export default interface CoreInventoryTabProps {
     dark_tables: boolean;
 
     character_id: number;
-
 }

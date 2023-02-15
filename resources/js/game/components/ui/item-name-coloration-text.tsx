@@ -50,7 +50,7 @@ export default class ItemNameColorationText extends React.Component<ItemNameColo
 
     render() {
         return (
-            <span className={this.getColorClass()}>{this.props.item.name}</span>
+            <span className={this.getColorClass() + ' max-w-[75%] sm:max-w-full'}>{this.props.item.name}</span>
         )
     }
 }

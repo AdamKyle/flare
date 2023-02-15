@@ -98,7 +98,7 @@ export default class BuildingsTable extends React.Component<BuildingsTableProps,
                 }
                 <div className={'max-w-[290px] sm:max-w-[100%] overflow-x-hidden'}>
                     <Table data={this.props.buildings}
-                           columns={buildBuildingsColumns(this.viewBuilding.bind(this), this.cancelBuildingQueue.bind(this), this.props.buildings_in_queue)}
+                           columns={buildBuildingsColumns(this.viewBuilding.bind(this), this.cancelBuildingQueue.bind(this), this.props.buildings_in_queue, this.props.view_port)}
                            dark_table={this.props.dark_tables}
                            conditional_row_styles={this.createConditionalRowStyles()}
                     />

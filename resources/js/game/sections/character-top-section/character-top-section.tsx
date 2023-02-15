@@ -97,20 +97,20 @@ export default class CharacterTopSection extends React.Component<CharacterTopSec
                     <button onClick={this.hideTopBar.bind(this)}><i className="fas fa-minus-circle"></i></button>
                 </div>
 
-                <div className='grid lg:grid-cols-4'>
+                <div className='grid md:grid-cols-4'>
                     <span className={'mb-2 sm:mb-0'}><strong>Name</strong>: {this.props.character.name}</span>
                     <span className={'mb-2 sm:mb-0'}><strong>Race</strong>: <a href={"/information/race/" + this.props.character.race_id} target='_blank'>{this.props.character.race}</a></span>
                     <span className={'mb-2 sm:mb-0'}><strong>Class</strong>: <a href={"/information/class/" + this.props.character.class_id} target='_blank'>{this.props.character.class}</a></span>
                     <span className={'mb-2 sm:mb-0'}><strong>Gold</strong>: {this.props.character.gold}</span>
                 </div>
                 <div className='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 hidden sm:block'></div>
-                <div className='grid lg:grid-cols-3'>
+                <div className='grid md:grid-cols-3'>
                     <span className={'mb-2 sm:mb-0'}><strong>Gold Dust</strong>: {this.props.character.gold_dust}</span>
                     <span className={'mb-2 sm:mb-0'}><strong>Crystal Shards</strong>: {this.props.character.shards}</span>
                     <span className={'mb-2 sm:mb-0'}><strong>Copper Coins</strong>: {this.props.character.copper_coins}</span>
                 </div>
                 <div className='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 hidden sm:block'></div>
-                <div className='grid lg:grid-cols-4'>
+                <div className='grid md:grid-cols-4'>
                     <div>
                         <div className='py-1'><strong>Level</strong>: {this.props.character.level}/{this.props.character.max_level}</div>
                         <div className='py-1'><strong>AC</strong>: {this.abbreviateNumber(this.props.character.ac)}</div>

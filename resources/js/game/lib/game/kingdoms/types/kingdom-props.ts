@@ -9,4 +9,6 @@ export default interface KingdomProps {
     dark_tables: boolean;
 
     character_gold: number;
+
+    view_port: number;
 }
