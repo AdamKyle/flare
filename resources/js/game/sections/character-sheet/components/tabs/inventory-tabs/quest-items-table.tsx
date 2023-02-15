@@ -55,7 +55,10 @@ export default class QuestItemsTable extends React.Component<QuestItemsInventory
                         </div>
                     </div>
                 </div>
-                <Table data={this.state.data} columns={buildLimitedColumns(undefined, this.viewItem.bind(this))} dark_table={this.props.dark_table}/>
+
+                <div className={'max-w-[290px] sm:max-w-[100%] overflow-y-hidden'}>
+                    <Table data={this.state.data} columns={buildLimitedColumns(undefined, this.viewItem.bind(this))} dark_table={this.props.dark_table}/>
+                </div>
 
                 {
                     this.state.view_item && this.state.item_id !== null ?
