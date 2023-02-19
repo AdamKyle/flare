@@ -53,7 +53,13 @@ class SpecialtyShop {
         $slotToTrade = $this->getItemToTrade($character, $type, $item->type);
         $itemToTrade = $slotToTrade->item;
 
-        $newItemToBuy = $this->moveEnchantmentsAndHoly($itemToTrade, $item);
+        // Only duplicate the item if we have either a prefix, suffix or holy stacks applied.
+        // If not, use the item we want to buy and set its id, so we don't duplicate the item.
+        if (!is_null($itemToTrade->item_suffix_id) || !is_null($itemToTrade->item_prefix_id) || $itemToTrade->appliedHolyStacks->isNotEmpty()) {
+            $newItemToBuy = $this->moveEnchantmentsAndHoly($itemToTrade, $item);
+        } else {
+            $newItemToBuy = $item;
+        }
 
         $character->inventory->slots()->create([
             'item_id'      => $newItemToBuy->id,
