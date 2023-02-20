@@ -1,14 +1,14 @@
 
 <p class="mt-2">
     Arcane Alchemists prefer to use staves above other weapons as it gives them an increase to their damage.
-    Arcane Alchemists are also as proficient with damaging spells like Heretics and are ok at using Healing spells.
+    Arcane Alchemists are also as proficient with damage spells like Heretics and are ok at using Healing spells.
 </p>
 <p>
-    Charisma is how you hit enemies, in conjunction with Accuracy or Casting Accuracy or both.
+    Charisma is how you hit enemies, in conjunction with Accuracy (weapons) or Casting Accuracy (damage spells) or both (<a href='/information/combat'>Attack and Cast</a>).
 </p>
 <ul>
     <li>With a stave equipped you do +15% modded chr on top of your damage.</li>
-    <li>If you have a healing spell equipped you will do 10% of your modded chr to healing and 10% to damage (this will add to the 15% from the stave)</li>
+    <li>If you have a healing spell equipped you will do 10% of your modded chr to healing.</li>
     <li>Like Heretics, if you have a damage spell equipped you do 30% of your modded int as damage on top of the spell damage + bonuses.</li>
 </ul>
 <p>

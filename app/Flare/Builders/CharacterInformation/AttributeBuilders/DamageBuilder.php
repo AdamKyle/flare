@@ -4,6 +4,7 @@ namespace App\Flare\Builders\CharacterInformation\AttributeBuilders;
 
 
 use App\Flare\Models\Character;
+use App\Flare\Values\WeaponTypes;
 use Exception;
 use Illuminate\Support\Collection;
 
@@ -45,11 +46,21 @@ class DamageBuilder extends BaseAttribute {
      */
     public function buildWeaponDamage(float $damageStat, bool $voided = false, string $position = 'both'): float {
         $class      = $this->character->class;
-        $baseDamage = $damageStat * .05;
-        $baseDamage = $baseDamage < 1 ? 1 : $baseDamage;
+        $baseDamage = 0;
+
+        if ($this->character->class->type()->isFighter()) {
+            $baseDamage = $damageStat * 0.15;
+        } else if ($this->character->class->type()->isArcaneAlchemist()) {
+            $hasStaveEquipped = $this->inventory->filter(function($slot) {
+                return $slot->item->type === WeaponTypes::STAVE;
+            })->isNotEmpty();
+
+            if ($hasStaveEquipped) {
+                $baseDamage = $damageStat * 0.15;
+            }
+        }
 
         $itemDamage      = $this->getDamageFromWeapons($position);
-
         $skillPercentage = 0;
 
         if ($this->shouldIncludeSkillDamage($class,'weapon')) {

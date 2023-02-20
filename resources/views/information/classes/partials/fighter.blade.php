@@ -16,13 +16,13 @@
   <li>Cast is useless to you because you won't have the intelligence. Technically you could go this route if you wanted to balance
     Your strength, Dexterity and Intelligence/Focus plus Casting Accuracy skill to become a "Battle Mage". But now you are stretching yourself too far.</li>
   <li>
-    Defend is only useful if the enemy is about to kill you and you have some health left over as Fighters can have the greatest AC when it comes to defending.
+    Defend is only useful if the enemy is about to kill you, and you have some health left over as Fighters can have the greatest AC when it comes to defending.
     because you use your class bonus as a bonus towards your AC.
   </li>
 </ul>
 <p>
-  When attacking with no weapons, Fighters will do 5% of their strength as their attack, while other classes do 2%. When attacking with weapons you use 15% of your strength
-  towards the overall damage.
+  When attacking with no weapons, Fighters will do 5% of their strength as their attack, while other classes do 2% of their respective attacking stat.
+  When attacking with weapons you use 15% of your strength towards the overall damage.
 </p>
 <p>If you go the weapon/shield route, make sure to add some extra dur (through enchanting) to that shield and level your class skill for the extra armour class bonus.</p>
 <p>Fighters will want a race that provides good strength and dex: Orc (dex and str - great for dual wielding), Dark Dwarf/Centaur (str and dur - great for weapon/shield).</p>
@@ -38,6 +38,6 @@
 <x-core.alerts.info-alert title="Attn!">
   <p>
     Do not try and max any of these skills, they will take you a very long time. Instead focus on these and bounce around between skills.
-    You can read more about <a href="/information/skill-information">skills</a> in the help docs. You will max them over time.
+    You can read more about <a href="/information/skill-information" class="dark:text-blue-700 dark:hover:text-blue-500">skills</a> in the help docs. You will max them over time.
   </p>
 </x-core.alerts.info-alert>

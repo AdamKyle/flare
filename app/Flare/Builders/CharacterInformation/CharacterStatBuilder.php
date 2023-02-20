@@ -161,17 +161,19 @@ class CharacterStatBuilder {
     /**
      * Get class bonus.
      *
+     * - Default bonus is 5%.
+     *
      * @return float
      */
     public function classBonus(): float {
         if (empty($this->equippedItems)) {
-            return 0.0;
+            return 0.5;
         }
 
         $suffixClassBonus = $this->equippedItems->sum('item.itemSuffix.class_bonus');
         $prefixClassBonus = $this->equippedItems->sum('item.itemPrefix.class_bonus');
 
-        $total = $suffixClassBonus + $prefixClassBonus;
+        $total = $suffixClassBonus + $prefixClassBonus + 0.5;
 
         if ($total > 1) {
             return 1.0;
@@ -280,7 +282,7 @@ class CharacterStatBuilder {
             $this->equippedItems,
         );
 
-        $defence   = $this->defenceBuilder->buildDefence($voided);
+        $defence   = $this->defenceBuilder->buildDefence($this->classBonus(), $voided);
         $holyBonus = $this->holyInfo()->fetchDefenceBonus();
 
         $classSpecialsBonus = $this->character->classSpecialsEquipped
@@ -329,10 +331,14 @@ class CharacterStatBuilder {
             if ($type === 'weapon') {
 
                 if ($this->character->classType()->isAlcoholic()) {
-                    return $stat;
+                    return $stat + ($stat * 0.25);
                 }
 
-                $value = $stat / 2;
+                if ($this->character->classType()->isFighter()) {
+                    return $stat + ($stat * 0.05);
+                }
+
+                $value = $stat * 0.02;
 
                 return $value < 5 ? 5 : $value;
             }
@@ -353,7 +359,7 @@ class CharacterStatBuilder {
             case 'ring':
                 return $this->damageBuilder->buildRingDamage();
             case 'spell-damage':
-                $damage = $this->damageBuilder->buildSpellDamage($stat, $voided);
+                $damage = $this->spellDamageBonus($this->damageBuilder->buildSpellDamage($stat, $voided), $voided);
                 break;
             default:
                 $damage = 0;
@@ -365,6 +371,16 @@ class CharacterStatBuilder {
                                               ->sum('base_damage_mod');
 
         return ceil($damage + ($damage * ($this->holyInfo()->fetchAttackBonus() + $classSpecialsBonus)));
+    }
+
+    protected function spellDamageBonus(int $damage, bool $voided = false): int {
+        if ($this->character->class->type()->isHeretic() || $this->character->class->type()->isArcaneAlchemist()) {
+            $intMod = $this->statMod('int', $voided) * 0.30;
+
+            return ceil($intMod + $damage);
+        }
+
+        return $damage;
     }
 
     /**
@@ -389,6 +405,7 @@ class CharacterStatBuilder {
      * @param string $weaponPosition
      * @param bool $voided
      * @return int
+     * @throws Exception
      */
     public function positionalWeaponDamage(string $weaponPosition, bool $voided = false): int {
         $stat = $this->statMod($this->character->damage_stat, $voided);
@@ -430,7 +447,7 @@ class CharacterStatBuilder {
             return 0;
         }
 
-        $damage = $this->damageBuilder->buildSpellDamage($stat, $voided, $spellPosition);
+        $damage = $this->spellDamageBonus($this->damageBuilder->buildSpellDamage($stat, $voided, $spellPosition), $voided);
 
         $classSpecialsBonus = $this->character->classSpecialsEquipped
                                               ->where('equipped', true)

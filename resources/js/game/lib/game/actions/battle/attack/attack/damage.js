@@ -257,29 +257,26 @@ export default class Damage extends BattleBase {
       if (extraActionChance.type === ExtraActionType.ARCANE_ALCHEMISTS_DREAMS && extraActionChance.has_item) {
         this.addMessage('The world around you fades to blackness, your eyes glow red with rage. The enemy trembles.', 'regular');
 
-        let damage = attacker.int_modded * 0.10;
-
-        if (attackData.damage_reduction > 0.0) {
-          this.addMessage('The Plane weakens your ability to do full damage!', 'enemy-action');
-
-          damage -= damage * attackData.damage_reduction;
-        }
-
-        monsterCurrentHealth -= damage;
-
-        this.addMessage(attacker.name + ' hits for (Arcane Alchemist Ravenous Dream): ' + formatNumber(damage), 'player-action');
-
         let times = random(2, 6);
         const originalTimes = times;
+        let percent     = 0.10;
 
         while (times > 0) {
 
           if (times === originalTimes) {
+            let damage          = attacker.int_modded * 0.10;
+
+            if (attackData.damage_reduction > 0.0) {
+              this.addMessage('The Plane weakens your ability to do full damage!', 'enemy-action');
+
+              damage -= damage * attackData.damage_reduction;
+            }
+
             monsterCurrentHealth -= damage;
 
             this.addMessage(attacker.name + ' hits for (Arcane Alchemist Ravenous Dream): ' + formatNumber(damage), 'player-action');
           } else {
-            let damage = attacker.int_modded * 0.10;
+            let damage = attacker.int_modded * percent;
 
             if (attackData.damage_reduction > 0.0) {
               this.addMessage('The Plane weakens your ability to do full damage!', 'enemy-action');
@@ -297,7 +294,7 @@ export default class Damage extends BattleBase {
           }
 
           times--;
-
+          percent += 0.03;
         }
       }
     }

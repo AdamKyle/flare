@@ -51,16 +51,28 @@ class HealingBuilder extends BaseAttribute {
             $skillPercentage = $this->fetchBaseAttributeFromSkills('base_healing');
         }
 
+        $additionalBonus = 0.0;
+
+        if ($this->character->class->type()->isArcaneAlchemist()) {
+            $additionalBonus = $damageStat * 0.10;
+        }
+
         $totalDamage = $baseDamage + $itemDamage;
 
         if ($voided) {
-            return $totalDamage + $totalDamage * $skillPercentage;
+            return $totalDamage + $totalDamage * ($skillPercentage + $additionalBonus);
         }
 
         $affixPercentage = $this->getAttributeBonusFromAllItemAffixes('base_healing');
 
         $healingMasteryBonus = $this->classRanksWeaponMasteriesBuilder->determineBonusForSpellHealing($position);
 
-        return $totalDamage + $totalDamage * ($skillPercentage + $affixPercentage + $healingMasteryBonus);
+        $healing = $totalDamage + $totalDamage * ($skillPercentage + $affixPercentage + $healingMasteryBonus + $additionalBonus);
+
+        if ($this->character->class->type()->isAlcoholic()) {
+            return $healing - ($healing * 0.50);
+        }
+
+        return $healing;
     }
 }

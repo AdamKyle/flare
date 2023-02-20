@@ -22,10 +22,10 @@
 </p>
 <p class="mb-4">
     Alcoholics suffer a 25% damage reduction when using any form of weapon and a 50% reduction when using spells.
-    The reason: You are far too drunk half the time to properly wheeled these.
+    The reason: You are far too drunk half the time to properly use these.
 </p>
 <p class="mb-4">
-    Alcoholics suffer no damage deduction when using fists.
+    Alcoholics suffer no damage deduction when using fists at 25% of the core damage stat.
 </p>
 <p class="mb-4">
     Alcoholics <a href="/information/class-ranks">class specials</a> focus mostly on raising your health and damage modifier

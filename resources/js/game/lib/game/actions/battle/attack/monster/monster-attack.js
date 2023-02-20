@@ -137,6 +137,7 @@ export default class MonsterAttack extends BattleBase {
   }
 
   isBlocked(attackType, defender, damage, isCharacterVoided) {
+    console.log(defender);
     if (AttackType.DEFEND === attackType || AttackType.VOIDED_DEFEND === attackType) {
       const defenderAC = defender.attack_types[attackType].defence;
 

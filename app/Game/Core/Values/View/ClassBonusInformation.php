@@ -42,7 +42,7 @@ class ClassBonusInformation {
         if ($classAttackValue->isFighter()) {
             $details['type'] = Str::ucfirst(ClassAttackValue::FIGHTERS_DOUBLE_DAMAGE);
             $details['requires'] = 'Dual Weapon equipped or Weapon/Shield equipped';
-            $details['description'] = 'With a weapon equipped you have a small chance to do damage equal to your modded attack + 15% of the modded attack, without being blocked. With a shield equipped you have will use your class bonus towards your defence.';
+            $details['description'] = 'With a weapon equipped you have a small chance to do damage equal to your modded attack + 15% of the modded attack, without being blocked. With a shield equipped you use your class bonus towards your defence automatically.';
         }
 
         if ($classAttackValue->isRanger()) {

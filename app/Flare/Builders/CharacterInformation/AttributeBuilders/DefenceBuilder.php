@@ -9,10 +9,11 @@ class DefenceBuilder extends BaseAttribute {
     /**
      * Build defence.
      *
+     * @param float $classBonus
      * @param bool $voided
      * @return int
      */
-    public function buildDefence(bool $voided = false): int {
+    public function buildDefence(float $classBonus, bool $voided = false): int {
         $baseAc      = $this->character->ac;
         $skillBonus  = $this->fetchBaseAttributeFromSkills('base_ac');
 
@@ -23,13 +24,22 @@ class DefenceBuilder extends BaseAttribute {
         $armourSlots = $this->getItemsWithBaseAC();
         $itemAC      = $this->getACFromItems($armourSlots);
 
+        $hasShield   = $this->character->class->type()->isFighter() && $armourSlots->filter(function($slot) {
+            return $slot->item->type === 'shield';
+        })->isNotEmpty();
+
+        if (!$hasShield) {
+            $classBonus = 0.0;
+        }
+
         if ($voided) {
-            return $itemAC + $itemAC * $skillBonus;
+            return $itemAC + $itemAC * ($skillBonus + $classBonus);
         }
 
         $affixBonus = $this->getAttributeBonusFromAllItemAffixes('base_ac');
 
-        $itemAC = $itemAC + $itemAC * ($skillBonus + $affixBonus);
+        $itemAC = $itemAC + $itemAC * ($skillBonus + $affixBonus + $classBonus);
+
 
         return intval($baseAc + $itemAC);
     }

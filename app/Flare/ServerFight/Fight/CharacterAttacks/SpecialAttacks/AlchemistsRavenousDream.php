@@ -22,36 +22,26 @@ class AlchemistsRavenousDream extends BattleBase {
 
             $this->addMessage('The world around you fades to blackness, your eyes glow red with rage. The enemy trembles.', 'regular', $isPvp);
 
-            $damage = $this->characterCacheData->getCachedCharacterData($character, 'int_modded') * 0.10;
-
-            if ($attackData['damage_deduction'] > 0.0) {
-                $this->addMessage('The Plane weakens your ability to do full damage!', 'enemy-action', $isPvp);
-
-                $damage = $damage - $damage * $attackData['damage_deduction'];
-            }
-
-            $this->doBaseAttack($damage);
+            $this->multiAttack($character, $attackData, $isPvp);
         }
     }
 
-    protected function doBaseAttack(int $damage, bool $isPvp = false) {
-        $this->monsterHealth -= $damage;
-
-        $this->addMessage('You hit for (Arcane Alchemist Ravenous Dream): ' . number_format($damage), 'player-action', $isPvp);
-
-        if ($isPvp) {
-            $this->addDefenderMessage('The enemy casts a spell of terrifying dreams that encricle and ravage you doing: ' . number_format($damage), 'enemy-action');
-        }
-    }
-
-    protected function multiAttack(Character $character, array $attackData, int $damage, bool $isPvp = false) {
+    protected function multiAttack(Character $character, array $attackData, bool $isPvp = false) {
         $times         = rand(2, 6);
         $originalTimes = $times;
-
-
+        $percent       = 0.10;
 
         while ($times > 0) {
             if ($times === $originalTimes) {
+
+                $damage = $this->characterCacheData->getCachedCharacterData($character, 'int_modded') * $percent;
+
+                if ($attackData['damage_deduction'] > 0.0) {
+                    $this->addMessage('The plane weakens your ability to do full damage!', 'enemy-action', $isPvp);
+
+                    $damage = $damage - $damage * $attackData['damage_deduction'];
+                }
+
                 $this->monsterHealth -= $damage;
 
                 $this->addMessage('You hit for (Arcane Alchemist Ravenous Dream): ' . number_format($damage), 'player-action', $isPvp);
@@ -60,7 +50,7 @@ class AlchemistsRavenousDream extends BattleBase {
                     $this->addDefenderMessage('A blast of Arcanic energy blasts you for: ' . number_format($damage), 'enemy-action');
                 }
             } else {
-                $damage = $this->characterCacheData->getCachedCharacterData($character, 'int_modded') * 0.10;
+                $damage = $this->characterCacheData->getCachedCharacterData($character, 'int_modded') * $percent;
 
                 if ($attackData['damage_deduction'] > 0.0) {
                     $this->addMessage('The Plane weakens your ability to do full damage!', 'enemy-action', $isPvp);
@@ -80,6 +70,9 @@ class AlchemistsRavenousDream extends BattleBase {
                     }
                 }
             }
+
+            $times--;
+            $percent += 0.03;
         }
     }
 }
