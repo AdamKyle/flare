@@ -21,7 +21,7 @@
     Alcoholics are a mix between Blacksmith (heavy drinkers) and Fighters (also heavy drinkers).
 </p>
 <p class="mb-4">
-    Alcoholics suffer a 25% damage reduction when using any form of weapon and a 50% reduction when using spells.
+    Alcoholics suffer a 25% damage reduction when using any form of weapon and a 50% reduction when using spells (damage or healing).
     The reason: You are far too drunk half the time to properly use these.
 </p>
 <p class="mb-4">

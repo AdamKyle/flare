@@ -66,6 +66,7 @@ class AffixesTable extends DataTableComponent {
             'int_reduction'            => 'Int Reduction',
             'agi_reduction'            => 'Agi Reduction',
             'focus_reduction'          => 'Focus Reduction',
+            'class_bonus'              => 'Class Bonus Modifier',
             'base_damage_mod'          => 'Base Damage',
             'base_ac_mod'              => 'Base AC',
             'base_healing_mod'         => 'Base Healing',
