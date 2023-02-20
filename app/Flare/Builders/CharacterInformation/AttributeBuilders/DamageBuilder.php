@@ -97,21 +97,13 @@ class DamageBuilder extends BaseAttribute {
     /**
      * Build spell damage.
      *
-     * @param float $damageStat
      * @param bool $voided
      * @param string $position
      * @return float
      * @throws Exception
      */
-    public function buildSpellDamage(float $damageStat, bool $voided = false, string $position = 'both'): float {
+    public function buildSpellDamage(bool $voided = false, string $position = 'both'): float {
         $class = $this->character->class;
-
-        if ($class->type()->isCaster()) {
-            $baseDamage = $damageStat * 0.05;
-            $baseDamage = max($baseDamage, 5);
-        } else {
-            $baseDamage = 0;
-        }
 
         $itemDamage      = $this->getDamageFromItems('spell-damage', $position);
 
@@ -121,23 +113,21 @@ class DamageBuilder extends BaseAttribute {
             $skillPercentage = $this->fetchBaseAttributeFromSkills('base_damage');
         }
 
-        $totalDamage = $baseDamage + $itemDamage;
-
         if ($voided) {
-            return $totalDamage + $totalDamage * $skillPercentage;
+            return $itemDamage + $itemDamage * $skillPercentage;
         }
 
         $affixPercentage = $this->getAttributeBonusFromAllItemAffixes('base_damage');
 
         $spellMasteryPercentage = $this->classRanksWeaponMasteriesBuilder->determineBonusForSpellDamage($position);
 
-        $damage = $totalDamage + $totalDamage * ($skillPercentage + $affixPercentage + $spellMasteryPercentage);
+        $damage = $itemDamage + $itemDamage * ($skillPercentage + $affixPercentage + $spellMasteryPercentage);
 
         if ($this->character->classType()->isAlcoholic()) {
             return $damage - ($damage * 0.50);
         }
 
-        return $totalDamage + $totalDamage * ($skillPercentage + $affixPercentage + $spellMasteryPercentage);
+        return $damage;
     }
 
     /**

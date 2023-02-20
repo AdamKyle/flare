@@ -21,15 +21,11 @@
     Prisoner is a cross between a Fighter and a Thief in the more early levels of their career.
 </p>
 <p class="mb-4">
-    Prisoner's do not have enchantments, much like the base classes, instead any gear that raises the class bonus
-    for their special attack will do just fine.
+    Prisoner's do not have enchantments, unlike like the base classes, instead all enchantments, all armour and weapons are what you are
+    best at. You get no bonuses towards spells or healing spells.
 </p>
 <p class="mb-4">
     Prisoner's are best using weapons (single-handed weapons, not staves, bows or hammers). While you have one or two
     weapons equipped you have a chance, based on your class bonus, to fire off your rage attack (detailed above).
-</p>
-<p class="mb-4">
-    Prisoner's <a href="/information/class-ranks">class specials</a> focus mostly on reducing enemy stats and
-    resistances as well as increasing your spell evasion.
 </p>
 

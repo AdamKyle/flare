@@ -343,8 +343,8 @@ class CharacterStatBuilder {
                 return $value < 5 ? 5 : $value;
             }
 
-            if ($type === 'spell-damage' && $this->character->classType()->isCaster()) {
-                $value = $stat / 2;
+            if ($type === 'spell-damage' && $this->character->classType()->isHeretic()) {
+                $value = $stat * 0.15;
 
                 return $value < 5 ? 5 : $value;
             }
@@ -359,7 +359,7 @@ class CharacterStatBuilder {
             case 'ring':
                 return $this->damageBuilder->buildRingDamage();
             case 'spell-damage':
-                $damage = $this->spellDamageBonus($this->damageBuilder->buildSpellDamage($stat, $voided), $voided);
+                $damage = $this->spellDamageBonus($this->damageBuilder->buildSpellDamage($voided), $voided);
                 break;
             default:
                 $damage = 0;
@@ -373,6 +373,16 @@ class CharacterStatBuilder {
         return ceil($damage + ($damage * ($this->holyInfo()->fetchAttackBonus() + $classSpecialsBonus)));
     }
 
+    /**
+     * Add bonus to spell damage.
+     *
+     * - Class should be heretic or arcane alchemist.
+     * - Adds 30% of their int to the damage.
+     *
+     * @param int $damage
+     * @param bool $voided
+     * @return int
+     */
     protected function spellDamageBonus(int $damage, bool $voided = false): int {
         if ($this->character->class->type()->isHeretic() || $this->character->class->type()->isArcaneAlchemist()) {
             $intMod = $this->statMod('int', $voided) * 0.30;
@@ -381,6 +391,38 @@ class CharacterStatBuilder {
         }
 
         return $damage;
+    }
+
+    /**
+     * Healing Bonus.
+     *
+     * - Prophets get 30% of their CHR
+     * - Arcane Alchemists get 10% of their CHR
+     *
+     * @param int $healing
+     * @param bool $voided
+     * @return int
+     */
+    protected function healingBonus(int $healing, bool $voided = false): int {
+        if ($this->character->class->type()->isProphet()) {
+            $chrMod = $this->statMod('chr', $voided) * 0.30;
+
+            return ceil($chrMod + $healing);
+        }
+
+        if ($this->character->class->type()->isArcaneAlchemist()) {
+            $chrMod = $this->statMod('chr', $voided) * 0.10;
+
+            return ceil($chrMod + $healing);
+        }
+
+        if ($this->character->class->type()->isRanger()) {
+            $chrMod = $this->statMod('chr', $voided) * 0.15;
+
+            return ceil($chrMod + $healing);
+        }
+
+        return $healing;
     }
 
     /**
@@ -447,7 +489,7 @@ class CharacterStatBuilder {
             return 0;
         }
 
-        $damage = $this->spellDamageBonus($this->damageBuilder->buildSpellDamage($stat, $voided, $spellPosition), $voided);
+        $damage = $this->spellDamageBonus($this->damageBuilder->buildSpellDamage($voided, $spellPosition), $voided);
 
         $classSpecialsBonus = $this->character->classSpecialsEquipped
                                               ->where('equipped', true)
@@ -480,7 +522,7 @@ class CharacterStatBuilder {
             return 0;
         }
 
-        $healing = $this->healingBuilder->buildHealing($stat, $voided, $spellPosition);
+        $healing = $this->healingBonus($this->healingBuilder->buildHealing($voided, $spellPosition), $voided);
 
         $classSpecialsBonus = $this->character->classSpecialsEquipped
                                               ->where('equipped', true)
@@ -502,8 +544,8 @@ class CharacterStatBuilder {
         $stat = $this->statMod($this->character->damage_stat, $voided);
 
         if (is_null($this->equippedItems)) {
-            if ($this->character->classType()->isProphet()) {
-                $value = $stat / 2;
+            if ($this->character->classType()->isProphet() || $this->character->classType()->isRanger()) {
+                $value = $stat * 0.15;
 
                 return $value < 5 ? 5 : $value;
             }
@@ -511,7 +553,7 @@ class CharacterStatBuilder {
             return 0;
         }
 
-        $healing = $this->healingBuilder->buildHealing($stat, $voided);
+        $healing = $this->healingBonus($this->healingBuilder->buildHealing($voided), $voided);
 
         $classSpecialsBonus = $this->character->classSpecialsEquipped
                                               ->where('equipped', true)

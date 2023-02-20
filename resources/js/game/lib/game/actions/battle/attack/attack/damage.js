@@ -364,7 +364,6 @@ export default class Damage extends BattleBase {
   }
 
   doubleCastChance(attacker, attackData, monsterCurrentHealth) {
-    console.log(attacker);
     if (attacker.extra_action_chance.class_name === attacker.class) {
       const extraActionChance = attacker.extra_action_chance;
 

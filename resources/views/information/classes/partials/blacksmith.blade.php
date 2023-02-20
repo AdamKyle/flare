@@ -1,4 +1,3 @@
-
 <p class="mt-2">
     Blacksmiths are a class that uses hammers, a new weapon type, which - much like bows - are two-handed weapons. As a result, hammers give slightly more Strength
     than other weapons.
