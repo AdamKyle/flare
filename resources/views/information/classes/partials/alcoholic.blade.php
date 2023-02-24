@@ -32,8 +32,11 @@
     as well as your damage stat.
 </p>
 <p class="mb-4">
-    Alcoholics have two special attacks that can proc depending on your class bonus %. One is Deathly puke, which has a very small chance to auto kill the enemy.
-    Otherwise, it will do 15% of your damage stat.
+    Alcoholics have a special attack: Bloody Puke. You'll deal 30% of your health to the enemy, but also suffer 15% damage, vomiting blood is not a good thing.
+    For this reason, you will want to make sure you have heavy durability focused gear, two shields and <a href="/information/enchanting">enchantments</a>.
+</p>
+<p class="mb-4">
+    It is also wise to enchant a few life stealing enchantments on your gear to help recover the lost health from your speciality.
 </p>
 <p class="mb-4">
     The other special attack is Bloody puke: Deal 30% of your health as damage, but also take 30% of your health in damage.

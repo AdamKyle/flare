@@ -20,19 +20,20 @@ class ClassesTable extends DataTableComponent
     public function columns(): array {
         return [
             Column::make('Name')->searchable()->format(function ($value, $row) {
-                $gameClass = GameClass::where('name', $value)->first()->id;
+                $gameClass = GameClass::where('name', $value)->first();
+                $isSpecial = !is_null($gameClass->primary_required_class_id);
 
                 if (is_null(auth()->user())) {
-                    '<a href="/information/classes/'. $gameClass.'">'.$row->name .'</a>';
+                    '<a href="/information/classes/'. $gameClass->id.'"> '  . ($isSpecial ? '<i class="fas fa-star text-yellow-700 dark:text-yellow-500"></i> ' : '') . $row->name .'</a>';
                 }
 
                 if (!is_null(auth()->user())) {
                     if (auth()->user()->hasRole('Admin')) {
-                        return '<a href="/admin/classes/'. $gameClass.'">'.$row->name .'</a>';
+                        return '<a href="/admin/classes/'. $gameClass->id.'"> ' . ($isSpecial ? '<i class="fas fa-star text-yellow-700 dark:text-yellow-500"></i> ' : '') . $row->name .'</a>';
                     }
                 }
 
-                return '<a href="/information/class/'. $gameClass.'">'.$row->name .'</a>';
+                return '<a href="/information/class/'. $gameClass->id.'"> ' . ($isSpecial ? '<i class="fas fa-star text-yellow-700 dark:text-yellow-500"></i> ' : '') . $row->name .'</a>';
 
             })->html(),
             Column::make('To Hit', 'to_hit_stat')->sortable(),

@@ -124,7 +124,7 @@ class CharacterDeletion {
 
         $character->passiveSkills()->delete();
 
-        $character->classRanks->weaponMasteries()->delete();
+        $this->deleteClassRanks($character);
 
         $character->classRanks()->delete();
 
@@ -137,5 +137,12 @@ class CharacterDeletion {
         $character->map()->delete();
 
         $character->delete();
+    }
+
+    protected function deleteClassRanks(Character $character): void {
+        foreach ($character->classRanks as $classRank) {
+            $classRank->weaponMasteries()->delete();
+            $classRank->delete();
+        }
     }
 }
