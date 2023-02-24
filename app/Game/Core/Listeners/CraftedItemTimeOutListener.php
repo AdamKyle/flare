@@ -2,6 +2,7 @@
 
 namespace App\Game\Core\Listeners;
 
+use App\Flare\Events\ServerMessageEvent;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Core\Events\ShowCraftingTimeOutEvent;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
@@ -23,6 +24,12 @@ class CraftedItemTimeOutListener
                     $timeOut = 30;
                     break;
             }
+        }
+
+        if ($event->character->classType()->isMerchant()) {
+            event(new ServerMessageEvent($event->character->user, 'As a merchant, your crafting timeout is reduced by 5%.'));
+
+            $timeOut = $timeOut - $timeOut * 0.05;
         }
 
         $event->character->update([
