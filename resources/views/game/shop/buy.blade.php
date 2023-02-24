@@ -12,6 +12,12 @@
 
         <div class="m-auto">
             <x-core.cards.card>
+                @if ($character->classType()->isMerchant())
+                    <x-core.alerts.info-alert>
+                        Your class grants you a 25% cost reduction at the shop. The items below have been adjusted in
+                        terms of cost.
+                    </x-core.alerts.info-alert>
+                @endif
                 @if ($isLocation)
                     <p class="mb-4 italic">
                         You enter the old and musty shop. Along the walls you and see various weapons, armor

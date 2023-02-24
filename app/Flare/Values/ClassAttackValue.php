@@ -22,6 +22,7 @@ class ClassAttackValue {
     const ARCANE_ALCHEMISTS_DREAMS = 'alchemists ravenous dream';
     const PRISONER_RAGE            = 'prisoner rage';
     const ALCOHOLIC_PUKE           = 'alcoholic puke';
+    const MERCHANTS_SUPPLY         = 'Merchants supply';
 
     private CharacterClassValue $classType;
 
@@ -101,6 +102,12 @@ class ClassAttackValue {
 
         if ($this->classType->isAlcoholic()) {
             $this->buildAlcoholicsChance();
+
+            return $this->chance;
+        }
+
+        if ($this->classType->isMerchant()) {
+            $this->buildMerchantsPlace();
 
             return $this->chance;
         }
@@ -191,6 +198,14 @@ class ClassAttackValue {
                                       !$this->hasItemTypeEquipped('spell-damage') &&
                                       !$this->hasItemTypeEquipped('spell-healing');
         $this->chance['chance']     = $this->chance['chance'] + $this->characterInfo->classBonus();
+    }
+
+    public function buildMerchantsPlace() {
+        $this->chance['type'] = self::MERCHANTS_SUPPLY;
+        $this->chance['only'] = 'Stave or Bow';
+        $this->chance['class_name'] = 'Merchant';
+        $this->chance['has_item'] = $this->hasItemTypeEquipped('stave') || $this->hasItemTypeEquipped('bow');
+        $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
     }
 
     protected function hasItemTypeEquipped(string $type): bool {

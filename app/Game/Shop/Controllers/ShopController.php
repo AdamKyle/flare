@@ -110,7 +110,13 @@ class ShopController extends Controller {
             return redirect()->back()->with('error', 'Item not found.');
         }
 
-        if ($item->cost > $character->gold) {
+        $cost = $item->cost;
+
+        if ($character->classType()->isMerchant()) {
+            $cost = $cost - $cost * 0.25;
+        }
+
+        if ($cost > $character->gold) {
             return redirect()->back()->with('error', 'You do not have enough gold.');
         }
 
@@ -169,7 +175,13 @@ class ShopController extends Controller {
             return redirect()->back()->with('error', 'You are not capable of affording such luxury, child!');
         }
 
-        if ($item->cost > $character->gold) {
+        $cost = $item->cost;
+
+        if ($character->classType()->isMerchant()) {
+            $cost = $cost - $cost * 0.25;
+        }
+
+        if ($cost > $character->gold) {
             return redirect()->back()->with('error', 'You do not have enough gold.');
         }
 
@@ -212,6 +224,10 @@ class ShopController extends Controller {
         }
 
         $cost = $amount * $item->cost;
+
+        if ($character->classType()->isMerchant()) {
+            $cost = $cost - $cost * 0.25;
+        }
 
         if ($cost > $character->gold) {
             return redirect()->back()->with('error', 'You do not have enough gold.');

@@ -120,7 +120,7 @@ class EnchantingService {
      * @param int $itemId
      * @return int
      */
-    public function getCostOfEnchantment(array $enchantmentIds, int $itemId): int {
+    public function getCostOfEnchantment(Character $character, array $enchantmentIds, int $itemId): int {
         $itemAffixes   = ItemAffix::findMany($enchantmentIds);
         $itemToEnchant = Item::find($itemId);
 
@@ -138,6 +138,12 @@ class EnchantingService {
             if (!is_null($itemToEnchant->{'item_' . $itemAffix->type . '_id'})) {
                 $cost += 1000;
             }
+        }
+
+        if ($character->classType()->isMerchant()) {
+            $cost = $cost - $cost * 0.15;
+
+            event(new ServerMessageEvent($character->user, 'As a merchant you get a 15% reduction on enchanting items (reduction applied to total price).'));
         }
 
         return $cost;

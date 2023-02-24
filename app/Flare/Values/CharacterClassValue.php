@@ -18,6 +18,7 @@ class CharacterClassValue {
 
     const PRISONER         = 'Prisoner';
     const ALCOHOLIC        = 'Alcoholic';
+    const MERCHANT         = 'Merchant';
 
 
     /**
@@ -39,6 +40,7 @@ class CharacterClassValue {
         self::ARCANE_ALCHEMIST => 'Arcane Alchemist',
         self::PRISONER         => 'Prisoner',
         self::ALCOHOLIC        => 'Alcoholic',
+        self::MERCHANT         => 'Merchant',
     ];
 
     protected $nonCaster = [
@@ -49,6 +51,7 @@ class CharacterClassValue {
         self::VAMPIRE,
         self::PRISONER,
         self::ALCOHOLIC,
+        self::MERCHANT,
     ];
 
     protected $caster = [
@@ -164,6 +167,15 @@ class CharacterClassValue {
      */
     public function isAlcoholic(): bool {
         return $this->value === self::ALCOHOLIC;
+    }
+
+    /**
+     * is a Merchant?
+     *
+     * @return bool
+     */
+    public function isMerchant(): bool {
+        return $this->value === self::MERCHANT;
     }
 
     /**

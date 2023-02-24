@@ -44,6 +44,7 @@ class CraftingController extends Controller {
 
         $craftingService->craft($character, $request->all());
 
+
         return response()->json([
             'items' => $this->craftingService->fetchCraftableItems($character->refresh(), ['crafting_type' => $request->type]),
         ], 200);

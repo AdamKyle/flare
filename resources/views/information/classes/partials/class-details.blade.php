@@ -127,6 +127,10 @@
             @if ($class->type()->isAlcoholic())
                 @include('information.classes.partials.alcoholic')
             @endif
+
+            @if ($class->type()->isMerchant())
+                @include('information.classes.partials.merchant')
+            @endif
         </div>
     </x-core.cards.card-with-title>
 </div>

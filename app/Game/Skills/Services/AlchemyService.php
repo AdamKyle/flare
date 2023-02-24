@@ -46,13 +46,23 @@ class AlchemyService {
             return;
         }
 
-        if ($item->gold_dust_cost > $character->gold_dust) {
+        $goldDustCost = $item->gold_dust_cost;
+        $shardsCost   = $item->shards_cost;
+
+        if ($character->classType()->isMerchant()) {
+            $goldDustCost = $goldDustCost - $goldDustCost * 0.10;
+            $shardsCost   = $shardsCost - $shardsCost * 0.10;
+
+            event( new ServerMessageEvent($character->user, 'As a merchant you get a 10% reduction on crafting alchemical items.'));
+        }
+
+        if ($goldDustCost > $character->gold_dust) {
             event(new ServerMessageEvent($character->user, 'not_enough_gold_dust'));
 
             return;
         }
 
-        if ($item->shards_cost > $character->shards) {
+        if ($shardsCost > $character->shards) {
             event(new ServerMessageEvent($character->user, 'not_enough_shards'));
 
             return;

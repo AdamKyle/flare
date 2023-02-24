@@ -138,6 +138,7 @@ class SpecialtyShop {
      * @param Character $character
      * @param Item $item
      * @return bool
+     * @throws Exception
      */
     protected function hasCurrency(Character $character, Item $item): bool {
 
@@ -145,6 +146,13 @@ class SpecialtyShop {
         $shardsCost      = is_null($item->shards_cost) ? 0 : $item->shards_cost;
         $copperCoinsCost = is_null($item->copper_coin_cost) ? 0 : $item->copper_coin_cost;
         $goldDustCost    = is_null($item->gold_dust_cost) ? 0 : $item->gold_dust_cost;
+
+        if ($character->classType()->isMerchant()) {
+            $goldDustCost    = $goldDustCost - $goldDustCost * 0.05;
+            $goldCost        = $goldCost - $goldCost * 0.05;
+            $shardsCost      = $shardsCost - $shardsCost * 0.05;
+            $copperCoinsCost = $copperCoinsCost - $copperCoinsCost * 0.05;
+        }
 
         if ($character->gold < $goldCost ||
             $character->gold_dust < $goldDustCost ||
@@ -163,12 +171,20 @@ class SpecialtyShop {
      * @param Character $character
      * @param Item $itemToBuy
      * @return void
+     * @throws Exception
      */
     protected function updateCharacterCurrencies(Character $character, Item $itemToBuy): void {
         $goldCost        = is_null($itemToBuy->cost) ? 0 : $itemToBuy->cost;
         $shardsCost      = is_null($itemToBuy->shards_cost) ? 0 : $itemToBuy->shards_cost;
         $copperCoinsCost = is_null($itemToBuy->copper_coin_cost) ? 0 : $itemToBuy->copper_coin_cost;
         $goldDustCost    = is_null($itemToBuy->gold_dust_cost) ? 0 : $itemToBuy->gold_dust_cost;
+
+        if ($character->classType()->isMerchant()) {
+            $goldDustCost    = $goldDustCost - $goldDustCost * 0.05;
+            $goldCost        = $goldCost - $goldCost * 0.05;
+            $shardsCost      = $shardsCost - $shardsCost * 0.05;
+            $copperCoinsCost = $copperCoinsCost - $copperCoinsCost * 0.05;
+        }
 
         $character->update([
             'gold'         => $character->gold - $goldCost,

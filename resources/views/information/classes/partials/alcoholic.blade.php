@@ -38,6 +38,3 @@
 <p class="mb-4">
     It is also wise to enchant a few life stealing enchantments on your gear to help recover the lost health from your speciality.
 </p>
-<p class="mb-4">
-    The other special attack is Bloody puke: Deal 30% of your health as damage, but also take 30% of your health in damage.
-</p>

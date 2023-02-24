@@ -84,13 +84,25 @@ class CraftingService {
             return false;
         }
 
-        if ($item->cost > $character->gold) {
+        $cost = $this->getItemCost($character, $item);
+
+        if ($cost > $character->gold) {
             event(new ServerMessageEvent($character->user, 'not_enough_gold'));
 
             return false;
         }
 
         return $this->attemptToCraftItem($character, $skill, $item);
+    }
+
+    protected function getItemCost(Character $character, Item $item): int {
+        $cost = $item->cost;
+
+        if ($character->classType()->isMerchant()) {
+            $cost = $cost - $cost * 0.30;
+        }
+
+        return $cost;
     }
 
     /**
@@ -103,6 +115,10 @@ class CraftingService {
      * @throws Exception
      */
     protected function attemptToCraftItem(Character $character, Skill $skill, Item $item): bool {
+        if ($character->classType()->isMerchant()) {
+            event(new ServerMessageEvent($character->user, 'As a merchant you get a 30% reduction on crafting items.'));
+        }
+
         if ($skill->level < $item->skill_level_required) {
             event(new ServerMessageEvent($character->user, 'to_hard_to_craft'));
 
@@ -128,7 +144,9 @@ class CraftingService {
 
         event(new ServerMessageEvent($character->user, 'failed_to_craft'));
 
-        $this->updateCharacterGold($character, $item->cost, $skill);
+        $cost = $this->getItemCost($character, $item);
+
+        $this->updateCharacterGold($character, $cost);
 
         return false;
     }

@@ -41,7 +41,7 @@ class  EnchantingController extends Controller {
             return response()->json(['message' => 'Invalid Slot.'], 422);
         }
 
-        $cost = $this->enchantingService->getCostOfEnchantment($request->affix_ids, $slot->item->id);
+        $cost = $this->enchantingService->getCostOfEnchantment($character, $request->affix_ids, $slot->item->id);
 
         if ($cost > $character->gold || $cost === 0) {
             event(new ServerMessageEvent($character->user, 'Not enough gold to enchant that.'));

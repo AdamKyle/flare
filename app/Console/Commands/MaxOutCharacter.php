@@ -55,6 +55,7 @@ class MaxOutCharacter extends Command
         $character = $this->levelSkills($character);
         $character = $this->levelFactions($character);
         $character = $this->levelMercenaries($character);
+        $character = $this->maxOutClassRanks($character);
 
         $character->update([
             'gold'         => MaxCurrenciesValue::MAX_GOLD,
@@ -150,6 +151,20 @@ class MaxOutCharacter extends Command
             'reincarnated_bonus' => 11,
             'times_reincarnated' => 10,
         ]);
+
+        return $character->refresh();
+    }
+
+    protected function maxOutClassRanks(Character $character): Character {
+        foreach ($character->classRanks as $rank) {
+            $rank->weaponMasteries()->update([
+                'level' => 100,
+            ]);
+
+            $rank->update([
+                'level' => 100,
+            ]);
+        }
 
         return $character->refresh();
     }

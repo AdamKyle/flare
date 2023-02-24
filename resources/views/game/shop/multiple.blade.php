@@ -4,6 +4,13 @@
     <x-core.layout.info-container>
 
         <x-core.cards.card-with-title title="Purchase multiple of {{$itemName}}" backUrl="{{url()->previous()}}" buttons="true">
+            @if ($character->classType()->isMerchant())
+                <x-core.alerts.info-alert>
+                    Your class adjusts the total cost of the amount of items you purchase by 25%. That is if you buy 10 items, instead of each one
+                    having their cost reduced by 25%, your total cost is reduced by 25%.
+                </x-core.alerts.info-alert>
+            @endif
+
             <dl class="my-4">
                 <dt>Your Gold:</dt>
                 <dd>{{number_format($gold)}}</dd>
@@ -19,7 +26,13 @@
                 <div class="mb-5" x-data="{
                     amount: 0,
                     get cost() {
-                        return this.amount * {{$cost}}
+                        let amount = this.amount * {{$cost}};
+
+                        if ({{$character->classType()->isMerchant()}}) {
+                            amount = amount - amount * .025;
+                        }
+
+                        return amount;
                     },
                     get isDisabled() { return true; }
                 }">
