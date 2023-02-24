@@ -123,6 +123,14 @@ class UpdateCharactersForClassRanks extends Command
             return 5;
         }
 
+        if (($classRank->gameClass->type()->isMerchant()) && (new WeaponMasteryValue($type))->isBow()) {
+            return 3;
+        }
+
+        if (($classRank->gameClass->type()->isMerchant()) && (new WeaponMasteryValue($type))->isStave()) {
+            return 5;
+        }
+
         return 0;
     }
 }
