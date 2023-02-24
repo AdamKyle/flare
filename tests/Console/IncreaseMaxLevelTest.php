@@ -8,7 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class IncreaseMaxLevelTest extends TestCase {
-    
+
     use RefreshDatabase;
 
     public function testInitialIncreaseMaxLevel() {

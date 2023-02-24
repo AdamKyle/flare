@@ -25,11 +25,11 @@
     The reason: You are far too drunk half the time to properly use these.
 </p>
 <p class="mb-4">
-    Alcoholics suffer no damage deduction when using fists at 25% of the core damage stat.
+    Alcoholics when attacking with their fists will do an extra 25% of their core damage stat for damage.
 </p>
 <p class="mb-4">
-    Alcoholics <a href="/information/class-ranks">class specials</a> focus mostly on raising your health and damage modifier
-    as well as your damage stat.
+    Alcoholics <a href="/information/class-ranks">class specials</a> focus mostly on raising your health for your special attack, but also focus
+    secondarily on damage stat followed by raw damage.
 </p>
 <p class="mb-4">
     Alcoholics have a special attack: Bloody Puke. You'll deal 30% of your health to the enemy, but also suffer 15% damage, vomiting blood is not a good thing.
