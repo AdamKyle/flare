@@ -5,8 +5,7 @@ namespace App\Flare\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 
-class CharacterClassSpecialtiesEquipped extends Model
-{
+class CharacterClassSpecialtiesEquipped extends Model {
 
     protected $table = 'character_class_specialties_equipped';
 

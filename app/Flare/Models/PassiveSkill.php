@@ -6,12 +6,10 @@ use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use Database\Factories\PassiveSkillFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Flare\Models\Traits\WithSearch;
 
-class PassiveSkill extends Model
-{
+class PassiveSkill extends Model {
 
-    use HasFactory, WithSearch;
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.

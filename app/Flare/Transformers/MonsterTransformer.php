@@ -31,7 +31,7 @@ class MonsterTransformer extends TransformerAbstract {
      * @param Monster $monster
      * @return array
      */
-    public function transform(Monster $monster) {
+    public function transform(Monster $monster): array {
 
         $shouldIncrease              = $this->shouldIncreaseStats($monster);
         $increaseAmount              = $monster->gameMap->enemy_stat_bonus;

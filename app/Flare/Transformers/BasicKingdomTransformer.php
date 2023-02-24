@@ -37,10 +37,10 @@ class BasicKingdomTransformer extends TransformerAbstract {
     /**
      * Gets the response data for the character sheet
      *
-     * @param Character $character
-     * @return mixed
+     * @param Kingdom $kingdom
+     * @return array
      */
-    public function transform(Kingdom $kingdom) {
+    public function transform(Kingdom $kingdom): array {
         return [
             'id'                 => $kingdom->id,
             'name'               => $kingdom->name,

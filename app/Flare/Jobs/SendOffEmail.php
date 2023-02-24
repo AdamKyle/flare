@@ -9,7 +9,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use App\Flare\Models\User;
-use Asahasrabuddhe\LaravelMJML\Mail\Mailable;
+use App\Flare\Mail\GenericMail;
 
 class SendOffEmail implements ShouldQueue {
 
@@ -21,17 +21,17 @@ class SendOffEmail implements ShouldQueue {
     public User $user;
 
     /**
-     * @var Mailable $mailable
+     * @var GenericMail $mailable
      */
-    public Mailable $mailable;
+    public GenericMail $mailable;
 
     /**
      * Create a new job instance.
      *
      * @param User $user
-     * @param Mailable $mailable
+     * @param GenericMail $mailable
      */
-    public function __construct(User $user, Mailable $mailable) {
+    public function __construct(User $user, GenericMail $mailable) {
         $this->user     = $user;
         $this->mailable = $mailable;
     }

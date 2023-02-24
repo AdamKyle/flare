@@ -167,7 +167,7 @@ class CharacterStatBuilder {
      */
     public function classBonus(): float {
         if (empty($this->equippedItems)) {
-            return 0.5;
+            return 0.05;
         }
 
         $suffixClassBonus = $this->equippedItems->sum('item.itemSuffix.class_bonus');

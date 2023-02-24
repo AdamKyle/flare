@@ -5,12 +5,10 @@ namespace App\Flare\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Database\Factories\GameRaceFactory;
-use App\Flare\Models\Traits\WithSearch;
 
-class GameRace extends Model
-{
+class GameRace extends Model {
 
-    use HasFactory, WithSearch;
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.

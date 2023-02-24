@@ -4,13 +4,11 @@ namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Flare\Models\Traits\WithSearch;
 use Database\Factories\MarketHistoryFactory;
 
-class MarketHistory extends Model
-{
+class MarketHistory extends Model {
 
-    use HasFactory, WithSearch;
+    use HasFactory;
 
     protected $table= 'market_history';
 

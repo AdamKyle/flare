@@ -18,7 +18,7 @@ class KingdomTransformer extends TransformerAbstract {
     /**
      * @var string[]
      */
-    protected $defaultIncludes = [
+    protected array $defaultIncludes = [
         'buildings',
         'units',
         'unitsInMovement'

@@ -2,15 +2,14 @@
 
 namespace App\Flare\Models;
 
-use Bkwld\Cloner\Cloneable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Database\Factories\ItemAffixFactory;
-use App\Flare\Models\Traits\WithSearch;
+use Bkwld\Cloner\Cloneable;
 
-class ItemAffix extends Model
-{
-    use HasFactory, WithSearch, Cloneable;
+class ItemAffix extends Model {
+
+    use HasFactory, Cloneable;
 
     /**
      * The attributes that are mass assignable.

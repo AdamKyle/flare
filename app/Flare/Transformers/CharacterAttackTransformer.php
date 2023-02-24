@@ -18,9 +18,9 @@ class CharacterAttackTransformer extends BaseTransformer {
      * creates response data for character attack data.
      *
      * @param Character $character
-     * @return mixed
+     * @return array
      */
-    public function transform(Character $character) {
+    public function transform(Character $character): array {
 
         $characterStatBuilder = resolve(CharacterStatBuilder::class)->setCharacter($character, $this->ignoreReductions);
 

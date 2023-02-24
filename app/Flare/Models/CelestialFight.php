@@ -6,8 +6,7 @@ use Database\Factories\CelestialFightFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class CelestialFight extends Model
-{
+class CelestialFight extends Model {
 
     use HasFactory;
 

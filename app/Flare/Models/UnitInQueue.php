@@ -6,8 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Database\Factories\UnitInQueueFactory;
 
-class UnitInQueue extends Model
-{
+class UnitInQueue extends Model {
 
     use HasFactory;
 

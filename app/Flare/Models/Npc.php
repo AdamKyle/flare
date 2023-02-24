@@ -5,12 +5,11 @@ namespace App\Flare\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Database\Factories\NpcFactory;
-use App\Flare\Models\Traits\WithSearch;
 use App\Flare\Values\NpcTypes;
 
 class Npc extends Model {
 
-    use WithSearch, HasFactory;
+    use HasFactory;
 
     protected $table = 'npcs';
 

@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Admin\Mail\UnBanRequestMail;
-use App\Flare\Models\User;
 use Cache;
 use Hash;
-use Illuminate\Http\Request;
 use Mail;
+use App\Admin\Mail\UnBanRequestMail;
+use App\Flare\Models\User;
+use Illuminate\Http\Request;
 use Monolog\Handler\MailHandler;
 
-class UnbanRequestController extends Controller
-{
+class UnbanRequestController extends Controller {
 
     public function unbanRequest() {
         return view('request.unban');

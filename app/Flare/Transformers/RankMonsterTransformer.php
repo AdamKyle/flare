@@ -32,7 +32,7 @@ class RankMonsterTransformer extends TransformerAbstract {
      * @param Monster $monster
      * @return array
      */
-    public function transform(Monster $monster) {
+    public function transform(Monster $monster): array {
 
         return [
             'id'                        => $monster->id,

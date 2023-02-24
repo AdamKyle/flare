@@ -5,8 +5,7 @@ namespace App\Flare\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class HolyStack extends Model
-{
+class HolyStack extends Model {
 
     use HasFactory;
 

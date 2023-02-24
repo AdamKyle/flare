@@ -5,13 +5,10 @@ namespace App\Flare\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Database\Factories\MonsterFactory;
-use App\Flare\Models\Skill;
-use App\Flare\Models\Traits\WithSearch;
 
-class Monster extends Model
-{
+class Monster extends Model {
 
-    use HasFactory, WithSearch;
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.

@@ -18,7 +18,7 @@ class UnitTransformer extends TransformerAbstract {
      * @return array
      * @throws Exception
      */
-    public function transform(GameUnit $unit) {
+    public function transform(GameUnit $unit): array {
         return [
             'id'                      => $unit->id,
             'name'                    => $unit->name,

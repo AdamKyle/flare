@@ -6,11 +6,10 @@ use App\Flare\Values\LocationEffectValue;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Database\Factories\LocationFactory;
-use App\Flare\Models\Traits\WithSearch;
 
-class Location extends Model
-{
-    use HasFactory, WithSearch;
+class Location extends Model {
+
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.

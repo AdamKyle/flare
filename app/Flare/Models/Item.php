@@ -2,18 +2,15 @@
 
 namespace App\Flare\Models;
 
-use App\Flare\Models\Traits\CalculateSkillBonus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Bkwld\Cloner\Cloneable;
 use Database\Factories\ItemFactory;
-use App\Flare\Models\Traits\WithSearch;
+use Bkwld\Cloner\Cloneable;
+use App\Flare\Models\Traits\CalculateSkillBonus;
 
 class Item extends Model {
 
-    use Cloneable;
-
-    use HasFactory, WithSearch, CalculateSkillBonus;
+    use Cloneable, HasFactory, CalculateSkillBonus;
 
     /**
      * The attributes that are mass assignable.

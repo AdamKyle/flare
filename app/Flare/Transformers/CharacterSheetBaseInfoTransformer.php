@@ -24,9 +24,9 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer {
      * Gets the response data for the character sheet
      *
      * @param Character $character
-     * @return mixed
+     * @return array
      */
-    public function transform(Character $character) {
+    public function transform(Character $character): array {
         $characterStatBuilder         = resolve(CharacterStatBuilder::class)->setCharacter($character, $this->ignoreReductions);
         $gameClass                    = GameClass::find($character->game_class_id);
 

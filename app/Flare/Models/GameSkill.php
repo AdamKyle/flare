@@ -2,16 +2,14 @@
 
 namespace App\Flare\Models;
 
-use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Database\Factories\GameSkillFactory;
-use App\Flare\Models\Traits\WithSearch;
+use App\Game\Skills\Values\SkillTypeValue;
 
-class GameSkill extends Model
-{
+class GameSkill extends Model {
 
-    use HasFactory, WithSearch;
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.

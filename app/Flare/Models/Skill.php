@@ -2,18 +2,16 @@
 
 namespace App\Flare\Models;
 
-use App\Flare\Models\Traits\CalculateSkillBonus;
-use App\Flare\Models\Traits\CalculateTimeReduction;
-use App\Flare\Models\Traits\ClassBasedBonuses;
-use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Database\Factories\SkillFactory;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use App\Flare\Models\Traits\CalculateSkillBonus;
+use App\Flare\Models\Traits\CalculateTimeReduction;
+use App\Game\Skills\Values\SkillTypeValue;
 
-class Skill extends Model
-{
+class Skill extends Model {
 
     use HasFactory, CalculateSkillBonus, CalculateTimeReduction;
 

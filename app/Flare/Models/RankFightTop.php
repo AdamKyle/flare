@@ -2,11 +2,7 @@
 
 namespace App\Flare\Models;
 
-use App\Flare\Values\CharacterClassValue;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Database\Factories\GameClassFactory;
-use App\Flare\Models\Traits\WithSearch;
 
 class RankFightTop extends Model {
 

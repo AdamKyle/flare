@@ -2,18 +2,15 @@
 
 namespace App\Flare\Models;
 
-use App\Flare\Values\ItemEffectsValue;
-use App\Flare\Values\MapNameValue;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Database\Factories\GameMapFactory;
-use App\Flare\Models\Map;
-use App\Flare\Models\Traits\WithSearch;
+use App\Flare\Values\ItemEffectsValue;
+use App\Flare\Values\MapNameValue;
 
-class GameMap extends Model
-{
+class GameMap extends Model {
 
-    use WithSearch, HasFactory;
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.

@@ -2,12 +2,10 @@
 
 namespace App\Flare\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Database\Factories\CharacterInCelestialFightFactory;
 
-class GuideQuest extends Model
-{
+class GuideQuest extends Model {
+
     /**
      * The attributes that are mass assignable.
      *

@@ -8,11 +8,12 @@ class CoreSerializer extends ArraySerializer
 {
     /**
      * Sets a resource key on a collection if set.
-     * 
+     *
      * @param mixed $resourceKey
      * @param array $data
+     * @return array
      */
-    public function collection($resourceKey, array $data) {
+    public function collection(?string $resourceKey, array $data): array {
         if ($resourceKey) {
             return [$resourceKey => $data];
         }
@@ -22,11 +23,12 @@ class CoreSerializer extends ArraySerializer
 
     /**
      * Sets a resource key on a item if set.
-     * 
+     *
      * @param mixed $resourceKey
      * @param array $data
+     * @return array
      */
-    public function item($resourceKey, array $data) {
+    public function item(?string $resourceKey, array $data): array {
         if ($resourceKey) {
             return [$resourceKey => $data];
         }

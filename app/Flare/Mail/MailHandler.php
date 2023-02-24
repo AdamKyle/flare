@@ -3,23 +3,29 @@
 namespace App\Flare\Mail;
 
 use Illuminate\Bus\Queueable;
-use Asahasrabuddhe\LaravelMJML\Mail\Mailable;
+use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Mail;
 
-class MailHandler extends Mailable
-{
+class MailHandler extends Mailable {
+
     use Queueable, SerializesModels;
 
-    private $toEmail;
+    /**
+     * @var string $toEmail
+     */
+    private string $toEmail;
 
-    private $mailable;
+    /**
+     * @var Mailable $mailable
+     */
+    private Mailable $mailable;
 
     /**
      * @param string $toEmail
      * @param Mailable $mailable
      */
-    public function __construct(string $toEmail, Mailable $mailable)
-    {
+    public function __construct(string $toEmail, Mailable $mailable) {
         $this->to       = $toEmail;
         $this->mailable = $mailable;
     }
@@ -27,10 +33,9 @@ class MailHandler extends Mailable
     /**
      * Build the message.
      *
-     * @return $this
+     * @return void
      */
-    public function build()
-    {
+    public function build(): void {
         Mail::to($this->toEmail)->send($this->mailable);
     }
 }

@@ -3,13 +3,11 @@
 namespace App\Flare\Models;
 
 use App\Flare\Values\AutomationType;
-use Database\Factories\CelestialFightFactory;
 use Database\Factories\CharacterAutomationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class CharacterAutomation extends Model
-{
+class CharacterAutomation extends Model {
 
     use HasFactory;
 

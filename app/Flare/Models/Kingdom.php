@@ -2,22 +2,16 @@
 
 namespace App\Flare\Models;
 
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Database\Factories\KingdomFactory;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use App\Game\Skills\Values\SkillTypeValue;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Flare\Models\Traits\WithSearch;
-use Database\Factories\KingdomFactory;
-use OwenIt\Auditing\Contracts\Auditable;
-use OwenIt\Auditing\Auditable as AuditableTrait;
 
-class Kingdom extends Model implements Auditable
-{
-
-    use AuditableTrait;
-
-    use HasFactory, WithSearch;
+class Kingdom extends Model {
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.

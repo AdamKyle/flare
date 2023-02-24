@@ -6,11 +6,10 @@ use App\Flare\Values\FeatureTypes;
 use Database\Factories\QuestFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Flare\Models\Traits\WithSearch;
 
 class Quest extends Model {
 
-    use WithSearch, HasFactory;
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.

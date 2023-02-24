@@ -33,7 +33,7 @@ class KingdomAttackLogsTransformer extends TransformerAbstract {
      * @return array
      * @throws Exception
      */
-    public function transform(KingdomLog $log) {
+    public function transform(KingdomLog $log): array {
         return [
             'id'                       => $log->id,
             'character_id'             => $log->character_id,

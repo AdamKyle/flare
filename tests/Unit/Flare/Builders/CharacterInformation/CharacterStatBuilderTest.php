@@ -124,7 +124,7 @@ class CharacterStatBuilderTest extends TestCase {
 
         $value = $this->characterStatBuilder->setCharacter($character)->classBonus();
 
-        $this->assertEquals(0, $value);
+        $this->assertEquals(0.05, $value);
     }
 
     public function testGetHolyInfo() {
@@ -429,7 +429,7 @@ class CharacterStatBuilderTest extends TestCase {
 
         $damage = $this->characterStatBuilder->setCharacter($character)->buildDamage('weapon', true);
 
-        $this->assertGreaterThan(100, $damage);
+        $this->assertEquals(100, $damage);
     }
 
     public function testWeaponDamageWithSkill() {
