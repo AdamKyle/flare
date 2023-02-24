@@ -478,6 +478,38 @@ export default class Damage extends BattleBase {
     return monsterCurrentHealth
   }
 
+  bloodyPuke(attacker, monsterCurrentHealth, attackerCurrentHealth, attackData, damageDeduction) {
+    if (attacker.extra_action_chance.class_name === attacker.class) {
+      const extraActionChance = attacker.extra_action_chance;
+
+      if (!this.canUse(extraActionChance)) {
+        return monsterCurrentHealth;
+      }
+
+      this.addMessage('You drink and you drink and you drink ...', 'regular');
+
+      let damageToDo     = attacker.dur_modded * 0.30;
+      let damageToSuffer = attacker.dur_modded * 0.15;
+
+      if (damageDeduction > 0.0) {
+        this.addMessage('The Plane weakens your ability to do full damage! You will still suffer the 15% damage for vomiting blood.', 'enemy-action');
+        damageToDo = damageToDo - (damageToDo * damageDeduction);
+      }
+
+      this.addMessage('You cannot hold it in, you vomit blood and bile so acidic your enemy cannot handle it! (You dealt: '+formatNumber(damageToDo)+')', 'player-action');
+
+      return {
+        monsterHealth: monsterCurrentHealth - damageToDo,
+        attackerHealth: attackerCurrentHealth - damageToSuffer
+      }
+    }
+
+    return {
+      monsterHealth:  monsterCurrentHealth,
+      attackerHealth: attackerCurrentHealth,
+    }
+  }
+
   canUse(extraActionChance) {
 
     if (extraActionChance >= 1.0) {

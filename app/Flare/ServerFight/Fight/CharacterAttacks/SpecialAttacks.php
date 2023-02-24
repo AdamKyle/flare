@@ -3,9 +3,9 @@
 namespace App\Flare\ServerFight\Fight\CharacterAttacks;
 
 use App\Flare\Models\Character;
-use App\Flare\ServerFight\BattleBase;
 use App\Flare\ServerFight\BattleMessages;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\AlchemistsRavenousDream;
+use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\BloodyPuke;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\DoubleAttack;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\DoubleCast;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\DoubleHeal;
@@ -14,37 +14,76 @@ use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\PrisonerRage;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\ThiefBackStab;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\TripleAttack;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\VampireThirst;
+use Exception;
 
 class SpecialAttacks extends BattleMessages {
 
+    /**
+     * @var int $characterHealth
+     */
     private int $characterHealth;
 
+    /**
+     * @var int $monsterHealth
+     */
     private int $monsterHealth;
+
 
     public function __construct() {
         parent::__construct();
     }
 
+    /**
+     * Set character health.
+     *
+     * @param int $characterHealth
+     * @return $this
+     */
     public function setCharacterHealth(int $characterHealth): SpecialAttacks {
         $this->characterHealth = $characterHealth;
 
         return $this;
     }
 
+    /**
+     * Set monster health.
+     *
+     * @param int $monsterHealth
+     * @return $this
+     */
     public function setMonsterHealth(int $monsterHealth): SpecialAttacks {
         $this->monsterHealth = $monsterHealth;
 
         return $this;
     }
 
+    /**
+     * Get Character health.
+     *
+     * @return int
+     */
     public function getCharacterHealth(): int {
         return $this->characterHealth;
     }
 
+    /**
+     * Get monster health.
+     *
+     * @return int
+     */
     public function getMonsterHealth(): int {
         return $this->monsterHealth;
     }
 
+    /**
+     * Do non caster based specials.
+     *
+     * @param Character $character
+     * @param array $attackData
+     * @param bool $isPvp
+     * @return void|null
+     * @throws Exception
+     */
     public function  doWeaponSpecials(Character $character, array $attackData, bool $isPvp = false) {
         if ($character->classType()->isBlacksmith()) {
             return $this->hammerSmash($character, $attackData, $isPvp);
@@ -73,25 +112,43 @@ class SpecialAttacks extends BattleMessages {
         if ($character->classType()->isPrisoner()) {
              return $this->prisonersRage($character, $attackData);
         }
+
+        if ($character->classType()->isAlcoholic()) {
+            return $this->alcoholicsBloodyVomit($character, $attackData);
+        }
+
+        if ($character->classType()->isVampire()) {
+            return $this->vampireThirst($character, $attackData, $isPvp);
+        }
     }
 
+    /**
+     * Do double cast spells
+     *
+     * @param Character $character
+     * @param array $attackData
+     * @param bool $isPvp
+     * @return void|null
+     * @throws Exception
+     */
     public function doCastDamageSpecials(Character $character, array $attackData, bool $isPvp = false) {
         if ($character->classType()->isHeretic()) {
             $this->doubleCast($character, $attackData, $isPvp);
         }
-
-        if ($character->classType()->isVampire()) {
-            return $this->vampireThirst($character, $attackData, $isPvp);
-        }
     }
 
+    /**
+     * Do double healing.
+     *
+     * @param Character $character
+     * @param array $attackData
+     * @param bool $isPvp
+     * @return void|null
+     * @throws Exception
+     */
     public function doCastHealSpecials(Character $character, array $attackData, bool $isPvp = false) {
         if ($character->classType()->isProphet()) {
             $this->doubleHeal($character, $attackData, $isPvp);
-        }
-
-        if ($character->classType()->isVampire()) {
-            return $this->vampireThirst($character, $attackData, $isPvp);
         }
     }
 
@@ -328,6 +385,29 @@ class SpecialAttacks extends BattleMessages {
         $this->monsterHealth   = $prisonersRage->getMonsterHealth();
 
         $prisonersRage->clearMessages();
+    }
+
+    /**
+     * Alcoholics bloody vomit
+     *
+     * @param Character $character
+     * @param array $attackData
+     * @param bool $isPvp
+     * @return void
+     */
+    public function alcoholicsBloodyVomit(Character $character, array $attackData, bool $isPvp = false) {
+        $alcoholicsBloodyVomit = resolve(BloodyPuke::class);
+
+        $alcoholicsBloodyVomit->setCharacterHealth($this->characterHealth);
+        $alcoholicsBloodyVomit->setMonsterHealth($this->monsterHealth);
+        $alcoholicsBloodyVomit->handleAttack($character, $attackData, $isPvp);
+
+        $this->mergeMessages($alcoholicsBloodyVomit->getMessages());
+
+        $this->characterHealth = $alcoholicsBloodyVomit->getCharacterHealth();
+        $this->monsterHealth   = $alcoholicsBloodyVomit->getMonsterHealth();
+
+        $alcoholicsBloodyVomit->clearMessages();
     }
 
 }
