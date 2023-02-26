@@ -4,6 +4,10 @@ namespace App\Providers;
 
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\ServiceProvider;
+use App\Console\DevelopmentCommands\CreateTestCharacters;
+use App\Console\DevelopmentCommands\LevelCharacter;
+use App\Console\DevelopmentCommands\MaxOutCharacter;
+use App\Console\DevelopmentCommands\UpdateUsersForDevelopment;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -14,6 +18,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void {
 
+        // Register development based commands.
+        $this->commands([
+            CreateTestCharacters::class,
+            MaxOutCharacter::class,
+            UpdateUsersForDevelopment::class,
+            LevelCharacter::class
+        ]);
     }
 
     /**

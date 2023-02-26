@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Console\DevelopmentCommands;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
