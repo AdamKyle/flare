@@ -24,7 +24,7 @@ class CreateTestCharacters extends Command {
      *
      * @var string
      */
-    protected $signature = 'create:test-characters {password} {?className}';
+    protected $signature = 'create:test-characters {password} {className?}';
 
     /**
      * The console command description.
@@ -65,7 +65,8 @@ class CreateTestCharacters extends Command {
             return;
         }
 
-        $this->line('ATTN! This command will take a while as we create, level up and max out the character.');
+        $this->line('ATTN! This command will take a while as we create, level up and max out the characters for each class, including the characters with locked classes.');
+        $this->line('You will still need to craft level 400 gear to purchase Hell Forged and then Purgatory gear.');
         $this->line('');
 
 

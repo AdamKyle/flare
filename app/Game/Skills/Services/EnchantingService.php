@@ -2,6 +2,7 @@
 
 namespace App\Game\Skills\Services;
 
+use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use App\Flare\Models\Inventory;
 use App\Game\Core\Services\CharacterInventoryService;
@@ -116,9 +117,11 @@ class EnchantingService {
     /**
      * Does the cost supplied actually match the actual cost?
      *
+     * @param Character $character
      * @param array $enchantmentIds
      * @param int $itemId
      * @return int
+     * @throws Exception
      */
     public function getCostOfEnchantment(Character $character, array $enchantmentIds, int $itemId): int {
         $itemAffixes   = ItemAffix::findMany($enchantmentIds);
@@ -240,7 +243,7 @@ class EnchantingService {
                 return;
             }
 
-            if ($enchantingSkill->level >= $affix->skill_level_trivial) {
+            if ($enchantingSkill->level > $affix->skill_level_trivial) {
                 if (!$this->sentToEasyMessage) {
                     event(new ServerMessageEvent($character->user, 'to_easy_to_craft'));
                     $this->sentToEasyMessage = true;

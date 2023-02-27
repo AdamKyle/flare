@@ -85,7 +85,7 @@ class AlchemyService {
             return;
         }
 
-        if ($skill->level >= $item->skill_level_trivial) {
+        if ($skill->level > $item->skill_level_trivial) {
 
             event(new ServerMessageEvent($character->user, 'to_easy_to_craft'));
 

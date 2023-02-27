@@ -13,6 +13,7 @@ use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Services\Traits\SkillCheck;
+use Exception;
 
 
 class TrinketCraftingService {
@@ -57,7 +58,7 @@ class TrinketCraftingService {
      * @param Character $character
      * @param Item $item
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public function craft(Character $character, Item $item): array {
         $trinkentrySkill = $this->fetchCharacterSkill($character);
@@ -82,7 +83,7 @@ class TrinketCraftingService {
             return $this->fetchItemsToCraft($character);
         }
 
-        if ($trinkentrySkill->level >= $item->skill_level_trivial) {
+        if ($trinkentrySkill->level > $item->skill_level_trivial) {
             event(new FlareServerMessage($character->user, 'to_easy_to_craft'));
 
             $this->craftingService->pickUpItem($character, $item, $trinkentrySkill, true);
@@ -123,7 +124,7 @@ class TrinketCraftingService {
      * @param Character $character
      * @param Item $item
      * @return bool
-     * @throws \Exception
+     * @throws Exception
      */
     protected function canAfford(Character $character, Item $item): bool {
 

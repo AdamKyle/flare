@@ -127,7 +127,7 @@ class UpdateCharactersForClassRanks extends Command
             return 3;
         }
 
-        if (($classRank->gameClass->type()->isMerchant()) && (new WeaponMasteryValue($type))->isStave()) {
+        if (($classRank->gameClass->type()->isMerchant()) && (new WeaponMasteryValue($type))->isStaff()) {
             return 5;
         }
 

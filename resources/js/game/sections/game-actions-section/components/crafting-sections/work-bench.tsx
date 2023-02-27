@@ -66,6 +66,13 @@ export default class WorkBench extends React.Component<any, any> {
                             max_holy_stacks: foundItem[0].item.holy_stacks,
                             applied_holy_stacks: foundItem[0].item.holy_stacks_applied,
                         })
+                    } else {
+                        // If the item is not found reset the state.
+                        this.setState({
+                            applied_holy_stacks: 0,
+                            max_holy_stacks: 0,
+                            selected_item: null,
+                        })
                     }
                 });
             }, (error: AxiosError) => {

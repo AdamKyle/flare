@@ -124,11 +124,11 @@ class MaxOutCharacter extends Command
                 $skill->baseSkill->type === SkillTypeValue::DISENCHANTING ||
                 $skill->baseSkill->type === SkillTypeValue::ENCHANTING)
             {
-                $skill->update(['level' => 400, 'is_hidden' => false]);
+                $skill->update(['level' => 400, 'is_hidden' => false, 'is_locked' => false]);
             }
 
             if ($skill->baseSkill->type === SkillTypeValue::ALCHEMY) {
-                $skill->update(['level' => 200, 'is_hidden' => false]);
+                $skill->update(['level' => 200, 'is_hidden' => false, 'is_locked' => false]);
             }
         }
 
