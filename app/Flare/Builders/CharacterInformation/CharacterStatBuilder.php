@@ -382,12 +382,17 @@ class CharacterStatBuilder {
      * @param int $damage
      * @param bool $voided
      * @return int
+     * @throws Exception
      */
     protected function spellDamageBonus(int $damage, bool $voided = false): int {
         if ($this->character->class->type()->isHeretic() || $this->character->class->type()->isArcaneAlchemist()) {
             $intMod = $this->statMod('int', $voided) * 0.30;
 
             return ceil($intMod + $damage);
+        }
+
+        if ($this->character->classType()->isAlcoholic()) {
+            return floor($damage - ($damage * 0.50));
         }
 
         return $damage;

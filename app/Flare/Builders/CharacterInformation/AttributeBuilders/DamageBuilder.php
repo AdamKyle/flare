@@ -125,10 +125,6 @@ class DamageBuilder extends BaseAttribute {
 
         $damage = $itemDamage + $itemDamage * ($skillPercentage + $affixPercentage + $spellMasteryPercentage);
 
-        if ($this->character->classType()->isAlcoholic()) {
-            return $damage - ($damage * 0.50);
-        }
-
         return $damage;
     }
 
