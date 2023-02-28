@@ -13,7 +13,7 @@ use App\Game\Core\Traits\ResponseBuilder;
 
 class CharacterReincarnateService {
 
-    const MAX_STATS = 9999999999;
+    const MAX_STATS = 99999999999;
 
     use ResponseBuilder, CharacterMaxLevel;
 
@@ -75,7 +75,7 @@ class CharacterReincarnateService {
         }
 
         if (empty($updatedStats)) {
-            return $this->errorResult('You have maxed all stats to 9,999,999.');
+            return $this->errorResult('You have maxed all stats to '.number_format(self::MAX_STATS).'.');
         }
 
         $xpPenalty = $character->xp_penalty + 0.05;
