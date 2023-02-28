@@ -92,6 +92,13 @@ class CreateTestCharacters extends Command {
         }
 
         $progressBar->finish();
+
+        $this->line('');
+        $this->line('Increasing Rank Fight To Max ....');
+        $this->line('');
+
+        Artisan::call('increase:rank-fight-to-max');
+
         $this->line('');
         $this->table($headers, $data);
     }
@@ -139,6 +146,8 @@ class CreateTestCharacters extends Command {
         Artisan::call('max-out:character ' . $character->name);
 
         Artisan::call('assign:top-end-gear ' . $character->name);
+
+        Artisan::call('reincarnate:character ' . $character->name);
 
         return $character;
     }

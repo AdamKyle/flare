@@ -42,7 +42,7 @@ class IncreaseRankFightToMax extends Command
 
         $progressBar = new ProgressBar(new ConsoleOutput(),$ranksLeft);
 
-        for ($i = 1; $i < $ranksLeft; $i++) {
+        for ($i = 0; $i < $ranksLeft; $i++) {
             Artisan::call('update:rank-fights');
 
             $progressBar->advance();

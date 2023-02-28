@@ -44,7 +44,7 @@ class ReincarnateCharacter extends Command {
 
         Artisan::call('level:character ' . $character->id . ' ' . 4999);
 
-        $this->line('reincarnation is done, character max stats are now 9,999,999. Character also leveled back to max level.');
+        $this->line('reincarnation is done, character max stats are now 99,999,999,999. Character also leveled back to max level.');
     }
 
     /**
