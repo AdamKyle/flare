@@ -2,6 +2,7 @@ import ExtraActionType from "./extra-action-type";
 import {random} from "lodash";
 import BattleBase from "../../battle-base";
 import {formatNumber} from "../../../../format-number";
+import SpecialAttackClasses from "./special-attack-classes";
 
 export default class Damage extends BattleBase {
 
@@ -122,7 +123,7 @@ export default class Damage extends BattleBase {
   }
 
   canAutoHit(attacker) {
-    if (attacker.extra_action_chance.class_name === attacker.class) {
+    if (SpecialAttackClasses.isThief(attacker.class)) {
       const extraActionChance = attacker.extra_action_chance;
 
       if (extraActionChance.type === ExtraActionType.THIEVES_SHADOW_DANCE && extraActionChance.has_item) {
@@ -202,7 +203,7 @@ export default class Damage extends BattleBase {
   }
 
   hammerSmash(attacker, monsterCurrentHealth, attackData) {
-    if (attacker.extra_action_chance.class_name === attacker.class) {
+    if (SpecialAttackClasses.isBlackSmith(attacker.class)) {
       const extraActionChance = attacker.extra_action_chance;
 
       if (!this.canUse(extraActionChance.chance)) {
@@ -247,7 +248,7 @@ export default class Damage extends BattleBase {
   }
 
   alchemistsRavenousDream(attacker, monsterCurrentHealth, attackData) {
-    if (attacker.extra_action_chance.class_name === attacker.class) {
+    if (SpecialAttackClasses.isArcaneAlchemist(attacker.class)) {
       const extraActionChance = attacker.extra_action_chance;
 
       if (!this.canUse(extraActionChance.chance)) {
@@ -303,7 +304,7 @@ export default class Damage extends BattleBase {
   }
 
   tripleAttackChance(attacker, monsterCurrentHealth, attackData) {
-    if (attacker.extra_action_chance.class_name === attacker.class) {
+    if (SpecialAttackClasses.isRanger(attacker.class)) {
       const extraActionChance = attacker.extra_action_chance;
 
       if (!this.canUse(extraActionChance.chance)) {
@@ -333,7 +334,7 @@ export default class Damage extends BattleBase {
   }
 
   doubleDamage(attacker, monsterCurrentHealth, attackData) {
-    if (attacker.extra_action_chance.class_name === attacker.class) {
+    if (SpecialAttackClasses.isFighter(attacker.class)) {
       const extraActionChance = attacker.extra_action_chance;
 
       if (!this.canUse(extraActionChance.chance)) {
@@ -364,7 +365,7 @@ export default class Damage extends BattleBase {
   }
 
   doubleCastChance(attacker, attackData, monsterCurrentHealth) {
-    if (attacker.extra_action_chance.class_name === attacker.class) {
+    if (SpecialAttackClasses.isHeretic(attacker.class)) {
       const extraActionChance = attacker.extra_action_chance;
 
       if (!this.canUse(extraActionChance.chance)) {
@@ -392,7 +393,7 @@ export default class Damage extends BattleBase {
   }
 
   doubleHeal(attacker, characterCurrentHealth, attackData, extraHealing) {
-    if (attacker.extra_action_chance.class_name === attacker.class) {
+    if (SpecialAttackClasses.isProphet(attacker.class)) {
       const extraActionChance = attacker.extra_action_chance;
 
       if (!this.canUse(extraActionChance.chance)) {
@@ -412,7 +413,7 @@ export default class Damage extends BattleBase {
 
   vampireThirstChance(attacker, monsterCurrentHealth, characterCurrentHealth, damageDeduction) {
 
-    if (attacker.extra_action_chance.class_name === attacker.class) {
+    if (SpecialAttackClasses.isVampire(attacker.class)) {
       const extraActionChance = attacker.extra_action_chance;
 
       if (!this.canUse(extraActionChance.chance)) {
@@ -448,11 +449,10 @@ export default class Damage extends BattleBase {
 
   prisonersRage(attacker, monsterCurrentHealth, attackData, damageDeduction) {
 
-    if (attacker.extra_action_chance.class_name === attacker.class) {
-
+    if (SpecialAttackClasses.isPrisoner(attacker.class)) {
       const extraActionChance = attacker.extra_action_chance;
 
-      if (!this.canUse(extraActionChance)) {
+      if (!this.canUse(extraActionChance.chance)) {
         return monsterCurrentHealth;
       }
 
@@ -479,14 +479,14 @@ export default class Damage extends BattleBase {
   }
 
   bloodyPuke(attacker, monsterCurrentHealth, attackerCurrentHealth, attackData, damageDeduction) {
-    if (attacker.extra_action_chance.class_name === attacker.class) {
+    if (SpecialAttackClasses.isAlcoholic(attacker.class)) {
       const extraActionChance = attacker.extra_action_chance;
 
-      if (!this.canUse(extraActionChance)) {
+      if (!this.canUse(extraActionChance.chance)) {
         return monsterCurrentHealth;
       }
 
-      this.addMessage('You drink and you drink and you drink ...', 'regular');
+      this.addMessage('You drink and you drink and you drink ...', 'player-action');
 
       let damageToDo     = attacker.dur_modded * 0.30;
       let damageToSuffer = attacker.dur_modded * 0.15;
@@ -497,6 +497,7 @@ export default class Damage extends BattleBase {
       }
 
       this.addMessage('You cannot hold it in, you vomit blood and bile so acidic your enemy cannot handle it! (You dealt: '+formatNumber(damageToDo)+')', 'player-action');
+      this.addMessage('You lost a lot of blood in your attack. You took: ' + formatNumber(damageToSuffer) + ' damage.', 'enemy-action');
 
       return {
         monsterHealth: monsterCurrentHealth - damageToDo,

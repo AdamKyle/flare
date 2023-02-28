@@ -142,7 +142,7 @@ export default class CharacterSheet extends React.Component<CharacterSheetProps,
                                 <BasicCard additionalClasses={'overflow-y-auto lg:w-1/2'}>
                                     {
                                         this.showCloseButton() ?
-                                            <div className='text-right cursor-pointer text-red-500 position top-[-10px]'>
+                                            <div className='text-right cursor-pointer text-red-500 relative top-[10px]'>
                                                 <button onClick={this.showTopSection.bind(this)}><i className="fas fa-minus-circle"></i></button>
                                             </div>
                                         : null
@@ -245,7 +245,7 @@ export default class CharacterSheet extends React.Component<CharacterSheetProps,
                             <BasicCard additionalClasses={'overflow-y-auto lg:w-1/2 lg:h-fit'}>
                                 {
                                     this.showCloseButton() ?
-                                        <div className='text-right cursor-pointer text-red-500 position top-[-10px]'>
+                                        <div className='text-right cursor-pointer text-red-500 relative top-[10px]'>
                                             <button onClick={this.manageSkillsManagement.bind(this)}><i className="fas fa-minus-circle"></i></button>
                                         </div>
                                     : null
@@ -265,7 +265,7 @@ export default class CharacterSheet extends React.Component<CharacterSheetProps,
                             <BasicCard additionalClasses={'overflow-y-auto lg:w-1/2 lg:h-fit'}>
                                 {
                                     this.showCloseButton() ?
-                                        <div className='text-right cursor-pointer text-red-500 position top-[-10px]'>
+                                        <div className='text-right cursor-pointer text-red-500 relative top-[10px]'>
                                             <button onClick={this.manageInventoryManagement.bind(this)}><i className="fas fa-minus-circle"></i></button>
                                         </div>
                                     : null

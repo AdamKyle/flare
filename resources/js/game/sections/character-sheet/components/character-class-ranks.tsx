@@ -174,7 +174,7 @@ export default class CharacterClassRanks extends React.Component<any, CharacterC
                 {
                     this.state.open_class_details && this.state.class_name_selected !== null ?
                         <div>
-                            <div className='text-right cursor-pointer text-red-500 position top-[-10px]'>
+                            <div className='text-right cursor-pointer text-red-500 relative top-[10px] right-[10px]'>
                                 <button onClick={() => this.manageViewClass(null)}><i className="fas fa-minus-circle"></i></button>
                             </div>
 

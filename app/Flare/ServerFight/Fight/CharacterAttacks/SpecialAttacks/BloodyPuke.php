@@ -33,16 +33,17 @@ class BloodyPuke extends BattleBase {
                 $damage = $damage - $damage * $attackData['damage_deduction'];
             }
 
-            $this->doBaseAttack($damage, $isPvp);
+            $this->doBaseAttack($damage, $damageToSuffer, $isPvp);
 
             $this->characterHealth -= $damageToSuffer;
         }
     }
 
-    protected function doBaseAttack(int $damage, bool $isPvp = false) {
+    protected function doBaseAttack(int $damage, int $damageToSuffer, bool $isPvp = false) {
         $this->monsterHealth -= $damage;
 
         $this->addMessage('You cannot hold it in, you vomit blood and bile so acidic your enemy cannot handle it! (You dealt: '.number_format($damage).')', 'player-action', $isPvp);
+        $this->addMessage('You lost a lot of blood in your attack. (You took: '.number_format($damageToSuffer).')', 'enemy-action');
 
         if ($isPvp) {
             $this->addDefenderMessage('The enemy has vomited their bloody acidic bile all over you! The smell alone makes you vomit. Damage dealt: ' . number_formart($damage), 'enemey-action');
