@@ -66,9 +66,8 @@ class CreateTestCharacters extends Command {
         }
 
         $this->line('ATTN! This command will take a while as we create, level up and max out the characters for each class, including the characters with locked classes.');
-        $this->line('You will still need to craft level 400 gear to purchase Hell Forged and then Purgatory gear.');
+        $this->line('This will also give each character 1 of every purgatory item (2 for shields, spells and rings) with proper enchantments (max level) and full holy stacks.');
         $this->line('');
-
 
         $gameClasses = GameClass::all();
 
@@ -138,6 +137,8 @@ class CreateTestCharacters extends Command {
         $character = $characterBuilder->character();
 
         Artisan::call('max-out:character ' . $character->name);
+
+        Artisan::call('assign:top-end-gear ' . $character->name);
 
         return $character;
     }

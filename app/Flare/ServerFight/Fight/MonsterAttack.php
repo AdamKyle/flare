@@ -7,6 +7,8 @@ use App\Flare\Models\Character;
 use App\Flare\ServerFight\BattleBase;
 use App\Flare\ServerFight\Fight\CharacterAttacks\PlayerHealing;
 use App\Flare\ServerFight\Monster\ServerMonster;
+use App\Flare\Values\AttackTypeValue;
+use Illuminate\Support\Facades\Cache;
 
 class MonsterAttack extends BattleBase {
 
@@ -34,7 +36,7 @@ class MonsterAttack extends BattleBase {
     public function monsterAttack(ServerMonster $monster, Character $character, string $previousAttackType, bool $isRankFight) {
 
         if ($this->canHit->canMonsterHitPlayer($character, $monster, $this->isVoided, $isRankFight)) {
-            $this->attackPlayer($monster, $character);
+            $this->attackPlayer($monster, $character, $previousAttackType);
         } else {
             $this->addMessage($monster->getName() . ' misses!', 'enemy-action');
         }
@@ -76,7 +78,7 @@ class MonsterAttack extends BattleBase {
         $this->playerHealing->clearMessages();
     }
 
-    protected function attackPlayer(ServerMonster $monster, Character $character) {
+    protected function attackPlayer(ServerMonster $monster, Character $character, string $previousAttackType) {
         $attack = $monster->buildAttack();
 
         if (rand(1, 100) > (100 - 100 * $monster->getMonsterStat('criticality'))) {
@@ -91,6 +93,13 @@ class MonsterAttack extends BattleBase {
             $ac = $this->characterCacheData->getCachedCharacterData($character, 'ac');
         } else {
             $ac = $playerCachedDefence;
+        }
+
+        $attackType = (new AttackTypeValue($previousAttackType));
+
+        if ($attackType->isDefend()) {
+            $classBonus = $this->characterCacheData->getCachedCharacterData($character, 'extra_action_chance')['chance'];
+            $ac = $ac + $ac * $classBonus;
         }
 
         if ($ac >= $attack) {

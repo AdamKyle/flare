@@ -58,6 +58,8 @@ class DamageBuilder extends BaseAttribute {
             if ($hasStaveEquipped) {
                 $baseDamage = $damageStat * 0.15;
             }
+        } else {
+            $baseDamage = $damageStat * 0.05;
         }
 
         $itemDamage      = $this->getDamageFromWeapons($position);

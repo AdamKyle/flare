@@ -72,7 +72,7 @@ class ClassBonusInformation {
         if ($classAttackValue->isVampire()) {
             $details['type'] = Str::ucfirst(ClassAttackValue::VAMPIRE_THIRST);
             $details['requires'] = 'N/A';
-            $details['description'] = 'Every time you attack, you have a chance to fire off the thirst which can steal 15% of your dur from the enemy as both attack and healing.';
+            $details['description'] = 'Every time you attack, you have a chance to fire off the thirst which can steal 15% of your dur from the enemy while attacking and defending.';
         }
 
         if ($classAttackValue->isBlacksmith()) {

@@ -100,6 +100,7 @@ export default class WorkBench extends React.Component<any, any> {
     }
 
     setAlchemyItem(data: any) {
+
         const foundAlchemyItem = this.state.alchemy_items.filter((slot: any) => {
             return slot.item.id === data.value;
         });
@@ -154,7 +155,7 @@ export default class WorkBench extends React.Component<any, any> {
         return this.state.alchemy_items.map((slot: any) => {
             return {
                 label: slot.item.name,
-                value: slot.item.id
+                value: slot.item.id,
             }
         });
     }
@@ -189,40 +190,57 @@ export default class WorkBench extends React.Component<any, any> {
             <Fragment>
                 <div className='mt-2 grid md:grid-cols-3 gap-2 md:ml-[120px]'>
                     <div className='col-start-1 col-span-2'>
-                        <Select
-                            onChange={this.setItem.bind(this)}
-                            options={this.buildItems()}
-                            menuPosition={'absolute'}
-                            menuPlacement={'bottom'}
-                            styles={{menuPortal: (base) => ({...base, zIndex: 9999, color: '#000000'})}}
-                            menuPortalTarget={document.body}
-                            value={this.selectedItem()}
-                        />
-
+                        {
+                            this.state.inventory_items.length > 0 ?
+                                <Select
+                                    onChange={this.setItem.bind(this)}
+                                    options={this.buildItems()}
+                                    menuPosition={'absolute'}
+                                    menuPlacement={'bottom'}
+                                    styles={{menuPortal: (base) => ({...base, zIndex: 9999, color: '#000000'})}}
+                                    menuPortalTarget={document.body}
+                                    value={this.selectedItem()}
+                                />
+                            :
+                                <p className='mt-2 text-red-400 text-red-500 text-center'>
+                                    No valid items in your inventory to apply oils to.
+                                </p>
+                        }
                     </div>
                     <div className='col-start-1 col-span-2'>
-                        <Select
-                            onChange={this.setAlchemyItem.bind(this)}
-                            options={this.buildAlchemicalItems()}
-                            menuPosition={'absolute'}
-                            menuPlacement={'bottom'}
-                            styles={{menuPortal: (base) => ({...base, zIndex: 9999, color: '#000000'})}}
-                            menuPortalTarget={document.body}
-                            value={this.selectedAlchemyItem()}
-                        />
                         {
-                            this.state.selected_item !== null ?
-                                <div className='my-2'>
-                                    <dl>
-                                        <dt>Gold Dust Cost:</dt>
-                                        <dd>{formatNumber(this.state.cost)}</dd>
-                                        <dt>Applied Holy Stacks</dt>
-                                        <dd>{this.state.applied_holy_stacks}</dd>
-                                        <dt>Max Holy Stacks</dt>
-                                        <dd>{this.state.max_holy_stacks}</dd>
-                                    </dl>
-                                </div>
-                            : null
+                            this.state.selected_item !== null && this.state.alchemy_items.length > 0 ?
+                                <Fragment>
+                                    <Select
+                                        onChange={this.setAlchemyItem.bind(this)}
+                                        options={this.buildAlchemicalItems()}
+                                        menuPosition={'absolute'}
+                                        menuPlacement={'bottom'}
+                                        styles={{menuPortal: (base) => ({...base, zIndex: 9999, color: '#000000'})}}
+                                        menuPortalTarget={document.body}
+                                        value={this.selectedAlchemyItem()}
+                                    />
+                                    {
+                                        this.state.selected_alchemy_item !== null ?
+                                            <div className='my-2'>
+                                                <dl>
+                                                    <dt>Gold Dust Cost:</dt>
+                                                    <dd>{formatNumber(this.state.cost)}</dd>
+                                                    <dt>Applied Holy Stacks</dt>
+                                                    <dd>{this.state.applied_holy_stacks}</dd>
+                                                    <dt>Max Holy Stacks</dt>
+                                                    <dd>{this.state.max_holy_stacks}</dd>
+                                                </dl>
+                                            </div>
+                                        : null
+                                    }
+                                </Fragment>
+                            :
+                                this.state.selected_item !== null && this.state.alchemy_items.length === 0 ?
+                                    <p className='mt-2 text-red-400 text-red-500 text-center'>
+                                        No Holy oils to apply. Craft some using alchemy!
+                                    </p>
+                                : null
                         }
                     </div>
                 </div>

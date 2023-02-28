@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Console\Commands\IncreaseRankFight;
+use App\Console\DevelopmentCommands\AssignTopEndGearToPlayer;
+use App\Console\DevelopmentCommands\IncreaseRankFightToMax;
+use App\Console\DevelopmentCommands\ReincarnateCharacter;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\ServiceProvider;
 use App\Console\DevelopmentCommands\CreateTestCharacters;
@@ -23,7 +27,10 @@ class AppServiceProvider extends ServiceProvider
             CreateTestCharacters::class,
             MaxOutCharacter::class,
             UpdateUsersForDevelopment::class,
-            LevelCharacter::class
+            LevelCharacter::class,
+            AssignTopEndGearToPlayer::class,
+            ReincarnateCharacter::class,
+            IncreaseRankFightToMax::class,
         ]);
     }
 
