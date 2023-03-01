@@ -147,6 +147,8 @@ class CreateTestCharacters extends Command {
 
         Artisan::call('assign:top-end-gear ' . $character->name);
 
+        Artisan::call('max-out:character ' . $character->name);
+
         return $character;
     }
 }

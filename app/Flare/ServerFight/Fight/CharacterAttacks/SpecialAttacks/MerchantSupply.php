@@ -58,7 +58,7 @@ class MerchantSupply extends BattleBase {
             $this->monsterHealth -= $damage;
         }
     }
-    
+
     /**
      * Apply damage deduction.
      *
