@@ -143,11 +143,9 @@ class CreateTestCharacters extends Command {
 
         $character = $characterBuilder->character();
 
-        Artisan::call('max-out:character ' . $character->name);
+        Artisan::call('reincarnate:character ' . $character->name);
 
         Artisan::call('assign:top-end-gear ' . $character->name);
-
-        Artisan::call('reincarnate:character ' . $character->name);
 
         return $character;
     }
