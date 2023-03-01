@@ -32,7 +32,7 @@
                             amount = amount - amount * .025;
                         }
 
-                        return amount;
+                        return Math.floor(amount);
                     },
                     get isDisabled() { return true; }
                 }">

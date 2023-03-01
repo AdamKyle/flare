@@ -10,6 +10,7 @@ use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\DoubleAttack;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\DoubleCast;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\DoubleHeal;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\HammerSmash;
+use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\MerchantSupply;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\PrisonerRage;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\ThiefBackStab;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\TripleAttack;
@@ -115,6 +116,10 @@ class SpecialAttacks extends BattleMessages {
 
         if ($character->classType()->isAlcoholic()) {
             return $this->alcoholicsBloodyVomit($character, $attackData);
+        }
+
+        if ($character->classType()->isMerchant()) {
+            return $this->merchantsSupply($character, $attackData);
         }
 
         if ($character->classType()->isVampire()) {
@@ -408,6 +413,29 @@ class SpecialAttacks extends BattleMessages {
         $this->monsterHealth   = $alcoholicsBloodyVomit->getMonsterHealth();
 
         $alcoholicsBloodyVomit->clearMessages();
+    }
+
+    /**
+     * Merchants supply attack
+     *
+     * @param Character $character
+     * @param array $attackData
+     * @param bool $isPvp
+     * @return void
+     */
+    public function merchantsSupply(Character $character, array $attackData, bool $isPvp = false) {
+        $merchantsSupply = resolve(MerchantSupply::class);
+
+        $merchantsSupply->setCharacterHealth($this->characterHealth);
+        $merchantsSupply->setMonsterHealth($this->monsterHealth);
+        $merchantsSupply->handleAttack($character, $attackData, $isPvp);
+
+        $this->mergeMessages($merchantsSupply->getMessages());
+
+        $this->characterHealth = $merchantsSupply->getCharacterHealth();
+        $this->monsterHealth   = $merchantsSupply->getMonsterHealth();
+
+        $merchantsSupply->clearMessages();
     }
 
 }

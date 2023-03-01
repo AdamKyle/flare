@@ -211,7 +211,8 @@ class ShopController extends Controller {
             'cost'        => $item->cost,
             'itemId'      => $item->id,
             'itemName'    => $item->name,
-            'characterId' => $character->id
+            'characterId' => $character->id,
+            'character'   => $character,
         ]);
     }
 

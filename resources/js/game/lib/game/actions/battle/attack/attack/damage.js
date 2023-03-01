@@ -511,6 +511,48 @@ export default class Damage extends BattleBase {
     }
   }
 
+  merchantsSupply(attacker, monsterCurrentHealth, attackData, damageDeduction) {
+
+    if (SpecialAttackClasses.isMerchant(attacker.class)) {
+      const extraActionChance = attacker.extra_action_chance;
+
+      if (!this.canUse(extraActionChance.chance)) {
+        return monsterCurrentHealth;
+      }
+
+      this.addMessage('You stare the enemy down as pull a coin out of your pocket to flip ...', 'player-action');
+
+      const chance = random(1, 100);
+      let damage = attackData.weapon_damage;
+
+      if (chance > 50) {
+         damage = damage * 4;
+
+        if (damageDeduction > 0.0) {
+          this.addMessage('The Plane weakens your ability to do full damage!', 'enemy-action');
+          damage = damage - (damage * damageDeduction);
+        }
+
+         monsterCurrentHealth = monsterCurrentHealth - damage;
+
+        this.addMessage('You flip the coin: Heads! You do 4x the damage for a total of: ' + formatNumber(damage), 'player-action');
+      } else {
+        damage = damage * 2;
+
+        if (damageDeduction > 0.0) {
+          this.addMessage('The Plane weakens your ability to do full damage!', 'enemy-action');
+          damage = damage - (damage * damageDeduction);
+        }
+
+        monsterCurrentHealth = monsterCurrentHealth - damage;
+
+        this.addMessage('You flip the coin: Tails! You do 2x the damage for a total of: ' + formatNumber(damage), 'player-action');
+      }
+    }
+
+    return monsterCurrentHealth;
+  }
+
   canUse(extraActionChance) {
 
     if (extraActionChance >= 1.0) {
