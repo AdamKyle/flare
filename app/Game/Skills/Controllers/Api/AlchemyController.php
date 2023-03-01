@@ -32,7 +32,7 @@ class AlchemyController extends Controller {
         $this->alchemyService->transmute($character, $request->item_to_craft);
 
         return response()->json([
-            'items' => $this->alchemyService->fetchAlchemistItems($character),
+            'items' => $this->alchemyService->fetchAlchemistItems($character, false),
         ]);
     }
 }

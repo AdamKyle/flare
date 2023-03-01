@@ -2,15 +2,15 @@
 
 namespace App\Game\SpecialtyShops\Controllers\Api;
 
-use App\Flare\Events\ServerMessageEvent;
+use Exception;
+use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Game\SpecialtyShops\Requests\SpecialtyShopValidation;
 use App\Game\SpecialtyShops\Requests\SpecialtyShopPurchaseValidation;
 use App\Game\SpecialtyShops\Services\SpecialtyShop;
-use Exception;
-use Illuminate\Http\JsonResponse;
+use App\Game\Messages\Events\ServerMessageEvent;
 
 class SpecialtyShopController extends Controller {
 
@@ -44,10 +44,11 @@ class SpecialtyShopController extends Controller {
         }
 
         if ($character->classType()->isMerchant()) {
-            foreach ($items as $item) {
+
+            $items = $items->transform(function($item) {
                 $goldCost       = $item->cost;
                 $goldDustCost   = $item->gold_gold_dust_cost;
-                $shardsCost     = $item->shards->shards_cost;
+                $shardsCost     = $item->shards_cost;
                 $copperCoinCost = $item->copper_coin_cost;
 
                 $goldCost       = $goldCost - $goldCost * 0.05;
@@ -59,9 +60,11 @@ class SpecialtyShopController extends Controller {
                 $item->gold_dust_cost   = $goldDustCost;
                 $item->shards_cost      = $shardsCost;
                 $item->copper_coin_cost = $copperCoinCost;
-            }
 
-            event(new ServerMessageEvent($character->user, 'As a merchant, you get 5% reduction on specialty shop costs. these have been applied to the list.'));
+                return $item;
+            });
+
+            event(new ServerMessageEvent($character->user, 'As a Merchant, you get 5% reduction on specialty shop costs. This has been applied to the cost calculation when you select an item.'));
         }
 
         return response()->json([

@@ -448,8 +448,8 @@ export default class Damage extends BattleBase {
   }
 
   prisonersRage(attacker, monsterCurrentHealth, attackData, damageDeduction) {
-
     if (SpecialAttackClasses.isPrisoner(attacker.class)) {
+
       const extraActionChance = attacker.extra_action_chance;
 
       if (!this.canUse(extraActionChance.chance)) {
@@ -468,7 +468,7 @@ export default class Damage extends BattleBase {
 
       const times = Math.random(1, 4);
 
-      for (let i = 1; i <= times; i++) {
+      for (let i = 0; i <= times; i++) {
           monsterCurrentHealth = monsterCurrentHealth - damageToDo;
 
         this.addMessage('You slash, you thrash, you bash and you crash your way through! (You dealt: '+formatNumber(damageToDo)+')', 'player-action');

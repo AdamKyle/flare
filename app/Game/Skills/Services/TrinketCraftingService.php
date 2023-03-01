@@ -36,16 +36,38 @@ class TrinketCraftingService {
      * Fetch trinkets the player can craft.
      *
      * @param Character $character
+     * @param bool $showMerchantMessage
      * @return array
+     * @throws Exception
      */
-    public function fetchItemsToCraft(Character $character): array {
+    public function fetchItemsToCraft(Character $character, bool $showMerchantMessage = true): array {
         $trinkentrySkill = $this->fetchCharacterSkill($character);
 
-        return Item::where('type', 'trinket')
-                    ->where('skill_level_required', '<=', $trinkentrySkill->level)
-                    ->select('name', 'id', 'gold_dust_cost', 'copper_coin_cost')
-                    ->get()
-                    ->toArray();
+        $items = Item::where('type', 'trinket')
+                     ->where('skill_level_required', '<=', $trinkentrySkill->level)
+                     ->select('name', 'id', 'gold_dust_cost', 'copper_coin_cost')
+                     ->get();
+
+        if ($character->classType()->isMerchant()) {
+            $items = $items->transform(function($item) {
+                $copperCoinCost = $item->copper_coin_cost;
+                $goldDustCost   = $item->gold_dust_cost;
+
+                $copperCoinCost = floor($copperCoinCost - $copperCoinCost * 0.10);
+                $goldDustCost   = floor($goldDustCost   - $goldDustCost * 0.10);
+
+                $item->gold_dust_cost   = $goldDustCost;
+                $item->copper_coin_cost = $copperCoinCost;
+
+                return $item;
+            });
+
+            if ($showMerchantMessage) {
+                event(new ServerMessageEvent($character->user, 'As a Merchant you get 10% discount on creating trinketry items. The discount has been applied to the items list.'));
+            }
+        }
+
+        return $items->toArray();
     }
 
     /**
@@ -64,7 +86,7 @@ class TrinketCraftingService {
         $trinkentrySkill = $this->fetchCharacterSkill($character);
 
         if ($character->classType()->isMerchant()) {
-            event(new FlareServerMessage($character->user, 'As a merchant you get a 10% reduction on crafting trinkets.'));
+            event(new FlareServerMessage($character->user, 'As a Merchant you get a 10% reduction on crafting trinkets.'));
         }
 
         if (!$this->canAfford($character, $item)) {
@@ -103,7 +125,7 @@ class TrinketCraftingService {
 
         event(new CharacterInventoryDetailsUpdate($character->user));
 
-        return $this->fetchItemsToCraft($character->refresh());
+        return $this->fetchItemsToCraft($character->refresh(), false);
     }
 
     /**
@@ -132,8 +154,8 @@ class TrinketCraftingService {
         $goldDustCostCost = $item->gold_dust_cost;
 
         if ($character->classType()->isMerchant()) {
-            $copperCoinCost   = $copperCoinCost - $copperCoinCost * 0.10;
-            $goldDustCostCost = $goldDustCostCost - $goldDustCostCost * 0.10;
+            $copperCoinCost   = floor($copperCoinCost - $copperCoinCost * 0.10);
+            $goldDustCostCost = floor($goldDustCostCost - $goldDustCostCost * 0.10);
         }
 
         if ($character->gold_dust < $goldDustCostCost) {

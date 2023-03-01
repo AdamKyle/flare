@@ -10,15 +10,14 @@ class ServerMessageListener
 {
 
     /**
-     * @var ServerMessage $serverMessage
+     * @var ServerMessageBuilder $serverMessage
      */
-    private $serverMessage;
+    private ServerMessageBuilder $serverMessage;
 
     /**
      * Constructor
      *
-     * @param ServerMessage $serverMessage
-     * @return void
+     * @param ServerMessageBuilder $serverMessage
      */
     public function __construct(ServerMessageBuilder $serverMessage) {
 

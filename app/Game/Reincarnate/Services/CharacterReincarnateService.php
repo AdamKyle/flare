@@ -13,7 +13,7 @@ use App\Game\Core\Traits\ResponseBuilder;
 
 class CharacterReincarnateService {
 
-    const MAX_STATS = 99999999999;
+    const MAX_STATS = 9999999999;
 
     use ResponseBuilder, CharacterMaxLevel;
 

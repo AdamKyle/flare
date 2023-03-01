@@ -45,9 +45,11 @@ class CraftingService {
      *
      * @param Character $character
      * @param array $params
+     * @param bool $merchantMessage
      * @return Collection
+     * @throws Exception
      */
-    public function fetchCraftableItems(Character $character, array $params): Collection {
+    public function fetchCraftableItems(Character $character, array $params, bool $merchantMessage = true): Collection {
 
         $craftingType = $params['crafting_type'];
 
@@ -57,7 +59,7 @@ class CraftingService {
 
         $skill = $this->fetchCraftingSkill($character, $craftingType);
 
-        return $this->getItems($params['crafting_type'], $skill);
+        return $this->getItems($character, $skill, $params['crafting_type'], $merchantMessage);
     }
 
     /**
@@ -99,7 +101,7 @@ class CraftingService {
         $cost = $item->cost;
 
         if ($character->classType()->isMerchant()) {
-            $cost = $cost - $cost * 0.30;
+            $cost = floor($cost - $cost * 0.30);
         }
 
         return $cost;
@@ -115,10 +117,6 @@ class CraftingService {
      * @throws Exception
      */
     protected function attemptToCraftItem(Character $character, Skill $skill, Item $item): bool {
-        if ($character->classType()->isMerchant()) {
-            event(new ServerMessageEvent($character->user, 'As a merchant you get a 30% reduction on crafting items.'));
-        }
-
         if ($skill->level < $item->skill_level_required) {
             event(new ServerMessageEvent($character->user, 'to_hard_to_craft'));
 
@@ -172,11 +170,14 @@ class CraftingService {
     /**
      * Return a list of items the player can craft for the type.
      *
-     * @param $craftingType
+     * @param Character $character
      * @param Skill $skill
+     * @param string $craftingType
+     * @param bool $merchantMessage
      * @return Collection
+     * @throws Exception
      */
-    protected function getItems($craftingType, Skill $skill): Collection {
+    protected function getItems(Character $character, Skill $skill, string $craftingType, bool $merchantMessage = true): Collection {
         $twoHandedWeapons = ['bow', 'hammer', 'stave'];
         $craftingTypes    = ['armour', 'ring', 'spell'];
 
@@ -191,11 +192,29 @@ class CraftingService {
             $items->where('default_position', strtolower($craftingType));
         } else if (in_array($craftingType, $craftingTypes)) {
             $items->where('crafting_type', strtolower($craftingType));
-        }else {
+        } else {
             $items->where('type', strtolower($craftingType));
         }
 
-        return $items->select('name', 'cost', 'type', 'id')->get();
+        $items = $items->select('name', 'cost', 'type', 'id')->get();
+
+        if ($character->classType()->isMerchant()) {
+            $items = $items->transform(function($item) {
+                $cost = $item->cost;
+
+                $cost = floor($cost - $cost * 0.30);
+
+                $item->cost = $cost;
+
+                return $item;
+            });
+
+            if ($merchantMessage) {
+                event(new GameServerMessageEvent($character->user, 'As a Merchant you get 30% discount on crafting items. The items in the list have been adjusted.'));
+            }
+        }
+
+        return $items;
     }
 
     /**

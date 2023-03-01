@@ -19,6 +19,7 @@ use App\Flare\Models\Skill;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Skills\Services\Traits\UpdateCharacterGold;
 use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
+use App\Game\Messages\Events\ServerMessageEvent as GameServerMessageEvent;
 
 class EnchantingService {
 
@@ -83,9 +84,10 @@ class EnchantingService {
      *
      * @param Character $character
      * @param bool $ignoreTrinkets
+     * @param bool $showMerchantMessage
      * @return array
      */
-    public function fetchAffixes(Character $character, bool $ignoreTrinkets = false): array {
+    public function fetchAffixes(Character $character, bool $ignoreTrinkets = false, bool $showMerchantMessage = true): array {
         $characterInfo   = $this->characterStatBuilder->setCharacter($character);
         $enchantingSkill = $this->getEnchantingSkill($character);
 
@@ -109,7 +111,7 @@ class EnchantingService {
         }
 
         return [
-            'affixes'             => $this->getAvailableAffixes($characterInfo, $enchantingSkill),
+            'affixes'             => $this->getAvailableAffixes($characterInfo, $enchantingSkill, $showMerchantMessage),
             'character_inventory' => $newInventory,
         ];
     }
@@ -144,9 +146,9 @@ class EnchantingService {
         }
 
         if ($character->classType()->isMerchant()) {
-            $cost = $cost - $cost * 0.15;
+            $cost = floor($cost - $cost * 0.15);
 
-            event(new ServerMessageEvent($character->user, 'As a merchant you get a 15% reduction on enchanting items (reduction applied to total price).'));
+            event(new ServerMessageEvent($character->user, 'As a Merchant you get a 15% reduction on enchanting items (reduction applied to total price).'));
         }
 
         return $cost;
@@ -170,6 +172,7 @@ class EnchantingService {
      * @param InventorySlot $slot
      * @param int $cost
      * @return void
+     * @throws Exception
      */
     public function enchant(Character $character, array $params, InventorySlot $slot, int $cost): void {
         $enchantingSkill = $this->getEnchantingSkill($character);
@@ -206,7 +209,7 @@ class EnchantingService {
         return Skill::where('character_id', $character->id)->where('game_skill_id', $gameSkill->id)->first();
     }
 
-    protected function getAvailableAffixes(CharacterStatBuilder $builder, Skill $enchantingSkill): Collection {
+    protected function getAvailableAffixes(CharacterStatBuilder $builder, Skill $enchantingSkill, bool $showMerchantMessage = true): Collection {
 
         $currentInt = $builder->statMod('int');
 
@@ -216,12 +219,21 @@ class EnchantingService {
             $currentInt = 1000000000;
         }
 
-        return ItemAffix::select('name', 'cost', 'id', 'type')
-                        ->where('int_required', '<=', $currentInt)
-                        ->where('skill_level_required', '<=', $enchantingSkill->level)
-                        ->where('randomly_generated', false)
-                        ->orderBy('skill_level_required', 'asc')
-                        ->get();
+        $affixes = ItemAffix::select('name', 'cost', 'id', 'type')
+                            ->where('int_required', '<=', $currentInt)
+                            ->where('skill_level_required', '<=', $enchantingSkill->level)
+                            ->where('randomly_generated', false)
+                            ->orderBy('skill_level_required', 'asc')
+                            ->get();
+
+        $character = $builder->character();
+
+        if ($character->classType()->isMerchant() && $showMerchantMessage) {
+
+            event(new GameServerMessageEvent($character->user, 'As a Merchant you get 15% discount on enchanting items. This discount is applied to the total cost of the enchantments, not the individual enchantments.'));
+        }
+
+        return $affixes;
     }
 
     protected function attachAffixes(array $affixes, InventorySlot $slot, Skill $enchantingSkill, Character $character) {

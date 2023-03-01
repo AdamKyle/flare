@@ -10,15 +10,21 @@ use Exception;
 trait UpdateCharacterGold {
 
     /**
-     * Update the characters gold when enchanting.
+     * Update the characters gold when crafting.
      *
      * Subtract cost from gold.
      *
      * @param Character $character
      * @param int $cost
      * @return void
+     * @throws Exception
      */
     public function updateCharacterGold(Character $character, int $cost): void {
+
+        if ($character->classType()->isMerchant()) {
+            $cost = floor($cost - $cost * 0.30);
+        }
+
         $character->update([
             'gold' => $character->gold - $cost,
         ]);
@@ -40,8 +46,8 @@ trait UpdateCharacterGold {
         $goldDustCost   = $item->gold_dust_cost;
 
         if ($character->classType()->isMerchant()) {
-            $copperCoinCost = $copperCoinCost - $copperCoinCost * 0.10;
-            $goldDustCost   = $goldDustCost   - $goldDustCost * 0.10;
+            $copperCoinCost = floor($copperCoinCost - $copperCoinCost * 0.10);
+            $goldDustCost   = floor($goldDustCost   - $goldDustCost * 0.10);
         }
 
         $character->update([
@@ -64,8 +70,8 @@ trait UpdateCharacterGold {
         $shardsCost   = $item->shards_cost;
 
         if ($character->classType()->isMerchant()) {
-            $goldDustCost = $goldDustCost - $goldDustCost * 0.10;
-            $shardsCost   = $shardsCost - $shardsCost * 0.10;
+            $goldDustCost = floor($goldDustCost - $goldDustCost * 0.10);
+            $shardsCost   = floor($shardsCost - $shardsCost * 0.10);
         }
 
         $character->update([

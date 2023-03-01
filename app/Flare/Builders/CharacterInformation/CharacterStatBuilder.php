@@ -146,6 +146,15 @@ class CharacterStatBuilder {
     }
 
     /**
+     * Return the character.
+     *
+     * @return Character
+     */
+    public function character(): Character {
+        return $this->character;
+    }
+
+    /**
      * Fetch inventory.
      *
      * @return Collection
@@ -439,9 +448,9 @@ class CharacterStatBuilder {
      * @throws Exception
      */
     public function buildTotalAttack(): int {
-        $weaponDamage = $this->buildDamage('weapon');
-        $ringDamage   = $this->buildDamage('ring');
-        $spellDamage  = $this->buildDamage('spell-damage');
+        $weaponDamage = $this->buildDamage('weapon') + $this->buildDamage('weapon');
+        $ringDamage   = $this->buildDamage('ring') + $this->buildDamage('ring');
+        $spellDamage  = $this->buildDamage('spell-damage') + $this->buildDamage('spell-damage');
 
         return $weaponDamage + $ringDamage + $spellDamage;
     }

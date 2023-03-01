@@ -132,6 +132,10 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
 
         // @ts-ignore
         this.serverMessages.listen('Game.Messages.Events.ServerMessageEvent', (event: any) => {
+            if (event.message === '') {
+                return;
+            }
+
             let messages = JSON.parse(JSON.stringify(this.state.server_messages));
 
             if (messages.length > 1000) {

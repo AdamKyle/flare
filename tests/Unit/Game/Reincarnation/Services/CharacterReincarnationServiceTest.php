@@ -167,14 +167,14 @@ class CharacterReincarnationServiceTest extends TestCase {
         $character = $character->refresh();
 
         $character->update([
-            'level' => 99999999998,
-            'str'   => 99999999998,
-            'dur'   => 99999999998,
-            'dex'   => 99999999998,
-            'chr'   => 99999999998,
-            'int'   => 99999999998,
-            'agi'   => 99999999998,
-            'focus' => 99999999998,
+            'level' => 9999999998,
+            'str'   => 9999999998,
+            'dur'   => 9999999998,
+            'dex'   => 9999999998,
+            'chr'   => 9999999998,
+            'int'   => 9999999998,
+            'agi'   => 9999999998,
+            'focus' => 9999999998,
             'copper_coins' => 100000,
             'reincarnated_stat_increase' => 99999999999,
         ]);
@@ -190,7 +190,7 @@ class CharacterReincarnationServiceTest extends TestCase {
         $this->assertEquals(0.05, $character->xp_penalty);
         $this->assertEquals(1, $character->level);
         $this->assertEquals(1, $character->times_reincarnated);
-        $this->assertEquals(99999999999, $character->str);
+        $this->assertEquals(9999999999, $character->str);
         $this->assertGreaterThan(0, $character->reincarnated_stat_increase);
     }
 
@@ -214,20 +214,20 @@ class CharacterReincarnationServiceTest extends TestCase {
         $character = $character->refresh();
 
         $character->update([
-            'level' => 99999999999,
-            'str'   => 99999999999,
-            'dur'   => 99999999999,
-            'dex'   => 99999999999,
-            'chr'   => 99999999999,
-            'int'   => 99999999999,
-            'agi'   => 99999999999,
-            'focus' => 99999999999,
+            'level' => 9999999999,
+            'str'   => 9999999999,
+            'dur'   => 9999999999,
+            'dex'   => 9999999999,
+            'chr'   => 9999999999,
+            'int'   => 9999999999,
+            'agi'   => 9999999999,
+            'focus' => 9999999999,
             'copper_coins' => 100000,
         ]);
 
         $result    = $this->reincarnationService->reincarnate($character->refresh());
 
         $this->assertEquals(422, $result['status']);
-        $this->assertEquals('You have maxed all stats to 99,999,999,999.', $result['message']);
+        $this->assertEquals('You have maxed all stats to 9,999,999,999.', $result['message']);
     }
 }

@@ -12,6 +12,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 
 use App\Flare\Models\User;
 use App\Game\Messages\Models\Message;
+use Illuminate\Support\Str;
 
 class ServerMessageEvent implements ShouldBroadcastNow {
 

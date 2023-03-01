@@ -114,7 +114,19 @@ class ItemsTable extends DataTableComponent {
                 return number_format($value);
             }),
             Column::make('Cost')->sortable()->format(function ($value) {
-                return number_format($value);
+                $cost = $value;
+
+                if (auth()->user()) {
+                    if (!is_null(auth()->user()->character)) {
+                        $character = auth()->user()->character;
+
+                        if ($character->classType()->isMerchant()) {
+                            $cost = floor($cost - $cost * 0.25);
+                        }
+                    }
+                }
+
+                return number_format($cost);
             }),
         ];
 

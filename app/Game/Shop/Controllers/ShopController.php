@@ -113,7 +113,7 @@ class ShopController extends Controller {
         $cost = $item->cost;
 
         if ($character->classType()->isMerchant()) {
-            $cost = $cost - $cost * 0.25;
+            $cost = floor($cost - $cost * 0.25);
         }
 
         if ($cost > $character->gold) {

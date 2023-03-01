@@ -27,7 +27,7 @@ class CraftedItemTimeOutListener
         }
 
         if ($event->character->classType()->isMerchant()) {
-            event(new ServerMessageEvent($event->character->user, 'As a merchant, your crafting timeout is reduced by 5%.'));
+            event(new ServerMessageEvent($event->character->user, 'As a Merchant, your crafting timeout is reduced by 5%.'));
 
             $timeOut = $timeOut - $timeOut * 0.05;
         }

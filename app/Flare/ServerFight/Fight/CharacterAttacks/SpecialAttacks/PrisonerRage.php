@@ -36,7 +36,7 @@ class PrisonerRage extends BattleBase {
 
             $times = rand(1, 4);
 
-            for ($i = $times; $i > 0; $i--) {
+            for ($i = 0; $i <= $times; $i++) {
                 $this->doBaseAttack($damage, $isPvp);
             }
         }
