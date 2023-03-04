@@ -38,17 +38,17 @@ Lets start with the new classes. It is important to note these classes cannot be
 
 It is also important to note that these classes do not come with enchantments, they can use any enchantment.
 
-## [Prisoner](https://planesoftlessa.com/information/classes/9)
+## [Prisoner](https://planesoftlessa.com/information/class/9)
 
-[Prisoners](https://planesoftlessa.com/information/classes/9) are a mix of thief and fighter and when using a weapon they have a chance to do 15% of their 15% of their strength 1-4 times for a rage attack against the enemy.
+[Prisoners](https://planesoftlessa.com/information/class/9) are a mix of thief and fighter and when using a weapon they have a chance to do 15% of their 15% of their strength 1-4 times for a rage attack against the enemy.
 
 Prisoners are best with weapons of any type.
 
-## [Alcoholic](https://planesoftlessa.com/information/classes/10)
+## [Alcoholic](https://planesoftlessa.com/information/class/10)
 
 Alcoholics are drunkards who puke blood across their enemies. They are horrible with weapons suffering 25% damage deduction. Exceptionally horrible with spells, suffering 50% damage/healing reduction (although resurrection chance on healing spells is not effected).
 
-How do they fight? bare handed! Their [class specials](https://planesoftlessa.com/information/classes/10) focus mostly on raising their health and their damage.
+How do they fight? bare handed! Their [class specials](https://planesoftlessa.com/information/class/10) focus mostly on raising their health and their damage.
 
 Fighting barehanded gives you an additional 25% of their damage stat towards their attack.
 
@@ -56,11 +56,11 @@ Their special, which will fire if they have no weapons AND no spells (damage or 
 
 These are one of the hardest classes to play. Alcoholics are a mix of Fighters and Blacksmiths.
 
-## [Merchant](https://planesoftlessa.com/information/classes/11)
+## [Merchant](https://planesoftlessa.com/information/class/11)
 
 One of the best classes to play, who are most proficient in staves with bows as secondary.
 
-[Merchants](https://planesoftlessa.com/information/classes/11) get a discount of 25% of at the shop, they also get 25% off the total bulk price of buying multiple items.
+[Merchants](https://planesoftlessa.com/information/class/11) get a discount of 25% of at the shop, they also get 25% off the total bulk price of buying multiple items.
 
 They get 30% reduction on crafting, 15% on enchanting, 10% on alchemy and trinketry and 5% off at specialty shops for Purgatory and Hell Forged gear.
 
@@ -103,7 +103,7 @@ the filters will now properly stay in place when equipping or unequipping.
 - Fixed Duplicate and incorrectly spelled Quest Items
 - Updated Ranked Fight Monsters to have slightly less Ambush and Counter Chance and resistance to give players more of a chance.
 - Fixed classes so they properly respect the [races and classes](https://planesoftlessa.com/information/races-and-classes) docs.
-	+ [Arcane Alchemists](https://planesoftlessa.com/information/classes/8) no longer get damage bonus from having healing spells equipped
+	+ [Arcane Alchemists](https://planesoftlessa.com/information/class/8) no longer get damage bonus from having healing spells equipped
 		* Their special attack now properly works.
 
 - Added class bonus to the [enchantments](https://planesoftlessa.com/information/enchanting) table so players can find gear that raises their class bonus so their classes special attack lands.",
