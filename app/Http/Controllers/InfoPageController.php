@@ -200,20 +200,4 @@ class InfoPageController extends Controller
             'skill' => $passiveSkill,
         ]);
     }
-
-    protected function cleanFiles(array $files): array {
-        $clean = [];
-
-        foreach ($files as $index => $path) {
-            if (explode('.', $path)[1] === 'DS_Store') {
-                // @codeCoverageIgnoreStart
-                unset($files[$index]);  // => We do not need this tested. Test environment would never have a mac specific file.
-                // @codeCoverageIgnoreEnd
-            } else {
-                $clean[] = $path;
-            }
-        }
-
-        return $clean;
-    }
 }

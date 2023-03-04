@@ -6,14 +6,12 @@ use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Database\Factories\CharacterFactory;
-use App\Flare\Models\Traits\WithSearch;
 use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
 use App\Flare\Values\CharacterClassValue;
 
-class Character extends Model
-{
+class Character extends Model {
 
-    use HasFactory, WithSearch;
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.

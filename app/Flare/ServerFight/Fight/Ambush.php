@@ -68,6 +68,7 @@ class Ambush extends BattleBase {
         $characterAmbushResistance = $this->characterCacheData->getCachedCharacterData($character, 'ambush_resistance_chance');
         $characterAmbushChance     = $this->characterCacheData->getCachedCharacterData($character, 'ambush_chance');
 
+
         if ($this->canPlayerAmbushMonster($characterAmbushChance, $serverMonster->getMonsterStat('ambush_resistance_chance'))) {
             $this->addMessage('You spot the enemy! Now is the time to ambush!', 'player-action');
 

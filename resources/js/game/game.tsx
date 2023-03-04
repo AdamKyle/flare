@@ -409,7 +409,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                                     />
                                 </BasicCard>
                                 <BasicCard additionalClasses={clsx('min-h-60', {
-                                    'max-w-[500px] ml-auto mr-auto': this.state.view_port < 1600
+                                    'ml-auto mr-auto': this.state.view_port < 1600
                                 })}>
                                     {
                                         this.state.view_port < 1600 ?

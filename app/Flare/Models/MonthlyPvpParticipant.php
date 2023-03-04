@@ -4,11 +4,8 @@ namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Flare\Models\GameMap;
-use Database\Factories\MapFactory;
 
-class MonthlyPvpParticipant extends Model
-{
+class MonthlyPvpParticipant extends Model {
 
     use HasFactory;
 

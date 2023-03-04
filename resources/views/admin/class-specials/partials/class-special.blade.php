@@ -44,12 +44,22 @@
                         <dt>Damage done uses % of damage stat:</dt>
                         <dd>{{$classSpecial->specialty_damage_uses_damage_stat_amount * 100}}%</dd>
                     </dl>
+                    <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                    <h3 class="my-4">Evasion Bonus</h3>
+                    <p>
+                        This will be applied to your spell evasion, which comes primarily from rings.
+                    </p>
+                    <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                    <dl class="mb-4">
+                        <dt>Spell Evasion</dt>
+                        <dd>{{$classSpecial->spell_evasion * 100}}%</dd>
+                    </dl>
                 </div>
                 <div class='border-b-2 block lg:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                 <div>
                     <h3>Modifiers</h3>
                     <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
-                    <dl>
+                    <dl class="mb-4">
                         <dt>Base Damage Modifier</dt>
                         <dd>{{$classSpecial->base_damage_mod * 100}}%</dd>
                         <dt>Base AC Modifier</dt>
@@ -62,6 +72,18 @@
                         <dd>{{$classSpecial->health_mod * 100}}%</dd>
                         <dt>Base Damage Stat Increase</dt>
                         <dd>{{$classSpecial->base_damage_stat_increase * 100}}%</dd>
+                    </dl>
+                    <h3>Reductions</h3>
+                    <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                    <dl>
+                        <dt>Affix Damage Reduction</dt>
+                        <dd>{{$classSpecial->affix_damage_reduction * 100}}%</dd>
+                        <dt>Healing Reduction</dt>
+                        <dd>{{$classSpecial->healing_reduction * 100}}%</dd>
+                        <dt>Skill Reduction</dt>
+                        <dd>{{$classSpecial->skill_reduction * 100}}%</dd>
+                        <dt>Resistance Reduction</dt>
+                        <dd>{{$classSpecial->resistance_reduction * 100}}%</dd>
                     </dl>
                 </div>
             </div>

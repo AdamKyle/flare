@@ -13,7 +13,7 @@ class UnitMovementTransformer extends TransformerAbstract {
      * @param UnitMovementQueue $unitMovementQueue
      * @return array
      */
-    public function transform(UnitMovementQueue $unitMovementQueue) {
+    public function transform(UnitMovementQueue $unitMovementQueue): array {
 
         return [
             'id'                => $unitMovementQueue->id,

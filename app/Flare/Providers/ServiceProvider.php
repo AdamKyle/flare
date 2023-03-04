@@ -2,12 +2,13 @@
 
 namespace App\Flare\Providers;
 
-use App\Flare\Builders\CharacterInformation\AttributeBuilders\ClassRanksWeaponMasteriesBuilder;
-use App\Flare\Transformers\RankMonsterTransformer;
-use App\Game\Skills\Services\SkillService;
 use Illuminate\Support\Facades\Blade;
 use League\Fractal\Manager;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
+use App\Flare\Builders\CharacterInformation\AttributeBuilders\ClassRanksWeaponMasteriesBuilder;
+use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\BloodyPuke;
+use App\Flare\Transformers\RankMonsterTransformer;
+use App\Game\Skills\Services\SkillService;
 use App\Flare\Builders\CharacterInformation\AttributeBuilders\DamageBuilder;
 use App\Flare\Builders\CharacterInformation\AttributeBuilders\DefenceBuilder;
 use App\Flare\Builders\CharacterInformation\AttributeBuilders\HealingBuilder;
@@ -46,6 +47,7 @@ use App\Flare\ServerFight\Fight\CharacterAttacks\Types\CastType;
 use App\Flare\ServerFight\Fight\CharacterAttacks\Types\Defend;
 use App\Flare\ServerFight\Fight\CharacterAttacks\Types\WeaponType;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\HammerSmash;
+use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\MerchantSupply;
 use App\Flare\ServerFight\Fight\Entrance;
 use App\Flare\ServerFight\Fight\MonsterAttack;
 use App\Flare\ServerFight\Fight\Voidance;
@@ -392,6 +394,14 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(ThiefBackStab::class, function($app) {
             return new ThiefBackStab($app->make(CharacterCacheData::class));
+        });
+
+        $this->app->bind(BloodyPuke::class, function($app) {
+            return new BloodyPuke($app->make(CharacterCacheData::class));
+        });
+
+        $this->app->bind(MerchantSupply::class, function($app) {
+            return new MerchantSupply($app->make(CharacterCacheData::class));
         });
 
         $this->app->bind(MonsterPlayerFight::class, function($app) {

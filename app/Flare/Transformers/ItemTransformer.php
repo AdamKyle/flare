@@ -15,10 +15,10 @@ class ItemTransformer extends TransformerAbstract {
     /**
      * Gets the response data for the character sheet
      *
-     * @param Character $character
-     * @return mixed
+     * @param Item $item
+     * @return array
      */
-    public function transform(Item $item) {
+    public function transform(Item $item): array {
 
         return [
             'id'                               => $item->id,

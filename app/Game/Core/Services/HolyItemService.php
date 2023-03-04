@@ -63,7 +63,7 @@ class HolyItemService {
         event(new UpdateTopBarEvent($character));
 
         if (($slot->item->holy_stacks - $slot->item->holy_stacks_applied) === 0) {
-            event(new ServerMessageEvent($character->user, 'You have applied the max stacks allowed. Item has been removed from list of items you can use at thw work bench.'));
+            event(new ServerMessageEvent($character->user, 'You have applied the max stacks allowed. Item has been removed from list of items you can use at the work bench.'));
         }
 
         return $this->fetchSmithingItems($character);

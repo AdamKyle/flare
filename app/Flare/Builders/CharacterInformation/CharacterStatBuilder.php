@@ -146,6 +146,15 @@ class CharacterStatBuilder {
     }
 
     /**
+     * Return the character.
+     *
+     * @return Character
+     */
+    public function character(): Character {
+        return $this->character;
+    }
+
+    /**
      * Fetch inventory.
      *
      * @return Collection
@@ -161,17 +170,19 @@ class CharacterStatBuilder {
     /**
      * Get class bonus.
      *
+     * - Default bonus is 5%.
+     *
      * @return float
      */
     public function classBonus(): float {
         if (empty($this->equippedItems)) {
-            return 0.0;
+            return 0.05;
         }
 
         $suffixClassBonus = $this->equippedItems->sum('item.itemSuffix.class_bonus');
         $prefixClassBonus = $this->equippedItems->sum('item.itemPrefix.class_bonus');
 
-        $total = $suffixClassBonus + $prefixClassBonus;
+        $total = $suffixClassBonus + $prefixClassBonus + 0.5;
 
         if ($total > 1) {
             return 1.0;
@@ -280,7 +291,7 @@ class CharacterStatBuilder {
             $this->equippedItems,
         );
 
-        $defence   = $this->defenceBuilder->buildDefence($voided);
+        $defence   = $this->defenceBuilder->buildDefence($this->classBonus(), $voided);
         $holyBonus = $this->holyInfo()->fetchDefenceBonus();
 
         $classSpecialsBonus = $this->character->classSpecialsEquipped
@@ -327,13 +338,22 @@ class CharacterStatBuilder {
         if (is_null($this->equippedItems)) {
 
             if ($type === 'weapon') {
-                $value = $stat / 2;
+
+                if ($this->character->classType()->isAlcoholic()) {
+                    return $stat + ($stat * 0.25);
+                }
+
+                if ($this->character->classType()->isFighter()) {
+                    return $stat + ($stat * 0.05);
+                }
+
+                $value = $stat * 0.02;
 
                 return $value < 5 ? 5 : $value;
             }
 
-            if ($type === 'spell-damage' && $this->character->classType()->isCaster()) {
-                $value = $stat / 2;
+            if ($type === 'spell-damage' && $this->character->classType()->isHeretic()) {
+                $value = $stat * 0.15;
 
                 return $value < 5 ? 5 : $value;
             }
@@ -348,7 +368,7 @@ class CharacterStatBuilder {
             case 'ring':
                 return $this->damageBuilder->buildRingDamage();
             case 'spell-damage':
-                $damage = $this->damageBuilder->buildSpellDamage($stat, $voided);
+                $damage = $this->spellDamageBonus($this->damageBuilder->buildSpellDamage($voided), $voided);
                 break;
             default:
                 $damage = 0;
@@ -363,6 +383,63 @@ class CharacterStatBuilder {
     }
 
     /**
+     * Add bonus to spell damage.
+     *
+     * - Class should be heretic or arcane alchemist.
+     * - Adds 30% of their int to the damage.
+     *
+     * @param int $damage
+     * @param bool $voided
+     * @return int
+     * @throws Exception
+     */
+    protected function spellDamageBonus(int $damage, bool $voided = false): int {
+        if ($this->character->class->type()->isHeretic() || $this->character->class->type()->isArcaneAlchemist()) {
+            $intMod = $this->statMod('int', $voided) * 0.30;
+
+            return ceil($intMod + $damage);
+        }
+
+        if ($this->character->classType()->isAlcoholic()) {
+            return floor($damage - ($damage * 0.50));
+        }
+
+        return $damage;
+    }
+
+    /**
+     * Healing Bonus.
+     *
+     * - Prophets get 30% of their CHR
+     * - Arcane Alchemists get 10% of their CHR
+     *
+     * @param int $healing
+     * @param bool $voided
+     * @return int
+     */
+    protected function healingBonus(int $healing, bool $voided = false): int {
+        if ($this->character->class->type()->isProphet()) {
+            $chrMod = $this->statMod('chr', $voided) * 0.30;
+
+            return ceil($chrMod + $healing);
+        }
+
+        if ($this->character->class->type()->isArcaneAlchemist()) {
+            $chrMod = $this->statMod('chr', $voided) * 0.10;
+
+            return ceil($chrMod + $healing);
+        }
+
+        if ($this->character->class->type()->isRanger()) {
+            $chrMod = $this->statMod('chr', $voided) * 0.15;
+
+            return ceil($chrMod + $healing);
+        }
+
+        return $healing;
+    }
+
+    /**
      * Build total attacks
      *
      * Includes: Weapons, Rings and Spell Damage.
@@ -371,9 +448,9 @@ class CharacterStatBuilder {
      * @throws Exception
      */
     public function buildTotalAttack(): int {
-        $weaponDamage = $this->buildDamage('weapon');
-        $ringDamage   = $this->buildDamage('ring');
-        $spellDamage  = $this->buildDamage('spell-damage');
+        $weaponDamage = $this->buildDamage('weapon') + $this->buildDamage('weapon');
+        $ringDamage   = $this->buildDamage('ring') + $this->buildDamage('ring');
+        $spellDamage  = $this->buildDamage('spell-damage') + $this->buildDamage('spell-damage');
 
         return $weaponDamage + $ringDamage + $spellDamage;
     }
@@ -384,6 +461,7 @@ class CharacterStatBuilder {
      * @param string $weaponPosition
      * @param bool $voided
      * @return int
+     * @throws Exception
      */
     public function positionalWeaponDamage(string $weaponPosition, bool $voided = false): int {
         $stat = $this->statMod($this->character->damage_stat, $voided);
@@ -425,7 +503,7 @@ class CharacterStatBuilder {
             return 0;
         }
 
-        $damage = $this->damageBuilder->buildSpellDamage($stat, $voided, $spellPosition);
+        $damage = $this->spellDamageBonus($this->damageBuilder->buildSpellDamage($voided, $spellPosition), $voided);
 
         $classSpecialsBonus = $this->character->classSpecialsEquipped
                                               ->where('equipped', true)
@@ -458,7 +536,7 @@ class CharacterStatBuilder {
             return 0;
         }
 
-        $healing = $this->healingBuilder->buildHealing($stat, $voided, $spellPosition);
+        $healing = $this->healingBonus($this->healingBuilder->buildHealing($voided, $spellPosition), $voided);
 
         $classSpecialsBonus = $this->character->classSpecialsEquipped
                                               ->where('equipped', true)
@@ -480,8 +558,8 @@ class CharacterStatBuilder {
         $stat = $this->statMod($this->character->damage_stat, $voided);
 
         if (is_null($this->equippedItems)) {
-            if ($this->character->classType()->isProphet()) {
-                $value = $stat / 2;
+            if ($this->character->classType()->isProphet() || $this->character->classType()->isRanger()) {
+                $value = $stat * 0.15;
 
                 return $value < 5 ? 5 : $value;
             }
@@ -489,7 +567,7 @@ class CharacterStatBuilder {
             return 0;
         }
 
-        $healing = $this->healingBuilder->buildHealing($stat, $voided);
+        $healing = $this->healingBonus($this->healingBuilder->buildHealing($voided), $voided);
 
         $classSpecialsBonus = $this->character->classSpecialsEquipped
                                               ->where('equipped', true)

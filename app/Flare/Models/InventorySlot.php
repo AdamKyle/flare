@@ -4,11 +4,9 @@ namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Flare\Models\Item;
 use Database\Factories\InventorySlotFactory;
 
-class InventorySlot extends Model
-{
+class InventorySlot extends Model {
 
     use HasFactory;
 

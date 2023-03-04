@@ -6,8 +6,7 @@ use Database\Factories\MaxLevelConfigurationFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class MaxLevelConfiguration extends Model
-{
+class MaxLevelConfiguration extends Model {
 
     use HasFactory;
 

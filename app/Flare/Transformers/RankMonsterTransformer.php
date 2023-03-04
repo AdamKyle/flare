@@ -32,7 +32,7 @@ class RankMonsterTransformer extends TransformerAbstract {
      * @param Monster $monster
      * @return array
      */
-    public function transform(Monster $monster) {
+    public function transform(Monster $monster): array {
 
         return [
             'id'                        => $monster->id,
@@ -50,10 +50,10 @@ class RankMonsterTransformer extends TransformerAbstract {
             'ac'                        => $this->statAmount / 2,
             'health_range'              => $this->statAmount . '-' . ($this->statAmount + ($this->statAmount / 2)),
             'attack_range'              => $this->statAmount . '-' . ($this->statAmount + ($this->statAmount / 2)),
-            'accuracy'                  => 3,
-            'dodge'                     => 3,
-            'casting_accuracy'          => 3,
-            'criticality'               => 3,
+            'accuracy'                  => 1.0,
+            'dodge'                     => .75,
+            'casting_accuracy'          => 1.0,
+            'criticality'               => 1.0,
             'base_stat'                 => $this->statAmount / 2,
             'max_level'                 => 9999,
             'has_damage_spells'         => true,
@@ -65,10 +65,10 @@ class RankMonsterTransformer extends TransformerAbstract {
             'entrancing_chance'         => 2,
             'devouring_light_chance'    => 1,
             'devouring_darkness_chance' => 1,
-            'ambush_chance'             => 1,
-            'ambush_resistance_chance'  => 1,
-            'counter_chance'            => 1,
-            'counter_resistance_chance' => 1,
+            'ambush_chance'             => .50,
+            'ambush_resistance_chance'  => .60,
+            'counter_chance'            => .70,
+            'counter_resistance_chance' => .45,
             'increases_damage_by'       => 0,
             'is_special'                => false,
         ];

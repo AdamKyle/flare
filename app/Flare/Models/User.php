@@ -9,8 +9,8 @@ use Spatie\Permission\Traits\HasRoles;
 use App\Game\Messages\Models\Message;
 use Database\Factories\UserFactory;
 
-class User extends Authenticatable
-{
+class User extends Authenticatable {
+
     use Notifiable, HasRoles, HasFactory;
 
     /**

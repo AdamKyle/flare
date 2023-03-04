@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Game\SpecialtyShops\Services;
 
+use App\Flare\Models\Item;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Values\ItemSpecialtyType;
 use App\Game\SpecialtyShops\Services\SpecialtyShop;
@@ -125,6 +126,7 @@ class SpecialtyShopTest extends TestCase {
         $this->assertEquals(200, $response['status']);
         $this->assertEquals(9000, $character->gold_dust);
         $this->assertEquals(9000, $character->shards);
+        $this->assertCount(1, Item::where('name', $item->name)->where('specialty_type', ItemSpecialtyType::HELL_FORGED)->get());
     }
 
     public function testPurchasePurgatoryChainItem() {
@@ -155,6 +157,7 @@ class SpecialtyShopTest extends TestCase {
         $this->assertEquals(200, $response['status']);
         $this->assertEquals(9000, $character->gold_dust);
         $this->assertEquals(9000, $character->shards);
+        $this->assertCount(1, Item::where('name', $item->name)->where('specialty_type', ItemSpecialtyType::PURGATORY_CHAINS)->get());
     }
 
     public function testMovesAffixesAndHolyOver() {

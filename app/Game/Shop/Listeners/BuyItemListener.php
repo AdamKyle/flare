@@ -12,7 +12,13 @@ use App\Game\Skills\Services\EnchantingService;
 class BuyItemListener {
 
     public function handle(BuyItemEvent $event) {
-        $event->character->gold = $event->character->gold - $event->item->cost;
+        $cost = $event->item->cost;
+
+        if ($event->character->classType()->isMerchant()) {
+            $cost = $cost - $cost * 0.25;
+        }
+
+        $event->character->gold = $event->character->gold - $cost;
         $event->character->save();
 
         $event->character->inventory->slots()->create([

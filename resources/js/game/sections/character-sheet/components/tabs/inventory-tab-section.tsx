@@ -184,7 +184,7 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
                     : null
                 }
 
-                <div className='flex items-center'>
+                <div className='flex flex-row flex-wrap items-center'>
                     <div>
                         <DropDown menu_items={[
                             {
@@ -202,7 +202,7 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
                     <div className={clsx('ml-2', {'hidden': this.isDropDownHidden()})}>
                         <DropDown menu_items={this.createActionsDropDown()} button_title={'Actions'} selected_name={this.state.table} disabled={this.props.is_dead} />
                     </div>
-                    <div className='ml-4 md:ml-0 my-4 md:my-0 md:absolute md:right-[10px]'>
+                    <div className='sm:ml-4 md:ml-0 my-4 md:my-0 md:absolute md:right-[10px]'>
                         <input type='text' name='search' className='form-control' onChange={this.search.bind(this)} placeholder={'Search'} value={this.state.search_string} />
                     </div>
                 </div>

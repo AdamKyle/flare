@@ -2,15 +2,11 @@
 
 namespace App\Flare\Models;
 
-use App\Flare\Transformers\MarketItemsTransformer;
-use App\Game\Core\Traits\UpdateMarketBoard;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Flare\Models\Item;
-use App\Flare\Models\InventorySlot;
-use App\Flare\Models\QuestItemSlot;
 use Database\Factories\InventoryFactory;
-use League\Fractal\Manager;
+use App\Flare\Models\QuestItemSlot;
+use App\Game\Core\Traits\UpdateMarketBoard;
 
 class Inventory extends Model {
 

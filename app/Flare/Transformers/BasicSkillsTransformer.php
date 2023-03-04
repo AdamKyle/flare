@@ -13,7 +13,7 @@ class BasicSkillsTransformer extends TransformerAbstract {
      * @param Skill $skill
      * @return array
      */
-    public function transform(Skill $skill) {
+    public function transform(Skill $skill): array {
         return [
             'id'                           => $skill->id,
             'character_id'                 => $skill->character_id,

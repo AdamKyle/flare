@@ -1,11 +1,11 @@
 <?php
 namespace App\Game\Messages\Providers;
 
-use App\Flare\Events\KingdomServerMessageEvent;
-use App\Game\Messages\Listeners\KingdomServerMessageListener;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\SkillLeveledUpServerMessageEvent;
+use App\Flare\Events\KingdomServerMessageEvent;
+use App\Game\Messages\Listeners\KingdomServerMessageListener;
 use App\Game\Messages\Listeners\SkillLeveledUpServerMessageListener;
 use App\Game\Messages\Listeners\ServerMessageListener;
 

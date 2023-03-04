@@ -36,10 +36,12 @@ export default class CharacterClassSpecialtiesModal extends React.Component<Clas
         this.state = {
             loading: true,
             equipping: false,
+            equipping_special_id: null,
             class_specialties: [],
             class_specials_for_table: [],
             specialties_equipped: [],
             other_class_specialties: [],
+            filtered_other_class_specialties: [],
             class_ranks: [],
             dark_tables: false,
             show_equipped: false,
@@ -48,6 +50,7 @@ export default class CharacterClassSpecialtiesModal extends React.Component<Clas
             success_message: null,
             error_message: null,
             selected_filter: null,
+            other_selected_filter: null,
         }
 
         this.tabs = [{
@@ -97,11 +100,36 @@ export default class CharacterClassSpecialtiesModal extends React.Component<Clas
 
         this.setState({
             selected_filter: data.value,
-        })
+        }, () => {
+            this.filterTable();
+        });
+    }
+
+    filterOtherSpecialties(data: any) {
+        if (data.value === 'Please select') {
+            this.setState({
+                filtered_other_class_specialties: this.state.other_class_specialties,
+            });
+
+            return;
+        }
+
+        this.setState({
+            other_selected_filter: data.value,
+        }, () => {
+            this.filterOtherClassSpecialsTable();
+        });
+    }
+
+    filterTable() {
+
+        if (this.state.selected_filter === null) {
+            return;
+        }
 
         const classSpecialties = JSON.parse(JSON.stringify(this.state.class_specialties));
 
-        if (data.value === 'Equippable') {
+        if (this.state.selected_filter === 'Equippable') {
             const specials = classSpecialties.filter((special: ClassSpecialtiesType) => {
                 const ranks = this.state.class_ranks.filter((rank: ClassRankType) => {
                     if (rank.game_class_id === special.game_class_id) {
@@ -122,12 +150,46 @@ export default class CharacterClassSpecialtiesModal extends React.Component<Clas
         }
 
         this.setState({
-            class_specials_for_table: classSpecialties.filter((special: ClassSpecialtiesType) => special.class_name === data.value),
+            class_specials_for_table: classSpecialties.filter((special: ClassSpecialtiesType) => special.class_name === this.state.selected_filter),
         });
     }
 
-    classOptions() {
-        const classes = ['Please select', 'Equippable', 'Heretic', 'Fighter', 'Vampire', 'Ranger', 'Prophet', 'Thief', 'Blacksmith', 'Arcane Alchemist'];
+    filterOtherClassSpecialsTable() {
+
+        if (this.state.other_class_specialties === null) {
+            return;
+        }
+
+        const otherSpecials = JSON.parse(JSON.stringify(this.state.other_class_specialties));
+
+        if (otherSpecials.length === 0) {
+            return;
+        }
+
+        this.setState({
+            other_class_specialties: otherSpecials.filter((special: ClassSpecialtiesType) => special.class_name === this.state.other_selected_filter),
+        });
+    }
+
+    classOptions(addEquippable: boolean) {
+        const classes = [
+            'Please select',
+            'Heretic',
+            'Fighter',
+            'Vampire',
+            'Ranger',
+            'Prophet',
+            'Thief',
+            'Blacksmith',
+            'Arcane Alchemist',
+            'Prisoner',
+            'Alcoholic',
+            'Merchant'
+        ];
+
+        if (addEquippable) {
+            classes.splice(1, 0, 'Equippable');
+        }
 
         return classes.map((className) => {
             return {
@@ -140,6 +202,7 @@ export default class CharacterClassSpecialtiesModal extends React.Component<Clas
     unequipSpecial(specialId: number) {
         this.setState({
             equipping: true,
+            equipping_special_id: specialId,
             success_message: null,
             error_message: null,
         }, () => {
@@ -151,12 +214,16 @@ export default class CharacterClassSpecialtiesModal extends React.Component<Clas
                 .doAjaxCall('post', (response: AxiosResponse) => {
                     this.setState({
                         equipping: false,
+                        equipping_special_id: null,
                         class_specialties: response.data.class_specialties,
                         class_specials_for_table: response.data.class_specialties,
                         specialties_equipped: response.data.specials_equipped,
                         class_ranks: response.data.class_ranks,
                         other_class_specialties: response.data.other_class_specials,
                         success_message: response.data.message
+                    }, () => {
+                        this.filterTable()
+                        this.filterOtherClassSpecialsTable()
                     })
                 }, (error: AxiosError) => {
                     this.setState({equipping: false});
@@ -173,6 +240,7 @@ export default class CharacterClassSpecialtiesModal extends React.Component<Clas
     equipSpecial(specialId: number) {
         this.setState({
             equipping: true,
+            equipping_special_id: specialId,
             success_message: null,
             error_message: null,
         }, () => {
@@ -184,12 +252,16 @@ export default class CharacterClassSpecialtiesModal extends React.Component<Clas
                 .doAjaxCall('post', (response: AxiosResponse) => {
                     this.setState({
                         equipping: false,
+                        equipping_special_id: null,
                         success_message: response.data.message,
                         class_specialties: response.data.class_specialties,
                         class_specials_for_table: response.data.class_specialties,
                         specialties_equipped: response.data.specials_equipped,
                         class_ranks: response.data.class_ranks,
                         other_class_specialties: response.data.other_class_specials
+                    }, () => {
+                        this.filterTable()
+                        this.filterOtherClassSpecialsTable()
                     })
                 }, (error: AxiosError) => {
                     this.setState({equipping: false});
@@ -232,7 +304,10 @@ export default class CharacterClassSpecialtiesModal extends React.Component<Clas
                         this.specialtyIsEquipped(row.id) ?
                             <span>Specialty is equipped</span>
                         :
-                            <PrimaryButton button_label={'Equip'} on_click={() => this.equipSpecial(row.id)} disabled={this.isEquipButtonDisabled(row.requires_class_rank_level, row.game_class_id)} />
+                            <PrimaryButton button_label={this.state.equipping && this.state.equipping_special_id === row.id ? <Fragment><i className="fas fa-spinner fa-spin"></i> Equip</Fragment> : 'Equip'}
+                                           on_click={() => this.equipSpecial(row.id)}
+                                           disabled={this.isEquipButtonDisabled(row.requires_class_rank_level, row.game_class_id)}
+                            />
                     }
                 </Fragment>
             },
@@ -279,10 +354,14 @@ export default class CharacterClassSpecialtiesModal extends React.Component<Clas
                             this.specialtyIsEquipped(row.id) ?
                                 <span>Specialty is equipped</span>
                             :
-                                <PrimaryButton button_label={'Equip'} on_click={() => this.equipSpecial(row.game_class_special_id)} disabled={this.isEquipButtonDisabled(row.game_class_special.requires_class_rank_level, row.game_class_special.game_class_id)} />
+                                <PrimaryButton button_label={this.state.equipping && this.state.equipping_special_id === row.game_class_special_id ? <Fragment><i className="fas fa-spinner fa-spin"></i> Equip</Fragment> : 'Equip'}
+                                               on_click={() => this.equipSpecial(row.game_class_special_id)}
+                                               disabled={this.isEquipButtonDisabled(row.game_class_special.requires_class_rank_level, row.game_class_special.game_class_id)}
+                                />
                         :
-                            <PrimaryButton button_label={'Unequip'}
+                            <PrimaryButton button_label={this.state.equipping && this.state.equipping_special_id === row.id ? <Fragment><i className="fas fa-spinner fa-spin"></i> Unequip</Fragment> : 'Unequip'}
                                            on_click={() => this.unequipSpecial(row.id)}
+                                           disabled={this.state.equipping}
                             />
                     }
 
@@ -292,6 +371,11 @@ export default class CharacterClassSpecialtiesModal extends React.Component<Clas
     }
 
     isEquipButtonDisabled(requiredLevel: number, classId: number): boolean {
+
+        if (this.state.equipping) {
+            return true;
+        }
+
         const rank = this.state.class_ranks.filter((rank: ClassRankType) => rank.game_class_id === classId)[0];
 
         return rank.level < requiredLevel;
@@ -317,7 +401,7 @@ export default class CharacterClassSpecialtiesModal extends React.Component<Clas
 
         return (
             <div>
-                <div className='text-right cursor-pointer text-red-500 position top-[-10px]'>
+                <div className='text-right cursor-pointer text-red-500 relative top-[10px] right-[20px]'>
                     <button onClick={() => this.manageViewSpecialty(null)}><i className="fas fa-minus-circle"></i></button>
                 </div>
                 <div className='my-4'>
@@ -339,12 +423,22 @@ export default class CharacterClassSpecialtiesModal extends React.Component<Clas
                                 <dt>% Of Damage Stat Used:</dt>
                                 <dd>{this.renderPercent(this.state.special_selected.specialty_damage_uses_damage_stat_amount)}%</dd>
                             </dl>
+                            <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                            <h3 className="my-4">Evasion Bonus</h3>
+                            <p>
+                                This will be applied to your spell evasion, which comes primarily from rings.
+                            </p>
+                            <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                            <dl className="mb-4">
+                                <dt>Spell Evasion</dt>
+                                <dd>{this.renderPercent(this.state.special_selected.spell_evasion)}%</dd>
+                            </dl>
                         </div>
                         <div className='lg:hidden block border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                         <div>
                             <h3>Modifier Information</h3>
                             <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
-                            <dl>
+                            <dl className='mb-4'>
                                 <dt>Base Damage Modifier:</dt>
                                 <dd>{this.renderPercent(this.state.special_selected.base_damage_mod)}%</dd>
                                 <dt>Base AC Modifier:</dt>
@@ -357,6 +451,18 @@ export default class CharacterClassSpecialtiesModal extends React.Component<Clas
                                 <dd>{this.renderPercent(this.state.special_selected.health_mod)}%</dd>
                                 <dt>Base Damage Stat Modifier:</dt>
                                 <dd>{this.renderPercent(this.state.special_selected.base_damage_stat_increase)}%</dd>
+                            </dl>
+                            <h3>Reductions</h3>
+                            <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                            <dl>
+                                <dt>Affix Damage Reduction</dt>
+                                <dd>{this.renderPercent(this.state.special_selected.affix_damage_reduction)}%</dd>
+                                <dt>Healing Reduction</dt>
+                                <dd>{this.renderPercent(this.state.special_selected.healing_reduction)}%</dd>
+                                <dt>Skill Reduction</dt>
+                                <dd>{this.renderPercent(this.state.special_selected.skill_reduction)}%</dd>
+                                <dt>Resistance Reduction</dt>
+                                <dd>{this.renderPercent(this.state.special_selected.resistance_reduction)}%</dd>
                             </dl>
                         </div>
                     </div>
@@ -372,7 +478,7 @@ export default class CharacterClassSpecialtiesModal extends React.Component<Clas
 
         return (
             <div>
-                <div className='text-right cursor-pointer text-red-500 position top-[-10px]'>
+                <div className='text-right cursor-pointer text-red-500 relative top-[10px]'>
                     <button onClick={() => this.manageViewSpecialtyEquipped(null, false)}><i className="fas fa-minus-circle"></i></button>
                 </div>
                 <div className='my-4'>
@@ -468,12 +574,12 @@ export default class CharacterClassSpecialtiesModal extends React.Component<Clas
                             <InfoAlert additional_css='my-4'>
                                 To reset the table below, select "Please select" when filtering by class.
                             </InfoAlert>
-                            <div className='flex relative top-[10px]'>
-                                <div className='mr-4 dark:text-gray-300'>Class Filter</div>
-                                <div className='relative top-[-10px] w-1/2'>
+                            <div className='flex'>
+                                <div className='mr-4 dark:text-gray-300 mt-[10px]'>Class Filter</div>
+                                <div className='w-1/2'>
                                     <Select
                                         onChange={this.filterTableByClass.bind(this)}
-                                        options={this.classOptions()}
+                                        options={this.classOptions(true)}
                                         menuPosition={'absolute'}
                                         menuPlacement={'bottom'}
                                         styles={{menuPortal: (base) => ({...base, zIndex: 9999, color: '#000000'})}}
@@ -503,6 +609,20 @@ export default class CharacterClassSpecialtiesModal extends React.Component<Clas
                         <InfoAlert additional_css='my-4'>
                             These specialties are ones you have progression in but do not have equipped.
                         </InfoAlert>
+                        <div className='flex mb-4'>
+                            <div className='mr-4 dark:text-gray-300 mt-[10px]'>Class Filter</div>
+                            <div className='w-1/2'>
+                                <Select
+                                    onChange={this.filterOtherSpecialties.bind(this)}
+                                    options={this.classOptions(false)}
+                                    menuPosition={'absolute'}
+                                    menuPlacement={'bottom'}
+                                    styles={{menuPortal: (base) => ({...base, zIndex: 9999, color: '#000000'})}}
+                                    menuPortalTarget={document.body}
+                                    value={[{label: this.state.other_selected_filter !== null ? this.state.other_selected_filter : 'Please Select', value: this.state.other_selected_filter !== null ? this.state.other_selected_filter : 'Please Select'}]}
+                                />
+                            </div>
+                        </div>
                         <Table
                             data={this.state.other_class_specialties}
                             columns={this.classSpecialtiesEquippedTable(true)}

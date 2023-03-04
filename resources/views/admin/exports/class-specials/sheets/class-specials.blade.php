@@ -16,6 +16,11 @@
         <th>health_mod</th>
         <th>base_damage_stat_increase</th>
         <th>attack_type_required</th>
+        <th>spell_evasion</th>
+        <th>affix_damage_reduction</th>
+        <th>healing_reduction</th>
+        <th>skill_reduction</th>
+        <th>resistance_reduction</th>
     </tr>
     </thead>
     <tbody>
@@ -36,6 +41,11 @@
             <td>{{$classSpecial->health_mod}}</td>
             <td>{{$classSpecial->base_damage_stat_increase}}</td>
             <td>{{$classSpecial->attack_type_required}}</td>
+            <td>{{$classSpecial->spell_evasion}}</td>
+            <td>{{$classSpecial->affix_damage_reduction}}</td>
+            <td>{{$classSpecial->healing_reduction}}</td>
+            <td>{{$classSpecial->skill_reduction}}</td>
+            <td>{{$classSpecial->resistance_reduction}}</td>
         </tr>
     @endforeach
     </tbody>

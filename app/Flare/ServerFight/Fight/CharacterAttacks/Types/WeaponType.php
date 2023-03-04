@@ -173,8 +173,8 @@ class WeaponType extends BattleBase {
                              ->setMonsterHealth($this->monsterHealth)
                              ->doWeaponSpecials($attacker, $this->attackData, true);
 
-        $this->mergeAttackerMessages($this->specialAttacks->getDefenderMessages());
-        $this->mergeDefenderMessages($this->specialAttacks->getAttackerMessages());
+        $this->mergeAttackerMessages($this->specialAttacks->getAttackerMessages());
+        $this->mergeDefenderMessages($this->specialAttacks->getDefenderMessages());
 
         $this->characterHealth = $this->specialAttacks->getCharacterHealth();
         $this->monsterHealth   = $this->specialAttacks->getMonsterHealth();

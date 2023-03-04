@@ -33,17 +33,17 @@ class HealingBuilder extends BaseAttribute {
         $this->classRanksWeaponMasteriesBuilder->initialize($this->character, $this->skills, $this->inventory);
     }
 
-    public function buildHealing(float $damageStat, bool $voided = false, string $position = 'both'): float {
+    /**
+     * Build the healing.
+     *
+     * @param bool $voided
+     * @param string $position
+     * @return float
+     */
+    public function buildHealing(bool $voided = false, string $position = 'both'): float {
         $class = $this->character->class;
 
-        if ($class->type()->isHealer()) {
-            $baseDamage = $damageStat * 0.05;
-            $baseDamage = max($baseDamage, 5);
-        } else {
-            $baseDamage = 0;
-        }
-
-        $itemDamage      = $this->getHealingFromItems('spell-healing', $position);
+        $itemHealing      = $this->getHealingFromItems('spell-healing', $position);
 
         $skillPercentage = 0;
 
@@ -51,16 +51,20 @@ class HealingBuilder extends BaseAttribute {
             $skillPercentage = $this->fetchBaseAttributeFromSkills('base_healing');
         }
 
-        $totalDamage = $baseDamage + $itemDamage;
-
         if ($voided) {
-            return $totalDamage + $totalDamage * $skillPercentage;
+            return $itemHealing + $itemHealing * ($skillPercentage);
         }
 
         $affixPercentage = $this->getAttributeBonusFromAllItemAffixes('base_healing');
 
         $healingMasteryBonus = $this->classRanksWeaponMasteriesBuilder->determineBonusForSpellHealing($position);
 
-        return $totalDamage + $totalDamage * ($skillPercentage + $affixPercentage + $healingMasteryBonus);
+        $healing = $itemHealing + $itemHealing * ($skillPercentage + $affixPercentage + $healingMasteryBonus);
+
+        if ($this->character->class->type()->isAlcoholic()) {
+            return $healing - ($healing * 0.50);
+        }
+
+        return $healing;
     }
 }

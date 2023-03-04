@@ -2,11 +2,13 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Exports\Items\ItemsExport;
+use App\Admin\Import\Items\ItemsImport;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Controllers\Controller;
-use App\Admin\Exports\Items\ItemsExport;
-use App\Admin\Import\Items\ItemsImport;
+use App\Admin\Exports\Items\ClassesExport;
+use App\Admin\Import\Items\ClassImport;
 use App\Admin\Requests\ItemsManagementRequest;
 use App\Admin\Services\ItemsService;
 use App\Flare\Values\ItemSpecialtyType;

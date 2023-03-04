@@ -4,13 +4,11 @@ namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Flare\Models\Traits\WithSearch;
 use Database\Factories\GameBuildingFactory;
 
-class GameBuilding extends Model
-{
+class GameBuilding extends Model {
 
-    use HasFactory, WithSearch;
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.

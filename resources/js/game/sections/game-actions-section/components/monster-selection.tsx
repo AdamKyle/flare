@@ -5,6 +5,7 @@ import {isEqual} from "lodash";
 import MonsterType from "../../../lib/game/types/actions/monster/monster-type";
 import MonsterSelectionProps from "../../../lib/game/types/actions/components/monster-selection-props";
 import MonsterSelectionState from "../../../lib/game/types/actions/components/monster-selection-state";
+import DangerButton from "../../../components/ui/buttons/danger-button";
 
 export default class MonsterSelection extends React.Component<MonsterSelectionProps, MonsterSelectionState> {
 
@@ -94,9 +95,9 @@ export default class MonsterSelection extends React.Component<MonsterSelectionPr
 
     render() {
         return (
-            <div className='mt-2 md:ml-[120px]'>
-                <div className='grid grid-cols-3 gap-2'>
-                    <div className='cols-start-1 col-span-2'>
+            <div className='mt-4 lg:mt-2 lg:ml-[120px]'>
+                <div className='lg:grid lg:grid-cols-3 lg:gap-2'>
+                    <div className='lg:cols-start-1 lg:col-span-2'>
                         <Select
                             onChange={this.setMonsterToFight.bind(this)}
                             options={this.buildMonsters()}
@@ -107,8 +108,14 @@ export default class MonsterSelection extends React.Component<MonsterSelectionPr
                             value={this.defaultMonster()}
                         />
                     </div>
-                    <div className='cols-start-3 cols-end-3'>
+                    <div className='text-center mt-4 lg:mt-0 lg:text-left lg:cols-start-3 lg:cols-end-3'>
                         <PrimaryButton button_label={'Attack'} on_click={this.attack.bind(this)} disabled={this.isAttackDisabled()}/>
+
+                        {
+                            typeof this.props.close_monster_section !== 'undefined' ?
+                                <DangerButton button_label={'Close'} on_click={this.props.close_monster_section} additional_css={'ml-4'} />
+                            : null
+                        }
                     </div>
                 </div>
             </div>

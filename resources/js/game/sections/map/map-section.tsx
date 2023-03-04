@@ -17,10 +17,11 @@ import MapTimer from "./map-timer";
 import DirectionalMovement from "./actions/directional-movement";
 import MapActions from "./actions/map-actions";
 import NpcKingdomsDetails from "../../lib/game/types/map/npc-kingdoms-details";
+import PlayerKingdomsDetails from "../../lib/game/types/map/player-kingdoms-details";
 import clsx from "clsx";
 // @ts-ignore
 import Draggable from 'react-draggable/build/web/react-draggable.min';
-import PlayerKingdomsDetails from "../../lib/game/types/map/player-kingdoms-details";
+
 
 
 export default class MapSection extends React.Component<MapProps, MapState> {
@@ -185,7 +186,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
 
         return(
             <Fragment>
-                <div className='overflow-hidden max-h-[315px]'>
+                <div className='overflow-hidden max-h-[315px] sm:max-w-[75%] md:max-w-[44%] sm:border-2 lg:border-0 sm:mr-auto sm:ml-auto lg:max-w-full lg:mr-0 lg:ml-0'>
                     <Draggable
                         position={this.state.map_position}
                         bounds={{top: -200, left: fetchLeftBounds(this), right: this.state.right_bounds, bottom: this.state.bottom_bounds}}

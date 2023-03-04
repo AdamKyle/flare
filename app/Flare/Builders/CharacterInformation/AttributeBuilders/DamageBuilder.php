@@ -4,6 +4,8 @@ namespace App\Flare\Builders\CharacterInformation\AttributeBuilders;
 
 
 use App\Flare\Models\Character;
+use App\Flare\Values\WeaponTypes;
+use Exception;
 use Illuminate\Support\Collection;
 
 class DamageBuilder extends BaseAttribute {
@@ -40,13 +42,27 @@ class DamageBuilder extends BaseAttribute {
      * @param bool $voided
      * @param string $position
      * @return float
+     * @throws Exception
      */
     public function buildWeaponDamage(float $damageStat, bool $voided = false, string $position = 'both'): float {
         $class      = $this->character->class;
-        $baseDamage = $damageStat * .05;
-        $baseDamage = $baseDamage < 1 ? 1 : $baseDamage;
+        $baseDamage = 0;
 
-        $itemDamage      = $this->getDamageFromItems('weapon', $position);
+        if ($this->character->class->type()->isFighter()) {
+            $baseDamage = $damageStat * 0.15;
+        } else if ($this->character->class->type()->isArcaneAlchemist()) {
+            $hasStaveEquipped = $this->inventory->filter(function($slot) {
+                return $slot->item->type === WeaponTypes::STAVE;
+            })->isNotEmpty();
+
+            if ($hasStaveEquipped) {
+                $baseDamage = $damageStat * 0.15;
+            }
+        } else {
+            $baseDamage = $damageStat * 0.05;
+        }
+
+        $itemDamage      = $this->getDamageFromWeapons($position);
         $skillPercentage = 0;
 
         if ($this->shouldIncludeSkillDamage($class,'weapon')) {
@@ -62,7 +78,13 @@ class DamageBuilder extends BaseAttribute {
         $affixPercentage         = $this->getAttributeBonusFromAllItemAffixes('base_damage');
         $weaponMasteryPercentage = $this->classRanksWeaponMasteriesBuilder->determineBonusForWeapon($position);
 
-        return $totalDamage + $totalDamage * ($skillPercentage + $affixPercentage + $weaponMasteryPercentage);
+        $damage = $totalDamage + $totalDamage * ($skillPercentage + $affixPercentage + $weaponMasteryPercentage);
+
+        if ($this->character->classType()->isAlcoholic() && $itemDamage > 0) {
+            return $damage - ($damage * 0.25);
+        }
+
+        return $damage;
     }
 
     /**
@@ -77,20 +99,13 @@ class DamageBuilder extends BaseAttribute {
     /**
      * Build spell damage.
      *
-     * @param float $damageStat
      * @param bool $voided
-     * @param $position
+     * @param string $position
      * @return float
+     * @throws Exception
      */
-    public function buildSpellDamage(float $damageStat, bool $voided = false, $position = 'both'): float {
+    public function buildSpellDamage(bool $voided = false, string $position = 'both'): float {
         $class = $this->character->class;
-
-        if ($class->type()->isCaster()) {
-            $baseDamage = $damageStat * 0.05;
-            $baseDamage = max($baseDamage, 5);
-        } else {
-            $baseDamage = 0;
-        }
 
         $itemDamage      = $this->getDamageFromItems('spell-damage', $position);
 
@@ -100,17 +115,17 @@ class DamageBuilder extends BaseAttribute {
             $skillPercentage = $this->fetchBaseAttributeFromSkills('base_damage');
         }
 
-        $totalDamage = $baseDamage + $itemDamage;
-
         if ($voided) {
-            return $totalDamage + $totalDamage * $skillPercentage;
+            return $itemDamage + $itemDamage * $skillPercentage;
         }
 
         $affixPercentage = $this->getAttributeBonusFromAllItemAffixes('base_damage');
 
         $spellMasteryPercentage = $this->classRanksWeaponMasteriesBuilder->determineBonusForSpellDamage($position);
 
-        return $totalDamage + $totalDamage * ($skillPercentage + $affixPercentage + $spellMasteryPercentage);
+        $damage = $itemDamage + $itemDamage * ($skillPercentage + $affixPercentage + $spellMasteryPercentage);
+
+        return $damage;
     }
 
     /**

@@ -136,7 +136,9 @@ export default class Skills extends React.Component<SkillsProps, any> {
                     </InfoAlert>
                 </div>
 
-                <Table columns={this.buildColumns()} data={this.props.trainable_skills} dark_table={this.props.dark_table} />
+                <div className={'max-w-[290px] sm:max-w-[100%] overflow-y-hidden'}>
+                    <Table columns={this.buildColumns()} data={this.props.trainable_skills} dark_table={this.props.dark_table} />
+                </div>
 
                 {
                     this.state.show_skill_details && this.state.skill !== null ?

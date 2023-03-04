@@ -2,12 +2,12 @@
 
 namespace App\Admin\Import\Items\Sheets;
 
+use App\Flare\Models\GameClass;
 use App\Flare\Models\Item;
 use App\Flare\Models\Location;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use App\Flare\Models\GameSkill;
-use App\Flare\Models\ItemAffix;
 
 class ItemsSheet implements ToCollection {
 
@@ -18,14 +18,21 @@ class ItemsSheet implements ToCollection {
 
                 $skill     = GameSkill::where('name', $item['skill_name'])->first();
 
+                $gameClass = GameClass::where('name', $item['unlocks_class_id'])->first();
+
+                if (is_null($gameClass) && !is_null($item['unlocks_class_id'])) {
+                    continue;
+                }
+
                 if (is_null($skill) && !is_null($item['skill_name'])) {
                     continue;
                 }
 
                 $itemData = $this->returnCleanItem($item);
 
+                $itemData['unlocks_class_id'] = $gameClass->id;
+
                 $item = Item::where('name', $itemData['name'])->first();
-                // $item = Item::find($itemData['id']);
 
                 if (!is_null($item)) {
                     $item->update($itemData);

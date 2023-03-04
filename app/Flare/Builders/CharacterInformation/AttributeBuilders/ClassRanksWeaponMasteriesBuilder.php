@@ -21,6 +21,10 @@ class ClassRanksWeaponMasteriesBuilder extends BaseAttribute {
         $slotFromRightHand = $this->inventory->where('position', 'right-hand')->first();
         $slotFromLeftHand  = $this->inventory->where('position', 'left-hand')->first();
 
+        if ($this->isTheSameTypeEquipped($slotFromLeftHand, $slotFromRightHand)) {
+            return $this->getPercentage($slotFromLeftHand);
+        }
+
         $percentageForLeftHand  = $this->getPercentage($slotFromLeftHand);
         $percentageForRightHand = $this->getPercentage($slotFromRightHand);
 
@@ -38,8 +42,13 @@ class ClassRanksWeaponMasteriesBuilder extends BaseAttribute {
         $spellSlotOne = $this->inventory->where('position', 'spell-one')->where('item.type', 'spell-damage')->first();
         $spellSlotTwo = $this->inventory->where('position', 'spell-two')->where('item.type', 'spell-damage')->first();
 
+        if ($this->isTheSameTypeEquipped($spellSlotOne, $spellSlotTwo)) {
+            return $this->getPercentage($spellSlotTwo);
+        }
+
         $percentageForLeftHand  = $this->getPercentage($spellSlotOne);
         $percentageForRightHand = $this->getPercentage($spellSlotTwo);
+
 
         return $percentageForLeftHand + $percentageForRightHand;
     }
@@ -54,6 +63,10 @@ class ClassRanksWeaponMasteriesBuilder extends BaseAttribute {
 
         $spellSlotOne = $this->inventory->where('position', 'spell-one')->where('item.type', 'spell-healing')->first();
         $spellSlotTwo = $this->inventory->where('position', 'spell-two')->where('item.type', 'spell-healing')->first();
+
+        if ($this->isTheSameTypeEquipped($spellSlotOne, $spellSlotTwo)) {
+            return $this->getPercentage($spellSlotTwo);
+        }
 
         $percentageForLeftHand  = $this->getPercentage($spellSlotOne);
         $percentageForRightHand = $this->getPercentage($spellSlotTwo);
@@ -85,5 +98,20 @@ class ClassRanksWeaponMasteriesBuilder extends BaseAttribute {
         } catch (Exception $e) {
             return 0.0;
         }
+    }
+
+    protected function isTheSameTypeEquipped(InventorySlot|SetSlot $slotOne = null,
+                                             InventorySlot|SetSlot $slotTwo = null): bool {
+
+        if (is_null($slotOne)) {
+            return false;
+        }
+
+        if (is_null($slotTwo)) {
+            return false;
+        }
+
+
+        return $slotOne->item->type === $slotTwo->item->type;
     }
 }

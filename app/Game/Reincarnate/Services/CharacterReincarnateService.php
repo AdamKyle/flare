@@ -13,6 +13,8 @@ use App\Game\Core\Traits\ResponseBuilder;
 
 class CharacterReincarnateService {
 
+    const MAX_STATS = 9999999999;
+
     use ResponseBuilder, CharacterMaxLevel;
 
     private UpdateCharacterAttackTypes $updateCharacterAttackTypes;
@@ -24,8 +26,6 @@ class CharacterReincarnateService {
     public function reincarnate(Character $character): array {
 
         $maxLevel = MaxLevelConfiguration::first()->max_level;
-
-
 
         if ($this->getMaxLevel($character) < $maxLevel) {
             return $this->errorResult('You need to complete the quest: Reach for the stars (Labyrinth, one off quests) to be able to reincarnate');
@@ -47,6 +47,10 @@ class CharacterReincarnateService {
             return $this->errorResult('Reincarnation costs 50,000 Copper Coins');
         }
 
+        return $this->doReincarnation($character);
+    }
+
+    public function doReincarnation(Character $character): array {
         $baseStats    = ['str', 'dur', 'dex', 'chr', 'int', 'agi', 'focus'];
         $updatedStats = [];
         $baseStat     = resolve(BaseStatValue::class)->setRace($character->race)->setClass($character->class);
@@ -55,31 +59,31 @@ class CharacterReincarnateService {
 
             $characterStat = $character->{$stat};
 
-            if ($characterStat >= 999999) {
-               continue;
+            if ($characterStat >= self::MAX_STATS) {
+                continue;
             }
 
             $base            = $baseStat->{$stat}() + $character->reincarnated_stat_increase;
             $characterBonus  = $characterStat * 0.20;
             $base            = $base + $characterBonus;
 
-            if ($base >= 999999) {
-                $base = 999999;
+            if ($base >= self::MAX_STATS) {
+                $base = self::MAX_STATS;
             }
 
             $updatedStats[$stat] = $base;
         }
 
         if (empty($updatedStats)) {
-            return $this->errorResult('You have maxed all stats to 999,999.');
+            return $this->errorResult('You have maxed all stats to '.number_format(self::MAX_STATS).'.');
         }
 
         $xpPenalty = $character->xp_penalty + 0.05;
 
         $newReincarnatedStatBonus = $character->reincarnated_stat_increase + $characterBonus;
 
-        if ($newReincarnatedStatBonus > 999999) {
-            $newReincarnatedStatBonus = 999999;
+        if ($newReincarnatedStatBonus > self::MAX_STATS) {
+            $newReincarnatedStatBonus = self::MAX_STATS;
         }
 
         $additionalUpdates = [
@@ -87,7 +91,7 @@ class CharacterReincarnateService {
             'level'                      => 1,
             'xp'                         => 0,
             'xp_next'                    => 100 + 100 * $xpPenalty,
-            'copper_coins'               => $character->copper_coins - 50000,
+            'copper_coins'               => $character->copper_coins > 0 ? $character->copper_coins - 50000 : 0,
             'reincarnated_stat_increase' => $newReincarnatedStatBonus,
             'times_reincarnated'         => $character->times_reincarnated + 1,
         ];

@@ -1,9 +1,5 @@
 import React from "react";
 import Dialogue from "../../../../components/ui/dialogue/dialogue";
-import {AdditionalInfoModalProps} from "../../../../lib/game/character-sheet/types/modal/additional-info-modal-props";
-import Tabs from "../../../../components/ui/tabs/tabs";
-import TabPanel from "../../../../components/ui/tabs/tab-panel";
-import {formatNumber} from "../../../../lib/game/format-number";
 import ReincarnateCheckModelProps from "../../../../lib/game/character-sheet/types/modal/reincarnate-check-model-props";
 
 export default class ReincarnationCheckModal extends React.Component<ReincarnateCheckModelProps, any> {

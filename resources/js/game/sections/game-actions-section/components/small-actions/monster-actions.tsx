@@ -176,16 +176,6 @@ export default class MonsterActions extends React.Component<MonsterActionsProps,
         return (
             <div className='relative'>
                 {
-                    typeof this.props.close_monster_section !== 'undefined' ?
-                        <button type='button' onClick={this.props.close_monster_section}
-                                className='text-red-600 dark:text-red-500 absolute right-[-20px] top-[-25px]'
-                        >
-                            <i className="fas fa-times-circle"></i>
-                        </button>
-                    : null
-                }
-
-                {
                     this.props.is_rank_fights ?
                         this.renderRankSelection()
                     : null
@@ -194,11 +184,12 @@ export default class MonsterActions extends React.Component<MonsterActionsProps,
                 <MonsterSelection monsters={this.props.monsters}
                                   update_monster_to_fight={this.setSelectedMonster.bind(this)}
                                   character={this.props.character}
+                                  close_monster_section={this.props.close_monster_section}
                 />
 
                 {
                     this.props.character.is_dead ?
-                        <div className='text-center my-4 ml-[-140px]'>
+                        <div className='text-center my-4 lg:ml-[-140px]'>
                             <PrimaryButton button_label={'Revive'}
                                            on_click={this.revive.bind(this)}
                                            additional_css={'mb-4'}

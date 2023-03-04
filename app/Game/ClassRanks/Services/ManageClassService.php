@@ -4,6 +4,7 @@ namespace App\Game\ClassRanks\Services;
 
 use App\Flare\Handlers\UpdateCharacterAttackTypes;
 use App\Flare\Models\Character;
+use App\Flare\Models\CharacterClassRank;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameSkill;
 use App\Flare\Values\BaseSkillValue;
@@ -56,6 +57,10 @@ class ManageClassService {
      */
     public function switchClass(Character $character, GameClass $class): array {
 
+        if ($this->isClassLocked($character, $class)) {
+            return $this->errorResult('This class is locked. You must level this classes required classes to the specified levels.');
+        }
+
         $gameSkill = GameSkill::where('game_class_id', $character->game_class_id)->first();
 
         $skillToHide = $character->skills->where('game_skill_id', $gameSkill->id)->first()->id;
@@ -96,5 +101,23 @@ class ManageClassService {
             'message'     => 'You have switched to: ' . $class->name,
             'class_ranks' => $this->classRankService->getClassRanks($character)['class_ranks'],
         ]);
+    }
+
+    protected function isClassLocked(Character $character, GameClass $gameClass): bool {
+        if (!is_null($gameClass->primary_required_class_id) &&
+            !is_null($gameClass->secondary_required_class_id)) {
+
+            $primaryRequiredClassId   = $gameClass->primary_required_class_id;
+            $secondaryRequiredClassId = $gameClass->secondary_required_class_id;
+
+            $primaryClassRank   = $character->classRanks->where('game_class_id', $primaryRequiredClassId)->first();
+            $secondaryClassRank = $character->classRanks->where('game_class_id', $secondaryRequiredClassId)->first();
+
+
+            return !(($primaryClassRank->level >= $gameClass->primary_required_class_level) &&
+                ($secondaryClassRank->level >= $gameClass->secondary_required_class_level));
+        }
+
+        return false;
     }
 }

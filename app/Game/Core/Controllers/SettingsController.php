@@ -22,7 +22,9 @@ class SettingsController extends Controller {
         return view('game.core.settings.settings', [
             'user'    => $user,
             'races'   => GameRace::pluck('name', 'id'),
-            'classes' => GameClass::pluck('name', 'id'),
+            'classes' => GameClass::whereNull('primary_required_class_id')
+                                  ->whereNull('secondary_required_class_id')
+                                  ->pluck('name', 'id'),
         ]);
     }
 

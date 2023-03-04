@@ -42,7 +42,7 @@ class ClassBonusInformation {
         if ($classAttackValue->isFighter()) {
             $details['type'] = Str::ucfirst(ClassAttackValue::FIGHTERS_DOUBLE_DAMAGE);
             $details['requires'] = 'Dual Weapon equipped or Weapon/Shield equipped';
-            $details['description'] = 'With a weapon equipped you have a small chance to do damage equal to your modded attack + 15% of the modded attack, without being blocked. With a shield equipped you have will use your class bonus towards your defence.';
+            $details['description'] = 'With a weapon equipped you have a small chance to do damage equal to your modded attack + 15% of the modded attack, without being blocked. With a shield equipped you use your class bonus towards your defence automatically.';
         }
 
         if ($classAttackValue->isRanger()) {
@@ -72,7 +72,7 @@ class ClassBonusInformation {
         if ($classAttackValue->isVampire()) {
             $details['type'] = Str::ucfirst(ClassAttackValue::VAMPIRE_THIRST);
             $details['requires'] = 'N/A';
-            $details['description'] = 'Every time you attack, you have a chance to fire off the thirst which can steal 15% of your dur from the enemy as both attack and healing.';
+            $details['description'] = 'Every time you attack, you have a chance to fire off the thirst which can steal 15% of your dur from the enemy while attacking and defending.';
         }
 
         if ($classAttackValue->isBlacksmith()) {
@@ -85,6 +85,24 @@ class ClassBonusInformation {
             $details['type'] = Str::ucfirst(ClassAttackValue::ARCANE_ALCHEMISTS_DREAMS);
             $details['requires'] = 'Stave';
             $details['description'] = 'Every time you attack you have chance to, based on class bonus and with a stave equipped, to do Alchemists Ravenous Dream. This can do 10% of your int followed by an additional 3% for each additional attack between 2 and 6 times.';
+        }
+
+        if ($classAttackValue->isPrisoner()) {
+            $details['type'] = Str::ucfirst(ClassAttackValue::PRISONER_RAGE);
+            $details['requires'] = 'Weapons';
+            $details['description'] = 'With a weapon (or two) equipped you have a chance to rage out at the enemy for 15% of your strength 1-4 times';
+        }
+
+        if ($classAttackValue->isAlcoholic()) {
+            $details['type'] = Str::ucfirst(ClassAttackValue::ALCOHOLIC_PUKE);
+            $details['requires'] = 'No Weapons';
+            $details['description'] = 'With no weapons (including: Staves, Hammers and Bows) and spells (damage or healing) equipped you have a chance to do Bloody Puke, which deals 30% of your health as damage but you also suffer 15% in damage.';
+        }
+
+        if ($classAttackValue->isMerchant()) {
+            $details['type'] = Str::ucfirst(ClassAttackValue::MERCHANTS_SUPPLY);
+            $details['requires'] = 'Stave or Bow';
+            $details['description'] = 'With a stave or bow equipped you have a chance to do one of two attacks based on a coin flip. One is 2x your damage and the other is 4x your damage.';
         }
 
         return $details;

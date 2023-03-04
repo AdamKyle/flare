@@ -124,7 +124,7 @@ export default class CharacterClassRanks extends React.Component<any, CharacterC
                 name: 'Action',
                 selector: (row: ClassRankType) => row.id,
                 cell: (row: ClassRankType) => <span>
-                    <PrimaryButton button_label={'Switch To'}  on_click={() => this.switchClass(row.game_class_id)} disabled={row.is_active} />
+                    <PrimaryButton button_label={'Switch To'}  on_click={() => this.switchClass(row.game_class_id)} disabled={row.is_active || row.is_locked} />
                 </span>
             }
         ];
@@ -174,7 +174,7 @@ export default class CharacterClassRanks extends React.Component<any, CharacterC
                 {
                     this.state.open_class_details && this.state.class_name_selected !== null ?
                         <div>
-                            <div className='text-right cursor-pointer text-red-500 position top-[-10px]'>
+                            <div className='text-right cursor-pointer text-red-500 relative top-[10px] right-[10px]'>
                                 <button onClick={() => this.manageViewClass(null)}><i className="fas fa-minus-circle"></i></button>
                             </div>
 
@@ -196,7 +196,7 @@ export default class CharacterClassRanks extends React.Component<any, CharacterC
                                 <div>
                                     <h3 className='my-3'>Base Information</h3>
                                     <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                                    <dl>
+                                    <dl className='mb-4'>
                                         <dt>Base Damage Stat</dt>
                                         <dd>{this.state.class_name_selected.game_class.to_hit_stat}</dd>
                                         <dt>Accuracy Mod</dt>
@@ -204,6 +204,30 @@ export default class CharacterClassRanks extends React.Component<any, CharacterC
                                         <dt>Looting Mod</dt>
                                         <dd>+{(this.state.class_name_selected.game_class.accuracy_mod * 100).toFixed(2)}%</dd>
                                     </dl>
+
+                                    {
+                                        this.state.class_name_selected.secondary_class_name !== null &&
+                                        this.state.class_name_selected.primary_class_name !== null ?
+                                            <Fragment>
+                                                <h3 className='my-3'>Requirements</h3>
+                                                <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                                                <p className='mb-2'>
+                                                    This class may require you to level other classes before being able to switch to this
+                                                    class. To do so, follow the below information to unlock the class!
+                                                </p>
+                                                <dl className='mb-4'>
+                                                    <dt>Primary Class Required:</dt>
+                                                    <dd>{this.state.class_name_selected.primary_class_name}</dd>
+                                                    <dt>Primary Class Level Required:</dt>
+                                                    <dd>{this.state.class_name_selected.primary_class_required_level}</dd>
+                                                    <dt>Secondary Class Required:</dt>
+                                                    <dd>{this.state.class_name_selected.secondary_class_name}</dd>
+                                                    <dt>Secondary Class Level Required:</dt>
+                                                    <dd>{this.state.class_name_selected.secondary_class_required_level}</dd>
+                                                </dl>
+                                            </Fragment>
+                                        : null
+                                    }
                                 </div>
                                 <div className='border-b-2 block lg:hidden border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                                 <div>

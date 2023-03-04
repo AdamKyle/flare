@@ -312,7 +312,7 @@ export default class CharacterMercenaries extends React.Component<CharacterMerce
         }
 
         if (this.state.loading) {
-            return <ComponentLoading />
+            return <LoadingProgressBar />
         }
 
         return (
@@ -326,7 +326,9 @@ export default class CharacterMercenaries extends React.Component<CharacterMerce
                     : null
                 }
 
-                <Table columns={this.buildColumns()} data={this.state.mercs} dark_table={this.state.dark_tables} />
+                <div className='max-w-[290px] sm:max-w-[100%] overflow-x-hidden'>
+                    <Table columns={this.buildColumns()} data={this.state.mercs} dark_table={this.state.dark_tables} />
+                </div>
 
                 <div className={clsx('flex justify-center mt-4', {
                     'hidden': this.state.mercs_to_buy.length === 0,

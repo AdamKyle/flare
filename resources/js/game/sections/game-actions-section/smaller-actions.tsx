@@ -84,7 +84,7 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
         this.pvpUpdate = Echo.private('update-pvp-attack-' + this.props.character.user_id);
 
         // @ts-ignore
-        this.celestialTimeout   = Echo.private('update-character-celestial-timeout-' + this.props.user_id);
+        this.celestialTimeout   = Echo.private('update-character-celestial-timeout-' + this.props.character.user_id);
 
         // @ts-ignore
         this.manageRankFights = Echo.private('update-rank-fight-' + this.props.character.user_id);

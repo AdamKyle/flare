@@ -13,10 +13,10 @@ class MarketItemsTransformer extends TransformerAbstract {
     /**
      * Gets the response data for the character sheet
      *
-     * @param Character $character
-     * @return mixed
+     * @param MarketBoard $marketListing
+     * @return array
      */
-    public function transform(MarketBoard $marketListing) {
+    public function transform(MarketBoard $marketListing): array {
 
         return [
             'id'             => $marketListing->id,

@@ -6,8 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Database\Factories\KingdomBuildingFactory;
 
-class KingdomBuilding extends Model
-{
+class KingdomBuilding extends Model {
 
     use HasFactory;
 

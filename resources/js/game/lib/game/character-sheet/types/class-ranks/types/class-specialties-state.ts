@@ -10,6 +10,8 @@ export default interface ClassSpecialtiesState {
 
     class_specials_for_table: ClassSpecialtiesType[]|[];
 
+    filtered_other_class_specialties: CharacterSpecialsEquippedTyp[]|[];
+
     special_selected: ClassSpecialtiesType | null;
 
     equipped_special: CharacterSpecialsEquippedTyp | null;
@@ -24,11 +26,16 @@ export default interface ClassSpecialtiesState {
 
     equipping: boolean;
 
+    equipping_special_id: number | null;
+
     success_message: string | null;
 
     error_message: string | null;
 
     selected_filter: string | null;
 
+    other_selected_filter: string | null;
+
     show_equipped: boolean,
+
 }

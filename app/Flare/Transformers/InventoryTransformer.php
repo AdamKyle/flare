@@ -19,9 +19,9 @@ class InventoryTransformer extends TransformerAbstract {
      * Gets the response data for the inventory sheet
      *
      * @param InventorySlot|SetSlot $slot
-     * @return mixed
+     * @return array
      */
-    public function transform(InventorySlot|SetSlot $slot) {
+    public function transform(InventorySlot|SetSlot $slot): array {
         return [
             'id'                      => $slot->id,
             'item_id'                 => $slot->item->id,

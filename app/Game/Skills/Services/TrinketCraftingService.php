@@ -13,6 +13,8 @@ use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Services\Traits\SkillCheck;
+use Exception;
+
 
 class TrinketCraftingService {
 
@@ -34,16 +36,38 @@ class TrinketCraftingService {
      * Fetch trinkets the player can craft.
      *
      * @param Character $character
+     * @param bool $showMerchantMessage
      * @return array
+     * @throws Exception
      */
-    public function fetchItemsToCraft(Character $character): array {
+    public function fetchItemsToCraft(Character $character, bool $showMerchantMessage = true): array {
         $trinkentrySkill = $this->fetchCharacterSkill($character);
 
-        return Item::where('type', 'trinket')
-                    ->where('skill_level_required', '<=', $trinkentrySkill->level)
-                    ->select('name', 'id', 'gold_dust_cost', 'copper_coin_cost')
-                    ->get()
-                    ->toArray();
+        $items = Item::where('type', 'trinket')
+                     ->where('skill_level_required', '<=', $trinkentrySkill->level)
+                     ->select('name', 'id', 'gold_dust_cost', 'copper_coin_cost')
+                     ->get();
+
+        if ($character->classType()->isMerchant()) {
+            $items = $items->transform(function($item) {
+                $copperCoinCost = $item->copper_coin_cost;
+                $goldDustCost   = $item->gold_dust_cost;
+
+                $copperCoinCost = floor($copperCoinCost - $copperCoinCost * 0.10);
+                $goldDustCost   = floor($goldDustCost   - $goldDustCost * 0.10);
+
+                $item->gold_dust_cost   = $goldDustCost;
+                $item->copper_coin_cost = $copperCoinCost;
+
+                return $item;
+            });
+
+            if ($showMerchantMessage) {
+                event(new ServerMessageEvent($character->user, 'As a Merchant you get 10% discount on creating trinketry items. The discount has been applied to the items list.'));
+            }
+        }
+
+        return $items->toArray();
     }
 
     /**
@@ -56,9 +80,14 @@ class TrinketCraftingService {
      * @param Character $character
      * @param Item $item
      * @return array
+     * @throws Exception
      */
     public function craft(Character $character, Item $item): array {
         $trinkentrySkill = $this->fetchCharacterSkill($character);
+
+        if ($character->classType()->isMerchant()) {
+            event(new FlareServerMessage($character->user, 'As a Merchant you get a 10% reduction on crafting trinkets.'));
+        }
 
         if (!$this->canAfford($character, $item)) {
             event(new ServerMessageEvent($character->user, 'You do not have enough of the required currencies to craft this.'));
@@ -70,13 +99,13 @@ class TrinketCraftingService {
 
         event(new UpdateTopBarEvent($character));
 
-        if ($trinkentrySkill->level < $item->$trinkentrySkill) {
+        if ($trinkentrySkill->level < $item->trinkentrySkill) {
             event(new FlareServerMessage($character->user, 'to_hard_to_craft'));
 
             return $this->fetchItemsToCraft($character);
         }
 
-        if ($trinkentrySkill->level >= $item->skill_level_trivial) {
+        if ($trinkentrySkill->level > $item->skill_level_trivial) {
             event(new FlareServerMessage($character->user, 'to_easy_to_craft'));
 
             $this->craftingService->pickUpItem($character, $item, $trinkentrySkill, true);
@@ -96,7 +125,7 @@ class TrinketCraftingService {
 
         event(new CharacterInventoryDetailsUpdate($character->user));
 
-        return $this->fetchItemsToCraft($character->refresh());
+        return $this->fetchItemsToCraft($character->refresh(), false);
     }
 
     /**
@@ -117,14 +146,23 @@ class TrinketCraftingService {
      * @param Character $character
      * @param Item $item
      * @return bool
+     * @throws Exception
      */
     protected function canAfford(Character $character, Item $item): bool {
 
-        if ($character->gold_dust < $item->gold_dust_cost) {
+        $copperCoinCost   = $item->copper_coin_cost;
+        $goldDustCostCost = $item->gold_dust_cost;
+
+        if ($character->classType()->isMerchant()) {
+            $copperCoinCost   = floor($copperCoinCost - $copperCoinCost * 0.10);
+            $goldDustCostCost = floor($goldDustCostCost - $goldDustCostCost * 0.10);
+        }
+
+        if ($character->gold_dust < $goldDustCostCost) {
             return false;
         }
 
-        if ($character->copper_coins < $item->copper_coin_cost) {
+        if ($character->copper_coins < $copperCoinCost) {
             return false;
         }
 

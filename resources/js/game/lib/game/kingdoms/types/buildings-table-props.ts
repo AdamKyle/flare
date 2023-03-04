@@ -10,4 +10,6 @@ export default interface BuildingsTableProps {
     dark_tables: boolean;
 
     view_building: (building?: BuildingDetails) => void;
+
+    view_port: number;
 }

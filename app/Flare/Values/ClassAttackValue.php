@@ -6,38 +6,46 @@ use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\SetSlot;
+use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use App\Flare\Models\Character;
 
 class ClassAttackValue {
 
-    const VAMPIRE_THIRST = 'vampire thirst';
-    const PROPHET_HEALING = 'prophet healing';
-    const RANGER_TRIPLE_ATTACK = 'ranger triple attack';
-    const THIEVES_SHADOW_DANCE = 'thieves shadow dance';
-    const HERETICS_DOUBLE_CAST = 'heretics double cast';
-    const FIGHTERS_DOUBLE_DAMAGE = 'double damage';
+    const VAMPIRE_THIRST           = 'vampire thirst';
+    const PROPHET_HEALING          = 'prophet healing';
+    const RANGER_TRIPLE_ATTACK     = 'ranger triple attack';
+    const THIEVES_SHADOW_DANCE     = 'thieves shadow dance';
+    const HERETICS_DOUBLE_CAST     = 'heretics double cast';
+    const FIGHTERS_DOUBLE_DAMAGE   = 'double damage';
     const BLACKSMITHS_HAMMER_SMASH = 'hammer smash';
-    const ARCANE_ALCHEMISTS_DREAMS    = 'alchemists ravenous dream';
+    const ARCANE_ALCHEMISTS_DREAMS = 'alchemists ravenous dream';
+    const PRISONER_RAGE            = 'prisoner rage';
+    const ALCOHOLIC_PUKE           = 'alcoholic puke';
+    const MERCHANTS_SUPPLY         = 'Merchants supply';
 
-    private $classType;
+    private CharacterClassValue $classType;
 
-    private $character;
+    private Character $character;
 
-    private $characterInfo;
+    private CharacterStatBuilder $characterInfo;
 
-    private $chance = [
+    private array $chance = [
         'chance' => 0.05,
         'class_name' => null,
     ];
 
+    /**
+     * @param Character $character
+     * @throws Exception
+     */
     public function __construct(Character $character) {
         $this->classType     = new CharacterClassValue($character->class->name);
         $this->characterInfo = resolve(CharacterStatBuilder::class)->setCharacter($character);
         $this->character     = $character;
     }
 
-    public function buildAttackData() {
+    public function buildAttackData(): array {
         if ($this->classType->isFighter()) {
             $this->buildFighterChance();
 
@@ -85,6 +93,26 @@ class ClassAttackValue {
 
             return $this->chance;
         }
+
+        if ($this->classType->isPrisoner()) {
+            $this->buildPrisonerChance();
+
+            return $this->chance;
+        }
+
+        if ($this->classType->isAlcoholic()) {
+            $this->buildAlcoholicsChance();
+
+            return $this->chance;
+        }
+
+        if ($this->classType->isMerchant()) {
+            $this->buildMerchantsPlace();
+
+            return $this->chance;
+        }
+
+        return $this->chance;
     }
 
     public function buildFighterChance() {
@@ -148,6 +176,35 @@ class ClassAttackValue {
         $this->chance['only'] = 'stave';
         $this->chance['class_name'] = 'Arcane Alchemist';
         $this->chance['has_item'] = $this->hasItemTypeEquipped('stave');
+        $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
+    }
+
+    public function buildPrisonerChance() {
+        $this->chance['type'] = self::PRISONER_RAGE;
+        $this->chance['only'] = 'weapon';
+        $this->chance['class_name'] = 'Prisoner';
+        $this->chance['has_item'] = $this->hasItemTypeEquipped('weapon');
+        $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
+    }
+
+    public function buildAlcoholicsChance() {
+        $this->chance['type']       = self::ALCOHOLIC_PUKE;
+        $this->chance['only']       = 'No weapon equipped';
+        $this->chance['class_name'] = 'Alcoholic';
+        $this->chance['has_item']   = !$this->hasItemTypeEquipped('weapon') &&
+                                      !$this->hasItemTypeEquipped('stave') &&
+                                      !$this->hasItemTypeEquipped('bow') &&
+                                      !$this->hasItemTypeEquipped('hammer') &&
+                                      !$this->hasItemTypeEquipped('spell-damage') &&
+                                      !$this->hasItemTypeEquipped('spell-healing');
+        $this->chance['chance']     = $this->chance['chance'] + $this->characterInfo->classBonus();
+    }
+
+    public function buildMerchantsPlace() {
+        $this->chance['type'] = self::MERCHANTS_SUPPLY;
+        $this->chance['only'] = 'Stave or Bow';
+        $this->chance['class_name'] = 'Merchant';
+        $this->chance['has_item'] = $this->hasItemTypeEquipped('stave') || $this->hasItemTypeEquipped('bow');
         $this->chance['chance'] = $this->chance['chance'] + $this->characterInfo->classBonus();
     }
 

@@ -148,6 +148,32 @@ class CharacterFactory {
         return $this;
     }
 
+    public function addAdditionalClassRanks(array $gameClassIds): CharacterFactory {
+        foreach ($gameClassIds as $gameClassId) {
+            $classRank = $this->character->classRanks()->create([
+                'character_id'  => $this->character->id,
+                'game_class_id' => $gameClassId,
+                'current_xp'    => 0,
+                'required_xp'   => 100,
+                'level'         => 0,
+            ]);
+
+            foreach (WeaponMasteryValue::getTypes() as $type) {
+                $classRank->weaponMasteries()->create([
+                    'character_class_rank_id'   => $classRank->id,
+                    'weapon_type'               => $type,
+                    'current_xp'                => 0,
+                    'required_xp'               => 100,
+                    'level'                     => 0,
+                ]);
+            }
+        }
+
+        $this->character = $this->character->refresh();
+
+        return $this;
+    }
+
     public function completeQuest(Quest $quest): CharacterFactory {
         $this->character->questsCompleted()->create([
             'quest_id'     => $quest->id,

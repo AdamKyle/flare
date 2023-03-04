@@ -40,7 +40,7 @@ export default class KingdomPassiveTree extends React.Component<any, any> {
 
     render() {
         return (
-            <Fragment>
+            <div className='overflow-x-auto overflow-y-hidden max-w-[300px] sm:max-w-[600px] md:max-w-[100%]'>
                 <Tree
                     lineWidth={'2px'}
                     lineColor={'green'}
@@ -67,7 +67,7 @@ export default class KingdomPassiveTree extends React.Component<any, any> {
                         />
                     : null
                 }
-            </Fragment>
+            </div>
         );
     }
 }

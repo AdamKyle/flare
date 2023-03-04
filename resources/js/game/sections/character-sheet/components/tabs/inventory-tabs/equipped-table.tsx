@@ -172,14 +172,14 @@ export default class EquippedTable extends React.Component<EquippedInventoryTabP
                      : null
                 }
                 <div className='mb-5'>
-                    <div className='flex items-center'>
+                    <div className='flex flex-row flex-wrap items-center'>
                         <div>
                             <label className="label block mb-2 mr-3" htmlFor="search">Search</label>
                         </div>
                         <div>
                             <input type='text' name='search' className='form-control' onChange={this.search.bind(this)} placeholder={'search'}/>
                         </div>
-                        <div className='ml-2'>
+                        <div className='mt-2 sm:mt-0 sm:ml-2'>
                             <DangerButton button_label={'Unequip All'} on_click={this.unequipAll.bind(this)} disabled={this.props.is_dead || this.state.data.length === 0 || this.props.is_automation_running || this.state.loading} />
                         </div>
                         {
@@ -211,7 +211,9 @@ export default class EquippedTable extends React.Component<EquippedInventoryTabP
                         : null
                 }
 
-                <Table data={this.state.data} columns={BuildInventoryTableColumns(this, this.viewItem.bind(this), 'equipped')} dark_table={this.props.dark_tables}/>
+                <div className={'max-w-[290px] sm:max-w-[100%] overflow-y-hidden'}>
+                    <Table data={this.state.data} columns={BuildInventoryTableColumns(this, this.viewItem.bind(this), 'equipped')} dark_table={this.props.dark_tables}/>
+                </div>
             </Fragment>
         );
     }

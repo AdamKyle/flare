@@ -9,11 +9,12 @@ use App\Game\ClassRanks\Values\WeaponMasteryValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateClass;
 use Tests\Traits\CreateGameClassSpecial;
 
 class ClassRanksServiceTest extends TestCase {
 
-    use RefreshDatabase, CreateGameClassSpecial;
+    use RefreshDatabase, CreateGameClassSpecial, CreateClass;
 
     private ?CharacterFactory $character;
 
@@ -38,6 +39,37 @@ class ClassRanksServiceTest extends TestCase {
 
         $this->assertEquals(200, $response['status']);
         $this->assertNotEmpty($response['class_ranks']);
+    }
+
+    public function testOneOfTheClassesIsLocked() {
+        $heretic     = $this->createClass([
+            'name' => 'Heretic',
+        ]);
+
+        $thief       = $this->createClass([
+            'name' => 'Thief',
+        ]);
+
+        $prisonerClass = $this->createClass([
+            'name'                            => 'Prisoner',
+            'primary_required_class_id'       => $heretic->id,
+            'secondary_required_class_id'     => $thief->id,
+            'primary_required_class_level'    => 10,
+            'secondary_required_class_level'  => 20,
+        ]);
+
+        $character = $this->character->addAdditionalClassRanks([$heretic->id, $thief->id, $prisonerClass->id])
+                                     ->getCharacter();
+
+        $response = $this->classRankService->getClassRanks($character);
+
+        $this->assertEquals(200, $response['status']);
+
+        $classRanks = $response['class_ranks'];
+
+        $index = array_search(true, array_column($classRanks, 'is_locked'));
+
+        $this->assertNotFalse($index);
     }
 
     public function testCannotEquipMoreThenThreeSpecialties() {
@@ -380,6 +412,24 @@ class ClassRanksServiceTest extends TestCase {
         foreach ($character->classRanks as $rank) {
             foreach ($rank->weaponMasteries as $mastery) {
                 $this->assertEquals(WeaponMasteryValue::MAX_LEVEL, $mastery->level);
+            }
+        }
+    }
+
+    public function testDoNotGiveXPToMasteriesWhenNoInventory() {
+        $character = $this->character->equipStartingEquipment()->getCharacter();
+
+        $character->inventory->slots()->update(['equipped' => false]);
+
+        $character = $character->refresh();
+
+        $this->classRankService->giveXpToMasteries($character);
+
+        $character = $character->refresh();
+
+        foreach ($character->classRanks as $rank) {
+            foreach ($rank->weaponMasteries as $mastery) {
+                $this->assertEquals(0, $mastery->current_xp);
             }
         }
     }

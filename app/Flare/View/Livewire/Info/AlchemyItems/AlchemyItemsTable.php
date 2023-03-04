@@ -16,7 +16,8 @@ class AlchemyItemsTable extends DataTableComponent {
     public function builder(): Builder {
         return Item::whereNull('item_prefix_id')
                    ->whereNull('item_suffix_id')
-                   ->where('type', 'alchemy');
+                   ->where('type', 'alchemy')
+                   ->whereNull('gold_bars_cost');
     }
 
     public function columns(): array {

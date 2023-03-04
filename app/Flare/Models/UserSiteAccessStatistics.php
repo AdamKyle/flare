@@ -21,7 +21,6 @@ class UserSiteAccessStatistics extends Model {
         'invalid_ips',
     ];
 
-
     /**
      * The attributes that should be cast to native types.
      *

@@ -5,8 +5,7 @@ namespace App\Flare\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 
-class CharacterClassSpecialtiesEquipped extends Model
-{
+class CharacterClassSpecialtiesEquipped extends Model {
 
     protected $table = 'character_class_specialties_equipped';
 
@@ -40,6 +39,11 @@ class CharacterClassSpecialtiesEquipped extends Model
         'base_spell_damage_mod',
         'health_mod',
         'base_damage_stat_increase',
+        'spell_evasion',
+        'affix_damage_reduction',
+        'healing_reduction',
+        'skill_reduction',
+        'resistance_reduction',
     ];
 
     public function getSpecialtyDamageAttribute() {
@@ -86,6 +90,26 @@ class CharacterClassSpecialtiesEquipped extends Model
 
     public function getIncreaseSpecialtyDamagePerLevelAttribute() {
         return $this->gameClassSpecial->increase_specialty_damage_per_level * $this->level;
+    }
+
+    public function getSpellEvasionAttribute() {
+        return $this->gameClassSpecial->spell_evasion * $this->level;
+    }
+
+    public function getAffixDamageReductionAttribute() {
+        return $this->gameClassSpecial->affix_damage_reduction * $this->level;
+    }
+
+    public function getHealingReductionAttribute() {
+        return $this->gameClassSpecial->healing_reduction * $this->level;
+    }
+
+    public function getSkillReductionAttribute() {
+        return $this->gameClassSpecial->skill_reduction * $this->level;
+    }
+
+    public function getResistanceReductionAttribute() {
+        return $this->gameClassSpecial->resistance_reduction * $this->level;
     }
 
     public function gameClassSpecial() {

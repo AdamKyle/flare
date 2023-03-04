@@ -14,7 +14,7 @@ import DangerLinkButton from "../../../components/ui/buttons/danger-link-button"
  * @param cancelBuilding
  * @param buildingsInQueue
  */
-export const buildBuildingsColumns = (onClick: (building: BuildingDetails) => void, cancelBuilding: (queueId: number|null) => void, buildingsInQueue: BuildingInQueueDetails[]|[]) => {
+export const buildBuildingsColumns = (onClick: (building: BuildingDetails) => void, cancelBuilding: (queueId: number|null) => void, buildingsInQueue: BuildingInQueueDetails[]|[], viewPort: number) => {
     return [
         {
             name: 'Name',
@@ -49,7 +49,7 @@ export const buildBuildingsColumns = (onClick: (building: BuildingDetails) => vo
             minWidth: '300px',
             cell: (row: BuildingDetails) => <Fragment>
                 <div className='w-full mt-2'>
-                    <TimerProgressBar time_remaining={fetchTimeRemaining(row.id, buildingsInQueue)} time_out_label={'Building'} />
+                    <TimerProgressBar time_remaining={fetchTimeRemaining(row.id, buildingsInQueue)} time_out_label={'Building'} useSmallTimer={viewPort < 800}/>
                     {
                         fetchTimeRemaining(row.id, buildingsInQueue) > 0 ?
                             <div className='mb-2 mt-4'>

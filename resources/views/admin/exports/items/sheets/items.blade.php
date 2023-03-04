@@ -70,6 +70,7 @@
         <td>counter_chance</td>
         <td>counter_resistance</td>
         <td>gains_additional_level</td>
+        <td>unlocks_class_id</td>
     </tr>
     </thead>
     <tbody>
@@ -144,6 +145,7 @@
             <td>{{$item->counter_chance}}</td>
             <td>{{$item->counter_resistance}}</td>
             <td>{{$item->gains_additional_level}}</td>
+            <td>{{is_null($item->unlocksClass) ? '' : $item->unlocksClass->name}}</td>
         </tr>
     @endforeach
     </tbody>

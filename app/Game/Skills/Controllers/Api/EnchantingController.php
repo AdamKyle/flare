@@ -27,7 +27,7 @@ class  EnchantingController extends Controller {
     }
 
     public function fetchAffixes(Character $character) {
-        return response()->json($this->enchantingService->fetchAffixes($character, true), 200);
+        return response()->json($this->enchantingService->fetchAffixes($character, true));
     }
 
     public function enchant(EnchantingValidation $request, Character $character) {
@@ -41,7 +41,7 @@ class  EnchantingController extends Controller {
             return response()->json(['message' => 'Invalid Slot.'], 422);
         }
 
-        $cost = $this->enchantingService->getCostOfEnchantment($request->affix_ids, $slot->item->id);
+        $cost = $this->enchantingService->getCostOfEnchantment($character, $request->affix_ids, $slot->item->id);
 
         if ($cost > $character->gold || $cost === 0) {
             event(new ServerMessageEvent($character->user, 'Not enough gold to enchant that.'));
@@ -55,6 +55,6 @@ class  EnchantingController extends Controller {
 
         $this->enchantingService->enchant($character, $request->all(), $slot, $cost);
 
-        return response()->json($this->enchantingService->fetchAffixes($character->refresh(), true));
+        return response()->json($this->enchantingService->fetchAffixes($character->refresh(), true, false));
     }
 }

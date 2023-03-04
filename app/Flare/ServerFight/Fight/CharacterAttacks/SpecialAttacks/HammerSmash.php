@@ -8,6 +8,14 @@ use App\Flare\ServerFight\BattleBase;
 
 class HammerSmash extends BattleBase {
 
+    /**
+     * Handle the hammer smash attack.
+     *
+     * @param Character $character
+     * @param array $attackData
+     * @param bool $isPvp
+     * @return void
+     */
     public function handleHammerSmash(Character $character, array $attackData, bool $isPvp = false) {
         $extraActionData = $this->characterCacheData->getCachedCharacterData($character, 'extra_action_chance');
 
@@ -32,6 +40,13 @@ class HammerSmash extends BattleBase {
         }
     }
 
+    /**
+     * Do the base hammer smash attack.
+     *
+     * @param int $damage
+     * @param bool $isPvp
+     * @return void
+     */
     protected function doBaseAttack(int $damage, bool $isPvp = false) {
         $this->addMessage('You raise your mighty hammer high above your head and bring it crashing down!', 'regular', $isPvp);
 
@@ -44,6 +59,16 @@ class HammerSmash extends BattleBase {
         }
     }
 
+    /**
+     * Do after shocks.
+     *
+     * - Players have a 60% chance
+     * - Damage looses 15% for each after shock.
+     *
+     * @param int $damage
+     * @param bool $isPvp
+     * @return void
+     */
     protected function doAfterShocks(int $damage, bool $isPvp = false) {
         $roll = rand (1, 100);
         $roll = $roll + $roll * .60;

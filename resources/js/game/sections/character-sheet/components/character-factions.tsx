@@ -6,6 +6,7 @@ import ComponentLoading from "../../../components/ui/loading/component-loading";
 import InfoAlert from "../../../components/ui/alerts/simple-alerts/info-alert";
 import Table from "../../../components/ui/data-tables/table";
 import {formatNumber} from "../../../lib/game/format-number";
+import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 
 export default class CharacterFactions extends React.Component<any, any> {
 
@@ -78,9 +79,7 @@ export default class CharacterFactions extends React.Component<any, any> {
     render() {
         if (this.state.loading) {
             return (
-                <div className="relative top-[20px]">
-                    <ComponentLoading/>
-                </div>
+                <LoadingProgressBar />
             )
         }
 
@@ -96,7 +95,9 @@ export default class CharacterFactions extends React.Component<any, any> {
                             </InfoAlert>
                             : null
                     }
-                    <Table columns={this.buildColumns()} data={this.state.factions} dark_table={this.state.dark_tables} />
+                    <div className={'max-w-[290px] sm:max-w-[100%] overflow-x-hidden'}>
+                        <Table columns={this.buildColumns()} data={this.state.factions} dark_table={this.state.dark_tables} />
+                    </div>
                 </div>
             </Fragment>
         )

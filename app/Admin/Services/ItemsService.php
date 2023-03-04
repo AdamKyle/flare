@@ -2,6 +2,7 @@
 
 namespace App\Admin\Services;
 
+use App\Flare\Models\GameClass;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Location;
 use App\Flare\Models\SetSlot;
@@ -80,6 +81,7 @@ class ItemsService {
             ],
             'locations'  => Location::select('name', 'id')->get(),
             'skills'     => GameSkill::pluck('name')->toArray(),
+            'classes'    => GameClass::pluck('name', 'id')->toArray(),
         ];
     }
 

@@ -2,13 +2,11 @@
 
 namespace App\Flare\Models;
 
-use App\Game\Skills\Values\SkillTypeValue;
 use Database\Factories\CharacterBoonFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class CharacterBoon extends Model
-{
+class CharacterBoon extends Model {
 
     use HasFactory;
 

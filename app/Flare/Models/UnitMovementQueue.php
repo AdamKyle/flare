@@ -4,11 +4,9 @@ namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Database\Factories\UnitInQueueFactory;
 use Database\Factories\UnitMoveQueueFactory;
 
-class UnitMovementQueue extends Model
-{
+class UnitMovementQueue extends Model {
 
     use HasFactory;
 

@@ -5,6 +5,7 @@ import {CraftingOptions} from "../../../../lib/game/types/actions/crafting-type-
 import SmallCraftingSectionProps from "../../../../lib/game/types/actions/components/smaller-actions/small-crafting-section-props";
 import SmallCraftingSectionState from "../../../../lib/game/types/actions/components/smaller-actions/small-crafting-section-state";
 import MainCraftingSection from '../crafting-section';
+import DangerButton from "../../../../components/ui/buttons/danger-button";
 
 export default class SmallCraftingSection extends React.Component<SmallCraftingSectionProps, SmallCraftingSectionState> {
 
@@ -35,12 +36,6 @@ export default class SmallCraftingSection extends React.Component<SmallCraftingS
     render() {
         return (
             <div className='relative'>
-                <button type='button' onClick={this.props.close_crafting_section}
-                        className='text-red-600 dark:text-red-500 absolute right-[-20px] top-[-25px]'
-                >
-                    <i className="fas fa-times-circle"></i>
-                </button>
-
                 {
                     this.state.crafting_type !== null ?
                         <MainCraftingSection
@@ -55,7 +50,11 @@ export default class SmallCraftingSection extends React.Component<SmallCraftingS
                             <DropDown menu_items={this.craftingSectionManager.buildCraftingList(this.setCraftingType.bind(this))}
                                       button_title={'Craft/Enchant'}
                                       disabled={this.craftingSectionManager.cannotCraft()}
-                                      selected_name={this.craftingSectionManager.getSelectedCraftingOption()}/>
+                                      selected_name={this.craftingSectionManager.getSelectedCraftingOption()}
+                                      show_close_button={true}
+                                      close_button_action={this.props.close_crafting_section}
+                            />
+
                         </Fragment>
                 }
             </div>

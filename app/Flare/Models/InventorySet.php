@@ -5,7 +5,6 @@ namespace App\Flare\Models;
 use Database\Factories\InventorySetFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Flare\Models\QuestItemSlot;
 
 class InventorySet extends Model {
 

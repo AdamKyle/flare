@@ -12,7 +12,11 @@ class ReductionsBuilder extends BaseAttribute {
 
         $maxValue = $this->inventory->where('item.type', 'ring')->max('item.' . $type);
 
-        return !is_null($maxValue) ? $maxValue : 0;
+        $value = !is_null($maxValue) ? $maxValue : 0;
+
+        $value += $this->character->classSpecialsEquipped->sum($type);
+
+        return $value;
     }
 
     public function getAffixReduction($type): float {
@@ -27,6 +31,10 @@ class ReductionsBuilder extends BaseAttribute {
 
         $value = max($values);
 
-        return !is_null($value) ? $value : 0;
+        $value = !is_null($value) ? $value : 0;
+
+        $value += $this->character->classSpecialsEquipped->sum($type);
+
+        return $value;
     }
 }

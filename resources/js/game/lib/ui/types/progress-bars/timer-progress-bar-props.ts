@@ -6,4 +6,6 @@ export default interface TimerProgressBarProps {
     update_time_remaining?: (timeLeft: number) => void;
 
     additional_css?: string;
+
+    useSmallTimer?: boolean;
 }

@@ -43,7 +43,11 @@
 @endphp
 
 <body>
-    <header class="top-bar">
+    @guest
+        <header class="top-bar hidden md:block">
+    @else
+        <header class="top-bar">
+    @endif
 
         <!-- Menu Toggler -->
         @auth
@@ -51,7 +55,11 @@
         @endauth
 
         <!-- Brand -->
-        <span class="brand hidden sm:block"><a href="/">Planes of Tlessa</a></span>
+        @guest
+            <span class="brand relative top-[20px] hidden md:block"><a href="/">Planes of Tlessa</a></span>
+        @else
+            <span class="brand hidden md:block"><a href="/">Planes of Tlessa</a></span>
+        @endguest
 
 
         <!-- Right -->
@@ -59,7 +67,7 @@
 
             <!-- Dark Mode -->
             @guest
-                <div class="hidden  lg:contents">
+                <div class="hidden md:block md:contents">
                     <label class="switch switch_outlined" data-toggle="tooltip" data-tippy-content="Toggle Dark Mode">
                         <input id="darkModeToggler" type="checkbox">
                         <span></span>
@@ -101,9 +109,9 @@
 
     @auth
         @if(auth()->user()->hasRole('Admin'))
-            @include('layouts.partials.sidebar.adminsidebar');
+            @include('layouts.partials.sidebar.adminsidebar')
         @else
-            @include('layouts.partials.sidebar.playersidebar');
+            @include('layouts.partials.sidebar.playersidebar')
         @endif
     @endauth
 

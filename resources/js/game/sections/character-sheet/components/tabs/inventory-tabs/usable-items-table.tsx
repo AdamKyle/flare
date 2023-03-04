@@ -111,7 +111,10 @@ export default class UsableItemsTable extends React.Component<UsableItemTable, a
         console.log(this.props.usable_items)
         return (
             <Fragment>
-                <Table data={this.props.usable_items} columns={buildLimitedColumns(this, this.manageViewItem.bind(this), true)} dark_table={this.props.dark_table}/>
+
+                <div className={'max-w-[290px] sm:max-w-[100%] overflow-y-hidden'}>
+                    <Table data={this.props.usable_items} columns={buildLimitedColumns(this, this.manageViewItem.bind(this), true)} dark_table={this.props.dark_table}/>
+                </div>
 
                 {
                     this.state.show_list_modal && this.state.item_to_list !== null ?

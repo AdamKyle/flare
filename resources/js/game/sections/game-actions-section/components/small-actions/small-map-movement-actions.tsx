@@ -14,7 +14,7 @@ export default class SmallMapMovementActions extends React.Component<SmallMapSec
         return (
             <div className='relative'>
                 <button type='button' onClick={this.props.close_map_section}
-                        className='text-red-600 dark:text-red-500 absolute right-[-20px] top-[-25px]'
+                        className='text-red-600 dark:text-red-500 absolute right-[-5px] top-[-10px]'
                 >
                     <i className="fas fa-times-circle"></i>
                 </button>

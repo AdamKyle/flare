@@ -7,26 +7,30 @@
 
 @section('content')
     <div class="container mx-auto px-4 mb-5">
-        <div class="text-center mb-10 mt-10">
+        <div class="text-center mb-10 lg:mt-10">
             <h1 class="mb-5 font-thin text-7xl dark:text-gray-300 text-gray-800 text-4xl md:text-9xl">Planes of Tlessa</h1>
             <p class="mb-10 dark:text-gray-300 text-gray-800 italic">A world full of mystery and exploration.</p>
-            <x-core.buttons.link-buttons.primary-button  css="mr-2" href="{{route('register')}}">
-                Join Today!
-            </x-core.buttons.link-buttons.primary-button>
-            <x-core.buttons.link-buttons.success-button  css="mr-2" href="{{route('info.page', ['pageName' => 'home'])}}">
-                Learn More
-            </x-core.buttons.link-buttons.success-button>
-            <x-core.buttons.link-buttons.success-button  css="mr-2" href="{{route('releases.list')}}">
-                Releases
-            </x-core.buttons.link-buttons.success-button>
+            <div class="grid md:grid-cols-3 gap-2 w-1/3 mr-auto ml-auto">
+                <x-core.buttons.link-buttons.primary-button  css="mr-2" href="{{route('register')}}">
+                    Join Today!
+                </x-core.buttons.link-buttons.primary-button>
+                <x-core.buttons.link-buttons.success-button  css="mr-2" href="{{route('info.page', ['pageName' => 'home'])}}">
+                    Learn More
+                </x-core.buttons.link-buttons.success-button>
+                <x-core.buttons.link-buttons.success-button  css="mr-2" href="{{route('releases.list')}}">
+                    Releases
+                </x-core.buttons.link-buttons.success-button>
+            </div>
         </div>
-        <div class="flex items-center mr-2 justify-center mb-5 lg:hidden">
+        <div class="grid gap-2 mb-5 w-2/3 md:hidden mr-auto ml-auto">
             @guest
-                <label class="switch switch_outlined" data-toggle="tooltip" data-tippy-content="Toggle Dark Mode">
-                    <input id="darkModeToggler" type="checkbox">
-                    <span></span>
-                </label>
-                <span class="ml-4 mr-4 dark:text-white">Test Dark Mode</span>
+                <div class="flex items-center mr-2 justify-center mb-4">
+                    <label class="switch switch_outlined" data-toggle="tooltip" data-tippy-content="Toggle Dark Mode">
+                        <input id="darkModeToggler" type="checkbox">
+                        <span></span>
+                    </label>
+                    <span class="ml-4 mr-4 dark:text-white">Test Dark Mode</span>
+                </div>
                 <x-core.buttons.link-buttons.login-button href="{{route('login')}}">
                     Login
                 </x-core.buttons.link-buttons.login-button>
@@ -35,14 +39,14 @@
         </div>
 
         <div>
-            <img src="{{asset('promotion/game.png')}}" class="shadow rounded max-w-full h-auto align-middle border-none img-fluid max-w-[60%] my-4 m-auto glightbox cursor-pointer"/>
+            <img src="{{asset('promotion/game.png')}}" class="shadow rounded max-w-full h-auto align-middle border-none img-fluid lg:max-w-[60%] my-4 m-auto glightbox cursor-pointer"/>
             <div class="text-sm text-center">
                 Click to make larger.
             </div>
         </div>
 
         <div class="text-center w-full lg:w-2/4 mx-auto mt-20">
-            <h2 class="mb-5 font-thin text-5xl dark:text-gray-300 text-gray-800">
+            <h2 class="mb-5 font-thin text-2xl lg:text-5xl dark:text-gray-300 text-gray-800">
                 <i class="fas fa-globe-americas"></i>
                 A World of Possibilities
             </h2>
@@ -56,7 +60,7 @@
             </p>
         </div>
 
-        <div class="grid lg:grid-cols-3 gap-3 w-full lg:w-2/3 m-auto">
+        <div class="grid md:grid-cols-3 gap-3 w-full md:w-2/3 m-auto">
             <x-core.cards.card-with-hover>
                 <div class="flex justify-center items-center">
                     <div class="w-1/5 text-7xl">
@@ -117,7 +121,7 @@
             <img src="{{asset('promotion/map.png')}}" class="shadow rounded max-w-full h-auto align-middle border-none img-fluid w-100 mb-5" />
             <div class="md:flex md:items-center text-center md:text-left">
                 <div>
-                    <h2 class="mb-5 font-thin md:text-4xl lg:text-5xl dark:text-gray-300 text-gray-800">See where you're going!</h2>
+                    <h2 class="mb-5 font-thin text-2xl lg:text-5xl dark:text-gray-300 text-gray-800">See where you're going!</h2>
                     <p class="mb-10 dark:text-gray-300 text-gray-800">Adventure on a map by clicking the action buttons. Set sail from one port to the other, traverse to other planes of existence!</p>
 
                     <x-core.buttons.link-buttons.primary-button href="{{route('info.page', [
@@ -130,7 +134,7 @@
         </div>
 
         <div class="text-center w-full lg:w-2/4 mx-auto mt-20">
-            <h2 class="mb-5 font-thin text-5xl dark:text-gray-300 text-gray-800">
+            <h2 class="mb-5 font-thin text-2xl lg:text-5xl dark:text-gray-300 text-gray-800">
                 <span class="fa-stack">
                             <i class="far fa-credit-card fa-stack-1x"></i>
                             <i class="fas fa-ban fa-stack-2x text-red-500"></i>
@@ -163,7 +167,7 @@
                     </x-core.buttons.link-buttons.primary-button>
                 </div>
             </div>
-            <div>
+            <div class="mt-4 lg:mt-0">
                 <img src="{{asset('promotion/rank-fight-chart-data.png')}}" class="shadow rounded max-w-full h-auto align-middle border-none img-fluid glightbox w-100 mb-5 cursor-pointer" />
                 <div class="text-center text-sm">
                     Click to make larger. Chart does not represent actual in game Rank progression data.
@@ -172,7 +176,7 @@
         </div>
 
         <div class="text-center w-full lg:w-2/4 mx-auto mt-20">
-            <h2 class="mb-5 font-thin text-5xl dark:text-gray-300 text-gray-800">
+            <h2 class="mb-5 font-thin text-2xl lg:text-5xl dark:text-gray-300 text-gray-800">
                 <i class="fas fa-mouse-pointer mr-2"></i>
                 Some Clicking Required!
             </h2>
@@ -182,10 +186,10 @@
             </p>
         </div>
 
-        <div class="grid lg:grid-cols-3 gap-3 mt-20 w-full lg:w-2/3 m-auto">
+        <div class="grid md:grid-cols-3 gap-3 mt-20 w-full md:w-2/3 m-auto">
             <x-core.cards.card-with-hover>
                 <div class="flex justify-center items-center">
-                    <div class="w-1/5 text-7xl">
+                    <div class="w-1/5 text-5xl lg:text-7xl">
                         <i class="ra ra-anvil text-primary-600 relative top-[10px] right-[10px]"></i>
                     </div>
                     <div class="w-4/5">
@@ -200,7 +204,7 @@
             </x-core.cards.card-with-hover>
             <x-core.cards.card-with-hover>
                 <div class="flex justify-center items-center">
-                    <div class="w-1/5 text-7xl">
+                    <div class="w-1/5 text-5xl lg:text-7xl">
                         <i class="ra ra-forging text-primary-600 relative top-[10px] right-[10px]"></i>
                     </div>
                     <div class="w-4/5">
@@ -215,7 +219,7 @@
             </x-core.cards.card-with-hover>
             <x-core.cards.card-with-hover>
                 <div class="flex justify-center items-center">
-                    <div class="w-1/5 text-7xl">
+                    <div class="w-1/5 text-5xl lg:text-7xl">
                         <i class="ra ra-wooden-sign text-primary-600 relative top-[10px] right-[10px]"></i>
                     </div>
                     <div class="w-4/5">
@@ -230,10 +234,10 @@
             </x-core.cards.card-with-hover>
         </div>
 
-        <div class="grid lg:grid-cols-3 gap-3 mt-2 w-full lg:w-2/3 m-auto">
+        <div class="grid md:grid-cols-3 gap-3 mt-2 w-full md:w-2/3 m-auto">
             <x-core.cards.card-with-hover>
                 <div class="flex justify-center items-center">
-                    <div class="w-1/5 text-7xl">
+                    <div class="w-1/5 text-5xl lg:text-7xl">
                         <i class="ra ra-bone-bite text-primary-600 relative top-[10px] right-[10px]"></i>
                     </div>
                     <div class="w-4/5">
@@ -248,7 +252,7 @@
             </x-core.cards.card-with-hover>
             <x-core.cards.card-with-hover>
                 <div class="flex justify-center items-center">
-                    <div class="w-1/5 text-7xl">
+                    <div class="w-1/5 text-5xl lg:text-7xl">
                         <i class="ra ra-compass text-primary-600 relative top-[10px] right-[10px]"></i>
                     </div>
                     <div class="w-4/5">
@@ -263,7 +267,7 @@
             </x-core.cards.card-with-hover>
             <x-core.cards.card-with-hover>
                 <div class="flex justify-center items-center">
-                    <div class="w-1/5 text-7xl">
+                    <div class="w-1/5 text-5xl lg:text-7xl">
                         <i class="fas fa-calendar text-primary-600 relative top-[10px] right-[10px]"></i>
                     </div>
                     <div class="w-4/5">
@@ -278,7 +282,7 @@
             </x-core.cards.card-with-hover>
         </div>
 
-        <div class="w-full lg:w-2/4 mx-auto mt-10 lg:mt-20 mb-10">
+        <div class="w-full lg:w-2/4 mx-auto mt-10 lg:mt-20 mb-10 mt-4 lg:mt-0">
             <h2 class="mb-5 font-thin text-center text-5xl dark:text-gray-300 text-gray-800">
                 <i class="far fa-question-circle"></i>
                 FAQ

@@ -11,7 +11,7 @@ along with <a href="/information/enchanting">Class based affix</a> and <a href="
 </p>
 <p>
   The issue with cast, is you do not do enough damage as a pure "caster vamp". Vampires, do not want weapons equipped as weapons do not increase a character durability.
-  Shields do increase the characters durability. The More durability a vampire has, the more damage they do with no weapons equipped and two shields.
+  Shields do increase the characters' durability. The More durability a vampire has, the more damage they do with no weapons equipped and two shields.
 </p>
 <p>
   Vampire's life stealing affixes will scale with enemy health. The idea is that you want to fight the hardest thing you can kill in one hit that triggers your

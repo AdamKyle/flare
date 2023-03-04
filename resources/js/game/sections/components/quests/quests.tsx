@@ -92,7 +92,7 @@ export default class Quests extends React.Component<QuestsProps, QuestState> {
 
                             </div>
                             <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                            <div className='overflow-x-auto max-w-[400px] sm:max-w-[600px] md:max-w-[100%]'>
+                            <div className='overflow-x-auto overflow-y-hidden max-w-[300px] sm:max-w-[600px] md:max-w-[100%]'>
                                 <QuestTree quests={this.state.quests} completed_quests={this.state.completed_quests} character_id={this.props.character_id} plane={this.state.current_plane} update_quests={this.props.update_quests}/>
                             </div>
                         </Fragment>

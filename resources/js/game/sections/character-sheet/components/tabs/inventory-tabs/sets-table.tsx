@@ -392,14 +392,14 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
                         </div>
                     : null
                 }
-                <div className='flex items-center'>
+                <div className='flex flex-row flex-wrap items-center'>
                     <div>
                         <DropDown menu_items={this.buildMenuItems()} button_title={'Sets'} selected_name={this.state.selected_set} secondary_selected={this.props.set_name_equipped} disabled={this.props.is_dead || this.state.loading}  />
                     </div>
                     <div className='ml-2'>
                         <DropDown menu_items={this.buildActionsDropDown()} button_title={'Actions'} disabled={this.props.is_dead || this.state.loading}  />
                     </div>
-                    <div className='ml-4 md:ml-0 my-4 md:my-0 md:absolute md:right-[10px]'>
+                    <div className='sm:ml-4 md:ml-0 my-4 md:my-0 md:absolute md:right-[10px]'>
                         <input type='text' name='search' className='form-control' onChange={this.search.bind(this)} placeholder={'Search'} value={this.state.search_string} />
                     </div>
                 </div>
@@ -423,7 +423,9 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
                     : null
                 }
 
-                <Table data={this.state.data} columns={BuildInventoryTableColumns(this, this.viewItem.bind(this))} dark_table={this.props.dark_tables}/>
+                <div className={'max-w-[290px] sm:max-w-[100%] overflow-y-hidden'}>
+                    <Table data={this.state.data} columns={BuildInventoryTableColumns(this, this.viewItem.bind(this))} dark_table={this.props.dark_tables}/>
+                </div>
             </Fragment>
         );
     }

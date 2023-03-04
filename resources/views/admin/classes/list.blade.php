@@ -12,12 +12,18 @@
                 <x-core.buttons.link-buttons.primary-button href="{{route('classes.create')}}" css="tw-ml-2">
                     Create
                 </x-core.buttons.link-buttons.primary-button>
-            {{--                <x-core.buttons.link-buttons.primary-button href="{{route('races.export')}}" css="tw-ml-2">--}}
-            {{--                    <i class="fas fa-file-export"></i> Export--}}
-            {{--                </x-core.buttons.link-buttons.primary-button>--}}
-            {{--                <x-core.buttons.link-buttons.primary-button href="{{route('races.import')}}" css="tw-ml-2">--}}
-            {{--                    <i class="fas fa-file-upload"></i> Import--}}
-            {{--                </x-core.buttons.link-buttons.primary-button>--}}
+                <x-core.buttons.link-buttons.primary-button
+                    href="{{route('classes.export-excel')}}"
+                    css="tw-ml-2"
+                >
+                    <i class="fas fa-file-export"></i> Export
+                </x-core.buttons.link-buttons.primary-button>
+                <x-core.buttons.link-buttons.primary-button
+                    href="{{route('classes.import-excel')}}"
+                    css="tw-ml-2"
+                >
+                    <i class="fas fa-file-upload"></i> Import
+                </x-core.buttons.link-buttons.primary-button>
             </x-core.page-title>
         </div>
         @livewire('admin.classes.classes-table')

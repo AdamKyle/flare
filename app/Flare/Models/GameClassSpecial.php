@@ -6,8 +6,7 @@ use Database\Factories\GameClassSpecialtiesFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class GameClassSpecial extends Model
-{
+class GameClassSpecial extends Model {
 
     use HasFactory;
 
@@ -31,6 +30,11 @@ class GameClassSpecial extends Model
         'health_mod',
         'base_damage_stat_increase',
         'attack_type_required',
+        'spell_evasion',
+        'affix_damage_reduction',
+        'healing_reduction',
+        'skill_reduction',
+        'resistance_reduction',
     ];
 
     protected $casts = [
@@ -45,6 +49,11 @@ class GameClassSpecial extends Model
         'base_spell_damage_mod'                     => 'float',
         'health_mod'                                => 'float',
         'base_damage_stat_increase'                 => 'float',
+        'spell_evasion'                             => 'float',
+        'affix_damage_reduction'                    => 'float',
+        'healing_reduction'                         => 'float',
+        'skill_reduction'                           => 'float',
+        'resistance_reduction'                      => 'float',
     ];
 
     public function gameClass() {

@@ -122,6 +122,7 @@ export default class Kingdom extends React.Component<KingdomProps, any> {
                                     dark_tables={this.props.dark_tables}
                                     manage_view_building={this.manageViewBuilding.bind(this)}
                                     manage_view_unit={this.manageViewUnit.bind(this)}
+                                    view_port={this.props.view_port}
                                 />
                         }
 

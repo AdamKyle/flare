@@ -4,13 +4,11 @@ namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Flare\Models\Traits\WithSearch;
 use Database\Factories\MarketBoardFactory;
 
-class MarketBoard extends Model
-{
+class MarketBoard extends Model {
 
-    use HasFactory, WithSearch;
+    use HasFactory;
 
     protected $table = 'market_board';
 
@@ -48,5 +46,5 @@ class MarketBoard extends Model
     protected static function newFactory() {
         return MarketBoardFactory::new();
     }
-    
+
 }

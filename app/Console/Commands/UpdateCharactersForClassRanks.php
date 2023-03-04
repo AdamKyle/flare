@@ -68,6 +68,13 @@ class UpdateCharactersForClassRanks extends Command
 
     protected function assignWeaponMasteriesToClassRanks(CharacterClassRank $classRank): void {
         foreach (WeaponMasteryValue::getTypes() as $type) {
+
+            $foundMastery = $classRank->weaponMasteries()->where('weapon_type', $type)->first();
+
+            if (!is_null($foundMastery)) {
+                continue;
+            }
+
             $classRank->weaponMasteries()->create([
                 'character_class_rank_id'   => $classRank->id,
                 'weapon_type'               => $type,
@@ -82,6 +89,7 @@ class UpdateCharactersForClassRanks extends Command
         if (($classRank->gameClass->type()->isFighter() ||
              $classRank->gameClass->type()->isThief() ||
              $classRank->gameClass->type()->isVampire() ||
+             $classRank->gameClass->type()->isPrisoner() ||
              $classRank->gameClass->type()->isBlackSmith()) && (new WeaponMasteryValue($type))->isWeapon())
         {
             return 5;
@@ -112,6 +120,14 @@ class UpdateCharactersForClassRanks extends Command
         }
 
         if (($classRank->gameClass->type()->isBlackSmith()) && (new WeaponMasteryValue($type))->isHammer()) {
+            return 5;
+        }
+
+        if (($classRank->gameClass->type()->isMerchant()) && (new WeaponMasteryValue($type))->isBow()) {
+            return 3;
+        }
+
+        if (($classRank->gameClass->type()->isMerchant()) && (new WeaponMasteryValue($type))->isStaff()) {
             return 5;
         }
 

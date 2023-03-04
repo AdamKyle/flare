@@ -8,6 +8,7 @@ import {DateTime} from "luxon";
 import Table from "../../../components/ui/data-tables/table";
 import {formatNumber} from "../../../lib/game/format-number";
 import InventoryUseDetails from "./modals/inventory-use-details";
+import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 
 export default class CharacterActiveBoons extends React.Component<any, any> {
 
@@ -93,9 +94,7 @@ export default class CharacterActiveBoons extends React.Component<any, any> {
     render() {
         if (this.state.loading) {
             return (
-                <div className="relative top-[20px]">
-                    <ComponentLoading/>
-                </div>
+                <LoadingProgressBar />
             )
         }
 
@@ -116,7 +115,17 @@ export default class CharacterActiveBoons extends React.Component<any, any> {
                             className="fas fa-external-link-alt"></i>
                         </a>
                     </p>
-                    <Table columns={this.buildColumns()} data={this.state.boons} dark_table={this.state.dark_tables} />
+                    {
+                        this.state.boons.length > 0 ?
+                            <div className='max-w-[290px] sm:max-w-[100%] overflow-x-hidden'>
+                                <Table columns={this.buildColumns()} data={this.state.boons} dark_table={this.state.dark_tables} />
+                            </div>
+                        :
+                            <p className='my-4 text-center'>
+                                No Active Boons.
+                            </p>
+                    }
+
                 </div>
 
                 {

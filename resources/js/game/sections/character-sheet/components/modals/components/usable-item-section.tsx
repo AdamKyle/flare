@@ -33,7 +33,7 @@ export default class UsableItemSection extends React.Component<any, any> {
                             </dl>
                         </Fragment>
                     :
-                        <Fragment>
+                        <div className={'max-h-[250px] lg:mx-h-full overflow-x-hidden'}>
                             <p className='mb-4 text-sky-700 dark:text-sky-500'>
                                 <strong>Lasts For: </strong> {this.props.item.lasts_for} Minutes.
                             </p>
@@ -47,7 +47,7 @@ export default class UsableItemSection extends React.Component<any, any> {
                                 <dd>{(this.props.item.xp_bonus * 100).toFixed(2)}%</dd>
                             </dl>
                             <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                            <div className='grid grid-cols-2 gap-2'>
+                            <div className='grid lg:grid-cols-2 gap-2'>
                                 <div>
                                     {
                                         this.props.item.stat_increase > 0.0 ?
@@ -145,7 +145,7 @@ export default class UsableItemSection extends React.Component<any, any> {
                                 <dt>Affects the following Skills</dt>
                                 <dd>{this.props.item.skills.join(', ')}</dd>
                             </dl>
-                        </Fragment>
+                        </div>
                 }
 
             </Fragment>

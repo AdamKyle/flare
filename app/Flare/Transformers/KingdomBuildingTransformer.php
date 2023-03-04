@@ -5,6 +5,7 @@ namespace App\Flare\Transformers;
 
 use App\Game\Kingdoms\Values\BuildingCosts;
 use App\Game\Kingdoms\Values\UnitCosts;
+use Exception;
 use League\Fractal\TransformerAbstract;
 use App\Flare\Models\KingdomBuilding;
 
@@ -14,10 +15,10 @@ class KingdomBuildingTransformer extends TransformerAbstract {
      * Gets the response data for the character sheet
      *
      * @param KingdomBuilding $building
-     * @return mixed
-     * @throws \Exception
+     * @return array
+     * @throws Exception
      */
-    public function transform(KingdomBuilding $building) {
+    public function transform(KingdomBuilding $building): array {
 
         $passiveRequired = null;
         $passiveSkill    = $building->gameBuilding->passive;
