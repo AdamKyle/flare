@@ -33,10 +33,6 @@ class PublicMessage {
         $newMessage->map_name = $this->shortenedMapName($user);
 
         broadcast(new MessageSentEvent($user, $newMessage))->toOthers();
-
-        if (!$user->hasRole('Admin')) {
-            broadcast(new UpdateAdminChatEvent($user));
-        }
     }
 
     /**

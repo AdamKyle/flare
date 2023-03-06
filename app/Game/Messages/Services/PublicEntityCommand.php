@@ -2,21 +2,20 @@
 
 namespace App\Game\Messages\Services;
 
-
+use Exception;
+use Illuminate\Support\Facades\Log;
 use App\Flare\Models\Character;
 use App\Flare\Models\User;
 use App\Flare\Values\ItemEffectsValue;
 use App\Game\Maps\Services\PctService;
 use App\Game\Messages\Events\ServerMessageEvent;
-use Exception;
-use Illuminate\Support\Facades\Log;
 
 class PublicEntityCommand {
 
     /**
      * @var Character|null $character
      */
-    private ?Character $character;
+    private ?Character $character = null;
 
     /**
      * @var PctService $pctService
@@ -70,7 +69,7 @@ class PublicEntityCommand {
      * Use the /pct command.
      *
      *  - If the character is null, we simply bail.
-     *  - If the check for thw quest item fails, we alert the player and log and error with the exception.
+     *  - If the check for the quest item fails, we alert the player and log and error with the exception.
      *  - If we fail to find a celestial, we simply state there are none.
      *
      * @return void
@@ -96,47 +95,12 @@ class PublicEntityCommand {
 
             return;
         } catch (Exception $e) {
-            new ServerMessage('Christ child! Something went wrong. Alert The Creator (probs best to head to discor and post in #bugs section. Hover over rpfile icon, click: Discord to join). /pct is not working!');
+            event(new ServerMessageEvent($this->character->user, 'Christ child! Something went wrong. Alert The Creator (probs best to head to discord and post in #bugs section. Hover over profile icon, click: Discord to join). /pct is not working!'));
 
             Log::error($e->getMessage());
 
             return;
         }
-    }
-
-    /**
-     * Is the characters automation running?
-     *
-     * @return bool
-     */
-    protected function isAutomationRunning(): bool {
-
-        if ($this->character->currentAutomations()->isEmpty()) {
-            return false;
-        }
-
-        event(new ServerMessageEvent($this->character->user, 'You are to preoccupied to do this. (You cannot be Exploring).'));
-
-        return true;
-    }
-
-    /**
-     * Can character use the pct command?
-     *
-     * - Must be able to move
-     * - Cannot be dead
-     *
-     * @return bool
-     */
-    protected function isCharacterAbleToUsePCT(): bool {
-
-        if (!$this->character->can_move || $this->character->is_dead) {
-            event(new ServerMessageEvent($this->character->user, 'You are to preoccupied to do this. (You must be able to move and cannot be dead).'));
-
-            return false;
-        }
-
-        return true;
     }
 
     /**
@@ -154,6 +118,4 @@ class PublicEntityCommand {
             }
         })->isNotEmpty();
     }
-
-
 }

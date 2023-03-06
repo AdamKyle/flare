@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Event;
 use App\Flare\Models\User;
 use App\Game\Messages\Services\PublicMessage;
 use App\Game\Messages\Models\Message;
-use App\Admin\Events\UpdateAdminChatEvent;
 use App\Game\Messages\Events\MessageSentEvent;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -28,7 +27,7 @@ class PublicMessageTest extends TestCase {
 
     private ?PublicMessage $publicMessage;
 
-    private ?User $user;
+    private ?User $admin;
 
     public function setUp(): void {
         parent::setUp();
@@ -56,7 +55,6 @@ class PublicMessageTest extends TestCase {
         $this->publicMessage->postPublicMessage('Test');
 
         Event::assertDispatched(MessageSentEvent::class);
-        Event::assertDispatched(UpdateAdminChatEvent::class);
 
         $this->assertCount(1, Message::all());
     }
@@ -84,8 +82,6 @@ class PublicMessageTest extends TestCase {
             return $event->message->map_name === 'SUR';
         });
 
-        Event::assertDispatched(UpdateAdminChatEvent::class);
-
         $this->assertCount(1, Message::all());
     }
 
@@ -111,8 +107,6 @@ class PublicMessageTest extends TestCase {
         Event::assertDispatched(function(MessageSentEvent $event) {
             return $event->message->map_name === 'LABY';
         });
-
-        Event::assertDispatched(UpdateAdminChatEvent::class);
 
         $this->assertCount(1, Message::all());
     }
@@ -140,8 +134,6 @@ class PublicMessageTest extends TestCase {
             return $event->message->map_name === 'DUN';
         });
 
-        Event::assertDispatched(UpdateAdminChatEvent::class);
-
         $this->assertCount(1, Message::all());
     }
 
@@ -167,8 +159,6 @@ class PublicMessageTest extends TestCase {
         Event::assertDispatched(function(MessageSentEvent $event) {
             return $event->message->map_name === 'HELL';
         });
-
-        Event::assertDispatched(UpdateAdminChatEvent::class);
 
         $this->assertCount(1, Message::all());
     }
@@ -196,8 +186,6 @@ class PublicMessageTest extends TestCase {
             return $event->message->map_name === 'SHP';
         });
 
-        Event::assertDispatched(UpdateAdminChatEvent::class);
-
         $this->assertCount(1, Message::all());
     }
 
@@ -223,8 +211,6 @@ class PublicMessageTest extends TestCase {
         Event::assertDispatched(function(MessageSentEvent $event) {
             return $event->message->map_name === 'PURG';
         });
-
-        Event::assertDispatched(UpdateAdminChatEvent::class);
 
         $this->assertCount(1, Message::all());
     }
@@ -252,8 +238,6 @@ class PublicMessageTest extends TestCase {
             return $event->message->map_name === 'SUR';
         });
 
-        Event::assertDispatched(UpdateAdminChatEvent::class);
-
         $this->assertCount(1, Message::all());
     }
 
@@ -273,7 +257,6 @@ class PublicMessageTest extends TestCase {
         $this->publicMessage->postPublicMessage('Test');
 
         Event::assertDispatched(MessageSentEvent::class);
-        Event::assertDispatched(UpdateAdminChatEvent::class);
 
         $this->assertCount(1, Message::all());
         $this->assertEquals(0, Message::first()->x_position);
@@ -295,7 +278,6 @@ class PublicMessageTest extends TestCase {
         $this->publicMessage->postPublicMessage('Test');
 
         Event::assertDispatched(MessageSentEvent::class);
-        Event::assertDispatched(UpdateAdminChatEvent::class);
 
         $this->assertCount(1, Message::all());
         $this->assertTrue(Message::first()->hide_location);
@@ -311,7 +293,6 @@ class PublicMessageTest extends TestCase {
         $this->publicMessage->postPublicMessage('Test');
 
         Event::assertDispatched(MessageSentEvent::class);
-        Event::assertNotDispatched(UpdateAdminChatEvent::class);
 
         $this->assertCount(1, Message::all());
     }
