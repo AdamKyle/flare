@@ -137,7 +137,7 @@ class PrivateMessage {
             Your first kingdom will always be free - even if you loose all your kingdoms!';
         }
 
-        return 'Who are you? What do you want? Go away child!';
+        return 'Who are you? What do you want? Go away child!'; // @codeCoverageIgnore
     }
 
     /**

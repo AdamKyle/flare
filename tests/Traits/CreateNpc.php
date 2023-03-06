@@ -11,7 +11,7 @@ trait CreateNpc {
 
     use CreateGameMap;
 
-    public function createNpc(array $options = [], array $commandOptions = []): Npc {
+    public function createNpc(array $options = []): Npc {
         $gameMap = GameMap::first();
 
         $npc = Npc::factory()->create(array_merge([
