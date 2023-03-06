@@ -1,0 +1,56 @@
+<?php
+
+namespace Tests\Unit\Game\Shop\Events;
+
+use App\Game\Shop\Events\BuyItemEvent;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Setup\Character\CharacterFactory;
+use Tests\TestCase;
+use Tests\Traits\CreateClass;
+use Tests\Traits\CreateItem;
+
+class BuyItemEventTest extends TestCase {
+
+    use RefreshDatabase, CreateItem, CreateClass;
+
+    private ?CharacterFactory $character;
+
+    public function setUp(): void {
+        parent::setUp();
+
+        $gameClass = $this->createClass([
+            'name' => 'Merchant'
+        ]);
+
+        $this->character = (new CharacterFactory())->createBaseCharacter([], $gameClass)->givePlayerLocation();
+    }
+
+    public function tearDown(): void {
+        parent::tearDown();
+
+        $this->character = null;
+    }
+
+    public function testMerchantShouldGetADiscount() {
+        $character = $this->character->getCharacter();
+
+        $character->update([
+            'gold' => 10
+        ]);
+
+        $item = $this->createItem([
+            'name' => 'something',
+            'type' => 'weapon',
+            'cost' => 10,
+        ]);
+
+        $character = $character->refresh();
+
+        event(new BuyItemEvent($item, $character));
+
+        $character = $character->refresh();
+
+        $this->assertNotEmpty($character->inventory->slots);
+        $this->assertEquals(3, $character->gold);
+    }
+}

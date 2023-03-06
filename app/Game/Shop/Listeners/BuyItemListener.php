@@ -15,7 +15,7 @@ class BuyItemListener {
         $cost = $event->item->cost;
 
         if ($event->character->classType()->isMerchant()) {
-            $cost = $cost - $cost * 0.25;
+            $cost = floor($cost - $cost * 0.25);
         }
 
         $event->character->gold = $event->character->gold - $cost;
