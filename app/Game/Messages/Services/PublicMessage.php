@@ -34,7 +34,7 @@ class PublicMessage {
 
         broadcast(new MessageSentEvent($user, $newMessage))->toOthers();
 
-        if ($user->hasRole('Admin')) {
+        if (!$user->hasRole('Admin')) {
             broadcast(new UpdateAdminChatEvent($user));
         }
     }
