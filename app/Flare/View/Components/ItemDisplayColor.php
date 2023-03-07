@@ -4,37 +4,35 @@ namespace App\Flare\View\Components;
 
 use App\Flare\Models\Item;
 use Illuminate\View\Component;
+use Illuminate\View\View;
 
-class ItemDisplayColor extends Component
-{
+class ItemDisplayColor extends Component {
 
     /**
-     * @var mixed $item
+     * @var Item $item
      */
-    public $item;
+    public Item $item;
 
     /**
      * @var string
      */
-    public $color;
+    public string $color;
 
     /**
      * Create a new component instance.
      *
      * @return void
      */
-    public function __construct($item)
-    {
+    public function __construct(Item $item) {
         $this->item = $item;
     }
 
     /**
      * Get the view / contents that represent the component.
      *
-     * @return \Illuminate\View\View|string
+     * @return string|View
      */
-    public function render()
-    {
+    public function render(): string|View{
         $isEitherRandomlyGenerated = $this->isEitherEnchantRandomlyGenerated();
 
         if ($isEitherRandomlyGenerated) {
