@@ -138,7 +138,7 @@ class RecruitUnits implements ShouldQueue {
                     '. You have a total of: ' . number_format($amount);
 
 
-                ServerMessageHandler::handleMessage($user, 'unit-recruitment-finished', $message);
+                ServerMessageHandler::handleMessage($user, 'unit_recruitment_finished', $message);
             }
         }
     }

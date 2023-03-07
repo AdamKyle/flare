@@ -73,7 +73,7 @@ class UpdateKingdomBuildings implements ShouldQueue {
                         $message = 'Kingdom: '.$kingdom->name.' gained a new building: ' . $this->gameBuilding->name;
 
                         if (UserOnlineValue::isOnline($user)) {
-                            ServerMessageHandler::handleMessage($user, 'new-building', $message);
+                            ServerMessageHandler::handleMessage($user, 'new_building', $message);
                         }
                     }
                 }

@@ -70,7 +70,7 @@ class ServerMessageBuilder {
                 return 'Gold Rush! You are now gold capped!';
             case 'failed_to_craft':
                 return 'You failed to craft the item! You lost the investment.';
-            case 'failed-to-disenchant':
+            case 'failed_to_disenchant':
                 return 'Failed to disenchant the item, it shatters before you into ashes. You only got 1 Gold Dust for your efforts.';
             case 'failed_to_transmute':
                 return 'You failed to transmute the item. It melts into a pool of liquid gold dust before evaporating away. Wasted efforts!';
@@ -90,15 +90,9 @@ class ServerMessageBuilder {
                 return 'You are now level: ' . $forMessage . '!';
             case 'gold_rush':
                 return 'Gold Rush! Your gold is now: ' . $forMessage . ' Gold! 5% of your total gold has been awarded to you.';
-            case 'gained_item':
-                return 'You found a: ' . $forMessage . ' on the enemy\'s corpse!';
-            case 'found_item':
-                return 'You happen upon a: ' . $forMessage . '!';
             case 'crafted':
                 return 'You crafted a: ' . $forMessage . '!';
-            case 'new-skill':
-                return 'You were given a new skill by The Creator. Head your character sheet to see the new skill: ' . $forMessage;
-            case 'new-damage-stat':
+            case 'new_damage_stat':
                 return 'The Creator has changed your classes damage stat to: ' . $forMessage . '. Please adjust your gear accordingly for maximum damage.';
             case 'disenchanted':
                 return 'Disenchanted the item and got: ' . $forMessage . ' Gold Dust.';
@@ -108,21 +102,18 @@ class ServerMessageBuilder {
                 return 'You got: ' . $forMessage . ' Gold Dust from the daily lottery';
             case 'transmuted':
                 return 'You transmuted a new: ' . $forMessage . ' It shines with a powerful glow!';
-            case 'disenchanted-with-out-skill':
-                return 'Disenchanted the item and got: ' . $forMessage . ' Gold Dust. No Disenchanting experience was given for destroying the item.';
             case 'enchantment_failed':
             case 'silenced':
             case 'deleted_affix':
-            case 'deleted_item':
-            case 'building-repair-finished':
-            case 'building-upgrade-finished':
+            case 'building_repair_finished':
+            case 'building_upgrade_finished':
             case 'sold_item':
-            case 'new-building':
-            case 'kingdom-resources-update':
-            case 'unit-recruitment-finished':
-            case 'plane-transfer':
+            case 'new_building':
+            case 'kingdom_resources_update':
+            case 'unit_recruitment_finished':
+            case 'plane_transfer':
             case 'enchanted':
-            case 'moved-location':
+            case 'moved_location':
                 return $forMessage;
             default:
                 return $this->build($type);

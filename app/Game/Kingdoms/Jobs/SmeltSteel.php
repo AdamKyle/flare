@@ -90,7 +90,7 @@ class SmeltSteel implements ShouldQueue {
                     ' has finished smelting: ' . number_format($amount) . ' of steel and now has: ' .
                     number_format($kingdom->current_steel) . ' steel.';
 
-                ServerMessageHandler::handleMessage($user, 'unit-recruitment-finished', $message);
+                ServerMessageHandler::handleMessage($user, 'unit_recruitment_finished', $message);
             }
         }
     }

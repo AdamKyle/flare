@@ -180,7 +180,7 @@ class UpgradeBuildingWithGold implements ShouldQueue {
                     $this->building->kingdom->name . ' on plane: ' . $plane .
                     ' At (X/Y) ' . $x . '/' . $y . ' and is now level: ' . $level;
 
-                ServerMessageHandler::handleMessage($this->user, 'building-upgrade-finished', $message);
+                ServerMessageHandler::handleMessage($this->user, 'building_upgrade_finished', $message);
             }
         }
     }

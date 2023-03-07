@@ -177,9 +177,160 @@ class ServerMessageBuilderTest extends TestCase {
         $this->assertEquals('The NPC does not understand you. Their eyes blink in confusion.', $message);
     }
 
+    public function testGoldCapped() {
+        $message = $this->serverMessageBuilder->build('gold_capped');
+
+        $this->assertEquals('Gold Rush! You are now gold capped!', $message);
+    }
+
+    public function testFailedToCraft() {
+        $message = $this->serverMessageBuilder->build('failed_to_craft');
+
+        $this->assertEquals('You failed to craft the item! You lost the investment.', $message);
+    }
+
+    public function testFailedToDisenchant() {
+        $message = $this->serverMessageBuilder->build('failed_to_disenchant');
+
+        $this->assertEquals('Failed to disenchant the item, it shatters before you into ashes. You only got 1 Gold Dust for your efforts.', $message);
+    }
+
+    public function testFailedToTransmute() {
+        $message = $this->serverMessageBuilder->build('failed_to_transmute');
+
+        $this->assertEquals('You failed to transmute the item. It melts into a pool of liquid gold dust before evaporating away. Wasted efforts!', $message);
+    }
+
     public function testWrongType() {
         $message = $this->serverMessageBuilder->build('some-command');
 
         $this->assertEquals('', $message);
     }
+
+    public function testLevelUpCharacter() {
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation('level_up', 1);
+
+        $this->assertEquals('You are now level: 1!', $message);
+    }
+
+    public function testGoldRush() {
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation('gold_rush', 1);
+
+        $this->assertEquals('Gold Rush! Your gold is now: 1 Gold! 5% of your total gold has been awarded to you.', $message);
+    }
+
+    public function testCrafted() {
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation('crafted', 'Test');
+
+        $this->assertEquals('You crafted a: Test!', $message);
+    }
+
+    public function testNewDamageStat() {
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation('new_damage_stat', 'Test');
+
+        $this->assertEquals('The Creator has changed your classes damage stat to: Test. Please adjust your gear accordingly for maximum damage.', $message);
+    }
+
+    public function testDisenchanted() {
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation('disenchanted', 'Test');
+
+        $this->assertEquals('Disenchanted the item and got: Test Gold Dust.', $message);
+    }
+
+    public function testLottoMax() {
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation('lotto_max', 'Test');
+
+        $this->assertEquals('You won the daily Gold Dust Lottery! Congrats! You won: Test Gold Dust', $message);
+    }
+
+    public function testDailyLotto() {
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation('daily_lottery', 'Test');
+
+        $this->assertEquals('You got: Test Gold Dust from the daily lottery', $message);
+    }
+
+    public function testTransmuted() {
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation('transmuted', 'Test');
+
+        $this->assertEquals('You transmuted a new: Test It shines with a powerful glow!', $message);
+    }
+
+    public function testEnchantmentFailed() {
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation('enchantment_failed', 'Test');
+
+        $this->assertEquals('Test', $message);
+    }
+
+    public function testSilenced() {
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation('silenced', 'Test');
+
+        $this->assertEquals('Test', $message);
+    }
+
+    public function testDeletedAffix() {
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation('deleted_affix', 'Test');
+
+        $this->assertEquals('Test', $message);
+    }
+
+    public function testBuildingRepaired() {
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation('building_repair_finished', 'Test');
+
+        $this->assertEquals('Test', $message);
+    }
+
+    public function testBuildingUpgraded() {
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation('building_upgrade_finished', 'Test');
+
+        $this->assertEquals('Test', $message);
+    }
+
+    public function testSoldItem() {
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation('sold_item', 'Test');
+
+        $this->assertEquals('Test', $message);
+    }
+
+    public function testNewBuilding() {
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation('new_building', 'Test');
+
+        $this->assertEquals('Test', $message);
+    }
+
+    public function testKingdomResourcesUpdated() {
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation('kingdom_resources_update', 'Test');
+
+        $this->assertEquals('Test', $message);
+    }
+
+    public function testUnitRecruitmentFinished() {
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation('unit_recruitment_finished', 'Test');
+
+        $this->assertEquals('Test', $message);
+    }
+
+    public function testPlaneTransfer() {
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation('plane_transfer', 'Test');
+
+        $this->assertEquals('Test', $message);
+    }
+
+    public function testEnchanted() {
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation('enchanted', 'Test');
+
+        $this->assertEquals('Test', $message);
+    }
+
+    public function testMovedLocation() {
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation('moved_location', 'Test');
+
+        $this->assertEquals('Test', $message);
+    }
+
+    public function testBuildDefaultMessageWhenTypesIsNotInAdditionalInformation() {
+        $message = $this->serverMessageBuilder->buildWithAdditionalInformation('cant_attack');
+
+        $this->assertEquals('Please wait for the timer (beside Again!) to state: Ready!', $message);
+    }
+
 }

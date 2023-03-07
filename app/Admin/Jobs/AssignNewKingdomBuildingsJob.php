@@ -56,7 +56,7 @@ class AssignNewKingdomBuildingsJob implements ShouldQueue
 
                         $message = 'Kingdom: '.$kingdom->name.' gained a new building: ' . $this->gameBuilding->name;
 
-                        ServerMessageHandler::handleMessage($user, 'new-building', $message);
+                        ServerMessageHandler::handleMessage($user, 'new_building', $message);
                     }
                 }
             }

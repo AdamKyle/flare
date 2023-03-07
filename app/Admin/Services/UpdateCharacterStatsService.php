@@ -127,7 +127,7 @@ class UpdateCharacterStatsService {
             if (UserOnlineValue::isOnline($character->user)) {
                 event(new UpdateTopBarEvent($character->refresh()));
 
-                ServerMessageHandler::handleMessage($character->user, 'new-damage-stat', $newClass->damage_stat);
+                ServerMessageHandler::handleMessage($character->user, 'new_damage_stat', $newClass->damage_stat);
             }
         }
 

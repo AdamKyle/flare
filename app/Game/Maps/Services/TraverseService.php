@@ -161,7 +161,7 @@ class TraverseService {
 
         $message = 'You have traveled to: ' . $character->map->gameMap->name;
 
-        ServerMessageHandler::handleMessage($character->user, 'plane-transfer', $message);
+        ServerMessageHandler::handleMessage($character->user, 'plane_transfer', $message);
 
         $gameMap = $character->map->gameMap;
 
@@ -242,7 +242,7 @@ class TraverseService {
         $newYPosition = $character->map->character_position_y;
 
         if ($newXPosition !== $xPosition || $newYPosition !== $yPosition) {
-            ServerMessageHandler::handleMessage($character->user, 'moved-location', 'Your character was moved as you are missing the appropriate quest item or were not allowed to enter the area.');
+            ServerMessageHandler::handleMessage($character->user, 'moved_location', 'Your character was moved as you are missing the appropriate quest item or were not allowed to enter the area.');
         }
     }
 

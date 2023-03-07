@@ -80,7 +80,7 @@ class DisenchantService {
         } else {
             $this->updateGoldDust($this->character, true);
 
-            ServerMessageHandler::handleMessage($this->character->user, 'failed-to-disenchant');
+            ServerMessageHandler::handleMessage($this->character->user, 'failed_to_disenchant');
         }
 
         $slot->delete();
@@ -113,7 +113,7 @@ class DisenchantService {
         } else {
             $this->updateGoldDust($this->character, true);
 
-            ServerMessageHandler::handleMessage($this->character->user, 'failed-to-disenchant');
+            ServerMessageHandler::handleMessage($this->character->user, 'failed_to_disenchant');
         }
     }
 

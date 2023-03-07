@@ -85,7 +85,7 @@ class AbandonKingdomService {
         $message = $kingdom->name . ' Has been given to the NPC due to being abandoned, at Location (x/y): '
             . $kingdom->x_position . '/' . $kingdom->y_position . ' on the: ' . $kingdom->gameMap->name . ' plane.';
 
-        ServerMessageHandler::handleMessage($this->character->user, 'kingdom-resources-update', $message);
+        ServerMessageHandler::handleMessage($this->character->user, 'kingdom_resources_update', $message);
 
         $this->updateKingdom->updateKingdomAllKingdoms($character);
 

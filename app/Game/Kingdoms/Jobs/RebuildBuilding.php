@@ -97,7 +97,7 @@ class RebuildBuilding implements ShouldQueue {
             $message = $this->building->name . ' finished being rebuilt for kingdom: ' .
                 $this->building->kingdom->name . ' on plane: '.$plane.' At: (X/Y) '.$x.'/'.$y.'.';
 
-            ServerMessageHandler::handleMessage($this->user, 'building-repair-finished', $message);
+            ServerMessageHandler::handleMessage($this->user, 'building_repair_finished', $message);
         }
     }
 }
