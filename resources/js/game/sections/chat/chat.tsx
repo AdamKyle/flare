@@ -77,7 +77,7 @@ export default class Chat extends React.Component<ChatComponentProps, ChatCompon
 
     sendPublicMessage() {
         if (this.state.message === '') {
-            return generateServerMessage('invalid_command');
+            return generateServerMessage('message_length_0');
         }
 
         if (this.props.is_silenced) {
@@ -104,7 +104,7 @@ export default class Chat extends React.Component<ChatComponentProps, ChatCompon
         const messageData = this.state.message.match(/^\/m\s+(\w+[\w| ]*):\s*(.*)/);
 
         if (messageData === null) {
-            return generateServerMessage('invalid_command');
+            return generateServerMessage('message_length_0');
         }
 
         if (this.props.is_silenced) {

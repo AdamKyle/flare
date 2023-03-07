@@ -2,15 +2,15 @@
 
 namespace App\Flare\Jobs;
 
-use App\Admin\Events\UpdateAdminChatEvent;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;;
 use App\Flare\Models\User;
-use App\Flare\Events\ServerMessageEvent;
+use App\Admin\Events\UpdateAdminChatEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
+use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class UpdateSilencedUserJob implements ShouldQueue
 {
@@ -19,15 +19,14 @@ class UpdateSilencedUserJob implements ShouldQueue
     /**
      * @var User $user
      */
-    protected $user;
+    protected User $user;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(User $user)
-    {
+    public function __construct(User $user) {
         $this->user = $user;
     }
 
@@ -36,8 +35,7 @@ class UpdateSilencedUserJob implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
-    {
+    public function handle(): void {
         $this->user->update([
             'is_silenced'            => false,
             'can_speak_again_at'     => null,
@@ -48,7 +46,7 @@ class UpdateSilencedUserJob implements ShouldQueue
 
         $user = $this->user->refresh(0);
 
-        event(new ServerMessageEvent($user, 'silenced', $forMessage));
+        ServerMessageHandler::handleMessage($user, 'silenced', $forMessage);
 
         event(new UpdateTopBarEvent($user->character));
 

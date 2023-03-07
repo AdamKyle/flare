@@ -2,24 +2,20 @@
 
 namespace App\Game\Kingdoms\Jobs;
 
-use App\Game\Kingdoms\Service\UpdateKingdom;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Facades\App\Flare\Values\UserOnlineValue;
-use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\User;
 use App\Flare\Models\KingdomBuilding;
 use App\Flare\Models\Kingdom;
-use App\Game\Kingdoms\Mail\UpgradedBuilding;
+use App\Game\Kingdoms\Service\UpdateKingdom;
+use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
+use Facades\App\Flare\Values\UserOnlineValue;
 
-
-class UpgradeBuildingWithGold implements ShouldQueue
-{
+class UpgradeBuildingWithGold implements ShouldQueue {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
@@ -184,7 +180,7 @@ class UpgradeBuildingWithGold implements ShouldQueue
                     $this->building->kingdom->name . ' on plane: ' . $plane .
                     ' At (X/Y) ' . $x . '/' . $y . ' and is now level: ' . $level;
 
-                event(new ServerMessageEvent($this->user, 'building-upgrade-finished', $message));
+                ServerMessageHandler::handleMessage($this->user, 'building-upgrade-finished', $message);
             }
         }
     }

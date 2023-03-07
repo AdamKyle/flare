@@ -2,15 +2,11 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Flare\Events\ServerMessageEvent;
-use App\Flare\Events\SiteAccessedEvent;
 use App\Flare\Handlers\CheatingCheck;
 use App\Flare\Jobs\LoginMessage;
 use App\Flare\Services\CanUserEnterSiteService;
-use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class LoginController extends Controller

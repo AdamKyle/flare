@@ -2,32 +2,18 @@
 
 namespace App\Game\Market\Controllers\Api;
 
-use App\Flare\Events\ServerMessageEvent;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Traits\IsItemUnique;
-use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
-use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
-use App\Game\Core\Events\UpdateMarketBoardBroadcastEvent;
 use App\Game\Core\Services\CharacterInventoryService;
 use Facades\App\Flare\Calculators\SellItemCalculator;
 use App\Flare\Models\MarketBoard;
-use App\Flare\Models\MarketHistory;
 use App\Game\Core\Traits\UpdateMarketBoard;
-use App\Game\Market\Requests\HistoryRequest;
 use App\Game\Market\Requests\ListPriceRequest;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
-use League\Fractal\Resource\Item as FractalItem;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
 use App\Flare\Transformers\MarketItemsTransformer;
-use App\Flare\Models\Item;
-use App\Flare\Transformers\ItemTransformer;
 use App\Game\Market\Requests\ChangeItemTypeRequest;
-use App\Game\Market\Requests\ItemDetailsRequest;
 
 class  MarketController extends Controller {
 

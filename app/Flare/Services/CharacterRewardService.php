@@ -3,10 +3,8 @@
 namespace App\Flare\Services;
 
 use Exception;
-use Facades\App\Flare\Calculators\XPCalculator;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
-use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
@@ -15,6 +13,7 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Location;
 use App\Flare\Models\Map;
 use App\Flare\Models\Monster;
+use App\Flare\Models\Item as ItemModel;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\LocationType;
@@ -22,9 +21,10 @@ use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Services\CharacterService;
 use App\Game\Core\Traits\MercenaryBonus;
-use App\Game\Messages\Events\ServerMessageEvent as GameServerMessageEvent;
+use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Services\SkillService;
-use App\Flare\Models\Item as ItemModel;
+use Facades\App\Flare\Calculators\XPCalculator;
+use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class CharacterRewardService {
 
@@ -183,7 +183,7 @@ class CharacterRewardService {
         if ($guideEnabled && $hasNoCompletedGuideQuests && $this->character->level < 2) {
             $xp += 10;
 
-            event(new GameServerMessageEvent($this->character->user, 'Rewarded an extra 10XP while doing the first guide quest. This bonus will end after you reach level 2.'));
+            event(new ServerMessageEvent($this->character->user, 'Rewarded an extra 10XP while doing the first guide quest. This bonus will end after you reach level 2.'));
         }
 
         $xp = $this->skillService->assignXPToTrainingSkill($this->character, $xp);
@@ -218,7 +218,7 @@ class CharacterRewardService {
 
         $this->updateCharacterStats($character);
 
-        event(new ServerMessageEvent($character->user, 'level_up'));
+        ServerMessageHandler::handleMessage($character->user, 'level_up', $character->level);
     }
 
     /**

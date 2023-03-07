@@ -8,9 +8,8 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use App\Flare\Models\GameBuilding;
-use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Models\Kingdom;
-use Facades\App\Flare\Values\UserOnlineValue;
+use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class AssignNewKingdomBuildingsJob implements ShouldQueue
 {
@@ -57,7 +56,7 @@ class AssignNewKingdomBuildingsJob implements ShouldQueue
 
                         $message = 'Kingdom: '.$kingdom->name.' gained a new building: ' . $this->gameBuilding->name;
 
-                        event(new ServerMessageEvent($user, 'new-building', $message));
+                        ServerMessageHandler::handleMessage($user, 'new-building', $message);
                     }
                 }
             }

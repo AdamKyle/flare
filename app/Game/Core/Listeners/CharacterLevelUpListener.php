@@ -2,25 +2,26 @@
 
 namespace App\Game\Core\Listeners;
 
-use App\Flare\Events\ServerMessageEvent;
-use App\Game\Core\Events\UpdateTopBarEvent;
+use Exception;
 use App\Flare\Events\UpdateCharacterAttackEvent;
 use App\Flare\Services\BuildCharacterAttackTypes;
-use App\Flare\Services\CharacterRewardService;
 use App\Game\Core\Events\CharacterLevelUpEvent;
-use App\Game\Core\Events\UpdateCharacterEvent;
 use App\Game\Core\Services\CharacterService;
-use Exception;
+use App\Game\Core\Events\UpdateTopBarEvent;
+use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
-class CharacterLevelUpListener
-{
+
+class CharacterLevelUpListener {
 
     /**
      * @var CharacterService $characterService
      */
-    private $characterService;
+    private CharacterService $characterService;
 
-    private $buildCharacterAttackTypes;
+    /**
+     * @var BuildCharacterAttackTypes $buildCharacterAttackTypes
+     */
+    private BuildCharacterAttackTypes $buildCharacterAttackTypes;
 
     /**
      * Constructor
@@ -40,14 +41,14 @@ class CharacterLevelUpListener
      * @return void
      * @throws Exception
      */
-    public function handle(CharacterLevelUpEvent $event)
-    {
+    public function handle(CharacterLevelUpEvent $event) {
+
         if ($event->character->xp >= $event->character->xp_next) {
             $this->characterService->levelUpCharacter($event->character);
 
             $character = $event->character->refresh();
 
-            event(new ServerMessageEvent($character->user, 'level_up'));
+            ServerMessageHandler::handleMessage($character->user, 'level_up', $character->level);
 
             if ($event->shouldUpdateCache) {
                 $this->buildCharacterAttackTypes->buildCache($character);

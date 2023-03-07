@@ -2,15 +2,15 @@
 
 namespace App\Admin\Services;
 
-use App\Flare\Events\ServerMessageEvent;
+use Illuminate\Database\Eloquent\Collection;
 use App\Flare\Models\GameSkill;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
 use App\Flare\Models\MarketBoard;
 use App\Flare\Models\MarketHistory;
-use Illuminate\Database\Eloquent\Collection;
+use App\Game\Core\Events\UpdateTopBarEvent;
+use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class ItemAffixService {
 
@@ -122,7 +122,8 @@ class ItemAffixService {
 
             $forMessages = $name . ' has been removed from one or more of your items. You have been compensated the amount of: ' . $affix->cost;
 
-            event(new ServerMessageEvent($character->user, 'deleted_affix', $forMessages));
+            ServerMessageHandler::handleMessage($character->user, 'deleted_affix', $forMessages);
+
             event(new UpdateTopBarEvent($character));
         }
     }

@@ -2,8 +2,6 @@
 
 namespace App\Admin\Jobs;
 
-use App\Flare\Mail\GenericMail;
-use Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -11,29 +9,28 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use App\Flare\Models\KingdomBuilding;
 use App\Flare\Models\GameBuilding;
-use App\Admin\Services\UpdateKingdomsService;
-use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Models\Kingdom;
 use Facades\App\Flare\Values\UserOnlineValue;
+use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
-class UpdateKingdomBuildings implements ShouldQueue
-{
+class UpdateKingdomBuildings implements ShouldQueue {
+
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
      * @var GameBuilding $gameBuilding
      */
-    public $gameBuilding;
+    public GameBuilding $gameBuilding;
 
     /**
      * @var array $selectedUnits
      */
-    public $selectedUnits;
+    public array $selectedUnits;
 
     /**
      * @var int|null $levels
      */
-    public $levels;
+    public ?int $levels = null;
 
     /**
      * Create a new job instance.
@@ -51,7 +48,7 @@ class UpdateKingdomBuildings implements ShouldQueue
      *
      * @return void
      */
-    public function handle() {
+    public function handle(): void {
         $query = KingdomBuilding::where('game_building_id', $this->gameBuilding->id);
 
         if ($query->get()->isEmpty()) {
@@ -76,7 +73,7 @@ class UpdateKingdomBuildings implements ShouldQueue
                         $message = 'Kingdom: '.$kingdom->name.' gained a new building: ' . $this->gameBuilding->name;
 
                         if (UserOnlineValue::isOnline($user)) {
-                            event(new ServerMessageEvent($user, 'new-building', $message));
+                            ServerMessageHandler::handleMessage($user, 'new-building', $message);
                         }
                     }
                 }

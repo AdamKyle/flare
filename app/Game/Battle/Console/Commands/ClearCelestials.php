@@ -2,26 +2,13 @@
 
 namespace App\Game\Battle\Console\Commands;
 
-use App\Admin\Services\ItemAffixService;
-use App\Flare\Events\ServerMessageEvent;
-use App\Game\Core\Events\UpdateTopBarEvent;
-use App\Flare\Models\CelestialFight;
-use App\Flare\Models\Character;
-use App\Flare\Models\CharacterInCelestialFight;
-use App\Flare\Models\InventorySlot;
-use App\Flare\Models\Item;
-use App\Flare\Models\ItemAffix;
-use App\Flare\Models\MarketBoard;
-use App\Flare\Models\MarketHistory;
-use App\Flare\Models\Skill;
-use App\Game\Battle\Events\UpdateCelestialFight;
-use App\Game\Messages\Events\GlobalMessageEvent;
-use Carbon\Carbon;
-use Facades\App\Flare\Calculators\SellItemCalculator;
 use Illuminate\Console\Command;
+use App\Flare\Models\CelestialFight;
+use App\Flare\Models\CharacterInCelestialFight;
+use App\Game\Messages\Events\GlobalMessageEvent;
 
-class ClearCelestials extends Command
-{
+class ClearCelestials extends Command {
+
     /**
      * The name and signature of the console command.
      *
@@ -41,17 +28,16 @@ class ClearCelestials extends Command
      *
      * @return void
      */
-    public function __construct()
-    {
+    public function __construct() {
         parent::__construct();
     }
 
     /**
      * Execute the console command.
      *
-     * @return int
+     * @return void
      */
-    public function handle() {
+    public function handle(): void {
         $count = CelestialFight::whereDate('updated_at', '<=', now()->subHour())->count();
 
         if ($count > 0) {

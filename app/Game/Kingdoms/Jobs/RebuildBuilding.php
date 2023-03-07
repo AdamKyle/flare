@@ -7,12 +7,12 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\User;
 use App\Flare\Models\KingdomBuilding;
 use Facades\App\Flare\Values\UserOnlineValue;
 use App\Game\Kingdoms\Service\UpdateKingdom;
+use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class RebuildBuilding implements ShouldQueue {
 
@@ -97,7 +97,7 @@ class RebuildBuilding implements ShouldQueue {
             $message = $this->building->name . ' finished being rebuilt for kingdom: ' .
                 $this->building->kingdom->name . ' on plane: '.$plane.' At: (X/Y) '.$x.'/'.$y.'.';
 
-            event(new ServerMessageEvent($this->user, 'building-repair-finished', $message));
+            ServerMessageHandler::handleMessage($this->user, 'building-repair-finished', $message);
         }
     }
 }

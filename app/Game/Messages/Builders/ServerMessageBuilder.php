@@ -2,6 +2,8 @@
 
 namespace App\Game\Messages\Builders;
 
+use App\Game\Messages\Events\ServerMessageEvent as ServerMessage;
+
 class ServerMessageBuilder {
 
     /**
@@ -64,8 +66,67 @@ class ServerMessageBuilder {
                 return 'Your message is far too long.';
             case 'no_matching_command':
                 return 'The NPC does not understand you. Their eyes blink in confusion.';
+            case 'gold_capped':
+                return 'Gold Rush! You are now gold capped!';
+            case 'failed_to_craft':
+                return 'You failed to craft the item! You lost the investment.';
+            case 'failed-to-disenchant':
+                return 'Failed to disenchant the item, it shatters before you into ashes. You only got 1 Gold Dust for your efforts.';
+            case 'failed_to_transmute':
+                return 'You failed to transmute the item. It melts into a pool of liquid gold dust before evaporating away. Wasted efforts!';
             default:
                 return '';
+        }
+    }
+
+    /**
+     * @param string $type
+     * @param string|int|null $forMessage
+     * @return string
+     */
+    public function buildWithAdditionalInformation(string $type, string|int $forMessage = null): string {
+        switch($type) {
+            case 'level_up':
+                return 'You are now level: ' . $forMessage . '!';
+            case 'gold_rush':
+                return 'Gold Rush! Your gold is now: ' . $forMessage . ' Gold! 5% of your total gold has been awarded to you.';
+            case 'gained_item':
+                return 'You found a: ' . $forMessage . ' on the enemy\'s corpse!';
+            case 'found_item':
+                return 'You happen upon a: ' . $forMessage . '!';
+            case 'crafted':
+                return 'You crafted a: ' . $forMessage . '!';
+            case 'new-skill':
+                return 'You were given a new skill by The Creator. Head your character sheet to see the new skill: ' . $forMessage;
+            case 'new-damage-stat':
+                return 'The Creator has changed your classes damage stat to: ' . $forMessage . '. Please adjust your gear accordingly for maximum damage.';
+            case 'disenchanted':
+                return 'Disenchanted the item and got: ' . $forMessage . ' Gold Dust.';
+            case 'lotto_max':
+                return 'You won the daily Gold Dust Lottery! Congrats! You won: ' . $forMessage . ' Gold Dust';
+            case 'daily_lottery':
+                return 'You got: ' . $forMessage . ' Gold Dust from the daily lottery';
+            case 'transmuted':
+                return 'You transmuted a new: ' . $forMessage . ' It shines with a powerful glow!';
+            case 'disenchanted-with-out-skill':
+                return 'Disenchanted the item and got: ' . $forMessage . ' Gold Dust. No Disenchanting experience was given for destroying the item.';
+            case 'enchantment_failed':
+            case 'silenced':
+            case 'deleted_affix':
+            case 'deleted_item':
+            case 'building-repair-finished':
+            case 'building-upgrade-finished':
+            case 'sold_item':
+            case 'new-building':
+            case 'kingdom-resources-update':
+            case 'unit-recruitment-finished':
+            case 'plane-transfer':
+            case 'enchanted':
+            case 'moved-location':
+                return $forMessage;
+            default:
+                return $this->build($type);
+
         }
     }
 }

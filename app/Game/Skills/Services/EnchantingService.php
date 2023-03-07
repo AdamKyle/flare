@@ -5,10 +5,6 @@ namespace App\Game\Skills\Services;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use App\Flare\Models\Inventory;
-use App\Game\Core\Services\CharacterInventoryService;
-use App\Game\Core\Services\RandomEnchantmentService;
-use App\Game\Skills\Values\SkillTypeValue;
-use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Events\UpdateSkillEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
@@ -16,10 +12,14 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
 use App\Flare\Models\Skill;
+use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
+use App\Game\Core\Services\CharacterInventoryService;
+use App\Game\Core\Services\RandomEnchantmentService;
+use App\Game\Skills\Values\SkillTypeValue;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Skills\Services\Traits\UpdateCharacterGold;
-use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
-use App\Game\Messages\Events\ServerMessageEvent as GameServerMessageEvent;
+use App\Game\Messages\Events\ServerMessageEvent;
+use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class EnchantingService {
 
@@ -148,7 +148,7 @@ class EnchantingService {
         if ($character->classType()->isMerchant()) {
             $cost = floor($cost - $cost * 0.15);
 
-            event(new ServerMessageEvent($character->user, 'As a Merchant you get a 15% reduction on enchanting items (reduction applied to total price).'));
+            ServerMessageHandler::sendBasicMessage($character->user, 'As a Merchant you get a 15% reduction on enchanting items (reduction applied to total price).');
         }
 
         return $cost;
@@ -230,7 +230,7 @@ class EnchantingService {
 
         if ($character->classType()->isMerchant() && $showMerchantMessage) {
 
-            event(new GameServerMessageEvent($character->user, 'As a Merchant you get 15% discount on enchanting items. This discount is applied to the total cost of the enchantments, not the individual enchantments.'));
+            event(new ServerMessageEvent($character->user, 'As a Merchant you get 15% discount on enchanting items. This discount is applied to the total cost of the enchantments, not the individual enchantments.'));
         }
 
         return $affixes;
@@ -250,14 +250,15 @@ class EnchantingService {
             $this->wasTooEasy = false;
 
             if ($enchantingSkill->level < $affix->skill_level_required) {
-                event(new ServerMessageEvent($character->user, 'to_hard_to_craft'));
+                ServerMessageHandler::handleMessage($character->user, 'to_hard_to_craft');
 
                 return;
             }
 
             if ($enchantingSkill->level > $affix->skill_level_trivial) {
                 if (!$this->sentToEasyMessage) {
-                    event(new ServerMessageEvent($character->user, 'to_easy_to_craft'));
+                    ServerMessageHandler::handleMessage($character->user, 'to_easy_to_craft');
+
                     $this->sentToEasyMessage = true;
                 }
 
@@ -298,7 +299,7 @@ class EnchantingService {
     protected function appliedEnchantment(InventorySlot $slot, ItemAffix $affix, Character $character, Skill $enchantingSkill, bool $tooEasy = false) {
         $message = 'Applied enchantment: '.$affix->name.' to: ' . $slot->item->refresh()->affix_name;
 
-        event(new ServerMessageEvent($character->user, 'enchanted', $message, $slot->id));
+        ServerMessageHandler::handleMessage($character->user, 'enchanted', $message, $slot->id);
 
         if (!$tooEasy) {
             event(new UpdateSkillEvent($enchantingSkill));
@@ -308,7 +309,7 @@ class EnchantingService {
     protected function failedToApplyEnchantment(InventorySlot $slot, ItemAffix $affix, Character $character) {
         $message = 'You failed to apply '.$affix->name.' to: ' . $slot->item->refresh()->affix_name . '. The item shatters before you. You lost the investment.';
 
-        event(new ServerMessageEvent($character->user, 'enchantment_failed', $message));
+        ServerMessageHandler::handleMessage($character->user, 'enchantment_failed', $message);
 
         $this->enchantItemService->deleteSlot($slot);
     }

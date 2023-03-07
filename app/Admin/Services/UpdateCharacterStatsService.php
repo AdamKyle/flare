@@ -2,16 +2,12 @@
 
 namespace App\Admin\Services;
 
-use Mail;
-use Cache;
-use App\Admin\Jobs\LevelTestCharacter;
-use Facades\App\Flare\Values\UserOnlineValue;
-use App\Flare\Mail\GenericMail;
-use App\Flare\Events\ServerMessageEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameRace;
+use Facades\App\Flare\Values\UserOnlineValue;
+use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 
 class UpdateCharacterStatsService {
@@ -130,7 +126,8 @@ class UpdateCharacterStatsService {
 
             if (UserOnlineValue::isOnline($character->user)) {
                 event(new UpdateTopBarEvent($character->refresh()));
-                event(new ServerMessageEvent($character->user, 'new-damage-stat', $newClass->damage_stat));
+
+                ServerMessageHandler::handleMessage($character->user, 'new-damage-stat', $newClass->damage_stat);
             }
         }
 

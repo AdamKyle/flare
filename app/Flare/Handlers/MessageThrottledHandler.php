@@ -2,17 +2,17 @@
 
 namespace App\Flare\Handlers;
 
-use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Jobs\UpdateSilencedUserJob;
 use App\Flare\Models\User;
 use App\Game\Core\Events\UpdateTopBarEvent;
+use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class MessageThrottledHandler {
 
     /**
      * @var User $user
      */
-    private $user;
+    private User $user;
 
     /**
      * Throttle for user
@@ -61,7 +61,7 @@ class MessageThrottledHandler {
             $forMessage = 'You have been silenced until: ' . $canSpeakAgainAt->format('Y-m-d H:i:s') . ' (5 minutes, server time). Making accounts to get around this is a bannable offense.';
             $user       = $this->user->refresh();
 
-            event(new ServerMessageEvent($user, 'silenced', $forMessage));
+            ServerMessageHandler::handleMessage($user, 'silenced', $forMessage);
 
             event(new UpdateTopBarEvent($user->character));
 

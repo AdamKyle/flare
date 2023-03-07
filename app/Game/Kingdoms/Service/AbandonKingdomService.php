@@ -2,16 +2,14 @@
 
 namespace App\Game\Kingdoms\Service;
 
-use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
-use App\Game\Kingdoms\Events\UpdateGlobalMap;
 use App\Game\Kingdoms\Events\UpdateNPCKingdoms;
 use App\Game\Kingdoms\Handlers\GiveKingdomsToNpcHandler;
 use App\Game\Kingdoms\Jobs\KingdomSettlementLockout;
-use App\Game\Maps\Events\UpdateMapDetailsBroadcast;
 use App\Game\Messages\Events\GlobalMessageEvent;
-use App\Game\Messages\Events\ServerMessageEvent as GameServerMessageEvent;
+use App\Game\Messages\Events\ServerMessageEvent;
+use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class AbandonKingdomService {
 
@@ -84,10 +82,10 @@ class AbandonKingdomService {
             $kingdom->gameMap->name .' plane.'
         ));
 
-        event(new ServerMessageEvent($this->character->user, 'kingdom-resources-update',
-            $kingdom->name . ' Has been given to the NPC due to being abandoned, at Location (x/y): '
-            . $kingdom->x_position . '/' . $kingdom->y_position . ' on the: ' . $kingdom->gameMap->name . ' plane.'
-        ));
+        $message = $kingdom->name . ' Has been given to the NPC due to being abandoned, at Location (x/y): '
+            . $kingdom->x_position . '/' . $kingdom->y_position . ' on the: ' . $kingdom->gameMap->name . ' plane.';
+
+        ServerMessageHandler::handleMessage($this->character->user, 'kingdom-resources-update', $message);
 
         $this->updateKingdom->updateKingdomAllKingdoms($character);
 
@@ -145,7 +143,7 @@ class AbandonKingdomService {
 
         $minutes = now()->diffInMinutes($time);
 
-        event(new GameServerMessageEvent($this->character->user, 'You have been locked out of settling or purchasing a new kingdom for: '.
+        event(new ServerMessageEvent($this->character->user, 'You have been locked out of settling or purchasing a new kingdom for: '.
             $minutes . ' Minutes. If you abandon another kingdom, we add 15 minutes to what ever time is left.
             If you attempt to settle or purchase a king you will be told how much time you have left.'));
     }

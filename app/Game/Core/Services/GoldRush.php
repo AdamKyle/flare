@@ -2,11 +2,11 @@
 
 namespace App\Game\Core\Services;
 
-use Facades\App\Flare\Calculators\GoldRushCheckCalculator;
-use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Models\Character;
 use App\Flare\Models\Monster;
+use Facades\App\Flare\Calculators\GoldRushCheckCalculator;
+use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class GoldRush {
 
@@ -41,7 +41,7 @@ class GoldRush {
 
         $character = $character->refresh();
 
-        event(new ServerMessageEvent($character->user, $type, number_format($character->gold)));
+        ServerMessageHandler::handleMessage($character->user, $type, number_format($character->gold));
     }
 
     protected function getGameMapBonus(Character $character): float {

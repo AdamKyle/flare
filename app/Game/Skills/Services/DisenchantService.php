@@ -2,18 +2,18 @@
 
 namespace App\Game\Skills\Services;
 
-use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Core\Traits\MercenaryBonus;
-use App\Game\Messages\Events\ServerMessageEvent as MessageEvent;
-use App\Flare\Events\UpdateSkillEvent;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Skill;
 use App\Flare\Values\ItemEffectsValue;
+use App\Flare\Events\UpdateSkillEvent;
+use App\Game\Core\Traits\MercenaryBonus;
+use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Skills\Events\UpdateCharacterEnchantingList;
 use App\Game\Skills\Services\Traits\SkillCheck;
+use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class DisenchantService {
 
@@ -73,13 +73,14 @@ class DisenchantService {
         if ($characterRoll > $dcCheck) {
             $goldDust = $this->updateGoldDust($this->character);
 
-            event(new ServerMessageEvent($this->character->user, 'disenchanted', $goldDust));
+            ServerMessageHandler::handleMessage($this->character->user, 'disenchanted', number_format($goldDust));
+
             event(new UpdateSkillEvent($this->disenchantingSkill));
 
         } else {
             $this->updateGoldDust($this->character, true);
 
-            event(new ServerMessageEvent($this->character->user, 'failed-to-disenchant'));
+            ServerMessageHandler::handleMessage($this->character->user, 'failed-to-disenchant');
         }
 
         $slot->delete();
@@ -105,14 +106,14 @@ class DisenchantService {
         if ($characterRoll > $dcCheck) {
             $goldDust = $this->updateGoldDust($this->character);
 
-            event(new ServerMessageEvent($this->character->user, 'disenchanted', $goldDust));
+            ServerMessageHandler::handleMessage($this->character->user, 'disenchanted', number_format($goldDust));
 
             event(new UpdateSkillEvent($this->disenchantingSkill));
 
         } else {
             $this->updateGoldDust($this->character, true);
 
-            event(new ServerMessageEvent($this->character->user, 'failed-to-disenchant'));
+            ServerMessageHandler::handleMessage($this->character->user, 'failed-to-disenchant');
         }
     }
 
@@ -144,9 +145,9 @@ class DisenchantService {
 
                 if ($characterTotalGoldDust >= MaxCurrenciesValue::MAX_GOLD_DUST) {
                     $characterTotalGoldDust = MaxCurrenciesValue::MAX_GOLD_DUST;
-                    event(new MessageEvent($character->user, 'Gold Dust Rush! You gained 5% interest on your total gold dust. You are now capped!'));
+                    event(new ServerMessageEvent($character->user, 'Gold Dust Rush! You gained 5% interest on your total gold dust. You are now capped!'));
                 } else {
-                    event(new MessageEvent($character->user, 'Gold Dust Rush! You gained 5% interest on your total gold dust. Your new total is: ' . $characterTotalGoldDust));
+                    event(new ServerMessageEvent($character->user, 'Gold Dust Rush! You gained 5% interest on your total gold dust. Your new total is: ' . $characterTotalGoldDust));
                 }
             }
         }

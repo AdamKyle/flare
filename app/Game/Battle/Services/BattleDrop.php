@@ -2,11 +2,9 @@
 
 namespace App\Game\Battle\Services;
 
-use App\Game\Skills\Services\DisenchantService;
 use Illuminate\Support\Facades\Cache;
-use Facades\App\Flare\RandomNumber\RandomNumberGenerator;
+use App\Game\Skills\Services\DisenchantService;
 use App\Flare\Builders\RandomItemDropBuilder;
-use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Models\Location;
@@ -14,9 +12,11 @@ use App\Flare\Models\Monster;
 use App\Flare\Values\AutomationType;
 use App\Game\Core\Traits\CanHaveQuestItem;
 use App\Game\Messages\Events\GlobalMessageEvent;
+use App\Game\Messages\Events\ServerMessageEvent;
 use Facades\App\Flare\Calculators\DropCheckCalculator;
 use Facades\App\Flare\Calculators\SellItemCalculator;
-use App\Game\Messages\Events\ServerMessageEvent as GameServerMessage;
+use Facades\App\Flare\RandomNumber\RandomNumberGenerator;
+use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class BattleDrop {
 
@@ -298,7 +298,7 @@ class BattleDrop {
 
                 $this->giveItemToPlayer($character, $item);
             } else {
-                event(new ServerMessageEvent($character->user, 'inventory_full'));
+                ServerMessageHandler::handleMessage($character->user, 'inventory_full');
             }
         }
     }
@@ -350,13 +350,13 @@ class BattleDrop {
 
                 $character->refresh()->inventory->slots()->where('item_id', $item->id)->first();
 
-                event(new GameServerMessage($character->user, 'You found: ' . $item->affix_name . ' on the enemies corpse.', $item->id, true));
+                event(new ServerMessageEvent($character->user, 'You found: ' . $item->affix_name . ' on the enemies corpse.', $item->id, true));
 
                 broadcast(new GlobalMessageEvent($message));
             } else {
                 $slot = $character->refresh()->inventory->slots()->where('item_id', $item->id)->first();
 
-                event(new GameServerMessage($character->user, 'You found: ' . $item->affix_name . ' on the enemies corpse.', $slot->id));
+                event(new ServerMessageEvent($character->user, 'You found: ' . $item->affix_name . ' on the enemies corpse.', $slot->id));
 
                 if ($isMythic) {
                     event(new GlobalMessageEvent($character->name . ' Has found a mythical item on the enemies corpse! Such a rare drop!'));

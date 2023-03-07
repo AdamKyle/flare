@@ -2,42 +2,41 @@
 
 namespace App\Game\Kingdoms\Jobs;
 
-
-use App\Game\Kingdoms\Service\UpdateKingdom;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Flare\Events\ServerMessageEvent;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\UnitInQueue;
+use App\Game\Kingdoms\Service\UpdateKingdom;
 use Facades\App\Flare\Values\UserOnlineValue;
+use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
-class RecruitUnits implements ShouldQueue
-{
+class RecruitUnits implements ShouldQueue {
+
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
      * @var Kingdom $kingdom
      */
-    protected $kingdom;
+    protected Kingdom $kingdom;
 
     /**
      * @var GameUnit $unit
      */
-    protected $unit;
+    protected GameUnit $unit;
 
     /**
      * @var int queueId
      */
-    protected $queueId;
+    protected int $queueId;
 
     /**
      * @var int $amount
      */
-    protected $amount;
+    protected int $amount;
 
     /**
      * Create a new job instance.
@@ -65,8 +64,7 @@ class RecruitUnits implements ShouldQueue
      * @param UpdateKingdom $updateKingdom
      * @return void
      */
-    public function handle(UpdateKingdom $updateKingdom)
-    {
+    public function handle(UpdateKingdom $updateKingdom): void {
 
         $queue = UnitInQueue::find($this->queueId);
 
@@ -140,7 +138,7 @@ class RecruitUnits implements ShouldQueue
                     '. You have a total of: ' . number_format($amount);
 
 
-                event(new ServerMessageEvent($user, 'unit-recruitment-finished', $message));
+                ServerMessageHandler::handleMessage($user, 'unit-recruitment-finished', $message);
             }
         }
     }

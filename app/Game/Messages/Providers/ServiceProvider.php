@@ -5,6 +5,7 @@ namespace App\Game\Messages\Providers;
 use App\Flare\Handlers\MessageThrottledHandler;
 use App\Game\Maps\Services\PctService;
 use App\Game\Messages\Builders\ServerMessageBuilder;
+use App\Game\Messages\Handlers\ServerMessageHandler;
 use App\Game\Messages\Services\FetchMessages;
 use App\Game\Messages\Services\NPCMessage;
 use App\Game\Messages\Services\PrivateMessage;
@@ -17,12 +18,13 @@ use App\Game\Messages\Builders\NpcServerMessageBuilder;
 use App\Game\Messages\Handlers\NpcCommandHandler;
 
 class ServiceProvider extends ApplicationServiceProvider {
+
     /**
      * Register any application services.
      *
      * @return void
      */
-    public function register() {
+    public function register(): void {
         $this->commands([CleanChat::class]);
 
         $this->app->bind(NPCMessage::class, function($app) {
@@ -59,6 +61,12 @@ class ServiceProvider extends ApplicationServiceProvider {
         $this->app->bind(PublicEntityCommand::class, function($app) {
             return new PublicEntityCommand(
                 $app->make(PctService::class),
+            );
+        });
+
+        $this->app->bind(ServerMessageHandler::class, function($app) {
+            return new ServerMessageHandler(
+                $app->make(ServerMessageBuilder::class)
             );
         });
     }

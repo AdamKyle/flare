@@ -4,7 +4,7 @@ namespace App\Game\Skills\Services;
 
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
-use App\Flare\Events\ServerMessageEvent;
+use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
@@ -13,7 +13,7 @@ use App\Game\Core\Services\RandomEnchantmentService;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Skills\Services\Traits\SkillCheck;
 use App\Game\Skills\Services\Traits\UpdateCharacterGold;
-use App\Game\Messages\Events\ServerMessageEvent as GameServerMessageEvent;
+use App\Game\Messages\Events\ServerMessageEvent;
 
 class CraftingService {
 
@@ -81,7 +81,7 @@ class CraftingService {
         $skill = $this->fetchCraftingSkill($character, $params['type']);
 
         if (is_null($item)) {
-            event(new GameServerMessageEvent($character->user, 'Invalid Item'));
+            event(new ServerMessageEvent($character->user, 'Invalid Item'));
 
             return false;
         }
@@ -89,7 +89,7 @@ class CraftingService {
         $cost = $this->getItemCost($character, $item);
 
         if ($cost > $character->gold) {
-            event(new ServerMessageEvent($character->user, 'not_enough_gold'));
+            ServerMessageHandler::handleMessage($character->user, 'not_enough_gold');
 
             return false;
         }
@@ -118,13 +118,13 @@ class CraftingService {
      */
     protected function attemptToCraftItem(Character $character, Skill $skill, Item $item): bool {
         if ($skill->level < $item->skill_level_required) {
-            event(new ServerMessageEvent($character->user, 'to_hard_to_craft'));
+            ServerMessageHandler::handleMessage($character->user, 'to_hard_to_craft');
 
             return false;
         }
 
         if ($skill->level > $item->skill_level_trivial) {
-            event(new ServerMessageEvent($character->user, 'to_easy_to_craft'));
+            ServerMessageHandler::handleMessage($character->user, 'to_easy_to_craft');
 
             $this->pickUpItem($character, $item, $skill, true);
 
@@ -140,7 +140,7 @@ class CraftingService {
             return true;
         }
 
-        event(new ServerMessageEvent($character->user, 'failed_to_craft'));
+        ServerMessageHandler::handleMessage($character->user, 'failed_to_craft');
 
         $cost = $this->getItemCost($character, $item);
 
@@ -210,7 +210,7 @@ class CraftingService {
             });
 
             if ($merchantMessage) {
-                event(new GameServerMessageEvent($character->user, 'As a Merchant you get 30% discount on crafting items. The items in the list have been adjusted.'));
+                event(new ServerMessageEvent($character->user, 'As a Merchant you get 30% discount on crafting items. The items in the list have been adjusted.'));
             }
         }
 
@@ -259,12 +259,12 @@ class CraftingService {
                 'inventory_id' => $character->inventory->id,
             ]);
 
-            event(new ServerMessageEvent($character->user, 'crafted', $item->name, $slot->id));
+            ServerMessageHandler::handleMessage($character->user, 'crafted', $item->name, $slot->id);
 
             return true;
         }
 
-        event(new ServerMessageEvent($character->user, 'inventory_full'));
+        ServerMessageHandler::handleMessage($character->user, 'inventory_full');
 
         return false;
     }

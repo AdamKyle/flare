@@ -2,23 +2,21 @@
 
 namespace App\Game\Core\Listeners;
 
+use Exception;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\GoldRushCheckEvent;
-use App\Flare\Events\ServerMessageEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
+use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Facades\App\Flare\Calculators\GoldRushCheckCalculator;
 
-class GoldRushCheckListener
-{
+class GoldRushCheckListener {
 
     /**
-     * Handle the event.
-     *
-     * @param  \App\Game\Battle\UpdateCharacterEvent  $event
+     * @param GoldRushCheckEvent $event
      * @return void
+     * @throws Exception
      */
-    public function handle(GoldRushCheckEvent $event)
-    {
+    public function handle(GoldRushCheckEvent $event): void {
 
         if ($event->character->gold === MaxCurrenciesValue::MAX_GOLD) {
             return; // They are at max, cannot receive anymore.
@@ -52,7 +50,8 @@ class GoldRushCheckListener
 
             $character = $event->character->refresh();
 
-            event(new ServerMessageEvent($character->user, $type, number_format($goldRush)));
+            ServerMessageHandler::handleMessage($character->user, $type, number_format($goldRush));
+
             event(new UpdateTopBarEvent($character));
         }
     }

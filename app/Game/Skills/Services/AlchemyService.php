@@ -2,18 +2,18 @@
 
 namespace App\Game\Skills\Services;
 
-use App\Flare\Events\ServerMessageEvent;
-use App\Flare\Events\UpdateSkillEvent;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
 use App\Flare\Models\Skill;
+use App\Flare\Events\UpdateSkillEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Skills\Services\Traits\SkillCheck;
 use App\Game\Skills\Services\Traits\UpdateCharacterGold;
-use App\Game\Messages\Events\ServerMessageEvent as GameServerMessageEvent;
+use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Values\SkillTypeValue;
+use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class AlchemyService {
     use ResponseBuilder, SkillCheck, UpdateCharacterGold;
@@ -49,7 +49,7 @@ class AlchemyService {
             });
 
             if ($showMerchantMessage) {
-                event(new GameServerMessageEvent($character->user, 'As a Merchant you get 10% discount on creating alchemy items. The discount has been applied to the items list.'));
+                event(new ServerMessageEvent($character->user, 'As a Merchant you get 10% discount on creating alchemy items. The discount has been applied to the items list.'));
             }
         }
 
@@ -62,7 +62,7 @@ class AlchemyService {
         $item      = Item::find($itemId);
 
         if (is_null($item)) {
-            event(new GameServerMessageEvent($character->user, 'Nope. Item does not exist.'));
+            event(new ServerMessageEvent($character->user, 'Nope. Item does not exist.'));
 
             return;
         }
@@ -74,17 +74,17 @@ class AlchemyService {
             $goldDustCost = floor($goldDustCost - $goldDustCost * 0.10);
             $shardsCost   = floor($shardsCost - $shardsCost * 0.10);
 
-            event( new ServerMessageEvent($character->user, 'As a Merchant you get a 10% reduction on crafting alchemical items.'));
+            ServerMessageHandler::sendBasicMessage($character->user, 'As a Merchant you get a 10% reduction on crafting alchemical items.');
         }
 
         if ($goldDustCost > $character->gold_dust) {
-            event(new ServerMessageEvent($character->user, 'not_enough_gold_dust'));
+            ServerMessageHandler::handleMessage($character->user, 'not_enough_gold_dust');
 
             return;
         }
 
         if ($shardsCost > $character->shards) {
-            event(new ServerMessageEvent($character->user, 'not_enough_shards'));
+            ServerMessageHandler::handleMessage($character->user, 'not_enough_shards');
 
             return;
         }
@@ -97,7 +97,7 @@ class AlchemyService {
 
         if ($skill->level < $item->skill_level_required) {
 
-            event(new ServerMessageEvent($character->user, 'to_hard_to_craft'));
+            ServerMessageHandler::handleMessage($character->user, 'to_hard_to_craft');
 
             $this->pickUpItem($character, $item, $skill, true);
 
@@ -108,7 +108,7 @@ class AlchemyService {
 
         if ($skill->level > $item->skill_level_trivial) {
 
-            event(new ServerMessageEvent($character->user, 'to_easy_to_craft'));
+            ServerMessageHandler::handleMessage($character->user, 'to_easy_to_craft');
 
             $this->pickUpItem($character, $item, $skill, true);
 
@@ -130,7 +130,7 @@ class AlchemyService {
             return;
         }
 
-        event(new ServerMessageEvent($character->user, 'failed_to_transmute'));
+        ServerMessageHandler::handleMessage($character->user, 'failed_to_transmute');
 
         event(new UpdateTopBarEvent($character->refresh()));
     }
@@ -152,12 +152,12 @@ class AlchemyService {
                 'inventory_id' => $character->inventory->id,
             ]);
 
-            event(new GameServerMessageEvent($character->user, 'You manage to create: ' . $item->name . ' from gold dust!', $slot->id));
+            event(new ServerMessageEvent($character->user, 'You manage to create: ' . $item->name . ' from gold dust!', $slot->id));
 
             return true;
         }
 
-        event(new ServerMessageEvent($character->user, 'inventory_full'));
+        ServerMessageHandler::handleMessage($character->user, 'inventory_full');
 
         return false;
     }

@@ -2,58 +2,62 @@
 
 namespace App\Game\Maps\Services;
 
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item;
+use Illuminate\Support\Facades\Cache;
 use App\Flare\Jobs\CharacterAttackTypesCacheBuilderWithDeductions;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\Map;
-use App\Game\Battle\Events\UpdateCharacterStatus;
-use App\Game\Maps\Events\UpdateMap;
-use Illuminate\Support\Facades\Cache;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item;
-use Facades\App\Flare\Cache\CoordinatesCache;
-use App\Game\Core\Events\UpdateTopBarEvent;
-use App\Flare\Models\Location;
-use App\Flare\Services\BuildCharacterAttackTypes;
-use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
-use App\Game\Core\Events\UpdateBaseCharacterInformation;
-use App\Game\Maps\Events\MoveTimeOutEvent;
-use App\Game\Maps\Events\UpdateGlobalCharacterCountBroadcast;
-use App\Game\Maps\Events\UpdateMonsterList;
-use App\Game\Maps\Values\MapTileValue;
-use App\Game\Messages\Events\GlobalMessageEvent;
-use App\Flare\Events\ServerMessageEvent;
-use App\Game\Messages\Events\ServerMessageEvent as MessageEvent;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Character;
 use App\Flare\Transformers\MonsterTransformer;
 use App\Flare\Values\ItemEffectsValue;
+use App\Flare\Models\Location;
+use App\Flare\Services\BuildCharacterAttackTypes;
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
+use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Game\Maps\Events\UpdateMap;
+use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateBaseCharacterInformation;
+use App\Game\Maps\Events\MoveTimeOutEvent;
+use App\Game\Maps\Events\UpdateMonsterList;
+use App\Game\Maps\Values\MapTileValue;
+use App\Game\Messages\Events\GlobalMessageEvent;
+use App\Game\Messages\Events\ServerMessageEvent;
+use Facades\App\Flare\Cache\CoordinatesCache;
+use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class TraverseService {
 
     /**
      * @var Manager $manager
      */
-    private $manager;
+    private Manager $manager;
 
     /**
      * @var MonsterTransformer $monsterTransformer
      */
-    private $monsterTransformer;
+    private MonsterTransformer $monsterTransformer;
 
     /**
      * @var LocationService $locationService
      */
-    private $locationService;
+    private LocationService $locationService;
 
     /**
      * @var MapTileValue $mapTileValue
      */
-    private $mapTileValue;
+    private MapTileValue $mapTileValue;
 
     /**
      * @var BuildCharacterAttackTypes  $buildCharacterAttackTypes
      */
     private BuildCharacterAttackTypes $buildCharacterAttackTypes;
+
+    /**
+     * @var CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer
+     */
+    private CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer;
 
     /**
      * TraverseService constructor.
@@ -144,7 +148,7 @@ class TraverseService {
      * @param int $mapId
      * @param Character $character
      */
-    public function travel(int $mapId, Character $character) {
+    public function travel(int $mapId, Character $character): void {
         $this->updateCharacterTimeOut($character);
 
         $oldMap = $character->map->gameMap;
@@ -157,7 +161,7 @@ class TraverseService {
 
         $message = 'You have traveled to: ' . $character->map->gameMap->name;
 
-        event(new ServerMessageEvent($character->user, 'plane-transfer', $message));
+        ServerMessageHandler::handleMessage($character->user, 'plane-transfer', $message);
 
         $gameMap = $character->map->gameMap;
 
@@ -167,7 +171,7 @@ class TraverseService {
             feel the presence of death as it creeps ever closer.
             (Characters can walk on water here.)';
 
-            event(new MessageEvent($character->user,  $message));
+            event(new ServerMessageEvent($character->user,  $message));
 
             event(new GlobalMessageEvent('The gates have opened for: ' . $character->name . '. They have entered the realm of shadows!'));
         }
@@ -175,7 +179,7 @@ class TraverseService {
         if ($gameMap->mapType()->isHell()) {
             $message = 'The stench of sulfur fills your nose. The heat of the magma oceans bathes over you. Demonic shadows and figures move about the land. Tormented souls cry out in anguish!';
 
-            event(new MessageEvent($character->user,  $message));
+            event(new ServerMessageEvent($character->user,  $message));
 
             event(new GlobalMessageEvent('Hell\'s gates swing wide for: ' . $character->name . '. May the light of The Poet, be their guide through such darkness!'));
         }
@@ -183,7 +187,7 @@ class TraverseService {
         if ($gameMap->mapType()->isPurgatory()) {
             $message = 'The silence of death fills your very being and chills you to bone. Nothing moves amongst the decay and death of this land.';
 
-            event(new MessageEvent($character->user,  $message));
+            event(new ServerMessageEvent($character->user,  $message));
 
             event(new GlobalMessageEvent('Thunder claps in the sky: ' . $character->name . ' has called forth The Creator\'s gates of despair! The Creator is Furious! "Hear me, child! I shall face you in the depths of my despair and crush the soul from your bones!" the lands fall silent, the children no longer have faith and the fabric of time rips open...'));
         }
@@ -220,7 +224,7 @@ class TraverseService {
      * @param int $mapId
      * @return void
      */
-    protected function updateCharactersPosition(Character $character, int $mapId) {
+    protected function updateCharactersPosition(Character $character, int $mapId): void {
         $character->map()->update([
             'game_map_id' => $mapId
         ]);
@@ -238,7 +242,7 @@ class TraverseService {
         $newYPosition = $character->map->character_position_y;
 
         if ($newXPosition !== $xPosition || $newYPosition !== $yPosition) {
-            event(new ServerMessageEvent($character->user, 'moved-location', 'Your character was moved as you are missing the appropriate quest item or were not allowed to enter the area.'));
+            ServerMessageHandler::handleMessage($character->user, 'moved-location', 'Your character was moved as you are missing the appropriate quest item or were not allowed to enter the area.');
         }
     }
 
@@ -251,7 +255,7 @@ class TraverseService {
      * @param array $cache
      * @return Character
      */
-    protected function changeLocation(Character $character, array $cache) {
+    protected function changeLocation(Character $character, array $cache): Character {
 
         $x = $cache['x'];
         $y = $cache['y'];
@@ -291,7 +295,7 @@ class TraverseService {
      *
      * @param Character $character
      */
-    protected function updateCharacterTimeOut(Character $character) {
+    protected function updateCharacterTimeOut(Character $character): Character {
         $character->update([
             'can_move'          => false,
             'can_move_again_at' => now()->addSeconds(10),
@@ -307,8 +311,9 @@ class TraverseService {
      *
      * @param int $mapId
      * @param Character $character
+     * @param GameMap $oldGameMap
      */
-    public function updateActions(int $mapId, Character $character, GameMap $oldGameMap) {
+    public function updateActions(int $mapId, Character $character, GameMap $oldGameMap): void {
         $user         = $character->user;
         $gameMap      = GameMap::find($mapId);
 
@@ -368,7 +373,7 @@ class TraverseService {
      * @param float $deduction
      * @return void
      */
-    protected function updateActionTypeCache(Character $character, float $deduction) {
+    protected function updateActionTypeCache(Character $character, float $deduction): void {
         CharacterAttackTypesCacheBuilderWithDeductions::dispatch($character, $deduction);
     }
 
@@ -377,26 +382,7 @@ class TraverseService {
      *
      * @param Character $character
      */
-    protected function updateMap(Character $character) {
+    protected function updateMap(Character $character): void {
         event(new UpdateMap($character->user));
-    }
-
-    /**
-     * When the character traverses, let's update the global character count for all planes.
-     *
-     * @param int $oldMap
-     */
-    protected function updateGlobalCharacterMapCount(int $oldMap) {
-        $maps = GameMap::where('id', '=', $oldMap)->get();
-
-        foreach ($maps as $map) {
-            event(new UpdateGlobalCharacterCountBroadcast($map));
-        }
-
-        $maps = GameMap::where('id', '!=', $oldMap)->get();
-
-        foreach ($maps as $map) {
-            event(new UpdateGlobalCharacterCountBroadcast($map));
-        }
     }
 }

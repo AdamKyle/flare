@@ -2,20 +2,27 @@
 
 namespace App\Admin\Services;
 
+use Carbon\Carbon;
 use App\Admin\Events\UpdateAdminChatEvent;
 use App\Admin\Jobs\BanEmail;
-use App\Flare\Events\ServerMessageEvent;
-use App\Flare\Jobs\UpdateSilencedUserJob;
-use App\Flare\Models\User;
 use App\Admin\Events\RefreshUserScreenEvent;
 use App\Admin\Jobs\UpdateBannedUserJob;
+use App\Flare\Jobs\UpdateSilencedUserJob;
+use App\Flare\Models\User;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Messages\Events\GlobalMessageEvent;
-
+use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class UserService {
 
-    public function banUser(User $user, array $params) {
+    /**
+     * Ban a user.
+     *
+     * @param User $user
+     * @param array $params
+     * @return bool
+     */
+    public function banUser(User $user, array $params): bool {
         $unBanAt = null;
 
         if ($params['for'] !== 'perm') {
@@ -52,9 +59,9 @@ class UserService {
      *
      * @param User $user
      * @param string $for
-     * @return mixed null | Carbon
+     * @return Carbon|null
      */
-    public function fetchUnBanAt(User $user, string $for) {
+    public function fetchUnBanAt(User $user, string $for): ?Carbon {
         $unBanAt = null;
 
         switch($for) {
@@ -77,7 +84,7 @@ class UserService {
      * @param User $user
      * @param int $silenceFor
      */
-    public function silence(User $user, int $silenceFor) {
+    public function silence(User $user, int $silenceFor): void {
         $canSpeakAgainAt = now()->addMinutes($silenceFor);
 
         $user->update([
@@ -89,7 +96,7 @@ class UserService {
 
         $message = 'The creator has silenced you until: ' . $canSpeakAgainAt->format('Y-m-d H:i:s') . ' ('.(int) $silenceFor.' Minutes server time) Making accounts to get around this is a bannable offense.';
 
-        event(new ServerMessageEvent($user, 'silenced', $message));
+        ServerMessageHandler::handleMessage($user, 'silenced', $message);
 
         event(new UpdateTopBarEvent($user->character));
 
@@ -98,7 +105,7 @@ class UserService {
         broadcast(new UpdateAdminChatEvent(auth()->user()));
     }
 
-    public function forceNameChange(User $user) {
+    public function forceNameChange(User $user): void {
         $user->character->update([
             'force_name_change' => true
         ]);
@@ -126,10 +133,10 @@ class UserService {
      * This alerts the user they have been banned.
      *
      * @param user $user
-     * @param Carbon | null $unBanAt
+     * @param Carbon|null $unBanAt
      * @return void
      */
-    public function sendUserMail(User $user, $unBanAt): void {
+    public function sendUserMail(User $user, ?Carbon $unBanAt = null): void {
         event(new RefreshUserScreenEvent($user));
 
         $unBannedAt = !is_null($unBanAt) ? $unBanAt->format('l jS \\of F Y h:i:s A') . ' ' . $unBanAt->timezoneName . '.' : 'Forever.';

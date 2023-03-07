@@ -2,15 +2,15 @@
 
 namespace App\Game\Kingdoms\Jobs;
 
-use App\Flare\Models\SmeltingProgress;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use App\Flare\Models\SmeltingProgress;
 use App\Game\Kingdoms\Service\UpdateKingdom;
-use App\Flare\Events\ServerMessageEvent;
 use Facades\App\Flare\Values\UserOnlineValue;
+use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class SmeltSteel implements ShouldQueue {
 
@@ -90,8 +90,7 @@ class SmeltSteel implements ShouldQueue {
                     ' has finished smelting: ' . number_format($amount) . ' of steel and now has: ' .
                     number_format($kingdom->current_steel) . ' steel.';
 
-
-                event(new ServerMessageEvent($user, 'unit-recruitment-finished', $message));
+                ServerMessageHandler::handleMessage($user, 'unit-recruitment-finished', $message);
             }
         }
     }

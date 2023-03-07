@@ -2,12 +2,12 @@
 
 namespace App\Flare\Services;
 
-use Cache;
-use App\Flare\Events\ServerMessageEvent;
+use Illuminate\Support\Facades\Cache;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Messages\Events\GlobalMessageEvent;
+use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class DailyGoldDustService {
 
@@ -19,7 +19,7 @@ class DailyGoldDustService {
      * @param Character $character
      * @return void
      */
-    public function handleRegularDailyGoldDust(Character $character) {
+    public function handleRegularDailyGoldDust(Character $character): void {
         $amount = rand(1, 100);
 
         $newAmount = $character->gold_dust + $amount;
@@ -34,7 +34,7 @@ class DailyGoldDustService {
 
         $character = $character->refresh();
 
-        event(new ServerMessageEvent($character->user, 'daily_lottery', $amount));
+        ServerMessageHandler::handleMessage($character->user, 'daily_lottery', number_format($amount));
 
         event(new UpdateTopBarEvent($character));
     }
@@ -45,7 +45,7 @@ class DailyGoldDustService {
      * @param Character $character
      * @return void
      */
-    public function handleWonDailyLottery(Character $character) {
+    public function handleWonDailyLottery(Character $character): void {
 
         if (!Cache::has('daily-gold-dust-lottery-won')) {
             event(new GlobalMessageEvent($character->name . ' has won the daily Gold Dust Lottery!
@@ -67,7 +67,7 @@ class DailyGoldDustService {
             Cache::put('daily-gold-dust-lottery-won', $character->id);
         }
 
-        event(new ServerMessageEvent($character->user, 'lotto_max', self::LOTTO_MAX));
+        ServerMessageHandler::handleMessage($character->user, 'lotto_max', number_format(self::LOTTO_MAX));
 
         event(new UpdateTopBarEvent($character));
     }
