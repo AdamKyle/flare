@@ -40,6 +40,8 @@ class GetReleaseData extends Command {
      * @param Github $github
      * @return void
      * @throws Exception
+     * @codeCoverageIgnore
+     *
      */
     public function handle(Github $github): void {
         $releaseData = $github->initiateClient()->fetchLatestRelease();

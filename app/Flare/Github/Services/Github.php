@@ -14,6 +14,18 @@ class Github {
     private ?Client $client = null;
 
     /**
+     * Inject a client object.
+     *
+     * @param Client $client
+     * @return Github
+     */
+    public function injectClient(Client $client): Github {
+        $this->client = $client;
+
+        return $this;
+    }
+
+    /**
      * Initiate the client, either with or without authentication.
      *
      * @param bool $withAuth
