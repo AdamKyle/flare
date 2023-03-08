@@ -12,23 +12,28 @@ class CraftedItemTimeOutEvent
     /**
      * @var Character $character
      */
-    public $character;
+    public Character $character;
 
     /**
-     * @var string $extraTime
+     * @var string|null $extraTime
      */
-    public $extraTime;
+    public ?string $extraTime = null;
+
+    /**
+     * @var int|null $setTime
+     */
+    public ?int $setTime = null;
 
     /**
      * Constructor
-     * 
+     *
      * @param Character $character
-     * @param string $extraTime | null
-     * @return void
+     * @param string|null $extraTime | null
+     * @param int|null $setTime
      */
-    public function __construct(Character $character, string $extraTime = null)
-    {
+    public function __construct(Character $character, string $extraTime = null, int $setTime = null) {
         $this->character = $character;
         $this->extraTime = $extraTime;
+        $this->setTime   = $setTime;
     }
 }

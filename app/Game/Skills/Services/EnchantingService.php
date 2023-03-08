@@ -177,7 +177,11 @@ class EnchantingService {
     public function enchant(Character $character, array $params, InventorySlot $slot, int $cost): void {
         $enchantingSkill = $this->getEnchantingSkill($character);
 
-        $this->updateCharacterGold($character, $cost);
+        $character->update([
+            'gold' => $character->gold - $cost,
+        ]);
+
+        $character = $character->refresh();
 
         $this->attachAffixes($params['affix_ids'], $slot, $enchantingSkill, $character);
 

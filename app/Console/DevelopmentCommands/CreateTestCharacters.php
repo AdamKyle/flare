@@ -50,7 +50,7 @@ class CreateTestCharacters extends Command {
 
             $this->line('Ceating Maxed out character for class: ' . $className);
 
-            $class = GameClass::where('name', $className);
+            $class = GameClass::where('name', $className)->first();
 
             if (is_null($class)) {
                 $this->error('No class for name: ' . $className . ' found');
@@ -60,7 +60,7 @@ class CreateTestCharacters extends Command {
 
             $character = $this->createCharacter($characterBuilder, $map, $class, $races, $password);
 
-            $this->line('Create Character: ' . $character->name);
+            $this->line('Created Character: ' . $character->name . ' who\'s email is: ' . $character->user->email);
 
             return;
         }

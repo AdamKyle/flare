@@ -27,8 +27,6 @@ class AlchemyController extends Controller {
             return response()->json(['message' => 'You must wait to craft again.'], 422);
         }
 
-        event(new CraftedItemTimeOutEvent($character));
-
         $this->alchemyService->transmute($character, $request->item_to_craft);
 
         return response()->json([

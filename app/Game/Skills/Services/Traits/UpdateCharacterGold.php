@@ -2,6 +2,9 @@
 
 namespace App\Game\Skills\Services\Traits;
 
+use App\Flare\Values\ArmourTypes;
+use App\Flare\Values\SpellTypes;
+use App\Flare\Values\WeaponTypes;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
@@ -15,14 +18,26 @@ trait UpdateCharacterGold {
      * Subtract cost from gold.
      *
      * @param Character $character
-     * @param int $cost
+     * @param Item $item
      * @return void
      * @throws Exception
      */
-    public function updateCharacterGold(Character $character, int $cost): void {
+    public function updateCharacterGold(Character $character, Item $item): void {
+
+        $cost = $item->cost;
 
         if ($character->classType()->isMerchant()) {
             $cost = floor($cost - $cost * 0.30);
+        }
+
+        if ($character->classType()->isBlacksmith() && (
+            WeaponTypes::isWeaponType($item->type) || ArmourTypes::isArmourType($item->type)
+        )) {
+            $cost = floor($cost - $cost * 0.25);
+        }
+
+        if ($character->classType()->isArcaneAlchemist() && SpellTypes::isSpellType($item->type)) {
+            $cost = floor($cost - $cost * 0.15);
         }
 
         $character->update([
@@ -72,6 +87,11 @@ trait UpdateCharacterGold {
         if ($character->classType()->isMerchant()) {
             $goldDustCost = floor($goldDustCost - $goldDustCost * 0.10);
             $shardsCost   = floor($shardsCost - $shardsCost * 0.10);
+        }
+
+        if ($character->classType()->isArcaneAlchemist()) {
+            $goldDustCost = floor($goldDustCost - $goldDustCost * 0.15);
+            $shardsCost   = floor($shardsCost - $shardsCost * 0.15);
         }
 
         $character->update([

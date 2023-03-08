@@ -7,6 +7,7 @@ use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
 use App\Flare\Models\Skill;
 use App\Flare\Events\UpdateSkillEvent;
+use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Skills\Services\Traits\SkillCheck;
@@ -53,6 +54,26 @@ class AlchemyService {
             }
         }
 
+        if ($character->classType()->isArcaneAlchemist()) {
+
+            $items = $items->transform(function($item) {
+                $goldDustCost = $item->gold_dust_cost;
+                $shardsCost   = $item->shards_cost;
+
+                $goldDustCost = $goldDustCost - $goldDustCost * 0.15;
+                $shardsCost   = $shardsCost - $shardsCost * 0.15;
+
+                $item->gold_dust_cost = $goldDustCost;
+                $item->shards_cost    = $shardsCost;
+
+                return $item;
+            });
+
+            if ($showMerchantMessage) {
+                event(new ServerMessageEvent($character->user, 'As a Arcane Alchemist you get 15% discount on creating alchemy items as well as a 15% Crafting Timeout Reduction. The discount has been applied to the items list.'));
+            }
+        }
+
         return $items;
     }
 
@@ -67,14 +88,27 @@ class AlchemyService {
             return;
         }
 
+        $setTime = null;
+
+        if ($character->classType()->isArcaneAlchemist() && $item->type === 'alchemy') {
+            ServerMessageHandler::sendBasicMessage($character->user, 'As a Arcane Alchemist, your crafting timeout for Alchemy items, is reduced by 15%.');
+
+            $setTime = floor(10 - 10 * 0.15);
+        }
+
+        event(new CraftedItemTimeOutEvent($character, null, $setTime));
+
         $goldDustCost = $item->gold_dust_cost;
         $shardsCost   = $item->shards_cost;
 
         if ($character->classType()->isMerchant()) {
             $goldDustCost = floor($goldDustCost - $goldDustCost * 0.10);
             $shardsCost   = floor($shardsCost - $shardsCost * 0.10);
+        }
 
-            ServerMessageHandler::sendBasicMessage($character->user, 'As a Merchant you get a 10% reduction on crafting alchemical items.');
+        if ($character->classType()->isArcaneAlchemist()) {
+            $goldDustCost = floor($goldDustCost - $goldDustCost * 0.15);
+            $shardsCost   = floor($shardsCost - $shardsCost * 0.15);
         }
 
         if ($goldDustCost > $character->gold_dust) {

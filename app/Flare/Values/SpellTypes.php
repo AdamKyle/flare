@@ -4,29 +4,23 @@ namespace App\Flare\Values;
 
 use Exception;
 
-class WeaponTypes {
+class SpellTypes {
 
     /**
      * @var string $value
      */
     private string $value;
 
-    const WEAPON = 'weapon';
-    CONST STAVE  = 'stave';
-    const HAMMER = 'hammer';
-    const BOW    = 'bow';
-    const RING   = 'ring';
+    const HEALING  = 'spell-healing';
+    const DAMAGE   = 'spell-damage';
 
 
     /**
      * @var string[] $values
      */
     protected static array $values = [
-        self::WEAPON => self::WEAPON,
-        self::STAVE  => self::STAVE,
-        self::HAMMER => self::HAMMER,
-        self::BOW    => self::BOW,
-        self::RING   => self::RING,
+        self::HEALING => self::HEALING,
+        self::DAMAGE  => self::DAMAGE,
     ];
 
     /**
@@ -42,12 +36,12 @@ class WeaponTypes {
     }
 
     /**
-     * is Valid Weapon?
+     * Is valid spell?
      *
      * @param string $type
      * @return bool
      */
-    public static function isWeaponType(string $type): bool {
+    public static function isSpellType(string $type): bool {
         return in_array($type, self::$values);
     }
 }

@@ -40,8 +40,6 @@ class CraftingController extends Controller {
             return response()->json(['message' => 'invalid input.'], 429);
         }
 
-        event(new CraftedItemTimeOutEvent($character));
-
         $craftingService->craft($character, $request->all());
 
         return response()->json([

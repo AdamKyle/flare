@@ -2,6 +2,11 @@
 
 namespace App\Game\Skills\Services;
 
+use App\Flare\Values\ArmourTypes;
+use App\Flare\Values\ItemUsabilityType;
+use App\Flare\Values\SpellTypes;
+use App\Flare\Values\WeaponTypes;
+use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
@@ -86,6 +91,8 @@ class CraftingService {
             return false;
         }
 
+        $this->handleCraftingTimeOut($character, $item);
+
         $cost = $this->getItemCost($character, $item);
 
         if ($cost > $character->gold) {
@@ -97,11 +104,54 @@ class CraftingService {
         return $this->attemptToCraftItem($character, $skill, $item);
     }
 
+    /**
+     * Handle crafting timeout.
+     *
+     * @param Character $character
+     * @param Item $item
+     * @return void
+     * @throws Exception
+     */
+    protected function handleCraftingTimeOut(Character $character, Item $item): void {
+        $craftingTimeOut = null;
+
+        if ($character->classType()->isBlacksmith() &&
+            (WeaponTypes::isWeaponType($item->type) ||
+                ArmourTypes::isArmourType($item->type)) )
+        {
+            ServerMessageHandler::sendBasicMessage($character->user, 'As a Blacksmith, your crafting timeout is reduced by 25% for weapons (including rings) and armour.');
+
+            $craftingTimeOut = ceil(10 - 10 * 0.25);
+        }
+
+        if ($character->classType()->isBlacksmith() && SpellTypes::isSpellType($item->type) )  {
+            ServerMessageHandler::sendBasicMessage($character->user, 'As a Blacksmith, your crafting timeout is increased by 25% for spell crafting.');
+
+            $craftingTimeOut = ceil(10 + 10 * 0.25);
+
+        }
+
+        if ($character->classType()->isArcaneAlchemist() && SpellTypes::isSpellType($item->type) )  {
+            ServerMessageHandler::sendBasicMessage($character->user, 'As a Arcane Alchemist, your crafting timeout is reduced by 15% for spell crafting.');
+
+            $craftingTimeOut = ceil(10 - 10 * 0.15);
+
+        }
+
+        event(new CraftedItemTimeOutEvent($character, null, $craftingTimeOut));
+    }
+
     protected function getItemCost(Character $character, Item $item): int {
         $cost = $item->cost;
 
         if ($character->classType()->isMerchant()) {
             $cost = floor($cost - $cost * 0.30);
+        }
+
+        if ($character->classType()->isBlacksmith() && (
+            WeaponTypes::isWeaponType($item->type) || ArmourTypes::isArmourType($item->type)
+        )) {
+            $cost = floor($cost - $cost * 0.25);
         }
 
         return $cost;
@@ -142,9 +192,7 @@ class CraftingService {
 
         ServerMessageHandler::handleMessage($character->user, 'failed_to_craft');
 
-        $cost = $this->getItemCost($character, $item);
-
-        $this->updateCharacterGold($character, $cost);
+        $this->updateCharacterGold($character, $item);
 
         return false;
     }
@@ -214,6 +262,38 @@ class CraftingService {
             }
         }
 
+        if ($character->classType()->isBlacksmith() && $craftingType !== 'spell') {
+            $items = $items->transform(function($item) {
+                $cost = $item->cost;
+
+                $cost = floor($cost - $cost * 0.25);
+
+                $item->cost = $cost;
+
+                return $item;
+            });
+
+            if ($merchantMessage) {
+                event(new ServerMessageEvent($character->user, 'As a Blacksmith, you get 25% reduction on crafting time out for weapons and armour, as well as cost reduction. Items in the list have been adjusted.'));
+            }
+        }
+
+        if ($character->classType()->isArcaneAlchemist() && $craftingType === 'spell') {
+            $items = $items->transform(function($item) {
+                $cost = $item->cost;
+
+                $cost = floor($cost - $cost * 0.15);
+
+                $item->cost = $cost;
+
+                return $item;
+            });
+
+            if ($merchantMessage) {
+                event(new ServerMessageEvent($character->user, 'As a Arcane Alchemist, you get 15% reduction on crafting time out for Spells, as well as cost reduction. Items in the list have been adjusted.'));
+            }
+        }
+
         return $items;
     }
 
@@ -239,7 +319,7 @@ class CraftingService {
             }
 
             if ($item->type !== 'trinket') {
-                $this->updateCharacterGold($character, $item->cost);
+                $this->updateCharacterGold($character, $item);
             }
         }
     }
