@@ -6,6 +6,7 @@ import Damage from "../damage";
 import {random} from "lodash";
 import BattleBase from "../../../battle-base";
 import {formatNumber} from "../../../../../format-number";
+import SpecialAttacks from "../special-attacks/special-attacks";
 
 export default class WeaponAttack extends BattleBase {
 
@@ -153,30 +154,49 @@ export default class WeaponAttack extends BattleBase {
   }
 
   extraAttacks(attackData, useClassSpecial) {
-    const damage = new Damage();
 
-    this.monsterHealth = damage.tripleAttackChance(this.attacker, this.monsterHealth, attackData);
-    this.monsterHealth = damage.doubleDamage(this.attacker, this.monsterHealth, attackData);
-    this.monsterHealth = damage.hammerSmash(this.attacker, this.monsterHealth, attackData);
-    this.monsterHealth = damage.alchemistsRavenousDream(this.attacker, this.monsterHealth, attackData)
-    this.monsterHealth = damage.prisonersRage(this.attacker, this.monsterHealth, attackData, attackData.damage_deduction);
-    this.monsterHealth = damage.merchantsSupply(this.attacker, this.monsterHealth, attackData, attackData.damage_deduction);
+    const specialAttacks = new SpecialAttacks(this.attacker, attackData, this.characterCurrentHealth, this.monsterHealth);
 
-    const result       = damage.bloodyPuke(this.attacker, this.monsterHealth, this.characterCurrentHealth, attackData, attackData.damage_deduction)
+    specialAttacks.doSpecialAttack();
 
-    this.monsterHealth          = result.monsterHealth;
-    this.characterCurrentHealth = result.attackerHealth
+    this.monsterHealth = specialAttacks.getMonsterHealth();
+    this.characterCurrentHealth = specialAttacks.getCharacterHealth();
 
-    const healthObject = damage.vampireThirstChance(this.attacker, this.monsterHealth, this.characterCurrentHealth, attackData.damage_deduction);
+    this.concatMessages(specialAttacks.getMessages());
 
-    this.monsterHealth          = healthObject.monster_hp;
-    this.characterCurrentHealth = healthObject.character_hp;
+    console.log('Battle Messages');
+    console.log(this.getMessages());
 
     if (useClassSpecial) {
       this.monsterHealth = this.handleClassSpecialAttackEquipped(attackData, this.monsterHealth)
     }
 
-    this.mergeMessages(damage.getMessages());
+    // const damage = new Damage();
+    //
+    // this.monsterHealth = damage.tripleAttackChance(this.attacker, this.monsterHealth, attackData);
+    // this.monsterHealth = damage.doubleDamage(this.attacker, this.monsterHealth, attackData);
+    // const hammerSmashResult = damage.hammerSmash(this.attacker, this.monsterHealth, attackData);
+    //
+    // this.characterCurrentHealth = hammerSmashResult.character_health;
+    // this.monsterHealth          = hammerSmashResult.monster_health;
+    //
+    // this.monsterHealth = damage.alchemistsRavenousDream(this.attacker, this.monsterHealth, attackData)
+    // this.monsterHealth = damage.prisonersRage(this.attacker, this.monsterHealth, attackData, attackData.damage_deduction);
+    // this.monsterHealth = damage.merchantsSupply(this.attacker, this.monsterHealth, attackData, attackData.damage_deduction);
+    //
+    // const result       = damage.bloodyPuke(this.attacker, this.monsterHealth, this.characterCurrentHealth, attackData, attackData.damage_deduction)
+    //
+    // this.monsterHealth          = result.monsterHealth;
+    // this.characterCurrentHealth = result.attackerHealth
+    //
+    // const healthObject = damage.vampireThirstChance(this.attacker, this.monsterHealth, this.characterCurrentHealth, attackData.damage_deduction);
+    //
+    // this.monsterHealth          = healthObject.monster_hp;
+    // this.characterCurrentHealth = healthObject.character_hp;
+    //
+
+    //
+    // this.mergeMessages(damage.getMessages());
   }
 
   canBlock(damage) {

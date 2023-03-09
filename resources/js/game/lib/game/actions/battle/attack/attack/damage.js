@@ -3,6 +3,7 @@ import {random} from "lodash";
 import BattleBase from "../../battle-base";
 import {formatNumber} from "../../../../format-number";
 import SpecialAttackClasses from "./special-attack-classes";
+import SpecialAttacks from "./special-attacks/special-attacks";
 
 export default class Damage extends BattleBase {
 
@@ -202,51 +203,6 @@ export default class Damage extends BattleBase {
     return healFor;
   }
 
-  hammerSmash(attacker, monsterCurrentHealth, attackData) {
-    if (SpecialAttackClasses.isBlackSmith(attacker.class)) {
-      const extraActionChance = attacker.extra_action_chance;
-
-      if (!this.canUse(extraActionChance.chance)) {
-        return monsterCurrentHealth;
-      }
-
-      if (extraActionChance.type === ExtraActionType.HAMMER_SMASH && extraActionChance.has_item) {
-        this.addMessage('You raise your mighty hammer high above your head and bring it crashing down!', 'regular');
-
-        let damage = attacker.str_modded * 0.30;
-
-        if (attackData.damage_reduction > 0.0) {
-          this.addMessage('The Plane weakens your ability to do full damage!', 'enemy-action');
-
-          damage -= damage * attackData.damage_reduction;
-        }
-
-        monsterCurrentHealth -= damage;
-
-        this.addMessage(attacker.name + ' hits for (Hammer): ' + formatNumber(damage), 'player-action');
-
-        let roll = random(1, 100);
-        roll += roll * 0.60;
-
-        if (roll > 99) {
-          this.addMessage('The enemy feels the aftershocks of the Hammer Smash!', 'regular');
-
-          for (let i = 3; i > 0; i--) {
-            damage -= damage * 0.15;
-
-            if (damage >= 1) {
-              monsterCurrentHealth -= damage;
-
-              this.addMessage('Aftershock hits for: ' + formatNumber(damage), 'player-action');
-            }
-          }
-        }
-      }
-    }
-
-    return monsterCurrentHealth;
-  }
-
   alchemistsRavenousDream(attacker, monsterCurrentHealth, attackData) {
     if (SpecialAttackClasses.isArcaneAlchemist(attacker.class)) {
       const extraActionChance = attacker.extra_action_chance;
@@ -296,67 +252,6 @@ export default class Damage extends BattleBase {
 
           times--;
           percent += 0.03;
-        }
-      }
-    }
-
-    return monsterCurrentHealth;
-  }
-
-  tripleAttackChance(attacker, monsterCurrentHealth, attackData) {
-    if (SpecialAttackClasses.isRanger(attacker.class)) {
-      const extraActionChance = attacker.extra_action_chance;
-
-      if (!this.canUse(extraActionChance.chance)) {
-        return monsterCurrentHealth;
-      }
-
-      if (extraActionChance.type === ExtraActionType.RANGER_TRIPLE_ATTACK && extraActionChance.has_item) {
-        this.addMessage('A fury takes over you. You notch the arrows thrice at the enemy\'s direction', 'regular');
-
-        for (let i = 1; i <= 3; i++) {
-          let totalDamage    = (attackData.weapon_damage + attackData.weapon_damage * .15).toFixed(0);
-
-          if (attackData.damage_reduction > 0.0) {
-            this.addMessage('The Plane weakens your ability to do full damage!', 'enemy-action');
-
-            totalDamage -= totalDamage * attackData.damage_reduction;
-          }
-
-          monsterCurrentHealth = monsterCurrentHealth - totalDamage;
-
-          this.addMessage(attacker.name + ' hits for (weapon - triple attack) ' + formatNumber(totalDamage));
-        }
-      }
-    }
-
-    return monsterCurrentHealth;
-  }
-
-  doubleDamage(attacker, monsterCurrentHealth, attackData) {
-    if (SpecialAttackClasses.isFighter(attacker.class)) {
-      const extraActionChance = attacker.extra_action_chance;
-
-      if (!this.canUse(extraActionChance.chance)) {
-        return monsterCurrentHealth;
-      }
-
-      if (extraActionChance.type === ExtraActionType.FIGHTERS_DOUBLE_DAMAGE && extraActionChance.has_item) {
-        this.addMessage('The strength of your rage courses through your veins!', 'regular');
-
-        let totalDamage = (attackData.weapon_damage + attackData.weapon_damage * .15).toFixed(0);
-
-        if (attackData.damage_reduction > 0.0) {
-          this.addMessage('The Plane weakens your ability to do full damage!', 'enemy-action');
-
-          totalDamage -= totalDamage * attackData.damage_reduction;
-        }
-
-        for (let i = 1; i <= 2; i++) {
-
-          monsterCurrentHealth = monsterCurrentHealth - totalDamage;
-
-          this.addMessage(attacker.name + ' hit for (weapon - double attack) ' + formatNumber(totalDamage), 'player-action');
         }
       }
     }

@@ -1,6 +1,7 @@
 import {BattleMessage} from "./types/battle-message-type";
 import CounterHandler from "./attack/attack/attack-types/ambush-and-counter/CounterHandler";
 import {formatNumber} from "../../format-number";
+import {random} from "lodash";
 
 export default class BattleBase {
 
@@ -37,8 +38,12 @@ export default class BattleBase {
         this.battle_messages = [...this.battle_messages, ...messagesToMerge];
     }
 
+    concatMessages(messagesToConcat: BattleMessage[]) {
+        this.battle_messages = this.battle_messages.concat(messagesToConcat);
+    }
+
     handleClassSpecialAttackEquipped(character: any, monsterHealth: number) {
-        
+
         if (character.special_damage.length == 0) {
             return monsterHealth;
         }
@@ -81,5 +86,26 @@ export default class BattleBase {
 
             return counter.getState();
         }
+    }
+
+    canUse(extraActionChance: number): boolean {
+
+        if (extraActionChance >= 1.0) {
+            return true;
+        }
+
+        const dc = Math.round(100 - (100 * extraActionChance));
+
+        return random(1, 100) > dc;
+    }
+
+    planeReduction(reduction: number, damage: number): number {
+        if (reduction > 0.0) {
+            this.addMessage('The Plane weakens your ability to do full damage!', 'enemy-action');
+
+            damage -= damage * reduction;
+        }
+
+        return damage;
     }
 }

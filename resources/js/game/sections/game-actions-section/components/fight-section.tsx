@@ -159,11 +159,7 @@ export default class FightSection extends React.Component<FightSectionProps, Fig
     }
 
     renderBattleMessages() {
-        return this.state.battle_messages.filter((value: BattleMessage, index: number, self: BattleMessage[]) => {
-            return index === self.findIndex((t: BattleMessage) => {
-                return t.message === value.message && t.type === value.type;
-            });
-        }).map((battleMessage: BattleMessage) => {
+        return this.state.battle_messages.map((battleMessage: BattleMessage) => {
             return <p className={clsx(
                 {
                     'text-green-700 dark:text-green-400': this.typeCheck(battleMessage.type, 'player-action')
@@ -207,8 +203,10 @@ export default class FightSection extends React.Component<FightSectionProps, Fig
             monsterHealth = this.state.monster_max_health;
         }
 
+        this.battle_messages = this.battle_messages.concat(attackState.battle_messages);
+
         this.setState({
-            battle_messages: [...this.battle_messages, ...attackState.battle_messages],
+            battle_messages: this.battle_messages,
             monster_current_health: monsterHealth,
             character_current_health: characterHealth,
         });

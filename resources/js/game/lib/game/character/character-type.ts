@@ -1,4 +1,6 @@
 import PositionType from "../types/map/position-type";
+import AttackTypes from "./attack-types";
+import ExtraActionType from "./extra-action-type";
 
 export interface CharacterType {
     id: number;
@@ -55,7 +57,7 @@ export interface CharacterType {
 
     heal_for: number;
 
-    attack_types: any;
+    attack_types: AttackTypes;
 
     base_stat: number;
 
@@ -93,7 +95,7 @@ export interface CharacterType {
 
     devouring_light_res: number;
 
-    extra_action_chance: any;
+    extra_action_chance: ExtraActionType;
 
     healing_reduction: number;
 

@@ -5,8 +5,11 @@ namespace App\Console\DevelopmentCommands;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
+use App\Flare\Values\ArmourTypes;
 use App\Flare\Values\ItemHolyValue;
 use App\Flare\Values\ItemSpecialtyType;
+use App\Flare\Values\SpellTypes;
+use App\Flare\Values\WeaponTypes;
 use Illuminate\Console\Command;
 
 class AssignTopEndGearToPlayer extends Command
@@ -69,10 +72,10 @@ class AssignTopEndGearToPlayer extends Command
         $bar = $this->output->createProgressBar(count($purgatoryGear));
 
         foreach ($purgatoryGear as $purgItem) {
-            if ($purgItem->type === 'shield' ||
-                $purgItem->type === 'spell-damage' ||
-                $purgItem->type === 'spell-healing' ||
-                $purgItem->type === 'ring')  {
+            if ($purgItem->type === ArmourTypes::SHIELD ||
+                $purgItem->type === SpellTypes::DAMAGE ||
+                $purgItem->type === SpellTypes::HEALING ||
+                $purgItem->type === WeaponTypes::RING)  {
 
                 $character->inventory->slots()->insert([
                     'inventory_id' => $character->inventory->id,
