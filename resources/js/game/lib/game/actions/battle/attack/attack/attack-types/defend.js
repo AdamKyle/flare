@@ -3,6 +3,7 @@ import CanEntranceEnemy from "./enchantments/can-entrance-enemy";
 import UseItems from "./use-items";
 import Damage from "../damage";
 import {formatNumber} from "../../../../../format-number";
+import SpecialAttacks from "../special-attacks/special-attacks";
 
 export default class Defend {
 
@@ -72,14 +73,15 @@ export default class Defend {
   }
 
   fireOffVampThirst(attackData) {
-    const damage = new Damage();
 
-    const health = damage.vampireThirstChance(this.attacker, this.monsterHealth, this.characterCurrentHealth, attackData.damage_deduction);
+    const specialAttacks = new SpecialAttacks(this.attacker, attackData, this.characterCurrentHealth, this.monsterHealth);
 
-    this.monsterHealth          = health.monster_hp;
-    this.characterCurrentHealth = health.character_hp;
+    specialAttacks.doSpecialAttack();
 
-    this.battleMessages = [...this.battleMessages, ...damage.getMessages()];
+    this.characterCurrentHealth = specialAttacks.getCharacterHealth();
+    this.monsterHealth          = specialAttacks.getMonsterHealth();
+
+    this.concatMessages(specialAttacks.getMessages());
   }
 
   handleClassSpecialAttackEquipped(character, monsterHealth) {
@@ -107,5 +109,9 @@ export default class Defend {
       message: message,
       type: type,
     });
+  }
+
+  concatMessages(messages) {
+    this.battleMessages = this.battleMessages.concat(messages);
   }
 }

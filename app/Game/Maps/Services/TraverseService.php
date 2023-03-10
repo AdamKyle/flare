@@ -294,6 +294,7 @@ class TraverseService {
      * Set the timeout for the character.
      *
      * @param Character $character
+     * @return Character
      */
     protected function updateCharacterTimeOut(Character $character): Character {
         $character->update([
@@ -301,9 +302,13 @@ class TraverseService {
             'can_move_again_at' => now()->addSeconds(10),
         ]);
 
+        $character = $character->refresh();
+
         event(new UpdateCharacterStatus($character));
 
         event(new MoveTimeOutEvent($character, 10, false, true));
+
+        return $character;
     }
 
     /**

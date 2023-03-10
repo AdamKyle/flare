@@ -84,7 +84,7 @@ class ClassBonusInformation {
         if ($classAttackValue->isArcaneAlchemist()) {
             $details['type'] = Str::ucfirst(ClassAttackValue::ARCANE_ALCHEMISTS_DREAMS);
             $details['requires'] = 'Stave';
-            $details['description'] = 'Every time you attack you have chance to, based on class bonus and with a stave equipped, to do Alchemists Ravenous Dream. This can do 10% of your int followed by an additional 3% for each additional attack between 2 and 6 times.';
+            $details['description'] = 'Every time you attack you have chance to, based on class bonus and with a stave equipped, to do Alchemists Ravenous Dream. This can do 10% of your int followed by a reduction of 3% for each additional attack between 2 and 6 times.';
         }
 
         if ($classAttackValue->isPrisoner()) {

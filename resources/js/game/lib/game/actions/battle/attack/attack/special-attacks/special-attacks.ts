@@ -6,6 +6,8 @@ import TripleAttack from "./attacks/triple-attack";
 import DoubleAttack from "./attacks/double-attack";
 import DoubleCast from "./attacks/double-cast";
 import DoubleHeal from "./attacks/double-heal";
+import AlchemistsRavenousDream from "./attacks/alchemists-ravenous-dream";
+import VampireThirst from "./attacks/vampire-thirst";
 
 type BattleMessages = {message: string, type: 'regular' | 'player-action' | 'enemy-action'}[]|[];
 
@@ -34,6 +36,8 @@ export default class SpecialAttacks {
         this.doubleAttack();
         this.doubleCast();
         this.doubleHeal();
+        this.alchemistsRavenousDream();
+        this.vampireThirst()
     }
 
     public getCharacterHealth(): number {
@@ -95,6 +99,29 @@ export default class SpecialAttacks {
             this.characterHealth = doubleHeal.handleAttack(this.character, this.attackData, this.extraActionChance, this.characterHealth);
 
             this.battleMessage = doubleHeal.getMessages();
+        }
+    }
+
+    protected alchemistsRavenousDream() {
+        if (SpecialAttackClasses.isArcaneAlchemist(this.character.class)) {
+            const alchemistsRavenousDream = new AlchemistsRavenousDream();
+
+            this.monsterHealth = alchemistsRavenousDream.handleAttack(this.character, this.attackData, this.extraActionChance, this.monsterHealth);
+
+            this.battleMessage = alchemistsRavenousDream.getMessages();
+        }
+    }
+
+    protected vampireThirst() {
+        if (SpecialAttackClasses.isVampire(this.character.class)) {
+            const vampireThirst = new VampireThirst();
+
+            const result        = vampireThirst.handleAttack(this.character, this.attackData, this.extraActionChance, this.monsterHealth, this.characterHealth);
+
+            this.monsterHealth   = result.monster_health;
+            this.characterHealth = result.character_health;
+
+            this.battleMessage = vampireThirst.getMessages();
         }
     }
 }
