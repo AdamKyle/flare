@@ -159,7 +159,7 @@ export default class Monster extends BattleBase {
             const newMonster = this.reduceAllStats(monster, statReduction);
 
             if (!newMonster) {
-                this.addMessage(this.name() + ' laughs at your attempt to make them weak (All Stat Reduction Failed).', 'regular')
+                this.addMessage(this.name() + ' laughs at your attempt to make them weak (All Stat Reduction Failed).', 'enemy-action')
             } else {
                 this.addMessage(this.name() + ' sinks to their knees in agony!', 'player-action')
 
@@ -171,7 +171,7 @@ export default class Monster extends BattleBase {
             const newMonster = this.nonStackingStatReducingAffixes(monster, statReduction);
 
             if (!newMonster) {
-                this.addMessage(this.name() + ' laughs at your attempt to make them weak (Stat Reduction Failed).', 'regular')
+                this.addMessage(this.name() + ' laughs at your attempt to make them weak (Stat Reduction Failed).', 'enemy-action')
             } else {
                 this.addMessage(this.name() + ' cries out for mercy!', 'player-action')
 

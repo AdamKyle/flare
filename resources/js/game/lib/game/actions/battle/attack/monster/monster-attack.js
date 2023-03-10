@@ -63,7 +63,7 @@ export default class MonsterAttack extends BattleBase {
         }
 
         if (this.canDoCritical(monster)) {
-          this.addMessage(monster.name + ' grows enraged and lashes out with all fury! (Critical Strike!)', 'regular')
+          this.addMessage(monster.name + ' grows enraged and lashes out with all fury! (Critical Strike!)', 'enemey-action')
 
           damage = damage * 2;
         }
@@ -88,7 +88,7 @@ export default class MonsterAttack extends BattleBase {
         return this.setState()
 
       } else {
-        this.addMessage(monster.name + ' missed!', 'regular');
+        this.addMessage(monster.name + ' missed!', 'enemy-action');
 
         this.useItems(monster, isCharacterVoided, isMonsterVoided, previousAttackType);
 
@@ -198,7 +198,7 @@ export default class MonsterAttack extends BattleBase {
 
   fireOffSpells(attacker, defender, isCharacterVoided, previousAttackType) {
     if (!this.canCastSpells(attacker, defender, isCharacterVoided)) {
-      this.addMessage(attacker.name + '\'s Spells fizzle and fail to fire.', 'regular');
+      this.addMessage(attacker.name + '\'s Spells fizzle and fail to fire.', 'enemy-action');
 
       return;
     }

@@ -6,6 +6,8 @@ import Damage from "../damage";
 import {random} from "lodash";
 import BattleBase from "../../../battle-base";
 import {formatNumber} from "../../../../../format-number";
+import SpecialAttacks from "../special-attacks/special-attacks";
+import SpecialAttackClasses from "../special-attack-classes";
 
 export default class CastAttack extends BattleBase {
 
@@ -47,7 +49,7 @@ export default class CastAttack extends BattleBase {
       }
 
       if (attackData.heal_for > 0) {
-        this.healWithSpells(attackData);
+        this.healWithSpells(attackData, true);
       }
 
       this.useItems(attackData, this.attacker.class);
@@ -58,14 +60,14 @@ export default class CastAttack extends BattleBase {
     if (canEntrance) {
       this.mergeMessages(canEntranceEnemy.getBattleMessages());
 
-      const status = this.attackWithSpells(attackData, true, false);
+      const status = this.attackWithSpells(attackData, true, true);
 
       if (!status) {
         return this.setState();
       }
 
       if (attackData.heal_for > 0) {
-        this.healWithSpells(attackData);
+        this.healWithSpells(attackData, true);
       }
 
       this.useItems(attackData, this.attacker.class);
@@ -82,7 +84,7 @@ export default class CastAttack extends BattleBase {
           this.addMessage(this.defender.name + ' blocked your damaging spell!', 'enemy-action');
 
           if (attackData.heal_for > 0) {
-            this.healWithSpells(attackData);
+            this.healWithSpells(attackData, true);
           }
 
           this.useItems(attackData, this.attacker.class);
@@ -90,26 +92,26 @@ export default class CastAttack extends BattleBase {
           return this.setState();
         }
 
-        const status = this.attackWithSpells(attackData, false, false);
+        const status = this.attackWithSpells(attackData, false, true);
 
         if (!status) {
           return this.setState();
         }
 
-        this.healWithSpells(attackData);
+        this.healWithSpells(attackData, true);
 
         this.useItems(attackData, this.attacker.class)
       } else {
         this.addMessage('Your damage spell missed!', 'enemy-action');
 
         if (attackData.heal_for > 0) {
-          this.healWithSpells(attackData);
+          this.healWithSpells(attackData, true);
         }
 
         this.useItems(attackData, this.attacker.class);
       }
     } else {
-      this.healWithSpells(attackData);
+      this.healWithSpells(attackData, true);
 
       this.useItems(attackData, this.attacker.class)
     }
@@ -181,12 +183,14 @@ export default class CastAttack extends BattleBase {
       }
     }
 
-    this.extraAttacks(attackData, canUseClassSpecial);
+    if (attackData.heal_for <= 0 || SpecialAttackClasses.isHeretic(this.attacker.class)) {
+      this.extraAttacks(attackData, canUseClassSpecial);
+    }
 
     return true;
   }
 
-  healWithSpells(attackData) {
+  healWithSpells(attackData, shouldDoExtraAttack) {
 
     const skillBonus = this.attacker.skills.criticality;
 
@@ -207,7 +211,9 @@ export default class CastAttack extends BattleBase {
       this.addMessage('Your healing spell(s) heals you for: ' + formatNumber(healFor.toFixed(0)), 'player-action');
     }
 
-    this.extraHealing(attackData);
+    if (shouldDoExtraAttack) {
+      this.extraAttacks(attackData, shouldDoExtraAttack);
+    }
   }
 
   useItems(attackData, attackerClass) {
@@ -223,33 +229,18 @@ export default class CastAttack extends BattleBase {
   }
 
   extraAttacks(attackData, canUseClassSpecial) {
-    const damage = new Damage();
+    const specialAttacks = new SpecialAttacks(this.attacker, attackData, this.characterCurrentHealth, this.monsterHealth);
 
-    this.monsterHealth = damage.doubleCastChance(this.attacker, attackData, this.monsterHealth);
+    specialAttacks.doSpecialAttack();
 
-    const health = damage.vampireThirstChance(this.attacker, this.monsterHealth, this.characterCurrentHealth, attackData.damage_deduction);
+    this.characterCurrentHealth = specialAttacks.getCharacterHealth();
+    this.monsterHealth          = specialAttacks.getMonsterHealth();
 
-    this.monsterHealth          = health.monster_hp;
-    this.characterCurrentHealth = health.character_hp;
+    this.concatMessages(specialAttacks.getMessages());
 
     if (canUseClassSpecial) {
       this.monsterHealth = this.handleClassSpecialAttackEquipped(attackData, this.monsterHealth)
     }
-
-    this.mergeMessages(damage.getMessages());
-  }
-
-  extraHealing(attackData) {
-    const damage = new Damage();
-
-    this.characterCurrentHealth = damage.doubleHeal(this.attacker, this.characterCurrentHealth, attackData, true);
-
-    const health = damage.vampireThirstChance(this.attacker, this.monsterHealth, this.characterCurrentHealth, attackData.damage_deduction);
-
-    this.monsterHealth          = health.monster_hp;
-    this.characterCurrentHealth = health.character_hp;
-
-    this.mergeMessages(damage.getMessages());
   }
 
   canBlock() {

@@ -77,15 +77,14 @@ class AssignTopEndGearToPlayer extends Command
                 $purgItem->type === SpellTypes::HEALING ||
                 $purgItem->type === WeaponTypes::RING)  {
 
-                $character->inventory->slots()->insert([
-                    'inventory_id' => $character->inventory->id,
-                    'item_id'      => $this->modifyItem($purgItem, $prefix, $suffix)->id,
-                ], [
-                    'inventory_id' => $character->inventory->id,
-                    'item_id'      => $this->modifyItem($purgItem, $prefix, $suffix)->id,
-                ]);
+                for ($i = 1; $i <= 2; $i++) {
+                    $character->inventory->slots()->create([
+                        'inventory_id' => $character->inventory->id,
+                        'item_id'      => $this->modifyItem($purgItem, $prefix, $suffix)->id,
+                    ]);
 
-                $character = $character->refresh();
+                    $character = $character->refresh();
+                }
 
                 $bar->advance();
 

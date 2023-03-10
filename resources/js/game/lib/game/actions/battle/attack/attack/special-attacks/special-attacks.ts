@@ -4,6 +4,8 @@ import AttackType from "../../../../../character/attack-type";
 import HammerSmash from "./attacks/hammer-smash";
 import TripleAttack from "./attacks/triple-attack";
 import DoubleAttack from "./attacks/double-attack";
+import DoubleCast from "./attacks/double-cast";
+import DoubleHeal from "./attacks/double-heal";
 
 type BattleMessages = {message: string, type: 'regular' | 'player-action' | 'enemy-action'}[]|[];
 
@@ -30,6 +32,8 @@ export default class SpecialAttacks {
         this.handleBlackSmith();
         this.tripleAttack();
         this.doubleAttack();
+        this.doubleCast();
+        this.doubleHeal();
     }
 
     public getCharacterHealth(): number {
@@ -71,6 +75,26 @@ export default class SpecialAttacks {
             this.monsterHealth = doubleAttack.handleAttack(this.character, this.attackData, this.extraActionChance, this.monsterHealth);
 
             this.battleMessage = doubleAttack.getMessages();
+        }
+    }
+
+    protected doubleCast() {
+        if (SpecialAttackClasses.isHeretic(this.character.class)) {
+            const doubleCast = new DoubleCast();
+
+            this.monsterHealth = doubleCast.handleAttack(this.character, this.attackData, this.extraActionChance, this.monsterHealth);
+
+            this.battleMessage = doubleCast.getMessages();
+        }
+    }
+
+    protected doubleHeal() {
+        if (SpecialAttackClasses.isProphet(this.character.class)) {
+            const doubleHeal = new DoubleHeal();
+
+            this.characterHealth = doubleHeal.handleAttack(this.character, this.attackData, this.extraActionChance, this.characterHealth);
+
+            this.battleMessage = doubleHeal.getMessages();
         }
     }
 }

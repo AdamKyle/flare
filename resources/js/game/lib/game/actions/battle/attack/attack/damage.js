@@ -259,34 +259,6 @@ export default class Damage extends BattleBase {
     return monsterCurrentHealth;
   }
 
-  doubleCastChance(attacker, attackData, monsterCurrentHealth) {
-    if (SpecialAttackClasses.isHeretic(attacker.class)) {
-      const extraActionChance = attacker.extra_action_chance;
-
-      if (!this.canUse(extraActionChance.chance)) {
-        return monsterCurrentHealth;
-      }
-
-      if (extraActionChance.type === ExtraActionType.HERETICS_DOUBLE_CAST && extraActionChance.has_item) {
-        this.addMessage('Magic crackles through the air as you cast again!', 'regular');
-
-        let totalDamage     = attackData.spell_damage + attackData.spell_damage * 0.15;
-
-        if (attackData.damage_reduction > 0.0) {
-          this.addMessage('The Plane weakens your ability to do full damage!', 'enemy-action');
-
-          totalDamage -= totalDamage * attackData.damage_reduction;
-        }
-
-        monsterCurrentHealth -= totalDamage;
-
-        this.addMessage('Your spell(s) hits for: ' +  formatNumber(totalDamage), 'player-action');
-      }
-    }
-
-    return monsterCurrentHealth;
-  }
-
   doubleHeal(attacker, characterCurrentHealth, attackData, extraHealing) {
     if (SpecialAttackClasses.isProphet(attacker.class)) {
       const extraActionChance = attacker.extra_action_chance;

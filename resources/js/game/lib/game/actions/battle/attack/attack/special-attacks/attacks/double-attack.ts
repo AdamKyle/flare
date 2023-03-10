@@ -21,7 +21,7 @@ export default class DoubleAttack extends BattleBase {
         }
 
         if (extraAction.type === SpecialType.FIGHTERS_DOUBLE_DAMAGE && extraAction.has_item) {
-            this.addMessage('A fury takes over you. You notch the arrows thrice at the enemy\'s direction', 'regular');
+            this.addMessage('The strength of your rage courses through your veins!', 'regular');
 
             let damage = attackType.weapon_damage + attackType.weapon_damage * 0.15
 
