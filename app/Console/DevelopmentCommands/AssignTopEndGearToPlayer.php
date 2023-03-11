@@ -73,6 +73,7 @@ class AssignTopEndGearToPlayer extends Command
 
         foreach ($purgatoryGear as $purgItem) {
             if ($purgItem->type === ArmourTypes::SHIELD ||
+                $purgItem->type === WeaponTypes::WEAPON ||
                 $purgItem->type === SpellTypes::DAMAGE ||
                 $purgItem->type === SpellTypes::HEALING ||
                 $purgItem->type === WeaponTypes::RING)  {

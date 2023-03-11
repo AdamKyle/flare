@@ -8,6 +8,9 @@ import DoubleCast from "./attacks/double-cast";
 import DoubleHeal from "./attacks/double-heal";
 import AlchemistsRavenousDream from "./attacks/alchemists-ravenous-dream";
 import VampireThirst from "./attacks/vampire-thirst";
+import PrisonerRage from "./attacks/prisoner-rage";
+import BloodyPuke from "./attacks/bloody-puke";
+import MerchantsSupply from "./attacks/merchants-supply";
 
 type BattleMessages = {message: string, type: 'regular' | 'player-action' | 'enemy-action'}[]|[];
 
@@ -37,7 +40,10 @@ export default class SpecialAttacks {
         this.doubleCast();
         this.doubleHeal();
         this.alchemistsRavenousDream();
-        this.vampireThirst()
+        this.vampireThirst();
+        this.prisonersRage();
+        this.bloodyPuke();
+        this.merchantsSupply();
     }
 
     public getCharacterHealth(): number {
@@ -122,6 +128,39 @@ export default class SpecialAttacks {
             this.characterHealth = result.character_health;
 
             this.battleMessage = vampireThirst.getMessages();
+        }
+    }
+
+    protected prisonersRage() {
+        if (SpecialAttackClasses.isPrisoner(this.character.class)) {
+            const prisonerRage = new PrisonerRage();
+
+            this.monsterHealth = prisonerRage.handleAttack(this.character, this.attackData, this.extraActionChance, this.monsterHealth);
+
+            this.battleMessage = prisonerRage.getMessages();
+        }
+    }
+
+    protected bloodyPuke() {
+        if (SpecialAttackClasses.isAlcoholic(this.character.class)) {
+            const bloodyPuke = new BloodyPuke();
+
+            const result         = bloodyPuke.handleAttack(this.character, this.attackData, this.extraActionChance, this.monsterHealth, this.characterHealth);
+
+            this.monsterHealth   = result.monster_health;
+            this.characterHealth = result.character_health;
+
+            this.battleMessage   = bloodyPuke.getMessages();
+        }
+    }
+
+    protected merchantsSupply() {
+        if (SpecialAttackClasses.isMerchant(this.character.class)) {
+            const merchantsSupply = new MerchantsSupply();
+
+            this.monsterHealth = merchantsSupply.handleAttack(this.character, this.attackData, this.extraActionChance, this.monsterHealth);
+
+            this.battleMessage = merchantsSupply.getMessages();
         }
     }
 }

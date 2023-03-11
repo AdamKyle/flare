@@ -35,4 +35,12 @@ export default class SpecialType {
     static get PRISONER_RAGE() {
         return 'prisoner rage';
     }
+
+    static get BLOODY_PUKE() {
+        return 'alcoholic puke';
+    }
+
+    static get MERCHANTS_SUPPLY() {
+        return 'merchants supply';
+    }
 }

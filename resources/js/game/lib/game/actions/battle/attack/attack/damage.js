@@ -3,7 +3,6 @@ import {random} from "lodash";
 import BattleBase from "../../battle-base";
 import {formatNumber} from "../../../../format-number";
 import SpecialAttackClasses from "./special-attack-classes";
-import SpecialAttacks from "./special-attacks/special-attacks";
 
 export default class Damage extends BattleBase {
 
@@ -201,113 +200,6 @@ export default class Damage extends BattleBase {
     this.addMessage('Your healing spell(s) heals for an additional: ' + formatNumber(parseInt(healFor.toFixed(0))), 'player-action');
 
     return healFor;
-  }
-
-
-  prisonersRage(attacker, monsterCurrentHealth, attackData, damageDeduction) {
-    if (SpecialAttackClasses.isPrisoner(attacker.class)) {
-
-      const extraActionChance = attacker.extra_action_chance;
-
-      if (!this.canUse(extraActionChance.chance)) {
-        return monsterCurrentHealth;
-      }
-
-      this.addMessage('You cannot let them keep you prisoner! Lash out and kill!', 'regular');
-
-      let strAmount  = attacker.str_modded * 0.15;
-      let damageToDo = (attackData.weapon_damage + strAmount);
-
-      if (damageDeduction > 0.0) {
-        this.addMessage('The Plane weakens your ability to do full damage!', 'enemy-action');
-        damageToDo = damageToDo - (damageToDo * damageDeduction);
-      }
-
-      const times = Math.random(1, 4);
-
-      for (let i = 0; i <= times; i++) {
-          monsterCurrentHealth = monsterCurrentHealth - damageToDo;
-
-        this.addMessage('You slash, you thrash, you bash and you crash your way through! (You dealt: '+formatNumber(damageToDo)+')', 'player-action');
-      }
-    }
-
-    return monsterCurrentHealth
-  }
-
-  bloodyPuke(attacker, monsterCurrentHealth, attackerCurrentHealth, attackData, damageDeduction) {
-    if (SpecialAttackClasses.isAlcoholic(attacker.class)) {
-      const extraActionChance = attacker.extra_action_chance;
-
-      if (!this.canUse(extraActionChance.chance)) {
-        return monsterCurrentHealth;
-      }
-
-      this.addMessage('You drink and you drink and you drink ...', 'player-action');
-
-      let damageToDo     = attacker.dur_modded * 0.30;
-      let damageToSuffer = attacker.dur_modded * 0.15;
-
-      if (damageDeduction > 0.0) {
-        this.addMessage('The Plane weakens your ability to do full damage! You will still suffer the 15% damage for vomiting blood.', 'enemy-action');
-        damageToDo = damageToDo - (damageToDo * damageDeduction);
-      }
-
-      this.addMessage('You cannot hold it in, you vomit blood and bile so acidic your enemy cannot handle it! (You dealt: '+formatNumber(damageToDo)+')', 'player-action');
-      this.addMessage('You lost a lot of blood in your attack. You took: ' + formatNumber(damageToSuffer) + ' damage.', 'enemy-action');
-
-      return {
-        monsterHealth: monsterCurrentHealth - damageToDo,
-        attackerHealth: attackerCurrentHealth - damageToSuffer
-      }
-    }
-
-    return {
-      monsterHealth:  monsterCurrentHealth,
-      attackerHealth: attackerCurrentHealth,
-    }
-  }
-
-  merchantsSupply(attacker, monsterCurrentHealth, attackData, damageDeduction) {
-
-    if (SpecialAttackClasses.isMerchant(attacker.class)) {
-      const extraActionChance = attacker.extra_action_chance;
-
-      if (!this.canUse(extraActionChance.chance)) {
-        return monsterCurrentHealth;
-      }
-
-      this.addMessage('You stare the enemy down as pull a coin out of your pocket to flip ...', 'player-action');
-
-      const chance = random(1, 100);
-      let damage = attackData.weapon_damage;
-
-      if (chance > 50) {
-         damage = damage * 4;
-
-        if (damageDeduction > 0.0) {
-          this.addMessage('The Plane weakens your ability to do full damage!', 'enemy-action');
-          damage = damage - (damage * damageDeduction);
-        }
-
-         monsterCurrentHealth = monsterCurrentHealth - damage;
-
-        this.addMessage('You flip the coin: Heads! You do 4x the damage for a total of: ' + formatNumber(damage), 'player-action');
-      } else {
-        damage = damage * 2;
-
-        if (damageDeduction > 0.0) {
-          this.addMessage('The Plane weakens your ability to do full damage!', 'enemy-action');
-          damage = damage - (damage * damageDeduction);
-        }
-
-        monsterCurrentHealth = monsterCurrentHealth - damage;
-
-        this.addMessage('You flip the coin: Tails! You do 2x the damage for a total of: ' + formatNumber(damage), 'player-action');
-      }
-    }
-
-    return monsterCurrentHealth;
   }
 
   canUse(extraActionChance) {

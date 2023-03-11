@@ -22,7 +22,7 @@ class ClassAttackValue {
     const ARCANE_ALCHEMISTS_DREAMS = 'alchemists ravenous dream';
     const PRISONER_RAGE            = 'prisoner rage';
     const ALCOHOLIC_PUKE           = 'alcoholic puke';
-    const MERCHANTS_SUPPLY         = 'Merchants supply';
+    const MERCHANTS_SUPPLY         = 'merchants supply';
 
     private CharacterClassValue $classType;
 
