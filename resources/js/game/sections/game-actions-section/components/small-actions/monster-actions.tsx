@@ -98,7 +98,7 @@ export default class MonsterActions extends React.Component<MonsterActionsProps,
                 }).doAjaxCall('post', (result: AxiosResponse) => {
                     component.setState({
                         processing_rank_battle: false,
-                        battle_messages: result.data.messages,
+                        battle_messages: [...component.state.battle_messages, ...result.data.messages],
                         character_current_health: result.data.health.character_health,
                         monster_current_health: result.data.health.monster_health,
                     });

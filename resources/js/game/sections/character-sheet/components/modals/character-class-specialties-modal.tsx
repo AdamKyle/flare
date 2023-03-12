@@ -75,13 +75,19 @@ export default class CharacterClassSpecialtiesModal extends React.Component<Clas
 
         (new Ajax()).setRoute('class-ranks/'+this.props.character.id+'/specials')
                     .doAjaxCall('get', (response: AxiosResponse) => {
+
                         this.setState({
                             loading: false,
                             class_specialties: response.data.class_specialties,
                             class_specials_for_table: response.data.class_specialties,
                             specialties_equipped: response.data.specials_equipped,
                             class_ranks: response.data.class_ranks,
-                            other_class_specialties: response.data.other_class_specials
+                            other_class_specialties: response.data.other_class_specials,
+                            selected_filter: this.props.character === null ? null : this.props.character.class,
+                            other_selected_filter: this.props.character === null ? null : this.props.character.class,
+                        }, () => {
+                            this.filterTable();
+                            this.filterOtherClassSpecialsTable();
                         });
                     }, (error: AxiosError) => {
                         console.error(error);

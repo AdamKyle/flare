@@ -104,7 +104,6 @@ class RankFightService {
         $health   = $data['health'];
 
         $messages = $monsterPlayerFight->getBattleMessages();
-        $messages = [...$data['opening_messages'], ...$messages];
 
         if ($health['character_health'] <= 0) {
             $health['character_health'] = 0;
