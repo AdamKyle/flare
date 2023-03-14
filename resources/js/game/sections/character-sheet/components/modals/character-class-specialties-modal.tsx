@@ -281,6 +281,14 @@ export default class CharacterClassSpecialtiesModal extends React.Component<Clas
         });
     }
 
+    doesSpecialtyDealDamage(specialty: ClassSpecialtiesType): boolean {
+        if (specialty.specialty_damage !== null) {
+            return specialty.specialty_damage > 0;
+        }
+
+        return false;
+    }
+
     classSpecialtiesTable() {
 
         return [
@@ -303,17 +311,24 @@ export default class CharacterClassSpecialtiesModal extends React.Component<Clas
                 selector: (row: ClassSpecialtiesType) => row.requires_class_rank_level,
             },
             {
+                name: 'Deals Damage',
+                selector: (row: ClassSpecialtiesType) => this.doesSpecialtyDealDamage(row) ? 'Yes' : 'No'
+            },
+            {
                 name: 'Actions',
                 selector: (row: ClassSpecialtiesType) => row.id,
                 cell: (row: ClassSpecialtiesType) => <Fragment>
                     {
                         this.specialtyIsEquipped(row.id) ?
-                            <span>Specialty is equipped</span>
+                            <span className='text-green-500 dark:text-green-400'>Specialty is equipped</span>
                         :
-                            <PrimaryButton button_label={this.state.equipping && this.state.equipping_special_id === row.id ? <Fragment><i className="fas fa-spinner fa-spin"></i> Equip</Fragment> : 'Equip'}
-                                           on_click={() => this.equipSpecial(row.id)}
-                                           disabled={this.isEquipButtonDisabled(row.requires_class_rank_level, row.game_class_id)}
-                            />
+                            this.hasDamageSpecialtyEquipped(row) ?
+                                <span className='text-red-500 dark:text-red-400'>You already have a damage specialty equipped.</span>
+                            :
+                                <PrimaryButton button_label={this.state.equipping && this.state.equipping_special_id === row.id ? <Fragment><i className="fas fa-spinner fa-spin"></i> Equip</Fragment> : 'Equip'}
+                                               on_click={() => this.equipSpecial(row.id)}
+                                               disabled={this.isEquipButtonDisabled(row.requires_class_rank_level, row.game_class_id)}
+                                />
                     }
                 </Fragment>
             },
@@ -352,18 +367,25 @@ export default class CharacterClassSpecialtiesModal extends React.Component<Clas
                 </Fragment>
             },
             {
+                name: 'Deals Damage',
+                selector: (row: ClassSpecialtiesType) => this.doesSpecialtyDealDamage(row) ? 'Yes' : 'No'
+            },
+            {
                 name: 'Actions',
                 selector: (row: CharacterSpecialsEquippedTyp) => row.id,
                 cell: (row: CharacterSpecialsEquippedTyp) => <Fragment>
                     {
                         equipSpecial ?
                             this.specialtyIsEquipped(row.id) ?
-                                <span>Specialty is equipped</span>
+                                <span className='text-green-500 dark:text-green-400'>Specialty is equipped</span>
                             :
-                                <PrimaryButton button_label={this.state.equipping && this.state.equipping_special_id === row.game_class_special_id ? <Fragment><i className="fas fa-spinner fa-spin"></i> Equip</Fragment> : 'Equip'}
-                                               on_click={() => this.equipSpecial(row.game_class_special_id)}
-                                               disabled={this.isEquipButtonDisabled(row.game_class_special.requires_class_rank_level, row.game_class_special.game_class_id)}
-                                />
+                                this.hasDamageSpecialtyEquipped(row) ?
+                                    <span className='text-red-500 dark:text-red-400'>You already have a damage specialty equipped.</span>
+                                :
+                                    <PrimaryButton button_label={this.state.equipping && this.state.equipping_special_id === row.game_class_special_id ? <Fragment><i className="fas fa-spinner fa-spin"></i> Equip</Fragment> : 'Equip'}
+                                                   on_click={() => this.equipSpecial(row.game_class_special_id)}
+                                                   disabled={this.isEquipButtonDisabled(row.game_class_special.requires_class_rank_level, row.game_class_special.game_class_id)}
+                                    />
                         :
                             <PrimaryButton button_label={this.state.equipping && this.state.equipping_special_id === row.id ? <Fragment><i className="fas fa-spinner fa-spin"></i> Unequip</Fragment> : 'Unequip'}
                                            on_click={() => this.unequipSpecial(row.id)}
@@ -398,6 +420,16 @@ export default class CharacterClassSpecialtiesModal extends React.Component<Clas
             equipped_special: equippedSpecialty,
             show_equipped: showIsEquipped,
         })
+    }
+
+    hasDamageSpecialtyEquipped(data: CharacterSpecialsEquippedTyp|ClassSpecialtiesType): boolean {
+        return this.state.specialties_equipped.some((equipped: CharacterSpecialsEquippedTyp) => {
+            if (equipped.specialty_damage !== null && data.specialty_damage !== null) {
+                return equipped.specialty_damage > 0
+            }
+
+            return false;
+        });
     }
 
     renderSpecialty() {

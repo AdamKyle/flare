@@ -48,7 +48,7 @@ class PrisonerRage extends BattleBase {
         $this->addMessage('You slash, you thrash, you bash and you crash your way through! (You dealt: '.number_format($damage).')', 'player-action', $isPvp);
 
         if ($isPvp) {
-            $this->addDefenderMessage('The enemy has refused to allow you to make them your prisoner. Death is coming! Damage dealt: ' . number_formart($damage), 'enemey-action');
+            $this->addDefenderMessage('The enemy has refused to allow you to make them your prisoner. Death is coming! Damage dealt: ' . number_format($damage), 'enemy-action');
         }
     }
 }

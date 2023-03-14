@@ -2,6 +2,8 @@
 
 namespace App\Flare\Providers;
 
+use App\Game\Skills\Builders\GemBuilder;
+use App\Game\Skills\Services\GemService;
 use Illuminate\Support\Facades\Blade;
 use League\Fractal\Manager;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
@@ -477,6 +479,16 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(HolyBuilder::class),
                 $app->make(ReductionsBuilder::class),
             );
+        });
+
+        $this->bind(GemService::class, function($app) {
+            return new GemService(
+                $app->make(GemBuilder::class)
+            );
+        });
+
+        $this->bind(GemBuilder::class, function() {
+            return new GemBuilder();
         });
     }
 

@@ -65,7 +65,7 @@ class Attack {
     }
 
     public function mergeBattleMessages(array $messages): void {
-        $this->battleMessages = [...$this->battleMessages, ...$messages];
+        $this->battleMessages = array_merge($this->battleMessages, $messages);
     }
 
     public function resetBattleMessages(): void {

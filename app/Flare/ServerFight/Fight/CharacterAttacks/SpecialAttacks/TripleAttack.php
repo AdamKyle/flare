@@ -44,7 +44,7 @@ class TripleAttack extends BattleBase {
         $this->addMessage('You hit for (weapon - triple attack) ' . number_format($damage), 'player-action', $isPvp);
 
         if ($isPvp) {
-            $this->addDefenderMessage('The enemies arrows fly at you in a fury, doing: ' . number_formart($damage), 'enemey-action');
+            $this->addDefenderMessage('The enemies arrows fly at you in a fury, doing: ' . number_format($damage), 'enemy-action');
         }
     }
 }

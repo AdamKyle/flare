@@ -46,7 +46,7 @@ class BloodyPuke extends BattleBase {
         $this->addMessage('You lost a lot of blood in your attack. (You took: '.number_format($damageToSuffer).')', 'enemy-action');
 
         if ($isPvp) {
-            $this->addDefenderMessage('The enemy has vomited their bloody acidic bile all over you! The smell alone makes you vomit. Damage dealt: ' . number_formart($damage), 'enemey-action');
+            $this->addDefenderMessage('The enemy has vomited their bloody acidic bile all over you! The smell alone makes you vomit. Damage dealt: ' . number_format($damage), 'enemy-action');
         }
     }
 }

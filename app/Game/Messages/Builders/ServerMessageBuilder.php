@@ -102,6 +102,8 @@ class ServerMessageBuilder {
                 return 'You got: ' . $forMessage . ' Gold Dust from the daily lottery';
             case 'transmuted':
                 return 'You transmuted a new: ' . $forMessage . ' It shines with a powerful glow!';
+            case 'crafted_gem':
+                return 'You buff, polish, cut, inspect and are finally proud to call this gem your own! You created a: ' . $forMessage;
             case 'enchantment_failed':
             case 'silenced':
             case 'deleted_affix':

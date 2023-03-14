@@ -23,11 +23,11 @@ class PvpMessages {
     }
 
     public function mergeAttackerMessages(array $messages) {
-        $this->attackerMessages = [...$this->attackerMessages, ...$messages];
+        $this->attackerMessages = array_merge($this->attackerMessages, $messages);
     }
 
     public function mergeDefenderMessages(array $messages) {
-        $this->defenderMessages = [...$this->defenderMessages, ...$messages];
+        $this->defenderMessages = array_merge($this->defenderMessages, $messages);
     }
 
     public function getAttackerMessages() {

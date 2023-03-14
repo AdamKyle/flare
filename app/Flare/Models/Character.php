@@ -135,6 +135,10 @@ class Character extends Model {
         return $this->hasMany(InventorySet::class, 'character_id', 'id');
     }
 
+    public function gemBag() {
+        return $this->hasOne(GemBag::class, 'character_id', 'id');
+    }
+
     public function factions() {
         return $this->hasMany(Faction::class, 'character_id', 'id');
     }
@@ -252,7 +256,9 @@ class Character extends Model {
      * @return bool
      */
     public function isInventoryFull(): bool {
-        return $this->getInventoryCount() >= $this->inventory_max;
+        $gemCount = $this->gemBag->sum('amount');
+
+        return ($this->getInventoryCount() + $gemCount) >= $this->inventory_max;
     }
 
     protected static function newFactory() {

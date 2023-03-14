@@ -106,6 +106,6 @@ class PvpAttack extends PvpBase {
     }
 
     protected function mergeMessages(array $messages, string $key) {
-        $this->battleMessages[$key] = [...$this->battleMessages[$key], ...$messages];
+        $this->battleMessages[$key] = array_merge($this->battleMessages[$key], $messages);
     }
 }

@@ -37,6 +37,8 @@ class SkillTypeValue {
 
     const EFFECTS_CLASS                   = 13;
 
+    const GEM_CRAFTING                    = 14;
+
     /**
      * @var string[] $values
      */
@@ -55,6 +57,7 @@ class SkillTypeValue {
         self::EFFECTS_SPELL_EVASION           => 11,
         self::EFFECTS_KINGDOM                 => 12,
         self::EFFECTS_CLASS                   => 13,
+        self::GEM_CRAFTING                    => 14
     ];
 
     public static $namedValues = [
@@ -72,6 +75,7 @@ class SkillTypeValue {
         11 => 'Effects Spell Evasion',
         12 => 'Effects Kingdoms',
         13 => 'Effects Class',
+        14 => 'Gem Crafting',
     ];
 
     /**
@@ -237,7 +241,8 @@ class SkillTypeValue {
             10 => 'Effects Unit Movement Timers',
             11 => 'Effects Spell Evasion',
             12 => 'Effects Artifact Annulment',
-            13 => 'Effects the kingdom in some way'
+            13 => 'Effects the kingdom in some way',
+            14 => 'Gem Crafting',
         ];
     }
 }

@@ -27,7 +27,7 @@ class BattleMessages extends PvpMessages {
     }
 
     public function mergeMessages(array $messages) {
-        $this->battleMessages = [...$this->battleMessages, ...$messages];
+        $this->battleMessages = array_merge($this->battleMessages, $messages);
     }
 
     public function getMessages() {

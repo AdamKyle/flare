@@ -474,6 +474,6 @@ class MonsterPlayerFight {
      * @return void
      */
     protected function mergeMessages(array $messages) {
-        $this->battleMessages = [...$this->battleMessages, ...$messages];
+        $this->battleMessages = array_merge($this->battleMessages, $messages);
     }
 }
