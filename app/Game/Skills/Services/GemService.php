@@ -77,6 +77,28 @@ class GemService {
     }
 
     /**
+     * Get tiers that are craftable.
+     *
+     * @param Character $character
+     * @return array
+     * @throws Exception
+     */
+    public function getCraftableTiers(Character $character): array {
+        $craftableSkill = $this->getCraftingSkill($character);
+        $craftableTiers = [];
+
+        foreach (GemTierValue::$values as $tier) {
+            $tierValue = (new GemTierValue($tier))->maxForTier();
+
+            if ($craftableSkill->level >= $tierValue['min_level']) {
+                $craftableTiers[] = $tierValue;
+            }
+        }
+
+        return $craftableTiers;
+    }
+
+    /**
      * Skill level is too low.
      *
      * @param Skill $skill
@@ -132,16 +154,16 @@ class GemService {
         if (!is_null($foundGem)) {
             $foundGem->update(['amount' => $foundGem->amount + 1]);
 
-            return;
+            return $character->gemBag->refresh();
         }
 
-        $gemBagEntry = $character->gemBag->gemBagSlots()->create([
+        $character->gemBag->gemBagSlots()->create([
             'character_id' => $character->id,
             'gem_id'       => $foundGem->id,
             'amount'       => 1,
         ]);
 
-        return $gemBagEntry;
+        return $character->gemBag->refresh();
     }
 
     /**
@@ -224,7 +246,7 @@ class GemService {
      */
     protected function getCraftingSkill(Character $character): Skill {
         $name      = (new SkillTypeValue(SkillTypeValue::GEM_CRAFTING))->getNamedValue();
-        $gameSkill = GameSkill::where('name',$name )->first();
+        $gameSkill = GameSkill::where('name', $name)->first();
 
         if (is_null($gameSkill)) {
             throw new Exception('Character is missing required game skill: ' . $name);

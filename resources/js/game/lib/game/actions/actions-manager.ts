@@ -220,6 +220,11 @@ export default class ActionsManager {
                 name: 'Trinketry',
                 icon_class: 'ra ra-anvil',
                 on_click: () => handler('trinketry'),
+            },
+            {
+                name: 'Gram Crafting',
+                icon_class: 'fas fa-gem',
+                on_click: () => handler('gem-crafting'),
             }
         ];
 

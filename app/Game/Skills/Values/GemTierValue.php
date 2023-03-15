@@ -11,7 +11,7 @@ class GemTierValue {
 
     private int $value;
 
-    private static array $values = [
+    public static array $values = [
         self::TIER_ONE   => self::TIER_ONE,
         self::TIER_TWO   => self::TIER_TWO,
         self::TIER_THREE => self::TIER_THREE,

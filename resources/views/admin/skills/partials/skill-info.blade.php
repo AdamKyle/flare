@@ -58,20 +58,20 @@
             <dt>Max Level:</dt>
             <dd>{{$skill->max_level}}</dd>
             <dt>Base Damage Mod At Max Level:</dt>
-            <dd>{{($skill->base_damage_mod_bonus_per_level * 999) * 100}}%</dd>
+            <dd>{{($skill->base_damage_mod_bonus_per_level * $skill->max_level) * 100}}%</dd>
             <dt>Base Ac Mod At Max Level:</dt>
-            <dd>{{($skill->base_ac_mod_bonus_per_level * 999) * 100}}%</dd>
+            <dd>{{($skill->base_ac_mod_bonus_per_level * $skill->max_level) * 100}}%</dd>
             <dt>Base Healing Mod At Max Level:</dt>
-            <dd>{{($skill->base_healing_mod_bonus_per_level * 999) * 100}}%</dd>
+            <dd>{{($skill->base_healing_mod_bonus_per_level * $skill->max_level) * 100}}%</dd>
             <dt>Fight Timeout Mod At Max Level:</dt>
-            <dd>{{($fightTimeOutMod = $skill->fight_time_out_mod_bonus_per_level * 999) * 100}}%</dd>
+            <dd>{{($fightTimeOutMod = $skill->fight_time_out_mod_bonus_per_level * $skill->max_level) * 100}}%</dd>
             <dt>Move Timeout Mod At Max Level:</dt>
-            <dd>{{($skill->move_time_out_mod_bonus_per_level * 999) * 100}}%</dd>
+            <dd>{{($skill->move_time_out_mod_bonus_per_level * $skill->max_level) * 100}}%</dd>
             <dt>Skill Bonus Bonus At Max Level:</dt>
             @if ($skill->can_train)
-                <dd>{{($skill->skill_bonus_per_level * 999) * 100}}%</dd>
+                <dd>{{($skill->skill_bonus_per_level * $skill->max_level) * 100}}%</dd>
             @else
-                <dd>{{($skill->skill_bonus_per_level * 400) * 100}}%</dd>
+                <dd>{{($skill->skill_bonus_per_level * $skill->max_level) * 100}}%</dd>
             @endif
         </dl>
 

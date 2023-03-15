@@ -1,1 +1,1 @@
-export type CraftingOptions = 'craft' | 'enchant' | 'alchemy' | 'workbench' | 'trinketry' | 'queen' | null;
+export type CraftingOptions = 'craft' | 'enchant' | 'alchemy' | 'workbench' | 'trinketry' | 'queen' | 'gem-crafting' | null;

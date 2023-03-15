@@ -2,6 +2,7 @@
 
 namespace App\Game\Skills\Controllers\Api;
 
+use App\Game\Skills\Requests\GemCraftingValidation;
 use App\Game\Skills\Services\GemService;
 use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
@@ -14,10 +15,17 @@ class GemCraftingController extends Controller {
         $this->gemService = $gemService;
     }
 
-    public function craftGem(Character $character) {
+    public function getCraftableItems(Character $character) {
+        return response()->json($this->gemService->getCraftableTiers($character));
+    }
 
-        $this->gemService->generateGem($character);
+    public function craftGem(Character $character, GemCraftingValidation $request) {
 
-        return response()->json();
+        $result = $this->gemService->generateGem($character, $request->tier);
+
+        $status = $result['status'];
+        unset($result['status']);
+
+        return response()->json($result, $status);
     }
 }

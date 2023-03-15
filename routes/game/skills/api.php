@@ -18,6 +18,9 @@ Route::middleware(['auth', 'is.player.banned', 'is.character.who.they.say.they.a
         // Fetch Trinkets
         Route::get('/trinket-crafting/{character}', ['uses' => 'Api\TrinketCraftingController@fetchItemsToCraft']);
 
+        // Fetch Gem Tiers
+        Route::get('/gem-crafting/craftable-tiers/{character}', ['uses' => 'Api\GemCraftingController@getCraftableItems']);
+
 
         Route::middleware(['is.character.exploring'])->group(function() {
             // Handle Training a specific skill.
@@ -27,10 +30,14 @@ Route::middleware(['auth', 'is.player.banned', 'is.character.who.they.say.they.a
             Route::post('/skill/cancel-train/{character}/{skill}', ['uses' => 'Api\SkillsController@cancelTrain']);
         });
 
-
         Route::group(['middleware' => 'throttle:crafting'], function() {
             // Craft Item
             Route::post('/craft/{character}', ['uses' => 'Api\CraftingController@craft']);
+        });
+
+        Route::group(['middleware' => 'throttle:crafting'], function() {
+            // Craft Gem
+            Route::post('/gem-crafting/craft/{character}', ['uses' => 'Api\GemCraftingController@craftGem']);
         });
 
         Route::group(['middleware' => 'throttle:crafting'], function() {

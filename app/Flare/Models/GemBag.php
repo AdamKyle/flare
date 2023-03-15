@@ -15,8 +15,6 @@ class GemBag extends Model {
      */
     protected $fillable = [
         'character_id',
-        'gem_id',
-        'amount',
     ];
 
     /**
@@ -26,16 +24,10 @@ class GemBag extends Model {
      */
     protected $casts = [
         'character_id' => 'integer',
-        'gem_id'       => 'integer',
-        'amount'       => 'integer',
     ];
 
     public function gemSlots(): HasMany {
         return $this->hasMany(GemBagSlot::class);
-    }
-
-    public function gem(): BelongsTo {
-        return $this->belongsTo(Gem::class, 'gem_id', 'id');
     }
 
     public function character(): BelongsTo {
