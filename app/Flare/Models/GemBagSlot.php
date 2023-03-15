@@ -4,9 +4,8 @@ namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class GemBag extends Model {
+class GemBagSlot extends Model {
 
     /**
      * The attributes that are mass assignable.
@@ -14,7 +13,7 @@ class GemBag extends Model {
      * @var array
      */
     protected $fillable = [
-        'character_id',
+        'gem_bag_id',
         'gem_id',
         'amount',
     ];
@@ -30,15 +29,11 @@ class GemBag extends Model {
         'amount'       => 'integer',
     ];
 
-    public function gemSlots(): HasMany {
-        return $this->hasMany(GemBagSlot::class);
-    }
-
     public function gem(): BelongsTo {
         return $this->belongsTo(Gem::class, 'gem_id', 'id');
     }
 
-    public function character(): BelongsTo {
-        return $this->belongsTo(Character::class, 'character_id', 'id');
+    public function GemBag(): BelongsTo {
+        return $this->belongsTo(GemBag::class, 'gem_bag_id', 'id');
     }
 }

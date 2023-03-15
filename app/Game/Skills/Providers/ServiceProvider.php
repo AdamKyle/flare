@@ -8,8 +8,10 @@ use App\Flare\Transformers\BasicSkillsTransformer;
 use App\Flare\Transformers\SkillsTransformer;
 use App\Game\Core\Services\CharacterInventoryService;
 use App\Game\Core\Services\RandomEnchantmentService;
+use App\Game\Skills\Builders\GemBuilder;
 use App\Game\Skills\Services\AlchemyService;
 use App\Game\Skills\Services\CraftingService;
+use App\Game\Skills\Services\GemService;
 use App\Game\Skills\Services\MassDisenchantService;
 use App\Game\Skills\Services\EnchantingService;
 use App\Game\Skills\Services\EnchantItemService;
@@ -71,6 +73,16 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(EnchantItemService::class),
                 $app->make(RandomEnchantmentService::class),
             );
+        });
+
+        $this->app->bind(GemService::class, function($app) {
+            return new GemService(
+                $app->make(GemBuilder::class)
+            );
+        });
+
+        $this->app->bind(GemBuilder::class, function() {
+            return new GemBuilder();
         });
     }
 }

@@ -11,4 +11,8 @@ class SeerService {
     public function removeGems() {
 
     }
+
+    public function assignGemToSocket() {
+
+    }
 }

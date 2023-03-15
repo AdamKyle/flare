@@ -16,10 +16,6 @@ return new class extends Migration {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('character_id');
             $table->foreign('character_id')->references('characters')->on('id');
-            $table->unsignedBigInteger('gem_id');
-            $table->foreign('gem_id')->references('gems')->on('id');
-            $table->integer('amount');
-            $table->timestamps();
         });
     }
 
