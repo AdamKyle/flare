@@ -34,15 +34,15 @@ class GemTypeValue {
         return $this->names[$this->value];
     }
 
-    public function isFire(): boolean {
+    public function isFire(): bool {
         return $this->value === self::FIRE;
     }
 
-    public function isIce(): boolean {
+    public function isIce(): bool {
         return $this->value === self::ICE;
     }
 
-    public function isWater(): boolean {
+    public function isWater(): bool {
         return $this->value === self::WATER;
     }
 }
