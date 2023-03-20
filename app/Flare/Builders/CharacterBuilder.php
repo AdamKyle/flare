@@ -119,6 +119,8 @@ class CharacterBuilder {
             'gold'          => 1000,
         ]);
 
+        $this->character->gemBag()->create(['character_id' => $this->character->id]);
+
         $this->character->inventory()->create([
             'character_id' => $this->character->id
         ]);

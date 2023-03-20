@@ -15,9 +15,9 @@ return new class extends Migration
         Schema::create('item_sockets', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('item_id');
-            $table->foreign('item_id')->references('items')->on('id');
+            $table->foreign('item_id')->references('id')->on('items');
             $table->unsignedBigInteger('gem_id')->nullable();
-            $table->foreign('gem_id')->references('gems')->on('id');
+            $table->foreign('gem_id')->references('id')->on('gems');
             $table->timestamps();
         });
     }

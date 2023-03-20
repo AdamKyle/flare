@@ -15,6 +15,7 @@ import {
 import UsableItemSection from "../../character-sheet/components/modals/components/usable-item-section";
 import InventoryQuestItemDetails from "../../character-sheet/components/modals/components/inventory-quest-item-details";
 import AlchemyItemHoly from "../../character-sheet/components/modals/components/alchemy-item-holy";
+import GemDetails from "../../character-sheet/components/modals/components/gem-details";
 
 export default class ItemComparison extends React.Component<any, any> {
 
@@ -84,14 +85,20 @@ export default class ItemComparison extends React.Component<any, any> {
 
         return (
             <div className='grid grid-cols-2 gap-2'>
-                <ItemNameColorationText item={{
-                    name: this.getTheName(),
-                    type: this.state.comparison_details.itemToEquip.type,
-                    affix_count: this.state.comparison_details.itemToEquip.affix_count,
-                    is_unique: this.state.comparison_details.itemToEquip.is_unique,
-                    is_mythic: this.state.comparison_details.itemToEquip.is_mythic,
-                    holy_stacks_applied: this.state.comparison_details.itemToEquip.holy_stacks_applied,
-                }} />
+
+                {
+                    this.state.comparison_details.itemToEquip.type === 'gem' ?
+                        <span className='text-lime-600 dark:text-lime-500'>{this.state.comparison_details.itemToEquip.item.name}</span>
+                    :
+                        <ItemNameColorationText item={{
+                            name: this.getTheName(),
+                            type: this.state.comparison_details.itemToEquip.type,
+                            affix_count: this.state.comparison_details.itemToEquip.affix_count,
+                            is_unique: this.state.comparison_details.itemToEquip.is_unique,
+                            is_mythic: this.state.comparison_details.itemToEquip.is_mythic,
+                            holy_stacks_applied: this.state.comparison_details.itemToEquip.holy_stacks_applied,
+                        }} />
+                }
 
                 <div className='absolute right-[-30px] md:right-0'>
                     <span className='pl-3 text-right mr-[70px]'>(Type: {capitalize(this.state.comparison_details.itemToEquip.type)})</span>
@@ -103,6 +110,11 @@ export default class ItemComparison extends React.Component<any, any> {
     isLargeModal() {
 
         if (this.state.comparison_details !== null) {
+
+            if (this.state.comparison_details.itemToEquip.type === 'gem') {
+                return false;
+            }
+
             if (this.state.comparison_details.itemToEquip.type !== 'quest') {
                 return this.state.comparison_details.details.length === 2;
             }
@@ -123,6 +135,40 @@ export default class ItemComparison extends React.Component<any, any> {
             default:
                 return false;
         }
+    }
+
+    renderViewForType(type: string, holy_number?: number): JSX.Element {
+
+        if (type === 'alchemy') {
+            if (typeof holy_number !== 'undefined') {
+                return <AlchemyItemHoly item={this.state.comparison_details.itemToEquip} />;
+            }
+
+            return <UsableItemSection item={this.state.comparison_details.itemToEquip} />;
+        }
+
+        if (type === 'quest') {
+            return <InventoryQuestItemDetails item={this.state.comparison_details.itemToEquip} />;
+        }
+
+        if (type === 'gem') {
+            return <GemDetails gem={this.state.comparison_details.itemToEquip.item} />;
+        }
+
+        return <ComparisonSection
+            is_large_modal={this.isLargeModal()}
+            is_grid_size={this.isGridSize.bind(this)}
+            comparison_details={this.state.comparison_details}
+            set_action_loading={this.setStatusToLoading.bind(this)}
+            is_action_loading={this.state.action_loading}
+            manage_modal={this.props.manage_modal}
+            character_id={this.props.character_id}
+            dark_charts={this.state.dark_charts}
+            usable_sets={this.state.usable_sets}
+            slot_id={this.props.slot_id}
+            is_automation_running={this.props.is_automation_running}
+        />
+
     }
 
     render() {
@@ -159,28 +205,8 @@ export default class ItemComparison extends React.Component<any, any> {
                                     </div>
                                 :
 
-                                    this.state.comparison_details.itemToEquip.type === 'alchemy' ?
-                                        this.state.comparison_details.itemToEquip.holy_level > 0 ?
-                                            <AlchemyItemHoly item={this.state.comparison_details.itemToEquip} />
-                                        :
-                                            <UsableItemSection item={this.state.comparison_details.itemToEquip} />
-                                   :
-                                        this.state.comparison_details.itemToEquip.type === 'quest' ?
-                                            <InventoryQuestItemDetails item={this.state.comparison_details.itemToEquip} />
-                                        :
-                                            <ComparisonSection
-                                                is_large_modal={this.isLargeModal()}
-                                                is_grid_size={this.isGridSize.bind(this)}
-                                                comparison_details={this.state.comparison_details}
-                                                set_action_loading={this.setStatusToLoading.bind(this)}
-                                                is_action_loading={this.state.action_loading}
-                                                manage_modal={this.props.manage_modal}
-                                                character_id={this.props.character_id}
-                                                dark_charts={this.state.dark_charts}
-                                                usable_sets={this.state.usable_sets}
-                                                slot_id={this.props.slot_id}
-                                                is_automation_running={this.props.is_automation_running}
-                                            />
+                                    this.renderViewForType(this.state.comparison_details.itemToEquip.type, this.state.comparison_details.itemToEquip.holy_level)
+
                             }
                         </Fragment>
 

@@ -7,8 +7,10 @@ use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
 use App\Game\Core\Requests\ComparisonFromChatValidate;
 use App\Game\Core\Requests\ComparisonValidation;
+use App\Game\Core\Services\CharacterGemBagService;
 use App\Game\Core\Services\CharacterInventoryService;
 use App\Game\Core\Services\ComparisonService;
+use App\Game\Skills\Services\GemService;
 use App\Http\Controllers\Controller;
 
 class ItemComparisonController extends Controller {
@@ -17,9 +19,12 @@ class ItemComparisonController extends Controller {
 
     private $characterInventoryService;
 
-    public function __construct(ComparisonService $comparisonService, CharacterInventoryService $characterInventoryService) {
+    private $gemBagService;
+
+    public function __construct(ComparisonService $comparisonService, CharacterInventoryService $characterInventoryService, CharacterGemBagService $gemBagService) {
         $this->comparisonService         = $comparisonService;
         $this->characterInventoryService = $characterInventoryService;
+        $this->gemBagService             = $gemBagService;
     }
 
     public function compareItem(ComparisonValidation $request, Character $character) {
@@ -48,9 +53,22 @@ class ItemComparisonController extends Controller {
         if (is_null($itemToEquip)) {
 
             $itemToEquip = InventorySlot::where('inventory_id', $inventory->id)->where('item_id', $request->id)->first();
+            $gemSlot     = $character->gemBag->gemSlots->find($request->id);
 
-            if (is_null($itemToEquip)) {
+            if (is_null($itemToEquip) && is_null($gemSlot)) {
                 return response()->json(['message' => 'Item does not exist  ...'], 404);
+            }
+
+            if (!is_null($gemSlot)) {
+                return response()->json([
+                    'comparison_data' => [
+                        'itemToEquip' => [
+                            'item' => $this->gemBagService->getGemData($character, $gemSlot),
+                            'type' => 'gem',
+                        ]
+                    ],
+                    'usable_sets'     => $this->characterInventoryService->setCharacter($character)->getInventoryForType('usable_sets')
+                ]);
             }
         }
 

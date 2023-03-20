@@ -15,7 +15,8 @@ return new class extends Migration {
         Schema::create('gem_bags', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('character_id');
-            $table->foreign('character_id')->references('characters')->on('id');
+            $table->foreign('character_id')->references('id')->on('characters');
+            $table->timestamps();
         });
     }
 

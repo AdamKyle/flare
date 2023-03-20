@@ -11,6 +11,7 @@ import InventoryTabSectionState from "../../../../lib/game/character-sheet/types
 import clsx from "clsx";
 import UsableItemsDetails from "../../../../lib/game/character-sheet/types/inventory/usable-items-details";
 import InventoryUseManyItems from "../modals/inventory-use-many-items";
+import {GemBagTable} from "./inventory-tabs/gem-bag-table";
 
 export default class InventoryTabSection extends React.Component<InventoryTabSectionProps, InventoryTabSectionState> {
 
@@ -18,7 +19,7 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
         super(props);
 
         this.state = {
-            table: 'Inventory',
+            table: 'inventory',
             data: this.props.inventory,
             usable_items: this.props.usable_items,
             show_destroy_all: false,
@@ -173,6 +174,39 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
         });
     }
 
+    renderTables(): JSX.Element | null {
+        switch (this.state.table) {
+            case 'inventory':
+                return <InventoryTable dark_table={this.props.dark_tables}
+                                       character_id={this.props.character_id}
+                                       inventory={this.state.data}
+                                       is_dead={this.props.is_dead}
+                                       update_inventory={this.updateInventory.bind(this)}
+                                       usable_sets={this.props.usable_sets}
+                                       set_success_message={this.setSuccessMessage.bind(this)}
+                                       is_automation_running={this.props.is_automation_running}
+                />
+            case 'usable_items':
+                return <UsableItemsTable
+                            dark_table={this.props.dark_tables}
+                            character_id={this.props.character_id}
+                            usable_items={this.state.usable_items}
+                            is_dead={this.props.is_dead}
+                            update_inventory={this.updateInventory.bind(this)}
+                            set_success_message={this.setSuccessMessage.bind(this)}
+                            is_automation_running={this.props.is_automation_running}
+                />
+            case 'gems':
+                return <GemBagTable
+                            dark_table={this.props.dark_tables}
+                            character_id={this.props.character_id}
+                            is_dead={this.props.is_dead}
+                />
+            default:
+                return null;
+        }
+    }
+
     render() {
         return (
             <Fragment>
@@ -190,13 +224,18 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
                             {
                                 name: 'Inventory',
                                 icon_class: 'fas fa-shopping-bag',
-                                on_click: () => this.switchTable('Inventory')
+                                on_click: () => this.switchTable('inventory')
                             },
                             {
                                 name: 'Usable',
                                 icon_class: 'ra ra-bubbling-potion',
-                                on_click: () => this.switchTable('Usable')
+                                on_click: () => this.switchTable('usable-items')
                             },
+                            {
+                                name: 'Gem Bag',
+                                icon_class: 'fas fa-gem',
+                                on_click: () => this.switchTable('gems')
+                            }
                         ]} button_title={'Type'} selected_name={this.state.table} disabled={this.props.is_dead} />
                     </div>
                     <div className={clsx('ml-2', {'hidden': this.isDropDownHidden()})}>
@@ -207,12 +246,7 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
                     </div>
                 </div>
 
-                {
-                    this.state.table === 'Inventory'  ?
-                        <InventoryTable dark_table={this.props.dark_tables} character_id={this.props.character_id} inventory={this.state.data} is_dead={this.props.is_dead} update_inventory={this.updateInventory.bind(this)} usable_sets={this.props.usable_sets} set_success_message={this.setSuccessMessage.bind(this)} is_automation_running={this.props.is_automation_running} />
-                    :
-                        <UsableItemsTable dark_table={this.props.dark_tables} character_id={this.props.character_id} usable_items={this.state.usable_items} is_dead={this.props.is_dead} update_inventory={this.updateInventory.bind(this)} set_success_message={this.setSuccessMessage.bind(this)} is_automation_running={this.props.is_automation_running}/>
-                }
+                { this.renderTables() }
 
                 {
                     this.state.show_destroy_all ?

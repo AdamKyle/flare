@@ -2,6 +2,7 @@ import clsx from "clsx";
 import React from "react";
 import ItemNameColorationProps from "../../lib/ui/types/item-name-coloration-props";
 import InventoryDetails from "../../lib/game/character-sheet/types/inventory/inventory-details";
+import {GemBagTable} from "../../sections/character-sheet/components/tabs/inventory-tabs/gem-bag-table";
 
 export default class ItemNameColorationButton extends React.Component<ItemNameColorationProps, any> {
 
@@ -20,6 +21,8 @@ export default class ItemNameColorationButton extends React.Component<ItemNameCo
     render() {
         return (
             <button className={clsx({
+                'text-lime-600 dark:text-lime-500' : this.props.item instanceof GemBagTable
+            }, {
                 'text-red-700 dark:text-red-400': this.props.item.type === 'trinket' && !this.props.item.is_mythic
             }, {
                 'text-green-700 dark:text-green-600': this.props.item.is_unique && this.props.item.type !== 'trinket' && !this.props.item.is_mythic

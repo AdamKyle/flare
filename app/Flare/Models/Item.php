@@ -91,6 +91,8 @@ class Item extends Model {
         'can_stack',
         'gains_additional_level',
         'unlocks_class_id',
+        'socket_count',
+        'has_gems_socketed',
     ];
 
     /**
@@ -111,6 +113,7 @@ class Item extends Model {
         'holy_stacks'                      => 'integer',
         'gold_bars_cost'                   => 'integer',
         'unlocks_class_id'                 => 'integer',
+        'socket_amount'                    => 'integer',
         'base_damage_mod'                  => 'float',
         'base_healing_mod'                 => 'float',
         'base_ac_mod'                      => 'float',
@@ -131,6 +134,7 @@ class Item extends Model {
         'can_craft'                        => 'boolean',
         'can_resurrect'                    => 'boolean',
         'randomly_generated'               => 'boolean',
+        'has_gems_socketed'                => 'boolean',
         'skill_level_required'             => 'integer',
         'skill_level_trivial'              => 'integer',
         'craft_only'                       => 'boolean',
@@ -202,6 +206,10 @@ class Item extends Model {
 
     public function appliedHolyStacks() {
         return $this->hasMany(HolyStack::class, 'item_id', 'id');
+    }
+
+    public function sockets() {
+        return $this->hasMany(ItemSocket::class, 'item_id', 'id');
     }
 
     public function dropLocation() {

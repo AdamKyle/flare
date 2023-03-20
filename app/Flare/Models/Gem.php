@@ -2,6 +2,7 @@
 
 namespace App\Flare\Models;
 
+use App\Game\Skills\Values\GemTierValue;
 use App\Game\Skills\Values\GemTypeValue;
 use Illuminate\Database\Eloquent\Model;
 
@@ -14,6 +15,7 @@ class Gem extends Model {
      */
     protected $fillable = [
         'name',
+        'tier',
         'primary_atonement_type',
         'secondary_atonement_type',
         'tertiary_atonement_type',
@@ -28,6 +30,7 @@ class Gem extends Model {
      * @var array
      */
     protected $casts = [
+        'tier'                       => 'integer',
         'primary_atonement_type'     => 'integer',
         'secondary_atonement_type'   => 'integer',
         'tertiary_atonement_type'    => 'integer',
@@ -46,5 +49,9 @@ class Gem extends Model {
 
     public function tertiaryAtonementType(): GemTypeValue {
         return new GemTypeValue($this->tertiary_atonement_type);
+    }
+
+    public function gemTier(): GemTierValue {
+        return new GemTierValue($this->tier);
     }
 }

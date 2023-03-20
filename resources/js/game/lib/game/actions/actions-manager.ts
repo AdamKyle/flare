@@ -222,7 +222,7 @@ export default class ActionsManager {
                 on_click: () => handler('trinketry'),
             },
             {
-                name: 'Gram Crafting',
+                name: 'Gem Crafting',
                 icon_class: 'fas fa-gem',
                 on_click: () => handler('gem-crafting'),
             }
@@ -249,6 +249,22 @@ export default class ActionsManager {
                     icon_class: 'ra ra-brandy-bottle',
                     on_click: () => handler('workbench'),
                 });
+            }
+        }
+
+        if (this.component.props.character.can_access_purgatory_chains) {
+            if (typeof options[3] !== 'undefined') {
+                options.splice(4, 0, {
+                    name: 'Seer Camp',
+                    icon_class: 'fas fa-campground',
+                    on_click: () => handler('seer-camp'),
+                })
+            } else {
+                options.splice(3, 0, {
+                    name: 'Seer Camp',
+                    icon_class: 'fas fa-campground',
+                    on_click: () => handler('seer-camp'),
+                })
             }
         }
 

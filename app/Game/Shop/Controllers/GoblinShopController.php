@@ -2,6 +2,7 @@
 
 namespace App\Game\Shop\Controllers;
 
+use Facades\App\Game\Core\Handlers\HandleGoldBarsAsACurrency;
 use App\Http\Controllers\Controller;
 use App\Game\Shop\Services\GoblinShopService;
 use App\Flare\Models\Character;
@@ -45,11 +46,11 @@ class GoblinShopController extends Controller {
             ->selectRaw('*, SUM(gold_bars) as gold_bars_sum')
             ->get();
 
-        if ($kingdoms->sum('gold_bars_sum') < $item->gold_bars_cost) {
+        $canAfford = HandleGoldBarsAsACurrency::hasTheGoldBars($kingdoms, $item->gold_bars_cost);
+
+        if (!$canAfford) {
             return redirect()->back()->with('error', 'Not enough gold bars. Go slay monsters to stalk your treasury.');
         }
-
-
 
         $this->goblinShopService->buyItem($character, $item, $kingdoms);
 

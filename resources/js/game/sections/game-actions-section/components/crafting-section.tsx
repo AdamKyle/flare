@@ -6,6 +6,7 @@ import WorkBench from "./crafting-sections/work-bench";
 import Trinketry from "./crafting-sections/trinketry";
 import QueenOfHearts from "./crafting-sections/queen-of-hearts";
 import GemCrafting from "./crafting-sections/gem-crafting";
+import SeerCamp from "./crafting-sections/seer-camp";
 
 export default class CraftingSection extends React.Component<any, any> {
 
@@ -29,6 +30,8 @@ export default class CraftingSection extends React.Component<any, any> {
                 return <QueenOfHearts character_id={this.props.character_id} remove_crafting={this.props.remove_crafting} cannot_craft={this.props.cannot_craft} user_id={this.props.user_id} />
             case 'gem-crafting':
                 return <GemCrafting character_id={this.props.character_id} remove_crafting={this.props.remove_crafting} cannot_craft={this.props.cannot_craft} />
+            case 'seer-camp':
+                return <SeerCamp character_id={this.props.character_id} leave_seer_camp={this.props.remove_crafting} />
             default:
                 return null;
         }

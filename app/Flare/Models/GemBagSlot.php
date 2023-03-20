@@ -2,8 +2,10 @@
 
 namespace App\Flare\Models;
 
+use App\Game\Skills\Values\GemTierValue;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class GemBagSlot extends Model {
 
@@ -29,8 +31,8 @@ class GemBagSlot extends Model {
         'amount'       => 'integer',
     ];
 
-    public function gem(): BelongsTo {
-        return $this->belongsTo(Gem::class, 'gem_id', 'id');
+    public function gem(): HasOne {
+        return $this->hasOne(Gem::class, 'id', 'gem_id');
     }
 
     public function GemBag(): BelongsTo {

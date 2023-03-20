@@ -256,7 +256,7 @@ class Character extends Model {
      * @return bool
      */
     public function isInventoryFull(): bool {
-        $gemCount = $this->gemBag->sum('amount');
+        $gemCount = $this->gemBag->gemSlots->sum('amount');
 
         return ($this->getInventoryCount() + $gemCount) >= $this->inventory_max;
     }

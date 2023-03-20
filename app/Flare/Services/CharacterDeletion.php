@@ -7,6 +7,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GameRace;
+use App\Flare\Models\GemBag;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\MarketBoard;
 use App\Flare\Models\RankFightTop;
@@ -35,6 +36,10 @@ class CharacterDeletion {
 
         if (!is_null($character->inventory)) {
             $this->emptyCharacterInventory($character->inventory);
+        }
+
+        if (!is_null($character->gemBag)) {
+            $this->emptyCharacterGemBag($character->gemBag);
         }
 
         if (!$character->inventorySets->isEmpty()) {
@@ -93,6 +98,14 @@ class CharacterDeletion {
         }
 
         $inventory->delete();
+    }
+
+    protected function emptyCharacterGemBag(GemBag $gemBag): void {
+        foreach ($gemBag->gemSlots as $slot) {
+            $slot->delete();
+        }
+
+        $gemBag->delete();
     }
 
     protected function emptyCharacterInventorySets(Collection $inventorySets): void {

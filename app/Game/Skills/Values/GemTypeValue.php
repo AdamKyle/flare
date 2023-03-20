@@ -10,10 +10,16 @@ class GemTypeValue {
 
     private int $value;
 
-    private array $values = [
+    private static array $values = [
         self::FIRE  => self::FIRE,
         self::ICE   => self::ICE,
         self::WATER => self::WATER,
+    ];
+
+    private array $names = [
+        self::FIRE  => 'Fire',
+        self::ICE   => 'Ice',
+        self::WATER => 'Water',
     ];
 
     public function __construct(int $value) {
@@ -22,6 +28,10 @@ class GemTypeValue {
         }
 
         $this->value = $value;
+    }
+
+    public function getNameOfAtonement(): string {
+        return $this->names[$this->value];
     }
 
     public function isFire(): boolean {

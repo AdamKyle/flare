@@ -30,7 +30,7 @@ class ComparisonFromChatValidate extends FormRequest
 
     public function messages() {
         return [
-            'slot_id.required' => 'Error. Invalid Input.',
+            'id.required' => 'Error. Invalid Input.',
         ];
     }
 }

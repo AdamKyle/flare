@@ -14,11 +14,11 @@ return new class extends Migration
     public function up()
     {
         Schema::create('gem_bag_slots', function (Blueprint $table) {
-            $table->unsignedBigInteger('id');
+            $table->bigIncrements('id');
             $table->unsignedBigInteger('gem_bag_id');
-            $table->foreign('gem_bag_id')->references('gem_bags')->on('id');
+            $table->foreign('gem_bag_id')->references('id')->on('gem_bags');
             $table->unsignedBigInteger('gem_id');
-            $table->foreign('gem_id')->references('gems')->on('id');
+            $table->foreign('gem_id')->references('id')->on('gems');
             $table->integer('amount');
             $table->timestamps();
         });

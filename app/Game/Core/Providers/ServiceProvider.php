@@ -13,12 +13,15 @@ use App\Flare\Transformers\InventoryTransformer;
 use App\Flare\Transformers\Serializers\CoreSerializer;
 use App\Flare\Transformers\UsableItemTransformer;
 use App\Game\Battle\Services\BattleDrop;
+use App\Game\Core\Handlers\HandleGoldBarsAsACurrency;
 use App\Game\Core\Services\CharacterPassiveSkills;
 use App\Game\Core\Services\DropCheckService;
 use App\Game\Core\Services\HolyItemService;
 use App\Game\Core\Services\InventorySetService;
 use App\Game\Core\Services\RandomEnchantmentService;
+use App\Game\Core\Services\SeerService;
 use App\Game\Core\Services\UseItemService;
+use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
 use App\Game\Skills\Services\MassDisenchantService;
 use App\Game\Skills\Services\UpdateCharacterSkillsService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
@@ -99,6 +102,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(HolyItemService::class, function() {
             return new HolyItemService();
+        });
+
+        $this->app->bind(HandleGoldBarsAsACurrency::class, function($app) {
+            return new HandleGoldBarsAsACurrency($app->make(UpdateKingdomHandler::class));
         });
     }
 

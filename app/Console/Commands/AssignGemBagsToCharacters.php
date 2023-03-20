@@ -6,7 +6,7 @@ use App\Flare\Models\Character;
 use Illuminate\Console\Command;
 
 class AssignGemBagsToCharacters extends Command {
-    
+
     /**
      * The name and signature of the console command.
      *

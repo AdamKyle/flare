@@ -2,6 +2,7 @@
 
 namespace App\Game\Skills\Services;
 
+use App\Flare\Models\GemBagSlot;
 use Exception;
 use App\Flare\Events\UpdateSkillEvent;
 use App\Flare\Models\Character;
@@ -143,13 +144,13 @@ class GemService {
      *
      * @param Character $character
      * @param int $tier
-     * @return GemBag
+     * @return GemBagSlot
      * @throws Exception
      */
-    protected function giveGem(Character $character, int $tier): GemBag {
+    protected function giveGem(Character $character, int $tier): GemBagSlot {
         $gem = $this->gemBuilder->buildGem($tier);
 
-        $foundGem = $character->gemBag->gemBagSlots()->where('gem_id', $gem->id)->first();
+        $foundGem = $character->gemBag->gemSlots()->where('gem_id', $gem->id)->first();
 
         if (!is_null($foundGem)) {
             $foundGem->update(['amount' => $foundGem->amount + 1]);
@@ -157,13 +158,11 @@ class GemService {
             return $character->gemBag->refresh();
         }
 
-        $character->gemBag->gemBagSlots()->create([
+        return $character->gemBag->gemSlots()->create([
             'character_id' => $character->id,
-            'gem_id'       => $foundGem->id,
+            'gem_id'       => $gem->id,
             'amount'       => 1,
         ]);
-
-        return $character->gemBag->refresh();
     }
 
     /**
@@ -181,7 +180,9 @@ class GemService {
         $shards      = $character->shards;
         $copperCoins = $character->copper_coins;
 
-        return $goldDust >= $data['gold_dust'] && $shards >= $data['shards'] && $copperCoins >= $data['copper_coins'];
+        return $goldDust >= $data['cost']['gold_dust'] &&
+               $shards >= $data['cost']['shards'] &&
+               $copperCoins >= $data['cost']['copper_coins'];
     }
 
     /**
@@ -199,9 +200,9 @@ class GemService {
         $shards      = $character->shards;
         $copperCoins = $character->copper_coins;
 
-        $goldDust    = $goldDust - $data['gold_dust'];
-        $shards      = $shards - $data['shards'];
-        $copperCoins = $copperCoins - $data['copper_coins'];
+        $goldDust    = $goldDust - $data['cost']['gold_dust'];
+        $shards      = $shards - $data['cost']['shards'];
+        $copperCoins = $copperCoins - $data['cost']['copper_coins'];
 
         $character->update([
             'gold'        => $goldDust > 0 ? $goldDust : 0,

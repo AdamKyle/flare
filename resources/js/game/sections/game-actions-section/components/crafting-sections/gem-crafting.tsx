@@ -44,7 +44,7 @@ export default class GemCrafting extends React.Component<any, any> {
             errorMessage: null,
         }, () => {
             (new Ajax()).setRoute('gem-crafting/craft/' + this.props.character_id).setParameters({
-                tier: this.state.tierForCrafting,
+                tier: this.state.selectedTier,
             }).doAjaxCall('post', (result: AxiosResponse) => {
                 this.setState({
                     tiersForCrafting: result.data,

@@ -1,9 +1,12 @@
-import React, {Component, MouseEventHandler} from "react";
+import React from "react";
 import ItemNameColorationButton from "../../../../../components/ui/item-name-coloration-button";
 import { formatNumber } from "../../../format-number";
 import ActionsInterface from "./actions-interface";
 import InventoryDetails from "../../types/inventory/inventory-details";
 import UsableItemsDetails from "../../types/inventory/usable-items-details";
+import GemBagDetails from "../../types/inventory/gem-bag-details";
+import {GemBagTable} from "../../../../../sections/character-sheet/components/tabs/inventory-tabs/gem-bag-table";
+import clsx from "clsx";
 
 /**
  * Build Inventory Table Columns
@@ -103,4 +106,40 @@ export const buildLimitedColumns = (component?: ActionsInterface, onClick?: (ite
         }
 
         return columns
+}
+
+/**
+ * build gem table columns.
+ *
+ * @param component
+ * @param onClick
+ */
+export const buildGemColumns = (component: GemBagTable, onClick: (gemSlot: GemBagDetails) => void) => {
+    const columns = [
+        {
+            name: 'Name',
+            selector: (row: GemBagDetails) => row.name,
+            cell: (row: GemBagDetails) => <button className='text-lime-600 dark:text-lime-500' onClick={() => onClick(row)}>{row.name}</button>
+        },
+        {
+            name: 'Tier',
+            selector: (row: GemBagDetails) => row.tier,
+            cell: (row: GemBagDetails) => row.tier
+        },
+        {
+            name: 'Amount',
+            selector: (row: GemBagDetails) => row.amount,
+            cell: (row: GemBagDetails) => row.amount
+        }
+    ];
+
+    if (typeof component !== 'undefined') {
+        columns.push({
+            name: 'Actions',
+            selector: (row: any) => '',
+            cell: (row: any) => component.gemActions(row)
+        });
+    }
+
+    return columns
 }

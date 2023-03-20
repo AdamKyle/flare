@@ -46,6 +46,7 @@ class GemBuilder {
 
         $dataForGem = [
             'name'                       => $this->names[rand(0, count($this->names) - 1)],
+            'tier'                       => $tier,
             'primary_atonement_type'     => GemTypeValue::FIRE,
             'secondary_atonement_type'   => GemTypeValue::WATER,
             'tertiary_atonement_type'    => GemTypeValue::ICE,

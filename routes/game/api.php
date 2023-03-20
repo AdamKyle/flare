@@ -28,6 +28,9 @@ Route::group(['middleware' => ['is.character.who.they.say.they.are']], function(
     Route::get('/character/{character}/inventory/comparison', ['uses' => 'Api\ItemComparisonController@compareItem']);
     Route::get('/character/{character}/inventory/comparison-from-chat', ['uses' => 'Api\ItemComparisonController@compareItemFromChat']);
 
+    Route::get('/character/{character}/gem-bag', ['uses' => 'Api\CharacterGemBagController@getGemSlots']);
+    Route::get('/character/{character}/gem-details/{gemBagSlot}', ['uses' => 'Api\CharacterGemBagController@getGem']);
+
 
     Route::group(['middleware' => ['is.character.dead']], function() {
         Route::get('/character/{character}/inventory/item/{item}', ['uses' => 'Api\CharacterInventoryController@itemDetails']);
@@ -49,6 +52,9 @@ Route::group(['middleware' => ['is.character.who.they.say.they.are']], function(
 
             Route::get('/character/{character}/inventory/smiths-workbench', ['uses' => 'Api\HolyItemsController@index']);
             Route::post('/character/{character}/smithy-workbench/apply', ['uses' => 'Api\HolyItemsController@apply']);
+
+            Route::get('/visit-seer-camp/{character}', ['uses' => 'Api\SeerCampController@visitCamp']);
+            Route::post('/seer-camp/add-sockets/{character}', ['uses' => 'Api\SeerCampController@rollSockets']);
 
         });
 

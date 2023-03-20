@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('gems', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name');
+            $table->integer('tier');
             $table->integer('primary_atonement_type');
             $table->integer('secondary_atonement_type');
             $table->integer('tertiary_atonement_type');

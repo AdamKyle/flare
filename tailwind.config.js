@@ -129,6 +129,10 @@ module.exports = {
         amber: {
           ...colors.amber,
           DEFAULT: '#fffbeb'
+        },
+        lime: {
+          ...colors.lime,
+          DEFAULT: '#FEF7E7'
         }
       },
       spacing: {
