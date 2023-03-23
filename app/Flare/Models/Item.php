@@ -113,7 +113,7 @@ class Item extends Model {
         'holy_stacks'                      => 'integer',
         'gold_bars_cost'                   => 'integer',
         'unlocks_class_id'                 => 'integer',
-        'socket_amount'                    => 'integer',
+        'socket_count'                     => 'integer',
         'base_damage_mod'                  => 'float',
         'base_healing_mod'                 => 'float',
         'base_ac_mod'                      => 'float',

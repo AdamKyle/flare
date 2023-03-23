@@ -2,8 +2,8 @@
 
 namespace App\Flare\Models;
 
-use App\Game\Skills\Values\GemTierValue;
-use App\Game\Skills\Values\GemTypeValue;
+use App\Game\Core\Gems\Values\GemTierValue;
+use App\Game\Core\Gems\Values\GemTypeValue;
 use Illuminate\Database\Eloquent\Model;
 
 class Gem extends Model {

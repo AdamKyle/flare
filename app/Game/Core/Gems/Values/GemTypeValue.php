@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Skills\Values;
+namespace App\Game\Core\Gems\Values;
 
 class GemTypeValue {
 

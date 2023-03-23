@@ -2,7 +2,6 @@
 
 namespace App\Flare\Models;
 
-use App\Game\Skills\Values\GemTierValue;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;

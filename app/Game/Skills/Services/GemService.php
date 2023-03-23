@@ -2,20 +2,19 @@
 
 namespace App\Game\Skills\Services;
 
-use App\Flare\Models\GemBagSlot;
-use Exception;
 use App\Flare\Events\UpdateSkillEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
-use App\Flare\Models\GemBag;
+use App\Flare\Models\GemBagSlot;
 use App\Flare\Models\Skill;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Core\Gems\Values\GemTierValue;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Skills\Builders\GemBuilder;
-use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
-use App\Game\Skills\Values\GemTierValue;
 use App\Game\Skills\Values\SkillTypeValue;
+use Exception;
+use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class GemService {
 

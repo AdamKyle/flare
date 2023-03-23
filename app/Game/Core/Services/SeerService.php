@@ -49,6 +49,14 @@ class SeerService {
             return $this->errorResult('No item was found to add a gem to.');
         }
 
+        if (is_null($slot->item->socket_count) || $slot->item->socket_count <= 0) {
+            return $this->errorResult('No sockets to remove gem from.');
+        }
+
+        if ($slot->item->sockets->isEmpty()) {
+            return $this->errorResult('Sockets on this item are already empty.');
+        }
+
         if ($character->isInventoryFull()) {
             return $this->errorResult('Your inventory is full (gem bag counts).');
         }
@@ -57,44 +65,40 @@ class SeerService {
             return $this->errorResult('You do not have the gold bars to do this.');
         }
 
-        if ($slot->item->socket_amount > 0) {
-            $socket = $slot->item->sockets->where('gem_id', $gemId)->first();
+        $socket = $slot->item->sockets->where('gem_id', $gemId)->first();
 
-            if (is_null($socket)) {
-                return $this->errorResult('Item does not have specified gem.');
-            }
-
-            $gemInBag = $character->gemBag->gemSlots->where('gem_id', $socket->gem_id)->first();
-
-            if (!is_null($gemInBag)) {
-                $gemInBag->update(['amount' => $gemInBag->amount + 1]);
-            }
-
-            $character->gemBag()->gemSlots()->create([
-                'gem_bag_id' => $character->gemBag->id,
-                'gem_id'     => $socket->gem_id,
-                'amount'     => 1,
-            ]);
-
-            $socket->delete();
-
-            HandleGoldBarsAsACurrency::subtractCostFromKingdoms($character->kingdoms, self::REMOVE_GEM);
-
-            $character = $character->refresh();
-
-            return $this->successResult([
-                'items'   => $this->getItems($character),
-                'gems'    => $this->getGems($character),
-                'message' => 'Gem has been removed from the socket!'
-            ]);
+        if (is_null($socket)) {
+            return $this->errorResult('Item does not have specified gem.');
         }
 
-        return $this->errorResult('Item has no sockets. What are you doing?');
+        $gemInBag = $character->gemBag->gemSlots->where('gem_id', $socket->gem_id)->first();
+
+        if (!is_null($gemInBag)) {
+            $gemInBag->update(['amount' => $gemInBag->amount + 1]);
+        }
+
+        $character->gemBag()->gemSlots()->create([
+            'gem_bag_id' => $character->gemBag->id,
+            'gem_id'     => $socket->gem_id,
+            'amount'     => 1,
+        ]);
+
+        $socket->delete();
+
+        HandleGoldBarsAsACurrency::subtractCostFromKingdoms($character->kingdoms, self::REMOVE_GEM);
+
+        $character = $character->refresh();
+
+        return $this->successResult([
+            'items'   => $this->getItems($character),
+            'gems'    => $this->getGems($character),
+            'message' => 'Gem has been removed from the socket!'
+        ]);
     }
 
     public function assignGemToSocket(Character $character, int $inventorySlotId, int $gemSlotId) {
         $slot    = $character->inventory->slots->find($inventorySlotId);
-        $gemSlot = $character->gemBags->gemSlot->find($gemSlotId);
+        $gemSlot = $character->gemBag->gemSlots->find($gemSlotId);
 
         if (is_null($slot)) {
             return $this->errorResult('No item was found to add a gem to.');
@@ -104,15 +108,35 @@ class SeerService {
             return $this->errorResult('No gem to attach to supplied item.');
         }
 
+        if (is_null($slot->item->socket_count)) {
+            return $this->errorResult('No Sockets on the supplied item. You need to add sockets to the item first');
+        }
+
+        if ($slot->item->sockets->isNotEmpty() && $slot->item->socket_count >= $slot->item->sockets->count()) {
+            return $this->errorResult(('Not enough sockets for this gem.'));
+        }
+
         if (!HandleGoldBarsAsACurrency::hasTheGoldBars($character->kingdoms, self::GEM_ATTACH_COST)) {
             return $this->errorResult('You do not have the gold bars to do this.');
         }
 
-        if ($slot->item->socket_amount > 0 && $slot->item->sockets->count < $slot->item->socket_amount) {
-            $slot->item->sockets()->create([
-                'item_id' => $slot->item_id,
-                'gem_id'  => $gemSlot->gem_id,
+        $newItem = DuplicateItemHandler::duplicateItem($slot->item);
+
+        $newItem->sockets()->create([
+            'item_id' => $slot->item_id,
+            'gem_id'  => $gemSlot->gem_id,
+        ]);
+
+        $slot->update([
+            'item_id' => $newItem->id,
+        ]);
+
+        if ($gemSlot->amount > 1) {
+            $gemSlot->update([
+                'amount' => $gemSlot->amount - 1
             ]);
+        } else {
+            $gemSlot->delete();
         }
 
         $gemSlot->delete();
@@ -129,7 +153,7 @@ class SeerService {
     }
 
     public function getItems(Character $character): array {
-        return array_values($character->inventory->slots->where('item.socket_amount', '>=', 0)->whereIn('item.type', [
+        return array_values($character->inventory->slots->where('item.socket_count', '>=', 0)->whereIn('item.type', [
             WeaponTypes::WEAPON,
             WeaponTypes::STAVE,
             WeaponTypes::BOW,
@@ -151,7 +175,14 @@ class SeerService {
     }
 
     public function getGems(Character $character): array {
-        return $character->gemBag->gemSlots->pluck('gem.name', 'id')->toArray();
+        return array_values($character->gemBag->gemSlots->map(function($slot) {
+            return [
+                'name'    => $slot->gem->name,
+                'amount'  => $slot->amount,
+                'tier'    => $slot->gem->tier,
+                'slot_id' => $slot->id,
+            ];
+        })->toArray());
     }
 
     protected function assignSocketCount(InventorySlot $slot): void {

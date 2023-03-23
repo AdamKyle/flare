@@ -88,6 +88,8 @@ class ItemTransformer extends TransformerAbstract {
             'is_mythic'                        => $item->is_mythic,
             'xp_bonus'                         => $item->xp_bonus,
             'ignores_caps'                     => $item->ignores_caps,
+            'sockets'                          => $item->sockets,
+            'socket_amount'                    => $item->socket_count,
         ];
     }
 }

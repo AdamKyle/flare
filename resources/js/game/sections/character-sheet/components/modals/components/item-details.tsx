@@ -128,6 +128,20 @@ export default class ItemDetails extends React.Component<any, any> {
                             : null
                         }
 
+                        {
+                            this.props.item.socket_amount > 0 ?
+                                <Fragment>
+                                    <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                                    <h4 className='text-sky-600 dark:text-sky-500'>Sockets</h4>
+                                    <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                                    <dl>
+                                        <dt>Sockets</dt>
+                                        <dd>{this.props.item.socket_amount}</dd>
+                                    </dl>
+                                </Fragment>
+                            : null
+                        }
+
                     </div>
                 </div>
                 <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>

@@ -2,7 +2,6 @@
 
 namespace App\Flare\Models;
 
-use App\Game\Skills\Values\GemTypeValue;
 use Illuminate\Database\Eloquent\Model;
 
 class ItemSocket extends Model {

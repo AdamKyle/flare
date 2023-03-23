@@ -3,20 +3,14 @@
 namespace App\Game\Core\Controllers\Api;
 
 use App\Flare\Handlers\UpdateCharacterAttackTypes;
-use App\Flare\Models\SetSlot;
 use App\Game\Core\Requests\UseManyItemsValidation;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use League\Fractal\Resource\Item as FractalItem;
-use App\Flare\Events\UpdateCharacterAttackEvent;
-use App\Flare\Jobs\CharacterAttackTypesCacheBuilder;
-use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySet;
 use App\Flare\Models\Item;
-use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Transformers\ItemTransformer;
-use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Exceptions\EquipItemException;
 use App\Game\Core\Requests\EquipItemValidation;
 use App\Game\Core\Requests\RemoveItemRequest;
@@ -30,7 +24,6 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
-use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Skills\Jobs\DisenchantItem;
 use App\Game\Core\Services\CharacterInventoryService;
 use App\Game\Core\Requests\MoveItemRequest;

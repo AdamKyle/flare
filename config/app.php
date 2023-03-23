@@ -211,6 +211,11 @@ return [
         App\Game\Battle\Providers\EventsProvider::class,
 
         /**
+         * Game Core Providers
+         */
+        App\Game\Core\Gems\Providers\ServiceProvider::class,
+
+        /**
         * Game Related
         */
         App\Game\Exploration\Providers\ServiceProvider::class,

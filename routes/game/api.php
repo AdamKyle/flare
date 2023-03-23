@@ -55,7 +55,7 @@ Route::group(['middleware' => ['is.character.who.they.say.they.are']], function(
 
             Route::get('/visit-seer-camp/{character}', ['uses' => 'Api\SeerCampController@visitCamp']);
             Route::post('/seer-camp/add-sockets/{character}', ['uses' => 'Api\SeerCampController@rollSockets']);
-
+            Route::post('/seer-camp/add-gem/{character}', ['uses' => 'Api\SeerCampController@attachGemToItem']);
         });
 
         Route::post('/character/{character}/inventory/destroy-all-alchemy-items', ['uses' => 'Api\CharacterInventoryController@destroyAllAlchemyItems']);
