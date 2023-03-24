@@ -3,15 +3,18 @@ import BasicCard from "../../../components/ui/cards/basic-card";
 import GemComparisonDetails from "./gem-comparison-details";
 import PrimaryButton from "../../../components/ui/buttons/primary-button";
 import clsx from "clsx";
+import ReplacingAGemProps from "./types/replacing-a-gem-props";
+import AttachedGems from "./deffinitions/attached-gems";
+import WhenReplacing from "./deffinitions/when-replacing";
 
-export default class ReplacingAGem extends React.Component<any, any> {
-    constructor(props: any) {
+export default class ReplacingAGem extends React.Component<ReplacingAGemProps, {}> {
+    constructor(props: ReplacingAGemProps) {
         super(props);
     }
 
-    displayCards() {
-        return this.props.when_replacing.map((gemComparisonDetails: any) => {
-            const gemYouHave = this.props.gems_you_have.filter((gem: any) => {
+    displayCards(): JSX.Element[] {
+        return this.props.when_replacing.map((gemComparisonDetails: WhenReplacing) => {
+            const gemYouHave = this.props.gems_you_have.filter((gem: AttachedGems) => {
                 return gem.id === gemComparisonDetails.gem_you_have_id;
             })[0];
 

@@ -42,15 +42,12 @@ export default class SeerActions {
             });
     }
 
-    static attachGemToItem(component: ManageGems, slotId: number, gemSlotId: number) {
+    static attachGemToItem<T>(component: ManageGems<T>, slotId: number, gemSlotId: number) {
         (new Ajax()).setRoute('seer-camp/add-gem/' + component.props.character_id)
             .setParameters({slot_id: slotId, gem_slot_id: gemSlotId})
             .doAjaxCall('post', (result: AxiosResponse) => {
                 component.setState({
-                    items: result.data.items,
-                    gems: result.data.gems,
                     trading_with_seer: false,
-                    success_message: result.data.message,
                 }, () => {
                     component.props.update_parent(result.data.message, 'success_message');
                     component.props.update_parent(result.data.items, 'items');

@@ -1,9 +1,10 @@
 import React from "react";
 import clsx from "clsx";
+import GemComparisonProps from "./types/gem-comparison-props";
 
-export default class GemComparisonDetails extends React.Component<any, any> {
+export default class GemComparisonDetails extends React.Component<GemComparisonProps, { }> {
 
-    constructor(props: any) {
+    constructor(props: GemComparisonProps) {
         super(props);
     }
 

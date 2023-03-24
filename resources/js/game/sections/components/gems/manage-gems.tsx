@@ -11,17 +11,21 @@ import InfoAlert from "../../../components/ui/alerts/simple-alerts/info-alert";
 import {formatNumber} from "../../../lib/game/format-number";
 import SeerActions from "../../../lib/game/actions/seer-camp/seer-actions";
 import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
+import ManageGemsState from "./types/manage-gems-state";
+import ManageGemsProps from "./types/manage-gems-props";
+import {ActionTypes} from "./types/adding-the-gem-props";
 
-export default class ManageGems extends React.Component<any, any> {
-    constructor(props: any) {
+export default class ManageGems<T> extends React.Component<ManageGemsProps<T>, ManageGemsState> {
+    constructor(props: ManageGemsProps<T>) {
         super(props);
 
         this.state = {
             loading: true,
-            gem_to_attach: [],
+            gem_to_attach: null,
             when_replacing: [],
             has_gems_on_item: false,
             attached_gems: [],
+            socket_data: {},
             tabs: [{
                 key: 'add-gem',
                 name: 'Add Gem',
@@ -45,14 +49,15 @@ export default class ManageGems extends React.Component<any, any> {
                 attached_gems: result.data.attached_gems,
                 gem_to_attach: result.data.gem_to_attach,
                 when_replacing: result.data.when_replacing,
-                has_gem_on_item: result.data.has_gem_on_item,
+                has_gems_on_item: result.data.has_gem_on_item,
+                socket_data: result.data.socket_data,
             })
         }, (error: AxiosError) => {
             console.error(error);
         });
     }
 
-    doAction(action: 'attach-gem' | 'replace-gem') {
+    doAction(action: ActionTypes) {
         if (action === 'attach-gem') {
             this.setState({
                 trading_with_seer: true,
@@ -66,7 +71,7 @@ export default class ManageGems extends React.Component<any, any> {
     render() {
         return(
             <Dialogue is_open={this.props.is_open}
-                      handle_close={this.props.manage_modal}
+                      handle_close={this.props.manage_model}
                       title={'Seer Socketing Table'}
                       primary_button_disabled={this.state.trading_with_seer}
             >
@@ -96,7 +101,7 @@ export default class ManageGems extends React.Component<any, any> {
                             }
                             <Tabs tabs={this.state.tabs} disabled={false}>
                                 <TabPanel key={'add-gem'}>
-                                    <AddingTheGem gem_to_add={this.state.gem_to_attach} do_action={this.doAction.bind(this)} action_disabled={this.state.trading_with_seer}/>
+                                    <AddingTheGem gem_to_add={this.state.gem_to_attach} do_action={this.doAction.bind(this)} action_disabled={this.state.trading_with_seer} socket_data={this.state.socket_data} />
                                 </TabPanel>
                                 <TabPanel key={'replace-gem'}>
                                     <ReplacingAGem when_replacing={this.state.when_replacing} gems_you_have={this.state.attached_gems} action_disabled={this.state.trading_with_seer}/>

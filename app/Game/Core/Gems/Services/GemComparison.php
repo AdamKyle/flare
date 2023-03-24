@@ -37,6 +37,12 @@ class GemComparison {
             return $this->errorResult('Selected gem was not found in your gem bag.');
         }
 
+        $itemSocketData = [
+            'item_sockets'       => $slot->item->socket_count,
+            'current_used_slots' => $slot->item->sockets->count(),
+            'item_name'          => $slot->item->affix_name,
+        ];
+
         if ($slot->item->sockets->isEmpty()) {
             $gem = $gemSlot->gem->getAttributes();
 
@@ -45,6 +51,7 @@ class GemComparison {
 
             return $this->successResult([
                 'attached_gems'      => [],
+                'socket_data'        => $itemSocketData,
                 'has_gems_on_item'   => false,
                 'gem_to_attach'      => $this->manager->createData(new Item($gemSlot->gem, $this->characterGemsTransformer))->toArray(),
                 'when_replacing'     => [],
@@ -72,6 +79,7 @@ class GemComparison {
 
                 return $this->manager->createData($gem)->toArray();
             })->toArray()),
+            'socket_data'        => $itemSocketData,
             'has_gems_on_item'   => true,
             'gem_to_attach'      => $this->manager->createData(new Item($gemSlot->gem, $this->characterGemsTransformer))->toArray(),
             'when_replacing'     => $comparisonData['when_replacing'],
