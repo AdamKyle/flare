@@ -46,13 +46,12 @@ class GemComparison {
             return $this->successResult([
                 'attached_gems'      => [],
                 'has_gems_on_item'   => false,
-                'when_adding'        => [],
+                'gem_to_attach'      => $this->manager->createData(new Item($gemSlot->gem, $this->characterGemsTransformer))->toArray(),
                 'when_replacing'     => [],
             ]);
         }
 
         $comparisonData = [
-            'when_adding'    => [],
             'when_replacing' => [],
         ];
 
@@ -60,10 +59,6 @@ class GemComparison {
             if (!is_null($socket->gem)) {
 
                 $gemComparison = $this->compareGems($gemSlot->gem, $socket->gem);
-
-                if (!empty($gemComparison['when_adding'])) {
-                    $comparisonData['when_adding'][] = $gemComparison['when_adding'];
-                }
 
                 if (!empty($gemComparison['when_replacing'])) {
                     $comparisonData['when_replacing'][] = $gemComparison['when_replacing'];
@@ -78,7 +73,7 @@ class GemComparison {
                 return $this->manager->createData($gem)->toArray();
             })->toArray()),
             'has_gems_on_item'   => true,
-            'when_adding'        => $comparisonData['when_adding'],
+            'gem_to_attach'      => $this->manager->createData(new Item($gemSlot->gem, $this->characterGemsTransformer))->toArray(),
             'when_replacing'     => $comparisonData['when_replacing'],
         ]);
     }
@@ -93,7 +88,6 @@ class GemComparison {
      */
     public function compareGems(Gem $gemToCompare, Gem $gemYouHave): array {
 
-        $comparison            = [];
         $nonMatchingComparison = [];
 
         $atonements = [
@@ -101,14 +95,6 @@ class GemComparison {
             'secondary_atonement',
             'tertiary_atonement',
         ];
-
-        foreach ($atonements as $atonement) {
-            $data = $this->getComparisonWhenAdding($gemToCompare, $gemYouHave, $atonement . '_type', $atonement . '_amount');
-
-            if (!empty($data)) {
-                $comparison = [...$comparison, ...$data];
-            }
-        }
 
         foreach ($atonements as $atonement) {
             $data = $this->getComparisonForReplacing($gemToCompare, $gemYouHave, $atonement . '_type', $atonement . '_amount');
@@ -119,30 +105,8 @@ class GemComparison {
         }
 
         return [
-            'when_adding'    => $comparison,
             'when_replacing' => $nonMatchingComparison,
         ];
-    }
-
-    /**
-     * Get comparison data when the types on the gems match
-     *
-     * @param Gem $gemToCompare
-     * @param Gem $gemYouHave
-     * @param string $type
-     * @param string $attribute
-     * @return array
-     * @throws Exception
-     */
-    protected function getComparisonWhenAdding(Gem $gemToCompare, Gem $gemYouHave, string $type, string $attribute): array {
-        $comparisonOfAttribute = [];
-
-        if ($gemToCompare->{$type} === $gemYouHave->{$type}) {
-            $comparisonOfAttribute[$type]      = (new GemTypeValue($gemToCompare->{$type}))->getNameOfAtonement();
-            $comparisonOfAttribute[$attribute] = $gemToCompare->{$attribute};
-        }
-
-        return $comparisonOfAttribute;
     }
 
     /**
@@ -158,8 +122,17 @@ class GemComparison {
     protected function getComparisonForReplacing(Gem $gemToCompare, Gem $gemYouHave, string $type, string $attribute): array {
         $comparisonOfAttribute = [];
 
-        $comparisonOfAttribute[$type]      = (new GemTypeValue($gemToCompare->{$type}))->getNameOfAtonement();
-        $comparisonOfAttribute[$attribute] = $gemToCompare->{$attribute} - $gemYouHave->{$attribute};
+        if ($gemToCompare->{$type} === $gemYouHave->{$type}) {
+            $comparisonOfAttribute[$type]               = (new GemTypeValue($gemToCompare->{$type}))->getNameOfAtonement();
+            $comparisonOfAttribute[$attribute]          = $gemToCompare->{$attribute} - $gemYouHave->{$attribute};
+        } else {
+            $comparisonOfAttribute[$type]               = (new GemTypeValue($gemToCompare->{$type}))->getNameOfAtonement();
+            $comparisonOfAttribute[$attribute]          = $gemToCompare->{$attribute};
+        }
+
+        $comparisonOfAttribute['gem_you_have_id'] = $gemYouHave->id;
+        $comparisonOfAttribute['tier']            = $gemToCompare->tier;
+        $comparisonOfAttribute['name']            = $gemToCompare->name;
 
         return $comparisonOfAttribute;
     }

@@ -15,6 +15,5 @@ export default interface SeerCampState {
     error_message: string|null,
     success_message: string|null,
     selected_seer_action: string|null,
-    view_gem: boolean,
     manage_gems_on_item: boolean;
 }

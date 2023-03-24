@@ -1,6 +1,7 @@
 import SeerCamp from "../../../../sections/game-actions-section/components/crafting-sections/seer-camp";
 import Ajax from "../../../ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
+import ManageGems from "../../../../sections/components/gems/manage-gems";
 
 export default class SeerActions {
 
@@ -41,7 +42,7 @@ export default class SeerActions {
             });
     }
 
-    static attachGemToItem(component: SeerCamp, slotId: number, gemSlotId: number) {
+    static attachGemToItem(component: ManageGems, slotId: number, gemSlotId: number) {
         (new Ajax()).setRoute('seer-camp/add-gem/' + component.props.character_id)
             .setParameters({slot_id: slotId, gem_slot_id: gemSlotId})
             .doAjaxCall('post', (result: AxiosResponse) => {
@@ -50,6 +51,11 @@ export default class SeerActions {
                     gems: result.data.gems,
                     trading_with_seer: false,
                     success_message: result.data.message,
+                }, () => {
+                    component.props.update_parent(result.data.message, 'success_message');
+                    component.props.update_parent(result.data.items, 'items');
+                    component.props.update_parent(result.data.gems, 'gems');
+                    component.props.manage_model();
                 })
             }, (error: AxiosError) => {
                 component.setState({

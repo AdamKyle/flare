@@ -13,7 +13,6 @@ import ItemsForSeer from "../../../../lib/game/types/actions/components/seer-cam
 import ManageItemSocketsCost from "./components/seer-actions/manage-item-sockets-cost";
 import AddGemsToItem from "./components/seer-actions/add-gems-to-item";
 import AddGemsToItemActions from "./components/seer-actions/add-gems-to-item-actions";
-import CharacterGem from "../../../character-sheet/components/modals/character-gem";
 import GemsForSeer from "../../../../lib/game/types/actions/components/seer-camp/gems-for-seer";
 import ManageGems from "../../../components/gems/manage-gems";
 
@@ -53,7 +52,6 @@ export default class SeerCamp extends React.Component<SeerCampProps, SeerCampSta
             error_message: null,
             success_message: null,
             selected_seer_action: null,
-            view_gem: false,
             manage_gems_on_item: false,
         }
     }
@@ -87,12 +85,6 @@ export default class SeerCamp extends React.Component<SeerCampProps, SeerCampSta
         if (action === 'attach-gem') {
             this.setState({
                 manage_gems_on_item: true
-            });
-        }
-
-        if (action === 'view-gem') {
-            this.setState({
-                view_gem: true,
             });
         }
     }
@@ -272,13 +264,12 @@ export default class SeerCamp extends React.Component<SeerCampProps, SeerCampSta
                                 <Fragment>
                                     <ManageItemSocketsActions do_action={this.doAction.bind(this)}
                                                               is_disabled={this.isManageSocketsDisabled()}
-                                                              is_loading={this.state.trading_with_seer} />
-                                    <div className={'mt-3'}>
+                                                              is_loading={this.state.trading_with_seer}>
                                         <DangerButton button_label={'Leave Seer Camp'}
                                                       on_click={this.props.leave_seer_camp}
                                                       additional_css={'ml-2'}
                                                       disabled={this.state.trading_with_seer} />
-                                    </div>
+                                    </ManageItemSocketsActions>
                                 </Fragment>
                             : null
                         }
@@ -288,13 +279,12 @@ export default class SeerCamp extends React.Component<SeerCampProps, SeerCampSta
                                 <Fragment>
                                     <AddGemsToItemActions do_action={this.doAction.bind(this)}
                                                           is_disabled={this.isAddGemsDisabled()}
-                                                          is_loading={this.state.trading_with_seer} />
-                                    <div className={'mt-3'}>
+                                                          is_loading={this.state.trading_with_seer}>
                                         <DangerButton button_label={'Leave Seer Camp'}
                                                       on_click={this.props.leave_seer_camp}
                                                       additional_css={'ml-2'}
                                                       disabled={this.state.trading_with_seer} />
-                                    </div>
+                                    </AddGemsToItemActions>
                                 </Fragment>
                             : null
                         }
@@ -311,24 +301,16 @@ export default class SeerCamp extends React.Component<SeerCampProps, SeerCampSta
                 </div>
 
                 {
-                    this.state.view_gem ?
-                        <CharacterGem character_id={this.props.character_id}
-                                      slot_id={this.state.gem_selected}
-                                      is_open={true}
-                                      title={this.buildGemDialogueTitle(this.state.gem_selected)}
-                                      manage_modal={() => {this.setState({view_gem: false}); }}/>
-                    : null
-                }
-
-                {
                     this.state.manage_gems_on_item  ?
                         <ManageGems character_id={this.props.character_id}
                                     selected_item={this.state.item_selected}
                                     selected_gem={this.state.gem_selected}
+                                    cost={this.state.attach_gem}
                                     manage_model={() => this.setState({manage_gems_on_item: false})}
+                                    update_parent={this.updateParent.bind(this)}
                                     is_open={true}
                         />
-                        : null
+                    : null
                 }
 
             </Fragment>

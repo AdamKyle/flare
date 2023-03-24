@@ -25,10 +25,9 @@ export default class ManageItemSocketsActions extends React.Component<any, any> 
                                on_click={this.doAction.bind(this)}
                                disabled={this.props.is_disabled || this.props.is_loading}
                 />
-                <DangerButton button_label={'Close'}
-                              on_click={this.closeAction.bind(this)}
-                              additional_css={'ml-2'}
-                              disabled={this.props.is_loading} />
+                {
+                    this.props.children
+                }
                 <a href='/information/seer' target='_blank' className='relative top-[20px] md:top-[0px] ml-2'>Help <i
                     className="fas fa-external-link-alt"></i></a>
             </Fragment>

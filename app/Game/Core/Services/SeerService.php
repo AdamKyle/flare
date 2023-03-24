@@ -112,7 +112,7 @@ class SeerService {
             return $this->errorResult('No Sockets on the supplied item. You need to add sockets to the item first');
         }
 
-        if ($slot->item->sockets->isNotEmpty() && $slot->item->socket_count >= $slot->item->sockets->count()) {
+        if ($slot->item->sockets->isNotEmpty() && $slot->item->sockets->count() >= $slot->item->socket_count) {
             return $this->errorResult(('Not enough sockets for this gem.'));
         }
 
