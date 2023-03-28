@@ -3,6 +3,8 @@ import {formatNumber} from "../../../../../lib/game/format-number";
 import ItemAffixDetails from "./item-affix-details";
 import ItemHolyDetails from "./item-holy-details";
 import OrangeButton from "../../../../../components/ui/buttons/orange-button";
+import PrimaryButton from "../../../../../components/ui/buttons/primary-button";
+import InventoryItemAttachedGems from "../inventory-item-attached-gems";
 
 export default class ItemDetails extends React.Component<any, any> {
 
@@ -14,6 +16,7 @@ export default class ItemDetails extends React.Component<any, any> {
             view_affix: false,
             holy_stacks: null,
             view_stacks: false,
+            view_sockets: false,
         }
     }
 
@@ -29,6 +32,21 @@ export default class ItemDetails extends React.Component<any, any> {
             holy_stacks: typeof holyStacks !== 'undefined' ? holyStacks : null,
             view_stacks: !this.state.view_stacks,
         });
+    }
+
+    viewSockets() {
+        this.setState({
+            view_sockets: !this.state.view_sockets
+        });
+    }
+
+    renderAtonementAmounts() {
+        return this.props.item.item_atonements.atonements.map((atonement: any) => {
+            return <Fragment>
+                <dt>{atonement.name}</dt>
+                <dd>{(atonement.total * 100).toFixed(2)}%</dd>
+            </Fragment>
+        })
     }
 
     render() {
@@ -128,20 +146,35 @@ export default class ItemDetails extends React.Component<any, any> {
                             : null
                         }
 
-                        {
-                            this.props.item.socket_amount > 0 ?
-                                <Fragment>
-                                    <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                                    <h4 className='text-sky-600 dark:text-sky-500'>Sockets</h4>
-                                    <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                                    <dl>
-                                        <dt>Sockets</dt>
-                                        <dd>{this.props.item.socket_amount}</dd>
-                                    </dl>
-                                </Fragment>
-                            : null
-                        }
-
+                    </div>
+                </div>
+                <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                <div className='grid grid-cols-3 gap-2'>
+                    <div>
+                        <h4 className='text-sky-600 dark:text-sky-500'>Sockets</h4>
+                        <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                        <dl>
+                            <dt>Sockets Available</dt>
+                            <dd>{this.props.item.socket_amount}</dd>
+                        </dl>
+                        <OrangeButton button_label={'View Attached Gems'} on_click={this.viewSockets.bind(this)} additional_css={'my-4'} />
+                    </div>
+                    <div>
+                        <h4 className='text-sky-600 dark:text-sky-500'>Elemental Atonement</h4>
+                        <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                        <dl>
+                            {this.renderAtonementAmounts()}
+                        </dl>
+                    </div>
+                    <div>
+                        <h4 className='text-sky-600 dark:text-sky-500'>Primary Elemental Attack</h4>
+                        <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                        <dl>
+                            <dt>Primary Element</dt>
+                            <dd>{this.props.item.item_atonements.elemental_damage.name}</dd>
+                            <dt>Damage</dt>
+                            <dd>{(this.props.item.item_atonements.elemental_damage.amount * 100).toFixed(2)}%</dd>
+                        </dl>
                     </div>
                 </div>
                 <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
@@ -224,6 +257,12 @@ export default class ItemDetails extends React.Component<any, any> {
                 {
                     this.state.view_stacks && this.state.holy_stacks !== null ?
                         <ItemHolyDetails is_open={this.state.view_stacks} holy_stacks={this.state.holy_stacks} manage_modal={this.manageHolyStacksDetails.bind(this)} />
+                    : null
+                }
+
+                {
+                    this.state.view_sockets ?
+                        <InventoryItemAttachedGems is_open={this.state.view_sockets} character_id={this.props.character_id} item_id={this.props.item.id} manage_modal={this.viewSockets.bind(this)} />
                     : null
                 }
             </div>

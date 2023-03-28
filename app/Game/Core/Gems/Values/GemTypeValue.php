@@ -16,7 +16,7 @@ class GemTypeValue {
         self::WATER => self::WATER,
     ];
 
-    private array $names = [
+    private static array $names = [
         self::FIRE  => 'Fire',
         self::ICE   => 'Ice',
         self::WATER => 'Water',
@@ -30,8 +30,12 @@ class GemTypeValue {
         $this->value = $value;
     }
 
+    public static function getNames(): array {
+        return self::$names;
+    }
+
     public function getNameOfAtonement(): string {
-        return $this->names[$this->value];
+        return self::$names[$this->value];
     }
 
     public function isFire(): bool {

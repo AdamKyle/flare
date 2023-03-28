@@ -83,7 +83,7 @@ export default class InventoryUseDetails extends React.Component<any, any> {
                                         this.state.item.type === 'quest' ?
                                             <InventoryQuestItemDetails item={this.state.item} />
                                         :
-                                            <ItemDetails item={this.state.item} />
+                                            <ItemDetails item={this.state.item} character_id={this.props.character_id} />
                                     }
                                 </Fragment>
                     }

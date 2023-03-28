@@ -25,6 +25,8 @@ export default class ManageGems<T> extends React.Component<ManageGemsProps<T>, M
             when_replacing: [],
             has_gems_on_item: false,
             attached_gems: [],
+            if_replacing_atonements: [],
+            original_atonement: [],
             socket_data: {},
             tabs: [{
                 key: 'add-gem',
@@ -51,6 +53,8 @@ export default class ManageGems<T> extends React.Component<ManageGemsProps<T>, M
                 when_replacing: result.data.when_replacing,
                 has_gems_on_item: result.data.has_gem_on_item,
                 socket_data: result.data.socket_data,
+                if_replacing_atonements: result.data.if_replacing_atonements,
+                original_atonement: result.data.original_atonement,
             })
         }, (error: AxiosError) => {
             console.error(error);
@@ -104,7 +108,13 @@ export default class ManageGems<T> extends React.Component<ManageGemsProps<T>, M
                                     <AddingTheGem gem_to_add={this.state.gem_to_attach} do_action={this.doAction.bind(this)} action_disabled={this.state.trading_with_seer} socket_data={this.state.socket_data} />
                                 </TabPanel>
                                 <TabPanel key={'replace-gem'}>
-                                    <ReplacingAGem when_replacing={this.state.when_replacing} gems_you_have={this.state.attached_gems} action_disabled={this.state.trading_with_seer}/>
+                                    <ReplacingAGem
+                                        when_replacing={this.state.when_replacing}
+                                        gems_you_have={this.state.attached_gems}
+                                        action_disabled={this.state.trading_with_seer}
+                                        original_atonement={this.state.original_atonement}
+                                        if_replacing={this.state.if_replacing_atonements}
+                                    />
                                 </TabPanel>
                             </Tabs>
                         </Fragment>

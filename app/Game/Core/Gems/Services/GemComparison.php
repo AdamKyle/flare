@@ -2,18 +2,21 @@
 
 namespace App\Game\Core\Gems\Services;
 
-use App\Flare\Models\Character;
-use App\Flare\Models\Gem;
-use App\Flare\Transformers\CharacterGemsTransformer;
-use App\Game\Core\Gems\Values\GemTypeValue;
-use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Core\Gems\Traits\GetItemAtonements;
 use Exception;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
+use App\Flare\Models\Character;
+use App\Flare\Models\Gem;
+use App\Flare\Models\Item as FlareItem;
+use App\Flare\Transformers\CharacterGemsTransformer;
+use App\Game\Core\Gems\Values\GemTypeValue;
+use App\Game\Core\Traits\ResponseBuilder;
+
 
 class GemComparison {
 
-    use ResponseBuilder;
+    use ResponseBuilder, GetItemAtonements;
 
     private Manager $manager;
 
@@ -55,11 +58,13 @@ class GemComparison {
                 'has_gems_on_item'   => false,
                 'gem_to_attach'      => $this->manager->createData(new Item($gemSlot->gem, $this->characterGemsTransformer))->toArray(),
                 'when_replacing'     => [],
+                'if_replaced'        => [],
             ]);
         }
 
         $comparisonData = [
-            'when_replacing' => [],
+            'when_replacing'          => [],
+            'if_replaced_atonements'  => [],
         ];
 
         foreach ($slot->item->sockets as $socket) {
@@ -70,6 +75,11 @@ class GemComparison {
                 if (!empty($gemComparison['when_replacing'])) {
                     $comparisonData['when_replacing'][] = $gemComparison['when_replacing'];
                 }
+
+                $comparisonData['if_replaced_atonements'][] = [
+                    'name_to_replace' => $socket->gem->name,
+                    'data'            => $this->ifReplaced($gemSlot->gem, $slot->item, $socket->gem->id),
+                ];
             }
         }
 
@@ -79,10 +89,12 @@ class GemComparison {
 
                 return $this->manager->createData($gem)->toArray();
             })->toArray()),
-            'socket_data'        => $itemSocketData,
-            'has_gems_on_item'   => true,
-            'gem_to_attach'      => $this->manager->createData(new Item($gemSlot->gem, $this->characterGemsTransformer))->toArray(),
-            'when_replacing'     => $comparisonData['when_replacing'],
+            'socket_data'             => $itemSocketData,
+            'has_gems_on_item'        => true,
+            'gem_to_attach'           => $this->manager->createData(new Item($gemSlot->gem, $this->characterGemsTransformer))->toArray(),
+            'when_replacing'          => $comparisonData['when_replacing'],
+            'if_replacing_atonements' => $comparisonData['if_replaced_atonements'],
+            'original_atonement'      => $this->getElementAtonement($socket->item)
         ]);
     }
 
@@ -115,6 +127,26 @@ class GemComparison {
         return [
             'when_replacing' => $nonMatchingComparison,
         ];
+    }
+
+    /**
+     * @param Gem $gemToCompare
+     * @param FlareItem $item
+     * @param int $gemToReplace
+     * @return array
+     */
+    protected function ifReplaced(Gem $gemToCompare, FlareItem $item, int $gemToReplace): array {
+
+        $gemToCompareAttributes = $gemToCompare->getAttributes();
+        $itemsAttachedGems      = $item->sockets->pluck('gem')->toArray();
+
+        foreach ($itemsAttachedGems as $index => $attachedGem) {
+            if ($attachedGem['id'] === $gemToReplace) {
+                $itemsAttachedGems[$index] = $gemToCompareAttributes;
+            }
+        }
+
+        return $this->getElementAtonementFromArray($itemsAttachedGems);
     }
 
     /**

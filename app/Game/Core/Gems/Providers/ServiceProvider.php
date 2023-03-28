@@ -14,6 +14,7 @@ use App\Flare\Transformers\InventoryTransformer;
 use App\Flare\Transformers\Serializers\CoreSerializer;
 use App\Flare\Transformers\UsableItemTransformer;
 use App\Game\Battle\Services\BattleDrop;
+use App\Game\Core\Gems\Services\AttachedGemService;
 use App\Game\Core\Gems\Services\GemComparison;
 use App\Game\Core\Handlers\HandleGoldBarsAsACurrency;
 use App\Game\Core\Services\CharacterPassiveSkills;
@@ -38,15 +39,22 @@ use App\Game\Core\Services\CraftingSkillService;
 use App\Game\Core\Services\EquipItemService;
 use App\Game\Core\Services\ShopService;
 
-class ServiceProvider extends ApplicationServiceProvider
-{
+class ServiceProvider extends ApplicationServiceProvider {
     /**
      * Register any application services.
      *
      * @return void
      */
-    public function register()
-    {
+    public function register() {
+
+        $this->app->bind(AttachedGemService::class, function($app) {
+            return new AttachedGemService(
+                $app->make(CharacterGemsTransformer::class),
+                $app->make(Manager::class),
+                $app->make(CharacterInventoryService::class)
+            );
+        });
+
         $this->app->bind(GemComparison::class, function($app) {
             return new GemComparison($app->make(CharacterGemsTransformer::class), $app->make(Manager::class));
         });

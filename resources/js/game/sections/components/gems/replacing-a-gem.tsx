@@ -6,10 +6,23 @@ import clsx from "clsx";
 import ReplacingAGemProps from "./types/replacing-a-gem-props";
 import AttachedGems from "./deffinitions/attached-gems";
 import WhenReplacing from "./deffinitions/when-replacing";
+import AtonementComparison from "./atonement-comparison";
 
-export default class ReplacingAGem extends React.Component<ReplacingAGemProps, {}> {
+export default class ReplacingAGem extends React.Component<ReplacingAGemProps, any> {
     constructor(props: ReplacingAGemProps) {
         super(props);
+
+        this.state = {
+            show_replacement_comparison: false,
+            gem_name_to_replace: null,
+        }
+    }
+
+    replaceGem(gemName: string) {
+        this.setState({
+            show_replacement_comparison: true,
+            gem_name_to_replace: gemName,
+        });
     }
 
     displayCards(): JSX.Element[] {
@@ -42,7 +55,7 @@ export default class ReplacingAGem extends React.Component<ReplacingAGemProps, {
                         </div>
                     </div>
                     <div className='my-4'>
-                        <PrimaryButton button_label={'Replace'} on_click={() => {}} disabled={this.props.action_disabled} />
+                        <PrimaryButton button_label={'Replace'} on_click={() => {this.replaceGem(gemYouHave.name)}} disabled={this.props.action_disabled} />
                     </div>
                 </BasicCard>
             );
@@ -59,6 +72,22 @@ export default class ReplacingAGem extends React.Component<ReplacingAGemProps, {
                 })}>
                     {this.displayCards()}
                 </div>
+
+                {
+                    this.state.show_replacement_comparison && this.state.gem_name_to_replace !== null ?
+                        <AtonementComparison
+                            is_open={true}
+                            manage_model={()=> {this.setState({
+                                show_replacement_comparison: false,
+                                gem_name_to_replace: null,
+                            })}}
+                            trading_with_seer={false}
+                            original_atonement={this.props.original_atonement}
+                            if_replacing={this.props.if_replacing}
+                            gem_name={this.state.gem_name_to_replace}
+                        />
+                    : null
+                }
             </div>
         );
     }

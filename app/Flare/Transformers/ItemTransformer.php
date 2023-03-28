@@ -4,13 +4,16 @@ namespace App\Flare\Transformers;
 
 use App\Flare\Models\GameSkill;
 use App\Flare\Traits\IsItemUnique;
+use App\Game\Core\Gems\Traits\GetItemAtonements;
+use App\Game\Core\Gems\Values\GemTypeValue;
 use Facades\App\Flare\Calculators\SellItemCalculator;
+use Illuminate\Support\Facades\DB;
 use League\Fractal\TransformerAbstract;
 use App\Flare\Models\Item;
 
 class ItemTransformer extends TransformerAbstract {
 
-    use IsItemUnique;
+    use IsItemUnique, GetItemAtonements;
 
     /**
      * Gets the response data for the character sheet
@@ -90,6 +93,7 @@ class ItemTransformer extends TransformerAbstract {
             'ignores_caps'                     => $item->ignores_caps,
             'sockets'                          => $item->sockets,
             'socket_amount'                    => $item->socket_count,
+            'item_atonements'                  => $this->getElementAtonement($item),
         ];
     }
 }

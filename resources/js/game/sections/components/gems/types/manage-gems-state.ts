@@ -14,4 +14,6 @@ export default interface ManageGemsState {
     tabs: ManageGemsTabs,
     trading_with_seer: boolean,
     error_message: string|null,
+    if_replacing_atonements: any[]|[],
+    original_atonement: any,
 }

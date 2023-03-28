@@ -5,4 +5,6 @@ export default interface ReplacingAGemProps {
     when_replacing: WhenReplacing[]|[];
     gems_you_have: AttachedGems[]|[];
     action_disabled: boolean;
+    original_atonement: any[]|[];
+    if_replacing: any[]|[];
 }
