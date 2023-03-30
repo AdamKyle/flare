@@ -114,6 +114,11 @@ export default class ManageGems<T> extends React.Component<ManageGemsProps<T>, M
                                         action_disabled={this.state.trading_with_seer}
                                         original_atonement={this.state.original_atonement}
                                         if_replacing={this.state.if_replacing_atonements}
+                                        update_parent={this.props.update_parent}
+                                        selected_gem={this.props.selected_gem}
+                                        selected_item={this.props.selected_item}
+                                        manage_parent_modal={this.props.manage_model}
+                                        character_id={this.props.character_id}
                                     />
                                 </TabPanel>
                             </Tabs>

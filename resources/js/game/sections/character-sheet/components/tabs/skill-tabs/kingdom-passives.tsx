@@ -76,7 +76,6 @@ export default class KingdomPassives extends React.Component<any, any> {
 
     updatePassiveTrainingState(passive: any): boolean {
         if (passive.started_at !== null) {
-            console.log(passive.name);
             this.setState({
                 skill_in_training: passive,
             });

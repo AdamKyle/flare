@@ -170,8 +170,6 @@ export default class DuelPlayer extends React.Component<any, any> {
             }
         }
 
-        console.log(this.state.battle_messages);
-
         return this.state.battle_messages.map((battleMessage: BattleMessage) => {
             return <p className={clsx(
                 {

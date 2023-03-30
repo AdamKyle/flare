@@ -3,9 +3,12 @@
 namespace App\Game\Core\Services;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\GemBagSlot;
 use App\Flare\Models\InventorySlot;
+use App\Flare\Models\Item;
 use App\Flare\Values\ArmourTypes;
 use App\Flare\Values\WeaponTypes;
+use App\Game\Core\Gems\Services\GemComparison;
 use App\Game\Core\Traits\ResponseBuilder;
 use Facades\App\Game\Core\Handlers\DuplicateItemHandler;
 use Facades\App\Game\Core\Handlers\HandleGoldBarsAsACurrency;
@@ -18,6 +21,25 @@ class SeerService {
     const GEM_ATTACH_COST = 500;
     const REMOVE_GEM      = 10;
 
+    /**
+     * @var GemComparison $gemComparison
+     */
+    private GemComparison $gemComparison;
+
+    /**
+     * @param GemComparison $gemComparison
+     */
+    public function __construct(GemComparison $gemComparison) {
+        $this->gemComparison = $gemComparison;
+    }
+
+    /**
+     * Create Sockets.
+     *
+     * @param Character $character
+     * @param int $inventorySlotId
+     * @return array
+     */
     public function createSockets(Character $character, int $inventorySlotId): array {
         $slot = $character->inventory->slots->find($inventorySlotId);
 
@@ -42,6 +64,43 @@ class SeerService {
 
     }
 
+    public function fetchGemsWithItemsForRemoval(Character $character): array {
+        $items =  $this->getItems($character);
+        $gems  = [];
+
+        foreach ($items as $item) {
+            $socketWithItem = InventorySlot::where('inventory_id', $character->inventory->id)->where('id', $item['slot_id'])->first();
+
+            if (is_null($socketWithItem)) {
+                continue;
+            }
+
+            $gems[] = [
+                'slot_id' => $item['slot_id'],
+                'gems'    => $socketWithItem->item->sockets->map(function ($socket) {
+                    return [
+                        'gem_name'  => $socket->gem->name,
+                        'gem_id'    => $socket->gem_id,
+                    ];
+                }),
+                'comparison' => $this->gemComparison->ifItemGemsAreRemoved($socketWithItem->item)
+            ];
+        }
+
+        return $this->successResult([
+            'items' => $items,
+            'gems'  => $gems,
+        ]);
+    }
+
+    /**
+     * Remove Gems From Item.
+     *
+     * @param Character $character
+     * @param int $inventorySlotId
+     * @param int $gemId
+     * @return array
+     */
     public function removeGems(Character $character, int $inventorySlotId, int $gemId) {
         $slot    = $character->inventory->slots->find($inventorySlotId);
 
@@ -65,27 +124,11 @@ class SeerService {
             return $this->errorResult('You do not have the gold bars to do this.');
         }
 
-        $socket = $slot->item->sockets->where('gem_id', $gemId)->first();
+        $slot = $this->removeGemFromItem($character, $slot, $gemId);
 
-        if (is_null($socket)) {
+        if (is_null($slot)) {
             return $this->errorResult('Item does not have specified gem.');
         }
-
-        $gemInBag = $character->gemBag->gemSlots->where('gem_id', $socket->gem_id)->first();
-
-        if (!is_null($gemInBag)) {
-            $gemInBag->update(['amount' => $gemInBag->amount + 1]);
-        }
-
-        $character->gemBag()->gemSlots()->create([
-            'gem_bag_id' => $character->gemBag->id,
-            'gem_id'     => $socket->gem_id,
-            'amount'     => 1,
-        ]);
-
-        $socket->delete();
-
-        HandleGoldBarsAsACurrency::subtractCostFromKingdoms($character->kingdoms, self::REMOVE_GEM);
 
         $character = $character->refresh();
 
@@ -96,6 +139,124 @@ class SeerService {
         ]);
     }
 
+    /**
+     * Remove the gem from the item.
+     *
+     * @param Character $character
+     * @param InventorySlot $slot
+     * @param int $gemId
+     * @return InventorySlot|null
+     */
+    protected function removeGemFromItem(Character $character, InventorySlot $slot, int $gemId): InventorySlot|null {
+        $newItem = DuplicateItemHandler::duplicateItem($slot->item);
+
+        $socket = $newItem->sockets->where('gem_id', $gemId)->first();
+
+        if (is_null($socket)) {
+            return null;
+        }
+
+        $gemInBag = $character->gemBag->gemSlots->where('gem_id', $socket->gem_id)->first();
+
+        if (!is_null($gemInBag)) {
+            $gemInBag->update(['amount' => $gemInBag->amount + 1]);
+        } else {
+            $character->gemBag->gemSlots()->create([
+                'gem_bag_id' => $character->gemBag->id,
+                'gem_id'     => $socket->gem_id,
+                'amount'     => 1,
+            ]);
+        }
+
+        $socket->delete();
+
+        HandleGoldBarsAsACurrency::subtractCostFromKingdoms($character->kingdoms, self::REMOVE_GEM);
+
+        $slot->update(['item_id' => $newItem->id]);
+
+        return $slot->refresh();
+    }
+
+    /**
+     * Replace the gem at the gem slot specified.
+     *
+     * @param Character $character
+     * @param int $slotId
+     * @param int $gemSlotId
+     * @param int $gemIdToReplace
+     * @return array
+     */
+    public function replaceGem(Character $character, int $slotId, int $gemSlotId, int $gemIdToReplace): array {
+        $slot    = $character->inventory->slots->find($slotId);
+        $gemSlot = $character->gemBag->gemSlots->find($gemSlotId);
+
+        if (is_null($slot)) {
+            return $this->errorResult('No item was found to add a gem to.');
+        }
+
+        if (is_null($gemSlot)) {
+            return $this->errorResult('The gem you want to use to replace the requested gem with, does not exist.');
+        }
+
+        if ($slot->item->sockets->isEmpty()) {
+            return $this->errorResult('No gem to replace as item doesnt have sockets');
+        }
+
+        if ($character->isInventoryFull()) {
+            return $this->errorResult('Your inventory is full (gem bag counts). Could not replace the gem.');
+        }
+
+        if (!HandleGoldBarsAsACurrency::hasTheGoldBars($character->kingdoms, self::REMOVE_GEM)) {
+            return $this->errorResult('You do not have the gold bars to do this.');
+        }
+
+        $newItem = DuplicateItemHandler::duplicateItem($slot->item);
+
+        $socket = $newItem->sockets->where('gem_id', $gemIdToReplace)->first();
+
+        if (is_null($socket)) {
+            return $this->errorResult('No Gem found on the item for the gem you want to replace.');
+        }
+
+        $gemInBag = $character->gemBag->gemSlots->where('gem_id', $socket->gem_id)->first();
+
+        if (!is_null($gemInBag)) {
+            $gemInBag->update(['amount' => $gemInBag->amount + 1]);
+        } else {
+            $character->gemBag->gemSlots()->create([
+                'gem_bag_id' => $character->gemBag->id,
+                'gem_id'     => $socket->gem_id,
+                'amount'     => 1,
+            ]);
+        }
+
+        $socket->update([
+            'gem_id' => $gemSlot->gem_id
+        ]);
+
+        HandleGoldBarsAsACurrency::subtractCostFromKingdoms($character->kingdoms, self::REMOVE_GEM);
+
+        $slot->update(['item_id' => $newItem->id]);
+
+        $gemSlot->delete();
+
+        $character = $character->refresh();
+
+        return $this->successResult([
+            'items'   => $this->getItems($character),
+            'gems'    => $this->getGems($character),
+            'message' => 'Gem has been replaced!'
+        ]);
+    }
+
+    /**
+     * Assign the gem to a socket.
+     *
+     * @param Character $character
+     * @param int $inventorySlotId
+     * @param int $gemSlotId
+     * @return array
+     */
     public function assignGemToSocket(Character $character, int $inventorySlotId, int $gemSlotId) {
         $slot    = $character->inventory->slots->find($inventorySlotId);
         $gemSlot = $character->gemBag->gemSlots->find($gemSlotId);
@@ -120,6 +281,25 @@ class SeerService {
             return $this->errorResult('You do not have the gold bars to do this.');
         }
 
+       $this->addGemToItem($slot, $gemSlot);
+
+        HandleGoldBarsAsACurrency::subtractCostFromKingdoms($character->kingdoms, self::SOCKET_COST);
+
+        $character = $character->refresh();
+
+        return $this->successResult([
+            'items'   => $this->getItems($character),
+            'gems'    => $this->getGems($character),
+            'message' => 'Attached gem to item!'
+        ]);
+    }
+
+    /**
+     * @param InventorySlot $slot
+     * @param GemBagSlot $gemSlot
+     * @return Item
+     */
+    protected function addGemToItem(InventorySlot $slot, GemBagSlot $gemSlot): Item {
         $newItem = DuplicateItemHandler::duplicateItem($slot->item);
 
         $newItem->sockets()->create([
@@ -141,17 +321,15 @@ class SeerService {
 
         $gemSlot->delete();
 
-        HandleGoldBarsAsACurrency::subtractCostFromKingdoms($character->kingdoms, self::SOCKET_COST);
-
-        $character = $character->refresh();
-
-        return $this->successResult([
-            'items'   => $this->getItems($character),
-            'gems'    => $this->getGems($character),
-            'message' => 'Attached gem to item!'
-        ]);
+        return $newItem->refresh();
     }
 
+    /**
+     * Get items that we can assign gems to.
+     *
+     * @param Character $character
+     * @return array
+     */
     public function getItems(Character $character): array {
         return array_values($character->inventory->slots->where('item.socket_count', '>=', 0)->whereIn('item.type', [
             WeaponTypes::WEAPON,
@@ -174,6 +352,12 @@ class SeerService {
         })->toArray());
     }
 
+    /**
+     * Get gems to attach.
+     *
+     * @param Character $character
+     * @return array
+     */
     public function getGems(Character $character): array {
         return array_values($character->gemBag->gemSlots->map(function($slot) {
             return [
@@ -185,6 +369,12 @@ class SeerService {
         })->toArray());
     }
 
+    /**
+     * Assign a random socket count (1-6 sockets)
+     *
+     * @param InventorySlot $slot
+     * @return void
+     */
     protected function assignSocketCount(InventorySlot $slot): void {
 
         $newItem = DuplicateItemHandler::duplicateItem($slot->item);

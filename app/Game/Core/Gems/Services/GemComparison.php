@@ -78,6 +78,7 @@ class GemComparison {
 
                 $comparisonData['if_replaced_atonements'][] = [
                     'name_to_replace' => $socket->gem->name,
+                    'gem_id'          => $socket->gem_id,
                     'data'            => $this->ifReplaced($gemSlot->gem, $slot->item, $socket->gem->id),
                 ];
             }
@@ -96,6 +97,28 @@ class GemComparison {
             'if_replacing_atonements' => $comparisonData['if_replaced_atonements'],
             'original_atonement'      => $this->getElementAtonement($socket->item)
         ]);
+    }
+
+    public function ifItemGemsAreRemoved(FlareItem $item): array {
+        $gems = $item->sockets->pluck('gem')->toArray();
+
+        $atonementChanges = [
+            'original_atonement' => $this->getElementAtonement($item),
+            'atonement_changes'  => [],
+        ];
+
+        foreach ($gems as $index => $gem) {
+            $newListOfGems = $gems;
+
+            array_splice($newListOfGems, $index, 1);
+
+            $atonementChanges['atonement_changes'][] = [
+                'gem_id_to_remove' => $gem['id'],
+                'comparisons'      => $this->getElementAtonementFromArray($newListOfGems),
+            ];
+        }
+
+        return $atonementChanges;
     }
 
     /**

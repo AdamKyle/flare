@@ -9,12 +9,10 @@ export default class ManageItemSocketsActions extends React.Component<any, any> 
     }
 
     doAction() {
-        console.log('Called?');
         this.props.do_action('roll-sockets')
     }
 
     closeAction() {
-        console.log('Called? - closes');
         this.props.do_action('close-seer-action');
     }
 

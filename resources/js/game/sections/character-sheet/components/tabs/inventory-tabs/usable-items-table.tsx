@@ -108,7 +108,6 @@ export default class UsableItemsTable extends React.Component<UsableItemTable, a
     }
 
     render() {
-        console.log(this.props.usable_items)
         return (
             <Fragment>
 

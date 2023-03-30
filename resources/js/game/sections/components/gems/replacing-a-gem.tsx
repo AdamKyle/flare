@@ -8,8 +8,8 @@ import AttachedGems from "./deffinitions/attached-gems";
 import WhenReplacing from "./deffinitions/when-replacing";
 import AtonementComparison from "./atonement-comparison";
 
-export default class ReplacingAGem extends React.Component<ReplacingAGemProps, any> {
-    constructor(props: ReplacingAGemProps) {
+export default class ReplacingAGem<T> extends React.Component<ReplacingAGemProps<T>, any> {
+    constructor(props: ReplacingAGemProps<T>) {
         super(props);
 
         this.state = {
@@ -77,7 +77,7 @@ export default class ReplacingAGem extends React.Component<ReplacingAGemProps, a
                     this.state.show_replacement_comparison && this.state.gem_name_to_replace !== null ?
                         <AtonementComparison
                             is_open={true}
-                            manage_model={()=> {this.setState({
+                            manage_modal={()=> {this.setState({
                                 show_replacement_comparison: false,
                                 gem_name_to_replace: null,
                             })}}
@@ -85,6 +85,11 @@ export default class ReplacingAGem extends React.Component<ReplacingAGemProps, a
                             original_atonement={this.props.original_atonement}
                             if_replacing={this.props.if_replacing}
                             gem_name={this.state.gem_name_to_replace}
+                            update_parent={this.props.update_parent}
+                            selected_gem={this.props.selected_gem}
+                            selected_item={this.props.selected_item}
+                            manage_parent_modal={this.props.manage_parent_modal}
+                            character_id={this.props.character_id}
                         />
                     : null
                 }

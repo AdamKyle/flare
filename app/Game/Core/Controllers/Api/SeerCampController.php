@@ -8,6 +8,8 @@ use App\Flare\Models\InventorySlot;
 use App\Game\Core\Requests\AddGemToItemRequest;
 use App\Game\Core\Requests\ComparisonFromChatValidate;
 use App\Game\Core\Requests\ComparisonValidation;
+use App\Game\Core\Requests\RemoveGemFromItemRequest;
+use App\Game\Core\Requests\ReplaceGemOnItemRequest;
 use App\Game\Core\Requests\RollItemSocketsRequest;
 use App\Game\Core\Services\CharacterGemBagService;
 use App\Game\Core\Services\CharacterInventoryService;
@@ -43,6 +45,33 @@ class SeerCampController extends Controller {
 
     public function attachGemToItem(Character $character, AddGemToItemRequest $request): JsonResponse {
         $result = $this->seerService->assignGemToSocket($character, $request->slot_id, $request->gem_slot_id);
+
+        $status = $result['status'];
+        unset($result['status']);
+
+        return response()->json($result, $status);
+    }
+
+    public function replaceGemOnItem(Character $character, ReplaceGemOnItemRequest $request): JsonResponse {
+        $result = $this->seerService->replaceGem($character, $request->slot_id, $request->gem_slot_id, $request->gem_slot_to_replace);
+
+        $status = $result['status'];
+        unset($result['status']);
+
+        return response()->json($result, $status);
+    }
+
+    public function fetchItemsWithGems(Character $character): JsonResponse {
+        $result = $this->seerService->fetchGemsWithItemsForRemoval($character);
+
+        $status = $result['status'];
+        unset($result['status']);
+
+        return response()->json($result, $status);
+    }
+
+    public function removeGemFromItem(Character $character, RemoveGemFromItemRequest $removedGemFromItemRequest): JsonResponse {
+        $result = $this->seerService->removeGems($character, $removedGemFromItemRequest->slot_id, $removedGemFromItemRequest->gem_id);
 
         $status = $result['status'];
         unset($result['status']);

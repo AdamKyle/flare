@@ -15,6 +15,7 @@ import AddGemsToItem from "./components/seer-actions/add-gems-to-item";
 import AddGemsToItemActions from "./components/seer-actions/add-gems-to-item-actions";
 import GemsForSeer from "../../../../lib/game/types/actions/components/seer-camp/gems-for-seer";
 import ManageGems from "../../../components/gems/manage-gems";
+import RemoveGem from "./components/seer-actions/remove-gem";
 
 export default class SeerCamp extends React.Component<SeerCampProps, SeerCampState> {
 
@@ -53,6 +54,7 @@ export default class SeerCamp extends React.Component<SeerCampProps, SeerCampSta
             success_message: null,
             selected_seer_action: null,
             manage_gems_on_item: false,
+            manage_remove_gem: false,
         }
     }
 
@@ -86,6 +88,12 @@ export default class SeerCamp extends React.Component<SeerCampProps, SeerCampSta
             this.setState({
                 manage_gems_on_item: true
             });
+        }
+
+        if (action === 'remove-gem') {
+            this.setState({
+                manage_remove_gem: true
+            })
         }
     }
 
@@ -149,12 +157,11 @@ export default class SeerCamp extends React.Component<SeerCampProps, SeerCampSta
         })[0];
     }
 
-    updateParent(value: any, property: string) {
-        let state = JSON.parse(JSON.stringify(this.state));
-
-        state[property] = value;
-
-        this.setState(state);
+    updateParent<T>(value: T, property: string) {
+        this.setState(prevState => ({
+            ...prevState,
+            [property]: value
+        }));
     }
 
     getItemInfo (key: string) {
@@ -229,6 +236,17 @@ export default class SeerCamp extends React.Component<SeerCampProps, SeerCampSta
                                     }
 
                                     {
+                                        this.state.selected_seer_action === 'remove-gem' ?
+                                            <div className='mt-3 mb-2'>
+                                                <RemoveGem
+                                                    character_id={this.props.character_id}
+                                                    update_parent={this.updateParent.bind(this)}
+                                                />
+                                            </div>
+                                        : null
+                                    }
+
+                                    {
                                         this.state.item_selected !== 0 && this.state.selected_seer_action === 'manage-sockets' ?
                                             <ManageItemSocketsCost socket_cost={this.state.socket_cost} get_item_info={this.getItemInfo.bind(this)} />
                                         : null
@@ -290,7 +308,7 @@ export default class SeerCamp extends React.Component<SeerCampProps, SeerCampSta
                         }
 
                         {
-                            this.state.selected_seer_action === null ?
+                            this.state.selected_seer_action === null || this.state.selected_seer_action === 'remove-gem' ?
                                 <DangerButton button_label={'Leave Seer Camp'}
                                               on_click={this.props.leave_seer_camp}
                                               additional_css={'ml-2'}

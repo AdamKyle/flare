@@ -13,6 +13,7 @@ use App\Flare\Transformers\InventoryTransformer;
 use App\Flare\Transformers\Serializers\CoreSerializer;
 use App\Flare\Transformers\UsableItemTransformer;
 use App\Game\Battle\Services\BattleDrop;
+use App\Game\Core\Gems\Services\GemComparison;
 use App\Game\Core\Handlers\HandleGoldBarsAsACurrency;
 use App\Game\Core\Services\CharacterPassiveSkills;
 use App\Game\Core\Services\DropCheckService;
@@ -106,6 +107,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(HandleGoldBarsAsACurrency::class, function($app) {
             return new HandleGoldBarsAsACurrency($app->make(UpdateKingdomHandler::class));
+        });
+
+        $this->app->bind(SeerService::class, function($app) {
+            return new SeerService($app->make(GemComparison::class));
         });
     }
 

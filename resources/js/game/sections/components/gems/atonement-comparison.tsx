@@ -16,82 +16,89 @@ import ManageGemsProps from "./types/manage-gems-props";
 import {ActionTypes} from "./types/adding-the-gem-props";
 import clsx from "clsx";
 import BasicCard from "../../../components/ui/cards/basic-card";
+import RenderAtonementDetails from "./components/render-atonement-details";
+import RenderAtonementAdjustment from "./components/render-atonement-adjustment";
 
 export default class AtonementComparison extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
+
+        this.state = {
+            is_replacing: false,
+            error_message: null,
+        }
     }
 
-    renderAtonements(atonementData: any): JSX.Element[]|[] {
-        return atonementData.map((data: any) => {
-            return (
-                <Fragment>
-                    <dt>{data.name}</dt>
-                    <dd>{(data.total * 100).toFixed(2)}%</dd>
-                </Fragment>
-            )
+    closeModals() {
+        this.props.manage_modal();
+        this.props.manage_parent_modal();
+    }
+
+
+
+    findAtonementsForReplacing(): any|undefined {
+        return this.props.if_replacing.find((data: any) => {
+            return data.name_to_replace === this.props.gem_name;
         })
     }
 
-    renderDifference(atonementData: any, originalAtonement: any): JSX.Element[]|[] {
-        return atonementData.atonements.map((data: any) => {
+    replaceGem() {
+        this.setState({
+            is_replacing: true,
+            error_message: null,
+        }, () => {
+            const gemSocketId = this.findAtonementsForReplacing()
 
-            const atonementValue = this.findElementAtonement(originalAtonement, data.name);
-
-            return (
-               <Fragment>
-                    <dt>{data.name}</dt>
-                    <dd
-                        className={clsx({
-                            'text-green-700 dark:text-green-500': data.total > atonementValue,
-                            'text-red-700 dark:text-red-500': data.total < atonementValue
-                        })}
-                    >{(data.total * 100).toFixed(2)}%</dd>
-                </Fragment>
-            );
-        });
-    }
-
-    findElementAtonement(originalAtonement: any, elementName: string): number {
-        const element = originalAtonement.filter((atonement: any) => atonement.name === elementName);
-
-        if (element.length > 0) {
-            return element[0].total;
-        }
-
-        return 0;
-    }
-
-    findAtonementsForReplacing(): any[]|[] {
-        return this.props.if_replacing.filter((data: any) => {
-            return data.name_to_replace === this.props.gem_name;
-        })[0].data
+            if (typeof gemSocketId !== 'undefined') {
+                SeerActions.replaceGemOnItem(this, this.props.selected_item, this.props.selected_item, gemSocketId.gem_id);
+            }
+        })
     }
 
     render() {
+        const atonementForReplacing = this.findAtonementsForReplacing();
+
         return(
             <Dialogue is_open={this.props.is_open}
-                      handle_close={this.props.manage_model}
+                      handle_close={this.props.manage_modal}
                       title={'Replacement details'}
-                      primary_button_disabled={this.props.trading_with_seer}
+                      primary_button_disabled={this.state.is_replacing}
+                      secondary_actions={{
+                          secondary_button_disabled: this.state.is_replacing,
+                          secondary_button_label: 'Replace The Gem',
+                          handle_action: this.replaceGem.bind(this)
+                      }}
             >
                 <p className='my-4'>Below are your Atonement Adjustment Details. Each item can be atoned to a specific element.</p>
                 <p className='my-4'>Upon doing so, taking into account your overall gear and the items atonements, your element damage/resistances
                 could change.</p>
+                {
+                    this.state.error_message !== null ?
+                        <DangerAlert additional_css={'my-4'}>
+                            {this.state.error_message}
+                        </DangerAlert>
+                    : null
+                }
                 <div className='my-4 grid lg:grid-cols-2 gap-2'>
+                    <RenderAtonementDetails title={'Original Atonement'} original_atonement={this.props.original_atonement} />
                     <BasicCard>
-                        <h3 className='my-4'>Original Atonement</h3>
-                        <dl>
-                            {this.renderAtonements(this.props.original_atonement.atonements)}
-                        </dl>
-                    </BasicCard>
-                    <BasicCard>
-                        <h3 className='my-4'>Adjusted Atonement</h3>
-                        <dl>
-                            {this.renderDifference(this.findAtonementsForReplacing(), this.props.original_atonement.atonements)}
-                        </dl>
+                        {
+
+                            typeof atonementForReplacing !== 'undefined' ?
+                                <RenderAtonementAdjustment atonement_for_comparison={this.findAtonementsForReplacing().data.atonements} original_atonement={this.props.original_atonement} />
+                            :
+                                <DangerAlert>
+                                    Error with finding the atonement to replace.
+                                </DangerAlert>
+                        }
+
                     </BasicCard>
                 </div>
+                {
+                    this.state.is_replacing ?
+                        <LoadingProgressBar />
+                    : null
+                }
             </Dialogue>
         );
     }
