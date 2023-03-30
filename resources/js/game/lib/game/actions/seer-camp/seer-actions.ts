@@ -108,6 +108,36 @@ export default class SeerActions {
                     component.props.update_parent(result.data.message, 'success_message');
                     component.props.update_parent(result.data.items, 'items');
                     component.props.update_parent(result.data.gems, 'gems');
+                    component.props.update_remomal_data(result.data.removal_data.items, 'items')
+                    component.props.update_remomal_data(result.data.removal_data.gems, 'gems')
+                    component.props.manage_modal();
+                })
+            }, (error: AxiosError) => {
+                component.setState({
+                    is_removing: false,
+                }, () => {
+                    if (typeof error.response !== 'undefined') {
+                        const response = error.response;
+
+                        component.setState({
+                            error_message: response.data.message,
+                        });
+                    }
+                });
+            });
+    }
+
+    static removeAllGems(component: RemoveGemComparison, slotId: number) {
+        (new Ajax()).setRoute('seer-camp/remove-all-gems/' + component.props.character_id + '/' + slotId)
+            .doAjaxCall('post', (result: AxiosResponse) => {
+                component.setState({
+                    is_removing: false,
+                }, () => {
+                    component.props.update_parent(result.data.message, 'success_message');
+                    component.props.update_parent(result.data.items, 'items');
+                    component.props.update_parent(result.data.gems, 'gems');
+                    component.props.update_remomal_data(result.data.removal_data.items, 'items')
+                    component.props.update_remomal_data(result.data.removal_data.gems, 'gems')
                     component.props.manage_modal();
                 })
             }, (error: AxiosError) => {

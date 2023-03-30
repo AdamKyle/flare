@@ -51,7 +51,15 @@ class SeerService {
             return $this->errorResult('You do not have the gold bars to do this.');
         }
 
+        if ($slot->item->sockets->count() > 0) {
+            return $this->errorResult('Cannot re-roll sockets as this item has gems attached. Remove them first.');
+        }
+
+        $oldSocketCount = $slot->item->socket_count;
+
         $this->assignSocketCount($slot);
+
+        $newSocketCount = $slot->refresh()->item->socket_count;
 
         $character = $character->refresh();
 
@@ -59,7 +67,8 @@ class SeerService {
 
         return $this->successResult([
             'items'   => $this->getItems($character),
-            'message' => 'Attached sockets to item!'
+            'gems'    => $this->getGems($character),
+            'message' => 'Attached sockets to item! (Old Socket Count: '.$oldSocketCount.', New Count: '.$newSocketCount.').'
         ]);
 
     }
@@ -101,7 +110,7 @@ class SeerService {
      * @param int $gemId
      * @return array
      */
-    public function removeGems(Character $character, int $inventorySlotId, int $gemId) {
+    public function removeGem(Character $character, int $inventorySlotId, int $gemId) {
         $slot    = $character->inventory->slots->find($inventorySlotId);
 
         if (is_null($slot)) {
@@ -132,10 +141,66 @@ class SeerService {
 
         $character = $character->refresh();
 
+        $result = $this->fetchGemsWithItemsForRemoval($character);
+
         return $this->successResult([
-            'items'   => $this->getItems($character),
-            'gems'    => $this->getGems($character),
-            'message' => 'Gem has been removed from the socket!'
+            'items'        => $this->getItems($character),
+            'gems'         => $this->getGems($character),
+            'removal_data' => [
+                'items' => $result['items'],
+                'gems'  => $result['gems'],
+            ],
+            'message'       => 'Gem has been removed from the socket!',
+        ]);
+    }
+
+    public function removeAllGems(Character $character, InventorySlot $inventorySlot): array {
+        $slot    = $character->inventory->slots->find($inventorySlot->id);
+
+        if (is_null($slot)) {
+            return $this->errorResult('No item was found to add a gem to.');
+        }
+
+        if (is_null($slot->item->socket_count) || $slot->item->socket_count <= 0) {
+            return $this->errorResult('No sockets to remove gems from.');
+        }
+
+        if ($slot->item->sockets->isEmpty()) {
+            return $this->errorResult('Sockets on this item are already empty.');
+        }
+
+        if ($character->isInventoryFull()) {
+            return $this->errorResult('Your inventory is full (gem bag counts).');
+        }
+
+        $inventoryCount = $character->getInventoryCount() + $slot->item->sockets->count();
+
+        if ($inventoryCount > $character->inventory_max) {
+            return $this->errorResult('Not enough room in your inventory to remove all the gems on this item. (gem bag counts).');
+        }
+
+        $socketCount = $slot->item->sockets->count();
+
+        if (!HandleGoldBarsAsACurrency::hasTheGoldBars($character->kingdoms, self::REMOVE_GEM * $socketCount)) {
+            return $this->errorResult('You do not have the gold bars to do this.');
+        }
+
+        foreach ($slot->item->sockets as $socket) {
+            $slot = $this->removeGemFromItem($character, $slot, $socket->gem_id);
+        }
+
+        $character = $character->refresh();
+
+        $result = $this->fetchGemsWithItemsForRemoval($character);
+
+        return $this->successResult([
+            'items'        => $this->getItems($character),
+            'gems'         => $this->getGems($character),
+            'removal_data' => [
+                'items' => $result['items'],
+                'gems'  => $result['gems'],
+            ],
+            'message' => 'All gems have been removed!',
         ]);
     }
 

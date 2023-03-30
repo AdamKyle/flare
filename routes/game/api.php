@@ -59,6 +59,7 @@ Route::group(['middleware' => ['is.character.who.they.say.they.are']], function(
             Route::post('/seer-camp/add-gem/{character}', ['uses' => 'Api\SeerCampController@attachGemToItem']);
             Route::post('/seer-camp/replace-gem/{character}', ['uses' => 'Api\SeerCampController@replaceGemOnItem']);
             Route::post('/seer-camp/remove-gem/{character}', ['uses' => 'Api\SeerCampController@removeGemFromItem']);
+            Route::post('/seer-camp/remove-all-gems/{character}/{inventorySlot}', ['uses' => 'Api\SeerCampController@removeAllGemsFromItem']);
         });
 
         Route::post('/character/{character}/inventory/destroy-all-alchemy-items', ['uses' => 'Api\CharacterInventoryController@destroyAllAlchemyItems']);

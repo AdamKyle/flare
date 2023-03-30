@@ -45,6 +45,8 @@ export default class RemoveGemComparison extends React.Component<any, any> {
         this.setState({
             is_removing: true,
             error_message: null,
+        }, () => {
+            SeerActions.removeAllGems(this, this.props.selected_item)
         })
     }
 
@@ -100,7 +102,7 @@ export default class RemoveGemComparison extends React.Component<any, any> {
                       secondary_actions={{
                           secondary_button_label: 'Remove All Gems',
                           secondary_button_disabled: false,
-                          handle_action: () => {},
+                          handle_action: this.removeAllGems.bind(this),
                       }}
             >
                 <InfoAlert>

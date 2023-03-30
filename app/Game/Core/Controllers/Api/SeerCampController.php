@@ -71,7 +71,16 @@ class SeerCampController extends Controller {
     }
 
     public function removeGemFromItem(Character $character, RemoveGemFromItemRequest $removedGemFromItemRequest): JsonResponse {
-        $result = $this->seerService->removeGems($character, $removedGemFromItemRequest->slot_id, $removedGemFromItemRequest->gem_id);
+        $result = $this->seerService->removeGem($character, $removedGemFromItemRequest->slot_id, $removedGemFromItemRequest->gem_id);
+
+        $status = $result['status'];
+        unset($result['status']);
+
+        return response()->json($result, $status);
+    }
+
+    public function removeAllGemsFromItem(Character $character, InventorySlot $inventorySlot): JsonResponse {
+        $result = $this->seerService->removeAllGems($character, $inventorySlot);
 
         $status = $result['status'];
         unset($result['status']);

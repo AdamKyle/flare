@@ -247,7 +247,7 @@ class Character extends Model {
                             ->join('items', function($join) {
                                 $join->on('items.id', '=', 'inventory_slots.item_id')
                                      ->where('items.type', '!=', 'quest');
-                           })->count();
+                           })->count() + $this->gemBag->gemSlots->sum('amount');
     }
 
     /**

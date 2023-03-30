@@ -35,11 +35,11 @@ export default class ReplacingAGem<T> extends React.Component<ReplacingAGemProps
                 <BasicCard additionalClasses='my-4'>
                     <div className='grid md:grid-cols-2 gap-2'>
                         <div>
-                            <h3 className='my-4 text-lime-600 dark:text-lime-500'>{gemComparisonDetails.name} (When Replacing)</h3>
+                            <h3 className='my-4'><span className='text-lime-600 dark:text-lime-500'>{gemComparisonDetails.name}</span> (When Replacing)</h3>
                             <GemComparisonDetails gem={gemComparisonDetails}/>
                         </div>
                         <div>
-                            <h3 className='my-4 text-lime-600 dark:text-lime-500'>{gemYouHave.name} (Currently Socketed)</h3>
+                            <h3 className='my-4'><span className='text-lime-600 dark:text-lime-500'>{gemYouHave.name}</span> (Currently Socketed)</h3>
                             <Fragment>
                                 <dl>
                                     <dt>Tier</dt>
@@ -74,6 +74,14 @@ export default class ReplacingAGem<T> extends React.Component<ReplacingAGemProps
                 </div>
 
                 {
+                    this.props.when_replacing.length <= 0 ?
+                        <div className='text-center text-orange-t00 dark:text-orange-500 my-4'>
+                            <p>No gems socketed. Anything is better then nothing.</p>
+                        </div>
+                    : null
+                }
+
+                {
                     this.state.show_replacement_comparison && this.state.gem_name_to_replace !== null ?
                         <AtonementComparison
                             is_open={true}
@@ -91,7 +99,8 @@ export default class ReplacingAGem<T> extends React.Component<ReplacingAGemProps
                             manage_parent_modal={this.props.manage_parent_modal}
                             character_id={this.props.character_id}
                         />
-                    : null
+                    :
+                        null
                 }
             </div>
         );

@@ -18,6 +18,7 @@ import clsx from "clsx";
 import BasicCard from "../../../components/ui/cards/basic-card";
 import RenderAtonementDetails from "./components/render-atonement-details";
 import RenderAtonementAdjustment from "./components/render-atonement-adjustment";
+import {Basic} from "react-organizational-chart/dist/stories/Tree.stories";
 
 export default class AtonementComparison extends React.Component<any, any> {
     constructor(props: any) {
@@ -56,7 +57,9 @@ export default class AtonementComparison extends React.Component<any, any> {
     }
 
     render() {
+        console.log(this.props);
         const atonementForReplacing = this.findAtonementsForReplacing();
+        console.log(atonementForReplacing);
 
         return(
             <Dialogue is_open={this.props.is_open}
@@ -80,12 +83,36 @@ export default class AtonementComparison extends React.Component<any, any> {
                     : null
                 }
                 <div className='my-4 grid lg:grid-cols-2 gap-2'>
-                    <RenderAtonementDetails title={'Original Atonement'} original_atonement={this.props.original_atonement} />
+                    <BasicCard>
+                        <h3 className='my-4'>With: <span className='text-lime-600 dark:text-lime-500'>{this.props.gem_name}</span></h3>
+                        <RenderAtonementDetails title={'Original Atonement'} original_atonement={this.props.original_atonement} />
+                        <div className='my-4'>
+                            <h4 className='mb-2'>Original Elemental Atonement</h4>
+                            <dl>
+                                <dt>Elemental Atonement</dt>
+                                <dd>{this.props.original_atonement.elemental_damage.name}</dd>
+                                <dt>Elemental Damage</dt>
+                                <dd>{(this.props.original_atonement.elemental_damage.amount * 100).toFixed(2)}%</dd>
+                            </dl>
+                        </div>
+                    </BasicCard>
                     <BasicCard>
                         {
 
                             typeof atonementForReplacing !== 'undefined' ?
-                                <RenderAtonementAdjustment atonement_for_comparison={this.findAtonementsForReplacing().data.atonements} original_atonement={this.props.original_atonement} />
+                                <Fragment>
+                                    <h3 className='my-4'>When: <span className='text-lime-600 dark:text-lime-500'>{atonementForReplacing.name_to_replace}</span> is replaced</h3>
+                                    <RenderAtonementAdjustment atonement_for_comparison={atonementForReplacing.data.atonements} original_atonement={this.props.original_atonement} />
+                                    <div className='my-4'>
+                                        <h4 className='mb-2'>Adjusted Elemental Atonement</h4>
+                                        <dl>
+                                            <dt>Elemental Atonement</dt>
+                                            <dd>{atonementForReplacing.data.elemental_damage.name}</dd>
+                                            <dt>Elemental Damage</dt>
+                                            <dd>{(atonementForReplacing.data.elemental_damage.amount * 100).toFixed(2)}%</dd>
+                                        </dl>
+                                    </div>
+                                </Fragment>
                             :
                                 <DangerAlert>
                                     Error with finding the atonement to replace.

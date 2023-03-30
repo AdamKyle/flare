@@ -49,6 +49,13 @@ export default class RemoveGem extends React.Component<any, any> {
         })
     }
 
+    updateRemoveGemState<T>(value: T, property: string) {
+        this.setState((prevState: any) => ({
+            ...prevState,
+            [property]: value
+        }));
+    }
+
     itemsToSelect() {
         const options = this.state.items.map((item: any) => {
             return {
@@ -126,6 +133,7 @@ export default class RemoveGem extends React.Component<any, any> {
                                              item_name={this.getItemName()}
                                              selected_item={this.state.selected_item}
                                              update_parent={this.props.update_parent}
+                                             update_remomal_data={this.updateRemoveGemState.bind(this)}
                                              manage_modal={() => this.setState({
                                                  selected_item: 0,
                                                  selected_gem_data: {},
