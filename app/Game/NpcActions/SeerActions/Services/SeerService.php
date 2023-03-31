@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Core\Services;
+namespace App\Game\NpcActions\SeerActions\Services;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\GemBagSlot;
@@ -73,6 +73,12 @@ class SeerService {
 
     }
 
+    /**
+     * Fetch Gems With items For Removal.
+     *
+     * @param Character $character
+     * @return array
+     */
     public function fetchGemsWithItemsForRemoval(Character $character): array {
         $items =  $this->getItems($character);
         $gems  = [];
@@ -434,6 +440,10 @@ class SeerService {
         })->toArray());
     }
 
+    protected function getRandomType(): int {
+        return rand(1, 100);
+    }
+
     /**
      * Assign a random socket count (1-6 sockets)
      *
@@ -444,7 +454,7 @@ class SeerService {
 
         $newItem = DuplicateItemHandler::duplicateItem($slot->item);
 
-        $type = rand(1, 100);
+        $type = $this->getRandomType();
 
         if ($type > 99) {
             $newItem->update(['socket_count' => 6]);
@@ -496,7 +506,7 @@ class SeerService {
             return;
         }
 
-        if ($type > 1) {
+        if ($type >= 1) {
             $newItem->update(['socket_count' => 1]);
         }
 

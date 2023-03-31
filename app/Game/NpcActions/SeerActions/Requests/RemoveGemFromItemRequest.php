@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Game\Core\Requests;
+namespace App\Game\NpcActions\SeerActions\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class AddGemToItemRequest extends FormRequest
-{
+class RemoveGemFromItemRequest extends FormRequest {
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -24,15 +23,15 @@ class AddGemToItemRequest extends FormRequest
     public function rules()
     {
         return [
-            'slot_id'     => 'required|integer',
-            'gem_slot_id' => 'required|integer',
+            'slot_id' => 'required|integer',
+            'gem_id'  => 'required|integer',
         ];
     }
 
     public function messages() {
         return [
-            'slot_id.required'     => 'Error. Invalid Input.',
-            'gem_slot_id.required' => 'Error. Invalid Input',
+            'slot_id.required' => 'Error. Invalid Input.',
+            'gem_id.required'  => 'Error. Invalid Input',
         ];
     }
 }

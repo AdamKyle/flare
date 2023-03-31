@@ -4,9 +4,13 @@ namespace App\Flare\Models;
 
 use App\Game\Core\Gems\Values\GemTierValue;
 use App\Game\Core\Gems\Values\GemTypeValue;
+use Database\Factories\GemFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Gem extends Model {
+
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -53,5 +57,9 @@ class Gem extends Model {
 
     public function gemTier(): GemTierValue {
         return new GemTierValue($this->tier);
+    }
+
+    protected static function newFactory() {
+        return GemFactory::new();
     }
 }

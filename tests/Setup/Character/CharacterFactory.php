@@ -95,6 +95,8 @@ class CharacterFactory {
 
         $this->createClassRanks();
 
+        $this->character->gemBag()->create(['character_id' => $this->character->id]);
+
         $character = $this->character->refresh();
 
         Cache::put('character-attack-data-' . $character->id, (new AttackDataCacheSetUp())->getCacheObject());

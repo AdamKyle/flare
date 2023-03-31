@@ -216,6 +216,11 @@ return [
         App\Game\Core\Gems\Providers\ServiceProvider::class,
 
         /**
+         * Npc Actions
+         */
+        App\Game\NpcActions\SeerActions\Providers\ServiceProvider::class,
+
+        /**
         * Game Related
         */
         App\Game\Exploration\Providers\ServiceProvider::class,

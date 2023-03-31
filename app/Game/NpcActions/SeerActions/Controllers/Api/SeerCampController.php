@@ -1,23 +1,16 @@
 <?php
 
-namespace App\Game\Core\Controllers\Api;
+namespace App\Game\NpcActions\SeerActions\Controllers\Api;
 
-use App\Flare\Models\Character;
-use App\Flare\Models\Inventory;
-use App\Flare\Models\InventorySlot;
-use App\Game\Core\Requests\AddGemToItemRequest;
-use App\Game\Core\Requests\ComparisonFromChatValidate;
-use App\Game\Core\Requests\ComparisonValidation;
-use App\Game\Core\Requests\RemoveGemFromItemRequest;
-use App\Game\Core\Requests\ReplaceGemOnItemRequest;
-use App\Game\Core\Requests\RollItemSocketsRequest;
-use App\Game\Core\Services\CharacterGemBagService;
-use App\Game\Core\Services\CharacterInventoryService;
-use App\Game\Core\Services\ComparisonService;
-use App\Game\Core\Services\SeerService;
-use App\Game\Skills\Services\GemService;
-use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
+use App\Http\Controllers\Controller;
+use App\Flare\Models\Character;
+use App\Flare\Models\InventorySlot;
+use App\Game\Core\Requests\RollItemSocketsRequest;
+use App\Game\NpcActions\SeerActions\Requests\AddGemToItemRequest;
+use App\Game\NpcActions\SeerActions\Requests\RemoveGemFromItemRequest;
+use App\Game\NpcActions\SeerActions\Requests\ReplaceGemOnItemRequest;
+use App\Game\NpcActions\SeerActions\Services\SeerService;
 
 class SeerCampController extends Controller {
 

@@ -86,6 +86,9 @@ class RouteServiceProvider extends ServiceProvider
         // Game Core Api Routes:
         $this->mapGemRoutes();
 
+        // NPC Actions:
+        $this->mapSeerActions();
+
         // Game Api Routes
         $this->mapApiRoutes();
         $this->mapExplorationApiRoutes();
@@ -312,5 +315,12 @@ class RouteServiceProvider extends ServiceProvider
             ->middleware('web')
             ->namespace('App\Game\ClassRanks\Controllers')
             ->group(base_path('routes/game/class-ranks/api.php'));
+    }
+
+    protected function mapSeerActions() {
+        Route::prefix('api')
+            ->middleware('web')
+            ->namespace('App\Game\NpcActions\SeerActions\Controllers')
+            ->group(base_path('routes/game/npc-actions/seer-actions/api.php'));
     }
 }
