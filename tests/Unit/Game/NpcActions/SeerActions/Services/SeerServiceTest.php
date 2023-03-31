@@ -2,18 +2,17 @@
 
 namespace Tests\Unit\Game\NpcActions\SeerActions\Services;
 
-use App\Flare\Services\BuildCharacterAttackTypes;
-use App\Game\NpcActions\SeerActions\Services\SeerService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Game\NpcActions\SeerActions\Services\SeerService;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateGem;
 use Tests\Traits\CreateItem;
-use Tests\Traits\CreateMap;
 
 class SeerServiceTest extends TestCase {
 
-    use RefreshDatabase, CreateItem, CreateGem, CreateMap;
+    use RefreshDatabase, CreateItem, CreateGem, CreateGameMap;
 
     private ?CharacterFactory $character;
 
@@ -64,7 +63,7 @@ class SeerServiceTest extends TestCase {
             'gem_id'  => $this->createGem()->id,
         ]);
 
-        $this->createMap();
+        $this->createGameMap();
 
         $character = $this->character->givePlayerLocation()
                                      ->inventoryManagement()
@@ -88,7 +87,7 @@ class SeerServiceTest extends TestCase {
             'type' => 'weapon',
         ]);
 
-        $this->createMap();
+        $this->createGameMap();
 
         $character = $this->character->givePlayerLocation()
             ->inventoryManagement()
@@ -116,7 +115,7 @@ class SeerServiceTest extends TestCase {
             'type' => 'weapon',
         ]);
 
-        $this->createMap();
+        $this->createGameMap();
 
         $character = $this->character->givePlayerLocation()
             ->inventoryManagement()

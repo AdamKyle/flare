@@ -435,6 +435,7 @@ class CharacterFactory {
                 'default' => true,
             ])->id;
         }
+
         $this->createMap([
             'character_id'         => $this->character->id,
             'position_x'           => $x,

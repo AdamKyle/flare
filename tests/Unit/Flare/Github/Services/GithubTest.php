@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Flare\Github\Services\GithubTest;
+namespace Tests\Unit\Flare\Github\Services;
 
 use Exception;
 use Mockery;
