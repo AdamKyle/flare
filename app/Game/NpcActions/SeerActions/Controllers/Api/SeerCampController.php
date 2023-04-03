@@ -73,7 +73,7 @@ class SeerCampController extends Controller {
     }
 
     public function removeAllGemsFromItem(Character $character, InventorySlot $inventorySlot): JsonResponse {
-        $result = $this->seerService->removeAllGems($character, $inventorySlot);
+        $result = $this->seerService->removeAllGems($character, $inventorySlot->id);
 
         $status = $result['status'];
         unset($result['status']);

@@ -154,11 +154,11 @@ class SeerService {
      * Remove all gems from the item.
      *
      * @param Character $character
-     * @param InventorySlot $inventorySlot
+     * @param int $slotId
      * @return array
      */
-    public function removeAllGems(Character $character, InventorySlot $inventorySlot): array {
-        $slot    = $character->inventory->slots->find($inventorySlot->id);
+    public function removeAllGems(Character $character, int $slotId): array {
+        $slot    = $character->inventory->slots->find($slotId);
 
         $validationResult = $this->gemRemovalValidation($character, $slot);
 
@@ -456,6 +456,11 @@ class SeerService {
         return $slot->refresh();
     }
 
+    /**
+     * Get random type.
+     *
+     * @return int
+     */
     protected function getRandomType(): int {
         return rand(1, 100);
     }
