@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Game\NpcActions\SeerActions\Services;
 
+use App\Flare\Values\SpellTypes;
+use App\Flare\Values\WeaponTypes;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Game\NpcActions\SeerActions\Services\SeerService;
 use Tests\Setup\Character\CharacterFactory;
@@ -149,7 +151,8 @@ class SeerServiceTest extends TestCase {
 
     public function testGetItemsWithGemsForRemoval() {
         $item = $this->createItem([
-            'type' => 'weapon',
+            'type'         => 'weapon',
+            'socket_count' => 2,
         ]);
 
         $item->sockets()->create([
@@ -409,5 +412,441 @@ class SeerServiceTest extends TestCase {
 
         $this->assertEquals(200, $result['status']);
         $this->assertEquals('All gems have been removed!', $result['message']);
+    }
+
+    public function testItemDoesNotExistWhenReplacingGem() {
+        $character = $this->character->getCharacter();
+        $result   = $this->seerService->replaceGem($character, 10, 1, 10);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('No item was found to replace gem on.', $result['message']);
+    }
+
+    public function testGemDoesNotExistForReplacing() {
+
+        $item = $this->createItem([
+            'socket_count' => 2
+        ]);
+
+        $character = $this->character->inventoryManagement()
+                                     ->giveItem($item)
+                                     ->getCharacter();
+
+        $slot = $character->inventory->slots->where('item_id', $item->id)->first();
+
+        $result   = $this->seerService->replaceGem($character, $slot->id, 1, 10);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('The gem you want to use to replace the requested gem with, does not exist.', $result['message']);
+
+    }
+
+    public function testItemDoesntHaveSockets() {
+        $item = $this->createItem([
+            'socket_count' => 2
+        ]);
+
+        $gem = $this->createGem();
+
+        $character = $this->character->inventoryManagement()
+                                     ->giveItem($item)
+                                     ->getCharacter();
+
+        $character->gemBag()->create([
+            'character_id' => $character->id,
+        ]);
+
+        $character = $character->refresh();
+
+        $character->gemBag->gemSlots()->create([
+            'gem_bag_id' => $character->gembag->id,
+            'gem_id'     => $gem->id,
+            'amount'     => 1
+        ]);
+
+        $character = $character->refresh();
+
+        $slot    = $character->inventory->slots->where('item_id', $item->id)->first();
+        $gemSlot = $character->gemBag->gemSlots->where('gem_id', $gem->id)->first();
+
+        $result   = $this->seerService->replaceGem($character, $slot->id, $gemSlot->id, 10);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('The item does not have any sockets. What are you doing?', $result['message']);
+    }
+
+    public function testInventoryIsFullWhenReplacingGem() {
+        $item = $this->createItem([
+            'socket_count' => 2
+        ]);
+
+        $gem = $this->createGem();
+
+        $character = $this->character->inventoryManagement()
+            ->giveItem($item)
+            ->getCharacter();
+
+        $character->gemBag()->create([
+            'character_id' => $character->id,
+        ]);
+
+        $character = $character->refresh();
+
+        $character->gemBag->gemSlots()->create([
+            'gem_bag_id' => $character->gembag->id,
+            'gem_id'     => $gem->id,
+            'amount'     => 1
+        ]);
+
+        $character->update([
+            'inventory_max' => 1
+        ]);
+
+        $character = $character->refresh();
+
+        $slot    = $character->inventory->slots->where('item_id', $item->id)->first();
+        $gemSlot = $character->gemBag->gemSlots->where('gem_id', $gem->id)->first();
+
+        $result   = $this->seerService->replaceGem($character, $slot->id, $gemSlot->id, 10);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('The item does not have any sockets. What are you doing?', $result['message']);
+    }
+
+    public function testCantAffordTheCostWhenReplacingGem() {
+        $gemForItem = $this->createGem();
+
+        $item = $this->createItem([
+            'socket_count' => 2
+        ]);
+
+        $item->sockets()->create([
+            'gem_id' => $gemForItem->id,
+        ]);
+
+        $gem = $this->createGem();
+
+        $character = $this->character->inventoryManagement()
+                                     ->giveItem($item)
+                                     ->getCharacter();
+
+        $character->gemBag()->create([
+            'character_id' => $character->id,
+        ]);
+
+        $character = $character->refresh();
+
+        $character->gemBag->gemSlots()->create([
+            'gem_bag_id' => $character->gembag->id,
+            'gem_id'     => $gem->id,
+            'amount'     => 1
+        ]);
+
+        $character = $character->refresh();
+
+        $slot    = $character->inventory->slots->where('item_id', $item->id)->first();
+        $gemSlot = $character->gemBag->gemSlots->where('gem_id', $gem->id)->first();
+
+        $result  = $this->seerService->replaceGem($character, $slot->id, $gemSlot->id, 10);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('You do not have the gold bars to do this.', $result['message']);
+    }
+
+    public function testGemToReplaceDoesNotExistOnItem() {
+        $gemForItem = $this->createGem();
+
+        $item = $this->createItem([
+            'socket_count' => 2
+        ]);
+
+        $item->sockets()->create([
+            'gem_id' => $gemForItem->id,
+        ]);
+
+        $gem = $this->createGem();
+
+        $character = $this->character->inventoryManagement()
+                                     ->giveItem($item)
+                                     ->getCharacterFactory()
+                                     ->kingdomManagement()
+                                     ->assignKingdom([
+                                         'gold_bars' => 2000,
+                                     ])
+                                     ->getCharacter();
+
+        $character->gemBag()->create([
+            'character_id' => $character->id,
+        ]);
+
+        $character = $character->refresh();
+
+        $character->gemBag->gemSlots()->create([
+            'gem_bag_id' => $character->gembag->id,
+            'gem_id'     => $gem->id,
+            'amount'     => 1
+        ]);
+
+        $character = $character->refresh();
+
+        $slot    = $character->inventory->slots->where('item_id', $item->id)->first();
+        $gemSlot = $character->gemBag->gemSlots->where('gem_id', $gem->id)->first();
+
+        $result  = $this->seerService->replaceGem($character, $slot->id, $gemSlot->id, 10);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('No Gem found on the item for the gem you want to replace.', $result['message']);
+    }
+
+    public function testReplaceTheGemOnTheItem() {
+        $gemForItem = $this->createGem();
+
+        $item = $this->createItem([
+            'socket_count' => 2
+        ]);
+
+        $item->sockets()->create([
+            'gem_id' => $gemForItem->id,
+        ]);
+
+        $gem = $this->createGem();
+
+        $character = $this->character->inventoryManagement()
+                                     ->giveItem($item->refresh())
+                                     ->getCharacterFactory()
+                                     ->kingdomManagement()
+                                     ->assignKingdom([
+                                         'gold_bars' => 2000,
+                                     ])
+                                     ->getCharacter();
+
+        $character->gemBag()->create([
+            'character_id' => $character->id,
+        ]);
+
+        $character = $character->refresh();
+
+        $character->gemBag->gemSlots()->create([
+            'gem_bag_id' => $character->gembag->id,
+            'gem_id'     => $gem->id,
+            'amount'     => 1
+        ]);
+
+        $character = $character->refresh();
+
+        $slot    = $character->inventory->slots->where('item_id', $item->id)->first();
+        $gemSlot = $character->gemBag->gemSlots->where('gem_id', $gem->id)->first();
+
+        $result  = $this->seerService->replaceGem($character, $slot->id, $gemSlot->id, $gemForItem->id);
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals('Gem has been replaced!', $result['message']);
+    }
+
+    public function testCannotAssignGemToItemThatDoesntExist() {
+        $character = $this->character->getCharacter();
+        $result    = $this->seerService->assignGemToSocket($character, 10, 1);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('No item was found to add a gem to.', $result['message']);
+    }
+
+    public function testGemDoesNotExistWhenTryingToAddToItem() {
+        $item = $this->createItem([
+            'socket_count' => 1
+        ]);
+
+        $character = $this->character->inventoryManagement()
+                                     ->giveItem($item)
+                                     ->getCharacter();
+
+        $slot = $character->inventory->slots->where('item_id', $item->id)->first();
+
+        $result    = $this->seerService->assignGemToSocket($character, $slot->id, 1);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('No gem to attach to supplied item was found.', $result['message']);
+    }
+
+    public function testItemDoesNotHaveSocketsToAttackGemTo() {
+        $item = $this->createItem();
+
+        $gemForAddition = $this->createGem();
+
+        $character = $this->character->inventoryManagement()
+                                     ->giveItem($item)
+                                     ->getCharacter();
+
+        $character->gemBag()->create([
+            'character_id' => $character->id,
+        ]);
+
+        $character->gemBag->gemSlots()->create([
+            'gem_bag_id' => $character->gemBag->id,
+            'gem_id'     => $gemForAddition->id,
+            'amount'     => 1
+        ]);
+
+        $slot    = $character->inventory->slots->where('item_id', $item->id)->first();
+        $gemSlot = $character->gemBag->gemSlots->where('gem_id', $gemForAddition->id)->first();
+
+        $result  = $this->seerService->assignGemToSocket($character->refresh(), $slot->id, $gemSlot->id);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('No Sockets on the supplied item. You need to add sockets to the item first.', $result['message']);
+    }
+
+    public function testCannotAssignGemToItemWhenSocketsAreFull() {
+        $item = $this->createItem([
+            'socket_count' => 1
+        ]);
+
+        $item->sockets()->create([
+            'item_id' => $item->id,
+            'gem_id'  => $this->createGem()->id,
+        ]);
+
+        $gemForAddition = $this->createGem();
+
+        $character = $this->character->inventoryManagement()
+                                     ->giveItem($item->refresh())
+                                     ->getCharacter();
+
+        $character->gemBag()->create([
+            'character_id' => $character->id,
+        ]);
+
+        $character->gemBag->gemSlots()->create([
+            'gem_bag_id' => $character->gemBag->id,
+            'gem_id'     => $gemForAddition->id,
+            'amount'     => 1
+        ]);
+
+        $slot    = $character->inventory->slots->where('item_id', $item->id)->first();
+        $gemSlot = $character->gemBag->gemSlots->where('gem_id', $gemForAddition->id)->first();
+
+        $result    = $this->seerService->assignGemToSocket($character->refresh(), $slot->id, $gemSlot->id);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('Not enough sockets for this gem.', $result['message']);
+    }
+
+    public function testCannotAffordToAddGemToItem() {
+        $item = $this->createItem([
+            'socket_count' => 1
+        ]);
+
+        $gemForAddition = $this->createGem();
+
+        $character = $this->character->inventoryManagement()
+                                      ->giveItem($item->refresh())
+                                      ->getCharacter();
+
+        $character->gemBag()->create([
+            'character_id' => $character->id,
+        ]);
+
+        $character->gemBag->gemSlots()->create([
+            'gem_bag_id' => $character->gemBag->id,
+            'gem_id'     => $gemForAddition->id,
+            'amount'     => 1
+        ]);
+
+        $slot    = $character->inventory->slots->where('item_id', $item->id)->first();
+        $gemSlot = $character->gemBag->gemSlots->where('gem_id', $gemForAddition->id)->first();
+
+        $result    = $this->seerService->assignGemToSocket($character->refresh(), $slot->id, $gemSlot->id);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('You do not have the gold bars to do this.', $result['message']);
+    }
+
+    public function testAddTheGemToTheItem() {
+        $item = $this->createItem([
+            'socket_count' => 1
+        ]);
+
+        $gemForAddition = $this->createGem();
+
+        $character = $this->character->inventoryManagement()
+            ->giveItem($item->refresh())
+            ->getCharacterFactory()
+            ->kingdomManagement()
+            ->assignKingdom(['gold_bars' => 2000])
+            ->getCharacter();
+
+        $character->gemBag()->create([
+            'character_id' => $character->id,
+        ]);
+
+        $character->gemBag->gemSlots()->create([
+            'gem_bag_id' => $character->gemBag->id,
+            'gem_id'     => $gemForAddition->id,
+            'amount'     => 1
+        ]);
+
+        $slot    = $character->inventory->slots->where('item_id', $item->id)->first();
+        $gemSlot = $character->gemBag->gemSlots->where('gem_id', $gemForAddition->id)->first();
+
+        $result  = $this->seerService->assignGemToSocket($character->refresh(), $slot->id, $gemSlot->id);
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals('Attached gem to item!', $result['message']);
+    }
+
+    public function testGetNoItemsWhenHasNotItemsWithSockets() {
+        $item = $this->createItem(['type' => WeaponTypes::BOW]);
+
+        $character = $this->character->inventoryManagement()
+                                     ->giveItem($item)
+                                     ->getCharacter();
+
+        $result = $this->seerService->getItems($character);
+
+        $this->assertEmpty($result);
+    }
+
+    public function testGetNoItemsWhenHasNotItemsWhenNoMatchingType() {
+        $item = $this->createItem(['type' => SpellTypes::DAMAGE]);
+
+        $character = $this->character->inventoryManagement()
+                                     ->giveItem($item)
+                                     ->getCharacter();
+
+        $result = $this->seerService->getItems($character);
+
+        $this->assertEmpty($result);
+    }
+
+    public function testGetItemsToAddGemsTo() {
+        $item = $this->createItem(['type' => WeaponTypes::BOW, 'socket_count' => 2]);
+
+        $character = $this->character->inventoryManagement()
+                                     ->giveItem($item)
+                                     ->getCharacter();
+
+        $result = $this->seerService->getItems($character);
+
+        $this->assertNotEmpty($result);
+    }
+
+    public function testGetGems() {
+        $gemForAddition = $this->createGem();
+
+        $character = $this->character->getCharacter();
+
+        $character->gemBag()->create([
+            'character_id' => $character->id,
+        ]);
+
+        $character->gemBag->gemSlots()->create([
+            'gem_bag_id' => $character->gemBag->id,
+            'gem_id'     => $gemForAddition->id,
+            'amount'     => 1
+        ]);
+
+        $result = $this->seerService->getGems($character);
+
+        $this->assertNotEmpty($result);
     }
 }

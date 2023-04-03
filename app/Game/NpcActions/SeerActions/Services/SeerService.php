@@ -34,6 +34,53 @@ class SeerService {
     }
 
     /**
+     * Get items that we can assign gems to.
+     *
+     * @param Character $character
+     * @return array
+     */
+    public function getItems(Character $character): array {
+        return array_values(array_filter($character->inventory->slots->whereNotNull('item.socket_count')->whereIn('item.type', [
+            WeaponTypes::WEAPON,
+            WeaponTypes::STAVE,
+            WeaponTypes::BOW,
+            WeaponTypes::HAMMER,
+            ArmourTypes::SHIELD,
+            ArmourTypes::BODY,
+            ArmourTypes::SLEEVES,
+            ArmourTypes::HELMET,
+            ArmourTypes::FEET,
+            ArmourTypes::LEGGINGS,
+            ArmourTypes::GLOVES
+        ])->map(function($slot) {
+            if ($slot->item->socket_count > 0) {
+                return [
+                    'name' => $slot->item->affix_name,
+                    'slot_id' => $slot->id,
+                    'socket_amount' => $slot->item->socket_count,
+                ];
+            }
+        })->toArray()));
+    }
+
+    /**
+     * Get gems to attach.
+     *
+     * @param Character $character
+     * @return array
+     */
+    public function getGems(Character $character): array {
+        return array_values($character->gemBag->gemSlots->map(function($slot) {
+            return [
+                'name'    => $slot->gem->name,
+                'amount'  => $slot->amount,
+                'tier'    => $slot->gem->tier,
+                'slot_id' => $slot->id,
+            ];
+        })->toArray());
+    }
+
+    /**
      * Create Sockets.
      *
      * @param Character $character
@@ -211,7 +258,7 @@ class SeerService {
         $gemSlot = $character->gemBag->gemSlots->find($gemSlotId);
 
         if (is_null($slot)) {
-            return $this->errorResult('No item was found to add a gem to.');
+            return $this->errorResult('No item was found to replace gem on.');
         }
 
         if (is_null($gemSlot)) {
@@ -219,7 +266,7 @@ class SeerService {
         }
 
         if ($slot->item->sockets->isEmpty()) {
-            return $this->errorResult('No gem to replace as item doesnt have sockets');
+            return $this->errorResult('The item does not have any sockets. What are you doing?');
         }
 
         if ($character->isInventoryFull()) {
@@ -286,11 +333,11 @@ class SeerService {
         }
 
         if (is_null($gemSlot)) {
-            return $this->errorResult('No gem to attach to supplied item.');
+            return $this->errorResult('No gem to attach to supplied item was found.');
         }
 
-        if (is_null($slot->item->socket_count)) {
-            return $this->errorResult('No Sockets on the supplied item. You need to add sockets to the item first');
+        if ($slot->item->socket_count < 1) {
+            return $this->errorResult('No Sockets on the supplied item. You need to add sockets to the item first.');
         }
 
         if ($slot->item->sockets->isNotEmpty() && $slot->item->sockets->count() >= $slot->item->socket_count) {
@@ -371,51 +418,6 @@ class SeerService {
         $gemSlot->delete();
 
         return $newItem->refresh();
-    }
-
-    /**
-     * Get items that we can assign gems to.
-     *
-     * @param Character $character
-     * @return array
-     */
-    public function getItems(Character $character): array {
-        return array_values($character->inventory->slots->where('item.socket_count', '>=', 0)->whereIn('item.type', [
-            WeaponTypes::WEAPON,
-            WeaponTypes::STAVE,
-            WeaponTypes::BOW,
-            WeaponTypes::HAMMER,
-            ArmourTypes::SHIELD,
-            ArmourTypes::BODY,
-            ArmourTypes::SLEEVES,
-            ArmourTypes::HELMET,
-            ArmourTypes::FEET,
-            ArmourTypes::LEGGINGS,
-            ArmourTypes::GLOVES
-        ])->map(function($slot) {
-            return [
-                'name'          => $slot->item->affix_name,
-                'slot_id'       => $slot->id,
-                'socket_amount' => $slot->item->socket_count,
-            ];
-        })->toArray());
-    }
-
-    /**
-     * Get gems to attach.
-     *
-     * @param Character $character
-     * @return array
-     */
-    public function getGems(Character $character): array {
-        return array_values($character->gemBag->gemSlots->map(function($slot) {
-            return [
-                'name'    => $slot->gem->name,
-                'amount'  => $slot->amount,
-                'tier'    => $slot->gem->tier,
-                'slot_id' => $slot->id,
-            ];
-        })->toArray());
     }
 
     /**
