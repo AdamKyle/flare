@@ -116,23 +116,13 @@ class SeerService {
      * @param int $gemId
      * @return array
      */
-    public function removeGem(Character $character, int $inventorySlotId, int $gemId) {
+    public function removeGem(Character $character, int $inventorySlotId, int $gemId): array {
         $slot    = $character->inventory->slots->find($inventorySlotId);
 
-        if (is_null($slot)) {
-            return $this->errorResult('No item was found to removed gem from.');
-        }
+        $validationResult = $this->gemRemovalValidation($character, $slot);
 
-        if (is_null($slot->item->socket_count) || $slot->item->socket_count <= 0) {
-            return $this->errorResult('No sockets to remove gem from.');
-        }
-
-        if ($slot->item->sockets->isEmpty()) {
-            return $this->errorResult('Sockets on this item are already empty.');
-        }
-
-        if ($character->isInventoryFull()) {
-            return $this->errorResult('Your inventory is full (gem bag counts).');
+        if ($validationResult['status'] !== 200) {
+            return $validationResult;
         }
 
         if (!HandleGoldBarsAsACurrency::hasTheGoldBars($character->kingdoms, self::REMOVE_GEM)) {
@@ -170,20 +160,10 @@ class SeerService {
     public function removeAllGems(Character $character, InventorySlot $inventorySlot): array {
         $slot    = $character->inventory->slots->find($inventorySlot->id);
 
-        if (is_null($slot)) {
-            return $this->errorResult('No item was found to add a gem to.');
-        }
+        $validationResult = $this->gemRemovalValidation($character, $slot);
 
-        if (is_null($slot->item->socket_count) || $slot->item->socket_count <= 0) {
-            return $this->errorResult('No sockets to remove gems from.');
-        }
-
-        if ($slot->item->sockets->isEmpty()) {
-            return $this->errorResult('Sockets on this item are already empty.');
-        }
-
-        if ($character->isInventoryFull()) {
-            return $this->errorResult('Your inventory is full (gem bag counts).');
+        if ($validationResult['status'] !== 200) {
+            return $validationResult;
         }
 
         $inventoryCount = $character->getInventoryCount() + $slot->item->sockets->count();
@@ -215,44 +195,6 @@ class SeerService {
             ],
             'message' => 'All gems have been removed!',
         ]);
-    }
-
-    /**
-     * Remove the gem from the item.
-     *
-     * @param Character $character
-     * @param InventorySlot $slot
-     * @param int $gemId
-     * @return InventorySlot|null
-     */
-    protected function removeGemFromItem(Character $character, InventorySlot $slot, int $gemId): InventorySlot|null {
-        $newItem = DuplicateItemHandler::duplicateItem($slot->item);
-
-        $socket = $newItem->sockets->where('gem_id', $gemId)->first();
-
-        if (is_null($socket)) {
-            return null;
-        }
-
-        $gemInBag = $character->gemBag->gemSlots->where('gem_id', $socket->gem_id)->first();
-
-        if (!is_null($gemInBag)) {
-            $gemInBag->update(['amount' => $gemInBag->amount + 1]);
-        } else {
-            $character->gemBag->gemSlots()->create([
-                'gem_bag_id' => $character->gemBag->id,
-                'gem_id'     => $socket->gem_id,
-                'amount'     => 1,
-            ]);
-        }
-
-        $socket->delete();
-
-        HandleGoldBarsAsACurrency::subtractCostFromKingdoms($character->kingdoms, self::REMOVE_GEM);
-
-        $slot->update(['item_id' => $newItem->id]);
-
-        return $slot->refresh();
     }
 
     /**
@@ -359,7 +301,7 @@ class SeerService {
             return $this->errorResult('You do not have the gold bars to do this.');
         }
 
-       $this->addGemToItem($slot, $gemSlot);
+        $this->addGemToItem($slot, $gemSlot);
 
         HandleGoldBarsAsACurrency::subtractCostFromKingdoms($character->kingdoms, self::SOCKET_COST);
 
@@ -370,6 +312,35 @@ class SeerService {
             'gems'    => $this->getGems($character),
             'message' => 'Attached gem to item!'
         ]);
+    }
+
+    /**
+     * Gem removal validation.
+     *
+     * - Common validation for removing gems.
+     *
+     * @param Character $character
+     * @param InventorySlot|null $slot
+     * @return array
+     */
+    protected function gemRemovalValidation(Character $character, ?InventorySlot $slot = null): array {
+        if (is_null($slot)) {
+            return $this->errorResult('No item was found to removed gem from.');
+        }
+
+        if (is_null($slot->item->socket_count) || $slot->item->socket_count <= 0) {
+            return $this->errorResult('No sockets to remove gem from.');
+        }
+
+        if ($slot->item->sockets->isEmpty()) {
+            return $this->errorResult('Sockets on this item are already empty.');
+        }
+
+        if ($character->isInventoryFull()) {
+            return $this->errorResult('Your inventory is full (gem bag counts).');
+        }
+
+        return $this->successResult();
     }
 
     /**
@@ -445,6 +416,44 @@ class SeerService {
                 'slot_id' => $slot->id,
             ];
         })->toArray());
+    }
+
+    /**
+     * Remove the gem from the item.
+     *
+     * @param Character $character
+     * @param InventorySlot $slot
+     * @param int $gemId
+     * @return InventorySlot|null
+     */
+    protected function removeGemFromItem(Character $character, InventorySlot $slot, int $gemId): InventorySlot|null {
+        $newItem = DuplicateItemHandler::duplicateItem($slot->item);
+
+        $socket = $newItem->sockets->where('gem_id', $gemId)->first();
+
+        if (is_null($socket)) {
+            return null;
+        }
+
+        $gemInBag = $character->gemBag->gemSlots->where('gem_id', $socket->gem_id)->first();
+
+        if (!is_null($gemInBag)) {
+            $gemInBag->update(['amount' => $gemInBag->amount + 1]);
+        } else {
+            $character->gemBag->gemSlots()->create([
+                'gem_bag_id' => $character->gemBag->id,
+                'gem_id'     => $socket->gem_id,
+                'amount'     => 1,
+            ]);
+        }
+
+        $socket->delete();
+
+        HandleGoldBarsAsACurrency::subtractCostFromKingdoms($character->kingdoms, self::REMOVE_GEM);
+
+        $slot->update(['item_id' => $newItem->id]);
+
+        return $slot->refresh();
     }
 
     protected function getRandomType(): int {
