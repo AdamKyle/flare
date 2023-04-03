@@ -120,7 +120,7 @@ class SeerService {
         $slot    = $character->inventory->slots->find($inventorySlotId);
 
         if (is_null($slot)) {
-            return $this->errorResult('No item was found to add a gem to.');
+            return $this->errorResult('No item was found to removed gem from.');
         }
 
         if (is_null($slot->item->socket_count) || $slot->item->socket_count <= 0) {
@@ -160,6 +160,13 @@ class SeerService {
         ]);
     }
 
+    /**
+     * Remove all gems from the item.
+     *
+     * @param Character $character
+     * @param InventorySlot $inventorySlot
+     * @return array
+     */
     public function removeAllGems(Character $character, InventorySlot $inventorySlot): array {
         $slot    = $character->inventory->slots->find($inventorySlot->id);
 
