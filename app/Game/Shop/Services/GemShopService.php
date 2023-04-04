@@ -2,6 +2,7 @@
 
 namespace App\Game\Shop\Services;
 
+use App\Flare\Models\Character;
 use App\Flare\Models\GemBagSlot;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\UpdateTopBarEvent;
@@ -19,10 +20,10 @@ class GemShopService {
         $this->characterGemBagService = $characterGemBagService;
     }
 
-    public function sellGem(Character $character, GemBagSlot $gemBagSlot): array {
-        $gemBagSlot = $character->gemBag->gemBagSlots->find($gemBagSlot->id);
+    public function sellGem(Character $character, int $gemBagSlotId): array {
+        $gemBagSlot = $character->gemBag->gemSlots->find($gemBagSlotId);
 
-        if (!is_null($gemBagSlot)) {
+        if (is_null($gemBagSlot)) {
             return $this->errorResult('Gem not found. Nothing to sell.');
         }
 
@@ -70,7 +71,7 @@ class GemShopService {
         $newShards      = 0;
         $newCopperCoins = 0;
 
-        foreach ($character->gemBag->gemBagSlots as $slot) {
+        foreach ($character->gemBag->gemSlots as $slot) {
             $cost = $this->getCurrencyBack($slot);
 
             $newGoldDust    += $cost['gold_dust'] + $character->gold_dust;
@@ -100,7 +101,7 @@ class GemShopService {
 
         event(new UpdateTopBarEvent($character->refresh()));
 
-        $message = 'You sold the gem for: ' . number_format($newGoldDust) . ' Gold Dust, ' .
+        $message = 'You sold the gems for: ' . number_format($newGoldDust) . ' Gold Dust, ' .
             number_format($newShards) . ' Shards and ' . number_format($newCopperCoins) . ' Copper Coins.';
 
         return $this->successResult([

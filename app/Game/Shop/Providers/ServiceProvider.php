@@ -2,8 +2,10 @@
 
 namespace App\Game\Shop\Providers;
 
+use App\Game\Core\Services\CharacterGemBagService;
 use App\Game\Core\Services\EquipItemService;
 use App\Game\Shop\Services\GemShopService;
+use App\Game\Shop\Services\GoblinShopService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use App\Game\Shop\Services\ShopService;
 
@@ -27,8 +29,8 @@ class ServiceProvider extends ApplicationServiceProvider
             return new GoblinShopService();
         });
 
-        $this->app->bind(GemShopService::class, function() {
-            return new GemShopService();
+        $this->app->bind(GemShopService::class, function($app) {
+            return new GemShopService($app->make(CharacterGemBagService::class));
         });
     }
 }

@@ -17,7 +17,7 @@ class GemShopController extends Controller {
     }
 
     public function sellSingleGem(Character $character, GemBagSlot $slot): JsonResponse {
-        $result = $this->gemShopService->sellGem($character, $slot);
+        $result = $this->gemShopService->sellGem($character, $slot->id);
 
         $status = $result['status'];
         unset($result['status']);
