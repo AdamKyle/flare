@@ -54,7 +54,9 @@ class GemService {
 
         $characterSkill = $this->getCraftingSkill($character);
 
-        if ($this->skillLevelToHigh($characterSkill, $tier))
+        if ($this->skillLevelToHigh($characterSkill, $tier)) {
+            ServerMessageHandler::sendBasicMessage($character->user, 'This gem tier is too easy, you get no XP for this craft');
+        }
 
         if (!$this->canCraft($characterSkill, (new GemTierValue($tier))->maxForTier()['chance'])) {
 

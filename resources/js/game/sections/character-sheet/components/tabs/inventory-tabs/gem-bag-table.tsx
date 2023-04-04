@@ -5,8 +5,6 @@ import Table from "../../../../../components/ui/data-tables/table";
 import {
     buildGemColumns,
 } from "../../../../../lib/game/character-sheet/helpers/inventory/build-inventory-table-columns";
-import InventoryDetails from "../../../../../lib/game/character-sheet/types/inventory/inventory-details";
-import UsableItemsDetails from "../../../../../lib/game/character-sheet/types/inventory/usable-items-details";
 import {AxiosError, AxiosResponse} from "axios";
 import Ajax from "../../../../../lib/ajax/ajax";
 import PrimaryButton from "../../../../../components/ui/buttons/primary-button";
@@ -37,6 +35,10 @@ export class GemBagTable extends React.Component<any, any> {
     }
 
     sellGem(gemSlotId: number) {
+
+    }
+
+    sellAllGems() {
 
     }
 
@@ -76,6 +78,7 @@ export class GemBagTable extends React.Component<any, any> {
                 <InfoAlert additional_css={'mt-4 mb-4'}>
                     Click the item name to get additional actions.
                 </InfoAlert>
+                <PrimaryButton button_label={'Sell all Gems'} on_click={this.sellAllGems.bind(this)} additional_css={'my-3'} />
                 <div className={'max-w-[290px] sm:max-w-[100%] overflow-x-hidden'}>
                     <Table data={this.state.gem_slots} columns={buildGemColumns(this, this.viewItem.bind(this))} dark_table={this.props.dark_table}/>
                 </div>

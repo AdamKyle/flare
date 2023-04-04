@@ -53,8 +53,8 @@ class GemTierValue {
                     'gold_dust'    => 1000,
                     'shards'       => 250,
                     'copper_coins' => 100,
-                    'chance'       => .30
-                ]
+                ],
+                'chance'    => .30
             ];
         }
 
@@ -72,8 +72,8 @@ class GemTierValue {
                     'gold_dust'    => 5000,
                     'shards'       => 500,
                     'copper_coins' => 250,
-                    'chance'       => .15
-                ]
+                ],
+                'chance'    => .15
             ];
         }
 
@@ -91,8 +91,8 @@ class GemTierValue {
                     'gold_dust'    => 10000,
                     'shards'       => 1000,
                     'copper_coins' => 500,
-                    'chance'       => .05
-                ]
+                ],
+                'chance'     => .05
             ];
         }
 
@@ -110,8 +110,8 @@ class GemTierValue {
                     'gold_dust'    => 50000,
                     'shards'       => 2500,
                     'copper_coins' => 1000,
-                    'chance'       => 0.01
-                ]
+                ],
+                'chance'    => 0.01
             ];
         }
 

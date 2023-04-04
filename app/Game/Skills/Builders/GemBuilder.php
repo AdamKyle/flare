@@ -44,15 +44,25 @@ class GemBuilder {
     public function buildGem(int $tier): Gem {
         $data = (new GemTierValue($tier))->maxForTier();
 
+        $rolls = [];
+
+        while(count($rolls) !== 3) {
+            $roll = rand($data['min'], $data['max']) / 100;
+
+            if (!in_array($roll, $rolls)) {
+                $rolls[] = $roll;
+            }
+        }
+
         $dataForGem = [
             'name'                       => $this->names[rand(0, count($this->names) - 1)],
             'tier'                       => $tier,
             'primary_atonement_type'     => GemTypeValue::FIRE,
             'secondary_atonement_type'   => GemTypeValue::WATER,
             'tertiary_atonement_type'    => GemTypeValue::ICE,
-            'primary_atonement_amount'   => rand($data['min'], $data['max']) / 100,
-            'secondary_atonement_amount' => rand($data['min'], $data['max']) / 100,
-            'tertiary_atonement_amount'  => rand($data['min'], $data['max']) / 100,
+            'primary_atonement_amount'   => $rolls[0],
+            'secondary_atonement_amount' => $rolls[1],
+            'tertiary_atonement_amount'  => $rolls[2],
         ];
 
         $gem = $this->findExistingGem($dataForGem);
