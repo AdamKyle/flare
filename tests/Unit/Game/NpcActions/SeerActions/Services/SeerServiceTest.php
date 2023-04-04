@@ -292,6 +292,8 @@ class SeerServiceTest extends TestCase {
             'socket_count' => 5,
         ]);
 
+        $secondItemWithNoSocketCount = $this->createItem([]);
+
         $gem = $this->createGem();
 
         $item->sockets()->create([
@@ -301,6 +303,7 @@ class SeerServiceTest extends TestCase {
 
         $character = $this->character->inventoryManagement()
             ->giveItem($item->refresh())
+            ->giveItem($secondItemWithNoSocketCount)
             ->getCharacterFactory()
             ->kingdomManagement()
             ->assignKingdom([
@@ -316,7 +319,53 @@ class SeerServiceTest extends TestCase {
 
         $this->assertEquals(200, $result['status']);
         $this->assertEquals('Gem has been removed from the socket!', $result['message']);
+        $this->assertCount(1, $result['items']);
     }
+
+    public function testRemoveTheActualGemAndStackIt() {
+        $gemForItem = $this->createGem();
+
+        $item = $this->createItem([
+            'socket_count' => 2
+        ]);
+
+        $item->sockets()->create([
+            'gem_id' => $gemForItem->id,
+        ]);
+
+        $character = $this->character->inventoryManagement()
+            ->giveItem($item->refresh())
+            ->getCharacterFactory()
+            ->kingdomManagement()
+            ->assignKingdom([
+                'gold_bars' => 2000,
+            ])
+            ->getCharacter();
+
+        $character->gemBag()->create([
+            'character_id' => $character->id,
+        ]);
+
+        $character = $character->refresh();
+
+        $character->gemBag->gemSlots()->create([
+            'gem_bag_id' => $character->gembag->id,
+            'gem_id'     => $gemForItem->id,
+            'amount'     => 1
+        ]);
+
+        $character = $character->refresh();
+
+        $slot    = $character->inventory->slots->where('item_id', $item->id)->first();
+        $gemSlot = $character->gemBag->gemSlots->where('gem_id', $gemForItem->id)->first();
+
+        $result  = $this->seerService->removeGem($character, $slot->id, $gemForItem->id);
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals('Gem has been removed from the socket!', $result['message']);
+        $this->assertEquals(2, $gemSlot->amount);
+    }
+
 
     public function testRemoveAllGemsFailsTheValidationTest() {
         $character = $this->character->getCharacter();
@@ -598,6 +647,53 @@ class SeerServiceTest extends TestCase {
         $this->assertEquals('No Gem found on the item for the gem you want to replace.', $result['message']);
     }
 
+    public function testCannotReplaceGemWhenInventoryIsFull() {
+        $gemForItem = $this->createGem();
+
+        $item = $this->createItem([
+            'socket_count' => 2
+        ]);
+
+        $item->sockets()->create([
+            'gem_id' => $gemForItem->id,
+        ]);
+
+        $gem = $this->createGem();
+
+        $character = $this->character->inventoryManagement()
+            ->giveItem($item->refresh())
+            ->getCharacterFactory()
+            ->kingdomManagement()
+            ->assignKingdom([
+                'gold_bars' => 2000,
+            ])
+            ->getCharacter();
+
+        $character->gemBag()->create([
+            'character_id' => $character->id,
+        ]);
+
+        $character->update(['inventory_max' => 1]);
+
+        $character = $character->refresh();
+
+        $character->gemBag->gemSlots()->create([
+            'gem_bag_id' => $character->gembag->id,
+            'gem_id'     => $gem->id,
+            'amount'     => 1
+        ]);
+
+        $character = $character->refresh();
+
+        $slot    = $character->inventory->slots->where('item_id', $item->id)->first();
+        $gemSlot = $character->gemBag->gemSlots->where('gem_id', $gem->id)->first();
+
+        $result  = $this->seerService->replaceGem($character, $slot->id, $gemSlot->id, $gemForItem->id);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('Your inventory is full (gem bag counts). Could not replace the gem.', $result['message']);
+    }
+
     public function testReplaceTheGemOnTheItem() {
         $gemForItem = $this->createGem();
 
@@ -641,6 +737,59 @@ class SeerServiceTest extends TestCase {
 
         $this->assertEquals(200, $result['status']);
         $this->assertEquals('Gem has been replaced!', $result['message']);
+    }
+
+    public function testReplaceTheGemOnTheItemAndStackTheGem() {
+        $gemForItem = $this->createGem();
+
+        $item = $this->createItem([
+            'socket_count' => 2
+        ]);
+
+        $item->sockets()->create([
+            'gem_id' => $gemForItem->id,
+        ]);
+
+        $gem = $this->createGem();
+
+        $character = $this->character->inventoryManagement()
+            ->giveItem($item->refresh())
+            ->getCharacterFactory()
+            ->kingdomManagement()
+            ->assignKingdom([
+                'gold_bars' => 2000,
+            ])
+            ->getCharacter();
+
+        $character->gemBag()->create([
+            'character_id' => $character->id,
+        ]);
+
+        $character = $character->refresh();
+
+        $character->gemBag->gemSlots()->create([
+            'gem_bag_id' => $character->gembag->id,
+            'gem_id'     => $gem->id,
+            'amount'     => 1
+        ]);
+
+        $character->gemBag->gemSlots()->create([
+            'gem_bag_id' => $character->gembag->id,
+            'gem_id'     => $gemForItem->id,
+            'amount'     => 1
+        ]);
+
+        $character = $character->refresh();
+
+        $slot        = $character->inventory->slots->where('item_id', $item->id)->first();
+        $gemSlot     = $character->gemBag->gemSlots->where('gem_id', $gem->id)->first();
+        $gemAttached = $character->gemBag->gemSlots->where('gem_id', $gemForItem->id)->first();
+
+        $result  = $this->seerService->replaceGem($character, $slot->id, $gemSlot->id, $gemForItem->id);
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals('Gem has been replaced!', $result['message']);
+        $this->assertEquals(2, $gemAttached->refresh()->amount);
     }
 
     public function testCannotAssignGemToItemThatDoesntExist() {
@@ -792,6 +941,40 @@ class SeerServiceTest extends TestCase {
 
         $this->assertEquals(200, $result['status']);
         $this->assertEquals('Attached gem to item!', $result['message']);
+    }
+
+    public function testAddTheGemToTheItemAndSubtractAmount() {
+        $item = $this->createItem([
+            'socket_count' => 1
+        ]);
+
+        $gemForAddition = $this->createGem();
+
+        $character = $this->character->inventoryManagement()
+            ->giveItem($item->refresh())
+            ->getCharacterFactory()
+            ->kingdomManagement()
+            ->assignKingdom(['gold_bars' => 2000])
+            ->getCharacter();
+
+        $character->gemBag()->create([
+            'character_id' => $character->id,
+        ]);
+
+        $character->gemBag->gemSlots()->create([
+            'gem_bag_id' => $character->gemBag->id,
+            'gem_id'     => $gemForAddition->id,
+            'amount'     => 2
+        ]);
+
+        $slot    = $character->inventory->slots->where('item_id', $item->id)->first();
+        $gemSlot = $character->gemBag->gemSlots->where('gem_id', $gemForAddition->id)->first();
+
+        $result  = $this->seerService->assignGemToSocket($character->refresh(), $slot->id, $gemSlot->id);
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals('Attached gem to item!', $result['message']);
+        $this->assertEquals(1, $gemSlot->refresh()->amount);
     }
 
     public function testGetNoItemsWhenHasNotItemsWithSockets() {

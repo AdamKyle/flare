@@ -133,10 +133,6 @@ class SeerService {
         foreach ($items as $item) {
             $socketWithItem = InventorySlot::where('inventory_id', $character->inventory->id)->where('id', $item['slot_id'])->first();
 
-            if (is_null($socketWithItem)) {
-                continue;
-            }
-
             $gems[] = [
                 'slot_id' => $item['slot_id'],
                 'gems'    => $socketWithItem->item->sockets->map(function ($socket) {
@@ -414,8 +410,6 @@ class SeerService {
         } else {
             $gemSlot->delete();
         }
-
-        $gemSlot->delete();
 
         return $newItem->refresh();
     }
