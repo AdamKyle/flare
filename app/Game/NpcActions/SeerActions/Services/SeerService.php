@@ -10,6 +10,7 @@ use App\Flare\Values\ArmourTypes;
 use App\Flare\Values\WeaponTypes;
 use App\Game\Core\Gems\Services\GemComparison;
 use App\Game\Core\Traits\ResponseBuilder;
+use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Facades\App\Game\Core\Handlers\DuplicateItemHandler;
 use Facades\App\Game\Core\Handlers\HandleGoldBarsAsACurrency;
 
@@ -106,11 +107,17 @@ class SeerService {
 
         $this->assignSocketCount($slot);
 
-        $newSocketCount = $slot->refresh()->item->socket_count;
+        $slot = $slot->refresh();
+
+        $newSocketCount = $slot->item->socket_count;
 
         $character = $character->refresh();
 
         HandleGoldBarsAsACurrency::subtractCostFromKingdoms($character->kingdoms, self::SOCKET_COST);
+
+        $message = 'The Seer attaches the sockets to: ' . $slot->item->affix_name . ' with their dark magics';
+
+        ServerMessageHandler::handleMessage($character->user, 'seer_actions', $message, $slot->id);
 
         return $this->successResult([
             'items'   => $this->getItems($character),
@@ -178,6 +185,10 @@ class SeerService {
             return $this->errorResult('Item does not have specified gem.');
         }
 
+        $message = 'The Seer removes the gem from: ' . $slot->item->affix_name . '. The air crackles with magic.';
+
+        ServerMessageHandler::handleMessage($character->user, 'seer_actions', $message, $slot->id);
+
         $character = $character->refresh();
 
         $result = $this->fetchGemsWithItemsForRemoval($character);
@@ -227,6 +238,10 @@ class SeerService {
 
         $character = $character->refresh();
 
+        $message = 'The Seer removes all gems from: ' . $slot->item->affix_name . '. The seer is exhausted!';
+
+        ServerMessageHandler::handleMessage($character->user, 'seer_actions', $message, $slot->id);
+
         $result = $this->fetchGemsWithItemsForRemoval($character);
 
         return $this->successResult([
@@ -250,6 +265,7 @@ class SeerService {
      * @return array
      */
     public function replaceGem(Character $character, int $slotId, int $gemSlotId, int $gemIdToReplace): array {
+
         $slot    = $character->inventory->slots->find($slotId);
         $gemSlot = $character->gemBag->gemSlots->find($gemSlotId);
 
@@ -303,6 +319,10 @@ class SeerService {
 
         $gemSlot->delete();
 
+        $message = 'The Seer replaces a gem for: ' . $slot->item->affix_name . '. The seer sees all.';
+
+        ServerMessageHandler::handleMessage($character->user, 'seer_actions', $message, $slot->id);
+
         $character = $character->refresh();
 
         return $this->successResult([
@@ -349,6 +369,10 @@ class SeerService {
         HandleGoldBarsAsACurrency::subtractCostFromKingdoms($character->kingdoms, self::SOCKET_COST);
 
         $character = $character->refresh();
+
+        $message = 'The Seer adds a gem to: ' . $slot->item->affix_name . '. The seer smiles as he hands you the item.';
+
+        ServerMessageHandler::handleMessage($character->user, 'seer_actions', $message, $slot->id);
 
         return $this->successResult([
             'items'   => $this->getItems($character),

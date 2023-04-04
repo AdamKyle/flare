@@ -116,6 +116,7 @@ class ServerMessageBuilder {
             case 'plane_transfer':
             case 'enchanted':
             case 'moved_location':
+            case 'seer_actions':
                 return $forMessage;
             default:
                 return $this->build($type);

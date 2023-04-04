@@ -51,7 +51,7 @@ export default class AtonementComparison extends React.Component<any, any> {
             const gemSocketId = this.findAtonementsForReplacing()
 
             if (typeof gemSocketId !== 'undefined') {
-                SeerActions.replaceGemOnItem(this, this.props.selected_item, this.props.selected_item, gemSocketId.gem_id);
+                SeerActions.replaceGemOnItem(this, this.props.selected_item, this.props.selected_gem, gemSocketId.gem_id);
             }
         })
     }

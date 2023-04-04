@@ -55,8 +55,8 @@ class GemShopService {
 
         $gemBagSlot->delete();
 
-        $message = 'You sold the gem for: ' . number_format($newGoldDust) . ' Gold Dust, ' .
-            number_format($newShards) . ' Shards and ' . number_format($newCopperCoins) . ' Copper Coins.';
+        $message = 'You sold the gem for: ' . number_format($cost['gold_dust']) . ' Gold Dust, ' .
+            number_format($cost['shards']) . ' Shards and ' . number_format($cost['copper_coins']) . ' Copper Coins.';
 
         return $this->successResult([
             'gems'    => $this->characterGemBagService->getGems($character->refresh())['gem_slots'],
@@ -101,8 +101,8 @@ class GemShopService {
 
         event(new UpdateTopBarEvent($character->refresh()));
 
-        $message = 'You sold the gems for: ' . number_format($newGoldDust) . ' Gold Dust, ' .
-            number_format($newShards) . ' Shards and ' . number_format($newCopperCoins) . ' Copper Coins.';
+        $message = 'You sold the gems for: ' . number_format($cost['gold_dust']) . ' Gold Dust, ' .
+            number_format($cost['shards']) . ' Shards and ' . number_format($cost['copper_coins']) . ' Copper Coins.';
 
         return $this->successResult([
             'gems'    => $this->characterGemBagService->getGems($character->refresh())['gem_slots'],
@@ -114,9 +114,9 @@ class GemShopService {
         $cost = (new GemTierValue($gemBagSlot->gem->tier))->maxForTier()['cost'];
 
         return [
-            'gold_dust'    => floor($cost['gold_dust'] * 0.15),
-            'shards'       => floor($cost['shards'] * 0.15),
-            'copper_coins' => floor($cost['copper_coins'] * 0.15),
+            'gold_dust'    => floor(($cost['gold_dust'] * 0.15) * $gemBagSlot->amount),
+            'shards'       => floor(($cost['shards'] * 0.15)  * $gemBagSlot->amount),
+            'copper_coins' => floor(($cost['copper_coins'] * 0.15)  * $gemBagSlot->amount),
         ];
     }
 }
