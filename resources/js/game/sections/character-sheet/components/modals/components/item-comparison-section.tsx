@@ -8,6 +8,7 @@ import TabPanel from "../../../../../components/ui/tabs/tab-panel";
 import {formatNumber} from "../../../../../lib/game/format-number";
 import ItemNameColorationText from "../../../../../components/ui/item-name-coloration-text";
 import ItemsAttachedSkills from "../../../../../lib/game/character-sheet/types/modal/items-attached-skills";
+import InventoryItemGemDetails from "../../inventory-item-gem-details";
 
 export default class ItemComparisonSection extends React.Component<any, any> {
 
@@ -22,6 +23,9 @@ export default class ItemComparisonSection extends React.Component<any, any> {
         }, {
             key: 'comparison',
             name: 'Comparison',
+        }, {
+            key: 'gem-comparison',
+            name: 'Gem Data',
         }]
     }
 
@@ -247,6 +251,7 @@ export default class ItemComparisonSection extends React.Component<any, any> {
     }
 
     renderTabs(double: boolean) {
+        console.log(this.props.comparison_details);
         return (
             <Tabs tabs={this.tabs}>
                 <TabPanel key={'general'}>
@@ -261,6 +266,12 @@ export default class ItemComparisonSection extends React.Component<any, any> {
                         :
                             this.renderSingleComparison()
                     }
+                </TabPanel>
+                <TabPanel key={'gem-comparison'}>
+                    <InventoryItemGemDetails
+                        item_atonement={this.props.comparison_details.atonement.item_atonement}
+                        equipped_atonements={this.props.comparison_details.atonement.inventory_atonements}
+                    />
                 </TabPanel>
             </Tabs>
         )

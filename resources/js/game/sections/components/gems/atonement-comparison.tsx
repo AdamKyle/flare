@@ -57,9 +57,7 @@ export default class AtonementComparison extends React.Component<any, any> {
     }
 
     render() {
-        console.log(this.props);
         const atonementForReplacing = this.findAtonementsForReplacing();
-        console.log(atonementForReplacing);
 
         return(
             <Dialogue is_open={this.props.is_open}

@@ -12,12 +12,14 @@ use App\Flare\Transformers\UsableItemTransformer;
 use App\Game\Battle\Services\BattleDrop;
 use App\Game\Core\Comparison\ItemComparison;
 use App\Game\Core\Gems\Services\GemComparison;
+use App\Game\Core\Gems\Services\ItemAtonements;
 use App\Game\Core\Handlers\HandleGoldBarsAsACurrency;
 use App\Game\Core\Middleware\IsCharacterAtLocationMiddleware;
 use App\Game\Core\Middleware\IsCharacterWhoTheySayTheyAre;
 use App\Game\Core\Services\AdventureRewardService;
 use App\Game\Core\Services\CharacterInventoryService;
 use App\Game\Core\Services\CharacterPassiveSkills;
+use App\Game\Core\Services\ComparisonService;
 use App\Game\Core\Services\CraftingSkillService;
 use App\Game\Core\Services\DropCheckService;
 use App\Game\Core\Services\EquipItemService;
@@ -26,6 +28,7 @@ use App\Game\Core\Services\InventorySetService;
 use App\Game\Core\Services\RandomEnchantmentService;
 use App\Game\Core\Services\ShopService;
 use App\Game\Core\Services\UseItemService;
+use App\Game\Core\Values\ValidEquipPositionsValue;
 use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
 use App\Game\NpcActions\SeerActions\Services\SeerService;
 use App\Game\Skills\Services\MassDisenchantService;
@@ -107,6 +110,15 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(SeerService::class, function($app) {
             return new SeerService($app->make(GemComparison::class));
+        });
+
+        $this->app->bind(ComparisonService::class, function($app) {
+            return new ComparisonService(
+                $app->make(ValidEquipPositionsValue::class),
+                $app->make(CharacterInventoryService::class),
+                $app->make(EquipItemService::class),
+                $app->make(ItemAtonements::class)
+            );
         });
     }
 

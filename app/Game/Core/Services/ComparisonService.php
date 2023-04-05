@@ -6,6 +6,8 @@ namespace App\Game\Core\Services;
 use App\Flare\Models\SetSlot;
 use App\Flare\Transformers\ItemTransformer;
 use App\Flare\Transformers\UsableItemTransformer;
+use App\Game\Core\Gems\Services\AtonementComparison;
+use App\Game\Core\Gems\Services\ItemAtonements;
 use Cache;
 
 use League\Fractal\Manager;
@@ -24,14 +26,18 @@ class ComparisonService {
 
     private $equipItemService;
 
+    private $itemAtonements;
+
     public function __construct(
         ValidEquipPositionsValue $validEquipPositionsValue,
         CharacterInventoryService $characterInventoryService,
         EquipItemService $equipItemService,
+        ItemAtonements $itemAtonements,
     ) {
         $this->validEquipPositionsValue  = $validEquipPositionsValue;
         $this->characterInventoryService = $characterInventoryService;
         $this->equipItemService          = $equipItemService;
+        $this->itemAtonements            = $itemAtonements;
     }
 
     /**
@@ -47,6 +53,7 @@ class ComparisonService {
 
         $viewData = [
             'details'        => [],
+            'atonement'      => [],
             'itemToEquip'    => $itemToEquip->item->type === 'alchemy' ? $this->buildUsableItemDetails($itemToEquip) : $this->buildItemDetails($itemToEquip),
             'type'           => $service->getType($itemToEquip->item, $type),
             'slotId'         => $itemToEquip->id,
@@ -65,9 +72,11 @@ class ComparisonService {
             $hasSet   = !is_null($setEquipped);
             $setIndex = !is_null($setEquipped) ? $character->inventorySets->search(function($set) {return $set->is_equipped; }) + 1 : 0;
 
+            $inventory = $service->inventory();
 
             $viewData = [
-                'details'        => $this->equipItemService->getItemStats($itemToEquip->item, $service->inventory(), $character),
+                'details'        => $this->equipItemService->getItemStats($itemToEquip->item, $inventory, $character),
+                'atonement'      => $this->itemAtonements->getAtonements($itemToEquip->item, $inventory),
                 'itemToEquip'    => $this->buildItemDetails($itemToEquip),
                 'type'           => $service->getType($itemToEquip->item, $type),
                 'slotId'         => $itemToEquip->id,
@@ -102,8 +111,11 @@ class ComparisonService {
         $hasSet   = !is_null($setEquipped);
         $setIndex = !is_null($setEquipped) ? $character->inventorySets->search(function($set) {return $set->is_equipped; }) + 1 : 0;
 
+        $inventory = $service->inventory();
+
         return [
-            'details'        => $this->equipItemService->getItemStats($item, $service->inventory(), $character),
+            'details'        => $this->equipItemService->getItemStats($item, $inventory, $character),
+            'atonement'      => $this->itemAtonements->getAtonements($item, $inventory),
             'itemToEquip'    => $this->itemDetails($item),
             'type'           => $service->getType($item, $type),
             'slotId'         => $item->id,

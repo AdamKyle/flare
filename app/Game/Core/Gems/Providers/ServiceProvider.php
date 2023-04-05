@@ -3,6 +3,7 @@
 namespace App\Game\Core\Gems\Providers;
 
 use App\Flare\Transformers\CharacterGemsTransformer;
+use App\Game\Core\Gems\Services\ItemAtonements;
 use App\Game\Core\Gems\Services\AttachedGemService;
 use App\Game\Core\Gems\Services\GemComparison;
 use App\Game\Core\Middleware\IsCharacterAtLocationMiddleware;
@@ -32,6 +33,10 @@ class ServiceProvider extends ApplicationServiceProvider {
 
         $this->app->bind(GemComparison::class, function($app) {
             return new GemComparison($app->make(CharacterGemsTransformer::class), $app->make(Manager::class));
+        });
+
+        $this->app->bind(ItemAtonements::class, function($app) {
+            return new ItemAtonements($app->make(GemComparison::class));
         });
     }
 
