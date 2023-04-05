@@ -123,7 +123,7 @@ export default class GemCrafting extends React.Component<any, any> {
         }
 
         return {
-            label: 'Tier ' + this.state.selectedTier,
+            label: 'Gem Tier ' + this.state.selectedTier,
             value: this.state.selectedTier,
         }
     }
