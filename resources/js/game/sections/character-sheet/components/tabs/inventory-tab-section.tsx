@@ -175,6 +175,7 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
     }
 
     renderTables(): JSX.Element | null {
+        console.log(this.state.table);
         switch (this.state.table) {
             case 'inventory':
                 return <InventoryTable dark_table={this.props.dark_tables}
@@ -186,7 +187,7 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
                                        set_success_message={this.setSuccessMessage.bind(this)}
                                        is_automation_running={this.props.is_automation_running}
                 />
-            case 'usable_items':
+            case 'usable-items':
                 return <UsableItemsTable
                             dark_table={this.props.dark_tables}
                             character_id={this.props.character_id}

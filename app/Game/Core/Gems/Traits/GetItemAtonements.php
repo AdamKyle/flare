@@ -121,7 +121,7 @@ trait GetItemAtonements {
      * @param array $atonements
      * @return array
      */
-    protected function determineHighestValue(array $atonements): array {
+    public function determineHighestValue(array $atonements): array {
         $highest = null;
 
         foreach ($atonements['atonements'] as $atonement) {

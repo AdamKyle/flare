@@ -7,6 +7,7 @@ use App\Flare\Builders\Character\Traits\Boons;
 use App\Flare\Builders\Character\Traits\FetchEquipped;
 use App\Flare\Builders\CharacterInformation\AttributeBuilders\DamageBuilder;
 use App\Flare\Builders\CharacterInformation\AttributeBuilders\DefenceBuilder;
+use App\FLare\Builders\CharacterInformation\AttributeBuilders\ElementalAtonement;
 use App\Flare\Builders\CharacterInformation\AttributeBuilders\HealingBuilder;
 use App\Flare\Builders\CharacterInformation\AttributeBuilders\HolyBuilder;
 use App\Flare\Builders\CharacterInformation\AttributeBuilders\ReductionsBuilder;
@@ -78,6 +79,11 @@ class CharacterStatBuilder {
     private ReductionsBuilder $reductionsBuilder;
 
     /**
+     * @var ElementalAtonement $elementalAtonement
+     */
+    private ElementalAtonement $elementalAtonement;
+
+    /**
      * @var bool $ignoreReductions
      */
     private bool $ignoreReductions = false;
@@ -88,18 +94,21 @@ class CharacterStatBuilder {
      * @param HealingBuilder $healingBuilder
      * @param HolyBuilder $holyBuilder
      * @param ReductionsBuilder $reductionsBuilder
+     * @param ElementalAtonement $elementalAtonement
      */
     public function __construct(DefenceBuilder $defenceBuilder,
                                 DamageBuilder $damageBuilder,
                                 HealingBuilder $healingBuilder,
                                 HolyBuilder $holyBuilder,
-                                ReductionsBuilder $reductionsBuilder
+                                ReductionsBuilder $reductionsBuilder,
+                                ElementalAtonement $elementalAtonement
     ) {
-        $this->defenceBuilder    = $defenceBuilder;
-        $this->damageBuilder     = $damageBuilder;
-        $this->healingBuilder    = $healingBuilder;
-        $this->holyBuilder       = $holyBuilder;
-        $this->reductionsBuilder = $reductionsBuilder;
+        $this->defenceBuilder     = $defenceBuilder;
+        $this->damageBuilder      = $damageBuilder;
+        $this->healingBuilder     = $healingBuilder;
+        $this->holyBuilder        = $holyBuilder;
+        $this->reductionsBuilder  = $reductionsBuilder;
+        $this->elementalAtonement = $elementalAtonement;
     }
 
     /**
@@ -139,6 +148,8 @@ class CharacterStatBuilder {
         );
 
         $this->holyBuilder->initialize($this->character, $this->skills, $this->equippedItems);
+
+        $this->elementalAtonement->initialize($this->character, $this->skills, $this->equippedItems);
 
         $this->reductionsBuilder->initialize($this->character, $this->skills, $this->equippedItems);
 
@@ -276,6 +287,15 @@ class CharacterStatBuilder {
         $health = $this->statMod('dur', $voided);
 
         return ($health + ($health * $classSpecialsBonus));
+    }
+
+    /**
+     * Build the characters over all elemental atonement.
+     *
+     * @return array|null
+     */
+    public function buildElementalAtonement(): array|null {
+        return $this->elementalAtonement->calculateAtonement();
     }
 
     /**

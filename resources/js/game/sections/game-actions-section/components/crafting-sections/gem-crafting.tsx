@@ -101,7 +101,7 @@ export default class GemCrafting extends React.Component<any, any> {
     craftingTiers() {
         const tierForSelection = this.state.tiersForCrafting.map((tier: any, index: number) => {
             return {
-                label: 'Tier ' + (index + 1),
+                label: 'Gem Tier ' + (index + 1),
                 value: index + 1,
             }
         });

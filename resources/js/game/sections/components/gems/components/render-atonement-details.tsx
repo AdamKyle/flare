@@ -1,5 +1,4 @@
 import React, {Fragment} from "react";
-import BasicCard from "../../../../components/ui/cards/basic-card";
 
 export default class RenderAtonementDetails extends React.Component<any, any> {
 

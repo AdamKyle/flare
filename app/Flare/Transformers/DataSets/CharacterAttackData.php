@@ -89,6 +89,7 @@ class CharacterAttackData {
             'reincarnated_stat_increase'  => $character->reincarnated_stat_increase,
             'xp_penalty'                  => $character->xp_penalty,
             'attack_types'                => $this->fetchAttackTypes($character),
+            'elemental_atonement'         => $character->getInformation()->buildElementalAtonement()
         ];
     }
 

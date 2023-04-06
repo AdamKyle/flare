@@ -2,6 +2,8 @@
 
 namespace App\Flare\Providers;
 
+use App\Flare\Builders\CharacterInformation\AttributeBuilders\ElementalAtonement;
+use App\Game\Core\Gems\Services\GemComparison;
 use League\Fractal\Manager;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
@@ -465,6 +467,10 @@ class ServiceProvider extends ApplicationServiceProvider
             return new HolyBuilder();
         });
 
+        $this->app->bind(ElementalAtonement::class, function($app) {
+            return new ElementalAtonement($app->make(GemComparison::class));
+        });
+
         $this->app->bind(ReductionsBuilder::class, function() {
             return new ReductionsBuilder();
         });
@@ -476,6 +482,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(HealingBuilder::class),
                 $app->make(HolyBuilder::class),
                 $app->make(ReductionsBuilder::class),
+                $app->make(ElementalAtonement::class)
             );
         });
     }

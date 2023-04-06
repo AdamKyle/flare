@@ -218,4 +218,6 @@ export interface CharacterType {
     base_stat_mod: number;
 
     base_damage_stat_mod: number;
+
+    elemental_atonement: any;
 }

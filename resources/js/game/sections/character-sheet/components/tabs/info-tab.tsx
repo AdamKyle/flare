@@ -9,6 +9,7 @@ import CharacterResistances from "../modals/character-resistances";
 import CharacterReincarnationModal from "../modals/character-reincarnation-modal";
 import CharacterTabs from "../character-tabs";
 import CharacterClassRanksModal from "../modals/character-class-ranks-modal";
+import CharacaterElementalAtonement from "../modals/characater-elemental-atonement";
 
 export default class InfoTab extends React.Component<InfoTabProps, InfoTabState> {
 
@@ -20,6 +21,7 @@ export default class InfoTab extends React.Component<InfoTabProps, InfoTabState>
             open_resistances: false,
             open_reincarnation: false,
             open_class_ranks: false,
+            open_elemental_atonement: false,
         }
     }
 
@@ -45,6 +47,12 @@ export default class InfoTab extends React.Component<InfoTabProps, InfoTabState>
         this.setState({
             open_class_ranks: !this.state.open_class_ranks,
         });
+    }
+
+    manageElementalAtonement() {
+        this.setState({
+            open_elemental_atonement: !this.state.open_elemental_atonement,
+        })
     }
 
     render() {
@@ -94,6 +102,9 @@ export default class InfoTab extends React.Component<InfoTabProps, InfoTabState>
                     </div>
                     <div className='mt-4'>
                         <OrangeButton button_label={'Class Ranks'} on_click={this.manageClassRanks.bind(this)}/>
+                    </div>
+                    <div className='mt-4'>
+                        <OrangeButton button_label={'Elemental Atonement'} on_click={this.manageElementalAtonement.bind(this)}/>
                     </div>
                 </div>
                 <div className='relative top-[24px]'>
@@ -149,6 +160,17 @@ export default class InfoTab extends React.Component<InfoTabProps, InfoTabState>
                             title={'Character Class Ranks'}
                             character={this.props.character}
                             finished_loading={true}
+                        />
+                    : null
+                }
+
+                {
+                    this.state.open_elemental_atonement ?
+                        <CharacaterElementalAtonement
+                            elemental_atonement={this.props.character.elemental_atonement}
+                            is_open={this.state.open_elemental_atonement}
+                            manage_modal={this.manageElementalAtonement.bind(this)}
+
                         />
                     : null
                 }
