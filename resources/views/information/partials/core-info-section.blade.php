@@ -18,6 +18,7 @@
     </x-core.page-title>
 
     <div class="prose dark:prose-invert min-w-full m-auto pb-10">
+
         @foreach($sections as $section)
 
             @if (is_null($section['content_image_path']))

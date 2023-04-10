@@ -54,11 +54,13 @@ class SeerService {
             ArmourTypes::LEGGINGS,
             ArmourTypes::GLOVES
         ])->map(function($slot) {
-            return [
-                'name' => $slot->item->affix_name,
-                'slot_id' => $slot->id,
-                'socket_amount' => $slot->item->socket_count,
-            ];
+            if ($slot->item->socket_count > 0) {
+                return [
+                    'name' => $slot->item->affix_name,
+                    'slot_id' => $slot->id,
+                    'socket_amount' => $slot->item->socket_count,
+                ];
+            }
         })->toArray()));
     }
 

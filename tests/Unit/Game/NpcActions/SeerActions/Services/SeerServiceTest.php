@@ -289,10 +289,13 @@ class SeerServiceTest extends TestCase {
 
     public function testRemoveTheActualGem() {
         $item = $this->createItem([
+            'name'         => 'Item Name',
             'socket_count' => 5,
         ]);
 
-        $secondItemWithNoSocketCount = $this->createItem([]);
+        $secondItemWithNoSocketCount = $this->createItem([
+            'name' => 'Rage Face 101'
+        ]);
 
         $gem = $this->createGem();
 
@@ -316,6 +319,8 @@ class SeerServiceTest extends TestCase {
         })->first();
 
         $result    = $this->seerService->removeGem($character, $slot->id, $gem->id);
+
+        dump($result['items']);
 
         $this->assertEquals(200, $result['status']);
         $this->assertEquals('Gem has been removed from the socket!', $result['message']);

@@ -24,5 +24,4 @@ class InfoPage extends Model {
     protected $casts = [
         'page_sections' => 'array',
     ];
-
 }
