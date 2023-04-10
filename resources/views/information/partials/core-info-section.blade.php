@@ -22,13 +22,13 @@
         @foreach($sections as $section)
 
             @if (is_null($section['content_image_path']))
-                <div class="mt-[30px]">
+                <div class="mt-[30px]" id="{{$section['order']}}">
                     <x-core.cards.card>
                         {!! $section['content'] !!}
                     </x-core.cards.card>
                 </div>
             @else
-                <div class="grid md:grid-cols-2 md:gap-4 m-auto">
+                <div class="grid md:grid-cols-2 md:gap-4 m-auto" id="{{$section['order']}}">
                     <div class="md:mt-[30px]">
                         <x-core.cards.card>
                             {!! $section['content'] !!}
@@ -56,3 +56,15 @@
         @endforeach
     </div>
 </x-core.layout.info-container>
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (window.location.hash) {
+                var target = document.querySelector(window.location.hash);
+                if (target) {
+                    target.scrollIntoView();
+                }
+            }
+        });
+    </script>
+@endpush

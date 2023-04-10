@@ -12,6 +12,7 @@ Route::get('/', function () {
     return redirect()->route('game');
 });
 
+Route::get('/information/search', ['as' => 'info.search', 'uses' => 'InfoPageController@search']);
 Route::get('/information/{pageName}', ['as' => 'info.page', 'uses' => 'InfoPageController@viewPage']);
 Route::get('/information/race/{race}', ['as' => 'info.page.race', 'uses' => 'InfoPageController@viewRace']);
 Route::get('/information/class/{class}', ['as' => 'info.page.class', 'uses' => 'InfoPageController@viewClass']);
@@ -28,7 +29,7 @@ Route::get('/information/npcs/{npc}', ['as' => 'info.page.npc', 'uses' => 'InfoP
 Route::get('/information/quests/{quest}', ['as' => 'info.page.quest', 'uses' => 'InfoPageController@viewQuest']);
 Route::get('/information/passive-skill/{passiveSkill}', ['as' => 'info.page.passive.skill', 'uses' => 'InfoPageController@viewPassiveSkill']);
 Route::get('/information/class-specials/{gameClassSpecial}', ['as' => 'info.page.class-special', 'uses' => 'InfoPageController@viewClassSpecialty']);
-Route::get('/information/search', ['as' => 'info.search', 'uses' => 'InfoPageController@search']);
+
 
 Route::get('/releases', ['as' => 'releases.list', 'uses' => 'ReleasesController@index']);
 

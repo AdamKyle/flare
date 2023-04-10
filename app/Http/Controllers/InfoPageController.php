@@ -32,6 +32,15 @@ class InfoPageController extends Controller
 
     use ItemsShowInformation, MonstersShowInformation;
 
+    public function search(Request $request) {
+        $searchResults = InfoPage::whereRaw("JSON_EXTRACT(page_sections, '$[*].content') LIKE '%".$request->info_search."%'")->get();
+
+        return view('information.search-results', [
+            'results' => $searchResults,
+            'query'   => $request->info_search,
+        ]);
+    }
+
     /**
      * Show the application dashboard.
      *
