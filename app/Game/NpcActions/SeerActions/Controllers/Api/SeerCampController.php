@@ -2,15 +2,15 @@
 
 namespace App\Game\NpcActions\SeerActions\Controllers\Api;
 
-use Illuminate\Http\JsonResponse;
-use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
-use App\Game\Core\Requests\RollItemSocketsRequest;
 use App\Game\NpcActions\SeerActions\Requests\AddGemToItemRequest;
 use App\Game\NpcActions\SeerActions\Requests\RemoveGemFromItemRequest;
 use App\Game\NpcActions\SeerActions\Requests\ReplaceGemOnItemRequest;
+use App\Game\NpcActions\SeerActions\Requests\RollItemSocketsRequest;
 use App\Game\NpcActions\SeerActions\Services\SeerService;
+use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 
 class SeerCampController extends Controller {
 

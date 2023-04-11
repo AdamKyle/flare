@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Core\Requests;
+namespace App\Game\NpcActions\WorkBench\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 

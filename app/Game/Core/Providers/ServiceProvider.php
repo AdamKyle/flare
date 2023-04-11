@@ -100,16 +100,8 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
-        $this->app->bind(HolyItemService::class, function() {
-            return new HolyItemService();
-        });
-
         $this->app->bind(HandleGoldBarsAsACurrency::class, function($app) {
             return new HandleGoldBarsAsACurrency($app->make(UpdateKingdomHandler::class));
-        });
-
-        $this->app->bind(SeerService::class, function($app) {
-            return new SeerService($app->make(GemComparison::class));
         });
 
         $this->app->bind(ComparisonService::class, function($app) {
