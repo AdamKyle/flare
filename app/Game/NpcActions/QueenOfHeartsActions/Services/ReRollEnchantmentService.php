@@ -11,6 +11,7 @@ use App\Flare\Values\RandomAffixDetails;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
+use Facades\App\Game\Core\Handlers\DuplicateItemHandler;
 
 class ReRollEnchantmentService {
 
@@ -110,9 +111,7 @@ class ReRollEnchantmentService {
     }
 
     public function doReRoll(Character $character, Item $item, string $affixType, string $reRollType) {
-        $duplicateItem   = $item->duplicate();
-
-        $duplicateItem   = $this->applyHolyStacks($item, $duplicateItem);
+        $duplicateItem   = DuplicateItemHandler::duplicateItem($item);
 
         $affixes = $this->fetchAffixesForReRoll($duplicateItem, $affixType);
 
@@ -315,8 +314,8 @@ class ReRollEnchantmentService {
     protected function fetchAffixesForReRoll(Item $item, string $affixType): array {
         $affixes = [];
 
-        if ($affixType === 'all-enchantments') {
 
+        if ($affixType === 'all-enchantments') {
             if (!is_null($item->item_prefix_id)) {
                 if ($item->itemPrefix->randomly_generated) {
                     $affixes[] = $item->itemPrefix;
