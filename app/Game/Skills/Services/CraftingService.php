@@ -2,23 +2,22 @@
 
 namespace App\Game\Skills\Services;
 
+use App\Flare\Models\Character;
+use App\Flare\Models\GameSkill;
+use App\Flare\Models\Item;
+use App\Flare\Models\Skill;
 use App\Flare\Values\ArmourTypes;
-use App\Flare\Values\ItemUsabilityType;
 use App\Flare\Values\SpellTypes;
 use App\Flare\Values\WeaponTypes;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
-use Exception;
-use Illuminate\Database\Eloquent\Collection;
-use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
-use App\Flare\Models\GameSkill;
-use App\Flare\Models\Character;
-use App\Flare\Models\Item;
-use App\Flare\Models\Skill;
-use App\Game\Core\Services\RandomEnchantmentService;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\NpcActions\QueenOfHeartsActions\Services\RandomEnchantmentService;
 use App\Game\Skills\Services\Traits\SkillCheck;
 use App\Game\Skills\Services\Traits\UpdateCharacterGold;
-use App\Game\Messages\Events\ServerMessageEvent;
+use Exception;
+use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
+use Illuminate\Database\Eloquent\Collection;
 
 class CraftingService {
 

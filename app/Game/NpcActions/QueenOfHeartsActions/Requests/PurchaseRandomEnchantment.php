@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Core\Requests;
+namespace App\Game\NpcActions\QueenOfHeartsActions\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -30,7 +30,7 @@ class PurchaseRandomEnchantment extends FormRequest
 
     public function messages() {
         return [
-            'type.required' => 'Error. Invalid Input.',
+            'type.required' => 'Error. Missing type or type is invalid.',
         ];
     }
 }

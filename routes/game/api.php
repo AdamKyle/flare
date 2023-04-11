@@ -45,10 +45,7 @@ Route::group(['middleware' => ['is.character.who.they.say.they.are']], function(
             Route::post('/character/{character}/inventory/use-many-items', ['uses' => 'Api\CharacterInventoryController@useManyItems']);
             Route::post('/character/{character}/inventory/use-item/{item}', ['uses' => 'Api\CharacterInventoryController@useItem']);
 
-            Route::get('/character/{character}/inventory/uniques', ['uses' => 'Api\RandomEnchantController@uniquesOnly']);
-            Route::post('/character/{character}/random-enchant/purchase', ['uses' => 'Api\RandomEnchantController@purchase']);
-            Route::post('/character/{character}/random-enchant/reroll', ['uses' => 'Api\RandomEnchantController@reRoll']);
-            Route::post('/character/{character}/random-enchant/move', ['uses' => 'Api\RandomEnchantController@moveAffixes']);
+
 
             Route::get('/character/{character}/inventory/smiths-workbench', ['uses' => 'Api\HolyItemsController@index']);
             Route::post('/character/{character}/smithy-workbench/apply', ['uses' => 'Api\HolyItemsController@apply']);

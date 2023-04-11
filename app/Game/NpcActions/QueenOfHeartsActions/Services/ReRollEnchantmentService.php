@@ -1,17 +1,14 @@
 <?php
 
-namespace App\Game\Core\Services;
+namespace App\Game\NpcActions\QueenOfHeartsActions\Services;
 
 use App\Flare\Builders\AffixAttributeBuilder;
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
 use App\Flare\Values\RandomAffixDetails;
-use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
-use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
-use App\Game\Core\Events\UpdateQueenOfHeartsPanel;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 

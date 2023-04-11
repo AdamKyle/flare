@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Core\Requests;
+namespace App\Game\NpcActions\QueenOfHeartsActions\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -35,8 +35,6 @@ class ReRollRandomEnchantment extends FormRequest
             'selected_slot_id.required'     => 'Invalid input.',
             'selected_affix.required'       => 'Invalid input.',
             'selected_reroll_type.required' => 'Invalid input.',
-            'shard_cost.required'           => 'Invalid input.',
-            'gold_dust_cost.required'       => 'Invalid input.',
         ];
     }
 }

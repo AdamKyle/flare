@@ -2,24 +2,24 @@
 
 namespace App\Game\Skills\Services;
 
-use Exception;
-use Illuminate\Database\Eloquent\Collection;
-use App\Flare\Models\Inventory;
+use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
 use App\Flare\Events\UpdateSkillEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
+use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
 use App\Flare\Models\Skill;
-use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
 use App\Game\Core\Services\CharacterInventoryService;
-use App\Game\Core\Services\RandomEnchantmentService;
-use App\Game\Skills\Values\SkillTypeValue;
 use App\Game\Core\Traits\ResponseBuilder;
-use App\Game\Skills\Services\Traits\UpdateCharacterGold;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\NpcActions\QueenOfHeartsActions\Services\RandomEnchantmentService;
+use App\Game\Skills\Services\Traits\UpdateCharacterGold;
+use App\Game\Skills\Values\SkillTypeValue;
+use Exception;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
+use Illuminate\Database\Eloquent\Collection;
 
 class EnchantingService {
 

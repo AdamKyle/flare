@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Game\Core\Events;
+namespace App\Game\NpcActions\QueenOfHeartsActions\Events;
 
+use App\Flare\Models\User;
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
-Use App\Flare\Models\User;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
 
 class UpdateQueenOfHeartsPanel implements ShouldBroadcastNow
 {

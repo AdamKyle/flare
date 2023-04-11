@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Core\Requests;
+namespace App\Game\NpcActions\QueenOfHeartsActions\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -32,9 +32,9 @@ class MoveRandomEnchantment extends FormRequest
 
     public function messages() {
         return [
-            'selected_slot_id.required'           => 'Invalid input.',
-            'selected_secondary_slot_id.required' => 'Invalid Input.',
-            'selected_affix.required'             => 'Invalid input.',
+            'selected_slot_id.required'           => 'Missing selected slot id.',
+            'selected_secondary_slot_id.required' => 'Missing secondary inventory slot id.',
+            'selected_affix.required'             => 'Missing selected Affix.',
         ];
     }
 }

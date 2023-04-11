@@ -1,24 +1,36 @@
 <?php
 
-namespace App\Game\Core\Services;
+namespace App\Game\NpcActions\QueenOfHeartsActions\Services;
 
 
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
-use App\Flare\Models\Item as ItemModel;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\RandomAffixDetails;
 use Illuminate\Support\Collection;
 
 class RandomEnchantmentService {
 
-    private $randomAffixGenerator;
+    /**
+     * @var RandomAffixGenerator $randomAffixGenerator
+     */
+    private RandomAffixGenerator $randomAffixGenerator;
 
+    /**
+     * @param RandomAffixGenerator $randomAffixGenerator
+     */
     public function __construct(RandomAffixGenerator $randomAffixGenerator) {
         $this->randomAffixGenerator = $randomAffixGenerator;
     }
 
+    /**
+     * Generate for type.
+     *
+     * @param Character $character
+     * @param string $type
+     * @return Item
+     */
     public function generateForType(Character $character, string $type): Item {
         switch ($type) {
             case 'medium':
@@ -31,6 +43,12 @@ class RandomEnchantmentService {
         }
     }
 
+    /**
+     * Get cost of unique.
+     *
+     * @param string $type
+     * @return int
+     */
     public function getCost(string $type): int {
         switch ($type) {
             case 'medium':
@@ -43,6 +61,12 @@ class RandomEnchantmentService {
         }
     }
 
+    /**
+     * Fetch uniques from characters inventory.
+     *
+     * @param Character $character
+     * @return Collection
+     */
     public function fetchUniquesFromCharactersInventory(Character $character): Collection {
         return $character->inventory->slots->filter(function($slot) {
             if (!$slot->equipped && ($slot->item->type !== 'quest' && $slot->item->type !== 'alchemy' && $slot->item->type !== 'trinket')) {
@@ -63,6 +87,12 @@ class RandomEnchantmentService {
         })->values();
     }
 
+    /**
+     * Fetch Api data.
+     *
+     * @param Character $character
+     * @return array
+     */
     public function fetchDataForApi(Character $character): array {
         $uniqueSlots    = $this->fetchUniquesFromCharactersInventory($character);
         $nonUniqueSlots = $this->fetchNonUniqueItems($character);
@@ -73,6 +103,12 @@ class RandomEnchantmentService {
         ];
     }
 
+    /**
+     * Fetch non unique items.
+     *
+     * @param Character $character
+     * @return Collection
+     */
     public function fetchNonUniqueItems(Character $character): Collection {
         return $character->inventory->slots->filter(function($slot) {
             if (!$slot->equipped && $slot->item->type !== 'quest' && $slot->item->type !== 'alchemy' && $slot->item->type !== 'trinket') {
@@ -93,14 +129,28 @@ class RandomEnchantmentService {
         })->values();
     }
 
+    /**
+     * Check if player is in hell.
+     *
+     * @param Character $character
+     * @return bool
+     */
     public function isPlayerInHell(Character $character): bool {
         return $character->inventory->slots->filter(function($slot) {
             return $slot->item->effect === ItemEffectsValue::QUEEN_OF_HEARTS;
         })->isNotEmpty() && $character->map->gameMap->mapType()->isHell();
     }
 
+    /**
+     * Generate completely random affix.
+     *
+     * @param Character $character
+     * @param int $amount
+     * @return Item
+     * @throws \Exception
+     */
     protected function generateRandomAffixForRandom(Character $character, int $amount): Item {
-        $item = ItemModel::whereNull('item_prefix_id')
+        $item = Item::whereNull('item_prefix_id')
             ->whereNull('item_suffix_id')
             ->whereNotIn('type', ['alchemy', 'quest', 'trinket'])
             ->where('cost', '<=', 4000000000)

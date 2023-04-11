@@ -59,7 +59,7 @@ export default class QueenOfHearts extends React.Component<any, any> {
             }, (error: AxiosError) => {console.error(error);});
 
         // @ts-ignore
-        this.queenOfHearts.listen('Game.Core.Events.UpdateQueenOfHeartsPanel', (event: any) => {
+        this.queenOfHearts.listen('Game.NpcActions.QueenOfHearts.Events.UpdateQueenOfHeartsPanel', (event: any) => {
             this.setState({
                 character_uniques: event.panelData.unique_slots,
                 character_non_uniques: event.panelData.non_unique_slots
