@@ -8,6 +8,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\RandomAffixDetails;
+use Exception;
 use Illuminate\Support\Collection;
 
 class RandomEnchantmentService {
@@ -30,6 +31,7 @@ class RandomEnchantmentService {
      * @param Character $character
      * @param string $type
      * @return Item
+     * @throws Exception
      */
     public function generateForType(Character $character, string $type): Item {
         switch ($type) {
@@ -123,8 +125,6 @@ class RandomEnchantmentService {
                         return $slot;
                     }
                 }
-
-                return $slot;
             }
         })->values();
     }
@@ -142,12 +142,19 @@ class RandomEnchantmentService {
     }
 
     /**
+     * @return bool
+     */
+    protected function shouldAddSuffixToItem(): bool {
+        return rand(1, 100) > 50;
+    }
+
+    /**
      * Generate completely random affix.
      *
      * @param Character $character
      * @param int $amount
      * @return Item
-     * @throws \Exception
+     * @throws Exception
      */
     protected function generateRandomAffixForRandom(Character $character, int $amount): Item {
         $item = Item::whereNull('item_prefix_id')
@@ -158,8 +165,8 @@ class RandomEnchantmentService {
             ->first();
 
         $randomAffix = $this->randomAffixGenerator
-            ->setCharacter($character)
-            ->setPaidAmount($amount);
+                            ->setCharacter($character)
+                            ->setPaidAmount($amount);
 
         $duplicateItem = $item->duplicate();
 
@@ -167,7 +174,7 @@ class RandomEnchantmentService {
             'item_prefix_id' => $randomAffix->generateAffix('prefix')->id,
         ]);
 
-        if (rand(1, 100) > 50) {
+        if ($this->shouldAddSuffixToItem()) {
             $duplicateItem->update([
                 'item_suffix_id' => $randomAffix->generateAffix('suffix')->id
             ]);
