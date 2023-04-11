@@ -29,6 +29,7 @@
                     });
 
                     $snippet         = '';
+                    $pos             = false;
                     $matchingSection = reset($matchingSections);
 
                     if ($matchingSection) {
@@ -48,11 +49,11 @@
                     }
                 @endphp
 
-                @if ($matchingSection)
+                @if ($matchingSection && $pos !== false)
                     <div class="my-4">
                         <a href="{{route('info.page', ['pageName' => $page->page_name])}}#{{$matchingSection['order']}}" class="text-gray-900 dark:text-white">
                             <x-core.cards.card-with-hover>
-                                <h3>{{ucfirst(str_replace('-', ' ', $page->page_name))}}</h3>
+                                <h3 class="text-blue-700 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-500">{{ucfirst(str_replace('-', ' ', $page->page_name))}}</h3>
                                 <p class="my-4">
                                     {!! $snippet !!}
                                 </p>
