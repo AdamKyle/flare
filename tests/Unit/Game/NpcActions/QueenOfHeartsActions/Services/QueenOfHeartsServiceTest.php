@@ -206,4 +206,115 @@ class QueenOfHeartsServiceTest extends TestCase
 
         $this->assertEquals(200, $result['status']);
     }
+
+    public function testCannotMoveEnchantmentsWhenNotInHell() {
+        Event::fake();
+
+        $character = $this->character->getCharacter();
+
+        $result = $this->queenOfHeartsService->moveAffixes($character, 1, 1, 'all-enchantments');
+
+        Event::assertDispatched(GlobalMessageEvent::class);
+
+        $this->assertEquals('Invalid location to use that.', $result['message']);
+        $this->assertEquals(422, $result['status']);
+    }
+
+    public function testCannotMoveEnchantmentsWhenItemsDoNotExist() {
+        $questItem = $this->createItem(['effect' => ItemEffectsValue::QUEEN_OF_HEARTS]);
+
+        $character = $this->character->inventoryManagement()->giveItem($questItem)->getCharacter();
+
+        $character->update([
+            'gold' => 0,
+        ]);
+
+        $gameMap = $this->createGameMap(['name' => 'Hell']);
+
+        $character->map()->update(['game_map_id' => $gameMap->id]);
+
+        $character = $character->refresh();
+
+        $result = $this->queenOfHeartsService->moveAffixes($character, 1, 1, 'all-enchantments');
+
+        $this->assertEquals('Where did you put that item, child? Ooooh hooo hooo hooo! Are you playing hide and seek with it? (Unique does not exist.)', $result['message']);
+        $this->assertEquals(422, $result['status']);
+    }
+
+    public function testCannotMoveEnchantmentsWhenCannotAfford() {
+        $questItem = $this->createItem(['effect' => ItemEffectsValue::QUEEN_OF_HEARTS]);
+
+        $character = $this->character->inventoryManagement()->giveItem($questItem)->giveItem($this->createItem(['name' => 'Sample', 'type' => 'weapon']))->getCharacter();
+
+        $character->update([
+            'gold' => 0,
+        ]);
+
+        $gameMap = $this->createGameMap(['name' => 'Hell']);
+
+        $character->map()->update(['game_map_id' => $gameMap->id]);
+
+        $character->update([
+            'gold' => MaxCurrenciesValue::MAX_GOLD
+        ]);
+
+        $character = $character->refresh();
+
+        $this->queenOfHeartsService->purchaseUnique($character, 'legendary');
+
+        $character->update(['gold' => 0]);
+
+        $character = $character->refresh();
+
+        $slotWithUnique = $character->inventory->slots->filter(function($slot) {
+            return $slot->item->is_unique;
+        })->first();
+
+        $slotToMoveTo = $character->inventory->slots->filter(function($slot) {
+            return !$slot->item->is_unique;
+        })->first();
+
+        $result = $this->queenOfHeartsService->moveAffixes($character, $slotWithUnique->id, $slotToMoveTo->id, 'all-enchantments');
+
+        $this->assertEquals('Child, you are so poor (Not enough currency) ...', $result['message']);
+        $this->assertEquals(422, $result['status']);
+    }
+
+    public function testCanMoveEnchantments() {
+        $questItem = $this->createItem(['effect' => ItemEffectsValue::QUEEN_OF_HEARTS]);
+
+        $character = $this->character->inventoryManagement()->giveItem($questItem)->giveItem($this->createItem(['name' => 'Sample', 'type' => 'weapon']))->getCharacter();
+
+        $character->update([
+            'gold' => 0,
+        ]);
+
+        $gameMap = $this->createGameMap(['name' => 'Hell']);
+
+        $character->map()->update(['game_map_id' => $gameMap->id]);
+
+        $character->update([
+            'gold'      => MaxCurrenciesValue::MAX_GOLD,
+            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
+            'shards'    => MaxCurrenciesValue::MAX_SHARDS,
+        ]);
+
+        $character = $character->refresh();
+
+        $this->queenOfHeartsService->purchaseUnique($character, 'legendary');
+
+        $character = $character->refresh();
+
+        $slotWithUnique = $character->inventory->slots->filter(function($slot) {
+            return $slot->item->is_unique;
+        })->first();
+
+        $slotToMoveTo = $character->inventory->slots->filter(function($slot) {
+            return !$slot->item->is_unique;
+        })->first();
+
+        $result = $this->queenOfHeartsService->moveAffixes($character, $slotWithUnique->id, $slotToMoveTo->id, 'all-enchantments');
+
+        $this->assertEquals(200, $result['status']);
+    }
 }

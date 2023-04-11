@@ -175,9 +175,8 @@ class ReRollEnchantmentService {
             'shards'    => $character->shards - $costs['shards_cost'],
         ]);
 
-        $duplicateSecondaryItem = $secondarySlot->item->duplicate();
-        $duplicateUnique        = $slot->item->duplicate();
-        $duplicateSecondaryItem = $this->applyHolyStacks($slot->item, $duplicateSecondaryItem);
+        $duplicateSecondaryItem = DuplicateItemHandler::duplicateItem($secondarySlot->item);
+        $duplicateUnique        = DuplicateItemHandler::duplicateItem($slot->item);
 
         $duplicateUnique->update([
             'market_sellable' => true,
