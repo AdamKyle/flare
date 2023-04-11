@@ -40,6 +40,12 @@ class QueenOfHeartsService {
      * @return array
      */
     public function purchaseUnique(Character $character, string $type): array {
+        if (!$this->randomEnchantmentService->isPlayerInHell($character)) {
+            event(new GlobalMessageEvent($character->name . ' has pissed off the Queen of Hearts with their cheating ways. They attempted to access her while not in Hell and/or with out the required item.'));
+
+            return $this->errorResult('Invalid location to use that.');
+        }
+
         if ($character->isInventoryFull()) {
             return $this->errorResult('Your inventory is full.');
         }
