@@ -1,22 +1,19 @@
 <?php
 
-namespace App\Game\Core\Services;
+namespace App\Game\NpcActions\WorkBench\Services;
 
-use App\Game\Core\Events\CraftedItemTimeOutEvent;
-use App\Game\Messages\Events\GlobalMessageEvent;
-use App\Game\Messages\Events\ServerMessageEvent;
-use Deployer\Executor\Server;
-use Illuminate\Support\Collection;
-use Illuminate\Database\Eloquent\Collection as DBCollection;
-use App\Game\Core\Events\UpdateTopBarEvent;
+
 use App\Flare\Models\Character;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Values\ItemHolyValue;
-use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
-use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
+use App\Game\Core\Events\CraftedItemTimeOutEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Messages\Events\ServerMessageEvent;
+use Illuminate\Database\Eloquent\Collection as DBCollection;
+use Illuminate\Support\Collection;
 
 class HolyItemService {
 

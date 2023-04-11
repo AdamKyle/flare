@@ -89,6 +89,7 @@ class RouteServiceProvider extends ServiceProvider
         // NPC Actions:
         $this->mapSeerActions();
         $this->mapQueenOfHeartsActions();
+        $this->mapWorkBenchActions();
 
         // Game Api Routes
         $this->mapApiRoutes();
@@ -330,5 +331,12 @@ class RouteServiceProvider extends ServiceProvider
             ->middleware('web')
             ->namespace('App\Game\NpcActions\QueenOfHeartsActions\Controllers')
             ->group(base_path('routes/game/npc-actions/queen-of-hearts/api.php'));
+    }
+
+    protected function mapWorkBenchActions() {
+        Route::prefix('api')
+            ->middleware('web')
+            ->namespace('App\Game\NpcActions\WorkBench\Controllers')
+            ->group(base_path('routes/game/npc-actions/work-bench/api.php'));
     }
 }

@@ -242,6 +242,9 @@ return [
         App\Game\Mercenaries\Providers\ServiceProvider::class,
         App\Game\Reincarnate\Providers\ServiceProvider::class,
         App\Game\ClassRanks\Providers\ServiceProvider::class,
+        App\Game\NpcActions\SeerActions\Providers\ServiceProvider::class,
+        App\Game\NpcActions\QueenOfHeartsActions\Providers\ServiceProvider::class,
+        App\Game\NpcActions\WorkBench\Providers\ServiceProvider::class,
     ],
 
     /*

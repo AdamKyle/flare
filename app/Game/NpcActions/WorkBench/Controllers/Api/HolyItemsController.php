@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Game\Core\Controllers\Api;
+namespace App\Game\NpcActions\WorkBench\Controllers\Api;
 
 use App\Flare\Models\Character;
 use App\Game\Core\Requests\CompareGemsRequest;
-use App\Game\Core\Services\HolyItemService;
+use App\Game\NpcActions\WorkBench\Services\HolyItemService;
 use App\Http\Controllers\Controller;
 
 class HolyItemsController extends Controller {
