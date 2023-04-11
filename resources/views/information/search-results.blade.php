@@ -13,7 +13,7 @@
             @csrf
 
             <div class="mb-5 flex justify-content-center">
-                <input id="info_search" type="text" class="form-control mr-2" name="info_search" value="{{$query}}">
+                <input id="info_search" type="text" class="form-control mr-2" name="info_search" value="{{$query !== null ? $query : old('info_search')}}">
                 <x-core.buttons.primary-button type="submit">Search</x-core.buttons.primary-button>
             </div>
         </form>

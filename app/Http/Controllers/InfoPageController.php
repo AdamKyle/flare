@@ -33,6 +33,11 @@ class InfoPageController extends Controller
     use ItemsShowInformation, MonstersShowInformation;
 
     public function search(Request $request) {
+
+        if (is_null($request->info_search)) {
+            return response()->redirectToRoute('info.page', ['pageName' => 'home']);
+        }
+
         $searchResults = InfoPage::whereRaw("JSON_EXTRACT(page_sections, '$[*].content') LIKE '%".$request->info_search."%'")->get();
 
         return view('information.search-results', [
