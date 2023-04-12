@@ -1,25 +1,30 @@
 import React, {Fragment} from "react";
-import ItemsForSeer from "../../../../../../lib/game/types/actions/components/seer-camp/items-for-seer";
-import GemsForSeer from "../../../../../../lib/game/types/actions/components/seer-camp/gems-for-seer";
 import Select from "react-select";
+import AddGemsToItemProps from "./types/add-gems-to-item-props";
+import Items from "./deffinitions/items";
+import Gems from "./deffinitions/gems";
 
-export default class AddGemsToItem extends React.Component<any, any> {
+export default class AddGemsToItem<T> extends React.Component<AddGemsToItemProps<T>, { }> {
 
-    constructor(props: any) {
+    constructor(props: AddGemsToItemProps<T>) {
         super(props);
     }
 
-    createItemsOptions() {
-        const items = this.props.items.map((item: ItemsForSeer) => {
-            if (item.socket_amount > 0) {
-                return {
-                    label: item.name,
-                    value: item.slot_id,
-                }
-            }
-        }).filter((item: { label: string, value: number } | undefined) => {
-            return typeof item !== 'undefined';
-        });
+    createItemsOptions(): {label: string, value: number}[]|[] {
+
+        if (this.props.items.length === 0) {
+            return [{
+                label: 'Please select item',
+                value: 0,
+            }];
+        }
+
+        const items = this.props.items
+            .filter(item => item.socket_amount > 0)
+            .map(item => ({
+                label: item.name,
+                value: item.slot_id,
+            }));
 
         items.unshift({
             label: 'Please select item',
@@ -30,7 +35,7 @@ export default class AddGemsToItem extends React.Component<any, any> {
     }
 
     createGemOptions() {
-        const gems = this.props.gems.map((gem: GemsForSeer) => {
+        const gems = this.props.gems.map((gem: Gems) => {
             return {
                 label: gem.name + ' (Amount: '+gem.amount+', Tier: '+gem.tier+')',
                 value: gem.slot_id
@@ -54,7 +59,7 @@ export default class AddGemsToItem extends React.Component<any, any> {
     }
 
     defaultValueForItems() {
-        const item = this.props.items.filter((item: ItemsForSeer) => {
+        const item = this.props.items.filter((item: Items) => {
             return item.slot_id === this.props.item_selected
         });
 
@@ -69,7 +74,7 @@ export default class AddGemsToItem extends React.Component<any, any> {
     }
 
     defaultValueForGems() {
-        const gem = this.props.gems.filter((gem: GemsForSeer) => {
+        const gem = this.props.gems.filter((gem: Gems) => {
             return gem.slot_id === this.props.gem_selected
         });
 
@@ -84,6 +89,7 @@ export default class AddGemsToItem extends React.Component<any, any> {
     }
 
     render() {
+        console.log(this.props);
         return (
             <Fragment>
                 <div className='mb-3'>

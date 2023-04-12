@@ -1,10 +1,10 @@
 import React, {Fragment} from "react";
-import PrimaryButton from "../../../../../../components/ui/buttons/primary-button";
-import DangerButton from "../../../../../../components/ui/buttons/danger-button";
+import PrimaryButton from "../../../../components/ui/buttons/primary-button";
+import ManageItemSocketActionsProps from "./types/manage-item-socket-actions-props";
 
-export default class ManageItemSocketsActions extends React.Component<any, any> {
+export default class ManageItemSocketsActions extends React.Component<ManageItemSocketActionsProps, {}> {
 
-    constructor(props: any) {
+    constructor(props: ManageItemSocketActionsProps) {
         super(props);
     }
 

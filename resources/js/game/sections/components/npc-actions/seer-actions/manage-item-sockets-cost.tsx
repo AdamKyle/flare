@@ -1,9 +1,10 @@
 import React from "react";
-import {formatNumber} from "../../../../../../lib/game/format-number";
+import {formatNumber} from "../../../../lib/game/format-number";
+import ManageItemSocketsCostProps from "./types/manage-item-sockets-cost-props";
 
-export default class ManageItemSocketsCost extends React.Component<any, any> {
+export default class ManageItemSocketsCost extends React.Component<ManageItemSocketsCostProps, { }> {
 
-    constructor(props: any) {
+    constructor(props: ManageItemSocketsCostProps) {
         super(props);
     }
 

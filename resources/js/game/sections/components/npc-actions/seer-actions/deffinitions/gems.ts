@@ -1,6 +1,6 @@
-export default interface GemsForSeer {
+export default interface Gems {
+    amount: number;
     name: string;
     slot_id: number;
-    amount: number;
     tier: number;
 }

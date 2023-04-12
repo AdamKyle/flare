@@ -3,19 +3,19 @@ import LoadingProgressBar from "../../../../components/ui/progress-bars/loading-
 import Select from "react-select";
 import DangerAlert from "../../../../components/ui/alerts/simple-alerts/danger-alert";
 import SuccessAlert from "../../../../components/ui/alerts/simple-alerts/success-alert";
-import ManageItemSockets from "./components/seer-actions/manage-item-sockets";
-import ManageItemSocketsActions from "./components/seer-actions/manage-item-sockets-actions";
+import ManageItemSockets from "../../../components/npc-actions/seer-actions/manage-item-sockets";
+import ManageItemSocketsActions from "../../../components/npc-actions/seer-actions/manage-item-sockets-actions";
 import DangerButton from "../../../../components/ui/buttons/danger-button";
 import SeerCampState from "../../../../lib/game/types/actions/seer-camp-state";
 import SeerCampProps from "../../../../lib/game/types/actions/seer-camp-props";
 import SeerActions from "../../../../lib/game/actions/seer-camp/seer-actions";
-import ItemsForSeer from "../../../../lib/game/types/actions/components/seer-camp/items-for-seer";
-import ManageItemSocketsCost from "./components/seer-actions/manage-item-sockets-cost";
-import AddGemsToItem from "./components/seer-actions/add-gems-to-item";
-import AddGemsToItemActions from "./components/seer-actions/add-gems-to-item-actions";
-import GemsForSeer from "../../../../lib/game/types/actions/components/seer-camp/gems-for-seer";
+import ManageItemSocketsCost from "../../../components/npc-actions/seer-actions/manage-item-sockets-cost";
+import AddGemsToItem from "../../../components/npc-actions/seer-actions/add-gems-to-item";
+import AddGemsToItemActions from "../../../components/npc-actions/seer-actions/add-gems-to-item-actions";
 import ManageGems from "../../../components/gems/manage-gems";
-import RemoveGem from "./components/seer-actions/remove-gem";
+import RemoveGem from "../../../components/npc-actions/seer-actions/remove-gem";
+import Items from "../../../components/npc-actions/seer-actions/deffinitions/items";
+import Gems from "../../../components/npc-actions/seer-actions/deffinitions/gems";
 
 export default class SeerCamp extends React.Component<SeerCampProps, SeerCampState> {
 
@@ -165,7 +165,7 @@ export default class SeerCamp extends React.Component<SeerCampProps, SeerCampSta
     }
 
     getItemInfo (key: string) {
-        const item = this.state.items.filter((item: ItemsForSeer) => {
+        const item = this.state.items.filter((item: Items) => {
             return item.slot_id === this.state.item_selected
         });
 
@@ -180,12 +180,12 @@ export default class SeerCamp extends React.Component<SeerCampProps, SeerCampSta
     }
 
     buildGemDialogueTitle(gemSlotId: number): JSX.Element | null {
-        let gemSlot: GemsForSeer[]|[] = this.state.gems.filter((gem: GemsForSeer) => {
+        let gemSlot: Gems[]|[] = this.state.gems.filter((gem: Gems) => {
             return gem.slot_id === gemSlotId;
         });
 
         if (gemSlot.length > 0) {
-             const gem: GemsForSeer = gemSlot[0];
+             const gem: Gems = gemSlot[0];
 
             return <span className={'text-lime-600 dark:text-lime-500'}>{gem.name}</span>;
         }

@@ -1,9 +1,9 @@
-import ItemsForSeer from "./components/seer-camp/items-for-seer";
-import GemsForSeer from "./components/seer-camp/gems-for-seer";
+import Items from "../../../../sections/components/npc-actions/seer-actions/deffinitions/items";
+import Gems from "../../../../sections/components/npc-actions/seer-actions/deffinitions/gems";
 
 export default interface SeerCampState {
-    items: ItemsForSeer[]|[],
-    gems: GemsForSeer[]|[],
+    items: Items[]|[],
+    gems: Gems[]|[],
     seer_actions: {label: string, value: string}[],
     socket_cost: number,
     attach_gem: number,

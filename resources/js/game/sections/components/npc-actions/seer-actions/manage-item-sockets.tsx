@@ -1,9 +1,12 @@
 import React, {Fragment} from "react";
 import Select from "react-select";
+import ManageItemSocketsProps from "./types/manage-item-sockets-props";
+import ManageItemSocketsState from "./types/manage-item-sockets-state";
+import Items from "./deffinitions/items";
 
-export default class ManageItemSockets extends React.Component<any, any> {
+export default class ManageItemSockets<T> extends React.Component<ManageItemSocketsProps<T>, ManageItemSocketsState> {
 
-    constructor(props: any) {
+    constructor(props: ManageItemSocketsProps<T>) {
         super(props);
 
         this.state = {
@@ -19,8 +22,8 @@ export default class ManageItemSockets extends React.Component<any, any> {
         })
     }
 
-    itemOptions() {
-        let options = this.props.items.map((item: any) => {
+    itemOptions(): {label: string, value: number}[] {
+        let options = this.props.items.map((item: Items) => {
             return {
                 label: item.name,
                 value: item.slot_id,
@@ -35,8 +38,8 @@ export default class ManageItemSockets extends React.Component<any, any> {
         return options;
     }
 
-    selectedItem() {
-        let item = this.props.items.filter((item: any) => {
+    selectedItem(): {label: string, value: number} {
+        let item = this.props.items.filter((item: Items) => {
             return item.slot_id === this.state.selected_item_slot_id;
         });
 

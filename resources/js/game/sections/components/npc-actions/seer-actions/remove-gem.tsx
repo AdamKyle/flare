@@ -1,11 +1,12 @@
 import React, {Fragment} from "react";
-import LoadingProgressBar from "../../../../../../components/ui/progress-bars/loading-progress-bar";
-import Ajax from "../../../../../../lib/ajax/ajax";
+import LoadingProgressBar from "../../../../components/ui/progress-bars/loading-progress-bar";
+import Ajax from "../../../../lib/ajax/ajax";
 import {AxiosResponse} from "axios";
 import Select from "react-select";
-import RemoveGemComparison from "../../../../../components/gems/remove-gem-comparison";
+import RemoveGemComparison from "../../gems/remove-gem-comparison";
+import RemoveGemsState from "./types/remove-gems-state";
 
-export default class RemoveGem extends React.Component<any, any> {
+export default class RemoveGem extends React.Component<any, RemoveGemsState> {
 
     constructor(props: any) {
         super(props);
@@ -16,7 +17,7 @@ export default class RemoveGem extends React.Component<any, any> {
             selected_item: 0,
             items: [],
             gems: [],
-            selected_gem_data: {},
+            selected_gem_data: null,
         }
     }
 
@@ -106,8 +107,12 @@ export default class RemoveGem extends React.Component<any, any> {
     }
 
     render() {
-
+        console.log(this.state && this.state.selected_gem_data);
         if (this.state.fetching_data) {
+            return <LoadingProgressBar />
+        }
+
+        if (this.state.selected_gem_data === null) {
             return <LoadingProgressBar />
         }
 
@@ -136,7 +141,7 @@ export default class RemoveGem extends React.Component<any, any> {
                                              update_remomal_data={this.updateRemoveGemState.bind(this)}
                                              manage_modal={() => this.setState({
                                                  selected_item: 0,
-                                                 selected_gem_data: {},
+                                                 selected_gem_data: null,
                                              })}
                          />
                     : null

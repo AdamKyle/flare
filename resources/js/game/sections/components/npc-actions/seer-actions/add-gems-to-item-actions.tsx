@@ -1,10 +1,10 @@
 import React, {Fragment} from "react";
-import PrimaryButton from "../../../../../../components/ui/buttons/primary-button";
-import DangerButton from "../../../../../../components/ui/buttons/danger-button";
+import PrimaryButton from "../../../../components/ui/buttons/primary-button";
+import AddGemsToItemsActionsProps from "./types/add-gems-to-items-actions-props";
 
-export default class AddGemsToItemActions extends React.Component<any, any> {
+export default class AddGemsToItemActions extends React.Component<AddGemsToItemsActionsProps, {}> {
 
-    constructor(props: any) {
+    constructor(props: AddGemsToItemsActionsProps) {
         super(props);
     }
 
