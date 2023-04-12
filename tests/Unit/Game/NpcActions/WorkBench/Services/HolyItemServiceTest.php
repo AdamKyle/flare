@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Game\NpcActions\SeerActions\Services;
+namespace Tests\Unit\Game\NpcActions\WorkBench\Services;
 
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Messages\Events\ServerMessageEvent;
