@@ -1,6 +1,6 @@
 import React, {Fragment} from "react";
 import InventoryComparisonAdjustment
-    from "./types/inventory-comparison-adjustment";
+    from "./definitions/inventory-comparison-adjustment";
 import {capitalize} from "lodash";
 import clsx from "clsx";
 import Tabs from "../../../../components/ui/tabs/tabs";
@@ -9,12 +9,14 @@ import {formatNumber} from "../../../../lib/game/format-number";
 import ItemNameColorationText from "../../../../components/ui/item-name-coloration-text";
 import ItemsAttachedSkills from "../../../../lib/game/character-sheet/types/modal/items-attached-skills";
 import InventoryItemGemDetails from "../../../character-sheet/components/inventory-item-gem-details";
+import ItemComparisonSectionProps from "./types/item-comparison-section-props";
+import {ItemForColorizationDefinition} from "../../../../lib/ui/types/item-name-coloration-text-props";
 
-export default class ItemComparisonSection extends React.Component<any, any> {
+export default class ItemComparisonSection extends React.Component<ItemComparisonSectionProps, {}> {
 
     private tabs: {name: string, key: string}[];
 
-    constructor(props: any) {
+    constructor(props: ItemComparisonSectionProps) {
         super(props);
 
         this.tabs = [{
@@ -196,13 +198,24 @@ export default class ItemComparisonSection extends React.Component<any, any> {
         return [...elements, ...skills];
     }
 
+    fetchItemInfoForColorization(item: InventoryComparisonAdjustment): ItemForColorizationDefinition {
+        return {
+            name: item.affix_name,
+            type: item.type,
+            affix_count: item.affix_count,
+            is_unique: item.is_unique,
+            holy_stacks_applied: item.holy_stacks_applied,
+            is_mythic: item.is_mythic,
+        }
+    }
+
     renderTwoComparisons() {
         if (this.props.comparison_details !== null) {
             return (
                 <div className='grid w-full lg:grid-cols-2 md:m-auto max-h-[400px] lg:max-h-[500px] overflow-y-auto'>
                     <div>
                         <div className={'font-light pb-3'}>
-                            <ItemNameColorationText item={this.props.comparison_details.details[0]} />
+                            <ItemNameColorationText item={this.fetchItemInfoForColorization(this.props.comparison_details.details[0])} />
                         </div>
                         {this.renderChange(this.props.comparison_details.details[0], this.props.comparison_details.itemToEquip)}
                     </div>
@@ -210,7 +223,7 @@ export default class ItemComparisonSection extends React.Component<any, any> {
                         className='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-3 mt-6'></div>
                     <div>
                         <div className={'font-light mb-3'}>
-                            <ItemNameColorationText item={this.props.comparison_details.details[1]} />
+                            <ItemNameColorationText item={this.fetchItemInfoForColorization(this.props.comparison_details.details[1])} />
                         </div>
                         {this.renderChange(this.props.comparison_details.details[1], this.props.comparison_details.itemToEquip)}
                     </div>
@@ -226,7 +239,7 @@ export default class ItemComparisonSection extends React.Component<any, any> {
             return (
                 <div className='max-h-[400px] lg:max-h-[500px] overflow-y-auto'>
                     <div className={'font-light pb-3'}>
-                        <ItemNameColorationText item={this.props.comparison_details.details[0]} />
+                        <ItemNameColorationText item={this.fetchItemInfoForColorization(this.props.comparison_details.details[0])} />
                     </div>
                     {this.renderChange(this.props.comparison_details.details[0], this.props.comparison_details.itemToEquip)}
                 </div>
@@ -251,7 +264,6 @@ export default class ItemComparisonSection extends React.Component<any, any> {
     }
 
     renderTabs(double: boolean) {
-        console.log(this.props.comparison_details);
         return (
             <Tabs tabs={this.tabs}>
                 <TabPanel key={'general'}>
@@ -298,6 +310,7 @@ export default class ItemComparisonSection extends React.Component<any, any> {
     }
 
     render() {
+        console.log(this.props);
         return (
             <Fragment>
                 {

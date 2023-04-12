@@ -9,7 +9,7 @@ import ItemNameColorationText from "../../../../components/ui/item-name-colorati
 import InventoryItemComparisonProps
     from "./types/inventory-item-comparison-props";
 import InventoryComparisonAdjustment
-    from "./types/inventory-comparison-adjustment";
+    from "./definitions/inventory-comparison-adjustment";
 import ComparisonSection from "./comparison-section";
 
 export default class InventoryItemComparison extends React.Component<InventoryItemComparisonProps, InventoryItemComparisonState> {

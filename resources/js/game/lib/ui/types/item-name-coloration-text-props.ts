@@ -1,16 +1,18 @@
 export default interface ItemNameColorationTextProps {
 
-    item: {
-        name: string;
+    item: ItemForColorizationDefinition
+}
 
-        type: string;
+export interface ItemForColorizationDefinition {
+    name: string;
 
-        affix_count: number;
+    type: string;
 
-        is_unique: boolean;
+    affix_count: number;
 
-        holy_stacks_applied: number;
+    is_unique: boolean;
 
-        is_mythic: boolean;
-    }
+    holy_stacks_applied: number;
+
+    is_mythic: boolean;
 }

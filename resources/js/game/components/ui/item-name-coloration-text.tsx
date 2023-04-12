@@ -2,7 +2,7 @@ import clsx from "clsx";
 import React from "react";
 import ItemNameColorationTextProps from "../../lib/ui/types/item-name-coloration-text-props";
 
-export default class ItemNameColorationText extends React.Component<ItemNameColorationTextProps, any> {
+export default class ItemNameColorationText extends React.Component<ItemNameColorationTextProps, { }> {
 
     constructor(props: ItemNameColorationTextProps) {
         super(props);

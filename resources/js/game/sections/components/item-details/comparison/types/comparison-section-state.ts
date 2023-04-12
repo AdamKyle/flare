@@ -1,4 +1,4 @@
-import InventoryComparisonAdjustment from "./inventory-comparison-adjustment";
+import InventoryComparisonAdjustment from "../definitions/inventory-comparison-adjustment";
 
 export default interface ComparisonSectionState {
     show_equip_modal: boolean;

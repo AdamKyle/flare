@@ -1,7 +1,7 @@
-import ComparisonDetails from '../../../../../lib/game/character-sheet/types/inventory/comparison-details';
+import ComparisonDetails from '../definitions/comparison-details';
 import SetDetails from "../../../../../lib/game/character-sheet/types/inventory/set-details";
 import InventoryDetails from "../../../../../lib/game/character-sheet/types/inventory/inventory-details";
-import InventoryComparisonAdjustment from "./inventory-comparison-adjustment";
+import InventoryComparisonAdjustment from "../definitions/inventory-comparison-adjustment";
 
 export default interface ComparisonSectionProps {
     is_large_modal: boolean;

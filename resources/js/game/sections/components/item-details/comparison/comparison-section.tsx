@@ -10,7 +10,7 @@ import MoveItemModal from "./actions/move-item-modal";
 import SellItemModal from "./actions/sell-item-modal";
 import ListItemModal from "./actions/list-item-modal";
 import InventoryComparisonAdjustment
-    from "./types/inventory-comparison-adjustment";
+    from "./definitions/inventory-comparison-adjustment";
 import InventoryComparisonActions from "./ajax/inventory-comparison-actions";
 import WarningAlert from "../../../../components/ui/alerts/simple-alerts/warning-alert";
 import ComparisonSectionProps from "./types/comparison-section-props";

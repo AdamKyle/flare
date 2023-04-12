@@ -2,7 +2,7 @@ import React, {Fragment} from "react";
 import ItemNameColorationText from "../../../components/ui/item-name-coloration-text";
 import {capitalize} from "lodash";
 import InventoryComparisonAdjustment
-    from "../../components/item-details/comparison/types/inventory-comparison-adjustment";
+    from "../../components/item-details/comparison/definitions/inventory-comparison-adjustment";
 import Dialogue from "../../../components/ui/dialogue/dialogue";
 import Ajax from "../../../lib/ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
