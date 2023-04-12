@@ -1,14 +1,14 @@
 import React, {Fragment} from "react";
 import InventoryComparisonAdjustment
-    from "../../../../../lib/game/character-sheet/types/modal/inventory-comparison-adjustment";
+    from "./types/inventory-comparison-adjustment";
 import {capitalize} from "lodash";
 import clsx from "clsx";
-import Tabs from "../../../../../components/ui/tabs/tabs";
-import TabPanel from "../../../../../components/ui/tabs/tab-panel";
-import {formatNumber} from "../../../../../lib/game/format-number";
-import ItemNameColorationText from "../../../../../components/ui/item-name-coloration-text";
-import ItemsAttachedSkills from "../../../../../lib/game/character-sheet/types/modal/items-attached-skills";
-import InventoryItemGemDetails from "../../inventory-item-gem-details";
+import Tabs from "../../../../components/ui/tabs/tabs";
+import TabPanel from "../../../../components/ui/tabs/tab-panel";
+import {formatNumber} from "../../../../lib/game/format-number";
+import ItemNameColorationText from "../../../../components/ui/item-name-coloration-text";
+import ItemsAttachedSkills from "../../../../lib/game/character-sheet/types/modal/items-attached-skills";
+import InventoryItemGemDetails from "../../../character-sheet/components/inventory-item-gem-details";
 
 export default class ItemComparisonSection extends React.Component<any, any> {
 

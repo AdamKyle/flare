@@ -8,7 +8,7 @@ import ActionsInterface from "../../../../../lib/game/character-sheet/helpers/in
 import InventoryDetails from "../../../../../lib/game/character-sheet/types/inventory/inventory-details";
 import UsableItemTable from "../../../../../lib/game/character-sheet/types/tables/usable-items-table-props";
 import MenuItemType from "../../../../../lib/ui/types/drop-down/menu-item-type";
-import ListItemModal from "../../modals/components/inventory-comparison/list-item-modal";
+import ListItemModal from "../../../../components/item-details/comparison/actions/list-item-modal";
 import Ajax from "../../../../../lib/ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
 import InventoryUseItem from "../../modals/inventory-use-item";

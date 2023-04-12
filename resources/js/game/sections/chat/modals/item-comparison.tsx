@@ -2,13 +2,12 @@ import React, {Fragment} from "react";
 import ItemNameColorationText from "../../../components/ui/item-name-coloration-text";
 import {capitalize} from "lodash";
 import InventoryComparisonAdjustment
-    from "../../../lib/game/character-sheet/types/modal/inventory-comparison-adjustment";
+    from "../../components/item-details/comparison/types/inventory-comparison-adjustment";
 import Dialogue from "../../../components/ui/dialogue/dialogue";
 import Ajax from "../../../lib/ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
 import ComponentLoading from "../../../components/ui/loading/component-loading";
-import ComparisonSection
-    from "../../character-sheet/components/modals/components/inventory-comparison/comparison-section";
+import ComparisonSection from "../../components/item-details/comparison/comparison-section";
 import {
     watchForChatDarkModeComparisonChange,
 } from "../../../lib/game/dark-mode-watcher";

@@ -1,16 +1,16 @@
-import React, {Fragment} from "react";
+import React from "react";
 import Dialogue from "../../../../components/ui/dialogue/dialogue";
 import ComponentLoading from "../../../../components/ui/loading/component-loading";
 import {AxiosError, AxiosResponse} from "axios";
 import Ajax from "../../../../lib/ajax/ajax";
 import InventoryItemComparisonState
-    from "../../../../lib/game/character-sheet/types/modal/inventory-item-comparison-state";
+    from "./types/inventory-item-comparison-state";
 import ItemNameColorationText from "../../../../components/ui/item-name-coloration-text";
 import InventoryItemComparisonProps
-    from "../../../../lib/game/character-sheet/types/modal/inventory-item-comparison-props";
+    from "./types/inventory-item-comparison-props";
 import InventoryComparisonAdjustment
-    from "../../../../lib/game/character-sheet/types/modal/inventory-comparison-adjustment";
-import ComparisonSection from "./components/inventory-comparison/comparison-section";
+    from "./types/inventory-comparison-adjustment";
+import ComparisonSection from "./comparison-section";
 
 export default class InventoryItemComparison extends React.Component<InventoryItemComparisonProps, InventoryItemComparisonState> {
 

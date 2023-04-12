@@ -1,10 +1,10 @@
 import React from "react";
-import Dialogue from "../../../../../../components/ui/dialogue/dialogue";
-import ItemNameColorationText from "../../../../../../components/ui/item-name-coloration-text";
-import SellModalProps from "../../../../../../lib/game/character-sheet/types/modal/sell-modal-props";
-import {formatNumber} from "../../../../../../lib/game/format-number";
+import Dialogue from "../../../../../components/ui/dialogue/dialogue";
+import ItemNameColorationText from "../../../../../components/ui/item-name-coloration-text";
+import SellModalProps from "./types/sell-modal-props";
+import {formatNumber} from "../../../../../lib/game/format-number";
 
-export default class SellItemModal extends React.Component<SellModalProps, any> {
+export default class SellItemModal extends React.Component<SellModalProps, { }> {
 
     constructor(props: SellModalProps) {
         super(props);

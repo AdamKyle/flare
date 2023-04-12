@@ -1,13 +1,13 @@
 import React, {Fragment} from "react";
-import Dialogue from "../../../../../../components/ui/dialogue/dialogue";
-import ItemNameColorationText from "../../../../../../components/ui/item-name-coloration-text";
-import {MarketBoardLineChart} from "../../../../../../components/ui/charts/line-chart";
-import Ajax from "../../../../../../lib/ajax/ajax";
+import Dialogue from "../../../../../components/ui/dialogue/dialogue";
+import ItemNameColorationText from "../../../../../components/ui/item-name-coloration-text";
+import {MarketBoardLineChart} from "../../../../../components/ui/charts/line-chart";
+import Ajax from "../../../../../lib/ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
-import ComponentLoading from "../../../../../../components/ui/loading/component-loading";
+import ComponentLoading from "../../../../../components/ui/loading/component-loading";
 import {DateTime} from "luxon";
-import InfoAlert from "../../../../../../components/ui/alerts/simple-alerts/info-alert";
-import { formatNumber } from "../../../../../../lib/game/format-number";
+import InfoAlert from "../../../../../components/ui/alerts/simple-alerts/info-alert";
+import { formatNumber } from "../../../../../lib/game/format-number";
 
 export default class ListItemModal extends React.Component<any, any> {
 

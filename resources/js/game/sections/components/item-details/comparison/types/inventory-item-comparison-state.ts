@@ -1,5 +1,5 @@
 import InventoryComparisonAdjustment from "./inventory-comparison-adjustment";
-import ComparisonDetails from "../inventory/comparison-details";
+import ComparisonDetails from "../../../../../lib/game/character-sheet/types/inventory/comparison-details";
 
 export default interface InventoryItemComparisonState {
 

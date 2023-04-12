@@ -1,4 +1,4 @@
-import InventoryComparisonAdjustment from "../modal/inventory-comparison-adjustment";
+import InventoryComparisonAdjustment from "../../../../../sections/components/item-details/comparison/types/inventory-comparison-adjustment";
 
 export default interface ComparisonDetails {
 

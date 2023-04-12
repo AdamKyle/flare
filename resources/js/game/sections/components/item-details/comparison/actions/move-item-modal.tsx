@@ -1,11 +1,7 @@
 import React from "react";
-import Dialogue from "../../../../../../components/ui/dialogue/dialogue";
-import {EquipPositions} from "../../../../../../lib/game/character-sheet/helpers/inventory/equip-positions";
-import PrimaryButton from "../../../../../../components/ui/buttons/primary-button";
-import {capitalize} from "lodash";
-import EquipModalProps from "../../../../../../lib/game/character-sheet/types/modal/equip-modal-props";
-import MoveModalProps from "../../../../../../lib/game/character-sheet/types/modal/move-modal-props";
-import DropDown from "../../../../../../components/ui/drop-down/drop-down";
+import Dialogue from "../../../../../components/ui/dialogue/dialogue";
+import MoveModalProps from "../../../../../lib/game/character-sheet/types/modal/move-modal-props";
+import DropDown from "../../../../../components/ui/drop-down/drop-down";
 
 export default class MoveItemModal extends React.Component<MoveModalProps, any> {
 

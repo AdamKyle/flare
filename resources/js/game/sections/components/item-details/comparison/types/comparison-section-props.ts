@@ -1,6 +1,6 @@
-import ComparisonDetails from '../inventory/comparison-details';
-import SetDetails from "../inventory/set-details";
-import InventoryDetails from "../inventory/inventory-details";
+import ComparisonDetails from '../../../../../lib/game/character-sheet/types/inventory/comparison-details';
+import SetDetails from "../../../../../lib/game/character-sheet/types/inventory/set-details";
+import InventoryDetails from "../../../../../lib/game/character-sheet/types/inventory/inventory-details";
 import InventoryComparisonAdjustment from "./inventory-comparison-adjustment";
 
 export default interface ComparisonSectionProps {

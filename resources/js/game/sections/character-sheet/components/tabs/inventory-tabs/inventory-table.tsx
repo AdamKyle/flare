@@ -3,7 +3,7 @@ import Table from "../../../../../components/ui/data-tables/table";
 import InventoryTabProps from "../../../../../lib/game/character-sheet/types/inventory-tab-props";
 import {BuildInventoryTableColumns} from "../../../../../lib/game/character-sheet/helpers/inventory/build-inventory-table-columns";
 import InventoryDetails from "../../../../../lib/game/character-sheet/types/inventory/inventory-details";
-import InventoryItemComparison from "../../modals/inventory-item-comparison";
+import InventoryItemComparison from "../../../../components/item-details/comparison/inventory-item-comparison";
 import InventoryItemsTableState from "../../../../../lib/game/character-sheet/types/tables/inventory-items-table-state";
 import UsableItemsDetails from "../../../../../lib/game/character-sheet/types/inventory/usable-items-details";
 import InfoAlert from "../../../../../components/ui/alerts/simple-alerts/info-alert";

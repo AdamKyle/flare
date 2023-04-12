@@ -1,4 +1,4 @@
-import InventoryComparisonAdjustment from "./inventory-comparison-adjustment";
+import InventoryComparisonAdjustment from "../../types/inventory-comparison-adjustment";
 
 export default interface EquipModalProps {
 

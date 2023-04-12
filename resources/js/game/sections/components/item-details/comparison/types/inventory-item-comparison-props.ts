@@ -1,5 +1,5 @@
-import InventoryDetails from "../inventory/inventory-details";
-import SetDetails from "../inventory/set-details";
+import InventoryDetails from "../../../../../lib/game/character-sheet/types/inventory/inventory-details";
+import SetDetails from "../../../../../lib/game/character-sheet/types/inventory/set-details";
 
 export default interface InventoryItemComparisonProps {
     is_open: boolean;

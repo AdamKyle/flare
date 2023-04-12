@@ -1,8 +1,7 @@
-import InventoryItemComparison from "../../../../sections/character-sheet/components/modals/inventory-item-comparison";
-import Ajax from "../../../ajax/ajax";
+import InventoryItemComparison from "../inventory-item-comparison";
+import Ajax from "../../../../../lib/ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
-import ComparisonSection
-    from "../../../../sections/character-sheet/components/modals/components/inventory-comparison/comparison-section";
+import ComparisonSection from "../comparison-section";
 
 type EquipParams = { position?: string, slot_id: number, equip_type: string };
 

@@ -1,4 +1,4 @@
-import ItemsAttachedSkills from "./items-attached-skills";
+import ItemsAttachedSkills from "../../../../../lib/game/character-sheet/types/modal/items-attached-skills";
 
 export default interface InventoryComparisonAdjustment {
 

@@ -1,23 +1,23 @@
 import React from "react";
-import ItemComparisonSection from "../item-comparison-section";
+import ItemComparisonSection from "./item-comparison-section";
 import clsx from "clsx";
-import PrimaryOutlineButton from "../../../../../../components/ui/buttons/primary-outline-button";
-import SuccessOutlineButton from "../../../../../../components/ui/buttons/success-outline-button";
-import DangerOutlineButton from "../../../../../../components/ui/buttons/danger-outline-button";
-import LoadingProgressBar from "../../../../../../components/ui/progress-bars/loading-progress-bar";
-import EquipModal from "./equip-modal";
-import MoveItemModal from "./move-item-modal";
-import SellItemModal from "./sell-item-modal";
-import ListItemModal from "./list-item-modal";
+import PrimaryOutlineButton from "../../../../components/ui/buttons/primary-outline-button";
+import SuccessOutlineButton from "../../../../components/ui/buttons/success-outline-button";
+import DangerOutlineButton from "../../../../components/ui/buttons/danger-outline-button";
+import LoadingProgressBar from "../../../../components/ui/progress-bars/loading-progress-bar";
+import EquipModal from "./actions/equip-modal";
+import MoveItemModal from "./actions/move-item-modal";
+import SellItemModal from "./actions/sell-item-modal";
+import ListItemModal from "./actions/list-item-modal";
 import InventoryComparisonAdjustment
-    from "../../../../../../lib/game/character-sheet/types/modal/inventory-comparison-adjustment";
-import InventoryComparisonActions from "../../../../../../lib/game/character-sheet/ajax/inventory-comparison-actions";
-import WarningAlert from "../../../../../../components/ui/alerts/simple-alerts/warning-alert";
-import ComparisonSectionProps from "../../../../../../lib/game/character-sheet/types/modal/comparison-section-props";
+    from "./types/inventory-comparison-adjustment";
+import InventoryComparisonActions from "./ajax/inventory-comparison-actions";
+import WarningAlert from "../../../../components/ui/alerts/simple-alerts/warning-alert";
+import ComparisonSectionProps from "./types/comparison-section-props";
 import ComparisonSectionState
-    from "../../../../../../lib/game/character-sheet/types/modal/comparison-section-state";
-import InventoryUseDetails from "../../inventory-item-details";
-import DangerAlert from "../../../../../../components/ui/alerts/simple-alerts/danger-alert";
+    from "./types/comparison-section-state";
+import InventoryUseDetails from "../../../character-sheet/components/modals/inventory-item-details";
+import DangerAlert from "../../../../components/ui/alerts/simple-alerts/danger-alert";
 
 export default class ComparisonSection extends React.Component<ComparisonSectionProps, ComparisonSectionState> {
 
