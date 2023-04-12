@@ -2,12 +2,10 @@
 
 namespace Tests\Unit\Game\NpcActions\QueenOfHeartsActions\Services;
 
-
-use App\Flare\Builders\RandomAffixGenerator;
-use App\Game\Gambler\Handlers\SpinHandler;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Item;
 use App\Flare\Values\RandomAffixDetails;
+use App\Flare\Builders\RandomAffixGenerator;
 use App\Game\NpcActions\QueenOfHeartsActions\Services\RandomEnchantmentService;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;

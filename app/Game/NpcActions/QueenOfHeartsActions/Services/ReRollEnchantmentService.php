@@ -59,38 +59,6 @@ class ReRollEnchantmentService {
         return $character->gold_dust > $goldDust && $character->shards > $shards;
     }
 
-    protected function getGoldDustCost(Character $character, string $type, string $selectedAffix): int {
-        $goldDust = 10000;
-
-        if ($selectedAffix === 'all-enchantments') {
-            $goldDust *= 2;
-        }
-
-        if ($type === 'everything') {
-            $goldDust += 500;
-        } else {
-            $goldDust += 100;
-        }
-
-        return $this->goldDust = $goldDust;
-    }
-
-    protected function getShardsCost(Character $character, string $type, string $selectedAffix): int {
-        $shardCost = 100;
-
-        if ($selectedAffix === 'all-enchantments') {
-            $shardCost *= 2;
-        }
-
-        if ($type === 'everything') {
-            $shardCost += 250;
-        } else {
-            $shardCost += 100;
-        }
-
-        return $this->shardCost = $shardCost;
-    }
-
     public function reRoll(Character $character, InventorySlot $slot, string $affixType, string $reRollType) {
         $character->update([
             'gold_dust' => $character->gold_dust - $this->goldDust,
@@ -139,7 +107,7 @@ class ReRollEnchantmentService {
         $item = Item::find($selectedItemToMoveId);
 
         if (is_null($item)) {
-            return false;
+            return [];
         }
 
         $cost = 0;
@@ -288,26 +256,36 @@ class ReRollEnchantmentService {
         event(new ServerMessageEvent($character->user, 'The Queen has moved the affixes and created the item: ' . $slot->item->affix_name, $slot->id));
     }
 
-    /**
-     * Apply the old items holy stacks to the new item.
-     *
-     * @param Item $oldItem
-     * @param Item $item
-     * @return Item
-     */
-    protected function applyHolyStacks(Item $oldItem, Item $item): Item {
-        if ($oldItem->appliedHolyStacks()->count() > 0) {
+    protected function getGoldDustCost(Character $character, string $type, string $selectedAffix): int {
+        $goldDust = 10000;
 
-            foreach ($oldItem->appliedHolyStacks as $stack) {
-                $stackAttributes = $stack->getAttributes();
-
-                $stackAttributes['item_id'] = $item->id;
-
-                $item->appliedHolyStacks()->create($stackAttributes);
-            }
+        if ($selectedAffix === 'all-enchantments') {
+            $goldDust *= 2;
         }
 
-        return $item->refresh();
+        if ($type === 'everything') {
+            $goldDust += 500;
+        } else {
+            $goldDust += 100;
+        }
+
+        return $this->goldDust = $goldDust;
+    }
+
+    protected function getShardsCost(Character $character, string $type, string $selectedAffix): int {
+        $shardCost = 100;
+
+        if ($selectedAffix === 'all-enchantments') {
+            $shardCost *= 2;
+        }
+
+        if ($type === 'everything') {
+            $shardCost += 250;
+        } else {
+            $shardCost += 100;
+        }
+
+        return $this->shardCost = $shardCost;
     }
 
     protected function fetchAffixesForReRoll(Item $item, string $affixType): array {
