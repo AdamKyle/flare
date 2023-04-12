@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Game\Core\Gems\Services;
+namespace App\Game\Gems\Services;
 
-use Illuminate\Support\Collection;
 use App\Flare\Models\Item;
+use Illuminate\Support\Collection;
 
 class ItemAtonements {
 

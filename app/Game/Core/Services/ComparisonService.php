@@ -3,20 +3,18 @@
 namespace App\Game\Core\Services;
 
 
-use App\Flare\Models\SetSlot;
+use App\Flare\Models\Character;
+use App\Flare\Models\InventorySlot;
+use App\Flare\Models\Item;
+use App\Flare\Transformers\ItemComparisonTransfromer;
 use App\Flare\Transformers\ItemTransformer;
 use App\Flare\Transformers\UsableItemTransformer;
 use App\Game\Core\Gems\Services\AtonementComparison;
-use App\Game\Core\Gems\Services\ItemAtonements;
+use App\Game\Core\Values\ValidEquipPositionsValue;
+use App\Game\Gems\Services\ItemAtonements;
 use Cache;
-
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item as FractalItem;
-use App\Flare\Models\Item;
-use App\Flare\Models\Character;
-use App\Flare\Models\InventorySlot;
-use App\Flare\Transformers\ItemComparisonTransfromer;
-use App\Game\Core\Values\ValidEquipPositionsValue;
 
 class ComparisonService {
 

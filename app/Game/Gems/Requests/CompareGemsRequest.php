@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Core\Gems\Requests;
+namespace App\Game\Gems\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 

@@ -213,7 +213,7 @@ return [
         /**
          * Game Core Providers
          */
-        App\Game\Core\Gems\Providers\ServiceProvider::class,
+        \App\Game\Gems\Providers\ServiceProvider::class,
 
         /**
          * Npc Actions

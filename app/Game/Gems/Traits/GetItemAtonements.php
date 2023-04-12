@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Game\Core\Gems\Traits;
+namespace App\Game\Gems\Traits;
 
 use App\Flare\Models\Item;
-use App\Game\Core\Gems\Values\GemTypeValue;
+use App\Game\Gems\Values\GemTypeValue;
 use Illuminate\Support\Facades\DB;
 
 trait GetItemAtonements {

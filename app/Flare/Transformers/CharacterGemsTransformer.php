@@ -3,7 +3,7 @@
 namespace App\Flare\Transformers;
 
 use App\Flare\Models\Gem;
-use App\Game\Core\Gems\Values\GemTypeValue;
+use App\Game\Gems\Values\GemTypeValue;
 use Exception;
 use League\Fractal\TransformerAbstract;
 

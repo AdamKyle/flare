@@ -8,11 +8,11 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Values\ArmourTypes;
 use App\Flare\Values\WeaponTypes;
-use App\Game\Core\Gems\Services\GemComparison;
 use App\Game\Core\Traits\ResponseBuilder;
-use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
+use App\Game\Gems\Services\GemComparison;
 use Facades\App\Game\Core\Handlers\DuplicateItemHandler;
 use Facades\App\Game\Core\Handlers\HandleGoldBarsAsACurrency;
+use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class SeerService {
 

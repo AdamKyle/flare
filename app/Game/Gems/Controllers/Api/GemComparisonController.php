@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Game\Core\Gems\Controllers\Api;
+namespace App\Game\Gems\Controllers\Api;
 
-use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
-use App\Game\Core\Gems\Requests\CompareGemsRequest;
-use App\Game\Core\Gems\Services\GemComparison;
+use App\Game\Gems\Requests\CompareGemsRequest;
+use App\Game\Gems\Services\GemComparison;
+use App\Http\Controllers\Controller;
 
 class GemComparisonController extends Controller
 {

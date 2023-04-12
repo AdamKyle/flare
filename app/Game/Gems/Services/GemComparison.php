@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Game\Core\Gems\Services;
+namespace App\Game\Gems\Services;
 
-use App\Game\Core\Gems\Traits\GetItemAtonements;
-use Exception;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item;
 use App\Flare\Models\Character;
 use App\Flare\Models\Gem;
 use App\Flare\Models\Item as FlareItem;
 use App\Flare\Transformers\CharacterGemsTransformer;
-use App\Game\Core\Gems\Values\GemTypeValue;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Gems\Traits\GetItemAtonements;
+use App\Game\Gems\Values\GemTypeValue;
+use Exception;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item;
 
 
 class GemComparison {

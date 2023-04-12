@@ -6,9 +6,9 @@ use App\Flare\Models\Character;
 use App\Flare\Models\GemBagSlot;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\UpdateTopBarEvent;
-use App\Game\Core\Gems\Values\GemTierValue;
 use App\Game\Core\Services\CharacterGemBagService;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Gems\Values\GemTierValue;
 
 class GemShopService {
 

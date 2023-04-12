@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Game\Core\Gems\Services;
+namespace App\Game\Gems\Services;
 
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item as FractalItem;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Transformers\CharacterGemsTransformer;
 use App\Game\Core\Services\CharacterInventoryService;
 use App\Game\Core\Traits\ResponseBuilder;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item as FractalItem;
 
 
 class AttachedGemService {

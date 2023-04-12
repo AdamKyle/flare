@@ -3,13 +3,11 @@
 namespace App\Flare\Transformers;
 
 use App\Flare\Models\GameSkill;
-use App\Flare\Traits\IsItemUnique;
-use App\Game\Core\Gems\Traits\GetItemAtonements;
-use App\Game\Core\Gems\Values\GemTypeValue;
-use Facades\App\Flare\Calculators\SellItemCalculator;
-use Illuminate\Support\Facades\DB;
-use League\Fractal\TransformerAbstract;
 use App\Flare\Models\Item;
+use App\Flare\Traits\IsItemUnique;
+use App\Game\Gems\Traits\GetItemAtonements;
+use Facades\App\Flare\Calculators\SellItemCalculator;
+use League\Fractal\TransformerAbstract;
 
 class ItemTransformer extends TransformerAbstract {
 

@@ -3,8 +3,8 @@
 namespace App\Game\Skills\Builders;
 
 use App\Flare\Models\Gem;
-use App\Game\Core\Gems\Values\GemTierValue;
-use App\Game\Core\Gems\Values\GemTypeValue;
+use App\Game\Gems\Values\GemTierValue;
+use App\Game\Gems\Values\GemTypeValue;
 
 class GemBuilder {
 

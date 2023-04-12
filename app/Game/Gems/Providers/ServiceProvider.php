@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Game\Core\Gems\Providers;
+namespace App\Game\Gems\Providers;
 
 use App\Flare\Transformers\CharacterGemsTransformer;
-use App\Game\Core\Gems\Services\ItemAtonements;
-use App\Game\Core\Gems\Services\AttachedGemService;
-use App\Game\Core\Gems\Services\GemComparison;
 use App\Game\Core\Middleware\IsCharacterAtLocationMiddleware;
 use App\Game\Core\Middleware\IsCharacterWhoTheySayTheyAre;
 use App\Game\Core\Services\AdventureRewardService;
 use App\Game\Core\Services\CharacterInventoryService;
 use App\Game\Core\Services\CraftingSkillService;
 use App\Game\Core\Services\ShopService;
+use App\Game\Gems\Services\AttachedGemService;
+use App\Game\Gems\Services\GemComparison;
+use App\Game\Gems\Services\ItemAtonements;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
 

@@ -2,9 +2,9 @@
 
 namespace App\Game\NpcActions\SeerActions\Providers;
 
-use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
-use App\Game\Core\Gems\Services\GemComparison;
+use App\Game\Gems\Services\GemComparison;
 use App\Game\NpcActions\SeerActions\Services\SeerService;
+use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
 class ServiceProvider extends ApplicationServiceProvider {
 

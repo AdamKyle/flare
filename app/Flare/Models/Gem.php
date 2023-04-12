@@ -2,8 +2,8 @@
 
 namespace App\Flare\Models;
 
-use App\Game\Core\Gems\Values\GemTierValue;
-use App\Game\Core\Gems\Values\GemTypeValue;
+use App\Game\Gems\Values\GemTierValue;
+use App\Game\Gems\Values\GemTypeValue;
 use Database\Factories\GemFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

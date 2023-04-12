@@ -135,8 +135,8 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapGemRoutes() {
         Route::prefix('api')
             ->middleware('web')
-            ->namespace('App\Game\Core\Gems\Controllers')
-            ->group(base_path('routes/game/core/gems/api.php'));
+            ->namespace('App\Game\Gems\Controllers')
+            ->group(base_path('routes/game/gems/api.php'));
     }
 
     protected function mapApiRoutes() {

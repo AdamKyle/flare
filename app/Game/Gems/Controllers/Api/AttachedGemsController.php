@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Game\Core\Gems\Controllers\Api;
+namespace App\Game\Gems\Controllers\Api;
 
-use App\Flare\Models\Item;
-use App\Game\Core\Gems\Services\AttachedGemService;
-use App\Http\Controllers\Controller;
 use App\Flare\Models\Character;
+use App\Flare\Models\Item;
+use App\Game\Gems\Services\AttachedGemService;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 
 class AttachedGemsController extends Controller {

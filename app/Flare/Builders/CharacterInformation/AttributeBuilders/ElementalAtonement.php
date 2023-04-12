@@ -2,7 +2,7 @@
 
 namespace App\Flare\Builders\CharacterInformation\AttributeBuilders;
 
-use App\Game\Core\Gems\Services\GemComparison;
+use App\Game\Gems\Services\GemComparison;
 
 class ElementalAtonement extends BaseAttribute {
 

@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use App\Flare\Models\Gem;
-use App\Game\Core\Gems\Values\GemTypeValue;
+use App\Game\Gems\Values\GemTypeValue;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class GemFactory extends Factory
