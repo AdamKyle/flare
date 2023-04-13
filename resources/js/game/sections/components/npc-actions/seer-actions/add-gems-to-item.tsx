@@ -89,7 +89,6 @@ export default class AddGemsToItem<T> extends React.Component<AddGemsToItemProps
     }
 
     render() {
-        console.log(this.props);
         return (
             <Fragment>
                 <div className='mb-3'>

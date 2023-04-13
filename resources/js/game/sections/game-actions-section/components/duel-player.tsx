@@ -27,6 +27,8 @@ export default class DuelPlayer extends React.Component<any, any> {
             defender_health: 0,
             battle_messages: [],
             error_message: null,
+            defender_atonement: 'N/A',
+            attacker_atonement: 'N/A',
         }
     }
 
@@ -40,6 +42,8 @@ export default class DuelPlayer extends React.Component<any, any> {
                 defender_health: this.props.duel_data.health_object.defender_health,
                 defender_id: this.props.duel_data.defender_id,
                 battle_messages: this.props.duel_data.messages,
+                defender_atonement: this.props.duel_data.defender_atonement,
+                attacker_atonement: this.props.duel_data.attacker_atonement,
             }, () => {
                 this.props.reset_duel_data();
             });
@@ -56,6 +60,8 @@ export default class DuelPlayer extends React.Component<any, any> {
                 defender_health: this.props.duel_data.health_object.defender_health,
                 defender_id: this.props.duel_data.defender_id,
                 battle_messages: this.props.duel_data.messages,
+                defender_atonement: this.props.duel_data.defender_atonement,
+                attacker_atonement: this.props.duel_data.attacker_atonement,
             }, () => {
                 this.props.reset_duel_data();
             });
@@ -125,6 +131,8 @@ export default class DuelPlayer extends React.Component<any, any> {
                     character_id: result.data.attacker_id,
                     defender_id: result.data.defender_id,
                     preforming_action: false,
+                    attacker_atonement: result.data.attacker_atonement,
+                    defender_atonement: result.data.defender_atonement,
                 });
             })
         })
@@ -260,6 +268,10 @@ export default class DuelPlayer extends React.Component<any, any> {
                             })}>
                                 <HealthMeters is_enemy={true} name={this.defenderName()} current_health={parseInt(this.state.defender_health)} max_health={this.state.defender_max_health} />
                                 <HealthMeters is_enemy={false} name={this.props.character.name} current_health={parseInt(this.state.attacker_health)} max_health={this.state.attacker_max_health} />
+                                <div className='my-2'>
+                                    <p className='text-red-500 dark:text-red-400 text-sm'>{this.defenderName()} Elemental Atonement: {this.state.defender_atonement}</p>
+                                    <p className='text-green-700 dark:text-green-400 text-sm'>Your Elemental Atonement: {this.state.attacker_atonement}</p>
+                                </div>
                             </div>
                             : null
                     }

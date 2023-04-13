@@ -77,6 +77,9 @@ class PvpService {
         $this->pvpAttack->cache()->deleteCharacterSheet($attacker);
         $this->pvpAttack->cache()->deleteCharacterSheet($defender);
 
+        $defenderElementalData = $defender->getInformation()->buildElementalAtonement();
+        $attackerElementalData = $attacker->getInformation()->buildElementalAtonement();
+
         if (!is_null($cache)) {
             return [
                 'attacker_health'     => $cache['attacker_health'],
@@ -85,6 +88,8 @@ class PvpService {
                 'defender_max_health' => $this->pvpAttack->cache()->getCachedCharacterData($defender, 'health'),
                 'defender_id'         => $defender->id,
                 'attacker_id'         => $attacker->id,
+                'defender_atonement'  => !is_null($defenderElementalData) ? $defenderElementalData['elemental_damage']['name'] : 'N/A',
+                'attacker_atonement'  => !is_null($attackerElementalData) ? $attackerElementalData['elemental_damage']['name'] : 'N/A',
             ];
         }
 
@@ -95,6 +100,8 @@ class PvpService {
             'defender_max_health' => $this->pvpAttack->cache()->getCachedCharacterData($defender, 'health'),
             'defender_id'         => $defender->id,
             'attacker_id'         => $attacker->id,
+            'defender_atonement'  => !is_null($defenderElementalData) ? $defenderElementalData['elemental_damage']['name'] : 'N/A',
+            'attacker_atonement'  => !is_null($attackerElementalData) ? $attackerElementalData['elemental_damage']['name'] : 'N/A',
         ];
     }
 
@@ -177,6 +184,9 @@ class PvpService {
     }
 
     protected function updateAttackerPvpInfo(Character $attacker, array $healthObject, int $defenderId, int $remainingDefenderHealth = 0) {
+        $attackerElementalAtonement = $attacker->getInformation()->buildElementalAtonement();
+        $defenderElementalAtonement = Character::find($defenderId)->getInformation()->buildElementalAtonement();
+
         event(new UpdateCharacterPvpAttack($attacker->user, [
             'health_object' => [
                 'attacker_max_health' => $healthObject['attacker_health'],
@@ -187,10 +197,15 @@ class PvpService {
             'messages'    => $this->pvpAttack->getMessages()['attacker'],
             'attacker_id' => $attacker->id,
             'defender_id' => $defenderId,
+            'attacker_atonement' => !is_null($attackerElementalAtonement) ? $attackerElementalAtonement['elemental_damage']['name'] : 'N/A',
+            'defender_atonement' => !is_null($defenderElementalAtonement) ? $defenderElementalAtonement['elemental_damage']['name'] : 'N/A'
         ]));
     }
 
     protected function updateDefenderPvpInfo(Character $defender, array $healthObject, int $attackerId, int $remainingDefenderHealth = 0) {
+        $defenderElementalAtonement = $defender->getInformation()->buildElementalAtonement();
+        $attackerElementalAtonement = Character::find($attackerId)->getInformation()->buildElementalAtonement();
+
         event(new UpdateCharacterPvpAttack($defender->user, [
             'health_object' => [
                 'attacker_max_health' => $healthObject['defender_health'],
@@ -201,6 +216,8 @@ class PvpService {
             'messages'    => $this->pvpAttack->getMessages()['defender'],
             'attacker_id' => $defender->id,
             'defender_id' => $attackerId,
+            'attacker_atonement' => !is_null($attackerElementalAtonement) ? $attackerElementalAtonement['elemental_damage']['name'] : 'N/A',
+            'defender_atonement' => !is_null($defenderElementalAtonement) ? $defenderElementalAtonement['elemental_damage']['name'] : 'N/A'
         ]));
     }
 

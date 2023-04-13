@@ -50,6 +50,8 @@ class GemService {
             return $this->errorResult('You do not have enough space in your inventory.');
         }
 
+        $character = $this->payForGem($character, $tier);
+
         event(new CraftedItemTimeOutEvent($character));
 
         $characterSkill = $this->getCraftingSkill($character);
@@ -184,6 +186,34 @@ class GemService {
         return $goldDust >= $data['cost']['gold_dust'] &&
                $shards >= $data['cost']['shards'] &&
                $copperCoins >= $data['cost']['copper_coins'];
+    }
+
+    /**
+     * For the cost of the gem based on tier.
+     *
+     * @param Character $character
+     * @param int $tier
+     * @return Character
+     * @throws Exception
+     */
+    protected function payForGem(Character $character, int $tier): Character {
+        $data = (new GemTierValue($tier))->maxForTier();
+
+        $goldDust    = $character->gold_dust;
+        $shards      = $character->shards;
+        $copperCoins = $character->copper_coins;
+
+        $newGoldDust    = $goldDust - $data['cost']['gold_dust'];
+        $newShards      = $shards - $data['cost']['shards'];
+        $newCopperCoins = $copperCoins - $data['cost']['copper_coins'];
+
+        $character->update([
+            'gold_dust'    => $newGoldDust,
+            'shards'       => $newShards,
+            'copper_coins' => $newCopperCoins,
+        ]);
+
+        return $character->refresh();
     }
 
     /**

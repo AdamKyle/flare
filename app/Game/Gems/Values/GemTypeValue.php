@@ -16,6 +16,12 @@ class GemTypeValue {
         self::WATER => self::WATER,
     ];
 
+    private static array $oppisites = [
+        self::FIRE  => self::WATER,
+        self::ICE   => self::FIRE,
+        self::WATER => self::ICE,
+    ];
+
     private static array $names = [
         self::FIRE  => 'Fire',
         self::ICE   => 'Ice',
@@ -32,6 +38,22 @@ class GemTypeValue {
 
     public static function getNames(): array {
         return self::$names;
+    }
+
+    public static function getOppositeForName(string $name): string {
+        if (!in_array($name, self::$names)) {
+            throw new \Exception($name . ' does not exist.');
+        }
+
+        $value = array_search($name, self::$names);
+
+        if ($value === false) {
+            throw new \Exception($name . ' does not exist.');
+        }
+
+        $opposite = self::$oppisites[$value];
+
+        return self::$names[$opposite];
     }
 
     public function getNameOfAtonement(): string {

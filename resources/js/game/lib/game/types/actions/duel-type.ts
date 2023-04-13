@@ -9,5 +9,14 @@ export default interface DuelType {
 
     defender_health: number;
 
-    battle_messages: {message: string, type: string}[] | [];
+    battle_messages: BattleMessages[] | [];
+
+    defender_atonement: string;
+
+    attacker_atonement: string;
+}
+
+interface BattleMessages {
+    message: string;
+    type: string;
 }

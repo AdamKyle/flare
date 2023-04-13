@@ -37,6 +37,7 @@ class CharacterAttack {
         $this->weaponType->setMonsterHealth($healthObject['defender_health']);
         $this->weaponType->setCharacterAttackData($attacker, $isAttackerVoided);
         $this->weaponType->setIsEnemyVoided($isEnemyVoided);
+        $this->weaponType->setDefenderId($defender->id);
         $this->weaponType->doPvpWeaponAttack($attacker, $defender);
 
         $this->type = $this->weaponType;
@@ -60,6 +61,7 @@ class CharacterAttack {
         $this->castType->setMonsterHealth($healthObject['defender_health']);
         $this->castType->setCharacterAttackData($attacker, $isAttackerVoided);
         $this->castType->setIsEnemyVoided($isEnemyVoided);
+        $this->castType->setDefenderId($defender->id);
         $this->castType->pvpCastAttack($attacker, $defender);
 
         $this->type = $this->castType;
@@ -83,6 +85,7 @@ class CharacterAttack {
         $this->attackAndCast->setMonsterHealth($healthObject['defender_health']);
         $this->attackAndCast->setCharacterAttackData($attacker, $isAttackerVoided);
         $this->attackAndCast->setIsEnemyVoided($isEnemyVoided);
+        $this->attackAndCast->setDefenderId($defender->id);
         $this->attackAndCast->handlePvpAttack($attacker, $defender);
 
         $this->type = $this->attackAndCast;
@@ -106,6 +109,7 @@ class CharacterAttack {
         $this->castAndAttack->setMonsterHealth($healthObject['defender_health']);
         $this->castAndAttack->setCharacterAttackData($attacker, $isAttackerVoided);
         $this->castAndAttack->setIsEnemyVoided($isEnemyVoided);
+        $this->castAndAttack->setDefenderId($defender->id);
         $this->castAndAttack->handlePvpAttack($attacker, $defender);
 
         $this->type = $this->castAndAttack;
@@ -129,6 +133,7 @@ class CharacterAttack {
         $this->defend->setMonsterHealth($healthObject['defender_health']);
         $this->defend->setCharacterAttackData($attacker, $isAttackerVoided);
         $this->defend->setIsEnemyVoided($isEnemyVoided);
+        $this->defend->setDefenderId($defender->id);
         $this->defend->pvpDefend($attacker, $defender);
 
         $this->type = $this->defend;

@@ -15,6 +15,8 @@ class BattleBase extends BattleMessages {
 
     protected int $monsterHealth;
 
+    protected int $defenderId;
+
     protected array $attackData;
 
     protected bool $isVoided = false;
@@ -63,6 +65,10 @@ class BattleBase extends BattleMessages {
         $this->isEnemyVoided = $isVoided;
     }
 
+    public function setDefenderId(int $defenderId) {
+        $this->defenderId = $defenderId;
+    }
+
     protected function doPvpEntrance(Character $attacker, Entrance $entrance) {
         $entrance->attackerEntrancesDefender($attacker, $this->attackData, $this->isVoided);
 
@@ -92,6 +98,7 @@ class BattleBase extends BattleMessages {
         $secondaryAttacks->setAttackData($this->attackData);
         $secondaryAttacks->setIsCharacterVoided($this->isVoided);
         $secondaryAttacks->setIsEnemyEntranced($this->isEnemyEntranced);
+        $secondaryAttacks->setDefenderId($this->defenderId);
 
         $secondaryAttacks->doSecondaryAttack($character, $monster, $affixReduction, $isPvp);
 

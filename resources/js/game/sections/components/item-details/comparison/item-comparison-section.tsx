@@ -310,7 +310,6 @@ export default class ItemComparisonSection extends React.Component<ItemCompariso
     }
 
     render() {
-        console.log(this.props);
         return (
             <Fragment>
                 {

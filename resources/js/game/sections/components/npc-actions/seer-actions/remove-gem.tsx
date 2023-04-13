@@ -107,7 +107,6 @@ export default class RemoveGem extends React.Component<any, RemoveGemsState> {
     }
 
     render() {
-        console.log(this.state && this.state.selected_gem_data);
         if (this.state.fetching_data) {
             return <LoadingProgressBar />
         }

@@ -2,6 +2,7 @@
 
 namespace App\Flare\Builders\CharacterInformation\AttributeBuilders;
 
+use App\Flare\Models\Item;
 use App\Game\Gems\Services\GemComparison;
 
 class ElementalAtonement extends BaseAttribute {
@@ -33,30 +34,20 @@ class ElementalAtonement extends BaseAttribute {
 
         foreach ($this->inventory as $slot) {
 
-            $itemAtonement = $this->gemComparison->getElementAtonement($slot->item)['atonements'];;
+            $itemAtonements = $this->buildPossibleAtonementDataWithDefaultValuesForItem($slot->item);
 
-            if (empty($itemAtonement)) {
+            if (empty($itemAtonements)) {
                 continue;
             }
 
-            if (empty($atonements)) {
+            forEach($itemAtonements as $key => $value) {
+                if (isset($atonements[$key])) {
+                    $atonements[$key] += floatval($value);
 
-                foreach ($itemAtonement as $value) {
-                    $atonements[$value['name']] = $value['total'];
+                    continue;
                 }
 
-                continue;
-            }
-
-            foreach ($itemAtonement as $atonement) {
-                foreach ($atonements as $key => $value) {
-                    if ($atonement['name'] === $key) {
-                        $atonements[$key] += $atonement['total'];
-                        continue;
-                    }
-
-                    $atonements[$atonement['name']] = $atonement['total'];
-                }
+                $atonements[$key] = floatval($value);
             }
         }
 
@@ -74,6 +65,21 @@ class ElementalAtonement extends BaseAttribute {
         }
 
         return $this->gemComparison->determineHighestValue(['atonements' => $characterAtonements]);
+    }
+
+    protected function buildPossibleAtonementDataWithDefaultValuesForItem(Item $item): array {
+        $itemAtonement = $this->gemComparison->getElementAtonement($item)['atonements'];
+        $atonementData = [];
+
+        if (empty($itemAtonement)) {
+            return [];
+        }
+
+        foreach ($itemAtonement as $value) {
+            $atonementData[$value['name']] = $value['total'];
+        }
+
+        return $atonementData;
     }
 
 }

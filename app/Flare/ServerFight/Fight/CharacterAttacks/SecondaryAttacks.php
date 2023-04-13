@@ -9,10 +9,9 @@ use App\Flare\ServerFight\BattleBase;
 use App\Flare\ServerFight\Fight\Affixes;
 use App\Flare\ServerFight\Monster\ServerMonster;
 use App\Flare\Values\LocationType;
+use App\Game\Gems\Values\GemTypeValue;
 
 class SecondaryAttacks extends BattleBase {
-
-    private bool $isCharacterVoided = false;
 
     private Affixes $affixes;
 
@@ -35,13 +34,16 @@ class SecondaryAttacks extends BattleBase {
     }
 
     public function doSecondaryAttack(Character $character, ServerMonster $monster = null, float $affixReduction = 0.0, bool $isPvp = false) {
+
+        $this->classSpecialtyDamage($isPvp);
+
+        $this->dealElementalDamage($character, $isPvp, $isPvp);
+
         if (!$this->isVoided) {
 
             if ($this->isEnemyEntranced) {
                 $affixReduction = 0.0;
             }
-
-            $this->classSpecialtyDamage($isPvp);
 
             $this->affixLifeStealingDamage($character, $monster, $affixReduction, $isPvp);
 
@@ -169,6 +171,59 @@ class SecondaryAttacks extends BattleBase {
                 $this->addDefenderMessage('The enemies rings glow and lash out for: ' . number_format($ringDamage), 'enemy-action');
             }
         }
+    }
+
+    public function dealElementalDamage(Character $character, bool $canDoElementalDamage = false, bool $isPvp = false) {
+
+        if (!$canDoElementalDamage) {
+            return;
+        }
+
+        if ($isPvp) {
+            $this->doElementalPvpDamage($character);
+        }
+    }
+
+    protected function doElementalPvpDamage(Character $character) {
+        $attackerAtonement = $character->getInformation()->buildElementalAtonement();
+        $defenderAtonement = Character::find($this->defenderId)->getInformation()->buildElementalAtonement();
+
+        if (!is_null($attackerAtonement)) {
+            $attackerOppositeElement = GemTypeValue::getOppositeForName($attackerAtonement['elemental_damage']['name']);
+
+            $damage = $this->getDamageForElementalDamage();
+
+            if (!is_null($defenderAtonement)) {
+                $defenderOppositeElement = GemTypeValue::getOppositeForName($defenderAtonement['elemental_damage']['name']);
+                
+                if ($attackerAtonement['elemental_damage']['name'] === $defenderOppositeElement) {
+                    $this->addMessage('Your elemental atonement is strong against the enemies elemental atonement (damage doubled!)', 'regular', true);
+                    $this->addDefenderMessage('Your elemental atonement is weak against the enemies! You suffer double damage.', 'regular');
+                    $damage = $damage * 2;
+                } else if ($attackerOppositeElement === $defenderAtonement['elemental_damage']['name']) {
+                    $this->addMessage('Your elemental atonement is weak against the enemies elemental atonement (damage is halved)', 'enemy-action', true);
+                    $this->addDefenderMessage('Your elemental atonement is strong against the enemies! You only suffer half damage.', 'regular');
+                    $damage = $damage / 2;
+                }
+            }
+
+            $this->monsterHealth -= $this->monsterHealth - $damage;
+
+            $this->addMessage('The elements deep inside the gems on your gear roar to life dealing: ' . number_format($damage) . ' damage.', 'player-action', true);
+            $this->addDefenderMessage('The enemies gems blast light towards you as the elements tare into your skin for: ' . number_format($damage) . ' damage.', 'enemy-action');
+        }
+    }
+
+    protected function getDamageForElementalDamage(): int {
+        if (isset($this->attackData['weapon_damage'])) {
+            return $this->attackData['weapon_damage'];
+        }
+
+        if (isset($this->attackData['spell_damage'])) {
+            return $this->attackData['spell_damage'];
+        }
+
+        return 0;
     }
 
     protected function isAtRankedFightLocation(Character $character): bool {
