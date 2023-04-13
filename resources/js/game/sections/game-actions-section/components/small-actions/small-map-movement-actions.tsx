@@ -1,6 +1,6 @@
 import React, {Fragment} from "react";
 import SmallMapSectionProps
-    from "../../../../lib/game/types/actions/components/smaller-actions/small-map-section-props";
+    from "./types/small-map-section-props";
 import MapSection from "../../../map/map-section";
 
 

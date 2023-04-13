@@ -1,6 +1,6 @@
-import MonsterType from "./monster/monster-type";
-import PvpCharactersType from "../pvp-characters-type";
-import DuelType from "./duel-type";
+import MonsterType from "../../../lib/game/types/actions/monster/monster-type";
+import PvpCharactersType from "../../../lib/game/types/pvp-characters-type";
+import DuelData from "../../../lib/game/types/core/duel-player/definitions/duel-data";
 
 export default interface ActionsState {
     monsters: MonsterType[]|[];
@@ -15,7 +15,7 @@ export default interface ActionsState {
 
     crafting_type: string|null;
 
-    duel_fight_info: DuelType | null;
+    duel_fight_info: DuelData | null;
 
     loading: boolean;
 

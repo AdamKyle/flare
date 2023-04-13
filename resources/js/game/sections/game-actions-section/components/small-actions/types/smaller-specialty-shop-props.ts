@@ -1,4 +1,4 @@
-import {CharacterType} from "../../../../character/character-type";
+import {CharacterType} from "../../../../../lib/game/character/character-type";
 
 export default interface SmallerSpecialtyShopProps {
     show_hell_forged_section: boolean,

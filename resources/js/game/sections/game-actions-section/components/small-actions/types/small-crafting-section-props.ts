@@ -1,5 +1,5 @@
-import {CharacterType} from "../../../../character/character-type";
-import CharacterStatusType from "../../../../character/character-status-type";
+import {CharacterType} from "../../../../../lib/game/character/character-type";
+import CharacterStatusType from "../../../../../lib/game/character/character-status-type";
 
 export default interface SmallCraftingSectionProps {
     close_crafting_section: () => void;

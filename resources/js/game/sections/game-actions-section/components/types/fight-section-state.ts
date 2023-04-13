@@ -1,6 +1,6 @@
-import MonsterType from "./monster/monster-type";
-import {BattleMessage} from "../../actions/battle/types/battle-message-type";
-import FightSection from "../../../../sections/game-actions-section/components/fight-section";
+import MonsterType from "../../../../lib/game/types/actions/monster/monster-type";
+import {BattleMessage} from "../../../../lib/game/actions/battle/types/battle-message-type";
+import FightSection from "../fight-section";
 
 export default interface FightSectionState {
     battle_messages: BattleMessage[]|[];

@@ -1,6 +1,6 @@
 import React, {Fragment} from "react";
 import Select from "react-select";
-import SmallActionsState from "../../lib/game/types/actions/small-actions-state";
+import SmallActionsState from "./types/small-actions-state";
 import SmallActionsManager from "../../lib/game/actions/small-actions-manager";
 import MonsterActions from "./components/small-actions/monster-actions";
 import ActionsTimers from "./components/actions-timers";
@@ -10,7 +10,7 @@ import JoinPvp from "./components/join-pvp";
 import MapTimer from "../map/map-timer";
 import DuelPlayer from "./components/duel-player";
 import SmallMapMovementActions from "./components/small-actions/small-map-movement-actions";
-import SmallActionsProps from "../../lib/game/types/actions/small-actions-props";
+import SmallActionsProps from "./types/small-actions-props";
 import CelestialFight from "./components/celestial-fight";
 import SmallerSpecialtyShop from "./components/small-actions/smaller-specialty-shop";
 import {removeCommas} from "../../lib/game/format-number";
@@ -322,6 +322,7 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
                         character={this.props.character}
                         manage_pvp={this.manageDuel.bind(this)}
                         reset_duel_data={this.resetDuelData.bind(this)}
+                        is_small={true}
             />
         )
     }

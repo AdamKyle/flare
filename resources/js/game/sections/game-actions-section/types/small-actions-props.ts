@@ -1,6 +1,6 @@
-import CharacterCurrenciesDetails from "../character-currencies-details";
+import CharacterCurrenciesDetails from "../../../lib/game/types/character-currencies-details";
 import ActionsProps from "./actions-props";
-import PositionType from "../map/position-type";
+import PositionType from "../../../lib/game/types/map/position-type";
 
 export default interface SmallActionsProps extends ActionsProps {
     character_currencies: CharacterCurrenciesDetails;

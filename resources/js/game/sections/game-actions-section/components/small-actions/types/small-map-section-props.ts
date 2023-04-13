@@ -1,6 +1,6 @@
-import {CharacterType} from "../../../../character/character-type";
-import CharacterCurrenciesDetails from "../../../character-currencies-details";
-import PositionType from "../../../map/position-type";
+import {CharacterType} from "../../../../../lib/game/character/character-type";
+import CharacterCurrenciesDetails from "../../../../../lib/game/types/character-currencies-details";
+import PositionType from "../../../../../lib/game/types/map/position-type";
 
 export default interface SmallMapSectionProps {
     close_map_section: () => void;

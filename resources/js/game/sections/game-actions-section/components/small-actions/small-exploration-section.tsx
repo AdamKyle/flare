@@ -1,7 +1,7 @@
 import React, { Fragment } from "react";
 import ExplorationSection from "../exploration-section";
 import SmallExplorationSectionProps
-    from "../../../../lib/game/types/actions/components/smaller-actions/small-exploration-section-props";
+    from "./types/small-exploration-section-props";
 
 export default class SmallExplorationSection extends React.Component<SmallExplorationSectionProps, {}> {
 

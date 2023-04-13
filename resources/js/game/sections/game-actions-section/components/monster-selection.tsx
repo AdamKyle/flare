@@ -3,8 +3,8 @@ import Select from "react-select";
 import PrimaryButton from "../../../components/ui/buttons/primary-button";
 import {isEqual} from "lodash";
 import MonsterType from "../../../lib/game/types/actions/monster/monster-type";
-import MonsterSelectionProps from "../../../lib/game/types/actions/components/monster-selection-props";
-import MonsterSelectionState from "../../../lib/game/types/actions/components/monster-selection-state";
+import MonsterSelectionProps from "./types/monster-selection-props";
+import MonsterSelectionState from "./types/monster-selection-state";
 import DangerButton from "../../../components/ui/buttons/danger-button";
 
 export default class MonsterSelection extends React.Component<MonsterSelectionProps, MonsterSelectionState> {

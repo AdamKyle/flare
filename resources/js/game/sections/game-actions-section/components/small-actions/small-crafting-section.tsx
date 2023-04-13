@@ -2,8 +2,8 @@ import React, { Fragment } from "react";
 import DropDown from "../../../../components/ui/drop-down/drop-down";
 import CraftingSectionManager from "../../../../lib/game/actions/smaller-actions-components/crafting-section-manager";
 import {CraftingOptions} from "../../../../lib/game/types/actions/crafting-type-options";
-import SmallCraftingSectionProps from "../../../../lib/game/types/actions/components/smaller-actions/small-crafting-section-props";
-import SmallCraftingSectionState from "../../../../lib/game/types/actions/components/smaller-actions/small-crafting-section-state";
+import SmallCraftingSectionProps from "./types/small-crafting-section-props";
+import SmallCraftingSectionState from "./types/small-crafting-section-state";
 import MainCraftingSection from '../crafting-section';
 import DangerButton from "../../../../components/ui/buttons/danger-button";
 

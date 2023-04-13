@@ -1,4 +1,6 @@
 export type BattleMessage = {
     message: string,
-    type: 'regular' | 'player-action' | 'enemy-action',
+    type: BattleMessageType,
 }
+
+export type BattleMessageType = 'regular' | 'player-action' | 'enemy-action';

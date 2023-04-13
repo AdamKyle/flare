@@ -1,7 +1,7 @@
 import React from "react";
 import Shop from "../specialty-shops/shop";
 import SmallerSpecialtyShopProps
-    from "../../../../lib/game/types/actions/components/smaller-actions/smaller-specialty-shop-props";
+    from "./types/smaller-specialty-shop-props";
 
 export default class SmallerSpecialtyShop extends React.Component<SmallerSpecialtyShopProps, { }> {
 

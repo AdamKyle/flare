@@ -1,4 +1,4 @@
-import React, {Fragment} from "react";
+import React from "react";
 import Select from "react-select";
 import PrimaryButton from "../../../components/ui/buttons/primary-button";
 import {AxiosResponse, AxiosError} from "axios";
@@ -9,11 +9,14 @@ import HealthMeters from "./health-meters";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import DangerButton from "../../../components/ui/buttons/danger-button";
 import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
-import {BattleMessage} from "../../../lib/game/actions/battle/types/battle-message-type";
+import {BattleMessageType} from "../../../lib/game/actions/battle/types/battle-message-type";
+import DuelPlayerProps, {CharactersList} from "./types/duel-player-props";
+import DuelPlayerState from "./types/duel-player-state";
+import {DuelMessages} from "../../../lib/game/types/core/duel-player/definitions/duel-data";
 
-export default class DuelPlayer extends React.Component<any, any> {
+export default class DuelPlayer extends React.Component<DuelPlayerProps, DuelPlayerState> {
 
-    constructor(props: any) {
+    constructor(props: DuelPlayerProps) {
         super(props);
 
         this.state = {
@@ -69,14 +72,16 @@ export default class DuelPlayer extends React.Component<any, any> {
     }
 
     buildCharacters() {
-        return this.props.characters.map((character: {id: number, name: string}) => {
-            if (character.id !== this.props.character.id) {
-                return {
-                    label: character.name,
-                    value: character.id,
-                }
-            }
-        }).filter((selectOptions: {label: string, value: number} | undefined) => typeof selectOptions !== 'undefined');
+        const selectedCharacter = this.props.character;
+
+        const filteredCharacters = this.props.characters.filter(
+            (character: CharactersList) => character.id !== selectedCharacter.id
+        );
+
+        return filteredCharacters.map((character: CharactersList) => ({
+            label: character.name,
+            value: character.id,
+        }));
     }
 
     setCharacterToFight(data: any) {
@@ -169,7 +174,7 @@ export default class DuelPlayer extends React.Component<any, any> {
 
     renderBattleMessages() {
         if (this.props.is_small && this.state.battle_messages.length > 0) {
-            const message = this.state.battle_messages.filter((battleMessage: BattleMessage) => battleMessage.message.includes('resurrect') || battleMessage.message.includes('has been defeated!'))
+            const message = this.state.battle_messages.filter((battleMessage: DuelMessages) => battleMessage.message.includes('resurrect') || battleMessage.message.includes('has been defeated!'))
 
             if (message.length > 0) {
                 return <p className='text-red-500 dark:text-red-400'>{message[0].message}</p>
@@ -178,7 +183,7 @@ export default class DuelPlayer extends React.Component<any, any> {
             }
         }
 
-        return this.state.battle_messages.map((battleMessage: BattleMessage) => {
+        return this.state.battle_messages.map((battleMessage: DuelMessages) => {
             return <p className={clsx(
                 {
                     'text-green-700 dark:text-green-400': this.typeCheck(battleMessage.type, 'player-action')
@@ -193,7 +198,7 @@ export default class DuelPlayer extends React.Component<any, any> {
         });
     }
 
-    typeCheck(battleType: 'regular' | 'player-action' | 'enemy-action', type: 'regular' | 'player-action' | 'enemy-action'): boolean {
+    typeCheck(battleType: BattleMessageType, type: BattleMessageType): boolean {
         return battleType === type;
     }
 
@@ -210,6 +215,7 @@ export default class DuelPlayer extends React.Component<any, any> {
     }
 
     render() {
+        console.log(this.props, this.state);
         return (
             <div className='mt-2 md:ml-[120px]'>
                 {
@@ -266,8 +272,8 @@ export default class DuelPlayer extends React.Component<any, any> {
                             <div className={clsx('mb-4 max-w-md m-auto', {
                                 'mt-4': this.attackHidden()
                             })}>
-                                <HealthMeters is_enemy={true} name={this.defenderName()} current_health={parseInt(this.state.defender_health)} max_health={this.state.defender_max_health} />
-                                <HealthMeters is_enemy={false} name={this.props.character.name} current_health={parseInt(this.state.attacker_health)} max_health={this.state.attacker_max_health} />
+                                <HealthMeters is_enemy={true} name={this.defenderName()} current_health={this.state.defender_health} max_health={this.state.defender_max_health} />
+                                <HealthMeters is_enemy={false} name={this.props.character.name} current_health={this.state.attacker_health} max_health={this.state.attacker_max_health} />
                                 <div className='my-2'>
                                     <p className='text-red-500 dark:text-red-400 text-sm'>{this.defenderName()} Elemental Atonement: {this.state.defender_atonement}</p>
                                     <p className='text-green-700 dark:text-green-400 text-sm'>Your Elemental Atonement: {this.state.attacker_atonement}</p>

@@ -3,8 +3,8 @@ import ActionsManager from "../../lib/game/actions/actions-manager";
 import ComponentLoading from "../../components/ui/loading/component-loading";
 import MonsterActions from "./components/small-actions/monster-actions";
 import ActionsTimers from "./components/actions-timers";
-import ActionsProps from "../../lib/game/types/actions/actions-props";
-import ActionsState from "../../lib/game/types/actions/actions-state";
+import ActionsProps from "./types/actions-props";
+import ActionsState from "./types/actions-state";
 import DropDown from "../../components/ui/drop-down/drop-down";
 import {CraftingOptions} from "../../lib/game/types/actions/crafting-type-options";
 import CraftingSection from "./components/crafting-section";
@@ -368,6 +368,7 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
                                             character={this.props.character}
                                             manage_pvp={this.manageDuel.bind(this)}
                                             reset_duel_data={this.resetDuelData.bind(this)}
+                                            is_small={false}
                                 />
                             : null
                         }

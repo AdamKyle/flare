@@ -195,7 +195,7 @@ class SecondaryAttacks extends BattleBase {
 
             if (!is_null($defenderAtonement)) {
                 $defenderOppositeElement = GemTypeValue::getOppositeForName($defenderAtonement['elemental_damage']['name']);
-                
+
                 if ($attackerAtonement['elemental_damage']['name'] === $defenderOppositeElement) {
                     $this->addMessage('Your elemental atonement is strong against the enemies elemental atonement (damage doubled!)', 'regular', true);
                     $this->addDefenderMessage('Your elemental atonement is weak against the enemies! You suffer double damage.', 'regular');

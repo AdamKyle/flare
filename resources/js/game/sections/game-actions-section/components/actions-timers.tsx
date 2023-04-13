@@ -1,7 +1,7 @@
 import React from "react";
 import clsx from "clsx";
 import TimerProgressBar from "../../../components/ui/progress-bars/timer-progress-bar";
-import ActionsTimerProps from "../../../lib/game/types/actions/actions-timer-props";
+import ActionsTimerProps from "./types/actions-timer-props";
 
 export default class ActionsTimers extends React.Component<ActionsTimerProps, {}> {
     constructor(props: ActionsTimerProps) {
