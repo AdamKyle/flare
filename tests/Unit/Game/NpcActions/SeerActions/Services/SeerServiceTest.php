@@ -320,8 +320,6 @@ class SeerServiceTest extends TestCase {
 
         $result    = $this->seerService->removeGem($character, $slot->id, $gem->id);
 
-        dump($result['items']);
-
         $this->assertEquals(200, $result['status']);
         $this->assertEquals('Gem has been removed from the socket!', $result['message']);
         $this->assertCount(1, $result['items']);
@@ -989,7 +987,7 @@ class SeerServiceTest extends TestCase {
                                      ->giveItem($item)
                                      ->getCharacter();
 
-        $result = $this->seerService->getItems($character);
+        $result = $this->seerService->getItems($character, true);
 
         $this->assertEmpty($result);
     }

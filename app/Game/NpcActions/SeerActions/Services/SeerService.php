@@ -38,9 +38,10 @@ class SeerService {
      * Get items that we can assign gems to.
      *
      * @param Character $character
+     * @param bool $isManagingGems
      * @return array
      */
-    public function getItems(Character $character): array {
+    public function getItems(Character $character, bool $isManagingGems = false): array {
         return array_values(array_filter($character->inventory->slots->whereNotNull('item.socket_count')->whereIn('item.type', [
             WeaponTypes::WEAPON,
             WeaponTypes::STAVE,
@@ -53,12 +54,25 @@ class SeerService {
             ArmourTypes::FEET,
             ArmourTypes::LEGGINGS,
             ArmourTypes::GLOVES
-        ])->map(function($slot) {
-            return [
-                'name' => $slot->item->affix_name,
-                'slot_id' => $slot->id,
-                'socket_amount' => $slot->item->socket_count,
-            ];
+        ])->map(function($slot) use($isManagingGems) {
+
+            if ($isManagingGems) {
+                if ($slot->item->socket_count > 0) {
+                    return [
+                        'name' => $slot->item->affix_name,
+                        'slot_id' => $slot->id,
+                        'socket_amount' => $slot->item->socket_count,
+                    ];
+                }
+            } else {
+                return [
+                    'name' => $slot->item->affix_name,
+                    'slot_id' => $slot->id,
+                    'socket_amount' => $slot->item->socket_count,
+                ];
+            }
+
+
         })->toArray()));
     }
 
@@ -192,7 +206,7 @@ class SeerService {
         $result = $this->fetchGemsWithItemsForRemoval($character);
 
         return $this->successResult([
-            'items'        => $this->getItems($character),
+            'items'        => $this->getItems($character, true),
             'gems'         => $this->getGems($character),
             'removal_data' => [
                 'items' => $result['items'],
@@ -243,7 +257,7 @@ class SeerService {
         $result = $this->fetchGemsWithItemsForRemoval($character);
 
         return $this->successResult([
-            'items'        => $this->getItems($character),
+            'items'        => $this->getItems($character, true),
             'gems'         => $this->getGems($character),
             'removal_data' => [
                 'items' => $result['items'],
@@ -324,7 +338,7 @@ class SeerService {
         $character = $character->refresh();
 
         return $this->successResult([
-            'items'   => $this->getItems($character),
+            'items'   => $this->getItems($character, true),
             'gems'    => $this->getGems($character),
             'message' => 'Gem has been replaced!'
         ]);
@@ -373,7 +387,7 @@ class SeerService {
         ServerMessageHandler::handleMessage($character->user, 'seer_actions', $message, $slot->id);
 
         return $this->successResult([
-            'items'   => $this->getItems($character),
+            'items'   => $this->getItems($character, true),
             'gems'    => $this->getGems($character),
             'message' => 'Attached gem to item!'
         ]);
