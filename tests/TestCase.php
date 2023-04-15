@@ -5,13 +5,13 @@ namespace Tests;
 use Laravel\BrowserKitTesting\TestCase as BaseTestCase;
 use Tests\Setup\AttackDataCacheSetUp;
 
-abstract class TestCase extends BaseTestCase
-{
+abstract class TestCase extends BaseTestCase {
+
     use CreatesApplication;
 
-    public $baseUrl = 'http://localhost';
+    public string $baseUrl = 'http://localhost';
 
-    public $attackDataCacheSetUp;
+    public AttackDataCacheSetUp $attackDataCacheSetUp;
 
     public function setUp(): void {
 

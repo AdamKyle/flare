@@ -1,24 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
-         backupGlobals="false" backupStaticAttributes="false"
-         bootstrap="vendor/autoload.php"
-         colors="true"
-         convertErrorsToExceptions="true"
-         convertNoticesToExceptions="true"
-         convertWarningsToExceptions="true"
-         processIsolation="false"
-         stopOnFailure="false"
-         printerClass="\Sempro\PHPUnitPrettyPrinter\PrettyPrinterForPhpUnit9"
->
-  <coverage processUncoveredFiles="true">
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.0/phpunit.xsd" backupGlobals="false" bootstrap="vendor/autoload.php" colors="true" processIsolation="false" stopOnFailure="false" cacheDirectory=".phpunit.cache" backupStaticProperties="false">
+  <coverage>
     <include>
       <directory suffix=".php">./app</directory>
     </include>
     <exclude>
-        <directory suffix=".php">./app/Flare/MapGenerator</directory>
-        <directory suffix=".php">./app/Admin/Import</directory>
-        <directory suffix=".php">./app/Admin/Exports</directory>
+      <directory suffix=".php">./app/Flare/MapGenerator</directory>
+      <directory suffix=".php">./app/Admin/Import</directory>
+      <directory suffix=".php">./app/Admin/Exports</directory>
     </exclude>
   </coverage>
   <testsuites>
@@ -33,17 +22,17 @@
     </testsuite>
   </testsuites>
   <php>
-      <ini name="memory_limit" value="-1" />
-      <env name="APP_ENV" value="testing"/>
-      <env name="BCRYPT_ROUNDS" value="4"/>
-      <env name="CACHE_DRIVER" value="array"/>
-      <env name="MAIL_DRIVER" value="array"/>
-      <env name="MAIL_USERNAME" value="test@example.ca" />
-      <env name="QUEUE_CONNECTION" value="sync"/>
-      <env name="DB_CONNECTION" value="mysql"/>
-      <env name="DB_DATABASE" value="flare_test"/>
-      <env name="SESSION_DRIVER" value="array"/>
-      <env name="BROADCAST_DRIVER" value="log"/>
-      <env name="TIME_ZONE" value="America/Edmonton"/>
+    <ini name="memory_limit" value="-1"/>
+    <env name="APP_ENV" value="testing"/>
+    <env name="BCRYPT_ROUNDS" value="4"/>
+    <env name="CACHE_DRIVER" value="array"/>
+    <env name="MAIL_DRIVER" value="array"/>
+    <env name="MAIL_USERNAME" value="test@example.ca"/>
+    <env name="QUEUE_CONNECTION" value="sync"/>
+    <env name="DB_CONNECTION" value="mysql"/>
+    <env name="DB_DATABASE" value="flare_test"/>
+    <env name="SESSION_DRIVER" value="array"/>
+    <env name="BROADCAST_DRIVER" value="log"/>
+    <env name="TIME_ZONE" value="America/Edmonton"/>
   </php>
 </phpunit>

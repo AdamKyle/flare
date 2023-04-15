@@ -10,20 +10,27 @@ use App\Flare\Events\UpdateSkillEvent;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
-use App\Game\Skills\Services\Traits\SkillCheck;
-use App\Game\Skills\Services\Traits\UpdateCharacterGold;
+use App\Game\Skills\Services\Traits\UpdateCharacterCurrency;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Values\SkillTypeValue;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class AlchemyService {
-    use ResponseBuilder, SkillCheck, UpdateCharacterGold;
+    use ResponseBuilder, UpdateCharacterCurrency;
+
+    private SkillCheckService $skillCheckService;
+
+    private ItemListCostTransformerService $itemListCostTransformerService;
+
+    public function __construct(SkillCheckService $skillCheckService, ItemListCostTransformerService $itemListCostTransformerService) {
+        $this->skillCheckService              = $skillCheckService;
+        $this->itemListCostTransformerService = $itemListCostTransformerService;
+    }
 
     public function fetchAlchemistItems(Character $character, bool $showMerchantMessage = true) {
         $gameSkill = GameSkill::where('type', SkillTypeValue::ALCHEMY)->first();
+
         $skill     = Skill::where('game_skill_id', $gameSkill->id)->where('character_id', $character->id)->first();
-
-
 
         $items = Item::where('can_craft', true)
                      ->where('crafting_type', 'alchemy')
@@ -34,48 +41,9 @@ class AlchemyService {
                      ->select('id', 'name', 'gold_dust_cost', 'shards_cost')
                      ->get();
 
-        if ($character->classType()->isMerchant()) {
-
-            $items = $items->transform(function($item) {
-                $goldDustCost = $item->gold_dust_cost;
-                $shardsCost   = $item->shards_cost;
-
-                $goldDustCost = $goldDustCost - $goldDustCost * 0.10;
-                $shardsCost   = $shardsCost - $shardsCost * 0.10;
-
-                $item->gold_dust_cost = $goldDustCost;
-                $item->shards_cost    = $shardsCost;
-
-                return $item;
-            });
-
-            if ($showMerchantMessage) {
-                event(new ServerMessageEvent($character->user, 'As a Merchant you get 10% discount on creating alchemy items. The discount has been applied to the items list.'));
-            }
-        }
-
-        if ($character->classType()->isArcaneAlchemist()) {
-
-            $items = $items->transform(function($item) {
-                $goldDustCost = $item->gold_dust_cost;
-                $shardsCost   = $item->shards_cost;
-
-                $goldDustCost = $goldDustCost - $goldDustCost * 0.15;
-                $shardsCost   = $shardsCost - $shardsCost * 0.15;
-
-                $item->gold_dust_cost = $goldDustCost;
-                $item->shards_cost    = $shardsCost;
-
-                return $item;
-            });
-
-            if ($showMerchantMessage) {
-                event(new ServerMessageEvent($character->user, 'As a Arcane Alchemist you get 15% discount on creating alchemy items as well as a 15% Crafting Timeout Reduction. The discount has been applied to the items list.'));
-            }
-        }
-
-        return $items;
+        return $this->itemListCostTransformerService->reduceCostOfAlchemyItems($character, $items, $showMerchantMessage);
     }
+
 
     public function transmute(Character $character, int $itemId): void {
         $gameSkill = GameSkill::where('type', SkillTypeValue::ALCHEMY)->first();
@@ -90,7 +58,7 @@ class AlchemyService {
 
         $setTime = null;
 
-        if ($character->classType()->isArcaneAlchemist() && $item->type === 'alchemy') {
+        if ($character->classType()->isArcaneAlchemist() && $item->crafting_type === 'alchemy') {
             ServerMessageHandler::sendBasicMessage($character->user, 'As a Arcane Alchemist, your crafting timeout for Alchemy items, is reduced by 15%.');
 
             $setTime = floor(10 - 10 * 0.15);
@@ -126,7 +94,7 @@ class AlchemyService {
         $this->attemptTransmute($character, $skill, $item);
     }
 
-    public function attemptTransmute(Character $character, Skill $skill, Item $item): void {
+    protected function attemptTransmute(Character $character, Skill $skill, Item $item): void {
         $this->updateAlchemyCost($character, $item);
 
         if ($skill->level < $item->skill_level_required) {
@@ -152,12 +120,11 @@ class AlchemyService {
             return;
         }
 
-        $characterRoll = $this->characterRoll($skill);
-        $dcCheck       = $this->getDCCheck($skill);
+        $characterRoll = $this->skillCheckService->characterRoll($skill);
+        $dcCheck       = $this->skillCheckService->getDCCheck($skill);
 
         if ($dcCheck < $characterRoll) {
             $this->pickUpItem($character, $item, $skill);
-
 
             event(new UpdateTopBarEvent($character->refresh()));
 
@@ -168,6 +135,8 @@ class AlchemyService {
 
         event(new UpdateTopBarEvent($character->refresh()));
     }
+
+
 
     private function pickUpItem(Character $character, Item $item, Skill $skill, bool $tooEasy = false) {
         if ($this->attemptToPickUpItem($character, $item)) {

@@ -18,14 +18,14 @@
         "http-interop/http-factory-guzzle": "^1.0",
         "itsgoingd/clockwork": "^5.1",
         "knplabs/github-api": "^3.0",
-        "laravel/framework": "^9.0",
+        "laravel/framework": "^10.0",
         "laravel/helpers": "^1.6",
         "laravel/horizon": "^5.14.2",
         "laravel/tinker": "^2.8.1",
         "laravel/ui": "^4.2.1",
         "league/commonmark": "^2.3",
         "league/fractal": "^0.20.1",
-        "livewire/livewire": "2.10.5",
+        "livewire/livewire": "^2.12.3",
         "maatwebsite/excel": "^3.1",
         "pusher/pusher-php-server": "7.0.2",
         "rappasoft/laravel-livewire-tables": "^2.1.1",
@@ -37,12 +37,11 @@
         "barryvdh/laravel-ide-helper": "^2.13.0",
         "beyondcode/laravel-dump-server": "1.9.0",
         "fakerphp/faker": "^1.21.0",
-        "laravel/browser-kit-testing": "^6.10.0",
+        "laravel/browser-kit-testing": "^7.0",
         "mockery/mockery": "^1.5",
         "nunomaduro/collision": "^7.0.5",
-        "phpunit/phpunit": "^9.0",
-        "sempro/phpunit-pretty-print": "^1.3",
-        "spatie/laravel-ignition": "^1.0"
+        "phpunit/phpunit": "^10.0",
+        "spatie/laravel-ignition": "^2.0"
     },
     "config": {
         "optimize-autoloader": true,
@@ -74,7 +73,6 @@
             "Tests\\": "tests/"
         }
     },
-    "minimum-stability": "dev",
     "prefer-stable": true,
     "scripts": {
         "post-autoload-dump": [

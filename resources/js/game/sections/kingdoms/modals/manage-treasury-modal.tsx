@@ -246,7 +246,7 @@ export default class ManageTreasuryModal extends React.Component<ManageTreasuryM
                                        on_click={this.deposit.bind(this)}
                                        disabled={this.state.amount_to_deposit === '' ||
                                            this.props.character_gold === 0 ||
-                                           this.props.character_gold < this.state.amount_to_deposit
+                                           (typeof this.state.amount_to_deposit === 'number' && this.props.character_gold < this.state.amount_to_deposit)
                                        }
                         />
                     </TabPanel>

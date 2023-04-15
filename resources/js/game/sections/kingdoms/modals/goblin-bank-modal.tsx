@@ -229,8 +229,8 @@ export default class GoblinBankModal extends React.Component<GoblinBankModalProp
                                        disabled={
                                                  this.state.amount_to_deposit === '' ||
                                                  this.props.character_gold === 0 ||
-                                                 this.state.amount_to_deposit <= 0 ||
-                                                 this.props.character_gold < this.state.cost_to_deposit
+                                                 (typeof this.state.amount_to_deposit === 'number' && this.state.amount_to_deposit <= 0) ||
+                                                 (typeof this.state.cost_to_deposit === 'number' && this.props.character_gold < this.state.cost_to_deposit)
                                       }
                         />
                     </TabPanel>

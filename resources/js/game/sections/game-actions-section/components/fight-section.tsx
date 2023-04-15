@@ -12,6 +12,7 @@ import Ajax from "../../../lib/ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
 import FightSectionState from "./types/fight-section-state";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
+import BattleMesages from "./fight-section/battle-mesages";
 
 export default class FightSection extends React.Component<FightSectionProps, FightSectionState> {
 
@@ -154,26 +155,6 @@ export default class FightSection extends React.Component<FightSectionProps, Fig
         }
     }
 
-    typeCheck(battleType: 'regular' | 'player-action' | 'enemy-action', type: 'regular' | 'player-action' | 'enemy-action'): boolean {
-        return battleType === type;
-    }
-
-    renderBattleMessages() {
-        return this.state.battle_messages.map((battleMessage: BattleMessage) => {
-            return <p className={clsx(
-                {
-                    'text-green-700 dark:text-green-400': this.typeCheck(battleMessage.type, 'player-action')
-                }, {
-                    'text-red-500 dark:text-red-400': this.typeCheck(battleMessage.type, 'enemy-action')
-                }, {
-                    'text-blue-500 dark:text-blue-400': this.typeCheck(battleMessage.type, 'regular')
-                }
-            )}>
-                {battleMessage.message}
-            </p>
-        });
-    }
-
     attack(attackType: string) {
 
         if (this.props.is_rank_fight) {
@@ -314,7 +295,7 @@ export default class FightSection extends React.Component<FightSectionProps, Fig
                     : null
                 }
                 <div className='italic text-center'>
-                    {this.renderBattleMessages()}
+                    <BattleMesages battle_messages={this.state.battle_messages} is_small={this.props.is_small} />
                 </div>
             </div>
         )

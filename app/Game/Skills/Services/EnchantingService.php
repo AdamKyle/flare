@@ -15,7 +15,7 @@ use App\Game\Core\Services\CharacterInventoryService;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\NpcActions\QueenOfHeartsActions\Services\RandomEnchantmentService;
-use App\Game\Skills\Services\Traits\UpdateCharacterGold;
+use App\Game\Skills\Services\Traits\UpdateCharacterCurrency;
 use App\Game\Skills\Values\SkillTypeValue;
 use Exception;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
@@ -23,7 +23,7 @@ use Illuminate\Database\Eloquent\Collection;
 
 class EnchantingService {
 
-    use ResponseBuilder, UpdateCharacterGold;
+    use ResponseBuilder, UpdateCharacterCurrency;
 
     /**
      * @var CharacterStatBuilder $characterStatBuilder;
@@ -33,22 +33,22 @@ class EnchantingService {
     /**
      * @var CharacterInventoryService $characterInventoryService
      */
-    private $characterInventoryService;
+    private CharacterInventoryService $characterInventoryService;
 
     /**
      * @var EnchantItemService $enchantItemService
      */
-    private $enchantItemService;
+    private EnchantItemService $enchantItemService;
 
     /**
      * @var RandomEnchantmentService
      */
-    private $randomEnchantmentService;
+    private RandomEnchantmentService $randomEnchantmentService;
 
     /**
      * @var bool $sentToEasyMessage
      */
-    private $sentToEasyMessage = false;
+    private bool $sentToEasyMessage = false;
 
     /**
      * Only set if the affix to be applied was too easy to enchant.

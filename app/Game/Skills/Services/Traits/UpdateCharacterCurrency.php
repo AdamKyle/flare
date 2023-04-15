@@ -10,7 +10,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use Exception;
 
-trait UpdateCharacterGold {
+trait UpdateCharacterCurrency {
 
     /**
      * Update the characters gold when crafting.

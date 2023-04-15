@@ -12,12 +12,11 @@ use App\Game\Core\Traits\MercenaryBonus;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Skills\Events\UpdateCharacterEnchantingList;
-use App\Game\Skills\Services\Traits\SkillCheck;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class DisenchantService {
 
-    use SkillCheck, MercenaryBonus;
+    use MercenaryBonus;
 
     /**
      * @var EnchantingService $enchantingService
@@ -34,10 +33,16 @@ class DisenchantService {
      */
     private Skill $disenchantingSkill;
 
+    private SkillCheckService $skillCheckService;
+
     /**
      * @var InventorySlot|null $questSlot
      */
     private ?InventorySlot $questSlot = null;
+
+    public function __construct(SkillCheckService $skillCheckService) {
+        $this->skillCheckService = $skillCheckService;
+    }
 
     /**
      * Set up the service.
@@ -67,8 +72,8 @@ class DisenchantService {
      */
     public function disenchantWithSkill(InventorySlot $slot): void {
 
-        $characterRoll = $this->characterRoll($this->disenchantingSkill);
-        $dcCheck       = $this->getDCCheck($this->disenchantingSkill);
+        $characterRoll = $this->skillCheckService->characterRoll($this->disenchantingSkill);
+        $dcCheck       = $this->skillCheckService->getDCCheck($this->disenchantingSkill);
 
         if ($characterRoll > $dcCheck) {
             $goldDust = $this->updateGoldDust($this->character);
@@ -100,8 +105,8 @@ class DisenchantService {
      * @return void
      */
     public function disenchantItemWithSkill(): void {
-        $characterRoll = $this->characterRoll($this->disenchantingSkill);
-        $dcCheck       = $this->getDCCheck($this->disenchantingSkill);
+        $characterRoll = $this->skillCheckService->characterRoll($this->disenchantingSkill);
+        $dcCheck       = $this->skillCheckService->getDCCheck($this->disenchantingSkill);
 
         if ($characterRoll > $dcCheck) {
             $goldDust = $this->updateGoldDust($this->character);
@@ -136,18 +141,18 @@ class DisenchantService {
         $characterTotalGoldDust = $character->gold_dust + $goldDust;
 
         if (!is_null($this->questSlot) && !$failedCheck) {
+
             $dc   = 1000 - 1000 * 0.02;
             $roll = $this->fetchDCRoll();
 
-            if ($roll > $dc) {;
-
+            if ($roll > $dc) {
                 $characterTotalGoldDust = $characterTotalGoldDust + $characterTotalGoldDust * 0.05;
 
                 if ($characterTotalGoldDust >= MaxCurrenciesValue::MAX_GOLD_DUST) {
                     $characterTotalGoldDust = MaxCurrenciesValue::MAX_GOLD_DUST;
                     event(new ServerMessageEvent($character->user, 'Gold Dust Rush! You gained 5% interest on your total gold dust. You are now capped!'));
                 } else {
-                    event(new ServerMessageEvent($character->user, 'Gold Dust Rush! You gained 5% interest on your total gold dust. Your new total is: ' . $characterTotalGoldDust));
+                    event(new ServerMessageEvent($character->user, 'Gold Dust Rush! You gained 5% interest on your total gold dust. Your new total is: ' . number_format($characterTotalGoldDust)));
                 }
             }
         }

@@ -13,15 +13,15 @@ use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\NpcActions\QueenOfHeartsActions\Services\RandomEnchantmentService;
-use App\Game\Skills\Services\Traits\SkillCheck;
-use App\Game\Skills\Services\Traits\UpdateCharacterGold;
+use App\Game\Skills\Services\Traits\UpdateCharacterCurrency;
 use Exception;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection as SupportCollection;
 
 class CraftingService {
 
-    use ResponseBuilder, SkillCheck, UpdateCharacterGold;
+    use ResponseBuilder, UpdateCharacterCurrency;
 
     /**
      * @var RandomEnchantmentService $randomEnchantmentService
@@ -33,13 +33,25 @@ class CraftingService {
      */
     private SkillService $skillService;
 
+    private ItemListCostTransformerService $itemListCostTransformerService;
+
+    private SkillCheckService $skillCheckService;
+
     /**
      * @param RandomEnchantmentService $randomEnchantmentService
      * @param SkillService $skillService
+     * @param ItemListCostTransformerService $itemListCostTransformerService
+     * @param SkillCheckService $skillCheckService
      */
-    public function __construct(RandomEnchantmentService $randomEnchantmentService, SkillService $skillService) {
-        $this->randomEnchantmentService = $randomEnchantmentService;
-        $this->skillService             = $skillService;
+    public function __construct(RandomEnchantmentService $randomEnchantmentService,
+                                SkillService $skillService,
+                                ItemListCostTransformerService $itemListCostTransformerService,
+                                SkillCheckService $skillCheckService,
+    ) {
+        $this->randomEnchantmentService       = $randomEnchantmentService;
+        $this->skillService                   = $skillService;
+        $this->itemListCostTransformerService = $itemListCostTransformerService;
+        $this->skillCheckService              = $skillCheckService;
     }
 
     /**
@@ -180,8 +192,8 @@ class CraftingService {
             return true;
         }
 
-        $characterRoll = $this->characterRoll($skill);
-        $dcCheck       = $this->getDCCheck($skill, 0);
+        $characterRoll = $this->skillCheckService->characterRoll($skill);
+        $dcCheck       = $this->skillCheckService->getDCCheck($skill, 0);
 
         if ($dcCheck < $characterRoll) {
             $this->pickUpItem($character, $item, $skill);
@@ -224,7 +236,7 @@ class CraftingService {
      * @return Collection
      * @throws Exception
      */
-    protected function getItems(Character $character, Skill $skill, string $craftingType, bool $merchantMessage = true): Collection {
+    protected function getItems(Character $character, Skill $skill, string $craftingType, bool $merchantMessage = true): SupportCollection {
         $twoHandedWeapons = ['bow', 'hammer', 'stave'];
         $craftingTypes    = ['armour', 'ring', 'spell'];
 
@@ -245,55 +257,12 @@ class CraftingService {
 
         $items = $items->select('name', 'cost', 'type', 'id')->get();
 
-        if ($character->classType()->isMerchant()) {
-            $items = $items->transform(function($item) {
-                $cost = $item->cost;
 
-                $cost = floor($cost - $cost * 0.30);
-
-                $item->cost = $cost;
-
-                return $item;
-            });
-
-            if ($merchantMessage) {
-                event(new ServerMessageEvent($character->user, 'As a Merchant you get 30% discount on crafting items. The items in the list have been adjusted.'));
-            }
+        if ($craftingType === 'spell') {
+           return $this->itemListCostTransformerService->reduceCostOfAlchemyItems($character, $items, true);
         }
 
-        if ($character->classType()->isBlacksmith() && $craftingType !== 'spell') {
-            $items = $items->transform(function($item) {
-                $cost = $item->cost;
-
-                $cost = floor($cost - $cost * 0.25);
-
-                $item->cost = $cost;
-
-                return $item;
-            });
-
-            if ($merchantMessage) {
-                event(new ServerMessageEvent($character->user, 'As a Blacksmith, you get 25% reduction on crafting time out for weapons and armour, as well as cost reduction. Items in the list have been adjusted.'));
-            }
-        }
-
-        if ($character->classType()->isArcaneAlchemist() && $craftingType === 'spell') {
-            $items = $items->transform(function($item) {
-                $cost = $item->cost;
-
-                $cost = floor($cost - $cost * 0.15);
-
-                $item->cost = $cost;
-
-                return $item;
-            });
-
-            if ($merchantMessage) {
-                event(new ServerMessageEvent($character->user, 'As a Arcane Alchemist, you get 15% reduction on crafting time out for Spells, as well as cost reduction. Items in the list have been adjusted.'));
-            }
-        }
-
-        return $items;
+        return $this->itemListCostTransformerService->reduceCostOfCraftingItems($character, $items, true);
     }
 
     /**
@@ -313,13 +282,7 @@ class CraftingService {
                 $this->skillService->assignXpToCraftingSkill($character->map->gameMap, $skill);
             }
 
-            if ($item->type === 'trinket') {
-                $this->updateTrinketCost($character, $item);
-            }
-
-            if ($item->type !== 'trinket') {
-                $this->updateCharacterGold($character, $item);
-            }
+            $this->updateCharacterGold($character, $item);
         }
     }
 

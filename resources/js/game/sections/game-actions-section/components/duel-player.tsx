@@ -13,6 +13,7 @@ import {BattleMessageType} from "../../../lib/game/actions/battle/types/battle-m
 import DuelPlayerProps, {CharactersList} from "./types/duel-player-props";
 import DuelPlayerState from "./types/duel-player-state";
 import {DuelMessages} from "../../../lib/game/types/core/duel-player/definitions/duel-data";
+import BattleMesages from "./fight-section/battle-mesages";
 
 export default class DuelPlayer extends React.Component<DuelPlayerProps, DuelPlayerState> {
 
@@ -172,36 +173,6 @@ export default class DuelPlayer extends React.Component<DuelPlayerProps, DuelPla
         });
     }
 
-    renderBattleMessages() {
-        if (this.props.is_small && this.state.battle_messages.length > 0) {
-            const message = this.state.battle_messages.filter((battleMessage: DuelMessages) => battleMessage.message.includes('resurrect') || battleMessage.message.includes('has been defeated!'))
-
-            if (message.length > 0) {
-                return <p className='text-red-500 dark:text-red-400'>{message[0].message}</p>
-            } else {
-                return <p className='text-blue-500 dark:text-blue-400'>Attack child!</p>
-            }
-        }
-
-        return this.state.battle_messages.map((battleMessage: DuelMessages) => {
-            return <p className={clsx(
-                {
-                    'text-green-700 dark:text-green-400': this.typeCheck(battleMessage.type, 'player-action')
-                }, {
-                    'text-red-500 dark:text-red-400': this.typeCheck(battleMessage.type, 'enemy-action')
-                }, {
-                    'text-blue-500 dark:text-blue-400': this.typeCheck(battleMessage.type, 'regular')
-                }
-            )}>
-                {battleMessage.message}
-            </p>
-        });
-    }
-
-    typeCheck(battleType: BattleMessageType, type: BattleMessageType): boolean {
-        return battleType === type;
-    }
-
     revive() {
         this.setState({
             preforming_action: true,
@@ -289,7 +260,7 @@ export default class DuelPlayer extends React.Component<DuelPlayerProps, DuelPla
                             : null
                     }
                     <div className='italic text-center my-4'>
-                        {this.renderBattleMessages()}
+                        <BattleMesages is_small={this.props.is_small} battle_messages={this.state.battle_messages} />
                     </div>
                     <div className='text-center'>
                         <DangerButton button_label={'Leave Fight'} on_click={this.props.manage_pvp} additional_css={'mr-4'} disabled={this.props.character.is_dead}/>
