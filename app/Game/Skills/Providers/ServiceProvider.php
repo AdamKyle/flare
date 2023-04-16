@@ -43,8 +43,8 @@ class ServiceProvider extends ApplicationServiceProvider
             return new SkillCheckService();
         });
 
-        $this->app->bind(EnchantItemService::class, function() {
-            return new EnchantItemService;
+        $this->app->bind(EnchantItemService::class, function($app) {
+            return new EnchantItemService($app->make(SkillCheckService::class));
         });
 
         $this->app->bind(UpdateCharacterSkillsService::class, function($app) {

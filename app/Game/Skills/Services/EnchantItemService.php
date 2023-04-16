@@ -6,21 +6,31 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
 use App\Flare\Models\Skill;
-use App\Game\Skills\Services\Traits\SkillCheck;
+use Facades\App\Game\Core\Handlers\DuplicateItemHandler;
 
 class EnchantItemService {
 
-    use SkillCheck;
-
     /**
-     * @var Item $item
+     * @var Item|null $item
      */
-    private $item;
+    private ?Item $item = null;
 
     /**
      * @var int $dcIncrease
      */
-    private $dcIncrease = 0;
+    private int $dcIncrease = 0;
+
+    /**
+     * @var SkillCheckService $skillCheckService;
+     */
+    private SkillCheckService $skillCheckService;
+
+    /**
+     * @param SkillCheckService $skillCheckService
+     */
+    public function __construct(SkillCheckService $skillCheckService) {
+        $this->skillCheckService = $skillCheckService;
+    }
 
     /**
      * Attach the affix to the item
@@ -31,12 +41,12 @@ class EnchantItemService {
      * @param bool $tooEasy
      * @return bool
      */
-    public function attachAffix(Item $item, ItemAffix $affix, Skill $enchantingSkill, bool $tooEasy = false) {
+    public function attachAffix(Item $item, ItemAffix $affix, Skill $enchantingSkill, bool $tooEasy = false): bool {
         if ($tooEasy) {
             $this->enchantItem($item, $affix);
         } else {
-            $dcCheck       = $this->getDCCheck($enchantingSkill, $this->dcIncrease);
-            $characterRoll = $this->characterRoll($enchantingSkill);
+            $dcCheck       = $this->skillCheckService->getDCCheck($enchantingSkill, $this->dcIncrease);
+            $characterRoll = $this->skillCheckService->characterRoll($enchantingSkill);
 
             if ($dcCheck > $characterRoll) {
                 return false;
@@ -54,7 +64,7 @@ class EnchantItemService {
      * @param InventorySlot $slot
      * @return void
      */
-    public function updateSlot(InventorySlot $slot) {
+    public function updateSlot(InventorySlot $slot): void {
         if (!is_null($this->item)) {
 
             if ($this->getCountOfMatchingItems() > 1) {
@@ -75,7 +85,7 @@ class EnchantItemService {
      * @param InventorySlot $slot
      * @return void
      */
-    public function deleteSlot(InventorySlot $slot) {
+    public function deleteSlot(InventorySlot $slot): void {
         $slot->delete();
 
         if (!is_null($this->item)) {
@@ -83,18 +93,6 @@ class EnchantItemService {
 
             $this->item = null;
         }
-    }
-
-    /**
-     * Set difficulty check increase.
-     *
-     * @param int $increaseBy
-     * @return $this
-     */
-    public function setDcIncrease(int $increaseBy): EnchantItemService {
-        $this->dcIncrease = $increaseBy;
-
-        return $this;
     }
 
     /**
@@ -124,7 +122,7 @@ class EnchantItemService {
     }
 
     protected function cloneItem(Item $item, ItemAffix $affix) {
-        $clonedItem = $item->duplicate();
+        $clonedItem = DuplicateItemHandler::duplicateItem($item);
 
         $clonedItem->{'item_' . $affix->type . '_id'} = $affix->id;
         $clonedItem->market_sellable                  = true;
@@ -132,31 +130,7 @@ class EnchantItemService {
 
         $clonedItem->save();
 
-        $this->item = $this->applyHolyStacks($item, $clonedItem);
-    }
-
-    /**
-     * Apply the old items holy stacks to the new item.
-     *
-     * @param Item $oldItem
-     * @param Item $item
-     * @return Item
-     */
-    protected function applyHolyStacks(Item $oldItem, Item $item): Item {
-
-        if ($oldItem->appliedHolyStacks()->count() > 0) {
-
-            foreach ($oldItem->appliedHolyStacks as $stack) {
-
-                $stackAttributes = $stack->getAttributes();
-
-                $stackAttributes['item_id'] = $item->id;
-
-                $item->appliedHolyStacks()->create($stackAttributes);
-            }
-        }
-
-        return $item->refresh();
+        $this->item = $clonedItem->refresh();
     }
 
     /**
