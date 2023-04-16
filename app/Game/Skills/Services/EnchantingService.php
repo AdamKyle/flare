@@ -129,7 +129,7 @@ class EnchantingService {
         $itemAffixes   = ItemAffix::findMany($enchantmentIds);
         $itemToEnchant = Item::find($itemId);
 
-        if (is_null($itemAffixes)) {
+        if ($itemAffixes->isEmpty()) {
             return 0;
         }
 
@@ -216,12 +216,6 @@ class EnchantingService {
     protected function getAvailableAffixes(CharacterStatBuilder $builder, Skill $enchantingSkill, bool $showMerchantMessage = true): Collection {
 
         $currentInt = $builder->statMod('int');
-
-        // If the current intelligence is over 1 billion,
-        // set the max to 1 billion as enchanting will never go over this.
-        if ($currentInt > 1000000000) {
-            $currentInt = 1000000000;
-        }
 
         $affixes = ItemAffix::select('name', 'cost', 'id', 'type')
                             ->where('int_required', '<=', $currentInt)
