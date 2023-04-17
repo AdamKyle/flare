@@ -131,22 +131,21 @@ class SkillService {
      *
      * @param Character $character
      * @param int $xp
-     * @return int
+     * @return void
      * @throws Exception
      */
-    public function assignXPToTrainingSkill(Character $character, int $xp): int {
-        $skillInTraining = $character->skills->where('currently_training', true)->first();
+    public function assignXPToTrainingSkill(Character $character, int $xp): void {
+        $skillInTraining = $character->skills()->where('currently_training', true)->first();
 
         if (is_null($skillInTraining)) {
-            return $xp;
+            return;
         }
 
         if ($skillInTraining->level === $skillInTraining->baseSkill->max_level) {
-            return $xp;
+            return;
         }
 
-        $skillXp     = $xp * $skillInTraining->xp_towards;
-        $remainingXp = ($xp - $skillXp);
+        $skillXp     = $xp + ($xp * $skillInTraining->xp_towards);
         $skillXp     = $skillXp + $skillXp * ($skillInTraining->skill_training_bonus + $character->map->gameMap->skill_training_bonus);
         $skillXp     += 5;
 
@@ -157,8 +156,6 @@ class SkillService {
         $skillInTraining = $skillInTraining->refresh();
 
         $this->levelUpSkill($skillInTraining);
-
-        return intval($remainingXp);
     }
 
     /**

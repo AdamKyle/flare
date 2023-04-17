@@ -11,23 +11,37 @@ use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
-use App\Game\Skills\Services\Traits\SkillCheck;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class TrinketCraftingService {
 
-    use SkillCheck;
-
     /**
      * @var CraftingService $craftingService
      */
-    private $craftingService;
+    private CraftingService $craftingService;
+
+    /**
+     * @var SkillCheckService $skillCheckService
+     */
+    private SkillCheckService $skillCheckService;
+
+    /**
+     * @var ItemListCostTransformerService
+     */
+    private ItemListCostTransformerService $itemListCostTransformerService;
 
     /**
      * @param CraftingService $craftingService
+     * @param SkillCheckService $skillCheckService
+     * @param ItemListCostTransformerService $itemListCostTransformerService
      */
-    public function __construct(CraftingService $craftingService) {
-        $this->craftingService = $craftingService;
+    public function __construct(CraftingService $craftingService,
+                                SkillCheckService $skillCheckService,
+                                ItemListCostTransformerService $itemListCostTransformerService
+    ) {
+        $this->craftingService                = $craftingService;
+        $this->skillCheckService              = $skillCheckService;
+        $this->itemListCostTransformerService = $itemListCostTransformerService;
     }
 
     /**
@@ -46,26 +60,7 @@ class TrinketCraftingService {
                      ->select('name', 'id', 'gold_dust_cost', 'copper_coin_cost')
                      ->get();
 
-        if ($character->classType()->isMerchant()) {
-            $items = $items->transform(function($item) {
-                $copperCoinCost = $item->copper_coin_cost;
-                $goldDustCost   = $item->gold_dust_cost;
-
-                $copperCoinCost = floor($copperCoinCost - $copperCoinCost * 0.10);
-                $goldDustCost   = floor($goldDustCost   - $goldDustCost * 0.10);
-
-                $item->gold_dust_cost   = $goldDustCost;
-                $item->copper_coin_cost = $copperCoinCost;
-
-                return $item;
-            });
-
-            if ($showMerchantMessage) {
-                event(new ServerMessageEvent($character->user, 'As a Merchant you get 10% discount on creating trinketry items. The discount has been applied to the items list.'));
-            }
-        }
-
-        return $items->toArray();
+        return $this->itemListCostTransformerService->reduceCostForTrinketryItems($character, $items, $showMerchantMessage)->toArray();
     }
 
     /**
@@ -174,6 +169,6 @@ class TrinketCraftingService {
      * @return bool
      */
     protected function canCraft(Skill $trinketSkill): bool {
-        return $this->characterRoll($trinketSkill) > $this->getDCCheck($trinketSkill);
+        return $this->skillCheckService->characterRoll($trinketSkill) > $this->skillCheckService->getDCCheck($trinketSkill);
     }
 }

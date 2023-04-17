@@ -186,7 +186,7 @@ class CharacterRewardService {
             event(new ServerMessageEvent($this->character->user, 'Rewarded an extra 10XP while doing the first guide quest. This bonus will end after you reach level 2.'));
         }
 
-        $xp = $this->skillService->assignXPToTrainingSkill($this->character, $xp);
+        $this->skillService->assignXPToTrainingSkill($this->character, $xp);
 
         if (!$this->characterXpService->canCharacterGainXP($this->character)) {
             return;

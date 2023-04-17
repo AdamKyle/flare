@@ -81,7 +81,11 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
         $this->app->bind(TrinketCraftingService::class, function($app) {
-            return new TrinketCraftingService($app->make(CraftingService::class));
+            return new TrinketCraftingService(
+                $app->make(CraftingService::class),
+                $app->make(SkillCheckService::class),
+                $app->make(ItemListCostTransformerService::class)
+            );
         });
 
         $this->app->bind(EnchantingService::class, function($app) {
