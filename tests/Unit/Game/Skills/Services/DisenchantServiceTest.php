@@ -42,7 +42,7 @@ class DisenchantServiceTest extends TestCase {
 
     private ?GameSkill $enchantingSkill;
 
-    private ?GameSkill $disenchantingKill;
+    private ?GameSkill $disenchantingSkill;
 
     public function setUp(): void {
         parent::setUp();
@@ -52,13 +52,13 @@ class DisenchantServiceTest extends TestCase {
             'type' => SkillTypeValue::ENCHANTING,
         ]);
 
-        $this->disenchantingKill = $this->createGameSkill([
+        $this->disenchantingSkill = $this->createGameSkill([
             'name' => 'Disenchanting',
             'type' => SkillTypeValue::DISENCHANTING,
         ]);
 
         $this->character = (new CharacterFactory())->createBaseCharacter()->assignSkill(
-            $this->disenchantingKill
+            $this->disenchantingSkill
         )->assignSkill($this->enchantingSkill)->givePlayerLocation();
 
         $this->disenchantService = resolve(DisenchantService::class);
@@ -86,7 +86,7 @@ class DisenchantServiceTest extends TestCase {
         $this->character         = null;
         $this->disenchantService = null;
         $this->itemToDisenchant  = null;
-        $this->disenchantingKill = null;
+        $this->disenchantingSkill = null;
         $this->enchantingSkill   = null;
     }
 

@@ -18,9 +18,13 @@ class SkillCheckService {
         $dcCheck = (rand(1, 400) + ($dcIncrease !== 0 ? $dcIncrease : 0)) - $skill->level;
 
         if ($dcCheck > 400) {
+            // @codeCoverageIgnoreStart
             return 399;
+            // @codeCoverageIgnoreEnd
         } else if ($dcCheck <= 0) {
+            // @codeCoverageIgnoreStart
             return 1;
+            // @codeCoverageIgnoreEnd
         }
 
         return $dcCheck;

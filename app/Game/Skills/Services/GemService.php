@@ -57,7 +57,9 @@ class GemService {
         $characterSkill = $this->getCraftingSkill($character);
 
         if ($this->skillLevelToHigh($characterSkill, $tier)) {
-            ServerMessageHandler::sendBasicMessage($character->user, 'This gem tier is too easy, you get no XP for this craft');
+            ServerMessageHandler::sendBasicMessage($character->user, 'This gem tier is too hard.');
+
+            return $this->successResult();
         }
 
         if (!$this->canCraft($characterSkill, (new GemTierValue($tier))->maxForTier()['chance'])) {
@@ -71,7 +73,7 @@ class GemService {
 
         $character = $this->updateCharacterCurrencies($character, $tier);
 
-        if (!$this->skillLevelToHigh($characterSkill, $tier)) {
+        if (!$characterSkill->level <= (new GemTierValue($tier))->maxForTier()['max_level']) {
             event(new UpdateSkillEvent($characterSkill));
         }
 
@@ -103,26 +105,6 @@ class GemService {
     }
 
     /**
-     * Skill level is too low.
-     *
-     * @param Skill $skill
-     * @param int $tier
-     * @return bool
-     * @throws Exception
-     */
-    protected function skillLevelToLow(Skill $skill, int $tier): bool {
-        $data = (new GemTierValue($tier))->maxForTier();
-
-        if ($skill->level < $data['min_level']) {
-            ServerMessageHandler::sendBasicMessage($skill->character->user, 'This gem tier is way to difficult for you. The minimum level is: ' . $data['min_level']);
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
      * Skill level too high.
      *
      * @param Skill $skill
@@ -133,9 +115,7 @@ class GemService {
     protected function skillLevelToHigh(Skill $skill, int $tier): bool {
         $data = (new GemTierValue($tier))->maxForTier();
 
-        if ($skill->level > $data['max_level']) {
-            ServerMessageHandler::sendBasicMessage($skill->character->user, 'This gem tier is too easy to craft, you will get no XP for crafting gems of the tier: ' . $data['min_level']);
-
+        if ($skill->level < $data['min_level']) {
             return true;
         }
 
@@ -158,7 +138,7 @@ class GemService {
         if (!is_null($foundGem)) {
             $foundGem->update(['amount' => $foundGem->amount + 1]);
 
-            return $character->gemBag->refresh();
+            return $foundGem->refresh();
         }
 
         return $character->gemBag->gemSlots()->create([
@@ -260,9 +240,11 @@ class GemService {
 
         $roll = $roll + $roll * $skill->skill_bonus;
 
+        // @codeCoverageIgnoreStart
         if ($roll === 1) {
             return true;
         }
+        // @codeCoverageIgnoreEnd
 
         $dc = 100 - ($chance * 100);
 
@@ -279,11 +261,12 @@ class GemService {
     protected function getCraftingSkill(Character $character): Skill {
         $name      = (new SkillTypeValue(SkillTypeValue::GEM_CRAFTING))->getNamedValue();
         $gameSkill = GameSkill::where('name', $name)->first();
+        $skill     = $character->skills()->where('game_skill_id', $gameSkill->id)->first();
 
-        if (is_null($gameSkill)) {
+        if (is_null($skill)) {
             throw new Exception('Character is missing required game skill: ' . $name);
         }
 
-        return $character->skills()->where('game_skill_id', $gameSkill->id)->first();
+        return $skill;
     }
 }

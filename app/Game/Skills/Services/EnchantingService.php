@@ -253,6 +253,12 @@ class EnchantingService {
                 return;
             }
 
+            if ($character->getInformation()->statMod('int') < $affix->int_required) {
+                ServerMessageHandler::handleMessage($character->user, 'int_to_low_enchanting');
+
+                return;
+            }
+
             if ($enchantingSkill->level > $affix->skill_level_trivial) {
                 if (!$this->sentToEasyMessage) {
                     ServerMessageHandler::handleMessage($character->user, 'to_easy_to_craft');

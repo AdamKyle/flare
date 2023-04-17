@@ -2,7 +2,6 @@
 
 namespace App\Game\Skills\Services;
 
-use App\Flare\Events\SkillLeveledUpServerMessageEvent;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Values\MaxCurrenciesValue;
@@ -11,12 +10,11 @@ use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Skill;
 use App\Flare\Values\ItemEffectsValue;
-use App\Game\Skills\Services\Traits\SkillCheck;
 use Illuminate\Support\Collection;
 
 class MassDisenchantService {
 
-    use SkillCheck, MercenaryBonus;
+    use MercenaryBonus;
 
     /**
      * @var int $goldDust
@@ -68,10 +66,16 @@ class MassDisenchantService {
      */
     private Skill $enchantingSkill;
 
+    private SkillCheckService $skillCheckService;
+
     /**
      * @var InventorySlot|null $questSlot
      */
     private ?InventorySlot $questSlot = null;
+
+    public function __construct(SkillCheckService $skillCheckService) {
+        $this->skillCheckService = $skillCheckService;
+    }
 
     /**
      * Set up the service.
@@ -194,11 +198,13 @@ class MassDisenchantService {
             }
         }
 
+        // @codeCoverageIgnoreStart
         if ($leftOver >= 0 && $leftOver < $skill->xp_next && ($skill->level < $skill->baseSkill->max_level)) {
             $skill->update([
                 'xp' => $skill->xp + $leftOver,
             ]);
         }
+        // @codeCoverageIgnoreEnd
 
         return $skill->refresh();
     }
@@ -235,8 +241,8 @@ class MassDisenchantService {
      * @return void
      */
     protected function disenchantItem(InventorySlot $slot): void {
-        $dcCheck = $this->getDCCheck($this->disenchantingSkill);
-        $roll    = 1000; // $this->characterRoll($this->disenchantingSkill);
+        $dcCheck = $this->skillCheckService->getDCCheck($this->disenchantingSkill);
+        $roll    = $this->skillCheckService->characterRoll($this->disenchantingSkill);
 
         if ($roll > $dcCheck) {
 
@@ -298,10 +304,6 @@ class MassDisenchantService {
             if ($roll > $dc) {;
 
                 $goldDust = $characterTotalGoldDust * 0.05;
-
-                if ($goldDust >= MaxCurrenciesValue::MAX_GOLD_DUST) {
-                    $goldDust = MaxCurrenciesValue::MAX_GOLD_DUST;
-                }
 
                 return $goldDust;
             }

@@ -56,6 +56,8 @@ class ServerMessageBuilder {
                 return 'You are too low level and thus, you lost your investment and epically failed to craft this item!';
             case 'to_easy_to_craft':
                 return 'This is far too easy to craft! You will get no experience for this item.';
+            case 'int_to_low_enchanting':
+                return 'This enchantment requires you to have more knowledge to attempt. Such wasted efforts! (Requires higher int).';
             case 'something_went_wrong':
                 return 'A component was unable to render. Please try refreshing the page.';
             case 'attacking_to_much':

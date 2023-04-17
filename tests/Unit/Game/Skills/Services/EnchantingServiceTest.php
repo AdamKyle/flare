@@ -3,14 +3,20 @@
 namespace Tests\Unit\Game\Skills\Services;
 
 use App\Flare\Values\CharacterClassValue;
+use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Services\EnchantingService;
+use App\Game\Skills\Services\EnchantItemService;
+use App\Game\Skills\Services\SkillCheckService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Item;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\ItemAffix;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Support\Facades\Event;
+use Mockery;
+use Mockery\MockInterface;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateClass;
@@ -194,5 +200,227 @@ class EnchantingServiceTest extends TestCase
         ])->id);
 
         $this->assertEquals(4000, $result);
+    }
+
+    public function testEnchantItemAndTheCostIsDeducted() {
+        $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->getCharacter();
+
+        $character->update(['gold' => 1000]);
+
+        $character = $character->refresh();
+
+        $this->enchantingService->enchant($character, [
+            'affix_ids' => [$this->prefix->id, $this->suffix->id]
+        ], $character->inventory->slots->first(), 1000);
+
+        $character = $character->refresh();
+
+        $this->assertEquals(0, $character->gold);
+    }
+
+    public function testEnchantItemWithNonExistantAffixesButStillReduceTheCharactersGoldAsPunishment() {
+        $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->getCharacter();
+
+        $character->update(['gold' => 1000]);
+
+        $character = $character->refresh();
+
+        $this->enchantingService->enchant($character, [
+            'affix_ids' => [10000, 1500]
+        ], $character->inventory->slots->first(), 1000);
+
+        $character = $character->refresh();
+
+        $this->assertEquals(0, $character->gold);
+    }
+
+    public function testCannotEnchantItemWhenSkillLevelRequiredIsToHigh() {
+
+        Event::fake();
+
+        $this->prefix->update([
+            'skill_level_required' => 1800
+        ]);
+
+        $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->getCharacter();
+
+        $character->update(['gold' => 1000]);
+
+        $character = $character->refresh();
+
+        $this->enchantingService->enchant($character, [
+            'affix_ids' => [$this->prefix->id]
+        ], $character->inventory->slots->first(), 1000);
+
+        $character = $character->refresh();
+
+        $this->assertEquals(0, $character->gold);
+
+        Event::assertDispatched(function (ServerMessageEvent $event) {
+            return $event->message === resolve(ServerMessageBuilder::class)->buildWithAdditionalInformation('to_hard_to_craft');
+        });
+    }
+
+    public function testEnchantNotEnoughInt() {
+
+        Event::fake();
+
+        $this->prefix->update([
+            'skill_level_trivial' => 1,
+            'int_required'        => 10000
+        ]);
+
+        $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->getCharacter();
+
+        $character->update(['gold' => 1000]);
+
+        $character = $character->refresh();
+
+        $this->enchantingService->enchant($character, [
+            'affix_ids' => [$this->prefix->id]
+        ], $character->inventory->slots->first(), 1000);
+
+        $character = $character->refresh();
+
+        $this->assertEquals(0, $character->gold);
+
+        Event::assertDispatched(function (ServerMessageEvent $event) {
+            return $event->message === resolve(ServerMessageBuilder::class)->buildWithAdditionalInformation('int_to_low_enchanting');
+        });
+    }
+
+    public function testEnchantWhenToEasy() {
+
+        Event::fake();
+
+        $this->prefix->update([
+            'skill_level_trivial' => -10
+        ]);
+
+        $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->getCharacter();
+
+        $character->update(['gold' => 1000]);
+
+        $character = $character->refresh();
+
+        $this->enchantingService->enchant($character, [
+            'affix_ids' => [$this->prefix->id]
+        ], $character->inventory->slots->first(), 1000);
+
+        $character = $character->refresh();
+
+        $this->assertEquals(0, $character->gold);
+
+        Event::assertDispatched(function (ServerMessageEvent $event) {
+            return $event->message === resolve(ServerMessageBuilder::class)->buildWithAdditionalInformation('to_easy_to_craft');
+        });
+    }
+
+    public function testEnchantingSucceeds() {
+
+        Event::fake();
+
+        $this->instance(
+            EnchantItemService::class,
+            Mockery::mock(EnchantItemService::class, function (MockInterface $mock) {
+                $mock->makePartial()->shouldReceive('attachAffix')->once()->andReturn(true);
+            })
+        );
+
+        $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->getCharacter();
+
+        $character->update(['gold' => 1000]);
+
+        $character = $character->refresh();
+
+        $enchantingService = resolve(EnchantingService::class);
+
+        $slot = $character->inventory->slots->first();
+
+        $enchantingService->enchant($character, [
+            'affix_ids' => [$this->prefix->id]
+        ], $slot, 1000);
+
+        $character = $character->refresh();
+
+        $this->assertEquals(0, $character->gold);
+
+        Event::assertDispatched(function (ServerMessageEvent $event) use($slot) {
+            return $event->message === 'Applied enchantment: '.$this->prefix->name.' to: ' . $slot->item->refresh()->affix_name;
+        });
+    }
+
+    public function testEnchantingFails() {
+
+        Event::fake();
+
+        $this->instance(
+            EnchantItemService::class,
+            Mockery::mock(EnchantItemService::class, function (MockInterface $mock) {
+                $mock->makePartial()->shouldReceive('attachAffix')->once()->andReturn(false);
+            })
+        );
+
+        $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->getCharacter();
+
+        $character->update(['gold' => 1000]);
+
+        $character = $character->refresh();
+
+        $enchantingService = resolve(EnchantingService::class);
+
+        $slot = $character->inventory->slots->first();
+
+        $itemName =  $slot->item->affix_name;
+
+        $enchantingService->enchant($character, [
+            'affix_ids' => [$this->prefix->id]
+        ], $slot, 1000);
+
+        $character = $character->refresh();
+
+        $this->assertEquals(0, $character->gold);
+
+        Event::assertDispatched(function (ServerMessageEvent $event) use($itemName) {
+            return $event->message === 'You failed to apply '.$this->prefix->name.' to: ' . $itemName . '. The item shatters before you. You lost the investment.';
+        });
+    }
+
+    public function testGetTimeAdditionForEnchantingShouldBeTriple() {
+        $item = $this->createItem([
+            'item_prefix_id' => $this->prefix->id,
+            'item_suffix_id' => $this->suffix->id,
+        ]);
+
+        $time = $this->enchantingService->timeForEnchanting($item);
+
+        $this->assertEquals('triple', $time);
+    }
+
+    public function testGetTimeAdditionForEnchantingShouldBeDouble() {
+        $item = $this->createItem([
+            'item_prefix_id' => $this->prefix->id,
+        ]);
+
+        $time = $this->enchantingService->timeForEnchanting($item);
+
+        $this->assertEquals('double', $time);
+    }
+
+    public function testGetTimeAdditionForEnchantingShouldBeNull() {
+        $time = $this->enchantingService->timeForEnchanting($this->itemToEnchant);
+
+        $this->assertNull($time);
+    }
+
+    public function testGetInventorySlotFromSlotId() {
+        $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->getCharacter();
+
+        $slotId    = $character->inventory->slots->first()->id;
+
+        $slot      = $this->enchantingService->getSlotFromInventory($character, $slotId);
+
+        $this->assertNotNull($slot);
+        $this->assertEquals($slotId, $slot->id);
     }
 }

@@ -67,8 +67,8 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
-        $this->app->bind(MassDisenchantService::class, function() {
-            return new MassDisenchantService();
+        $this->app->bind(MassDisenchantService::class, function($app) {
+            return new MassDisenchantService($app->make(SkillCheckService::class));
         });
 
         $this->app->bind(SkillService::class, function($app) {
