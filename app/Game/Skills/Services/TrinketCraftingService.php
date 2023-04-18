@@ -2,6 +2,7 @@
 
 namespace App\Game\Skills\Services;
 
+use App\Game\Skills\Services\Traits\UpdateCharacterCurrency;
 use Exception;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
@@ -14,6 +15,8 @@ use App\Game\Messages\Events\ServerMessageEvent;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class TrinketCraftingService {
+
+    use UpdateCharacterCurrency;
 
     /**
      * @var CraftingService $craftingService
@@ -78,21 +81,13 @@ class TrinketCraftingService {
     public function craft(Character $character, Item $item): array {
         $trinkentrySkill = $this->fetchCharacterSkill($character);
 
-        if ($character->classType()->isMerchant()) {
-            ServerMessageHandler::sendBasicMessage($character->user, 'As a Merchant you get a 10% reduction on crafting trinkets.');
-        }
-
         if (!$this->canAfford($character, $item)) {
             event(new ServerMessageEvent($character->user, 'You do not have enough of the required currencies to craft this.'));
 
             return $this->fetchItemsToCraft($character);
         }
 
-        $character = $character->refresh();
-
-        event(new UpdateTopBarEvent($character));
-
-        if ($trinkentrySkill->level < $item->trinkentrySkill) {
+        if ($trinkentrySkill->level < $item->skill_level_required) {
             ServerMessageHandler::handlemessage($character->user, 'to_hard_to_craft');
 
             return $this->fetchItemsToCraft($character);
@@ -101,10 +96,14 @@ class TrinketCraftingService {
         if ($trinkentrySkill->level > $item->skill_level_trivial) {
             ServerMessageHandler::handlemessage($character->user, 'to_easy_to_craft');
 
+            $this->updateTrinketCost($character, $item);
+
             $this->craftingService->pickUpItem($character, $item, $trinkentrySkill, true);
 
             return $this->fetchItemsToCraft($character);
         }
+
+        $this->updateTrinketCost($character, $item);
 
         if (!$this->canCraft($trinkentrySkill)) {
             event(new ServerMessageEvent($character->user, 'You failed to craft the trinket. All your efforts fall apart before your eyes!'));

@@ -63,7 +63,7 @@ class ItemListCostTransformerService {
                 event(new ServerMessageEvent($character->user, 'As a Merchant you get 10% discount on creating trinketry items. The discount has been applied to the items list.'));
             }
 
-            return $this->reduceCostForCrafting($items, 0.30);
+            return $this->reduceCostForTrinketry($items, 0.10);
         }
 
         return $items;
@@ -79,6 +79,21 @@ class ItemListCostTransformerService {
 
             $item->gold_dust_cost = $goldDustCost;
             $item->shards_cost    = $shardsCost;
+
+            return $item;
+        });
+    }
+
+    private function reduceCostForTrinketry(Collection $items, float $reduction): SupportCollection {
+        return $items->transform(function($item) use($reduction) {
+            $goldDustCost = $item->gold_dust_cost;
+            $copperCost   = $item->copper_coin_cost;
+
+            $goldDustCost = $goldDustCost - $goldDustCost * $reduction;
+            $copperCost   = $copperCost - $copperCost * $reduction;
+
+            $item->gold_dust_cost    = $goldDustCost;
+            $item->copper_coin_cost = $copperCost;
 
             return $item;
         });

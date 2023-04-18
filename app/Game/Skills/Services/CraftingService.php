@@ -275,14 +275,16 @@ class CraftingService {
      * @return void
      * @throws Exception
      */
-    public function pickUpItem(Character $character, Item $item, Skill $skill, bool $tooEasy = false) {
+    public function pickUpItem(Character $character, Item $item, Skill $skill, bool $tooEasy = false, bool $updateGoldCost = true) {
         if ($this->attemptToPickUpItem($character, $item)) {
 
             if (!$tooEasy) {
                 $this->skillService->assignXpToCraftingSkill($character->map->gameMap, $skill);
             }
 
-            $this->updateCharacterGold($character, $item);
+            if ($updateGoldCost) {
+                $this->updateCharacterGold($character, $item);
+            }
         }
     }
 
