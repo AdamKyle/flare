@@ -5,10 +5,11 @@ import Ajax from "../../lib/ajax/ajax";
 import ServerMessages from "./server-messages";
 import {AxiosError, AxiosResponse} from "axios";
 import Chat from "./chat";
-import GameChatProps from "../../lib/game/chat/game-chat-props";
-import GameChatState from "../../lib/game/chat/game-chat-state";
+import GameChatProps from "./types/game-chat-props";
+import GameChatState, {AnnouncementType} from "./types/game-chat-state";
 import ExplorationMessages from "./exploration-messages";
 import {DateTime} from "luxon";
+import AnnouncementMessages from "./announcement-messages";
 
 export default class GameChat extends React.Component<GameChatProps, GameChatState> {
     private chat: any;
@@ -23,11 +24,14 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
 
     private explorationMessage: any;
 
+    private announcements: any;
+
     constructor(props: GameChatProps) {
         super(props);
 
         this.state = {
             chat: [],
+            announcements: [],
             server_messages: [],
             exploration_messages: [],
             message: '',
@@ -44,6 +48,10 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
             }, {
                 key: 'exploration-messages',
                 name: 'Exploration',
+                updated: false,
+            }, {
+                key: 'announcements-messages',
+                name: 'Announcements',
                 updated: false,
             }]
         }
@@ -65,6 +73,9 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
 
         // @ts-ignore
         this.globalMessage = Echo.join('global-message');
+
+        // @ts-ignore
+        this.announcements = Echo.join('announcement-message');
     }
 
     componentDidMount() {
@@ -75,7 +86,11 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
         });
 
         (new Ajax()).setRoute('last-chats').doAjaxCall('get', (result: AxiosResponse) => {
-            const chats = result.data.map((chat: any) => {
+            this.setState({
+                announcements: result.data.announcements,
+            })
+
+            const chats = result.data.chat_messages.map((chat: any) => {
                 if (chat.name === 'The Creator') {
                     return {
                         message: chat.message,
@@ -97,8 +112,10 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
                 }
             }).filter((chat: any) => typeof chat !== 'undefined');
 
+
             this.setState({
                 chat: [...this.state.chat, ...chats],
+                announcements: result.data.announcements,
             }, () => {
                 if (typeof this.props.update_finished_loading !== 'undefined') {
                     this.props.update_finished_loading();
@@ -242,6 +259,25 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
                 this.setTabToUpdated('chat');
             })
         })
+
+        this.announcements.listen('Game.Messages.Events.AnnouncementMessageEvent', (event: any) => {
+            const chat = JSON.parse(JSON.stringify(this.state.announcements))
+
+            if (chat.length > 1000) {
+                chat.length = 500;
+            }
+
+            chat.unshift({
+                message:    event.message,
+                expires_at: event.expires_at,
+            });
+
+            this.setState({
+                announcements: chat,
+            }, () => {
+                this.setTabToUpdated('announcements-messages');
+            })
+        })
     }
 
     componentDidUpdate(prevProps: Readonly<any>, prevState: Readonly<any>, snapshot?: any) {
@@ -369,6 +405,10 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
 
                     <TabPanel key={'exploration-messages'}>
                         <ExplorationMessages exploration_messages={this.state.exploration_messages} />
+                    </TabPanel>
+
+                    <TabPanel key={'announcements-messages'}>
+                        <AnnouncementMessages announcements={this.state.announcements} />
                     </TabPanel>
                 </Tabs>
             </div>

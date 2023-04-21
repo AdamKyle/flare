@@ -40,6 +40,17 @@
                 <span class="fas fa-feather"></span>
                 Guide Quests
             </a>
+            <hr />
+            <h6 class="uppercase">Event Management</h6>
+            <a href="{{route('admin.raids.list')}}">
+                <span class="fas fa-list"></span>
+                Raid Events
+            </a>
+            <a href="#">
+                <span class="fas fa-list"></span>
+                Event Scheduler
+            </a>
+
         </div>
     </div>
 

@@ -14,7 +14,7 @@
 
     <div class="pb-5">
         <x-core.page-title
-            title="{{$monster->name}} in {{$monster->gameMap->name}}"
+            title="{{$monster->name}} on {{$monster->gameMap->name}}"
             route="{{$backUrl}}"
             color="success" link="Back"
         >
@@ -29,6 +29,18 @@
                 @endif
             @endauth
         </x-core.page-title>
+
+        @if ($monster->is_raid_boss)
+            <x-core.alerts.info-alert title="ATTN!">
+                This is a raid boss and cannot be encountered by traditional means.
+            </x-core.alerts.info-alert>
+        @endif
+
+        @if ($monster->is_raid_monster)
+            <x-core.alerts.info-alert title="ATTN!">
+                This is a raid monster and cannot be encountered by traditional means.
+            </x-core.alerts.info-alert>
+        @endif
 
         @include('admin.monsters.partials.details', [
             'monster' => $monster,

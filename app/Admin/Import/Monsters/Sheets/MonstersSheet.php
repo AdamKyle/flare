@@ -22,6 +22,10 @@ class MonstersSheet implements ToCollection {
                     continue;
                 }
 
+                if ($monster['is_raid_boss'] && $monster['is_raid_monster']) {
+                    continue;
+                }
+
                 $foundMonster = Monster::where('name', $monster['name'])->first();
 
                 if (is_null($foundMonster)) {

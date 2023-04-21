@@ -13,6 +13,8 @@ class EventType {
 
     const WEEKLY_CURRENCY_DROPS = 2;
 
+    const RAID_EVENT            = 3;
+
     /**
      * @var string $value
      */
@@ -25,6 +27,7 @@ class EventType {
         0 => self::WEEKLY_CELESTIALS,
         1 => self::MONTHLY_PVP,
         2 => self::WEEKLY_CURRENCY_DROPS,
+        3 => self::RAID_EVENT,
     ];
 
     /**
@@ -66,5 +69,14 @@ class EventType {
      */
     public function isWeeklyCurrencyDrops(): bool {
         return $this->value === self::WEEKLY_CURRENCY_DROPS;
+    }
+
+    /**
+     * Are we a raid event?
+     *
+     * @return bool
+     */
+    public function isRaidEvent(): bool {
+        return $this->value === self::RAID_EVENT;
     }
 }

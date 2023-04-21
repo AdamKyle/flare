@@ -8,6 +8,7 @@ use App\Flare\Models\Item;
 use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Traits\Controllers\MonstersShowInformation;
 use App\Flare\Values\CelestialType;
+use App\Flare\Values\RaidAttackTypesValue;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -47,6 +48,7 @@ class MonstersController extends Controller {
             'gameMaps'       => GameMap::all(),
             'questItems'     => Item::where('type', 'quest')->get(),
             'celestialTypes' => CelestialType::getNamedValues(),
+            'specialAttacks' => RaidAttackTypesValue::$attackTypeNames,
         ]);
     }
 
@@ -56,6 +58,7 @@ class MonstersController extends Controller {
             'gameMaps'       => GameMap::all(),
             'questItems'     => Item::where('type', 'quest')->get(),
             'celestialTypes' => CelestialType::getNamedValues(),
+            'specialAttacks' => RaidAttackTypesValue::$attackTypeNames,
         ]);
     }
 
@@ -99,6 +102,10 @@ class MonstersController extends Controller {
 
     public function store(MonsterManagementRequest $request) {
         $data = $this->cleanRequestData($request->all());
+
+        if ($data['is_raid_monster'] && $data['is_raid_boss']) {
+            return redirect()->back()->with('error', 'This enemy cannot be both raid boss and raid montser. Pick one.');
+        }
 
         $monster = Monster::updateOrCreate(['id' => $data['id']], $data);
 

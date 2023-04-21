@@ -29,6 +29,9 @@ class Location extends Model {
         'x',
         'y',
         'type',
+        'raid_id',
+        'has_raid_boss',
+        'is_corrupted'
     ];
 
     /**
@@ -47,6 +50,9 @@ class Location extends Model {
         'quest_reward_item_id'   => 'integer',
         'required_quest_item_id' => 'integer',
         'enemy_strength_type'    => 'integer',
+        'raid_id'                => 'integer',
+        'has_raid_boss'          => 'boolean',
+        'is_corrupted'           => 'boolean',
     ];
 
     public function questRewardItem() {
@@ -55,6 +61,10 @@ class Location extends Model {
 
     public function map() {
         return $this->hasOne(GameMap::class, 'id', 'game_map_id');
+    }
+
+    public function raid() {
+        return $this->hasOne(Raid::class, 'id', 'raid_id');
     }
 
     public function requiredQuestItem() {

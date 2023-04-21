@@ -24,3 +24,8 @@ Broadcast::channel('npc-message-{userId}', function ($user, $userId) {
 Broadcast::channel('global-message', function ($user) {
     return $user;
 });
+
+// When a global message is sent out.
+Broadcast::channel('announcement-message', function ($user) {
+    return $user;
+});

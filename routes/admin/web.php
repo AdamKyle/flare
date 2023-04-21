@@ -193,6 +193,16 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::get('/admin/information-management/page/{infoPage}', ['as' => 'admin.info-management.page', 'uses' => 'InformationController@page']);
     Route::get('/admin/information-management/update-page/{infoPage}', ['as' => 'admin.info-management.up-page', 'uses' => 'InformationController@managePage']);
 
+    Route::post('/admin/raids/export', ['as' => 'admin.raids.export', 'uses' => 'RaidsController@export']);
+    Route::post('/admin/raid/import', ['as' => 'admin.raids.import', 'uses' => 'RaidsController@import']);
+
+    Route::get('/admin/raids', ['as' => 'admin.raids.list', 'uses' => 'RaidsController@index']);
+    Route::get('/admin/raids/export-data', ['as' => 'admin.raids.export-data', 'uses' => 'RaidsControler@exportInfo']);
+    Route::get('/admin/raids/import-data', ['as' => 'admin.raids.import-data', 'uses' => 'RaidsControler@importInfo']);
+    Route::get('/admin/raids/create', ['as' => 'admin.raids.create', 'uses' => 'RaidsController@create']);
+    Route::get('/admin/raids/{raid}/edit', ['as' => 'admin.raids.edit', 'uses' => 'RaidsController@edit']);
+    Route::get('/admin/raids/{raid}', ['as' => 'admin.raids.show', 'uses' => 'RaidsController@show']);
+    Route::post('/admin/raids/store', ['as' => 'admin.raids.store', 'uses' => 'RaidsController@store']);
 
     Route::get('/admin/statistics/dashboard', ['as' => 'admin.statistics', 'uses' => 'StatisticsController@index']);
 });

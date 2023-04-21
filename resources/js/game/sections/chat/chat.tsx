@@ -4,8 +4,8 @@ import Messages from "./components/messages";
 import Ajax from "../../lib/ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
 import {generateServerMessage} from "../../lib/ajax/generate-server-message";
-import ChatComponentProps from "../../lib/game/chat/components/chat-component-props";
-import ChatComponentState from "../../lib/game/chat/components/chat-component-state";
+import ChatComponentProps from "./types/components/chat-component-props";
+import ChatComponentState from "./types/components/chat-component-state";
 
 export default class Chat extends React.Component<ChatComponentProps, ChatComponentState> {
 

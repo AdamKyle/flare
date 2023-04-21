@@ -4,6 +4,7 @@
 @import "./react-data-tables.css";
 @import "./item-colors.css";
 @import "./guide-quests-admin.css";
+@import "./chat-blobal-message-colors.css";
 
 #perPage {
     width: 50px;

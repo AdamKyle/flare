@@ -57,6 +57,9 @@ class Monster extends Model {
         'criticality',
         'shards',
         'celestial_type',
+        'is_raid_monster',
+        'is_raid_boss',
+        'raid_special_attack_type',
     ];
 
     /**
@@ -99,6 +102,9 @@ class Monster extends Model {
         'ambush_resistance'         => 'float',
         'counter_chance'            => 'float',
         'counter_resistance'        => 'float',
+        'is_raid_monster'           => 'boolean',
+        'is_raid_boss'              => 'boolean',
+        'raid_special_attack_type'  => 'integer',
     ];
 
     public function questItem() {

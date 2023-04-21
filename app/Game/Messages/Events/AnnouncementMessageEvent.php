@@ -9,7 +9,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 
-class GlobalMessageEvent implements ShouldBroadcastNow {
+class AnnouncementMessageEvent implements ShouldBroadcastNow {
 
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -19,22 +19,15 @@ class GlobalMessageEvent implements ShouldBroadcastNow {
     public string $message;
 
     /**
-     * @var string|null
-     */
-    public ?string $specialColor = null;
-
-    /**
      * Create a new event instance.
      *
      * - specialColor should be a css class that
      * represents the color you want applied to the message.
      *
      * @param string $message
-     * @param string|null $specialColor
      */
-    public function __construct(string $message, string $specialColor = null) {
-        $this->message      = $message;
-        $this->specialColor = $specialColor;
+    public function __construct(string $message) {
+        $this->message = $message;
     }
 
     /**
@@ -43,6 +36,6 @@ class GlobalMessageEvent implements ShouldBroadcastNow {
      * @return Channel|array
      */
     public function broadcastOn(): Channel|array {
-        return new PresenceChannel('global-message');
+        return new PresenceChannel('announcement-message');
     }
 }

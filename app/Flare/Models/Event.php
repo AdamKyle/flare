@@ -14,7 +14,8 @@ class Event extends Model {
     protected $fillable = [
         'type',
         'started_at',
-        'ends_at'
+        'ends_at',
+        'raid_id',
     ];
 
     /**
@@ -24,5 +25,6 @@ class Event extends Model {
      */
     protected $casts = [
         'type' => 'integer',
+        'raid_id' => 'integer',
     ];
 }

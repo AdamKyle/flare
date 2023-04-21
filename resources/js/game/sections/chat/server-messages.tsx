@@ -1,8 +1,8 @@
 import React, {Fragment} from "react";
 import Messages from "./components/messages";
 import ItemComparison from "./modals/item-comparison";
-import ServerMessagesComponentProps from "../../lib/game/chat/components/server-messages-component-props";
-import ServerMessagesComponentState from "../../lib/game/chat/components/server-messages-component-state";
+import ServerMessagesComponentProps from "./types/components/server-messages-component-props";
+import ServerMessagesComponentState from "./types/components/server-messages-component-state";
 
 export default class ServerMessages extends React.Component<ServerMessagesComponentProps, ServerMessagesComponentState> {
 

@@ -2,6 +2,7 @@
 
 namespace App\Game\Messages\Services;
 
+use App\Flare\Models\Announcement;
 use Illuminate\Support\Collection as SupportCollection;
 use Illuminate\Database\Eloquent\Collection;
 use App\Game\Messages\Models\Message;

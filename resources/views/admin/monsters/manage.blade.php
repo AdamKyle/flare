@@ -35,6 +35,12 @@
                                 <x-core.forms.input :model="$monster" label="Int:" modelKey="int" name="int" />
                                 <x-core.forms.input :model="$monster" label="Chr:" modelKey="chr" name="chr" />
                                 <x-core.forms.input :model="$monster" label="Focus:" modelKey="focus" name="focus" />
+                                <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                                <h3 class="mb-3">Raid Info (Optional)</h3>
+                                <p class="mb-3 text-sm text-gray-800 dark:text-gray-300">Raid Bosses cannot also be raid monsters.</p>
+                                <x-core.forms.check-box :model="$monster" label="Is Raid Boss?" modelKey="is_raid_boss" name="is_raid_boss" />
+                                <x-core.forms.check-box :model="$monster" label="(or) Is Raid Monster?" modelKey="is_raid_monster" name="is_raid_monster" />
+                                <x-core.forms.key-value-select :model="$monster" label="Special Raid Attack Type:" modelKey="raid_special_attack_type" name="raid_special_attack_type" :options="$specialAttacks" />
                             </div>
                             <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                             <div>
