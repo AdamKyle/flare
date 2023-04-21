@@ -22,8 +22,11 @@ class RaidsController extends Controller {
     }
 
     public function show(Raid $raid) {
-        return view('admin.raids.raid', [
-            'raid' => $raid
+        $monsters = Monster::whereIn('id', $raid->raid_monster_ids)->select('id', 'name')->get()->toArray();
+
+        return view('information.raids.raid', [
+            'raid'         => $raid,
+            'raidMonsters' => array_chunk($monsters, ceil(count($monsters) / 2))
         ]);
     }
 
@@ -38,10 +41,10 @@ class RaidsController extends Controller {
 
     public function edit(Raid $raid) {
         return view('admin.raids.manage', [
-            'raid'        => $raid,
-            'monsters'    => Monster::where('is_raid_monster', true)->get(),
-            'locations'   => Location::all(),
-            'raid_bosses' => Monster::where('is_raid_boss', true)->get(),
+            'raid'       => $raid,
+            'monsters'   => Monster::where('is_raid_monster', true)->get(),
+            'locations'  => Location::all(),
+            'raidBosses' => Monster::where('is_raid_boss', true)->get(),
         ]);
     }
 
@@ -76,7 +79,16 @@ class RaidsController extends Controller {
     }
 
     public function store(Request $request) {
-        $raid = Raid::create($request->all());
+
+        $raid = Raid::find($request->id);
+
+        if (is_null($raid)) {
+            $raid = Raid::create($request->all());
+        } else {
+            $raid->update($request->all());
+        }
+
+        $raid = $raid->refresh();
 
         return response()->redirectToRoute('admin.raids.show', ['raid' => $raid->id])->with('success', 'Saved raid: ' . $raid->name);
     }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Flare\Models\GameClassSpecial;
+use App\Flare\Models\Raid;
 use Storage;
 use Illuminate\Http\Request;
 use App\Flare\Models\GameBuilding;
@@ -193,6 +194,15 @@ class InfoPageController extends Controller
     public function viewNpc(Npc $npc) {
         return view('information.npcs.npc', [
             'npc' => $npc
+        ]);
+    }
+
+    public function viewRaid(Raid $raid) {
+        $monsters = Monster::whereIn('id', $raid->raid_monster_ids)->select('id', 'name')->get()->toArray();
+
+        return view('information.raids.raid', [
+            'raid'         => $raid,
+            'raidMonsters' => array_chunk($monsters, ceil(count($monsters) / 2))
         ]);
     }
 

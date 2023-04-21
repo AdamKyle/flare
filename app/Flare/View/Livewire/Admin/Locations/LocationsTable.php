@@ -11,11 +11,18 @@ use Rappasoft\LaravelLivewireTables\Views\Column;
 
 class LocationsTable extends DataTableComponent {
 
+    public array $locationIds = [];
+
     public function configure(): void {
         $this->setPrimaryKey('id');
     }
 
     public function builder(): Builder {
+
+        if (!empty($this->locationIds)) {
+            return Location::whereIn('id', $this->locationIds);
+        }
+
         return Location::query();
     }
 

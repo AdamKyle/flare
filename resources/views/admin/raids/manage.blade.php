@@ -5,7 +5,7 @@
         <x-core.cards.card-with-title
             title="{{!is_null($raid) ? 'Edit: ' . nl2br($raid->name) : 'Create New Race'}}"
             buttons="true"
-            backUrl="{{!is_null($raid) ? route('raids.raid', ['raid' => $raid->id]) : route('admin.raids.list')}}"
+            backUrl="{{!is_null($raid) ? route('admin.raids.show', ['raid' => $raid->id]) : route('admin.raids.list')}}"
         >
             <x-core.form-wizard.container action="{{route('admin.raids.store')}}" modelId="{{!is_null($raid) ? $raid->id : 0}}" lastTab="tab-style-2-5">
                 <x-core.form-wizard.tabs>

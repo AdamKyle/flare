@@ -24,17 +24,21 @@ class RaidsTable extends DataTableComponent {
 
     public function columns(): array {
         return [
-            Column::make('Name')->searchable(),
+            Column::make('Name')->searchable()->format(function ($value) {
+                $raid = Raid::where('name', $value)->first();
+
+                return '<a href="/information/raids/'. $raid->id.'">  <i class="fas fa-external-link-alt"></i> '.$raid->name . '</a>';
+            })->html(),
 
             Column::make('Raid Boss', 'raid_boss_id')->format(function ($value) {
                 $monster = Monster::find($value);
 
-                return '<a href="/information/monster/'. $monster->id.'" target="_blank">  <i class="fas fa-external-link-alt"></i> '.$monster->name . '</a>';
+                return '<a href="/information/monster/'. $monster->id.'">  <i class="fas fa-external-link-alt"></i> '.$monster->name . '</a>';
             })->html(),
             Column::make('Raid Boss Location', 'raid_boss_location_id')->format(function ($value) {
                 $location = Location::find($value);
 
-                return '<a href="/information/location/'. $location->id.'" target="_blank">  <i class="fas fa-external-link-alt"></i> '.$location->name . '</a>';
+                return '<a href="/information/location/'. $location->id.'">  <i class="fas fa-external-link-alt"></i> '.$location->name . '</a>';
             })->html(),
             Column::make('Has Corrupted Locations', 'corrupted_location_ids')->format(function ($value, $row) {
                 $raid = Raid::where('name', $row->name)->first();

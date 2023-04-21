@@ -24,4 +24,12 @@ class Raid extends Model {
         'raid_monster_ids'       => 'array',
         'corrupted_location_ids' => 'array',
     ];
+
+    public function raidBoss() {
+        return $this->hasOne(Monster::class, 'id', 'raid_boss_id');
+    }
+
+    public function raidBossLocation() {
+        return $this->hasOne(Location::class, 'id', 'raid_boss_location_id');
+    }
 }

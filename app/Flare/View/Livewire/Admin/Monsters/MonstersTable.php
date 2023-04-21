@@ -7,7 +7,6 @@ use App\Flare\Models\Monster;
 use Illuminate\Database\Eloquent\Builder;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Column;
-use App\Flare\Models\Item;
 use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 
 class MonstersTable extends DataTableComponent {
@@ -17,10 +16,12 @@ class MonstersTable extends DataTableComponent {
     }
 
     public function builder(): Builder {
+
         return Monster::query();
     }
 
     public function filters(): array {
+
         return [
             SelectFilter::make('Maps')
                 ->options([
