@@ -39,3 +39,8 @@ require('./game/admin/statistics-dashboard');
  */
 require('./game/admin/info-management/info-management-init');
 
+/**
+ * Renders the event calendar for the admin to manage.
+ */
+require('./game/admin/calendar');
+

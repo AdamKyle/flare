@@ -46,7 +46,7 @@
                 <span class="fas fa-list"></span>
                 Raid Events
             </a>
-            <a href="#">
+            <a href="{{route('admin.events')}}">
                 <span class="fas fa-list"></span>
                 Event Scheduler
             </a>

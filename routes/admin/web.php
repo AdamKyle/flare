@@ -205,4 +205,5 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::post('/admin/raids/store', ['as' => 'admin.raids.store', 'uses' => 'RaidsController@store']);
 
     Route::get('/admin/statistics/dashboard', ['as' => 'admin.statistics', 'uses' => 'StatisticsController@index']);
+    Route::get('/admin/events', ['as' => 'admin.events', 'uses' => 'EventScheduleController@index']);
 });
