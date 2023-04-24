@@ -15,6 +15,7 @@ export default class EventSchedulerEditor extends React.Component<any, any> {
 
         this.state = {
             selected_event_type: null,
+            event_description: null,
             selected_start_date: setHours(setMinutes(new Date(), 0), 9),
             selected_end_date: setHours(setMinutes(new Date(), 0), 9),
         }
@@ -30,8 +31,10 @@ export default class EventSchedulerEditor extends React.Component<any, any> {
         });
     }
 
-    setDescription(event: any) {
-        console.log(event);
+    setDescription(event: React.ChangeEvent<HTMLTextAreaElement>) {
+        this.setState({
+            event_description: event.target.value,
+        });
     }
 
     setStartDate(date: Date | null) {
@@ -96,7 +99,8 @@ export default class EventSchedulerEditor extends React.Component<any, any> {
 
     render() {
         return (
-            <div className='w-[500px] p-[1rem]'>
+            <div className='w-[500px] p-[1rem] dark:bg-gray-800'>
+                <h4 className='my-4 font-bold text-blue-600'>Manage Event</h4>
                 <Select
                     onChange={this.setEventType.bind(this)}
                     options={this.optionsForEventType()}
@@ -124,13 +128,13 @@ export default class EventSchedulerEditor extends React.Component<any, any> {
                 }
 
                 <div className='my-4'>
-                    <div className='my-3'><strong>Description</strong></div>
-                    <textarea rows={5} cols={45} onChange={this.setDescription.bind(this)} className='border-2 border-gray-300'/>
+                    <div className='my-3 dark:text-gray-300'><strong>Description</strong></div>
+                    <textarea rows={5} cols={45} onChange={this.setDescription.bind(this)} className='border-2 border-gray-300 p-4'/>
                 </div>
 
                 <div className='grid md:grid-cols-2 gap-2 mb-8'>
                     <div className='my-4'>
-                        <div className='my-3'><strong>Start Date (and time)</strong></div>
+                        <div className='my-3 dark:text-gray-300'><strong>Start Date (and time)</strong></div>
                         <DatePicker
                             selected={this.state.selected_start_date}
                             onChange={(date) => this.setStartDate(date)}
@@ -143,7 +147,7 @@ export default class EventSchedulerEditor extends React.Component<any, any> {
                     </div>
 
                     <div className='my-4'>
-                        <div className='my-3'><strong>End Date (and time)</strong></div>
+                        <div className='my-3 dark:text-gray-300'><strong>End Date (and time)</strong></div>
                         <DatePicker
                             selected={this.state.selected_end_date}
                             onChange={(date) => this.setEndDate(date)}
