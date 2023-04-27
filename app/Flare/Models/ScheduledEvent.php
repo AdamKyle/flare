@@ -4,7 +4,7 @@ namespace App\Flare\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ScheduledEvents extends Model {
+class ScheduledEvent extends Model {
 
     /**
      * The attributes that are mass assignable.

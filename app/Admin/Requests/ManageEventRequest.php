@@ -7,7 +7,7 @@ use Illuminate\Foundation\Http\FormRequest;
 /**
  * @codeCoverageIgnore
  */
-class CreateEventRequest extends FormRequest
+class ManageEventRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

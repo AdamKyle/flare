@@ -18,4 +18,6 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
 
     Route::get('/admin/event-calendar/fetch-events', ['uses' => 'Api\EventScheduleController@index']);
     Route::post('/admin/create-new-event', ['uses' => 'Api\EventScheduleController@createEvent']);
+    Route::post('/admin/update-event/{scheduledEvent}', ['uses' => 'Api\EventScheduleController@updateEvent']);
+    Route::post('/admin/delete-event', ['uses' => 'Api\EventScheduleController@deleteEvent']);
 });

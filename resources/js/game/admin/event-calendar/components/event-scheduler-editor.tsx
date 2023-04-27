@@ -42,7 +42,13 @@ export default class EventSchedulerEditor extends React.Component<any, any> {
             is_saving: true,
         });
 
-        (new Ajax).setRoute('admin/create-new-event').setParameters(this.state.form_data).doAjaxCall('post',
+        let route = 'admin/create-new-event';
+
+        if (typeof this.props.scheduler.edited !== 'undefined') {
+            route = 'admin/update-event/' + this.props.scheduler.edited.id;
+        }
+
+        (new Ajax).setRoute(route).setParameters(this.state.form_data).doAjaxCall('post',
             (result: AxiosResponse) => {
                 this.props.scheduler.close();
             }, (error: AxiosError) => {
@@ -66,7 +72,6 @@ export default class EventSchedulerEditor extends React.Component<any, any> {
             form_data: formData
         });
     }
-
 
     render() {
         return (

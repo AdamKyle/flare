@@ -186,7 +186,6 @@ export default class DuelPlayer extends React.Component<DuelPlayerProps, DuelPla
     }
 
     render() {
-        console.log(this.props, this.state);
         return (
             <div className='mt-2 md:ml-[120px]'>
                 {

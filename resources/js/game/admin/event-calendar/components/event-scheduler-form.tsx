@@ -20,7 +20,6 @@ export default class EventSchedulerForm extends React.Component<any, any> {
     componentDidMount() {
 
         if (typeof this.props.event_data !== 'undefined') {
-            console.log(this.props.event_data);
             this.setState({
                 selected_event_type: this.props.event_data.event_type,
                 event_description: this.props.event_data.description,

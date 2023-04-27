@@ -2,10 +2,12 @@
 
 namespace App\Admin\Controllers\Api;
 
+use App\Admin\Requests\DeleteEventRequest;
 use App\Flare\Models\Raid;
+use App\Flare\Models\ScheduledEvent;
 use App\Flare\Services\EventSchedulerService;
 use App\Http\Controllers\Controller;
-use App\Admin\Requests\CreateEventRequest;
+use App\Admin\Requests\ManageEventRequest;
 
 class EventScheduleController extends Controller {
 
@@ -25,8 +27,26 @@ class EventScheduleController extends Controller {
         ]);
     }
 
-    public function createEvent(CreateEventRequest $request) {
+    public function createEvent(ManageEventRequest $request) {
         $result = $this->eventSchedulerService->createEvent($request->all());
+
+        $status = $result['status'];
+        unset($result['status']);
+
+        return response()->json($result, $status);
+    }
+
+    public function updateEvent(ManageEventRequest $request, ScheduledEvent $scheduledEvent)  {
+        $result = $this->eventSchedulerService->updateEvent($request->all(), $scheduledEvent);
+
+        $status = $result['status'];
+        unset($result['status']);
+
+        return response()->json($result, $status);
+    }
+
+    public function deleteEvent(DeleteEventRequest $request) {
+        $result = $this->eventSchedulerService->deleteEvent($request->event_id);
 
         $status = $result['status'];
         unset($result['status']);

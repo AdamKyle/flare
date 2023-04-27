@@ -10,8 +10,6 @@ export default class EventSchedule extends React.Component<any, any> {
 
     private updateScheduledEvents: any;
 
-    private calendarRef: React.RefObject<SchedulerRef>;
-
     constructor(props: any) {
         super(props);
 
@@ -24,7 +22,6 @@ export default class EventSchedule extends React.Component<any, any> {
 
         // @ts-ignore
         this.updateScheduledEvents = Echo.join('update-event-schedule');
-        this.calendarRef           = React.createRef<SchedulerRef>();
     }
 
     componentDidMount() {
@@ -45,18 +42,41 @@ export default class EventSchedule extends React.Component<any, any> {
             });
 
         this.updateScheduledEvents.listen('Flare.Events.UpdateScheduledEvents', (event: any) => {
+            // We have to do this for the calendar to update when a new event is created and added to the calendar.
+            // If we don't the calendar does not properly update, calling forceUpdate, doesn't work.
             this.setState({
-                events: event.eventData
+                loading: true
+            }, () => {
+                this.setState({
+                    events: event.eventData.map((event: any) => {
+                        event.start = new Date(event.start);
+                        event.end   = new Date(event.end);
+
+                        return event;
+                    }),
+                    loading: false,
+                });
             });
+
         });
     }
 
-    deleteEvent(event: any) {
+    deleteEvent(eventId: number) {
         this.setState({
             deleting: true,
-        })
-
-        console.log(event);
+        }, () => {
+            (new Ajax).setRoute('admin/delete-event').setParameters({
+                event_id: eventId,
+            }).doAjaxCall('post',
+                (result: AxiosResponse) => {
+                    this.setState({
+                        deleting: false,
+                    });
+                },
+                (error: AxiosError) => {
+                    console.error(error);
+                });
+        });
     }
 
     render() {

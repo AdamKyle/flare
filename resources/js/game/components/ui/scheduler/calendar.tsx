@@ -14,7 +14,6 @@ export default class Calendar extends React.Component<any, any> {
                        customEditor={this.props.customEditor}
                        viewerExtraComponent={this.props.viewerExtraComponent}
                        onDelete={this.props.onDelete}
-                       ref={this.props.ref}
             />
         )
     }
