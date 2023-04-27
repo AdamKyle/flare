@@ -13,8 +13,32 @@ export default class EventSchedulerForm extends React.Component<any, any> {
             event_description: null,
             selected_raid: null,
             selected_start_date: setHours(setMinutes(new Date(), 0), 9),
-            selected_end_date: setHours(setMinutes(new Date(), 0), 9),
+            selected_end_date: null,
         }
+    }
+
+    componentDidMount() {
+
+        if (typeof this.props.event_data !== 'undefined') {
+            console.log(this.props.event_data);
+            this.setState({
+                selected_event_type: this.props.event_data.event_type,
+                event_description: this.props.event_data.description,
+                selected_raid: this.props.event_data.raid_id,
+                selected_start_date: new Date(this.props.event_data.start),
+                selected_end_date: new Date(this.props.event_data.end),
+            });
+
+            return;
+        }
+
+        let endDate = setHours(setMinutes(new Date(), 0), 9);
+
+        endDate = new Date(endDate.setDate(endDate.getDate() + 1));
+
+        this.setState({
+            selected_end_date: endDate
+        });
     }
 
     setEventType(data: any) {
@@ -137,6 +161,10 @@ export default class EventSchedulerForm extends React.Component<any, any> {
         return currentDate.getTime() < selectedDate.getTime();
     };
 
+    filterEndDates(date: any) {
+        return date > this.state.selected_start_date;
+    }
+
     render() {
         return (
             <Fragment>
@@ -168,7 +196,7 @@ export default class EventSchedulerForm extends React.Component<any, any> {
 
                 <div className='my-4'>
                     <div className='my-3 dark:text-gray-300'><strong>Description</strong></div>
-                    <textarea rows={5} cols={45} onChange={this.setDescription.bind(this)} className='border-2 border-gray-300 p-4'/>
+                    <textarea rows={5} cols={45} onChange={this.setDescription.bind(this)} className='border-2 border-gray-300 p-4' value={this.state.event_description} />
                 </div>
 
                 <div className='grid md:grid-cols-2 gap-2 mb-8'>
@@ -192,6 +220,7 @@ export default class EventSchedulerForm extends React.Component<any, any> {
                             onChange={(date) => this.setEndDate(date)}
                             showTimeSelect
                             filterTime={this.filterPassedTime.bind(this)}
+                            filterDate={this.filterEndDates.bind(this)}
                             dateFormat="MMMM d, yyyy h:mm aa"
                             className={'border-2 border-gray-300 rounded-md p-2'}
                             withPortal

@@ -17,4 +17,5 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::post('/admin/info-section/delete-page', ['uses' => 'Api\InformationController@deletePage']);
 
     Route::get('/admin/event-calendar/fetch-events', ['uses' => 'Api\EventScheduleController@index']);
+    Route::post('/admin/create-new-event', ['uses' => 'Api\EventScheduleController@createEvent']);
 });

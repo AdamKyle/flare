@@ -64,6 +64,7 @@ use App\Flare\Services\CharacterDeletion;
 use App\Flare\Services\CharacterRewardService;
 use App\Flare\Services\CharacterXPService;
 use App\Flare\Services\DailyGoldDustService;
+use App\Flare\Services\EventSchedulerService;
 use App\Flare\Transformers\BasicKingdomTransformer;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
@@ -484,6 +485,10 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(ReductionsBuilder::class),
                 $app->make(ElementalAtonement::class)
             );
+        });
+
+        $this->app->bind(EventSchedulerService::class, function() {
+           return new EventSchedulerService();
         });
     }
 

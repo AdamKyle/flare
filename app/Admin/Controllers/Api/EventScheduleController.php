@@ -2,24 +2,35 @@
 
 namespace App\Admin\Controllers\Api;
 
-use App\Admin\Requests\SilenceUserRequest;
 use App\Flare\Models\Raid;
+use App\Flare\Services\EventSchedulerService;
 use App\Http\Controllers\Controller;
-use App\Flare\Models\User;
-use App\Admin\Events\UpdateAdminChatEvent;
-use App\Admin\Requests\BanUserRequest;
-use App\Admin\Services\UserService;
-use App\Game\Messages\Models\Message;
-use Facades\App\Admin\Formatters\MessagesFormatter;
+use App\Admin\Requests\CreateEventRequest;
 
 class EventScheduleController extends Controller {
+
+    private EventSchedulerService $eventSchedulerService;
+
+    public function __construct(EventSchedulerService $eventSchedulerService) {
+        $this->eventSchedulerService = $eventSchedulerService;
+    }
 
 
     public function index() {
         $raids = Raid::select('name', 'id')->get()->toArray();
 
         return response()->json([
-            'raids' => $raids
+            'raids'  => $raids,
+            'events' => $this->eventSchedulerService->fetchEvents(),
         ]);
+    }
+
+    public function createEvent(CreateEventRequest $request) {
+        $result = $this->eventSchedulerService->createEvent($request->all());
+
+        $status = $result['status'];
+        unset($result['status']);
+
+        return response()->json($result, $status);
     }
 }
