@@ -10,7 +10,7 @@ export default class EventSchedulerForm extends React.Component<any, any> {
 
         this.state = {
             selected_event_type: null,
-            event_description: null,
+            event_description: '',
             selected_raid: null,
             selected_start_date: setHours(setMinutes(new Date(), 0), 9),
             selected_end_date: null,

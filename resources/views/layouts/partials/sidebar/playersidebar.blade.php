@@ -22,6 +22,10 @@
             <span class="icon fas fa-chart-area"></span>
             <span class="title">Tops</span>
         </a>
+        <a href="{{route('game.event.calendar')}}" class="link" data-toggle="tooltip-menu" data-tippy-content="Events">
+            <span class="icon far fa-calendar-alt"></span>
+            <span class="title">Event Calendar</span>
+        </a>
     </div>
 
     <!-- Character -->

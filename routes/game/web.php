@@ -22,8 +22,9 @@ Route::middleware([
     // Core routes for the game related stuff:
     Route::get('/game', ['as' => 'game', 'uses' => 'GameController@game']);
 
-
     Route::get('/game/character/sheet', ['as' => 'game.character.sheet', 'uses' => 'CharacterSheetController@index']);
+
+    Route::get('/game/event-calendar', ['as' => 'game.event.calendar', 'uses' => 'EventCalendarController@index']);
 
     Route::middleware(['is.character.exploring'])->group(function() {
         Route::get('/game/character/inventory/compare/{character}', ['as' => 'game.inventory.compare', 'uses' => 'CharacterInventoryController@compare']);
