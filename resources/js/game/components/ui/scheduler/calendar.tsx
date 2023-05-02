@@ -2,7 +2,7 @@ import React from "react";
 import { Scheduler } from "@aldabil/react-scheduler";
 import SchedulerProps from "./types/scheduler-props";
 
-export default class Calendar extends React.Component<SchedulerProps, any> {
+export default class Calendar extends React.Component<SchedulerProps, {}> {
 
     constructor(props: SchedulerProps) {
         super(props);
@@ -10,12 +10,16 @@ export default class Calendar extends React.Component<SchedulerProps, any> {
 
     render() {
 
-        if (typeof this.props.customEditor === 'undefined') {
+        if (!this.props.can_edit) {
             return (
                 <Scheduler view={this.props.view}
                            events={this.props.events}
                            viewerExtraComponent={this.props.viewerExtraComponent}
+                           customEditor={this.props.customEditor}
                            editable={false}
+                           deletable={false}
+                           disableViewNavigator={true}
+                           draggable={false}
                 />
             )
         }

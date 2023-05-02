@@ -5,6 +5,8 @@ Route::post('/character-timeout', ['uses' => 'Api\CharacterSheetController@globa
 Route::group(['middleware' => ['auth']], function() {
     Route::get('/ranked-fight-tops', ['uses' => 'Api\RankTopsController@loadRankTops']);
     Route::get('/rank-fight-tops-list', ['uses' => 'Api\RankTopsController@loadSpecificTop']);
+
+    Route::get('/calendar/events', ['uses' => 'Api\EventCalendarController@loadEvents']);
 });
 
 Route::group(['middleware' => ['is.character.who.they.say.they.are']], function() {

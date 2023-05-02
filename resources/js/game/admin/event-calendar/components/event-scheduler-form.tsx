@@ -2,10 +2,12 @@ import React, {Fragment} from "react";
 import Select from "react-select";
 import DatePicker from "react-datepicker";
 import {setHours, setMinutes} from "date-fns";
+import EventSchedulerFormState from "../types/components/event-scheduler-form-state";
+import EventSchedulerFormProps from "../types/components/event-scheduler-form-props";
 
-export default class EventSchedulerForm extends React.Component<any, any> {
+export default class EventSchedulerForm extends React.Component<EventSchedulerFormProps, EventSchedulerFormState> {
 
-    constructor(props: any) {
+    constructor(props: EventSchedulerFormProps) {
         super(props);
 
         this.state = {
@@ -60,7 +62,7 @@ export default class EventSchedulerForm extends React.Component<any, any> {
         });
     }
 
-    setStartDate(date: Date | null) {
+    setStartDate(date: Date) {
         this.setState({
             selected_start_date: date,
         }, () => {
@@ -68,7 +70,7 @@ export default class EventSchedulerForm extends React.Component<any, any> {
         });
     }
 
-    setEndDate(date: Date | null) {
+    setEndDate(date: Date) {
         this.setState({
             selected_end_date: date,
         }, () => {
@@ -160,7 +162,7 @@ export default class EventSchedulerForm extends React.Component<any, any> {
         return currentDate.getTime() < selectedDate.getTime();
     };
 
-    filterEndDates(date: any) {
+    filterEndDates(date: Date) {
         return date > this.state.selected_start_date;
     }
 
@@ -203,7 +205,7 @@ export default class EventSchedulerForm extends React.Component<any, any> {
                         <div className='my-3 dark:text-gray-300'><strong>Start Date (and time)</strong></div>
                         <DatePicker
                             selected={this.state.selected_start_date}
-                            onChange={(date) => this.setStartDate(date)}
+                            onChange={(date) => date !== null ? this.setStartDate(date) : null}
                             showTimeSelect
                             filterTime={this.filterPassedTime.bind(this)}
                             dateFormat="MMMM d, yyyy h:mm aa"
@@ -216,7 +218,7 @@ export default class EventSchedulerForm extends React.Component<any, any> {
                         <div className='my-3 dark:text-gray-300'><strong>End Date (and time)</strong></div>
                         <DatePicker
                             selected={this.state.selected_end_date}
-                            onChange={(date) => this.setEndDate(date)}
+                            onChange={(date) => date !== null ? this.setEndDate(date) : null}
                             showTimeSelect
                             filterTime={this.filterPassedTime.bind(this)}
                             filterDate={this.filterEndDates.bind(this)}

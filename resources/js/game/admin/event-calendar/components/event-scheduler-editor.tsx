@@ -7,10 +7,13 @@ import LoadingProgressBar from "../../../components/ui/progress-bars/loading-pro
 import EventSchedulerForm from "./event-scheduler-form";
 import {AxiosError, AxiosResponse} from "axios";
 import Ajax from "../../../lib/ajax/ajax";
+import EventForm from "../deffinitions/components/event-form";
+import EventSchedulerEditorProps from "../types/components/event-scheduler-editor-props";
+import EventSchedulerEditorState from "../types/components/event-scheduler-editor-state";
 
-export default class EventSchedulerEditor extends React.Component<any, any> {
+export default class EventSchedulerEditor extends React.Component<EventSchedulerEditorProps, EventSchedulerEditorState> {
 
-    constructor(props: any) {
+    constructor(props: EventSchedulerEditorProps) {
         super(props);
 
         this.state = {
@@ -67,7 +70,7 @@ export default class EventSchedulerEditor extends React.Component<any, any> {
         this.props.scheduler.close();
     }
 
-    updateParentData(formData: any) {
+    updateParentData(formData: EventForm) {
         this.setState({
             form_data: formData
         });

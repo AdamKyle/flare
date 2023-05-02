@@ -1,0 +1,12 @@
+import Event from "../../../../components/ui/scheduler/deffinitions/event";
+import Raid from "../../../../components/ui/scheduler/deffinitions/raid";
+import EventForm from "../../deffinitions/components/event-form";
+import {ProcessedEvent} from "@aldabil/react-scheduler/types";
+
+export default interface EventSchedulerFormProps {
+    event_data: ProcessedEvent | undefined;
+
+    update_parent: (formData: EventForm) => void;
+
+    raids: Raid[]|[];
+}

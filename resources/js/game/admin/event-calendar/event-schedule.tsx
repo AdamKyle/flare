@@ -1,4 +1,4 @@
-import React, {Fragment} from "react";
+import React from "react";
 import Calendar from "../../components/ui/scheduler/calendar";
 import EventSchedulerEditor from "./components/event-scheduler-editor";
 import {FieldProps, ProcessedEvent, SchedulerHelpers} from "@aldabil/react-scheduler/types";
@@ -6,7 +6,6 @@ import Ajax from "../../lib/ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
 import LoadingProgressBar from "../../components/ui/progress-bars/loading-progress-bar";
 import EventScheduleState from "./types/event-schedule-state";
-import Event from "../../components/ui/scheduler/deffinitions/event";
 import EventView from "../../components/ui/scheduler/event-view";
 
 export default class EventSchedule extends React.Component<{}, EventScheduleState> {
@@ -106,6 +105,7 @@ export default class EventSchedule extends React.Component<{}, EventScheduleStat
                              <EventView event={event} deleting={this.state.deleting} />
                          }
                          onDelete={this.deleteEvent.bind(this)}
+                         can_edit={true}
         />
     }
 }

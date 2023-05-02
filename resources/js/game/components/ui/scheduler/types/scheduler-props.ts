@@ -8,6 +8,7 @@ export default interface SchedulerProps {
     viewerExtraComponent?: (fields: FieldProps[]|[], event: ProcessedEvent) => JSX.Element;
     onDelete?: (eventId: number) => Promise<string | number | void>
     view: View;
+    can_edit: boolean;
 }
 
 type RaidsForSelection = {

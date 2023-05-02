@@ -25,6 +25,11 @@ require('./game/game-launcher');
 require('./game/tops/rank-fight-tops-component');
 
 /**
+ * Load the event calendar for the player.
+ */
+require('./game/event-calendar/calendar-component');
+
+/**
  * When the administrator is logged in, load their chat.
  */
 require('./game/admin/admin-chat');
