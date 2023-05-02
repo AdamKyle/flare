@@ -1,0 +1,14 @@
+/**
+ * These classes are overrides for the existing calendar component.
+ */
+
+
+/*
+
+  Makes it so that the day header on the calendar sits below all other elements.
+  the default is 999, which interfears with the sidebar.
+
+*/
+.css-e572m3 {
+    z-index: 0 !important;
+}
