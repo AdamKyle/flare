@@ -122,7 +122,7 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
                 }
             });
         }, (error: AxiosError) => {
-
+            console.error(error);
         })
 
         // @ts-ignore

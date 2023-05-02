@@ -27,7 +27,7 @@ class FetchMessagesController extends Controller {
      */
     public function fetchChatMessages(): JsonResponse {
         return response()->json([
-            'chat_message'  => $this->fetchMesages->fetchMessages(),
+            'chat_messages' => $this->fetchMesages->fetchMessages(),
             'announcements' => Announcement::orderByDesc('id')->get()->transform(function($announcement) {
                 $announcement->expires_at_formatted = (new Carbon($announcement->expires_at))->format('l, j \of F \a\t h:ia \G\M\TP');
 
