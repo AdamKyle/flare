@@ -24,7 +24,7 @@
                                 <h3 class="mb-3">Basic Item Info</h3>
                                 <x-core.forms.input :model="$monster" label="Name:" modelKey="name" name="name" type="text"/>
                                 <x-core.forms.input :model="$monster" label="Max Level:" modelKey="max_level" name="max_level" />
-                                <x-core.forms.collection-select :model="$monster" label="Live on map:" modelKey="game_map_id" name="game_map_id" value="id" key="name" :options="$gameMaps" />
+                                <x-core.forms.collection-select :model="$monster" label="Lives on map:" modelKey="game_map_id" name="game_map_id" value="id" key="name" :options="$gameMaps" />
                                 <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                                 <h3 class="mb-3">Stat Info</h3>
                                 <x-core.forms.select :model="$monster" label="Damage Stat:" modelKey="damage_stat" name="damage_stat" :options="['str', 'dex', 'agi', 'dur', 'int', 'chr', 'focus']" />

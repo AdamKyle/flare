@@ -5,7 +5,6 @@ import LoadingProgressBar from "../components/ui/progress-bars/loading-progress-
 import {FieldProps, ProcessedEvent, SchedulerHelpers} from "@aldabil/react-scheduler/types";
 import EventView from "../components/ui/scheduler/event-view";
 import EventCalendar from "../components/ui/scheduler/calendar";
-import EventSchedulerModal from "./components/event-scheduler-modal";
 import CalendarState from "./types/calendar-state";
 
 export default class Calendar extends React.Component<{}, CalendarState> {
@@ -70,7 +69,6 @@ export default class Calendar extends React.Component<{}, CalendarState> {
                          viewerExtraComponent={(fields: FieldProps[]|[], event: ProcessedEvent) =>
                              <EventView event={event} deleting={false} />
                          }
-                         customEditor={(scheduler: SchedulerHelpers) =>  <EventSchedulerModal scheduler={scheduler} />}
                          can_edit={false}
         />
     }

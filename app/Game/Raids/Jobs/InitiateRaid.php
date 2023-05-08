@@ -6,6 +6,8 @@ use App\Flare\Models\Event;
 use App\Flare\Models\Location;
 use App\Flare\Models\Raid;
 use App\Flare\Values\EventType;
+use App\Game\Maps\Services\LocationService;
+use App\Game\Raids\Events\CorruptLocations;
 use Facades\App\Game\Core\Handlers\AnnouncementHandler;
 use App\Game\Core\Traits\UpdateMarketBoard;
 use App\Game\Messages\Events\GlobalMessageEvent;
@@ -41,15 +43,16 @@ class InitiateRaid implements ShouldQueue {
     }
 
     /**
+     * @param LocationService $locationService
      * @return void
      */
-    public function handle(): void {
+    public function handle(LocationService $locationService): void {
 
         if (empty($this->raidStory)) {
 
             $raid = Raid::find($this->raidId);
 
-            $this->corruptLocations($raid);
+            $this->initializeRaid($raid, $locationService);
 
             return;
         }
@@ -59,7 +62,15 @@ class InitiateRaid implements ShouldQueue {
         InitiateRaid::dispatch($this->raidId, $this->raidStory)->delay(now()->addSeconds(30));
     }
 
-    private function corruptLocations(Raid $raid): void {
+    private function corruptLocations(Raid $raid, LocationService $locationService): void {
+        event(new CorruptLocations($locationService->fetchCorruptedLocationData($raid)->toArray()));
+    }
+
+    private function initializeRaidBoss(Raid $raid): void {
+
+    }
+
+    private function initializeRaid(Raid $raid, LocationService $locationService): void {
         if (empty($raid->corrupted_location_ids)) {
             return;
         }
@@ -97,8 +108,11 @@ class InitiateRaid implements ShouldQueue {
             'raid_id'     => $raid->id,
         ]);
 
+        $this->corruptLocations($raid, $locationService);
+
         event(new GlobalMessageEvent('Raid has started! and will end on: ' . $formattedDate));
 
         AnnouncementHandler::createAnnouncement('raid_announcement');
+
     }
 }

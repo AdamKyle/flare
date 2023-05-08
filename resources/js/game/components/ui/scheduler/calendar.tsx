@@ -1,6 +1,7 @@
 import React from "react";
 import { Scheduler } from "@aldabil/react-scheduler";
 import SchedulerProps from "./types/scheduler-props";
+import {Button} from "@mui/material";
 
 export default class Calendar extends React.Component<SchedulerProps, {}> {
 
@@ -20,6 +21,22 @@ export default class Calendar extends React.Component<SchedulerProps, {}> {
                            deletable={false}
                            disableViewNavigator={true}
                            draggable={false}
+                           month={{
+                               weekDays: [0, 1, 2, 3, 4, 5, 6],
+                               weekStartOn: 6,
+                               startHour: 0,
+                               endHour: 23,
+                               cellRenderer: ({ height, start, onClick, ...props }) => {
+                                   return(
+                                       <Button
+                                           style={{
+                                               height: "100%",
+                                               cursor: "not-allowed",
+                                           }}
+                                       ></Button>
+                                   )
+                               }
+                           }}
                 />
             )
         }

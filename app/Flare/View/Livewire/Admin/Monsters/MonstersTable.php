@@ -25,30 +25,61 @@ class MonstersTable extends DataTableComponent {
         return [
             SelectFilter::make('Maps')
                 ->options([
-                    ''                        => 'Please Select',
-                    'Surface'                 => 'Surface',
-                    'Labyrinth'               => 'Labyrinth',
-                    'Dungeons'                => 'Dungeons',
-                    'Shadow Plane'            => 'Shadow Plane',
-                    'Hell'                    => 'Hell',
-                    'Purgatory'               => 'Purgatory',
-                    'Surface Celestials'      => 'Surface Celestials',
-                    'Labyrinth Celestials'    => 'Labyrinth Celestials',
-                    'Dungeons Celestials'     => 'Dungeons Celestials',
-                    'Shadow Plane Celestials' => 'Shadow Planes Celestials',
-                    'Purgatory Celestials'    => 'Purgatory Celestials',
+                    ''                            => 'Please Select',
+                    'Surface'                     => 'Surface',
+                    'Labyrinth'                   => 'Labyrinth',
+                    'Dungeons'                    => 'Dungeons',
+                    'Shadow Plane'                => 'Shadow Plane',
+                    'Hell'                        => 'Hell',
+                    'Purgatory'                   => 'Purgatory',
+                    'Surface Celestials'          => 'Surface Celestials',
+                    'Labyrinth Celestials'        => 'Labyrinth Celestials',
+                    'Dungeons Celestials'         => 'Dungeons Celestials',
+                    'Shadow Plane Celestials'     => 'Shadow Planes Celestials',
+                    'Purgatory Celestials'        => 'Purgatory Celestials',
+                    'Surface Raid Bosses'         => 'Surface Raid Bosses',
+                    'Labyrinth Raid Bosses'       => 'Labyrinth Raid Bosses',
+                    'Dungeons Raid Bosses'        => 'Dungeons Raid Bosses',
+                    'Shadow Plane Raid Bosses'    => 'Shadow Plane Raid Bosses',
+                    'Hell Raid Bosses'            => 'Hell Raid Bosses',
+                    'Purgatory Raid Bosses'       => 'Purgatory Raid Bosses',
+                    'Surface Raid Monsters'       => 'Surface Raid Monsters',
+                    'Labyrinth Raid Monsters'     => 'Labyrinth Raid Monsters',
+                    'Dungeons Raid Monsters'      => 'Dungeons Raid Monsters',
+                    'Shadow Plane Raid Monsters'  => 'Shadow Plane Raid Monsters',
+                    'Hell Raid Monsters'          => 'Hell Raid Monsters',
+                    'Purgatory Raid Monsters'     => 'Purgatory Raid Monsters',
                 ])->filter(function(Builder $builder, string $value) {
-                    $celestialType = false;
-
                     if (str_contains($value, 'Celestials')) {
-                        $celestialType = true;
 
-                        $gameMapId     = GameMap::where('name', trim(str_replace('Celestials', '', $value)))->first()->id;
-                    } else {
-                        $gameMapId     = GameMap::where('name', $value)->first()->id;
+                        $gameMapId = GameMap::where('name', trim(str_replace('Celestials', '', $value)))->first()->id;
+
+                        return $builder->where('game_map_id', $gameMapId)->where('is_celestial_entity', true);
                     }
 
-                    return $builder->where('game_map_id', $gameMapId)->where('is_celestial_entity', $celestialType);
+                    if (str_contains($value, 'Raid Bosses')) {
+
+                        $gameMapId = GameMap::where('name', trim(str_replace('Raid Bosses', '', $value)))->first()->id;
+
+                        dump($builder->where('game_map_id', $gameMapId)->where('is_raid_boss', true)->get());
+
+                        return $builder->where('game_map_id', $gameMapId)->where('is_raid_boss', true);
+                    }
+
+                    if (str_contains($value, 'Raid Monsters')) {
+
+                        $gameMapId = GameMap::where('name', trim(str_replace('Raid Monsters', '', $value)))->first()->id;
+
+                        dump($builder->where('game_map_id', $gameMapId)->where('is_raid_monster', true)->get());
+
+                        return $builder->where('game_map_id', $gameMapId)->where('is_raid_monster', true);
+                    }
+
+                    $gameMapId = GameMap::where('name', $value)->first()->id;
+
+                    return $builder->where('game_map_id', $gameMapId)
+                                   ->where('is_celestial_entity', false)
+                                   ->where('is_raid_boss', false);
                 }),
         ];
     }
@@ -65,6 +96,14 @@ class MonstersTable extends DataTableComponent {
                 }
 
                 return '<a href="/monsters/'. $monsterId.'" >'.$row->name . '</a>';
+            })->html(),
+            Column::make('Is Raid Boss', 'is_raid_boss')->searchable()->format(function ($value, $row) {
+
+                return $value ? 'Yes' : 'No';
+            })->html(),
+            Column::make('Is Raid Monster', 'is_raid_monster')->searchable()->format(function ($value, $row) {
+
+                return $value ? 'Yes' : 'No';
             })->html(),
             Column::make('Plane', 'gameMap.name')->searchable(),
 

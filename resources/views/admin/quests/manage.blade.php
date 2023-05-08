@@ -18,6 +18,7 @@
                     <x-core.form-wizard.content target="tab-style-2-1" isOpen="true">
                         <h3 class="mb-3">Basic Quest Info</h3>
                         <x-core.forms.input :model="$quest" label="Name:" modelKey="name" name="name" />
+                        <x-core.forms.key-value-select :model="$quest" label="Belongs To Raid (optional):" modelKey="raid_id" name="raid_id" :options="$raids" />
                         <x-core.forms.key-value-select :model="$quest" label="Belongs To NPC:" modelKey="npc_id" name="npc_id" :options="$npcs" />
                         <x-core.forms.quill-editor type="normal" :model="$quest" label="Before Completion text:" modelKey="before_completion_description" name="before_completion_description" quillId="before-completion-text"/>
                         <x-core.forms.quill-editor type="normal" :model="$quest" label="After Completion text:" modelKey="after_completion_description" name="after_completion_description" quillId="after-completion-text"/>

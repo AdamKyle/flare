@@ -2,11 +2,11 @@
 
 namespace App\Game\Maps\Services;
 
+use App\Flare\Models\Raid;
+use Storage;
+use Illuminate\Support\Collection;
 use App\Flare\Builders\Character\CharacterCacheData;
-use App\Flare\Events\UpdateCharacterAttackEvent;
 use App\Flare\Handlers\UpdateCharacterAttackTypes;
-use App\Flare\Jobs\CharacterAttackTypesCacheBuilderWithDeductions;
-use App\Flare\Models\Map;
 use App\Flare\Values\LocationEffectValue;
 use App\Flare\Values\LocationType;
 use App\Game\Battle\Events\UpdateCharacterStatus;
@@ -14,14 +14,10 @@ use App\Game\Maps\Events\UpdateDuelAtPosition;
 use App\Game\Maps\Events\UpdateLocationBasedCraftingOptions;
 use App\Game\Maps\Events\UpdateLocationBasedSpecialShops;
 use App\Game\Maps\Events\UpdateRankFights;
-use Illuminate\Support\Collection;
-use Storage;
-use League\Fractal\Manager;
 use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\Location;
-use App\Flare\Transformers\KingdomTransformer;
 use App\Flare\Models\CelestialFight;
 use App\Game\Maps\Services\Common\CanPlayerMassEmbezzle;
 use App\Game\Maps\Services\Common\LiveCharacterCount;
@@ -74,7 +70,7 @@ class LocationService {
      * @param Character $character
      * @return array
      */
-    public function getLocationData(Character $character): array {
+    public function getLocationData(Character $character, ?Raid $raid = null): array {
         $this->processLocation($character);
 
         $this->kingdomManagement($character);
@@ -100,7 +96,7 @@ class LocationService {
         return [
             'map_url'                => Storage::disk('maps')->url($character->map_url),
             'character_map'          => $character->map,
-            'locations'              => $this->fetchLocationData($character),
+            'locations'              => $this->fetchLocationData($character)->merge($this->fetchCorruptedLocationData($raid)),
             'can_move'               => $character->can_move,
             'can_move_again_at'      => $character->can_move_again_at,
             'coordinates'            => $this->coordinatesCache->getFromCache(),
@@ -137,9 +133,26 @@ class LocationService {
         event(new UpdateRankFights($character->user, false));
     }
 
-    protected function fetchLocationData(Character $character): Collection {
+    public function fetchLocationData(Character $character): Collection {
         $locations = Location::with('questRewardItem')->where('game_map_id', $character->map->game_map_id)->get();
 
+        return $this->transformLocationData($locations);
+    }
+
+
+    public function fetchCorruptedLocationData(?Raid $raid = null): Collection {
+
+        if (is_null($raid)) {
+            return collect();
+        }
+
+        $raidLocations = array_push($raid->corrupted_location_ids, $raid->raid_boss_location_id);
+        $locations     = Location::whereIn('id', $raidLocations)->get();
+
+        return $this->transformLocationData($locations);
+    }
+
+    protected function transformLocationData(Collection $locations): Collection {
         return $locations->transform(function($location) {
 
             $location->increases_enemy_stats_by      = null;

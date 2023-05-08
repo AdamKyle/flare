@@ -59,6 +59,7 @@ use App\Flare\ServerFight\Pvp\PvpAttack;
 use App\Flare\ServerFight\Pvp\SetUpFight;
 use App\Flare\Services\BuildCharacterAttackTypes;
 use App\Flare\Services\BuildMonsterCacheService;
+use App\Flare\Services\BuildQuestCacheService;
 use App\Flare\Services\CanUserEnterSiteService;
 use App\Flare\Services\CharacterDeletion;
 use App\Flare\Services\CharacterRewardService;
@@ -489,6 +490,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(EventSchedulerService::class, function() {
            return new EventSchedulerService();
+        });
+
+        $this->app->bind(BuildQuestCacheService::class, function() {
+            return new BuildQuestCacheService();
         });
     }
 

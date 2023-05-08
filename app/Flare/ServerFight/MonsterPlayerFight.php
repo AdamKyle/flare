@@ -350,7 +350,7 @@ class MonsterPlayerFight {
      * @param bool $isRankFight
      * @return bool
      */
-    protected function doAttack(ServerMonster $monster, array $health, bool $isPlayerVoided, bool $isEnemyVoided, bool $onlyOnce, bool $isRankFight = false): bool {
+    public function doAttack(ServerMonster $monster, array $health, bool $isPlayerVoided, bool $isEnemyVoided, bool $onlyOnce, bool $isRankFight = false): bool {
         $this->attack->setHealth($health)
             ->setIsCharacterVoided($isPlayerVoided)
             ->setIsEnemyVoided($isEnemyVoided)

@@ -2,7 +2,9 @@
 
 namespace App\Game\Quests\Controllers\Api;
 
+use App\Flare\Models\Event;
 use App\Flare\Models\PassiveSkill;
+use App\Flare\Services\BuildQuestCacheService;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Quests\Services\QuestHandlerService;
 use App\Game\Skills\Values\SkillTypeValue;
@@ -13,19 +15,23 @@ use App\Http\Controllers\Controller;
 
 class QuestsController extends Controller {
 
-    private $questHandler;
+    private QuestHandlerService $questHandler;
 
-    public function __construct(QuestHandlerService $questHandlerService) {
-        $this->questHandler = $questHandlerService;
+    private BuildQuestCacheService $buildQuestCacheService;
+
+    public function __construct(QuestHandlerService $questHandlerService, BuildQuestCacheService $buildQuestCacheService) {
+        $this->questHandler           = $questHandlerService;
+        $this->buildQuestCacheService = $buildQuestCacheService;
     }
 
     public function index(Character $character) {
 
-        $quests = Quest::where('is_parent', true)->with('childQuests')->get();
+        $eventWithRaid = Event::whereNotNull('raid_id')->first();
 
         return response()->json([
             'completed_quests' => $character->questsCompleted()->pluck('quest_id'),
-            'quests'           => $quests->toArray(),
+            'quests'           => $this->buildQuestCacheService->getRegularQuests(),
+            'event_quests'     => $this->buildQuestCacheService->fetchQuestsForRaid($eventWithRaid),
             'player_plane'     => $character->map->gameMap->name,
         ]);
     }
