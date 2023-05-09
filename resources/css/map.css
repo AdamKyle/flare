@@ -31,6 +31,17 @@
          }
     }
 
+    .location-corrupted-pin {
+        &:after {
+             font-family: 'Font Awesome\ 5 Free';
+             content: '\f714';
+             font-size: 16px;
+             color: #d99ea8;
+             top: -18px;
+             left: -6px;
+         }
+    }
+
     .kingdom-x-pin {
         &:after {
              font-family: 'RPGAwesome';

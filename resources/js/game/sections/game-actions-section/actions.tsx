@@ -36,11 +36,14 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
 
     private manageRankFights: any;
 
+    private raidMonsterUpdate: any;
+
     constructor(props: ActionsProps) {
         super(props);
 
         this.state = {
             monsters: [],
+            raid_monsters: [],
             characters_for_dueling: [],
             pvp_characters_on_map: [],
             attack_time_out: 0,
@@ -63,6 +66,9 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
 
         // @ts-ignore
         this.monsterUpdate = Echo.private('update-monsters-list-' + this.props.character.user_id);
+
+        // @ts-ignore
+        this.raidMonsterUpdate = Echo.private('update-raid-monsters-list-' + this.props.character.user_id);
 
         // @ts-ignore
         this.attackTimeOut = Echo.private('show-timeout-bar-' + this.props.character.user_id);
@@ -104,6 +110,12 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
         this.monsterUpdate.listen('Game.Maps.Events.UpdateMonsterList', (event: any) => {
             this.setState({
                 monsters: event.monsters,
+            });
+        });
+
+        this.raidMonsterUpdate.listen('Game.Maps.Events.UpdateRaidMonsters', (event: any) => {
+            this.setState({
+                raid_monsters: event.raidMonsters,
             });
         });
 
@@ -327,7 +339,7 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
                     </div>
                     <div className='md:col-start-2 md:col-span-3 mt-1'>
                         {
-                            !this.state.show_exploration && !this.state.show_duel_fight && !this.state.show_join_pvp && !this.state.show_celestial_fight ?
+                            !this.state.show_exploration && !this.state.show_duel_fight && !this.state.show_join_pvp && !this.state.show_celestial_fight && this.state.raid_monsters.length === 0 ?
                                 <MonsterActions monsters={this.state.monsters}
                                                 character={this.props.character}
                                                 character_statuses={this.props.character_status}
@@ -358,6 +370,12 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
                                             : null
                                     }
                                 </MonsterActions>
+                            : null
+                        }
+
+                        {
+                            !this.state.show_exploration && !this.state.show_duel_fight && !this.state.show_join_pvp && !this.state.show_celestial_fight && this.state.raid_monsters.length > 0 ?
+                                <p>Raid Stuff Here ... </p>
                             : null
                         }
 

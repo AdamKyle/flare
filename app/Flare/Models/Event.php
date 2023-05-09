@@ -27,4 +27,8 @@ class Event extends Model {
         'type' => 'integer',
         'raid_id' => 'integer',
     ];
+
+    public function raid() {
+        return $this->hasOne(Raid::class, 'id', 'raid_id');
+    }
 }

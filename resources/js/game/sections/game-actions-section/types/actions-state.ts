@@ -5,6 +5,8 @@ import DuelData from "../../../lib/game/types/core/duel-player/definitions/duel-
 export default interface ActionsState {
     monsters: MonsterType[]|[];
 
+    raid_monsters: RaidMonsters[]|[]
+
     characters_for_dueling: PvpCharactersType[]|[];
 
     pvp_characters_on_map: PvpCharactersType[]|[];
@@ -36,4 +38,9 @@ export default interface ActionsState {
     show_rank_fight: boolean;
 
     total_ranks: number;
+}
+
+type RaidMonsters = {
+    id: number;
+    name: string;
 }

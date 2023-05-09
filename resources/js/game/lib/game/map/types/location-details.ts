@@ -27,4 +27,6 @@ export default interface LocationDetails {
     type: string | null;
 
     type_name: string | null;
+
+    is_corrupted: boolean;
 }

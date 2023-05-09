@@ -81,10 +81,12 @@ class MapController extends Controller {
             return response()->json(['invalid input'], 429);
         }
 
-        $response = $this->walkingService->setCoordinatesToTravelTo(
+        $this->walkingService->setCoordinatesToTravelTo(
             $request->character_position_x,
             $request->character_position_y
-        )->movePlayerToNewLocation($character);
+        );
+
+        $response = $this->walkingService->movePlayerToNewLocation($character);
 
         $status = $response['status'];
 

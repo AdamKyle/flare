@@ -11,11 +11,13 @@ use App\Game\Maps\Events\UpdateMonsterList;
 use Illuminate\Support\Facades\Cache;
 use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\Character;
+use App\Flare\Models\Event;
 use App\Flare\Models\Item;
 use App\Flare\Models\Location;
 use App\Flare\Models\User;
 use App\Flare\Values\ItemEffectsValue;
 use App\Game\Battle\Services\ConjureService;
+use App\Game\Maps\Events\UpdateRaidMonsters;
 use App\Game\Maps\Values\MapPositionValue;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -296,6 +298,15 @@ class BaseMovementService {
      * @return void
      */
     protected function updateMonstersList(Character $character, ?Location $location = null): void {
+
+        $raidEvent = Event::whereNotNull('raid_id')->first();
+
+        if (!is_null($raidEvent)) {
+           event(new UpdateRaidMonsters($$raidEvent->raid->getMonstersForSelection(), $character->user));
+
+           return;
+        }
+
         $monsters = Cache::get('monsters')[$character->map->gameMap->name];
 
         if (!is_null($location)) {

@@ -15,6 +15,11 @@ Broadcast::channel('update-monsters-list-{userId}', function($user, $userId) {
     return $user->id === (int) $userId;
 });
 
+// When we update the raid monsters list based on location.
+Broadcast::channel('update-raid-monsters-list-{userId}', function($user, $userId) {
+    return $user->id === (int) $userId;
+});
+
 // When a user is traveling to another plane.
 Broadcast::channel('update-plane-{userId}', function($user, $userId) {
     return $user->id === (int) $userId;

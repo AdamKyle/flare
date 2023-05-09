@@ -13,11 +13,11 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 Use App\Flare\Models\User;
 use App\Flare\Models\Map;
 
-class UpdateMonsterList implements ShouldBroadcastNow
+class UpdateRaidMonsters implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels, KingdomCache, CanPlayerMassEmbezzle;
 
-    public array $monsters;
+    public array $raidMonsters;
 
     /**
      * @var User $user
@@ -31,10 +31,10 @@ class UpdateMonsterList implements ShouldBroadcastNow
      * @param Map $map
      * @param User $user
      */
-    public function __construct(array $monsters, User $user)
+    public function __construct(array $raidMonsters, User $user)
     {
-        $this->monsters = $monsters;
-        $this->user     = $user;
+        $this->raidMonsters = $raidMonsters;
+        $this->user         = $user;
     }
 
     /**
@@ -44,6 +44,6 @@ class UpdateMonsterList implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('update-monsters-list-' . $this->user->id);
+        return new PrivateChannel('update-raid-monsters-list-' . $this->user->id);
     }
 }

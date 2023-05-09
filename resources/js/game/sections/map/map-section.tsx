@@ -40,6 +40,8 @@ export default class MapSection extends React.Component<MapProps, MapState> {
 
     private celestialTimeout: any;
 
+    private corruptedLocations: any;
+
     constructor(props: MapProps) {
         super(props);
 
@@ -90,6 +92,9 @@ export default class MapSection extends React.Component<MapProps, MapState> {
 
         // @ts-ignore
         this.celestialTimeout   = Echo.private('update-character-celestial-timeout-' + this.props.user_id);
+
+        // @ts-ignore
+        this.corruptedLocations = Echo.join('corrupt-locations');
     }
 
     componentDidMount() {
@@ -163,6 +168,16 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                 celestial_time_out: event.timeLeft,
             });
         });
+
+        this.corruptedLocations.listen('Game.Raids.Events.CorruptLocations', (event: any) => {
+            let locations = JSON.parse(JSON.stringify(this.state.locations));
+
+            locations = [...locations, ...event.corruptedLocations];
+
+            this.setState({
+                locations: locations,
+            });
+        })
     }
 
     setStateFromData(data: MapData, callback?: () => void) {

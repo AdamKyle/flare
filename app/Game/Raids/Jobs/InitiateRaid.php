@@ -62,26 +62,36 @@ class InitiateRaid implements ShouldQueue {
         InitiateRaid::dispatch($this->raidId, $this->raidStory)->delay(now()->addSeconds(30));
     }
 
-    private function corruptLocations(Raid $raid, LocationService $locationService): void {
+    /**
+     * Corrupt locations for the raid.
+     *
+     * @param Raid $raid
+     * @param LocationService $locationService
+     * @return void
+     */
+    private function updateCorruptLocations(Raid $raid, LocationService $locationService): void {
         event(new CorruptLocations($locationService->fetchCorruptedLocationData($raid)->toArray()));
     }
 
-    private function initializeRaidBoss(Raid $raid): void {
-
-    }
-
+    /**
+     * Initialize the raid
+     *
+     * @param Raid $raid
+     * @param LocationService $locationService
+     * @return void
+     */
     private function initializeRaid(Raid $raid, LocationService $locationService): void {
         if (empty($raid->corrupted_location_ids)) {
             return;
         }
 
-        Location::whereIn('id', $raid->corrupted_location_ids)->update([
+        Location::findMany('id', $raid->corrupted_location_ids)->update([
             'is_corrupted' => true,
             'raid_id'      => $raid->id,
         ]);
 
-        $locationNames    = Location::whereIn('id', $raid->corrupted_location_ids)->pluck('name')->toArray();
-        $locationMapNames = Location::whereIn('id', $raid->corrupted_location_ids)->pluck('gameMap.name')->toArray();
+        $locationNames    = Location::findMany('id', $raid->corrupted_location_ids)->pluck('name')->toArray();
+        $locationMapNames = Location::findMany('id', $raid->corrupted_location_ids)->pluck('gameMap.name')->toArray();
 
         event(new GlobalMessageEvent('Locations: ' . implode(', ', $locationNames) . ' on the planes: ' .
             implode(', ', $locationMapNames) . ' have become corrupted with foul critters!'));
@@ -108,7 +118,7 @@ class InitiateRaid implements ShouldQueue {
             'raid_id'     => $raid->id,
         ]);
 
-        $this->corruptLocations($raid, $locationService);
+        $this->updateCorruptLocations($raid, $locationService);
 
         event(new GlobalMessageEvent('Raid has started! and will end on: ' . $formattedDate));
 

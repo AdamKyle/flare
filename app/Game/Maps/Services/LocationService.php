@@ -110,6 +110,12 @@ class LocationService {
         ];
     }
 
+    /**
+     * Update the location with rank fights if there is any.
+     * 
+     * @param Character $character
+     * @return void
+     */
     protected function updateForRankFights(Character $character): void {
         if (is_null($this->location)) {
             event(new UpdateRankFights($character->user, false));
@@ -133,6 +139,12 @@ class LocationService {
         event(new UpdateRankFights($character->user, false));
     }
 
+    /**
+     * Fetch the locations for this map the characters on.
+     * 
+     * @param Character $character
+     * @return Collection
+     */
     public function fetchLocationData(Character $character): Collection {
         $locations = Location::with('questRewardItem')->where('game_map_id', $character->map->game_map_id)->get();
 
@@ -140,6 +152,15 @@ class LocationService {
     }
 
 
+    /**
+     * Fetch corrupted locatuions based on the raid.
+     * 
+     * If no raid is set, return an empty collection.
+     * 
+     * @param ?Raid $raid
+     * @return Collection
+     * 
+     */
     public function fetchCorruptedLocationData(?Raid $raid = null): Collection {
 
         if (is_null($raid)) {
@@ -147,11 +168,17 @@ class LocationService {
         }
 
         $raidLocations = array_push($raid->corrupted_location_ids, $raid->raid_boss_location_id);
-        $locations     = Location::whereIn('id', $raidLocations)->get();
+        $locations     = Location::findMany('id', $raidLocations);
 
         return $this->transformLocationData($locations);
     }
 
+    /**
+     * Add additional data to the location data.
+     * 
+     * @param Collection $collection
+     * @return Collection
+     */
     protected function transformLocationData(Collection $locations): Collection {
         return $locations->transform(function($location) {
 
@@ -196,7 +223,13 @@ class LocationService {
         });
     }
 
-    protected function getCelestialEntityId(Character $character) {
+    /**
+     * Is there a cedlestial entity at the characters location?
+     * 
+     * @param Character $character
+     * @return int|null
+     */
+    protected function getCelestialEntityId(Character $character): int|null {
         $fight = CelestialFight::with('monster')->join('monsters', function($join) use($character) {
             $join->on('monsters.id', 'celestial_fights.monster_id')
                 ->where('x_position', $character->x_position)

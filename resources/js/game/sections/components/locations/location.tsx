@@ -65,7 +65,7 @@ export default class Location extends React.Component<LocationProps, LocationSta
                     <LocationPin key={'port-pin-' + location.id}
                                  location={location}
                                  openLocationDetails={this.openLocationDetails.bind(this)}
-                                 pin_class={'port-x-pin'}
+                                 pin_class={location.is_corrupted ? 'location-corrupted-pin' : 'port-x-pin'}
                     />
                 )
             } else {
@@ -73,7 +73,7 @@ export default class Location extends React.Component<LocationProps, LocationSta
                     <LocationPin key={'location-pin-' + location.id}
                                  location={location}
                                  openLocationDetails={this.openLocationDetails.bind(this)}
-                                 pin_class={'location-x-pin'}
+                                 pin_class={location.is_corrupted ? 'location-corrupted-pin' : 'location-x-pin'}
                     />
                 );
             }
