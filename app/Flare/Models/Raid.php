@@ -28,7 +28,7 @@ class Raid extends Model {
     public function getMonstersForSelection(): array {
         $monsterArray = array_unshift($this->raid_monster_ids, $this->raid_boss_id);
 
-        return Monster::findMany($monsterArray)->select('name', 'id')->toArray()
+        return Monster::findMany($monsterArray)->select('name', 'id')->toArray();
     }
 
     public function raidBoss() {
