@@ -17,6 +17,7 @@ class ScheduledEvent extends Model {
         'start_date',
         'end_date',
         'description',
+        'currently_running'
     ];
 
     protected $casts = [
@@ -24,6 +25,7 @@ class ScheduledEvent extends Model {
         'raid_id'                => 'integer',
         'start_date'             => 'datetime',
         'end_date'               => 'datetime',
+        'currently_running'      => 'boolean',
     ];
 
     public function raid() {

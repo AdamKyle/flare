@@ -2,9 +2,12 @@
 
 namespace App\Game\Raids\Jobs;
 
+use App\Flare\Events\UpdateScheduledEvents;
 use App\Flare\Models\Event;
 use App\Flare\Models\Location;
 use App\Flare\Models\Raid;
+use App\Flare\Models\ScheduledEvent;
+use App\Flare\Services\EventSchedulerService;
 use App\Flare\Values\EventType;
 use App\Game\Maps\Services\LocationService;
 use App\Game\Raids\Events\CorruptLocations;
@@ -32,12 +35,18 @@ class InitiateRaid implements ShouldQueue {
     protected int $raidId;
 
     /**
+     * @var int $eventId
+     */
+    protected int $eventId;
+
+    /**
      * Create a new job instance.
      *
      * @param int $raidId
      * @param array $raidStory
      */
-    public function __construct(int $raidId, array $raidStory = []) {
+    public function __construct(int $eventId, int $raidId, array $raidStory = []) {
+        $this->eventId   = $eventId;
         $this->raidId    = $raidId;
         $this->raidStory = $raidStory;
     }
@@ -46,13 +55,13 @@ class InitiateRaid implements ShouldQueue {
      * @param LocationService $locationService
      * @return void
      */
-    public function handle(LocationService $locationService): void {
+    public function handle(LocationService $locationService, EventSchedulerService $eventSchedulerService): void {
 
         if (empty($this->raidStory)) {
 
             $raid = Raid::find($this->raidId);
 
-            $this->initializeRaid($raid, $locationService);
+            $this->initializeRaid($raid, $locationService, $eventSchedulerService);
 
             return;
         }
@@ -80,7 +89,7 @@ class InitiateRaid implements ShouldQueue {
      * @param LocationService $locationService
      * @return void
      */
-    private function initializeRaid(Raid $raid, LocationService $locationService): void {
+    private function initializeRaid(Raid $raid, LocationService $locationService, EventSchedulerService $eventSchedulerService): void {
         if (empty($raid->corrupted_location_ids)) {
             return;
         }
@@ -124,5 +133,10 @@ class InitiateRaid implements ShouldQueue {
 
         AnnouncementHandler::createAnnouncement('raid_announcement');
 
+        ScheduledEvent::find($this->eventId)->update([
+            'currently_running' => true
+        ]);
+
+        event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));
     }
 }
