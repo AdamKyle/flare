@@ -9,4 +9,6 @@ export default interface EventSchedulerEditorProps {
 
     raids: Raid[]|[];
 
+    event_types: string[]|[]
+
 }

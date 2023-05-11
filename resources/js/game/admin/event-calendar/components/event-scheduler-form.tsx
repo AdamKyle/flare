@@ -4,6 +4,7 @@ import DatePicker from "react-datepicker";
 import {setHours, setMinutes} from "date-fns";
 import EventSchedulerFormState from "../types/components/event-scheduler-form-state";
 import EventSchedulerFormProps from "../types/components/event-scheduler-form-props";
+import EventType from "../values/EventType";
 
 export default class EventSchedulerForm extends React.Component<EventSchedulerFormProps, EventSchedulerFormState> {
 
@@ -92,13 +93,21 @@ export default class EventSchedulerForm extends React.Component<EventSchedulerFo
     }
 
     optionsForEventType() {
-        return [{
+
+        const types = this.props.event_types.map((eventType: string, index: number) => {
+            return {
+                label: eventType,
+                value: index,
+
+            }
+        })
+
+        types.unshift({
             label: 'Please select a type',
             value: -1
-        }, {
-            label: 'Raid Event',
-            value: 0,
-        }];
+        });
+
+        return types;
     }
 
     optionsForRaids() {
@@ -118,25 +127,22 @@ export default class EventSchedulerForm extends React.Component<EventSchedulerFo
     }
 
     getSelectedEventType() {
-        if (this.state.selected_event_type === null) {
+
+        const foundValue: string|undefined = this.props.event_types.find((event: string, index: number) => {
+            return index === this.state.selected_event_type;
+        });
+
+        if (typeof foundValue !== 'undefined') {
             return [{
-                label: 'Please select a type',
-                value: -1
+                label: foundValue,
+                value: this.state.selected_event_type,
             }]
         }
 
-        switch(this.state.selected_event_type) {
-            case 0:
-                return [{
-                    label: 'Raid Event',
-                    value: 0,
-                }];
-            default:
-                return [{
-                    label: 'Please select a type',
-                    value: -1
-                }]
-        }
+        return [{
+            label: 'Please select a type',
+            value: -1
+        }]
     }
 
     getSelectedRaid() {
@@ -153,6 +159,18 @@ export default class EventSchedulerForm extends React.Component<EventSchedulerFo
             label: 'Please select a raid',
             value: 0,
         }]
+    }
+
+    getSelectedEventTypeName(): string {
+        const foundValue: string|undefined = this.props.event_types.find((event: string, index: number) => {
+            return index === this.state.selected_event_type;
+        });
+
+        if (typeof foundValue !== 'undefined') {
+            return foundValue;
+        }
+
+        return '';
     }
 
     filterPassedTime(time: any)  {
@@ -180,7 +198,7 @@ export default class EventSchedulerForm extends React.Component<EventSchedulerFo
                 />
 
                 {
-                    this.state.selected_event_type === 0 ?
+                    EventType.is(EventType.RAID_EVENT, this.getSelectedEventTypeName()) ?
                         <div className='my-4'>
                             <Select
                                 onChange={this.setRaidEvent.bind(this)}
@@ -192,7 +210,7 @@ export default class EventSchedulerForm extends React.Component<EventSchedulerFo
                                 value={this.getSelectedRaid()}
                             />
                         </div>
-                        : null
+                    : null
                 }
 
                 <div className='my-4'>

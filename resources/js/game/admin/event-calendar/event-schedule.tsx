@@ -18,6 +18,7 @@ export default class EventSchedule extends React.Component<{}, EventScheduleStat
         this.state = {
             events: [],
             raids: [],
+            event_types: [],
             loading: true,
             deleting: false,
         }
@@ -29,6 +30,7 @@ export default class EventSchedule extends React.Component<{}, EventScheduleStat
     componentDidMount() {
         (new Ajax).setRoute('admin/event-calendar/fetch-events')
             .doAjaxCall('get', (result: AxiosResponse) => {
+                console.log(result.data);
                 this.setState({
                     raids: result.data.raids,
                     events: result.data.events.map((event: any) => {
@@ -38,6 +40,7 @@ export default class EventSchedule extends React.Component<{}, EventScheduleStat
                         return event;
                     }),
                     loading: false,
+                    event_types: result.data.event_types
                 })
             }, (error: AxiosError) => {
                 console.error(error);
@@ -99,6 +102,7 @@ export default class EventSchedule extends React.Component<{}, EventScheduleStat
                              <EventSchedulerEditor scheduler={scheduler}
                                                    is_loading={this.state.loading}
                                                    raids={this.state.raids}
+                                                   event_types={this.state.event_types}
                              />
                          }
                          viewerExtraComponent={(fields: FieldProps[]|[], event: ProcessedEvent) =>

@@ -44,6 +44,7 @@ export default class SmallerActions extends React.Component<SmallActionsProps, S
         this.state = {
             selected_action: null,
             monsters: [],
+            raid_monsters: [],
             characters_for_dueling: [],
             pvp_characters_on_map: [],
             attack_time_out: 0,

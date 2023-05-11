@@ -8,6 +8,7 @@ use App\Flare\Models\ScheduledEvent;
 use App\Flare\Services\EventSchedulerService;
 use App\Http\Controllers\Controller;
 use App\Admin\Requests\ManageEventRequest;
+use App\Flare\Values\EventType;
 
 class EventScheduleController extends Controller {
 
@@ -22,8 +23,9 @@ class EventScheduleController extends Controller {
         $raids = Raid::select('name', 'id')->get()->toArray();
 
         return response()->json([
-            'raids'  => $raids,
-            'events' => $this->eventSchedulerService->fetchEvents(),
+            'raids'       => $raids,
+            'events'      => $this->eventSchedulerService->fetchEvents(),
+            'event_types' => EventType::getOptionsForSelect(),
         ]);
     }
 

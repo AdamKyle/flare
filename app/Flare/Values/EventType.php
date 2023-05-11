@@ -30,6 +30,13 @@ class EventType {
         3 => self::RAID_EVENT,
     ];
 
+    protected static array $selection = [
+        0 => 'Weekly Celestials',
+        1 => 'Monthly PVP',
+        2 => 'Weekly Currency Drops',
+        3 => 'Raid Event',
+    ];
+
     /**
      * Throws if the value does not exist in the array of const values.
      *
@@ -42,6 +49,15 @@ class EventType {
         }
 
         $this->value = $value;
+    }
+
+    /**
+     * Return values for selection on the front end.
+     *
+     * @return array
+     */
+    public static function getOptionsForSelect(): array {
+        return self::$selection;
     }
 
     /**
