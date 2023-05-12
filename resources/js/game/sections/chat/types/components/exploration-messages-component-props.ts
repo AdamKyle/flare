@@ -1,5 +1,5 @@
-import ServerMessageType from "../../deffinitions/server-message-type";
-import ExplorationMessageType from "../../deffinitions/exploration-message-type";
+import ServerMessageType from "../deffinitions/server-message-type";
+import ExplorationMessageType from "../deffinitions/exploration-message-type";
 
 export default interface ExplorationMessagesComponentProps {
 

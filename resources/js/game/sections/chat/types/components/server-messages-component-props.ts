@@ -1,4 +1,4 @@
-import ServerMessageType from "../../deffinitions/server-message-type";
+import ServerMessageType from "../deffinitions/server-message-type";
 
 export default interface ServerMessagesComponentProps {
 

@@ -25,6 +25,11 @@ Broadcast::channel('update-market', function($user) {
 	return $user;
 });
 
+// When locations become corrupt.
+Broadcast::channel('corrupt-locations', function($user) {
+    return $user;
+});
+
 // When a user settles a kingdom, we want to show it for them only, on their map.
 Broadcast::channel('add-kingdom-to-map-{userId}', function($user, $userId) {
 	return $user->id === (int) $userId;

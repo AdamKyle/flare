@@ -22,10 +22,11 @@ use App\Flare\Models\CelestialFight;
 use App\Game\Maps\Services\Common\CanPlayerMassEmbezzle;
 use App\Game\Maps\Services\Common\LiveCharacterCount;
 use App\Game\Core\Traits\KingdomCache;
+use App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation;
 
 class LocationService {
 
-    use KingdomCache, LiveCharacterCount, CanPlayerMassEmbezzle;
+    use KingdomCache, LiveCharacterCount, CanPlayerMassEmbezzle, UpdateRaidMonstersForLocation;
 
     /**
      * @var CoordinatesCache $coordinatesCache
@@ -89,9 +90,14 @@ class LocationService {
         // Update location based special shops:
         event(new UpdateLocationBasedSpecialShops($character->user));
 
+        // Remove character from pvp cache
         $this->characterCacheData->removeFromPvpCache($character);
 
+        // Update rank fights.
         $this->updateForRankFights($character);
+
+        // Update monsters foir a possible raid at a possible location
+        $this->updateMonstersForRaid($character, $this->location);
 
         return [
             'map_url'                => Storage::disk('maps')->url($character->map_url),
@@ -167,8 +173,11 @@ class LocationService {
             return collect();
         }
 
-        $raidLocations = array_push($raid->corrupted_location_ids, $raid->raid_boss_location_id);
-        $locations     = Location::findMany('id', $raidLocations);
+        $corruptedLocationIds = $raid->corrupted_location_ids;
+
+        array_push($corruptedLocationIds, $raid->raid_boss_location_id);
+
+        $locations = Location::whereIn('id', $corruptedLocationIds)->get();
 
         return $this->transformLocationData($locations);
     }

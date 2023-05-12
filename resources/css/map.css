@@ -1,5 +1,5 @@
 .game-map {
-    .map-x-pin, .location-x-pin, .port-x-pin, .kingdom-x-pin {
+    .map-x-pin, .location-x-pin, .port-x-pin, .kingdom-x-pin, .location-corrupted-pin {
         background-color: black; /* So we can see where the pixel is */
         height: 1px;
         position: absolute;
@@ -35,8 +35,8 @@
         &:after {
              font-family: 'Font Awesome\ 5 Free';
              content: '\f714';
-             font-size: 16px;
-             color: #d99ea8;
+             font-size: 24px;
+             color: #fff;
              top: -18px;
              left: -6px;
          }

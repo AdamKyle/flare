@@ -1,7 +1,7 @@
-import ChatType from "../deffinitions/chat-type";
-import ServerMessageType from "../deffinitions/server-message-type";
+import ChatType from "./deffinitions/chat-type";
+import ServerMessageType from "./deffinitions/server-message-type";
 import TabsType from "../../../lib/game/types/tabs-type";
-import ExplorationMessageType from "../deffinitions/exploration-message-type";
+import ExplorationMessageType from "./deffinitions/exploration-message-type";
 
 export default interface GameChatState {
 

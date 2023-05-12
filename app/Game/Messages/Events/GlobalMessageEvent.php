@@ -30,9 +30,9 @@ class GlobalMessageEvent implements ShouldBroadcastNow {
      * represents the color you want applied to the message.
      *
      * @param string $message
-     * @param string|null $specialColor
+     * @param string $specialColor
      */
-    public function __construct(string $message, string $specialColor = null) {
+    public function __construct(string $message, string $specialColor = 'global-message') {
         $this->message      = $message;
         $this->specialColor = $specialColor;
     }

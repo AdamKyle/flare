@@ -250,7 +250,7 @@ export default class GameChat extends React.Component<GameChatProps, GameChatSta
 
             chat.unshift({
                 message: event.message,
-                type: 'global-message',
+                type: event.specialColor,
             });
 
             this.setState({

@@ -63,7 +63,7 @@ export default class MonsterSelection extends React.Component<MonsterSelectionPr
             }
         }
 
-        return [{label: 'Please Select', value: 0}];
+        return [{label: 'Please select a monster', value: 0}];
     }
 
     findMonster(monsterId: number): MonsterType|null {

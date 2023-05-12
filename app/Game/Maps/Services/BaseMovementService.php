@@ -2,28 +2,28 @@
 
 namespace App\Game\Maps\Services;
 
-use App\Flare\Models\GameMap;
+use Illuminate\Support\Facades\Cache;
 use App\Flare\Models\Kingdom;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\LocationType;
 use App\Game\Maps\Events\UpdateCharacterBasePosition;
 use App\Game\Maps\Events\UpdateMonsterList;
-use Illuminate\Support\Facades\Cache;
 use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\Character;
-use App\Flare\Models\Event;
 use App\Flare\Models\Item;
 use App\Flare\Models\Location;
 use App\Flare\Models\User;
-use App\Flare\Values\ItemEffectsValue;
 use App\Game\Battle\Services\ConjureService;
-use App\Game\Maps\Events\UpdateRaidMonsters;
 use App\Game\Maps\Values\MapPositionValue;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Facades\App\Flare\RandomNumber\RandomNumberGenerator;
+use App\Game\Maps\Events\UpdateRaidMonsters;
+use App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation;
 
 class BaseMovementService {
+
+    use UpdateRaidMonstersForLocation;
 
     /**
      * @var MapTileValue $mapTileValue
@@ -299,15 +299,20 @@ class BaseMovementService {
      */
     protected function updateMonstersList(Character $character, ?Location $location = null): void {
 
-        $raidEvent = Event::whereNotNull('raid_id')->first();
+        $monsters = Cache::get('monsters')[$character->map->gameMap->name];
 
-        if (!is_null($raidEvent)) {
-           event(new UpdateRaidMonsters($$raidEvent->raid->getMonstersForSelection(), $character->user));
+        if (is_null($location)) {
+            event(new UpdateMonsterList($monsters, $character->user));
+            event(new UpdateRaidMonsters([], $character->user));
 
-           return;
+            return;
         }
 
-        $monsters = Cache::get('monsters')[$character->map->gameMap->name];
+
+        if ($this->updateMonstersForRaid($character, $location)) {
+            return;
+        }
+
 
         if (!is_null($location)) {
             if (!is_null($location->enemy_strength_type)) {

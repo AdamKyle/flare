@@ -27,9 +27,10 @@ export default class Calendar extends React.Component<{}, CalendarState> {
         (new Ajax).setRoute('calendar/events')
             .doAjaxCall('get', (result: AxiosResponse) => {
                 this.setState({
-                    events: result.data.events.map((event: any) => {
+                    events: result.data.events.map((event: ProcessedEvent) => {
                         event.start = new Date(event.start);
                         event.end   = new Date(event.end);
+                        event.color = event.currently_running ? '#16a34a' : '#1976d2';
 
                         return event;
                     }),
@@ -46,9 +47,10 @@ export default class Calendar extends React.Component<{}, CalendarState> {
                 loading: true
             }, () => {
                 this.setState({
-                    events: event.eventData.map((event: any) => {
+                    events: event.eventData.map((event: ProcessedEvent) => {
                         event.start = new Date(event.start);
                         event.end   = new Date(event.end);
+                        event.color = event.currently_running ? '#16a34a' : '#1976d2';
 
                         return event;
                     }),

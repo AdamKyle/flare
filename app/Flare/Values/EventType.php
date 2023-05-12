@@ -16,9 +16,9 @@ class EventType {
     const RAID_EVENT            = 3;
 
     /**
-     * @var string $value
+     * @var int $value
      */
-    private string $value;
+    private int $value;
 
     /**
      * @var int[] $values

@@ -36,7 +36,7 @@ class ProcessScheduledEvents extends Command
             $eventType = new EventType($event->event_type);
 
             if ($eventType->isRaidEvent()) {
-                InitiateRaid::dispatch($event->id, $event->raid_id, preg_split('/(?<=[.!?])\s+/', $event->raid->story))->delay(now()->addMinutes(5));
+                InitiateRaid::dispatch($event->id, preg_split('/(?<=[.!?])\s+/', $event->raid->story))->delay(now()->addMinutes(5));
             }
          }
     }

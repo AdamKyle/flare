@@ -24,8 +24,9 @@ class Event extends Model {
      * @var array
      */
     protected $casts = [
-        'type' => 'integer',
+        'type'    => 'integer',
         'raid_id' => 'integer',
+        'ends_at' => 'datetime'
     ];
 
     public function raid() {

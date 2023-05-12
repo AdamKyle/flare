@@ -24,6 +24,7 @@ use App\Game\Maps\Services\LocationService;
 use App\Game\Maps\Services\MovementService;
 use App\Game\Maps\Services\PortService;
 use App\Game\Maps\Values\MapPositionValue;
+use App\Game\Maps\Services\UpdateRaidMonsters;
 
 class ServiceProvider extends ApplicationServiceProvider
 {
@@ -58,6 +59,16 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(WalkingService::class, function($app) {
             return new WalkingService(
+                $app->make(MapTileValue::class),
+                $app->make(MapPositionValue::class),
+                $app->make(CoordinatesCache::class),
+                $app->make(ConjureService::class),
+                $app->make(MovementService::class),
+            );
+        });
+
+        $this->app->bind(UpdateRaidMonsters::class, function($app) {
+            return new UpdateRaidMonsters(
                 $app->make(MapTileValue::class),
                 $app->make(MapPositionValue::class),
                 $app->make(CoordinatesCache::class),

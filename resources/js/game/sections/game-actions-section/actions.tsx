@@ -114,6 +114,7 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
         });
 
         this.raidMonsterUpdate.listen('Game.Maps.Events.UpdateRaidMonsters', (event: any) => {
+            console.log('Raid Monster Update', event);
             this.setState({
                 raid_monsters: event.raidMonsters,
             });
@@ -367,7 +368,7 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
                                                 close_hell_forged={this.manageHellForgedShop.bind(this)}
                                                 close_purgatory_chains={this.managedPurgatoryChainsShop.bind(this)}
                                             />
-                                            : null
+                                        : null
                                     }
                                 </MonsterActions>
                             : null

@@ -1,7 +1,7 @@
 import React from "react";
 import Messages from "./components/messages";
 import ExplorationMessagesComponentProps from "./types/components/exploration-messages-component-props";
-import ExplorationMessageType from "./deffinitions/exploration-message-type";
+import ExplorationMessageType from "./types/deffinitions/exploration-message-type";
 import clsx from "clsx";
 
 export default class ExplorationMessages extends React.Component<ExplorationMessagesComponentProps, any> {

@@ -7,6 +7,7 @@ import {AxiosError, AxiosResponse} from "axios";
 import LoadingProgressBar from "../../components/ui/progress-bars/loading-progress-bar";
 import EventScheduleState from "./types/event-schedule-state";
 import EventView from "../../components/ui/scheduler/event-view";
+import EventType from "./values/EventType";
 
 export default class EventSchedule extends React.Component<{}, EventScheduleState> {
 
@@ -30,12 +31,12 @@ export default class EventSchedule extends React.Component<{}, EventScheduleStat
     componentDidMount() {
         (new Ajax).setRoute('admin/event-calendar/fetch-events')
             .doAjaxCall('get', (result: AxiosResponse) => {
-                console.log(result.data);
                 this.setState({
                     raids: result.data.raids,
-                    events: result.data.events.map((event: any) => {
+                    events: result.data.events.map((event: ProcessedEvent) => {
                         event.start = new Date(event.start);
                         event.end   = new Date(event.end);
+                        event.color = event.currently_running ? '#16a34a' : '#1976d2';
 
                         return event;
                     }),
@@ -47,15 +48,17 @@ export default class EventSchedule extends React.Component<{}, EventScheduleStat
             });
 
         this.updateScheduledEvents.listen('Flare.Events.UpdateScheduledEvents', (event: any) => {
+            console.log(event);
             // We have to do this for the calendar to update when a new event is created and added to the calendar.
             // If we don't the calendar does not properly update, calling forceUpdate, doesn't work.
             this.setState({
                 loading: true
             }, () => {
                 this.setState({
-                    events: event.eventData.map((event: any) => {
+                    events: event.eventData.map((event: ProcessedEvent) => {
                         event.start = new Date(event.start);
                         event.end   = new Date(event.end);
+                        event.color = event.currently_running ? '#16a34a' : '#1976d2';
 
                         return event;
                     }),

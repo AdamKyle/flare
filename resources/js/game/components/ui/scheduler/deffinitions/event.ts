@@ -11,4 +11,5 @@ export default interface Event extends ProcessedEvent {
     title: string;
     start: Date;
     end: Date;
+    currently_running: boolean;
 }
