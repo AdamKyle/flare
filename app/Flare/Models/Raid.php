@@ -30,7 +30,9 @@ class Raid extends Model {
         
         array_unshift($monstersArray, $this->raid_boss_id);
 
-        return array_values(Monster::whereIn('id', $monstersArray)->pluck('name', 'id')->toArray());
+        $raidMonsters = Monster::whereIn('id', $monstersArray)->select('name', 'id', 'is_raid_boss')->get()->toArray();
+
+        return $this->moveRaidBossToTheTopOfTheList($raidMonsters);
     }
 
     public function raidBoss() {
@@ -39,5 +41,27 @@ class Raid extends Model {
 
     public function raidBossLocation() {
         return $this->hasOne(Location::class, 'id', 'raid_boss_location_id');
+    }
+
+    private function moveRaidBossToTheTopOfTheList(array $raidMonsters): array {
+        $raidBossIndex = -1;
+
+        foreach ($raidMonsters as $key => $value) {
+            if ($value['is_raid_boss']) {
+                $raidBossIndex = $key;
+
+                break;
+            }
+        }
+
+        if ($raidBossIndex > -1) {
+            $raidBoss = array_splice($raidMonsters, $raidBossIndex, 1)[0];
+
+            $raidBoss['name'] = $raidBoss['name'] . ' (RAID BOSS)';
+
+            array_unshift($raidMonsters, $raidBoss);
+        }
+
+        return $raidMonsters;
     }
 }

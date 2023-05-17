@@ -1,11 +1,9 @@
 import React from "react";
-import Select from "react-select";
-import PrimaryButton from "../../../components/ui/buttons/primary-button";
 import {isEqual} from "lodash";
 import MonsterType from "../../../lib/game/types/actions/monster/monster-type";
 import MonsterSelectionProps from "./types/monster-selection-props";
 import MonsterSelectionState from "./types/monster-selection-state";
-import DangerButton from "../../../components/ui/buttons/danger-button";
+import CritterSelection from "./fight-section/monster-selection";
 
 export default class MonsterSelection extends React.Component<MonsterSelectionProps, MonsterSelectionState> {
 
@@ -95,30 +93,14 @@ export default class MonsterSelection extends React.Component<MonsterSelectionPr
 
     render() {
         return (
-            <div className='mt-4 lg:mt-2 lg:ml-[120px]'>
-                <div className='lg:grid lg:grid-cols-3 lg:gap-2'>
-                    <div className='lg:cols-start-1 lg:col-span-2'>
-                        <Select
-                            onChange={this.setMonsterToFight.bind(this)}
-                            options={this.buildMonsters()}
-                            menuPosition={'absolute'}
-                            menuPlacement={'bottom'}
-                            styles={{menuPortal: (base) => ({...base, zIndex: 9999, color: '#000000'})}}
-                            menuPortalTarget={document.body}
-                            value={this.defaultMonster()}
-                        />
-                    </div>
-                    <div className='text-center mt-4 lg:mt-0 lg:text-left lg:cols-start-3 lg:cols-end-3'>
-                        <PrimaryButton button_label={'Attack'} on_click={this.attack.bind(this)} disabled={this.isAttackDisabled()}/>
-
-                        {
-                            typeof this.props.close_monster_section !== 'undefined' ?
-                                <DangerButton button_label={'Close'} on_click={this.props.close_monster_section} additional_css={'ml-4'} />
-                            : null
-                        }
-                    </div>
-                </div>
-            </div>
+            <CritterSelection
+                set_monster_to_fight={this.setMonsterToFight.bind(this)}
+                monsters={this.buildMonsters()}
+                default_monster={this.defaultMonster()}
+                attack={this.attack.bind(this)}
+                is_attack_disabled={this.isAttackDisabled()}
+                close_monster_section={this.props.close_monster_section}
+            />
         );
     }
 

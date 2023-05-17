@@ -12,8 +12,10 @@ use App\Flare\Builders\BuildMythicItem;
 use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Builders\RandomItemDropBuilder;
+use App\Flare\ServerFight\Monster\BuildMonster;
 use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Flare\ServerFight\Pvp\PvpAttack;
+use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Services\CharacterRewardService;
 use App\Game\Battle\Console\Commands\ClearCelestials;
 use App\Game\Battle\Handlers\BattleEventHandler;
@@ -26,8 +28,8 @@ use App\Game\Battle\Services\MonthlyPvpService;
 use App\Game\Battle\Services\PvpService;
 use App\Game\Core\Services\GoldRush;
 use App\Game\Maps\Values\MapTileValue;
-use App\Game\Skills\Services\MassDisenchantService;
 use App\Game\Battle\Services\ConjureService;
+use App\Game\Battle\Services\RaidBattleService;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
 use App\Game\GuideQuests\Services\GuideQuestService;
 
@@ -114,6 +116,15 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(MonthlyPvpService::class, function($app) {
             return new MonthlyPvpService();
+        });
+
+        $this->app->bind(RaidBattleService::class, function($app) {
+            return new RaidBattleService(
+                $app->make(BuildMonster::class),
+                $app->make(CharacterCacheData::class),
+                $app->make(MonsterPlayerFight::class),
+                $app->make(BuildMonsterCacheService::class)
+            );
         });
 
         $this->commands([

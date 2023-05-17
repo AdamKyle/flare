@@ -17,6 +17,7 @@ import CelestialFight from "./components/celestial-fight";
 import Shop from "./components/specialty-shops/shop";
 import {removeCommas} from "../../lib/game/format-number";
 import GamblingSection from "./components/gambling-section";
+import RaidSection from "./components/raid-section";
 
 export default class Actions extends React.Component<ActionsProps, ActionsState> {
 
@@ -114,7 +115,6 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
         });
 
         this.raidMonsterUpdate.listen('Game.Maps.Events.UpdateRaidMonsters', (event: any) => {
-            console.log('Raid Monster Update', event);
             this.setState({
                 raid_monsters: event.raidMonsters,
             });
@@ -376,7 +376,37 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
 
                         {
                             !this.state.show_exploration && !this.state.show_duel_fight && !this.state.show_join_pvp && !this.state.show_celestial_fight && this.state.raid_monsters.length > 0 ?
-                                <p>Raid Stuff Here ... </p>
+                                <RaidSection 
+                                    raid_monsters={this.state.raid_monsters}
+                                    character_id={this.props.character.id}
+                                    can_attack={this.props.character.can_attack}
+                                    is_dead={this.props.character.is_dead}
+                                    is_small={false}
+                                    character_name={this.props.character.name}
+                                >
+                                    {
+                                        this.state.crafting_type !== null ?
+                                            <CraftingSection
+                                                remove_crafting={this.removeCraftingType.bind(this)}
+                                                type={this.state.crafting_type}
+                                                character_id={this.props.character.id}
+                                                user_id={this.props.character.user_id}
+                                                cannot_craft={this.actionsManager.cannotCraft()}
+                                            />
+                                        : null
+                                    }
+
+                                    {
+                                        this.state.show_hell_forged_section || this.state.show_purgatory_chains_section ?
+                                            <Shop
+                                                type={this.state.show_hell_forged_section ? 'Hell Forged' : 'Purgatory Chains'}
+                                                character_id={this.props.character.id}
+                                                close_hell_forged={this.manageHellForgedShop.bind(this)}
+                                                close_purgatory_chains={this.managedPurgatoryChainsShop.bind(this)}
+                                            />
+                                        : null
+                                    }
+                                </RaidSection>
                             : null
                         }
 

@@ -1,14 +1,11 @@
 import clsx from "clsx";
-import AttackButton from "../../../components/ui/buttons/attack-button";
-import HealthMeters from "./health-meters";
-import React, {Fragment} from "react";
+import React from "react";
 import ComponentLoading from "../../../components/ui/loading/component-loading";
 import {AxiosError, AxiosResponse} from "axios";
 import Ajax from "../../../lib/ajax/ajax";
-import DangerButton from "../../../components/ui/buttons/danger-button";
-import PrimaryButton from "../../../components/ui/buttons/primary-button";
 import {BattleMessage} from "../../../lib/game/actions/battle/types/battle-message-type";
-import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
+import ServerFight from './fight-section/server-fight';
+import BattleMesages from "./fight-section/battle-mesages";
 
 export default class CelestialFight extends React.Component<any, any> {
 
@@ -102,89 +99,28 @@ export default class CelestialFight extends React.Component<any, any> {
         });
     }
 
-    renderBattleMessages() {
-        if (this.props.is_small && this.state.battle_messages.length > 0) {
-            const message = this.state.battle_messages.filter((battleMessage: BattleMessage) => battleMessage.message.includes('resurrect') || battleMessage.message.includes('has been defeated!'))
-
-            if (message.length > 0) {
-                return <p className='text-red-500 dark:text-red-400'>{message[0].message}</p>
-            } else {
-                return <p className='text-blue-500 dark:text-blue-400'>Attack child!</p>
-            }
-        }
-
-        return this.state.battle_messages.map((battleMessage: BattleMessage) => {
-            return <p className={clsx(
-                {
-                    'text-green-700 dark:text-green-400': this.typeCheck(battleMessage.type, 'player-action')
-                }, {
-                    'text-red-500 dark:text-red-400': this.typeCheck(battleMessage.type, 'enemy-action')
-                }, {
-                    'text-blue-500 dark:text-blue-400': this.typeCheck(battleMessage.type, 'regular')
-                }
-            )}>
-                {battleMessage.message}
-            </p>
-        });
-    }
-
-    typeCheck(battleType: 'regular' | 'player-action' | 'enemy-action', type: 'regular' | 'player-action' | 'enemy-action'): boolean {
-        return battleType === type;
-    }
-
     render() {
         return (
             this.state.loading ?
                 <ComponentLoading />
             :
-                <div className='relative'>
-                    <div className={clsx('mt-4 mb-4 text-xs text-center', {
-                        'hidden': this.attackButtonDisabled()
-                    })}>
-                        <AttackButton additional_css={'btn-attack'} icon_class={'ra ra-sword'} on_click={() => this.attack('attack')} disabled={this.attackButtonDisabled() || this.state.preforming_action}/>
-                        <AttackButton additional_css={'btn-cast'} icon_class={'ra ra-burning-book'} on_click={() => this.attack('cast')} disabled={this.attackButtonDisabled() || this.state.preforming_action}/>
-                        <AttackButton additional_css={'btn-cast-attack'} icon_class={'ra ra-lightning-sword'} on_click={() => this.attack('cast_and_attack')} disabled={this.attackButtonDisabled() || this.state.preforming_action}/>
-                        <AttackButton additional_css={'btn-attack-cast'} icon_class={'ra ra-lightning-sword'} on_click={() => this.attack('attack_and_cast')} disabled={this.attackButtonDisabled() || this.state.preforming_action}/>
-                        <AttackButton additional_css={'btn-defend'} icon_class={'ra ra-round-shield'} on_click={() => this.attack('defend')} disabled={this.attackButtonDisabled() || this.state.preforming_action}/>
-                        <a href='/information/combat' target='_blank' className='ml-2'>Help <i
-                            className="fas fa-external-link-alt"></i></a>
-                    </div>
-                    <div className={clsx('mt-1 text-xs text-center ml-[-50px]', { 'hidden': this.attackButtonDisabled() })}>
-                        <span className={'w-10 mr-4 ml-4'}>Atk</span>
-                        <span className={'w-10 ml-6'}>Cast</span>
-                        <span className={'w-10 ml-4'}>Cast & Atk</span>
-                        <span className={'w-10 ml-2'}>Atk & Cast</span>
-                        <span className={'w-10 ml-2'}>Defend</span>
-                    </div>
-                    {
-                        this.state.monster_max_health > 0 ?
-                            <div className={clsx('mb-4 max-w-md m-auto', {
-                                'mt-4': this.attackButtonDisabled()
-                            })}>
-                                <HealthMeters is_enemy={true} name={this.state.monster_name} current_health={parseInt(this.state.monster_health)} max_health={this.state.monster_max_health} />
-                                <HealthMeters is_enemy={false} name={this.props.character.name} current_health={parseInt(this.state.character_health)} max_health={this.state.character_max_health} />
-                            </div>
-                            : null
-                    }
-                    {
-                        this.state.preforming_action ?
-                            <div className='w-1/2 ml-auto mr-auto'>
-                                <LoadingProgressBar />
-                            </div>
-                        : null
-                    }
-                    <div className='italic text-center mb-4'>
-                        {this.renderBattleMessages()}
-                    </div>
-                    <div className='text-center'>
-                        <DangerButton button_label={'Leave Fight'} on_click={this.props.manage_celestial_fight} additional_css={'mr-4'} disabled={this.props.character.is_dead}/>
-                        {
-                            this.props.character.is_dead ?
-                                <PrimaryButton button_label={'Revive'} on_click={this.revive.bind(this)} disabled={!this.props.character.can_attack}/>
-                            : null
-                        }
-                    </div>
-                </div>
+                <ServerFight 
+                    monster_health={this.state.monster_health}
+                    character_health={this.state.character_health}
+                    monster_max_health={this.state.monster_max_health}
+                    character_max_health={this.state.character_max_health}
+                    monster_name={this.state.monster_name}
+                    preforming_action={this.state.preforming_action}
+                    character_name={this.state.character.name}
+                    is_dead={this.state.character.is_dead}
+                    can_attack={this.state.character.can_attack}
+                    monster_id={this.props.celestial_id}
+                    attack={this.attack.bind(this)}
+                    manage_server_fight={this.props.manage_celestial_fight}
+                    revive={this.revive.bind(this)}
+                >
+                    <BattleMesages is_small={this.props.is_small} battle_messages={this.state.battle_messages} />
+                </ServerFight>
         )
     }
 }

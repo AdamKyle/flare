@@ -13,6 +13,8 @@ use App\Flare\Models\ScheduledEvent;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use App\Flare\Events\UpdateScheduledEvents;
+use App\Flare\Models\Monster;
+use App\Flare\Models\RaidBoss;
 use App\Game\Maps\Services\LocationService;
 use App\Game\Raids\Events\CorruptLocations;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -92,6 +94,8 @@ class InitiateRaid implements ShouldQueue {
 
         $endDate = $this->createEvent($eventSchedulerService);
 
+        $this->createRaidBoss($raid);
+
         $this->updateMonstersForCharactersAtRaidLocations($raid, $updateRaidMonsters);
 
         event(new GlobalMessageEvent('Raid has started! and will end on: ' . $endDate));
@@ -124,6 +128,19 @@ class InitiateRaid implements ShouldQueue {
                 $updateRaidMonsters->updateMonstersForRaidLocations($character, $location);
             }
         }
+    }
+
+    /**
+     * Create base raid boss
+     *
+     * @param Raid $raid
+     * @return void
+     */
+    private function createRaidBoss(Raid $raid): void {
+        RaidBoss::create([
+            'raid_id'      => $raid->id,
+            'raid_boss_id' => $raid->raid_boss_id,
+        ]);
     }
 
     /**

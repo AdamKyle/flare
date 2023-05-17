@@ -59,6 +59,8 @@ class BuildMonsterCacheService {
         foreach (GameMap::all() as $gameMap) {
             $monsters =  new Collection(
                 Monster::where('is_celestial_entity', false)
+                       ->where('is_raid_monster', false)
+                       ->where('is_raid_boss', false)
                        ->where('game_map_id', $gameMap->id)
                        ->get(),
                 $this->monster
@@ -71,6 +73,45 @@ class BuildMonsterCacheService {
         $monstersCache = $monstersCache + $this->manageMonsters($monstersCache);
 
         Cache::put('monsters', $monstersCache);
+    }
+
+     /**
+     * Builds raid monster cache.
+     *
+     * @return void
+     */
+    public function buildRaidCache(): void {
+        $monstersCache = [];
+
+        Cache::delete('raid-monsters');
+
+        foreach (GameMap::all() as $gameMap) {
+
+            $raidCritters = Monster::where('is_celestial_entity', false)
+                                   ->where('is_raid_monster', true)
+                                   ->where('is_raid_boss', false)
+                                   ->where('game_map_id', $gameMap->id)
+                                   ->get();
+
+            $raidBosses = Monster::where('is_celestial_entity', false)
+                                 ->where('is_raid_monster', false)
+                                 ->where('is_raid_boss', true)
+                                 ->where('game_map_id', $gameMap->id)
+                                 ->get();
+
+
+            $monsters =  new Collection(
+                $raidCritters->merge($raidBosses),
+                $this->monster
+            );
+
+
+            $monstersCache[$gameMap->name] = $this->manager->createData($monsters)->toArray();
+        }
+
+        $monstersCache = $monstersCache + $this->manageMonsters($monstersCache);
+
+        Cache::put('raid-monsters', $monstersCache);
     }
 
     /**

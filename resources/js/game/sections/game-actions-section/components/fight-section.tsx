@@ -1,4 +1,4 @@
-import React, {Fragment} from "react";
+import React from "react";
 import AttackButton from "../../../components/ui/buttons/attack-button";
 import BattleSetUp from "../../../lib/game/actions/battle/battle-setup";
 import {BattleMessage} from "../../../lib/game/actions/battle/types/battle-message-type";
