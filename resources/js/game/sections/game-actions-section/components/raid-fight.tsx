@@ -28,6 +28,7 @@ export default class RaidFight extends React.Component<RaidFightProps, RaidFight
         this.setState({
             is_attacking: true,
         }, () => {
+            
             console.log('Hook up attack!');
         })
     }

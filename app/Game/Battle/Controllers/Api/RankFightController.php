@@ -8,7 +8,7 @@ use App\Flare\Services\BuildMonsterCacheService;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Jobs\BattleAttackHandler;
 use App\Game\Battle\Events\AttackTimeOutEvent;
-use App\Game\Battle\Request\RankedFightRequest;
+use App\Game\Battle\Request\AttackTypeRequest;
 use App\Game\Battle\Request\RankFightSetUpRequest;
 use App\Game\Battle\Services\RankFightService;
 use Exception;
@@ -79,12 +79,12 @@ class RankFightController extends Controller {
     }
 
     /**
-     * @param RankedFightRequest $request
+     * @param AttackTypeRequest $request
      * @param Character $character
      * @return JsonResponse
      * @throws Exception
      */
-    public function fightRankedMonster(RankedFightRequest $request, Character $character): JsonResponse {
+    public function fightRankedMonster(AttackTypeRequest $request, Character $character): JsonResponse {
 
         if (!Cache::has('rank-fight-for-character-' . $character->id)) {
             return response()->json([

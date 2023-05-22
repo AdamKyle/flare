@@ -46,6 +46,11 @@ Broadcast::channel('update-character-status-{userId}', function ($user, $userId)
     return $user->id === (int) $userId;
 });
 
+// When the raid bosses health updates.
+Broadcast::channel('update-raid-boss-health-attack', function ($user) {
+    return $user;
+});
+
 // When the Celestial Fight Details Change:
 Broadcast::channel('celestial-fight-changes', function ($user) {
     return $user;

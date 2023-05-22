@@ -147,6 +147,22 @@ class MonsterPlayerFight {
     }
 
     /**
+     * Setup  the raid fight
+     *
+     * @param Character $character
+     * @param array $raidMonster
+     * @return MonsterPlayerFight
+     */
+    public function setUpRaidFight(Character $character, array $raidMonster, string $attackType): MonsterPlayerFight {
+
+        $this->monster    = $raidMonster;
+        $this->character  = $character;
+        $this->attackType = $attackType;
+
+        return $this;
+    }
+
+    /**
      * Did the fight take too long?
      *
      * @return bool
@@ -313,6 +329,18 @@ class MonsterPlayerFight {
             $this->monster = $data['monster']->getMonster();
         }
 
+        return $this->processAttack($data, $onlyOnce, $isRankFight);
+    }
+
+    /**
+     * Process the attack on the monster.
+     *
+     * @param array $data
+     * @param boolean $onlyOnce
+     * @param boolean $isRankFight
+     * @return boolean
+     */
+    public function processAttack(array $data, bool $onlyOnce = false, $isRankFight = false): bool {
         $health         = $data['health'];
         $monster        = $data['monster'];
         $isPlayerVoided = $data['player_voided'];
@@ -350,7 +378,7 @@ class MonsterPlayerFight {
      * @param bool $isRankFight
      * @return bool
      */
-    public function doAttack(ServerMonster $monster, array $health, bool $isPlayerVoided, bool $isEnemyVoided, bool $onlyOnce, bool $isRankFight = false): bool {
+    protected function doAttack(ServerMonster $monster, array $health, bool $isPlayerVoided, bool $isEnemyVoided, bool $onlyOnce, bool $isRankFight = false): bool {
         $this->attack->setHealth($health)
             ->setIsCharacterVoided($isPlayerVoided)
             ->setIsEnemyVoided($isEnemyVoided)

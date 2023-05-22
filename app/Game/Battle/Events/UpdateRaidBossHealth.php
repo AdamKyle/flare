@@ -1,42 +1,36 @@
 <?php
 
-namespace App\Flare\Events;
+namespace App\Game\Battle\Events;
 
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 Use App\Flare\Models\User;
+use BeyondCode\LaravelWebSockets\WebSockets\Channels\PresenceChannel;
 
-class UpdateCharacterAttackBroadcastEvent implements ShouldBroadcastNow
+class UpdateRaidBossHealth implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
-     * the character attack
-     *
      * @var array
      */
-    public $attack;
+    public int $raidBossHealth;
 
     /**
-     * @var User $users
+     * @var integer
      */
-    private $user;
+    public int $raidBossId;
 
     /**
-     * Create a new event instance.
-     *
-     * @param array $attack
+     * @param integer $raidBossHealth
      * @param User $user
-     * @return void
      */
-    public function __construct(array $attack, User $user)
-    {
-        $this->attack = $attack;
-        $this->user   = $user;
+    public function __construct(int $raidBossId, int $raidBossHealth) {
+        $this->raidBossId     = $raidBossId;
+        $this->raidBossHealth = $raidBossHealth;
     }
 
     /**
@@ -46,6 +40,6 @@ class UpdateCharacterAttackBroadcastEvent implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('update-character-attack-' . $this->user->id);
+        return new PresenceChannel('update-raid-boss-health-attack');
     }
 }

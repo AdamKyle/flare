@@ -11,6 +11,8 @@ import RaidFight from "./raid-fight";
 
 export default class RaidSection extends React.Component<RaidSelectionProps, RaidSelectionType> {
 
+    private updateRaidBosshealth: any;
+
     constructor(props: RaidSelectionProps) {
         super(props);
 
@@ -24,6 +26,18 @@ export default class RaidSection extends React.Component<RaidSelectionProps, Rai
             selected_raid_monster_id: 0,
             monster_name: '',
         }
+
+         // @ts-ignore
+         this.updateRaidBosshealth = Echo.join('update-raid-boss-health-attack');
+    }
+
+    componentDidMount(): void {
+        // @ts-ignore
+        this.updateRaidBosshealth.listen('Game.Battle.Events.UpdateRaidBossHealth', (event: any) => {
+            if (event.raidBossId === this.state.selected_raid_monster_id) {
+                this.setState({monster_current_health: event.raidBossHealth});
+            }
+        });
     }
 
     buildRaidMonsterSelection() {
