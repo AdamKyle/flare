@@ -15,7 +15,7 @@ class BattleBase extends BattleMessages {
 
     protected int $monsterHealth;
 
-    protected int $defenderId;
+    protected ?int $defenderId = null;
 
     protected array $attackData;
 
@@ -98,7 +98,7 @@ class BattleBase extends BattleMessages {
         $secondaryAttacks->setAttackData($this->attackData);
         $secondaryAttacks->setIsCharacterVoided($this->isVoided);
         $secondaryAttacks->setIsEnemyEntranced($this->isEnemyEntranced);
-        $secondaryAttacks->setDefenderId($this->defenderId);
+        $secondaryAttacks->setDefenderId(is_null($this->defenderId) ? $monster->getId() : $this->defenderId);
 
         $secondaryAttacks->doSecondaryAttack($character, $monster, $affixReduction, $isPvp);
 
@@ -144,7 +144,7 @@ class BattleBase extends BattleMessages {
         $this->mergeAttackerMessages($counter->getAttackerMessages());
         $this->mergeDefenderMessages($counter->getDefenderMessages());
 
-        $this->characterhealth = $counter->getCharacterHealth();
+        $this->characterHealth = $counter->getCharacterHealth();
         $this->monsterHealth   = $counter->getMonsterHealth();
 
         $counter->clearMessages();
@@ -161,7 +161,7 @@ class BattleBase extends BattleMessages {
         $this->mergeAttackerMessages($counter->getAttackerMessages());
         $this->mergeDefenderMessages($counter->getDefenderMessages());
 
-        $this->characterhealth = $counter->getCharacterHealth();
+        $this->characterHealth = $counter->getCharacterHealth();
         $this->monsterHealth   = $counter->getMonsterHealth();
 
         $counter->clearMessages();

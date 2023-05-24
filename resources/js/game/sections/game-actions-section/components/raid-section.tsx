@@ -8,6 +8,7 @@ import { AxiosError, AxiosResponse } from "axios";
 import MonsterSelection from "./fight-section/monster-selection";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import RaidFight from "./raid-fight";
+import PrimaryButton from "../../../components/ui/buttons/primary-button";
 
 export default class RaidSection extends React.Component<RaidSelectionProps, RaidSelectionType> {
 
@@ -181,6 +182,14 @@ export default class RaidSection extends React.Component<RaidSelectionProps, Rai
                     : null
                 }
 
+                {
+                    this.props.is_dead && this.state.monster_name === '' ?
+                        <div className="text-center mr-4 mt-4">
+                            <PrimaryButton button_label={'Revive'} on_click={this.revive.bind(this)} disabled={!this.props.can_attack}/>
+                        </div>
+                    : null
+                }
+
                 {this.props.children}
 
                 {
@@ -195,7 +204,9 @@ export default class RaidSection extends React.Component<RaidSelectionProps, Rai
                             monster_name={this.state.monster_name} 
                             monster_id={this.state.selected_raid_monster_id} 
                             is_small={this.props.is_small}
-                            character_name={this.props.character_name}                            
+                            character_name={this.props.character_name}   
+                            character_id={this.props.character_id}
+                            revive={this.revive.bind(this)}                 
                         />
                     : null
                 }

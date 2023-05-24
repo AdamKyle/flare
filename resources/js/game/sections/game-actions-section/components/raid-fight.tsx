@@ -3,6 +3,8 @@ import RaidFightProps from "./types/raid-fight-props";
 import ServerFight from "./fight-section/server-fight";
 import BattleMesages from "./fight-section/battle-mesages";
 import RaidFightState from "./types/raid-fight-state";
+import Ajax from "../../../lib/ajax/ajax";
+import { AxiosError, AxiosResponse } from "axios";
 
 export default class RaidFight extends React.Component<RaidFightProps, RaidFightState> {
 
@@ -12,7 +14,16 @@ export default class RaidFight extends React.Component<RaidFightProps, RaidFight
         this.state = {
             is_attacking: false,
             battle_messages: [],
+            character_current_health: 0,
+            monster_current_health: 0,
         }
+    }
+
+    componentDidMount(): void {
+        this.setState({
+            character_current_health: this.props.character_current_health,
+            monster_current_health: this.props.monster_current_health,
+        })
     }
 
     attackButtonDisabled(): boolean {
@@ -28,24 +39,31 @@ export default class RaidFight extends React.Component<RaidFightProps, RaidFight
         this.setState({
             is_attacking: true,
         }, () => {
-            
-            console.log('Hook up attack!');
-        })
-    }
+            (new Ajax()).setRoute('raid-fight/'+this.props.character_id+'/' + this.props.monster_id).setParameters({
+                attack_type: type,
+            }).doAjaxCall('post', (result: AxiosResponse) => {
+                this.setState({
+                    character_current_health: result.data.character_current_health,
+                    monster_current_health: result.data.monster_current_health,
+                    battle_messages: result.data.messages,
+                    is_attacking: false,
+                });
+            }, (error: AxiosError) => {
+                console.error(error);
 
-    revive() {
-        this.setState({
-            is_attacking: true,
-        }, () => {
-            console.log('hook up revive!');
+                this.setState({
+                    is_attacking: false,
+                })
+            })
+            console.log('Hook up attack!');
         })
     }
 
     render() {
         return (
             <ServerFight 
-                monster_health={this.props.monster_current_health}
-                character_health={this.props.character_current_health}
+                monster_health={this.state.monster_current_health}
+                character_health={this.state.character_current_health}
                 monster_max_health={this.props.monster_max_health}
                 character_max_health={this.props.character_max_health}
                 monster_name={this.props.monster_name}
@@ -55,7 +73,7 @@ export default class RaidFight extends React.Component<RaidFightProps, RaidFight
                 can_attack={this.props.can_attack}
                 monster_id={this.props.monster_id}
                 attack={this.attack.bind(this)}
-                revive={this.revive.bind(this)}
+                revive={this.props.revive}
             >
                 <BattleMesages is_small={this.props.is_small} battle_messages={this.state.battle_messages} />
             </ServerFight>

@@ -74,7 +74,11 @@ class ServerMonster {
         return $attack;
     }
 
-    public function getName() {
+    public function getId(): int {
+        return $this->monster['id'];
+    }
+
+    public function getName(): string {
         return $this->monster['name'];
     }
 

@@ -73,7 +73,12 @@ class RaidBattleController extends Controller {
     public function fightMonster(AttackTypeRequest $attackTypeRequest, Character $character, Monster $monster): JsonResponse {
 
         if ($monster->is_raid_monster) {
-            return $this->raidBattleService->fightRaidMonster($character, $monster->id, $attackTypeRequest->attack_type, false);
+            $result = $this->raidBattleService->fightRaidMonster($character, $monster->id, $attackTypeRequest->attack_type, false);
+            $status = $result['status'];
+    
+            unset($result['status']);
+
+            return response()->json($result, $status);
         }
 
         $raidBoss = RaidBoss::where('raid_boss_id', $monster->id)->first();
@@ -84,6 +89,11 @@ class RaidBattleController extends Controller {
             ], 422);
         }
 
-        return $this->raidBattleService->fightRaidMonster($character, $monster->id, $attackTypeRequest->attack_type, true);
+        $result = $this->raidBattleService->fightRaidMonster($character, $monster->id, $attackTypeRequest->attack_type, true);
+        $status = $result['status'];
+
+        unset($result['status']);
+
+        return response()->json($result, $status);
     }
 }

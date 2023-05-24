@@ -123,7 +123,8 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(BuildMonster::class),
                 $app->make(CharacterCacheData::class),
                 $app->make(MonsterPlayerFight::class),
-                $app->make(BuildMonsterCacheService::class)
+                $app->make(BuildMonsterCacheService::class),
+                $app->make(BattleEventHandler::class)
             );
         });
 

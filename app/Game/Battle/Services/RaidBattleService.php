@@ -107,7 +107,7 @@ class RaidBattleService {
 
         $messages = $this->monsterPlayerFight->getBattleMessages();
 
-        $preAttackResult = $this->handlePreAttack($character, $fightData['health'], $messages, $$monsterId, $isRaidBoss);
+        $preAttackResult = $this->handlePreAttack($character, $fightData['health'], $messages, $monsterId, $isRaidBoss);
 
         if (!empty($preAttackResult)) {
             return $preAttackResult;

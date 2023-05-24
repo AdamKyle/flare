@@ -10,4 +10,6 @@ export default interface RaidFightProps {
     monster_id: number;
     is_small: boolean;
     character_name: string;
+    character_id: number;
+    revive: () => void;
 }
