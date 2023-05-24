@@ -384,6 +384,7 @@ export default class Actions extends React.Component<ActionsProps, ActionsState>
                                     is_small={false}
                                     character_name={this.props.character.name}
                                     user_id={this.props.character.user_id}
+                                    character_current_health={this.props.character.health}
                                 >
                                     {
                                         this.state.crafting_type !== null ?

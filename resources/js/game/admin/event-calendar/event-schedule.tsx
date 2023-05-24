@@ -48,7 +48,6 @@ export default class EventSchedule extends React.Component<{}, EventScheduleStat
             });
 
         this.updateScheduledEvents.listen('Flare.Events.UpdateScheduledEvents', (event: any) => {
-            console.log(event);
             // We have to do this for the calendar to update when a new event is created and added to the calendar.
             // If we don't the calendar does not properly update, calling forceUpdate, doesn't work.
             this.setState({

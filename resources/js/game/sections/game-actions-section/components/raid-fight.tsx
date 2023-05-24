@@ -26,6 +26,20 @@ export default class RaidFight extends React.Component<RaidFightProps, RaidFight
         })
     }
 
+    componentDidUpdate(): void {
+        if (this.state.character_current_health !== this.props.character_current_health && this.props.revived) {
+            this.setState({
+                character_current_health: this.props.character_current_health
+            }, () => {
+                this.props.reset_revived();
+            });
+        }
+
+        if (this.state.monster_current_health !== this.props.monster_current_health) {
+            console.log('Monster health (state then props)', this.state.monster_current_health, this.props.monster_current_health);
+        }
+    }
+
     attackButtonDisabled(): boolean {
         return this.props.monster_current_health <= 0 || 
                this.props.character_current_health <= 0 || 
@@ -42,6 +56,7 @@ export default class RaidFight extends React.Component<RaidFightProps, RaidFight
             (new Ajax()).setRoute('raid-fight/'+this.props.character_id+'/' + this.props.monster_id).setParameters({
                 attack_type: type,
             }).doAjaxCall('post', (result: AxiosResponse) => {
+                console.log(result.data);
                 this.setState({
                     character_current_health: result.data.character_current_health,
                     monster_current_health: result.data.monster_current_health,
@@ -54,9 +69,8 @@ export default class RaidFight extends React.Component<RaidFightProps, RaidFight
                 this.setState({
                     is_attacking: false,
                 })
-            })
-            console.log('Hook up attack!');
-        })
+            });
+        });
     }
 
     render() {

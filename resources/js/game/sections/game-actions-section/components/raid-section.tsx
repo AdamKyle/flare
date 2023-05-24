@@ -14,6 +14,8 @@ export default class RaidSection extends React.Component<RaidSelectionProps, Rai
 
     private updateRaidBosshealth: any;
 
+    private characterRevive: any;
+
     constructor(props: RaidSelectionProps) {
         super(props);
 
@@ -26,10 +28,14 @@ export default class RaidSection extends React.Component<RaidSelectionProps, Rai
             monster_max_health: 0,
             selected_raid_monster_id: 0,
             monster_name: '',
+            revived: false,
         }
 
-         // @ts-ignore
-         this.updateRaidBosshealth = Echo.join('update-raid-boss-health-attack');
+        // @ts-ignore
+        this.updateRaidBosshealth = Echo.join('update-raid-boss-health-attack');
+
+        // @ts-ignore
+        this.characterRevive = Echo.private('character-revive-' + this.props.user_id);
     }
 
     componentDidMount(): void {
@@ -38,6 +44,13 @@ export default class RaidSection extends React.Component<RaidSelectionProps, Rai
             if (event.raidBossId === this.state.selected_raid_monster_id) {
                 this.setState({monster_current_health: event.raidBossHealth});
             }
+        });
+
+        // @ts-ignore
+        this.characterRevive.listen('Game.Battle.Events.CharacterRevive', (event: {health: number}) => {
+            this.setState({
+                character_current_health: event.health,
+            });
         });
     }
 
@@ -153,13 +166,30 @@ export default class RaidSection extends React.Component<RaidSelectionProps, Rai
     }
 
     revive() {
-        console.log('Revive ...');
+        this.setState({
+            is_fighting: true,
+        }, () => {
+            (new Ajax()).setRoute('battle-revive/' + this.props.character_id).doAjaxCall(
+                'post', (result: AxiosResponse) => {
+                    this.setState({
+                        is_fighting: false,
+                        revived: true,
+                    })
+                },
+                (error: AxiosError) => {
+                    this.setState({is_fighting: false});
+
+                    console.error(error);
+            });
+        });
     }
 
-    renderBattleMessages() {
-
+    resetRevived(): void {
+        this.setState({
+            revived: false,
+        })
     }
-
+    
     attackButtonDisabled() {
         return this.props.is_dead || !this.props.can_attack || this.state.selected_raid_monster_id === 0
     }
@@ -206,7 +236,9 @@ export default class RaidSection extends React.Component<RaidSelectionProps, Rai
                             is_small={this.props.is_small}
                             character_name={this.props.character_name}   
                             character_id={this.props.character_id}
-                            revive={this.revive.bind(this)}                 
+                            revive={this.revive.bind(this)}      
+                            reset_revived={this.resetRevived.bind(this)}    
+                            revived={this.state.revived}       
                         />
                     : null
                 }

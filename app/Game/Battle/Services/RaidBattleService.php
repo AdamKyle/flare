@@ -2,35 +2,58 @@
 
 namespace  App\Game\Battle\Services;
 
+use Exception;
 use App\Flare\Models\Monster;
 use App\Flare\Models\RaidBoss;
 use App\Flare\Models\Character;
+use Illuminate\Support\Facades\Cache;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Flare\ServerFight\Monster\BuildMonster;
 use App\Flare\ServerFight\Monster\ServerMonster;
-use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Services\BuildMonsterCacheService;
 use App\Game\Battle\Events\UpdateRaidBossHealth;
 use App\Game\Battle\Handlers\BattleEventHandler;
-use Exception;
+use App\Flare\Builders\Character\CharacterCacheData;
 use Facade\App\Game\Messages\Handlers\ServerMessageHandler;
-use Illuminate\Support\Facades\Cache;
+use App\Game\Battle\Services\Concerns\HandleCachedRaidCritterHealth;
 
 class RaidBattleService {
 
-    use ResponseBuilder;
+    use ResponseBuilder, HandleCachedRaidCritterHealth;
 
+    /**
+     * @var BuildMonster $buildMonster
+     */
     private BuildMonster $buildMonster;
 
+    /**
+     * @var CharacterCacheData $characterCacheData
+     */
     private CharacterCacheData $characterCacheData;
 
+    /**
+     * @var MonsterPlayerFight $monsterPlayerFight
+     */
     private MonsterPlayerFight $monsterPlayerFight;
 
+    /**
+     * @var BuildMonsterCacheService $buildMonsterCacheService
+     */
     private BuildMonsterCacheService $buildMonsterCacheService;
 
+    /**
+     * @var BattleEventHandler $battleEventHandler
+     */
     private BattleEventHandler $battleEventHandler;
 
+    /**
+     * @param BuildMonster $buildMonster
+     * @param CharacterCacheData $characterCacheData
+     * @param MonsterPlayerFight $monsterPlayerFight
+     * @param BuildMonsterCacheService $buildMonsterCacheService
+     * @param BattleEventHandler $battleEventHandler
+     */
     public function __construct(BuildMonster $buildMonster, 
                                 CharacterCacheData $characterCacheData, 
                                 MonsterPlayerFight $monsterPlayerFight,
@@ -45,6 +68,13 @@ class RaidBattleService {
 
     }
 
+    /**
+     * Set up the boss battle.
+     *
+     * @param Character $character
+     * @param RaidBoss $raidBoss
+     * @return array
+     */
     public function setUpRaidBossBattle(Character $character, RaidBoss $raidBoss): array {
 
         try {
@@ -74,6 +104,13 @@ class RaidBattleService {
         ]);
     }
 
+    /**
+     * Set up the raid critter monster.
+     *
+     * @param Character $character
+     * @param Monster $monster
+     * @return array
+     */
     public function setUpRaidCritterMonster(Character $character, Monster $monster): array {
         try {
             $serverMonster   = $this->buildServerMonster($character, $monster->id);
@@ -93,12 +130,25 @@ class RaidBattleService {
         ]);
     }
 
+    /**
+     * Fight either the raid boss or the raid critter.
+     *
+     * @param Character $character
+     * @param integer $monsterId
+     * @param string $attackType
+     * @param boolean $isRaidBoss
+     * @return array
+     */
     public function fightRaidMonster(Character $character, int $monsterId, string $attackType, bool $isRaidBoss = false): array {
 
         try {
             $serverMonster = $this->buildServerMonster($character, $monsterId);
         } catch (Exception $e) {
             return $this->errorResult($e->getMessage());
+        }
+
+        if (!$isRaidBoss) {
+            $serverMonster->setHealth($this->getCachedHealth($serverMonster, $character->id, $monsterId));
         }
 
         $monster = $serverMonster->getMonster();
@@ -129,6 +179,8 @@ class RaidBattleService {
 
             $resultData['character_current_health'] = 0;
 
+            $this->setCachedHealth($character->id, $monsterId, $resultData['monster_current_health']);
+
             return $this->successResult($resultData);
         }
 
@@ -139,13 +191,18 @@ class RaidBattleService {
 
             $resultData['monster_current_health'] = 0;
 
+            $this->deleteMonsterCacheHealth($character->id, $monsterId);
+
             return $this->successResult($resultData);
         }
+
+        $this->setCachedHealth($character->id, $monsterId, $resultData['monster_current_health']);
 
         $this->handleRaidBossHealth($monsterId, $isRaidBoss);
 
         return $this->successResult($resultData);
     }
+
 
     /**
      * Process the pre attack.

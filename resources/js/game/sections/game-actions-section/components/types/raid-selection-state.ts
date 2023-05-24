@@ -8,4 +8,5 @@ export default interface RaidSelectionType {
     character_max_health: number;
     monster_name: string;
     selected_raid_monster_id: number;
+    revived: boolean;
 }

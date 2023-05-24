@@ -7,6 +7,8 @@ export default interface RaidSelectionProps {
 
     character_id: number;
 
+    character_current_health: number;
+
     user_id: number;
 
     can_attack: boolean;

@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Game\Battle\Services\RaidBattleService;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
+use Illuminate\Support\Facades\Cache;
 
 class RaidBattleController extends Controller {
 
@@ -73,6 +74,7 @@ class RaidBattleController extends Controller {
     public function fightMonster(AttackTypeRequest $attackTypeRequest, Character $character, Monster $monster): JsonResponse {
 
         if ($monster->is_raid_monster) {
+
             $result = $this->raidBattleService->fightRaidMonster($character, $monster->id, $attackTypeRequest->attack_type, false);
             $status = $result['status'];
     

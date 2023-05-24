@@ -115,7 +115,14 @@ export default class CharacterTopSection extends React.Component<CharacterTopSec
                         <div className='py-1'><strong>Level</strong>: {this.props.character.level}/{this.props.character.max_level}</div>
                         <div className='py-1'><strong>AC</strong>: {this.abbreviateNumber(this.props.character.ac)}</div>
                         <div className='py-1'><strong>Attack</strong>: {this.abbreviateNumber(this.props.character.attack)}</div>
-                        <div className='py-1'><strong>Health</strong>: {this.abbreviateNumber(this.props.character.health)}</div>
+                        <div className='py-1'><strong>Health</strong>: {
+                            this.props.character.is_dead ?
+                                <Fragment>
+                                    <span className='text-red-600 dark:text-red-400'>0 [DEAD]</span>
+                                </Fragment> 
+                            : 
+                                this.abbreviateNumber(this.props.character.health)
+                        }</div>
                     </div>
                     <div>
                         <div className='py-1'><strong>Strength</strong>: {this.abbreviateNumber(this.props.character.str_modded)}</div>
