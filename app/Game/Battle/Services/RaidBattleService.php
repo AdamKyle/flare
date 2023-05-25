@@ -147,23 +147,38 @@ class RaidBattleService {
             return $this->errorResult($e->getMessage());
         }
 
-        if (!$isRaidBoss) {
-            $serverMonster->setHealth($this->getCachedHealth($serverMonster, $character->id, $monsterId));
+        if (!$isRaidBoss && $this->hasCachedHealth($character->id, $monsterId)) {
+            $serverMonster->setHealth($this->getCachedHealth($character->id, $monsterId));
         }
 
-        $monster = $serverMonster->getMonster();
+        $monster   = $serverMonster->getMonster();
         
-        $fightData = $this->monsterPlayerFight->setUpRaidFight($character, $monster, $attackType)->fightSetUp();
+        if (!$isRaidBoss && $this->hasCachedHealth($character->id, $monsterId)) {
+            $fightData = $this->getCachedFightData($character->id, $monsterId);
+            $fightData['health']['monster_health'] = $serverMonster->getHealth();
 
-        $messages = $this->monsterPlayerFight->getBattleMessages();
-
-        $preAttackResult = $this->handlePreAttack($character, $fightData['health'], $messages, $monsterId, $isRaidBoss);
-
-        if (!empty($preAttackResult)) {
-            return $preAttackResult;
+            $this->monsterPlayerFight->setUpRaidFight($character, $monster, $attackType);
+        } else {
+            $fightData = $this->monsterPlayerFight->setUpRaidFight($character, $monster, $attackType)->fightSetUp();
         }
+        
+        $messages  = $this->monsterPlayerFight->getBattleMessages();
+
+        if (!$this->hasCachedHealth($character->id, $monsterId)) {
+            $preAttackResult = $this->handlePreAttack($character, $fightData['health'], $messages, $monsterId, $isRaidBoss);
+            dump($preAttackResult);
+            if (!empty($preAttackResult)) {
+
+                return $this->successResult($preAttackResult);
+            }
+        }
+
+        dump('Health before fight: ');
+        dump($fightData['health']);
 
         $result = $this->monsterPlayerFight->processAttack($fightData, true);
+
+        dump('Monster hp after fight: ' . $this->monsterPlayerFight->getMonsterHealth());
 
         $resultData = [
             'character_current_health' => $this->monsterPlayerFight->getCharacterHealth(),
@@ -179,7 +194,7 @@ class RaidBattleService {
 
             $resultData['character_current_health'] = 0;
 
-            $this->setCachedHealth($character->id, $monsterId, $resultData['monster_current_health']);
+            $this->setCachedHealth($serverMonster, $fightData, $character->id, $monsterId, $resultData['monster_current_health']);
 
             return $this->successResult($resultData);
         }
@@ -196,7 +211,7 @@ class RaidBattleService {
             return $this->successResult($resultData);
         }
 
-        $this->setCachedHealth($character->id, $monsterId, $resultData['monster_current_health']);
+        $this->setCachedHealth($serverMonster, $fightData, $character->id, $monsterId, $resultData['monster_current_health']);
 
         $this->handleRaidBossHealth($monsterId, $isRaidBoss);
 
@@ -295,7 +310,6 @@ class RaidBattleService {
         $characterStatReductionAffixes = $this->characterCacheData->getCachedCharacterData($character, 'stat_affixes');
         $skillReduction                = $this->characterCacheData->getCachedCharacterData($character, 'skill_reduction');
         $resistanceReduction           = $this->characterCacheData->getCachedCharacterData($character, 'resistance_reduction');
-
 
         $cache = Cache::get('raid-monsters');
 

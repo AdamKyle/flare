@@ -62,7 +62,17 @@ class AttackAndCast extends BattleBase
 
     public function handleAttack(Character $character, ServerMonster $monster) {
         $this->handleWeaponAttack($character, $monster);
+
+        if ($this->characterHealth <= 0) {
+            return $this;
+        }
+
         $this->handleCastAttack($character, $monster);
+
+        if ($this->characterHealth <= 0) {
+            return $this;
+        }
+
         $this->secondaryAttack($character, $monster);
 
         return $this;

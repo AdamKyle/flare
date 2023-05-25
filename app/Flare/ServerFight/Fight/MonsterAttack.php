@@ -35,13 +35,16 @@ class MonsterAttack extends BattleBase {
 
     public function monsterAttack(ServerMonster $monster, Character $character, string $previousAttackType, bool $isRankFight) {
 
+        dump('Monster Attack Time!');
+
         if ($this->canHit->canMonsterHitPlayer($character, $monster, $this->isVoided, $isRankFight)) {
             $this->attackPlayer($monster, $character, $previousAttackType);
+
+            $this->doPlayerCounterMonster($character, $monster);
+
         } else {
             $this->addMessage($monster->getName() . ' misses!', 'enemy-action');
         }
-
-        $this->doPlayerCounterMonster($character, $monster);
 
         if ($this->monsterHealth <= 0) {
             return;

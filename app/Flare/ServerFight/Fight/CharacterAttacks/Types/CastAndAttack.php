@@ -4,8 +4,6 @@ namespace App\Flare\ServerFight\Fight\CharacterAttacks\Types;
 
 use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Models\Character;
-use App\Flare\ServerFight\BattleBase;
-use App\Flare\ServerFight\Fight\Affixes;
 use App\Flare\ServerFight\Fight\CanHit;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SecondaryAttacks;
 use App\Flare\ServerFight\Fight\Entrance;
@@ -30,7 +28,17 @@ class CastAndAttack extends AttackAndCast {
 
     public function handleAttack(Character $character, ServerMonster $monster) {
         $this->handleCastAttack($character, $monster);
+
+        if ($this->characterHealth <= 0) {
+            return $this;
+        }
+
         $this->handleWeaponAttack($character, $monster);
+
+        if ($this->characterHealth <= 0) {
+            return $this;
+        }
+
         $this->secondaryAttack($character, $monster);
 
         return $this;

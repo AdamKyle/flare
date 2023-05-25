@@ -6,13 +6,15 @@ use App\Flare\Models\Monster;
 use App\Flare\Models\RaidBoss;
 use App\Flare\Models\Character;
 use App\Game\Battle\Request\AttackTypeRequest;
+use App\Game\Battle\Services\Concerns\HandleCachedRaidCritterHealth;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Game\Battle\Services\RaidBattleService;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
-use Illuminate\Support\Facades\Cache;
 
 class RaidBattleController extends Controller {
+
+    use HandleCachedRaidCritterHealth;
 
     /**
      * @var RaidBattleService $raidBattleService
@@ -34,6 +36,8 @@ class RaidBattleController extends Controller {
      * @return JsonResponse
      */
     public function fetchRaidMonster(Character $character, Monster $monster): JsonResponse {
+
+        $this->deleteMonsterCacheHealth($character->id, $monster->id);
 
         if ($monster->is_raid_boss) {
             $raidBoss = RaidBoss::where('raid_boss_id', $monster->id)->first();

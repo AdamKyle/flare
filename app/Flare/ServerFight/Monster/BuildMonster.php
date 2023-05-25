@@ -2,7 +2,6 @@
 
 namespace App\Flare\ServerFight\Monster;
 
-use App\Flare\Models\CelestialFight;
 use App\Flare\ServerFight\BattleMessages;
 
 class BuildMonster extends BattleMessages {

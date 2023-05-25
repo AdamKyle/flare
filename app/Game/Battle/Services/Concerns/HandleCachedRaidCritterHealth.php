@@ -8,27 +8,73 @@ use App\Flare\ServerFight\Monster\ServerMonster;
 trait HandleCachedRaidCritterHealth {
 
     /**
-     * Get the cached health for the raid monster.
+     * Do we have cached health
      *
-     * @param ServerMonster $serverMonster
      * @param integer $characterId
      * @param integer $monsterId
-     * @return integer
+     * @return boolean
      */
-    public function getCachedHealth(ServerMonster $serverMonster, int $characterId, int $monsterId): int {
+    public function hasCachedHealth(int $characterId, int $monsterId): bool {
+        $cacheName = 'character-' . $characterId . '-raid-monster-' . $monsterId;
+
+        return !is_null(Cache::get($cacheName));
+    }
+
+    /**
+     * Get the cached health for the raid monster.
+     *
+     * @param integer $characterId
+     * @param integer $monsterId
+     * @return integer|null
+     */
+    public function getCachedHealth(int $characterId, int $monsterId): ?int {
         $cacheName = 'character-' . $characterId . '-raid-monster-' . $monsterId;
 
         $cache = Cache::get($cacheName);
 
         if (is_null($cache)) {
-            Cache::put($cacheName, [
-                'monster_current_health' => $serverMonster->getHealth(),
-            ], now()->addMinutes(20));
+            return null;
         }
+
+        return $cache['monster_current_health'];
+    }
+
+    /**
+     * Get the cached server monster from the previous attack.
+     *
+     * @param integer $characterId
+     * @param integer $monsterId
+     * @return array|null
+     */
+    public function getCachedMonster(int $characterId, int $monsterId): ?array {
+        $cacheName = 'character-' . $characterId . '-raid-monster-' . $monsterId;
 
         $cache = Cache::get($cacheName);
 
-        return $cache['monster_current_health'];
+        if (is_null($cache)) {
+            return null;
+        }
+
+        return $cache['server_monster'];
+    }
+
+    /**
+     * Get cached fight data.
+     *
+     * @param integer $characterId
+     * @param integer $monsterId
+     * @return array|null
+     */
+    public function getCachedFightData(int $characterId, int $monsterId): ?array {
+        $cacheName = 'character-' . $characterId . '-raid-monster-' . $monsterId;
+
+        $cache = Cache::get($cacheName);
+
+        if (is_null($cache)) {
+            return null;
+        }
+
+        return $cache['fight_data'];
     }
 
     /**
@@ -39,11 +85,13 @@ trait HandleCachedRaidCritterHealth {
      * @param integer $health
      * @return void
      */
-    public function setCachedHealth(int $characterId, int $monsterId, int $health) {
+    public function setCachedHealth(ServerMonster $serverMonster, array $fightData, int $characterId, int $monsterId, int $health) {
         $cacheName = 'character-' . $characterId . '-raid-monster-' . $monsterId;
 
         Cache::put($cacheName, [
             'monster_current_health' => $health,
+            'server_monster'         => $serverMonster->getMonster(),
+            'fight_data'             => $fightData,
         ], now()->addMinutes(20));
     }
 

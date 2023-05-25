@@ -134,6 +134,7 @@ class BattleBase extends BattleMessages {
     }
 
     protected function doMonsterCounter(Character $character, ServerMonster $monster) {
+        
         $counter = resolve(Counter::class);
 
         $counter->setCharacterHealth($this->characterHealth);
@@ -141,8 +142,7 @@ class BattleBase extends BattleMessages {
         $counter->setIsAttackerVoided($this->isVoided);
         $counter->monsterCounter($character, $monster);
 
-        $this->mergeAttackerMessages($counter->getAttackerMessages());
-        $this->mergeDefenderMessages($counter->getDefenderMessages());
+        $this->mergeMessages($counter->getMessages());
 
         $this->characterHealth = $counter->getCharacterHealth();
         $this->monsterHealth   = $counter->getMonsterHealth();
@@ -158,8 +158,7 @@ class BattleBase extends BattleMessages {
         $counter->setIsAttackerVoided($this->isVoided);
         $counter->playerCounter($character, $monster);
 
-        $this->mergeAttackerMessages($counter->getAttackerMessages());
-        $this->mergeDefenderMessages($counter->getDefenderMessages());
+        $this->mergeMessages($counter->getMessages());
 
         $this->characterHealth = $counter->getCharacterHealth();
         $this->monsterHealth   = $counter->getMonsterHealth();
