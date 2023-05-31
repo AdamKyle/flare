@@ -1,4 +1,4 @@
-export default interface RaidSelectionType {
+export default interface RaidSelectionState {
     
     is_loading: boolean;
     is_fighting: boolean;
@@ -9,4 +9,6 @@ export default interface RaidSelectionType {
     monster_name: string;
     selected_raid_monster_id: number;
     revived: boolean;
+    raid_boss_attacks_left: number;
+    is_raid_boss: boolean;
 }

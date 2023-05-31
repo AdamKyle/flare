@@ -13,21 +13,23 @@ class RaidBossParticipation extends Model {
      */
     protected $fillable = [
         'character_id',
-        'raid_boss_id',
+        'raid_id',
+        'attacks_left',
         'damage_dealt',
+        'killed_boss',
     ];
 
     protected $casts = [
-        'character_id'    => 'integer',
-        'raid_boss_id'    => 'integer',
-        'damage_dealt'    => 'integer',
+        'attacks_left' => 'integer',
+        'damage_dealt' => 'integer',
+        'killed_boss'  => 'boolean',
     ];
 
-    public function character() {
-        return $this->hasOne(Character::class, 'id', 'character_id');
+    public function raid() {
+        return $this->hasOne(Raid::class, 'id', 'raid_id');
     }
 
-    public function raidBoss() {
-        return $this->hasOne(Monster::class, 'id', 'raid_boss_id');
+    public function character() {
+        return $this->hasOne(Character::class, 'id', '');
     }
 }

@@ -60,3 +60,8 @@ Broadcast::channel('celestial-fight-changes', function ($user) {
 Broadcast::channel('character-revive-{userId}', function($user, $userId) {
     return $user->id === (int) $userId;
 });
+
+// Raid Attacks left
+Broadcast::channel('update-raid-attacks-left-{userId}', function($user, $userId) {
+    return $user->id === (int) $userId;
+});

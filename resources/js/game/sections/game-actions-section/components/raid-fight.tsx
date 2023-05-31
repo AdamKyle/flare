@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment } from "react";
 import RaidFightProps from "./types/raid-fight-props";
 import ServerFight from "./fight-section/server-fight";
 import BattleMesages from "./fight-section/battle-mesages";
@@ -8,6 +8,8 @@ import { AxiosError, AxiosResponse } from "axios";
 
 export default class RaidFight extends React.Component<RaidFightProps, RaidFightState> {
 
+    private attacksLeftUpdate: any;
+
     constructor(props: any) {
         super(props);
 
@@ -16,14 +18,27 @@ export default class RaidFight extends React.Component<RaidFightProps, RaidFight
             battle_messages: [],
             character_current_health: 0,
             monster_current_health: 0,
+            attacks_left: 5,
+            error_message: '',
         }
+
+        // @ts-ignore
+        this.attacksLeftUpdate = Echo.private('update-raid-attacks-left-' + this.props.user_id);
     }
 
     componentDidMount(): void {
         this.setState({
             character_current_health: this.props.character_current_health,
             monster_current_health: this.props.monster_current_health,
-        })
+            attacks_left: this.props.initial_attacks_left,
+        });
+
+        // @ts-ignore
+        this.attacksLeftUpdate.listen('Game.Battle.Events.UpdateRaidAttacksLeft', (event: {attacksLeft: number}) => {
+            this.setState({
+                attacks_left: event.attacksLeft,
+            });
+        });
     }
 
     componentDidUpdate(): void {
@@ -63,8 +78,15 @@ export default class RaidFight extends React.Component<RaidFightProps, RaidFight
             }, (error: AxiosError) => {
                 console.error(error);
 
+                let response = null;
+
+                if (typeof error.response !== 'undefined') {
+                    response = error.response;
+                }
+
                 this.setState({
                     is_attacking: false,
+                    error_message: response !== null ? response.data.message : 'Unknown error occured!',
                 })
             });
         });
@@ -72,22 +94,36 @@ export default class RaidFight extends React.Component<RaidFightProps, RaidFight
 
     render() {
         return (
-            <ServerFight 
-                monster_health={this.state.monster_current_health}
-                character_health={this.state.character_current_health}
-                monster_max_health={this.props.monster_max_health}
-                character_max_health={this.props.character_max_health}
-                monster_name={this.props.monster_name}
-                preforming_action={this.state.is_attacking}
-                character_name={this.props.character_name}
-                is_dead={this.props.is_dead}
-                can_attack={this.props.can_attack}
-                monster_id={this.props.monster_id}
-                attack={this.attack.bind(this)}
-                revive={this.props.revive}
-            >
-                <BattleMesages is_small={this.props.is_small} battle_messages={this.state.battle_messages} />
-            </ServerFight>
+            <Fragment>
+                <div className="flex items-center justify-center">
+                    <div className="mt-4 text-center font-bold">Attacks Left: {this.state.attacks_left}/5 {this.state.attacks_left <= 0 ? '[You can attack again tomorrow]' : ''}</div>
+                </div>
+                {
+                    this.state.error_message !== '' ?
+                        <div className="flex items-center justify-center">
+                            <div className="mt-4 text-center text-red-700 dark:text-red-500">
+                                {this.state.error_message}
+                            </div>
+                        </div>
+                    : null
+                }
+                <ServerFight 
+                    monster_health={this.state.monster_current_health}
+                    character_health={this.state.character_current_health}
+                    monster_max_health={this.props.monster_max_health}
+                    character_max_health={this.props.character_max_health}
+                    monster_name={this.props.monster_name}
+                    preforming_action={this.state.is_attacking}
+                    character_name={this.props.character_name}
+                    is_dead={this.props.is_dead}
+                    can_attack={this.props.can_attack}
+                    monster_id={this.props.monster_id}
+                    attack={this.attack.bind(this)}
+                    revive={this.props.revive}
+                >
+                    <BattleMesages is_small={this.props.is_small} battle_messages={this.state.battle_messages} />
+                </ServerFight>
+            </Fragment>
         );
     }
 

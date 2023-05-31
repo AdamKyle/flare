@@ -11,7 +11,9 @@ export default interface RaidFightProps {
     is_small: boolean;
     character_name: string;
     character_id: number;
+    user_id: number;
     revived: boolean;
     revive: () => void;
     reset_revived: () => void;
+    initial_attacks_left: number;
 }

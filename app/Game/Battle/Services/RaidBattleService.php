@@ -15,6 +15,8 @@ use App\Flare\Services\BuildMonsterCacheService;
 use App\Game\Battle\Events\UpdateRaidBossHealth;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Flare\Builders\Character\CharacterCacheData;
+use App\Flare\Models\RaidBossParticipation;
+use App\Game\Battle\Events\UpdateRaidAttacksLeft;
 use Facade\App\Game\Messages\Handlers\ServerMessageHandler;
 use App\Game\Battle\Services\Concerns\HandleCachedRaidCritterHealth;
 use App\Game\Messages\Services\ServerMessage;
@@ -102,11 +104,15 @@ class RaidBattleService {
 
         $characterHealth = $character->getInformation()->buildHealth();
 
+        $raidBossParticipation = RaidBossParticipation::where('character_id', $character->id)->first();
+
         return $this->successResult([
             'character_max_health'     => $characterHealth,
             'character_current_health' => $characterHealth,
             'monster_max_health'       => $raidBoss->boss_max_hp,
             'monster_current_health'   => $raidBoss->boss_current_hp,
+            'attacks_left'             => !is_null($raidBossParticipation) ? $raidBossParticipation->attacks_left : 5,
+            'is_raid_boss'             => true,
         ]);
     }
 
@@ -145,6 +151,8 @@ class RaidBattleService {
             'character_current_health' => $characterHealth,
             'monster_max_health'       => $monsterHealth,
             'monster_current_health'   => $monsterHealth,
+            'attacks_left'             => 0,
+            'is_raid_boss'             => false,
         ]);
     }
 
@@ -198,7 +206,7 @@ class RaidBattleService {
 
         if (!$result && $this->monsterPlayerFight->getCharacterHealth() <= 0) {
 
-            $this->handleRaidBossHealth($monsterId, $isRaidBoss);
+            $this->handleRaidBossHealth($character, $monsterId, $isRaidBoss);
 
             $this->battleEventHandler->processDeadCharacter($character);
 
@@ -210,7 +218,7 @@ class RaidBattleService {
         }
 
         if ($this->monsterPlayerFight->getMonsterHealth() <= 0) {
-            $this->handleRaidBossHealth($monsterId, $isRaidBoss);
+            $this->handleRaidBossHealth($character, $monsterId, $isRaidBoss);
 
             $this->battleEventHandler->processMonsterDeath($character->id, $monsterId);
 
@@ -223,7 +231,7 @@ class RaidBattleService {
 
         $this->setCachedHealth($serverMonster, $fightData, $character->id, $monsterId, $resultData['monster_current_health']);
 
-        $this->handleRaidBossHealth($monsterId, $isRaidBoss);
+        $this->handleRaidBossHealth($character, $monsterId, $isRaidBoss);
 
         return $this->successResult($resultData);
     }
@@ -279,7 +287,7 @@ class RaidBattleService {
                 'type'    => 'enemy-action',
             ];
 
-            $this->handleRaidBossHealth($monsterId, $isRaidBoss);
+            $this->handleRaidBossHealth($character, $monsterId, $isRaidBoss);
 
             $this->battleEventHandler->processDeadCharacter($character);
 
@@ -294,7 +302,7 @@ class RaidBattleService {
                 'type'    => 'enemy-action',
             ];
 
-            $this->handleRaidBossHealth($monsterId, $isRaidBoss);
+            $this->handleRaidBossHealth($character, $monsterId, $isRaidBoss);
 
             $this->battleEventHandler->processMonsterDeath($character->id, $monsterId);
 
@@ -328,15 +336,62 @@ class RaidBattleService {
      * @param boolean $shouldUpdateHealth
      * @return void
      */
-    protected function handleRaidBossHealth(int $monsterId, bool $shouldUpdateHealth): void {
+    protected function handleRaidBossHealth(Character $character, int $monsterId, bool $shouldUpdateHealth): void {
 
         if (!$shouldUpdateHealth) {
             return;
         }
 
-        $raidBoss = RaidBoss::where('raid_boss_id', $monsterId)->first();
+        $raidBoss  = RaidBoss::where('raid_boss_id', $monsterId)->first();
+        $oldHealth = $raidBoss->boss_current_hp;
 
         $this->updateRaidBossHealth($raidBoss, $this->monsterPlayerFight->getMonsterHealth());
+
+        $this->updateRaidParticipation($character, $raidBoss, $oldHealth);
+    }
+
+    /**
+     * Update raid Participation info.
+     *
+     * @param Character $character
+     * @param RaidBoss $raidBoss
+     * @param integer $oldHealth
+     * @return void
+     */
+    private function updateRaidParticipation(Character $character, RaidBoss $raidBoss, int $oldHealth): void {
+        $raidBossParticipation = RaidBossParticipation::where('character_id', $character->id)->first();
+
+        $newHealth      = $raidBoss->refresh()->boss_current_hp;
+        $damageDealt    = ($oldHealth - ($newHealth <= 0 ? 0 : $newHealth));
+        $killedRaidBoss = $damageDealt >= $oldHealth;
+
+        if (!is_null($raidBossParticipation)) {
+            $attacksLeft     = $raidBossParticipation->attacks_left - 1;
+            
+            $newDamageAmount = $raidBossParticipation->damage_dealt + ($damageDealt >= $oldHealth ? $oldHealth : $damageDealt);
+           
+            $raidBossParticipation->update([
+                'attacks_left' => $attacksLeft <= 0 ? 0 : $attacksLeft,
+                'damage_dealt' => $newDamageAmount,
+                'killed_boss'  => $killedRaidBoss,
+            ]);
+
+            if (!is_null($raidBossParticipation)) {
+                event(new UpdateRaidAttacksLeft($character->user_id, ($attacksLeft <= 0 ? 0 : $attacksLeft)));
+            }
+
+            return;
+        }
+
+        RaidBossParticipation::create([
+            'character_id'  => $character->id,
+            'raid_id'       => $raidBoss->raid->id,
+            'attacks_left'  => 4,
+            'damage_dealt'  => $damageDealt,
+            'killed_boss'   => $killedRaidBoss,
+        ]);
+
+        event(new UpdateRaidAttacksLeft($character->user_id, 4));
     }
 
     /**

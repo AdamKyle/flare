@@ -5,6 +5,7 @@ namespace App\Game\Battle\Controllers\Api;
 use App\Flare\Models\Monster;
 use App\Flare\Models\RaidBoss;
 use App\Flare\Models\Character;
+use App\Flare\Models\RaidBossParticipation;
 use App\Game\Battle\Request\AttackTypeRequest;
 use App\Game\Battle\Services\Concerns\HandleCachedRaidCritterHealth;
 use Illuminate\Http\JsonResponse;
@@ -78,13 +79,22 @@ class RaidBattleController extends Controller {
     public function fightMonster(AttackTypeRequest $attackTypeRequest, Character $character, Monster $monster): JsonResponse {
 
         if ($monster->is_raid_monster) {
-
             $result = $this->raidBattleService->fightRaidMonster($character, $monster->id, $attackTypeRequest->attack_type, false);
             $status = $result['status'];
     
             unset($result['status']);
 
             return response()->json($result, $status);
+        }
+
+        $raidBossParticipation = RaidBossParticipation::where('character_id', $character->id)->first();
+
+        if (!is_null($raidBossParticipation)) {
+            if ($raidBossParticipation->attacks_left <= 0) {
+                return response()->json([
+                    'message' => 'Error! You cannot attack until tomorrow. Out of attacks!'
+                ], 422);
+            }
         }
 
         $raidBoss = RaidBoss::where('raid_boss_id', $monster->id)->first();

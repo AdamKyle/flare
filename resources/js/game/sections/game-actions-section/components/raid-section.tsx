@@ -2,7 +2,7 @@
 import React, { Fragment } from "react";
 import RaidSelectionProps from "./types/raid-selection-props";
 import RaidMonsterType from '../../../lib/game/types/actions/monster/raid-monster-type';
-import RaidSelectionType from "./types/raid-selection-state";
+import RaidSelectionState from "./types/raid-selection-state";
 import Ajax from "../../..//lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
 import MonsterSelection from "./fight-section/monster-selection";
@@ -10,7 +10,7 @@ import LoadingProgressBar from "../../../components/ui/progress-bars/loading-pro
 import RaidFight from "./raid-fight";
 import PrimaryButton from "../../../components/ui/buttons/primary-button";
 
-export default class RaidSection extends React.Component<RaidSelectionProps, RaidSelectionType> {
+export default class RaidSection extends React.Component<RaidSelectionProps, RaidSelectionState> {
 
     private updateRaidBosshealth: any;
 
@@ -29,6 +29,8 @@ export default class RaidSection extends React.Component<RaidSelectionProps, Rai
             selected_raid_monster_id: 0,
             monster_name: '',
             revived: false,
+            raid_boss_attacks_left: 0,
+            is_raid_boss: false,
         }
 
         // @ts-ignore
@@ -135,6 +137,8 @@ export default class RaidSection extends React.Component<RaidSelectionProps, Rai
                     monster_max_health: result.data.monster_max_health,
                     monster_current_health: result.data.monster_current_health,
                     monster_name: self.fetchRaidMonsterName(),
+                    raid_boss_attacks_left: result.data.attacks_left,
+                    is_raid_boss: result.data.is_raid_boss,
                 });
             }, (error: AxiosError) => {
                 this.setState({
@@ -194,6 +198,14 @@ export default class RaidSection extends React.Component<RaidSelectionProps, Rai
         return this.props.is_dead || !this.props.can_attack || this.state.selected_raid_monster_id === 0
     }
 
+    canAttack(): boolean {
+        if (this.state.is_raid_boss) {
+            return this.state.raid_boss_attacks_left > 0;
+        }
+
+        return this.props.can_attack;
+    }
+
     render() {
         return (
             <Fragment>
@@ -229,11 +241,12 @@ export default class RaidSection extends React.Component<RaidSelectionProps, Rai
                 {
                     this.state.monster_name !== '' ?
                         <RaidFight 
+                            user_id={this.props.user_id}
                             character_current_health={this.state.character_current_health}
                             character_max_health={this.state.character_max_health}
                             monster_current_health={this.state.monster_current_health}
                             monster_max_health={this.state.monster_max_health}
-                            can_attack={this.props.can_attack}
+                            can_attack={this.canAttack()}
                             is_dead={this.props.is_dead} 
                             monster_name={this.state.monster_name} 
                             monster_id={this.state.selected_raid_monster_id} 
@@ -242,7 +255,8 @@ export default class RaidSection extends React.Component<RaidSelectionProps, Rai
                             character_id={this.props.character_id}
                             revive={this.revive.bind(this)}      
                             reset_revived={this.resetRevived.bind(this)}    
-                            revived={this.state.revived}       
+                            revived={this.state.revived}   
+                            initial_attacks_left={this.state.raid_boss_attacks_left}
                         />
                     : null
                 }
