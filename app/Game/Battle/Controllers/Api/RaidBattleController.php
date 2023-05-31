@@ -95,7 +95,7 @@ class RaidBattleController extends Controller {
             ], 422);
         }
 
-        $result = $this->raidBattleService->fightRaidMonster($character, $monster->id, $attackTypeRequest->attack_type, true);
+        $result = $this->raidBattleService->setRaidBossHealth($raidBoss->boss_current_hp)->fightRaidMonster($character, $monster->id, $attackTypeRequest->attack_type, true);
         $status = $result['status'];
 
         unset($result['status']);

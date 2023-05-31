@@ -17,6 +17,7 @@ use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Flare\Builders\Character\CharacterCacheData;
 use Facade\App\Game\Messages\Handlers\ServerMessageHandler;
 use App\Game\Battle\Services\Concerns\HandleCachedRaidCritterHealth;
+use App\Game\Messages\Services\ServerMessage;
 
 class RaidBattleService {
 
@@ -48,6 +49,11 @@ class RaidBattleService {
     private BattleEventHandler $battleEventHandler;
 
     /**
+     * @var integer $raidBossCurrentHealth
+     */
+    private int $raidBossCurrentHealth;
+
+    /**
      * @param BuildMonster $buildMonster
      * @param CharacterCacheData $characterCacheData
      * @param MonsterPlayerFight $monsterPlayerFight
@@ -65,7 +71,6 @@ class RaidBattleService {
         $this->monsterPlayerFight       = $monsterPlayerFight;
         $this->buildMonsterCacheService = $buildMonsterCacheService;
         $this->battleEventHandler       = $battleEventHandler;
-
     }
 
     /**
@@ -87,8 +92,9 @@ class RaidBattleService {
             $monsterHealth   = $serverMonster->getHealth();
 
             $raidBoss->update([
-                'boss_max_hp'     => $monsterHealth,
-                'boss_current_hp' => $monsterHealth,
+                'boss_max_hp'       => $monsterHealth,
+                'boss_current_hp'   => $monsterHealth,
+                'raid_boss_deatils' => $serverMonster->getMonster(),
             ]);
 
             $raidBoss = $raidBoss->refresh();
@@ -102,6 +108,18 @@ class RaidBattleService {
             'monster_max_health'       => $raidBoss->boss_max_hp,
             'monster_current_health'   => $raidBoss->boss_current_hp,
         ]);
+    }
+
+    /**
+     * Set the current health for the raid battle service.
+     *
+     * @param integer $raidBossCurrentHealth
+     * @return RaidBattleService
+     */
+    public function setRaidBossHealth(int $raidBossCurrentHealth): RaidBattleService {
+        $this->raidBossCurrentHealth = $raidBossCurrentHealth;
+
+        return $this;
     }
 
     /**
@@ -151,34 +169,26 @@ class RaidBattleService {
             $serverMonster->setHealth($this->getCachedHealth($character->id, $monsterId));
         }
 
+        if ($isRaidBoss) {
+            $serverMonster->setHealth($this->raidBossCurrentHealth);
+        }
+
         $monster   = $serverMonster->getMonster();
         
-        if (!$isRaidBoss && $this->hasCachedHealth($character->id, $monsterId)) {
-            $fightData = $this->getCachedFightData($character->id, $monsterId);
-            $fightData['health']['monster_health'] = $serverMonster->getHealth();
-
-            $this->monsterPlayerFight->setUpRaidFight($character, $monster, $attackType);
-        } else {
-            $fightData = $this->monsterPlayerFight->setUpRaidFight($character, $monster, $attackType)->fightSetUp();
-        }
+        $fightData = $this->getFightData($character, $serverMonster, $monsterId, $monster, $attackType, $isRaidBoss);
         
         $messages  = $this->monsterPlayerFight->getBattleMessages();
 
         if (!$this->hasCachedHealth($character->id, $monsterId)) {
             $preAttackResult = $this->handlePreAttack($character, $fightData['health'], $messages, $monsterId, $isRaidBoss);
-            dump($preAttackResult);
+
             if (!empty($preAttackResult)) {
 
                 return $this->successResult($preAttackResult);
             }
         }
 
-        dump('Health before fight: ');
-        dump($fightData['health']);
-
         $result = $this->monsterPlayerFight->processAttack($fightData, true);
-
-        dump('Monster hp after fight: ' . $this->monsterPlayerFight->getMonsterHealth());
 
         $resultData = [
             'character_current_health' => $this->monsterPlayerFight->getCharacterHealth(),
@@ -216,6 +226,36 @@ class RaidBattleService {
         $this->handleRaidBossHealth($monsterId, $isRaidBoss);
 
         return $this->successResult($resultData);
+    }
+
+    /**
+     * Get the fight data for the raid critter.
+     *
+     * @param Character $character
+     * @param ServerMonster $serverMonster
+     * @param integer $monsterId
+     * @param array $monster
+     * @param string $attackType
+     * @param boolean $isRaidBoss
+     * @return array
+     */
+    protected function getFightData(Character $character, ServerMonster $serverMonster, int $monsterId, array $monster, string $attackType, bool $isRaidBoss): array {
+        if (!$isRaidBoss && $this->hasCachedHealth($character->id, $monsterId)) {
+            $fightData = $this->getCachedFightData($character->id, $monsterId);
+            $fightData['health']['monster_health'] = $serverMonster->getHealth();
+
+            $this->monsterPlayerFight->setUpRaidFight($character, $monster, $attackType);
+        } else {
+            $fightData = $this->monsterPlayerFight->setUpRaidFight($character, $monster, $attackType)->fightSetUp();
+
+            $raidBoss = RaidBoss::where('raid_boss_id', $monsterId)->first();
+
+            $fightData['monster']                  = resolve(ServerMonster::class)->setMonster($raidBoss->raid_boss_deatils)
+                                                                                  ->setHealth($raidBoss->boss_current_hp);
+            $fightData['health']['monster_health'] = $raidBoss->boss_current_hp;
+        }
+
+        return $fightData;
     }
 
 
@@ -273,12 +313,12 @@ class RaidBattleService {
      */
     protected function updateRaidBossHealth(RaidBoss $raidBoss, int $newHealth) {
         $raidBoss->update([
-            'boss_current_hp' => $newHealth
+            'boss_current_hp' => $newHealth,
         ]);
 
         $raidBoss = $raidBoss->refresh();
 
-        event(new UpdateRaidBossHealth($raidBoss->id, $raidBoss->boss_current_health));
+        event(new UpdateRaidBossHealth($raidBoss->id, $raidBoss->boss_current_hp));
     }
 
     /**
@@ -346,6 +386,6 @@ class RaidBattleService {
      */
     private function isRaidBossSetup(RaidBoss $raidBoss): bool {
 
-        return is_null($raidBoss->boss_max_hp) && is_null($raidBoss->boss_current_hp);
+        return !is_null($raidBoss->boss_max_hp) && !is_null($raidBoss->boss_current_hp);
     }
 }

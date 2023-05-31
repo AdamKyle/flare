@@ -16,13 +16,15 @@ class RaidBoss extends Model {
         'raid_boss_id',
         'boss_max_hp',
         'boss_current_hp',
+        'raid_boss_deatils'
     ];
 
     protected $casts = [
-        'raid_id'         => 'integer',
-        'raid_boss_id'    => 'integer',
-        'boss_max_hp'     => 'integer',
-        'boss_current_hp' => 'integer',
+        'raid_id'           => 'integer',
+        'raid_boss_id'      => 'integer',
+        'boss_max_hp'       => 'integer',
+        'boss_current_hp'   => 'integer',
+        'raid_boss_deatils' => 'array',
     ];
 
     public function raid() {

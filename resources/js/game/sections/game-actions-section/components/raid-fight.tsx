@@ -29,14 +29,11 @@ export default class RaidFight extends React.Component<RaidFightProps, RaidFight
     componentDidUpdate(): void {
         if (this.state.character_current_health !== this.props.character_current_health && this.props.revived) {
             this.setState({
-                character_current_health: this.props.character_current_health
+                character_current_health: this.props.character_current_health,
+                battle_messages: [],
             }, () => {
                 this.props.reset_revived();
             });
-        }
-
-        if (this.state.monster_current_health !== this.props.monster_current_health) {
-            console.log('Monster health (state then props)', this.state.monster_current_health, this.props.monster_current_health);
         }
     }
 

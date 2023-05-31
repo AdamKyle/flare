@@ -208,7 +208,11 @@ export default class RaidSection extends React.Component<RaidSelectionProps, Rai
 
                 {
                     this.state.is_loading || this.state.is_fighting ?
-                        <LoadingProgressBar />
+                        <div className="flex items-center justify-center">
+                            <div className="w-[50%] lg:mr-[100px]">
+                                <LoadingProgressBar />
+                            </div>
+                        </div>
                     : null
                 }
 
