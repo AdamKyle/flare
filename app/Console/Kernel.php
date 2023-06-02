@@ -73,6 +73,9 @@ class Kernel extends ConsoleKernel {
 
         // Give people a chance to win daily lottery for gold dust
         $schedule->command('daily:gold-dust')->dailyAt('12:00')->timezone(config('app.timezone'));
+
+        // Reset raid attacks every day.
+        $schedule->command('reset:daily-raid-attack-limits')->dailyAt('04:00')->timezone(config('app.timezone'));
     }
 
     /**

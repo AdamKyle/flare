@@ -134,6 +134,10 @@ class BattleBase extends BattleMessages {
     }
 
     protected function doMonsterCounter(Character $character, ServerMonster $monster) {
+
+        if ($this->getMonsterHealth() < 0) {
+            return;
+        }
         
         $counter = resolve(Counter::class);
 

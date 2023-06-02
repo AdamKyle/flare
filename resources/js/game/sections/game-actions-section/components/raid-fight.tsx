@@ -91,6 +91,14 @@ export default class RaidFight extends React.Component<RaidFightProps, RaidFight
             });
         });
     }
+    
+    canAttack(): boolean {
+        if (this.props.is_raid_boss && this.state.attacks_left <= 0 && !this.props.is_dead) {
+            return false;
+        }
+
+        return this.props.can_attack;
+    }
 
     render() {
         return (
@@ -116,7 +124,7 @@ export default class RaidFight extends React.Component<RaidFightProps, RaidFight
                     preforming_action={this.state.is_attacking}
                     character_name={this.props.character_name}
                     is_dead={this.props.is_dead}
-                    can_attack={this.props.can_attack}
+                    can_attack={this.canAttack()}
                     monster_id={this.props.monster_id}
                     attack={this.attack.bind(this)}
                     revive={this.props.revive}

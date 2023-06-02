@@ -107,6 +107,8 @@ class CharacterRewardService {
         if ($this->character->xp >= $this->character->xp_next) {
             $leftOverXP = $this->character->xp - $this->character->xp_next;
 
+            dump('Left over XP: ' . $leftOverXP);
+
             if ($leftOverXP > 0) {
                 $this->handleLevelUps($leftOverXP);
             }
@@ -128,18 +130,19 @@ class CharacterRewardService {
      * @param int $leftOverXP
      * @return void
      */
-    protected function handleLevelUps(int $leftOverXP): void {
-        $this->handleCharacterLevelUp($leftOverXP);
+    protected function handleLevelUps(int $leftOverXP, bool $shouldBuildCache = false): void {
+
+        $this->handleCharacterLevelUp($leftOverXP, $shouldBuildCache);
 
         if ($leftOverXP >= $this->character->xp_next) {
             $leftOverXP = $this->character->xp - $this->character->xp_next;
 
             if ($leftOverXP > 0) {
-                $this->handleLevelUps($leftOverXP);
+                $this->handleLevelUps($leftOverXP, false);
             }
 
             if ($leftOverXP <= 0) {
-                $this->handleLevelUps(0);
+                $this->handleLevelUps(0, true);
             }
         }
 
@@ -209,14 +212,14 @@ class CharacterRewardService {
      * @param int $leftOverXP
      * @return void
      */
-    public function handleCharacterLevelUp(int $leftOverXP): void {
+    public function handleCharacterLevelUp(int $leftOverXP, bool $shouldBuildCache = false): void {
         $this->characterService->levelUpCharacter($this->character, $leftOverXP);
-
         $character = $this->character->refresh();
 
-        CharacterAttackTypesCacheBuilder::dispatch($character);
-
-        $this->updateCharacterStats($character);
+        if ($shouldBuildCache || $leftOverXP < $character->xp_next) {
+            CharacterAttackTypesCacheBuilder::dispatch($character);
+            $this->updateCharacterStats($character);
+        }
 
         ServerMessageHandler::handleMessage($character->user, 'level_up', $character->level);
     }

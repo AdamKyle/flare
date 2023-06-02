@@ -198,14 +198,6 @@ export default class RaidSection extends React.Component<RaidSelectionProps, Rai
         return this.props.is_dead || !this.props.can_attack || this.state.selected_raid_monster_id === 0
     }
 
-    canAttack(): boolean {
-        if (this.state.is_raid_boss) {
-            return this.state.raid_boss_attacks_left > 0;
-        }
-
-        return this.props.can_attack;
-    }
-
     render() {
         return (
             <Fragment>
@@ -221,7 +213,7 @@ export default class RaidSection extends React.Component<RaidSelectionProps, Rai
                 {
                     this.state.is_loading || this.state.is_fighting ?
                         <div className="flex items-center justify-center">
-                            <div className="w-[50%] lg:mr-[100px]">
+                            <div className="w-[50%]">
                                 <LoadingProgressBar />
                             </div>
                         </div>
@@ -246,7 +238,7 @@ export default class RaidSection extends React.Component<RaidSelectionProps, Rai
                             character_max_health={this.state.character_max_health}
                             monster_current_health={this.state.monster_current_health}
                             monster_max_health={this.state.monster_max_health}
-                            can_attack={this.canAttack()}
+                            can_attack={this.props.can_attack}
                             is_dead={this.props.is_dead} 
                             monster_name={this.state.monster_name} 
                             monster_id={this.state.selected_raid_monster_id} 
@@ -257,6 +249,7 @@ export default class RaidSection extends React.Component<RaidSelectionProps, Rai
                             reset_revived={this.resetRevived.bind(this)}    
                             revived={this.state.revived}   
                             initial_attacks_left={this.state.raid_boss_attacks_left}
+                            is_raid_boss={this.state.is_raid_boss}
                         />
                     : null
                 }

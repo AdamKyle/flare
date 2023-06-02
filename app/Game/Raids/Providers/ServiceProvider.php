@@ -1,14 +1,8 @@
 <?php
 
-namespace App\Game\Quests\Providers;
+namespace App\Game\Raids\Providers;
 
-use App\Admin\Services\QuestService;
-use App\Game\Maps\Validation\CanTravelToMap;
-use App\Game\Maps\Values\MapTileValue;
-use App\Game\Messages\Builders\NpcServerMessageBuilder;
-use App\Game\Quests\Handlers\NpcQuestRewardHandler;
-use App\Game\Quests\Handlers\NpcQuestsHandler;
-use App\Game\Quests\Services\QuestHandlerService;
+use App\Game\Raids\Console\Commands\ResetDailyRaidAttackLimits;
 use App\Game\Raids\Services\RaidEventService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
@@ -23,6 +17,10 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(RaidEventService::class, function() {
             return new RaidEventService();
         });
+
+        $this->commands([
+            ResetDailyRaidAttackLimits::class,
+        ]);
     }
 
     /**

@@ -135,7 +135,7 @@ class CastType extends BattleBase
             $this->pvpSpellDamage($attacker, $defender, $spellDamage);
         }
 
-        $this->heal($attacker, true);
+        $this->heal($attacker, $defender, true);
 
         if ($this->allowSecondaryAttacks) {
             $this->secondaryAttack($attacker, null, $this->characterCacheData->getCachedCharacterData($defender, 'affix_damage_reduction'), true);

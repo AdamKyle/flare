@@ -16,4 +16,5 @@ export default interface RaidFightProps {
     revive: () => void;
     reset_revived: () => void;
     initial_attacks_left: number;
+    is_raid_boss: boolean;
 }

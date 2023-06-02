@@ -61,16 +61,12 @@ class MonstersTable extends DataTableComponent {
 
                         $gameMapId = GameMap::where('name', trim(str_replace('Raid Bosses', '', $value)))->first()->id;
 
-                        dump($builder->where('game_map_id', $gameMapId)->where('is_raid_boss', true)->get());
-
                         return $builder->where('game_map_id', $gameMapId)->where('is_raid_boss', true);
                     }
 
                     if (str_contains($value, 'Raid Monsters')) {
 
                         $gameMapId = GameMap::where('name', trim(str_replace('Raid Monsters', '', $value)))->first()->id;
-
-                        dump($builder->where('game_map_id', $gameMapId)->where('is_raid_monster', true)->get());
 
                         return $builder->where('game_map_id', $gameMapId)->where('is_raid_monster', true);
                     }
