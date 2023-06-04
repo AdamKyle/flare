@@ -130,7 +130,7 @@ class QuestHandlerService {
         }
 
         if (!$this->hasCompletedRequiredQuest($character, $quest)) {
-            $this->bailMessage = 'You need to complete another quest before completing this one. Check the Required To Complete tab.';
+            $this->bailMessage = 'You need to complete another quest before handing this one in. Check the Required To Complete tab.';
 
             return true;
         }
