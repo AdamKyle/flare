@@ -45,6 +45,8 @@ class BuildQuestCacheService {
         if (!is_null($eventWithRaid)) {
             $raidQuests = $this->getRaidQuests();
 
+            dump($raidQuests);
+
             if (!is_null($raidQuests)) {
 
                 if (isset($raidQuests[$eventWithRaid->raid_id])) {

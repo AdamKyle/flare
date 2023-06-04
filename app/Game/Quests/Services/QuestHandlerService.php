@@ -2,17 +2,18 @@
 
 namespace App\Game\Quests\Services;
 
-use App\Flare\Jobs\CharacterAttackTypesCacheBuilder;
-use App\Flare\Models\Character;
 use App\Flare\Models\Npc;
 use App\Flare\Models\Quest;
+use App\Flare\Models\Character;
+use App\Game\Maps\Values\MapTileValue;
+use App\Game\Quests\Traits\QuestDetails;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Maps\Validation\CanTravelToMap;
-use App\Game\Maps\Values\MapTileValue;
+use App\Flare\Services\BuildQuestCacheService;
+use App\Game\Quests\Handlers\NpcQuestsHandler;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
-use App\Game\Quests\Traits\QuestDetails;
-use App\Game\Quests\Handlers\NpcQuestsHandler;
+use App\Flare\Jobs\CharacterAttackTypesCacheBuilder;
 
 class QuestHandlerService {
 
@@ -39,14 +40,24 @@ class QuestHandlerService {
     private MapTileValue $mapTileValue;
 
     /**
+     * @var BuildQuestCacheService
+     */
+    private BuildQuestCacheService $buildQuestCacheService;
+
+    /**
      * @param NpcQuestsHandler $npcQuestsHandler
      * @param CanTravelToMap $canTravelToMap
      * @param MapTileValue $mapTileValue
      */
-    public function __construct(NpcQuestsHandler $npcQuestsHandler, CanTravelToMap $canTravelToMap, MapTileValue $mapTileValue) {
-        $this->npcQuestsHandler = $npcQuestsHandler;
-        $this->canTravelToMap   = $canTravelToMap;
-        $this->mapTileValue     = $mapTileValue;
+    public function __construct(NpcQuestsHandler $npcQuestsHandler, 
+                                CanTravelToMap $canTravelToMap, 
+                                MapTileValue $mapTileValue,
+                                BuildQuestCacheService $buildQuestCacheService) {
+                                    
+        $this->npcQuestsHandler       = $npcQuestsHandler;
+        $this->canTravelToMap         = $canTravelToMap;
+        $this->mapTileValue           = $mapTileValue;
+        $this->buildQuestCacheService = $buildQuestCacheService;
     }
 
     /**
@@ -118,6 +129,12 @@ class QuestHandlerService {
             }
         }
 
+        if (!$this->hasCompletedRequiredQuest($character, $quest)) {
+            $this->bailMessage = 'You need to complete another quest before completing this one. Check the Required To Complete tab.';
+
+            return true;
+        }
+
         return false;
     }
 
@@ -167,12 +184,14 @@ class QuestHandlerService {
 
         $character = $character->refresh();
 
-        $quests = Quest::where('is_parent', true)->with('childQuests')->get();
+        $quests     = $this->buildQuestCacheService->getRegularQuests();
+        $raidQuests = $this->buildQuestCacheService->fetchQuestsForRaid();
 
         return $this->successResult([
             'completed_quests' => $character->questsCompleted()->pluck('quest_id'),
             'player_plane'     => $character->map->gameMap->name,
-            'quests'           => $quests->toArray(),
+            'quests'           => $quests,
+            'raid_quests'      => $raidQuests,
         ]);
     }
 

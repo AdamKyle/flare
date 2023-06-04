@@ -2,24 +2,26 @@
 
 namespace App\Game\Battle\Jobs;
 
+use App\Flare\Models\Raid;
+use App\Flare\Models\Monster;
 use Illuminate\Bus\Queueable;
+use App\Flare\Models\Location;
+use App\Flare\Models\Character;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
+use App\Flare\Models\RaidBossParticipation;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Database\Eloquent\Collection;
-use App\Flare\Models\Raid;
-use App\Flare\Models\Monster;
-use App\Flare\Models\Character;
-use App\Flare\Models\RaidBossParticipation;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Battle\Events\UpdateRaidAttacksLeft;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
+use App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation;
 
 class RaidBossRewardHandler implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, UpdateRaidMonstersForLocation;
 
     /**
      * @var integer $characterId
@@ -58,6 +60,10 @@ class RaidBossRewardHandler implements ShouldQueue
         $raid = Raid::find($this->raidId);
 
         $this->handleWhenRaidBossIsKilled($character, $raid->raidBoss);
+
+        $location = Location::where('x', $character->map->character_position_x)->where('y', $character->map->character_position_y)->first();
+
+        $this->updateMonstersForRaid($character, $location);
     }
 
     /**

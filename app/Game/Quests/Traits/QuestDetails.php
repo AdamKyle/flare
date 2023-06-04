@@ -98,4 +98,12 @@ trait QuestDetails {
 
         return $hasGold && $hasGoldDust && $hasShards && $copperCoins;
     }
+
+    protected function hasCompletedRequiredQuest(Character $character, Quest $quest): bool {
+        if (!is_null($quest->required_quest_id)) {
+            return !is_null($character->completedQuests->where('required_quest_id', $quest->required_quest_id)->first());
+        }
+
+        return true;
+    }
 }

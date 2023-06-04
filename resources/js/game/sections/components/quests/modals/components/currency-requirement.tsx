@@ -132,6 +132,22 @@ export default class CurrencyRequirement extends React.Component<any, any> {
                             </Fragment>
                             : null
                     }
+                    {
+                        this.props.quest.required_quest_id !== null ?
+                            <Fragment>
+                                <dt>Required Quest To Complete:</dt>
+                                <dd className='flex items-center'>
+                                    <span>{this.props.quest.required_quest.name}</span>
+                                    <div className='ml-2'>
+                                        <button type={"button"} onClick={() => this.manageHelpDialogue('required_quest')} className='text-blue-500 dark:text-blue-300'>
+                                            <i className={'fas fa-info-circle'}></i> Help
+                                        </button>
+                                    </div>
+                                </dd>
+                            </Fragment>
+                            :
+                            null
+                    }
                 </dl>
 
                 {

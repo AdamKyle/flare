@@ -21,7 +21,7 @@
                 <div>
                     <ul class="list-disc ml-8">
                         @foreach($raidMonsterChunk as $monster)
-                            <li><a href="/information/monster/{{$monster['id']}}" target="_blank"><i class="fas fa-external-link-alt"></i>{{$monster['name']}}</a></li>
+                            <li><a href="/information/monster/{{$monster['id']}}" target="_blank"><i class="fas fa-external-link-alt"></i> {{$monster['name']}}</a></li>
                         @endforeach
                     </ul>
                 </div>

@@ -57,9 +57,14 @@ class Raid extends Model {
         if ($raidBossIndex > -1) {
             $raidBoss = array_splice($raidMonsters, $raidBossIndex, 1)[0];
 
-            $raidBoss['name'] = $raidBoss['name'] . ' (RAID BOSS)';
+            $raidBossRecord = RaidBoss::where('raid_boss_id', $raidBoss['id'])->first();
 
-            array_unshift($raidMonsters, $raidBoss);
+            if (!$raidBossRecord->boss_current_hp > 0) {
+
+                $raidBoss['name'] = $raidBoss['name'] . ' (RAID BOSS)';
+
+                array_unshift($raidMonsters, $raidBoss);
+            }
         }
 
         return $raidMonsters;

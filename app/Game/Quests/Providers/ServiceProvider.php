@@ -3,6 +3,7 @@
 namespace App\Game\Quests\Providers;
 
 use App\Admin\Services\QuestService;
+use App\Flare\Services\BuildQuestCacheService;
 use App\Game\Maps\Validation\CanTravelToMap;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
@@ -37,6 +38,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(NpcQuestsHandler::class),
                 $app->make(CanTravelToMap::class),
                 $app->make(MapTileValue::class),
+                $app->make(BuildQuestCacheService::class)
             );
         });
     }

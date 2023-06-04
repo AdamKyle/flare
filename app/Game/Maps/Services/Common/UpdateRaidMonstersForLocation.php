@@ -14,9 +14,9 @@ trait UpdateRaidMonstersForLocation {
      *
      * @param Character $character
      * @param Location|null $location
-     * @return void
+     * @return bool
      */
-    public function updateMonstersForRaid(Character $character, ?Location $location = null) {
+    public function updateMonstersForRaid(Character $character, ?Location $location = null): bool {
         $raidEvent = Event::whereNotNull('raid_id')->first();
 
         if (!is_null($raidEvent) && !is_null($location)) {

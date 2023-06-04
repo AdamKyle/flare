@@ -59,6 +59,7 @@ class QuestsController extends Controller {
             'unlocksFeatures' => FeatureTypes::getSelectable(),
             'passiveSkills'   => PassiveSkill::pluck('name', 'id')->toArray(),
             'raids'           => Raid::pluck('name', 'id')->toArray(),
+            'requiredQuests'  => Quest::pluck('name', 'id')->toArray(),
         ]);
     }
 
@@ -74,6 +75,7 @@ class QuestsController extends Controller {
             'unlocksFeatures' => FeatureTypes::getSelectable(),
             'passiveSkills'   => PassiveSkill::pluck('name', 'id')->toArray(),
             'raids'           => Raid::pluck('name', 'id')->toArray(),
+            'requiredQuests'  => Quest::pluck('name', 'id')->toArray(),
         ]);
     }
 

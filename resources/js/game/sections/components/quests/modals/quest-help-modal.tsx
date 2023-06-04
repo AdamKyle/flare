@@ -18,6 +18,8 @@ export default class QuestHelpModal extends React.Component<any, any> {
                 return 'How to get: ' + this.props.quest.item.name
             case 'secondary_item_requirement':
                 return 'How to get: ' + this.props.quest.secondary_item.name
+            case 'required_quest':
+                return 'Quest to complete: ' + this.props.quest.required_quest.name
             default:
                 return null;
         }
@@ -58,7 +60,7 @@ export default class QuestHelpModal extends React.Component<any, any> {
     buildCopperCoins() {
         return (
             <Fragment>
-                <p className='my-2 text-gray-700 dark:text-gray-200'>
+                <p className='mt-2 mb-4 text-gray-700 dark:text-gray-200'>
                     You must have access to Purgatory, from there you will kill any creature to get Copper Coins.
                     Players should first complete the quest line to access Purgatory Smith Work Bench in the Purgatory Smiths House
                     in Purgatory. This will allow you to make Holy Items, through Alchemy. These items are required to make
@@ -66,6 +68,43 @@ export default class QuestHelpModal extends React.Component<any, any> {
                 </p>
             </Fragment>
         );
+    }
+
+    buildRequiredQuestHelp() {
+        console.log(this.props.quest.required_quest);
+        return (
+            <Fragment>
+                <p className='my-4 text-gray-700 dark:text-gray-200'>
+                    You need to complete a quest before you can hand this one in. The quest you are looking for can be in the same tree as this quest.
+                    Take a look below to see what plane the quest is on, the name of the quest and if its a raid specific quest, which means it only 
+                    appears when that raid is running.
+                </p>
+                <dl>
+                    <dt>Quest Name:</dt>
+                    <dd>{this.props.quest.required_quest.name}</dd>
+                    <dt>Plane:</dt>
+                    <dd>
+                        <a href={'/information/map/' + this.props.quest.required_quest.npc.game_map.id} target='_blank'>
+                            {this.props.quest.required_quest.npc.game_map.name} <i className="fas fa-external-link-alt"></i>
+                        </a>
+                    </dd>
+                    <dt>Is Raid Quest:</dt>
+                    <dd>
+                        {this.props.quest.required_quest.raid_id !== null ? 'Yes' : 'No'}
+                    </dd>
+                    {
+                        this.props.quest.required_quest.raid_id !== null ?
+                            <Fragment>
+                                <dt>Raid Name:</dt>
+                                <dd>
+                                    <strong>{this.props.quest.required_quest.raid.name}</strong> Check your event calendar in the side bar to see when this raid is going to take place again!
+                                </dd>
+                            </Fragment>
+                        : null
+                    }
+                </dl>
+            </Fragment>
+        )
     }
 
     buildContent() {
@@ -80,6 +119,8 @@ export default class QuestHelpModal extends React.Component<any, any> {
                 return <p className='my-2 text-gray-700 dark:text-gray-200'>{this.props.item_requirements(this.props.quest.item)}</p>
             case 'secondary_item_requirement':
                 return <p className='my-2 text-gray-700 dark:text-gray-200'>{this.props.item_requirements(this.props.quest.secondary_item)}</p>
+            case 'required_quest':
+                return this.buildRequiredQuestHelp()
             default:
                 return null;
         }

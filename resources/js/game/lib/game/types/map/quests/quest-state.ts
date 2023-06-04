@@ -4,6 +4,8 @@ export default interface QuestState {
 
     quests: QuestDetails[] | [];
 
+    raid_quests: QuestDetails[]|[];
+
     completed_quests: number[] | [];
 
     loading: boolean,

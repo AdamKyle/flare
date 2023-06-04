@@ -1,4 +1,4 @@
-<div class="grid lg:grid-cols-2 gap-2">
+<div class="grid lg:grid-cols-2 gap-4">
     <div>
         <p class="mt-3 mb-3">This quest belongs to an NPC, whom you must be on the same place as to complete.</p>
         <p class="mb-3">To complete all a quest all you have to do is on the same plane, then click Quests tab, click the quest, click complete.</p>
@@ -89,6 +89,11 @@
             @if (!is_null($quest->shards_cost))
                 <dt>Required Shards Cost:</dt>
                 <dd>{{$quest->shards_cost}}</dd>
+            @endif
+
+            @if (!is_null($quest->required_quest_id))
+                <dt>Must Complete Quest:</dt>
+                <dd>{{$quest->requiredQuest->name}}</dd>
             @endif
         </dl>
     </div>

@@ -4,6 +4,8 @@ export default interface QuestType {
 
     quests: QuestDetails[]|[];
 
+    raid_quests: QuestDetails[]|[];
+
     completed_quests: number[];
 
     player_plane: string;

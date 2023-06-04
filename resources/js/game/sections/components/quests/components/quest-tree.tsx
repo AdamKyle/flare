@@ -7,7 +7,7 @@ import {ChildQuestDetails} from "../../../../lib/game/map/types/child-quest-deta
 import Tabs from "../../../../components/ui/tabs/tabs";
 import TabPanel from "../../../../components/ui/tabs/tab-panel";
 
-export  default class QuestTree extends React.Component<QuestTreeProps, any> {
+export  default class QuestTree extends React.Component<QuestTreeProps, {}> {
 
     private tabs: {key: string, name: string}[];
 
@@ -25,6 +25,15 @@ export  default class QuestTree extends React.Component<QuestTreeProps, any> {
         }];
 
         this.invalid_planes = ['Purgatory']
+    }
+
+    componentDidMount(): void {
+        if (this.props.raid_quests.length > 0) {
+            this.tabs.push({
+                key: 'raid-quests',
+                name: 'Raid Quests',
+            });
+        }
     }
 
     renderQuestTree(parentQuest: QuestDetails | ChildQuestDetails | null) {
@@ -46,6 +55,18 @@ export  default class QuestTree extends React.Component<QuestTreeProps, any> {
         const plane = this.fetchPlane();
 
         const questChain = this.props.quests.filter((quest) => quest.child_quests.length > 0 && quest.belongs_to_map_name === plane);
+
+        if (questChain.length > 0) {
+            return questChain[0];
+        }
+
+        return null
+    }
+
+    fetchParentRaidQuestChain(): QuestDetails | null {
+        const plane = this.fetchPlane();
+
+        const questChain = this.props.raid_quests.filter((quest) => quest.child_quests.length > 0 && quest.belongs_to_map_name === plane);
 
         if (questChain.length > 0) {
             return questChain[0];
@@ -91,6 +112,7 @@ export  default class QuestTree extends React.Component<QuestTreeProps, any> {
         });
     }
 
+
     render() {
         return(
             <Tabs tabs={this.tabs}>
@@ -108,6 +130,20 @@ export  default class QuestTree extends React.Component<QuestTreeProps, any> {
                     {this.renderSingleQuests()}
 
                 </TabPanel>
+                {
+                    this.props.raid_quests.length > 0 ?
+                        <TabPanel key={'one-off-quests'}>
+                            <Tree
+                                lineWidth={'2px'}
+                                lineColor={'#0ea5e9'}
+                                lineBorderRadius={'10px'}
+                                label={<QuestNode quest={this.fetchParentRaidQuestChain()} character_id={this.props.character_id} completed_quests={this.props.completed_quests} update_quests={this.props.update_quests}/>}
+                            >
+                                {this.renderQuestTree(this.fetchParentRaidQuestChain())}
+                            </Tree>
+                        </TabPanel>
+                    : null
+                }
             </Tabs>
         );
     }

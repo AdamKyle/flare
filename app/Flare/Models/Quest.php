@@ -20,6 +20,9 @@ class Quest extends Model {
         'name',
         'npc_id',
         'item_id',
+        'raid_id',
+        'required_quest_id',
+        'reincarnated_times',
         'access_to_map_id',
         'gold_dust_cost',
         'shard_cost',
@@ -46,6 +49,9 @@ class Quest extends Model {
     protected $casts = [
         'name'                    => 'string',
         'item_id'                 => 'integer',
+        'raid_id'                 => 'integer',
+        'required_quest_id'       => 'integer',
+        'reincarnated_times'      => 'integer',
         'gold_dust_cost'          => 'integer',
         'shard_cost'              => 'integer',
         'gold_cost'               => 'integer',
@@ -73,14 +79,15 @@ class Quest extends Model {
     public function childQuests() {
         return $this->hasMany($this, 'parent_quest_id')
                     ->with(
-                'childQuests'
+                        'childQuests'
                     );
     }
 
     public function loadRelations() {
         return $this->load(
-    'rewardItem',
+            'rewardItem',
             'item',
+            'requiredQuest',
             'factionMap',
             'item.dropLocation',
             'secondaryItem',
@@ -88,6 +95,7 @@ class Quest extends Model {
             'requiredPlane',
             'npc',
             'npc.gameMap',
+            'raid',
         );
     }
 
@@ -97,6 +105,10 @@ class Quest extends Model {
 
     public function item() {
         return $this->belongsTo(Item::class, 'item_id', 'id');
+    }
+
+    public function requiredQuest() {
+        return $this->belongsTo($this, 'required_quest_id')->with('raid');
     }
 
     public function secondaryItem() {
@@ -117,6 +129,10 @@ class Quest extends Model {
 
     public function factionMap() {
         return $this->hasOne(GameMap::class, 'id', 'faction_game_map_id');
+    }
+
+    public function raid() {
+        return $this->hasOne(Raid::class, 'id', 'raid_id');
     }
 
     public function unlocksFeature(): ?FeatureTypes {
