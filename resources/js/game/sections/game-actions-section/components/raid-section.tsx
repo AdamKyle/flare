@@ -126,7 +126,7 @@ export default class RaidSection extends React.Component<RaidSelectionProps, Rai
         const self = this;
 
         this.setState({
-            is_loading: false,
+            is_loading: true,
         }, () => {
             (new Ajax()).setRoute('raid-fight-participation/'+this.props.character_id+'/' + this.state.selected_raid_monster_id)
             .doAjaxCall('get', (result: AxiosResponse) => {

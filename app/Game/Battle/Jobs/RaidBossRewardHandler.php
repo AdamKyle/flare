@@ -16,7 +16,6 @@ use Illuminate\Database\Eloquent\Collection;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Battle\Events\UpdateRaidAttacksLeft;
-use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation;
 
 class RaidBossRewardHandler implements ShouldQueue
@@ -29,9 +28,9 @@ class RaidBossRewardHandler implements ShouldQueue
     private int $characterId;
 
     /**
-     * @var integer $raidId
+     * @var integer $raidId|null
      */
-    private int $raidId;
+    private ?int $raidId;
 
     /**
      * @var integer $monsterId
@@ -41,7 +40,7 @@ class RaidBossRewardHandler implements ShouldQueue
     /**
      * @param Collection $participants
      */
-    public function __construct(int $characterId, int $raidId, $monsterId) {
+    public function __construct(int $characterId, int $monsterId, int $raidId = null) {
         $this->characterId = $characterId;
         $this->raidId      = $raidId;
         $this->monsterId   = $monsterId;
@@ -57,13 +56,16 @@ class RaidBossRewardHandler implements ShouldQueue
         
         $battleEventHandler->processMonsterDeath($this->characterId, $this->monsterId);
 
-        $raid = Raid::find($this->raidId);
+        if (!is_null($this->raidId)) {
 
-        $this->handleWhenRaidBossIsKilled($character, $raid->raidBoss);
+            $raid = Raid::find($this->raidId);
 
-        $location = Location::where('x', $character->map->character_position_x)->where('y', $character->map->character_position_y)->first();
+            $this->handleWhenRaidBossIsKilled($character, $raid->raidBoss);
 
-        $this->updateMonstersForRaid($character, $location);
+            $location = Location::where('x', $character->map->character_position_x)->where('y', $character->map->character_position_y)->first();
+
+            $this->updateMonstersForRaid($character, $location);
+        }
     }
 
     /**

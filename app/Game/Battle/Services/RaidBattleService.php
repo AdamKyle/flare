@@ -224,7 +224,7 @@ class RaidBattleService {
 
             $raid = Raid::where('raid_boss_id', $monsterId)->first();
 
-            RaidBossRewardHandler::dispatch($character->id, $raid->id, $monsterId);
+            RaidBossRewardHandler::dispatch($character->id, $monsterId, is_null($raid) ? null : $raid->id);
 
             $resultData['monster_current_health'] = 0;
 
@@ -259,7 +259,9 @@ class RaidBattleService {
             $this->monsterPlayerFight->setUpRaidFight($character, $monster, $attackType);
         } else {
             $fightData = $this->monsterPlayerFight->setUpRaidFight($character, $monster, $attackType)->fightSetUp();
+        }
 
+        if ($isRaidBoss) {
             $raidBoss = RaidBoss::where('raid_boss_id', $monsterId)->first();
 
             $fightData['monster']                  = resolve(ServerMonster::class)->setMonster($raidBoss->raid_boss_deatils)

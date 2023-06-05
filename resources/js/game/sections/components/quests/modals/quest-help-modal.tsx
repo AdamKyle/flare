@@ -1,5 +1,6 @@
 import React, {Fragment} from "react";
 import HelpDialogue from "../../../../components/ui/dialogue/help-dialogue";
+import AlchemyItemHoly from '../../../character-sheet/components/modals/components/alchemy-item-holy';
 
 export default class QuestHelpModal extends React.Component<any, any> {
     constructor(props: any) {
@@ -20,6 +21,8 @@ export default class QuestHelpModal extends React.Component<any, any> {
                 return 'How to get: ' + this.props.quest.secondary_item.name
             case 'required_quest':
                 return 'Quest to complete: ' + this.props.quest.required_quest.name
+            case 'reincarnation_times':
+                return 'Times to reincarnate'
             default:
                 return null;
         }
@@ -71,7 +74,6 @@ export default class QuestHelpModal extends React.Component<any, any> {
     }
 
     buildRequiredQuestHelp() {
-        console.log(this.props.quest.required_quest);
         return (
             <Fragment>
                 <p className='my-4 text-gray-700 dark:text-gray-200'>
@@ -107,6 +109,26 @@ export default class QuestHelpModal extends React.Component<any, any> {
         )
     }
 
+    buildReincarnationHelp() {
+        return (
+            <Fragment>
+                <p className='mt-2 mb-4 text-gray-700 dark:text-gray-200'>
+                    This quest requires you to head to your Character Sheet (tab) and click the Reincarnate button. This will set your character to level one, keeping all
+                    skills, current stats and so on. Only your level will be reset back to one, allowing your character to grow stronger.
+                </p>
+
+                <p className='mb-4 text-gray-700 dark:text-gray-200'>
+                    While you can reincarnate at anytime, a word of caution: If you reincarnate too early, you will have less stats then someone who waits till they are level 5000.
+                    A character may only reincarnate 100 times. The choice is yours if you reincarnate now, or wait.
+                </p>
+
+                <p className='text-gray-700 dark:text-gray-200'>
+                    Learn more about <a href='/information/reincarnation' target='_blank'>Reincarnation <i className="fas fa-external-link-alt"></i></a>
+                </p>
+            </Fragment>
+        );
+    }
+
     buildContent() {
         switch(this.props.type) {
             case 'gold_dust':
@@ -121,6 +143,8 @@ export default class QuestHelpModal extends React.Component<any, any> {
                 return <p className='my-2 text-gray-700 dark:text-gray-200'>{this.props.item_requirements(this.props.quest.secondary_item)}</p>
             case 'required_quest':
                 return this.buildRequiredQuestHelp()
+            case 'reincarnation_times':
+                return this.buildReincarnationHelp();
             default:
                 return null;
         }

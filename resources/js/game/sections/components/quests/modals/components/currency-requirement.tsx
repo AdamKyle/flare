@@ -148,6 +148,22 @@ export default class CurrencyRequirement extends React.Component<any, any> {
                             :
                             null
                     }
+                    {
+                        this.props.quest.reincarnated_times !== null ?
+                            <Fragment>
+                                <dt>Number of times to reincarnate:</dt>
+                                <dd className='flex items-center'>
+                                    <span>{this.props.quest.reincarnated_times}</span>
+                                    <div className='ml-2'>
+                                        <button type={"button"} onClick={() => this.manageHelpDialogue('reincarnation_times')} className='text-blue-500 dark:text-blue-300'>
+                                            <i className={'fas fa-info-circle'}></i> Help
+                                        </button>
+                                    </div>
+                                </dd>
+                            </Fragment>
+                            :
+                            null
+                    }
                 </dl>
 
                 {

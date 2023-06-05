@@ -103,9 +103,14 @@ export default class RaidFight extends React.Component<RaidFightProps, RaidFight
     render() {
         return (
             <Fragment>
-                <div className="flex items-center justify-center">
-                    <div className="mt-4 text-center font-bold">Attacks Left: {this.state.attacks_left}/5 {this.state.attacks_left <= 0 ? '[You can attack again tomorrow]' : ''}</div>
-                </div>
+                {
+                    this.props.is_raid_boss ?
+                        <div className="flex items-center justify-center">
+                            <div className="mt-4 text-center font-bold">Attacks Left: {this.state.attacks_left}/5 {this.state.attacks_left <= 0 ? '[You can attack again tomorrow]' : ''}</div>
+                        </div>
+                    : null
+                }
+
                 {
                     this.state.error_message !== '' ?
                         <div className="flex items-center justify-center">
