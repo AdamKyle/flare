@@ -48,6 +48,7 @@ class BuildCharacterAttackTypes {
                 'defend'                 => $characterAttack->buildDefend(),
                 'voided_defend'          => $characterAttack->buildDefend(true),
                 'elemental_atonement'    => $character->getInformation()->buildElementalAtonement(),
+                
             ],
             'damage_stat_amount'     => $character->getInformation()->statMod($character->damage_stat),
         ]);

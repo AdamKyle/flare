@@ -16,10 +16,16 @@ class GemTypeValue {
         self::WATER => self::WATER,
     ];
 
-    private static array $oppisites = [
+    private static array $halfDamage = [
         self::FIRE  => self::WATER,
         self::ICE   => self::FIRE,
         self::WATER => self::ICE,
+    ];
+
+    private static array $doubleDamage = [
+        self::WATER => self::FIRE,
+        self::FIRE  => self::ICE,
+        self::ICE  => self::WATER,
     ];
 
     private static array $names = [
@@ -40,7 +46,7 @@ class GemTypeValue {
         return self::$names;
     }
 
-    public static function getOppositeForName(string $name): string {
+    public static function getOppsiteForHalfDamage(string $name): string {
         if (!in_array($name, self::$names)) {
             throw new \Exception($name . ' does not exist.');
         }
@@ -51,7 +57,23 @@ class GemTypeValue {
             throw new \Exception($name . ' does not exist.');
         }
 
-        $opposite = self::$oppisites[$value];
+        $opposite = self::$halfDamage[$value];
+
+        return self::$names[$opposite];
+    }
+
+    public static function getOppsiteForDoubleDamage(string $name): string {
+        if (!in_array($name, self::$names)) {
+            throw new \Exception($name . ' does not exist.');
+        }
+
+        $value = array_search($name, self::$names);
+
+        if ($value === false) {
+            throw new \Exception($name . ' does not exist.');
+        }
+
+        $opposite = self::$doubleDamage[$value];
 
         return self::$names[$opposite];
     }

@@ -15,13 +15,14 @@ use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
+use App\Flare\ServerFight\Fight\Concerns\ElementAttackData;
 use App\Flare\Values\ItemEffectsValue;
 use Exception;
 use Illuminate\Support\Collection;
 
 class CharacterStatBuilder {
 
-    use FetchEquipped, Boons;
+    use FetchEquipped, Boons, ElementAttackData;
 
     /**
      * @var Character $character
@@ -401,6 +402,36 @@ class CharacterStatBuilder {
 
         return ceil($damage + ($damage * ($this->holyInfo()->fetchAttackBonus() + $classSpecialsBonus)));
     }
+
+    /**
+     * Build elemental Damage For the character.
+     *
+     * @param string $defendingElement
+     * @param boolean $isVoided
+     * @return integer
+     */
+    public function buildElementalDamage(int $weaponAttack, string $defendingElement): int {
+        $elementalData = $this->buildElementalAtonement();
+
+        if (is_null($elementalData)) {
+            return 0;
+        }
+
+        $highestDamage = $this->getHighestElementDamage($this->buildElementalAtonement()); 
+
+        $attack = ceil($weaponAttack * $highestDamage);
+
+        if ($this->isHalfDamage($elementalData, $defendingElement)) {
+            return floor ($attack / 2);
+        }
+
+        if ($this->isDoubleDamage($elementalData, $defendingElement)) {
+            return floor ($attack * 2);
+        }
+
+        return $attack;
+    }
+    
 
     /**
      * Add bonus to spell damage.

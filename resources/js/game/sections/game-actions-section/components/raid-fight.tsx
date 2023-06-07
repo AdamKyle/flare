@@ -5,6 +5,7 @@ import BattleMesages from "./fight-section/battle-mesages";
 import RaidFightState from "./types/raid-fight-state";
 import Ajax from "../../../lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
+import PrimaryLinkButton from "../../../components/ui/buttons/primary-link-button";
 
 export default class RaidFight extends React.Component<RaidFightProps, RaidFightState> {
 
@@ -120,6 +121,13 @@ export default class RaidFight extends React.Component<RaidFightProps, RaidFight
                         </div>
                     : null
                 }
+
+                <div className="flex items-center justify-center">
+                    <div className=" mt-4 mb-4 text-center">
+                        <PrimaryLinkButton button_label={'Elemental Atonement Info'} on_click={() => console.log('clicked')} />
+                    </div>
+                </div>
+
                 <ServerFight 
                     monster_health={this.state.monster_current_health}
                     character_health={this.state.character_current_health}

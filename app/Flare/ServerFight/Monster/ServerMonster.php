@@ -2,7 +2,11 @@
 
 namespace App\Flare\ServerFight\Monster;
 
+use App\Flare\ServerFight\Fight\Concerns\ElementAttackData;
+
 class ServerMonster {
+
+    use ElementAttackData;
 
     private int $health;
 
@@ -74,6 +78,24 @@ class ServerMonster {
         return $attack;
     }
 
+    public function getMonsterElementalDamage(string $characterElement): int {
+        $elementDamage = $this->getHighestElementDamage($this->getElementData());
+
+        $attack = $this->buildAttack();
+
+        $damage = ceil($attack * $elementDamage);
+
+        if ($this->isHalfDamage($this->getElementData(), $characterElement)) {
+            return floor($damage/2);
+        }
+
+        if ($this->isDoubleDamage($this->getElementData(), $characterElement)) {
+            return floor($damage * 2);
+        }
+
+        return $damage;
+    }
+
     public function getId(): int {
         return $this->monster['id'];
     }
@@ -92,5 +114,13 @@ class ServerMonster {
 
     public function getHealth(): int {
         return $this->health;
+    }
+
+    public function getElementData(): array {
+        return [
+            'fire'  => $this->monster['fire_atonement'],
+            'ice'   => $this->monster['ice_atonement'],
+            'water' => $this->monster['water_atonement']
+        ];  
     }
 }
