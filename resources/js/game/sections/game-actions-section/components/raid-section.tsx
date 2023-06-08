@@ -9,6 +9,7 @@ import MonsterSelection from "./fight-section/monster-selection";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import RaidFight from "./raid-fight";
 import PrimaryButton from "../../../components/ui/buttons/primary-button";
+import RaidElementInfo from "./fight-section/modals/raid-elemental-info";
 
 export default class RaidSection extends React.Component<RaidSelectionProps, RaidSelectionState> {
 
@@ -31,6 +32,9 @@ export default class RaidSection extends React.Component<RaidSelectionProps, Rai
             revived: false,
             raid_boss_attacks_left: 0,
             is_raid_boss: false,
+            open_elemental_atonement: false,
+            elemental_atonement: {},
+            highest_element: null,
         }
 
         // @ts-ignore
@@ -130,6 +134,7 @@ export default class RaidSection extends React.Component<RaidSelectionProps, Rai
         }, () => {
             (new Ajax()).setRoute('raid-fight-participation/'+this.props.character_id+'/' + this.state.selected_raid_monster_id)
             .doAjaxCall('get', (result: AxiosResponse) => {
+                console.log(result.data);
                 this.setState({
                     is_loading: false,
                     character_current_health: result.data.character_max_health,
@@ -139,6 +144,8 @@ export default class RaidSection extends React.Component<RaidSelectionProps, Rai
                     monster_name: self.fetchRaidMonsterName(),
                     raid_boss_attacks_left: result.data.attacks_left,
                     is_raid_boss: result.data.is_raid_boss,
+                    elemental_atonement: result.data.elemental_atonemnt,
+                    highest_element: result.data.highest_element,
                 });
             }, (error: AxiosError) => {
                 this.setState({
@@ -198,7 +205,14 @@ export default class RaidSection extends React.Component<RaidSelectionProps, Rai
         return this.props.is_dead || !this.props.can_attack || this.state.selected_raid_monster_id === 0
     }
 
+    manageAtonementModal() {
+        this.setState({
+            open_elemental_atonement: !this.state.open_elemental_atonement,
+        })
+    }
+
     render() {
+        console.log(this.state);
         return (
             <Fragment>
                 <MonsterSelection
@@ -250,6 +264,19 @@ export default class RaidSection extends React.Component<RaidSelectionProps, Rai
                             revived={this.state.revived}   
                             initial_attacks_left={this.state.raid_boss_attacks_left}
                             is_raid_boss={this.state.is_raid_boss}
+                            manage_elemental_atonement_modal={this.manageAtonementModal.bind(this)}
+                        />
+                    : null
+                }
+
+                {
+                    this.state.open_elemental_atonement ?
+                        <RaidElementInfo 
+                            element_atonements={this.state.elemental_atonement}
+                            highest_element={this.state.highest_element}
+                            monster_name={this.state.monster_name}
+                            is_open={this.state.open_elemental_atonement}
+                            manage_modal={this.manageAtonementModal.bind(this)}
                         />
                     : null
                 }

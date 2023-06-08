@@ -73,6 +73,9 @@ class MonsterTransformer extends TransformerAbstract {
             'counter_resistance_chance' => $monster->counter_resistance,
             'increases_damage_by'       => $monster->gameMap->enemy_stat_bonus,
             'is_special'                => $this->isSpecial,
+            'fire_atonement'            => $monster->fire_atonement,
+            'ice_atonement'             => $monster->ice_atonement,
+            'water_atonement'           => $monster->water_atonement,
         ];
     }
 

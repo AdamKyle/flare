@@ -96,9 +96,9 @@ class RaidBattleService {
             $monsterHealth   = $serverMonster->getHealth();
 
             $raidBoss->update([
-                'boss_max_hp'       => $monsterHealth,
-                'boss_current_hp'   => $monsterHealth,
-                'raid_boss_deatils' => $serverMonster->getMonster(),
+                'boss_max_hp'        => $monsterHealth,
+                'boss_current_hp'    => $monsterHealth,
+                'raid_boss_deatils'  => $serverMonster->getMonster(),
             ]);
 
             $raidBoss = $raidBoss->refresh();
@@ -108,6 +108,8 @@ class RaidBattleService {
 
         $raidBossParticipation = RaidBossParticipation::where('character_id', $character->id)->first();
 
+        $elementData     = $serverMonster->getElementData();
+
         return $this->successResult([
             'character_max_health'     => $characterHealth,
             'character_current_health' => $characterHealth,
@@ -115,6 +117,8 @@ class RaidBattleService {
             'monster_current_health'   => $raidBoss->boss_current_hp,
             'attacks_left'             => !is_null($raidBossParticipation) ? $raidBossParticipation->attacks_left : 5,
             'is_raid_boss'             => true,
+            'elemental_atonemnt'       => $elementData,
+            'highest_element'          => $serverMonster->getHighestElementName($elementData, $serverMonster->getHighestElementDamage($elementData))
         ]);
     }
 
@@ -148,6 +152,8 @@ class RaidBattleService {
 
         $monsterHealth   = $serverMonster->getHealth();
 
+        $elementData     = $serverMonster->getElementData();
+
         return $this->successResult([
             'character_max_health'     => $characterHealth,
             'character_current_health' => $characterHealth,
@@ -155,6 +161,8 @@ class RaidBattleService {
             'monster_current_health'   => $monsterHealth,
             'attacks_left'             => 0,
             'is_raid_boss'             => false,
+            'elemental_atonemnt'       => $elementData,
+            'highest_element'          => $serverMonster->getHighestElementName($elementData, $serverMonster->getHighestElementDamage($elementData))
         ]);
     }
 

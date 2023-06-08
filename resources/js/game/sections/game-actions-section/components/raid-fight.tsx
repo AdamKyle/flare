@@ -124,7 +124,7 @@ export default class RaidFight extends React.Component<RaidFightProps, RaidFight
 
                 <div className="flex items-center justify-center">
                     <div className=" mt-4 mb-4 text-center">
-                        <PrimaryLinkButton button_label={'Elemental Atonement Info'} on_click={() => console.log('clicked')} />
+                        <PrimaryLinkButton button_label={'Elemental Atonement Info'} on_click={this.props.manage_elemental_atonement_modal} />
                     </div>
                 </div>
 

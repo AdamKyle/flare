@@ -60,6 +60,9 @@ class Monster extends Model {
         'is_raid_monster',
         'is_raid_boss',
         'raid_special_attack_type',
+        'fire_atonement',
+        'ice_atonement',
+        'water_atonement',
     ];
 
     /**
@@ -109,6 +112,9 @@ class Monster extends Model {
         'is_raid_monster'           => 'boolean',
         'is_raid_boss'              => 'boolean',
         'raid_special_attack_type'  => 'integer',
+        'fire_atonement'            => 'float',
+        'ice_atonement'             => 'float',
+        'water_atonement'           => 'float', 
     ];
 
     public function questItem() {

@@ -49,6 +49,10 @@
                                 <x-core.forms.input :model="$monster" label="Attack Range:" modelKey="attack_range" name="attack_range"/>
                                 <x-core.forms.input :model="$monster" label="Armour Class:" modelKey="ac" name="ac"/>
                                 <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                                <h3 class="mb-3">Casting Details</h3>
+                                <x-core.forms.check-box :model="$monster" label="Can Cast?" modelKey="can_cast" name="can_cast" />
+                                <x-core.forms.input :model="$monster" label="Max Cast Amount:" modelKey="max_spell_damage" name="max_spell_damage"/>
+                                <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                                 <h3 class="mb-3">Reward Info</h3>
                                 <x-core.forms.input :model="$monster" label="XP Per Kill:" modelKey="xp" name="xp"/>
                                 <x-core.forms.input :model="$monster" label="Gold Per Kill:" modelKey="gold" name="gold"/>
@@ -68,14 +72,6 @@
                         <x-core.forms.input :model="$monster" label="Affix Damage Resistance (%):" modelKey="affix_resistance" name="affix_resistance"/>
                     </x-core.form-wizard.content>
                     <x-core.form-wizard.content target="tab-style-2-3">
-                        <div>
-                            <h3 class="mb-3">Casting Details</h3>
-                            <x-core.forms.check-box :model="$monster" label="Can Cast?" modelKey="can_cast" name="can_cast" />
-                            <x-core.forms.input :model="$monster" label="Max Cast Amount:" modelKey="max_spell_damage" name="max_spell_damage"/>
-                        </div>
-
-                        <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
-
                         <div class="grid md:grid-cols-2 gap-2">
                             <div>
                                 <h3 class="mb-3">Misc Modifiers</h3>
@@ -90,6 +86,17 @@
                                 <x-core.forms.input :model="$monster" label="Casting Accuracy (%):" modelKey="casting_accuracy" name="casting_accuracy"/>
                                 <x-core.forms.input :model="$monster" label="Dodge (%):" modelKey="dodge" name="dodge"/>
                                 <x-core.forms.input :model="$monster" label="Criticality (%):" modelKey="criticality" name="criticality"/>
+                            </div>
+                            <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                            <div>
+                                <h3 class="mb-3">Elemental Atonement</h3>
+                                <p class="mb-3">
+                                    This allos creatures to have elemental atonements, the highest value is used for attack. This should only be used for raid creatures,
+                                    where characters have to make use of gems. This can also be used for other server side fight creatures.
+                                </p>
+                                <x-core.forms.input :model="$monster" label="Fire Atonement (%):" modelKey="fire_atonement" name="fire_atonement"/>
+                                <x-core.forms.input :model="$monster" label="Ice Atonement (%):" modelKey="ice_atonement" name="ice_atonement"/>
+                                <x-core.forms.input :model="$monster" label="Water Atonement (%):" modelKey="water_atonement" name="water_atonement"/>
                             </div>
                         </div>
 

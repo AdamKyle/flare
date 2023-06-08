@@ -11,4 +11,7 @@ export default interface RaidSelectionState {
     revived: boolean;
     raid_boss_attacks_left: number;
     is_raid_boss: boolean;
+    open_elemental_atonement: boolean;
+    elemental_atonement: object,
+    highest_element: string|null,
 }

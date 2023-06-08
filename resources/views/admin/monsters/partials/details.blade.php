@@ -75,14 +75,18 @@
                 <dd>{{$monster->spell_evasion * 100}}%</dd>
             </dl>
         </div>
-        <div class='block md:hidden border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
         <div>
-            <dl>
-                <dt>Devouring Light Chance:</dt>
-                <dd>{{$monster->devouring_light_chance * 100}}%</dd>
-                <dt>Devouring Darkness Chance:</dt>
-                <dd>{{$monster->devouring_darkness_chance * 100}}%</dd>
-            </dl>
+            <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+            <strong>Devouring Light/Darkness</strong>
+            <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+            <div>
+                <dl>
+                    <dt>Devouring Light Chance:</dt>
+                    <dd>{{$monster->devouring_light_chance * 100}}%</dd>
+                    <dt>Devouring Darkness Chance:</dt>
+                    <dd>{{$monster->devouring_darkness_chance * 100}}%</dd>
+                </dl>
+            </div>
         </div>
     </div>
 
@@ -113,6 +117,28 @@
         <dd>{{$monster->counter_resistance * 100}}%</dd>
     </dl>
 </x-core.cards.card-with-title>
+
+@if (!is_null($monster->fire_atonement) && !is_null($monster->ice_atonement) && !is_null($monster->water_atonement))
+    <x-core.cards.card-with-title title="Elemental Atunement">
+        <p class="mb-3">
+            Elemental Atunement is simmilar to how <a href="/information/gems" target="_blank"><i class="fas fa-external-link-alt"></i> Gems</a> work for characters.
+            The higher the value, the more attuned to thay element the critter is, which means tier elemental attack will be of that type. If your elemental atunement is
+            the oppisite, for example Water is oppisite to Fire, you will only take half the damage, If your element is weak against their, ie: They are fire, you are ice, you will
+            take twice the amount of damage.
+        </p>
+        <p>
+            Your armour class can block the damage, if it is high enough.
+        </p>
+        <dl class="mt-3">
+            <dt>Fire Atunement</dt>
+            <dd>{{$monster->fire_atonement * 100}}%</dd>
+            <dt>Ice Atunement</dt>
+            <dd>{{$monster->ice_atonement * 100}}%</dd>
+            <dt>Water Atunement</dt>
+            <dd>{{$monster->water_atonement * 100}}%</dd>
+        </dl>
+    </x-core.cards.card-with-title>
+@endif
 
 @if ($monster->is_celestial_entity)
     <hr />

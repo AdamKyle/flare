@@ -12,8 +12,8 @@ trait ElementAttackData {
      * @param array $elementData
      * @return integer
      */
-    public function getHighestElementDamage(array $elementData): int {
-        return max($elementData); 
+    public function getHighestElementDamage(array $elementData): float {
+        return max(array_values($elementData)); 
     }
 
     /**
@@ -23,7 +23,7 @@ trait ElementAttackData {
      * @param integer $highestElementForAttack
      * @return string
      */
-    public function getHighestElementName(array $elementData, int $highestElementForAttack): string {
+    public function getHighestElementName(array $elementData, float $highestElementForAttack): string {
         return array_search($highestElementForAttack, $elementData);
     }
 

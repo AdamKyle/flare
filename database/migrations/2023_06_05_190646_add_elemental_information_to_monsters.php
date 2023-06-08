@@ -15,7 +15,6 @@ return new class extends Migration
             $table->decimal('fire_atonement', 8, 4)->nullable();
             $table->decimal('ice_atonement', 8, 4)->nullable();
             $table->decimal('water_atonement', 8, 4)->nullable();
-            $table->string('highest_atonment_name')->nullable();
         });
     }
 
