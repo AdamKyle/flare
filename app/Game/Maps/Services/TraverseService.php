@@ -2,32 +2,35 @@
 
 namespace App\Game\Maps\Services;
 
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item;
-use Illuminate\Support\Facades\Cache;
-use App\Flare\Jobs\CharacterAttackTypesCacheBuilderWithDeductions;
-use App\Flare\Models\Kingdom;
 use App\Flare\Models\Map;
+use League\Fractal\Manager;
 use App\Flare\Models\GameMap;
-use App\Flare\Models\Character;
-use App\Flare\Transformers\MonsterTransformer;
-use App\Flare\Values\ItemEffectsValue;
+use App\Flare\Models\Kingdom;
 use App\Flare\Models\Location;
-use App\Flare\Services\BuildCharacterAttackTypes;
-use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
-use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Flare\Models\Character;
+use League\Fractal\Resource\Item;
 use App\Game\Maps\Events\UpdateMap;
-use App\Game\Core\Events\UpdateTopBarEvent;
-use App\Game\Core\Events\UpdateBaseCharacterInformation;
-use App\Game\Maps\Events\MoveTimeOutEvent;
-use App\Game\Maps\Events\UpdateMonsterList;
+use Illuminate\Support\Facades\Cache;
+use App\Flare\Values\ItemEffectsValue;
 use App\Game\Maps\Values\MapTileValue;
+use App\Game\Maps\Events\MoveTimeOutEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Maps\Events\UpdateMonsterList;
+use Facades\App\Flare\Cache\CoordinatesCache;
+use App\Flare\Transformers\MonsterTransformer;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
-use Facades\App\Flare\Cache\CoordinatesCache;
+use App\Flare\Services\BuildCharacterAttackTypes;
+use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
+use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
+use App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation;
+use App\Flare\Jobs\CharacterAttackTypesCacheBuilderWithDeductions;
 
 class TraverseService {
+
+    use UpdateRaidMonstersForLocation;
 
     /**
      * @var Manager $manager
@@ -159,6 +162,12 @@ class TraverseService {
         $this->updateActions($mapId, $character, $oldMap);
         $this->updateKingdomOwnedKingdom($character);
 
+        $character = $character->refresh();
+
+        $location = $this->getLocationForCoordinates($character);
+
+        $this->updateMonstersList($character, $location);
+
         $message = 'You have traveled to: ' . $character->map->gameMap->name;
 
         ServerMessageHandler::handleMessage($character->user, 'plane_transfer', $message);
@@ -191,6 +200,20 @@ class TraverseService {
 
             event(new GlobalMessageEvent('Thunder claps in the sky: ' . $character->name . ' has called forth The Creator\'s gates of despair! The Creator is Furious! "Hear me, child! I shall face you in the depths of my despair and crush the soul from your bones!" the lands fall silent, the children no longer have faith and the fabric of time rips open...'));
         }
+    }
+
+    /**
+     * Returns the location at the coordinates the player wants to move too.
+     *
+     * - Location can be null.
+     *
+     * @param Character $character
+     * @return Location|null
+     */
+    protected function getLocationForCoordinates(Character $character): ?Location {
+        $gameMapId = $character->map->game_map_id;
+
+        return Location::where('x', $character->map->character_position_x)->where('y', $character->map->character_position_y)->where('game_map_id', $gameMapId)->first();
     }
 
     /**

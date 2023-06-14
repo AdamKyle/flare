@@ -112,7 +112,17 @@ export default class RemoveGem extends React.Component<any, RemoveGemsState> {
         }
 
         if (this.state.selected_gem_data === null) {
-            return <LoadingProgressBar />
+            return  (
+                <Select
+                    onChange={this.selectedItems.bind(this)}
+                    options={this.itemsToSelect()}
+                    menuPosition={'absolute'}
+                    menuPlacement={'bottom'}
+                    styles={{menuPortal: (base) => ({...base, zIndex: 9999, color: '#000000'})}}
+                    menuPortalTarget={document.body}
+                    value={this.selectedItem()}
+                />
+            )
         }
 
         return (

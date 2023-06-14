@@ -124,6 +124,8 @@ class CastType extends BattleBase
 
             if ($this->allowSecondaryAttacks) {
                 $this->secondaryAttack($character, $monster);
+
+                $this->elementalAttack($character, $monster);
             }
         }
 
@@ -159,6 +161,8 @@ class CastType extends BattleBase
 
         if ($this->allowSecondaryAttacks) {
             $this->secondaryAttack($character, $monster);
+
+            $this->elementalAttack($character, $monster);
         }
     }
 

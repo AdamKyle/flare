@@ -15,7 +15,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
-use App\Flare\ServerFight\Fight\Concerns\ElementAttackData;
+use App\Flare\Traits\ElementAttackData;
 use App\Flare\Values\ItemEffectsValue;
 use Exception;
 use Illuminate\Support\Collection;

@@ -73,9 +73,13 @@ class MonsterTransformer extends TransformerAbstract {
             'counter_resistance_chance' => $monster->counter_resistance,
             'increases_damage_by'       => $monster->gameMap->enemy_stat_bonus,
             'is_special'                => $this->isSpecial,
+            'is_raid_monster'           => $monster->is_raid_monster,
+            'is_raid_boss'              => $monster->is_raid_boss,
             'fire_atonement'            => $monster->fire_atonement,
             'ice_atonement'             => $monster->ice_atonement,
             'water_atonement'           => $monster->water_atonement,
+            'life_stealing_resistance'  => $monster->life_stealing_resistance,
+            'raid_special_attack_type'  => $monster->raid_special_attack_type,
         ];
     }
 

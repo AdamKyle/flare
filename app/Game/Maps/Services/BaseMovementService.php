@@ -7,7 +7,6 @@ use App\Flare\Models\Kingdom;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\LocationType;
 use App\Game\Maps\Events\UpdateCharacterBasePosition;
-use App\Game\Maps\Events\UpdateMonsterList;
 use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
@@ -18,7 +17,6 @@ use App\Game\Maps\Values\MapPositionValue;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Facades\App\Flare\RandomNumber\RandomNumberGenerator;
-use App\Game\Maps\Events\UpdateRaidMonsters;
 use App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation;
 
 class BaseMovementService {
@@ -288,45 +286,6 @@ class BaseMovementService {
         }
 
         return true;
-    }
-
-    /**
-     * Updates the monster list when a player enters a special location.
-     *
-     * @param Character $character
-     * @param Location|null $location
-     * @return void
-     */
-    protected function updateMonstersList(Character $character, ?Location $location = null): void {
-
-        $monsters = Cache::get('monsters')[$character->map->gameMap->name];
-
-        if (is_null($location)) {
-            event(new UpdateMonsterList($monsters, $character->user));
-            event(new UpdateRaidMonsters([], $character->user));
-
-            return;
-        }
-
-
-        if ($this->updateMonstersForRaid($character, $location)) {
-            return;
-        }
-
-
-        if (!is_null($location)) {
-            if (!is_null($location->enemy_strength_type)) {
-                $monsters = Cache::get('monsters')[$location->name];
-
-                event(new ServerMessageEvent($character->user, 'You have entered a special location.
-                Special locations are places where only specific quest items can drop. You can click View Location Details
-                to read more about the location and click the relevant help docs link in the modal to read more about special locations.
-                Exploring here will NOT allow the location specific quest items to drop. Monsters here are stronger then outside the location.'
-                ));
-            }
-        }
-
-        event(new UpdateMonsterList($monsters, $character->user));
     }
 
     /**

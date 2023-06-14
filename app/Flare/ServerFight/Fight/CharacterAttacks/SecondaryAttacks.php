@@ -125,7 +125,22 @@ class SecondaryAttacks extends BattleBase {
             $this->affixes->setEntranced();
         }
 
+        $monsterData            = $monster->getMonster();
+        $lifeStealingResistance = $monsterData['life_stealing_resistance'];
+        $damageResistance       = 0.0;      
+
+        if (($monsterData['is_raid_monster'] || $monsterData['is_raid_boss']) && !is_null($lifeStealingResistance)) {
+
+            $damageResistance = $lifeStealingResistance;
+        }
+
         $lifeStealingDamage = $this->affixes->getAffixLifeSteal($character, $this->attackData, $this->monsterHealth, $resistance, $isPvp);
+
+        if ($damageResistance > 0) {
+            $lifeStealingDamage -= $lifeStealingDamage * $damageResistance;
+
+            $this->addMessage('The enemy manages to resist ('.($damageResistance * 100).'%) some of the life stealing damage!', 'enemy-action');
+        }
 
         if (!$isPvp) {
             $this->mergeMessages($this->affixes->getMessages());

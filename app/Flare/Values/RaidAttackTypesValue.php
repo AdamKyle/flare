@@ -6,6 +6,8 @@ use Exception;
 
 class RaidAttackTypesValue {
 
+    private int $value;
+
     const PHYSICAL_ATTACK = 0;
 
     protected static array $values = [
@@ -22,5 +24,9 @@ class RaidAttackTypesValue {
         }
 
         $this->value = $value;
+    }
+
+    public function isPhysicalAttack(): bool {
+        return $this->value === self::PHYSICAL_ATTACK;
     }
 }

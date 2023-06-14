@@ -2,7 +2,6 @@ import React, {Fragment} from "react";
 import Ajax from "../../../lib/ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
 import {watchForDarkModeTableChange} from "../../../lib/game/dark-mode-watcher";
-import ComponentLoading from "../../../components/ui/loading/component-loading";
 import InfoAlert from "../../../components/ui/alerts/simple-alerts/info-alert";
 import {DateTime} from "luxon";
 import Table from "../../../components/ui/data-tables/table";
@@ -97,7 +96,7 @@ export default class CharacterActiveBoons extends React.Component<any, any> {
                 <LoadingProgressBar />
             )
         }
-
+        
         return (
             <Fragment>
 

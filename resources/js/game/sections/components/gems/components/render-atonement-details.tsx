@@ -7,14 +7,19 @@ export default class RenderAtonementDetails extends React.Component<any, any> {
     }
 
     renderAtonements(atonementData: any): JSX.Element[]|[] {
-        return atonementData.map((data: any) => {
-            return (
+
+        const elements = [];
+
+        for (const key in atonementData) {
+            elements.push(
                 <Fragment>
-                    <dt>{data.name}</dt>
-                    <dd>{(data.total * 100).toFixed(2)}%</dd>
+                    <dt>{key}</dt>
+                    <dd>{(atonementData[key] * 100).toFixed(2)}%</dd>
                 </Fragment>
             )
-        })
+        }
+
+        return elements;
     }
 
 
@@ -23,7 +28,7 @@ export default class RenderAtonementDetails extends React.Component<any, any> {
             <Fragment>
                 <h3 className='my-4'>{this.props.title}</h3>
                 <dl>
-                    {this.renderAtonements(this.props.original_atonement.atonements)}
+                    {this.renderAtonements(this.props.original_atonement)}
                 </dl>
             </Fragment>
         )

@@ -2,7 +2,6 @@
 
 namespace App\Flare\ServerFight\Fight\CharacterAttacks\Types;
 
-use App\Falre\ServerFight\Fight\CharacterAttacks\Counter;
 use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Models\Character;
 use App\Flare\ServerFight\BattleBase;
@@ -113,6 +112,8 @@ class WeaponType extends BattleBase {
 
             if ($this->allowSecondaryAttacks) {
                 $this->secondaryAttack($character, $serverMonster);
+
+                $this->elementalAttack($character, $serverMonster);
             }
         }
 
@@ -135,7 +136,7 @@ class WeaponType extends BattleBase {
     public function weaponAttack(Character $character, ServerMonster $monster, int $weaponDamage) {
         $this->weaponDamage($character, $monster->getName(), $weaponDamage);
 
-        $this->doMonsterCounter($character, $monster);
+        // $this->doMonsterCounter($character, $monster);
 
         if ($this->characterHealth <= 0) {
             $this->abortCharacterIsDead = true;
@@ -145,6 +146,8 @@ class WeaponType extends BattleBase {
 
         if ($this->allowSecondaryAttacks) {
             $this->secondaryAttack($character, $monster);
+
+            $this->elementalAttack($character, $monster);
         }
     }
 

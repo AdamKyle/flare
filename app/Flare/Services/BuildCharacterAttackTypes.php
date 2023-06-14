@@ -2,10 +2,10 @@
 
 namespace App\Flare\Services;
 
-use Cache;
+use App\Flare\Models\Character;
+use Illuminate\Support\Facades\Cache;
 use App\Flare\Transformers\Traits\SkillsTransformerTrait;
 use App\Flare\Builders\Character\AttackDetails\CharacterAttackBuilder;
-use App\Flare\Models\Character;
 
 class BuildCharacterAttackTypes {
 

@@ -107,8 +107,6 @@ class CharacterRewardService {
         if ($this->character->xp >= $this->character->xp_next) {
             $leftOverXP = $this->character->xp - $this->character->xp_next;
 
-            dump('Left over XP: ' . $leftOverXP);
-
             if ($leftOverXP > 0) {
                 $this->handleLevelUps($leftOverXP);
             }

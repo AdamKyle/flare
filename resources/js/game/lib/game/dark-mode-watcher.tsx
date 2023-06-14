@@ -1,7 +1,6 @@
 import CharacterInventoryTabs from "../../sections/character-sheet/components/character-inventory-tabs";
 import CharacterSkillsTabs from "../../sections/character-sheet/components/character-skills-tabs";
-import CharacterActiveBoons from "../../sections/character-sheet/components/character-active-boons";
-import {Component, ReactComponentElement} from "react";
+import {Component} from "react";
 import ItemComparison from "../../sections/chat/modals/item-comparison";
 import CharacterClassRanks from "../../sections/character-sheet/components/character-class-ranks";
 import CharacterClassSpecialtiesModal
@@ -99,15 +98,27 @@ export const watchForDarkModeSkillsChange = (component: CharacterSkillsTabs) => 
 }
 
 export const watchForDarkModeTableChange = (component: Component<any, {dark_tables: boolean}>) => {
+    let previousScheme = window.localStorage.scheme;
+
     window.setInterval(() => {
-        if (window.localStorage.hasOwnProperty('scheme') && !component.state.dark_tables) {
-            component.setState({
-                dark_tables: window.localStorage.scheme === 'dark'
-            })
-        } else if (!window.localStorage.hasOwnProperty('scheme') && component.state.dark_tables) {
-            component.setState({
-                dark_tables: false
-            });
+      if (window.localStorage.hasOwnProperty('scheme')) {
+        const currentScheme = window.localStorage.scheme;
+        
+        if (currentScheme === 'dark' && !component.state.dark_tables) {
+          component.setState({
+            dark_tables: true
+          });
+        } else if (currentScheme !== 'dark' && component.state.dark_tables) {
+          component.setState({
+            dark_tables: false
+          });
         }
+  
+        previousScheme = currentScheme;
+      } else if (component.state.dark_tables) {
+        component.setState({
+          dark_tables: false
+        });
+      }
     }, 10);
 }

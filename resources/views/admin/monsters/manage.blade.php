@@ -41,6 +41,7 @@
                                 <x-core.forms.check-box :model="$monster" label="Is Raid Boss?" modelKey="is_raid_boss" name="is_raid_boss" />
                                 <x-core.forms.check-box :model="$monster" label="(or) Is Raid Monster?" modelKey="is_raid_monster" name="is_raid_monster" />
                                 <x-core.forms.key-value-select :model="$monster" label="Special Raid Attack Type:" modelKey="raid_special_attack_type" name="raid_special_attack_type" :options="$specialAttacks" />
+                                <x-core.forms.input :model="$monster" label="Life Stealing Resistance:" modelKey="life_stealing_resistance" name="life_stealing_resistance" />
                             </div>
                             <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                             <div>

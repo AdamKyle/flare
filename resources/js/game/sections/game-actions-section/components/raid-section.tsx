@@ -212,7 +212,6 @@ export default class RaidSection extends React.Component<RaidSelectionProps, Rai
     }
 
     render() {
-        console.log(this.state);
         return (
             <Fragment>
                 <MonsterSelection

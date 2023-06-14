@@ -380,10 +380,10 @@ class MonsterPlayerFight {
      */
     protected function doAttack(ServerMonster $monster, array $health, bool $isPlayerVoided, bool $isEnemyVoided, bool $onlyOnce, bool $isRankFight = false): bool {
         $this->attack->setHealth($health)
-            ->setIsCharacterVoided($isPlayerVoided)
-            ->setIsEnemyVoided($isEnemyVoided)
-            ->onlyAttackOnce($onlyOnce)
-            ->attack($this->character, $monster, $this->attackType, 'character', $isRankFight);
+                     ->setIsCharacterVoided($isPlayerVoided)
+                     ->setIsEnemyVoided($isEnemyVoided)
+                     ->onlyAttackOnce($onlyOnce)
+                     ->attack($this->character, $monster, $this->attackType, 'character', $isRankFight);
 
         $this->mergeMessages($this->attack->getMessages());
 

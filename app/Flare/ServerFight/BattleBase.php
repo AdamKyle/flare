@@ -8,6 +8,7 @@ use App\Flare\Models\Character;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SecondaryAttacks;
 use App\Flare\ServerFight\Fight\Entrance;
 use App\Flare\ServerFight\Monster\ServerMonster;
+use App\Flare\ServerFight\Fight\ElementalAttack;
 
 class BattleBase extends BattleMessages {
 
@@ -113,6 +114,31 @@ class BattleBase extends BattleMessages {
         }
 
         $secondaryAttacks->clearMessages();
+    }
+
+    protected function elementalAttack(Character $character, ServerMonster $monster) {
+
+        if (!$monster->getMonsterStat('is_raid_monster') && !$monster->getMonsterStat('is_raid_boss')) {
+            return;
+        }
+
+        $elementalAttack = resolve(ElementalAttack::class);
+
+        $elementalAttack->setMonsterHealth($this->monsterHealth);
+        $elementalAttack->setCharacterHealth($this->characterHealth);
+
+        $characterElementalData = $this->characterCacheData->getCachedCharacterData($character, 'elemental_atonement')['elemental_data'];
+        
+        $weaponDamage           = $this->characterCacheData->getCachedCharacterData($character, 'weapon_attack');
+
+        $elementalAttack->doElementalAttack($monster->getElementData(), $characterElementalData, $weaponDamage);
+
+        $this->mergeMessages($elementalAttack->getMessages());
+
+        $this->characterHealth = $elementalAttack->getCharacterHealth();
+        $this->monsterHealth   = $elementalAttack->getMonsterHealth();
+
+        $elementalAttack->clearMessages();
     }
 
     protected function pvpCounter(Character $attacker, Character $defender) {

@@ -5,9 +5,43 @@ namespace App\Game\Maps\Services\Common;
 use App\Flare\Models\Event;
 use App\Flare\Models\Location;
 use App\Flare\Models\Character;
+use Illuminate\Support\Facades\Cache;
+use App\Game\Maps\Events\UpdateMonsterList;
 use App\Game\Maps\Events\UpdateRaidMonsters;
+use App\Game\Messages\Events\ServerMessageEvent;
 
 trait UpdateRaidMonstersForLocation {
+
+    /**
+     * Updates the monster list when a player enters a special location.
+     *
+     * @param Character $character
+     * @param Location|null $location
+     * @return void
+     */
+    public function updateMonstersList(Character $character, ?Location $location = null): void {
+
+        $monsters = Cache::get('monsters')[$character->map->gameMap->name];
+
+        if ($this->updateMonstersForRaid($character, $location)) {
+            return;
+        }
+
+        if (!is_null($location)) {
+            if (!is_null($location->enemy_strength_type)) {
+                $monsters = Cache::get('monsters')[$location->name];
+
+                event(new ServerMessageEvent($character->user, 'You have entered a special location.
+                Special locations are places where only specific quest items can drop. You can click View Location Details
+                to read more about the location and click the relevant help docs link in the modal to read more about special locations.
+                Exploring here will NOT allow the location specific quest items to drop. Monsters here are stronger then outside the location.'
+                ));
+            }
+        }
+
+        event(new UpdateMonsterList($monsters, $character->user));
+        event(new UpdateRaidMonsters([], $character->user));
+    }
 
     /**
      * Update Monsters for a possible raid at a possible location for a character.
@@ -16,20 +50,21 @@ trait UpdateRaidMonstersForLocation {
      * @param Location|null $location
      * @return bool
      */
-    public function updateMonstersForRaid(Character $character, ?Location $location = null): bool {
+    protected function updateMonstersForRaid(Character $character, ?Location $location = null): bool {
         $raidEvent = Event::whereNotNull('raid_id')->first();
 
         if (!is_null($raidEvent) && !is_null($location)) {
+            $locationIds = array_map('intval', $raidEvent->raid->corrupted_location_ids);
+            
+            array_push($locationIds, $raidEvent->raid->raid_boss_location_id);
 
-            $raidLocations = $raidEvent->raid->raid_monster_ids;
-                
-            array_push($raidLocations, $raidEvent->raid->raid_boss_location_id);
-
-            if (in_array($location->id, $raidLocations)) {
-                event(new UpdateRaidMonsters($raidEvent->raid->getMonstersForSelection(), $character->user));
-
-                return true;
+            if (!in_array($location->id, $locationIds)) {
+                return false;
             }
+
+            event(new UpdateRaidMonsters($raidEvent->raid->getMonstersForSelection(), $character->user));
+
+            return true;
         }
 
         return false;

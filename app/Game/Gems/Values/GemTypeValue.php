@@ -2,6 +2,8 @@
 
 namespace App\Game\Gems\Values;
 
+use Illuminate\Support\Str;
+
 class GemTypeValue {
 
     const FIRE  = 0;
@@ -47,11 +49,11 @@ class GemTypeValue {
     }
 
     public static function getOppsiteForHalfDamage(string $name): string {
-        if (!in_array($name, self::$names)) {
+        if (!in_array(Str::title($name), array_map('Str::title', array_values(self::$names)), true)) {
             throw new \Exception($name . ' does not exist.');
         }
 
-        $value = array_search($name, self::$names);
+        $value = array_search(strtolower($name), array_map('strtolower', self::$names));
 
         if ($value === false) {
             throw new \Exception($name . ' does not exist.');
@@ -63,11 +65,11 @@ class GemTypeValue {
     }
 
     public static function getOppsiteForDoubleDamage(string $name): string {
-        if (!in_array($name, self::$names)) {
+        if (!in_array(Str::title($name), array_map('Str::title', array_values(self::$names)), true)) {
             throw new \Exception($name . ' does not exist.');
         }
 
-        $value = array_search($name, self::$names);
+        $value = array_search(strtolower($name), array_map('strtolower', self::$names));
 
         if ($value === false) {
             throw new \Exception($name . ' does not exist.');

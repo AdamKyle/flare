@@ -3,10 +3,13 @@
 namespace App\Game\Gems\Traits;
 
 use App\Flare\Models\Item;
-use App\Game\Gems\Values\GemTypeValue;
 use Illuminate\Support\Facades\DB;
+use App\Game\Gems\Values\GemTypeValue;
+use App\Flare\Traits\ElementAttackData;
 
 trait GetItemAtonements {
+
+    use ElementAttackData;
 
     /**
      * Get atonement data based on gem array data.
@@ -23,7 +26,7 @@ trait GetItemAtonements {
 
         foreach (GemTypeValue::getNames() as $type => $name) {
             if (empty($gemData)) {
-                $atonements['atonements'][] = ['name' => $name, 'total' => 0.0];
+                $atonements['atonements'][] = [$name => 0.0];
             } else {
                 $atonements['atonements'][] = $this->fetchSummedValueFromArray($gemData, $type, $name);
             }
@@ -82,7 +85,7 @@ trait GetItemAtonements {
         }
 
         return array_map(function($name, $total) {
-            return ["name" => $name, "total" => $total];
+            return [$name => $total];
         }, array_keys($result), $result)[0];
     }
 
@@ -122,18 +125,17 @@ trait GetItemAtonements {
      * @return array
      */
     public function determineHighestValue(array $atonements): array {
-        $highest = null;
+        
+        $elementData = [];
 
-        foreach ($atonements['atonements'] as $atonement) {
-            if ($highest === null || $atonement['total'] > $highest['total']) {
-                $highest = $atonement;
-            }
+        foreach ($atonements['atonements'] as $value) {
+            $elementData[$value['name']] = $value['total'];
         }
 
-        $highestName = $highest['name'];
-        $highestValue = $highest['total'];
+        $highestElementalDamage = $this->getHighestElementDamage($elementData);
+        $highestElementalName   = $this->getHighestElementName($elementData, $highestElementalDamage);
 
-        if ($highestValue <= 0) {
+        if ($highestElementalDamage <= 0) {
             $atonements['elemental_damage'] = [
                 'name'   => 'N/A',
                 'amount' => 0.0,
@@ -143,8 +145,8 @@ trait GetItemAtonements {
         }
 
         $atonements['elemental_damage'] = [
-            'name'   => $highestName,
-            'amount' => $highestValue,
+            'name'   => $highestElementalName,
+            'amount' => $highestElementalDamage,
         ];
 
         return $atonements;

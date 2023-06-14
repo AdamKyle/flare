@@ -6,9 +6,9 @@ use App\Flare\Builders\Character\CharacterCacheData;
 use App\Flare\Models\Character;
 use App\Flare\ServerFight\BattleBase;
 use App\Flare\ServerFight\Fight\CharacterAttacks\PlayerHealing;
+use App\Flare\ServerFight\Monster\MonsterSpecialAttack;
 use App\Flare\ServerFight\Monster\ServerMonster;
 use App\Flare\Values\AttackTypeValue;
-use Illuminate\Support\Facades\Cache;
 
 class MonsterAttack extends BattleBase {
 
@@ -53,8 +53,54 @@ class MonsterAttack extends BattleBase {
             $this->castSpells($monster, $character, $previousAttackType);
         }
 
+        $this->monsterElementalAttack($monster, $character);
+        $this->monsterSpecialAttack($monster, $character);
+
         if ($this->characterHealth > 0) {
             $this->playerHealing($monster, $character, $previousAttackType);
+        }
+    }
+
+    protected function monsterElementalAttack(ServerMonster $monster, Character $character) {
+        if ($monster->getMonsterStat('is_raid_monster') || $monster->getMonsterStat('is_raid_boss')) {
+            $elementalData = $this->characterCacheData->getCachedCharacterData($character, 'elemental_atonement')['elemental_data'];
+
+            $elementalAttack = resolve(ElementalAttack::class);
+
+            $elementalAttack->setMonsterHealth($this->monsterHealth);
+            $elementalAttack->setCharacterHealth($this->characterHealth);
+
+            $elementalAttack->doElementalAttack($elementalData, $monster->getElementData(), $monster->buildAttack(), true);
+
+            $this->characterHealth = $elementalAttack->getCharacterHealth();
+            $this->monsterHealth   = $elementalAttack->getMonsterHealth();
+
+            $this->mergeMessages($elementalAttack->getMessages());
+    
+            $elementalAttack->clearMessages();
+        }
+    }
+
+    protected function monsterSpecialAttack(ServerMonster $monster, Character $character) {
+        if ($monster->getMonsterStat('is_raid_monster') || $monster->getMonsterStat('is_raid_boss')) {
+            $ac = $this->characterCacheData->getCachedCharacterData($character, 'ac');
+
+            $monsterSpecialAttack = resolve(MonsterSpecialAttack::class);
+
+            $monsterSpecialAttack->setMonsterHealth($this->monsterHealth);
+            $monsterSpecialAttack->setCharacterHealth($this->characterHealth);
+
+            $specialAttackType = $monster->getMonsterStat('raid_special_attack_type');
+            $damageStatAmount  = $monster->getMonsterStat($monster->getMonsterStat('damage_stat'));
+
+            $monsterSpecialAttack->doSpecialAttack($specialAttackType, $damageStatAmount, $ac);
+
+            $this->characterHealth = $monsterSpecialAttack->getCharacterHealth();
+            $this->monsterHealth   = $monsterSpecialAttack->getMonsterHealth();
+
+            $this->mergeMessages($monsterSpecialAttack->getMessages());
+    
+            $monsterSpecialAttack->clearMessages();
         }
     }
 

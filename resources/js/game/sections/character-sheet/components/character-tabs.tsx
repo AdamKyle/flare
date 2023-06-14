@@ -6,7 +6,6 @@ import CharacterTabsProps from "../../../lib/game/character-sheet/types/characte
 import CharacterActiveBoons from "./character-active-boons";
 import CharacterFactions from "./character-factions";
 import CharacterMercenaries from "./character-mercenaries";
-import CharacterClassRanks from "./character-class-ranks";
 
 export default class CharacterTabs extends React.Component<CharacterTabsProps, any> {
 

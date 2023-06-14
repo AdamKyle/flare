@@ -112,7 +112,7 @@ export default class CharacterSheet extends React.Component<CharacterSheetProps,
         if (this.props.character === null) {
             return null;
         }
-
+        
         return(
             <div>
                 {

@@ -63,6 +63,7 @@ class Monster extends Model {
         'fire_atonement',
         'ice_atonement',
         'water_atonement',
+        'life_stealing_resistance',
     ];
 
     /**
@@ -115,6 +116,7 @@ class Monster extends Model {
         'fire_atonement'            => 'float',
         'ice_atonement'             => 'float',
         'water_atonement'           => 'float', 
+        'life_stealing_resistance'  => 'float',
     ];
 
     public function questItem() {

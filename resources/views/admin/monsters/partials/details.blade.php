@@ -73,6 +73,8 @@
                 <dd>{{$monster->affix_resistance * 100}}%</dd>
                 <dt>Spell Evasion (chance):</dt>
                 <dd>{{$monster->spell_evasion * 100}}%</dd>
+                <dt>Life Stealing Resistance:</dt>
+                <dd>{{is_null($monster->life_stealing_resistance) ? 0 : ($monster->life_stealing_resistance * 100)}}%</dd>
             </dl>
         </div>
         <div>

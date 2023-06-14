@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Flare\ServerFight\Fight\Concerns;
+namespace App\Flare\Traits;
 
 use App\Game\Gems\Values\GemTypeValue;
 
@@ -39,7 +39,7 @@ trait ElementAttackData {
     public function isHalfDamage(array $elementData, string $attackingElementName): bool {
 
         $name = $this->getHighestElementName($elementData, $this->getHighestElementDamage($elementData));
-
+        
         return GemTypeValue::getOppsiteForHalfDamage($name)  === $attackingElementName;
     }
 
