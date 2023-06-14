@@ -26,9 +26,9 @@ trait GetItemAtonements {
 
         foreach (GemTypeValue::getNames() as $type => $name) {
             if (empty($gemData)) {
-                $atonements['atonements'][] = [$name => 0.0];
+                $atonements['atonements'][$name] = 0.0;
             } else {
-                $atonements['atonements'][] = $this->fetchSummedValueFromArray($gemData, $type, $name);
+                $atonements['atonements'][$name] = $this->fetchSummedValueFromArray($gemData, $type, $name);
             }
         }
 
@@ -49,9 +49,9 @@ trait GetItemAtonements {
 
         foreach (GemTypeValue::getNames() as $type => $name) {
             if ($item->socket_count <= 0) {
-                $atonements['atonements'][] = ['name' => $name, 'total' => 0.0];
+                $atonements['atonements'][$name] = 0.0;
             } else {
-                $atonements['atonements'][] = $this->fetchSummedValue($item, $type, $name);
+                $atonements['atonements'][$name] = $this->fetchSummedValue($item, $type, $name);
             }
         }
 
@@ -95,9 +95,9 @@ trait GetItemAtonements {
      * @param Item $item
      * @param int $type
      * @param string $name
-     * @return array
+     * @return float
      */
-    protected function fetchSummedValue(Item $item, int $type, string $name): array {
+    protected function fetchSummedValue(Item $item, int $type, string $name): float {
         $value = $item->sockets()->join('gems', function ($join) use ($type) {
             $join->on('item_sockets.gem_id', '=', 'gems.id')
                 ->where(function ($query) use($type) {
@@ -112,10 +112,7 @@ trait GetItemAtonements {
                     ELSE 0
                 END"));
 
-        return [
-            'name'  => $name,
-            'total' => $value
-        ];
+        return $value;
     }
 
     /**
@@ -126,11 +123,7 @@ trait GetItemAtonements {
      */
     public function determineHighestValue(array $atonements): array {
         
-        $elementData = [];
-
-        foreach ($atonements['atonements'] as $value) {
-            $elementData[$value['name']] = $value['total'];
-        }
+        $elementData = $atonements['atonements'];
 
         $highestElementalDamage = $this->getHighestElementDamage($elementData);
         $highestElementalName   = $this->getHighestElementName($elementData, $highestElementalDamage);

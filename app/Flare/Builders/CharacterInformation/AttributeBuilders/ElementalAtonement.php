@@ -66,18 +66,6 @@ class ElementalAtonement extends BaseAttribute {
     }
 
     protected function buildPossibleAtonementDataWithDefaultValuesForItem(Item $item): array {
-        $itemAtonement = $this->gemComparison->getElementAtonement($item)['atonements'];
-        $atonementData = [];
-
-        if (empty($itemAtonement)) {
-            return [];
-        }
-
-        foreach ($itemAtonement as $value) {
-            $atonementData[$value['name']] = $value['total'];
-        }
-
-        return $atonementData;
+       return $this->gemComparison->getElementAtonement($item)['atonements'];
     }
-
 }
