@@ -197,8 +197,8 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::post('/admin/raid/import', ['as' => 'admin.raids.import', 'uses' => 'RaidsController@import']);
 
     Route::get('/admin/raids', ['as' => 'admin.raids.list', 'uses' => 'RaidsController@index']);
-    Route::get('/admin/raids/export-data', ['as' => 'admin.raids.export-data', 'uses' => 'RaidsControler@exportInfo']);
-    Route::get('/admin/raids/import-data', ['as' => 'admin.raids.import-data', 'uses' => 'RaidsControler@importInfo']);
+    Route::get('/admin/raids/export-data', ['as' => 'admin.raids.export-data', 'uses' => 'RaidsController@exportRaids']);
+    Route::get('/admin/raids/import-data', ['as' => 'admin.raids.import-data', 'uses' => 'RaidsController@importRaids']);
     Route::get('/admin/raids/create', ['as' => 'admin.raids.create', 'uses' => 'RaidsController@create']);
     Route::get('/admin/raids/{raid}/edit', ['as' => 'admin.raids.edit', 'uses' => 'RaidsController@edit']);
     Route::get('/admin/raids/{raid}', ['as' => 'admin.raids.show', 'uses' => 'RaidsController@show']);
@@ -206,4 +206,10 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
 
     Route::get('/admin/statistics/dashboard', ['as' => 'admin.statistics', 'uses' => 'StatisticsController@index']);
     Route::get('/admin/events', ['as' => 'admin.events', 'uses' => 'EventScheduleController@index']);
+
+    Route::post('/admin/events/export', ['as' => 'admin.events.export', 'uses' => 'EventsController@exportInfo']);
+    Route::post('/admin/events/import', ['as' => 'admin.events.import', 'uses' => 'EventsController@importInfo']);
+
+    Route::get('/admin/events/export-data', ['as' => 'admin.events.export-data', 'uses' => 'EventsController@exportEvents']);
+    Route::get('/admin/events/import-data', ['as' => 'admin.events.import-data', 'uses' => 'EventsController@importEvents']);
 });

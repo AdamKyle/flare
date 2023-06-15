@@ -23,6 +23,22 @@
                         Export Celestials
                     </x-core.buttons.primary-button>
                 </form>
+
+                <form method="POST" action="{{ route('monsters.export-data') }}" class="text-center">
+                    @csrf
+                    <input type="hidden" value="raid_monster" name="monster_type" />
+                    <x-core.buttons.primary-button type="submit">
+                        Export Raid Monsters
+                    </x-core.buttons.primary-button>
+                </form>
+
+                <form method="POST" action="{{ route('monsters.export-data') }}" class="text-center">
+                    @csrf
+                    <input type="hidden" value="raid_boss" name="monster_type" />
+                    <x-core.buttons.primary-button type="submit">
+                        Export Raid Bosses
+                    </x-core.buttons.primary-button>
+                </form>
             </div>
         </x-core.cards.card-with-title>
     </x-core.layout.info-container>

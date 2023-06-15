@@ -4,6 +4,9 @@
         <th>id</th>
         <th>name</th>
         <th>npc_id</th>
+        <th>raid_id</th>
+        <th>required_quest_id</th>
+        <th>reincarnated_times</th>
         <th>item_name</th>
         <th>gold_dust_cost</th>
         <th>shard_cost</th>
@@ -54,6 +57,9 @@
             <td>{{!is_null($quest->unlocks_passive_id) ? $quest->unlocks_passive_id : ''}}</td>
             <td>{{nl2br($quest->before_completion_description)}}</td>
             <td>{{nl2br($quest->after_completion_description)}}</td>
+            <td>{{!is_null($quest->raid_id) ? $quest->raid->name : ''}}</td>
+            <td>{{!is_null($quest->required_quest_id) ? $quest->requiredQuest->name : ''}}</td>
+            <td>{{$quest->reincarnated_times}}</td>
         </tr>
     @endforeach
     </tbody>

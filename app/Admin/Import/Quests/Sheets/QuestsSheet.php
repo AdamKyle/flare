@@ -8,6 +8,7 @@ use App\Flare\Models\Item;
 use App\Flare\Models\Npc;
 use App\Flare\Models\PassiveSkill;
 use App\Flare\Models\Quest;
+use App\Flare\Models\Raid;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 
@@ -121,6 +122,26 @@ class QuestsSheet implements ToCollection {
 
             if (is_null($passive)) {
                 $quest['required_passive_level'] = null;
+            }
+        }
+
+        if (!isset($quest['raid_id'])) {
+            $quest['raid_id'] = null;
+        } else {
+            $raid = Raid::find($quest['raid_id']);
+
+            if (is_null($raid)) {
+                $quest['raid_id'] = null;
+            }
+        }
+
+        if (!isset($quest['required_quest_id'])) {
+            $quest['required_quest_id'] = null;
+        } else {
+            $raid = Quest::find($quest['required_quest_id']);
+
+            if (is_null($raid)) {
+                $quest['required_quest_id'] = null;
             }
         }
 

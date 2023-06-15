@@ -43,6 +43,13 @@
         <th>quest_item_drop_chance</th>
         <th>game_map_id</th>
         <th>celestial_type</th>
+        <th>fire_atonement</th>
+        <th>ice_atonement</th>
+        <th>water_atonement</th>
+        <th>is_raid_monster</th>
+        <th>is_raid_boss</th>
+        <th>raid_special_attack_type</th>
+        <th>life_stealing_resistance</th>
     </tr>
     </thead>
     <tbody>
@@ -90,6 +97,13 @@
             <td>{{$monster->quest_item_drop_chance}}</td>
             <td>{{$monster->game_map_id}}</td>
             <td>{{$monster->celestial_type}}</td>
+            <td>{{$monster->fire_atonement}}</td>
+            <td>{{$monster->ice_atonement}}</td>
+            <td>{{$monster->water_atonement}}</td>
+            <td>{{$monster->is_raid_monster}}</td>
+            <td>{{$monster->is_raid_boss}}</td>
+            <td>{{$monster->raid_special_attack_type}}</td>
+            <td>{{$monster->life_stealing_resistance}}</td>
         </tr>
     @endforeach
     </tbody>

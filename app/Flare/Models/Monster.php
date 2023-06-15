@@ -109,13 +109,9 @@ class Monster extends Model {
         'fire_atonement'            => 'float',
         'ice_atonement'             => 'float',
         'water_atonement'           => 'float',
-        'highest_atonment_name'     => 'string',
         'is_raid_monster'           => 'boolean',
         'is_raid_boss'              => 'boolean',
         'raid_special_attack_type'  => 'integer',
-        'fire_atonement'            => 'float',
-        'ice_atonement'             => 'float',
-        'water_atonement'           => 'float', 
         'life_stealing_resistance'  => 'float',
     ];
 

@@ -3,17 +3,25 @@
 @section('content')
     <x-core.layout.info-container>
         <x-core.cards.card-with-title
-            title="Import Races"
+            title="Import Raids"
             buttons="true"
-            backUrl="{{route('races.list')}}"
+            backUrl="{{route('admin.raids.list')}}"
         >
-            <form class="mt-4" action="{{route('races.import')}}" method="POST" enctype="multipart/form-data">
+            <form class="mt-4" action="{{route('admin.raids.import')}}" method="POST" enctype="multipart/form-data">
                 @csrf
-                <div class="mb-5">
-                    <label class="label block mb-2" for="races_import">Races File</label>
-                    <input id="races_import" type="file" class="form-control" name="races_import" />
+                <div class="mt-4 mb-4">
+                    <x-core.alerts.info-alert title="Importing Tip">
+                        <p className='my-4'>
+                            <strong>Caution</strong> If data such as bosses, monster, locations or the boss location is missing, the raid will be skipped.
+                        </p>
+                    </x-core.alerts.info-alert>
                 </div>
-                <x-core.buttons.primary-button type="submit">Import Races</x-core.buttons.primary-button>
+
+                <div class="mb-5">
+                    <label class="label block mb-2" for="raids">Raids File</label>
+                    <input id="raids" type="file" class="form-control" name="raids" />
+                </div>
+                <x-core.buttons.primary-button type="submit">Import Raids</x-core.buttons.primary-button>
             </form>
         </x-core.cards.card-with-title>
     </x-core.layout.info-container>

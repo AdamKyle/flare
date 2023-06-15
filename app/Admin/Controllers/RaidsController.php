@@ -11,7 +11,10 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Flare\Models\Monster;
 use App\Admin\Import\Monsters\MonstersImport;
 use App\Admin\Exports\Monsters\MonstersExport;
+use App\Admin\Exports\Raids\RaidExport;
+use App\Admin\Import\Raids\RaidsImport;
 use App\Admin\Requests\MonstersImport as MonstersImportRequest;
+use App\Admin\Requests\RaidImportRequest;
 
 class RaidsController extends Controller {
 
@@ -59,11 +62,11 @@ class RaidsController extends Controller {
     /**
      * @codeCoverageIgnore
      */
-    public function export(Request $request) {
+    public function export() {
 
         $fileName = 'raids.xlsx';
 
-        $response = Excel::download(new MonstersExport($request->monster_type), $fileName, \Maatwebsite\Excel\Excel::XLSX);
+        $response = Excel::download(new RaidExport, $fileName, \Maatwebsite\Excel\Excel::XLSX);
         ob_end_clean();
 
         return $response;
@@ -72,8 +75,8 @@ class RaidsController extends Controller {
     /**
      * @codeCoverageIgnore
      */
-    public function importData(MonstersImportRequest $request) {
-        Excel::import(new MonstersImport, $request->monsters_import);
+    public function import(RaidImportRequest $request) {
+        Excel::import(new RaidsImport, $request->raids);
 
         return redirect()->back()->with('success', 'imported raid data.');
     }
