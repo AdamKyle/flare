@@ -19,7 +19,8 @@ export default class EventView extends React.Component<EventViewProps, {}> {
                         : null
                 }
                 <div className='my-4'>
-                    <p>{this.props.event.description}</p>
+                    <p className='my-4'>{this.props.event.description}</p>
+                    <p><a href={"/information/raids/" + this.props.event.raid_id} target="_blank">Vies Raid Details <i className="fas fa-external-link-alt"></i></a>.</p>
                 </div>
             </Fragment>
         )

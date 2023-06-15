@@ -93,7 +93,7 @@ class CastType extends BattleBase
 
         if (!$this->isEnemyEntranced) {
 
-            $this->doEnemyEntrance($character, $monster, $this->entrance);
+            //$this->doEnemyEntrance($character, $monster, $this->entrance);
 
             if ($this->isEnemyEntranced) {
                 $this->doSpellDamage($character, $monster, $spellDamage, true);

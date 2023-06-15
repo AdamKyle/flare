@@ -2,6 +2,7 @@ import React, {Fragment} from "react";
 import {formatNumber} from "../../../../lib/game/format-number";
 import SpecialLocationHelpModal from "./special-location-help-modal";
 import LocationDetailsProps from "../../../../lib/game/types/map/location-pins/modals/location-details-props";
+import Gems from '../../npc-actions/seer-actions/deffinitions/gems';
 
 export default class LocationDetails extends React.Component<LocationDetailsProps, any> {
     constructor(props: LocationDetailsProps) {
@@ -23,6 +24,7 @@ export default class LocationDetails extends React.Component<LocationDetailsProp
     }
 
     renderSpecialType() {
+
         if (this.props.location.type_name === 'Gold Mines') {
             return (
                 <Fragment>
@@ -36,6 +38,7 @@ export default class LocationDetails extends React.Component<LocationDetailsProp
                 </Fragment>
             )
         }
+        
 
         if (this.props.location.type_name === 'Purgatory Dungeons') {
             return (
@@ -54,10 +57,39 @@ export default class LocationDetails extends React.Component<LocationDetailsProp
         return null;
     }
 
+    renderRaidDetails() {
+        if (this.props.location.is_corrupted) {
+            return (
+                <Fragment>
+                    <div className='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 hidden sm:block'></div>
+                    <h5 className='text-orange-500 dark:text-orange-400'>Corrupted</h5>
+                    <p className='my-4'>
+                        This location has been corrupted by evil forces! There happens to be a raid going on here, the monsters of this
+                        location are exceptionaly hard, how ever quest items that you would get for visiting the place, if applicable, will still drop.
+                    </p>
+                    {
+                        this.props.location.has_raid_boss ?
+                            <p className='my-4 font-bold'>
+                                The raid boss lives here! He will be the first monster in the list!
+                            </p>
+                        :
+                            null
+
+                    }
+                    <p className='my-4 italic text-sm'>
+                        It is recomended that players have top tier gear, have reincarnated (at max level) at least twice and have gear with sockets and Gems
+                        attached. All players are welcome to participate in the raid, regardless of gear or level, but the more prepared the better chances you have.
+                    </p>
+                </Fragment>
+            )
+        }
+    }
+
     render() {
         return (
             <Fragment>
                 <p className='my-3'>{this.props.location.description}</p>
+                {this.renderRaidDetails()}
                 {
                     this.isSpecialLocation() ?
                         <Fragment>

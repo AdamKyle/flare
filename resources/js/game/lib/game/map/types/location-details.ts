@@ -29,4 +29,6 @@ export default interface LocationDetails {
     type_name: string | null;
 
     is_corrupted: boolean;
+
+    has_raid_boss: boolean;
 }

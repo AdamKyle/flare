@@ -67,13 +67,13 @@ class AttackAndCast extends BattleBase
             return $this;
         }
 
-        $this->handleCastAttack($character, $monster);
+        $this->handleCastAttack($character, $monster, false);
 
         if ($this->characterHealth <= 0) {
             return $this;
         }
 
-        $this->secondaryAttack($character, $monster);
+        // $this->secondaryAttack($character, $monster);
 
         return $this;
     }
@@ -101,13 +101,18 @@ class AttackAndCast extends BattleBase
         $this->weaponType->resetMessages();
     }
 
-    protected function handleWeaponAttack(Character $character, ServerMonster $monster) {
-        $this->doEnemyEntrance($character, $monster, $this->entrance);
+    protected function handleWeaponAttack(Character $character, ServerMonster $monster, bool $disableSecondaryAttacks = true) {
+        if (!$this->isEnemyEntranced) {
+            $this->doEnemyEntrance($character, $monster, $this->entrance);
+        }
 
         $this->weaponType->setMonsterHealth($this->monsterHealth);
         $this->weaponType->setCharacterHealth($this->characterHealth);
         $this->weaponType->setCharacterAttackData($character, $this->isVoided);
-        $this->weaponType->doNotAllowSecondaryAttacks();
+
+        if ($disableSecondaryAttacks) {
+            $this->weaponType->doNotAllowSecondaryAttacks();
+        }
 
         if ($this->isEnemyEntranced) {
             $this->weaponType->setEntranced();
@@ -141,10 +146,24 @@ class AttackAndCast extends BattleBase
         $this->castType->resetMessages();
     }
 
-    protected function handleCastAttack(Character $character, ServerMonster $monster) {
+    protected function handleCastAttack(Character $character, ServerMonster $monster, bool $disableSecondaryAttacks = true) {
+
+        if (!$this->isEnemyEntranced) {
+            $this->doEnemyEntrance($character, $monster, $this->entrance);
+        }
+
         $this->castType->setMonsterHealth($this->monsterHealth);
         $this->castType->setCharacterHealth($this->characterHealth);
         $this->castType->setCharacterAttackData($character, $this->isVoided);
+
+        if ($disableSecondaryAttacks) {
+            $this->castType->doNotAllowSecondaryAttacks();
+        }
+
+        if ($this->isEnemyEntranced && !$disableSecondaryAttacks) {
+            $this->castType->setEntranced();
+        }
+
         $this->castType->castAttack($character, $monster);
 
         $this->mergeMessages($this->castType->getMessages());
