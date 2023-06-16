@@ -204,6 +204,17 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::get('/admin/raids/{raid}', ['as' => 'admin.raids.show', 'uses' => 'RaidsController@show']);
     Route::post('/admin/raids/store', ['as' => 'admin.raids.store', 'uses' => 'RaidsController@store']);
 
+    Route::post('/admin/item-skills/export', ['as' => 'admin.items-skills.export', 'uses' => 'ItemSkillsController@export']);
+    Route::post('/admin/item-skills/import', ['as' => 'admin.items-skills.import', 'uses' => 'ItemSkillsController@import']);
+
+    Route::get('/admin/item-skills', ['as' => 'admin.items-skills.list', 'uses' => 'ItemSkillsController@index']);
+    Route::get('/admin/item-skills/export-data', ['as' => 'admin.items-skills.export-data', 'uses' => 'ItemSkillsController@exportItemSkills']);
+    Route::get('/admin/item-skills/import-data', ['as' => 'admin.items-skills.import-data', 'uses' => 'ItemSkillsController@importItemSkills']);
+    Route::get('/admin/item-skills/create', ['as' => 'admin.items-skills.create', 'uses' => 'ItemSkillsController@create']);
+    Route::get('/admin/item-skills/{itemSkill}/edit', ['as' => 'admin.items-skills.edit', 'uses' => 'ItemSkillsController@edit']);
+    Route::get('/admin/item-skills/{itemSkill}', ['as' => 'admin.items-skills.show', 'uses' => 'ItemSkillsController@show']);
+    Route::post('/admin/item-skills/store', ['as' => 'admin.item-skills.store', 'uses' => 'ItemSkillsController@store']);
+
     Route::get('/admin/statistics/dashboard', ['as' => 'admin.statistics', 'uses' => 'StatisticsController@index']);
     Route::get('/admin/events', ['as' => 'admin.events', 'uses' => 'EventScheduleController@index']);
 

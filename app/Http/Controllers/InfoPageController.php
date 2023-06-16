@@ -2,31 +2,32 @@
 
 namespace App\Http\Controllers;
 
-use App\Flare\Models\GameClassSpecial;
-use App\Flare\Models\Raid;
 use Storage;
-use Illuminate\Http\Request;
-use App\Flare\Models\GameBuilding;
-use App\Flare\Models\GameMap;
-use App\Flare\Models\InfoPage;
 use App\Flare\Models\Npc;
-use App\Flare\Models\PassiveSkill;
+use App\Flare\Models\Item;
+use App\Flare\Models\Raid;
 use App\Flare\Models\Quest;
-use App\Flare\Traits\Controllers\MonstersShowInformation;
-use App\Flare\Values\ItemEffectsValue;
-use App\Flare\Values\LocationEffectValue;
+use Illuminate\Http\Request;
+use App\Flare\Models\GameMap;
+use App\Flare\Models\Monster;
+use App\Flare\Models\GameRace;
+use App\Flare\Models\GameUnit;
+use App\Flare\Models\InfoPage;
+use App\Flare\Models\Location;
+use App\Flare\Models\GameClass;
+use App\Flare\Models\GameSkill;
+use App\Flare\Models\ItemAffix;
+use App\Flare\Models\ItemSkill;
+use App\Flare\Models\GameBuilding;
+use App\Flare\Models\PassiveSkill;
 use App\Flare\Values\LocationType;
 use App\Flare\Models\GameBuildingUnit;
-use App\Flare\Models\GameClass;
-use App\Flare\Models\GameRace;
-use App\Flare\Models\GameSkill;
-use App\Flare\Models\GameUnit;
-use App\Flare\Models\Item;
-use App\Flare\Models\ItemAffix;
-use App\Flare\Models\Location;
-use App\Flare\Models\Monster;
-use App\Flare\Traits\Controllers\ItemsShowInformation;
+use App\Flare\Models\GameClassSpecial;
+use App\Flare\Values\ItemEffectsValue;
+use App\Flare\Values\LocationEffectValue;
 use App\Game\Core\Values\View\ClassBonusInformation;
+use App\Flare\Traits\Controllers\ItemsShowInformation;
+use App\Flare\Traits\Controllers\MonstersShowInformation;
 
 class InfoPageController extends Controller
 {
@@ -222,6 +223,12 @@ class InfoPageController extends Controller
     public function viewPassiveSkill(PassiveSkill $passiveSkill) {
         return view('information.passive-skills.skill', [
             'skill' => $passiveSkill,
+        ]);
+    }
+
+    public function itemSkill(ItemSkill $itemSkill) {
+        return view('information.item-skills.skill', [
+            'skill' => $itemSkill,
         ]);
     }
 }

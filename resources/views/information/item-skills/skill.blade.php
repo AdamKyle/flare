@@ -1,0 +1,1 @@
+@include('admin.item-skills.skill', ['skill' => $skill])

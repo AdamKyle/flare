@@ -213,6 +213,24 @@
             Import Data
         </a>
         <hr />
+        <h6 class="uppercase">Item Skills</h6>
+        <a href="{{route('admin.items-skills.list')}}">
+            <span class="ra ra-player-thunder-struck"></span>
+            Item Skills
+        </a>
+        <a href="{{route('admin.items-skills.create')}}">
+            <span class="fas fa-plus"></span>
+            Create New Skill
+        </a>
+        <a href="{{route('admin.items-skills.export-data')}}">
+            <span class="fas fa-file-export"></span>
+            Export Data
+        </a>
+        <a href="{{route('admin.items-skills.import-data')}}">
+            <span class="fas fa-file-import"></span>
+            Import Data
+        </a>
+        <hr />
         <h6 class="uppercase">Passives</h6>
         <a href="{{route('passive.skills.list')}}">
             <span class="ra ra-muscle-up"></span>

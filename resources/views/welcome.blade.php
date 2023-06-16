@@ -61,60 +61,51 @@
         </div>
 
         <div class="grid md:grid-cols-3 gap-3 w-full md:w-2/3 m-auto">
-            <x-core.cards.card-with-hover>
-                <div class="flex justify-center items-center">
-                    <div class="w-1/5 text-7xl">
-                        <i class="ra ra-player text-primary-600 relative top-[10px] right-[10px]"></i>
-                    </div>
-                    <div class="w-4/5">
-                        <h5>
-                            <a href="{{route('info.page', [
+            <x-core.cards.feature-card>
+                <x-slot:icon>
+                    <i class="ra ra-player text-primary-600 relative top-[10px] right-[10px]"></i>
+                </x-slot:icon>
+                <x-slot:title>
+                    <a href="{{route('info.page', [
                                 'pageName' => 'equipment'
                             ])}}">Equip your character!</a>
-                        </h5>
-                        <p>
-                            Buy/sell weapons, armor, rings and more to out fit your character
-                            for the road ahead. Who knows what beasties you might find!
-                        </p>
-                    </div>
-                </div>
-            </x-core.cards.card-with-hover>
-            <x-core.cards.card-with-hover>
-                <div class="flex justify-center items-center">
-                    <div class="w-1/5 text-7xl">
-                        <i class="ra ra-player-king text-primary-600 relative top-[10px] right-[10px]"></i>
-                    </div>
-                    <div class="w-4/5">
-                        <h5>
-                            <a href="{{route('info.page', [
+                </x-slot:title>
+
+                <p>
+                    Buy/sell weapons, armor, rings and more to out fit your character
+                    for the road ahead. Who knows what beasties you might find!
+                </p>
+            </x-core.cards.feature-card>
+            <x-core.cards.feature-card>
+                <x-slot:icon>
+                    <i class="ra ra-player-king text-primary-600 relative top-[10px] right-[10px]"></i>
+                </x-slot:icon>
+                <x-slot:title>
+                    <a href="{{route('info.page', [
                                 'pageName' => 'kingdoms'
                             ])}}">Rule Kingdoms!</a>
-                        </h5>
-                        <p>
-                            Settle, Manage and wage war against other players! You can use Kingdom passives to train new skills to unlock new buildings
-                            and units that give your kingdoms even more power!
-                        </p>
-                    </div>
-                </div>
-            </x-core.cards.card-with-hover>
-            <x-core.cards.card-with-hover>
-                <div class="flex justify-center items-center">
-                    <div class="w-1/5 text-7xl">
-                        <i class="ra ra-trail text-primary-600 relative top-[10px] right-[10px]"></i>
-                    </div>
-                    <div class="w-4/5">
-                        <h5>
-                            <a href="{{route('info.page', [
-                                'pageName' => 'exploration',
-                            ])}}">Automated exploration</a>
-                        </h5>
-                        <p>
-                            Set up automation and let the game do all the fighting for you! Come back later or do other actions and
-                            get rewards over time!
-                        </p>
-                    </div>
-                </div>
-            </x-core.cards.card-with-hover>
+                </x-slot:title>
+
+                <p>
+                    Settle, Manage and wage war against other players! You can use Kingdom passives to train new skills to unlock new buildings
+                    and units that give your kingdoms even more power!
+                </p>
+            </x-core.cards.feature-card>
+            <x-core.cards.feature-card>
+                <x-slot:icon>
+                    <i class="ra ra-trail text-primary-600 relative top-[10px] right-[10px]"></i>
+                </x-slot:icon>
+                <x-slot:title>
+                    <a href="{{route('info.page', [
+                        'pageName' => 'exploration',
+                    ])}}">Automated exploration</a>
+                </x-slot:title>
+
+                <p>
+                    Set up automation and let the game do all the fighting for you! Come back later or do other actions and
+                    get rewards over time!
+                </p>
+            </x-core.cards.feature-card>
         </div>
 
         <div class="grid md:grid-cols-2 gap-3 mt-5 w-full mt-10 mx-auto lg:w-2/3 md:mt-20">
@@ -187,99 +178,93 @@
         </div>
 
         <div class="grid md:grid-cols-3 gap-3 mt-20 w-full md:w-2/3 m-auto">
-            <x-core.cards.card-with-hover>
-                <div class="flex justify-center items-center">
-                    <div class="w-1/5 text-5xl lg:text-7xl">
-                        <i class="ra ra-anvil text-primary-600 relative top-[10px] right-[10px]"></i>
-                    </div>
-                    <div class="w-4/5">
-                        <h5>
-                            <a href="{{route('info.page', [
+            <x-core.cards.feature-card>
+                <x-slot:icon>
+                    <i class="ra ra-anvil text-primary-600 relative top-[10px] right-[10px]"></i>
+                </x-slot:icon>
+                <x-slot:title>
+                    <a href="{{route('info.page', [
                                 'pageName' => 'crafting',
                             ])}}">Crafting is simple</a>
-                        </h5>
-                        <p>No need to gather. You can just start crafting! Find tomes to get xp bonuses!</p>
-                    </div>
-                </div>
-            </x-core.cards.card-with-hover>
-            <x-core.cards.card-with-hover>
-                <div class="flex justify-center items-center">
-                    <div class="w-1/5 text-5xl lg:text-7xl">
-                        <i class="ra ra-forging text-primary-600 relative top-[10px] right-[10px]"></i>
-                    </div>
-                    <div class="w-4/5">
-                        <h5>
-                            <a href="{{route('info.page', [
+                </x-slot:title>
+
+                <p>No need to gather. You can just start crafting! Find tomes to get xp bonuses!</p>
+            </x-core.cards.feature-card>
+
+            <x-core.cards.feature-card>
+                <x-slot:icon>
+                    <i class="ra ra-forging text-primary-600 relative top-[10px] right-[10px]"></i>
+                </x-slot:icon>
+                <x-slot:title>
+                    <a href="{{route('info.page', [
                                 'pageName' => 'enchanting',
                             ])}}">Enchant Gear!</a>
-                        </h5>
-                        <p>With over 400 enchantments, there isn't anything you can't make for your character!</p>
-                    </div>
-                </div>
-            </x-core.cards.card-with-hover>
-            <x-core.cards.card-with-hover>
-                <div class="flex justify-center items-center">
-                    <div class="w-1/5 text-5xl lg:text-7xl">
-                        <i class="ra ra-wooden-sign text-primary-600 relative top-[10px] right-[10px]"></i>
-                    </div>
-                    <div class="w-4/5">
-                        <h5>
-                            <a href="{{route('info.page', [
+                </x-slot:title>
+
+                <p>With over 400 enchantments, there isn't anything you can't make for your character!</p>
+            </x-core.cards.feature-card>
+            
+            <x-core.cards.feature-card>
+                <x-slot:icon>
+                    <i class="ra ra-wooden-sign text-primary-600 relative top-[10px] right-[10px]"></i>
+                </x-slot:icon>
+                <x-slot:title>
+                    <a href="{{route('info.page', [
                                         'pageName' => 'market-board',
                                     ])}}">Market Board</a>
-                        </h5>
-                        <p>Buy and sell from the market board. Craft and Enchant items for others and make a profit!</p>
-                    </div>
-                </div>
-            </x-core.cards.card-with-hover>
+                </x-slot:title>
+
+                <p>Buy and sell from the market board. Craft and Enchant items for others and make a profit!</p>
+            </x-core.cards.feature-card>
         </div>
 
         <div class="grid md:grid-cols-3 gap-3 mt-2 w-full md:w-2/3 m-auto">
-            <x-core.cards.card-with-hover>
-                <div class="flex justify-center items-center">
-                    <div class="w-1/5 text-5xl lg:text-7xl">
-                        <i class="ra ra-bone-bite text-primary-600 relative top-[10px] right-[10px]"></i>
-                    </div>
-                    <div class="w-4/5">
-                        <h5>
-                            <a href="{{route('info.page', [
-                                'pageName' => 'player-vs-player',
-                            ])}}">Pvp</a>
-                        </h5>
-                        <p>Fight other players for a chance to earn a Mythic Unique. Participate in monthly pvp tournaments.</p>
-                    </div>
-                </div>
-            </x-core.cards.card-with-hover>
-            <x-core.cards.card-with-hover>
-                <div class="flex justify-center items-center">
-                    <div class="w-1/5 text-5xl lg:text-7xl">
-                        <i class="ra ra-compass text-primary-600 relative top-[10px] right-[10px]"></i>
-                    </div>
-                    <div class="w-4/5">
-                        <h5>
-                            <a href="{{route('info.page', [
-                                        'pageName' => 'the-guide',
-                                    ])}}">The Guide</a>
-                        </h5>
-                        <p>New Player? Enable the guide during registration to help you out and learn about the game!</p>
-                    </div>
-                </div>
-            </x-core.cards.card-with-hover>
-            <x-core.cards.card-with-hover>
-                <div class="flex justify-center items-center">
-                    <div class="w-1/5 text-5xl lg:text-7xl">
-                        <i class="fas fa-calendar text-primary-600 relative top-[10px] right-[10px]"></i>
-                    </div>
-                    <div class="w-4/5">
-                        <h5>
-                            <a href="{{route('info.page', [
+            <x-core.cards.feature-card>
+                <x-slot:icon>
+                    <i class="ra ra-bone-bite text-primary-600 relative top-[10px] right-[10px]"></i>
+                </x-slot:icon>
+                <x-slot:title>
+                    <a href="{{route('info.page', [
+                        'pageName' => 'player-vs-player',
+                    ])}}">Pvp</a>
+                </x-slot:title>
+
+                <p>Fight other players for a chance to earn a Mythic Unique. Participate in monthly pvp tournaments.</p>
+            </x-core.cards.feature-card>
+            <x-core.cards.feature-card>
+                <x-slot:icon>
+                    <i class="ra ra-compass text-primary-600 relative top-[10px] right-[10px]"></i>
+                </x-slot:icon>
+                <x-slot:title>
+                    <a href="{{route('info.page', [
+                            'pageName' => 'the-guide',
+                        ])}}">The Guide</a>
+                </x-slot:title>
+
+                <p>New Player? Enable the guide during registration to help you out and learn about the game!</p>
+            </x-core.cards.feature-card>
+            <x-core.cards.feature-card>
+                <x-slot:icon>
+                    <i class="fas fa-calendar text-primary-600 relative top-[10px] right-[10px]"></i>
+                </x-slot:icon>
+                <x-slot:title>
+                    <a href="{{route('info.page', [
                                         'pageName' => 'events',
                                     ])}}">Events</a>
-                        </h5>
-                        <p>Tlessa offers events that reward players for participating!</p>
-                    </div>
-                </div>
-            </x-core.cards.card-with-hover>
+                </x-slot:title>
+
+                <p>Tlessa offers events that reward players for participating!</p>
+            </x-core.cards.feature-card>
+        </div>
+
+        <div class="text-center mt-4 w-full md:w-2/3 m-auto">
+            <h4 class="mb-5 font-thin text-3xl dark:text-gray-300 text-gray-800">And so many more!</h1>
+            <p class="mb-10 dark:text-gray-300 text-gray-800 italic">Planes of tlessa has so many rich and diverse features its hard to showcase them all!</p>
+            <div class="text-center w-1/3 mr-auto ml-auto">
+                <x-core.buttons.link-buttons.success-button  css="mr-2" href="{{route('game.features')}}">
+                    See all the features
+                </x-core.buttons.link-buttons.success-button>
+            </div>
         </div>
 
         <div class="w-full lg:w-2/4 mx-auto mt-10 lg:mt-20 mb-10 mt-4 lg:mt-0">
