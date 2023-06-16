@@ -11,15 +11,17 @@ class ItemSpecialtyType {
      */
     private string $value;
 
-    const HELL_FORGED      = 'Hell Forged';
-    const PURGATORY_CHAINS = 'Purgatory Chains';
+    const HELL_FORGED         = 'Hell Forged';
+    const PURGATORY_CHAINS    = 'Purgatory Chains';
+    const PIRATE_LORD_LEATHER = 'Pirate Lord Leather';
 
     /**
      * @var string[] $values
      */
     protected static $values = [
-        self::HELL_FORGED      => 'Hell Forged',
-        self::PURGATORY_CHAINS => 'Purgatory Chains',
+        self::HELL_FORGED         => 'Hell Forged',
+        self::PURGATORY_CHAINS    => 'Purgatory Chains',
+        self::PIRATE_LORD_LEATHER => 'Pirate Lord Leather',
     ];
 
     /**
@@ -56,5 +58,14 @@ class ItemSpecialtyType {
      */
     public function isPurgatoryChains(): bool {
         return $this->value === self::PURGATORY_CHAINS;
+    }
+
+    /**
+     * Is Pirate Lord Leather?
+     *
+     * @return boolean
+     */
+    public function isPirateLordLeather(): bool {
+        return $this->value === self::PIRATE_LORD_LEATHER;
     }
 }

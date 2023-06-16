@@ -24,7 +24,7 @@ class ItemsSheet implements FromView, WithTitle, ShouldAutoSize {
         if (empty($this->itemTypes)) {
             $items = Item::whereNull('item_suffix_id')->whereNull('item_prefix_id')->orderBy('type', 'desc')->orderBy('cost', 'asc')->get();
         } else {
-            $items = Item::whereNull('item_suffix_id')->whereNull('item_prefix_id')->whereIn('type', $this->itemTypes)->orWhereIn('specialty_type', $this->itemTypes)->orderBy('type', 'desc')->orderBy('cost', 'asc')->get();
+            $items = Item::whereNull('item_suffix_id')->whereNull('item_prefix_id')->whereIn('type', $this->itemTypes)->orWhereIn('specialty_type', $this->itemTypes)->orderBy('type', 'desc')->orderBy('cost', 'asc')->get()->unique('name');
         }
 
         return view('admin.exports.items.sheets.items', [

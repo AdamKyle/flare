@@ -80,6 +80,8 @@ class RaidBossRewardHandler implements ShouldQueue
     private function handleWhenRaidBossIsKilled(Character $charater, Monster $raidBoss): void {
         event(new GlobalMessageEvent($charater->name . ' Has slaughted: ' . $raidBoss->name . ' and has recieved a special Ancient gift from The Poet him self!'));
         
+        $this->giveAncientReward($charater);
+
         RaidBossParticipation::chunkById(250, function($participationRecords) {
             foreach ($participationRecords as $record) {
                 $record->update([
@@ -90,7 +92,10 @@ class RaidBossRewardHandler implements ShouldQueue
             }
         });
 
-        // Do stuff here...
+    }
+
+    protected function giveAncientReward(Character $character) {
+        
     }
 
 }

@@ -78,6 +78,7 @@ class ItemsService {
             'specialtyTypes' => [
                 ItemSpecialtyType::HELL_FORGED,
                 ItemSpecialtyType::PURGATORY_CHAINS,
+                ItemSpecialtyType::PIRATE_LORD_LEATHER,
             ],
             'locations'  => Location::select('name', 'id')->get(),
             'skills'     => GameSkill::pluck('name')->toArray(),

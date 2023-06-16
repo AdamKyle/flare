@@ -18,11 +18,13 @@ class Raid extends Model {
         'raid_monster_ids',
         'raid_boss_location_id',
         'corrupted_location_ids',
+        'item_specialty_reward_type'
     ];
 
     protected $casts = [
         'raid_monster_ids'       => 'array',
         'corrupted_location_ids' => 'array',
+        'item_specialty_reward_type' => 'string',
     ];
 
     public function getMonstersForSelection(): array {

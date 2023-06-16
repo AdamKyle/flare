@@ -15,6 +15,7 @@ use App\Admin\Exports\Raids\RaidExport;
 use App\Admin\Import\Raids\RaidsImport;
 use App\Admin\Requests\MonstersImport as MonstersImportRequest;
 use App\Admin\Requests\RaidImportRequest;
+use App\Flare\Values\ItemSpecialtyType;
 
 class RaidsController extends Controller {
 
@@ -39,6 +40,9 @@ class RaidsController extends Controller {
             'monsters'    => Monster::where('is_raid_monster', true)->get(),
             'locations'   => Location::all(),
             'raidBosses'  => Monster::where('is_raid_boss', true)->get(),
+            'itemTypes'   => [
+                ItemSpecialtyType::PIRATE_LORD_LEATHER,
+            ]
         ]);
     }
 
@@ -48,6 +52,9 @@ class RaidsController extends Controller {
             'monsters'   => Monster::where('is_raid_monster', true)->get(),
             'locations'  => Location::all(),
             'raidBosses' => Monster::where('is_raid_boss', true)->get(),
+            'itemTypes'  => [
+                ItemSpecialtyType::PIRATE_LORD_LEATHER,
+            ]
         ]);
     }
 

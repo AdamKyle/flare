@@ -35,5 +35,10 @@
         @livewire('admin.locations.locations-table', [
             'locationIds' => $raid->corrupted_location_ids
         ])
+        <h3 class="my-4">Reward Items</h3>
+        <p>These items will drop when the raid is completed. Players will get one item, at random, so long as they are in the top twenty Five damage dealers to the raid boss</p>
+        @livewire('info.items.raid-items-for-type', [
+            'type' => $raid->item_specialty_reward_type
+        ])
     </x-core.cards.card-with-title>
 </x-core.layout.info-container>

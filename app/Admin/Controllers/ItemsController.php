@@ -105,6 +105,7 @@ class ItemsController extends Controller {
             'specialty-shops' => [
                 ItemSpecialtyType::HELL_FORGED,
                 ItemSpecialtyType::PURGATORY_CHAINS,
+                ItemSpecialtyType::PIRATE_LORD_LEATHER,
             ]
         ];
 

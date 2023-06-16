@@ -30,6 +30,6 @@ class RaidBossParticipation extends Model {
     }
 
     public function character() {
-        return $this->hasOne(Character::class, 'id', '');
+        return $this->hasOne(Character::class, 'id', 'character_id');
     }
 }

@@ -2,23 +2,22 @@
 
 namespace App\Game\Raids\Jobs;
 
+use Illuminate\Bus\Queueable;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
 use App\Flare\Models\Raid;
 use App\Flare\Models\Event;
 use App\Flare\Models\GameMap;
-use Illuminate\Bus\Queueable;
 use App\Flare\Models\Location;
 use App\Flare\Models\Character;
 use App\Flare\Values\EventType;
 use App\Flare\Models\ScheduledEvent;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use App\Flare\Events\UpdateScheduledEvents;
-use App\Flare\Models\Monster;
 use App\Flare\Models\RaidBoss;
 use App\Game\Maps\Services\LocationService;
 use App\Game\Raids\Events\CorruptLocations;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
 use App\Game\Maps\Services\UpdateRaidMonsters;
 use App\Flare\Services\EventSchedulerService;
 use App\Game\Messages\Events\GlobalMessageEvent;
