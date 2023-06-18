@@ -42,7 +42,9 @@ class ItemDisplayColor extends Component {
                 $this->color = 'unique-item';
             }
         } else {
-            if ($this->item->type === 'trinket') {
+            if ($this->item->type === 'artifact') {
+                $this->color = 'artifact';
+            } else if ($this->item->type === 'trinket') {
                 $this->color = 'trinket';
             } else if ($this->item->appliedHolyStacks->isNotEmpty()) {
                 $this->color = 'holy-item';

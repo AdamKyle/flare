@@ -185,6 +185,7 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
                                        usable_sets={this.props.usable_sets}
                                        set_success_message={this.setSuccessMessage.bind(this)}
                                        is_automation_running={this.props.is_automation_running}
+                                       manage_skills={this.props.manage_skills}
                 />
             case 'usable-items':
                 return <UsableItemsTable

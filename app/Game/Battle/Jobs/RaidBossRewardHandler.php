@@ -16,11 +16,12 @@ use Illuminate\Database\Eloquent\Collection;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Battle\Events\UpdateRaidAttacksLeft;
+use App\Game\Battle\Concerns\HandleGivingAncestorItem;
 use App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation;
 
 class RaidBossRewardHandler implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, UpdateRaidMonstersForLocation;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, UpdateRaidMonstersForLocation, HandleGivingAncestorItem;
 
     /**
      * @var integer $characterId
@@ -93,9 +94,4 @@ class RaidBossRewardHandler implements ShouldQueue
         });
 
     }
-
-    protected function giveAncientReward(Character $character) {
-        
-    }
-
 }

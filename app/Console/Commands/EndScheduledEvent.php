@@ -96,7 +96,7 @@ class EndScheduledEvent extends Command
 
         foreach ($raidParticipation as $participator) {
 
-            $item = Item::where('specialty_type', ItemSpecialtyType::PIRATE_LORD_LEATHER)->inRandomOrder()->first();
+            $item = Item::where('specialty_type', $raid->item_specialty_reward_type)->inRandomOrder()->first();
 
             if ($participator->character->isInventoryFull()) {
                 return;

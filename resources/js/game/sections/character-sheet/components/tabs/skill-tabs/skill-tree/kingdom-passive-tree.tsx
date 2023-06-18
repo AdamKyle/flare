@@ -36,8 +36,6 @@ export default class KingdomPassiveTree extends React.Component<any, any> {
         });
     }
 
-
-
     render() {
         return (
             <div className='overflow-x-auto overflow-y-hidden max-w-[300px] sm:max-w-[600px] md:max-w-[100%]'>

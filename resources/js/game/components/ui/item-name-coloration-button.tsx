@@ -23,6 +23,8 @@ export default class ItemNameColorationButton extends React.Component<ItemNameCo
             <button className={clsx({
                 'text-lime-600 dark:text-lime-500' : this.props.item instanceof GemBagTable
             }, {
+                'text-artifact-colors-800 dark:text-artifact-colors-600': this.props.item.type === 'artifact' && !this.props.item.is_mythic,
+            }, {
                 'text-red-700 dark:text-red-400': this.props.item.type === 'trinket' && !this.props.item.is_mythic
             }, {
                 'text-green-700 dark:text-green-600': this.props.item.is_unique && this.props.item.type !== 'trinket' && !this.props.item.is_mythic

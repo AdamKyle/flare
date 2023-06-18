@@ -9,10 +9,12 @@ import Ajax from "../../../lib/ajax/ajax";
 import {AxiosError, AxiosResponse} from "axios";
 import ComponentLoading from "../../../components/ui/loading/component-loading";
 import CharacterInventoryTabsState from "../../../lib/game/character-sheet/types/character-inventory-tabs-state";
-import Inventory from "resources/js/game/lib/game/character-sheet/types/inventory/inventory";
 import InventoryTabSection from "./tabs/inventory-tab-section";
 import InventoryDetails from "../../../lib/game/character-sheet/types/inventory/inventory-details";
 import CharacterInventoryTabsProps from "../../../lib/game/character-sheet/types/character-inventory-tabs-props";
+import ItemSkillManagement from "./item-skill-management/item-skill-management";
+import ItemSkill from "./item-skill-management/types/deffinitions/item-skill";
+import ItemSkillProgression from "./item-skill-management/types/deffinitions/item-skill-progression";
 
 export default class CharacterInventoryTabs extends React.Component<CharacterInventoryTabsProps, CharacterInventoryTabsState> {
 
@@ -43,6 +45,7 @@ export default class CharacterInventoryTabs extends React.Component<CharacterInv
             loading: true,
             inventory: null,
             disable_tabs: false,
+            item_skill_data: null
         }
 
         // @ts-ignore
@@ -107,21 +110,39 @@ export default class CharacterInventoryTabs extends React.Component<CharacterInv
         })
     }
 
+    manageItemSkills(slotId: number, itemSkills: ItemSkill[], itemSkillProgressions: ItemSkillProgression[]) {
+        this.setState({
+            item_skill_data: {
+                slot_id: slotId,
+                item_skills: itemSkills,
+                item_skill_progressions: itemSkillProgressions,
+            }
+        });
+    }
+
     render() {
         if (this.state.loading || this.state.inventory === null) {
             return <div className='my-4'><ComponentLoading /></div>
         }
 
+        if (this.state.item_skill_data !== null) {
+            return (
+                <div className='my-4'>
+                    <ItemSkillManagement slot_id={this.state.item_skill_data.slot_id} skill_data={this.state.item_skill_data.item_skills} skill_progression_data={this.state.item_skill_data.item_skill_progressions} />
+                </div>
+            )
+        }
+
         return (
             <Tabs tabs={this.tabs} full_width={true} disabled={this.state.disable_tabs}>
                 <TabPanel key={'inventory'}>
-                    <InventoryTabSection dark_tables={this.state.dark_tables} character_id={this.props.character_id} inventory={this.state.inventory.inventory} usable_items={this.state.inventory.usable_items} is_dead={this.props.is_dead} update_inventory={this.updateInventory.bind(this)} usable_sets={this.state.inventory.usable_sets} is_automation_running={this.props.is_automation_running} user_id={this.props.user_id}/>
+                    <InventoryTabSection dark_tables={this.state.dark_tables} character_id={this.props.character_id} inventory={this.state.inventory.inventory} usable_items={this.state.inventory.usable_items} is_dead={this.props.is_dead} update_inventory={this.updateInventory.bind(this)} usable_sets={this.state.inventory.usable_sets} is_automation_running={this.props.is_automation_running} user_id={this.props.user_id} manage_skills={this.manageItemSkills.bind(this)}/>
                 </TabPanel>
                 <TabPanel key={'equipped'}>
-                    <EquippedTable dark_tables={this.state.dark_tables} equipped_items={this.state.inventory.equipped} is_dead={this.props.is_dead} sets={this.state.inventory.sets} character_id={this.props.character_id} is_set_equipped={this.state.inventory.set_is_equipped} update_inventory={this.updateInventory.bind(this)} is_automation_running={this.props.is_automation_running} disable_tabs={this.manageDisableTabs.bind(this)}/>
+                    <EquippedTable dark_tables={this.state.dark_tables} equipped_items={this.state.inventory.equipped} is_dead={this.props.is_dead} sets={this.state.inventory.sets} character_id={this.props.character_id} is_set_equipped={this.state.inventory.set_is_equipped} update_inventory={this.updateInventory.bind(this)} is_automation_running={this.props.is_automation_running} disable_tabs={this.manageDisableTabs.bind(this)} manage_skills={this.manageItemSkills.bind(this)}/>
                 </TabPanel>
                 <TabPanel key={'sets'}>
-                    <SetsTable dark_tables={this.state.dark_tables} sets={this.state.inventory.sets} is_dead={this.props.is_dead} character_id={this.props.character_id} savable_sets={this.state.inventory.savable_sets} update_inventory={this.updateInventory.bind(this)} set_name_equipped={this.state.inventory.set_name_equipped} is_automation_running={this.props.is_automation_running} disable_tabs={this.manageDisableTabs.bind(this)}/>
+                    <SetsTable dark_tables={this.state.dark_tables} sets={this.state.inventory.sets} is_dead={this.props.is_dead} character_id={this.props.character_id} savable_sets={this.state.inventory.savable_sets} update_inventory={this.updateInventory.bind(this)} set_name_equipped={this.state.inventory.set_name_equipped} is_automation_running={this.props.is_automation_running} disable_tabs={this.manageDisableTabs.bind(this)} manage_skills={this.manageItemSkills.bind(this)}/>
                 </TabPanel>
                 <TabPanel key={'quest'}>
                     <QuestItemsTable dark_table={this.state.dark_tables} quest_items={this.state.inventory.quest_items} is_dead={this.props.is_dead} character_id={this.props.character_id} />

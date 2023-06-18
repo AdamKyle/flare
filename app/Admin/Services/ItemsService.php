@@ -2,16 +2,17 @@
 
 namespace App\Admin\Services;
 
+use App\Flare\Models\Item;
+use App\Flare\Models\SetSlot;
+use App\Flare\Models\Location;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameSkill;
-use App\Flare\Models\Location;
-use App\Flare\Models\SetSlot;
+use App\Flare\Models\ItemSkill;
+use App\Flare\Models\InventorySlot;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\ItemSpecialtyType;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Skills\Values\SkillTypeValue;
-use App\Flare\Models\InventorySlot;
-use App\Flare\Models\Item;
 
 class ItemsService {
 
@@ -37,6 +38,7 @@ class ItemsService {
                 'artifact',
                 'quest',
                 'alchemy',
+                'artifact',
             ],
             'defaultPositions' => [
                 'body',
@@ -80,6 +82,7 @@ class ItemsService {
                 ItemSpecialtyType::PURGATORY_CHAINS,
                 ItemSpecialtyType::PIRATE_LORD_LEATHER,
             ],
+            'itemSkills' => ItemSkill::whereNull('parent_id')->get(),
             'locations'  => Location::select('name', 'id')->get(),
             'skills'     => GameSkill::pluck('name')->toArray(),
             'classes'    => GameClass::pluck('name', 'id')->toArray(),

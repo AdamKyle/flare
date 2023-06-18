@@ -11,6 +11,8 @@ class ItemSkillsTable extends DataTableComponent {
 
     public ?int $parentSkill = null;
 
+    public ?int $itemSkillId = null;
+
     public function configure(): void {
         $this->setPrimaryKey('id');
     }
@@ -19,6 +21,10 @@ class ItemSkillsTable extends DataTableComponent {
 
         if (!is_null($this->parentSkill)) {
             return ItemSkill::where('parent_id', $this->parentSkill);
+        }
+
+        if (!is_null($this->itemSkillId)) {
+            return ItemSkill::where('id', $this->itemSkillId);
         }
 
         return ItemSkill::query();

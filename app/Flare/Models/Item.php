@@ -2,11 +2,12 @@
 
 namespace App\Flare\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Database\Factories\ItemFactory;
 use Bkwld\Cloner\Cloneable;
+use Database\Factories\ItemFactory;
+use Illuminate\Database\Eloquent\Model;
+use App\Flare\Models\ItemSkillProgression;
 use App\Flare\Models\Traits\CalculateSkillBonus;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Item extends Model {
 
@@ -93,6 +94,7 @@ class Item extends Model {
         'unlocks_class_id',
         'socket_count',
         'has_gems_socketed',
+        'item_skill_id',
     ];
 
     /**
@@ -179,6 +181,14 @@ class Item extends Model {
         'holy_stacks_applied',
         'is_unique',
     ];
+
+    public function itemSkill() {
+        return $this->hasOne(ItemSkill::class, 'id', 'item_skill_id')->with('children');
+    }
+
+    public function itemSkillProgressions() {
+        return $this->hasMany(ItemSkillProgression::class, 'item_id', 'id');
+    }
 
     public function inventorySlots() {
         return $this->hasMany(InventorySlot::class, 'item_id', 'id');

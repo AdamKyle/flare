@@ -221,6 +221,24 @@
                 </div>
             </x-core.cards.card>
         @endif
+
+        @if(!is_null($item->itemSkill))
+            <x-core.cards.card-with-title title="Item Skills">
+                <p class="my-4">
+                    This item has skills attached to it. below is the parent skill, from there, you will see other child skills
+                    this item has to offer.
+                </p>
+
+                <p class="my-4">
+                    Items with item skills cannot be sold on the market and cannot be sold. They are bound to your character and 
+                    there skills effects only take place whe equipped.
+                </p>
+
+                @livewire('admin.item-skills.item-skills-table', [
+                    'itemSkillId' => $item->itemSkill->id
+                ])
+            </x-core.cards.card-woth-title>
+        @endif
     </div>
     @include('game.items.components.items-quest-details', ['item' => $item])
 </div>

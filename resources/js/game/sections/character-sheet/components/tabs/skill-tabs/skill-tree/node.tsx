@@ -1,6 +1,4 @@
 import React from "react";
-import ManualProgressBar from "../../../../../../components/ui/progress-bars/manual-progress-bar";
-import TimerProgressBar from "../../../../../../components/ui/progress-bars/timer-progress-bar";
 import clsx from "clsx";
 
 export default class Node extends React.Component<any, any> {

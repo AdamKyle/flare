@@ -18,4 +18,6 @@ export default interface InventoryTabProps {
     set_success_message: (message: string) => void;
 
     is_automation_running: boolean;
+
+    manage_skills: (itemId: number, itemSkills: any[]|[], itemSkillProgressions: any[]) => void;
 }

@@ -14,4 +14,6 @@ export default interface InventoryTabSectionProps extends CoreInventoryTabProps 
     is_automation_running: boolean;
 
     user_id: number;
+
+    manage_skills: (itemId: number, itemSkills: any[], itemSkillProgressions: any[]) => void;
 }

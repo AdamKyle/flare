@@ -35,6 +35,10 @@ module.exports = {
         '900': '#324a76',
         '950': '#222f49',
       },
+      'artifact-colors': {
+        '600': '#4c56c4',
+        '800': '#3b3b92',
+      },
       primary: {
         DEFAULT: "#145388",
         100: "#F3F6F9",

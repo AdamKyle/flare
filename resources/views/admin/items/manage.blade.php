@@ -120,6 +120,10 @@
                         <x-core.forms.select :model="$item" label="Specialty Type:" modelKey="specialty_type" name="specialty_type" :options="$specialtyTypes" />
 
                         <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                        <h3 class="mb-3">Skill Tree (Parent Skill)</h3>
+                        <x-core.forms.collection-select :model="$item" label="Skill Tree:" modelKey="item_skill_id" name="item_skill_id" value='id' key='name' :options="$itemSkills" />
+
+                        <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
                         <h3 class="mb-3">Drop Location</h3>
                         <x-core.forms.collection-select :model="$item" label="Drops From:" modelKey="drop_location_id" name="drop_location_id" value="id" key="name" :options="$locations" />
 

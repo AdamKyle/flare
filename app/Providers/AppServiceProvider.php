@@ -2,15 +2,15 @@
 
 namespace App\Providers;
 
-use App\Console\Commands\IncreaseRankFight;
-use App\Console\DevelopmentCommands\AssignTopEndGearToPlayer;
-use App\Console\DevelopmentCommands\IncreaseRankFightToMax;
-use App\Console\DevelopmentCommands\ReincarnateCharacter;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\ServiceProvider;
-use App\Console\DevelopmentCommands\CreateTestCharacters;
+use App\Console\DevelopmentCommands\GivePlayerAncenstorItem;
 use App\Console\DevelopmentCommands\LevelCharacter;
 use App\Console\DevelopmentCommands\MaxOutCharacter;
+use App\Console\DevelopmentCommands\CreateTestCharacters;
+use App\Console\DevelopmentCommands\ReincarnateCharacter;
+use App\Console\DevelopmentCommands\IncreaseRankFightToMax;
+use App\Console\DevelopmentCommands\AssignTopEndGearToPlayer;
 use App\Console\DevelopmentCommands\UpdateUsersForDevelopment;
 
 class AppServiceProvider extends ServiceProvider
@@ -31,6 +31,7 @@ class AppServiceProvider extends ServiceProvider
             AssignTopEndGearToPlayer::class,
             ReincarnateCharacter::class,
             IncreaseRankFightToMax::class,
+            GivePlayerAncenstorItem::class,
         ]);
     }
 

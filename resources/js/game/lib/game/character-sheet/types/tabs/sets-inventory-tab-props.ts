@@ -12,4 +12,6 @@ export default interface SetsInventoryTabProps extends CoreInventoryTabProps {
     is_automation_running: boolean;
 
     disable_tabs: () => void;
+
+    manage_skills: (itemId: number, itemSkills: any[]|[], itemSkillProgressions: any[]) => void;
 }

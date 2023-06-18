@@ -424,7 +424,7 @@ export default class SetsTable extends React.Component<SetsInventoryTabProps, Se
                 }
 
                 <div className={'max-w-[290px] sm:max-w-[100%] overflow-y-hidden'}>
-                    <Table data={this.state.data} columns={BuildInventoryTableColumns(this, this.viewItem.bind(this))} dark_table={this.props.dark_tables}/>
+                    <Table data={this.state.data} columns={BuildInventoryTableColumns(this, this.viewItem.bind(this), this.props.manage_skills)} dark_table={this.props.dark_tables}/>
                 </div>
             </Fragment>
         );

@@ -8,6 +8,7 @@ use App\Flare\Models\Location;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use App\Flare\Models\GameSkill;
+use App\Flare\Models\ItemSkill;
 
 class ItemsSheet implements ToCollection {
 
@@ -100,6 +101,10 @@ class ItemsSheet implements ToCollection {
             $item['holy_level']             = null;
         }
 
+        if (!isset($item['item_skill_id'])) {
+            $item['item_skill_id'] = null;
+        }
+
         foreach ($item as $key => $value) {
             if (!is_null($value)) {
                 if ($key === 'can_drop') {
@@ -113,6 +118,14 @@ class ItemsSheet implements ToCollection {
                         $value = null;
                     } else {
                         $value = $foundLocation->id;
+                    }
+                } else if ($key === 'item_skill_id') {
+                    $foundItemSkill = ItemSkill::where('name', $value)->first();
+
+                    if (is_null($foundItemSkill)) {
+                        $value = null;
+                    } else {
+                        $value = $foundItemSkill->id;
                     }
                 }
 

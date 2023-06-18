@@ -43,7 +43,7 @@ export default class InventoryTable extends React.Component<InventoryTabProps, I
                     Click the item name to get additional actions. This table only sometimes updates automatically, such as with disenchanting mass items.
                 </InfoAlert>
                 <div className={'max-w-[290px] sm:max-w-[100%] overflow-x-hidden'}>
-                    <Table data={this.props.inventory} columns={BuildInventoryTableColumns(undefined, this.viewItem.bind(this))} dark_table={this.props.dark_table}/>
+                    <Table data={this.props.inventory} columns={BuildInventoryTableColumns(undefined, this.viewItem.bind(this), this.props.manage_skills)} dark_table={this.props.dark_table}/>
                 </div>
 
                 {

@@ -6,7 +6,7 @@ import InventoryDetails from "../../types/inventory/inventory-details";
 import UsableItemsDetails from "../../types/inventory/usable-items-details";
 import GemBagDetails from "../../types/inventory/gem-bag-details";
 import {GemBagTable} from "../../../../../sections/character-sheet/components/tabs/inventory-tabs/gem-bag-table";
-import clsx from "clsx";
+import PrimaryLinkButton from "../../../../../components/ui/buttons/primary-link-button";
 
 /**
  * Build Inventory Table Columns
@@ -16,7 +16,7 @@ import clsx from "clsx";
  * @param componentName
  * @constructor
  */
-export const BuildInventoryTableColumns = (component?: ActionsInterface, clickAction?: (item?: InventoryDetails | UsableItemsDetails) => any, componentName?: string) => {
+export const BuildInventoryTableColumns = (component?: ActionsInterface, clickAction?: (item?: InventoryDetails | UsableItemsDetails) => any, manageSkills?: (slotId: number, itemSkills: any[]|[], itemSkillProgressions: any[]) => void, componentName?: string) => {
     const columns = [
         {
             name: 'Name',
@@ -46,6 +46,7 @@ export const BuildInventoryTableColumns = (component?: ActionsInterface, clickAc
             sortable: true,
             format: (row: any) => row.has_holy_stacks_applied + '/' + row.holy_stacks
         },
+
     ];
 
     if (typeof componentName !== 'undefined') {
@@ -56,6 +57,20 @@ export const BuildInventoryTableColumns = (component?: ActionsInterface, clickAc
                 cell: (row: any) => row.position,
             });
         }
+    }
+
+    if (typeof manageSkills !== 'undefined') {
+        columns.push({
+            name: 'Item Skills',
+            selector: (row: any) => row.item_skill,
+            cell: (row: any) => <span>
+                {
+                    row.item_skill_progressions !== null ?
+                        <PrimaryLinkButton button_label={'Manage Skills'} on_click={() => manageSkills(row.slot_id, row.item_skills, row.item_skill_progressions)} />
+                    : 'N/A'
+                }
+            </span>
+        });
     }
 
     if (typeof component !== 'undefined') {

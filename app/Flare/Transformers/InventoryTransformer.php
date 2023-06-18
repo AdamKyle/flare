@@ -2,16 +2,9 @@
 
 namespace App\Flare\Transformers;
 
-use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
-use App\Flare\Models\Item;
 use App\Flare\Models\SetSlot;
-use Illuminate\Support\Facades\Cache;
 use League\Fractal\TransformerAbstract;
-use App\Flare\Models\Character;
-use App\Flare\Models\MaxLevelConfiguration;
-use App\Flare\Values\ItemEffectsValue;
-use App\Game\Battle\Values\MaxLevel;
 
 class InventoryTransformer extends TransformerAbstract {
 
@@ -38,6 +31,8 @@ class InventoryTransformer extends TransformerAbstract {
             'usable'                  => $slot->item->usable,
             'holy_stacks'             => $slot->item->holy_stacks,
             'position'                => ucfirst(str_replace('-', ' ', $slot->position)),
+            'item_skills'             => $slot->item->itemSkill()->with('children')->get(),
+            'item_skill_progressions' => $slot->item->itemSkillProgressions,
         ];
     }
 }

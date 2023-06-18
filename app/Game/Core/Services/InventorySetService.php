@@ -415,7 +415,7 @@ class InventorySetService {
             return $slot->item->type === 'artifact';
         }));
 
-        if ($artifacts->count() > 2) {
+        if ($artifacts->count() > 1) {
             return false;
         }
 

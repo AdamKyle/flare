@@ -16,6 +16,8 @@ export default class ItemNameColorationText extends React.Component<ItemNameColo
               return 'text-orange-400 dark:text-orange-300';
           case 'trinket':
               return 'text-red-700 dark:text-red-400';
+          case 'artifact':
+              return 'text-artifact-colors-800 dark:text-artifact-colors-600';
           default:
               return this.getColorClassFromType();
 
