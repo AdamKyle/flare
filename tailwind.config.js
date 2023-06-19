@@ -36,8 +36,12 @@ module.exports = {
         '950': '#222f49',
       },
       'artifact-colors': {
-        '600': '#4c56c4',
-        '800': '#3b3b92',
+        '200': '#e9b8e2',
+        '800': '#82326b',
+      },
+      'item-skill-training': {
+        '300': '#f7c852',
+        '600': '#d36e0c'
       },
       primary: {
         DEFAULT: "#145388",

@@ -11,7 +11,7 @@
 }
 
 .artifact {
-  @apply text-artifact-colors-800 dark:text-artifact-colors-600
+  @apply text-artifact-colors-800 dark:text-artifact-colors-200
 }
 
 .regular-item {

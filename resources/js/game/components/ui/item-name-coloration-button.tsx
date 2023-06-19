@@ -19,11 +19,12 @@ export default class ItemNameColorationButton extends React.Component<ItemNameCo
     }
 
     render() {
+        console.log(this.props.item.type, this.props.item.type === 'artifact', !this.props.item.is_mythic);
         return (
             <button className={clsx({
                 'text-lime-600 dark:text-lime-500' : this.props.item instanceof GemBagTable
             }, {
-                'text-artifact-colors-800 dark:text-artifact-colors-600': this.props.item.type === 'artifact' && !this.props.item.is_mythic,
+                'text-artifact-colors-800 dark:text-artifact-colors-200': this.props.item.type === 'artifact' && !this.props.item.is_mythic,
             }, {
                 'text-red-700 dark:text-red-400': this.props.item.type === 'trinket' && !this.props.item.is_mythic
             }, {
@@ -35,7 +36,7 @@ export default class ItemNameColorationButton extends React.Component<ItemNameCo
             },{
                 'text-pink-500 dark:text-pink-300': this.props.item.type === 'alchemy' && !this.props.item.is_unique && !this.props.item.is_mythic
             },{
-                'text-gray-600 dark:text-gray-300': this.props.item.attached_affixes_count === 0 && !this.props.item.is_unique && this.props.item.type !== 'alchemy' && this.props.item.type !== 'quest' && this.props.item.has_holy_stacks_applied === 0 && this.props.item.type !== 'trinket' && !this.props.item.is_mythic
+                'text-gray-600 dark:text-gray-300': this.props.item.attached_affixes_count === 0 && !this.props.item.is_unique && this.props.item.type !== 'alchemy' && this.props.item.type !== 'quest' && this.props.item.has_holy_stacks_applied === 0 && this.props.item.type !== 'trinket' && !this.props.item.is_mythic && this.props.item.type !== 'artifact'
             },{
                 'text-blue-500': this.props.item.attached_affixes_count === 1 && !this.props.item.is_unique && this.props.item.type !== 'alchemy' && this.props.item.type !== 'quest' && this.props.item.has_holy_stacks_applied === 0 && this.props.item.type !== 'trinket' && !this.props.item.is_mythic
             },{

@@ -17,6 +17,7 @@ use App\Game\Skills\Services\EnchantingService;
 use App\Game\Skills\Services\EnchantItemService;
 use App\Game\Skills\Services\GemService;
 use App\Game\Skills\Services\ItemListCostTransformerService;
+use App\Game\Skills\Services\ItemSkillService;
 use App\Game\Skills\Services\MassDisenchantService;
 use App\Game\Skills\Services\SkillCheckService;
 use App\Game\Skills\Services\SkillService;
@@ -109,6 +110,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(DisenchantService::class, function($app) {
             return new DisenchantService($app->make(SkillCheckService::class));
+        });
+
+        $this->app->bind(ItemSkillService::class, function() {
+            return new ItemSkillService();
         });
     }
 }

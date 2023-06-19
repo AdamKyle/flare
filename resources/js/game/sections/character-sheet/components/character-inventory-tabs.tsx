@@ -120,6 +120,12 @@ export default class CharacterInventoryTabs extends React.Component<CharacterInv
         });
     }
 
+    closeItemSkillTree() {
+        this.setState({
+            item_skill_data: null,
+        })
+    }
+
     render() {
         if (this.state.loading || this.state.inventory === null) {
             return <div className='my-4'><ComponentLoading /></div>
@@ -128,7 +134,11 @@ export default class CharacterInventoryTabs extends React.Component<CharacterInv
         if (this.state.item_skill_data !== null) {
             return (
                 <div className='my-4'>
-                    <ItemSkillManagement slot_id={this.state.item_skill_data.slot_id} skill_data={this.state.item_skill_data.item_skills} skill_progression_data={this.state.item_skill_data.item_skill_progressions} />
+                    <ItemSkillManagement slot_id={this.state.item_skill_data.slot_id} 
+                                         skill_data={this.state.item_skill_data.item_skills} 
+                                         skill_progression_data={this.state.item_skill_data.item_skill_progressions}
+                                         close_skill_tree={this.closeItemSkillTree.bind(this)}
+                    />
                 </div>
             )
         }

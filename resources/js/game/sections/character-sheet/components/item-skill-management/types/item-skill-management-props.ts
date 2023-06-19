@@ -5,4 +5,5 @@ export default interface ItemSkillManagementProps {
     slot_id: number;
     skill_data: ItemSkill[];
     skill_progression_data: ItemSkillProgression[];
+    close_skill_tree: () => void;
 }

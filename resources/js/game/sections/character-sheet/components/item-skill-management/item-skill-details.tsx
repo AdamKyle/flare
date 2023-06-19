@@ -3,10 +3,20 @@ import ItemSkillDetailsProps from "./types/item-skill-details-props";
 import clsx from 'clsx';
 import PrimaryButton from "../../../../components/ui/buttons/primary-button";
 import DangerButton from "../../../../components/ui/buttons/danger-button";
+import SuccessButton from "../../../../components/ui/buttons/success-button";
+import LoadingProgressBar from "../../../../components/ui/progress-bars/loading-progress-bar";
+import SuccessAlert from "../../../../components/ui/alerts/simple-alerts/success-alert";
+import DangerAlert from "../../../../components/ui/alerts/simple-alerts/danger-alert";
 
 export default class ItemSkillDetails extends React.Component<ItemSkillDetailsProps, any> {
     constructor(props: ItemSkillDetailsProps) {
         super(props);
+
+        this.state = {
+            loading: false,
+            success_message: null,
+            error_message: null,
+        }
     }
 
     render() {
@@ -15,6 +25,22 @@ export default class ItemSkillDetails extends React.Component<ItemSkillDetailsPr
         return (
             <>
                 <h2>{this.props.skill_progression_data.item_skill.name}</h2>
+                {
+                    this.state.success_message !== null ?
+                        <SuccessAlert additional_css="my-4">
+                            {this.state.success_message}
+                        </SuccessAlert>
+                    : null
+                }
+
+                {
+                    this.state.error_message !== null ?
+                        <DangerAlert additional_css="my-4">
+                            {this.state.error_message}
+                        </DangerAlert>
+                    : null
+                }
+                
                 <p className='my-4'>{this.props.skill_progression_data.item_skill.description}</p>
                 <p className="mb-4">For more infomatio please refer to the <a href='/information/item-skills' target='_blank' >Item Skills help docs <i
                         className="fas fa-external-link-alt"></i></a>.</p>
@@ -113,9 +139,22 @@ export default class ItemSkillDetails extends React.Component<ItemSkillDetailsPr
                     </div>
                 </div>
                 <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                {
+                    this.state.is_loading ?
+                        <LoadingProgressBar />
+                    : null
+                }
                 <div className="flex space-x-4 flex-row justify-start">
-                    <PrimaryButton button_label={'Train Skill'} on_click={() => {}} />
-                    <DangerButton button_label={'Close Skill Management'} on_click={() => {}} />
+                    
+                    {
+                        this.props.skill_progression_data.is_training ?
+                            <PrimaryButton button_label={'Stop Training Skill'} on_click={() => {}} />
+                        :
+                            <SuccessButton button_label={'Train Skill'} on_click={() => {}} />
+                    }
+                    
+                    
+                    <DangerButton button_label={'Close Skill Management'} on_click={() => this.props.manage_skill_details(null)} />
                 </div>
             </>
         )
