@@ -19,7 +19,6 @@ export default class ItemNameColorationButton extends React.Component<ItemNameCo
     }
 
     render() {
-        console.log(this.props.item.type, this.props.item.type === 'artifact', !this.props.item.is_mythic);
         return (
             <button className={clsx({
                 'text-lime-600 dark:text-lime-500' : this.props.item instanceof GemBagTable

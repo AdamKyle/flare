@@ -16,16 +16,37 @@ export default class ItemSkillManagement extends React.Component<ItemSkillManage
         }
     }
 
-    showSkillSectionl(skill: ItemSkillProgression | null) {
+    showSkillSection(skill: ItemSkillProgression | null) {
         this.setState({
             skill_progression: skill
         });
     }
 
+    componentDidUpdate(prevProps: Readonly<ItemSkillManagementProps>): void {
+        if (this.state.skill_progression !== null) {
+            const updatedSkillProgressionInfo = this.props.skill_progression_data.find((data: ItemSkillProgression) => {
+                return data.id === this.state.skill_progression?.id;
+            });
+
+            if (typeof updatedSkillProgressionInfo === 'undefined') {
+                return;
+            }
+
+            if (updatedSkillProgressionInfo !== this.state.skill_progression) {
+                this.setState({
+                    skill_progression: updatedSkillProgressionInfo
+                });
+            }
+        }
+    }
+
     render() {
 
         if (this.state.skill_progression !== null) {
-            return <ItemSkillDetails skill_progression_data={this.state.skill_progression} manage_skill_details={this.showSkillSectionl.bind(this)} />
+            return <ItemSkillDetails skill_progression_data={this.state.skill_progression} 
+                                     manage_skill_details={this.showSkillSection.bind(this)} 
+                                     character_id={this.props.character_id}
+                    />
         }
 
         return (
@@ -45,7 +66,7 @@ export default class ItemSkillManagement extends React.Component<ItemSkillManage
                 <ItemSkillTree 
                     skill_data={this.props.skill_data} 
                     progression_data={this.props.skill_progression_data} 
-                    show_skill_management={this.showSkillSectionl.bind(this)} 
+                    show_skill_management={this.showSkillSection.bind(this)} 
                 />
             </Fragment>
         );

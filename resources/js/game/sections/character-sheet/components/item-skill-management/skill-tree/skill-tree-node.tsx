@@ -30,7 +30,7 @@ export default class SkillTreeNode extends React.Component<SkillTreeNodeProps, {
                         'text-blue-500 dark:text-blue-400' : this.props.skill.parent_id === null,
                         'text-green-700 dark:text-green-600': this.isActive(),
                     })}>
-                        {this.props.skill.name}
+                        {this.props.skill_progression.is_training ? <i className="ra ra-broadsword"></i> : null} {this.props.skill.name}
                     </h4>
                 </button>
                 <p className='mt-3'>Level: {this.props.skill_progression.current_level}/{this.props.skill_progression.item_skill.max_level}</p>

@@ -96,7 +96,7 @@ class EnchantingService {
 
         if ($ignoreTrinkets) {
             $inventory = array_values(array_filter($inventory, function($item) {
-                return $item['type'] !== 'trinket';
+                return $item['type'] !== 'trinket' && $item['type'] !== 'artifact';
             }));
         }
 

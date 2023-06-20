@@ -5,6 +5,7 @@ namespace App\Game\Skills\Services;
 use App\Flare\Models\Item;
 use App\Flare\Models\Character;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Flare\Models\ItemSkillProgression;
 use App\Flare\Builders\Character\Traits\FetchEquipped;
 use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 
@@ -40,7 +41,9 @@ class ItemSkillService {
             'is_training' => true,
         ]);
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
+        $character = $character->refresh();
+
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'equipped'));
 
         return $this->successResult([
             'message' => 'You are now training: ' . $foundSkill->name
@@ -59,7 +62,7 @@ class ItemSkillService {
         $foundItem = $this->fetchItemWithSkill($character, $itemId);
 
         if (is_null($foundItem)) {
-            return $this->errorResult('No item found. Either it is not equipped, or it does not exist.');
+            return $this->errorResult('Item must be equipped to train a skill.');
         }
 
         $foundSkill = $this->fetchItemSkillProgression($foundItem, $itemSkillProgressionId);
@@ -72,7 +75,7 @@ class ItemSkillService {
             'is_training' => false,
         ]);
 
-        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'inventory'));
+        event(new CharacterInventoryUpdateBroadCastEvent($character->user, 'equipped'));
 
         return $this->successResult([
             'message' => 'You stopped training: ' . $foundSkill->name
@@ -90,10 +93,16 @@ class ItemSkillService {
         $equippedItems = $this->fetchEquipped($character);
 
         if (is_null($equippedItems)) {
-            return false;
+            return null;
         }
         
-        return $equippedItems->where('item.type', 'artifact')->where('item.id', $itemId)->first();
+        $slot = $equippedItems->where('item.type', 'artifact')->where('item.id', $itemId)->first();
+
+        if (is_null($slot)) {
+            return null;
+        }
+
+        return $slot->item;
     }
 
     /**

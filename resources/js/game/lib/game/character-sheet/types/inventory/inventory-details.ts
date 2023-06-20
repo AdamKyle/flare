@@ -1,4 +1,6 @@
+import ItemSkill from "../../../../../sections/character-sheet/components/item-skill-management/types/deffinitions/item-skill";
 import DataTableBaseData from "../../../../ui/types/tables/data-table-base-data";
+import ItemSkillProgression from "../../../../../sections/character-sheet/components/item-skill-management/types/deffinitions/item-skill-progression";
 
 export default interface InventoryDetails extends DataTableBaseData {
 
@@ -27,4 +29,9 @@ export default interface InventoryDetails extends DataTableBaseData {
     has_holy_stacks_applied: number,
 
     usable: boolean,
+
+    item_skills: ItemSkill[]|[],
+
+    item_skill_progressions: ItemSkillProgression[]|[]
+
 }

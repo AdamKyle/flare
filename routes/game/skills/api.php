@@ -21,10 +21,11 @@ Route::middleware(['auth', 'is.player.banned', 'is.character.who.they.say.they.a
         // Fetch Gem Tiers
         Route::get('/gem-crafting/craftable-tiers/{character}', ['uses' => 'Api\GemCraftingController@getCraftableItems']);
 
-        // Train or stop training item skills.
+        // Train Item Skills
         Route::post('/item-skills/train/{character}/{itemId}/{itemSkillProgressionId}', ['uses' => 'Api\ItemSkillController@trainSkill']);
+        
+        // Stop Training Skills
         Route::post('/item-skills/stop-training/{character}/{itemId}/{itemSkillProgressionId}', ['uses' => 'Api\ItemSkillController@stopTrainingSkill']);
-
 
         Route::middleware(['is.character.exploring'])->group(function() {
             // Handle Training a specific skill.

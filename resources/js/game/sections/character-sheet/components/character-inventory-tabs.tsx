@@ -10,7 +10,7 @@ import {AxiosError, AxiosResponse} from "axios";
 import ComponentLoading from "../../../components/ui/loading/component-loading";
 import CharacterInventoryTabsState from "../../../lib/game/character-sheet/types/character-inventory-tabs-state";
 import InventoryTabSection from "./tabs/inventory-tab-section";
-import InventoryDetails from "../../../lib/game/character-sheet/types/inventory/inventory-details";
+import InventoryDetails from '../../../lib/game/character-sheet/types/inventory/inventory-details';
 import CharacterInventoryTabsProps from "../../../lib/game/character-sheet/types/character-inventory-tabs-props";
 import ItemSkillManagement from "./item-skill-management/item-skill-management";
 import ItemSkill from "./item-skill-management/types/deffinitions/item-skill";
@@ -45,7 +45,7 @@ export default class CharacterInventoryTabs extends React.Component<CharacterInv
             loading: true,
             inventory: null,
             disable_tabs: false,
-            item_skill_data: null
+            item_skill_data: null,
         }
 
         // @ts-ignore
@@ -71,10 +71,12 @@ export default class CharacterInventoryTabs extends React.Component<CharacterInv
             if (this.state.inventory !== null) {
                 const inventoryState = JSON.parse(JSON.stringify(this.state.inventory));
 
-                inventoryState.inventory = event.inventory;
+                inventoryState[event.type] = event.inventory;
 
                 this.setState({
                     inventory: inventoryState
+                }, () => {
+                    this.updateItemSkillData();
                 });
             }
         });
@@ -102,12 +104,31 @@ export default class CharacterInventoryTabs extends React.Component<CharacterInv
 
     manageDisableTabs() {
         this.setState({
-            disable_tabs: !this.state.disable_tabs
+            disable_tabs: !this.state.disable_tabs,
         }, () => {
             if (typeof this.props.update_disable_tabs !== 'undefined') {
+                console.log(this.state.inventory?.equipped);
                 this.props.update_disable_tabs();
             }
         })
+    }
+
+    updateItemSkillData() {
+        if (this.state.item_skill_data === null) {
+            return;
+        }
+
+        if (this.state.inventory === null) {
+            return;
+        }
+
+        const equippedSlot  = this.state.inventory.equipped.find((slot: InventoryDetails) => {
+            return slot.slot_id === this.state.item_skill_data?.slot_id;
+        });
+
+        if (typeof equippedSlot !== 'undefined') {
+            return this.manageItemSkills(equippedSlot.slot_id, equippedSlot.item_skills, equippedSlot.item_skill_progressions)
+        }
     }
 
     manageItemSkills(slotId: number, itemSkills: ItemSkill[], itemSkillProgressions: ItemSkillProgression[]) {
@@ -138,6 +159,7 @@ export default class CharacterInventoryTabs extends React.Component<CharacterInv
                                          skill_data={this.state.item_skill_data.item_skills} 
                                          skill_progression_data={this.state.item_skill_data.item_skill_progressions}
                                          close_skill_tree={this.closeItemSkillTree.bind(this)}
+                                         character_id={this.props.character_id}
                     />
                 </div>
             )

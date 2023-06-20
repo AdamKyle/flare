@@ -6,4 +6,5 @@ export default interface ItemSkillManagementProps {
     skill_data: ItemSkill[];
     skill_progression_data: ItemSkillProgression[];
     close_skill_tree: () => void;
+    character_id: number;
 }

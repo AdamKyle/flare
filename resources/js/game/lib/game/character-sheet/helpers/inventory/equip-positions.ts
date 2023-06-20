@@ -16,16 +16,21 @@ export abstract class EquipPositions {
             case 'trinket':
                 return ['trinket-one','trinket-two'];
             case 'armour':
+            case 'artifact':
             default:
                 return null;
         }
     }
 
-    public static isTwoHanded(type: string) {
+    public static isTwoHanded(type: string): boolean {
         return ['bow', 'stave', 'hammer'].includes(type);
     }
 
-    public static isArmour(type: string) {
+    public static isArmour(type: string): boolean {
         return ['body', 'leggings', 'feet', 'sleeves', 'helmet', 'gloves'].includes(type);
+    }
+
+    public static isArtifact(type: string): boolean {
+        return type === 'artifact'
     }
 }

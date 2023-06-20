@@ -7,6 +7,8 @@ import SuccessButton from "../../../../components/ui/buttons/success-button";
 import LoadingProgressBar from "../../../../components/ui/progress-bars/loading-progress-bar";
 import SuccessAlert from "../../../../components/ui/alerts/simple-alerts/success-alert";
 import DangerAlert from "../../../../components/ui/alerts/simple-alerts/danger-alert";
+import Ajax from "../../../../lib/ajax/ajax";
+import { AxiosError, AxiosResponse } from "axios";
 
 export default class ItemSkillDetails extends React.Component<ItemSkillDetailsProps, any> {
     constructor(props: ItemSkillDetailsProps) {
@@ -17,6 +19,64 @@ export default class ItemSkillDetails extends React.Component<ItemSkillDetailsPr
             success_message: null,
             error_message: null,
         }
+    }
+
+    trainSkill() {
+        this.setState({
+            loading: true
+        }, () => {
+            (new Ajax).setRoute('item-skills/train/' + 
+                this.props.character_id + '/' + 
+                this.props.skill_progression_data.item_id + '/' + 
+                this.props.skill_progression_data.item_skill_id
+            ).doAjaxCall('post', (result: AxiosResponse) => {
+                    this.setState({
+                        loading: false,
+                        success_message: result.data.message,
+                    })
+            }, (error: AxiosError) => {
+                this.setState({
+                    loading: false,
+                });
+                
+                const response = error.response;
+
+                if (typeof response != 'undefined') {
+                    this.setState({
+                        error_message: response.data.message,
+                    })
+                }
+            });
+        })
+    }
+
+    stopTrainingSkipp() {
+        this.setState({
+            loading: true
+        }, () => {
+            (new Ajax).setRoute('item-skills/stop-training/' + 
+                this.props.character_id + '/' + 
+                this.props.skill_progression_data.item_id + '/' + 
+                this.props.skill_progression_data.item_skill_id
+            ).doAjaxCall('post', (result: AxiosResponse) => {
+                    this.setState({
+                        loading: false,
+                        success_message: result.data.message,
+                    })
+            }, (error: AxiosError) => {
+                this.setState({
+                    loading: false,
+                });
+                
+                const response = error.response;
+
+                if (typeof response != 'undefined') {
+                    this.setState({
+                        error_message: response.data.message,
+                    })
+                }
+            });
+        })
     }
 
     render() {
@@ -45,7 +105,7 @@ export default class ItemSkillDetails extends React.Component<ItemSkillDetailsPr
                 <p className="mb-4">For more infomatio please refer to the <a href='/information/item-skills' target='_blank' >Item Skills help docs <i
                         className="fas fa-external-link-alt"></i></a>.</p>
                 <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                <span className="my-4 font-bold">Progression Data</span>
+                <h4 className="my-4 font-bold">Progression Data</h4>
                 <dl>
                     <dt>Level (Current/Max):</dt>
                     <dd>{skillData.current_level}/{skillData.item_skill.max_level}</dd> 
@@ -140,7 +200,7 @@ export default class ItemSkillDetails extends React.Component<ItemSkillDetailsPr
                 </div>
                 <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                 {
-                    this.state.is_loading ?
+                    this.state.loading ?
                         <LoadingProgressBar />
                     : null
                 }
@@ -148,13 +208,13 @@ export default class ItemSkillDetails extends React.Component<ItemSkillDetailsPr
                     
                     {
                         this.props.skill_progression_data.is_training ?
-                            <PrimaryButton button_label={'Stop Training Skill'} on_click={() => {}} />
+                            <PrimaryButton button_label={'Stop Training Skill'} on_click={this.stopTrainingSkipp.bind(this)} disabled={this.state.loading} />
                         :
-                            <SuccessButton button_label={'Train Skill'} on_click={() => {}} />
+                            <SuccessButton button_label={'Train Skill'} on_click={this.trainSkill.bind(this)} disabled={this.state.loading} />
                     }
                     
                     
-                    <DangerButton button_label={'Close Skill Management'} on_click={() => this.props.manage_skill_details(null)} />
+                    <DangerButton button_label={'Close Skill Management'} on_click={() => this.props.manage_skill_details(null)} disabled={this.state.loading} />
                 </div>
             </>
         )

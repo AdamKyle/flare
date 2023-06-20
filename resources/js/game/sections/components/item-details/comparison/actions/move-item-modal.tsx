@@ -60,6 +60,7 @@ export default class MoveItemModal extends React.Component<MoveModalProps, any> 
                             <li><strong>Trinkets</strong>: Max of 2</li>
                             <li><strong>Uniques (green items)</strong>: 1 unique, regardless of type.</li>
                             <li><strong>Mythics (orange items)</strong>: 1 Mythic, if there is no Unique, regardless of type.</li>
+                            <li><strong>Ancestral Items (purple items)</strong>: 1 Ancestral item may be equipped at a time.</li>
                         </ul>
                         <p className='mb-3'>The above rules only apply to characters who want to equip the set, You may also use a set as a stash tab with unlimited items.</p>
                     </div>

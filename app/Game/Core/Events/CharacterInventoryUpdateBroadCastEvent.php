@@ -19,7 +19,12 @@ class CharacterInventoryUpdateBroadCastEvent implements ShouldBroadcastNow
     /**
      * @var array $inventory
      */
-    public $inventory;
+    public array $inventory;
+
+    /**
+     * @var string $type
+     */
+    public string $type;
 
     /**
      * @var User $users
@@ -37,6 +42,7 @@ class CharacterInventoryUpdateBroadCastEvent implements ShouldBroadcastNow
         $this->inventory = resolve(CharacterInventoryService::class)
                                 ->setCharacter($user->character->refresh())
                                 ->getInventoryForType($type);
+        $this->type      = $type;
     }
 
     /**

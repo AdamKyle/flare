@@ -18,6 +18,6 @@ export default interface CharacterInventoryTabsState {
         slot_id: number;
         item_skills: ItemSkill[];
         item_skill_progressions: ItemSkillProgressions[];
-    }|null
+    } | null;
 }
 

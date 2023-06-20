@@ -56,7 +56,7 @@ export default class EquippedTable extends React.Component<EquippedInventoryTabP
     }
 
     actions(row: InventoryDetails): JSX.Element {
-        return <DangerButton button_label={'Unequip'} on_click={() => this.unequip(row.slot_id)} disabled={this.props.is_dead || this.props.is_automation_running || this.state.loading} />
+        return <DangerButton button_label={'Remove'} on_click={() => this.unequip(row.slot_id)} disabled={this.props.is_dead || this.props.is_automation_running || this.state.loading} />
     }
 
     assignToSet(label: string) {

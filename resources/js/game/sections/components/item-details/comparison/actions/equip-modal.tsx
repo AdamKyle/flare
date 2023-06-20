@@ -63,6 +63,12 @@ export default class EquipModal extends React.Component<EquipModalProps, { }> {
                 }
 
                 {
+                    EquipPositions.isArtifact(this.props.item_to_equip.type) ?
+                        <p className='mt-3 mb-3'>This item has a default position already selected. (Ancestral [artifacts] will never let you select the position)</p>
+                    : null
+                }
+
+                {
                     this.replacesTwoHandedItem() ?
                         <p className='mt-3 mb-3'>Equipping this item will remove your two handed equipped item.</p>
                     : null
