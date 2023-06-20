@@ -35,6 +35,10 @@ class HolyItemService {
         $itemSlot    = InventorySlot::where('inventory_id', $inventory->id)->where('item_id', $params['item_id'])->first();
         $alchemySlot = InventorySlot::where('inventory_id', $inventory->id)->where('item_id', $params['alchemy_item_id'])->first();
 
+        if ($itemSlot->item->type === 'trinket' || $itemSlot->item->type === 'artifact') {
+            return $this->errorResult('Trinkets and Artifacts cannot have holy oils applied.');
+        }
+
         $cost = $this->getCost($itemSlot->item, $alchemySlot->item);
 
         if ($cost > $character->gold_dust) {

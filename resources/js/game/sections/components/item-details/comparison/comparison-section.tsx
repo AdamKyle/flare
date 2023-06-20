@@ -188,7 +188,7 @@ export default class ComparisonSection extends React.Component<ComparisonSection
                     <PrimaryOutlineButton button_label={'Move'} on_click={this.manageMoveModalModal.bind(this)} disabled={this.props.is_action_loading}/>
 
                     {
-                        this.props.comparison_details.itemToEquip.type !== 'trinket' ?
+                        this.props.comparison_details.itemToEquip.type !== 'trinket' && this.props.comparison_details.itemToEquip.type !== 'artifact' ?
                             <SuccessOutlineButton button_label={'Sell'} on_click={() => this.manageSellModal(this.props.comparison_details.itemToEquip)} disabled={this.props.is_action_loading}/>
                         : null
                     }

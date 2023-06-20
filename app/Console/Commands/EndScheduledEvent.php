@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Flare\Models\Item;
 use App\Flare\Models\Raid;
 use App\Flare\Models\Event;
 use App\Flare\Models\Location;
@@ -11,15 +10,12 @@ use App\Flare\Values\EventType;
 use Illuminate\Console\Command;
 use App\Flare\Models\Announcement;
 use App\Flare\Models\ScheduledEvent;
-use App\Flare\Values\ItemSpecialtyType;
 use App\Flare\Events\UpdateScheduledEvents;
-use App\Flare\Models\RaidBossParticipation;
 use App\Game\Maps\Services\LocationService;
 use App\Game\Raids\Events\CorruptLocations;
 use App\Flare\Services\EventSchedulerService;
 use App\Game\Maps\Services\UpdateRaidMonsters;
 use App\Game\Messages\Events\GlobalMessageEvent;
-use App\Game\Messages\Events\ServerMessageEvent;
 
 class EndScheduledEvent extends Command
 {
@@ -38,10 +34,12 @@ class EndScheduledEvent extends Command
     protected $description = 'End all scheduled events';
 
     /**
-     * Execute the console command.
+     * @param LocationService $locationService
+     * @param UpdateRaidMonsters $updateRaidMonsters
+     * @param EventSchedulerService $eventSchedulerService
+     * @return void
      */
-    public function handle(LocationService $locationService, UpdateRaidMonsters $updateRaidMonsters, EventSchedulerService $eventSchedulerService)
-    {
+    public function handle(LocationService $locationService, UpdateRaidMonsters $updateRaidMonsters, EventSchedulerService $eventSchedulerService) {
         $targetEventStart = now()->copy()->addMinutes(5);
 
         $scheduledEvents = ScheduledEvent::where('end_date', '<=', now())->get();
@@ -62,23 +60,39 @@ class EndScheduledEvent extends Command
         }
     }
 
-    protected function endRaid(Raid $raid, LocationService $locationService, UpdateRaidMonsters $updateRaidMonsters)
-    {
+    /**
+     * End the raid.
+     * 
+     * - Un corrupt locations
+     * - Delete Event for raid.
+     * - Update monsters for locations, to set them back to normal.
+     * - Cleanup other aspects such as announcements.
+     *
+     * @param Raid $raid
+     * @param LocationService $locationService
+     * @param UpdateRaidMonsters $updateRaidMonsters
+     * @return void
+     */
+    protected function endRaid(Raid $raid, LocationService $locationService, UpdateRaidMonsters $updateRaidMonsters) {
         event(new GlobalMessageEvent('The Raid: ' . $raid->name . ' is now ending! Don\'t worry, the raid will be back soon. Check the event calendar for the next time!'));
 
-        $this->unCorruptLocations($raid, $locationService, $updateRaidMonsters);
+        $this->unCorruptLocations($raid, $locationService);
 
         Event::where('raid_id', $raid->id)->delete();
 
         $this->updateMonstersForCharactersAtRaidLocations($raid, $updateRaidMonsters);
 
-        $this->giveGearReward($raid);
-
         $this->cleanUp();
     }
 
-    protected function unCorruptLocations(Raid $raid, LocationService $locationService, UpdateRaidMonsters $updateRaidMonsters)
-    {
+    /**
+     * Set locations back to normal
+     *
+     * @param Raid $raid
+     * @param LocationService $locationService
+     * @return void
+     */
+    protected function unCorruptLocations(Raid $raid, LocationService $locationService) {
         $raidLocations = [...$raid->corrupted_location_ids, $raid->raid_boss_location_id];
 
         Location::whereIn('id', $raidLocations)->update([
@@ -90,50 +104,23 @@ class EndScheduledEvent extends Command
         event(new CorruptLocations($locationService->fetchCorruptedLocationData($raid)->toArray()));
     }
 
-    protected function giveGearReward(Raid $raid)
-    {
-        $raidParticipation = RaidBossParticipation::where('raid_id', $raid->id)->get();
-
-        foreach ($raidParticipation as $participator) {
-
-            $item = Item::where('specialty_type', $raid->item_specialty_reward_type)->inRandomOrder()->first();
-
-            if ($participator->character->isInventoryFull()) {
-                return;
-            }
-            
-            if (!is_null($item)) {
-                $validSocketTypes = [
-                    'weapon', 'sleeves', 'gloves', 'feet', 'body', 'shield', 'helmet'
-                ];
-
-                $duplicatedItem = $item->duplicate();
-
-                if (in_array($duplicatedItem->type, $validSocketTypes)) {
-                    
-                    $duplicatedItem->update([
-                        'socket_count' => rand(0, 6),
-                    ]);
-                }
-
-                $slot = $participator->character->inventory->slots()->create([
-                    'inventory_id' => $participator->character->inventory->id,
-                    'item_id'      => $duplicatedItem->id,
-                ]);
-
-                event(new ServerMessageEvent($participator->character->user, 'You were given: ' . $slot->item->name, $slot->id));
-
-                event(new GlobalMessageEvent('Congratulations to: ' . $participator->character->name . ' for doing: ' . number_format($participator->damage_dealt) . ' total Damage to the raid boss! They have recieved a godly gift!'));
-            }
-        }
-    }
-
+    /**
+     * Cleanup other aspects of the raid.
+     *
+     * @return void
+     */
     protected function cleanUp() {
         Announcement::where('expires_at', '<=', now())->delete();
     }
 
-    protected function updateMonstersForCharactersAtRaidLocations(Raid $raid, UpdateRaidMonsters $updateRaidMonsters): void
-    {
+    /**
+     * Update monsyers for the characters at raid locations.
+     *
+     * @param Raid $raid
+     * @param UpdateRaidMonsters $updateRaidMonsters
+     * @return void
+     */
+    protected function updateMonstersForCharactersAtRaidLocations(Raid $raid, UpdateRaidMonsters $updateRaidMonsters): void {
         $corruptedLocationIds = $raid->corrupted_location_ids;
 
         array_unshift($corruptedLocationIds, $raid->raid_boss_location_id);

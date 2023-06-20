@@ -5,7 +5,6 @@ namespace App\Flare\Handlers;
 use App\Flare\Events\UpdateCharacterAttackEvent;
 use App\Flare\Models\Character;
 use App\Flare\Services\BuildCharacterAttackTypes;
-use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Events\UpdateCharacterAttacks;
 use Exception;
 

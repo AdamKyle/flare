@@ -147,6 +147,10 @@ class QueenOfHeartsService {
             return $this->errorResult('Where did you put that item, child? Ooooh hooo hooo hooo! Are you playing hide and seek with it? (Unique does not exist.)');
         }
 
+        if ($slot->item->type === 'trinket' || $slot->item->type === 'artifact') {
+            $this->errorResult('I don\'t know how to handle trinkets or artifacts child. Bring me something sexy! Oooooh hooo hooo!');
+        }
+
         if (!$this->reRollEnchantmentService->canAffordMovementCost($character, $slot->item->id, $selectedAffix)) {
             return $this->errorResult('Child, you are so poor (Not enough currency) ...');
         }

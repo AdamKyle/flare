@@ -31,6 +31,8 @@ class UpdateItemSkill {
         ]);
 
         $skillProgressionToUpdate = $skillProgressionToUpdate->refresh();
+
+        $this->levelUpSkill($character, $skillProgressionToUpdate);
     }
 
     protected function levelUpSkill(Character $character, ItemSkillProgression $itemSkillProgression) {

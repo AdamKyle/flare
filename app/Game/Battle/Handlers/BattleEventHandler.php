@@ -3,7 +3,7 @@
 namespace App\Game\Battle\Handlers;
 
 use App\Flare\Builders\Character\Traits\FetchEquipped;
-use Facades\App\Game\Skill\Handlers\UpdateItemSkill;
+use Facades\App\Game\Skills\Handlers\UpdateItemSkill;
 use App\Game\Battle\Events\CharacterRevive;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Events\AttackTimeOutEvent;
@@ -139,12 +139,12 @@ class BattleEventHandler {
 
         $equippedItem = $equippedItems->filter(function($slot) {
             return $slot->item->type === 'artifact';
-        });
+        })->first();
 
         if (is_null($equippedItem)) {
             return;
         }
 
-        UpdateItemSkill::updateItemSkill($character, $equippedItem);        
+        UpdateItemSkill::updateItemSkill($character, $equippedItem->item);        
     }
 }

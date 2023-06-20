@@ -3,10 +3,7 @@
 namespace App\Game\Shop\Controllers\Api;
 
 use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
-use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
-use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Shop\Services\ShopService;
 use App\Http\Controllers\Controller;
 use Facades\App\Flare\Calculators\SellItemCalculator;
@@ -35,8 +32,8 @@ class ShopController extends Controller {
 
         $item         = $inventorySlot->item;
 
-        if ($item->type === 'trinket') {
-            return response()->json(['message' => 'The shop keeper will not accept this item (Trinkets cannot be sold to the shop).']);
+        if ($item->type === 'trinket' || $item->type === 'artifact') {
+            return response()->json(['message' => 'The shop keeper will not accept this item (Trinkets/Artifacts cannot be sold to the shop).']);
         }
 
         $totalSoldFor = SellItemCalculator::fetchSalePriceWithAffixes($item);

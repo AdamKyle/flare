@@ -2,6 +2,7 @@
 
 namespace App\Game\Battle\Jobs;
 
+use App\Flare\Models\Item;
 use App\Flare\Models\Raid;
 use App\Flare\Models\Monster;
 use Illuminate\Bus\Queueable;
@@ -18,6 +19,7 @@ use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Battle\Events\UpdateRaidAttacksLeft;
 use App\Game\Battle\Concerns\HandleGivingAncestorItem;
 use App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation;
+use App\Game\Messages\Events\ServerMessageEvent;
 
 class RaidBossRewardHandler implements ShouldQueue
 {
@@ -73,6 +75,8 @@ class RaidBossRewardHandler implements ShouldQueue
      * Handle the raid boss when its killed.
      * 
      * - No one can attack anymore. The attacks will not reset.
+     * - Give ancestral item to winner.
+     * - Give top 10 damage dealers a piece of gear.
      *
      * @param Character $charater
      * @param Monster $raidBoss
@@ -82,6 +86,10 @@ class RaidBossRewardHandler implements ShouldQueue
         event(new GlobalMessageEvent($charater->name . ' Has slaughted: ' . $raidBoss->name . ' and has recieved a special Ancient gift from The Poet him self!'));
         
         $this->giveAncientReward($charater);
+
+        $raid = Raid::find($this->raidId);
+
+        $this->giveGearReward($raid);
 
         RaidBossParticipation::chunkById(250, function($participationRecords) {
             foreach ($participationRecords as $record) {
@@ -93,5 +101,44 @@ class RaidBossRewardHandler implements ShouldQueue
             }
         });
 
+    }
+
+    private function giveGearReward(Raid $raid) {
+        $raidParticipation = RaidBossParticipation::where('raid_id', $raid->id)->orderBy('damage_dealt', 'asc')->take(10);
+
+        foreach ($raidParticipation as $participator) {
+
+            $item = Item::where('specialty_type', $raid->item_specialty_reward_type)->inRandomOrder()->first();
+
+            if ($participator->character->isInventoryFull()) {
+                event(new ServerMessageEvent($participator->character->user, 'Your inventory was full. You got no item. Make sure to clear room next time!'));
+                
+                return;
+            }
+            
+            if (!is_null($item)) {
+                $validSocketTypes = [
+                    'weapon', 'sleeves', 'gloves', 'feet', 'body', 'shield', 'helmet'
+                ];
+
+                $duplicatedItem = $item->duplicate();
+
+                if (in_array($duplicatedItem->type, $validSocketTypes)) {
+                    
+                    $duplicatedItem->update([
+                        'socket_count' => rand(0, 6),
+                    ]);
+                }
+
+                $slot = $participator->character->inventory->slots()->create([
+                    'inventory_id' => $participator->character->inventory->id,
+                    'item_id'      => $duplicatedItem->id,
+                ]);
+
+                event(new ServerMessageEvent($participator->character->user, 'You were given: ' . $slot->item->name, $slot->id));
+
+                event(new GlobalMessageEvent('Congratulations to: ' . $participator->character->name . ' for doing: ' . number_format($participator->damage_dealt) . ' total Damage to the raid boss! They have recieved a godly gift!'));
+            }
+        }
     }
 }

@@ -72,7 +72,6 @@ class SeerService {
                 ];
             }
 
-
         })->toArray()));
     }
 
@@ -105,6 +104,10 @@ class SeerService {
 
         if (is_null($slot)) {
             return $this->errorResult('No item was found to apply sockets to.');
+        }
+
+        if ($slot->item->type === 'trinket' || $slot->item->type === 'artifact') {
+            return $this->errorResult('Trinkets and Artifacts cannot have sockets on them.');
         }
 
         if (!HandleGoldBarsAsACurrency::hasTheGoldBars($character->kingdoms, self::SOCKET_COST)) {
@@ -358,6 +361,10 @@ class SeerService {
 
         if (is_null($slot)) {
             return $this->errorResult('No item was found to add a gem to.');
+        }
+
+        if ($slot->item->type === 'trinket' || $slot->item->type === 'artifact') {
+            return $this->errorResult('Trinkets and Artifacts cannot have gems on them.');
         }
 
         if (is_null($gemSlot)) {

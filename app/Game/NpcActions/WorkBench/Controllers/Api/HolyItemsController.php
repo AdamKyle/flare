@@ -3,9 +3,9 @@
 namespace App\Game\NpcActions\WorkBench\Controllers\Api;
 
 use App\Flare\Models\Character;
-use App\Game\Core\Requests\CompareGemsRequest;
-use App\Game\NpcActions\WorkBench\Services\HolyItemService;
 use App\Http\Controllers\Controller;
+use App\Game\NpcActions\WorkBench\Services\HolyItemService;
+use App\Game\NpcActions\WorkBench\Requests\ApplyHolyOilRequest;
 
 class HolyItemsController extends Controller {
 
@@ -19,7 +19,7 @@ class HolyItemsController extends Controller {
         return response()->json($this->holyItemService->fetchSmithingItems($character));
     }
 
-    public function apply(CompareGemsRequest $request, Character $character) {
+    public function apply(ApplyHolyOilRequest $request, Character $character) {
         return response()->json($this->holyItemService->applyOil($character, $request->all()));
     }
 }

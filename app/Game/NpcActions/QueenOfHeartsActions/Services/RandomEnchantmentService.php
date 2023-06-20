@@ -113,7 +113,12 @@ class RandomEnchantmentService {
      */
     public function fetchNonUniqueItems(Character $character): Collection {
         return $character->inventory->slots->filter(function($slot) {
-            if (!$slot->equipped && $slot->item->type !== 'quest' && $slot->item->type !== 'alchemy' && $slot->item->type !== 'trinket') {
+            if (!$slot->equipped && 
+                $slot->item->type !== 'quest' && 
+                $slot->item->type !== 'alchemy' && 
+                $slot->item->type !== 'trinket' && 
+                $slot->item->type !== 'artifact') 
+            {
                 if (!is_null($slot->item->itemPrefix)) {
                     if (!$slot->item->itemPrefix->randomly_generated) {
                         return $slot;

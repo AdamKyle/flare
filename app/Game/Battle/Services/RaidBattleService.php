@@ -17,7 +17,6 @@ use App\Flare\ServerFight\Monster\ServerMonster;
 use App\Flare\Services\BuildMonsterCacheService;
 use App\Game\Battle\Events\UpdateRaidBossHealth;
 use App\Game\Battle\Handlers\BattleEventHandler;
-use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Battle\Events\UpdateRaidAttacksLeft;
 use App\Flare\Builders\Character\CharacterCacheData;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
