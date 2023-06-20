@@ -2,10 +2,7 @@
 
 namespace App\Game\Skills\Events;
 
-use App\Flare\Models\Skill;
-use App\Game\Core\Services\CharacterInventoryService;
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Foundation\Events\Dispatchable;

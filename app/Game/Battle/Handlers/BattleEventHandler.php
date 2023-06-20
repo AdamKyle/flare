@@ -2,12 +2,12 @@
 
 namespace App\Game\Battle\Handlers;
 
-use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
+use App\Flare\Builders\Character\Traits\FetchEquipped;
+use Facades\App\Game\Battle\Handlers\UpdateItemSkill;
 use App\Game\Battle\Events\CharacterRevive;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Events\AttackTimeOutEvent;
 use App\Game\ClassRanks\Services\ClassRankService;
-use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Mercenaries\Services\MercenaryService;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Flare\Models\Character;
@@ -15,10 +15,10 @@ use App\Flare\Models\CharacterInCelestialFight;
 use App\Flare\Models\Monster;
 use App\Game\Battle\Services\BattleRewardProcessing;
 use Exception;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item;
 
 class BattleEventHandler {
+
+    use FetchEquipped;
 
     /**
      * @var BattleRewardProcessing $battleRewardProcessing
@@ -94,6 +94,8 @@ class BattleEventHandler {
         $this->classRankService->giveXpToMasteries($character);
 
         $this->classRankService->giveXpToEquippedClassSpecialties($character);
+
+        $this->handleItemSkillUpdate($character);
     }
 
     /**
@@ -120,5 +122,29 @@ class BattleEventHandler {
         event(new UpdateCharacterStatus($character));
 
         return $character->refresh();
+    }
+
+    /**
+     * Handle item skill updates for artifacts that are equipped with skill trees.
+     *
+     * @param Character $character
+     * @return void
+     */
+    protected function handleItemSkillUpdate(Character $character): void {
+        $equippedItems = $this->fetchEquipped($character);
+
+        if (is_null($equippedItems)) {
+            return;
+        }
+
+        $equippedItem = $equippedItems->filter(function($slot) {
+            return $slot->item->type === 'artifact';
+        });
+
+        if (is_null($equippedItem)) {
+            return;
+        }
+
+        UpdateItemSkill::updateItemSkill($character, $equippedItem);        
     }
 }

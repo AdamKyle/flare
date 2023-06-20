@@ -9,6 +9,7 @@ use App\Flare\Transformers\BasicSkillsTransformer;
 use App\Flare\Transformers\SkillsTransformer;
 use App\Game\Core\Services\CharacterInventoryService;
 use App\Game\NpcActions\QueenOfHeartsActions\Services\RandomEnchantmentService;
+use App\Game\Skill\Handlers\UpdateItemSkill;
 use App\Game\Skills\Builders\GemBuilder;
 use App\Game\Skills\Services\AlchemyService;
 use App\Game\Skills\Services\CraftingService;
@@ -114,6 +115,12 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(ItemSkillService::class, function() {
             return new ItemSkillService();
+        });
+
+        $this->app->bind(UpdateItemSkill::class, function($app) {
+            return new UpdateItemSkill(
+                $app->make(UpdateChatacterAttackTypes::class),
+            );
         });
     }
 }

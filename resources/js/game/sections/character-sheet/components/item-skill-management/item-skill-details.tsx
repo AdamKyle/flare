@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment } from "react";
 import ItemSkillDetailsProps from "./types/item-skill-details-props";
 import clsx from 'clsx';
 import PrimaryButton from "../../../../components/ui/buttons/primary-button";
@@ -9,6 +9,8 @@ import SuccessAlert from "../../../../components/ui/alerts/simple-alerts/success
 import DangerAlert from "../../../../components/ui/alerts/simple-alerts/danger-alert";
 import Ajax from "../../../../lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
+import InfoAlert from "../../../../components/ui/alerts/simple-alerts/info-alert";
+import { findParentSkill } from "./helpers/is-skill-locked";
 
 export default class ItemSkillDetails extends React.Component<ItemSkillDetailsProps, any> {
     constructor(props: ItemSkillDetailsProps) {
@@ -82,6 +84,8 @@ export default class ItemSkillDetails extends React.Component<ItemSkillDetailsPr
     render() {
         const skillData = this.props.skill_progression_data;
 
+        const parentSkill = findParentSkill(this.props.skill_progression_data.item_skill, this.props.skills);
+
         return (
             <>
                 <h2>{this.props.skill_progression_data.item_skill.name}</h2>
@@ -100,10 +104,36 @@ export default class ItemSkillDetails extends React.Component<ItemSkillDetailsPr
                         </DangerAlert>
                     : null
                 }
+
+                {
+                    this.props.is_skill_locked ?
+                        <InfoAlert additional_css="my-4">
+                            This skill is locked and cannot be trained until you meet the requirements below.
+                        </InfoAlert>
+                    : null
+                }
                 
                 <p className='my-4'>{this.props.skill_progression_data.item_skill.description}</p>
                 <p className="mb-4">For more infomatio please refer to the <a href='/information/item-skills' target='_blank' >Item Skills help docs <i
                         className="fas fa-external-link-alt"></i></a>.</p>
+                
+                {
+                    typeof parentSkill !== 'undefined' ?
+                        <Fragment>
+                            <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                            <div className="bg-yellow-200 border border-yellow-700 dark:border-yellow-400 rounded-md py-3 px-4 text-yellow-900 dark:text-yellow-700">
+                                <h3 className="my-4 font-bold text-yellow-900 dark:text-yellow-700">Requirements</h3>
+                                <dl>
+                                    <dt>Parent Skill Name:</dt>
+                                    <dd>{parentSkill.name}</dd> 
+                                    <dt>Required Level:</dt>
+                                    <dd>{this.props.skill_progression_data.item_skill.parent_level_needed}</dd>    
+                                </dl>
+                            </div>
+                        </Fragment>
+                    : null
+                }
+
                 <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
                 <h4 className="my-4 font-bold">Progression Data</h4>
                 <dl>
@@ -210,11 +240,11 @@ export default class ItemSkillDetails extends React.Component<ItemSkillDetailsPr
                         this.props.skill_progression_data.is_training ?
                             <PrimaryButton button_label={'Stop Training Skill'} on_click={this.stopTrainingSkipp.bind(this)} disabled={this.state.loading} />
                         :
-                            <SuccessButton button_label={'Train Skill'} on_click={this.trainSkill.bind(this)} disabled={this.state.loading} />
+                            <SuccessButton button_label={'Train Skill'} on_click={this.trainSkill.bind(this)} disabled={this.state.loading || this.props.is_skill_locked} />
                     }
                     
                     
-                    <DangerButton button_label={'Close Skill Management'} on_click={() => this.props.manage_skill_details(null)} disabled={this.state.loading} />
+                    <DangerButton button_label={'Close Skill Management'} on_click={() => this.props.manage_skill_details(null, null)} disabled={this.state.loading} />
                 </div>
             </>
         )

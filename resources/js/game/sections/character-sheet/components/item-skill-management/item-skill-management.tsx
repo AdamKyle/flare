@@ -5,6 +5,9 @@ import ItemSkillManagementState from "./types/item-skill-management-state";
 import ItemSkillProgression from "./types/deffinitions/item-skill-progression";
 import ItemSkillDetails from "./item-skill-details";
 import DangerButton from "../../../../components/ui/buttons/danger-button";
+import ItemSkill from "./types/deffinitions/item-skill";
+import { isSkillLocked } from "./helpers/is-skill-locked";
+import Skills from '../tabs/skill-tabs/skills';
 
 export default class ItemSkillManagement extends React.Component<ItemSkillManagementProps, ItemSkillManagementState> {
 
@@ -12,13 +15,15 @@ export default class ItemSkillManagement extends React.Component<ItemSkillManage
         super(props);
 
         this.state = {
-            skill_progression: null
+            skill_progression: null,
+            skill: null,
         }
     }
 
-    showSkillSection(skill: ItemSkillProgression | null) {
+    showSkillSection(skill: ItemSkill | null, progression: ItemSkillProgression | null) {
         this.setState({
-            skill_progression: skill
+            skill_progression: progression,
+            skill: skill,
         });
     }
 
@@ -42,10 +47,12 @@ export default class ItemSkillManagement extends React.Component<ItemSkillManage
 
     render() {
 
-        if (this.state.skill_progression !== null) {
+        if (this.state.skill_progression !== null && this.state.skill !== null) {
             return <ItemSkillDetails skill_progression_data={this.state.skill_progression} 
+                                     skills={this.props.skill_data}
                                      manage_skill_details={this.showSkillSection.bind(this)} 
                                      character_id={this.props.character_id}
+                                     is_skill_locked={isSkillLocked(this.state.skill, this.props.skill_data, this.props.skill_progression_data)}
                     />
         }
 

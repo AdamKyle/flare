@@ -24,7 +24,6 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
-use App\Game\Skills\Jobs\DisenchantItem;
 use App\Game\Core\Services\CharacterInventoryService;
 use App\Game\Core\Requests\MoveItemRequest;
 use App\Game\Core\Services\InventorySetService;

@@ -23,7 +23,7 @@ export default class SkillTreeNode extends React.Component<SkillTreeNodeProps, {
     render() {
         return (
             <div>
-                <button onClick={() => this.props.show_passive_modal(this.props.skill_progression)}>
+                <button onClick={() => this.props.show_passive_modal(this.props.skill, this.props.skill_progression)}>
                     <h4 className={clsx({
                         'text-item-skill-training-300 dark:text-item-skill-training-600': this.props.skill_progression.is_training,
                         'text-red-500 dark:text-red-400' : this.props.is_locked,

@@ -16,10 +16,8 @@ use App\Flare\Models\Monster;
 use App\Flare\Services\CharacterRewardService;
 use App\Game\Battle\Handlers\FactionHandler;
 use App\Game\Battle\Jobs\BattleItemHandler;
-use App\Game\Core\Services\DropCheckService;
 use App\Game\Core\Services\GoldRush;
 use App\Game\Core\Traits\MercenaryBonus;
-use App\Game\Mercenaries\Values\MercenaryValue;
 use Exception;
 
 class BattleRewardProcessing {
