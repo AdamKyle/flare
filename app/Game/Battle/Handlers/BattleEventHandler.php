@@ -3,7 +3,7 @@
 namespace App\Game\Battle\Handlers;
 
 use App\Flare\Builders\Character\Traits\FetchEquipped;
-use Facades\App\Game\Battle\Handlers\UpdateItemSkill;
+use Facades\App\Game\Skill\Handlers\UpdateItemSkill;
 use App\Game\Battle\Events\CharacterRevive;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Events\AttackTimeOutEvent;

@@ -3,7 +3,7 @@
 namespace App\Admin\Import\ItemSkills;
 
 
-use App\Admin\Import\Items\Sheets\ItemSkillsSheet;
+use App\Admin\Import\ItemSkills\Sheets\ItemSkillsSheet;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
 class ItemSkillsImport implements WithMultipleSheets

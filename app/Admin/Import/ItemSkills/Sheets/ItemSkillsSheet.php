@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Admin\Import\Items\Sheets;
+namespace App\Admin\Import\ItemSkills\Sheets;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\ItemSkill;

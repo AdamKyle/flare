@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Game\Skill\Handlers;
+namespace App\Game\Skills\Handlers;
 
 use App\Flare\Handlers\UpdateCharacterAttackTypes;
 use App\Flare\Models\Item;
