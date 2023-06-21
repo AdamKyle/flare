@@ -100,8 +100,8 @@ class EquipItemService {
                 throw new EquipItemException('Inventory is full. Cannot replace a set item. Please make some room.');
             }
 
-            $uniqueSlot          = $this->getUniqueFromSet($equippedSet);
-            $isItemToEquipUnique = $this->isItemToEquipUnique($characterSlot->item);
+            $uniqueSlot            = $this->getUniqueFromSet($equippedSet);
+            $isItemToEquipUnique   = $this->isItemToEquipUnique($characterSlot->item);
             $isItemToReplaceUnique = $this->isItemToBeReplacedUnique($equippedSet);
 
             if (!is_null($uniqueSlot) && $isItemToEquipUnique && !$isItemToReplaceUnique) {

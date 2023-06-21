@@ -42,6 +42,18 @@ class EndScheduledEvent extends Command
     public function handle(LocationService $locationService, UpdateRaidMonsters $updateRaidMonsters, EventSchedulerService $eventSchedulerService) {
         $targetEventStart = now()->copy()->addMinutes(5);
 
+        $this->endScheduledEvent($locationService, $updateRaidMonsters, $eventSchedulerService);
+    }
+
+    /**
+     * End the scheduled events who are suppose to end.
+     *
+     * @param LocationService $locationService
+     * @param UpdateRaidMonsters $updateRaidMonsters
+     * @param EventSchedulerService $eventSchedulerService
+     * @return void
+     */
+    protected function endScheduledEvent(LocationService $locationService, UpdateRaidMonsters $updateRaidMonsters, EventSchedulerService $eventSchedulerService): void {
         $scheduledEvents = ScheduledEvent::where('end_date', '<=', now())->get();
 
         foreach ($scheduledEvents as $event) {
@@ -49,7 +61,7 @@ class EndScheduledEvent extends Command
 
             if ($eventType->isRaidEvent()) {
 
-                $this->endRaid($event->raid, $locationService, $updateRaidMonsters);
+                $this->endRaid($event, $locationService, $updateRaidMonsters);
 
                 $event->update([
                     'currently_running' => false,
@@ -68,12 +80,15 @@ class EndScheduledEvent extends Command
      * - Update monsters for locations, to set them back to normal.
      * - Cleanup other aspects such as announcements.
      *
-     * @param Raid $raid
+     * @param Event $event
      * @param LocationService $locationService
      * @param UpdateRaidMonsters $updateRaidMonsters
      * @return void
      */
-    protected function endRaid(Raid $raid, LocationService $locationService, UpdateRaidMonsters $updateRaidMonsters) {
+    protected function endRaid(Event $event, LocationService $locationService, UpdateRaidMonsters $updateRaidMonsters) {
+        
+        $raid = $event->raid;
+        
         event(new GlobalMessageEvent('The Raid: ' . $raid->name . ' is now ending! Don\'t worry, the raid will be back soon. Check the event calendar for the next time!'));
 
         $this->unCorruptLocations($raid, $locationService);
@@ -82,7 +97,7 @@ class EndScheduledEvent extends Command
 
         $this->updateMonstersForCharactersAtRaidLocations($raid, $updateRaidMonsters);
 
-        $this->cleanUp();
+        Announcement::where('expires_at', '<=', now())->where('event_id', $event->id)->first()->delete();
     }
 
     /**
@@ -102,15 +117,6 @@ class EndScheduledEvent extends Command
         ]);
 
         event(new CorruptLocations($locationService->fetchCorruptedLocationData($raid)->toArray()));
-    }
-
-    /**
-     * Cleanup other aspects of the raid.
-     *
-     * @return void
-     */
-    protected function cleanUp() {
-        Announcement::where('expires_at', '<=', now())->delete();
     }
 
     /**

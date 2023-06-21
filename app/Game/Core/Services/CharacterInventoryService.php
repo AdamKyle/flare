@@ -2,22 +2,22 @@
 
 namespace App\Game\Core\Services;
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use League\Fractal\Resource\Collection as LeagueCollection;
+use League\Fractal\Manager;
 use App\Flare\Transformers\UsableItemTransformer;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Skills\Services\MassDisenchantService;
 use App\Game\Skills\Services\UpdateCharacterSkillsService;
-use League\Fractal\Resource\Collection as LeagueCollection;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\SetSlot;
 use App\Flare\Transformers\InventoryTransformer;
-use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySet;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
-use League\Fractal\Manager;
 
 class CharacterInventoryService {
 
@@ -47,6 +47,11 @@ class CharacterInventoryService {
      * @var string $inventorySetEquippedName
      */
     private string $inventorySetEquippedName = '';
+
+    /**
+     * @var Collection $inventory
+     */
+    private Collection $inventory;
 
     /**
      * @var InventoryTransformer $inventoryTransformer
@@ -451,14 +456,14 @@ class CharacterInventoryService {
      */
     public function setInventory(string $type): CharacterInventoryService {
 
-        $useArray = !in_array($type, ['body','shield','leggings','feet','sleeves','helmet','gloves']);
+        $useArray = !in_array($type, ['body','shield','leggings','feet','sleeves','helmet','gloves', 'artifact']);
 
         $this->inventory = $this->getInventory($type, $useArray);
 
         return $this;
     }
 
-    protected function getInventory(string $type, bool $useArray = false) {
+    protected function getInventory(string $type, bool $useArray = false): Collection {
         $inventory = $this->character->inventory->slots->filter(function($slot) use($type, $useArray) {
             if ($useArray) {
                 return in_array($slot->position, $this->positions) && $slot->equipped;

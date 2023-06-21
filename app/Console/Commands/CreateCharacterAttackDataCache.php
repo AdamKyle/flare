@@ -6,8 +6,8 @@ use App\Flare\Jobs\CreateCharacterAttackData;
 use App\Flare\Models\Character;
 use Illuminate\Console\Command;
 
-class CreateCharacterAttackDataCache extends Command
-{
+class CreateCharacterAttackDataCache extends Command {
+    
     /**
      * The name and signature of the console command.
      *

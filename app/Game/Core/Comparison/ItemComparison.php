@@ -37,6 +37,7 @@ class ItemComparison {
         $comparison = [];
 
         foreach($inventorySlots as $slot) {
+
             if ($slot->position !== null) {
                 $result = $this->fetchHandComparison($toCompare, $inventorySlots, $slot->position);
 

@@ -2,30 +2,42 @@
 
 namespace App\Game\Core\Services;
 
-
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item as FractalItem;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Transformers\ItemComparisonTransfromer;
 use App\Flare\Transformers\ItemTransformer;
 use App\Flare\Transformers\UsableItemTransformer;
-use App\Game\Core\Gems\Services\AtonementComparison;
 use App\Game\Core\Values\ValidEquipPositionsValue;
 use App\Game\Gems\Services\ItemAtonements;
-use Cache;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item as FractalItem;
 
 class ComparisonService {
 
-    private $validEquipPositionsValue;
+    private ValidEquipPositionsValue $validEquipPositionsValue;
 
-    private $characterInventoryService;
+    /**
+     * @var CharacterInventoryService $characterInventoryService
+     */
+    private CharacterInventoryService $characterInventoryService;
 
-    private $equipItemService;
+    /**
+     * @var EquipItemService $equipItemService
+     */
+    private EquipItemService $equipItemService;
 
-    private $itemAtonements;
+    /**
+     * @var ItemAtonements $itemAtonements
+     */
+    private ItemAtonements $itemAtonements;
 
+    /**
+     * @param ValidEquipPositionsValue $validEquipPositionsValue
+     * @param CharacterInventoryService $characterInventoryService
+     * @param EquipItemService $equipItemService
+     * @param ItemAtonements $itemAtonements
+     */
     public function __construct(
         ValidEquipPositionsValue $validEquipPositionsValue,
         CharacterInventoryService $characterInventoryService,
@@ -45,9 +57,9 @@ class ComparisonService {
      */
     public function buildComparisonData(Character $character, InventorySlot $itemToEquip, string $type = null) {
         $service = $this->characterInventoryService->setCharacter($character)
-            ->setInventorySlot($itemToEquip)
-            ->setPositions($this->validEquipPositionsValue->getPositions($itemToEquip->item))
-            ->setInventory($type);
+                                                   ->setInventorySlot($itemToEquip)
+                                                   ->setPositions($this->validEquipPositionsValue->getPositions($itemToEquip->item))
+                                                   ->setInventory($type);
 
         $viewData = [
             'details'        => [],

@@ -283,6 +283,14 @@
                 <span class="ra ra-fire-shield"></span>
                 Trinkets
             </a>
+            <a href="{{route('info.page', ['pageName' => 'gems'])}}">
+                <span class="fas fa-gem"></span>
+                Gem Crafting
+            </a>
+            <a href="{{route('info.page', ['pageName' => 'seer-camp'])}}">
+                <span class="fas fa-campground"></span>
+                Seer Camp
+            </a>
             <hr />
             <h6>Misc. Lists</h6>
             <a href="{{route('info.page', ['pageName' => 'monsters'])}}">

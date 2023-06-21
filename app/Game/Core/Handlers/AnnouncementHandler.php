@@ -45,7 +45,8 @@ class AnnouncementHandler {
 
         Announcement::create([
             'message'    => $message,
-            'expires_at' => $event->ends_at
+            'expires_at' => $event->ends_at,
+            'event_id'   => $event->id,
         ]);
 
         event(new AnnouncementMessageEvent($message));
