@@ -62,7 +62,7 @@ class ItemSkillService {
         $foundItem = $this->fetchItemWithSkill($character, $itemId);
 
         if (is_null($foundItem)) {
-            return $this->errorResult('Item must be equipped to train a skill.');
+            return $this->errorResult('Item must be equipped to manage the training of a skill.');
         }
 
         $foundSkill = $this->fetchItemSkillProgression($foundItem, $itemSkillProgressionId);

@@ -40,13 +40,22 @@ export default class ItemDetails extends React.Component<any, any> {
         });
     }
 
-    renderAtonementAmounts() {
-        return this.props.item.item_atonements.atonements.map((atonement: any) => {
-            return <Fragment>
-                <dt>{atonement.name}</dt>
-                <dd>{(atonement.total * 100).toFixed(2)}%</dd>
-            </Fragment>
-        })
+    renderAtonementAmounts(): JSX.Element[]|[] {
+        console.log(this.props.item);
+
+        const atonements = this.props.item.item_atonements.atonements;
+        const atonementData = [];
+
+        for (const key in atonements) {
+            atonementData.push(
+                <Fragment>
+                    <dt>{key}</dt>
+                    <dd>{(atonements[key] * 100).toFixed(2)}%</dd>
+                </Fragment>
+            )
+        }
+
+        return atonementData;
     }
 
     render() {
