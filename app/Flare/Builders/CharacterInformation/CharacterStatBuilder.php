@@ -2,7 +2,6 @@
 
 namespace App\Flare\Builders\CharacterInformation;
 
-use App\Flare\Builders\Character\ClassDetails\HolyStacks;
 use App\Flare\Builders\Character\Traits\Boons;
 use App\Flare\Builders\Character\Traits\FetchEquipped;
 use App\Flare\Builders\CharacterInformation\AttributeBuilders\DamageBuilder;
@@ -17,6 +16,7 @@ use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
 use App\Flare\Traits\ElementAttackData;
 use App\Flare\Values\ItemEffectsValue;
+use Facades\App\Flare\Builders\CharacterInformation\AttributeBuilders\ItemSkillAttribute;
 use Exception;
 use Illuminate\Support\Collection;
 
@@ -252,8 +252,9 @@ class CharacterStatBuilder {
 
         $baseStat = $baseStat + $baseStat * $this->fetchStatFromEquipment($stat, $voided);
 
-        $baseStat = $this->applyBoons($baseStat);
-        $baseStat = $this->applyBoons($baseStat, $stat . '_mod');
+        $baseStat =  $this->applyBoons($baseStat);
+        $baseStat =  $this->applyBoons($baseStat, $stat . '_mod');
+        $baseStat += ItemSkillAttribute::fetchModifier($this->character, $this->equippedItems, $stat . '_mod');
 
         if ($stat === $this->character->damage_stat) {
             $classSpecialsBonus = $this->character->classSpecialsEquipped
@@ -320,7 +321,15 @@ class CharacterStatBuilder {
                                               ->where('base_ac_mod', '>', 0)
                                               ->sum('base_ac_mod');
 
-        return $defence + ($defence * ($holyBonus + $classSpecialsBonus));
+
+        $itemSkillBonus = 0;
+
+        if (!is_null($this->equippedItems)) {
+            $itemSkillBonus = ItemSkillAttribute::fetchModifier($this->character, $this->equippedItems, 'base_ac');
+        }
+        
+
+        return $defence + ($defence * ($holyBonus + $classSpecialsBonus + $itemSkillBonus));
     }
 
     /**
@@ -400,7 +409,13 @@ class CharacterStatBuilder {
                                               ->where('base_damage_mod', '>', 0)
                                               ->sum('base_damage_mod');
 
-        return ceil($damage + ($damage * ($this->holyInfo()->fetchAttackBonus() + $classSpecialsBonus)));
+        $itemSkillBonus = 0;
+
+        if (!is_null($this->equippedItems)) {
+            $itemSkillBonus = ItemSkillAttribute::fetchModifier($this->character, $this->equippedItems, 'base_damage');
+        }
+
+        return ceil($damage + ($damage * ($this->holyInfo()->fetchAttackBonus() + $classSpecialsBonus + $itemSkillBonus)));
     }
 
     /**
@@ -625,7 +640,13 @@ class CharacterStatBuilder {
                                               ->where('base_healing_mod', '>', 0)
                                               ->sum('base_healing_mod');
 
-        return ceil($healing + ($healing * ($this->holyInfo()->fetchHealingBonus() + $classSpecialsBonus)));
+        $itemSkillBonus = 0;
+
+        if (!is_null($this->equippedItems)) {
+            $itemSkillBonus = ItemSkillAttribute::fetchModifier($this->character, $this->equippedItems, 'base_healing');
+        }     
+
+        return ceil($healing + ($healing * ($this->holyInfo()->fetchHealingBonus() + $classSpecialsBonus + $itemSkillBonus)));
     }
 
     /**
