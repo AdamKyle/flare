@@ -39,6 +39,12 @@
                             of this type to drop.
                         </p>
                         <x-core.forms.select :model="$raid" label="Specialty Reward Type:" modelKey="item_specialty_reward_type" name="item_specialty_reward_type" :options="$itemTypes" />
+                        <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                        <h3 class="mb-3">Ancestral Item Reward</h3>
+                        <p class="mb-3 italic text-sm">
+                            This item will be rewarded to the one that kills the Raid Boss
+                        </p>
+                        <x-core.forms.collection-select :model="$raid" label="Ancestrral Item:" modelKey="artifact_item_id" name="artifact_item_id" value="id" key="name" :options="$artifacts" />
                     </x-core.form-wizard.content>
                 </x-core.form-wizard.contents>
             </x-core.form-wizard.container>

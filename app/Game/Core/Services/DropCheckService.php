@@ -56,6 +56,7 @@ class DropCheckService {
         $this->battleDrop      = $battleDrop;
         $this->buildMythicItem = $buildMythicItem;
     }
+    
 
     /**
      * Process the drop check.

@@ -1,0 +1,99 @@
+<?php
+
+namespace App\Flare\AffixGenerator\Console\Commands;
+
+use Illuminate\Console\Command;
+use App\Flare\AffixGenerator\DTO\AffixGeneratorDTO;
+use App\Flare\AffixGenerator\Generator\GenerateAffixes;
+use App\Flare\AffixGenerator\Values\AffixGeneratorTypes;
+use App\Flare\Models\GameSkill;
+
+class MassGenerateAffixes extends Command
+{
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'generate:affixes';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Can generate a set of 56 enchantments based on user supplied input.';
+
+    /**
+     * Execute the console command.
+     */
+    public function handle(AffixGeneratorDTO $affixGeneratorDTO, GenerateAffixes $generateAffixes) {
+        $this->line('Hello and welcome. I will guide you through generating Affixes in mass. Please note all names and descriptions are randomly generated.');
+        $this->line('For this reason it is suggested you export the affixes you generate and rename the names and update descriptions.');
+        $this->newLine();
+
+        $type = $this->affixType();
+
+        $affixGeneratorDTO->setAffixType($type);
+
+        $skill = $this->skillForAffixes();
+
+        if (!is_null($skill)) {
+            $affixGeneratorDTO->setSkillName($skill);
+        }
+
+        $attributes = $this->selectAttributesForAffixes();
+
+        $affixGeneratorDTO->setAttributes($attributes);
+
+        $generateAffixes->generate($affixGeneratorDTO);
+        
+    }
+
+    /**
+     * What type of affix are we generatoring
+     *
+     * @return string
+     */
+    protected function affixType(): string {
+        return $this->choice('What type do these affixes have?', [
+            'prefix', 'suffix'
+        ]);
+    }
+
+    /**
+     * Does the batch of affixes effect a skill?
+     *
+     * @return string|null
+     */
+    protected function skillForAffixes(): ?string {
+        $effects = $this->choice('Do these affixes effect skills?', [
+            'Y', 'N'
+        ]);
+
+        if ($effects === 'Y') {
+            $skill = $this->choice('Please select a skill', GameSkill::pluck('name')->toArray());
+
+            return $skill;
+        }
+
+        return null;
+    }
+
+    /**
+     * Select attributes for the affixes
+     *
+     * @return array
+     */
+    protected function selectAttributesForAffixes(): array {
+        $this->newLine();
+        $this->line('Please select a set of attributes you want for these affixes. Keep in mind that if you choose any of the stat reducting attributes');
+        $this->line('then the logic states: ');
+        $this->line('The logic states that prefixes can reduce all stats and do not stack, while suffixes can reduce individual stats and do stack.');
+        $this->newLine();
+
+        $this->line('Note: To select multiple enter the numbers as such: 0,1,2,3 ...');
+
+        return $this->choice('Select one or more attributes for this set of affixes', AffixGeneratorTypes::getValuesForCommandSelection(), null, null, true);
+    }
+}

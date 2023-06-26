@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\ServiceProvider;
+use App\Console\DevelopmentCommands\GivePlayerMythicItem;
 use App\Console\DevelopmentCommands\GivePlayerAncenstorItem;
 use App\Console\DevelopmentCommands\LevelCharacter;
 use App\Console\DevelopmentCommands\MaxOutCharacter;
@@ -32,6 +33,7 @@ class AppServiceProvider extends ServiceProvider
             ReincarnateCharacter::class,
             IncreaseRankFightToMax::class,
             GivePlayerAncenstorItem::class,
+            GivePlayerMythicItem::class,
         ]);
     }
 

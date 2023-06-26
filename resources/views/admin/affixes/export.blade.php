@@ -75,7 +75,7 @@
                     <select class="form-control" name="export_type">
                         <option value="">Please select</option>
                         @foreach($types as $key => $value)
-                            <option value={{$key}}>{{$value}}</option>
+                            <option value="{{$key}}">{{$value}}</option>
                         @endforeach
                     </select>
                 </div>

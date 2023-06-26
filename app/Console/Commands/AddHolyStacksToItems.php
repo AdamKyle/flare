@@ -39,7 +39,7 @@ class AddHolyStacksToItems extends Command
      * @throws Exception
      */
     public function handle(): void {
-        Item::whereNotIn('type', ['quest', 'alchemy', 'trinket'])
+        Item::whereNotIn('type', ['quest', 'alchemy', 'trinket', 'artifact'])
             ->chunkById(250, function($items) {
                 foreach ($items as $item) {
 

@@ -193,6 +193,7 @@ return [
         App\Flare\Providers\ServiceProvider::class,
         App\Flare\Providers\EventsProvider::class,
         App\Flare\MapGenerator\Providers\ServiceProvider::class,
+        App\Flare\AffixGenerator\Providers\ServiceProvider::class,
 
         /**
          * Component Related

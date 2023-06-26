@@ -124,7 +124,7 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
     }
 
     createActionsDropDown() {
-        if (this.state.table === 'Inventory') {
+        if (this.state.table === 'inventory') {
             return [
                 {
                     name: 'Destroy All',
@@ -159,7 +159,7 @@ export default class InventoryTabSection extends React.Component<InventoryTabSec
     }
 
     isDropDownHidden() {
-        if (this.state.table === 'Inventory') {
+        if (this.state.table === 'inventory') {
             return this.state.data.length === 0;
         } else {
             return this.props.usable_items.length === 0;

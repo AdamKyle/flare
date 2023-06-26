@@ -44,6 +44,11 @@
             </form>
             <form method="POST" action="{{ route('items.export-data') }}" class="mb-4 text-center">
                 @csrf
+                <input value="artifact" name="type_to_export" type="hidden" />
+                <x-core.buttons.primary-button type="submit">Export Artifacts Only</x-core.buttons.primary-button>
+            </form>
+            <form method="POST" action="{{ route('items.export-data') }}" class="mb-4 text-center">
+                @csrf
                 <input value="specialty-shops" name="type_to_export" type="hidden" />
                 <x-core.buttons.primary-button type="submit">Export Specialty Shops Only</x-core.buttons.primary-button>
             </form>

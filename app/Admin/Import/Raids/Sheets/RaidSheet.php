@@ -2,6 +2,7 @@
 
 namespace App\Admin\Import\Raids\Sheets;
 
+use App\Flare\Models\Item;
 use App\Flare\Models\Raid;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Location;
@@ -19,6 +20,10 @@ class RaidSheet implements ToCollection {
                 $cleanRaidData = $this->cleanRaidData($raidData);
 
                 if (empty($cleanRaidData)) {
+                    continue;
+                }
+
+                if (!isset($cleanRaidData['artifact_item_id'])) {
                     continue;
                 }
 
@@ -54,6 +59,16 @@ class RaidSheet implements ToCollection {
         $raidData['raid_monster_ids']       = $raidMonsterIds;
         $raidData['raid_boss_location_id']  = $raidBossLocationId->id;
         $raidData['corrupted_location_ids'] = $raidCorruptedLocations;
+
+        if (isset($raidData['artifact_item_id'])) {
+            $item = Item::where('name', $raidData['artifact_item_id'])->first();
+
+            if (!is_null($item)) {
+                $raidData['artifact_item_id'] = $item->id;
+            } else {
+                unset($raidData['artifact_item_id']);
+            }
+        }
 
         return $raidData;
     }

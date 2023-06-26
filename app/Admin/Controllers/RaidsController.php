@@ -2,20 +2,18 @@
 
 namespace App\Admin\Controllers;
 
-use App\Flare\Models\GameMap;
-use App\Flare\Models\Location;
+use App\Flare\Models\Item;
 use App\Flare\Models\Raid;
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Maatwebsite\Excel\Facades\Excel;
+use App\Flare\Models\GameMap;
 use App\Flare\Models\Monster;
-use App\Admin\Import\Monsters\MonstersImport;
-use App\Admin\Exports\Monsters\MonstersExport;
+use App\Flare\Models\Location;
+use App\Http\Controllers\Controller;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Admin\Exports\Raids\RaidExport;
 use App\Admin\Import\Raids\RaidsImport;
-use App\Admin\Requests\MonstersImport as MonstersImportRequest;
-use App\Admin\Requests\RaidImportRequest;
 use App\Flare\Values\ItemSpecialtyType;
+use App\Admin\Requests\RaidImportRequest;
 
 class RaidsController extends Controller {
 
@@ -42,7 +40,8 @@ class RaidsController extends Controller {
             'raidBosses'  => Monster::where('is_raid_boss', true)->get(),
             'itemTypes'   => [
                 ItemSpecialtyType::PIRATE_LORD_LEATHER,
-            ]
+            ],
+            'artifacts'   => Item::where('type', 'artifact')->get(),
         ]);
     }
 
@@ -54,7 +53,8 @@ class RaidsController extends Controller {
             'raidBosses' => Monster::where('is_raid_boss', true)->get(),
             'itemTypes'  => [
                 ItemSpecialtyType::PIRATE_LORD_LEATHER,
-            ]
+            ],
+            'artifacts'   => Item::where('type', 'artifact')->get(),
         ]);
     }
 

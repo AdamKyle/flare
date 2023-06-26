@@ -15,6 +15,14 @@
             at <a href="/information/location/{{$raid->raid_boss_location_id}}" target="_blank"><i class="fas fa-external-link-alt"></i> {{$raid->raidBossLocation->name}}</a>
         </p>
         <div class='block md:hidden border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+        <strong class="my-4">Raid Boss Ancestral Item (Reward)</strong>
+        <p class="my-4">
+            This item is only given to those who kill the Raid Boss.
+        </p>
+        <p class="my-4">
+            <a href="/information/item/{{$raid->artifact_item_id}}" target="_blank"><i class="fas fa-external-link-alt"></i> <x-item-display-color :item="$raid->artifactItem" /></a>
+        </p>
+        <div class='block md:hidden border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
         <strong class="my-4">Raid Monsters</strong>
         <div class="my-4 grid md:grid-cols-2 gap-2">
             @foreach($raidMonsters as $raidMonsterChunk)

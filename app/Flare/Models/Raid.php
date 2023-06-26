@@ -18,7 +18,8 @@ class Raid extends Model {
         'raid_monster_ids',
         'raid_boss_location_id',
         'corrupted_location_ids',
-        'item_specialty_reward_type'
+        'item_specialty_reward_type',
+        'artifact_item_id',
     ];
 
     protected $casts = [
@@ -43,6 +44,10 @@ class Raid extends Model {
 
     public function raidBossLocation() {
         return $this->hasOne(Location::class, 'id', 'raid_boss_location_id');
+    }
+
+    public function artifactItem() {
+        return $this->hasOne(Item::class, 'id', 'artifact_item_id');
     }
 
     private function moveRaidBossToTheTopOfTheList(array $raidMonsters): array {

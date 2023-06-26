@@ -87,6 +87,9 @@ class ItemsController extends Controller {
             'spells' => [
                 'spell-damage', 'spell-healing',
             ],
+            'artifact' => [
+                'artifact',
+            ],
             'rings' => [
                 'ring'
             ],

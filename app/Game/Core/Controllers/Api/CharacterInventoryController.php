@@ -129,7 +129,19 @@ class  CharacterInventoryController extends Controller {
 
         $name = $slot ->item->affix_name;
 
+        $item = null;
+
+        if ($slot->item->type === 'artifact' && $slot->item->itemSkillProgressions->isNotEmpty()) {
+            $item = $slot->item;
+        }
+
         $slot->delete();
+
+        if (!is_null($item)) {
+            $item->itemSkillProgressions()->delete();
+
+            $item->delete();
+        }
 
         $inventory = $this->characterInventoryService->setCharacter($character->refresh());
 
@@ -150,7 +162,19 @@ class  CharacterInventoryController extends Controller {
 
         $slotIds   = $inventory->findCharacterInventorySlotIds();
 
+        $items     = $character->inventory->slots->where('item.type', 'artifact')->whereNotNull('item.itemSkillProgressions')->pluck('item.id')->toArray(); 
+
         $character->inventory->slots()->whereIn('id', $slotIds)->delete();
+
+        if (!empty($items)) {
+            $items = Item::whereIn('id', $items)->get();
+
+            foreach ($items as $item) {
+                $item->itemSkillProgressions()->delete();
+
+                $item->delete();
+            }
+        }
 
         return response()->json([
             'message' => 'Destroyed All Items.',

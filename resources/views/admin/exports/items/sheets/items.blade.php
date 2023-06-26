@@ -147,7 +147,7 @@
             <td>{{$item->counter_resistance}}</td>
             <td>{{$item->gains_additional_level}}</td>
             <td>{{is_null($item->unlocksClass) ? '' : $item->unlocksClass->name}}</td>
-            <td>{{is_null(($item->item_skill_id) ? '' : $item->itemSkill->name)}}</td>
+            <td>{{is_null($item->item_skill_id) ? '' : $item->itemSkill->name}}</td>
         </tr>
     @endforeach
     </tbody>

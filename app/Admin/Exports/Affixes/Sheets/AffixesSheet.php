@@ -23,6 +23,8 @@ class AffixesSheet implements FromView, WithTitle, ShouldAutoSize {
      */
     public function view(): View {
 
+        dump($this->type);
+
         $query = $this->createQuery(ItemAffix::query(), $this->type);
 
         if ($this->type === 'all') {

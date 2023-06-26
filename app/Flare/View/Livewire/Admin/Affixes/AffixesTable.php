@@ -2,7 +2,6 @@
 
 namespace App\Flare\View\Livewire\Admin\Affixes;
 
-use App\Flare\Models\GameMap;
 use App\Flare\Models\ItemAffix;
 use Illuminate\Database\Eloquent\Builder;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
@@ -106,6 +105,7 @@ class AffixesTable extends DataTableComponent {
             'Celestial Prayer'         => 'Celestial Prayer',
             'Astral Magics'            => 'Astral Magics',
             'Fighter\'s Resilience'    => 'Fighter\'s Resilience',
+            'Incarcerated Thoughts'    => 'Incarcerated Thoughts'
         ];
     }
 
