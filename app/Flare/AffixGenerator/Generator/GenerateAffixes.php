@@ -2,23 +2,17 @@
 
 namespace App\Flare\AffixGenerator\Generator;
 
-use Exception;
+use App\Flare\AffixGenerator\Builders\AffixBuilder;
 use App\Flare\AffixGenerator\Curve\ExponentialAttributeCurve;
 use App\Flare\AffixGenerator\Curve\ExponentialLevelCurve;
+use App\Flare\AffixGenerator\DTO\AffixCurveDTO;
 use App\Flare\AffixGenerator\DTO\AffixGeneratorDTO;
 use App\Flare\Models\ItemAffix;
 
 class GenerateAffixes {
 
-    /**
-     * @var array $castArray
-     */
-    private array $castArray;
 
-    /**
-     * @var array $generatedStats
-     */
-    private array $generatedStats;
+    private int $amountOfAffixedToCreate = 0;
 
     /**
      * @var ExponentialAttributeCurve $exponentialAttributeCurve
@@ -31,17 +25,29 @@ class GenerateAffixes {
     private ExponentialLevelCurve $exponentialLevelCurve;
 
     /**
+     * @var AffixCurveDTO $affixCurveDTO
+     */
+    private AffixCurveDTO $affixCurveDTO;
+
+    /**
+     * @var AffixBuilder $affixBuilder;
+     */
+    private AffixBuilder $affixBuilder;
+
+    /**
      * @param ExponentialAttributeCurve $exponentialAttributeCurve
      * @param ExponentialLevelCurve $exponentialLevelCurve
+     * @param AffixCurveDTO $affixCurveDTO
      */
-    public function __construct(ExponentialAttributeCurve $exponentialAttributeCurve, ExponentialLevelCurve $exponentialLevelCurve) {
-        
-        $model = new ItemAffix();
-
-        $this->castArray = $model->getCasts();
-
+    public function __construct(ExponentialAttributeCurve $exponentialAttributeCurve, 
+                                ExponentialLevelCurve $exponentialLevelCurve,
+                                AffixCurveDTO $affixCurveDTO,
+                                AffixBuilder $affixBuilder,
+    ) {
         $this->exponentialAttributeCurve = $exponentialAttributeCurve;
         $this->exponentialLevelCurve     = $exponentialLevelCurve;
+        $this->affixCurveDTO             = $affixCurveDTO;
+        $this->affixBuilder              = $affixBuilder;
     }
 
     /**
@@ -54,35 +60,15 @@ class GenerateAffixes {
 
         $this->generateCurves();
 
-        $attributes = $affixGeneratorDTO->getAttributes();
+        $affixes = [];
 
-        $attribute[] = 'cost';
-        $attribute[] = 'int_required';
-        
-        foreach ($attributes as $attribute) {
-            $castType = $this->getCastType($attribute);
-
-            if (is_null($castType)) {
-                throw new Exception('No cast type found for: ' . $attribute);
-            }
-        }
-    }
-
-    /**
-     * Get the cast type of the attribute
-     * 
-     * - Can be null if the attribute doesn't have a cast type.
-     *
-     * @param string $attributeName
-     * @return string|null
-     */
-    protected function getCastType(string $attributeName): ?string {
-
-        if (isset($this->castArray[$attributeName])) {
-            return $this->castArray[$attributeName];
+        for ($i = 0; $i < $this->amountOfAffixedToCreate; $i++) {
+            $affixes[] = $this->affixBuilder->generateAffix($affixGeneratorDTO, $this->affixCurveDTO, $i);
         }
 
-        return null;
+        foreach ($affixes as $affix) {
+            ItemAffix::create($affix);
+        }
     }
 
     /**
@@ -94,9 +80,11 @@ class GenerateAffixes {
 
         $levels = $this->exponentialLevelCurve->generateSkillLevels(1, 401);
 
+        $this->affixCurveDTO->setLevelRequirements($levels);
+
         $size = count($levels['required']);
 
-        $this->generatedStats['levels'] = $levels;
+        $this->amountOfAffixedToCreate = $size;
 
         $this->generateCurveForStats($size);
         $this->generateCurveForFloat($size);
@@ -117,7 +105,7 @@ class GenerateAffixes {
                                                  ->setIncrease(0.08)
                                                  ->setRange(1.2);
 
-        $this->generatedStats['stats'] = $curve->generateValues($size);
+        $this->affixCurveDTO->setStatCurve($curve->generateValues($size));
     }
 
     /**
@@ -131,7 +119,7 @@ class GenerateAffixes {
                                                  ->setIncrease(0.002)
                                                  ->setRange(0.20);
 
-        $this->generatedStats['float'] = $curve->generateValues($size);
+        $this->affixCurveDTO->setFloatCurve($curve->generateValues($size));
     }
 
     /**
@@ -140,12 +128,13 @@ class GenerateAffixes {
      * @return void
      */
     protected function generateCurveForInteger(int $size): void {
-        $curve = $this->exponentialAttributeCurve->setMin(1000)
+        $curve = $this->exponentialAttributeCurve->setMin(50)
                                                  ->setMax(2000000000)
                                                  ->setIncrease(100000)
                                                  ->setRange(500);
 
-        $this->generatedStats['integer'] = $curve->generateValues($size, true);
+        
+        $this->affixCurveDTO->setIntegerCurve($curve->generateValues($size, true));
     }
 
     /**
@@ -155,11 +144,11 @@ class GenerateAffixes {
      */
     protected function generateCurveForCost(int $size): void {
         $curve = $this->exponentialAttributeCurve->setMin(1000)
-                                                 ->setMax(40000000)
+                                                 ->setMax(40000000000)
                                                  ->setIncrease(100000)
                                                  ->setRange(500);
 
-        $this->generatedStats['cost'] = $curve->generateValues($size, true);
+        $this->affixCurveDTO->setCostCurve($curve->generateValues($size, true));
     }
 
 
@@ -174,6 +163,6 @@ class GenerateAffixes {
                                                  ->setIncrease(1000)
                                                  ->setRange(56, true);
 
-        $this->generatedStats['int_required'] = $curve->generateValues($size, true);
+        $this->affixCurveDTO->setIntRequiredCurve($curve->generateValues($size, true));
     }
 }

@@ -8,9 +8,21 @@ class AffixGeneratorDTO {
 
     private string $affixType;
 
-    private string $skillName;
+    private ?string $skillName = null;
 
     private array $attributes;
+
+    private bool $isIrresistible  = false;
+
+    private bool $doesDamageStack = false;
+
+    public function setIsDamageIrresistible(bool $isIrresistible) {
+        $this->isIrresistible = $isIrresistible;
+    }
+
+    public function setDoesDamageStatck(bool $doesDamageStack) {
+        $this->doesDamageStack = $doesDamageStack;
+    }
 
     public function setAffixType(string $type) {
         $this->affixType = $type;
@@ -28,11 +40,19 @@ class AffixGeneratorDTO {
         return $this->affixType;
     }
 
-    public function getSkillName(): string {
+    public function getSkillName(): ?string {
         return $this->skillName;
     }
 
     public function getAttributes(): array {
         return $this->attributes;
+    }
+
+    public function getIsDamageIrresistible(): bool {
+        return $this->isIrresistible;
+    }
+
+    public function getDoesDamageStatck(): bool {
+        return $this->doesDamageStack;
     }
 }

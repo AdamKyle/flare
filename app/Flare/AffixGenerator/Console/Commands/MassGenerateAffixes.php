@@ -44,10 +44,43 @@ class MassGenerateAffixes extends Command
 
         $attributes = $this->selectAttributesForAffixes();
 
+        $attribues[] = 'int_required';
+        $atributes[] = 'cost';
+
+        if (in_array('damage', $attributes)) {
+            $this->isDamageIrresistable($affixGeneratorDTO);
+
+            $this->isDamageStackable($affixGeneratorDTO);
+        }
+
         $affixGeneratorDTO->setAttributes($attributes);
 
         $generateAffixes->generate($affixGeneratorDTO);
         
+    }
+
+    protected function isDamageIrresistable(AffixGeneratorDTO $affixGeneratorDTO) {
+        $choice = $this->choice('You selected damage as one of the attributes, would you like to make the damage irresistable?', [
+            'Y', 'N'
+        ]);
+
+        if ($choice === 'Y') {
+            $affixGeneratorDTO->setIsDamageIrresistible(true);
+        } else {
+            $affixGeneratorDTO->setIsDamageIrresistible(false);
+        }
+    }
+
+    protected function isDamageStackable(AffixGeneratorDTO $affixGeneratorDTO) {
+        $choice = $this->choice('You selected damage as one of the attributes, would you like to make the damage stack?', [
+            'Y', 'N'
+        ]);
+
+        if ($choice === 'Y') {
+            $affixGeneratorDTO->setDoesDamageStatck(true);
+        } else {
+            $affixGeneratorDTO->setDoesDamageStatck(false);
+        }
     }
 
     /**

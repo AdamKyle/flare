@@ -110,6 +110,22 @@ class ExponentialAttributeCurve {
                 }
 
                 $y = ceil($y);
+
+                if ($y > $this->max) {
+                    $y = $this->max;
+                }
+
+                if ($y === $this->max) {
+                    $y = $numbers[count($numbers) - 1] + ($numbers[count($numbers) - 1] / 10);
+
+                    if ($y > $this->max && $x !== $size - 1) {
+                        $y = $numbers[count($numbers) - 1] + ($numbers[count($numbers) - 1] / 100);
+                    }
+
+                    if ($y > $this->max && $x === $size - 1) {
+                        $y = $this->max;
+                    }
+                }
             }
 
             if (!$integer) {
@@ -131,7 +147,7 @@ class ExponentialAttributeCurve {
                 $numbers[$size - 2] = ($numbers[$size - 3] + $numbers[$size - 1]) / 2;
             }
         }
-    
+
         return $numbers;
     }
 

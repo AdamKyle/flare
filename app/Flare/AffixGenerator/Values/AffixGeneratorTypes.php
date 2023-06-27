@@ -36,6 +36,9 @@ class AffixGeneratorTypes {
     const DAMAGE                   = 'damage';
     const SKILL_REDUCTION          = 'skill_reduction';
     const RESISTANCE_REDUCTION     = 'resistance_reduction';
+    const BASE_DAMAGE_MOD_BONUS    = 'base_damage_mod_bonus';
+    const BASE_HEALING_MOD_BONUS   = 'base_healing_mod_bonus';
+    const BASE_AC_MOD_BONUS        = 'base_ac_mod_bonus';
 
     /**
      * @var string[] $values
@@ -67,6 +70,9 @@ class AffixGeneratorTypes {
         self::DAMAGE                   => self::DAMAGE,
         self::SKILL_REDUCTION          => self::SKILL_REDUCTION,
         self::RESISTANCE_REDUCTION     => self::RESISTANCE_REDUCTION,
+        self::BASE_DAMAGE_MOD_BONUS    => self::BASE_DAMAGE_MOD_BONUS,
+        self::BASE_HEALING_MOD_BONUS   => self::BASE_HEALING_MOD_BONUS,
+        self::BASE_AC_MOD_BONUS        => self::BASE_AC_MOD_BONUS,           
     ];
 
     /**

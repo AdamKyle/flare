@@ -40,6 +40,10 @@ class ExponentialLevelCurve {
                 return $skillLevels;
             }
 
+            if ($trivial < $required) {
+                $trivial = rand(5, 9) + $required;
+            }
+
             $skillLevels['required'][] = $required;
             $skillLevels['trivial'][]  = $trivial;
     

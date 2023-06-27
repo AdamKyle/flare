@@ -73,6 +73,7 @@ class ItemAffix extends Model {
     protected $casts = [
         'base_damage_mod'                  => 'float',
         'base_healing_mod'                 => 'float',
+        'base_ac_mod'                      => 'float',
         'str_mod'                          => 'float',
         'dur_mod'                          => 'float',
         'dex_mod'                          => 'float',
