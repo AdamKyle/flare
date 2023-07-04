@@ -23,7 +23,7 @@
             <th>focus_reduction</th>
             <th>reduces_enemy_stats</th>
             <th>steal_life_amount</th>
-            <th>class_bonus</th>
+
             <th>damage</th>
             <th>int_required</th>
             <th>skill_level_required</th>
@@ -32,11 +32,6 @@
             <th>affects_skill_type</th>
             <th>skill_bonus</th>
             <th>skill_training_bonus</th>
-            <td>base_damage_mod_bonus</td>
-            <td>base_healing_mod_bonus</td>
-            <td>base_ac_mod_bonus</td>
-            <td>fight_time_out_mod_bonus</td>
-            <td>move_time_out_mod_bonus</td>
             <th>can_drop</th>
             <th>damage_can_stack</th>
             <th>irresistible_damage</th>
@@ -73,7 +68,6 @@
             <td>{{$affix->focus_reduction}}</td>
             <td>{{$affix->reduces_enemy_stats}}</td>
             <td>{{$affix->steal_life_amount}}</td>
-            <td>{{$affix->class_bonus}}</td>
             <td>{{$affix->damage}}</td>
             <td>{{$affix->int_required}}</td>
             <td>{{$affix->skill_level_required}}</td>
@@ -82,11 +76,6 @@
             <td>{{$affix->affects_skill_type}}</td>
             <td>{{$affix->skill_bonus}}</td>
             <td>{{$affix->skill_training_bonus}}</td>
-            <td>{{$affix->base_damage_mod_bonus}}</td>
-            <td>{{$affix->base_healing_mod_bonus}}</td>
-            <td>{{$affix->base_ac_mod_bonus}}</td>
-            <td>{{$affix->fight_time_out_mod_bonus}}</td>
-            <td>{{$affix->move_time_out_mod_bonus}}</td>
             <td>{{$affix->can_drop}}</td>
             <td>{{$affix->damage_can_stack}}</td>
             <td>{{$affix->irresistible_damage}}</td>

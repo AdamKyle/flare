@@ -56,9 +56,9 @@ class GenerateAffixes {
      * @param AffixGeneratorDTO $affixGeneratorDTO
      * @return void
      */
-    public function generate(AffixGeneratorDTO $affixGeneratorDTO) {
+    public function generate(AffixGeneratorDTO $affixGeneratorDTO, int $sizeLimit) {
 
-        $this->generateCurves();
+        $this->generateCurves($sizeLimit);
 
         $affixes = [];
 
@@ -76,9 +76,9 @@ class GenerateAffixes {
      *
      * @return void
      */
-    protected function generateCurves(): void {
+    protected function generateCurves(int $sizeLimit): void {
 
-        $levels = $this->exponentialLevelCurve->generateSkillLevels(1, 401);
+        $levels = $this->exponentialLevelCurve->generateSkillLevels(1, 401, $sizeLimit);
 
         $this->affixCurveDTO->setLevelRequirements($levels);
 

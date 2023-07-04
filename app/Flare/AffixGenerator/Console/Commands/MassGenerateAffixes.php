@@ -15,7 +15,7 @@ class MassGenerateAffixes extends Command
      *
      * @var string
      */
-    protected $signature = 'generate:affixes';
+    protected $signature = 'generate:affixes {amount=25}';
 
     /**
      * The console command description.
@@ -55,7 +55,9 @@ class MassGenerateAffixes extends Command
 
         $affixGeneratorDTO->setAttributes($attributes);
 
-        $generateAffixes->generate($affixGeneratorDTO);
+        $sizeLimit = intVal($this->argument('amount'));
+
+        $generateAffixes->generate($affixGeneratorDTO, $sizeLimit);
         
     }
 

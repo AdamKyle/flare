@@ -62,30 +62,6 @@ export default class ItemAffixDetails extends React.Component<any, any> {
                                 <dt>Base Healing Modifier</dt>
                                 <dd>{(this.props.affix.base_healing_mod * 100).toFixed(2)}%</dd>
                             </dl>
-
-                            <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                            <h4 className='text-sky-600 dark:text-sky-500'>Class Bonus</h4>
-                            <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                            <dl>
-                                <dt>Class Bonus</dt>
-                                <dd>{this.props.affix.class_bonus !== null ? (this.props.affix.class_bonus * 100).toFixed(2) + '%' : 'N/A'}</dd>
-                            </dl>
-
-                            <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                            <h4 className='text-sky-600 dark:text-sky-500'>Misc Skill Modifiers</h4>
-                            <div className='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                            <dl>
-                                <dt>Base Attack Modifier</dt>
-                                <dd>{(this.props.affix.base_damage_mod_bonus * 100).toFixed(2)}%</dd>
-                                <dt>Base AC Modifier</dt>
-                                <dd>{(this.props.affix.base_ac_mod_bonus * 100).toFixed(2)}%</dd>
-                                <dt>Base Healing Modifier</dt>
-                                <dd>{(this.props.affix.base_healing_mod_bonus * 100).toFixed(2)}%</dd>
-                                <dt>Fight Timeout Modifier</dt>
-                                <dd>{(this.props.affix.fight_time_out_mod_bonus * 100).toFixed(2)}%</dd>
-                                <dt>Move Timeout Modifier</dt>
-                                <dd>{(this.props.affix.move_time_out_mod_bonus * 100).toFixed(2)}%</dd>
-                            </dl>
                         </div>
                     </div>
 

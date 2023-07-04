@@ -34,6 +34,8 @@ class AffixBuilder {
 
         if (!is_null($affixSkillName)) {
             $affix['skill_name'] = $affixSkillName;
+            $affix['skill_bonus'] = $affixCurveDTO->getValueForIndex(AffixCurveDTO::FLOAT_CURVE, $index);
+            $affix['skill_training_bonus'] = $affixCurveDTO->getValueForIndex(AffixCurveDTO::FLOAT_CURVE, $index);
         }
 
         $affix['cost']         = $affixCurveDTO->getValueForIndex(AffixCurveDTO::COST_CURVE, $index);

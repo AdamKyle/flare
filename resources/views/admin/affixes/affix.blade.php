@@ -53,46 +53,20 @@
                         <dt>Base Healing Modifier:</dt>
                         <dd>{{$itemAffix->base_healing_mod * 100}}%</dd>
                     </dl>
-                    <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                    <h3 class="text-sky-600 dark:text-sky-500">Class Modifier</h3>
-                    <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                    <dl>
-                        <dt>Class Bonus Mod:</dt>
-                        <dd>{{$itemAffix->class_bonus * 100}}%</dd>
-                    </dl>
                 </div>
             </div>
             <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-            <div class='grid md:grid-cols-2 gap-2'>
-                <div>
-                    <h3 class="text-sky-600 dark:text-sky-500">Skill Modifiers</h3>
-                    <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                    <dl>
-                        <dt>Skill Name:</dt>
-                        <dd>{{is_null($itemAffix->skill_name) ? 'N/A' : $itemAffix->skill_name}}</dd>
-                        <dt>Skill XP Bonus (When Training):</dt>
-                        <dd>{{is_null($itemAffix->skill_name) ? 0 : $itemAffix->skill_training_bonus * 100}}%</dd>
-                        <dt>Skill Bonus (When using)</dt>
-                        <dd>{{is_null($itemAffix->skill_bonus) ? 0 : $itemAffix->skill_bonus * 100}}%</dd>
-                    </dl>
-                </div>
-                <div class='block md:hidden border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                <div>
-                    <h3 class="text-sky-600 dark:text-sky-500">Other Skill Modifiers</h3>
-                    <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                    <dl>
-                        <dt>Damage Modifier:</dt>
-                        <dd>{{$itemAffix->base_damage_mod_bonus * 100}}%</dd>
-                        <dt>AC Modifier:</dt>
-                        <dd>{{$itemAffix->base_ac_mod_bonus * 100}}%</dd>
-                        <dt>Healing Modifier:</dt>
-                        <dd>{{$itemAffix->base_healing_mod_bonus * 100}}%</dd>
-                        <dt>Fight Timeout Modifier:</dt>
-                        <dd>{{$itemAffix->fight_time_out_mod_bonus * 100}}%</dd>
-                        <dt>Move Timeout Modifier:</dt>
-                        <dd>{{$itemAffix->move_time_out_mod_bonus * 100}}%</dd>
-                    </dl>
-                </div>
+            <div>
+                <h3 class="text-sky-600 dark:text-sky-500">Skill Modifiers</h3>
+                <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                <dl>
+                    <dt>Skill Name:</dt>
+                    <dd>{{is_null($itemAffix->skill_name) ? 'N/A' : $itemAffix->skill_name}}</dd>
+                    <dt>Skill XP Bonus (When Training):</dt>
+                    <dd>{{is_null($itemAffix->skill_name) ? 0 : $itemAffix->skill_training_bonus * 100}}%</dd>
+                    <dt>Skill Bonus (When using)</dt>
+                    <dd>{{is_null($itemAffix->skill_bonus) ? 0 : $itemAffix->skill_bonus * 100}}%</dd>
+                </dl>
             </div>
         </x-core.cards.card-with-title>
         <x-core.cards.card-with-title
