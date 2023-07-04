@@ -85,7 +85,6 @@ class AffixAttributeBuilder {
 
         $attributes = $this->mergeDetails($attributes, $this->setDamageDetails());
 
-        $attributes = $this->mergeDetails($attributes, $this->setClassBonus());
         $attributes = $this->mergeDetails($attributes, $this->setReductions());
 
         if (!$ignoreSkills) {
@@ -94,10 +93,10 @@ class AffixAttributeBuilder {
             }
 
             if ($this->canHaveSkillBonuses()) {
-                $attributes = $this->mergeDetails($attributes, $this->setSkillBonuses());
+                // $attributes = $this->mergeDetails($attributes, $this->setSkillBonuses());
             }
         } else {
-            $attributes = $this->mergeDetails($attributes, $this->setSkillBonuses());
+            // $attributes = $this->mergeDetails($attributes, $this->setSkillBonuses());
         }
 
         if ($this->canHaveDevouringLight()) {
@@ -196,12 +195,6 @@ class AffixAttributeBuilder {
         ];
     }
 
-    public function setClassBonus(): array {
-        return [
-            'class_bonus' => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]) / 10
-        ];
-    }
-
     public function setReductions(): array {
         return [
             'skill_reduction'      => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]),
@@ -223,12 +216,7 @@ class AffixAttributeBuilder {
         ];
 
         return [
-            'affects_skill_type'       => $allowedTypes[rand(0, count($allowedTypes) - 1)],
-            'base_damage_mod_bonus'    => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]),
-            'base_healing_mod_bonus'   => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]),
-            'base_ac_mod_bonus'        => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]),
-            'fight_time_out_mod_bonus' => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]),
-            'move_time_out_mod_bonus'  => $this->getPercentage($this->percentageRange[0], $this->percentageRange[1]),
+            'affects_skill_type' => $allowedTypes[rand(0, count($allowedTypes) - 1)],
         ];
     }
 

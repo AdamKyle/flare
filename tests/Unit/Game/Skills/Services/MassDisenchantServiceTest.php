@@ -256,7 +256,7 @@ class MassDisenchantServiceTest extends TestCase {
         $this->assertGreaterThan(0, $massDisenchantService->getTotalGoldDust());
     }
 
-    public function testAttemptGoldRush() {
+    public function testAttemptGoldDustRush() {
         $character = $this->character->inventoryManagement()->giveItem(
             $this->createItem([
                 'name'   => 'sample',

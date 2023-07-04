@@ -26,7 +26,6 @@ class ReRollEnchantmentService {
     private $functionMap = [
         'base'       => [
             'setCoreModifiers',
-            'setClassBonus',
         ],
         'stats'      => [
             'increaseStats',
@@ -34,7 +33,7 @@ class ReRollEnchantmentService {
         ],
         'skills'     => [
             'setSkillDetails',
-            'setSkillBonuses',
+            // 'setSkillBonuses',
         ],
         'damage'     => [
             'setDamageDetails',

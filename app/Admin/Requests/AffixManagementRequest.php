@@ -62,12 +62,6 @@ class AffixManagementRequest extends FormRequest
             'skill_name'               => 'nullable',
             'skill_bonus'              => 'nullable',
             'skill_training_bonus'     => 'nullable',
-            'base_damage_mod_bonus'    => 'nullable',
-            'base_healing_mod_bonus'   => 'nullable',
-            'base_ac_mod_bonus'        => 'nullable',
-            'fight_time_out_mod_bonus' => 'nullable',
-            'move_time_out_mod_bonus'  => 'nullable',
-            'class_bonus'              => 'nullable',
             'skill_reduction'          => 'nullable',
             'resistance_reduction'     => 'nullable',
         ];
