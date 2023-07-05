@@ -27,7 +27,6 @@ class GameSkill extends Model {
         'base_ac_mod_bonus_per_level',
         'fight_time_out_mod_bonus_per_level',
         'move_time_out_mod_bonus_per_level',
-        'can_monsters_have_skill',
         'unit_time_reduction',
         'building_time_reduction',
         'unit_movement_time_reduction',
@@ -35,7 +34,8 @@ class GameSkill extends Model {
         'can_train',
         'skill_bonus_per_level',
         'game_class_id',
-        'is_locked'
+        'is_locked',
+        'class_bonus',
     ];
 
     /**
@@ -53,7 +53,7 @@ class GameSkill extends Model {
         'unit_time_reduction'                => 'float',
         'building_time_reduction'            => 'float',
         'unit_movement_time_reduction'       => 'float',
-        'can_monsters_have_skill'            => 'boolean',
+        'class_bonus'                        => 'float',
         'can_train'                          => 'boolean',
         'is_locked'                          => 'integer',
         'type'                               => 'integer',

@@ -67,7 +67,13 @@
             <dd>{{($fightTimeOutMod = $skill->fight_time_out_mod_bonus_per_level * $skill->max_level) * 100}}%</dd>
             <dt>Move Timeout Mod At Max Level:</dt>
             <dd>{{($skill->move_time_out_mod_bonus_per_level * $skill->max_level) * 100}}%</dd>
-            <dt>Skill Bonus Bonus At Max Level:</dt>
+            <dt>Class Bonus At Max Level:</dt>
+            @if (!is_null($skill->class_bonus))
+                <dd>{{($skill->class_bonus * $skill->max_level) * 100}}%</dd>
+            @else
+                <dd>0%</dd>
+            @endif
+            <dt>Skill Bonus At Max Level:</dt>
             @if ($skill->can_train)
                 <dd>{{($skill->skill_bonus_per_level * $skill->max_level) * 100}}%</dd>
             @else

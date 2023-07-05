@@ -23,8 +23,8 @@ class SkillsSheet implements ToCollection {
                     $skill['is_locked'] = false;
                 }
 
-                if (is_null($skill['can_monsters_have_skill'])) {
-                    $skill['can_monsters_have_skill'] = false;
+                if (is_null($skill['class_bonus'])) {
+                    $skill['class_bonus'] = null;
                 }
 
                 if (!is_null($skill['game_class_id'])) {

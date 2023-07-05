@@ -27,7 +27,6 @@ class GameSkillsSeeder extends Seeder
                 'can_train' => true,
                 'max_level' => 100,
                 'skill_bonus_per_level' => 0.01,
-                'can_monsters_have_skill' => true,
                 'type' => SkillTypeValue::TRAINING,
             ],
             [
@@ -41,7 +40,6 @@ class GameSkillsSeeder extends Seeder
                 'can_train' => true,
                 'max_level' => 100,
                 'skill_bonus_per_level' => 0.01,
-                'can_monsters_have_skill' => true,
                 'type' => SkillTypeValue::TRAINING,
             ],
             [
@@ -55,7 +53,6 @@ class GameSkillsSeeder extends Seeder
                 'can_train' => true,
                 'max_level' => 100,
                 'skill_bonus_per_level' => 0.01,
-                'can_monsters_have_skill' => false,
                 'type' => SkillTypeValue::TRAINING,
             ],
             [
@@ -69,7 +66,6 @@ class GameSkillsSeeder extends Seeder
                 'can_train' => false,
                 'max_level' => 400,
                 'skill_bonus_per_level' => 0.0025,
-                'can_monsters_have_skill' => false,
                 'type' => SkillTypeValue::CRAFTING,
             ],
             [
@@ -83,7 +79,6 @@ class GameSkillsSeeder extends Seeder
                 'can_train' => false,
                 'max_level' => 400,
                 'skill_bonus_per_level' => 0.0025,
-                'can_monsters_have_skill' => false,
                 'type' => SkillTypeValue::CRAFTING,
             ],
             [
@@ -97,7 +92,6 @@ class GameSkillsSeeder extends Seeder
                 'can_train' => false,
                 'max_level' => 400,
                 'skill_bonus_per_level' => 0.0025,
-                'can_monsters_have_skill' => false,
                 'type' => SkillTypeValue::CRAFTING,
             ],
             [
@@ -111,21 +105,6 @@ class GameSkillsSeeder extends Seeder
                 'can_train' => false,
                 'max_level' => 400,
                 'skill_bonus_per_level' => 0.0025,
-                'can_monsters_have_skill' => false,
-                'type' => SkillTypeValue::CRAFTING,
-            ],
-            [
-                'name' => 'Artifact Crafting',
-                'description' => 'A skill used in crafting artifact.',
-                'base_damage_mod_bonus_per_level' => 0.0,
-                'base_healing_mod_bonus_per_level' => 0.0,
-                'base_ac_mod_bonus_per_level' => 0.0,
-                'fight_time_out_mod_bonus_per_level' => 0.0,
-                'move_time_out_mod_bonus_per_level' => 0.0,
-                'can_train' => false,
-                'max_level' => 400,
-                'skill_bonus_per_level' => 0.0025,
-                'can_monsters_have_skill' => false,
                 'type' => SkillTypeValue::CRAFTING,
             ],
             [
@@ -139,7 +118,6 @@ class GameSkillsSeeder extends Seeder
                 'can_train' => false,
                 'max_level' => 400,
                 'skill_bonus_per_level' => 0.0025,
-                'can_monsters_have_skill' => false,
                 'type' => SkillTypeValue::ENCHANTING,
             ],
         ]);
