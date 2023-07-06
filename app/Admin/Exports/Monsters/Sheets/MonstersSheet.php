@@ -26,6 +26,7 @@ class MonstersSheet implements FromView, WithTitle, ShouldAutoSize {
         switch($this->type) {
             case 'celestial':
                 $monsters = Monster::orderBy('game_map_id')
+                                   ->orderBy('gold_cost')
                                    ->where('is_celestial_entity', true)
                                    ->where('is_raid_monster', false)
                                    ->where('is_raid_boss', false)

@@ -31,7 +31,9 @@ class ItemsSheet implements ToCollection {
 
                 $itemData = $this->returnCleanItem($item);
 
-                $itemData['unlocks_class_id'] = $gameClass->id;
+                if (!is_null($gameClass)) {
+                    $itemData['unlocks_class_id'] = $gameClass->id;
+                }
 
                 $item = Item::where('name', $itemData['name'])->first();
 
