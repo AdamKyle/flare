@@ -5,7 +5,7 @@ namespace App\Game\Shop\Services;
 use App\Flare\Models\Character;
 use App\Flare\Models\GemBagSlot;
 use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Core\Services\CharacterGemBagService;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Gems\Values\GemTierValue;
@@ -51,7 +51,7 @@ class GemShopService {
             'copper_coins' => $newCopperCoins,
         ]);
 
-        event(new UpdateTopBarEvent($character->refresh()));
+        event(new UpdateCharacterCurrenciesEvent($character->refresh()));
 
         $gemBagSlot->delete();
 
@@ -99,7 +99,7 @@ class GemShopService {
             'copper_coins' => $newCopperCoins,
         ]);
 
-        event(new UpdateTopBarEvent($character->refresh()));
+        event(new UpdateCharacterCurrenciesEvent($character->refresh()));
 
         $message = 'You sold the gems for: ' . number_format($cost['gold_dust']) . ' Gold Dust, ' .
             number_format($cost['shards']) . ' Shards and ' . number_format($cost['copper_coins']) . ' Copper Coins.';

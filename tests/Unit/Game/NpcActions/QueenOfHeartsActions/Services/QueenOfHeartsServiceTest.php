@@ -7,6 +7,7 @@ use App\Game\Messages\Events\GlobalMessageEvent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\NpcActions\QueenOfHeartsActions\Events\UpdateQueenOfHeartsPanel;
@@ -115,7 +116,7 @@ class QueenOfHeartsServiceTest extends TestCase
 
         $result = $this->queenOfHeartsService->purchaseUnique($character, 'basic');
 
-        Event::assertDispatched(UpdateTopBarEvent::class);
+        Event::assertDispatched(UpdateCharacterCurrenciesEvent::class);
         Event::assertDispatched(UpdateQueenOfHeartsPanel::class);
         Event::assertDispatched(ServerMessageEvent::class);
 

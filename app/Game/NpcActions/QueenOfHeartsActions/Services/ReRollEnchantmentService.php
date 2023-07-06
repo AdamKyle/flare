@@ -8,6 +8,7 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
 use App\Flare\Values\RandomAffixDetails;
+use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -234,7 +235,7 @@ class ReRollEnchantmentService {
 
         $character = $character->refresh();
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterCurrenciesEvent($character));
 
         event(new ServerMessageEvent($character->user, 'Ooooh hoo hoo hoo! I have done as thou have requested, my lovely, beautiful, gorgeous child! Oh look at how powerful you are!'));
 

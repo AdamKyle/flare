@@ -49,7 +49,11 @@ class MassDisenchantServiceTest extends TestCase {
 
         $this->character = (new CharacterFactory())->createBaseCharacter()->assignSkill(
             $this->disenchantingSkill
-        )->assignSkill($this->enchantingSkill)->givePlayerLocation();
+        )->assignSkill($this->enchantingSkill)->assignSkill(
+            $this->createGameSkill([
+                'class_bonus' => 0.01
+            ]), 5
+        )->givePlayerLocation();
 
         $this->massDisenchantService = resolve(MassDisenchantService::class);
 

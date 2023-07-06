@@ -65,6 +65,16 @@ Broadcast::channel('update-boons-{userId}', function ($user, $userId) {
     return $user->id === (int) $userId;
 });
 
+// When the player levels up the top bar should reflect that.
+Broadcast::channel('update-top-bar-{userId}', function ($user, $userId) {
+	return $user->id === (int) $userId;
+});
+
+// When the player levels up the top bar should reflect that.
+Broadcast::channel('update-currencies-{userId}', function ($user, $userId) {
+	return $user->id === (int) $userId;
+});
+
 // When a characters Inventory updates
 Broadcast::channel('update-inventory-{userId}', function ($user, $userId) {
     return $user->id === (int) $userId;

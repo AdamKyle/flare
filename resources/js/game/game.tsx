@@ -37,8 +37,6 @@ export default class Game extends React.Component<GameProps, GameState> {
 
     private characterAttackData: any;
 
-    private forceNameChange: any;
-
     private unlockAlchemySkill: any;
 
     private updateCraftingTypes: any;
@@ -52,6 +50,8 @@ export default class Game extends React.Component<GameProps, GameState> {
     private globalTimeOut: any;
 
     private updateCharacterBasePosition: any;
+    
+    private characterCurrencies: any;
 
     constructor(props: GameProps) {
         super(props)
@@ -92,6 +92,9 @@ export default class Game extends React.Component<GameProps, GameState> {
         this.characterTopBar = Echo.private('update-top-bar-' + this.props.userId);
 
         // @ts-ignore
+        this.characterCurrencies = Echo.private('update-currencies-' + this.props.userId);
+
+        // @ts-ignore
         this.characterAttacks = Echo.private('update-character-attacks-' + this.props.userId);
 
         // @ts-ignore
@@ -102,9 +105,6 @@ export default class Game extends React.Component<GameProps, GameState> {
 
         // @ts-ignore
         this.characterAttackData = Echo.private('update-character-attack-' + this.props.userId);
-
-        // @ts-ignore
-        this.forceNameChange = Echo.private('force-name-change-' + this.props.userId);
 
         // @ts-ignore
         this.unlockAlchemySkill = Echo.private('unlock-skill-' + this.props.userId);
@@ -156,6 +156,13 @@ export default class Game extends React.Component<GameProps, GameState> {
                 }
             });
         });
+
+        // @ts-ignore
+        this.characterCurrencies.listen('Game.Core.Events.UpdateCharacterCurrenciesBroadcastevent', (event: any) => {
+            this.setState({
+                character: {...this.state.character, ...event.currencies}
+            });
+        })
 
         // @ts-ignore
         this.characterAttacks.listen('Game.Core.Events.UpdateCharacterAttacks', (event: any) => {

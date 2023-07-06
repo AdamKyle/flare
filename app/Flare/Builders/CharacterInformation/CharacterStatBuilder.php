@@ -187,20 +187,7 @@ class CharacterStatBuilder {
      * @return float
      */
     public function classBonus(): float {
-        if (empty($this->equippedItems)) {
-            return 0.05;
-        }
-
-        $suffixClassBonus = $this->equippedItems->sum('item.itemSuffix.class_bonus');
-        $prefixClassBonus = $this->equippedItems->sum('item.itemPrefix.class_bonus');
-
-        $total = $suffixClassBonus + $prefixClassBonus + 0.5;
-
-        if ($total > 1) {
-            return 1.0;
-        }
-
-        return $total;
+        return $this->character->skills->whereNotNull('class_bonus')->first()->class_bonus;
     }
 
     /**

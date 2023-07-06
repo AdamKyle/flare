@@ -2,7 +2,7 @@
 
 namespace App\Flare\Builders\Character;
 
-use Cache;
+use Illuminate\Support\Facades\Cache;
 use App\Flare\Models\Character;
 
 class CharacterPvpCacheData {

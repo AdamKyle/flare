@@ -4,6 +4,7 @@ namespace App\Game\Kingdoms\Handlers;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
+use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Kingdoms\Events\AddKingdomToMap;
 use App\Game\Kingdoms\Events\UpdateGlobalMap;
@@ -198,7 +199,7 @@ class TooMuchPopulationHandler {
                 'gold' => 0,
             ]);
 
-            event(new UpdateTopBarEvent($character->refresh()));
+            event(new UpdateCharacterCurrenciesEvent($character->refresh()));
 
             event(new ServerMessageEvent($character->user,
                 'The Old Man is not pleased (You do not have enough gold to pay him in full). ' .
@@ -214,7 +215,7 @@ class TooMuchPopulationHandler {
             'gold' => $newGold < 0 ? 0 : $newGold,
         ]);
 
-        event(new UpdateTopBarEvent($character->refresh()));
+        event(new UpdateCharacterCurrenciesEvent($character->refresh()));
 
         event(new ServerMessageEvent($character->user,
             'The Old Man is pleased (you payed him the gold). ' .

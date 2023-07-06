@@ -17,6 +17,7 @@ use App\Flare\Models\Character;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Game\Core\Comparison\ItemComparison;
+use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Core\Exceptions\EquipItemException;
 
 
@@ -137,7 +138,7 @@ class EquipItemService {
 
         $character = $this->character->refresh();
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterCurrenciesEvent($character));
 
         return $characterSlot->item;
     }

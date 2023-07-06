@@ -6,6 +6,7 @@ use App\Flare\Models\Character;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\MercenaryBonus;
 use App\Game\Core\Traits\ResponseBuilder;
@@ -13,7 +14,6 @@ use App\Game\Gambler\Events\GamblerSlotTimeOut;
 use App\Game\Gambler\Handlers\SpinHandler;
 use App\Game\Gambler\Jobs\SlotTimeOut;
 use App\Game\Gambler\Values\CurrencyValue;
-use App\Game\Mercenaries\Values\MercenaryValue;
 use Exception;
 
 class GamblerService {
@@ -45,7 +45,7 @@ class GamblerService {
 
         $character = $character->refresh();
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterCurrenciesEvent($character));
 
         $this->spinTimeout($character);
 
@@ -151,7 +151,7 @@ class GamblerService {
         $character->{$attribute} = $newAmount;
         $character->save();
 
-        event(new UpdateTopBarEvent($character->refresh()));
+        event(new UpdateCharacterCurrenciesEvent($character->refresh()));
 
         return $this->successResult([
             'message' => 'You got a ' . number_format($amountToWin) . ' ' . ucfirst(str_replace('_', ' ', $attribute)) . '!',

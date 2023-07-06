@@ -7,11 +7,12 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Game\Shop\Services\ShopService;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateItem;
 
 class ShopServiceTest extends TestCase {
 
-    use RefreshDatabase, CreateItem;
+    use RefreshDatabase, CreateItem, CreateGameSkill;
 
     private ?CharacterFactory $character;
 
@@ -20,7 +21,11 @@ class ShopServiceTest extends TestCase {
     public function setUp(): void {
         parent::setUp();
 
-        $this->character   = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $this->character   = (new CharacterFactory())->createBaseCharacter()->assignSkill(
+            $this->createGameSkill([
+                'class_bonus' => 0.01
+            ]), 5
+        )->givePlayerLocation();
         $this->shopService = resolve(ShopService::class);
     }
 

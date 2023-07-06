@@ -26,7 +26,11 @@ class CharacterStatBuilderTest extends TestCase {
     public function setUp(): void {
         parent::setUp();
 
-        $this->character            = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $this->character            = (new CharacterFactory())->createBaseCharacter()->assignSkill(
+            $this->createGameSkill([
+                'class_bonus' => 0.01
+            ]), 5
+        )->givePlayerLocation();
         $this->characterStatBuilder = resolve(CharacterStatBuilder::class);
     }
 

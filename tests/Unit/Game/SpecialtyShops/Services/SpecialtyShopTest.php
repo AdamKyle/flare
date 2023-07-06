@@ -22,7 +22,8 @@ class SpecialtyShopTest extends TestCase {
     public function setUp(): void {
         parent::setUp();
 
-        $this->character     = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $this->character     = (new CharacterFactory())->createBaseCharacter()
+                                                       ->givePlayerLocation();
         $this->specialtyShop = resolve(SpecialtyShop::class);
     }
 

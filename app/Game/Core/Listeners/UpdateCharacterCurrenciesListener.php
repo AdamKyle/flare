@@ -2,14 +2,16 @@
 
 namespace App\Game\Core\Listeners;
 
+use App\Flare\Transformers\CharacterCurrenciesTransformer;
 use League\Fractal\Resource\Item;
 use League\Fractal\Manager;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Transformers\CharacterTopBarTransformer;
+use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Events\UpdateTopBarBroadcastEvent;
 
-class UpdateTopBarListener {
+class UpdateCharacterCurrenciesListener {
 
     /**
      * @var Manager $manager
@@ -17,18 +19,18 @@ class UpdateTopBarListener {
     private Manager $manager;
 
     /**
-     * @var CharacterTopBarTransformer $characterTopBarTransformer
+     * @var CharacterCurrenciesTransformer $characterCurrenciesTransformer
      */
-    private CharacterTopBarTransformer $characterTopBarTransformer;
+    private CharacterCurrenciesTransformer $characterCurrenciesTransformer;
 
     /**
      * @param Manager $manager
      * @param CharacterTopBarTransformer $characterTopBarTransformer
      * @param CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer
      */
-    public function __construct(Manager $manager, CharacterTopBarTransformer $characterTopBarTransformer) {
+    public function __construct(Manager $manager, CharacterCurrenciesTransformer $characterCurrenciesTransformer) {
         $this->manager                           = $manager;
-        $this->characterTopBarTransformer        = $characterTopBarTransformer;
+        $this->characterCurrenciesTransformer    = $characterCurrenciesTransformer;
     }
 
     /**
@@ -37,8 +39,8 @@ class UpdateTopBarListener {
      * @param UpdateTopBarEvent $event
      * @return void
      */
-    public function handle(UpdateTopBarEvent $event): void {
-        $character = new Item($event->character, $this->characterTopBarTransformer);
+    public function handle(UpdateCharacterCurrenciesEvent $event): void {
+        $character = new Item($event->character, $this->characterCurrenciesTransformer);
         $character = $this->manager->createData($character)->toArray();
 
         broadcast(new UpdateTopBarBroadcastEvent($character, $event->character->user));

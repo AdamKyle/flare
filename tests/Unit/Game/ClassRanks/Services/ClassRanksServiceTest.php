@@ -11,10 +11,11 @@ use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateClass;
 use Tests\Traits\CreateGameClassSpecial;
+use Tests\Traits\CreateGameSkill;
 
 class ClassRanksServiceTest extends TestCase {
 
-    use RefreshDatabase, CreateGameClassSpecial, CreateClass;
+    use RefreshDatabase, CreateGameClassSpecial, CreateClass, CreateGameSkill;
 
     private ?CharacterFactory $character;
 
@@ -23,7 +24,11 @@ class ClassRanksServiceTest extends TestCase {
     public function setUp(): void {
         parent::setUp();
 
-        $this->character        = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $this->character        = (new CharacterFactory())->createBaseCharacter()->assignSkill(
+            $this->createGameSkill([
+                'class_bonus' => 0.01
+            ]), 5
+        )->givePlayerLocation();
         $this->classRankService = resolve(ClassRankService::class);
     }
 

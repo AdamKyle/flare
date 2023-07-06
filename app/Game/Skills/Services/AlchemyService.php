@@ -8,7 +8,7 @@ use App\Flare\Models\Item;
 use App\Flare\Models\Skill;
 use App\Flare\Events\UpdateSkillEvent;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
-use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Skills\Services\Traits\UpdateCharacterCurrency;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -103,7 +103,7 @@ class AlchemyService {
 
             $this->pickUpItem($character, $item, $skill, true);
 
-            event(new UpdateTopBarEvent($character->refresh()));
+            event(new UpdateCharacterCurrenciesEvent($character->refresh()));
 
             return;
         }
@@ -115,7 +115,7 @@ class AlchemyService {
             $this->pickUpItem($character, $item, $skill, true);
 
 
-            event(new UpdateTopBarEvent($character->refresh()));
+            event(new UpdateCharacterCurrenciesEvent($character->refresh()));
 
             return;
         }
@@ -126,14 +126,14 @@ class AlchemyService {
         if ($dcCheck < $characterRoll) {
             $this->pickUpItem($character, $item, $skill);
 
-            event(new UpdateTopBarEvent($character->refresh()));
+            event(new UpdateCharacterCurrenciesEvent($character->refresh()));
 
             return;
         }
 
         ServerMessageHandler::handleMessage($character->user, 'failed_to_transmute');
 
-        event(new UpdateTopBarEvent($character->refresh()));
+        event(new UpdateCharacterCurrenciesEvent($character->refresh()));
     }
 
 

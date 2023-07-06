@@ -2,8 +2,8 @@
 
 namespace App\Game\Shop\Listeners;
 
-use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Shop\Events\SellItemEvent;
 use App\Game\Skills\Services\EnchantingService;
 use Facades\App\Flare\Calculators\SellItemCalculator;
@@ -33,7 +33,7 @@ class SellItemListener
 
         $event->inventorySlot->delete();
 
-        event(new UpdateTopBarEvent($event->character->refresh()));
+        event(new UpdateCharacterCurrenciesEvent($event->character->refresh()));
     }
 
 

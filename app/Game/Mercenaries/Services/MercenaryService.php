@@ -5,6 +5,7 @@ namespace App\Game\Mercenaries\Services;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterMercenary;
 use App\Flare\Values\ItemEffectsValue;
+use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Mercenaries\Requests\PurchaseMercenaryRequest;
@@ -83,7 +84,7 @@ class MercenaryService {
 
         $character = $character->refresh();
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterCurrenciesEvent($character));
 
         CharacterMercenary::create([
             'character_id'         => $character->id,
@@ -142,7 +143,7 @@ class MercenaryService {
 
         $character = $character->refresh();
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterCurrenciesEvent($character));
 
         event(new ServerMessageEvent($character->user, 'Reincarnated ' . $characterMercenary->type()->getName() . ' back to level 1! Leveling back to level 100 will stack the bonuses! Get even more currencies!'));
 
@@ -185,7 +186,7 @@ class MercenaryService {
 
         $character = $character->refresh();
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterCurrenciesEvent($character));
 
         event(new ServerMessageEvent($character->user, 'Reincarnated ' . $characterMercenary->type()->getName() . ' back to level 1! Leveling back to level 100 will stack the bonuses! Get even more currencies!'));
 

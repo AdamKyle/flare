@@ -8,6 +8,7 @@ use App\Flare\Values\WeaponTypes;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
+use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use Exception;
 
 trait UpdateCharacterCurrency {
@@ -44,7 +45,7 @@ trait UpdateCharacterCurrency {
             'gold' => $character->gold - $cost,
         ]);
 
-        event(new UpdateTopBarEvent($character->refresh()));
+        event(new UpdateCharacterCurrenciesEvent($character->refresh()));
     }
 
     /**
@@ -70,7 +71,7 @@ trait UpdateCharacterCurrency {
             'gold_dust'     => $character->gold_dust - $goldDustCost,
         ]);
 
-        event(new UpdateTopBarEvent($character->refresh()));
+        event(new UpdateCharacterCurrenciesEvent($character->refresh()));
     }
 
     /**
@@ -99,6 +100,6 @@ trait UpdateCharacterCurrency {
             'shards'     => ($character->shards - $shardsCost),
         ]);
 
-        event(new UpdateTopBarEvent($character->refresh()));
+        event(new UpdateCharacterCurrenciesEvent($character->refresh()));
     }
 }

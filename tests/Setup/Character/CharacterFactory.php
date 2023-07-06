@@ -273,15 +273,6 @@ class CharacterFactory {
     }
 
     /**
-     * Fetch the adventure management class.
-     *
-     * @return AdventureManagement
-     */
-    public function adventureManagement(): AdventureManagement {
-        return new AdventureManagement($this->character, $this);
-    }
-
-    /**
      * Fetch the kingdom management class.
      *
      * @return KingdomManagement.

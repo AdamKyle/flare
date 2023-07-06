@@ -9,7 +9,7 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Values\ItemHolyValue;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
-use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Database\Eloquent\Collection as DBCollection;
@@ -61,7 +61,7 @@ class HolyItemService {
 
         event(new ServerMessageEvent($character->user, 'Applied Holy Oil to: ' . $slot->item->affix_name, $slot->id));
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterCurrenciesEvent($character));
 
         if (($slot->item->holy_stacks - $slot->item->holy_stacks_applied) === 0) {
             event(new ServerMessageEvent($character->user, 'You have applied the max stacks allowed. Item has been removed from list of items you can use at the work bench.'));

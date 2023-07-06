@@ -3,6 +3,8 @@
 namespace App\Game\NpcActions\QueenOfHeartsActions\Services;
 
 use App\Flare\Models\Character;
+use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
+use App\Game\Core\Events\UpdateCharacterEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\GlobalMessageEvent;
@@ -67,7 +69,7 @@ class QueenOfHeartsService {
 
         $character = $character->refresh();
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterCurrenciesEvent($character));
 
         event(new UpdateQueenOfHeartsPanel($character->user, $this->randomEnchantmentService->fetchDataForApi($character)));
 

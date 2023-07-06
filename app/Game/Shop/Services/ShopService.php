@@ -11,7 +11,6 @@ use App\Game\Core\Services\EquipItemService;
 use App\Game\Shop\Events\BuyItemEvent;
 use App\Game\Shop\Events\SellItemEvent;
 use Facades\App\Flare\Calculators\SellItemCalculator;
-use Illuminate\Http\Request;
 
 class ShopService {
 

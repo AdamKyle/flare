@@ -69,6 +69,15 @@ class Skill extends Model {
         return $this->baseSkill->name;
     }
 
+    public function getClassBonusAttribute() {
+
+        if (is_null($this->baseSkill->class_bonus)) {
+             return null;
+        }
+
+        return $this->baseSkill->class_bonus * $this->level;
+    }
+
     public function getDescriptionAttribute() {
         return $this->baseSkill->description;
     }

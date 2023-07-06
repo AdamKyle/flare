@@ -93,10 +93,10 @@ class AffixAttributeBuilder {
             }
 
             if ($this->canHaveSkillBonuses()) {
-                // $attributes = $this->mergeDetails($attributes, $this->setSkillBonuses());
+                $attributes = $this->mergeDetails($attributes, $this->setSkillBonuses());
             }
         } else {
-            // $attributes = $this->mergeDetails($attributes, $this->setSkillBonuses());
+            $attributes = $this->mergeDetails($attributes, $this->setSkillBonuses());
         }
 
         if ($this->canHaveDevouringLight()) {

@@ -3,6 +3,7 @@
 namespace Tests\Unit\Game\NpcActions\QueenOfHeartsActions\Services;
 
 use App\Flare\Values\RandomAffixDetails;
+use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -236,7 +237,7 @@ class ReRollEnchantmentServiceTest extends TestCase {
 
         $this->reRollEnchantmentService->moveAffixes($character, $slotUnique, $slotNotUnique, 'all-enchantments');
 
-        Event::assertDispatched(UpdateTopBarEvent::class);
+        Event::assertDispatched(UpdateCharacterCurrenciesEvent::class);
         Event::assertDispatchedTimes(ServerMessageEvent::class, 2);
         Event::assertDispatched(GlobalMessageEvent::class);
     }
@@ -276,7 +277,7 @@ class ReRollEnchantmentServiceTest extends TestCase {
 
         $this->reRollEnchantmentService->moveAffixes($character, $slotUnique, $slotNotUnique, 'all-enchantments');
 
-        Event::assertDispatched(UpdateTopBarEvent::class);
+        Event::assertDispatched(UpdateCharacterCurrenciesEvent::class);
         Event::assertDispatchedTimes(ServerMessageEvent::class, 2);
         Event::assertDispatched(GlobalMessageEvent::class);
     }
@@ -320,7 +321,7 @@ class ReRollEnchantmentServiceTest extends TestCase {
 
         $this->reRollEnchantmentService->moveAffixes($character, $slotUnique, $slotNotUnique, 'prefix');
 
-        Event::assertDispatched(UpdateTopBarEvent::class);
+        Event::assertDispatched(UpdateCharacterCurrenciesEvent::class);
         Event::assertDispatchedTimes(ServerMessageEvent::class, 2);
         Event::assertDispatched(GlobalMessageEvent::class);
     }
@@ -361,7 +362,7 @@ class ReRollEnchantmentServiceTest extends TestCase {
 
         $this->reRollEnchantmentService->moveAffixes($character, $slotUnique, $slotNotUnique, 'prefix');
 
-        Event::assertDispatched(UpdateTopBarEvent::class);
+        Event::assertDispatched(UpdateCharacterCurrenciesEvent::class);
         Event::assertDispatchedTimes(ServerMessageEvent::class, 2);
         Event::assertDispatched(GlobalMessageEvent::class);
 

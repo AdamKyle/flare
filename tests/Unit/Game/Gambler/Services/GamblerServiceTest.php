@@ -10,11 +10,12 @@ use App\Game\Gambler\Handlers\SpinHandler;
 use App\Game\Gambler\Services\GamblerService;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateItem;
 
 class GamblerServiceTest extends TestCase {
 
-    use RefreshDatabase, CreateItem;
+    use RefreshDatabase, CreateItem, CreateGameSkill;
 
     private ?CharacterFactory $character;
 

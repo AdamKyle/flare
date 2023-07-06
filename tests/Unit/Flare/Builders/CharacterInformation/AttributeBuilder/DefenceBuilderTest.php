@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Flare\Builders\CharacterInformation\AttributeBuilder;
 
-use App\Flare\Builders\CharacterInformation\AttributeBuilders\DefenceBuilder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Builders\CharacterInformation\CharacterStatBuilder;
 use Tests\Setup\Character\CharacterFactory;
@@ -25,7 +24,11 @@ class DefenceBuilderTest extends TestCase {
     {
         parent::setUp();
 
-        $this->character            = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $this->character            = (new CharacterFactory())->createBaseCharacter()->assignSkill(
+            $this->createGameSkill([
+                'class_bonus' => 0.01
+            ]), 5
+        )->givePlayerLocation();
         $this->characterStatBuilder = resolve(CharacterStatBuilder::class);
     }
 

@@ -2,12 +2,8 @@
 
 namespace App\Game\Shop\Listeners;
 
-use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Shop\Events\BuyItemEvent;
-use App\Game\Core\Events\CharacterInventoryDetailsUpdate;
-use App\Game\Core\Events\CharacterInventoryUpdateBroadCastEvent;
-use App\Game\Skills\Events\UpdateCharacterEnchantingList;
-use App\Game\Skills\Services\EnchantingService;
 
 class BuyItemListener {
 
@@ -28,6 +24,6 @@ class BuyItemListener {
 
         $character = $event->character->refresh();
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterCurrenciesEvent($character));
     }
 }

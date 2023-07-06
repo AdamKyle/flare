@@ -6,6 +6,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Values\ItemSpecialtyType;
+use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -195,7 +196,7 @@ class SpecialtyShop {
 
         $character = $character->refresh();
 
-        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterCurrenciesEvent($character));
     }
 
     /**

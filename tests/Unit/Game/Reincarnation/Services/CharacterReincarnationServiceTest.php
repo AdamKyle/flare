@@ -9,13 +9,14 @@ use App\Flare\Values\FeatureTypes;
 use App\Game\Reincarnate\Services\CharacterReincarnateService;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateNpc;
 use Tests\Traits\CreateQuest;
 
 class CharacterReincarnationServiceTest extends TestCase {
 
-    use RefreshDatabase, CreateQuest, CreateNpc, CreateItem;
+    use RefreshDatabase, CreateQuest, CreateNpc, CreateItem, CreateGameSkill;
 
     private ?CharacterFactory $character;
 
@@ -24,7 +25,11 @@ class CharacterReincarnationServiceTest extends TestCase {
     public function setUp(): void {
         parent::setUp();
 
-        $this->character            = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $this->character            = (new CharacterFactory())->createBaseCharacter()->assignSkill(
+            $this->createGameSkill([
+                'class_bonus' => 0.01
+            ]), 5
+        )->givePlayerLocation();
         $this->reincarnationService = resolve(CharacterReincarnateService::class);
 
         MaxLevelConfiguration::create([
