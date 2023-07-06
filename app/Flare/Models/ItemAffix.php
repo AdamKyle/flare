@@ -55,7 +55,7 @@ class ItemAffix extends Model {
         'devouring_light',
         'can_drop',
         'randomly_generated',
-        'type',
+        'affix_type',
     ];
 
     /**
@@ -94,6 +94,7 @@ class ItemAffix extends Model {
         'skill_level_required'             => 'integer',
         'skill_level_trivial'              => 'integer',
         'damage'                           => 'integer',
+        'affix_type'                       => 'integer',
         'can_drop'                         => 'boolean',
         'irresistible_damage'              => 'boolean',
         'damage_can_stack'                 => 'boolean',

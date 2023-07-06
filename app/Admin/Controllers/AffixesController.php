@@ -13,6 +13,7 @@ use App\Admin\Exports\Affixes\AffixesExport;
 use App\Admin\Services\ItemAffixService;
 use App\Flare\Models\ItemAffix;
 use App\Admin\Requests\AffixesImport as AffixesImportRequest;
+use App\Flare\Values\ItemAffixType;
 
 class AffixesController extends Controller {
 
@@ -29,7 +30,8 @@ class AffixesController extends Controller {
     public function create() {
 
         return view('admin.affixes.manage', array_merge([
-            'itemAffix' => null,
+            'itemAffix'  => null,
+            'affix_type' => ItemAffixType::$dropDownValues,
         ], $this->itemAffixService->getFormData()));
     }
 
@@ -42,7 +44,8 @@ class AffixesController extends Controller {
 
     public function edit(ItemAffix $affix) {
         return view('admin.affixes.manage', array_merge([
-            'itemAffix' => $affix,
+            'itemAffix'  => $affix,
+            'affix_type' => ItemAffixType::$dropDownValues,
         ], $this->itemAffixService->getFormData()));
     }
 
@@ -69,7 +72,9 @@ class AffixesController extends Controller {
     }
 
     public function exportItems() {
-        return view('admin.affixes.export');
+        return view('admin.affixes.export', [
+            'types' => ItemAffixType::$dropDownValues,
+        ]);
     }
 
     public function importItems() {
@@ -85,13 +90,9 @@ class AffixesController extends Controller {
             return redirect()->back()->with('error', 'No export type selected.');
         }
 
-        $type = $request->export_type;
+        $type     = $request->export_type;
 
-        $fileName = ucFirst($type);
-
-        if (preg_match('/_/', $type)) {
-           $fileName = ucFirst(str_replace('_', ' ', $type));
-        }
+        $fileName = ucFirst(ItemAffixType::$dropDownValues[$type]);
 
         $response = Excel::download(new AffixesExport($type), $fileName . ' (Affixes).xlsx', \Maatwebsite\Excel\Excel::XLSX);
         ob_end_clean();

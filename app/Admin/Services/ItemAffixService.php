@@ -22,10 +22,6 @@ class ItemAffixService {
     }
 
     public function cleanRequestData(array $params): array {
-        if ($params['type'] !== 'quest') {
-            $params['effect'] = null;
-        }
-
         if (!filter_var($params['reduces_enemy_stats'], FILTER_VALIDATE_BOOLEAN)) {
             $params['reduces_enemy_stats'] = false;
             $params['str_reduction']       = 0.00;

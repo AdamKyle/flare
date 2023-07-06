@@ -23,7 +23,6 @@
             <th>focus_reduction</th>
             <th>reduces_enemy_stats</th>
             <th>steal_life_amount</th>
-
             <th>damage</th>
             <th>int_required</th>
             <th>skill_level_required</th>
@@ -41,6 +40,7 @@
             <th>devouring_light</th>
             <th>skill_reduction</th>
             <th>resistance_reduction</th>
+            <th>affix_type</th>
         </tr>
     </thead>
     <tbody>
@@ -85,6 +85,7 @@
             <td>{{$affix->devouring_light}}</td>
             <td>{{$affix->skill_reduction}}</td>
             <td>{{$affix->resistance_reduction}}</td>
+            <td>{{$affix->affix_type}}</td>
         </tr>
     @endforeach
     </tbody>
