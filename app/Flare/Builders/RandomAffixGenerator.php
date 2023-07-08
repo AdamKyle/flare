@@ -4,6 +4,7 @@ namespace App\Flare\Builders;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\ItemAffix;
+use App\Flare\Values\ItemAffixType;
 use App\Flare\Values\RandomAffixDetails;
 
 class RandomAffixGenerator {
@@ -71,6 +72,8 @@ class RandomAffixGenerator {
         if (!is_null($foundMatchingPrefix)) {
             return $foundMatchingPrefix;
         }
+
+        $attributes['affix_type'] = ItemAffixType::RANDOMLY_GENERATED;
 
         return ItemAffix::create($attributes);
     }

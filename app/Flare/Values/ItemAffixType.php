@@ -29,6 +29,7 @@ class ItemAffixType {
     const SPELL_CRAFTING       = 15;
     const ENCHANTMENT_CRAFTING = 16; 
     const ENTRANCING           = 17;
+    const RANDOMLY_GENERATED   = 18;
 
 
     /**
@@ -53,6 +54,7 @@ class ItemAffixType {
         self::SPELL_CRAFTING       => self::SPELL_CRAFTING,
         self::ENCHANTMENT_CRAFTING => self::ENCHANTMENT_CRAFTING,
         self::ENTRANCING           => self::ENTRANCING,
+        self::RANDOMLY_GENERATED   => self::RANDOMLY_GENERATED,
     ];
 
     /**

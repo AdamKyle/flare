@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Flare\Models\ItemAffix;
+use App\Flare\Values\ItemAffixType;
 
 class ItemAffixFactory extends Factory
 {
@@ -41,6 +42,7 @@ class ItemAffixFactory extends Factory
             'skill_level_trivial'      => 10,
             'irresistible_damage'      => false,
             'damage_can_stack'         => false,
+            'affix_type'               => ItemAffixType::ACCURACY,
         ];
     }
 }
