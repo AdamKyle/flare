@@ -82,6 +82,29 @@ class CleanupUnusedItems extends Command
             $bar->advance();
         }
 
+        $this->line('Removing Unused Artifacts ...');
+        $this->newLine();
+
+        $unusedArtifacts = Item::where('type', 'artifact')
+                               ->whereDoesntHave('inventorySlots')
+                               ->whereDoesntHave('inventorySetSlots')
+                               ->pluck('id')->toArray();
+
+        $chunkedSuffixItems = array_chunk($unusedArtifacts, 10);
+
+        $bar = $this->output->createProgressBar(count($chunkedSuffixItems));
+
+        foreach ($chunkedSuffixItems as $chunk) {
+            $items = Item::whereIn('id', $chunk)->get();
+
+            foreach ($items as $item) {
+                $item->itemSkillProgressions()->delete();
+                $item->delete();
+            }
+
+            $bar->advance();
+        }
+
         $this->line('All Done ...');
     }
 }

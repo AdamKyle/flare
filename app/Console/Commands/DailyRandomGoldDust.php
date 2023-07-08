@@ -2,11 +2,9 @@
 
 namespace App\Console\Commands;
 
-use App\Flare\Jobs\DailyGoldDustJob;
 use App\Flare\Models\Character;
 use App\Flare\Services\DailyGoldDustService;
 use Illuminate\Console\Command;
-use Facades\App\Flare\Values\UserOnlineValue;
 use Illuminate\Support\Facades\Cache;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\ConsoleOutput;
