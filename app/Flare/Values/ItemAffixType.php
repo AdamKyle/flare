@@ -28,6 +28,7 @@ class ItemAffixType {
     const RING_CRAFTING        = 14;
     const SPELL_CRAFTING       = 15;
     const ENCHANTMENT_CRAFTING = 16; 
+    const ENTRANCING           = 17;
 
 
     /**
@@ -51,6 +52,7 @@ class ItemAffixType {
         self::RING_CRAFTING        => self::RING_CRAFTING,
         self::SPELL_CRAFTING       => self::SPELL_CRAFTING,
         self::ENCHANTMENT_CRAFTING => self::ENCHANTMENT_CRAFTING,
+        self::ENTRANCING           => self::ENTRANCING,
     ];
 
     /**
@@ -61,9 +63,10 @@ class ItemAffixType {
     public static $dropDownValues = [
         self::STAT_MODIFIERS       => 'Stat Modifiers',
         self::BASE_MODIFIERS       => 'Base Modifiers',
-        self::STAT_REDUCTION       => 'Stat Reduction + Devouring Light',
-        self::SKILL_REDUCTION      => 'skill Reduction',
+        self::STAT_REDUCTION       => 'Stat Reduction',
+        self::SKILL_REDUCTION      => 'Skill/Res Reduction + Devouring Light',
         self::LIFE_STEALING        => 'Life stealing',
+        self::ENTRANCING           => 'Entrancing',
         self::DAMAGE_STACKING      => 'Stacking Damage',
         self::DAMAGE_IRRESISTIBLE  => 'Irresistible Damage',
         self::ACCURACY             => 'Accuracy',

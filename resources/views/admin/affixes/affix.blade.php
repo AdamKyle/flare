@@ -13,14 +13,14 @@
         @endphp
 
         <x-core.cards.card-with-title
-            title="{{$itemAffix->name}}"
+            title="{{$itemAffix->name}} ({{$itemAffix->type}})"
             buttons="true"
             backUrl="{{$backUrl}}"
             editUrl="{{route('affixes.edit', ['affix' => $itemAffix->id])}}"
         >
             <p class="mt-4 mb-4">{{$itemAffix->description}}</p>
             <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-            <div class='grid md:grid-cols-2 gap-2'>
+            <div class='grid md:grid-cols-3 gap-2'>
                 <div>
                     <h3 class="text-sky-600 dark:text-sky-500">Stat Modifiers</h3>
                     <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
@@ -39,6 +39,27 @@
                         <dd>{{$itemAffix->agi_mod * 100}}%</dd>
                         <dt>Focus Modifier:</dt>
                         <dd>{{$itemAffix->focus_mod * 100}}%</dd>
+                    </dl>
+                </div>
+                <div class='block md:hidden border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                <div>
+                    <h3 class="text-sky-600 dark:text-sky-500">Enemy Stat Reduction</h3>
+                    <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                    <dl>
+                        <dt>Str Reduction:</dt>
+                        <dd>{{$itemAffix->str_reduction * 100}}%</dd>
+                        <dt>Dex Reduction:</dt>
+                        <dd>{{$itemAffix->dex_reduction * 100}}%</dd>
+                        <dt>Dur Reduction:</dt>
+                        <dd>{{$itemAffix->dur_reduction * 100}}%</dd>
+                        <dt>Int Reduction:</dt>
+                        <dd>{{$itemAffix->int_reduction * 100}}%</dd>
+                        <dt>Chr Reduction:</dt>
+                        <dd>{{$itemAffix->chr_reduction * 100}}%</dd>
+                        <dt>Agi Reduction:</dt>
+                        <dd>{{$itemAffix->agi_reduction * 100}}%</dd>
+                        <dt>Focus Reduction:</dt>
+                        <dd>{{$itemAffix->focus_reduction * 100}}%</dd>
                     </dl>
                 </div>
                 <div class='block md:hidden border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
@@ -89,24 +110,15 @@
                 title="Damage Info"
                 buttons="false"
             >
-                <p class="mt-4 mb-4">
-                    Affixes such as these will fire automatically. However, enemies can outright
-                    resist the damage done. All enemies have a % of resistance against affixes. Celestials have a higher
-                    amount of resistance than regular dropdown critters.
-                </p>
-                <p class="mb-4">
-                    Unlike artifact Annulment and Spell Evasion, the resistance will not reduce damage done, instead it will
-                    out right nullify the damage. If the enchantment is marked as irresistible damage, then the enemy cannot resist
-                    the incoming damage.
-                </p>
-                <p class="mb-4">
-                    These affixes will fire, regardless if you miss or hit. These affixes cannot stack unless otherwise stated.
-                    That means, having multiple will do nothing, you'll take the highest of all non stacking damaging affixes.
-                </p>
-                <p class="mb-4">
-                    With the right quest item, you can make all damage from all affixes Irresistible.
-                </p>
-                <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                <x-core.alerts.warning-alert title="ATTN!">
+                    <p class="my-2">
+                        Some damage based affixes can stack - which is outlined below. Those that can stack are able to be resisted
+                        by the enemy. 
+                    </p>
+                    <p>
+                        Those that do not stack, are irresistible and cannot be blocked.
+                    </p>
+                </x-core.alerts.warning-alert>
                 <dl>
                     <dt>Damage:</dt>
                     <dd>{{number_format($itemAffix->damage)}}</dd>
@@ -117,55 +129,16 @@
                 </dl>
             </x-core.cards.card-with-title>
         @endif
-        @if ($itemAffix->reduces_enemy_stats)
-            <x-core.cards.card-with-title
-                title="Enemy Stat Reduction"
-                buttons="false"
-            >
-                <p class="mt-4 mb-4">
-                    Affixes that reduce stats can and cannot stack. For example: Prefixes cannot stack, but Suffixes can.
-                </p>
-                <p class="mb-4">
-                    If you have multiple prefixes attached that reduce all enemy stats, we will take the first one. Doesn't matter
-                    what it is.
-                </p>
-                <p class="mb-4">
-                    Stat reduction is applied before anything else is done, but can be resisted unless you have the appropriate quest item.
-                </p>
-                <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-                <dl>
-                    <dt>Str Reduction:</dt>
-                    <dd>{{$itemAffix->str_reduction * 100}}%</dd>
-                    <dt>Dex Reduction:</dt>
-                    <dd>{{$itemAffix->dex_reduction * 100}}%</dd>
-                    <dt>Dur Reduction:</dt>
-                    <dd>{{$itemAffix->dur_reduction * 100}}%</dd>
-                    <dt>Int Reduction:</dt>
-                    <dd>{{$itemAffix->int_reduction * 100}}%</dd>
-                    <dt>Chr Reduction:</dt>
-                    <dd>{{$itemAffix->chr_reduction * 100}}%</dd>
-                    <dt>Agi Reduction:</dt>
-                    <dd>{{$itemAffix->agi_reduction * 100}}%</dd>
-                    <dt>Focus Reduction:</dt>
-                    <dd>{{$itemAffix->focus_reduction * 100}}%</dd>
-                </dl>
-            </x-core.cards.card-with-title>.
-        @endif
         @if (!is_null($itemAffix->steal_life_amount))
             <x-core.cards.card-with-title
                 title="Life Stealing"
                 buttons="false"
             >
-                <p class="mt-4 mb-4">
-                    These Affixes can and cannot stack. If you are a vampire they will stack and you have a chance for them to fire twice.
-                    The first time they can fire is during the attack and the second time is after the enemy's round if you or
-                    the enemy is still alive.
-                </p>
-                <p class="mb-4">
-                    If you are <strong>not</strong> a vampire, these affixes will
-                    <strong>NOT</strong> stack. Instead, we will use your highest, and it will only fire after the enemy attack.
-                </p>
-                <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                <x-core.alerts.warning-alert title="ATTN!">
+                    These affixes will only stack, both stat increase and life stealing, for Vampire classes.
+                    For other classes, we will take the Lifestealing Affix attached. The durability will 
+                    stack when calculating your durability and therfor your health - for all classes.
+                </x-core.alerts.warning-alert>
                 <dl>
                     <dt>Steal Life Amount:</dt>
                     <dd>{{$itemAffix->steal_life_amount * 100}}%</dd>
@@ -177,10 +150,10 @@
                 title="Entrance Chance"
                 buttons="false"
             >
-                <p class="mt-4 mb-4">
-                    These Affixes do not stack. You have percentage chance to entrance the enemy so they cannot block or be missed.
-                </p>
-                <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                <x-core.alerts.warning-alert title="ATTN!">
+                    These Affixes will not stack. Entrancing the enemy makes it so your attack cannot be blocked and will not miss. The higher the chance,
+                    the more possibility you have of entrancing the enemy.
+                </x-core.alerts.warning-alert>
                 <dl>
                     <dt>Entrance Chance:</dt>
                     <dd>{{$itemAffix->entranced_chance * 100}}%</dd>
@@ -192,12 +165,10 @@
                 title="Devouring Light"
                 buttons="false"
             >
-                <p class="mt-4 mb-4">
-                    These Affixes do not stack. You have a percentage chance to void the enemy of using their affixes. Some higher level critters
-                    have a small chance to void you, while Celestials have a much higher chance. If you are voided, you lose all enchantments, no life stealing,
-                    no modded stats and no boons.
-                </p>
-                <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                <x-core.alerts.warning-alert title="ATTN!">
+                    These Affixes will not stack. Devouring light allows you to void the enemy, which prevents them from using enchantments, life stealing and - more importantly - from voiding you,
+                    which essentially weakens you as your enchantments become useless.
+                </x-core.alerts.warning-alert>
                 <dl>
                     <dt>Devouring Light Chance:</dt>
                     <dd>{{$itemAffix->devouring_light * 100}}%</dd>
@@ -209,11 +180,10 @@
                 title="Enemy Skill Reduction"
                 buttons="false"
             >
-                <p class="mt-4 mb-4">
-                    These Affixes only affect enemies and can reduce ALL their skills at once by a specified %. These affixes work
-                    in the same vein as stat reduction affixes, however these do not stack. We take the best one of all you have on.
-                </p>
-                <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                <x-core.alerts.warning-alert title="ATTN!">
+                    These Affixes will not stack. These can reduce the base skills of en 
+                    enemy such as Acuracy, needed to hit you or Dodge - used to get out the way of your attack.
+                </x-core.alerts.warning-alert>
                 <dl>
                     <dt>Skills Affected:</dt>
                     <dd>Accuracy, Dodge, Casting Accuracy and Criticality</dd>
@@ -227,16 +197,15 @@
                 title="Enemy Resistance Reduction"
                 buttons="false"
             >
-                <p class="mt-4 mb-4">These affixes do not stack and only effect the enemy. These reduce the following resistances that all enemies have:</p>
-                <ul class="mb-4 list-disc ml-[20px]">
-                    <li>Spell Evasion</li>
-                    <li>Affix Resistance</li>
-                    <li>Ambush Resistance</li>
-                    <li>Counter Resistance</li>
-                </ul>
-                <p class="mb-4">Should you have many equipped, we will take the best one of them all.</p>
-                <p class="mb-4">Much like skill reduction and stat reduction these are applied only if you are not voided and before the fight begins.</p>
-                <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
+                <x-core.alerts.warning-alert title="ATTN!">
+                    <p class='my-2'>These Affixes will not stack. The following resistances are reduced makig it easier for specific abilities to land:</p>
+                    <ul class="mb-4 list-disc ml-[20px]">
+                        <li>Spell Evasion</li>
+                        <li>Affix Resistance</li>
+                        <li>Ambush Resistance</li>
+                        <li>Counter Resistance</li>
+                    </ul>
+                </x-core.alerts.warning-alert>
                 <dl>
                     <dt>Resistance Reduction:</dt>
                     <dd>{{$itemAffix->resistance_reduction * 100}}%</dd>

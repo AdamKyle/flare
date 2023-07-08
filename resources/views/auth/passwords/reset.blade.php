@@ -1,69 +1,67 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container small-container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="row page-titles">
-                <div class="col-md-6 align-self-right">
-                    <h4 class="mt-2">Reset Password</h4>
-                </div>
+    <div class="container flex items-center justify-center">
+        <div class="w-full md:w-1/2 xl:w-1/3">
+            <div class="mx-5 md:mx-10">
+                <h2 class="uppercase">Rest Your Password</h2>
+                <h4 class="uppercase">Come back and advanture with us!</h4>
             </div>
 
-            <div class="card">
-                <div class="card-body">
-                    <form method="POST" action="{{ route('password.update') }}">
-                        @csrf
+            @if (config('app.disabled_reg_and_login'))
+                <x-core.alerts.info-alert title="ATTN!">
+                    Deepest apologizes, however Planes of Tlessa is currently down for maintenance and unlike other deployments,
+                    this one has had to disable the Registration and Login for a short time. We promise to be back up and running soon
+                    and hope to see you all in-game soon. For more info, please check <a href="https://discord.gg/hcwdqJUerh" target="_blank">Discord.</a>
+                </x-core.alerts.info-alert>
+            @endif
 
-                        <input type="hidden" name="token" value="{{ $token }}">
+            <x-core.cards.form-card css="mt-5 p-5 md:p-10" method="POST" action="{{ route('password.update') }}">
+                @csrf
 
-                        <div class="form-group row">
-                            <label for="email" class="col-md-4 col-form-label text-md-right">{{ __('E-Mail Address') }}</label>
+                <input type="hidden" name="token" value="{{ $token }}">
 
-                            <div class="col-md-6">
-                                <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ $email ?? old('email') }}" required autocomplete="email" autofocus>
+                @if (session('status'))
+                    <x-core.alerts.success-alert>
+                        {{ session('status') }}
+                    </x-core.alerts.success-alert>
+                @endif
 
-                                @error('email')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <label for="password" class="col-md-4 col-form-label text-md-right">{{ __('Password') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="new-password">
-
-                                @error('password')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <label for="password-confirm" class="col-md-4 col-form-label text-md-right">{{ __('Confirm Password') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required autocomplete="new-password">
-                            </div>
-                        </div>
-
-                        <div class="form-group row mb-0">
-                            <div class="col-md-6 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
-                                    {{ __('Reset Password') }}
-                                </button>
-                            </div>
-                        </div>
-                    </form>
+                <div class="mb-5">
+                    <label class="label block mb-2" for="name">{{ __('E-Mail Address') }}</label>
+                    <input id="name" type="email" class="form-control" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
+                    @error('email')
+                    <div class="text-red-800 dark:text-red-500 pt-3" role="alert">
+                        <strong>{{$message}}</strong>
+                    </div>
+                    @enderror
                 </div>
-            </div>
+                <div class="mb-5">
+                    <label for="password" class="col-md-4 col-form-label text-md-right">{{ __('Password') }}</label>
+                    <input id="password" type="password" class="form-control" name="password" required autocomplete="new-password" autofocus>
+                    @error('password')
+                    <div class="text-red-800 dark:text-red-500 pt-3" role="alert">
+                        <strong>{{$message}}</strong>
+                    </div>
+                    @enderror
+                </div>
+                <div class="mb-5">
+                    <label for="password_confirmation" class="col-md-4 col-form-label text-md-right">{{ __('Confirm Password') }}</label>
+                    <input id="password" type="password" class="form-control" name="password_confirmation" required autocomplete="new-password" autofocus>
+                    @error('password_confirmation')
+                    <div class="text-red-800 dark:text-red-500 pt-3" role="alert">
+                        <strong>{{$message}}</strong>
+                    </div>
+                    @enderror
+                </div>
+                <div class="grid lg:grid-cols-1 gap-3">
+                    <x-core.buttons.primary-button css="ltr:ml-auto rtl:mr-auto uppercase" type="submit">Reset Password</x-core.buttons.primary-button>
+
+                    <a href="/information/account-deletion" class="ml-2" target="_blank">
+                        Account Deletion <i class="fas fa-external-link-alt"></i>
+                    </a>
+                </div>
+            </x-core.cards.form-card>
         </div>
     </div>
-</div>
 @endsection
