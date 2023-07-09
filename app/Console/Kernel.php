@@ -46,9 +46,6 @@ class Kernel extends ConsoleKernel {
         // Fix Character Gold every 5 minutes.
         $schedule->command('fix:character-gold')->everyFiveMinutes();
 
-        // Increase max level every month.
-        $schedule->command('increase:max_level')->monthly()->timezone(config('app.timezone'));
-
         /**
          * Game Events:
          */

@@ -1,7 +1,6 @@
 <?php
 namespace Database\Seeders;
 
-use CreateGameSkills;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -19,6 +18,8 @@ class DatabaseSeeder extends Seeder
             CreateClasses::class,
             GameSkillsSeeder::class,
             CreatePortLocationsSeeder::class,
+            SetMaxLevelSeeder::class,
+            SetupRankFightsSeeder::class,
         ]);
     }
 }

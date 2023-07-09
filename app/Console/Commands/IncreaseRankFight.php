@@ -34,16 +34,6 @@ class IncreaseRankFight extends Command
 
         $currentRank = RankFight::first();
 
-        if (is_null($currentRank)) {
-            RankFight::create([
-                'current_rank' => 10,
-            ]);
-
-            Artisan::call('generate:monster-cache');
-
-            return;
-        }
-
         if ($currentRank->current_rank < 50) {
             $currentRank->update([
                 'current_rank' => $currentRank->current_rank + 1,
