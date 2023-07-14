@@ -23,7 +23,7 @@ class EventsController extends Controller {
      */
     public function exportInfo() {
 
-        $response = Excel::download(new EventsExport(), 'Scheduled Events.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+        $response = Excel::download(new EventsExport(), 'scheduled_events.xlsx', \Maatwebsite\Excel\Excel::XLSX);
         ob_end_clean();
 
         return $response;

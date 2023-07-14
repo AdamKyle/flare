@@ -31,7 +31,7 @@ class GuideQuestsController extends Controller {
     }
 
     public function export() {
-        $response = Excel::download(new GuideQuestsExport(), 'guide-quests.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+        $response = Excel::download(new GuideQuestsExport(), 'guide_quests.xlsx', \Maatwebsite\Excel\Excel::XLSX);
         ob_end_clean();
 
         return $response;

@@ -13,12 +13,14 @@ class LocationType {
     const GOLD_MINES            = 1;
     const PURGATORY_DUNGEONS    = 2;
     const UNDERWATER_CAVES      = 3;
+    const TEAR_FABRIC_TIME      = 4;
 
     protected static $values = [
         0 => self::PURGATORY_SMITH_HOUSE,
         1 => self::GOLD_MINES,
         2 => self::PURGATORY_DUNGEONS,
         3 => self::UNDERWATER_CAVES,
+        4 => self::TEAR_FABRIC_TIME
     ];
 
     /**
@@ -29,6 +31,7 @@ class LocationType {
         self::GOLD_MINES            => 'Gold Mines',
         self::PURGATORY_DUNGEONS    => 'Purgatory Dungeons',
         self::UNDERWATER_CAVES      => 'Underwater Caves',
+        self::TEAR_FABRIC_TIME      => 'Tear in the fabrice of time',
     ];
 
     /**

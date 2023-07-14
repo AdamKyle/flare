@@ -194,6 +194,7 @@ return [
         App\Flare\Providers\EventsProvider::class,
         App\Flare\MapGenerator\Providers\ServiceProvider::class,
         App\Flare\AffixGenerator\Providers\ServiceProvider::class,
+        App\Flare\GameImporter\Providers\ServiceProvider::class,
 
         /**
          * Component Related
@@ -212,7 +213,7 @@ return [
         App\Game\Battle\Providers\EventsProvider::class,
 
         /**
-         * Game Core Providers
+         * Gem Acrions
          */
         \App\Game\Gems\Providers\ServiceProvider::class,
 

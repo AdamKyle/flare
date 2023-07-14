@@ -36,6 +36,7 @@
             <td>{{$quest->id}}</td>
             <td>{{$quest->name}}</td>
             <td>{{$quest->npc->id}}</td>
+            <td>{{!is_null($quest->raid) ? $quest->raid->name : ''}}</td>
             <td>{{!is_null($quest->item) ? $quest->item->name : ''}}</td>
             <td>{{$quest->gold_dust_cost}}</td>
             <td>{{$quest->shard_cost}}</td>

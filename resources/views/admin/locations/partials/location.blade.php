@@ -1,8 +1,4 @@
-<x-core.cards.card-with-title
-    title="{{$location->name}}"
-    buttons="false"
->
-    <p class="mb-4">{{$location->description}}</p>
+<p class="mb-4">{{$location->description}}</p>
     <dl class="mb-4">
         <dt>Location X Coordinate:</dt>
         <dd>{{$location->x}}</dd>
@@ -45,7 +41,7 @@
             'locationId' => $location->id,
         ])
     @endif
-</x-core.cards.card-with-title>
+</p>
 
 @if (!is_null($location->questRewardItem))
     <x-core.alerts.info-alert title="Game Tip">
