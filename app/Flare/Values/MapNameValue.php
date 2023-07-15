@@ -41,7 +41,10 @@ class MapNameValue {
         self::PURGATORY => '#000000',
     ];
 
-    public static $mapModifiers = [
+    /**
+     * @var array $mapModifiers
+     */
+    public static array $mapModifiers = [
         self::SURFACE => [
             'xp_bonus'                     => 0.0,
             'skill_training_bonus'         => 0.0,
@@ -58,7 +61,7 @@ class MapNameValue {
             'character_attack_reduction'   => 0.0,
             'required_location_id'         => 0.0,
         ]
-    ]
+    ];
 
     /**
      *
@@ -102,17 +105,6 @@ class MapNameValue {
 
     public function getMapModifers(): array {
         switch ($this->value) {
-            case self::SURFACE:
-            case self::LABYRINTH:
-            case self::DUNGEONS:
-                return [
-                    'xp_bonus'                     => 0.0,
-                    'skill_training_bonus'         => 0.0,
-                    'drop_chance_bonus'            => 0.0,
-                    'enemy_stat_bonus'             => 0.0,
-                    'character_attack_reduction'   => 0.0,
-                    'required_location_id'         => null,
-                ];
             case self::SHADOW_PLANE:
                 return [
                     'xp_bonus'                     => 0.05,
@@ -138,7 +130,19 @@ class MapNameValue {
                     'drop_chance_bonus'            => 0.30,
                     'enemy_stat_bonus'             => 0.30,
                     'character_attack_reduction'   => 0.25,
-                    'required_location_id'         => Location::where('type', LocationType::),
+                    'required_location_id'         => Location::where('type', LocationType::TEAR_FABRIC_TIME),
+                ];
+            case self::SURFACE:
+            case self::LABYRINTH:
+            case self::DUNGEONS:
+            default:
+                return [
+                    'xp_bonus'                     => 0.0,
+                    'skill_training_bonus'         => 0.0,
+                    'drop_chance_bonus'            => 0.0,
+                    'enemy_stat_bonus'             => 0.0,
+                    'character_attack_reduction'   => 0.0,
+                    'required_location_id'         => null,
                 ];
         }
     }

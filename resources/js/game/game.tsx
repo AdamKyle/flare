@@ -158,7 +158,7 @@ export default class Game extends React.Component<GameProps, GameState> {
         });
 
         // @ts-ignore
-        this.characterCurrencies.listen('Game.Core.Events.UpdateCharacterCurrenciesBroadcastevent', (event: any) => {
+        this.characterCurrencies.listen('Game.Core.Events.UpdateCharacterCurrenciesBroadcastEvent', (event: any) => {
             this.setState({
                 character: {...this.state.character, ...event.currencies}
             });

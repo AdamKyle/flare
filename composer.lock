@@ -2189,16 +2189,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v10.14.1",
+            "version": "v10.15.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "6f89a2b74b232d8bf2e1d9ed87e311841263dfcb"
+                "reference": "c7599dc92e04532824bafbd226c2936ce6a905b8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/6f89a2b74b232d8bf2e1d9ed87e311841263dfcb",
-                "reference": "6f89a2b74b232d8bf2e1d9ed87e311841263dfcb",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/c7599dc92e04532824bafbd226c2936ce6a905b8",
+                "reference": "c7599dc92e04532824bafbd226c2936ce6a905b8",
                 "shasum": ""
             },
             "require": {
@@ -2385,7 +2385,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2023-06-28T14:25:16+00:00"
+            "time": "2023-07-11T13:43:52+00:00"
         },
         {
             "name": "laravel/helpers",
@@ -2445,16 +2445,16 @@
         },
         {
             "name": "laravel/horizon",
-            "version": "v5.17.0",
+            "version": "v5.18.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/horizon.git",
-                "reference": "569c7154033679a1ca05b43bfa640cc60aa3b37b"
+                "reference": "b14498a09af826035e46ae8d6b013d0ec849bdb7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/horizon/zipball/569c7154033679a1ca05b43bfa640cc60aa3b37b",
-                "reference": "569c7154033679a1ca05b43bfa640cc60aa3b37b",
+                "url": "https://api.github.com/repos/laravel/horizon/zipball/b14498a09af826035e46ae8d6b013d0ec849bdb7",
+                "reference": "b14498a09af826035e46ae8d6b013d0ec849bdb7",
                 "shasum": ""
             },
             "require": {
@@ -2517,9 +2517,9 @@
             ],
             "support": {
                 "issues": "https://github.com/laravel/horizon/issues",
-                "source": "https://github.com/laravel/horizon/tree/v5.17.0"
+                "source": "https://github.com/laravel/horizon/tree/v5.18.0"
             },
-            "time": "2023-06-13T20:49:30+00:00"
+            "time": "2023-06-30T15:11:51+00:00"
         },
         {
             "name": "laravel/serializable-closure",
@@ -4269,16 +4269,16 @@
         },
         {
             "name": "php-http/discovery",
-            "version": "1.19.0",
+            "version": "1.19.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-http/discovery.git",
-                "reference": "1856a119a0b0ba8da8b5c33c080aa7af8fac25b4"
+                "reference": "57f3de01d32085fea20865f9b16fb0e69347c39e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-http/discovery/zipball/1856a119a0b0ba8da8b5c33c080aa7af8fac25b4",
-                "reference": "1856a119a0b0ba8da8b5c33c080aa7af8fac25b4",
+                "url": "https://api.github.com/repos/php-http/discovery/zipball/57f3de01d32085fea20865f9b16fb0e69347c39e",
+                "reference": "57f3de01d32085fea20865f9b16fb0e69347c39e",
                 "shasum": ""
             },
             "require": {
@@ -4341,9 +4341,9 @@
             ],
             "support": {
                 "issues": "https://github.com/php-http/discovery/issues",
-                "source": "https://github.com/php-http/discovery/tree/1.19.0"
+                "source": "https://github.com/php-http/discovery/tree/1.19.1"
             },
-            "time": "2023-06-19T08:45:36+00:00"
+            "time": "2023-07-11T07:02:26+00:00"
         },
         {
             "name": "php-http/httplug",
@@ -6037,23 +6037,24 @@
         },
         {
             "name": "react/promise",
-            "version": "v2.10.0",
+            "version": "v3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/promise.git",
-                "reference": "f913fb8cceba1e6644b7b90c4bfb678ed8a3ef38"
+                "reference": "c86753c76fd3be465d93b308f18d189f01a22be4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/promise/zipball/f913fb8cceba1e6644b7b90c4bfb678ed8a3ef38",
-                "reference": "f913fb8cceba1e6644b7b90c4bfb678ed8a3ef38",
+                "url": "https://api.github.com/repos/reactphp/promise/zipball/c86753c76fd3be465d93b308f18d189f01a22be4",
+                "reference": "c86753c76fd3be465d93b308f18d189f01a22be4",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.4.0"
+                "php": ">=7.1.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^9.5 || ^5.7 || ^4.8.36"
+                "phpstan/phpstan": "1.10.20 || 1.4.10",
+                "phpunit/phpunit": "^9.5 || ^7.5"
             },
             "type": "library",
             "autoload": {
@@ -6097,7 +6098,7 @@
             ],
             "support": {
                 "issues": "https://github.com/reactphp/promise/issues",
-                "source": "https://github.com/reactphp/promise/tree/v2.10.0"
+                "source": "https://github.com/reactphp/promise/tree/v3.0.0"
             },
             "funding": [
                 {
@@ -6105,7 +6106,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2023-05-02T15:15:43+00:00"
+            "time": "2023-07-11T16:12:49+00:00"
         },
         {
             "name": "react/socket",
@@ -9777,16 +9778,16 @@
         },
         {
             "name": "filp/whoops",
-            "version": "2.15.2",
+            "version": "2.15.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/filp/whoops.git",
-                "reference": "aac9304c5ed61bf7b1b7a6064bf9806ab842ce73"
+                "reference": "c83e88a30524f9360b11f585f71e6b17313b7187"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/filp/whoops/zipball/aac9304c5ed61bf7b1b7a6064bf9806ab842ce73",
-                "reference": "aac9304c5ed61bf7b1b7a6064bf9806ab842ce73",
+                "url": "https://api.github.com/repos/filp/whoops/zipball/c83e88a30524f9360b11f585f71e6b17313b7187",
+                "reference": "c83e88a30524f9360b11f585f71e6b17313b7187",
                 "shasum": ""
             },
             "require": {
@@ -9836,7 +9837,7 @@
             ],
             "support": {
                 "issues": "https://github.com/filp/whoops/issues",
-                "source": "https://github.com/filp/whoops/tree/2.15.2"
+                "source": "https://github.com/filp/whoops/tree/2.15.3"
             },
             "funding": [
                 {
@@ -9844,7 +9845,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-04-12T12:00:00+00:00"
+            "time": "2023-07-13T12:00:00+00:00"
         },
         {
             "name": "hamcrest/hamcrest-php",
@@ -10853,16 +10854,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "10.2.3",
+            "version": "10.2.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "35c8cac1734ede2ae354a6644f7088356ff5b08e"
+                "reference": "15a89f123d8ca9c1e1598d6d87a56a8bf28c72cd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/35c8cac1734ede2ae354a6644f7088356ff5b08e",
-                "reference": "35c8cac1734ede2ae354a6644f7088356ff5b08e",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/15a89f123d8ca9c1e1598d6d87a56a8bf28c72cd",
+                "reference": "15a89f123d8ca9c1e1598d6d87a56a8bf28c72cd",
                 "shasum": ""
             },
             "require": {
@@ -10934,7 +10935,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/10.2.3"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/10.2.5"
             },
             "funding": [
                 {
@@ -10950,7 +10951,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-06-30T06:17:38+00:00"
+            "time": "2023-07-14T04:18:47+00:00"
         },
         {
             "name": "sebastian/cli-parser",

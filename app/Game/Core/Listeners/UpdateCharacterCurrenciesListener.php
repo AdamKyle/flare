@@ -7,6 +7,7 @@ use League\Fractal\Resource\Item;
 use League\Fractal\Manager;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Transformers\CharacterTopBarTransformer;
+use App\Game\Core\Events\UpdateCharacterCurrenciesBroadcastEvent;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Events\UpdateTopBarBroadcastEvent;
@@ -40,9 +41,9 @@ class UpdateCharacterCurrenciesListener {
      * @return void
      */
     public function handle(UpdateCharacterCurrenciesEvent $event): void {
-        $character = new Item($event->character, $this->characterCurrenciesTransformer);
-        $character = $this->manager->createData($character)->toArray();
+        $characterCurrencies = new Item($event->character, $this->characterCurrenciesTransformer);
+        $characterCurrencies = $this->manager->createData($characterCurrencies)->toArray();
 
-        broadcast(new UpdateTopBarBroadcastEvent($character, $event->character->user));
+        broadcast(new UpdateCharacterCurrenciesBroadcastEvent($characterCurrencies, $event->character->user));
     }
 }
