@@ -10,7 +10,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Admin\Services\LocationService;
 use App\Flare\Values\LocationEffectValue;
 use App\Admin\Exports\Locations\LocationsExport;
-use App\Admin\Import\Npcs\LocationsImport;
+use App\Admin\Import\Locations\LocationsImport;
 use App\Admin\Requests\LocationsImportRequest;
 
 class LocationsController extends Controller {

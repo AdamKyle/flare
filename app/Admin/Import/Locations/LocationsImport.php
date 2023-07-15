@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Admin\Import\Npcs;
+namespace App\Admin\Import\Locations;
 
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 use App\Admin\Import\Locations\Sheets\LocationsSheet;
