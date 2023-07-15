@@ -2,12 +2,13 @@
 
 namespace App\Flare\GameImporter\Console\Commands;
 
+use App\Flare\Models\GameMap;
 use App\Flare\Models\InfoPage;
 use Illuminate\Console\Command;
+use App\Flare\Values\MapNameValue;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use App\Flare\GameImporter\Values\ExcelMapper;
-use App\Flare\Values\MapNameValue;
 
 class ImportGameData extends Command {
 
@@ -30,22 +31,36 @@ class ImportGameData extends Command {
      */
     public function handle(ExcelMapper $excelMapper) {
 
-        dd($this->importGameMaps());
+        $this->line('Fetching files ...');
 
         $files    = $this->fetchFiles();
+
+        $this->line('Importing non map speficic data ...');
 
         $this->import($excelMapper, $files['Core Imports'], 'Core Imports');
         $this->import($excelMapper, $files['Skills'], 'Skills');
         $this->import($excelMapper, $files['Items'], 'Items');
         $this->import($excelMapper, $files['Affixes'], 'Affixes');
-        $this->import($excelMapper, $files['Monsters'], 'Monsters');
         $this->import($excelMapper, $files['Kingdoms'], 'Kingdoms');
+
+        $this->line('Importing maps ...');
+        
+        // Import maps:
+        $this->importGameMaps();
+
+        $this->line('Importing map spefic data ...');
+
+        // This stuff depends on maps existing.
         $this->import($excelMapper, $files['.'], '.');
+        $this->import($excelMapper, $files['Monsters'], 'Monsters');
         $this->import($excelMapper, $files['Admin Section'], 'Admin Section');
 
-        // Import information section:
+        $this->line('Importing Infromation section ...');
+
+        // Import the information wiki
         $this->importInformationSection();
 
+        $this->line('Finished the import ...');
     }
 
     /**
@@ -104,9 +119,15 @@ class ImportGameData extends Command {
     protected function importInformationSection(): void {
         $data = Storage::disk('data-imports')->get('/Admin Section/information.json');
 
-        foreach ($data as $key => $modelEntry) {
+        $data = json_decode(trim($data), true);
+
+        foreach ($data as $modelEntry) {
             InfoPage::updateOrCreate(['id' => $modelEntry['id']], $modelEntry);
         }
+
+        $pathToBackup = resource_path('backup/info-sections-images');
+
+        File::copyDirectory($pathToBackup, storage_path('app/public'));
     }
 
     /**
@@ -120,14 +141,20 @@ class ImportGameData extends Command {
         foreach ($files as $file) {
             $fileName = pathinfo($file->getFilename(), PATHINFO_FILENAME);
 
-            $path = Storage::disk('maps')->putFile($fileName, $file);
+            $path     = Storage::disk('maps')->putFile($fileName, $file);
+
+            $mapValue = new MapNameValue($fileName);
 
             $gameMapData = [
                 'name'          => $fileName,
                 'path'          => $path,
-                'default'       => (new MapNameValue($fileName))->isSurface(),
+                'default'       => $mapValue->isSurface(),
                 'kingdom_color' => MapNameValue::$kingdomColors[$fileName],
             ];
+
+            $gameMapData = array_merge($gameMapData, $mapValue->getMapModifers());
+
+            GameMap::create($gameMapData);
         }
     }
 }

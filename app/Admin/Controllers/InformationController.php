@@ -32,7 +32,7 @@ class InformationController extends Controller {
 
         $data = json_decode(trim($request->file('info_import')->get()), true);
 
-        foreach ($data as $key => $modelEntry) {
+        foreach ($data as $modelEntry) {
             InfoPage::updateOrCreate(['id' => $modelEntry['id']], $modelEntry);
         }
 

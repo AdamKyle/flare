@@ -28,7 +28,7 @@ class NpcsSheet implements ToCollection {
         foreach ($buildingData as $key => $value) {
             if (!is_null($value)) {
                 if ($key === 'game_map_id') {
-                    $gameMap = GameMap::find($value);
+                    $gameMap = GameMap::where('name', $value)->first();
 
                     if (is_null($gameMap)) {
                         return []; // Map does not exist: Bail.

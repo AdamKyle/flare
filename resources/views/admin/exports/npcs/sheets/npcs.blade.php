@@ -20,7 +20,7 @@
             <td>{{$npc->name}}</td>
             <td>{{$npc->real_name}}</td>
             <td>{{$npc->type}}</td>
-            <td>{{$npc->game_map_id}}</td>
+            <td>{{!is_null($npc->game_map_id) ? $npc->gameMap->name : ''}}</td>
             <td>{{$npc->moves_around_map}}</td>
             <td>{{$npc->must_be_at_same_location}}</td>
             <td>{{$npc->text_command_to_message}}</td>

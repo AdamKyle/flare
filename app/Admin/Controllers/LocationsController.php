@@ -2,12 +2,16 @@
 
 namespace App\Admin\Controllers;
 
-use App\Admin\Services\LocationService;
-use App\Flare\Values\LocationEffectValue;
+use Illuminate\Http\Request;
+use App\Flare\Models\Location;
 use App\Flare\Values\LocationType;
 use App\Http\Controllers\Controller;
-use App\Flare\Models\Location;
-use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Admin\Services\LocationService;
+use App\Flare\Values\LocationEffectValue;
+use App\Admin\Exports\Locations\LocationsExport;
+use App\Admin\Import\Npcs\LocationsImport;
+use App\Admin\Requests\LocationsImportRequest;
 
 class LocationsController extends Controller {
 
@@ -58,5 +62,32 @@ class LocationsController extends Controller {
             'increasesDropChanceBy'    => $increasesDropChanceBy,
             'locationType'             => $locationType,
         ]);
+    }
+
+    public function exportLocations() {
+        return view('admin.locations.export');
+    }
+
+    public function importLocations() {
+        return view('admin.locations.import');
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    public function export() {
+        $response = Excel::download(new LocationsExport, 'locations.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+        ob_end_clean();
+
+        return $response;
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    public function import(LocationsImportRequest $request) {
+        Excel::import(new LocationsImport, $request->locations_import);
+
+        return redirect()->back()->with('success', 'imported location data.');
     }
 }

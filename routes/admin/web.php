@@ -18,6 +18,11 @@ Route::middleware(['auth', 'is.admin'])->group(function() {
     Route::post('/admin/maps/process-upload', ['as' => 'upload.map', 'uses' => 'MapsController@upload']);
     Route::post('/admin/maps/{gameMap}/post-bonuses', ['as' => 'add.map.bonuses', 'uses' => 'MapsController@postBonuses']);
 
+    Route::get('/admin/locations/export-locations', ['as' => 'locations.export', 'uses' => 'LocationsController@exportLocations']);
+    Route::get('/admin/locations/import-locations', ['as' => 'locations.import', 'uses' => 'LocationsController@importLocations']);
+    Route::post('/admin/locations/export-data', ['as' => 'locations.export-data', 'uses' => 'LocationsController@export']);
+    Route::post('/admin/locations/import-data', ['as' => 'locations.import-data', 'uses' => 'LocationsController@importData']);
+
     Route::get('/admin/locations', ['as' => 'locations.list', 'uses' => 'LocationsController@index']);
     Route::get('/admin/locations/create', ['as' => 'locations.create', 'uses' => 'LocationsController@create']);
     Route::get('/admin/location/{location}', ['as' => 'locations.location', 'uses' => 'LocationsController@show']);
